@@ -16,27 +16,27 @@ return [
     'backend' => [
         'access' => [
             'users' => [
-                'activate' => 'Ativar',
-                'change_password' => 'Alterar senha',
-                'deactivate' => 'Desativar',
-                'delete_permanently' => 'Excluir Permanentemente',
-                'resend_email' => 'Reenviar e-mail de confirmação',
-                'restore_user' => 'Restaurar Usuário',
+                'activate' => 'Activate',
+                'change_password' => 'Change Password',
+                'deactivate' => 'Deactivate',
+                'delete_permanently' => 'Delete Permanently',
+                'resend_email' => 'Resend Confirmation E-mail',
+                'restore_user' => 'Restore User',
             ],
         ],
     ],
 
     'general' => [
-        'cancel' => 'Cancelar',
+        'cancel' => 'Cancel',
 
         'crud' => [
-            'create' => 'Criar',
-            'delete' => 'Excluir',
-            'edit' => 'Editar',
-            'update' => 'Atualizar',
+            'create' => 'Create',
+            'delete' => 'Delete',
+            'edit' => 'Edit',
+            'update' => 'Update',
         ],
 
-        'save' => 'Salvar',
-        'view' => 'Visualizar',
+        'save' => 'Save',
+        'view' => 'View',
     ],
 ];

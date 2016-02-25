@@ -28,12 +28,8 @@ return [
          * Index 0 of sub-array is the Carbon locale code
          * Index 1 of sub-array is the PHP locale code for setlocale()
          */
-        'de'    => ['de', 'de_DE'],
         'en'    => ['en', 'en_US'],
-        'es'    => ['es', 'es_ES'],
         'fr'    => ['fr', 'fr_FR'],
-        'it'    => ['it', 'it_IT'],
-        'pt-BR' => ['pt_BR', 'pt_BR'],
-        'sv'    => ['sv', 'sv_SE'],
+        'kh'    => ['kh', 'kh_KH'],
     ],
 ];
