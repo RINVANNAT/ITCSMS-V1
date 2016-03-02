@@ -26,7 +26,8 @@ elixir(function(mix) {
       */
      .sass([
         'frontend/app.scss',
-        'plugin/sweetalert/sweetalert.scss'
+        'plugin/sweetalert/sweetalert.scss',
+        'font.scss'
      ], 'resources/assets/css/frontend/app.css')
 
      /**

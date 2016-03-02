@@ -56,6 +56,14 @@ return [
             'logs' => 'Logs',
         ],
 
+        'configuration' => [
+            'main' => 'Configuration',
+            'departments'=> 'Departments',
+            'grades'=> 'Grades',
+            'degrees' => 'Degrees',
+            'academic_years' => 'Academic Years'
+        ],
+
         'sidebar' => [
             'dashboard' => 'Dashboard',
             'general' => 'General',

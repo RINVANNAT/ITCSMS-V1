@@ -85,12 +85,54 @@ return [
         /*
          * Whether or not the user has to confirm their email when signing up
          */
-        'confirm_email' => true,
+        'confirm_email' => false,
 
         /*
          * Whether or not the users email can be changed on the edit profile screen
          */
         'change_email' => false,
+    ],
+
+    'departments' =>[
+        'department_gca'=> 1,
+        'department_gci'=> 2,
+        'department_gee'=> 3,
+        'department_gic'=> 4,
+        'department_gim'=> 5,
+        'department_gru'=> 6,
+        'department_ggg'=> 7,
+        'department_tc'=> 8,
+        'department_finance' => 9,
+        'department_study_affair'=>10
+    ],
+    'genders' => [
+        'gender_male'=> 1,
+        'gender_female'=> 2,
+    ],
+    'degrees' => [
+        'degree_engineer'=> 1,
+        'degree_associate'=> 3,
+        'degree_bachelor'=> 4,
+        'degree_master'=>5,
+        'degree_doctor'=> 6,
+    ],
+    'grades' => [
+        'grade_1'=> 1,
+        'grade_2'=> 2,
+        'grade_3'=> 3,
+        'grade_4'=> 4,
+        'grade_5'=> 5,
+    ],
+    'income_type'=> [
+        'income_type_student_day'=>1,
+        'income_type_student_night'=>2,
+        'income_type_student_master'=>3,
+    ],
+
+    'account'=>[
+        'account_day_student'=>1,
+        'account_night_student'=>2,
+        'account_master_student'=>3,
     ],
 
     /*

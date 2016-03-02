@@ -1,4 +1,22 @@
 @extends('frontend.layouts.master')
+@section('after-styles-end')
+    <style>
+        .feature-item {
+            margin-bottom: 40px;
+            text-align: center;
+        }
+
+        .feature-item .fa {
+            font-size: 25px;
+            border-radius: 5px;
+            color: #3c8dbc;
+            display: block;
+            margin: 0 auto;
+            transition: background-color 0.25s linear;
+        }
+    </style>
+@endsection
+
 
 @section('content')
     <div class="row">
@@ -17,178 +35,124 @@
 
         </div><!-- col-md-10 -->
 
-        @role('Administrator')
-        {{-- You can also send through the Role ID --}}
+        <div class="col-md-12">
+            <h2 class="text-center" style="margin-bottom: 40px"><b>ITC-SMS</b> Features</h2>
 
-        <div class="col-md-10 col-md-offset-1">
+            <div class="row">
+                <div class="col-xs-12 col-sm-6 col-md-4">
+                    <div class="feature-item animated fadeInUp delay-3">
+                        <i class="fa fa-css3"></i>
+                        <h4>Entrance Exam</h4>
 
-            <div class="panel panel-default">
-                <div class="panel-heading"><i class="fa fa-home"></i> {{ trans('strings.frontend.tests.based_on.role') . trans('strings.frontend.tests.using_blade_extensions') }}</div>
-
-                <div class="panel-body">
-                    {{ trans('strings.frontend.test') . ' 1: ' . trans('strings.frontend.tests.you_can_see_because', ['role' => trans('roles.administrator')]) }}
+                        <p>
+                            Register new candidate, validate score, and generate successful student to enter itc for the new academic.
+                        </p>
+                    </div>
                 </div>
-            </div><!-- panel -->
+                <!-- /.item -->
 
-        </div><!-- col-md-10 -->
-        @endauth
+                <div class="col-xs-12 col-sm-6 col-md-4">
+                    <div class="feature-item animated fadeInUp delay-3">
+                        <i class="fa fa-laptop"></i>
+                        <h4>Student Payment</h4>
 
-        @if (access()->hasRole('Administrator'))
-            <div class="col-md-10 col-md-offset-1">
-
-                <div class="panel panel-default">
-                    <div class="panel-heading"><i class="fa fa-home"></i> {{ trans('strings.frontend.tests.based_on.role') . trans('strings.frontend.tests.using_access_helper.role_name') }}</div>
-
-                    <div class="panel-body">
-                        {{ trans('strings.frontend.test') . ' 2: ' . trans('strings.frontend.tests.you_can_see_because', ['role' => trans('roles.administrator')]) }}
+                        <p>
+                            Register and manage the student's payment. It is equipped with reminder and alert to particular student.
+                        </p>
                     </div>
-                </div><!-- panel -->
-
-            </div><!-- col-md-10 -->
-        @endif
-
-        @if (access()->hasRole(1))
-            <div class="col-md-10 col-md-offset-1">
-
-                <div class="panel panel-default">
-                    <div class="panel-heading"><i class="fa fa-home"></i> {{ trans('strings.frontend.tests.based_on.role') . trans('strings.frontend.tests.using_access_helper.role_id') }}</div>
-
-                    <div class="panel-body">
-                        {{ trans('strings.frontend.test') . ' 3: ' . trans('strings.frontend.tests.you_can_see_because', ['role' => trans('roles.administrator')]) }}
-                    </div>
-                </div><!-- panel -->
-
-            </div><!-- col-md-10 -->
-        @endif
-
-        @if (access()->hasRoles(['Administrator', 1]))
-            <div class="col-md-10 col-md-offset-1">
-
-                <div class="panel panel-default">
-                    <div class="panel-heading"><i class="fa fa-home"></i> {{ trans('strings.frontend.tests.based_on.role') . trans('strings.frontend.tests.using_access_helper.array_roles_not') }}</div>
-
-                    <div class="panel-body">
-                        {{ trans('strings.frontend.test') . ' 4: ' . trans('strings.frontend.tests.you_can_see_because', ['role' => trans('roles.administrator')]) }}
-                    </div>
-                </div><!-- panel -->
-
-            </div><!-- col-md-10 -->
-        @endif
-
-        {{-- The second parameter says the user must have all the roles specified. Administrator does not have the role with an id of 2, so this will not show. --}}
-        @if (access()->hasRoles(['Administrator', 2], true))
-            <div class="col-md-10 col-md-offset-1">
-
-                <div class="panel panel-default">
-                    <div class="panel-heading"><i class="fa fa-home"></i> {{ trans('strings.frontend.tests.based_on.role') . trans('strings.frontend.tests.using_access_helper.array_roles') }}</div>
-
-                    <div class="panel-body">
-                        {{ trans('strings.frontend.tests.you_can_see_because', ['role' => trans('roles.administrator')]) }}
-                    </div>
-                </div><!-- panel -->
-
-            </div><!-- col-md-10 -->
-        @endif
-
-        @permission('view-backend')
-            <div class="col-md-10 col-md-offset-1">
-
-                <div class="panel panel-default">
-                    <div class="panel-heading"><i class="fa fa-home"></i> {{ trans('strings.frontend.tests.based_on.permission') . trans('strings.frontend.tests.using_access_helper.permission_name') }}</div>
-
-                    <div class="panel-body">
-                        {{ trans('strings.frontend.test') . ' 5: ' . trans('strings.frontend.tests.you_can_see_because_permission', ['permission' => 'view-backend']) }}
-                    </div>
-                </div><!-- panel -->
-
-            </div><!-- col-md-10 -->
-        @endauth
-
-        @if (access()->hasPermission(1))
-            <div class="col-md-10 col-md-offset-1">
-
-                <div class="panel panel-default">
-                    <div class="panel-heading"><i class="fa fa-home"></i> {{ trans('strings.frontend.tests.based_on.permission') . trans('strings.frontend.tests.using_access_helper.permission_id') }}</div>
-
-                    <div class="panel-body">
-                        {{ trans('strings.frontend.test') . ' 6: ' . trans('strings.frontend.tests.you_can_see_because_permission', ['permission' => 'view_backend']) }}
-                    </div>
-                </div><!-- panel -->
-
-            </div><!-- col-md-10 -->
-        @endif
-
-        @if (access()->hasPermissions(['view-backend', 1]))
-            <div class="col-md-10 col-md-offset-1">
-
-                <div class="panel panel-default">
-                    <div class="panel-heading"><i class="fa fa-home"></i> {{ trans('strings.frontend.tests.based_on.permission') . trans('strings.frontend.tests.using_access_helper.array_permissions_not') }}</div>
-
-                    <div class="panel-body">
-                        {{ trans('strings.frontend.test') . ' 7: ' . trans('strings.frontend.tests.you_can_see_because_permission', ['permission' => 'view_backend']) }}
-                    </div>
-                </div><!-- panel -->
-
-            </div><!-- col-md-10 -->
-        @endif
-
-        @if (access()->hasPermissions(['view-backend', 2], true))
-            <div class="col-md-10 col-md-offset-1">
-
-                <div class="panel panel-default">
-                    <div class="panel-heading"><i class="fa fa-home"></i> {{ trans('strings.frontend.tests.based_on.permission') . trans('strings.frontend.tests.using_access_helper.array_permissions') }}</div>
-
-                    <div class="panel-body">
-                        {{ trans('strings.frontend.tests.you_can_see_because_permission', ['permission' => 'view_backend']) }}
-                    </div>
-                </div><!-- panel -->
-
-            </div><!-- col-md-10 -->
-        @endif
-
-        <div class="col-md-10 col-md-offset-1">
-
-            <div class="panel panel-default">
-                <div class="panel-heading"><i class="fa fa-home"></i> {{ trans('strings.frontend.tests.js_injected_from_controller') }}</div>
-
-                <div class="panel-body">
-                    {{ trans('strings.frontend.test') . ' 8: ' . trans('strings.frontend.tests.view_console_it_works') }}
                 </div>
-            </div><!-- panel -->
+                <!-- /.item -->
+                <div class="clearfix visible-sm"></div>
+                <div class="col-xs-12 col-sm-6 col-md-4">
+                    <div class="feature-item animated fadeInUp delay-3">
+                        <i class="fa fa-rocket"></i>
+                        <h4>Student Management</h4>
 
-        </div><!-- col-md-10 -->
-
-        <div class="col-md-10 col-md-offset-1">
-
-            <div class="panel panel-default">
-                <div class="panel-heading"><i class="fa fa-home"></i> Bootstrap Glyphicon {{ trans('strings.frontend.test') }}</div>
-
-                <div class="panel-body">
-                    <span class="glyphicon glyphicon-search" aria-hidden="true"></span>
-                    <span class="glyphicon glyphicon glyphicon-euro" aria-hidden="true"></span>
-                    <span class="glyphicon glyphicon glyphicon-cloud" aria-hidden="true"></span>
-                    <span class="glyphicon glyphicon glyphicon-envelope" aria-hidden="true"></span>
+                        <p>
+                            Featuring Font Awesome, Ion Icons, and Glyphicons.
+                        </p>
+                    </div>
                 </div>
-            </div><!-- panel -->
+                <!-- /.item -->
+                <div class="clearfix visible-md visible-lg"></div>
+                <div class="col-xs-12 col-sm-6 col-md-4">
+                    <div class="feature-item animated fadeInUp delay-3">
+                        <i class="fa fa-paint-brush"></i>
+                        <h4>Time Table</h4>
 
-        </div><!-- col-md-10 -->
-
-        <div class="col-md-10 col-md-offset-1">
-
-            <div class="panel panel-default">
-                <div class="panel-heading"><i class="fa fa-home"></i> Font Awesome {{ trans('strings.frontend.test') }}</div>
-
-                <div class="panel-body">
-                    <i class="fa fa-home"></i>
-                    <i class="fa fa-facebook"></i>
-                    <i class="fa fa-twitter"></i>
-                    <i class="fa fa-pinterest"></i>
+                        <p>
+                            Choose a skin that matches your branding or
+                            edit the LESS variables to create your own.
+                        </p>
+                    </div>
                 </div>
-            </div><!-- panel -->
+                <!-- /.item -->
+                <div class="clearfix visible-sm"></div>
+                <div class="col-xs-12 col-sm-6 col-md-4">
+                    <div class="feature-item animated fadeInUp delay-3">
+                        <i class="fa fa-print"></i>
+                        <h4>Calendar</h4>
 
-        </div><!-- col-md-10 -->
+                        <p>
+                            Support for printing any page. The invoice page
+                            makes a perfect example.
+                        </p>
+                    </div>
+                </div>
+                <!-- /.item -->
 
-    </div><!--row-->
+                <div class="col-xs-12 col-sm-6 col-md-4">
+                    <div class="feature-item animated fadeInUp delay-3">
+                        <i class="fa fa-bolt"></i>
+                        <h4>Score Management</h4>
+
+                        <p>
+                            Although AdminLTE is full of features, it was
+                            designed to be fast and lightweight.
+                        </p>
+                    </div>
+                </div>
+                <!-- /.item -->
+                <div class="clearfix visible-sm visible-md visible-lg"></div>
+                <div class="col-xs-12 col-sm-6 col-md-4">
+                    <div class="feature-item animated fadeInUp delay-3">
+                        <i class="fa fa-globe"></i>
+                        <h4>Course Management and Assignment</h4>
+
+                        <p>
+                            Support for most major browsers including Safari, IE9+, Chrome, FF, and Opera.
+                        </p>
+                    </div>
+                </div>
+                <!-- /.item -->
+
+                <div class="col-xs-12 col-sm-6 col-md-4">
+                    <div class="feature-item animated fadeInUp delay-3">
+                        <i class="fa fa-th"></i>
+                        <h4>Inventory Management</h4>
+
+                        <p>
+                            Over 18 plugins and an aditional 3 custom made
+                            plugins just for AdminLTE.
+                        </p>
+                    </div>
+                </div>
+                <!-- /.item -->
+                <div class="clearfix visible-sm"></div>
+                <div class="col-xs-12 col-sm-6 col-md-4">
+                    <div class="feature-item animated fadeInUp delay-3">
+                        <i class="fa fa-users"></i>
+                        <h4>Scholarship Managment</h4>
+
+                        <p>
+                            Have a suggestion or an issue?
+                            Visit our <a href="https://github.com/almasaeed2010/AdminLTE/issues">Github</a>
+                            repository to get help.
+                        </p>
+                    </div>
+                </div>
+        </div>
+
 @endsection
 
 @section('after-scripts-end')

@@ -14,15 +14,11 @@
             <a class="navbar-brand" href="{!! route('frontend.index') !!}">
                 {!! app_name() !!}
             </a>
+
         </div><!--navbar-header-->
 
         <div class="collapse navbar-collapse" id="frontend-navbar-collapse">
 
-            <!-- Left Side Of Navbar -->
-            <ul class="nav navbar-nav">
-                <li>{!! link_to_route('frontend.index', trans('navs.frontend.home')) !!}</li>
-                <li>{!! link_to_route('frontend.macros', trans('navs.frontend.macros')) !!}</li>
-            </ul>
 
             <!-- Right Side Of Navbar -->
             <ul class="nav navbar-nav navbar-right">
@@ -41,7 +37,6 @@
                 <!-- Authentication Links -->
                 @if (Auth::guest())
                     <li>{!! link_to('login', trans('navs.frontend.login')) !!}</li>
-                    <li>{!! link_to('register', trans('navs.frontend.register')) !!}</li>
                 @else
                     <li class="dropdown">
                         <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">

@@ -41,6 +41,27 @@
                 </li>
             @endauth
 
+            <li class="{{ Active::pattern('admin/configuration*') }} treeview">
+                <a href="#">
+                    <span>{{ trans('menus.backend.configuration.main') }}</span>
+                    <i class="fa fa-angle-left pull-right"></i>
+                </a>
+                <ul class="treeview-menu {{ Active::pattern('admin/configuration*', 'menu-open') }}" style="display: none; {{ Active::pattern('admin/configuration*', 'display: block;') }}">
+                    <li class="{{ Active::pattern('admin/configuration/departments') }}">
+                        <a href="{!! url('admin/configuration/departments') !!}">{{ trans('menus.backend.configuration.departments') }}</a>
+                    </li>
+                    <li class="{{ Active::pattern('admin/configuration/degrees') }}">
+                        <a href="{!! url('admin/configuration/degrees') !!}">{{ trans('menus.backend.configuration.degrees') }}</a>
+                    </li>
+                    <li class="{{ Active::pattern('admin/configuration/grades') }}">
+                        <a href="{!! url('admin/configuration/grades') !!}">{{ trans('menus.backend.configuration.grades') }}</a>
+                    </li>
+                    <li class="{{ Active::pattern('admin/configuration/academic_years') }}">
+                        <a href="{!! url('admin/configuration/academic_years') !!}">{{ trans('menus.backend.configuration.academic_years') }}</a>
+                    </li>
+                </ul>
+            </li>
+
             <li class="{{ Active::pattern('admin/log-viewer*') }} treeview">
                 <a href="#">
                     <span>{{ trans('menus.backend.log-viewer.main') }}</span>
