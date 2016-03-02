@@ -35,6 +35,9 @@
                 <a href="{!! route('admin.dashboard') !!}"><span>{{ trans('menus.backend.sidebar.dashboard') }}</span></a>
             </li>
 
+            <li class="{{ Active::pattern('admin/student') }}">
+                <a href="{!!url('admin/studentAnnuals')!!}"><span>{{ trans('menus.backend.student.title') }}</span></a>
+            </li>
             @permission('view-access-management')
                 <li class="{{ Active::pattern('admin/access/*') }}">
                     <a href="{!!url('admin/access/users')!!}"><span>{{ trans('menus.backend.access.title') }}</span></a>
@@ -56,8 +59,8 @@
                     <li class="{{ Active::pattern('admin/configuration/grades') }}">
                         <a href="{!! url('admin/configuration/grades') !!}">{{ trans('menus.backend.configuration.grades') }}</a>
                     </li>
-                    <li class="{{ Active::pattern('admin/configuration/academic_years') }}">
-                        <a href="{!! url('admin/configuration/academic_years') !!}">{{ trans('menus.backend.configuration.academic_years') }}</a>
+                    <li class="{{ Active::pattern('admin/configuration/academicYears') }}">
+                        <a href="{!! url('admin/configuration/academicYears') !!}">{{ trans('menus.backend.configuration.academicYears') }}</a>
                     </li>
                 </ul>
             </li>

@@ -43,14 +43,13 @@
 
         <div class="box-body">
             <div>
-                <table class="table table-striped table-bordered table-hover" id="departments-table">
+                <table class="table table-striped table-bordered table-hover" id="students-table">
                     <thead>
                     <tr>
-                        <th>{{ trans('labels.general.id') }}</th>
-                        <th>{{ trans('labels.backend.departments.fields.code') }}</th>
-                        <th>{{ trans('labels.backend.departments.fields.name_kh') }}</th>
-                        <th>{{ trans('labels.backend.departments.fields.name_en') }}</th>
-                        <th>{{ trans('labels.backend.departments.fields.name_fr') }}</th>
+                        <th>{{ trans('labels.backend.students.fields.id_card') }}</th>
+                        <th>{{ trans('labels.backend.students.fields.name_kh') }}</th>
+                        <th>{{ trans('labels.backend.students.fields.name_latin') }}</th>
+                        <th>{{ trans('labels.backend.students.fields.class') }}</th>
                         <th>{{ trans('labels.general.actions') }}</th>
                     </tr>
                     </thead>
@@ -67,18 +66,17 @@
     {!! Html::script('plugins/datatables/dataTables.bootstrap.min.js') !!}
     <script>
         $(function() {
-            $('#departments-table').DataTable({
+
+            $('#students-table').DataTable({
                 processing: true,
                 serverSide: true,
                 pageLength: {!! config('app.records_per_page')!!},
-                ajax: '{!! route('admin.configuration.department.data') !!}',
+                ajax: '{!! route('student_datatable.data') !!}',
                 columns: [
-                    { data: 'id', name: 'id'},
-                    { data: 'code', name: 'code'},
-                    { data: 'name_kh', name: 'name_kh'},
-                    { data: 'name_en', name: 'name_en'},
-                    { data: 'name_fr', name: 'name_fr'},
-                    { data: 'action', name: 'action',orderable: false, searchable: false}
+                    { data: 'id_card', name: 'students.id_card',searchable:false },
+                    { data: 'name_kh', name: 'students.name_kh',searchable:false },
+                    { data: 'name_latin', name: 'students.name_latin', searchable:false},
+                    { data: 'class' , name: 'class', searchable:false}
                 ]
             });
         });

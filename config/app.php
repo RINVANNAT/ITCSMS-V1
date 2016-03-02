@@ -24,6 +24,8 @@ return [
 	*/
     'name' => 'ITC | SMIS',
 
+    'records_per_page' => 25,
+
     /*
     |--------------------------------------------------------------------------
     | Application Debug Mode
@@ -189,6 +191,7 @@ return [
         HieuLe\Active\ActiveServiceProvider::class,
         Laravel\Socialite\SocialiteServiceProvider::class,
         Yajra\Datatables\DatatablesServiceProvider::class,
+        Maatwebsite\Excel\ExcelServiceProvider::class,
 
         /*
          * Has to override the Collective\Html\HtmlServiceProvider form singleton
@@ -251,6 +254,7 @@ return [
         'Html'        => Collective\Html\HtmlFacade::class,
         'Socialite'   => Laravel\Socialite\Facades\Socialite::class,
         'Datatables' => Yajra\Datatables\Datatables::class,
+        'Excel' => Maatwebsite\Excel\Facades\Excel::class,
     ],
 
 ];

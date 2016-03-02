@@ -1,33 +1,12 @@
-<?php
-
-namespace App\Http\Controllers\Backend\Configuration;
+<?php namespace App\Http\Controllers\Backend\Configuration;
 
 use App\Http\Controllers\Controller;
-use App\Http\Requests\Backend\Configuration\Department\DataDepartmentRequest;
-use App\Http\Requests\Backend\Configuration\Department\StoreDepartmentRequest;
-use App\Http\Requests\Backend\Configuration\Department\UpdateDepartmentRequest;
-use App\Models\Department;
-use App\Models\School;
-use App\Repositories\Backend\Department\DepartmentRepositoryContract;
+use App\Http\Requests;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Http\Request;
 
-class DepartmentController extends Controller
+class DegreeController extends Controller
 {
-    /**
-     * @var DepartmentRepositoryContract
-     */
-    protected $departments;
-
-    /**
-     * @param DepartmentRepositoryContract       $departments
-     */
-    public function __construct(
-        DepartmentRepositoryContract $departmentRepo
-    )
-    {
-        $this->departments = $departmentRepo;
-    }
-
     /**
      * Display a listing of the resource.
      *
@@ -35,7 +14,7 @@ class DepartmentController extends Controller
      */
     public function index()
     {
-        return view('backend.configuration.department.index');
+        return view('backend.configuration.degree.index');
     }
 
     /**
@@ -45,9 +24,7 @@ class DepartmentController extends Controller
      */
     public function create()
     {
-        $departments = Department::lists('name_kh','id');
-        $schools = School::lists('name_kh','id');
-        return view('backend.configuration.department.create',compact('departments','schools'));
+        //
     }
 
     /**
@@ -56,10 +33,9 @@ class DepartmentController extends Controller
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
-    public function store(StoreDepartmentRequest $request)
+    public function store(Request $request)
     {
-        $this->departments->create($request->all());
-        return redirect()->route('admin.configuration.departments.index')->withFlashSuccess(trans('alerts.backend.roles.created'));
+        //
     }
 
     /**
@@ -91,7 +67,7 @@ class DepartmentController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function update(UpdateDepartmentRequest $request, $id)
+    public function update(Request $request, $id)
     {
         //
     }
@@ -107,32 +83,26 @@ class DepartmentController extends Controller
         //
     }
 
-    public function getSubDepartments(){
-
-    }
-
-    public function data()
+    public function data(Request $request)
     {
         //$student = Student::join('studentAnnuals', 'studentAnnuals.student_id', '=', 'students.id')
         //	->select(['students.id_card','students.name_kh','students.name_latin','studentAnnuals.grade_id']);
 
         //$studentAnnuals = StudentAnnual::with(['student','grade'])->select(['students.id_card','students.name_kh','students.name_latin','grades.name_kh']);
 
-        $departments = DB::table('departments')
-            //->whereNull('parent_id')
+        $degrees = DB::table('degrees')
             ->select(['id','code','name_kh','name_en','name_fr']);
 
-        $datatables =  app('datatables')->of($departments);
+        $datatables =  app('datatables')->of($degrees);
 
 
         return $datatables
-            ->editColumn('id', '{!! str_limit($id, 60) !!}')
             ->editColumn('code', '{!! str_limit($code, 60) !!}')
             ->editColumn('name_kh', '{!! str_limit($name_kh, 60) !!}')
             ->editColumn('name_en', '{!! str_limit($name_en, 60) !!}')
             ->editColumn('name_fr', '{!! str_limit($name_fr, 60) !!}')
-            ->addColumn('action', function ($department) {
-                return '<a href="#edit-'.$department->id.'" class="btn btn-xs btn-primary"><i class="glyphicon glyphicon-edit"></i> '. trans('buttons.general.crud.edit').'</a>';
+            ->addColumn('action', function ($degree) {
+                return '<a href="#edit-'.$degree->id.'" class="btn btn-xs btn-primary"><i class="glyphicon glyphicon-edit"></i> '. trans('buttons.general.crud.edit').'</a>';
             })
             ->make(true);
     }

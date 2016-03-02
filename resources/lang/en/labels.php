@@ -26,6 +26,8 @@ return [
         'none' => 'None',
         'show' => 'Show',
         'toggle_navigation' => 'Toggle Navigation',
+        'id' => 'ID',
+        'none' => 'None',
     ],
 
     'backend' => [
@@ -119,7 +121,75 @@ return [
                     'total' => 'user total|users total',
                 ],
             ],
+
         ],
+        'departments' => [
+            'index_title' => 'Departments',
+            'sub_index_title' => 'All available departments',
+            'sub_create_title' => 'Create department',
+            'sub_detail_title' => 'Detail of department',
+            'fields'=>[
+                'code' => 'Code',
+                'name_kh' => 'Name KH',
+                'name_en' => "Name EN",
+                'name_fr' => "Name FR",
+                'description' => "Description",
+                "parent" => "Head Department",
+                'is_specialist' => "is Specialist",
+                'school' => "School"
+            ]
+        ],
+        'degrees' => [
+            'index_title' => 'Degrees',
+            'sub_index_title' => 'All available degrees',
+            'sub_create_title' => 'Create department',
+            'sub_detail_title' => 'Detail of department',
+            'fields'=>[
+                'code' => 'Code',
+                'name_kh' => 'Name KH',
+                'name_en' => "Name EN",
+                'name_fr' => "Name FR"
+            ]
+        ],
+        'grades' => [
+            'index_title' => 'Grades',
+            'sub_index_title' => 'All available grades',
+            'sub_create_title' => 'Create grade',
+            'sub_detail_title' => 'Detail of grade',
+            'fields'=>[
+                'code' => 'Code',
+                'name_kh' => 'Name KH',
+                'name_en' => "Name EN",
+                'name_fr' => "Name FR"
+            ]
+        ],
+        'academicYears' => [
+            'index_title' => 'Academic Years',
+            'sub_index_title' => 'All available academic years',
+            'sub_create_title' => 'Create academic year',
+            'sub_detail_title' => 'Detail of academic year',
+            'fields'=>[
+                'code' => 'Code',
+                'name_kh' => 'Name KH',
+                'name_latin' => 'Name Latin',
+                'date_start' => "Date Start",
+                'date_end' => "Date End"
+            ]
+        ],
+        'students' => [
+            'index_title' => 'Students',
+            'sub_index_title' => 'All existing students',
+            'sub_create_title' => 'Register new student',
+            'sub_detail_title' => 'Detail of student',
+            'sub_import_title' => "Import students",
+            'fields'=>[
+                'id_card' => 'ID Card',
+                'name_kh' => 'Name KH',
+                'name_latin' => 'Name Latin',
+                'class' => "Class",
+            ]
+        ]
+
     ],
 
     'frontend' => [

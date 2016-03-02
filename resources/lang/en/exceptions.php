@@ -56,6 +56,33 @@ return [
                 'update_password_error' => 'There was a problem changing this users password. Please try again.',
             ],
         ],
+
+        'configuration' => [
+            'departments' => [
+                'create_error' => 'There was a problem creating this department. Please try again.',
+                'delete_error' => 'There was a problem deleting this department. Please try again.',
+                'not_found' => 'That department does not exist.',
+                'already_exists' => 'That department already exists. You can not add the same department.',
+            ],
+            'degrees' => [
+                'create_error' => 'There was a problem creating this degree. Please try again.',
+                'delete_error' => 'There was a problem deleting this degree. Please try again.',
+                'not_found' => 'That degree does not exist.',
+                'already_exists' => 'That degree already exists. You can not add the same degree.',
+            ],
+            'grades' => [
+                'create_error' => 'There was a problem creating this grade. Please try again.',
+                'delete_error' => 'There was a problem deleting this grade. Please try again.',
+                'not_found' => 'That grade does not exist.',
+                'already_exists' => 'That grade already exists. You can not add the same grade.',
+            ],
+            'academicYears' => [
+                'create_error' => 'There was a problem creating this academic year. Please try again.',
+                'delete_error' => 'There was a problem deleting this academic year. Please try again.',
+                'not_found' => 'That academic year does not exist.',
+                'already_exists' => 'That academic year already exists. You can not add the same academic year.',
+            ],
+        ]
     ],
 
     'frontend' => [

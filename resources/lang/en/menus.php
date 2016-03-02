@@ -61,7 +61,11 @@ return [
             'departments'=> 'Departments',
             'grades'=> 'Grades',
             'degrees' => 'Degrees',
-            'academic_years' => 'Academic Years'
+            'academicYears' => 'Academic Years'
+        ],
+
+        'student' => [
+            'title' => 'Student',
         ],
 
         'sidebar' => [

@@ -14,7 +14,7 @@ class SchoolTableSeeder extends Seeder
     {
         $schools = array(
             array(
-                'id'=>2,
+                'id' => config('access.schools.itc'),
                 'name_kh' => 'វិទ្យាស្ថានបច្ចេកវិទ្យាកម្ពុជា',
                 'name_en' => 'Institute of Technology of Cambodia',
                 'name_fr' => 'Institut de Technologie du Cambodge',

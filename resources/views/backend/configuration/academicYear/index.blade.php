@@ -1,11 +1,11 @@
 @extends ('backend.layouts.master')
 
-@section ('title', trans('labels.backend.departments.index_title'))
+@section ('title', trans('labels.backend.academicYears.index_title'))
 
 @section('page-header')
     <h1>
-        {{ trans('labels.backend.departments.index_title') }}
-        <small>{{ trans('labels.backend.departments.sub_index_title') }}</small>
+        {{ trans('labels.backend.academicYears.index_title') }}
+        <small>{{ trans('labels.backend.academicYears.sub_index_title') }}</small>
     </h1>
 
 @endsection
@@ -19,7 +19,7 @@
         <div class="box-header with-border">
             <div class="mailbox-controls">
                 <!-- Check all button -->
-                <a href="{!! route('admin.configuration.departments.create') !!}">
+                <a href="{!! route('admin.configuration.academicYears.create') !!}">
                     <button class="btn btn-primary btn-sm"><i class="fa fa-plus-circle"></i> Add
                     </button>
                 </a>
@@ -43,14 +43,13 @@
 
         <div class="box-body">
             <div>
-                <table class="table table-striped table-bordered table-hover" id="departments-table">
+                <table class="table table-striped table-bordered table-hover" id="academicYears-table">
                     <thead>
                     <tr>
-                        <th>{{ trans('labels.general.id') }}</th>
-                        <th>{{ trans('labels.backend.departments.fields.code') }}</th>
-                        <th>{{ trans('labels.backend.departments.fields.name_kh') }}</th>
-                        <th>{{ trans('labels.backend.departments.fields.name_en') }}</th>
-                        <th>{{ trans('labels.backend.departments.fields.name_fr') }}</th>
+                        <th>{{ trans('labels.backend.academicYears.fields.code') }}</th>
+                        <th>{{ trans('labels.backend.academicYears.fields.name_kh') }}</th>
+                        <th>{{ trans('labels.backend.academicYears.fields.date_start') }}</th>
+                        <th>{{ trans('labels.backend.academicYears.fields.date_end') }}</th>
                         <th>{{ trans('labels.general.actions') }}</th>
                     </tr>
                     </thead>
@@ -67,17 +66,15 @@
     {!! Html::script('plugins/datatables/dataTables.bootstrap.min.js') !!}
     <script>
         $(function() {
-            $('#departments-table').DataTable({
+            $('#academicYears-table').DataTable({
                 processing: true,
                 serverSide: true,
-                pageLength: {!! config('app.records_per_page')!!},
-                ajax: '{!! route('admin.configuration.department.data') !!}',
+                ajax: '{!! route('admin.configuration.academicYear.data') !!}',
                 columns: [
-                    { data: 'id', name: 'id'},
                     { data: 'code', name: 'code'},
                     { data: 'name_kh', name: 'name_kh'},
-                    { data: 'name_en', name: 'name_en'},
-                    { data: 'name_fr', name: 'name_fr'},
+                    { data: 'date_start', name: 'date_start'},
+                    { data: 'date_end', name: 'date_end'},
                     { data: 'action', name: 'action',orderable: false, searchable: false}
                 ]
             });

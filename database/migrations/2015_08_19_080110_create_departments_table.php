@@ -21,11 +21,16 @@ class CreateDepartmentsTable extends Migration
             $table->string('name_fr')->nullable();
             $table->string('code')->nullable();
             $table->string('description')->nullable();
-            $table->enum('type',["academic","study","finance"]);
             $table->boolean('is_specialist')->default(true);
             $table->timestamps();
 
-            $table->integer('school_id')->unsigned();
+			$table->integer('parent_id')->unsigned()->nullable();
+			$table->foreign('parent_id')
+				->references('id')
+				->on('departments')
+				->onDelete('cascade');
+
+			$table->integer('school_id')->unsigned();
             $table->foreign('school_id')
                   ->references('id')
                   ->on('schools')

@@ -93,6 +93,9 @@ return [
         'change_email' => false,
     ],
 
+    'schools' => [
+        'itc' => 2,
+    ],
     'departments' =>[
         'department_gca'=> 1,
         'department_gci'=> 2,
@@ -103,7 +106,8 @@ return [
         'department_ggg'=> 7,
         'department_tc'=> 8,
         'department_finance' => 9,
-        'department_study_affair'=>10
+        'department_study_affair'=>10,
+        'department_academic'=>11
     ],
     'genders' => [
         'gender_male'=> 1,
