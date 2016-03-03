@@ -1,5 +1,6 @@
 <?php namespace App\Models;
 
+use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Model as Model;
 
 class AcademicYear extends Model
@@ -11,15 +12,27 @@ class AcademicYear extends Model
 	public $fillable = [
 		"id",
 	    "name_kh",
-		"name_en",
-		"name_fr",
-		"code",
+		"name_latin",
 		"date_start",
 		"date_end",
 		"description",
         "create_uid",
         "write_uid"
 	];
+
+	public function setDateStartAttribute($value)
+	{
+		$date = Carbon::createFromFormat('d/m/Y', $value);
+		$this->attributes['date_start'] = $date->format('Y/m/d');
+	}
+
+	public function setDateEndAttribute($value)
+	{
+		$date = Carbon::createFromFormat('d/m/Y', $value);
+		$this->attributes['date_end'] = $date->format('Y/m/d');
+	}
+
+	protected $dates = ['date_start','date_end'];
 
     public function student_annuals(){
         return $this->hasMany('App\Models\StudentAnnual');
@@ -39,28 +52,6 @@ class AcademicYear extends Model
     public function lastModifier(){
         return $this->belongsTo('App\User','write_uid');
     }
-    /**
-     * The attributes that should be casted to native types.
-     *
-     * @var array
-     */
-    protected $casts = [
-        "name_kh" => "string",
-		"name_en" => "string",
-		"name_fr" => "string",
-		"code" => "string",
-		"description" => "string",
-        "create_uid"=>"integer",
-        "write_uid"=>"integer"
-    ];
-
-	public static $rules = [
-	    "name_kh" => "Required",
-		"name_en" => "Required",
-		"code" => "Required",
-		"date_start" => "Required",
-		"date_end" => "Required"
-	];
 
 	public function scopeLastestAcademicYear($query){
 		$query->orderBy('code','desc')->first();

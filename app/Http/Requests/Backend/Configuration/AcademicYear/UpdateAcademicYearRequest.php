@@ -28,6 +28,10 @@ class UpdateAcademicYearRequest extends Request
     public function rules()
     {
         return [
+            'id' => 'required',
+            'name_latin' => 'required',
+            'name_kh' => 'required',
+            'date_start_end' => 'required',
         ];
     }
 }

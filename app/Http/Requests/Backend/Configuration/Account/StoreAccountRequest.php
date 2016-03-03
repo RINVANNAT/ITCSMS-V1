@@ -28,8 +28,8 @@ class StoreAccountRequest extends Request
     public function rules()
     {
         return [
-            'code' => 'required',
-            'name_en' => 'required',
+            'name' => 'required',
+            'active' => 'required',
         ];
     }
 }

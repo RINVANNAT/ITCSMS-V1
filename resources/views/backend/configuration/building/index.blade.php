@@ -1,11 +1,11 @@
 @extends ('backend.layouts.master')
 
-@section ('title', trans('labels.backend.departments.index_title'))
+@section ('title', trans('labels.backend.buildings.title'))
 
 @section('page-header')
     <h1>
-        {{ trans('labels.backend.departments.index_title') }}
-        <small>{{ trans('labels.backend.departments.sub_index_title') }}</small>
+        {{ trans('labels.backend.buildings.title') }}
+        <small>{{ trans('labels.backend.buildings.sub_title') }}</small>
     </h1>
 
 @endsection
@@ -19,12 +19,8 @@
         <div class="box-header with-border">
             <div class="mailbox-controls">
                 <!-- Check all button -->
-                <a href="{!! route('admin.configuration.departments.create') !!}">
+                <a href="{!! route('admin.configuration.buildings.create') !!}">
                     <button class="btn btn-primary btn-sm"><i class="fa fa-plus-circle"></i> Add
-                    </button>
-                </a>
-                <a href="#">
-                    <button class="btn btn-primary btn-sm"><i class="fa fa-plus-circle"></i> Import
                     </button>
                 </a>
 
@@ -43,14 +39,11 @@
 
         <div class="box-body">
             <div>
-                <table class="table table-striped table-bordered table-hover" id="departments-table">
+                <table class="table table-striped table-bordered table-hover" id="buildings-table">
                     <thead>
                     <tr>
                         <th>{{ trans('labels.general.id') }}</th>
-                        <th>{{ trans('labels.backend.departments.fields.code') }}</th>
-                        <th>{{ trans('labels.backend.departments.fields.name_kh') }}</th>
-                        <th>{{ trans('labels.backend.departments.fields.name_en') }}</th>
-                        <th>{{ trans('labels.backend.departments.fields.name_fr') }}</th>
+                        <th>{{ trans('labels.backend.buildings.fields.name') }}</th>
                         <th>{{ trans('labels.general.actions') }}</th>
                     </tr>
                     </thead>
@@ -67,17 +60,14 @@
     {!! Html::script('plugins/datatables/dataTables.bootstrap.min.js') !!}
     <script>
         $(function() {
-            $('#departments-table').DataTable({
+            $('#buildings-table').DataTable({
                 processing: true,
                 serverSide: true,
                 pageLength: {!! config('app.records_per_page')!!},
-                ajax: '{!! route('admin.configuration.department.data') !!}',
+                ajax: '{!! route('admin.configuration.building.data') !!}',
                 columns: [
                     { data: 'id', name: 'id'},
-                    { data: 'code', name: 'code'},
-                    { data: 'name_kh', name: 'name_kh'},
-                    { data: 'name_en', name: 'name_en'},
-                    { data: 'name_fr', name: 'name_fr'},
+                    { data: 'name', name: 'name'},
                     { data: 'action', name: 'action',orderable: false, searchable: false}
                 ]
             });

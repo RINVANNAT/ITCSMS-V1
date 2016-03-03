@@ -105,5 +105,20 @@ class EloquentGradeRepository implements GradeRepositoryContract
         throw new GeneralException(trans('exceptions.configuration.grades.update_error'));
     }
 
+    /**
+     * @param  $id
+     * @throws GeneralException
+     * @return bool
+     */
+    public function destroy($id)
+    {
 
+        $model = $this->findOrThrowException($id);
+
+        if ($model->delete()) {
+            return true;
+        }
+
+        throw new GeneralException(trans('exceptions.backend.general.delete_error'));
+    }
 }

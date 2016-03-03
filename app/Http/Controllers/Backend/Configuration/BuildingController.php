@@ -3,29 +3,29 @@
 namespace App\Http\Controllers\Backend\Configuration;
 
 use App\Http\Controllers\Controller;
-use App\Http\Requests\Backend\Configuration\Department\DataDepartmentRequest;
-use App\Http\Requests\Backend\Configuration\Department\StoreDepartmentRequest;
-use App\Http\Requests\Backend\Configuration\Department\UpdateDepartmentRequest;
-use App\Models\Department;
+use App\Http\Requests\Backend\Configuration\Building\DataBuildingRequest;
+use App\Http\Requests\Backend\Configuration\Building\StoreBuildingRequest;
+use App\Http\Requests\Backend\Configuration\Building\UpdateBuildingRequest;
+use App\Models\Building;
 use App\Models\School;
-use App\Repositories\Backend\Department\DepartmentRepositoryContract;
+use App\Repositories\Backend\Building\BuildingRepositoryContract;
 use Illuminate\Support\Facades\DB;
 
-class DepartmentController extends Controller
+class BuildingController extends Controller
 {
     /**
-     * @var DepartmentRepositoryContract
+     * @var BuildingRepositoryContract
      */
-    protected $departments;
+    protected $buildings;
 
     /**
-     * @param DepartmentRepositoryContract       $departments
+     * @param BuildingRepositoryContract       $buildings
      */
     public function __construct(
-        DepartmentRepositoryContract $departmentRepo
+        BuildingRepositoryContract $buildingRepo
     )
     {
-        $this->departments = $departmentRepo;
+        $this->buildings = $buildingRepo;
     }
 
     /**
@@ -35,7 +35,7 @@ class DepartmentController extends Controller
      */
     public function index()
     {
-        return view('backend.configuration.department.index');
+        return view('backend.configuration.building.index');
     }
 
     /**
@@ -45,9 +45,7 @@ class DepartmentController extends Controller
      */
     public function create()
     {
-        $departments = Department::lists('name_kh','id');
-        $schools = School::lists('name_kh','id');
-        return view('backend.configuration.department.create',compact('departments','schools'));
+        return view('backend.configuration.building.create');
     }
 
     /**
@@ -56,10 +54,10 @@ class DepartmentController extends Controller
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
-    public function store(StoreDepartmentRequest $request)
+    public function store(StoreBuildingRequest $request)
     {
-        $this->departments->create($request->all());
-        return redirect()->route('admin.configuration.departments.index')->withFlashSuccess(trans('alerts.backend.roles.created'));
+        $this->buildings->create($request->all());
+        return redirect()->route('admin.configuration.buildings.index')->withFlashSuccess(trans('alerts.backend.generals.created'));
     }
 
     /**
@@ -70,7 +68,7 @@ class DepartmentController extends Controller
      */
     public function show($id)
     {
-        //
+
     }
 
     /**
@@ -81,7 +79,9 @@ class DepartmentController extends Controller
      */
     public function edit($id)
     {
-        //
+        $building = $this->buildings->findOrThrowException($id);
+
+        return view('backend.configuration.building.edit',compact('building'));
     }
 
     /**
@@ -91,9 +91,10 @@ class DepartmentController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function update(UpdateDepartmentRequest $request, $id)
+    public function update(UpdateBuildingRequest $request, $id)
     {
-        //
+        $this->buildings->update($id, $request->all());
+        return redirect()->route('admin.configuration.buildings.index')->withFlashSuccess(trans('alerts.backend.generals.updated'));
     }
 
     /**
@@ -104,11 +105,8 @@ class DepartmentController extends Controller
      */
     public function destroy($id)
     {
-        //
-    }
-
-    public function getSubDepartments(){
-
+        $this->buildings->destroy($id);
+        return redirect()->route('admin.configuration.buildings.index')->withFlashSuccess(trans('alerts.backend.generals.deleted'));
     }
 
     public function data()
@@ -118,21 +116,20 @@ class DepartmentController extends Controller
 
         //$studentAnnuals = StudentAnnual::with(['student','grade'])->select(['students.id_card','students.name_kh','students.name_latin','grades.name_kh']);
 
-        $departments = DB::table('departments')
+        $buildings = DB::table('buildings')
             //->whereNull('parent_id')
-            ->select(['id','code','name_kh','name_en','name_fr']);
+            ->select(['id','name','description']);
 
-        $datatables =  app('datatables')->of($departments);
+        $datatables =  app('datatables')->of($buildings);
 
 
         return $datatables
             ->editColumn('id', '{!! str_limit($id, 60) !!}')
-            ->editColumn('code', '{!! str_limit($code, 60) !!}')
-            ->editColumn('name_kh', '{!! str_limit($name_kh, 60) !!}')
-            ->editColumn('name_en', '{!! str_limit($name_en, 60) !!}')
-            ->editColumn('name_fr', '{!! str_limit($name_fr, 60) !!}')
-            ->addColumn('action', function ($department) {
-                return '<a href="#edit-'.$department->id.'" class="btn btn-xs btn-primary"><i class="glyphicon glyphicon-edit"></i> '. trans('buttons.general.crud.edit').'</a>';
+            ->editColumn('name', '{!! str_limit($name, 60) !!}')
+            ->editColumn('description', '{!! str_limit($description, 200) !!}')
+            ->addColumn('action', function ($building) {
+                return  '<a href="'.route('admin.configuration.buildings.edit',$building->id).'" class="btn btn-xs btn-primary"><i class="fa fa-pencil" data-toggle="tooltip" data-placement="top" title="" data-original-title="'.trans('buttons.general.crud.edit').'"></i> </a>'.
+                ' <button class="btn btn-xs btn-danger btn-delete" data-remote="'.route('admin.configuration.buildings.destroy', $building->id) .'"><i class="fa fa-times" data-toggle="tooltip" data-placement="top" title="' . trans('buttons.general.crud.delete') . '"></i></button>';
             })
             ->make(true);
     }

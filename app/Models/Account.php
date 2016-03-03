@@ -9,7 +9,9 @@ class Account extends Model
     
 
 	public $fillable = [
-	    "name"
+	    "name",
+		"active",
+		"description"
 	];
 
     /**

@@ -115,10 +115,10 @@ return [
     ],
     'degrees' => [
         'degree_engineer'=> 1,
-        'degree_associate'=> 3,
-        'degree_bachelor'=> 4,
-        'degree_master'=>5,
-        'degree_doctor'=> 6,
+        'degree_associate'=> 2,
+        'degree_bachelor'=> 3,
+        'degree_master'=>4,
+        'degree_doctor'=> 5,
     ],
     'grades' => [
         'grade_1'=> 1,

@@ -42,5 +42,9 @@ interface GradeRepositoryContract
      */
     public function update($id, $input);
 
-
+    /**
+     * @param  $id
+     * @return mixed
+     */
+    public function destroy($id);
 }

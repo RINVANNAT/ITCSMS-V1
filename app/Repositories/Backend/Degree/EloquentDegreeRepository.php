@@ -69,11 +69,16 @@ class EloquentDegreeRepository implements DegreeRepositoryContract
         $degree->name_fr = $input['name_fr'];
         $degree->name_kh = $input['name_kh'];
         $degree->code = $input['code'];
+        $degree->school_id = $input['school_id'];
         $degree->description = $input['description'];
         $degree->created_at = Carbon::now();
         $degree->create_uid = auth()->id();
 
         if ($degree->save()) {
+            if(isset($input['departments'])){
+                $departmentIds = $input['departments'];
+                $degree->departments()->sync($departmentIds);
+            }
             return true;
         }
 
@@ -94,16 +99,36 @@ class EloquentDegreeRepository implements DegreeRepositoryContract
         $degree->name_fr = $input['name_fr'];
         $degree->name_kh = $input['name_kh'];
         $degree->code = $input['code'];
+        $degree->school_id = $input['school_id'];
         $degree->description = $input['description'];
         $degree->updated_at = Carbon::now();
         $degree->write_uid = auth()->id();
 
         if ($degree->save()) {
+            if(isset($input['departments'])){
+                $departmentIds = $input['departments'];
+                $degree->departments()->sync($departmentIds);
+            }
             return true;
         }
 
         throw new GeneralException(trans('exceptions.configuration.degrees.update_error'));
     }
 
+    /**
+     * @param  $id
+     * @throws GeneralException
+     * @return bool
+     */
+    public function destroy($id)
+    {
 
+        $model = $this->findOrThrowException($id);
+
+        if ($model->delete()) {
+            return true;
+        }
+
+        throw new GeneralException(trans('exceptions.backend.general.delete_error'));
+    }
 }

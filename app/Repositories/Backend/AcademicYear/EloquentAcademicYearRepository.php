@@ -57,19 +57,22 @@ class EloquentAcademicYearRepository implements AcademicYearRepositoryContract
      */
     public function create($input)
     {
-        if (AcademicYear::where('name_en', $input['name_en'])->first()) {
+        if (AcademicYear::where('name_latin', $input['name_latin'])->first()) {
             throw new GeneralException(trans('exceptions.backend.configuration.academicYears.already_exists'));
         }
 
+        $date_start_end = explode(" - ",$input['date_start_end']);
+
+        $date_start = $date_start_end[0];
+        $date_end = $date_start_end[1];
         $academicYear = new AcademicYear();
 
         $academicYear->id = $input['id'];
-        $academicYear->name_en = $input['name_en'];
-        $academicYear->name_fr = $input['name_fr'];
+        $academicYear->name_latin = $input['name_latin'];
         $academicYear->name_kh = $input['name_kh'];
-        $academicYear->date_start = $input['code'];
-        $academicYear->date_end = $input['description'];
-        $academicYear->description = $input['is_specialist'];
+        $academicYear->date_start = $date_start;
+        $academicYear->date_end = $date_end;
+        $academicYear->description = $input['description'];
         $academicYear->created_at = Carbon::now();
         $academicYear->create_uid = auth()->id();
 
@@ -90,12 +93,16 @@ class EloquentAcademicYearRepository implements AcademicYearRepositoryContract
     {
         $academicYear = $this->findOrThrowException($id);
 
-        $academicYear->name_en = $input['name_en'];
-        $academicYear->name_fr = $input['name_fr'];
+        $date_start_end = explode(" - ",$input['date_start_end']);
+
+        $date_start = $date_start_end[0];
+        $date_end = $date_start_end[1];
+
+        $academicYear->name_latin = $input['name_latin'];
         $academicYear->name_kh = $input['name_kh'];
-        $academicYear->date_start = $input['code'];
-        $academicYear->date_end = $input['description'];
-        $academicYear->description = $input['is_specialist'];
+        $academicYear->date_start = $date_start;
+        $academicYear->date_end = $date_end;
+        $academicYear->description = $input['description'];
         $academicYear->updated_at = Carbon::now();
         $academicYear->write_uid = auth()->id();
 
@@ -104,6 +111,28 @@ class EloquentAcademicYearRepository implements AcademicYearRepositoryContract
         }
 
         throw new GeneralException(trans('exceptions.configuration.academicYears.update_error'));
+    }
+
+    /**
+     * @param  $id
+     * @throws GeneralException
+     * @return bool
+     */
+    public function destroy($id)
+    {
+
+        $academicYear = $this->findOrThrowException($id);
+
+        //Don't delete the role is there are users associated
+        if ($academicYear->student_annuals()->count() > 0) {
+            throw new GeneralException(trans('exceptions.backend.general.has_reference'));
+        }
+
+        if ($academicYear->delete()) {
+            return true;
+        }
+
+        throw new GeneralException(trans('exceptions.backend.general.delete_error'));
     }
 
 

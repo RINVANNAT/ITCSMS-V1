@@ -58,13 +58,16 @@ class EloquentBuildingRepository implements BuildingRepositoryContract
      */
     public function create($input)
     {
-        if (Building::where('name_en', $input['name_en'])->first()) {
+        if (Building::where('name', $input['name'])->first()) {
             throw new GeneralException(trans('exceptions.backend.configuration.buildings.already_exists'));
         }
 
+        $count = Building::count();
         $building = new Building();
 
+        $building->id = $count+1;
         $building->name = $input['name'];
+        $building->description = $input['description'];
         $building->created_at = Carbon::now();
         $building->create_uid = auth()->id();
 
@@ -86,6 +89,7 @@ class EloquentBuildingRepository implements BuildingRepositoryContract
         $building = $this->findOrThrowException($id);
 
         $building->name = $input['name'];
+        $building->description = $input['description'];
         $building->updated_at = Carbon::now();
         $building->write_uid = auth()->id();
 
@@ -96,5 +100,20 @@ class EloquentBuildingRepository implements BuildingRepositoryContract
         throw new GeneralException(trans('exceptions.configuration.buildings.update_error'));
     }
 
+    /**
+     * @param  $id
+     * @throws GeneralException
+     * @return bool
+     */
+    public function destroy($id)
+    {
 
+        $model = $this->findOrThrowException($id);
+
+        if ($model->delete()) {
+            return true;
+        }
+
+        throw new GeneralException(trans('exceptions.backend.general.delete_error'));
+    }
 }

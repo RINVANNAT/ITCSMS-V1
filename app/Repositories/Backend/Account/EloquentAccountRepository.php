@@ -58,7 +58,7 @@ class EloquentAccountRepository implements AccountRepositoryContract
      */
     public function create($input)
     {
-        if (Account::where('name_en', $input['name_en'])->first()) {
+        if (Account::where('name', $input['name'])->first()) {
             throw new GeneralException(trans('exceptions.backend.configuration.accounts.already_exists'));
         }
 
@@ -66,11 +66,16 @@ class EloquentAccountRepository implements AccountRepositoryContract
 
         $account = new Account();
         $account->id = $count+1;
-        $account->name_en = $input['name'];
+        $account->name = $input['name'];
         $account->description = $input['description'];
-        $account->active = $input['active'];
         $account->created_at = Carbon::now();
         $account->create_uid = auth()->id();
+
+        if(isset($input['active'])){
+            $account->active = true;
+        } else {
+            $account->active = false;
+        }
 
         if ($account->save()) {
             return true;
@@ -89,11 +94,16 @@ class EloquentAccountRepository implements AccountRepositoryContract
     {
         $account = $this->findOrThrowException($id);
 
-        $account->name_en = $input['name'];
+        $account->name = $input['name'];
         $account->description = $input['description'];
-        $account->active = $input['active'];
         $account->updated_at = Carbon::now();
         $account->write_uid = auth()->id();
+
+        if(isset($input['active'])){
+            $account->active = true;
+        } else {
+            $account->active = false;
+        }
 
         if ($account->save()) {
             return true;
@@ -102,5 +112,21 @@ class EloquentAccountRepository implements AccountRepositoryContract
         throw new GeneralException(trans('exceptions.configuration.accounts.update_error'));
     }
 
+    /**
+     * @param  $id
+     * @throws GeneralException
+     * @return bool
+     */
+    public function destroy($id)
+    {
+
+        $model = $this->findOrThrowException($id);
+
+        if ($model->delete()) {
+            return true;
+        }
+
+        throw new GeneralException(trans('exceptions.backend.general.delete_error'));
+    }
 
 }

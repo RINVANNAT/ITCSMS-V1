@@ -14,6 +14,10 @@ return [
     */
 
     'backend' => [
+        'general' => [
+            'has_reference' => 'This record has reference with other data. You can not delete this first',
+            'delete_error' => 'Something went wrong. Cannot delete this record'
+        ],
         'access' => [
             'permissions' => [
                 'create_error' => 'There was a problem creating this permission. Please try again.',

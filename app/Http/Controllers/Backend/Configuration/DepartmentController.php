@@ -80,7 +80,10 @@ class DepartmentController extends Controller
      */
     public function edit($id)
     {
-        //
+        $departments = Department::lists('name_kh','id');
+        $schools = School::lists('name_kh','id');
+        $department = $this->departments->findOrThrowException($id);
+        return view('backend.configuration.department.edit',compact('department','departments','schools'));
     }
 
     /**
@@ -92,7 +95,8 @@ class DepartmentController extends Controller
      */
     public function update(UpdateDepartmentRequest $request, $id)
     {
-        //
+        $this->departments->update($id, $request->all());
+        return redirect()->route('admin.configuration.departments.index')->withFlashSuccess(trans('alerts.backend.generals.updated'));
     }
 
     /**
@@ -103,11 +107,8 @@ class DepartmentController extends Controller
      */
     public function destroy($id)
     {
-        //
-    }
-
-    public function getSubDepartments(){
-
+        $this->departments->destroy($id);
+        return redirect()->route('admin.configuration.academicYears.index')->withFlashSuccess(trans('alerts.backend.generals.deleted'));
     }
 
     public function data()
@@ -131,7 +132,8 @@ class DepartmentController extends Controller
             ->editColumn('name_en', '{!! str_limit($name_en, 60) !!}')
             ->editColumn('name_fr', '{!! str_limit($name_fr, 60) !!}')
             ->addColumn('action', function ($department) {
-                return '<a href="#edit-'.$department->id.'" class="btn btn-xs btn-primary"><i class="glyphicon glyphicon-edit"></i> '. trans('buttons.general.crud.edit').'</a>';
+                return  '<a href="'.route('admin.configuration.departments.edit',$department->id).'" class="btn btn-xs btn-primary"><i class="fa fa-pencil" data-toggle="tooltip" data-placement="top" title="" data-original-title="'.trans('buttons.general.crud.edit').'"></i> </a>'.
+                ' <button class="btn btn-xs btn-danger btn-delete" data-remote="'.route('admin.configuration.departments.destroy', $department->id) .'"><i class="fa fa-times" data-toggle="tooltip" data-placement="top" title="' . trans('buttons.general.crud.delete') . '"></i></button>';
             })
             ->make(true);
     }

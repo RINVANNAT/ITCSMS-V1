@@ -35,28 +35,7 @@ class Degree extends Model
     }
 
     public function departments(){
-        return $this->hasMany('App\Models\Department');
+		return $this->belongsToMany('App\Models\Department');
     }
-
-
-    /**
-     * The attributes that should be casted to native types.
-     *
-     * @var array
-     */
-    protected $casts = [
-        "name_kh" => "string",
-		"name_en" => "string",
-		"name_fr" => "string",
-		"code" => "string",
-		"description" => "string"
-    ];
-
-	public static $rules = [
-	    "name_kh" => "Required",
-		"name_en" => "Required",
-		"name_fr" => "Required",
-		"code" => "Required"
-	];
 
 }

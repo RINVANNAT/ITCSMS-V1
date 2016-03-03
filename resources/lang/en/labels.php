@@ -27,6 +27,7 @@ return [
         'show' => 'Show',
         'toggle_navigation' => 'Toggle Navigation',
         'id' => 'ID',
+        'last_updated' => 'Last Updated'
     ],
 
     'backend' => [
@@ -123,8 +124,9 @@ return [
 
         ],
         'departments' => [
-            'index_title' => 'Departments',
+            'title' => 'Departments',
             'sub_index_title' => 'All available departments',
+            'sub_edit_title' => 'Edit department',
             'sub_create_title' => 'Create department',
             'sub_detail_title' => 'Detail of department',
             'fields'=>[
@@ -139,20 +141,25 @@ return [
             ]
         ],
         'degrees' => [
-            'index_title' => 'Degrees',
-            'sub_index_title' => 'All available degrees',
-            'sub_create_title' => 'Create department',
-            'sub_detail_title' => 'Detail of department',
+            'title' => 'Academic Degrees',
+            'sub_index_title' => 'All available academic degrees',
+            'sub_edit_title' => 'Edit degree',
+            'sub_create_title' => 'Create new academic degree',
+            'sub_detail_title' => 'Detail of an academic degree',
             'fields'=>[
                 'code' => 'Code',
                 'name_kh' => 'Name KH',
                 'name_en' => "Name EN",
-                'name_fr' => "Name FR"
+                'name_fr' => "Name FR",
+                'school' => "school",
+                'departments' => "Related Departments",
+                'description' => "Description"
             ]
         ],
         'grades' => [
-            'index_title' => 'Grades',
+            'title' => 'Grades',
             'sub_index_title' => 'All available grades',
+            'sub_edit_title' => 'Edit grade',
             'sub_create_title' => 'Create grade',
             'sub_detail_title' => 'Detail of grade',
             'fields'=>[
@@ -166,32 +173,75 @@ return [
             'title' => 'Academic Years',
             'sub_index_title' => 'All available academic years',
             'sub_create_title' => 'Create academic year',
+            'sub_edit_title' => 'Edit academic year',
             'sub_detail_title' => 'Detail of academic year',
             'fields'=>[
                 'code' => 'Code',
                 'name_kh' => 'Name KH',
                 'name_latin' => 'Name Latin',
                 'date_start' => "Date Start",
-                'date_end' => "Date End"
+                'date_end' => "Date End",
+                'date_start_end' => "Date From/Until",
+                'description' => "Description"
             ]
         ],
         'accounts' => [
             'title' => 'Account',
             'sub_index_title' => 'All available account',
+            'sub_edit_title' => 'Edit account',
             'sub_create_title' => 'Create new account',
             'sub_detail_title' => 'Detail of an account',
             'fields'=>[
-                'code' => 'Code',
-                'name_kh' => 'Name KH',
-                'name_latin' => 'Name Latin',
-                'date_start' => "Date Start",
-                'date_end' => "Date End"
+                'name' => 'Name',
+                'active' => 'Is Active',
+                'description' => "Description",
+                'amount_dollar' => 'Amount in Dollar',
+                'amount_riel' => 'Amount in Riel',
+            ]
+        ],
+
+        'buildings' => [
+            'title' => 'Building',
+            'sub_index_title' => 'All existing building',
+            'sub_edit_title' => 'Edit building information',
+            'sub_create_title' => 'Create new building',
+            'sub_detail_title' => 'Detail of an building',
+            'fields'=>[
+                'name' => 'Name',
+                'description' => "Description",
+            ]
+        ],
+
+        'highSchools' => [
+            'title' => 'High School',
+            'sub_index_title' => 'All existing High School',
+            'sub_edit_title' => 'Edit High School information',
+            'sub_create_title' => 'Create new High School',
+            'sub_detail_title' => 'Detail of an High School',
+            'fields'=>[
+                'name_en' => 'Name Latin',
+                'description' => "Description",
+                'name_kh' => 'Name Khmer',
+                'province_id' => 'In Province',
+                'd_id' => 'District ID',
+                'c_id' => 'Country ID',
+                'v_id' => 'V ID',
+                's_id' => 'S ID',
+                'ps_id' => 'PS ID',
+                'prefix_id' => 'Prefix ID',
+                'valid' => 'Is Valid',
+                'is_no_school' => "Is'nt School",
+                'locp_code' => 'LOCP Code',
+                'locd_code' => 'LOCD Code',
+                'locc_code' => 'LOCC Code',
+                'locv_code' => 'LOCV Code',
             ]
         ],
 
         'students' => [
-            'index_title' => 'Students',
+            'title' => 'Students',
             'sub_index_title' => 'All existing students',
+            'sub_edit_title' => 'Edit student',
             'sub_create_title' => 'Register new student',
             'sub_detail_title' => 'Detail of student',
             'sub_import_title' => "Import students",

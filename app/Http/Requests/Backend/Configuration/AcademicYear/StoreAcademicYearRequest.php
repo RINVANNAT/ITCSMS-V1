@@ -28,8 +28,10 @@ class StoreAcademicYearRequest extends Request
     public function rules()
     {
         return [
-            'code' => 'required',
-            'name_en' => 'required',
+            'id' => 'required',
+            'name_latin' => 'required',
+            'name_kh' => 'required',
+            'date_start_end' => 'required',
         ];
     }
 }

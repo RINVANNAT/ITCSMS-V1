@@ -71,11 +71,16 @@ class EloquentDepartmentRepository implements DepartmentRepositoryContract
         $department->name_kh = $input['name_kh'];
         $department->code = $input['code'];
         $department->description = $input['description'];
-        $department->is_specialist = $input['is_specialist'];
         $department->parent_id = $input['parent_id'];
         $department->school_id = $input['school_id'];
         $department->created_at = Carbon::now();
         $department->create_uid = auth()->id();
+
+        if(isset($input['is_specialist'])){
+            $department->is_specialist =  true;
+        } else {
+            $department->is_specialist =  false;
+        }
 
         if ($department->save()) {
             return true;
@@ -98,12 +103,40 @@ class EloquentDepartmentRepository implements DepartmentRepositoryContract
         $department->name_fr = $input['name_fr'];
         $department->name_kh = $input['name_kh'];
         $department->code = $input['code'];
+        $department->description = $input['description'];
+        $department->parent_id = $input['parent_id'];
+        $department->school_id = $input['school_id'];
+        $department->created_at = Carbon::now();
+        $department->create_uid = auth()->id();
+
+        if(isset($input['is_specialist'])){
+            $department->is_specialist =  true;
+        } else {
+            $department->is_specialist =  false;
+        }
 
         if ($department->save()) {
             return true;
         }
 
         throw new GeneralException(trans('exceptions.configuration.departments.update_error'));
+    }
+
+    /**
+     * @param  $id
+     * @throws GeneralException
+     * @return bool
+     */
+    public function destroy($id)
+    {
+
+        $model = $this->findOrThrowException($id);
+
+        if ($model->delete()) {
+            return true;
+        }
+
+        throw new GeneralException(trans('exceptions.backend.general.delete_error'));
     }
 
 

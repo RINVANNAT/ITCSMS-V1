@@ -138,5 +138,20 @@ class EloquentStudentBac2Repository implements StudentBac2RepositoryContract
         throw new GeneralException(trans('exceptions.configuration.studentBac2s.update_error'));
     }
 
+    /**
+     * @param  $id
+     * @throws GeneralException
+     * @return bool
+     */
+    public function destroy($id)
+    {
 
+        $model = $this->findOrThrowException($id);
+
+        if ($model->delete()) {
+            return true;
+        }
+
+        throw new GeneralException(trans('exceptions.backend.general.delete_error'));
+    }
 }

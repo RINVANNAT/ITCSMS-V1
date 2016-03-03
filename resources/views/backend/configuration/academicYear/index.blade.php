@@ -1,10 +1,10 @@
 @extends ('backend.layouts.master')
 
-@section ('title', trans('labels.backend.academicYears.index_title'))
+@section ('title', trans('labels.backend.academicYears.title'))
 
 @section('page-header')
     <h1>
-        {{ trans('labels.backend.academicYears.index_title') }}
+        {{ trans('labels.backend.academicYears.title') }}
         <small>{{ trans('labels.backend.academicYears.sub_index_title') }}</small>
     </h1>
 
@@ -23,11 +23,6 @@
                     <button class="btn btn-primary btn-sm"><i class="fa fa-plus-circle"></i> Add
                     </button>
                 </a>
-                <a href="#">
-                    <button class="btn btn-primary btn-sm"><i class="fa fa-plus-circle"></i> Import
-                    </button>
-                </a>
-
                 <div class="btn-group">
                     <button class="btn btn-default btn-sm"><i class="fa fa-trash-o"></i></button>
                     <button class="btn btn-default btn-sm"><i class="fa fa-reply"></i></button>
@@ -71,13 +66,17 @@
                 serverSide: true,
                 ajax: '{!! route('admin.configuration.academicYear.data') !!}',
                 columns: [
-                    { data: 'code', name: 'code'},
+                    { data: 'id', name: 'id'},
                     { data: 'name_kh', name: 'name_kh'},
                     { data: 'date_start', name: 'date_start'},
                     { data: 'date_end', name: 'date_end'},
                     { data: 'action', name: 'action',orderable: false, searchable: false}
                 ]
             });
+
+            enableDeleteRecord($('#academicYears-table'));
+
+
         });
     </script>
 @stop

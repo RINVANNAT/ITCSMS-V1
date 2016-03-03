@@ -1,11 +1,11 @@
 @extends ('backend.layouts.master')
 
-@section ('title', trans('labels.backend.departments.index_title'))
+@section ('title', trans('labels.backend.highSchools.title'))
 
 @section('page-header')
     <h1>
-        {{ trans('labels.backend.departments.index_title') }}
-        <small>{{ trans('labels.backend.departments.sub_index_title') }}</small>
+        {{ trans('labels.backend.highSchools.title') }}
+        <small>{{ trans('labels.backend.highSchools.sub_index_title') }}</small>
     </h1>
 
 @endsection
@@ -19,15 +19,10 @@
         <div class="box-header with-border">
             <div class="mailbox-controls">
                 <!-- Check all button -->
-                <a href="{!! route('admin.configuration.departments.create') !!}">
+                <a href="{!! route('admin.configuration.highSchools.create') !!}">
                     <button class="btn btn-primary btn-sm"><i class="fa fa-plus-circle"></i> Add
                     </button>
                 </a>
-                <a href="#">
-                    <button class="btn btn-primary btn-sm"><i class="fa fa-plus-circle"></i> Import
-                    </button>
-                </a>
-
                 <div class="btn-group">
                     <button class="btn btn-default btn-sm"><i class="fa fa-trash-o"></i></button>
                     <button class="btn btn-default btn-sm"><i class="fa fa-reply"></i></button>
@@ -43,14 +38,12 @@
 
         <div class="box-body">
             <div>
-                <table class="table table-striped table-bordered table-hover" id="departments-table">
+                <table class="table table-striped table-bordered table-hover" id="highSchools-table">
                     <thead>
                     <tr>
-                        <th>{{ trans('labels.general.id') }}</th>
-                        <th>{{ trans('labels.backend.departments.fields.code') }}</th>
-                        <th>{{ trans('labels.backend.departments.fields.name_kh') }}</th>
-                        <th>{{ trans('labels.backend.departments.fields.name_en') }}</th>
-                        <th>{{ trans('labels.backend.departments.fields.name_fr') }}</th>
+                        <th>{{ trans('labels.backend.highSchools.fields.name_kh') }}</th>
+                        <th>{{ trans('labels.backend.highSchools.fields.name_en') }}</th>
+                        <th>{{ trans('labels.backend.highSchools.fields.is_no_school') }}</th>
                         <th>{{ trans('labels.general.actions') }}</th>
                     </tr>
                     </thead>
@@ -67,20 +60,18 @@
     {!! Html::script('plugins/datatables/dataTables.bootstrap.min.js') !!}
     <script>
         $(function() {
-            $('#departments-table').DataTable({
+            $('#highSchools-table').DataTable({
                 processing: true,
                 serverSide: true,
-                pageLength: {!! config('app.records_per_page')!!},
-                ajax: '{!! route('admin.configuration.department.data') !!}',
+                ajax: '{!! route('admin.configuration.highSchool.data') !!}',
                 columns: [
-                    { data: 'id', name: 'id'},
-                    { data: 'code', name: 'code'},
                     { data: 'name_kh', name: 'name_kh'},
                     { data: 'name_en', name: 'name_en'},
-                    { data: 'name_fr', name: 'name_fr'},
+                    { data: 'is_no_school', name: 'is_no_school'},
                     { data: 'action', name: 'action',orderable: false, searchable: false}
                 ]
             });
+            enableDeleteRecord($('#highSchools-table'));
         });
     </script>
 @stop

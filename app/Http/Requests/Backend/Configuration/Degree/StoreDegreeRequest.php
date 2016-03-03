@@ -28,7 +28,6 @@ class StoreDegreeRequest extends Request
     public function rules()
     {
         return [
-            'code' => 'required',
             'name_en' => 'required',
         ];
     }

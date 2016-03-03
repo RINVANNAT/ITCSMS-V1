@@ -19,6 +19,8 @@ class CreateAccountsTable extends Migration
 			$table->string('name');
             $table->string('description')->nullable();
             $table->boolean('active')->default(true);
+			$table->double('amount_dollar')->nullable();
+			$table->double('amount_riel')->nullable();
 			$table->timestamps();
 			$table->softDeletes();
 

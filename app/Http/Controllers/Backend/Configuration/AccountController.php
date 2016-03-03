@@ -3,23 +3,27 @@
 namespace App\Http\Controllers\Backend\Configuration;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Backend\Configuration\Account\StoreAccountRequest;
+use App\Http\Requests\Backend\Configuration\Account\UpdateAccountRequest;
+use App\Repositories\Backend\Account\AccountRepositoryContract;
+use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
 
 class AccountController extends Controller
 {
     /**
-     * @var DepartmentRepositoryContract
+     * @var AccountRepositoryContract
      */
-    protected $departments;
+    protected $accounts;
 
     /**
-     * @param DepartmentRepositoryContract       $departments
+     * @param AccountRepositoryContract $accountRepo
      */
     public function __construct(
-        DepartmentRepositoryContract $departmentRepo
+        AccountRepositoryContract $accountRepo
     )
     {
-        $this->departments = $departmentRepo;
+        $this->accounts = $accountRepo;
     }
 
     /**
@@ -29,7 +33,7 @@ class AccountController extends Controller
      */
     public function index()
     {
-        return view('backend.configuration.department.index');
+        return view('backend.configuration.account.index');
     }
 
     /**
@@ -39,9 +43,8 @@ class AccountController extends Controller
      */
     public function create()
     {
-        $departments = Department::lists('name_kh','id');
-        $schools = School::lists('name_kh','id');
-        return view('backend.configuration.department.create',compact('departments','schools'));
+
+        return view('backend.configuration.account.create');
     }
 
     /**
@@ -50,10 +53,10 @@ class AccountController extends Controller
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
-    public function store(StoreDepartmentRequest $request)
+    public function store(StoreAccountRequest $request)
     {
-        $this->departments->create($request->all());
-        return redirect()->route('admin.configuration.departments.index')->withFlashSuccess(trans('alerts.backend.roles.created'));
+        $this->accounts->create($request->all());
+        return redirect()->route('admin.configuration.accounts.index')->withFlashSuccess(trans('alerts.backend.general.created'));
     }
 
     /**
@@ -75,7 +78,9 @@ class AccountController extends Controller
      */
     public function edit($id)
     {
-        //
+        $account = $this->accounts->findOrThrowException($id);
+
+        return view('backend.configuration.account.edit',compact('account'));
     }
 
     /**
@@ -85,9 +90,10 @@ class AccountController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function update(UpdateDepartmentRequest $request, $id)
+    public function update(UpdateAccountRequest $request, $id)
     {
-        //
+        $this->accounts->update($id, $request->all());
+        return redirect()->route('admin.configuration.accounts.index')->withFlashSuccess(trans('alerts.backend.generals.updated'));
     }
 
     /**
@@ -98,35 +104,32 @@ class AccountController extends Controller
      */
     public function destroy($id)
     {
-        //
-    }
-
-    public function getSubDepartments(){
-
+        $this->accounts->destroy($id);
+        return redirect()->route('admin.configuration.accounts.index')->withFlashSuccess(trans('alerts.backend.generals.deleted'));
     }
 
     public function data()
     {
-        //$student = Student::join('studentAnnuals', 'studentAnnuals.student_id', '=', 'students.id')
-        //	->select(['students.id_card','students.name_kh','students.name_latin','studentAnnuals.grade_id']);
 
-        //$studentAnnuals = StudentAnnual::with(['student','grade'])->select(['students.id_card','students.name_kh','students.name_latin','grades.name_kh']);
+        $accounts = DB::table('accounts')
+            ->select(['id','name','description','active','amount_dollar','amount_riel','updated_at']);
 
-        $departments = DB::table('departments')
-            //->whereNull('parent_id')
-            ->select(['id','code','name_kh','name_en','name_fr']);
-
-        $datatables =  app('datatables')->of($departments);
+        $datatables =  app('datatables')->of($accounts);
 
 
         return $datatables
-            ->editColumn('id', '{!! str_limit($id, 60) !!}')
-            ->editColumn('code', '{!! str_limit($code, 60) !!}')
-            ->editColumn('name_kh', '{!! str_limit($name_kh, 60) !!}')
-            ->editColumn('name_en', '{!! str_limit($name_en, 60) !!}')
-            ->editColumn('name_fr', '{!! str_limit($name_fr, 60) !!}')
-            ->addColumn('action', function ($department) {
-                return '<a href="#edit-'.$department->id.'" class="btn btn-xs btn-primary"><i class="glyphicon glyphicon-edit"></i> '. trans('buttons.general.crud.edit').'</a>';
+            ->editColumn('name', '{!! str_limit($name, 60) !!}')
+            ->editColumn('description', '{!! str_limit($description, 200) !!}')
+            ->editColumn('active', '{!! $active==1?"<i class=\"glyphicon glyphicon-ok\"></i>":"<i class=\"glyphicon glyphicon-remove\"></i>" !!}')
+            ->editColumn('amount_dollar', '{!! $amount_dollar==""? "0 $" : $amount_dollar. " $"  !!}')
+            ->editColumn('amount_riel', '{!! $amount_riel==""? "0 ៛" : $amount_riel. " ៛" !!}')
+            ->editColumn('updated_at', function ($account) {
+                $date = Carbon::createFromFormat('Y-m-d h:i:s', $account->updated_at);
+                return $date->diffForHumans();
+            })
+            ->addColumn('action', function ($account) {
+                return  '<a href="'.route('admin.configuration.accounts.edit',$account->id).'" class="btn btn-xs btn-primary"><i class="fa fa-pencil" data-toggle="tooltip" data-placement="top" title="" data-original-title="'.trans('buttons.general.crud.edit').'"></i> </a>'.
+                ' <button class="btn btn-xs btn-danger btn-delete" data-remote="'.route('admin.configuration.accounts.destroy', $account->id) .'"><i class="fa fa-times" data-toggle="tooltip" data-placement="top" title="' . trans('buttons.general.crud.delete') . '"></i></button>';
             })
             ->make(true);
     }

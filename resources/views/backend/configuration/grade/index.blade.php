@@ -1,10 +1,10 @@
 @extends ('backend.layouts.master')
 
-@section ('title', trans('labels.backend.grades.index_title'))
+@section ('title', trans('labels.backend.grades.title'))
 
 @section('page-header')
     <h1>
-        {{ trans('labels.backend.grades.index_title') }}
+        {{ trans('labels.backend.grades.title') }}
         <small>{{ trans('labels.backend.grades.sub_index_title') }}</small>
     </h1>
 
@@ -17,7 +17,21 @@
 @section('content')
     <div class="box box-success">
         <div class="box-header with-border">
-            <h3 class="box-title">{{ trans('labels.backend.grades.index_title') }}</h3>
+            <div class="mailbox-controls">
+                <!-- Check all button -->
+                <a href="{!! route('admin.configuration.grades.create') !!}">
+                    <button class="btn btn-primary btn-sm"><i class="fa fa-plus-circle"></i> Add
+                    </button>
+                </a>
+                <div class="btn-group">
+                    <button class="btn btn-default btn-sm"><i class="fa fa-trash-o"></i></button>
+                    <button class="btn btn-default btn-sm"><i class="fa fa-reply"></i></button>
+                    <button class="btn btn-default btn-sm"><i class="fa fa-share"></i></button>
+                </div>
+                <!-- /.btn-group -->
+                <button class="btn btn-default btn-sm"><i class="fa fa-refresh"></i></button>
+
+            </div>
 
 
         </div><!-- /.box-header -->
@@ -59,6 +73,7 @@
                     { data: 'action', name: 'action',orderable: false, searchable: false}
                 ]
             });
+            enableDeleteRecord($('#grades-table'));
         });
     </script>
 @stop

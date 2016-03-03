@@ -2,11 +2,28 @@
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests;
+use App\Repositories\Backend\Grade\GradeRepositoryContract;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Http\Request;
 
 class GradeController extends Controller
 {
+
+    /**
+     * @var GradeRepositoryContract
+     */
+    protected $grades;
+
+    /**
+     * @param GradeRepositoryContract $gradeRepo
+     */
+    public function __construct(
+        GradeRepositoryContract $gradeRepo
+    )
+    {
+        $this->grades = $gradeRepo;
+    }
+
     /**
      * Display a listing of the resource.
      *
@@ -24,7 +41,7 @@ class GradeController extends Controller
      */
     public function create()
     {
-        //
+        return view('backend.configuration.grade.create');
     }
 
     /**
@@ -35,7 +52,8 @@ class GradeController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        $this->grades->create($request->all());
+        return redirect()->route('admin.configuration.grades.index')->withFlashSuccess(trans('alerts.backend.generals.created'));
     }
 
     /**
@@ -57,7 +75,10 @@ class GradeController extends Controller
      */
     public function edit($id)
     {
-        //
+
+        $grade = $this->grades->findOrThrowException($id);
+
+        return view('backend.configuration.grade.edit',compact('grade'));
     }
 
     /**
@@ -69,7 +90,8 @@ class GradeController extends Controller
      */
     public function update(Request $request, $id)
     {
-        //
+        $this->grades->update($id, $request->all());
+        return redirect()->route('admin.configuration.grades.index')->withFlashSuccess(trans('alerts.backend.generals.updated'));
     }
 
     /**
@@ -80,7 +102,8 @@ class GradeController extends Controller
      */
     public function destroy($id)
     {
-        //
+        $this->grades->destroy($id);
+        return redirect()->route('admin.configuration.grades.index')->withFlashSuccess(trans('alerts.backend.generals.deleted'));
     }
 
     public function data(Request $request)
@@ -97,7 +120,8 @@ class GradeController extends Controller
             ->editColumn('name_en', '{!! str_limit($name_en, 60) !!}')
             ->editColumn('name_fr', '{!! str_limit($name_fr, 60) !!}')
             ->addColumn('action', function ($grade) {
-                return '<a href="#edit-'.$grade->id.'" class="btn btn-xs btn-primary"><i class="glyphicon glyphicon-edit"></i> '. trans('buttons.general.crud.edit').'</a>';
+                return  '<a href="'.route('admin.configuration.grades.edit',$grade->id).'" class="btn btn-xs btn-primary"><i class="fa fa-pencil" data-toggle="tooltip" data-placement="top" title="" data-original-title="'.trans('buttons.general.crud.edit').'"></i> </a>'.
+                ' <button class="btn btn-xs btn-danger btn-delete" data-remote="'.route('admin.configuration.grades.destroy', $grade->id) .'"><i class="fa fa-times" data-toggle="tooltip" data-placement="top" title="' . trans('buttons.general.crud.delete') . '"></i></button>';
             })
             ->make(true);
     }

@@ -1,10 +1,10 @@
 @extends ('backend.layouts.master')
 
-@section ('title', trans('labels.backend.departments.index_title'))
+@section ('title', trans('labels.backend.departments.title'))
 
 @section('page-header')
     <h1>
-        {{ trans('labels.backend.departments.index_title') }}
+        {{ trans('labels.backend.departments.title') }}
         <small>{{ trans('labels.backend.departments.sub_index_title') }}</small>
     </h1>
 
@@ -21,10 +21,6 @@
                 <!-- Check all button -->
                 <a href="{!! route('admin.configuration.departments.create') !!}">
                     <button class="btn btn-primary btn-sm"><i class="fa fa-plus-circle"></i> Add
-                    </button>
-                </a>
-                <a href="#">
-                    <button class="btn btn-primary btn-sm"><i class="fa fa-plus-circle"></i> Import
                     </button>
                 </a>
 
@@ -81,6 +77,8 @@
                     { data: 'action', name: 'action',orderable: false, searchable: false}
                 ]
             });
+
+            enableDeleteRecord($('#departments-table'));
         });
     </script>
 @stop

@@ -14,6 +14,11 @@ return [
     */
 
     'backend' => [
+        'generals'=> [
+            'updated' => 'Information is updated.',
+            'deleted' => 'Information is deleted',
+            'created' => 'Information is created'
+        ],
         'permissions' => [
             'created' => 'Permission successfully created.',
             'deleted' => 'Permission successfully deleted.',
