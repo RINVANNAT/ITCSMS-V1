@@ -82,6 +82,48 @@ return [
                 'not_found' => 'That academic year does not exist.',
                 'already_exists' => 'That academic year already exists. You can not add the same academic year.',
             ],
+            'accounts' => [
+                'create_error' => 'There was a problem creating this account. Please try again.',
+                'delete_error' => 'There was a problem deleting this account. Please try again.',
+                'not_found' => 'That account does not exist.',
+                'already_exists' => 'That account already exists. You can not add the same account.',
+            ],
+            'buildings' => [
+                'create_error' => 'There was a problem creating this building. Please try again.',
+                'delete_error' => 'There was a problem deleting this building. Please try again.',
+                'not_found' => 'That building does not exist.',
+                'already_exists' => 'That building already exists. You can not add the same building.',
+            ],
+            'highSchools' => [
+                'create_error' => 'There was a problem creating this high school. Please try again.',
+                'delete_error' => 'There was a problem deleting this high school. Please try again.',
+                'not_found' => 'That high school does not exist.',
+                'already_exists' => 'That high school already exists. You can not add the same high school.',
+            ],
+            'incomeTypes' => [
+                'create_error' => 'There was a problem creating this income type. Please try again.',
+                'delete_error' => 'There was a problem deleting this income type. Please try again.',
+                'not_found' => 'That income type does not exist.',
+                'already_exists' => 'That academic year already exists. You can not add the same academic year.',
+            ],
+            'outcomeTypes' => [
+                'create_error' => 'There was a problem creating this outcome type. Please try again.',
+                'delete_error' => 'There was a problem deleting this outcome type. Please try again.',
+                'not_found' => 'That outcome type does not exist.',
+                'already_exists' => 'That outcome type already exists. You can not add the same outcome type.',
+            ],
+            'rooms' => [
+                'create_error' => 'There was a problem creating this room. Please try again.',
+                'delete_error' => 'There was a problem deleting this room. Please try again.',
+                'not_found' => 'That academic year does not exist.',
+                'already_exists' => 'That room already exists. You can not add the same room.',
+            ],
+            'studentsBac2s' => [
+                'create_error' => 'There was a problem creating this student BacII. Please try again.',
+                'delete_error' => 'There was a problem deleting this student BacII. Please try again.',
+                'not_found' => 'That student BacII does not exist.',
+                'already_exists' => 'That student BacII already exists. You can not add the same student BacII.',
+            ],
         ]
     ],
 

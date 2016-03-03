@@ -4,11 +4,27 @@ namespace App\Http\Controllers\Backend\Configuration;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests;
+use App\Repositories\Backend\AcademicYear\AcademicYearRepositoryContract;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Http\Request;
 
 class AcademicYearController extends Controller
 {
+    /**
+     * @var AcademicYearRepositoryContract
+     */
+    protected $academicYears;
+
+    /**
+     * @param AcademicYearRepositoryContract $academicYearRepo
+     */
+    public function __construct(
+        AcademicYearRepositoryContract $academicYearRepo
+    )
+    {
+        $this->academicYears = $academicYearRepo;
+    }
+    
     /**
      * Display a listing of the resource.
      *
@@ -37,8 +53,8 @@ class AcademicYearController extends Controller
      */
     public function store(Request $request)
     {
-        $this->roles->create($request->all());
-        return redirect()->route('admin.access.roles.index')->withFlashSuccess(trans('alerts.backend.roles.created'));
+        $this->academicYears->create($request->all());
+        return redirect()->route('admin.configuration.academicYears.index')->withFlashSuccess(trans('alerts.backend.academicYears.created'));
     }
 
     /**

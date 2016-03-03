@@ -3,17 +3,16 @@
 namespace App\Repositories\Backend\Department;
 
 /**
- * Interface RoleRepositoryContract
- * @package App\Repositories\Role
+ * Interface DepartmentRepositoryContract
+ * @package App\Repositories\Backend\Department
  */
 interface DepartmentRepositoryContract
 {
     /**
      * @param  $id
-     * @param  bool    $withPermissions
      * @return mixed
      */
-    public function findOrThrowException($id, $withPermissions = false);
+    public function findOrThrowException($id);
 
     /**
      * @param  $per_page
@@ -26,10 +25,9 @@ interface DepartmentRepositoryContract
     /**
      * @param  string  $order_by
      * @param  string  $sort
-     * @param  bool    $withPermissions
      * @return mixed
      */
-    public function getAllDepartments($order_by = 'id', $sort = 'asc', $withPermissions = false);
+    public function getAllDepartments($order_by = 'id', $sort = 'asc');
 
     /**
      * @param  $input

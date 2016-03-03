@@ -61,7 +61,14 @@ return [
             'departments'=> 'Departments',
             'grades'=> 'Grades',
             'degrees' => 'Degrees',
-            'academicYears' => 'Academic Years'
+            'academicYears' => 'Academic Years',
+            'highSchools' => 'High School',
+            'accounts' => 'Account',
+            'incomeTypes' => 'Income Type',
+            'outcomeTypes' => 'Outcome Type',
+            'buildings' => 'Building',
+            'rooms' => 'Room',
+            'studentBac2s' => 'Student Bac II',
         ],
 
         'student' => [

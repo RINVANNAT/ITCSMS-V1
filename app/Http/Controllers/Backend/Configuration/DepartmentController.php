@@ -3,7 +3,6 @@
 namespace App\Http\Controllers\Backend\Configuration;
 
 use App\Http\Controllers\Controller;
-use App\Http\Requests\Backend\Configuration\Department\DataDepartmentRequest;
 use App\Http\Requests\Backend\Configuration\Department\StoreDepartmentRequest;
 use App\Http\Requests\Backend\Configuration\Department\UpdateDepartmentRequest;
 use App\Models\Department;
@@ -19,7 +18,7 @@ class DepartmentController extends Controller
     protected $departments;
 
     /**
-     * @param DepartmentRepositoryContract       $departments
+     * @param DepartmentRepositoryContract $departmentRepo
      */
     public function __construct(
         DepartmentRepositoryContract $departmentRepo
@@ -53,7 +52,7 @@ class DepartmentController extends Controller
     /**
      * Store a newly created resource in storage.
      *
-     * @param  \Illuminate\Http\Request  $request
+     * @param  StoreDepartmentRequest $request
      * @return \Illuminate\Http\Response
      */
     public function store(StoreDepartmentRequest $request)
@@ -87,7 +86,7 @@ class DepartmentController extends Controller
     /**
      * Update the specified resource in storage.
      *
-     * @param  \Illuminate\Http\Request  $request
+     * @param  UpdateDepartmentRequest $request
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */

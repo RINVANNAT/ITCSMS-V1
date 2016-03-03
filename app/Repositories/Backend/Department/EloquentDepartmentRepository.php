@@ -16,11 +16,10 @@ class EloquentDepartmentRepository implements DepartmentRepositoryContract
 {
     /**
      * @param  $id
-     * @param  bool $withPermissions
      * @throws GeneralException
      * @return \Illuminate\Database\Eloquent\Collection|\Illuminate\Database\Eloquent\Model|\Illuminate\Support\Collection|null|static
      */
-    public function findOrThrowException($id, $withPermissions = false)
+    public function findOrThrowException($id)
     {
         if (! is_null(Department::find($id))) {
             return Department::find($id);
@@ -44,10 +43,9 @@ class EloquentDepartmentRepository implements DepartmentRepositoryContract
     /**
      * @param  string  $order_by
      * @param  string  $sort
-     * @param  bool    $withPermissions
      * @return mixed
      */
-    public function getAllDepartments($order_by = 'sort', $sort = 'asc', $withPermissions = false)
+    public function getAllDepartments($order_by = 'sort', $sort = 'asc')
     {
         return Department::orderBy($order_by, $sort)
             ->get();

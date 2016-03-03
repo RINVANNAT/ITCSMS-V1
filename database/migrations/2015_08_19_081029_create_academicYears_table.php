@@ -19,7 +19,6 @@ class CreateAcademicYearsTable extends Migration
 			$table->string('name_kh')->nullable();
 			$table->string('name_en');
 			$table->string('name_fr')->nullable();
-			$table->string('code')->nullable();
 			$table->timestamp('date_start')->nullable();
 			$table->timestamp('date_end')->nullable();
 			$table->string('description')->nullable();

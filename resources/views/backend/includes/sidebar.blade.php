@@ -35,7 +35,7 @@
                 <a href="{!! route('admin.dashboard') !!}"><span>{{ trans('menus.backend.sidebar.dashboard') }}</span></a>
             </li>
 
-            <li class="{{ Active::pattern('admin/student') }}">
+            <li class="{{ Active::pattern('admin/studentAnnuals') }}">
                 <a href="{!!url('admin/studentAnnuals')!!}"><span>{{ trans('menus.backend.student.title') }}</span></a>
             </li>
             @permission('view-access-management')
@@ -61,6 +61,27 @@
                     </li>
                     <li class="{{ Active::pattern('admin/configuration/academicYears') }}">
                         <a href="{!! url('admin/configuration/academicYears') !!}">{{ trans('menus.backend.configuration.academicYears') }}</a>
+                    </li>
+                    <li class="{{ Active::pattern('admin/configuration/accounts') }}">
+                        <a href="{!! url('admin/configuration/accounts') !!}">{{ trans('menus.backend.configuration.accounts') }}</a>
+                    </li>
+                    <li class="{{ Active::pattern('admin/configuration/buildings') }}">
+                        <a href="{!! url('admin/configuration/buildings') !!}">{{ trans('menus.backend.configuration.buildings') }}</a>
+                    </li>
+                    <li class="{{ Active::pattern('admin/configuration/highSchools') }}">
+                        <a href="{!! url('admin/configuration/highSchools') !!}">{{ trans('menus.backend.configuration.highSchools') }}</a>
+                    </li>
+                    <li class="{{ Active::pattern('admin/configuration/incomeTypes') }}">
+                        <a href="{!! url('admin/configuration/incomeTypes') !!}">{{ trans('menus.backend.configuration.incomeTypes') }}</a>
+                    </li>
+                    <li class="{{ Active::pattern('admin/configuration/outcomeTypes') }}">
+                        <a href="{!! url('admin/configuration/outcomeTypes') !!}">{{ trans('menus.backend.configuration.outcomeTypes') }}</a>
+                    </li>
+                    <li class="{{ Active::pattern('admin/configuration/rooms') }}">
+                        <a href="{!! url('admin/configuration/rooms') !!}">{{ trans('menus.backend.configuration.rooms') }}</a>
+                    </li>
+                    <li class="{{ Active::pattern('admin/configuration/studentBac2s') }}">
+                        <a href="{!! url('admin/configuration/studentBac2s') !!}">{{ trans('menus.backend.configuration.studentBac2s') }}</a>
                     </li>
                 </ul>
             </li>

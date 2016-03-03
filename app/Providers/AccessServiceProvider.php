@@ -104,6 +104,56 @@ class AccessServiceProvider extends ServiceProvider
             \App\Repositories\Backend\Department\EloquentDepartmentRepository::class
         );
 
+        $this->app->bind(
+            \App\Repositories\Backend\AcademicYear\AcademicYearRepositoryContract::class,
+            \App\Repositories\Backend\AcademicYear\EloquentAcademicYearRepository::class
+        );
+
+        $this->app->bind(
+            \App\Repositories\Backend\Account\AccountRepositoryContract::class,
+            \App\Repositories\Backend\Account\EloquentAccountRepository::class
+        );
+
+        $this->app->bind(
+            \App\Repositories\Backend\Building\BuildingRepositoryContract::class,
+            \App\Repositories\Backend\Building\EloquentBuildingRepository::class
+        );
+
+        $this->app->bind(
+            \App\Repositories\Backend\Degree\DegreeRepositoryContract::class,
+            \App\Repositories\Backend\Degree\EloquentDegreeRepository::class
+        );
+
+        $this->app->bind(
+            \App\Repositories\Backend\Grade\GradeRepositoryContract::class,
+            \App\Repositories\Backend\Grade\EloquentGradeRepository::class
+        );
+
+        $this->app->bind(
+            \App\Repositories\Backend\HighSchool\HighSchoolRepositoryContract::class,
+            \App\Repositories\Backend\HighSchool\EloquentHighSchoolRepository::class
+        );
+
+        $this->app->bind(
+            \App\Repositories\Backend\IncomeType\IncomeTypeRepositoryContract::class,
+            \App\Repositories\Backend\IncomeType\EloquentIncomeTypeRepository::class
+        );
+
+        $this->app->bind(
+            \App\Repositories\Backend\OutcomeType\OutcomeTypeRepositoryContract::class,
+            \App\Repositories\Backend\OutcomeType\EloquentOutcomeTypeRepository::class
+        );
+
+        $this->app->bind(
+            \App\Repositories\Backend\Room\RoomRepositoryContract::class,
+            \App\Repositories\Backend\Room\EloquentRoomRepository::class
+        );
+
+        $this->app->bind(
+            \App\Repositories\Backend\StudentBac2\StudentBac2RepositoryContract::class,
+            \App\Repositories\Backend\StudentBac2\EloquentStudentBac2Repository::class
+        );
+
     }
 
     /**

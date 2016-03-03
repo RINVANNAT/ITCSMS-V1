@@ -27,7 +27,6 @@ return [
         'show' => 'Show',
         'toggle_navigation' => 'Toggle Navigation',
         'id' => 'ID',
-        'none' => 'None',
     ],
 
     'backend' => [
@@ -164,7 +163,7 @@ return [
             ]
         ],
         'academicYears' => [
-            'index_title' => 'Academic Years',
+            'title' => 'Academic Years',
             'sub_index_title' => 'All available academic years',
             'sub_create_title' => 'Create academic year',
             'sub_detail_title' => 'Detail of academic year',
@@ -176,6 +175,20 @@ return [
                 'date_end' => "Date End"
             ]
         ],
+        'accounts' => [
+            'title' => 'Account',
+            'sub_index_title' => 'All available account',
+            'sub_create_title' => 'Create new account',
+            'sub_detail_title' => 'Detail of an account',
+            'fields'=>[
+                'code' => 'Code',
+                'name_kh' => 'Name KH',
+                'name_latin' => 'Name Latin',
+                'date_start' => "Date Start",
+                'date_end' => "Date End"
+            ]
+        ],
+
         'students' => [
             'index_title' => 'Students',
             'sub_index_title' => 'All existing students',

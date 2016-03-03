@@ -1,14 +1,14 @@
 <?php
 
-namespace App\Http\Requests\Backend\Configuration\Department;
+namespace App\Http\Requests\Backend\Configuration\Building;
 
 use App\Http\Requests\Request;
 
 /**
- * Class StoreRoleRequest
- * @package App\Http\Requests\Backend\Access\Role
+ * Class EditBuildingRequest
+ * @package App\Http\Requests\Backend\Configuration\Building
  */
-class DataDepartmentRequest extends Request
+class EditBuildingRequest extends Request
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -17,8 +17,7 @@ class DataDepartmentRequest extends Request
      */
     public function authorize()
     {
-        //return access()->allow('create-departments');
-        return true;
+        return access()->allow('edit-accounts');
     }
 
     /**
