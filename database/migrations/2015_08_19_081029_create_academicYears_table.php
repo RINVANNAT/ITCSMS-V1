@@ -21,6 +21,7 @@ class CreateAcademicYearsTable extends Migration
 			$table->timestamp('date_start')->nullable();
 			$table->timestamp('date_end')->nullable();
 			$table->string('description')->nullable();
+			$table->boolean('active')->default(true);
 			$table->timestamps();
 
             $table->integer('create_uid')->unsigned()->index();
@@ -34,7 +35,7 @@ class CreateAcademicYearsTable extends Migration
                 ->references('id')
                 ->on('users')
                 ->onDelete('NO ACTION');
-			$table->softDeletes();
+
 		});
 	}
 

@@ -18,7 +18,7 @@ class CreateRoomTypesTable extends Migration
 			$table->increments('id');
 			$table->string('name');
 			$table->timestamps();
-			$table->softDeletes();
+            $table->boolean('active')->default(true);
 
             $table->integer('create_uid')->unsigned()->index();
             $table->foreign('create_uid')

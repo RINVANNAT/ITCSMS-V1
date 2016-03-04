@@ -21,6 +21,7 @@ class CreateGradesTable extends Migration
 			$table->string('name_fr')->nullable();
 			$table->string('code')->nullable();
 			$table->string('description')->nullable();
+			$table->boolean('active')->default(true);
 			$table->timestamps();
 
             $table->integer('create_uid')->unsigned()->index();
@@ -34,7 +35,6 @@ class CreateGradesTable extends Migration
                 ->references('id')
                 ->on('users')
                 ->onDelete('NO ACTION');
-			$table->softDeletes();
 		});
 	}
 

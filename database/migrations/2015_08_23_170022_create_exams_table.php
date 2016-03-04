@@ -19,10 +19,10 @@ class CreateExamsTable extends Migration
 			$table->string('name');
 			$table->timestamp('date_start');
 			$table->timestamp('date_end');
+            $table->boolean('active')->default(true);
 
 			$table->string('description')->nullable();
 			$table->timestamps();
-			$table->softDeletes();
 
 			$table->integer('type_id')->unsigned();
 			$table->foreign('type_id')

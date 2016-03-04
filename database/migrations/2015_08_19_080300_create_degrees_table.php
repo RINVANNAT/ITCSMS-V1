@@ -21,6 +21,7 @@ class CreateDegreesTable extends Migration
             $table->string('name_fr')->nullable();
             $table->string('code')->nullable();
             $table->string('description')->nullable();
+            $table->boolean('active')->default(true);
             $table->timestamps();
 
             $table->integer('school_id')->unsigned();
@@ -40,7 +41,6 @@ class CreateDegreesTable extends Migration
                 ->references('id')
                 ->on('users')
                 ->onDelete('NO ACTION');
-            $table->softDeletes();
         });
 
         Schema::create('degree_department',function(Blueprint $table){

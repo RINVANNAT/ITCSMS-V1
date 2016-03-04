@@ -20,6 +20,7 @@ class CreateSchoolPrefixsTable extends Migration
             $table->string('name_kh',100);
             $table->boolean('is_moe')->default(true);
             $table->string('desc',100)->nullable();
+            $table->boolean('active')->default(true);
 
         });
     }

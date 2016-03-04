@@ -22,7 +22,6 @@ class CreateAccountsTable extends Migration
 			$table->double('amount_dollar')->nullable();
 			$table->double('amount_riel')->nullable();
 			$table->timestamps();
-			$table->softDeletes();
 
             $table->integer('create_uid')->unsigned()->index();
             $table->foreign('create_uid')

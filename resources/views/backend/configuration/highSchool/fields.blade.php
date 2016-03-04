@@ -30,7 +30,6 @@
     </div>
 </div><!--form control-->
 
-
 <div class="form-group">
     {!! Form::label('name', trans('labels.backend.highSchools.fields.prefix_id'), ['class' => 'col-lg-2 control-label']) !!}
     <div class="col-lg-4">

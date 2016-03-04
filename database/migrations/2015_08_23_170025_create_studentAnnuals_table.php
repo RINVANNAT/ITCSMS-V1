@@ -18,7 +18,7 @@ class CreateStudentAnnualsTable extends Migration
 			$table->increments('id');
             $table->timestamps();
             $table->string('group')->nullable();
-            $table->softDeletes();
+            $table->boolean('active')->default(true);
 
             $table->integer('promotion_id')->unsigned()->index();
             $table->integer('department_id')->unsigned()->index();

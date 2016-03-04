@@ -28,8 +28,9 @@ class StoreOutcomeTypeRequest extends Request
     public function rules()
     {
         return [
-            'code' => 'required',
-            'name_en' => 'required',
+            'code' => 'required|unique:outcomeTypes|max:4',
+            'name' => 'required',
+            'origin' => 'max:10'
         ];
     }
 }

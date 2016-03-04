@@ -18,6 +18,7 @@ class CreateCommunesTable extends Migration
 			$table->increments('id');
 			$table->string('name_en');
 			$table->string('name_kh');
+            $table->boolean('active')->default(true);
 			$table->timestamps();
 
 			$table->integer('district_id');
@@ -25,7 +26,6 @@ class CreateCommunesTable extends Migration
 				->references('id')
 				->on('districts')
 				->onDelete('cascade');
-			$table->softDeletes();
 		});
 	}
 

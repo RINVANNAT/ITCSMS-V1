@@ -17,7 +17,7 @@ class CreateCountriesTable extends Migration
             $table->string('name');
             $table->string('name_kh')->nullable();
             $table->timestamps();
-            $table->softDeletes();
+            $table->boolean('active')->default(true);
 
             $table->integer('create_uid')->unsigned()->index();
             $table->foreign('create_uid')

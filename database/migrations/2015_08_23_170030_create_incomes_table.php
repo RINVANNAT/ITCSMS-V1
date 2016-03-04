@@ -24,7 +24,7 @@ class CreateIncomesTable extends Migration
             $table->boolean('is_printed')->default(false);
 			$table->timestamp('pay_date');
 			$table->timestamps();
-			$table->softDeletes();
+            $table->boolean('active')->default(true);
 
             $table->integer('create_uid')->unsigned();
             $table->foreign('create_uid')

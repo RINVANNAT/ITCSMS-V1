@@ -20,7 +20,6 @@ class CreateIncomeTypesTable extends Migration
 			$table->string('description')->nullable();
             $table->boolean('active')->default(true);
 			$table->timestamps();
-			$table->softDeletes();
 
             $table->integer('create_uid')->unsigned()->index();
             $table->foreign('create_uid')

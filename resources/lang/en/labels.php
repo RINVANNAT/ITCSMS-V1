@@ -225,6 +225,72 @@ return [
             ]
         ],
 
+        'outcomeTypes' => [
+            'title' => 'Outcome Type',
+            'sub_index_title' => 'All existing outcome type',
+            'sub_edit_title' => 'Edit outcome type information',
+            'sub_create_title' => 'Create new outcome type',
+            'sub_detail_title' => 'Detail of an outcome type',
+            'fields'=>[
+                'code' => "Code",
+                'origin' => "Origin",
+                'name' => 'Name',
+                'active' => 'Is Active',
+                'description' => "Description",
+            ]
+        ],
+        'rooms' => [
+            'title' => 'Room',
+            'sub_index_title' => 'All existing rooms',
+            'sub_edit_title' => 'Edit room information',
+            'sub_create_title' => 'Create new rooms',
+            'sub_detail_title' => 'Detail of a room',
+            'fields'=>[
+                'active' => 'Is Active',
+                'name' => "Name",
+                'nb_desk' => "Total Desk",
+                'nb_chair' => 'Total Chair',
+                'nb_chair_exam' => 'Chair Exam',
+                'size' => 'Size',
+                'room_type_id' => 'Room Type',
+                'building_id' => 'Building',
+                'department_id' => 'Department',
+                'description' => "Description",
+            ]
+        ],
+
+        'studentBac2s' => [
+            'title' => 'Student Bac II',
+            'sub_index_title' => 'All existing student Bac II',
+            'sub_edit_title' => 'Edit student Bac II information',
+            'sub_create_title' => 'Create new student Bac II',
+            'sub_detail_title' => 'Detail of a student Bac II',
+            'fields'=>[
+                'active' => 'Is Active',
+                'can_id' => "Candidate ID",
+                'mcs_no' => "Ministry No",
+                'province_id' => "From Province",
+                'name_kh' => "Name Khmer",
+                'dob' => "Date of birth",
+                'gender_id' => "Gender",
+                'father_name' => "Father Name",
+                'mother_name' => "Mother Name",
+                'pob' => "Place of birth",
+                'highschool_id' => "High School",
+                'room' => "Exam Room",
+                'seat' => "Exam Seat",
+                'bac_math_grade' => "Math Grade",
+                'bac_chem_grade' => "Chemie Grade",
+                'bac_phys_grade' => "Physique Grade",
+                'percentile' => "Percentile",
+                'grade' => "Total Grade",
+                'program' => "Program",
+                'desc' => "Description",
+                'bac_year' => "BacII Year",
+                'status' => "Status",
+                'is_registered' => "Is Registered"
+            ]
+        ],
 
         'highSchools' => [
             'title' => 'High School',

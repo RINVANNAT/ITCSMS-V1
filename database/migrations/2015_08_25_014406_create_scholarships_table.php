@@ -27,7 +27,7 @@ class CreateScholarshipsTable extends Migration
             $table->date('stop')->nullable();
             $table->string('description')->nullable();
             $table->timestamps();
-			$table->softDeletes();
+            $table->boolean('active')->default(true);
 
 			$table->integer('create_uid')->unsigned();
 			$table->foreign('create_uid')

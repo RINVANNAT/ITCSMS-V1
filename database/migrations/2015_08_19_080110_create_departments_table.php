@@ -22,6 +22,7 @@ class CreateDepartmentsTable extends Migration
             $table->string('code')->nullable();
             $table->string('description')->nullable();
             $table->boolean('is_specialist')->default(true);
+			$table->boolean('active')->default(true);
             $table->timestamps();
 
 			$table->integer('parent_id')->unsigned()->nullable();
@@ -47,7 +48,6 @@ class CreateDepartmentsTable extends Migration
                 ->references('id')
                 ->on('users')
                 ->onDelete('NO ACTION');
-			$table->softDeletes();
 		});
 
 

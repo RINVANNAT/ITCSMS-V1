@@ -1,11 +1,11 @@
 @extends ('backend.layouts.master')
 
-@section ('title', trans('labels.backend.departments.index_title'))
+@section ('title', trans('labels.backend.rooms.title'))
 
 @section('page-header')
     <h1>
-        {{ trans('labels.backend.departments.index_title') }}
-        <small>{{ trans('labels.backend.departments.sub_index_title') }}</small>
+        {{ trans('labels.backend.rooms.title') }}
+        <small>{{ trans('labels.backend.rooms.sub_index_title') }}</small>
     </h1>
 
 @endsection
@@ -19,15 +19,10 @@
         <div class="box-header with-border">
             <div class="mailbox-controls">
                 <!-- Check all button -->
-                <a href="{!! route('admin.configuration.departments.create') !!}">
+                <a href="{!! route('admin.configuration.rooms.create') !!}">
                     <button class="btn btn-primary btn-sm"><i class="fa fa-plus-circle"></i> Add
                     </button>
                 </a>
-                <a href="#">
-                    <button class="btn btn-primary btn-sm"><i class="fa fa-plus-circle"></i> Import
-                    </button>
-                </a>
-
                 <div class="btn-group">
                     <button class="btn btn-default btn-sm"><i class="fa fa-trash-o"></i></button>
                     <button class="btn btn-default btn-sm"><i class="fa fa-reply"></i></button>
@@ -43,14 +38,16 @@
 
         <div class="box-body">
             <div>
-                <table class="table table-striped table-bordered table-hover" id="departments-table">
+                <table class="table table-striped table-bordered table-hover" id="rooms-table">
                     <thead>
                     <tr>
-                        <th>{{ trans('labels.general.id') }}</th>
-                        <th>{{ trans('labels.backend.departments.fields.code') }}</th>
-                        <th>{{ trans('labels.backend.departments.fields.name_kh') }}</th>
-                        <th>{{ trans('labels.backend.departments.fields.name_en') }}</th>
-                        <th>{{ trans('labels.backend.departments.fields.name_fr') }}</th>
+                        <th>{{ trans('labels.backend.rooms.fields.name') }}</th>
+                        <th>{{ trans('labels.backend.rooms.fields.nb_desk') }}</th>
+                        <th>{{ trans('labels.backend.rooms.fields.nb_chair') }}</th>
+                        <th>{{ trans('labels.backend.rooms.fields.nb_chair_exam') }}</th>
+                        <th>{{ trans('labels.backend.rooms.fields.size') }}</th>
+                        <th>{{ trans('labels.backend.rooms.fields.room_type_id') }}</th>
+                        <th>{{ trans('labels.backend.rooms.fields.building_id') }}</th>
                         <th>{{ trans('labels.general.actions') }}</th>
                     </tr>
                     </thead>
@@ -67,20 +64,24 @@
     {!! Html::script('plugins/datatables/dataTables.bootstrap.min.js') !!}
     <script>
         $(function() {
-            $('#departments-table').DataTable({
+            $('#rooms-table').DataTable({
                 processing: true,
                 serverSide: true,
                 pageLength: {!! config('app.records_per_page')!!},
-                ajax: '{!! route('admin.configuration.department.data') !!}',
+                ajax: '{!! route('admin.configuration.room.data') !!}',
                 columns: [
-                    { data: 'id', name: 'id'},
-                    { data: 'code', name: 'code'},
-                    { data: 'name_kh', name: 'name_kh'},
-                    { data: 'name_en', name: 'name_en'},
-                    { data: 'name_fr', name: 'name_fr'},
+                    { data: 'rooms.name', name: 'rooms.name'},
+                    { data: 'nb_desk', name: 'nb_desk'},
+                    { data: 'nb_chair', name: 'nb_chair'},
+                    { data: 'nb_chair_exam', name: 'nb_chair_exam'},
+                    { data: 'size', name: 'size'},
+                    { data: 'roomTypes.id', name: 'roomTypes.id'},
+                    { data: 'buildings.id', name: 'buildings.id'},
+
                     { data: 'action', name: 'action',orderable: false, searchable: false}
                 ]
             });
+            enableDeleteRecord($('#rooms-table'));
         });
     </script>
 @stop

@@ -18,6 +18,7 @@ class CreateDistrictsTable extends Migration
 			$table->increments('id');
 			$table->string('name_kh');
 			$table->string('name_en');
+            $table->boolean('active')->default(true);
 			$table->timestamps();
 
 			$table->integer('create_uid')->unsigned()->index();
@@ -37,7 +38,7 @@ class CreateDistrictsTable extends Migration
 				->references('id')
 				->on('origins')
 				->onDelete('cascade');
-			$table->softDeletes();
+
 		});
 	}
 

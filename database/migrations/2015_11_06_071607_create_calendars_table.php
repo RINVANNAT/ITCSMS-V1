@@ -20,7 +20,7 @@ class CreateCalendarsTable extends Migration
 			$table->timestamp('start');
 			$table->timestamp('stop');
 			$table->timestamps();
-			$table->softDeletes();
+            $table->boolean('active')->default(true);
 		});
 	}
 

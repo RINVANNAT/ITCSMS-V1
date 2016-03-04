@@ -30,7 +30,7 @@ class CreateHighSchoolsTable extends Migration
             $table->integer('locd_code')->nullable();
             $table->integer('locc_code')->nullable();
             $table->integer('locv_code')->nullable();
-            $table->softDeletes();
+            $table->boolean('active')->default(true);
 
             $table->foreign('province_id')
                 ->references('id')

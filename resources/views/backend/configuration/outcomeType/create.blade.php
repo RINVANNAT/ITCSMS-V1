@@ -9,6 +9,12 @@
     </h1>
 @endsection
 
+@section('after-styles-end')
+    <style>
+
+    </style>
+@stop
+
 @section('content')
     {!! Form::open(['route' => 'admin.configuration.outcomeTypes.store', 'class' => 'form-horizontal', 'role' => 'form', 'method' => 'post', 'id' => 'create-role']) !!}
 

@@ -18,6 +18,7 @@ class CreateGendersTable extends Migration
             $table->string('name_en');
             $table->string('name_fr')->nullable();
             $table->string('code')->nullable();;
+            $table->boolean('active')->default(true);
             $table->timestamps();
 
             $table->integer('create_uid')->unsigned()->index();
@@ -31,7 +32,6 @@ class CreateGendersTable extends Migration
                 ->references('id')
                 ->on('users')
                 ->onDelete('NO ACTION');
-            $table->softDeletes();
         });
     }
 

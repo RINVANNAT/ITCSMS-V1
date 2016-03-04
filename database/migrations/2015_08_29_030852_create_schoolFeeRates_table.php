@@ -28,7 +28,7 @@ class CreateSchoolFeeRatesTable extends Migration
             $table->integer('academic_year_id')->nullable();
             $table->string('description')->nullable();
             $table->timestamps();
-            $table->softDeletes();
+            $table->boolean('active')->default(true);
 
             $table->foreign('scholarship_id')
                 ->references('id')

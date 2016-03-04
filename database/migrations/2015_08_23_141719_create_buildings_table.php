@@ -19,7 +19,7 @@ class CreateBuildingsTable extends Migration
 			$table->string('name');
 			$table->string('description')->nullable();
 			$table->timestamps();
-			$table->softDeletes();
+            $table->boolean('active')->default(true);
 
 			$table->integer('create_uid')->unsigned()->index()->nullable();
 			$table->foreign('create_uid')

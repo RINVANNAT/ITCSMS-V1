@@ -17,6 +17,7 @@ class CreateOwnershipsTable extends Migration
             $table->string('name_kh');
             $table->string('name_en');
             $table->string('name_fr')->nullable();
+            $table->boolean('active')->default(true);
             $table->timestamps();
 
             $table->integer('create_uid')->unsigned()->index();

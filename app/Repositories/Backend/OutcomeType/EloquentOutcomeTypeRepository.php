@@ -57,7 +57,7 @@ class EloquentOutcomeTypeRepository implements OutcomeTypeRepositoryContract
      */
     public function create($input)
     {
-        if (OutcomeType::where('name_en', $input['name_en'])->first()) {
+        if (OutcomeType::where('name', $input['name'])->first()) {
             throw new GeneralException(trans('exceptions.backend.configuration.outcomeTypes.already_exists'));
         }
 
@@ -66,8 +66,9 @@ class EloquentOutcomeTypeRepository implements OutcomeTypeRepositoryContract
 
         $outcomeType->code = $input['code'];
         $outcomeType->origin = $input['origin'];
+        $outcomeType->name = $input['name'];
         $outcomeType->description = $input['description'];
-        $outcomeType->active = $input['active'];
+        $outcomeType->active = isset($input['active'])?true:false;
         $outcomeType->created_at = Carbon::now();
         $outcomeType->create_uid = auth()->id();
 
@@ -90,8 +91,9 @@ class EloquentOutcomeTypeRepository implements OutcomeTypeRepositoryContract
 
         $outcomeType->code = $input['code'];
         $outcomeType->origin = $input['origin'];
+        $outcomeType->name = $input['name'];
         $outcomeType->description = $input['description'];
-        $outcomeType->active = $input['active'];
+        $outcomeType->active = isset($input['active'])?true:false;
         $outcomeType->updated_at = Carbon::now();
         $outcomeType->write_uid = auth()->id();
 

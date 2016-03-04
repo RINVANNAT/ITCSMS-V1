@@ -57,14 +57,14 @@ class EloquentStudentBac2Repository implements StudentBac2RepositoryContract
      */
     public function create($input)
     {
-        if (StudentBac2::where('name_en', $input['name_en'])->first()) {
-            throw new GeneralException(trans('exceptions.backend.configuration.studentBac2s.already_exists'));
-        }
 
 
         $studentBac2 = new StudentBac2();
 
-        $studentBac2->can_id = $input['can_id'];
+        if(isset($input['can_id'])){
+            $studentBac2->can_id = $input['can_id'];
+        }
+
         $studentBac2->mcs_no = $input['mcs_no'];
         $studentBac2->province_id = $input['province_id'];
         $studentBac2->name_kh = $input['name_kh'];
@@ -79,15 +79,18 @@ class EloquentStudentBac2Repository implements StudentBac2RepositoryContract
         $studentBac2->bac_math_grade = $input['bac_math_grade'];
         $studentBac2->bac_chem_grade = $input['bac_chem_grade'];
         $studentBac2->bac_phys_grade = $input['bac_phys_grade'];
-        $studentBac2->percentile = $input['v'];
+        $studentBac2->percentile = $input['percentile'];
         $studentBac2->grade = $input['grade'];
         $studentBac2->program = $input['program'];
-        $studentBac2->desc = $input['desc'];
         $studentBac2->bac_year = $input['bac_year'];
         $studentBac2->status = $input['status'];
-        $studentBac2->is_registered = $input['is_registered'];
-        $studentBac2->created_at = Carbon::now();
-        $studentBac2->create_uid = auth()->id();
+
+        if (isset($input['desc'])){
+            $studentBac2->desc = $input['desc'];
+        }
+
+        $studentBac2->is_registered = isset($input['is_registered'])?true:false;
+        $studentBac2->active = isset($input['active'])?true:false;
 
         if ($studentBac2->save()) {
             return true;
@@ -121,15 +124,19 @@ class EloquentStudentBac2Repository implements StudentBac2RepositoryContract
         $studentBac2->bac_math_grade = $input['bac_math_grade'];
         $studentBac2->bac_chem_grade = $input['bac_chem_grade'];
         $studentBac2->bac_phys_grade = $input['bac_phys_grade'];
-        $studentBac2->percentile = $input['v'];
+        $studentBac2->percentile = $input['percentile'];
         $studentBac2->grade = $input['grade'];
         $studentBac2->program = $input['program'];
         $studentBac2->desc = $input['desc'];
         $studentBac2->bac_year = $input['bac_year'];
         $studentBac2->status = $input['status'];
-        $studentBac2->is_registered = $input['is_registered'];
-        $studentBac2->updated_at = Carbon::now();
-        $studentBac2->write_uid = auth()->id();
+
+        if (isset($input['desc'])){
+            $studentBac2->desc = $input['desc'];
+        }
+
+        $studentBac2->is_registered = isset($input['is_registered'])?true:false;
+        $studentBac2->active = isset($input['active'])?true:false;
 
         if ($studentBac2->save()) {
             return true;

@@ -19,6 +19,7 @@ class CreateHistoriesTable extends Migration
 			$table->string('name_en');
 			$table->string('name_kh')->nullable();
 			$table->string('name_fr')->nullable();
+            $table->boolean('active')->default(true);
 			$table->timestamps();
 
 			$table->integer('create_uid')->unsigned()->index();

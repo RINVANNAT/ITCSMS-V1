@@ -28,8 +28,10 @@ class StoreRoomRequest extends Request
     public function rules()
     {
         return [
-            'code' => 'required',
-            'name_en' => 'required',
+            'name' => 'required|max:10|unique:rooms',
+            'room_type_id' => 'required',
+            'building_id' => 'required',
+            'department_id' => 'required',
         ];
     }
 }

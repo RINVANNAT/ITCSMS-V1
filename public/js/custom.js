@@ -24,12 +24,13 @@ function enableDeleteRecord(datatable){
                     url: url,
                     type: 'DELETE',
                     dataType: 'json',
-                    data: {method: '_DELETE', submit: true}
+                    data: {method: '_DELETE'},
                 }).always(function (data) {
                     datatable.DataTable().draw(false);
                 });
             }
         });
+        return false;
 
     });
 }

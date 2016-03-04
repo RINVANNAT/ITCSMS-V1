@@ -38,6 +38,9 @@
             <li class="{{ Active::pattern('admin/studentAnnuals') }}">
                 <a href="{!!url('admin/studentAnnuals')!!}"><span>{{ trans('menus.backend.student.title') }}</span></a>
             </li>
+            <li class="{{ Active::pattern('admin/candidates') }}">
+                <a href="{!!url('admin/candidates')!!}"><span>{{ trans('menus.backend.candidate.title') }}</span></a>
+            </li>
             @permission('view-access-management')
                 <li class="{{ Active::pattern('admin/access/*') }}">
                     <a href="{!!url('admin/access/users')!!}"><span>{{ trans('menus.backend.access.title') }}</span></a>

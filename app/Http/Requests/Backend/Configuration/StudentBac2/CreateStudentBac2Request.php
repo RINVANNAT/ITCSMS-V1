@@ -17,7 +17,7 @@ class CreateStudentBac2Request extends Request
      */
     public function authorize()
     {
-        return access()->allow('create-studentBac2s');
+        return false;
     }
 
     /**

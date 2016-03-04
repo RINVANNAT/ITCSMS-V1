@@ -26,7 +26,7 @@ class CreateOutcomesTable extends Migration
             $table->string('attachment')->nullable();
             $table->string('attachment_title')->nullable();
             $table->timestamps();
-            $table->softDeletes();
+            $table->boolean('active')->default(true);
 
             $table->integer('create_uid')->unsigned();
             $table->foreign('create_uid')

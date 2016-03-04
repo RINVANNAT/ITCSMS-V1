@@ -154,6 +154,11 @@ class AccessServiceProvider extends ServiceProvider
             \App\Repositories\Backend\StudentBac2\EloquentStudentBac2Repository::class
         );
 
+        $this->app->bind(
+            \App\Repositories\Backend\Candidate\CandidateRepositoryContract::class,
+            \App\Repositories\Backend\Candidate\EloquentCandidateRepository::class
+        );
+
     }
 
     /**

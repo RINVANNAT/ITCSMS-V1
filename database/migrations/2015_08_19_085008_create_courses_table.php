@@ -24,6 +24,7 @@ class CreateCoursesTable extends Migration
 			$table->integer('time_td')->nullable();
 			$table->integer('time_course')->nullable();
 			$table->float('credit')->nullable();
+			$table->boolean('active')->default(true);
 			$table->timestamps();
 
             $table->integer('create_uid')->unsigned()->index();
@@ -37,7 +38,6 @@ class CreateCoursesTable extends Migration
                 ->references('id')
                 ->on('users')
                 ->onDelete('NO ACTION');
-			$table->softDeletes();
 		});
 	}
 

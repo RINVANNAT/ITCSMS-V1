@@ -35,7 +35,7 @@ class CreateStudentsTable extends Migration
 			$table->string('parent_address',100)->nullable();
 			$table->string('parent_phone',100)->nullable();
 			$table->timestamps();
-			$table->softDeletes();
+            $table->boolean('active')->default(true);
 
             $table->integer('user_id')->unsigned()->index()->nullable();
             $table->foreign('user_id')

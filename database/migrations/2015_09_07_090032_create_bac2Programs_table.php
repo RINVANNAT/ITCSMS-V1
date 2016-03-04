@@ -18,6 +18,7 @@ class CreateBac2ProgramsTable extends Migration
             $table->string('name_en')->nullable();
             $table->string('name_kh');
             $table->boolean('is_grade12')->default(true);
+            $table->boolean('active')->default(true);
 
         });
     }

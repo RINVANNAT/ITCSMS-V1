@@ -22,6 +22,7 @@ class CreateEmployeesTable extends Migration
             $table->string('phone');
 			$table->timestamp('birthdate')->nullable();
 			$table->string('address')->nullable();
+			$table->boolean('active')->default(true);
 			$table->timestamps();
 
 			$table->integer('gender_id')->unsigned()->index();
@@ -60,7 +61,6 @@ class CreateEmployeesTable extends Migration
                 ->references('id')
                 ->on('payslipClients')
                 ->onDelete('NO ACTION');
-			$table->softDeletes();
 		});
 
         Schema::create('employee_role',function(Blueprint $table){

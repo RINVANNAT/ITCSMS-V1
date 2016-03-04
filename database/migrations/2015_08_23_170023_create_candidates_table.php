@@ -48,6 +48,7 @@ class CreateCandidatesTable extends Migration
             $table->float('average')->nullable();
 
             $table->float('bac_percentile')->nullable();
+            $table->boolean('active')->default(true);
 
             $table->string('highschool_id')->index()->nullable();
             $table->foreign('highschool_id')
@@ -145,7 +146,7 @@ class CreateCandidatesTable extends Migration
                 ->references('id')
                 ->on('payslipClients')
                 ->onDelete('NO ACTION');
-            $table->softDeletes();
+
 
 		});
 

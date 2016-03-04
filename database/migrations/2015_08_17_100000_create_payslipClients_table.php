@@ -17,6 +17,7 @@ class CreatePayslipClientsTable extends Migration
 		{
 			$table->increments('id');
 			$table->enum('type',['Student','Staff','Other']);
+			$table->boolean('active')->default(true);
 			$table->timestamps();
 
             $table->integer('create_uid')->unsigned()->index();
@@ -30,7 +31,6 @@ class CreatePayslipClientsTable extends Migration
                 ->references('id')
                 ->on('users')
                 ->onDelete('NO ACTION');
-			$table->softDeletes();
 		});
 	}
 

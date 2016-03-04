@@ -17,7 +17,7 @@ class UpdateStudentBac2Request extends Request
      */
     public function authorize()
     {
-        return access()->allow('edit-studentBac2s');
+        return false;
     }
 
     /**

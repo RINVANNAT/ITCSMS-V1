@@ -20,6 +20,7 @@ class CreateDepartmentOptionsTable extends Migration
 			$table->string('name_en');
 			$table->string('name_fr')->nullable();
 			$table->string('code')->nullable();
+			$table->boolean('active')->default(true);
 			$table->timestamps();
 
 			$table->integer('department_id')->unsigned()->index();
@@ -39,7 +40,6 @@ class CreateDepartmentOptionsTable extends Migration
                 ->references('id')
                 ->on('users')
                 ->onDelete('NO ACTION');
-			$table->softDeletes();
 		});
 	}
 

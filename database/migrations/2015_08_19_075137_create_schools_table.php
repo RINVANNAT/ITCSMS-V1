@@ -20,6 +20,7 @@ class CreateSchoolsTable extends Migration
 			$table->string('name_en');
 			$table->string('name_fr')->nullable();
 			$table->string('code')->nullable();
+			$table->boolean('active')->default(true);
 			$table->enum('language',['khmer','english', 'french'])->nullable();
 			$table->timestamps();
 
@@ -34,7 +35,6 @@ class CreateSchoolsTable extends Migration
                 ->references('id')
                 ->on('users')
                 ->onDelete('NO ACTION');
-			$table->softDeletes();
 		});
 	}
 

@@ -24,7 +24,7 @@ class CreateRoomsTable extends Migration
 
             $table->string('description',100)->nullable();
             $table->string('size',10)->nullable();
-			$table->softDeletes();
+			$table->boolean('active')->default(true);
 
             $table->integer('room_type_id')->unsigned()->index();
             $table->foreign('room_type_id')

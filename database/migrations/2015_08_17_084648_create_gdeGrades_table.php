@@ -16,6 +16,7 @@ class CreateGdeGradesTable extends Migration
             $table->increments('id');
             $table->string('name_kh');
             $table->string('name_en');
+            $table->boolean('active')->default(true);
             $table->timestamps();
 
             $table->integer('create_uid')->unsigned()->index();
@@ -29,7 +30,6 @@ class CreateGdeGradesTable extends Migration
                 ->references('id')
                 ->on('users')
                 ->onDelete('NO ACTION');
-            $table->softDeletes();
         });
     }
 

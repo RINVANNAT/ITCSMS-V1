@@ -3,29 +3,34 @@
 namespace App\Http\Controllers\Backend\Configuration;
 
 use App\Http\Controllers\Controller;
-use App\Http\Requests\Backend\Configuration\Department\DataDepartmentRequest;
-use App\Http\Requests\Backend\Configuration\Department\StoreDepartmentRequest;
-use App\Http\Requests\Backend\Configuration\Department\UpdateDepartmentRequest;
+use App\Http\Requests\Backend\Configuration\Room\CreateRoomRequest;
+use App\Http\Requests\Backend\Configuration\Room\DeleteRoomRequest;
+use App\Http\Requests\Backend\Configuration\Room\EditRoomRequest;
+use App\Http\Requests\Backend\Configuration\Room\StoreRoomRequest;
+use App\Http\Requests\Backend\Configuration\Room\UpdateRoomRequest;
+use App\Models\Building;
 use App\Models\Department;
+use App\Models\Room;
+use App\Models\RoomType;
 use App\Models\School;
-use App\Repositories\Backend\Department\DepartmentRepositoryContract;
+use App\Repositories\Backend\Room\RoomRepositoryContract;
 use Illuminate\Support\Facades\DB;
 
-class DepartmentController extends Controller
+class RoomController extends Controller
 {
     /**
-     * @var DepartmentRepositoryContract
+     * @var RoomRepositoryContract
      */
-    protected $departments;
+    protected $rooms;
 
     /**
-     * @param DepartmentRepositoryContract       $departments
+     * @param RoomRepositoryContract $roomRepo
      */
     public function __construct(
-        DepartmentRepositoryContract $departmentRepo
+        RoomRepositoryContract $roomRepo
     )
     {
-        $this->departments = $departmentRepo;
+        $this->rooms = $roomRepo;
     }
 
     /**
@@ -35,7 +40,7 @@ class DepartmentController extends Controller
      */
     public function index()
     {
-        return view('backend.configuration.department.index');
+        return view('backend.configuration.room.index');
     }
 
     /**
@@ -43,23 +48,24 @@ class DepartmentController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function create()
+    public function create(CreateRoomRequest $request)
     {
+        $room_types = RoomType::lists('name','id');
+        $buildings = Building::lists('name','id');
         $departments = Department::lists('name_kh','id');
-        $schools = School::lists('name_kh','id');
-        return view('backend.configuration.department.create',compact('departments','schools'));
+        return view('backend.configuration.room.create',compact('room_types','buildings','departments'));
     }
 
     /**
      * Store a newly created resource in storage.
      *
-     * @param  \Illuminate\Http\Request  $request
+     * @param  StoreRoomRequest $request
      * @return \Illuminate\Http\Response
      */
-    public function store(StoreDepartmentRequest $request)
+    public function store(StoreRoomRequest $request)
     {
-        $this->departments->create($request->all());
-        return redirect()->route('admin.configuration.departments.index')->withFlashSuccess(trans('alerts.backend.roles.created'));
+        $this->rooms->create($request->all());
+        return redirect()->route('admin.configuration.rooms.index')->withFlashSuccess(trans('alerts.backend.roles.created'));
     }
 
     /**
@@ -79,21 +85,27 @@ class DepartmentController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function edit($id)
+    public function edit(EditRoomRequest $request, $id)
     {
-        //
+        $room_types = RoomType::lists('name','id');
+        $buildings = Building::lists('name','id');
+        $departments = Department::lists('name_kh','id');
+
+        $room = $this->rooms->findOrThrowException($id);
+        return view('backend.configuration.room.edit',compact('room','room_types','buildings','departments'));
     }
 
     /**
      * Update the specified resource in storage.
      *
-     * @param  \Illuminate\Http\Request  $request
+     * @param  UpdateRoomRequest $request
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function update(UpdateDepartmentRequest $request, $id)
+    public function update(UpdateRoomRequest $request, $id)
     {
-        //
+        $this->rooms->update($id, $request->all());
+        return redirect()->route('admin.configuration.rooms.index')->withFlashSuccess(trans('alerts.backend.generals.updated'));
     }
 
     /**
@@ -102,37 +114,37 @@ class DepartmentController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function destroy($id)
+    public function destroy(DeleteRoomRequest $request, $id)
     {
-        //
-    }
-
-    public function getSubDepartments(){
-
+        if($request->ajax()){
+            $this->rooms->destroy($id);
+        } else {
+            return redirect()->route('admin.configuration.rooms.index')->withFlashSuccess(trans('alerts.backend.generals.deleted'));
+        }
     }
 
     public function data()
     {
-        //$student = Student::join('studentAnnuals', 'studentAnnuals.student_id', '=', 'students.id')
-        //	->select(['students.id_card','students.name_kh','students.name_latin','studentAnnuals.grade_id']);
 
-        //$studentAnnuals = StudentAnnual::with(['student','grade'])->select(['students.id_card','students.name_kh','students.name_latin','grades.name_kh']);
+        $rooms = DB::table('rooms')
+            ->join('roomTypes', 'rooms.room_type_id', '=', 'roomTypes.id')
+            ->join('buildings', 'rooms.building_id', '=', 'buildings.id')
+            ->select(['rooms.id as room_id','rooms.name as room_name','nb_desk','nb_chair','nb_chair_exam', 'size', 'roomTypes.name as room_type_name', 'buildings.name as building_name']);
 
-        $departments = DB::table('departments')
-            //->whereNull('parent_id')
-            ->select(['id','code','name_kh','name_en','name_fr']);
-
-        $datatables =  app('datatables')->of($departments);
+        $datatables =  app('datatables')->of($rooms);
 
 
         return $datatables
-            ->editColumn('id', '{!! str_limit($id, 60) !!}')
-            ->editColumn('code', '{!! str_limit($code, 60) !!}')
-            ->editColumn('name_kh', '{!! str_limit($name_kh, 60) !!}')
-            ->editColumn('name_en', '{!! str_limit($name_en, 60) !!}')
-            ->editColumn('name_fr', '{!! str_limit($name_fr, 60) !!}')
-            ->addColumn('action', function ($department) {
-                return '<a href="#edit-'.$department->id.'" class="btn btn-xs btn-primary"><i class="glyphicon glyphicon-edit"></i> '. trans('buttons.general.crud.edit').'</a>';
+            ->editColumn('rooms.name', '{!! $room_name !!}')
+            ->editColumn('nb_desk', '{!! $nb_desk !!}')
+            ->editColumn('nb_chair', '{!! $nb_chair !!}')
+            ->editColumn('nb_chair_exam', '{!! $nb_chair_exam !!}')
+            ->editColumn('size', '{!! $size !!}')
+            ->editColumn('roomTypes.id', '{!! $room_type_name !!}')
+            ->editColumn('buildings.id', '{!! $building_name !!}')
+            ->addColumn('action', function ($room) {
+                return  '<a href="'.route('admin.configuration.rooms.edit',$room->room_id).'" class="btn btn-xs btn-primary"><i class="fa fa-pencil" data-toggle="tooltip" data-placement="top" title="" data-original-title="'.trans('buttons.general.crud.edit').'"></i> </a>'.
+                ' <button class="btn btn-xs btn-danger btn-delete" data-remote="'.route('admin.configuration.rooms.destroy', $room->room_id) .'"><i class="fa fa-times" data-toggle="tooltip" data-placement="top" title="' . trans('buttons.general.crud.delete') . '"></i></button>';
             })
             ->make(true);
     }

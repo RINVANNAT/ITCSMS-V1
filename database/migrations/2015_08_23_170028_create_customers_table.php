@@ -23,7 +23,7 @@ class CreateCustomersTable extends Migration
 			$table->string('company',100)->nullable();
 			$table->string('identity_number',50)->nullable();
 			$table->timestamps();
-			$table->softDeletes();
+            $table->boolean('active')->default(true);
 
             $table->integer('payslip_client_id')->unsigned();
             $table->foreign('payslip_client_id')

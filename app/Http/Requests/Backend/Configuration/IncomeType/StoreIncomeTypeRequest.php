@@ -28,8 +28,7 @@ class StoreIncomeTypeRequest extends Request
     public function rules()
     {
         return [
-            'code' => 'required',
-            'name_en' => 'required',
+            'name' => 'required|unique:posts|max:100',
         ];
     }
 }

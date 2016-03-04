@@ -19,7 +19,7 @@ class CreateCourseAnnualsTable extends Migration
 			$table->string('name')->nullable();
 			$table->integer('semester');
 			$table->timestamps();
-			$table->softDeletes();
+            $table->boolean('active')->default(true);
 
 			$table->integer('academic_year_id')->unsigned()->index()->nullable();
 			$table->foreign('academic_year_id')

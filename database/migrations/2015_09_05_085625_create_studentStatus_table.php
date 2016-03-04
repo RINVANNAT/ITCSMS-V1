@@ -18,7 +18,7 @@ class CreateStudentStatusTable extends Migration
             $table->string('name_en');
             $table->string('name_fr')->nullable();
             $table->timestamps();
-            $table->softDeletes();
+            $table->boolean('active')->default(true);
 
             $table->integer('create_uid')->unsigned()->index();
             $table->foreign('create_uid')

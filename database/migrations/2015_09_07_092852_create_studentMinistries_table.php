@@ -19,6 +19,7 @@ class CreateStudentMinistriesTable extends Migration
 			$table->string('name_kh');
 			$table->string('name_latin');
 			$table->integer('ministry_id');
+            $table->boolean('active')->default(true);
 			$table->timestamps();
 		});
 	}

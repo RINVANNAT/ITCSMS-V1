@@ -18,6 +18,7 @@ class CreatePromotionsTable extends Migration
 			$table->increments('id');
 			$table->string('name');
 			$table->string('observation')->nullable();
+			$table->boolean('active')->default(true);
 			$table->timestamps();
 
 			$table->integer('create_uid')->unsigned()->index();
@@ -31,7 +32,6 @@ class CreatePromotionsTable extends Migration
 				->references('id')
 				->on('users')
 				->onDelete('NO ACTION');
-			$table->softDeletes();
 		});
 	}
 

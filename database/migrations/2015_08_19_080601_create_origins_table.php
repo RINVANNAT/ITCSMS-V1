@@ -23,7 +23,7 @@ class CreateOriginsTable extends Migration
             $table->string('prefix',10)->nullable();
             $table->boolean('is_province')->default(true);
             $table->integer('locp_code')->nullable();
-			$table->softDeletes();
+			$table->boolean('active')->default(true);
 		});
 	}
 

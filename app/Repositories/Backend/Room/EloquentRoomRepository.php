@@ -57,7 +57,7 @@ class EloquentRoomRepository implements RoomRepositoryContract
      */
     public function create($input)
     {
-        if (Room::where('name_en', $input['name_en'])->first()) {
+        if (Room::where('name', $input['name'])->first()) {
             throw new GeneralException(trans('exceptions.backend.configuration.rooms.already_exists'));
         }
 
@@ -70,6 +70,7 @@ class EloquentRoomRepository implements RoomRepositoryContract
         $room->nb_chair_exam = $input['nb_chair_exam'];
         $room->description = $input['description'];
         $room->size = $input['size'];
+        $room->active = isset($input['active'])?true:false;
         $room->room_type_id = $input['room_type_id'];
         $room->department_id = $input['department_id'];
         $room->building_id = $input['building_id'];
@@ -99,6 +100,7 @@ class EloquentRoomRepository implements RoomRepositoryContract
         $room->nb_chair_exam = $input['nb_chair_exam'];
         $room->description = $input['description'];
         $room->size = $input['size'];
+        $room->active = isset($input['active'])?true:false;
         $room->room_type_id = $input['room_type_id'];
         $room->department_id = $input['department_id'];
         $room->building_id = $input['building_id'];

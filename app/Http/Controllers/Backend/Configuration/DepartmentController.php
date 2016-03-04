@@ -108,15 +108,11 @@ class DepartmentController extends Controller
     public function destroy($id)
     {
         $this->departments->destroy($id);
-        return redirect()->route('admin.configuration.academicYears.index')->withFlashSuccess(trans('alerts.backend.generals.deleted'));
+        return redirect()->route('admin.configuration.departments.index')->withFlashSuccess(trans('alerts.backend.generals.deleted'));
     }
 
     public function data()
     {
-        //$student = Student::join('studentAnnuals', 'studentAnnuals.student_id', '=', 'students.id')
-        //	->select(['students.id_card','students.name_kh','students.name_latin','studentAnnuals.grade_id']);
-
-        //$studentAnnuals = StudentAnnual::with(['student','grade'])->select(['students.id_card','students.name_kh','students.name_latin','grades.name_kh']);
 
         $departments = DB::table('departments')
             //->whereNull('parent_id')

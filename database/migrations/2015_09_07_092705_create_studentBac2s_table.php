@@ -39,6 +39,7 @@ class CreateStudentBac2sTable extends Migration
             $table->integer('bac_year')->unsigned()->index();
             $table->enum('status',['ITC','Ministry'])->default('ITC');
             $table->boolean('is_registered')->default(false);
+            $table->boolean('active')->default(true);
 
 
             $table->foreign('gender_id')
@@ -92,7 +93,7 @@ class CreateStudentBac2sTable extends Migration
                 ->references('id')
                 ->on('bac2Programs')
                 ->onDelete('CASCADE');
-            $table->softDeletes();
+
         });
 	}
 

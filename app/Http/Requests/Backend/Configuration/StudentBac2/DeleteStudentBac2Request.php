@@ -17,7 +17,7 @@ class DeleteStudentBac2Request extends Request
      */
     public function authorize()
     {
-        return access()->allow('delete-studentBac2s');
+        return false;
     }
 
     /**
