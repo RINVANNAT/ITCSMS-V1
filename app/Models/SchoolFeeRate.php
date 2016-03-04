@@ -23,10 +23,10 @@ class SchoolFeeRate extends Model
     ];
 
     public function creator(){
-        return $this->belongsTo('App\User','create_uid');
+        return $this->belongsTo('App\Models\Access\User','create_uid');
     }
     public function lastModifier(){
-        return $this->belongsTo('App\User','write_uid');
+        return $this->belongsTo('App\Models\Access\User','write_uid');
     }
     public function degree(){
         return $this->belongsTo('App\Models\Degree');

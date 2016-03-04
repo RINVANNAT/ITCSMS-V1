@@ -18,6 +18,7 @@ function enableDeleteRecord(datatable){
                     }
                 });
 
+                console.log('elete');
                 // confirm then
                 $.ajax({
                     url: url,

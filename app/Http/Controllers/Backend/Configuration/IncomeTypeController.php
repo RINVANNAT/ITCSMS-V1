@@ -1,31 +1,30 @@
-<?php
-
-namespace App\Http\Controllers\Backend\Configuration;
+<?php namespace App\Http\Controllers\Backend\Configuration;
 
 use App\Http\Controllers\Controller;
-use App\Http\Requests\Backend\Configuration\Department\DataDepartmentRequest;
-use App\Http\Requests\Backend\Configuration\Department\StoreDepartmentRequest;
-use App\Http\Requests\Backend\Configuration\Department\UpdateDepartmentRequest;
-use App\Models\Department;
-use App\Models\School;
-use App\Repositories\Backend\Department\DepartmentRepositoryContract;
+use App\Http\Requests\Backend\Configuration\IncomeType\CreateIncomeTypeRequest;
+use App\Http\Requests\Backend\Configuration\IncomeType\DeleteIncomeTypeRequest;
+use App\Http\Requests\Backend\Configuration\IncomeType\EditIncomeTypeRequest;
+use App\Http\Requests\Backend\Configuration\IncomeType\StoreIncomeTypeRequest;
+use App\Http\Requests\Backend\Configuration\IncomeType\UpdateIncomeTypeRequest;
+use App\Repositories\Backend\IncomeType\IncomeTypeRepositoryContract;
 use Illuminate\Support\Facades\DB;
 
-class DepartmentController extends Controller
+class IncomeTypeController extends Controller
 {
-    /**
-     * @var DepartmentRepositoryContract
-     */
-    protected $departments;
 
     /**
-     * @param DepartmentRepositoryContract       $departments
+     * @var IncomeTypeRepositoryContract
+     */
+    protected $incomeTypes;
+
+    /**
+     * @param IncomeTypeRepositoryContract $incomeTypeRepo
      */
     public function __construct(
-        DepartmentRepositoryContract $departmentRepo
+        IncomeTypeRepositoryContract $incomeTypeRepo
     )
     {
-        $this->departments = $departmentRepo;
+        $this->incomeTypes = $incomeTypeRepo;
     }
 
     /**
@@ -35,7 +34,7 @@ class DepartmentController extends Controller
      */
     public function index()
     {
-        return view('backend.configuration.department.index');
+        return view('backend.configuration.incomeType.index');
     }
 
     /**
@@ -43,11 +42,9 @@ class DepartmentController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function create()
+    public function create(CreateIncomeTypeRequest $request)
     {
-        $departments = Department::lists('name_kh','id');
-        $schools = School::lists('name_kh','id');
-        return view('backend.configuration.department.create',compact('departments','schools'));
+        return view('backend.configuration.incomeType.create');
     }
 
     /**
@@ -56,10 +53,10 @@ class DepartmentController extends Controller
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
-    public function store(StoreDepartmentRequest $request)
+    public function store(StoreIncomeTypeRequest $request)
     {
-        $this->departments->create($request->all());
-        return redirect()->route('admin.configuration.departments.index')->withFlashSuccess(trans('alerts.backend.roles.created'));
+        $this->incomeTypes->create($request->all());
+        return redirect()->route('admin.configuration.incomeTypes.index')->withFlashSuccess(trans('alerts.backend.generals.created'));
     }
 
     /**
@@ -79,9 +76,12 @@ class DepartmentController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function edit($id)
+    public function edit(EditIncomeTypeRequest $request, $id)
     {
-        //
+
+        $incomeType = $this->incomeTypes->findOrThrowException($id);
+
+        return view('backend.configuration.incomeType.edit',compact('incomeType'));
     }
 
     /**
@@ -91,9 +91,10 @@ class DepartmentController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function update(UpdateDepartmentRequest $request, $id)
+    public function update(UpdateIncomeTypeRequest $request, $id)
     {
-        //
+        $this->incomeTypes->update($id, $request->all());
+        return redirect()->route('admin.configuration.incomeTypes.index')->withFlashSuccess(trans('alerts.backend.generals.updated'));
     }
 
     /**
@@ -102,37 +103,27 @@ class DepartmentController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function destroy($id)
+    public function destroy(DeleteIncomeTypeRequest $request, $id)
     {
-        //
-    }
-
-    public function getSubDepartments(){
-
+        $this->incomeTypes->destroy($id);
+        return true;
     }
 
     public function data()
     {
-        //$student = Student::join('studentAnnuals', 'studentAnnuals.student_id', '=', 'students.id')
-        //	->select(['students.id_card','students.name_kh','students.name_latin','studentAnnuals.grade_id']);
+        $incomeTypes = DB::table('incomeTypes')
+            ->select(['id','name','active','description']);
 
-        //$studentAnnuals = StudentAnnual::with(['student','grade'])->select(['students.id_card','students.name_kh','students.name_latin','grades.name_kh']);
-
-        $departments = DB::table('departments')
-            //->whereNull('parent_id')
-            ->select(['id','code','name_kh','name_en','name_fr']);
-
-        $datatables =  app('datatables')->of($departments);
+        $datatables =  app('datatables')->of($incomeTypes);
 
 
         return $datatables
-            ->editColumn('id', '{!! str_limit($id, 60) !!}')
-            ->editColumn('code', '{!! str_limit($code, 60) !!}')
-            ->editColumn('name_kh', '{!! str_limit($name_kh, 60) !!}')
-            ->editColumn('name_en', '{!! str_limit($name_en, 60) !!}')
-            ->editColumn('name_fr', '{!! str_limit($name_fr, 60) !!}')
-            ->addColumn('action', function ($department) {
-                return '<a href="#edit-'.$department->id.'" class="btn btn-xs btn-primary"><i class="glyphicon glyphicon-edit"></i> '. trans('buttons.general.crud.edit').'</a>';
+            ->editColumn('name', '{!! str_limit($name, 60) !!}')
+            ->editColumn('active', '{!! $active==1?"<i class=\"glyphicon glyphicon-ok\"></i>":"<i class=\"glyphicon glyphicon-remove\"></i>" !!}')
+            ->editColumn('description', '{!! str_limit($description, 200) !!}')
+            ->addColumn('action', function ($incomeType) {
+                return  '<a href="'.route('admin.configuration.incomeTypes.edit',$incomeType->id).'" class="btn btn-xs btn-primary"><i class="fa fa-pencil" data-toggle="tooltip" data-placement="top" title="" data-original-title="'.trans('buttons.general.crud.edit').'"></i> </a>'.
+                ' <button class="btn btn-xs btn-danger btn-delete" data-remote="'.route('admin.configuration.incomeTypes.destroy', $incomeType->id) .'"><i class="fa fa-times" data-toggle="tooltip" data-placement="top" title="' . trans('buttons.general.crud.delete') . '"></i></button>';
             })
             ->make(true);
     }

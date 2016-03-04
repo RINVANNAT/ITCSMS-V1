@@ -1,13 +1,10 @@
 <?php namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model as Model;
-use Illuminate\Database\Eloquent\SoftDeletes;
 
 
 class OutcomeType extends Model
 {
-	use SoftDeletes;
-	protected $dates = ['deleted_at'];
 	public $table = "outcomeTypes";
     
 

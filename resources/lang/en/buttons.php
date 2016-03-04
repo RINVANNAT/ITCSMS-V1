@@ -35,7 +35,7 @@ return [
             'edit' => 'Edit',
             'update' => 'Update',
         ],
-
+        'import' => 'Import',
         'save' => 'Save',
         'view' => 'View',
     ],

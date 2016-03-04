@@ -64,6 +64,7 @@
             $('#academicYears-table').DataTable({
                 processing: true,
                 serverSide: true,
+                pageLength: {!! config('app.records_per_page')!!},
                 ajax: '{!! route('admin.configuration.academicYear.data') !!}',
                 columns: [
                     { data: 'id', name: 'id'},

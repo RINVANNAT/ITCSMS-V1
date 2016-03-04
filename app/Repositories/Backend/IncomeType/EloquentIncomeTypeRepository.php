@@ -57,7 +57,7 @@ class EloquentIncomeTypeRepository implements IncomeTypeRepositoryContract
      */
     public function create($input)
     {
-        if (IncomeType::where('name_en', $input['name_en'])->first()) {
+        if (IncomeType::where('name', $input['name'])->first()) {
             throw new GeneralException(trans('exceptions.backend.configuration.incomeTypes.already_exists'));
         }
 
@@ -65,7 +65,7 @@ class EloquentIncomeTypeRepository implements IncomeTypeRepositoryContract
 
         $incomeType->name = $input['name'];
         $incomeType->description = $input['description'];
-        $incomeType->active = $input['active']; 
+        $incomeType->active = isset($input['active'])?true:false;
         $incomeType->created_at = Carbon::now();
         $incomeType->create_uid = auth()->id();
 
@@ -88,7 +88,7 @@ class EloquentIncomeTypeRepository implements IncomeTypeRepositoryContract
 
         $incomeType->name = $input['name'];
         $incomeType->description = $input['description'];
-        $incomeType->active = $input['active'];
+        $incomeType->active = isset($input['active'])?true:false;
         $incomeType->updated_at = Carbon::now();
         $incomeType->write_uid = auth()->id();
 

@@ -1,29 +1,36 @@
 <div class="form-group">
-    {!! Form::label('name', trans('labels.backend.highSchools.fields.name_kh'), ['class' => 'col-lg-2 control-label']) !!}
-    <div class="col-lg-10">
-        {!! Form::text('name_kh', null, ['class' => 'form-control']) !!}
+    {!! Form::label('name', trans('labels.backend.generals.id'), ['class' => 'col-lg-2 control-label']) !!}
+    <div class="col-lg-4">
+        {!! Form::text('id', null, ['class' => 'form-control']) !!}
     </div>
 </div><!--form control-->
-
 <div class="form-group">
+    {!! Form::label('name', trans('labels.backend.highSchools.fields.name_kh'), ['class' => 'col-lg-2 control-label']) !!}
+    <div class="col-lg-4">
+        {!! Form::text('name_kh', null, ['class' => 'form-control']) !!}
+    </div>
     {!! Form::label('name', trans('labels.backend.highSchools.fields.name_en'), ['class' => 'col-lg-2 control-label']) !!}
-    <div class="col-lg-10">
+    <div class="col-lg-4">
         {!! Form::text('name_en', null, ['class' => 'form-control']) !!}
     </div>
 </div><!--form control-->
 
 <div class="form-group">
-    {!! Form::label('name', trans('labels.backend.highSchools.fields.is_no_school'), ['class' => 'col-lg-2 control-label']) !!}
-    <div class="col-lg-10">
-        {!! Form::checkbox('is_no_school', "TRUE", true) !!}
+    {!! Form::label('name', trans('labels.backend.highSchools.fields.province_id'), ['class' => 'col-lg-2 control-label']) !!}
+    <div class="col-lg-4">
+        {!! Form::select('province_id',$provinces, null, ['class' => 'form-control']) !!}
     </div>
-</div><!--form control-->
-<div class="form-group">
+    {!! Form::label('name', trans('labels.backend.highSchools.fields.is_no_school'), ['class' => 'col-lg-2 control-label']) !!}
+    <div class="col-lg-1">
+        {!! Form::checkbox('is_no_school', "TRUE") !!}
+    </div>
     {!! Form::label('name', trans('labels.backend.highSchools.fields.valid'), ['class' => 'col-lg-2 control-label']) !!}
-    <div class="col-lg-10">
+    <div class="col-lg-1">
         {!! Form::checkbox('valid', "TRUE", true) !!}
     </div>
 </div><!--form control-->
+
+
 <div class="form-group">
     {!! Form::label('name', trans('labels.backend.highSchools.fields.prefix_id'), ['class' => 'col-lg-2 control-label']) !!}
     <div class="col-lg-4">
@@ -66,13 +73,11 @@
 </div><!--form control-->
 <div class="form-group">
     {!! Form::label('name', trans('labels.backend.highSchools.fields.s_id'), ['class' => 'col-lg-2 control-label']) !!}
-    <div class="col-lg-10">
+    <div class="col-lg-4">
         {!! Form::text('s_id', null, ['class' => 'form-control']) !!}
     </div>
-</div><!--form control-->
-<div class="form-group">
     {!! Form::label('name', trans('labels.backend.highSchools.fields.ps_id'), ['class' => 'col-lg-2 control-label']) !!}
-    <div class="col-lg-10">
+    <div class="col-lg-4">
         {!! Form::text('ps_id', null, ['class' => 'form-control']) !!}
     </div>
 </div><!--form control-->

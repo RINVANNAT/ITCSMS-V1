@@ -71,8 +71,8 @@
                     <li class="{{ Active::pattern('admin/configuration/highSchools*') }}">
                         <a href="{!! url('admin/configuration/highSchools') !!}">{{ trans('menus.backend.configuration.highSchools') }}</a>
                     </li>
-                    <li class="{{ Active::pattern('admin/configuration/incomeTypes') }}">
-                        <a href="{!! url('admin/configuration/incomeTypes/*') !!}">{{ trans('menus.backend.configuration.incomeTypes') }}</a>
+                    <li class="{{ Active::pattern('admin/configuration/incomeTypes*') }}">
+                        <a href="{!! url('admin/configuration/incomeTypes') !!}">{{ trans('menus.backend.configuration.incomeTypes') }}</a>
                     </li>
                     <li class="{{ Active::pattern('admin/configuration/outcomeTypes*') }}">
                         <a href="{!! url('admin/configuration/outcomeTypes') !!}">{{ trans('menus.backend.configuration.outcomeTypes') }}</a>

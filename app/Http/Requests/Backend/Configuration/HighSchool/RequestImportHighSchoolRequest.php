@@ -5,10 +5,10 @@ namespace App\Http\Requests\Backend\Configuration\HighSchool;
 use App\Http\Requests\Request;
 
 /**
- * Class StoreHighSchoolRequest
+ * Class RequestImportHighSchoolRequest
  * @package App\Http\Requests\Backend\Configuration\HighSchool
  */
-class StoreHighSchoolRequest extends Request
+class RequestImportHighSchoolRequest extends Request
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -17,7 +17,7 @@ class StoreHighSchoolRequest extends Request
      */
     public function authorize()
     {
-        return false;
+        return access()->allow('create-highSchools');
     }
 
     /**
@@ -28,8 +28,6 @@ class StoreHighSchoolRequest extends Request
     public function rules()
     {
         return [
-            'name_kh' => 'required',
-            'province_id' => 'required',
         ];
     }
 }

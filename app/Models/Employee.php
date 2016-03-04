@@ -22,10 +22,10 @@ class Employee extends Model
 	];
 
     public function creator(){
-        return $this->belongsTo('App\User','create_uid');
+        return $this->belongsTo('App\Models\Access\User','create_uid');
     }
     public function lastModifier(){
-        return $this->belongsTo('App\User','write_uid');
+        return $this->belongsTo('App\Models\Access\User','write_uid');
     }
 	public function gender(){
 		return $this->belongsTo('App\Models\Gender');
@@ -37,7 +37,7 @@ class Employee extends Model
 		return $this->belongsTo('App\Models\PayslipClient');
 	}
     public function user(){
-        return $this->hasOne('App\User','user_id');
+        return $this->hasOne('App\Models\Access\User','user_id');
     }
 	public function groups(){
 		return $this->belongsToMany('App\Models\Group')->withTimestamps();

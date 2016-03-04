@@ -17,7 +17,7 @@ class UpdateHighSchoolRequest extends Request
      */
     public function authorize()
     {
-        return access()->allow('edit-highSchools');
+        return false;
     }
 
     /**

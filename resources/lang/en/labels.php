@@ -212,12 +212,27 @@ return [
             ]
         ],
 
+        'incomeTypes' => [
+            'title' => 'Income Type',
+            'sub_index_title' => 'All existing income type',
+            'sub_edit_title' => 'Edit income type information',
+            'sub_create_title' => 'Create new income type',
+            'sub_detail_title' => 'Detail of an income type',
+            'fields'=>[
+                'name' => 'Name',
+                'active' => 'Is Active',
+                'description' => "Description",
+            ]
+        ],
+
+
         'highSchools' => [
             'title' => 'High School',
             'sub_index_title' => 'All existing High School',
             'sub_edit_title' => 'Edit High School information',
             'sub_create_title' => 'Create new High School',
             'sub_detail_title' => 'Detail of an High School',
+            'sub_import_title' => 'Import high schools',
             'fields'=>[
                 'name_en' => 'Name Latin',
                 'description' => "Description",

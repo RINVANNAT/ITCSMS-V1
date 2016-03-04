@@ -57,28 +57,29 @@ class EloquentHighSchoolRepository implements HighSchoolRepositoryContract
      */
     public function create($input)
     {
-        if (HighSchool::where('name_en', $input['name_en'])->first()) {
-            throw new GeneralException(trans('exceptions.backend.configuration.highSchools.already_exists'));
-        }
+        // For now we allow the same high school, that is from ministry.
+        //if (HighSchool::where('name_en', $input['name_en'])->first()) {
+        //    throw new GeneralException(trans('exceptions.backend.configuration.highSchools.already_exists'));
+        //}
 
         $highSchool = new HighSchool();
 
+        $highSchool->id = $input['id'];
         $highSchool->name_en = $input['name_en'];
-        $highSchool->province_id = $input['name_fr'];
-        $highSchool->d_id = $input['name_kh'];
-        $highSchool->c_id = $input['code'];
-        $highSchool->v_id = $input['description'];
-        $highSchool->s_id = $input['is_specialist'];
+        $highSchool->province_id = $input['province_id'];
+        $highSchool->d_id = $input['d_id'];
+        $highSchool->c_id = $input['c_id'];
+        $highSchool->v_id = $input['v_id'];
+        $highSchool->s_id = $input['s_id'];
+        $highSchool->s_id = $input['ps_id'];
         $highSchool->name_kh = $input['name_kh'];
         $highSchool->prefix_id = $input['prefix_id'];
-        $highSchool->valid = $input['valid'];
-        $highSchool->is_no_school = $input['is_no_school'];
+        $highSchool->valid = isset($input['valid'])?1:0;
+        $highSchool->is_no_school = isset($input['is_no_school'])?1:0;
         $highSchool->locp_code = $input['locp_code'];
         $highSchool->locc_code = $input['locc_code'];
         $highSchool->locd_code = $input['locd_code'];
         $highSchool->locv_code = $input['locv_code'];
-        $highSchool->created_at = Carbon::now();
-        $highSchool->create_uid = auth()->id();
 
         if ($highSchool->save()) {
             return true;
@@ -98,21 +99,20 @@ class EloquentHighSchoolRepository implements HighSchoolRepositoryContract
         $highSchool = $this->findOrThrowException($id);
 
         $highSchool->name_en = $input['name_en'];
-        $highSchool->province_id = $input['name_fr'];
-        $highSchool->d_id = $input['name_kh'];
-        $highSchool->c_id = $input['code'];
-        $highSchool->v_id = $input['description'];
-        $highSchool->s_id = $input['is_specialist'];
+        $highSchool->province_id = $input['province_id'];
+        $highSchool->d_id = $input['d_id'];
+        $highSchool->c_id = $input['c_id'];
+        $highSchool->v_id = $input['v_id'];
+        $highSchool->s_id = $input['s_id'];
+        $highSchool->s_id = $input['ps_id'];
         $highSchool->name_kh = $input['name_kh'];
         $highSchool->prefix_id = $input['prefix_id'];
-        $highSchool->valid = $input['valid'];
-        $highSchool->is_no_school = $input['is_no_school'];
+        $highSchool->valid = isset($input['valid'])?1:0;
+        $highSchool->is_no_school = isset($input['is_no_school'])?1:0;
         $highSchool->locp_code = $input['locp_code'];
         $highSchool->locc_code = $input['locc_code'];
         $highSchool->locd_code = $input['locd_code'];
         $highSchool->locv_code = $input['locv_code'];
-        $highSchool->updated_at = Carbon::now();
-        $highSchool->write_uid = auth()->id();
 
         if ($highSchool->save()) {
             return true;

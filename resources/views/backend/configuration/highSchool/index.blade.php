@@ -19,8 +19,8 @@
         <div class="box-header with-border">
             <div class="mailbox-controls">
                 <!-- Check all button -->
-                <a href="{!! route('admin.configuration.highSchools.create') !!}">
-                    <button class="btn btn-primary btn-sm"><i class="fa fa-plus-circle"></i> Add
+                <a href="{!! route('admin.configuration.highSchool.request_import') !!}">
+                    <button class="btn btn-primary btn-sm"><i class="fa fa-plus-circle"></i> Import
                     </button>
                 </a>
                 <div class="btn-group">
@@ -41,8 +41,10 @@
                 <table class="table table-striped table-bordered table-hover" id="highSchools-table">
                     <thead>
                     <tr>
+                        <th>{{ trans('labels.backend.highSchools.fields.prefix_id') }}</th>
                         <th>{{ trans('labels.backend.highSchools.fields.name_kh') }}</th>
                         <th>{{ trans('labels.backend.highSchools.fields.name_en') }}</th>
+                        <th>{{ trans('labels.backend.highSchools.fields.province_id') }}</th>
                         <th>{{ trans('labels.backend.highSchools.fields.is_no_school') }}</th>
                         <th>{{ trans('labels.general.actions') }}</th>
                     </tr>
@@ -63,10 +65,13 @@
             $('#highSchools-table').DataTable({
                 processing: true,
                 serverSide: true,
+                pageLength: {!! config('app.records_per_page')!!},
                 ajax: '{!! route('admin.configuration.highSchool.data') !!}',
                 columns: [
-                    { data: 'name_kh', name: 'name_kh'},
-                    { data: 'name_en', name: 'name_en'},
+                    { data: 'prefix_id', name: 'prefix_id'},
+                    { data: 'highSchools.name_kh', name: 'highSchools.name_kh'},
+                    { data: 'highSchools.name_en', name: 'highSchools.name_en'},
+                    { data: 'province_id', name: 'province_id',searchable:false},
                     { data: 'is_no_school', name: 'is_no_school'},
                     { data: 'action', name: 'action',orderable: false, searchable: false}
                 ]

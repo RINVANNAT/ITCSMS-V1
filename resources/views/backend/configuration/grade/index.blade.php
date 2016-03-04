@@ -64,6 +64,7 @@
             $('#grades-table').DataTable({
                 processing: true,
                 serverSide: true,
+                pageLength: {!! config('app.records_per_page')!!},
                 ajax: '{!! route('admin.configuration.grade.data') !!}',
                 columns: [
                     { data: 'code', name: 'code'},

@@ -37,6 +37,8 @@ Route::group([
     Route::group([], function() {
         Route::resource('highSchools', 'HighSchoolController');
         Route::get('highSchool-data', 'HighSchoolController@data')->name('admin.configuration.highSchool.data');
+        Route::get('highSchool-request-import', 'HighSchoolController@request_import')->name('admin.configuration.highSchool.request_import');
+        Route::post('highSchool-import', 'HighSchoolController@import')->name('admin.configuration.highSchool.import');
     });
     Route::group([], function() {
         Route::resource('incomeTypes', 'IncomeTypeController');

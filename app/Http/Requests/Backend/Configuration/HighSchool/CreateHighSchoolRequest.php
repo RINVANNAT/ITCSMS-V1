@@ -17,7 +17,7 @@ class CreateHighSchoolRequest extends Request
      */
     public function authorize()
     {
-        return access()->allow('create-highSchools');
+        return false;
     }
 
     /**

@@ -17,7 +17,7 @@ class DeleteHighSchoolRequest extends Request
      */
     public function authorize()
     {
-        return access()->allow('delete-highSchools');
+        return false;
     }
 
     /**
