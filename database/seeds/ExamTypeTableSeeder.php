@@ -14,6 +14,7 @@ class ExamTypeTableSeeder extends Seeder
     {
         $examTypes = array(
             array(
+                'id' => config('access.exam.entrance_engineer'),
                 'name_en' => 'Entrance Engineer',
                 'name_fr' => "Entrée d'Ingénieur",
                 'name_kh'=> 'ប្រលងចូលថ្នាក់វិស្វករ',
@@ -22,6 +23,7 @@ class ExamTypeTableSeeder extends Seeder
                 'updated_at'=>Carbon\Carbon::now()
             ),
             array(
+                'id' => config('access.exam.entrance_dut'),
                 'name_en' => 'Entrance Associate',
                 'name_fr' => "Entrée d'Associé",
                 'name_kh'=> 'ប្រលងចូលថ្នាក់បរិញ្ញាប័ត្ររង',
@@ -30,6 +32,7 @@ class ExamTypeTableSeeder extends Seeder
                 'updated_at'=>Carbon\Carbon::now()
             ),
             array(
+                'id' => config('access.exam.final_semester'),
                 'name_en' => 'Final Semester',
                 'name_fr' => "Semestre Finale",
                 'name_kh'=> 'បញ្ចប់ឆមាស',

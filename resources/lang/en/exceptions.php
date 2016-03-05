@@ -16,7 +16,10 @@ return [
     'backend' => [
         'general' => [
             'has_reference' => 'This record has reference with other data. You can not delete this first',
-            'delete_error' => 'Something went wrong. Cannot delete this record'
+            'delete_error' => 'Something went wrong. Cannot delete this record',
+            'already_exists' => 'This record is already exist. You cannot add the same record',
+            'create_error' => 'There was a problem creating this record. Please try again.',
+            'not_found' => 'That record does not exist.',
         ],
         'access' => [
             'permissions' => [

@@ -69,10 +69,26 @@ return [
             'buildings' => 'Building',
             'rooms' => 'Room',
             'studentBac2s' => 'Student Bac II',
+            'examTypes' => 'Room',
+            'departmentOptions' => 'Room',
+            'origins' => 'Room',
+            'promotions' => 'Promotion',
         ],
 
         'student' => [
             'title' => 'Student',
+        ],
+        'candidate' => [
+            'title' => 'Candidate',
+        ],
+        'exam' => [
+            'title' => 'Examination',
+            'entrances-engineer' => 'Entrance-Engineer Exams',
+            'entrances-dut' => 'Entrance-DUT Exams',
+            'finals' => 'Final Semester Exams'
+        ],
+        'scholarship' => [
+            'title' => 'Scholarship',
         ],
 
         'sidebar' => [

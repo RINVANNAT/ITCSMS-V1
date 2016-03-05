@@ -138,6 +138,11 @@ return [
         'account_night_student'=>2,
         'account_master_student'=>3,
     ],
+    'exam' => [
+        'entrance_engineer' => 1,
+        'entrance_dut' => 2,
+        'final_semester' => 3
+    ],
 
     /*
      * Configuration for roles

@@ -1,0 +1,199 @@
+<?php namespace App\Http\Controllers\Backend;
+
+use App\Http\Controllers\Controller;
+use App\Http\Requests\Backend\Exam\CreateExamRequest;
+use App\Http\Requests\Backend\Exam\DeleteExamRequest;
+use App\Http\Requests\Backend\Exam\EditExamRequest;
+use App\Http\Requests\Backend\Exam\StoreExamRequest;
+use App\Http\Requests\Backend\Exam\UpdateExamRequest;
+use App\Models\AcademicYear;
+use App\Models\Department;
+use App\Models\ExamType;
+use App\Repositories\Backend\Exam\ExamRepositoryContract;
+use Illuminate\Support\Facades\DB;
+
+class ExamController extends Controller
+{
+    /**
+     * @var ExamRepositoryContract
+     */
+    protected $exams;
+
+    /**
+     * @param ExamRepositoryContract $examRepo
+     */
+    public function __construct(
+        ExamRepositoryContract $examRepo
+    )
+    {
+        $this->exams = $examRepo;
+    }
+
+    /**
+     * Display a listing of the exams base on its type (engineer or DUT or final semester).
+     * @param  int $id
+     * @return \Illuminate\Http\Response
+     */
+
+    public function index($id)
+    {
+        if($id == config('access.exam.entrance_engineer')){
+            $data_url = route('admin.exam.entrance_engineer.data');
+        } else if ($id == config('access.exam.entrance_engineer')){
+            $data_url = route('admin.exam.entrance_dut.data');
+        } else {
+            $data_url = route('admin.exam.final_semester.data');
+        }
+
+        $type = $id;
+        return view('backend.exam.index',compact('type','data_url'));
+    }
+
+
+    /**
+     * Show the form for creating a new resource.
+     * @param CreateExamRequest $request
+     * @param int $id
+     *
+     * @return \Illuminate\Http\Response
+     */
+    public function create(CreateExamRequest $request, $id)
+    {
+        $last_academic_year_id =AcademicYear::orderBy('id','desc')->first()->id;
+        $academicYear = AcademicYear::where('id',$last_academic_year_id)->orderBy('id')->lists('name_kh','id');
+        $examType = ExamType::where('id',$id)->lists('name_kh','id')->toArray();
+        $type = $id;
+        return view('backend.exam.create',compact('examType','type','academicYear'));
+    }
+
+    /**
+     * Store a newly created resource in storage.
+     *
+     * @param  StoreExamRequest  $request
+     * @param int $id
+     * @return \Illuminate\Http\Response
+     */
+    public function store(StoreExamRequest $request, $id)
+    {
+        $this->exams->create($request->all());
+        return redirect()->route('admin.exam.index',$id)->withFlashSuccess(trans('alerts.backend.generals.created'));
+    }
+
+    /**
+     * Display the specified resource.
+     *
+     * @param  int  $id
+     * @return \Illuminate\Http\Response
+     */
+    public function show($id)
+    {
+        //
+    }
+
+    /**
+     * Show the form for editing the specified resource.
+     *
+     * @param  int  $id
+     * @return \Illuminate\Http\Response
+     */
+    public function edit(EditExamRequest $request, $id)
+    {
+        $departments = Department::lists('name_kh','id');
+        $exam = $this->exams->findOrThrowException($id);
+        $selected_departments = $exam->departments->lists('id')->toArray();
+        return view('backend.exam.edit',compact('exam','departments','selected_departments'));
+    }
+
+    /**
+     * Update the specified resource in storage.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @param  int  $id
+     * @return \Illuminate\Http\Response
+     */
+    public function update(UpdateExamRequest $request, $id)
+    {
+        $this->exams->update($id, $request->all());
+        return redirect()->route('admin.exams.index')->withFlashSuccess(trans('alerts.backend.generals.updated'));
+    }
+
+    /**
+     * Remove the specified resource from storage.
+     *
+     * @param  int  $id
+     * @return \Illuminate\Http\Response
+     */
+    public function destroy(DeleteExamRequest $request, $id)
+    {
+            $this->exams->destroy($id);
+        if($request->ajax()){
+            return json_encode(array("success"=>true));
+        } else {
+            return redirect()->route('admin.exams.index')->withFlashSuccess(trans('alerts.backend.generals.deleted'));
+        }
+    }
+
+    public function entrance_engineer_data()
+    {
+        $exams = DB::table('exams')
+            ->where('type_id',config('access.exam.entrance_engineer'))
+            ->select(['id','name','date_start','date_end','description']);
+
+        $datatables =  app('datatables')->of($exams);
+
+
+        return $datatables
+            ->editColumn('name', '{!! $name !!}')
+            ->editColumn('date_start', '{!! $date_start !!}')
+            ->editColumn('date_end', '{!! $date_end !!}')
+            ->editColumn('description', '{!! $description !!}')
+            ->addColumn('action', function ($exam) {
+                return  '<a href="'.route('admin.exams.edit',$exam->id).'" class="btn btn-xs btn-primary"><i class="fa fa-pencil" data-toggle="tooltip" data-placement="top" title="" data-original-title="'.trans('buttons.general.crud.edit').'"></i> </a>'.
+                ' <button class="btn btn-xs btn-danger btn-delete" data-remote="'.route('admin.exams.destroy', $exam->id) .'"><i class="fa fa-times" data-toggle="tooltip" data-placement="top" title="' . trans('buttons.general.crud.delete') . '"></i></button>';
+            })
+            ->make(true);
+    }
+
+    public function entrance_dut_data()
+    {
+        $exams = DB::table('exams')
+            ->where('type_id',config('access.exam.entrance_dut'))
+            ->select(['id','name','date_start','date_end','description']);
+
+        $datatables =  app('datatables')->of($exams);
+
+
+        return $datatables
+            ->editColumn('name', '{!! $name !!}')
+            ->editColumn('date_start', '{!! $date_start !!}')
+            ->editColumn('date_end', '{!! $date_end !!}')
+            ->editColumn('description', '{!! $description !!}')
+            ->addColumn('action', function ($exam) {
+                return  '<a href="'.route('admin.exams.edit',$exam->id).'" class="btn btn-xs btn-primary"><i class="fa fa-pencil" data-toggle="tooltip" data-placement="top" title="" data-original-title="'.trans('buttons.general.crud.edit').'"></i> </a>'.
+                ' <button class="btn btn-xs btn-danger btn-delete" data-remote="'.route('admin.exams.destroy', $exam->id) .'"><i class="fa fa-times" data-toggle="tooltip" data-placement="top" title="' . trans('buttons.general.crud.delete') . '"></i></button>';
+            })
+            ->make(true);
+    }
+
+    public function final_semester_data()
+    {
+        $exams = DB::table('exams')
+            ->where('type_id',config('access.exam.final_semester'))
+            ->select(['id','name','date_start','date_end','description']);
+
+        $datatables =  app('datatables')->of($exams);
+
+
+        return $datatables
+            ->editColumn('name', '{!! $name !!}')
+            ->editColumn('date_start', '{!! $date_start !!}')
+            ->editColumn('date_end', '{!! $date_end !!}')
+            ->editColumn('description', '{!! $description !!}')
+            ->addColumn('action', function ($exam) {
+                return  '<a href="'.route('admin.exams.edit',$exam->id).'" class="btn btn-xs btn-primary"><i class="fa fa-pencil" data-toggle="tooltip" data-placement="top" title="" data-original-title="'.trans('buttons.general.crud.edit').'"></i> </a>'.
+                ' <button class="btn btn-xs btn-danger btn-delete" data-remote="'.route('admin.exams.destroy', $exam->id) .'"><i class="fa fa-times" data-toggle="tooltip" data-placement="top" title="' . trans('buttons.general.crud.delete') . '"></i></button>';
+            })
+            ->make(true);
+    }
+
+}

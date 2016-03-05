@@ -1,11 +1,11 @@
 @extends ('backend.layouts.master')
 
-@section ('title', trans('labels.backend.candidates.title'))
+@section ('title', trans('labels.backend.exams.title'))
 
 @section('page-header')
     <h1>
-        {{ trans('labels.backend.candidates.title') }}
-        <small>{{ trans('labels.backend.candidates.sub_index_title') }}</small>
+        {{ trans('labels.backend.exams.title') }}
+        <small>{{ trans('labels.backend.exams.sub_index_title') }}</small>
     </h1>
 
 @endsection
@@ -19,7 +19,7 @@
         <div class="box-header with-border">
             <div class="mailbox-controls">
                 <!-- Check all button -->
-                <a href="{!! route('admin.candidates.create') !!}">
+                <a href="{!! route('admin.exam.create',$type) !!}">
                     <button class="btn btn-primary btn-sm"><i class="fa fa-plus-circle"></i> Add
                     </button>
                 </a>
@@ -38,13 +38,13 @@
 
         <div class="box-body">
             <div>
-                <table class="table table-striped table-bordered table-hover" id="candidates-table">
+                <table class="table table-striped table-bordered table-hover" id="exams-table">
                     <thead>
                     <tr>
-                        <th>{{ trans('labels.backend.candidates.fields.name_kh') }}</th>
-                        <th>{{ trans('labels.backend.candidates.fields.name_latin') }}</th>
-                        <th>{{ trans('labels.backend.candidates.fields.gender_id') }}</th>
-                        <th>{{ trans('labels.backend.candidates.fields.bac_total_grade') }}</th>
+                        <th>{{ trans('labels.backend.exams.fields.name') }}</th>
+                        <th>{{ trans('labels.backend.exams.fields.date_start') }}</th>
+                        <th>{{ trans('labels.backend.exams.fields.date_end') }}</th>
+                        <th>{{ trans('labels.backend.exams.fields.description') }}</th>
                         <th>{{ trans('labels.general.actions') }}</th>
                     </tr>
                     </thead>
@@ -61,20 +61,20 @@
     {!! Html::script('plugins/datatables/dataTables.bootstrap.min.js') !!}
     <script>
         $(function() {
-            $('#candidates-table').DataTable({
+            $('#exams-table').DataTable({
                 processing: true,
                 serverSide: true,
                 pageLength: {!! config('app.records_per_page')!!},
-                ajax: '{!! route('admin.candidate.data') !!}',
+                ajax: '{!! $data_url !!}',
                 columns: [
-                    { data: 'name_kh', name: 'name_kh'},
-                    { data: 'name_en', name: 'name_en'},
-                    { data: 'gender_id', name: 'gender_id'},
-                    { data: 'bac_total_grade', name: 'bac_total_grade'},
+                    { data: 'name', name: 'name'},
+                    { data: 'date_start', name: 'date_start'},
+                    { data: 'date_end', name: 'date_end'},
+                    { data: 'description', name: 'description'},
                     { data: 'action', name: 'action',orderable: false, searchable: false}
                 ]
             });
-            enableDeleteRecord($('#candidates-table'));
+            enableDeleteRecord($('#exams-table'));
         });
     </script>
 @stop

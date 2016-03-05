@@ -47,6 +47,23 @@
                 </li>
             @endauth
 
+            <li class="{{ Active::pattern('admin/exam*') }} treeview">
+                <a href="#">
+                    <span>{{ trans('menus.backend.exam.title') }}</span>
+                    <i class="fa fa-angle-left pull-right"></i>
+                </a>
+                <ul class="treeview-menu {{ Active::pattern('admin/exam/*', 'menu-open') }}" style="display: none; {{ Active::pattern('admin/exam/*', 'display: block;') }}">
+                    <li class="{{ Active::pattern('admin/exam/'.config('access.exam.entrance_engineer').'/*') }}">
+                        <a href="{!! route('admin.exam.index',config('access.exam.entrance_engineer')) !!}">{{ trans('menus.backend.exam.entrances-engineer') }}</a>
+                    </li>
+                    <li class="{{ Active::pattern('admin/exam/'.config('access.exam.entrance_dut').'/*') }}">
+                        <a href="{!! route('admin.exam.index',config('access.exam.entrance_dut')) !!}">{{ trans('menus.backend.exam.entrances-dut') }}</a>
+                    </li>
+                    <li class="{{ Active::pattern('admin/exam/'.config('access.exam.final_semester').'/*') }}">
+                        <a href="{!! route('admin.exam.index',config('access.exam.final_semester')) !!}">{{ trans('menus.backend.exam.finals') }}</a>
+                    </li>
+                </ul>
+            </li>
             <li class="{{ Active::pattern('admin/configuration*') }} treeview">
                 <a href="#">
                     <span>{{ trans('menus.backend.configuration.main') }}</span>

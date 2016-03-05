@@ -159,6 +159,11 @@ class AccessServiceProvider extends ServiceProvider
             \App\Repositories\Backend\Candidate\EloquentCandidateRepository::class
         );
 
+        $this->app->bind(
+            \App\Repositories\Backend\Exam\ExamRepositoryContract::class,
+            \App\Repositories\Backend\Exam\EloquentExamRepository::class
+        );
+
     }
 
     /**
