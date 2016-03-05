@@ -38,4 +38,5 @@ Route::group(['namespace' => 'Backend', 'prefix' => 'admin', 'middleware' => 'ad
     require (__DIR__ . '/Routes/Backend/Student.php');
     require (__DIR__ . '/Routes/Backend/Candidate.php');
     require (__DIR__ . '/Routes/Backend/Examination.php');
+    require (__DIR__ . '/Routes/Backend/Accounting.php');
 });

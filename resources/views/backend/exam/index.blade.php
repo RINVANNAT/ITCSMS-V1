@@ -65,7 +65,7 @@
                 processing: true,
                 serverSide: true,
                 pageLength: {!! config('app.records_per_page')!!},
-                ajax: '{!! $data_url !!}',
+                ajax: '{!! route('admin.exam.data',$type) !!}',
                 columns: [
                     { data: 'name', name: 'name'},
                     { data: 'date_start', name: 'date_start'},

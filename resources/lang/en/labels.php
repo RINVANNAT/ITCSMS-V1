@@ -340,6 +340,12 @@ return [
             'sub_create_title' => 'Register new examination',
             'sub_detail_title' => 'Detail of an examination',
             'sub_import_title' => "Import examinations",
+            'show_tabs' => [
+                'general_info' => 'General Information',
+                'candidate_info' => 'Candidate Information',
+                'room_info' => 'Room Information',
+                'staff_info' => 'Staff Information'
+            ],
             'fields'=>[
                 'name' => 'Exam Name',
                 'date_start' => 'Date Start',
@@ -405,7 +411,45 @@ return [
                 'exam_id' => "Exam Date",
                 'payslip_client_id' => "Payment ID"
             ]
-        ]
+        ],
+        'reporting' => [
+            'academic_year_id' => 'Academic Year',
+            'degree_id' => 'Degree',
+            'department_id' => 'Department'
+        ],
+        'incomes' => [
+            'title' => 'Incomes',
+            'sub_index_title' => 'All existing income',
+            'sub_edit_title' => 'Edit income information',
+            'sub_create_title' => 'Create new income',
+            'sub_detail_title' => 'Detail of an income',
+            'fields'=>[
+                'amount_dollar' => "Amount ($)",
+                'amount_riel' => "Amount (៛)",
+                'amount_kh' => "Amount as Letters",
+                'number' => 'Number',
+                'account_id' => 'Account Name',
+                'payslip_client_id' => 'Income From',
+                'date' => 'Date of payment'
+            ]
+        ],
+
+        'outcomes' => [
+            'title' => 'Outcomes',
+            'sub_index_title' => 'All existing outcome',
+            'sub_edit_title' => 'Edit outcome information',
+            'sub_create_title' => 'Create new outcome',
+            'sub_detail_title' => 'Detail of an outcome',
+            'fields'=>[
+                'amount_dollar' => "Amount ($)",
+                'amount_riel' => "Amount (៛)",
+                'amount_kh' => "Amount as Letters",
+                'number' => 'Number',
+                'account_id' => 'Account Name',
+                'payslip_client_id' => 'Open payment to',
+                'date' => 'Date of payment'
+            ]
+        ],
 
     ],
 

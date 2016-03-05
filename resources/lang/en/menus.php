@@ -75,8 +75,21 @@ return [
             'promotions' => 'Promotion',
         ],
 
+        'reporting' => [
+            'title' => 'Reporting',
+            'report_student_age' => 'Students Statistic By Age',
+            'report_student_drop_out' => 'Drop Out Students Statistic',
+            'report_student_degree' => 'Students Statistic By Degree',
+            'report_foreign_student_degree' => 'Foreign Students Statistic By Degree'
+        ],
         'student' => [
             'title' => 'Student',
+        ],
+        'accounting' => [
+            'title' => 'Accounting',
+            'incomes' => 'Income',
+            'outcomes' => 'Outcome',
+            'student_payments' => 'Student Payment'
         ],
         'candidate' => [
             'title' => 'Candidate',

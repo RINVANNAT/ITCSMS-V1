@@ -1,10 +1,10 @@
 @extends ('backend.layouts.master')
 
-@section ('title', trans('labels.backend.students.index_title'))
+@section ('title', trans('labels.backend.students.title'))
 
 @section('page-header')
     <h1>
-        {{ trans('labels.backend.students.index_title') }}
+        {{ trans('labels.backend.students.title') }}
         <small>{{ trans('labels.backend.students.sub_index_title') }}</small>
     </h1>
 
@@ -37,7 +37,9 @@
                 <button class="btn btn-default btn-sm"><i class="fa fa-refresh"></i></button>
 
             </div>
-
+            <div class="box-tools pull-right">
+                @include('backend.studentAnnual.includes.partials.header-buttons')
+            </div>
 
         </div><!-- /.box-header -->
 

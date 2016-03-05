@@ -149,9 +149,18 @@ class EloquentExamRepository implements ExamRepositoryContract
     public function destroy($id)
     {
 
-        $model = $this->findOrThrowException($id);
+        $exam = $this->findOrThrowException($id);
 
-        if ($model->delete()) {
+        //Don't delete the role is there are users associated
+        if ($exam->candidates()->count() > 0) {
+            throw new GeneralException(trans('exceptions.backend.exams.has_candidate'));
+        }
+
+        $exam->rooms()->sync([]);
+        $exam->employees()->sync([]);
+        $exam->students()->sync([]);
+
+        if ($exam->delete()) {
             return true;
         }
 

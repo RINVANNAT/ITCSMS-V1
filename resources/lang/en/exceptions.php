@@ -131,6 +131,9 @@ return [
                 'not_found' => 'That student BacII does not exist.',
                 'already_exists' => 'That student BacII already exists. You can not add the same student BacII.',
             ],
+        ],
+        'exams'=>[
+            'has_candidate' => 'You cannot delete this examination. There are associated candidates!'
         ]
     ],
 

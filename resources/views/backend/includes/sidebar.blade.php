@@ -47,20 +47,37 @@
                 </li>
             @endauth
 
-            <li class="{{ Active::pattern('admin/exam*') }} treeview">
+            <li class="{{ Active::pattern('admin/exams*') }} treeview">
                 <a href="#">
                     <span>{{ trans('menus.backend.exam.title') }}</span>
                     <i class="fa fa-angle-left pull-right"></i>
                 </a>
-                <ul class="treeview-menu {{ Active::pattern('admin/exam/*', 'menu-open') }}" style="display: none; {{ Active::pattern('admin/exam/*', 'display: block;') }}">
-                    <li class="{{ Active::pattern('admin/exam/'.config('access.exam.entrance_engineer').'/*') }}">
+                <ul class="treeview-menu {{ Active::pattern('admin/exams/*', 'menu-open') }}" style="display: none; {{ Active::pattern('admin/exams/*', 'display: block;') }}">
+                    <li class="{{ Active::pattern('admin/exams/'.config('access.exam.entrance_engineer').'/*') }}">
                         <a href="{!! route('admin.exam.index',config('access.exam.entrance_engineer')) !!}">{{ trans('menus.backend.exam.entrances-engineer') }}</a>
                     </li>
-                    <li class="{{ Active::pattern('admin/exam/'.config('access.exam.entrance_dut').'/*') }}">
+                    <li class="{{ Active::pattern('admin/exams/'.config('access.exam.entrance_dut').'/*') }}">
                         <a href="{!! route('admin.exam.index',config('access.exam.entrance_dut')) !!}">{{ trans('menus.backend.exam.entrances-dut') }}</a>
                     </li>
-                    <li class="{{ Active::pattern('admin/exam/'.config('access.exam.final_semester').'/*') }}">
+                    <li class="{{ Active::pattern('admin/exams/'.config('access.exam.final_semester').'/*') }}">
                         <a href="{!! route('admin.exam.index',config('access.exam.final_semester')) !!}">{{ trans('menus.backend.exam.finals') }}</a>
+                    </li>
+                </ul>
+            </li>
+            <li class="{{ Active::pattern('admin/accounting*') }} treeview">
+                <a href="#">
+                    <span>{{ trans('menus.backend.accounting.title') }}</span>
+                    <i class="fa fa-angle-left pull-right"></i>
+                </a>
+                <ul class="treeview-menu {{ Active::pattern('admin/accounting/*', 'menu-open') }}" style="display: none; {{ Active::pattern('admin/accounting*', 'display: block;') }}">
+                    <li class="{{ Active::pattern('admin/accounting/incomes*') }}">
+                        <a href="{!! url('admin/accounting/incomes') !!}">{{ trans('menus.backend.accounting.incomes') }}</a>
+                    </li>
+                    <li class="{{ Active::pattern('admin/accounting/outcomes*') }}">
+                        <a href="{!! url('admin/accounting/outcomes') !!}">{{ trans('menus.backend.accounting.outcomes') }}</a>
+                    </li>
+                    <li class="{{ Active::pattern('admin/accounting/student_payments*') }}">
+                        <a href="{!! url('admin/accounting/student_payments') !!}">{{ trans('menus.backend.accounting.student_payments') }}</a>
                     </li>
                 </ul>
             </li>

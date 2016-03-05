@@ -78,13 +78,13 @@ class CreateStudentAnnualsTable extends Migration
                 ->onDelete('cascade');
 		});
 
-        Schema::create('exam_studentAnnual', function(Blueprint $table)
+        Schema::create('exam_student_annual', function(Blueprint $table)
         {
             $table->integer('exam_id')->unsigned()->index();
             $table->foreign('exam_id')->references('id')->on('exams')->onDelete('cascade');
 
-            $table->integer('studentAnnual_id')->unsigned()->index();
-            $table->foreign('studentAnnual_id')->references('id')->on('studentAnnuals')->onDelete('cascade');
+            $table->integer('student_annual_id')->unsigned()->index();
+            $table->foreign('student_annual_id')->references('id')->on('studentAnnuals')->onDelete('cascade');
         });
 
 

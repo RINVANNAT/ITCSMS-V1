@@ -10,7 +10,7 @@
 @endsection
 
 @section('content')
-    {!! Form::model($grade, ['route' => ['admin.configuration.candidates.update', $grade->id],'class' => 'form-horizontal', 'role'=>'form', 'method' => 'patch']) !!}
+    {!! Form::model($exam, ['route' => ['admin.exams.update', $exam->id],'class' => 'form-horizontal', 'role'=>'form', 'method' => 'patch']) !!}
 
         <div class="box box-success">
             <div class="box-header with-border">
@@ -18,14 +18,14 @@
             </div><!-- /.box-header -->
 
             <div class="box-body">
-                @include ("backend.configuration.grade.fields")
+                @include ("backend.exam.fields")
             </div><!-- /.box-body -->
         </div><!--box-->
 
         <div class="box box-success">
             <div class="box-body">
                 <div class="pull-left">
-                    <a href="{!! route('admin.configuration.candidates.index') !!}" class="btn btn-danger btn-xs">{{ trans('buttons.general.cancel') }}</a>
+                    <a href="{!! route('admin.exam.index',$type) !!}" class="btn btn-danger btn-xs">{{ trans('buttons.general.cancel') }}</a>
                 </div>
 
                 <div class="pull-right">

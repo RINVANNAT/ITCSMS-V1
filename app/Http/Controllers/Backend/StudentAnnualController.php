@@ -5,6 +5,9 @@ use App\Http\Requests\Backend\Student\ImportStudentRequest;
 use App\Http\Requests\Backend\Student\RequestImportStudentRequest;
 use App\Http\Requests\Backend\Student\StoreStudentRequest;
 use App\Http\Requests\Backend\Student\UpdateStudentRequest;
+use App\Models\AcademicYear;
+use App\Models\Degree;
+use App\Models\Department;
 use App\Models\Student;
 use App\Models\StudentAnnual;
 use Carbon\Carbon;
@@ -211,6 +214,31 @@ class StudentAnnualController extends Controller
 
             return redirect(route('admin.studentAnnuals.index'));
         }
+    }
+
+    public function reporting($id){
+        $departments = Department::lists('name_kh','id')->toArray();
+        $degrees = Degree::lists('name_kh','id')->toArray();
+        $academicYears = AcademicYear::lists('name_kh','id')->toArray();
+
+        $view = "";
+        switch ($id) {
+            case 1:
+                $view = 'backend.studentAnnual.reporting.reporting_student_by_age';
+        break;
+            case 2:
+                $view = 'backend.studentAnnual.reporting.reporting_student_by_age';
+        break;
+            default:
+                $view = 'backend.studentAnnual.reporting.reporting_student_by_age';
+        }
+
+        return view($view,compact('id','degrees','academicYears','departments'));
+    }
+
+    public function reporting_data($id,$academicYear,$degree){
+
+        return true;
     }
 
 }

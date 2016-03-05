@@ -1,11 +1,11 @@
 @extends ('backend.layouts.master')
 
-@section ('title', trans('labels.backend.candidates.title'))
+@section ('title', trans('labels.backend.incomes.title'))
 
 @section('page-header')
     <h1>
-        {{ trans('labels.backend.candidates.title') }}
-        <small>{{ trans('labels.backend.candidates.sub_index_title') }}</small>
+        {{ trans('labels.backend.incomes.title') }}
+        <small>{{ trans('labels.backend.incomes.sub_index_title') }}</small>
     </h1>
 
 @endsection
@@ -19,7 +19,7 @@
         <div class="box-header with-border">
             <div class="mailbox-controls">
                 <!-- Check all button -->
-                <a href="{!! route('admin.candidates.create') !!}">
+                <a href="{!! route('admin.accounting.incomes.create') !!}">
                     <button class="btn btn-primary btn-sm"><i class="fa fa-plus-circle"></i> Add
                     </button>
                 </a>
@@ -38,7 +38,18 @@
 
         <div class="box-body">
             <div>
-                @include('backend.candidate.includes.index_table_header')
+                <table class="table table-striped table-bordered table-hover" id="incomes-table">
+                    <thead>
+                    <tr>
+                        <th>{{ trans('labels.backend.incomes.fields.number') }}</th>
+                        <th>{{ trans('labels.backend.incomes.fields.amount_dollar') }}</th>
+                        <th>{{ trans('labels.backend.incomes.fields.amount_riel') }}</th>
+                        <th>{{ trans('labels.backend.incomes.fields.account_id') }}</th>
+                        <th>{{ trans('labels.backend.incomes.fields.payslip_client_id') }}</th>
+                        <th>{{ trans('labels.general.actions') }}</th>
+                    </tr>
+                    </thead>
+                </table>
             </div>
 
             <div class="clearfix"></div>
@@ -51,20 +62,22 @@
     {!! Html::script('plugins/datatables/dataTables.bootstrap.min.js') !!}
     <script>
         $(function() {
-            $('#candidates-table').DataTable({
+            $('#incomes-table').DataTable({
                 processing: true,
                 serverSide: true,
                 pageLength: {!! config('app.records_per_page')!!},
-                ajax: '{!! route('admin.candidate.data') !!}',
+                ajax: '{!! route('admin.accounting.income.data') !!}',
                 columns: [
-                    { data: 'name_kh', name: 'name_kh'},
-                    { data: 'name_en', name: 'name_en'},
-                    { data: 'gender_id', name: 'gender_id'},
-                    { data: 'bac_total_grade', name: 'bac_total_grade'},
+                    { data: 'number', name: 'number'},
+                    { data: 'amount_dollar', name: 'amount_dollar'},
+                    { data: 'amount_riel', name: 'amount_riel'},
+                    { data: 'account_id', name: 'account_id'},
+                    { data: 'payslip_client_id', name: 'payslip_client_id'},
                     { data: 'action', name: 'action',orderable: false, searchable: false}
                 ]
             });
-            enableDeleteRecord($('#candidates-table'));
+
+            enableDeleteRecord($('#incomes-table'));
         });
     </script>
 @stop

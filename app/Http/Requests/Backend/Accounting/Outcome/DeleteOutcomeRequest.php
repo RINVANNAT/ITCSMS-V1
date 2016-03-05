@@ -1,14 +1,14 @@
 <?php
 
-namespace App\Http\Requests\Backend\Exam;
+namespace App\Http\Requests\Backend\Accounting\Outcome;
 
 use App\Http\Requests\Request;
 
 /**
- * Class UpdateExamRequest
- * @package App\Http\Requests\Backend\Exam
+ * Class DeleteOutcomeRequest
+ * @package App\Http\Requests\Backend\Accounting\Outcome
  */
-class UpdateExamRequest extends Request
+class DeleteOutcomeRequest extends Request
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -17,7 +17,7 @@ class UpdateExamRequest extends Request
      */
     public function authorize()
     {
-        return access()->allow('edit-exams');
+        return access()->allow('delete-outcomes');
     }
 
     /**
@@ -28,9 +28,6 @@ class UpdateExamRequest extends Request
     public function rules()
     {
         return [
-            'name' => 'required|max:255',
-            'description' => 'max:255',
-            'type_id' => 'required',
         ];
     }
 }

@@ -37,16 +37,8 @@ class ExamController extends Controller
 
     public function index($id)
     {
-        if($id == config('access.exam.entrance_engineer')){
-            $data_url = route('admin.exam.entrance_engineer.data');
-        } else if ($id == config('access.exam.entrance_engineer')){
-            $data_url = route('admin.exam.entrance_dut.data');
-        } else {
-            $data_url = route('admin.exam.final_semester.data');
-        }
-
         $type = $id;
-        return view('backend.exam.index',compact('type','data_url'));
+        return view('backend.exam.index',compact('type'));
     }
 
 
@@ -87,7 +79,12 @@ class ExamController extends Controller
      */
     public function show($id)
     {
-        //
+        $exam = $this->exams->findOrThrowException($id);
+
+        $type = $exam->type->id;
+        $academicYear = AcademicYear::where('id',$exam->academicYear->id)->lists('name_kh','id');
+        $examType = ExamType::where('id',$type)->lists('name_kh','id')->toArray();
+        return view('backend.exam.show',compact('exam','type','academicYear','examType'));
     }
 
     /**
@@ -98,10 +95,14 @@ class ExamController extends Controller
      */
     public function edit(EditExamRequest $request, $id)
     {
-        $departments = Department::lists('name_kh','id');
+
         $exam = $this->exams->findOrThrowException($id);
-        $selected_departments = $exam->departments->lists('id')->toArray();
-        return view('backend.exam.edit',compact('exam','departments','selected_departments'));
+
+        $type = $exam->type->id;
+        $academicYear = AcademicYear::where('id',$exam->academicYear->id)->lists('name_kh','id');
+        $examType = ExamType::where('id',$type)->lists('name_kh','id')->toArray();
+
+        return view('backend.exam.edit',compact('exam','type','academicYear','examType'));
     }
 
     /**
@@ -114,7 +115,7 @@ class ExamController extends Controller
     public function update(UpdateExamRequest $request, $id)
     {
         $this->exams->update($id, $request->all());
-        return redirect()->route('admin.exams.index')->withFlashSuccess(trans('alerts.backend.generals.updated'));
+        return redirect()->route('admin.exam.index',$request['type_id'])->withFlashSuccess(trans('alerts.backend.generals.updated'));
     }
 
     /**
@@ -133,10 +134,10 @@ class ExamController extends Controller
         }
     }
 
-    public function entrance_engineer_data()
+    public function data($id)
     {
         $exams = DB::table('exams')
-            ->where('type_id',config('access.exam.entrance_engineer'))
+            ->where('type_id',$id)
             ->select(['id','name','date_start','date_end','description']);
 
         $datatables =  app('datatables')->of($exams);
@@ -149,49 +150,8 @@ class ExamController extends Controller
             ->editColumn('description', '{!! $description !!}')
             ->addColumn('action', function ($exam) {
                 return  '<a href="'.route('admin.exams.edit',$exam->id).'" class="btn btn-xs btn-primary"><i class="fa fa-pencil" data-toggle="tooltip" data-placement="top" title="" data-original-title="'.trans('buttons.general.crud.edit').'"></i> </a>'.
-                ' <button class="btn btn-xs btn-danger btn-delete" data-remote="'.route('admin.exams.destroy', $exam->id) .'"><i class="fa fa-times" data-toggle="tooltip" data-placement="top" title="' . trans('buttons.general.crud.delete') . '"></i></button>';
-            })
-            ->make(true);
-    }
-
-    public function entrance_dut_data()
-    {
-        $exams = DB::table('exams')
-            ->where('type_id',config('access.exam.entrance_dut'))
-            ->select(['id','name','date_start','date_end','description']);
-
-        $datatables =  app('datatables')->of($exams);
-
-
-        return $datatables
-            ->editColumn('name', '{!! $name !!}')
-            ->editColumn('date_start', '{!! $date_start !!}')
-            ->editColumn('date_end', '{!! $date_end !!}')
-            ->editColumn('description', '{!! $description !!}')
-            ->addColumn('action', function ($exam) {
-                return  '<a href="'.route('admin.exams.edit',$exam->id).'" class="btn btn-xs btn-primary"><i class="fa fa-pencil" data-toggle="tooltip" data-placement="top" title="" data-original-title="'.trans('buttons.general.crud.edit').'"></i> </a>'.
-                ' <button class="btn btn-xs btn-danger btn-delete" data-remote="'.route('admin.exams.destroy', $exam->id) .'"><i class="fa fa-times" data-toggle="tooltip" data-placement="top" title="' . trans('buttons.general.crud.delete') . '"></i></button>';
-            })
-            ->make(true);
-    }
-
-    public function final_semester_data()
-    {
-        $exams = DB::table('exams')
-            ->where('type_id',config('access.exam.final_semester'))
-            ->select(['id','name','date_start','date_end','description']);
-
-        $datatables =  app('datatables')->of($exams);
-
-
-        return $datatables
-            ->editColumn('name', '{!! $name !!}')
-            ->editColumn('date_start', '{!! $date_start !!}')
-            ->editColumn('date_end', '{!! $date_end !!}')
-            ->editColumn('description', '{!! $description !!}')
-            ->addColumn('action', function ($exam) {
-                return  '<a href="'.route('admin.exams.edit',$exam->id).'" class="btn btn-xs btn-primary"><i class="fa fa-pencil" data-toggle="tooltip" data-placement="top" title="" data-original-title="'.trans('buttons.general.crud.edit').'"></i> </a>'.
-                ' <button class="btn btn-xs btn-danger btn-delete" data-remote="'.route('admin.exams.destroy', $exam->id) .'"><i class="fa fa-times" data-toggle="tooltip" data-placement="top" title="' . trans('buttons.general.crud.delete') . '"></i></button>';
+                ' <button class="btn btn-xs btn-danger btn-delete" data-remote="'.route('admin.exams.destroy', $exam->id) .'"><i class="fa fa-times" data-toggle="tooltip" data-placement="top" title="' . trans('buttons.general.crud.delete') . '"></i></button>'.
+                ' <a href="'.route('admin.exams.show',$exam->id).'" class="btn btn-xs btn-info"><i class="fa fa-eye" data-toggle="tooltip" data-placement="top" title="" data-original-title="'.trans('buttons.general.view').'"></i> </a>';
             })
             ->make(true);
     }
