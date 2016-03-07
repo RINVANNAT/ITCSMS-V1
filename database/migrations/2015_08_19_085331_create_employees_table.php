@@ -64,8 +64,9 @@ class CreateEmployeesTable extends Migration
 		});
 
         Schema::create('employee_role',function(Blueprint $table){
+            $table->increments('id')->unsigned();
             $table->integer('role_id')->unsigned()->index();
-            $table->foreign('role_id')->references('id')->on('roles')->onDelete('cascade');
+            $table->foreign('role_id')->references('id')->on(config('access.roles_table'))->onDelete('cascade');
 
             $table->integer('employee_id')->unsigned()->index();
             $table->foreign('employee_id')->references('id')->on('employees')->onDelete('cascade');

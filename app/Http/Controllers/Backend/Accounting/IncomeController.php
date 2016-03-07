@@ -110,7 +110,7 @@ class IncomeController extends Controller
         return redirect()->route('admin.accounting.academicYears.index')->withFlashSuccess(trans('alerts.backend.generals.deleted'));
     }
 
-    public function data(Request $request)
+    public function data()
     {
         //$student = Student::join('studentAnnuals', 'studentAnnuals.student_id', '=', 'students.id')
         //	->select(['students.id_card','students.name_kh','students.name_latin','studentAnnuals.grade_id']);

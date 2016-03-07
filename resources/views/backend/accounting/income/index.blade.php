@@ -41,11 +41,11 @@
                 <table class="table table-striped table-bordered table-hover" id="incomes-table">
                     <thead>
                     <tr>
-                        <th>{{ trans('labels.backend.incomes.fields.number') }}</th>
-                        <th>{{ trans('labels.backend.incomes.fields.amount_dollar') }}</th>
-                        <th>{{ trans('labels.backend.incomes.fields.amount_riel') }}</th>
-                        <th>{{ trans('labels.backend.incomes.fields.account_id') }}</th>
-                        <th>{{ trans('labels.backend.incomes.fields.payslip_client_id') }}</th>
+                        <th>{{ trans('labels.backend.accounting.fields.number') }}</th>
+                        <th>{{ trans('labels.backend.accounting.fields.amount_dollar') }}</th>
+                        <th>{{ trans('labels.backend.accounting.fields.amount_riel') }}</th>
+                        <th>{{ trans('labels.backend.accounting.fields.account_id') }}</th>
+                        <th>{{ trans('labels.backend.accounting.fields.payslip_client_id') }}</th>
                         <th>{{ trans('labels.general.actions') }}</th>
                     </tr>
                     </thead>

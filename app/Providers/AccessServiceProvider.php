@@ -174,6 +174,26 @@ class AccessServiceProvider extends ServiceProvider
             \App\Repositories\Backend\Outcome\EloquentOutcomeRepository::class
         );
 
+        $this->app->bind(
+            \App\Repositories\Backend\Employee\EmployeeRepositoryContract::class,
+            \App\Repositories\Backend\Employee\EloquentEmployeeRepository::class
+        );
+
+        $this->app->bind(
+            \App\Repositories\Backend\Customer\CustomerRepositoryContract::class,
+            \App\Repositories\Backend\Customer\EloquentCustomerRepository::class
+        );
+
+        $this->app->bind(
+            \App\Repositories\Backend\CourseAnnual\CourseAnnualRepositoryContract::class,
+            \App\Repositories\Backend\CourseAnnual\EloquentCourseAnnualRepository::class
+        );
+
+        $this->app->bind(
+            \App\Repositories\Backend\CourseProgram\CourseProgramRepositoryContract::class,
+            \App\Repositories\Backend\CourseProgram\EloquentCourseProgramRepository::class
+        );
+
     }
 
     /**

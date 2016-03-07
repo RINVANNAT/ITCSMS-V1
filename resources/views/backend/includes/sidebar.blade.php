@@ -41,6 +41,9 @@
             <li class="{{ Active::pattern('admin/candidates') }}">
                 <a href="{!!url('admin/candidates')!!}"><span>{{ trans('menus.backend.candidate.title') }}</span></a>
             </li>
+            <li class="{{ Active::pattern('admin/employees') }}">
+                <a href="{!!url('admin/employees')!!}"><span>{{ trans('menus.backend.employee.title') }}</span></a>
+            </li>
             @permission('view-access-management')
                 <li class="{{ Active::pattern('admin/access/*') }}">
                     <a href="{!!url('admin/access/users')!!}"><span>{{ trans('menus.backend.access.title') }}</span></a>
@@ -64,6 +67,21 @@
                     </li>
                 </ul>
             </li>
+            <li class="{{ Active::pattern('admin/course*') }} treeview">
+                <a href="#">
+                    <span>{{ trans('menus.backend.course.title') }}</span>
+                    <i class="fa fa-angle-left pull-right"></i>
+                </a>
+                <ul class="treeview-menu {{ Active::pattern('admin/course/*', 'menu-open') }}" style="display: none; {{ Active::pattern('admin/course*', 'display: block;') }}">
+                    <li class="{{ Active::pattern('admin/course/course_annual*') }}">
+                        <a href="{!! url('admin/course/course_annual') !!}">{{ trans('menus.backend.course.course_annuals') }}</a>
+                    </li>
+                    <li class="{{ Active::pattern('admin/course/course_program*') }}">
+                        <a href="{!! url('admin/course/course_program') !!}">{{ trans('menus.backend.course.course_programs') }}</a>
+                    </li>
+                </ul>
+            </li>
+
             <li class="{{ Active::pattern('admin/accounting*') }} treeview">
                 <a href="#">
                     <span>{{ trans('menus.backend.accounting.title') }}</span>
@@ -78,6 +96,9 @@
                     </li>
                     <li class="{{ Active::pattern('admin/accounting/student_payments*') }}">
                         <a href="{!! url('admin/accounting/student_payments') !!}">{{ trans('menus.backend.accounting.student_payments') }}</a>
+                    </li>
+                    <li class="{{ Active::pattern('admin/accounting/customers*') }}">
+                        <a href="{!! url('admin/accounting/customers') !!}">{{ trans('menus.backend.accounting.customers') }}</a>
                     </li>
                 </ul>
             </li>

@@ -12,7 +12,12 @@ Route::group([
     });
     Route::group([], function() {
         Route::resource('outcomes', 'OutcomeController');
-        Route::get('outcome-data', 'OutcomeController@data')->name('admin.configuration.outcome.data');
+        Route::get('outcome-data', 'OutcomeController@data')->name('admin.accounting.outcome.data');
+    });
+
+    Route::group([], function() {
+        Route::resource('customers', 'CustomerController');
+        Route::get('customer-data', 'CustomerController@data')->name('admin.accounting.customer.data');
     });
 
 });

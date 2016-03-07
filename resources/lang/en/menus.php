@@ -89,10 +89,19 @@ return [
             'title' => 'Accounting',
             'incomes' => 'Income',
             'outcomes' => 'Outcome',
+            'customers' => 'Customer',
             'student_payments' => 'Student Payment'
+        ],
+        'course' => [
+            'title' => 'Course Management',
+            'course_annuals' => 'Courses Annually',
+            'course_programs' => 'Courses Program'
         ],
         'candidate' => [
             'title' => 'Candidate',
+        ],
+        'employee' => [
+            'title' => 'Employee',
         ],
         'exam' => [
             'title' => 'Examination',

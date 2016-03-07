@@ -23,10 +23,9 @@ class CreateOutcomesTable extends Migration
             $table->string('number')->nullable();
             $table->boolean('is_printed')->default(false);
             $table->timestamp('pay_date');
-            $table->string('attachment')->nullable();
-            $table->string('attachment_title')->nullable();
             $table->timestamps();
             $table->boolean('active')->default(true);
+            $table->string('attachment_name')->nullable();
 
             $table->integer('create_uid')->unsigned();
             $table->foreign('create_uid')

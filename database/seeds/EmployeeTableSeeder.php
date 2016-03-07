@@ -14,7 +14,6 @@ class EmployeeTableSeeder extends Seeder
     {
         $employees = array(
             array(
-                'id'=>1,
                 'name_kh' => 'admin',
                 'name_latin' => 'admin',
                 'birthdate' => Carbon\Carbon::now(),
@@ -28,7 +27,6 @@ class EmployeeTableSeeder extends Seeder
                 'department_id'=>4
             ),
             array(
-                'id'=>2,
                 'name_kh' => 'chun thavorac',
                 'name_latin' => 'chun thavorac',
                 'birthdate' => Carbon\Carbon::now(),
@@ -42,7 +40,6 @@ class EmployeeTableSeeder extends Seeder
                 'department_id'=>4
             ),
             array(
-                'id'=>3,
                 'name_kh' => 'chea chheang',
                 'name_latin' => 'chea chheang',
                 'birthdate' => Carbon\Carbon::now(),

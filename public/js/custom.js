@@ -247,7 +247,7 @@ function getKhmerCurrentDate() {
     if (mm < 10) {
         mm = '0' + mm
     }
-    today = convertKhmerNumber(dd.toString()) + ' ' + convertKhmerMonth(mm) + ' ' + convertKhmerNumber(year.toString());
+    today = "ថ្ងៃទី"+ convertKhmerNumber(dd.toString()) + ' ខែ ' + convertKhmerMonth(mm) + ' ឆ្នាំ ' + convertKhmerNumber(year.toString());
     return today;
 }
 

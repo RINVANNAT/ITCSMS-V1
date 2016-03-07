@@ -333,6 +333,27 @@ return [
                 'class' => "Class",
             ]
         ],
+        'employees' => [
+            'title' => 'Employees',
+            'sub_index_title' => 'All existing employees',
+            'sub_edit_title' => 'Edit employee',
+            'sub_create_title' => 'Register new employee',
+            'sub_detail_title' => 'Detail of employee',
+            'sub_import_title' => "Import employees",
+            'fields'=>[
+                'name_kh' => 'Name KH',
+                'name_latin' => 'Name Latin',
+                'phone' => "Phone",
+                'email' => "Email",
+                'department_id' => "Department",
+                'birthdate' => "Birth Date",
+                'active' => "Active",
+                'address' => "Address",
+                'gender_id' => "Gender",
+                'user_id' => 'Related User',
+                'role_id' => 'Related Role'
+            ]
+        ],
         'exams' => [
             'title' => 'Examinations',
             'sub_index_title' => 'All existing examinations',
@@ -417,12 +438,8 @@ return [
             'degree_id' => 'Degree',
             'department_id' => 'Department'
         ],
-        'incomes' => [
-            'title' => 'Incomes',
-            'sub_index_title' => 'All existing income',
-            'sub_edit_title' => 'Edit income information',
-            'sub_create_title' => 'Create new income',
-            'sub_detail_title' => 'Detail of an income',
+        'accounting' => [
+
             'fields'=>[
                 'amount_dollar' => "Amount ($)",
                 'amount_riel' => "Amount (៛)",
@@ -433,23 +450,74 @@ return [
                 'date' => 'Date of payment'
             ]
         ],
-
+        'incomes' => [
+            'title' => 'Incomes',
+            'sub_index_title' => 'All existing income',
+            'sub_edit_title' => 'Edit income information',
+            'sub_create_title' => 'Create new income',
+            'sub_detail_title' => 'Detail of an income',
+        ],
         'outcomes' => [
             'title' => 'Outcomes',
             'sub_index_title' => 'All existing outcome',
             'sub_edit_title' => 'Edit outcome information',
             'sub_create_title' => 'Create new outcome',
             'sub_detail_title' => 'Detail of an outcome',
-            'fields'=>[
-                'amount_dollar' => "Amount ($)",
-                'amount_riel' => "Amount (៛)",
-                'amount_kh' => "Amount as Letters",
-                'number' => 'Number',
-                'account_id' => 'Account Name',
-                'payslip_client_id' => 'Open payment to',
-                'date' => 'Date of payment'
+            'search_client' => 'Search for client',
+            'search_result' =>'Search result',
+            'fields' => [
+                'is' => "Is",
+                'name' => 'Name',
             ]
         ],
+        'customers' => [
+            'title' => 'Customers',
+            'sub_index_title' => 'All existing customer',
+            'sub_edit_title' => 'Edit customer information',
+            'sub_create_title' => 'Create new customer',
+            'sub_detail_title' => 'Detail of an customer',
+            'search_client' => 'Search for client',
+            'search_result' =>'Search result',
+            'fields' => [
+                'name' => "Name",
+                'address' => 'Address',
+                'phone' => 'Phone',
+                'email' => 'Email',
+                'company' => 'Company',
+                'identity_number' => 'Identity Number',
+                'active' => 'Active'
+            ]
+        ],
+        'courseAnnuals' => [
+            'title' => 'Course Annually',
+            'sub_index_title' => 'All existing course',
+            'sub_edit_title' => 'Edit course information',
+            'sub_create_title' => 'Create new course',
+            'sub_detail_title' => 'Detail of an course',
+            'fields' => [
+                'name' => "Name",
+                'semester' => 'Semester',
+                'academic_year_id' => 'Academic year',
+                'department_id' => 'Department',
+                'degree_id' => 'Degree',
+                'grade_id' => 'Grade',
+                'employee_id' => 'Lecturer'
+            ]
+        ],
+        'coursePrograms' => [
+            'title' => 'Course Programs',
+            'sub_index_title' => 'All existing course program',
+            'sub_edit_title' => 'Edit course program information',
+            'sub_create_title' => 'Create new course program',
+            'sub_detail_title' => 'Detail of a course program',
+            'fields' => [
+                'name_kh' => "Name Khmer",
+                'name_en' => 'Name English',
+                'name_fr' => 'Name French',
+                'duration' => 'Duration',
+                'code' => 'Code',
+            ]
+        ]
 
     ],
 

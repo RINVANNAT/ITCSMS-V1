@@ -19,9 +19,13 @@ class Outcome extends Model
 		"write_uid",
 		"payslip_client_id",
 		"outcome_type_id",
-		"attachment",
-		"account_id"
+		"account_id",
+        "attachment_name"
 	];
+
+	public function attachments(){
+		return $this->hasMany('App\Models\Attachment');
+	}
 
 	public function outcomeType(){
 		return $this->belongsTo('App\Models\OutcomeType');

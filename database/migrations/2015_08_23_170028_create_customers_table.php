@@ -25,7 +25,7 @@ class CreateCustomersTable extends Migration
 			$table->timestamps();
             $table->boolean('active')->default(true);
 
-            $table->integer('payslip_client_id')->unsigned();
+            $table->integer('payslip_client_id')->unsigned()->nullable();
             $table->foreign('payslip_client_id')
                 ->references('id')
                 ->on('payslipClients')

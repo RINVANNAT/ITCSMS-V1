@@ -1,11 +1,11 @@
 @extends ('backend.layouts.master')
 
-@section ('title', trans('labels.backend.degrees.title'))
+@section ('title', trans('labels.backend.outcomes.title'))
 
 @section('page-header')
     <h1>
-        {{ trans('labels.backend.degrees.title') }}
-        <small>{{ trans('labels.backend.degrees.sub_index_title') }}</small>
+        {{ trans('labels.backend.outcomes.title') }}
+        <small>{{ trans('labels.backend.outcomes.sub_index_title') }}</small>
     </h1>
 
 @endsection
@@ -19,7 +19,7 @@
         <div class="box-header with-border">
             <div class="mailbox-controls">
                 <!-- Check all button -->
-                <a href="{!! route('admin.configuration.degrees.create') !!}">
+                <a href="{!! route('admin.accounting.outcomes.create') !!}">
                     <button class="btn btn-primary btn-sm"><i class="fa fa-plus-circle"></i> Add
                     </button>
                 </a>
@@ -38,13 +38,14 @@
 
         <div class="box-body">
             <div>
-                <table class="table table-striped table-bordered table-hover" id="degrees-table">
+                <table class="table table-striped table-bordered table-hover" id="outcomes-table">
                     <thead>
                     <tr>
-                        <th>{{ trans('labels.backend.degrees.fields.code') }}</th>
-                        <th>{{ trans('labels.backend.degrees.fields.name_kh') }}</th>
-                        <th>{{ trans('labels.backend.degrees.fields.name_en') }}</th>
-                        <th>{{ trans('labels.backend.degrees.fields.name_fr') }}</th>
+                        <th>{{ trans('labels.backend.accounting.fields.number') }}</th>
+                        <th>{{ trans('labels.backend.accounting.fields.amount_dollar') }}</th>
+                        <th>{{ trans('labels.backend.accounting.fields.amount_riel') }}</th>
+                        <th>{{ trans('labels.backend.accounting.fields.account_id') }}</th>
+                        <th>{{ trans('labels.backend.accounting.fields.payslip_client_id') }}</th>
                         <th>{{ trans('labels.general.actions') }}</th>
                     </tr>
                     </thead>
@@ -61,21 +62,22 @@
     {!! Html::script('plugins/datatables/dataTables.bootstrap.min.js') !!}
     <script>
         $(function() {
-            $('#degrees-table').DataTable({
+            $('#outcomes-table').DataTable({
                 processing: true,
                 serverSide: true,
                 pageLength: {!! config('app.records_per_page')!!},
-                ajax: '{!! route('admin.configuration.degree.data') !!}',
+                ajax: '{!! route('admin.accounting.outcome.data') !!}',
                 columns: [
-                    { data: 'code', name: 'code'},
-                    { data: 'name_kh', name: 'name_kh'},
-                    { data: 'name_en', name: 'name_en'},
-                    { data: 'name_fr', name: 'name_fr'},
+                    { data: 'number', name: 'number'},
+                    { data: 'amount_dollar', name: 'amount_dollar'},
+                    { data: 'amount_riel', name: 'amount_riel'},
+                    { data: 'account_id', name: 'account_id'},
+                    { data: 'payslip_client_id', name: 'payslip_client_id'},
                     { data: 'action', name: 'action',orderable: false, searchable: false}
                 ]
             });
 
-            enableDeleteRecord($('#degrees-table'));
+            enableDeleteRecord($('#outcomes-table'));
         });
     </script>
 @stop

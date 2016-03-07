@@ -17,7 +17,8 @@ return [
         'generals'=> [
             'updated' => 'Information is updated.',
             'deleted' => 'Information is deleted',
-            'created' => 'Information is created'
+            'created' => 'Information is created',
+            'no_result_found' => 'There are no records.'
         ],
         'permissions' => [
             'created' => 'Permission successfully created.',

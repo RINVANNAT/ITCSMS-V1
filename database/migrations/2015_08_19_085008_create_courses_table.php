@@ -20,9 +20,9 @@ class CreateCoursesTable extends Migration
 			$table->string('name_en');
 			$table->string('name_fr')->nullable();
 			$table->string('code')->nullable();
-			$table->integer('time_tp')->nullable();
-			$table->integer('time_td')->nullable();
-			$table->integer('time_course')->nullable();
+			$table->integer('time_tp');
+			$table->integer('time_td');
+			$table->integer('time_course');
 			$table->float('credit')->nullable();
 			$table->boolean('active')->default(true);
 			$table->timestamps();

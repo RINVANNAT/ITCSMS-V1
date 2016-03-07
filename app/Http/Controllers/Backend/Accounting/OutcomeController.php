@@ -42,9 +42,9 @@ class OutcomeController extends Controller
      */
     public function create()
     {
-        $departments = Department::lists('name_kh','id')->toArray();
-        $schools = School::lists('name_kh','id')->toArray();
-        return view('backend.accounting.outcome.create',compact('departments','schools'));
+        $outcomeTypes = \App\Models\OutcomeType::get()->lists('codeName','id');
+        $accounts = \App\Models\Account::lists('name','id');
+        return view('backend.accounting.outcome.create',compact('outcomeTypes','accounts'));
     }
 
     /**
@@ -110,27 +110,28 @@ class OutcomeController extends Controller
         return redirect()->route('admin.accounting.academicYears.index')->withFlashSuccess(trans('alerts.backend.generals.deleted'));
     }
 
-    public function data(Request $request)
+    public function data()
     {
         //$student = Student::join('studentAnnuals', 'studentAnnuals.student_id', '=', 'students.id')
         //	->select(['students.id_card','students.name_kh','students.name_latin','studentAnnuals.grade_id']);
 
         //$studentAnnuals = StudentAnnual::with(['student','grade'])->select(['students.id_card','students.name_kh','students.name_latin','grades.name_kh']);
 
-        $outcomes = DB::table('outcomes')
-            ->select(['id','code','name_kh','name_en','name_fr']);
+        $outcomes = DB::table('incomes')
+            ->select(['id','number','amount_dollar','amount_riel','account_id','payslip_client_id']);
 
         $datatables =  app('datatables')->of($outcomes);
 
 
         return $datatables
-            ->editColumn('code', '{!! str_limit($code, 60) !!}')
-            ->editColumn('name_kh', '{!! str_limit($name_kh, 60) !!}')
-            ->editColumn('name_en', '{!! str_limit($name_en, 60) !!}')
-            ->editColumn('name_fr', '{!! str_limit($name_fr, 60) !!}')
+            ->editColumn('number', '{!! $number !!}')
+            ->editColumn('amount_dollar', '{!! $amount_dollar !!}')
+            ->editColumn('amount_riel', '{!! $amount_riel !!}')
+            ->editColumn('account_id', '{!! $account_id !!}')
+            ->editColumn('payslip_client_id', '{!! $payslip_client_id !!}')
             ->addColumn('action', function ($outcome) {
-                return  '<a href="'.route('admin.accounting.outcomes.edit',$outcome->id).'" class="btn btn-xs btn-primary"><i class="fa fa-pencil" data-toggle="tooltip" data-placement="top" title="" data-original-title="'.trans('buttons.general.crud.edit').'"></i> </a>'.
-                ' <button class="btn btn-xs btn-danger btn-delete" data-remote="'.route('admin.accounting.outcomes.destroy', $outcome->id) .'"><i class="fa fa-times" data-toggle="tooltip" data-placement="top" title="' . trans('buttons.general.crud.delete') . '"></i></button>';
+                return  '<a href="'.route('admin.accounting.incomes.edit',$outcome->id).'" class="btn btn-xs btn-primary"><i class="fa fa-pencil" data-toggle="tooltip" data-placement="top" title="" data-original-title="'.trans('buttons.general.crud.edit').'"></i> </a>'.
+                ' <button class="btn btn-xs btn-danger btn-delete" data-remote="'.route('admin.accounting.incomes.destroy', $outcome->id) .'"><i class="fa fa-times" data-toggle="tooltip" data-placement="top" title="' . trans('buttons.general.crud.delete') . '"></i></button>';
             })
             ->make(true);
     }

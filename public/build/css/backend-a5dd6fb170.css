@@ -13442,6 +13442,36 @@ body.stop-scrolling {
     -webkit-transform: translateY(145%);
     transform: translateY(145%); } }
 
+@font-face {
+  font-family: bayon;
+  src: url("../fonts/Bayon.ttf"); }
+
+@font-face {
+  font-family: kh-bokor;
+  src: url("../fonts/Kh-Bokor.ttf"); }
+
+@font-face {
+  font-family: khmerosmoulpali;
+  src: url("../fonts/KhmerOSMoulpali.ttf"); }
+
+@font-face {
+  font-family: metal;
+  src: url("../fonts/Metal.ttf"); }
+
+@font-face {
+  font-family: tactieng;
+  src: url("../fonts/TACTIENG.TTF"); }
+
+@font-face {
+  font-family: khmeros;
+  src: url("../fonts/KhmerOSContent-Regular.ttf"); }
+
+h1, h2, h3, h4, h5, h6, .h1, .h2, .h3, .h4, .h5, .h6 {
+  font-family: 'bayon'; }
+
+.modal-title {
+  font-family: 'KhmerOSMoulpali'; }
+
 /*# sourceMappingURL=app.css.map */
 
 /*# sourceMappingURL=backend.css.map */

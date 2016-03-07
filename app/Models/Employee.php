@@ -1,14 +1,15 @@
 <?php namespace App\Models;
 
+use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Model as Model;
 
 class Employee extends Model
 {
     
 	public $table = "employees";
-    
 
-	public $fillable = [
+    //protected $dates = ['birthdate'];
+    public $fillable = [
 	    "name_kh",
 		"name_latin",
 		"birthdate",
@@ -20,6 +21,19 @@ class Employee extends Model
         "department_id",
         "user_id"
 	];
+
+    public function setBirthdateAttribute($value)
+    {
+        $date = Carbon::createFromFormat('d/m/Y', $value);
+        $this->attributes['birthdate'] = $date->format('Y/m/d');
+    }
+
+    public function getBirthdateAttribute(){
+        $date = Carbon::createFromFormat('Y-m-d h:i:s', $this->attributes['birthdate']);
+
+        return $date->format('m/d/Y');
+    }
+
 
     public function creator(){
         return $this->belongsTo('App\Models\Access\User','create_uid');
@@ -39,9 +53,10 @@ class Employee extends Model
     public function user(){
         return $this->hasOne('App\Models\Access\User','user_id');
     }
-	public function groups(){
-		return $this->belongsToMany('App\Models\Group')->withTimestamps();
-	}
+    public function roles()
+    {
+        return $this->belongsToMany(config('access.role'));
+    }
 
     /**
      * The attributes that should be casted to native types.
