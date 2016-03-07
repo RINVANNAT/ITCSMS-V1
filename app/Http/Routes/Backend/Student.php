@@ -7,5 +7,5 @@
         Route::post('student-import', 'StudentAnnualController@import')->name('admin.student.import');
 
         Route::get('student/{id}/reporting', 'StudentAnnualController@reporting')->name('admin.student.reporting');
-        Route::get('student/{id}/reporting-data/{academicYear}/{degree}', 'StudentAnnualController@reporting_data')->name('admin.student.reporting_data');
+        Route::post('student/{id}/reporting-data', 'StudentAnnualController@reporting_data')->name('admin.student.reporting_data');
     });

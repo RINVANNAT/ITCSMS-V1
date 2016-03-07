@@ -44,6 +44,9 @@
             <li class="{{ Active::pattern('admin/employees') }}">
                 <a href="{!!url('admin/employees')!!}"><span>{{ trans('menus.backend.employee.title') }}</span></a>
             </li>
+            <li class="{{ Active::pattern('admin/scholarships') }}">
+                <a href="{!!url('admin/scholarships')!!}"><span>{{ trans('menus.backend.scholarship.title') }}</span></a>
+            </li>
             @permission('view-access-management')
                 <li class="{{ Active::pattern('admin/access/*') }}">
                     <a href="{!!url('admin/access/users')!!}"><span>{{ trans('menus.backend.access.title') }}</span></a>

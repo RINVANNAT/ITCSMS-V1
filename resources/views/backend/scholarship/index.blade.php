@@ -1,11 +1,11 @@
 @extends ('backend.layouts.master')
 
-@section ('title', trans('labels.backend.departments.index_title'))
+@section ('title', trans('labels.backend.scholarships.title'))
 
 @section('page-header')
     <h1>
-        {{ trans('labels.backend.departments.index_title') }}
-        <small>{{ trans('labels.backend.departments.sub_index_title') }}</small>
+        {{ trans('labels.backend.scholarships.title') }}
+        <small>{{ trans('labels.backend.scholarships.sub_index_title') }}</small>
     </h1>
 
 @endsection
@@ -19,7 +19,7 @@
         <div class="box-header with-border">
             <div class="mailbox-controls">
                 <!-- Check all button -->
-                <a href="{!! route('admin.configuration.departments.create') !!}">
+                <a href="{!! route('admin.scholarships.create') !!}">
                     <button class="btn btn-primary btn-sm"><i class="fa fa-plus-circle"></i> Add
                     </button>
                 </a>
@@ -43,13 +43,14 @@
 
         <div class="box-body">
             <div>
-                <table class="table table-striped table-bordered table-hover" id="students-table">
+                <table class="table table-striped table-bordered table-hover" id="scholarships-table">
                     <thead>
                     <tr>
-                        <th>{{ trans('labels.backend.students.fields.id_card') }}</th>
-                        <th>{{ trans('labels.backend.students.fields.name_kh') }}</th>
-                        <th>{{ trans('labels.backend.students.fields.name_latin') }}</th>
-                        <th>{{ trans('labels.backend.students.fields.class') }}</th>
+                        <th>{{ trans('labels.backend.scholarships.fields.name_kh') }}</th>
+                        <th>{{ trans('labels.backend.scholarships.fields.name_en') }}</th>
+                        <th>{{ trans('labels.backend.scholarships.fields.name_fr') }}</th>
+                        <th>{{ trans('labels.backend.scholarships.fields.code') }}</th>
+                        <th>{{ trans('labels.backend.scholarships.fields.founder') }}</th>
                         <th>{{ trans('labels.general.actions') }}</th>
                     </tr>
                     </thead>
@@ -66,19 +67,22 @@
     {!! Html::script('plugins/datatables/dataTables.bootstrap.min.js') !!}
     <script>
         $(function() {
-
-            $('#students-table').DataTable({
+            $('#scholarships-table').DataTable({
                 processing: true,
                 serverSide: true,
                 pageLength: {!! config('app.records_per_page')!!},
-                ajax: '{!! route('student_datatable.data') !!}',
+                ajax: '{!! route('admin.scholarship.data') !!}',
                 columns: [
-                    { data: 'id_card', name: 'students.id_card',searchable:false },
-                    { data: 'name_kh', name: 'students.name_kh',searchable:false },
-                    { data: 'name_latin', name: 'students.name_latin', searchable:false},
-                    { data: 'class' , name: 'class', searchable:false}
+                    { data: 'name_kh', name: 'name_kh'},
+                    { data: 'name_en', name: 'name_en'},
+                    { data: 'name_fr', name: 'name_fr'},
+                    { data: 'code', name: 'code'},
+                    { data: 'founder', name: 'founder'},
+                    { data: 'action', name: 'action',orderable: false, searchable: false}
                 ]
             });
+
+            enableDeleteRecord($('#scholarships-table'));
         });
     </script>
 @stop

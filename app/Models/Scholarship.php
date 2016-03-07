@@ -1,5 +1,6 @@
 <?php namespace App\Models;
 
+use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Model as Model;
 use Illuminate\Support\Facades\Config;
 
@@ -7,7 +8,7 @@ class Scholarship extends Model
 {
     
 	public $table = "scholarships";
-    
+    protected $dates = ['start', 'stop'];
 
 	public $fillable = [
 	    "name_en",
@@ -23,6 +24,17 @@ class Scholarship extends Model
         "create_uid",
 	];
 
+    public function setStartAttribute($value)
+    {
+        $date = Carbon::createFromFormat('d/m/Y', $value);
+        $this->attributes['start'] = $date->format('Y/m/d');
+    }
+
+    public function setStopAttribute($value)
+    {
+        $date = Carbon::createFromFormat('d/m/Y', $value);
+        $this->attributes['stop'] = $date->format('Y/m/d');
+    }
 
     public function creator(){
         return $this->belongsTo('App\Models\Access\User','create_uid');

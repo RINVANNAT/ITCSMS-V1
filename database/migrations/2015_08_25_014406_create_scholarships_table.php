@@ -23,8 +23,8 @@ class CreateScholarshipsTable extends Migration
             $table->boolean('isDroppedUponFail')->default(true);
             $table->enum('duration',['1 year','2 years','3 years','4 years','5 years','Full'])->nullable();
             $table->string('founder')->nullable();
-            $table->date('start')->nullable();
-            $table->date('stop')->nullable();
+            $table->timestamp('start')->nullable();
+            $table->timestamp('stop')->nullable();
             $table->string('description')->nullable();
             $table->timestamps();
             $table->boolean('active')->default(true);

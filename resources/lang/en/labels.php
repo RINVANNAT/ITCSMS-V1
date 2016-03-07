@@ -436,7 +436,8 @@ return [
         'reporting' => [
             'academic_year_id' => 'Academic Year',
             'degree_id' => 'Degree',
-            'department_id' => 'Department'
+            'department_id' => 'Department',
+            'all_department' => 'All Department',
         ],
         'accounting' => [
 
@@ -517,7 +518,38 @@ return [
                 'duration' => 'Duration',
                 'code' => 'Code',
             ]
-        ]
+        ],
+        'scholarships' => [
+            'title' => 'Scholarships',
+            'sub_index_title' => 'All existing scholarships',
+            'sub_edit_title' => 'Edit scholarship information',
+            'sub_create_title' => 'Create new scholarship',
+            'sub_detail_title' => 'Detail of a scholarship',
+            'general_information' => 'General Information',
+            'more_information' => 'More Information',
+            'school_fee_and_award' => 'School Fee and Award',
+            'scholarship_holder' => 'Scholarship Holder',
+            'fields' => [
+                'name_kh' => "Name Khmer",
+                'name_en' => 'Name English',
+                'name_fr' => 'Name French',
+                'start' => 'Date Start',
+                'stop' => 'Date Stop',
+                'founder' => 'Founder',
+                'code' => 'Code',
+                'description' => 'Description',
+                'date_start_end' => 'Date From/Till',
+                'active' => 'Active',
+                'isDroppedUponFail' => 'Suspend upon student fail',
+                'duration' => 'Scholarship period'
+            ],
+            'school_fee_and_award_tab' => [
+                'degree' => 'Degree',
+                'promotion' => 'Promotion',
+                'school_fee_rate' =>'School Fee Rate',
+                'scholarship_budget' =>'Scholarship Budget',
+            ]
+        ],
 
     ],
 

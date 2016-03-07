@@ -103,6 +103,9 @@ return [
         'employee' => [
             'title' => 'Employee',
         ],
+        'scholarship' => [
+            'title' => 'Scholarship',
+        ],
         'exam' => [
             'title' => 'Examination',
             'entrances-engineer' => 'Entrance-Engineer Exams',

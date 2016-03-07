@@ -11,6 +11,7 @@ use App\Models\Department;
 use App\Models\Student;
 use App\Models\StudentAnnual;
 use Carbon\Carbon;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Maatwebsite\Excel\Facades\Excel;
 
@@ -219,7 +220,7 @@ class StudentAnnualController extends Controller
     public function reporting($id){
         $departments = Department::lists('name_kh','id')->toArray();
         $degrees = Degree::lists('name_kh','id')->toArray();
-        $academicYears = AcademicYear::lists('name_kh','id')->toArray();
+        $academicYears = AcademicYear::orderBy('id','desc')->lists('name_kh','id')->toArray();
 
         $view = "";
         switch ($id) {
@@ -236,9 +237,21 @@ class StudentAnnualController extends Controller
         return view($view,compact('id','degrees','academicYears','departments'));
     }
 
-    public function reporting_data($id,$academicYear,$degree){
+    public function reporting_data(Request $request, $id){
 
-        return true;
+        if($request->ajax()){
+            $data = "";
+            switch ($id) {
+                case 1:
+                    break;
+                case 2:
+                    break;
+                case 3:
+                    break;
+                default:
+            }
+            return $data;
+        }
     }
 
 }

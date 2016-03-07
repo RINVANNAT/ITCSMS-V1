@@ -1,0 +1,119 @@
+@section('before-styles-end')
+    <style type="text/css">
+        table{
+            border: 1px;
+            border-collapse: collapse;
+            margin: 0px auto;
+            width: 100%;
+        }
+        #table_age{
+            font-family: "Khmer OS";
+        }
+        .font-muol, .font-head{
+            font-family: "Khmer OS Muol Light" !important;
+        }
+        .font-head{
+            font-size: 20px;
+        }
+        table tr.insertBorder td{
+            border: 1px solid black;
+        }
+        .blue{
+            color: blue;
+        }
+    </style>
+@stop
+<table id="table_age">
+    <tr>
+        <th colspan="25">
+            <center><span class="font-head">ព្រះរាជាណាចក្រកម្ពុជា</span></center>
+            <br/>
+            <center><span class="font-muol">ជាតិ សាសនា ព្រះមហាក្សត្រ</span></center>
+        </th>
+    </tr>
+    <tr>
+        <td colspan="25">
+            <span class="font-muol">ក្រសួងអប់រំ យុវជន ​និងកីឡា</span>
+        </td>
+    </tr>
+    <tr>
+        <td colspan="25">
+            វិទ្យាស្ថានបច្ចេកវិទ្យាកម្ពុជា
+        </td>
+    </tr>
+    <tr>
+        <td colspan="25" align="center" class="blue">
+            <span>ស្ថិតិនិស្សិត</span>
+            <span class="font-muol">តាមអាយុ ថ្នាក់បរិញ្ញាបត្រ </span>
+            <span>និងតាមឆ្នាំ ឆ្នាំសិក្សា<span id="academicYear">២០១៥-២០១៦</span></span>
+        </td>
+    </tr>
+    <tr align="center" class="insertBorder">
+        <td rowspan="3">
+            <span>អាយុ</span>
+        </td>
+        <td colspan="4"><span>ឆ្នាំទី១</span></td>
+        <td colspan="4"><span>ឆ្នាំទី២</span></td>
+        <td colspan="4"><span>ឆ្នាំទី៣</span></td>
+        <td colspan="4"><span>ឆ្នាំទី៤</span></td>
+        <td colspan="4"><span>ឆ្នាំទី៥</span></td>
+        <td colspan="4"><span>សរុប</span></td>
+    </tr>
+    <tr align="center" class="insertBorder">
+        <td colspan="2"><span>អាហា.</span></td>
+        <td colspan="2"><span>បង់ថ្លៃ</span></td>
+        <td colspan="2"><span>អាហា.</span></td>
+        <td colspan="2"><span>បង់ថ្លៃ</span></td>
+        <td colspan="2"><span>អាហា.</span></td>
+        <td colspan="2"><span>បង់ថ្លៃ</span></td>
+        <td colspan="2"><span>អាហា.</span></td>
+        <td colspan="2"><span>បង់ថ្លៃ</span></td>
+        <td colspan="2"><span>អាហា.</span></td>
+        <td colspan="2"><span>បង់ថ្លៃ</span></td>
+        <td colspan="2"><span>អាហា.</span></td>
+        <td colspan="2"><span>បង់ថ្លៃ</span></td>
+    </tr>
+    <tr align="center" class="insertBorder">
+        <td><span>សរុប</span></td>
+        <td><span>ស្រី</span></td>
+        <td><span>សរុប</span></td>
+        <td><span>ស្រី</span></td>
+        <td><span>សរុប</span></td>
+        <td><span>ស្រី</span></td>
+        <td><span>សរុប</span></td>
+        <td><span>ស្រី</span></td>
+        <td><span>សរុប</span></td>
+        <td><span>ស្រី</span></td>
+        <td><span>សរុប</span></td>
+        <td><span>ស្រី</span></td>
+        <td><span>សរុប</span></td>
+        <td><span>ស្រី</span></td>
+        <td><span>សរុប</span></td>
+        <td><span>ស្រី</span></td>
+        <td><span>សរុប</span></td>
+        <td><span>ស្រី</span></td>
+        <td><span>សរុប</span></td>
+        <td><span>ស្រី</span></td>
+        <td><span>សរុប</span></td>
+        <td><span>ស្រី</span></td>
+        <td><span>សរុប</span></td>
+        <td><span>ស្រី</span></td>
+    </tr>
+    <tr class="insertBorder">
+        <td colspan="25"><span>This is a free row to insert datas</span></td>
+    </tr>
+    <tr>
+        <td></td>
+        <td colspan="24">
+            <span>សំគាល់ៈចំពោះគ្រឹះស្ថានឧត្តមសិក្សាណា ដែលបណ្តុះបណ្តាលលើសពី៤ ឬ៥ឆ្នាំ អាចបន្តទំព័របាន</span>
+        </td>
+    </tr>
+    <tr align="center">
+        <td colspan="16"></td>
+        <td colspan="9">
+            <span>ធ្វើនៅ<span id="place">.............</span>ថ្ងៃទី<span id="day">.............</span>ខែ<span id="month">............</span>ឆ្នាំ<span id="year">២០១......</span></span>
+            <br/>
+            <span>សាកលវិទ្យាធិការ/នាយក</span>
+        </td>
+    </tr>
+</table>
