@@ -51,6 +51,7 @@
                         <th>{{ trans('labels.backend.students.fields.id_card') }}</th>
                         <th>{{ trans('labels.backend.students.fields.name_kh') }}</th>
                         <th>{{ trans('labels.backend.students.fields.name_latin') }}</th>
+                        <th>{{ trans('labels.backend.students.fields.name_latin') }}</th>
                         <th>{{ trans('labels.backend.students.fields.class') }}</th>
                         <th>{{ trans('labels.general.actions') }}</th>
                     </tr>
@@ -73,11 +74,12 @@
                 processing: true,
                 serverSide: true,
                 pageLength: {!! config('app.records_per_page')!!},
-                ajax: '{!! route('admin.student.data') !!}',
+                ajax: '{!! route('admin.student.data',0) !!}',
                 columns: [
-                    { data: 'id_card', name: 'students.id_card',searchable:false },
-                    { data: 'name_kh', name: 'students.name_kh',searchable:false },
+                    { data: 'id_card', name: 'students.id_card' , searchable:false},
+                    { data: 'name_kh', name: 'students.name_kh' , searchable:false},
                     { data: 'name_latin', name: 'students.name_latin', searchable:false},
+                    { data: 'dob', name: 'students.dob', searchable:false},
                     { data: 'class' , name: 'class', searchable:false},
                     { data: 'action', name: 'action',orderable: false, searchable: false}
                 ]

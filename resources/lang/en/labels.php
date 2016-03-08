@@ -239,6 +239,31 @@ return [
                 'description' => "Description",
             ]
         ],
+        'schoolFees' => [
+            'title' => 'School & Scholarship Fee Rate',
+            'sub_index_title' => 'All existing fee rate',
+            'sub_edit_title' => 'Edit fee rate information',
+            'sub_create_title' => 'Create new fee rate',
+            'sub_detail_title' => 'Detail of a fee rate',
+            'fields'=>[
+                'group' => "Group",
+                'promotion_id' => "Promotion",
+                'scholarship_id' => 'Scholarship',
+                'to_pay' => 'To Pay',
+                'budget' => "Award",
+                'currency' => 'Currency',
+                'degree_id' => 'Degree',
+                'department_id' => 'Department',
+                'grade_id' => 'Grade',
+                'academic_year_id' => 'Academic Year',
+                'description' => 'Description',
+                'active' => 'Active'
+            ],
+            'index_tabs' => [
+                'school_fee' => "School Fee Rates",
+                'scholarship_fee' => "Scholarship Fee & Award"
+            ]
+        ],
         'rooms' => [
             'title' => 'Room',
             'sub_index_title' => 'All existing rooms',
@@ -548,6 +573,14 @@ return [
                 'promotion' => 'Promotion',
                 'school_fee_rate' =>'School Fee Rate',
                 'scholarship_budget' =>'Scholarship Budget',
+            ],
+            'scholarship_holder_tab' => [
+                'id_card' => 'ID Card',
+                'name_kh' => 'Name Khmer',
+                'name_latin' => 'Name Latin',
+                'dob' => 'Date of Birth',
+                'gender' => 'Gender',
+                'class' => 'Class'
             ]
         ],
 

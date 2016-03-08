@@ -8,10 +8,11 @@
         <table id="scholarship_holder_table" class="table table-bordered table-striped">
             <thead>
             <tr>
-                <th>{{trans('messages.id_card')}}</th>
-                <th>{{trans('messages.name_kh')}}</th>
-                <th>{{trans('messages.name_latin')}}</th>
-                <th>{{trans('messages.class')}}</th>
+                <th>{{trans('labels.backend.scholarships.scholarship_holder_tab.id_card')}}</th>
+                <th>{{trans('labels.backend.scholarships.scholarship_holder_tab.name_kh')}}</th>
+                <th>{{trans('labels.backend.scholarships.scholarship_holder_tab.name_latin')}}</th>
+                <th>{{trans('labels.backend.scholarships.scholarship_holder_tab.dob')}}</th>
+                <th>{{trans('labels.backend.scholarships.scholarship_holder_tab.class')}}</th>
             </tr>
             </thead>
 

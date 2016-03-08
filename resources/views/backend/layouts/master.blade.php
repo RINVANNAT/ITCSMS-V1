@@ -26,6 +26,9 @@
         <![endif]-->
     </head>
     <body class="skin-{!! config('backend.theme') !!}">
+    <div class="loading">
+        <i class="fa fa-refresh fa-spin"></i>
+    </div>
     <div class="wrapper">
         @include('backend.includes.header')
         @include('backend.includes.sidebar')
@@ -58,6 +61,22 @@
     @yield('before-scripts-end')
     {!! HTML::script(elixir('js/backend.js')) !!}
     {!! HTML::script('js/custom.js') !!}
+
+    <script>
+        var needConfirm = false;
+        window.onbeforeunload = confirmExit;
+        function confirmExit()
+        {
+            if(needConfirm){
+                return "Data isn't saved yet. ";
+            }
+        }
+
+        $(document).ready(function(){
+            toggleLoading(false);
+        });
+
+    </script>
     @yield('after-scripts-end')
     </body>
 </html>

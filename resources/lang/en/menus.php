@@ -73,6 +73,7 @@ return [
             'departmentOptions' => 'Room',
             'origins' => 'Room',
             'promotions' => 'Promotion',
+            'schoolFees' => 'School & Scholarship Fee',
         ],
 
         'reporting' => [

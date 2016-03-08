@@ -44,7 +44,7 @@
             <li class="{{ Active::pattern('admin/employees') }}">
                 <a href="{!!url('admin/employees')!!}"><span>{{ trans('menus.backend.employee.title') }}</span></a>
             </li>
-            <li class="{{ Active::pattern('admin/scholarships') }}">
+            <li class="{{ Active::pattern('admin/scholarships*') }}">
                 <a href="{!!url('admin/scholarships')!!}"><span>{{ trans('menus.backend.scholarship.title') }}</span></a>
             </li>
             @permission('view-access-management')
@@ -137,6 +137,9 @@
                     </li>
                     <li class="{{ Active::pattern('admin/configuration/outcomeTypes*') }}">
                         <a href="{!! url('admin/configuration/outcomeTypes') !!}">{{ trans('menus.backend.configuration.outcomeTypes') }}</a>
+                    </li>
+                    <li class="{{ Active::pattern('admin/configuration/schoolFees*') }}">
+                        <a href="{!! url('admin/configuration/schoolFees') !!}">{{ trans('menus.backend.configuration.schoolFees') }}</a>
                     </li>
                     <li class="{{ Active::pattern('admin/configuration/rooms*') }}">
                         <a href="{!! url('admin/configuration/rooms') !!}">{{ trans('menus.backend.configuration.rooms') }}</a>

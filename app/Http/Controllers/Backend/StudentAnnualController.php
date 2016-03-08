@@ -94,26 +94,40 @@ class StudentAnnualController extends Controller
         //
     }
 
-    public function data()
+    public function data($scholarship_id) // 0 mean, scholarship id is not applied
     {
+
+        $keyword = "%".strtolower($_GET["search"]["value"])."%";
+
         $studentAnnuals = DB::table('studentAnnuals')
+            ->select(['studentAnnuals.id','students.id_card','students.name_kh','students.dob','students.name_latin','grades.code as grade_code','departments.code as department_code','degrees.code as degree_code'])
             ->join('students', 'studentAnnuals.student_id', '=', 'students.id')
             ->join('grades', 'studentAnnuals.grade_id', '=', 'grades.id')
             ->join('departments', 'studentAnnuals.department_id', '=', 'departments.id')
-            ->join('degrees', 'studentAnnuals.degree_id', '=', 'degrees.id')
-            ->select(['studentAnnuals.id','students.id_card','students.name_kh','students.name_latin','grades.code as grade_code','departments.code as department_code','degrees.code as degree_code']);
+            ->join('degrees', 'studentAnnuals.degree_id', '=', 'degrees.id');
+        if($scholarship_id!= 0){
+            //dd($scholarship_id);
+            $studentAnnuals = $studentAnnuals
+                ->join('scholarship_student_annual','studentAnnuals.id','=','scholarship_student_annual.student_annual_id')
+                ->where('scholarship_student_annual.scholarship_id','=',$scholarship_id);
+        }
+
+        $studentAnnuals = $studentAnnuals
+            ->where( function ($query) use ($keyword) {
+
+                $query
+                    ->orWhere (DB::raw("LOWER(CONCAT(degrees.code,grades.code,departments.code))"),  'like', $keyword)
+                    ->orWhere(DB::raw("LOWER(students.name_kh)"),  'like', $keyword)
+                    ->orWhere(DB::raw("LOWER(students.name_latin)"),  'like', $keyword);
+            });
 
         $datatables =  app('datatables')->of($studentAnnuals);
-        $keyword = "%".strtolower($_GET["search"]["value"])."%";
-        $datatables->orWhere(DB::raw("LOWER(CONCAT(degrees.code,grades.code,departments.code))"),  'like', $keyword);
-        $datatables->orWhere(DB::raw("LOWER(students.name_kh)"),  'like', $keyword);
-        $datatables->orWhere(DB::raw("LOWER(students.name_latin)"),  'like', $keyword);
-
 
         return $datatables
             ->editColumn('id_card', '{!! str_limit($id_card, 60) !!}')
             ->editColumn('name_kh', '{!! str_limit($name_kh, 60) !!}')
             ->editColumn('name_latin', '{!! str_limit($name_latin, 60) !!}')
+            ->editColumn('dob', '{!! str_limit($dob, 60) !!}')
             ->editColumn('class', '{!! $degree_code.$grade_code.$department_code !!}')
             ->addColumn('action', function ($studentAnnual) {
                 return '<a href="#edit-'.$studentAnnual->id.'" class="btn btn-xs btn-primary"><i class="glyphicon glyphicon-edit"></i> '. trans('buttons.general.crud.edit').'</a>';
@@ -243,6 +257,9 @@ class StudentAnnualController extends Controller
             $data = "";
             switch ($id) {
                 case 1:
+                    $data = array(
+
+                    );
                     break;
                 case 2:
                     break;

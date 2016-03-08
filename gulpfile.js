@@ -53,7 +53,8 @@ elixir(function(mix) {
          'backend/app.scss',
          'backend/plugin/toastr/toastr.scss',
          'plugin/sweetalert/sweetalert.scss',
-         'font.scss'
+         'font.scss',
+         'main.scss'
      ], 'resources/assets/css/backend/app.css')
 
      /**

@@ -58,4 +58,10 @@ Route::group([
         Route::get('studentBac2-request-import', 'StudentBac2Controller@request_import')->name('admin.configuration.studentBac2.request_import');
         Route::post('studentBac2-import', 'StudentBac2Controller@import')->name('admin.configuration.studentBac2.import');
     });
+    Route::group([], function() {
+        Route::resource('schoolFees', 'SchoolFeeRateController');
+        Route::get('schoolFee-data/{with_scholarships}/{scholarship_id}', 'SchoolFeeRateController@data')->name('admin.configuration.schoolFee.data');
+        Route::get('schoolFee-request-import', 'SchoolFeeRateController@request_import')->name('admin.configuration.schoolFee.request_import');
+        Route::post('schoolFee-import', 'SchoolFeeRateController@import')->name('admin.configuration.schoolFee.import');
+    });
 });
