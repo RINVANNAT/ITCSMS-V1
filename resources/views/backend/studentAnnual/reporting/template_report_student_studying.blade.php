@@ -1,12 +1,12 @@
 <table>
-    <tr>
+    <tr align='center' >
         <th colspan="28">
             <span class="font-head">ព្រះរាជាណាចក្រកម្ពុជា</span>
             <br/>
             <span class="font-muol">ជាតិ សាសនា ព្រះមហាក្សត្រ</span>
         </th>
     </tr>
-    <tr>
+    <tr align='center' >
         <td colspan="28">
             <span class="font-muol">ក្រសួងអប់រំ យុវជន ​និងកីឡា</span>
         </td>
@@ -83,36 +83,43 @@
         <td><span>សរុប</span></td>
         <td><span>ស្រី</span></td>
     </tr>
-    <tr class="insertBorder">
-        <td colspan="28"><span>This is a free row to insert datas</span></td>
-    </tr>
+
+    <?php
+        $count_dept = 1;
+        $count_row = 1;
+    ?>
+
+    @foreach($data as $department)
+        @if($count_dept < sizeof($data))
+            @foreach($department['department_options'] as $key => $option)
+                <tr class="insertBorder" align='center' >
+                    <td>{{$count_row}}</td>
+                    <td>{{$department['name_kh']}}</td>
+                    <td>{{$option['code']}}</td>
+                    <td>៣⁣ ឆ្នាំ</td>
+                    @foreach($option['data'] as $grade)
+                        <td>{{$grade['st']}}</td>
+                        <td>{{$grade['sf']}}</td>
+                        <td>{{$grade['pt']}}</td>
+                        <td>{{$grade['pf']}}</td>
+                    @endforeach
+
+                </tr>
+                <?php $count_row++; ?>
+            @endforeach
+        @endif
+        <?php $count_dept++; ?>
+    @endforeach
     <tr align="center" class="insertBorder">
         <td colspan="3"><span><b>សរុប</b></span></td>
         <td><span id="totalTime"></span></td>
-        <td><span id="y1Scholarshipotal"></span></td>
-        <td><span id="y1ScholarshipFemale"></span></td>
-        <td><span id="y1SpendTotal"></span></td>
-        <td><span id="y1SpendFemale"></span></td>
-        <td><span id="y2ScholarshipTotal"></span></td>
-        <td><span id="y2ScholarshipFemale"></span></td>
-        <td><span id="y2SpendTotal"></span></td>
-        <td><span id="y2SpendFemale"></span></td>
-        <td><span id="y3ScholarshipTotal"></span></td>
-        <td><span id="y3ScholarshipFemale"></span></td>
-        <td><span id="y3SpendTotal"></span></td>
-        <td><span id="y3SpendFemale"></span></td>
-        <td><span id="y4ScholarshipTotal"></span></td>
-        <td><span id="y4ScholarshipFemale"></span></td>
-        <td><span id="y4SpendTotal"></span></td>
-        <td><span id="y4SpendFemale"></span></td>
-        <td><span id="y5ScholarshipTotal"></span></td>
-        <td><span id="y5ScholarshipFemale"></span></td>
-        <td><span id="y5SpendTotal"></span></td>
-        <td><span id="y5SpendFemale"></span></td>
-        <td><span id="scholarshipTotal"></span></td>
-        <td><span id="scholarshipFemale"></span></td>
-        <td><span id="spendTotal"></span></td>
-        <td><span id="spendFemale"></span></td>
+        @foreach(end($data) as $value)
+            <td>{{$value['st']}}</td>
+            <td>{{$value['sf']}}</td>
+            <td>{{$value['pt']}}</td>
+            <td>{{$value['pf']}}</td>
+        @endforeach
+
     </tr>
     <tr>
         <td colspan="2"></td>

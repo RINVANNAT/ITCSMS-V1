@@ -258,7 +258,7 @@ class StudentAnnualController extends Controller
     public function get_student_list_by_age($academic_year_id, $degree){
 
         $grades = [1,2,3,4,5];
-        $scholarships = [2,4,5,6];
+        $scholarships = [2,3,4,5,6];
         $ages = array(
             ['min'=>1,'max'=>17,'name'=>'<17','data'=> array()],
             ['min'=>17,'max'=>18,'name'=>'17','data'=> array()],
@@ -286,7 +286,7 @@ class StudentAnnualController extends Controller
                 $maxDate = Carbon::today()->subYears($age['min'])->subDay()->endOfDay();
 
                 $total = DB::table('studentAnnuals')
-                    ->join('students','studentAnnuals.student_id','=','students.id')
+                    ->leftJoin('students','studentAnnuals.student_id','=','students.id')
                     ->where('studentAnnuals.degree_id','=',$degree)
                     ->where('studentAnnuals.grade_id','=',$grade)
                     ->where('studentAnnuals.academic_year_id','=',$academic_year_id)
@@ -294,7 +294,7 @@ class StudentAnnualController extends Controller
 
 
                 $total_female = DB::table('studentAnnuals')
-                    ->join('students','studentAnnuals.student_id','=','students.id')
+                    ->leftJoin('students','studentAnnuals.student_id','=','students.id')
                     ->where('studentAnnuals.degree_id','=',$degree)
                     ->where('studentAnnuals.grade_id','=',$grade)
                     ->where('studentAnnuals.academic_year_id','=',$academic_year_id)
@@ -303,8 +303,8 @@ class StudentAnnualController extends Controller
 
                                 ;
                 $scholarship_total =  DB::table('studentAnnuals')
-                    ->join('scholarship_student_annual','studentAnnuals.id','=','scholarship_student_annual.student_annual_id')
-                    ->join('students','studentAnnuals.student_id','=','students.id')
+                    ->leftJoin('scholarship_student_annual','studentAnnuals.id','=','scholarship_student_annual.student_annual_id')
+                    ->leftJoin('students','studentAnnuals.student_id','=','students.id')
                     ->where('studentAnnuals.degree_id','=',$degree)
                     ->where('studentAnnuals.grade_id','=',$grade)
                     ->where('studentAnnuals.academic_year_id','=',$academic_year_id)
@@ -312,8 +312,8 @@ class StudentAnnualController extends Controller
                     ->whereBetween('students.dob',[$minDate,$maxDate])->count();
 
                 $scholarship_female =  DB::table('studentAnnuals')
-                    ->join('scholarship_student_annual','studentAnnuals.id','=','scholarship_student_annual.student_annual_id')
-                    ->join('students','studentAnnuals.student_id','=','students.id')
+                    ->leftJoin('scholarship_student_annual','studentAnnuals.id','=','scholarship_student_annual.student_annual_id')
+                    ->leftJoin('students','studentAnnuals.student_id','=','students.id')
                     ->where('studentAnnuals.degree_id','=',$degree)
                     ->where('studentAnnuals.grade_id','=',$grade)
                     ->where('studentAnnuals.academic_year_id','=',$academic_year_id)
@@ -355,32 +355,46 @@ class StudentAnnualController extends Controller
         $departments = Department::where('parent_id',11)->with(['department_options'])->get()->toArray();
         //dd($departments);
         $grades = [1,2,3,4,5];
-        $scholarships = [2,4,5,6];
+        $scholarships = [2,3,4,5,6];
 
+        $array_total = array(
+            array('st'=>0,'sf'=>0,'pt'=>0,'pf'=>0),
+            array('st'=>0,'sf'=>0,'pt'=>0,'pf'=>0),
+            array('st'=>0,'sf'=>0,'pt'=>0,'pf'=>0),
+            array('st'=>0,'sf'=>0,'pt'=>0,'pf'=>0),
+            array('st'=>0,'sf'=>0,'pt'=>0,'pf'=>0),
+            array('st'=>0,'sf'=>0,'pt'=>0,'pf'=>0)
+        );
         foreach($departments as &$department) {
-            $t_st = 0;
-            $t_sf = 0;
-            $t_pt = 0;
-            $t_pf = 0;
 
-            if(empty($department['department_options'])){
-                $department['department_options'] = [array(
-                                                        'id'=>null,
-                                                        'name_kh'=>$department['name_kh'],
-                                                        'name_en'=>$department['name_en'],
-                                                        'name_fr'=>$department['name_fr'],
-                                                        'code'=>$department['code']
-                                                    )];
+
+
+            $empty_option = array(
+                                'id'=>null,
+                                'name_kh'=>$department['name_kh'],
+                                'name_en'=>$department['name_en'],
+                                'name_fr'=>$department['name_fr'],
+                                'code'=>$department['code']
+                            );
+
+            if($degree ==2){
+                $department['department_options'] = $empty_option;
+            } else {
+                array_unshift($department['department_options'], $empty_option);
             }
 
+            //dd($department);
             foreach($department['department_options'] as &$option){
-
                 $records = array();
+                $t_st = 0;
+                $t_sf = 0;
+                $t_pt = 0;
+                $t_pf = 0;
 
                 foreach($grades as $grade){
 
                     $total = DB::table('studentAnnuals')
-                        ->join('students','studentAnnuals.student_id','=','students.id')
+                        ->leftJoin('students','studentAnnuals.student_id','=','students.id')
                         ->where('studentAnnuals.degree_id','=',$degree)
                         ->where('studentAnnuals.grade_id','=',$grade)
                         ->where('studentAnnuals.academic_year_id','=',$academic_year_id)
@@ -389,7 +403,7 @@ class StudentAnnualController extends Controller
 
 
                     $total_female = DB::table('studentAnnuals')
-                        ->join('students','studentAnnuals.student_id','=','students.id')
+                        ->leftJoin('students','studentAnnuals.student_id','=','students.id')
                         ->where('studentAnnuals.degree_id','=',$degree)
                         ->where('studentAnnuals.grade_id','=',$grade)
                         ->where('studentAnnuals.academic_year_id','=',$academic_year_id)
@@ -399,8 +413,8 @@ class StudentAnnualController extends Controller
 
                     ;
                     $scholarship_total =  DB::table('studentAnnuals')
-                        ->join('scholarship_student_annual','studentAnnuals.id','=','scholarship_student_annual.student_annual_id')
-                        ->join('students','studentAnnuals.student_id','=','students.id')
+                        ->leftJoin('scholarship_student_annual','studentAnnuals.id','=','scholarship_student_annual.student_annual_id')
+                        ->leftJoin('students','studentAnnuals.student_id','=','students.id')
                         ->where('studentAnnuals.degree_id','=',$degree)
                         ->where('studentAnnuals.grade_id','=',$grade)
                         ->where('studentAnnuals.academic_year_id','=',$academic_year_id)
@@ -409,8 +423,8 @@ class StudentAnnualController extends Controller
                         ->where('studentAnnuals.department_option_id','=',$option['id'])->count();
 
                     $scholarship_female =  DB::table('studentAnnuals')
-                        ->join('scholarship_student_annual','studentAnnuals.id','=','scholarship_student_annual.student_annual_id')
-                        ->join('students','studentAnnuals.student_id','=','students.id')
+                        ->leftJoin('scholarship_student_annual','studentAnnuals.id','=','scholarship_student_annual.student_annual_id')
+                        ->leftJoin('students','studentAnnuals.student_id','=','students.id')
                         ->where('studentAnnuals.degree_id','=',$degree)
                         ->where('studentAnnuals.grade_id','=',$grade)
                         ->where('studentAnnuals.academic_year_id','=',$academic_year_id)
@@ -442,14 +456,26 @@ class StudentAnnualController extends Controller
                     unset($total_female);
                     unset($scholarship_total);
                     unset($scholarship_female);
+
+                    $array_total[$grade-1]['st'] += $array['st'];
+                    $array_total[$grade-1]['sf'] += $array['sf'];
+                    $array_total[$grade-1]['pt'] += $array['pt'];
+                    $array_total[$grade-1]['pf'] += $array['pf'];
                 }
 
                 array_push($records,array('st'=>$t_st,'sf'=>$t_sf,'pt'=>$t_pt,'pf'=>$t_pf));
+                $array_total[5]['st'] += $t_st;
+                $array_total[5]['sf'] += $t_sf;
+                $array_total[5]['pt'] += $t_pt;
+                $array_total[5]['pf'] += $t_pf;
+
                 $option['data'] = $records;
             }
-        }
 
-        dd($departments);
+
+        }
+        array_push($departments,$array_total);
+        return $departments;
     }
 
 
@@ -473,7 +499,13 @@ class StudentAnnualController extends Controller
             case 3:
 
                 $data = $this->get_student_by_group($_GET['academic_year_id'],$_GET['degree_id']);
-                return view('backend.studentAnnual.reporting.template_report_student_studying',compact('id','data','degree_name','academic_year_name'));
+                $degree_name = Degree::find($_GET['degree_id'])->name_kh;
+                $academic_year_name = AcademicYear::find($_GET['academic_year_id'])->name_kh;
+                if($is_preview) {
+                    return view('backend.studentAnnual.reporting.template_report_student_studying', compact('id', 'data', 'degree_name', 'academic_year_name'));
+                } else {
+                    return view('backend.studentAnnual.reporting.print_report_student_studying',compact('id','data','degree_name','academic_year_name'));
+                }
                 break;
             default:
                 $view = 'backend.studentAnnual.reporting.reporting_student_by_age';

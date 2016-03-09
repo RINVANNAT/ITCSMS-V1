@@ -24,6 +24,11 @@ class SetupAccessTables extends Migration
             $table->timestamp('created_at')->default(DB::raw('CURRENT_TIMESTAMP'));
             $table->timestamp('updated_at')->default('1900-01-01 00:00:00');
 
+            $table->integer('parent_id')->unsigned()->nullable();
+            $table->foreign('parent_id')
+                ->references('id')
+                ->on(config('access.roles_table'))
+                ->onDelete('cascade');
             /**
              * Add Foreign/Unique/Index
              */
@@ -118,6 +123,7 @@ class SetupAccessTables extends Migration
             $table->increments('id')->unsigned();
             $table->integer('permission_id')->unsigned();
             $table->integer('user_id')->unsigned();
+            $table->timestamp('expired')->default('2100-01-01 00:00:00');
 
             /**
              * Add Foreign/Unique/Index

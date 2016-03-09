@@ -97,9 +97,10 @@
         var report_data_url = "{!! url('admin/student/'.$id.'/reporting-data') !!}";
         var export_data_url = "{!! url('admin/student/'.$id.'/reporting/export') !!}";
         var print_url = "{!! url('admin/student/'.$id.'/reporting/print') !!}";
+        var preview_url = "{!! url('admin/student/'.$id.'/reporting/preview') !!}";
 
         /* ----------------------Page functions---------------------*/
-        function loadDynamic(link){
+        function preview(link){
             $.ajax({
                 url: link+"?academic_year_id="+$('#input_academic_year').val()+"&degree_id="+$('#input_degree').val(),
                 type: 'GET',
@@ -127,10 +128,10 @@
                 }
             });
             // Start load data when page loaded
-            loadDynamic(print_url);
+            preview(preview_url);
             $("#search_btn").click(function (e) {
                 e.preventDefault();
-                loadDynamic(print_url);
+                preview(preview_url);
             });
 
             $("#export_btn").click(function (e) {

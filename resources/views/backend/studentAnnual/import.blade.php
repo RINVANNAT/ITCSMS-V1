@@ -1,10 +1,10 @@
 @extends ('backend.layouts.master')
 
-@section ('title', trans('labels.backend.students.index_title') . ' | ' . trans('labels.backend.students.sub_import_title'))
+@section ('title', trans('labels.backend.students.title') . ' | ' . trans('labels.backend.students.sub_import_title'))
 
 @section('page-header')
     <h1>
-        {{ trans('labels.backend.students.index_title') }}
+        {{ trans('labels.backend.students.title') }}
         <small>{{ trans('labels.backend.students.sub_import_title') }}</small>
     </h1>
 @endsection
@@ -41,11 +41,11 @@
     <div class="box box-success">
         <div class="box-body">
             <div class="pull-left">
-                <a href="{!! route('admin.access.roles.index') !!}" class="btn btn-danger btn-xs">{{ trans('buttons.general.cancel') }}</a>
+                <a href="{!! route('admin.studentAnnuals.index') !!}" class="btn btn-danger btn-xs">{{ trans('buttons.general.cancel') }}</a>
             </div>
 
             <div class="pull-right">
-                <input type="submit" class="btn btn-success btn-xs" value="{{ trans('buttons.general.crud.create') }}" />
+                <input type="submit" class="btn btn-success btn-xs" id="submit_student_import" value="{{ trans('buttons.general.crud.create') }}" />
             </div>
             <div class="clearfix"></div>
         </div><!-- /.box-body -->
@@ -56,4 +56,13 @@
 @section('after-scripts-end')
     {!! Html::script('js/backend/plugin/jstree/jstree.min.js') !!}
     {!! Html::script('js/backend/access/roles/script.js') !!}
+
+    <script>
+        $(function(){
+            $('#submit_student_import').on('click',function(){
+                toggleLoading(true);
+            });
+        });
+    </script>
+
 @stop

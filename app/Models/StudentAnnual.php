@@ -9,6 +9,8 @@ class StudentAnnual extends Model
     
 
 	public $fillable = [
+        "group",
+        "active",
 	    "promotion_id",
         "history_id",
         "department_id",
@@ -17,7 +19,8 @@ class StudentAnnual extends Model
         "academic_year_id",
         "student_id",
         "create_uid",
-        "write_uid"
+        "write_uid",
+        "department_option_id"
 	];
     //LATER do this latter
 
