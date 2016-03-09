@@ -7,5 +7,8 @@
         Route::post('student-import', 'StudentAnnualController@import')->name('admin.student.import');
 
         Route::get('student/{id}/reporting', 'StudentAnnualController@reporting')->name('admin.student.reporting');
-        Route::post('student/{id}/reporting-data', 'StudentAnnualController@reporting_data')->name('admin.student.reporting_data');
+
+        Route::get('student/{id}/reporting/export', 'StudentAnnualController@export')->name('admin.student.reporting.export');
+        Route::get('student/{id}/reporting/print', 'StudentAnnualController@print_report')->name('admin.student.reporting.print');
+        Route::get('student/{id}/reporting/preview', 'StudentAnnualController@preview_report')->name('admin.student.reporting.preview');
     });

@@ -26,7 +26,7 @@
             margin: 0px auto;
             width: 100%;
         }
-        #table_age{
+        *{
             font-family: "Khmer OS";
         }
         .font-muol, .font-head{
@@ -97,50 +97,9 @@
         var report_data_url = "{!! url('admin/student/'.$id.'/reporting-data') !!}";
         var export_data_url = "{!! url('admin/student/'.$id.'/reporting/export') !!}";
         var print_url = "{!! url('admin/student/'.$id.'/reporting/print') !!}";
-        var preview_url = "{!! url('admin/student/'.$id.'/reporting/preview') !!}";
 
         /* ----------------------Page functions---------------------*/
-
-        /*function loadData() {
-            $.ajax({
-                url: report_data_url,
-                type: 'POST',
-                dataType: 'json',
-                data: $("#report_search").serialize(),
-                success: function(data) {
-                    var rows="";
-                    $.each(data, function(key,age) {
-                        var row = "<tr align='center' class='insertBorder record'><td>"+age.name+"</td>";
-
-                        var scholarship_total = 0;
-                        var scholarship_total_female = 0;
-                        var pay_total = 0;
-                        var pay_total_female = 0;
-                        $.each(age.data, function(x,y){
-                            row +=  "<td>"+ y.st +"</td>"+"<td>"+ y.sf +"</td>"+"<td>"+ y.pt +"</td>"+"<td>"+ y.pf +"</td>";
-                            scholarship_total = scholarship_total + y.st;
-                            scholarship_total_female = scholarship_total_female + y.sf;
-                            pay_total = pay_total + y.pt;
-                            pay_total_female = pay_total_female + y.pf;
-                        });
-                        row += "<td>"+ scholarship_total +"</td>"+"<td>"+ scholarship_total_female +"</td>"+"<td>"+ pay_total +"</td>"+"<td>"+ pay_total_female +"</td>";
-                        row = row+"</tr>"
-
-                        rows = rows+ row;
-
-                    });
-                    $('.record').remove();
-                    $('#row_header').after(rows);
-
-
-                },
-                error: function() {
-                    alert('Something is wrong');
-                }
-            });
-        }*/
-
-        function preview(link){
+        function loadDynamic(link){
             $.ajax({
                 url: link+"?academic_year_id="+$('#input_academic_year').val()+"&degree_id="+$('#input_degree').val(),
                 type: 'GET',
@@ -168,10 +127,10 @@
                 }
             });
             // Start load data when page loaded
-            preview(preview_url);
+            loadDynamic(print_url);
             $("#search_btn").click(function (e) {
                 e.preventDefault();
-                preview(preview_url);
+                loadDynamic(print_url);
             });
 
             $("#export_btn").click(function (e) {

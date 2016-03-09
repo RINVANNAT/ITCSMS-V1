@@ -38,6 +38,8 @@ return [
         'import' => 'Import',
         'save' => 'Save',
         'view' => 'View',
-        'add' => 'Add'
+        'add' => 'Add',
+        'print' => 'Print',
+        'export' => 'Export'
     ],
 ];
