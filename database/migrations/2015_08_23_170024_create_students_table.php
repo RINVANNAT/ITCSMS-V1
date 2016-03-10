@@ -19,9 +19,9 @@ class CreateStudentsTable extends Migration
 			$table->string('id_card');
 			$table->integer('mcs_no')->nullable();
 			$table->string('can_id',100)->nullable();
-			$table->string('name_latin',100);
-			$table->string('name_kh',100);
-			$table->timestamp('dob')->nullable();
+			$table->string('name_latin',255);
+			$table->string('name_kh',255);
+			$table->timestamp('dob');
 			$table->string('photo')->nullable();
 			$table->boolean('radie')->nullable();
 			$table->string('observation')->nullable();
@@ -29,10 +29,10 @@ class CreateStudentsTable extends Migration
 			$table->string('email',100)->nullable();
 			$table->timestamp('admission_date')->nullable();
 			$table->string('address')->nullable();
-			$table->string('address_current')->nullable();
-			$table->string('parent_name',100)->nullable();
-			$table->string('parent_occupation',100)->nullable();
-			$table->string('parent_address',100)->nullable();
+			$table->string('address_current');
+			$table->string('parent_name')->nullable();
+			$table->string('parent_occupation')->nullable();
+			$table->string('parent_address')->nullable();
 			$table->string('parent_phone',100)->nullable();
 			$table->timestamps();
             $table->boolean('active')->default(true);
@@ -67,7 +67,7 @@ class CreateStudentsTable extends Migration
 				->on('highSchools')
 				->onDelete('NO ACTION');
 
-			$table->integer('origin_id')->unsigned()->index()->nullable();
+			$table->integer('origin_id')->unsigned()->index();
 			$table->foreign('origin_id')
 				->references('id')
 				->on('origins')

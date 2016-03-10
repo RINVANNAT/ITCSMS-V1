@@ -1,15 +1,27 @@
 <?php namespace App\Http\Controllers\Backend;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Backend\Student\DeleteStudentRequest;
 use App\Http\Requests\Backend\Student\ImportStudentRequest;
 use App\Http\Requests\Backend\Student\RequestImportStudentRequest;
 use App\Http\Requests\Backend\Student\StoreStudentRequest;
 use App\Http\Requests\Backend\Student\UpdateStudentRequest;
 use App\Models\AcademicYear;
+use App\Models\Candidate;
 use App\Models\Degree;
 use App\Models\Department;
+use App\Models\DepartmentOption;
+use App\Models\Gender;
+use App\Models\Grade;
+use App\Models\HighSchool;
+use App\Models\History;
+use App\Models\Origin;
+use App\Models\Promotion;
+use App\Models\Redouble;
+use App\Models\Scholarship;
 use App\Models\Student;
 use App\Models\StudentAnnual;
+use App\Repositories\Backend\StudentAnnual\StudentAnnualRepositoryContract;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -18,6 +30,21 @@ use Maatwebsite\Excel\Facades\Excel;
 
 class StudentAnnualController extends Controller
 {
+    /**
+     * @var StudentAnnualRepositoryContract
+     */
+    protected $students;
+
+    /**
+     * @param StudentAnnualRepositoryContract $studentAnnualRepo
+     */
+    public function __construct(
+        StudentAnnualRepositoryContract $studentAnnualRepo
+    )
+    {
+        $this->students = $studentAnnualRepo;
+    }
+
     /**
      * Display a listing of the resource.
      *
@@ -35,7 +62,22 @@ class StudentAnnualController extends Controller
      */
     public function create()
     {
-        //
+        //$last_academic_year = AcademicYear::orderBy('id','desc')->first();
+        //$studentAnnuals = StudentAnnual::where('academic_year_id',$last_academic_year->id)->paginate(config('app.records_per_page'));
+        //$candidates = Candidate::where('academic_year_id',$last_academic_year->id)->paginate(config('app.records_per_page'));
+        $academic_years = AcademicYear::orderBy('id','desc')->lists('name_kh','id');
+        $departments = Department::where('parent_id',11)->orderBy('id','DESC')->lists('code','id'); // 11 is for all academic departments
+        $degrees = Degree::lists('name_kh','id');
+        $grades = Grade::lists('name_kh','id');
+        $scholarships = Scholarship::lists('code','id');
+        $origins = Origin::lists('name_kh','id');
+        $genders = Gender::lists('name_kh','id');
+        $highSchools = HighSchool::lists('name_kh','id');
+        $promotions = Promotion::orderBy('name','DESC')->lists('name','id');
+        $histories = History::lists('name_en','id');
+        $redoubles = Redouble::lists('name_en','id');
+        $department_options = DepartmentOption::lists('code','id');
+        return view('backend.studentAnnual.create',compact('departments','promotions','degrees','grades','genders','histories','scholarships','highSchools','origins','academic_years','redoubles','department_options'));
     }
 
     /**
@@ -46,7 +88,8 @@ class StudentAnnualController extends Controller
      */
     public function store(StoreStudentRequest $request)
     {
-        //
+        $this->students->create($request);
+        return redirect()->route('admin.studentAnnuals.index')->withFlashSuccess(trans('alerts.backend.generals.created'));
     }
 
     /**
@@ -68,7 +111,24 @@ class StudentAnnualController extends Controller
      */
     public function edit($id)
     {
-        //
+        $studentAnnual = $this->students->findOrThrowException($id);
+
+        //dd($studentAnnual);
+
+        $academic_years = AcademicYear::orderBy('id','desc')->lists('name_kh','id');
+        $departments = Department::where('parent_id',11)->orderBy('id','DESC')->lists('code','id'); // 11 is for all academic departments
+        $degrees = Degree::lists('name_kh','id');
+        $grades = Grade::lists('name_kh','id');
+        $scholarships = Scholarship::lists('code','id');
+        $origins = Origin::lists('name_kh','id');
+        $genders = Gender::lists('name_kh','id');
+        $highSchools = HighSchool::lists('name_kh','id');
+        $promotions = Promotion::orderBy('name','DESC')->lists('name','id');
+        $histories = History::lists('name_en','id');
+        $redoubles = Redouble::lists('name_en','id');
+        $department_options = DepartmentOption::lists('code','id');
+        return view('backend.studentAnnual.edit',compact('studentAnnual','departments','promotions','degrees','grades','genders','histories','scholarships','highSchools','origins','academic_years','redoubles','department_options'));
+
     }
 
     /**
@@ -89,9 +149,14 @@ class StudentAnnualController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function destroy($id)
+    public function destroy(DeleteStudentRequest $request, $id)
     {
-        //
+        $this->students->destroy($id);
+        if($request->ajax()){
+            return json_encode(array("success"=>true));
+        } else {
+            return redirect()->route('admin.studentAnnuals.index')->withFlashSuccess(trans('alerts.backend.generals.deleted'));
+        }
     }
 
     public function data($scholarship_id) // 0 mean, scholarship id is not applied
@@ -130,7 +195,9 @@ class StudentAnnualController extends Controller
             ->editColumn('dob', '{!! str_limit($dob, 60) !!}')
             ->editColumn('class', '{!! $degree_code.$grade_code.$department_code !!}')
             ->addColumn('action', function ($studentAnnual) {
-                return '<a href="#edit-'.$studentAnnual->id.'" class="btn btn-xs btn-primary"><i class="glyphicon glyphicon-edit"></i> '. trans('buttons.general.crud.edit').'</a>';
+                return '<a href="'.route('admin.studentAnnuals.edit',$studentAnnual->id).'" class="btn btn-xs btn-primary"><i class="glyphicon glyphicon-edit" data-toggle="tooltip" data-placement="top" title="'.trans('buttons.general.crud.edit').'"></i></a>'.
+                ' <button class="btn btn-xs btn-danger btn-delete" data-remote="'.route('admin.studentAnnuals.destroy', $studentAnnual->id) .'"><i class="fa fa-times" data-toggle="tooltip" data-placement="top" title="' . trans('buttons.general.crud.delete') . '"></i></button>'.
+                ' <a href="'.route('admin.studentAnnuals.show',$studentAnnual->id).'" class="btn btn-xs btn-info"><i class="fa fa-eye" data-toggle="tooltip" data-placement="top" title="" data-original-title="'.trans('buttons.general.crud.view').'"></i> </a>';
             })
             ->make(true);
     }

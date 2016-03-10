@@ -45,7 +45,6 @@
     {!! HTML::script('plugins/select2/select2.full.min.js') !!}
     <script>
         $(function () {
-
             $(".select2").select2();
         });
     </script>

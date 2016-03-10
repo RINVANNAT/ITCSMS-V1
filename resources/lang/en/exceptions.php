@@ -134,6 +134,9 @@ return [
         ],
         'exams'=>[
             'has_candidate' => 'You cannot delete this examination. There are associated candidates!'
+        ],
+        'students' => [
+            'already_exits' => "Student with this ID Card is already exist. Please check again or modify ID Card number"
         ]
     ],
 
