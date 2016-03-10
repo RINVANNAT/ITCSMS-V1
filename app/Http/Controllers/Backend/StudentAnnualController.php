@@ -351,7 +351,7 @@ class StudentAnnualController extends Controller
         return $ages;
     }
 
-    public function get_student_by_group($academic_year_id , $degree){
+    public function get_student_by_group($academic_year_id , $degree, $only_foreigner){
         $departments = Department::where('parent_id',11)->with(['department_options'])->get()->toArray();
         //dd($departments);
         $grades = [1,2,3,4,5];
@@ -365,9 +365,9 @@ class StudentAnnualController extends Controller
             array('st'=>0,'sf'=>0,'pt'=>0,'pf'=>0),
             array('st'=>0,'sf'=>0,'pt'=>0,'pf'=>0)
         );
+
+        $locals = ['1','2','3','4','5','6','7','8','9','10','11','12','13','14','15','16','17','18','19','20','21','22','23','24','25'];
         foreach($departments as &$department) {
-
-
 
             $empty_option = array(
                                 'id'=>null,
@@ -393,26 +393,36 @@ class StudentAnnualController extends Controller
 
                 foreach($grades as $grade){
 
-                    $total = DB::table('studentAnnuals')
+                    $total_query = DB::table('studentAnnuals')
                         ->leftJoin('students','studentAnnuals.student_id','=','students.id')
                         ->where('studentAnnuals.degree_id','=',$degree)
                         ->where('studentAnnuals.grade_id','=',$grade)
                         ->where('studentAnnuals.academic_year_id','=',$academic_year_id)
                         ->where('studentAnnuals.department_id','=',$department['id'])
-                        ->where('studentAnnuals.department_option_id','=',$option['id'])->count();
+                        ->where('studentAnnuals.department_option_id','=',$option['id']);
 
+                    if($only_foreigner == "true"){
+                        $total = $total_query->whereNotIn('students.origin_id',$locals)->count();
+                    } else {
+                        $total = $total_query->count();
+                    }
 
-                    $total_female = DB::table('studentAnnuals')
+                    $total_female_query = DB::table('studentAnnuals')
                         ->leftJoin('students','studentAnnuals.student_id','=','students.id')
                         ->where('studentAnnuals.degree_id','=',$degree)
                         ->where('studentAnnuals.grade_id','=',$grade)
                         ->where('studentAnnuals.academic_year_id','=',$academic_year_id)
                         ->where('studentAnnuals.department_id','=',$department['id'])
                         ->where('studentAnnuals.department_option_id','=',$option['id'])
-                        ->where('students.gender_id','=',2)->count(); // 2 is female
+                        ->where('students.gender_id','=',2); // 2 is female
 
-                    ;
-                    $scholarship_total =  DB::table('studentAnnuals')
+                    if($only_foreigner == "true"){
+                        $total_female = $total_female_query->whereNotIn('students.origin_id',$locals)->count();
+                    } else {
+                        $total_female = $total_female_query->count();
+                    }
+
+                    $scholarship_total_query =  DB::table('studentAnnuals')
                         ->leftJoin('scholarship_student_annual','studentAnnuals.id','=','scholarship_student_annual.student_annual_id')
                         ->leftJoin('students','studentAnnuals.student_id','=','students.id')
                         ->where('studentAnnuals.degree_id','=',$degree)
@@ -420,9 +430,15 @@ class StudentAnnualController extends Controller
                         ->where('studentAnnuals.academic_year_id','=',$academic_year_id)
                         ->whereIn('scholarship_student_annual.scholarship_id',$scholarships)
                         ->where('studentAnnuals.department_id','=',$department['id'])
-                        ->where('studentAnnuals.department_option_id','=',$option['id'])->count();
+                        ->where('studentAnnuals.department_option_id','=',$option['id']);
 
-                    $scholarship_female =  DB::table('studentAnnuals')
+                    if($only_foreigner == "true"){
+                        $scholarship_total = $scholarship_total_query->whereNotIn('students.origin_id',$locals)->count();
+                    } else {
+                        $scholarship_total = $scholarship_total_query->count();
+                    }
+
+                    $scholarship_female_query =  DB::table('studentAnnuals')
                         ->leftJoin('scholarship_student_annual','studentAnnuals.id','=','scholarship_student_annual.student_annual_id')
                         ->leftJoin('students','studentAnnuals.student_id','=','students.id')
                         ->where('studentAnnuals.degree_id','=',$degree)
@@ -431,7 +447,13 @@ class StudentAnnualController extends Controller
                         ->whereIn('scholarship_student_annual.scholarship_id',$scholarships)
                         ->where('studentAnnuals.department_id','=',$department['id'])
                         ->where('studentAnnuals.department_option_id','=',$option['id'])
-                        ->where('students.gender_id','=',2)->count(); // 2 is female
+                        ->where('students.gender_id','=',2); // 2 is female
+
+                    if($only_foreigner == "true"){
+                        $scholarship_female = $scholarship_female_query->whereNotIn('students.origin_id',$locals)->count();
+                    } else {
+                        $scholarship_female = $scholarship_female_query->count();
+                    }
 
                     $array = array(
                         'st' => $scholarship_total,
@@ -498,13 +520,14 @@ class StudentAnnualController extends Controller
                 break;
             case 3:
 
-                $data = $this->get_student_by_group($_GET['academic_year_id'],$_GET['degree_id']);
+                $data = $this->get_student_by_group($_GET['academic_year_id'],$_GET['degree_id'],$_GET['only_foreigner']);
                 $degree_name = Degree::find($_GET['degree_id'])->name_kh;
                 $academic_year_name = AcademicYear::find($_GET['academic_year_id'])->name_kh;
+                $only_foreigner = $_GET['only_foreigner'];
                 if($is_preview) {
-                    return view('backend.studentAnnual.reporting.template_report_student_studying', compact('id', 'data', 'degree_name', 'academic_year_name'));
+                    return view('backend.studentAnnual.reporting.template_report_student_studying', compact('id', 'data', 'degree_name', 'academic_year_name','only_foreigner'));
                 } else {
-                    return view('backend.studentAnnual.reporting.print_report_student_studying',compact('id','data','degree_name','academic_year_name'));
+                    return view('backend.studentAnnual.reporting.print_report_student_studying',compact('id','data','degree_name','academic_year_name','only_foreigner'));
                 }
                 break;
             default:
@@ -640,6 +663,141 @@ class StudentAnnualController extends Controller
             case 2:
                 break;
             case 3:
+                $data = $this->get_student_by_group($_GET['academic_year_id'],$_GET['degree_id'],$_GET['only_foreigner']);
+
+                $degree_name = Degree::find($_GET['degree_id'])->name_kh;
+                $academic_year_name = AcademicYear::find($_GET['academic_year_id'])->name_kh;
+                Excel::create('ស្ថិតិនិស្សិត តាមដេប៉ាតឺម៉ង់និងជំនាញ', function($excel) use ($data,$degree_name,$academic_year_name) {
+
+                    // Set the title
+                    $excel->setTitle('ស្ថិតិនិស្សិត តាមអាយុ');
+
+                    // Chain the setters
+                    $excel->setCreator('Department of Study & Student Affair')
+                        ->setCompany('Institute of Technology of Cambodia');
+
+                    $excel->sheet('New sheet', function($sheet) use ($data,$degree_name,$academic_year_name) {
+
+                        $sheet->setOrientation('landscape');
+                        // Set top, right, bottom, left
+                        $sheet->setPageMargin(array(
+                            0.25, 0.30, 0.25, 0.30
+                        ));
+
+                        // Set all margins
+                        $sheet->setPageMargin(0.25);
+
+                        $sheet->row(1, array(
+                            'ព្រះរាជាណាចក្រកម្ពុជា'
+                        ));
+                        $sheet->appendRow(array(
+                            'ជាតិ សាសនា ព្រះមហាក្សត្រ'
+                        ));
+                        $sheet->appendRow(array(
+                            'ក្រសួងអប់រំ យុវជន ​និងកីឡា'
+                        ));
+                        $sheet->appendRow(array(
+                            'វិទ្យាស្ថានបច្ចេកវិទ្យាកម្ពុជា'
+                        ));
+                        $sheet->appendRow(array(
+                            'ស្ថិតិនិស្សិត តាមអាយុ ថ្នាក់'.$degree_name.'និងតាមឆ្នាំ ឆ្នាំសិក្សា'.$academic_year_name
+                        ));
+
+                        $sheet->rows(array(
+                            array('ល.រ','មហាវិទ្យាល័យ','ឯកទេស / ជំនាញ','រយៈ', 'ឆ្នាំទី១','','','','ឆ្នាំទី២','','','','ឆ្នាំទី៣','','','','ឆ្នាំទី៤','','','','ឆ្នាំទី៥','','','','សរុប','','',''),
+                            array('','','','ពេល','អាហា.','', 'បង់ថ្លៃ','','អាហា.','', 'បង់ថ្លៃ','','អាហា.','', 'បង់ថ្លៃ','','អាហា.','', 'បង់ថ្លៃ','','អាហា.','', 'បង់ថ្លៃ','','អាហា.','', 'បង់ថ្លៃ',''),
+                            array('','','','បប','សរុប','ស្រី','សរុប','ស្រី','សរុប','ស្រី','សរុប','ស្រី','សរុប','ស្រី','សរុប','ស្រី','សរុប','ស្រី','សរុប','ស្រី','សរុប','ស្រី','សរុប','ស្រី','សរុប','ស្រី','សរុប','ស្រី'),
+
+                        ));
+
+                        $key = 1;
+                        foreach ($data as $department) {
+                            if($key <sizeof($data)) {
+                                foreach ($department['department_options'] as $option) {
+                                    $row = array($key, $department['name_kh']);
+                                    array_push($row, $option['code']);
+                                    array_push($row,'3');
+                                    foreach ($option['data'] as $grade) {
+                                        array_push($row, $grade['st']);
+                                        array_push($row, $grade['sf']);
+                                        array_push($row, $grade['pt']);
+                                        array_push($row, $grade['pf']);
+                                    }
+                                    $sheet->appendRow(
+                                        $row
+                                    );
+                                }
+                            }
+                            $key++;
+                        }
+
+                        $row = array('សរុប','','','');
+                        foreach(end($data) as $total){
+                            array_push($row, $total['st']);
+                            array_push($row, $total['sf']);
+                            array_push($row, $total['pt']);
+                            array_push($row, $total['pf']);
+                        }
+                        $sheet->appendRow(
+                            $row
+                        );
+
+                        $sheet->rows(array(
+                            array("",'សំគាល់ៈចំពោះគ្រឹះស្ថានឧត្តមសិក្សាណា ដែលបណ្តុះបណ្តាលលើសពី៤ ឬ៥ឆ្នាំ អាចបន្តទំព័របាន'),
+                            array('','','','','','','','','','','','','','','','','ធ្វើនៅ.............ថ្ងៃទី.............ខែ............ឆ្នាំ២០១...... '),
+                            array('','','','','','','','','','','','','','','','','សាកលវិទ្យាធិការ/នាយក')
+                        ));
+
+                        $sheet->mergeCells('A1:AB1');
+                        $sheet->mergeCells('A2:AB2');
+                        $sheet->mergeCells('A3:AB3');
+                        $sheet->mergeCells('A4:AB4');
+                        $sheet->mergeCells('A5:AB5');
+                        $sheet->mergeCells('A6:A8');
+                        $sheet->mergeCells('B6:B8');
+                        $sheet->mergeCells('C6:C8');
+
+                        $sheet->mergeCells('E6:H6');
+                        $sheet->mergeCells('I6:L6');
+                        $sheet->mergeCells('M6:P6');
+                        $sheet->mergeCells('Q6:T6');
+                        $sheet->mergeCells('U6:X6');
+                        $sheet->mergeCells('Y6:AB6');
+
+                        $sheet->mergeCells('E7:F7');
+                        $sheet->mergeCells('G7:H7');
+                        $sheet->mergeCells('I7:J7');
+                        $sheet->mergeCells('K7:L7');
+                        $sheet->mergeCells('M7:N7');
+                        $sheet->mergeCells('O7:P7');
+                        $sheet->mergeCells('Q7:R7');
+                        $sheet->mergeCells('S7:T7');
+                        $sheet->mergeCells('U7:V7');
+                        $sheet->mergeCells('W7:X7');
+                        $sheet->mergeCells('Y7:Z7');
+                        $sheet->mergeCells('AA7:AB7');
+
+                        $sheet->mergeCells('A23:C23');
+                        $sheet->mergeCells('B24:AB24');
+                        $sheet->mergeCells('Q25:AB25');
+                        $sheet->mergeCells('Q26:AB26');
+
+                        $sheet->cells('A1:AB2', function($cells) {
+                            $cells->setAlignment('center');
+                            $cells->setValignment('middle');
+                        });
+                        $sheet->cells('A5:AB23', function($cells) {
+                            $cells->setAlignment('center');
+                            $cells->setValignment('middle');
+                        });
+                        $sheet->cells('Q23:Q24', function($cells) {
+                            $cells->setAlignment('center');
+                            $cells->setValignment('middle');
+                        });
+                        $sheet->setBorder('A6:AB23', 'thin');
+                    });
+
+                })->export('xls');
                 break;
             default:
         }

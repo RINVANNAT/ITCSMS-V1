@@ -463,6 +463,7 @@ return [
             'degree_id' => 'Degree',
             'department_id' => 'Department',
             'all_department' => 'All Department',
+            'is_foreigner' => 'Only Foreigner'
         ],
         'accounting' => [
 

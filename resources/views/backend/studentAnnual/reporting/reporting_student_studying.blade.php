@@ -59,6 +59,12 @@
                             {!! Form::select('degree_id', $degrees,null, ['class' => 'form-control', 'id'=>'input_degree']) !!}
                         </div>
                     </div><!--form control-->
+                    <div class="form-group">
+                        {!! Form::label('name', trans('labels.backend.reporting.is_foreigner'), ['class' => 'col-lg-2 control-label']) !!}
+                        <div class="col-lg-4">
+                            {!! Form::checkbox('is_foreigner', 'TRUE',false,['id'=>'is_foreigner']) !!}
+                        </div>
+                    </div><!--form control-->
                 </div>
                 <div class="col-lg-2 vcenter">
                     <a class="btn btn-app" id="search_btn">
@@ -102,7 +108,7 @@
         /* ----------------------Page functions---------------------*/
         function preview(link){
             $.ajax({
-                url: link+"?academic_year_id="+$('#input_academic_year').val()+"&degree_id="+$('#input_degree').val(),
+                url: link+"?academic_year_id="+$('#input_academic_year').val()+"&degree_id="+$('#input_degree').val()+"&only_foreigner="+$('#is_foreigner').is(':checked'),
                 type: 'GET',
                 dataType: 'text',
                 success: function(data) {
@@ -115,7 +121,7 @@
         }
         function submitForm(link){
 
-            window.location = link+"?academic_year_id="+$('#input_academic_year').val()+"&degree_id="+$('#input_degree').val();
+            window.location = link+"?academic_year_id="+$('#input_academic_year').val()+"&degree_id="+$('#input_degree').val()+"&only_foreigner="+$('#is_foreigner').is(':checked');
         }
 
 

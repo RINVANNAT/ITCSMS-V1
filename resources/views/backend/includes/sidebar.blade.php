@@ -35,7 +35,7 @@
                 <a href="{!! route('admin.dashboard') !!}"><span>{{ trans('menus.backend.sidebar.dashboard') }}</span></a>
             </li>
 
-            <li class="{{ Active::pattern('admin/studentAnnuals') }}">
+            <li class="{{ Active::pattern('admin/student*') }}">
                 <a href="{!!url('admin/studentAnnuals')!!}"><span>{{ trans('menus.backend.student.title') }}</span></a>
             </li>
             <li class="{{ Active::pattern('admin/candidates') }}">
