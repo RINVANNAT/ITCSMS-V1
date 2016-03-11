@@ -78,10 +78,9 @@ return [
 
         'reporting' => [
             'title' => 'Reporting',
-            'report_student_age' => 'Students Statistic By Age',
-            'report_student_drop_out' => 'Drop Out Students Statistic',
-            'report_student_degree' => 'Students Statistic By Degree',
-            'report_foreign_student_degree' => 'Foreign Students Statistic By Degree'
+            'report_student_age' => 'Students/Age Statistic',
+            'report_student_redouble' => 'Students/Redouble Statistic',
+            'report_student_degree' => 'Students/Techniques Statistic',
         ],
         'student' => [
             'title' => 'Student',

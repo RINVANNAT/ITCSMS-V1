@@ -197,7 +197,7 @@ class StudentAnnualController extends Controller
             ->addColumn('action', function ($studentAnnual) {
                 return '<a href="'.route('admin.studentAnnuals.edit',$studentAnnual->id).'" class="btn btn-xs btn-primary"><i class="glyphicon glyphicon-edit" data-toggle="tooltip" data-placement="top" title="'.trans('buttons.general.crud.edit').'"></i></a>'.
                 ' <button class="btn btn-xs btn-danger btn-delete" data-remote="'.route('admin.studentAnnuals.destroy', $studentAnnual->id) .'"><i class="fa fa-times" data-toggle="tooltip" data-placement="top" title="' . trans('buttons.general.crud.delete') . '"></i></button>'.
-                ' <a href="'.route('admin.studentAnnuals.show',$studentAnnual->id).'" class="btn btn-xs btn-info"><i class="fa fa-eye" data-toggle="tooltip" data-placement="top" title="" data-original-title="'.trans('buttons.general.crud.view').'"></i> </a>';
+                ' <a href="'.route('admin.studentAnnuals.show',$studentAnnual->id).'" class="btn btn-xs btn-info"><i class="fa fa-eye" data-toggle="tooltip" data-placement="top" title="" data-original-title="'.trans('buttons.general.view').'"></i> </a>';
             })
             ->make(true);
     }
@@ -309,13 +309,13 @@ class StudentAnnualController extends Controller
                 $view = 'backend.studentAnnual.reporting.reporting_student_by_age';
         break;
             case 2:
-                $view = 'backend.studentAnnual.reporting.reporting_student_by_age';
+                $view = 'backend.studentAnnual.reporting.reporting_student_redouble';
         break;
             case 3:
                 $view = 'backend.studentAnnual.reporting.reporting_student_studying';
         break;
             default:
-                $view = 'backend.studentAnnual.reporting.reporting_student_by_age';
+                return redirect(route('admin.studentAnnuals.index'));
         }
 
         return view($view,compact('id','degrees','academicYears','departments'));
@@ -416,6 +416,141 @@ class StudentAnnualController extends Controller
             array_push($age['data'],array('st'=>$t_st,'sf'=>$t_sf,'pt'=>$t_pt,'pf'=>$t_pf));
         }
         return $ages;
+    }
+
+    public function get_student_redouble($academic_year_id , $degree){
+
+        $departments = Department::where('parent_id',11)->with(['department_options'])->get()->toArray();
+        $grades = [1,2,3,4,5];
+        $scholarships = [2,3,4,5,6];
+
+        $array_total = array(
+            array('st'=>0,'sf'=>0,'pt'=>0,'pf'=>0),
+            array('st'=>0,'sf'=>0,'pt'=>0,'pf'=>0),
+            array('st'=>0,'sf'=>0,'pt'=>0,'pf'=>0),
+            array('st'=>0,'sf'=>0,'pt'=>0,'pf'=>0),
+            array('st'=>0,'sf'=>0,'pt'=>0,'pf'=>0),
+            array('st'=>0,'sf'=>0,'pt'=>0,'pf'=>0)
+        );
+
+        foreach($departments as &$department) {
+
+            $empty_option = array(
+                'id'=>null,
+                'name_kh'=>$department['name_kh'],
+                'name_en'=>$department['name_en'],
+                'name_fr'=>$department['name_fr'],
+                'code'=>$department['code']
+            );
+
+            if($degree ==2){
+                $department['department_options'] = $empty_option;
+            } else {
+                array_unshift($department['department_options'], $empty_option);
+            }
+
+            foreach($department['department_options'] as &$option){
+
+                $records = array();
+                $t_st = 0;
+                $t_sf = 0;
+                $t_pt = 0;
+                $t_pf = 0;
+
+
+
+                foreach($grades as $grade){
+
+                    $total = DB::table('studentAnnuals')
+                        ->leftJoin('students','studentAnnuals.student_id','=','students.id')
+                        ->where('studentAnnuals.degree_id','=',$degree)
+                        ->where('studentAnnuals.grade_id','=',$grade)
+                        ->where('studentAnnuals.academic_year_id','=',$academic_year_id)
+                        ->where('studentAnnuals.department_id','=',$department['id'])
+                        ->where('studentAnnuals.department_option_id','=',$option['id'])
+                        ->where('students.redouble_id','=',7)->count();
+
+                    print "1";
+
+                    $total_female = DB::table('studentAnnuals')
+                        ->leftJoin('students','studentAnnuals.student_id','=','students.id')
+                        ->where('studentAnnuals.degree_id','=',$degree)
+                        ->where('studentAnnuals.grade_id','=',$grade)
+                        ->where('studentAnnuals.academic_year_id','=',$academic_year_id)
+                        ->where('studentAnnuals.department_id','=',$department['id'])
+                        ->where('studentAnnuals.department_option_id','=',$option['id'])
+                        ->where('students.gender_id','=',2)
+                        ->where('students.redouble_id','=',7)->count(); // 2 is female
+                    print "1";
+
+                    $scholarship_total =  DB::table('studentAnnuals')
+                        ->leftJoin('scholarship_student_annual','studentAnnuals.id','=','scholarship_student_annual.student_annual_id')
+                        ->leftJoin('students','studentAnnuals.student_id','=','students.id')
+                        ->where('studentAnnuals.degree_id','=',$degree)
+                        ->where('studentAnnuals.grade_id','=',$grade)
+                        ->where('studentAnnuals.academic_year_id','=',$academic_year_id)
+                        ->whereIn('scholarship_student_annual.scholarship_id',$scholarships)
+                        ->where('studentAnnuals.department_id','=',$department['id'])
+                        ->where('studentAnnuals.department_option_id','=',$option['id'])
+                        ->where('students.redouble_id','=',7)->count();
+
+                    print "1";
+                    $scholarship_female =  DB::table('studentAnnuals')
+                        ->leftJoin('scholarship_student_annual','studentAnnuals.id','=','scholarship_student_annual.student_annual_id')
+                        ->leftJoin('students','studentAnnuals.student_id','=','students.id')
+                        ->where('studentAnnuals.degree_id','=',$degree)
+                        ->where('studentAnnuals.grade_id','=',$grade)
+                        ->where('studentAnnuals.academic_year_id','=',$academic_year_id)
+                        ->whereIn('scholarship_student_annual.scholarship_id',$scholarships)
+                        ->where('studentAnnuals.department_id','=',$department['id'])
+                        ->where('studentAnnuals.department_option_id','=',$option['id'])
+                        ->where('students.gender_id','=',2)
+                        ->where('students.redouble_id','=',7)->count(); // 2 is female
+                    print "1";
+
+                    $array = array(
+                        'st' => $scholarship_total,
+                        'sf' => $scholarship_female,
+                        'pt' => $total-$scholarship_total,
+                        'pf' => $total_female-$scholarship_female
+                    );
+
+                    $t_st += $array['st'];
+                    $t_sf += $array['sf'];
+                    $t_pt += $array['pt'];
+                    $t_pf += $array['pf'];
+
+                    array_push($records,$array);
+
+                    // unset unnecessary variables
+
+                    unset($query);
+                    unset($minDate);
+                    unset($maxDate);
+                    unset($total);
+                    unset($total_female);
+                    unset($scholarship_total);
+                    unset($scholarship_female);
+
+                    $array_total[$grade-1]['st'] += $array['st'];
+                    $array_total[$grade-1]['sf'] += $array['sf'];
+                    $array_total[$grade-1]['pt'] += $array['pt'];
+                    $array_total[$grade-1]['pf'] += $array['pf'];
+                }
+
+                array_push($records,array('st'=>$t_st,'sf'=>$t_sf,'pt'=>$t_pt,'pf'=>$t_pf));
+                $array_total[5]['st'] += $t_st;
+                $array_total[5]['sf'] += $t_sf;
+                $array_total[5]['pt'] += $t_pt;
+                $array_total[5]['pf'] += $t_pf;
+
+                $option['data'] = $records;
+            }
+
+
+        }
+        array_push($departments,$array_total);
+        return $departments;
     }
 
     public function get_student_by_group($academic_year_id , $degree, $only_foreigner){
@@ -567,6 +702,13 @@ class StudentAnnualController extends Controller
         return $departments;
     }
 
+    public function print_report($id){
+        return $this->prepare_print_and_preview($id,false);
+    }
+
+    public function preview_report($id){
+        return $this->prepare_print_and_preview($id,true);
+    }
 
     public function prepare_print_and_preview($id, $is_preview){
         switch ($id) {
@@ -583,7 +725,15 @@ class StudentAnnualController extends Controller
 
                 break;
             case 2:
-                return view('backend.studentAnnual.reporting.template_report_student_studying',compact('id','data','degree_name','academic_year_name'));
+                $data = $this->get_student_redouble($_GET['academic_year_id'],$_GET['degree_id']);
+                $degree_name = Degree::find($_GET['degree_id'])->name_kh;
+                $academic_year_name = AcademicYear::find($_GET['academic_year_id'])->name_kh;
+
+                if($is_preview){
+                    return view('backend.studentAnnual.reporting.template_report_student_redouble',compact('id','data','degree_name','academic_year_name'));
+                } else{
+                    return view('backend.studentAnnual.reporting.print_report_student_redouble',compact('id','data','degree_name','academic_year_name'));
+                }
                 break;
             case 3:
 
@@ -600,13 +750,6 @@ class StudentAnnualController extends Controller
             default:
                 $view = 'backend.studentAnnual.reporting.reporting_student_by_age';
         }
-    }
-    public function print_report($id){
-        return $this->prepare_print_and_preview($id,false);
-    }
-
-    public function preview_report($id){
-        return $this->prepare_print_and_preview($id,true);
     }
 
     public function export($id){
