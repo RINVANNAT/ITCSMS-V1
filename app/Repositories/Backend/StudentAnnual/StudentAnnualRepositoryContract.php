@@ -2,6 +2,7 @@
 
 namespace App\Repositories\Backend\StudentAnnual;
 use App\Http\Requests\Backend\Student\StoreStudentRequest;
+use App\Http\Requests\Backend\Student\UpdateStudentRequest;
 
 /**
  * Interface StudentAnnualRepositoryContract
@@ -41,7 +42,7 @@ interface StudentAnnualRepositoryContract
      * @param  $input
      * @return mixed
      */
-    public function update($id, $input);
+    public function update($id, UpdateStudentRequest $request);
 
     /**
      * @param  $id

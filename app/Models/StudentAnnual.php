@@ -65,6 +65,9 @@ class StudentAnnual extends Model
     public function department(){
         return $this->belongsTo('App\Models\Department');
     }
+    public function department_option(){
+        return $this->belongsTo('App\Models\DepartmentOption');
+    }
     public function degree(){
         return $this->belongsTo('App\Models\Degree');
     }

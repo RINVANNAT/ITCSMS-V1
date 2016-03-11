@@ -12,6 +12,11 @@
 
 @section('after-styles-end')
     {!! Html::style('plugins/datatables/dataTables.bootstrap.css') !!}
+    <style>
+        .toolbar {
+            float: left;
+        }
+    </style>
 @stop
 
 @section('content')
@@ -51,8 +56,10 @@
                         <th>{{ trans('labels.backend.students.fields.id_card') }}</th>
                         <th>{{ trans('labels.backend.students.fields.name_kh') }}</th>
                         <th>{{ trans('labels.backend.students.fields.name_latin') }}</th>
-                        <th>{{ trans('labels.backend.students.fields.name_latin') }}</th>
+                        <th>{{ trans('labels.backend.students.fields.dob') }}</th>
+                        <th>{{ trans('labels.backend.students.fields.gender_id') }}</th>
                         <th>{{ trans('labels.backend.students.fields.class') }}</th>
+                        <th>{{ trans('labels.backend.students.fields.department_option_id') }}</th>
                         <th>{{ trans('labels.general.actions') }}</th>
                     </tr>
                     </thead>
@@ -68,21 +75,61 @@
     {!! Html::script('plugins/datatables/jquery.dataTables.min.js') !!}
     {!! Html::script('plugins/datatables/dataTables.bootstrap.min.js') !!}
     <script>
-        $(function() {
-
-            $('#students-table').DataTable({
+        $(document).ready(function(){
+            var oTable = $('#students-table').DataTable({
+                dom: '<"toolbar">frtip',
                 processing: true,
                 serverSide: true,
                 pageLength: {!! config('app.records_per_page')!!},
-                ajax: '{!! route('admin.student.data',0) !!}',
+                ajax: {
+                    url:"{!! route('admin.student.data',0) !!}",
+                    data:function(d){
+                        d.degree = $('#filter_degree').val();
+                        d.grade = $('#filter_grade').val();
+                        d.department = $('#filter_department').val();
+                        d.gender = $('#filter_gender').val();
+                    }
+                },
                 columns: [
-                    { data: 'id_card', name: 'students.id_card' , searchable:false},
-                    { data: 'name_kh', name: 'students.name_kh' , searchable:false},
-                    { data: 'name_latin', name: 'students.name_latin', searchable:false},
-                    { data: 'dob', name: 'students.dob', searchable:false},
-                    { data: 'class' , name: 'class', searchable:false},
+                    { data: 'id_card', name: 'students.id_card'},
+                    { data: 'name_kh', name: 'students.name_kh'},
+                    { data: 'name_latin', name: 'students.name_latin'},
+                    { data: 'dob', name: 'dob'},
+                    { data: 'gender', name: 'gender',searchable:false},
+                    { data: 'class' , name: 'class',searchable:false},
+                    { data: 'option' , name: 'option',searchable:false},
                     { data: 'action', name: 'action',orderable: false, searchable: false}
                 ]
+            });
+            $("div.toolbar").html(' &nbsp;<label for="name">Class</label> '+
+                    '{!! Form::select('degree',$degrees,null, array('class'=>'form-control','id'=>'filter_degree','placeholder'=>'')) !!} '+
+                    '{!! Form::select('grade',$grades,null, array('class'=>'form-control','id'=>'filter_grade','placeholder'=>'')) !!} '+
+                    '{!! Form::select('department',$departments,null, array('class'=>'form-control','id'=>'filter_department','placeholder'=>'')) !!}' +
+                    '&nbsp;&nbsp; <label for="name">Gender</label> '+
+                    '{!! Form::select('gender',$genders,null, array('class'=>'form-control','id'=>'filter_gender','placeholder'=>'')) !!} '+
+                    '&nbsp;&nbsp; <label for="name">Option</label> '+
+                    '{!! Form::select('option',$options,null, array('class'=>'form-control','id'=>'filter_option','placeholder'=>'')) !!} '
+            );
+
+            $('#filter_degree').on('change', function(e) {
+                oTable.draw();
+                e.preventDefault();
+            });
+            $('#filter_grade').on('change', function(e) {
+                oTable.draw();
+                e.preventDefault();
+            });
+            $('#filter_department').on('change', function(e) {
+                oTable.draw();
+                e.preventDefault();
+            });
+            $('#filter_gender').on('change', function(e) {
+                oTable.draw();
+                e.preventDefault();
+            });
+            $('#filter_option').on('change', function(e) {
+                oTable.draw();
+                e.preventDefault();
             });
 
             enableDeleteRecord($('#students-table'));

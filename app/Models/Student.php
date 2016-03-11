@@ -5,6 +5,7 @@ use Illuminate\Database\Eloquent\Model as Model;
 
 class Student extends Model
 {
+    protected $dates = ['dob'];
 
 	public $fillable = [
 		"id",
@@ -47,10 +48,6 @@ class Student extends Model
     {
         $date = Carbon::createFromFormat('d/m/Y', $value);
         $this->attributes['dob'] = $date->format('Y/m/d');
-    }
-    public function getDobAttribute($date){
-        $dob = Carbon::createFromFormat('Y-m-d H:i:s', $date);
-        return $dob->format('d/m/Y');
     }
 
     public function studentAnnuals(){
