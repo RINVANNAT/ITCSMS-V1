@@ -623,6 +623,34 @@ return [
                 'class' => 'Class'
             ]
         ],
+        'promotions' => [
+            'title' => 'Promotions',
+            'sub_index_title' => 'All existing promotions',
+            'sub_edit_title' => 'Edit promotion information',
+            'sub_create_title' => 'Create new promotion',
+            'sub_detail_title' => 'Detail of a promotion',
+            'fields' => [
+                'name' => "Name",
+                'observation' => 'Observation',
+                'active' => 'Active',
+            ]
+        ],
+        'departmentOptions' => [
+            'title' => 'Department Option / Technique',
+            'sub_index_title' => 'All existing department option',
+            'sub_edit_title' => 'Edit department option information',
+            'sub_create_title' => 'Create new department option',
+            'sub_detail_title' => 'Detail of a department option',
+            'fields' => [
+                'name_kh' => "Name Khmer",
+                'name_en' => 'Name English',
+                'name_fr' => 'Name French',
+                'active' => 'Active',
+                'code' => 'Code',
+                'department_id' => 'Department',
+                'degree_id' => 'Degree'
+            ]
+        ],
 
     ],
 

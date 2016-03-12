@@ -208,6 +208,16 @@ class AccessServiceProvider extends ServiceProvider
             \App\Repositories\Backend\StudentAnnual\EloquentStudentAnnualRepository::class
         );
 
+        $this->app->bind(
+            \App\Repositories\Backend\DepartmentOption\DepartmentOptionRepositoryContract::class,
+            \App\Repositories\Backend\DepartmentOption\EloquentDepartmentOptionRepository::class
+        );
+
+        $this->app->bind(
+            \App\Repositories\Backend\Promotion\PromotionRepositoryContract::class,
+            \App\Repositories\Backend\Promotion\EloquentPromotionRepository::class
+        );
+
     }
 
     /**

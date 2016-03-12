@@ -69,11 +69,12 @@ return [
             'buildings' => 'Building',
             'rooms' => 'Room',
             'studentBac2s' => 'Student Bac II',
-            'examTypes' => 'Room',
-            'departmentOptions' => 'Room',
+            'examTypes' => 'Exam Types',
+            'departmentOptions' => 'Department Option / Technique',
             'origins' => 'Room',
             'promotions' => 'Promotion',
-            'schoolFees' => 'School & Scholarship Fee',
+            'schoolFees' => 'School & Scholarship Fee'
+
         ],
 
         'reporting' => [

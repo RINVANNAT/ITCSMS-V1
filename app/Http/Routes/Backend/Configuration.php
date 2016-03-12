@@ -64,4 +64,14 @@ Route::group([
         Route::get('schoolFee-request-import', 'SchoolFeeRateController@request_import')->name('admin.configuration.schoolFee.request_import');
         Route::post('schoolFee-import', 'SchoolFeeRateController@import')->name('admin.configuration.schoolFee.import');
     });
+
+    Route::group([], function() {
+        Route::resource('departmentOptions', 'DepartmentOptionController');
+        Route::get('departmentOption-data', 'DepartmentOptionController@data')->name('admin.configuration.departmentOption.data');
+    });
+
+    Route::group([], function() {
+        Route::resource('promotions', 'PromotionController');
+        Route::get('promotion-data', 'PromotionController@data')->name('admin.configuration.promotion.data');
+    });
 });
