@@ -144,6 +144,9 @@
                     <li class="{{ Active::pattern('admin/configuration/rooms*') }}">
                         <a href="{!! url('admin/configuration/rooms') !!}">{{ trans('menus.backend.configuration.rooms') }}</a>
                     </li>
+                    <li class="{{ Active::pattern('admin/configuration/roomTypes*') }}">
+                        <a href="{!! url('admin/configuration/roomTypes') !!}">{{ trans('menus.backend.configuration.roomTypes') }}</a>
+                    </li>
                     <li class="{{ Active::pattern('admin/configuration/studentBac2s*') }}">
                         <a href="{!! url('admin/configuration/studentBac2s') !!}">{{ trans('menus.backend.configuration.studentBac2s') }}</a>
                     </li>
@@ -152,6 +155,9 @@
                     </li>
                     <li class="{{ Active::pattern('admin/configuration/promotions*') }}">
                         <a href="{!! url('admin/configuration/promotions') !!}">{{ trans('menus.backend.configuration.promotions') }}</a>
+                    </li>
+                    <li class="{{ Active::pattern('admin/configuration/redoubles*') }}">
+                        <a href="{!! url('admin/configuration/redoubles') !!}">{{ trans('menus.backend.configuration.redoubles') }}</a>
                     </li>
                 </ul>
             </li>

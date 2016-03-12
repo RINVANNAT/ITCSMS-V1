@@ -1,17 +1,17 @@
 <?php
 
-namespace App\Repositories\Backend\Promotion;
+namespace App\Repositories\Backend\Redouble;
 
 
 use App\Exceptions\GeneralException;
-use App\Models\Promotion;
+use App\Models\Redouble;
 use Carbon\Carbon;
 
 /**
- * Class EloquentPromotionRepository
- * @package App\Repositories\Backend\Promotion
+ * Class EloquentRedoubleRepository
+ * @package App\Repositories\Backend\Redouble
  */
-class EloquentPromotionRepository implements PromotionRepositoryContract
+class EloquentRedoubleRepository implements RedoubleRepositoryContract
 {
     /**
      * @param  $id
@@ -20,8 +20,8 @@ class EloquentPromotionRepository implements PromotionRepositoryContract
      */
     public function findOrThrowException($id)
     {
-        if (! is_null(Promotion::find($id))) {
-            return Promotion::find($id);
+        if (! is_null(Redouble::find($id))) {
+            return Redouble::find($id);
         }
 
         throw new GeneralException(trans('exceptions.backend.general.not_found'));
@@ -33,9 +33,9 @@ class EloquentPromotionRepository implements PromotionRepositoryContract
      * @param  string      $sort
      * @return mixed
      */
-    public function getPromotionsPaginated($per_page, $order_by = 'sort', $sort = 'asc')
+    public function getRedoublesPaginated($per_page, $order_by = 'sort', $sort = 'asc')
     {
-        return Promotion::orderBy($order_by, $sort)
+        return Redouble::orderBy($order_by, $sort)
             ->paginate($per_page);
     }
 
@@ -44,9 +44,9 @@ class EloquentPromotionRepository implements PromotionRepositoryContract
      * @param  string  $sort
      * @return mixed
      */
-    public function getAllPromotions($order_by = 'sort', $sort = 'asc')
+    public function getAllRedoubles($order_by = 'sort', $sort = 'asc')
     {
-        return Promotion::orderBy($order_by, $sort)
+        return Redouble::orderBy($order_by, $sort)
             ->get();
     }
 
@@ -57,21 +57,22 @@ class EloquentPromotionRepository implements PromotionRepositoryContract
      */
     public function create($input)
     {
-        if (Promotion::where('name', $input['name'])->first()) {
+        if (Redouble::where('name_en', $input['name_en'])->first()) {
             throw new GeneralException(trans('exceptions.backend.general.already_exists'));
         }
 
 
-        $promotion = new Promotion();
+        $redouble = new Redouble();
         
-        $promotion->name = $input['name'];
-        $promotion->active = isset($input['active'])?true:false;
-        $promotion->observation = $input['observation'];
+        $redouble->name_en = $input['name_en'];
+        $redouble->name_kh = $input['name_kh'];
+        $redouble->name_fr = $input['name_fr'];
+        $redouble->active = isset($input['active'])?true:false;
 
-        $promotion->created_at = Carbon::now();
-        $promotion->create_uid = auth()->id();
+        $redouble->created_at = Carbon::now();
+        $redouble->create_uid = auth()->id();
 
-        if ($promotion->save()) {
+        if ($redouble->save()) {
             return true;
         }
 
@@ -86,16 +87,17 @@ class EloquentPromotionRepository implements PromotionRepositoryContract
      */
     public function update($id, $input)
     {
-        $promotion = $this->findOrThrowException($id);
+        $redouble = $this->findOrThrowException($id);
 
-        $promotion->name = $input['name'];
-        $promotion->active = isset($input['active'])?true:false;
-        $promotion->observation = $input['observation'];
+        $redouble->name_en = $input['name_en'];
+        $redouble->name_kh = $input['name_kh'];
+        $redouble->name_fr = $input['name_fr'];
+        $redouble->active = isset($input['active'])?true:false;
 
-        $promotion->updated_at = Carbon::now();
-        $promotion->write_uid = auth()->id();
+        $redouble->updated_at = Carbon::now();
+        $redouble->write_uid = auth()->id();
 
-        if ($promotion->save()) {
+        if ($redouble->save()) {
             return true;
         }
 

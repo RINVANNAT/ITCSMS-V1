@@ -57,23 +57,22 @@ class EloquentDepartmentOptionRepository implements DepartmentOptionRepositoryCo
      */
     public function create($input)
     {
-        if (DepartmentOption::where('name', $input['name'])->first()) {
-            throw new GeneralException(trans('exceptions.backend.configuration.departmentOptions.already_exists'));
+        if (DepartmentOption::where('name_en', $input['name_en'])->first()) {
+            throw new GeneralException(trans('exceptions.backend.general.already_exists'));
         }
 
 
         $departmentOption = new DepartmentOption();
         
-        $departmentOption->name = $input['name'];
-        $departmentOption->nb_desk = $input['nb_desk'];
-        $departmentOption->nb_chair = $input['nb_chair'];
-        $departmentOption->nb_chair_exam = $input['nb_chair_exam'];
-        $departmentOption->description = $input['description'];
-        $departmentOption->size = $input['size'];
+        $departmentOption->name_kh = $input['name_kh'];
+        $departmentOption->name_en = $input['name_en'];
+        $departmentOption->name_fr = $input['name_fr'];
+        $departmentOption->code = $input['code'];
         $departmentOption->active = isset($input['active'])?true:false;
-        $departmentOption->departmentOption_type_id = $input['departmentOption_type_id'];
+
         $departmentOption->department_id = $input['department_id'];
-        $departmentOption->building_id = $input['building_id'];
+        $departmentOption->degree_id = $input['degree_id'];
+
         $departmentOption->created_at = Carbon::now();
         $departmentOption->create_uid = auth()->id();
 
@@ -81,7 +80,7 @@ class EloquentDepartmentOptionRepository implements DepartmentOptionRepositoryCo
             return true;
         }
 
-        throw new GeneralException(trans('exceptions.backend.configuration.departmentOptions.create_error'));
+        throw new GeneralException(trans('exceptions.backend.general.create_error'));
     }
 
     /**
@@ -94,16 +93,15 @@ class EloquentDepartmentOptionRepository implements DepartmentOptionRepositoryCo
     {
         $departmentOption = $this->findOrThrowException($id);
 
-        $departmentOption->name = $input['name'];
-        $departmentOption->nb_desk = $input['nb_desk'];
-        $departmentOption->nb_chair = $input['nb_chair'];
-        $departmentOption->nb_chair_exam = $input['nb_chair_exam'];
-        $departmentOption->description = $input['description'];
-        $departmentOption->size = $input['size'];
+        $departmentOption->name_kh = $input['name_kh'];
+        $departmentOption->name_en = $input['name_en'];
+        $departmentOption->name_fr = $input['name_fr'];
+        $departmentOption->code = $input['code'];
         $departmentOption->active = isset($input['active'])?true:false;
-        $departmentOption->departmentOption_type_id = $input['departmentOption_type_id'];
+
         $departmentOption->department_id = $input['department_id'];
-        $departmentOption->building_id = $input['building_id'];
+        $departmentOption->degree_id = $input['degree_id'];
+
         $departmentOption->updated_at = Carbon::now();
         $departmentOption->write_uid = auth()->id();
 
@@ -111,7 +109,7 @@ class EloquentDepartmentOptionRepository implements DepartmentOptionRepositoryCo
             return true;
         }
 
-        throw new GeneralException(trans('exceptions.configuration.departmentOptions.update_error'));
+        throw new GeneralException(trans('exceptions.backend.general.update_error'));
     }
 
     /**

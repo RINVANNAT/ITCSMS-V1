@@ -1,14 +1,14 @@
 <?php
 
-namespace App\Http\Requests\Backend\Configuration\Promotion;
+namespace App\Http\Requests\Backend\Configuration\RoomType;
 
 use App\Http\Requests\Request;
 
 /**
- * Class StorePromotionRequest
- * @package App\Http\Requests\Backend\Configuration\Promotion
+ * Class EditRoomTypeRequest
+ * @package App\Http\Requests\Backend\Configuration\RoomType
  */
-class StorePromotionRequest extends Request
+class EditRoomTypeRequest extends Request
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -17,7 +17,7 @@ class StorePromotionRequest extends Request
      */
     public function authorize()
     {
-        return access()->allow('create-promotions');
+        return access()->allow('edit-roomTypes');
     }
 
     /**
@@ -28,8 +28,6 @@ class StorePromotionRequest extends Request
     public function rules()
     {
         return [
-            'name' => 'required|max:255|unique:promotions',
-            'observation' => 'max:255',
         ];
     }
 }

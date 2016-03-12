@@ -52,7 +52,7 @@ class DepartmentOptionController extends Controller
      */
     public function create(CreateDepartmentOptionRequest $request)
     {
-        $departments = Department::lists('name_kh','id');
+        $departments = Department::where('parent_id',11)->lists('name_kh','id');
         $degrees = Degree::lists('name_kh','id');
         return view('backend.configuration.departmentOption.create',compact('degrees','departments'));
     }
@@ -90,7 +90,7 @@ class DepartmentOptionController extends Controller
     public function edit(EditDepartmentOptionRequest $request, $id)
     {
 
-        $departments = Department::lists('name_kh','id');
+        $departments = Department::where('parent_id',11)->lists('name_kh','id');
         $degrees = Degree::lists('name_kh','id');
 
         $departmentOption = $this->departmentOptions->findOrThrowException($id);
@@ -132,17 +132,17 @@ class DepartmentOptionController extends Controller
         $departmentOptions = DB::table('departmentOptions')
             ->leftJoin('departments', 'departmentOptions.department_id', '=', 'departments.id')
             ->leftJoin('degrees', 'departmentOptions.degree_id', '=', 'degrees.id')
-            ->select(['departmentOptions.id','departmentOptions.name_kh','departmentOptions.code', 'departments.name_kh', 'degrees.name_kh']);
+            ->select(['departmentOptions.id as id','departmentOptions.name_kh as option_name_kh','departmentOptions.code as option_code',
+                'departmentOptions.name_en as option_name_en','departmentOptions.name_fr as option_name_fr', 'departments.code as department_code', 'degrees.name_kh as degree_name_kh']);
 
-        $datatables =  app('datatables')->of($departmentOptions);
+        $datatables =  app('datatables')->of($departmentOptions)
 
-
-        return $datatables
             ->addColumn('action', function ($departmentOption) {
-                return  '<a href="'.route('admin.configuration.departmentOptions.edit',$departmentOption->departmentOption_id).'" class="btn btn-xs btn-primary"><i class="fa fa-pencil" data-toggle="tooltip" data-placement="top" title="" data-original-title="'.trans('buttons.general.crud.edit').'"></i> </a>'.
-                ' <button class="btn btn-xs btn-danger btn-delete" data-remote="'.route('admin.configuration.departmentOptions.destroy', $departmentOption->departmentOption_id) .'"><i class="fa fa-times" data-toggle="tooltip" data-placement="top" title="' . trans('buttons.general.crud.delete') . '"></i></button>';
-            })
-            ->make(true);
+                return  '<a href="'.route('admin.configuration.departmentOptions.edit',$departmentOption->id).'" class="btn btn-xs btn-primary"><i class="fa fa-pencil" data-toggle="tooltip" data-placement="top" title="" data-original-title="'.trans('buttons.general.crud.edit').'"></i> </a>'.
+                ' <button class="btn btn-xs btn-danger btn-delete" data-remote="'.route('admin.configuration.departmentOptions.destroy', $departmentOption->id) .'"><i class="fa fa-times" data-toggle="tooltip" data-placement="top" title="' . trans('buttons.general.crud.delete') . '"></i></button>';
+            });
+
+            return $datatables->make(true);
     }
 
 }

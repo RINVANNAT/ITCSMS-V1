@@ -29,7 +29,7 @@ class CreateDepartmentOptionsTable extends Migration
 				->on('departments')
 				->onDelete('CASCADE');
 
-            $table->integer('degree_id')->unsigned()->nullable()->index();
+            $table->integer('degree_id')->unsigned()->index();
             $table->foreign('degree_id')
                 ->references('id')
                 ->on('degrees')
