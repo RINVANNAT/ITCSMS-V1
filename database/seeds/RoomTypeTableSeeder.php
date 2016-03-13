@@ -14,28 +14,24 @@ class RoomTypeTableSeeder extends Seeder
     {
         $room_types = array(
             array(
-                'id'=>1,
                 'name' => 'Teaching',
                 'create_uid'=>1,
                 'created_at'=>Carbon\Carbon::now(),
                 'updated_at'=>Carbon\Carbon::now()
             ),
             array(
-                'id'=>2,
                 'name' => 'Laboratory',
                 'create_uid'=>1,
                 'created_at'=>Carbon\Carbon::now(),
                 'updated_at'=>Carbon\Carbon::now()
             ),
             array(
-                'id'=>3,
                 'name' => 'Office',
                 'create_uid'=>1,
                 'created_at'=>Carbon\Carbon::now(),
                 'updated_at'=>Carbon\Carbon::now()
             ),
             array(
-                'id'=>4,
                 'name' => 'Storage',
                 'create_uid'=>1,
                 'created_at'=>Carbon\Carbon::now(),

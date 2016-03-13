@@ -74,4 +74,14 @@ Route::group([
         Route::resource('promotions', 'PromotionController');
         Route::get('promotion-data', 'PromotionController@data')->name('admin.configuration.promotion.data');
     });
+
+    Route::group([], function() {
+        Route::resource('roomTypes', 'RoomTypeController');
+        Route::get('roomType-data', 'RoomTypeController@data')->name('admin.configuration.roomType.data');
+    });
+
+    Route::group([], function() {
+        Route::resource('redoubles', 'RedoubleController');
+        Route::get('redouble-data', 'RedoubleController@data')->name('admin.configuration.redouble.data');
+    });
 });

@@ -73,7 +73,9 @@ return [
             'departmentOptions' => 'Department Option / Technique',
             'origins' => 'Room',
             'promotions' => 'Promotion',
-            'schoolFees' => 'School & Scholarship Fee'
+            'schoolFees' => 'School & Scholarship Fee',
+            'roomTypes' => 'Room Type',
+            'redoubles' => 'Redouble'
 
         ],
 

@@ -1,11 +1,11 @@
 @extends ('backend.layouts.master')
 
-@section ('title', trans('labels.backend.departmentOptions.title'))
+@section ('title', trans('labels.backend.roomTypes.title'))
 
 @section('page-header')
     <h1>
-        {{ trans('labels.backend.departmentOptions.title') }}
-        <small>{{ trans('labels.backend.departmentOptions.sub_index_title') }}</small>
+        {{ trans('labels.backend.roomTypes.title') }}
+        <small>{{ trans('labels.backend.roomTypes.sub_index_title') }}</small>
     </h1>
 
 @endsection
@@ -19,7 +19,7 @@
         <div class="box-header with-border">
             <div class="mailbox-controls">
                 <!-- Check all button -->
-                <a href="{!! route('admin.configuration.departmentOptions.create') !!}">
+                <a href="{!! route('admin.configuration.roomTypes.create') !!}">
                     <button class="btn btn-primary btn-sm"><i class="fa fa-plus-circle"></i> Add
                     </button>
                 </a>
@@ -38,15 +38,11 @@
 
         <div class="box-body">
             <div>
-                <table class="table table-striped table-bordered table-hover" id="departmentOptions-table">
+                <table class="table table-striped table-bordered table-hover" id="roomTypes-table">
                     <thead>
                     <tr>
-                        <th>{{ trans('labels.backend.departmentOptions.fields.code') }}</th>
-                        <th>{{ trans('labels.backend.departmentOptions.fields.name_kh') }}</th>
-                        <th>{{ trans('labels.backend.departmentOptions.fields.name_en') }}</th>
-                        <th>{{ trans('labels.backend.departmentOptions.fields.name_fr') }}</th>
-                        <th>{{ trans('labels.backend.departmentOptions.fields.department_id') }}</th>
-                        <th>{{ trans('labels.backend.departmentOptions.fields.degree_id') }}</th>
+                        <th>{{ trans('labels.backend.roomTypes.fields.id') }}</th>
+                        <th>{{ trans('labels.backend.roomTypes.fields.name') }}</th>
                         <th>{{ trans('labels.general.actions') }}</th>
                     </tr>
                     </thead>
@@ -63,22 +59,18 @@
     {!! Html::script('plugins/datatables/dataTables.bootstrap.min.js') !!}
     <script>
         $(function() {
-            $('#departmentOptions-table').DataTable({
+            $('#roomTypes-table').DataTable({
                 processing: true,
                 serverSide: true,
                 pageLength: {!! config('app.records_per_page')!!},
-                ajax: '{!! route('admin.configuration.departmentOption.data') !!}',
+                ajax: '{!! route('admin.configuration.roomType.data') !!}',
                 columns: [
-                    { data: 'option_code', name: 'departmentOptions.code'},
-                    { data: 'option_name_kh', name: 'departmentOptions.name_kh'},
-                    { data: 'option_name_en', name: 'departmentOptions.name_en'},
-                    { data: 'option_name_fr', name: 'departmentOptions.name_fr'},
-                    { data: 'department_code', name: 'departments.code'},
-                    { data: 'degree_name_kh', name: 'degrees.name_kh'},
+                    { data: 'id', name: 'id'},
+                    { data: 'name', name: 'name'},
                     { data: 'action', name: 'action',orderable: false, searchable: false}
                 ]
             });
-            enableDeleteRecord($('#departmentOptions-table'));
+            enableDeleteRecord($('#roomTypes-table'));
         });
     </script>
 @stop

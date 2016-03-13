@@ -28,6 +28,12 @@ class UpdateDepartmentOptionRequest extends Request
     public function rules()
     {
         return [
+            'name_en' => 'required|unique:departmentOptions|max:255',
+            'name_kh' => 'max:255',
+            'name_fr' => 'max:255',
+            'code' => 'max:255',
+            'department_id' => 'required',
+            'degree_id' => 'required'
         ];
     }
 }

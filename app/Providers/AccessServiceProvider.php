@@ -218,6 +218,16 @@ class AccessServiceProvider extends ServiceProvider
             \App\Repositories\Backend\Promotion\EloquentPromotionRepository::class
         );
 
+        $this->app->bind(
+            \App\Repositories\Backend\Redouble\RedoubleRepositoryContract::class,
+            \App\Repositories\Backend\Redouble\EloquentRedoubleRepository::class
+        );
+
+        $this->app->bind(
+            \App\Repositories\Backend\RoomType\RoomTypeRepositoryContract::class,
+            \App\Repositories\Backend\RoomType\EloquentRoomTypeRepository::class
+        );
+
     }
 
     /**

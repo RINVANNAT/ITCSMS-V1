@@ -1,17 +1,17 @@
 <?php
 
-namespace App\Repositories\Backend\Promotion;
+namespace App\Repositories\Backend\RoomType;
 
 
 use App\Exceptions\GeneralException;
-use App\Models\Promotion;
+use App\Models\RoomType;
 use Carbon\Carbon;
 
 /**
- * Class EloquentPromotionRepository
- * @package App\Repositories\Backend\Promotion
+ * Class EloquentRoomTypeRepository
+ * @package App\Repositories\Backend\RoomType
  */
-class EloquentPromotionRepository implements PromotionRepositoryContract
+class EloquentRoomTypeRepository implements RoomTypeRepositoryContract
 {
     /**
      * @param  $id
@@ -20,8 +20,8 @@ class EloquentPromotionRepository implements PromotionRepositoryContract
      */
     public function findOrThrowException($id)
     {
-        if (! is_null(Promotion::find($id))) {
-            return Promotion::find($id);
+        if (! is_null(RoomType::find($id))) {
+            return RoomType::find($id);
         }
 
         throw new GeneralException(trans('exceptions.backend.general.not_found'));
@@ -33,9 +33,9 @@ class EloquentPromotionRepository implements PromotionRepositoryContract
      * @param  string      $sort
      * @return mixed
      */
-    public function getPromotionsPaginated($per_page, $order_by = 'sort', $sort = 'asc')
+    public function getRoomTypesPaginated($per_page, $order_by = 'sort', $sort = 'asc')
     {
-        return Promotion::orderBy($order_by, $sort)
+        return RoomType::orderBy($order_by, $sort)
             ->paginate($per_page);
     }
 
@@ -44,9 +44,9 @@ class EloquentPromotionRepository implements PromotionRepositoryContract
      * @param  string  $sort
      * @return mixed
      */
-    public function getAllPromotions($order_by = 'sort', $sort = 'asc')
+    public function getAllRoomTypes($order_by = 'sort', $sort = 'asc')
     {
-        return Promotion::orderBy($order_by, $sort)
+        return RoomType::orderBy($order_by, $sort)
             ->get();
     }
 
@@ -57,21 +57,20 @@ class EloquentPromotionRepository implements PromotionRepositoryContract
      */
     public function create($input)
     {
-        if (Promotion::where('name', $input['name'])->first()) {
+        if (RoomType::where('name', $input['name'])->first()) {
             throw new GeneralException(trans('exceptions.backend.general.already_exists'));
         }
 
 
-        $promotion = new Promotion();
+        $roomType = new RoomType();
         
-        $promotion->name = $input['name'];
-        $promotion->active = isset($input['active'])?true:false;
-        $promotion->observation = $input['observation'];
+        $roomType->name = $input['name'];
+        $roomType->active = isset($input['active'])?true:false;
 
-        $promotion->created_at = Carbon::now();
-        $promotion->create_uid = auth()->id();
+        $roomType->created_at = Carbon::now();
+        $roomType->create_uid = auth()->id();
 
-        if ($promotion->save()) {
+        if ($roomType->save()) {
             return true;
         }
 
@@ -86,16 +85,15 @@ class EloquentPromotionRepository implements PromotionRepositoryContract
      */
     public function update($id, $input)
     {
-        $promotion = $this->findOrThrowException($id);
+        $roomType = $this->findOrThrowException($id);
 
-        $promotion->name = $input['name'];
-        $promotion->active = isset($input['active'])?true:false;
-        $promotion->observation = $input['observation'];
+        $roomType->name = $input['name'];
+        $roomType->active = isset($input['active'])?true:false;
 
-        $promotion->updated_at = Carbon::now();
-        $promotion->write_uid = auth()->id();
+        $roomType->updated_at = Carbon::now();
+        $roomType->write_uid = auth()->id();
 
-        if ($promotion->save()) {
+        if ($roomType->save()) {
             return true;
         }
 

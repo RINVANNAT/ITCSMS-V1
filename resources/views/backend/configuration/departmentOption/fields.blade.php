@@ -1,40 +1,41 @@
 <div class="form-group">
-    {!! Form::label('name', trans('labels.backend.departmentOptions.fields.name'), ['class' => 'col-lg-2 control-label']) !!}
+    {!! Form::label('name', trans('labels.backend.departmentOptions.fields.code'), ['class' => 'col-lg-2 control-label']) !!}
     <div class="col-lg-4">
-        {!! Form::text('name', null, ['class' => 'form-control']) !!}
-    </div>
-    {!! Form::label('name', trans('labels.backend.departmentOptions.fields.nb_desk'), ['class' => 'col-lg-2 control-label']) !!}
-    <div class="col-lg-1">
-        {!! Form::text('nb_desk', null, ['class' => 'form-control']) !!}
-    </div>
-    {!! Form::label('name', trans('labels.backend.departmentOptions.fields.size'), ['class' => 'col-lg-2 control-label']) !!}
-    <div class="col-lg-1">
-        {!! Form::text('size', null, ['class' => 'form-control']) !!}
+        {!! Form::text('code', null, ['class' => 'form-control']) !!}
     </div>
 </div><!--form control-->
 <div class="form-group">
-    {!! Form::label('name', trans('labels.backend.departmentOptions.fields.room_type_id'), ['class' => 'col-lg-2 control-label']) !!}
-    <div class="col-lg-4">
-        {!! Form::select('room_type_id',$room_types, null, ['class' => 'form-control']) !!}
-    </div>
-    {!! Form::label('name', trans('labels.backend.departmentOptions.fields.nb_chair'), ['class' => 'col-lg-2 control-label']) !!}
-    <div class="col-lg-1">
-        {!! Form::text('nb_chair', null, ['class' => 'form-control']) !!}
-    </div>
-    {!! Form::label('name', trans('labels.backend.departmentOptions.fields.nb_chair_exam'), ['class' => 'col-lg-2 control-label']) !!}
-    <div class="col-lg-1">
-        {!! Form::text('nb_chair_exam', null, ['class' => 'form-control']) !!}
+    {!! Form::label('name', trans('labels.backend.departmentOptions.fields.name_kh'), ['class' => 'col-lg-2 control-label']) !!}
+    <div class="col-lg-10">
+        {!! Form::text('name_kh', null, ['class' => 'form-control']) !!}
     </div>
 </div><!--form control-->
 
 <div class="form-group">
-    {!! Form::label('name', trans('labels.backend.departmentOptions.fields.building_id'), ['class' => 'col-lg-2 control-label']) !!}
-    <div class="col-lg-4">
-        {!! Form::select('building_id',$buildings, null, ['class' => 'form-control']) !!}
+    {!! Form::label('name', trans('labels.backend.departmentOptions.fields.name_en'), ['class' => 'col-lg-2 control-label']) !!}
+    <div class="col-lg-10">
+        {!! Form::text('name_en', null, ['class' => 'form-control']) !!}
     </div>
-    {!! Form::label('name', trans('labels.backend.departmentOptions.fields.department_id'), ['class' => 'col-lg-2 control-label']) !!}
-    <div class="col-lg-4">
-        {!! Form::select('department_id',$departments, null, ['class' => 'form-control']) !!}
+</div><!--form control-->
+
+<div class="form-group">
+    {!! Form::label('name', trans('labels.backend.departmentOptions.fields.name_fr'), ['class' => 'col-lg-2 control-label']) !!}
+    <div class="col-lg-10">
+        {!! Form::text('name_fr', null, ['class' => 'form-control']) !!}
+    </div>
+</div><!--form control-->
+
+<div class="form-group">
+    {!! Form::label('name', trans('labels.backend.departmentOptions.fields.department_id'), ['class' => 'col-lg-2 control-label required']) !!}
+    <div class="col-lg-10">
+        {!! Form::select('department_id',$departments, null, ['class' => 'form-control','placeholder'=>'','required'=>'required']) !!}
+    </div>
+</div><!--form control-->
+
+<div class="form-group">
+    {!! Form::label('name', trans('labels.backend.departmentOptions.fields.degree_id'), ['class' => 'col-lg-2 control-label required']) !!}
+    <div class="col-lg-10">
+        {!! Form::select('degree_id',$degrees, null, ['class' => 'form-control','required'=>'required']) !!}
     </div>
 </div><!--form control-->
 
@@ -42,13 +43,5 @@
     {!! Form::label('name', trans('labels.backend.departmentOptions.fields.active'), ['class' => 'col-lg-2 control-label']) !!}
     <div class="col-lg-10">
         {!! Form::checkbox('active', 'TRUE', true) !!}
-    </div>
-</div><!--form control-->
-
-
-<div class="form-group">
-    {!! Form::label('name', trans('labels.backend.departmentOptions.fields.description'), ['class' => 'col-lg-2 control-label']) !!}
-    <div class="col-lg-10">
-        {!! Form::textarea('description', null, ['class' => 'form-control']) !!}
     </div>
 </div><!--form control-->

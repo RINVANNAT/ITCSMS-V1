@@ -268,7 +268,7 @@ return [
             'title' => 'Room',
             'sub_index_title' => 'All existing rooms',
             'sub_edit_title' => 'Edit room information',
-            'sub_create_title' => 'Create new rooms',
+            'sub_create_title' => 'Create new room',
             'sub_detail_title' => 'Detail of a room',
             'fields'=>[
                 'active' => 'Is Active',
@@ -281,6 +281,33 @@ return [
                 'building_id' => 'Building',
                 'department_id' => 'Department',
                 'description' => "Description",
+            ]
+        ],
+        'roomTypes' => [
+            'title' => 'Room',
+            'sub_index_title' => 'All existing room Types',
+            'sub_edit_title' => 'Edit room type information',
+            'sub_create_title' => 'Create new room type',
+            'sub_detail_title' => 'Detail of a room type',
+            'fields'=>[
+                'id' => 'ID',
+                'active' => 'Is Active',
+                'name' => "Name",
+            ]
+        ],
+
+        'redoubles' => [
+            'title' => 'Redouble',
+            'sub_index_title' => 'All existing redoubes',
+            'sub_edit_title' => 'Edit redouble information',
+            'sub_create_title' => 'Create new redouble',
+            'sub_detail_title' => 'Detail of a redouble',
+            'fields'=>[
+                'id' => 'ID',
+                'active' => 'Is Active',
+                'name_kh' => "Name Khmer",
+                'name_en' => 'Name English',
+                'name_fr' => "name French"
             ]
         ],
 
