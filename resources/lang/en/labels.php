@@ -386,7 +386,9 @@ return [
                 'academic_year_id' =>'Academic Year',
                 'redouble_id' => 'Redouble',
                 'group' => 'Group',
-                'department_option_id' => 'Geo Technique'
+                'department_option_id' => 'Geo Technique',
+                'to_pay' => 'To Pay',
+                'debt' => 'Debt'
 
             ],
             'tabs' => [
@@ -652,6 +654,18 @@ return [
             ]
         ],
 
+        'studentPayments' => [
+            'title' => 'Student Payment',
+            'sub_index_title' => 'All existing student payments',
+            'sub_edit_title' => 'Edit student payment information',
+            'sub_create_title' => 'Create new payment',
+            'sub_detail_title' => 'Detail of a payment',
+            'fields' => [
+                'name' => "Name",
+                'observation' => 'Observation',
+                'active' => 'Active',
+            ]
+        ],
     ],
 
     'frontend' => [

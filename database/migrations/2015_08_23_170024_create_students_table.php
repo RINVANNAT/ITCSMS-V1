@@ -29,7 +29,7 @@ class CreateStudentsTable extends Migration
 			$table->string('email',100)->nullable();
 			$table->timestamp('admission_date')->nullable();
 			$table->string('address')->nullable();
-			$table->string('address_current');
+			$table->string('address_current')->nullable();
 			$table->string('parent_name')->nullable();
 			$table->string('parent_occupation')->nullable();
 			$table->string('parent_address')->nullable();

@@ -57,8 +57,9 @@ class StudentAnnualController extends Controller
         $grades = Grade::lists('name_kh','id');
         $genders = Gender::lists('name_kh','id');
         $options = DepartmentOption::lists('code','id');
+        $academicYears = AcademicYear::orderBy('id','desc')->lists('name_kh','id');
 
-        return view('backend.studentAnnual.index',compact('departments','degrees','grades','genders','options'));
+        return view('backend.studentAnnual.index',compact('departments','degrees','grades','genders','options','academicYears'));
     }
 
     /**
@@ -89,7 +90,7 @@ class StudentAnnualController extends Controller
     /**
      * Store a newly created resource in storage.
      *
-     * @param  \Illuminate\Http\Request  $request
+     * @param  StoreStudentRequest  $request
      * @return \Illuminate\Http\Response
      */
     public function store(StoreStudentRequest $request)
@@ -181,12 +182,12 @@ class StudentAnnualController extends Controller
                 'studentAnnuals.id','students.id_card','students.name_kh','students.dob as dob','students.name_latin', 'genders.code as gender', 'departmentOptions.code as option',
                 DB::raw("CONCAT(degrees.code,grades.code,departments.code) as class")
             ])
-            ->join('students','students.id','=','studentAnnuals.student_id')
-            ->join('genders', 'students.gender_id', '=', 'genders.id')
-            ->join('grades', 'studentAnnuals.grade_id', '=', 'grades.id')
-            ->join('departmentOptions', 'studentAnnuals.department_option_id', '=', 'departmentOptions.id')
-            ->join('departments', 'studentAnnuals.department_id', '=', 'departments.id')
-            ->join('degrees', 'studentAnnuals.degree_id', '=', 'degrees.id');
+            ->leftJoin('students','students.id','=','studentAnnuals.student_id')
+            ->leftJoin('genders', 'students.gender_id', '=', 'genders.id')
+            ->leftJoin('grades', 'studentAnnuals.grade_id', '=', 'grades.id')
+            ->leftJoin('departmentOptions', 'studentAnnuals.department_option_id', '=', 'departmentOptions.id')
+            ->leftJoin('departments', 'studentAnnuals.department_id', '=', 'departments.id')
+            ->leftJoin('degrees', 'studentAnnuals.degree_id', '=', 'degrees.id');
 
 
         $datatables = app('datatables')->of($studentAnnuals)
@@ -200,7 +201,10 @@ class StudentAnnualController extends Controller
                 ' <a href="' . route('admin.studentAnnuals.show', $studentAnnual->id) . '" class="btn btn-xs btn-info"><i class="fa fa-eye" data-toggle="tooltip" data-placement="top" title="" data-original-title="' . trans('buttons.general.view') . '"></i> </a>';
             });
 
-        // additional users.name search
+        // additional search
+        if ($academic_year = $datatables->request->get('academic_year')) {
+            $datatables->where('studentAnnuals.academic_year_id', '=', $academic_year);
+        }
         if ($degree = $datatables->request->get('degree')) {
             $datatables->where('studentAnnuals.degree_id', '=', $degree);
         }

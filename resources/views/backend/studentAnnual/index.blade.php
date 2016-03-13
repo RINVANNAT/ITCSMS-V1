@@ -84,6 +84,7 @@
                 ajax: {
                     url:"{!! route('admin.student.data',0) !!}",
                     data:function(d){
+                        d.academic_year = $('#filter_academic_year').val();
                         d.degree = $('#filter_degree').val();
                         d.grade = $('#filter_grade').val();
                         d.department = $('#filter_department').val();
@@ -101,7 +102,10 @@
                     { data: 'action', name: 'action',orderable: false, searchable: false}
                 ]
             });
-            $("div.toolbar").html(' &nbsp;<label for="name">Class</label> '+
+            $("div.toolbar").html(
+                    '&nbsp;&nbsp; <label for="name">Academic Year</label> '+
+                    '{!! Form::select('academic_year',$academicYears,null, array('class'=>'form-control','id'=>'filter_academic_year')) !!} '+
+                    ' &nbsp;<label for="name">Class</label> '+
                     '{!! Form::select('degree',$degrees,null, array('class'=>'form-control','id'=>'filter_degree','placeholder'=>'')) !!} '+
                     '{!! Form::select('grade',$grades,null, array('class'=>'form-control','id'=>'filter_grade','placeholder'=>'')) !!} '+
                     '{!! Form::select('department',$departments,null, array('class'=>'form-control','id'=>'filter_department','placeholder'=>'')) !!}' +
@@ -110,6 +114,11 @@
                     '&nbsp;&nbsp; <label for="name">Option</label> '+
                     '{!! Form::select('option',$options,null, array('class'=>'form-control','id'=>'filter_option','placeholder'=>'')) !!} '
             );
+
+            $('#filter_academic_year').on('change', function(e) {
+                oTable.draw();
+                e.preventDefault();
+            });
 
             $('#filter_degree').on('change', function(e) {
                 oTable.draw();

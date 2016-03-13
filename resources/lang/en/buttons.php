@@ -40,6 +40,9 @@ return [
         'view' => 'View',
         'add' => 'Add',
         'print' => 'Print',
-        'export' => 'Export'
+        'export' => 'Export',
+        'close' => 'Close',
+        'save_close' => 'Save & Close',
+        'save_print' => 'Save & Print'
     ],
 ];

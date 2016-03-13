@@ -16,6 +16,11 @@
         <!-- Styles -->
         @yield('before-styles-end')
         {!! Html::style(elixir('css/backend.css')) !!}
+        <style>
+            .content-wrapper{
+                background-image: url("/img/bg_contit.gif"); !important;
+            }
+        </style>
         @yield('after-styles-end')
 
         <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
