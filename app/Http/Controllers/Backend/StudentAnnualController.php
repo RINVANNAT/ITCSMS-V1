@@ -9,7 +9,6 @@ use App\Http\Requests\Backend\Student\RequestImportStudentRequest;
 use App\Http\Requests\Backend\Student\StoreStudentRequest;
 use App\Http\Requests\Backend\Student\UpdateStudentRequest;
 use App\Models\AcademicYear;
-use App\Models\Candidate;
 use App\Models\Degree;
 use App\Models\Department;
 use App\Models\DepartmentOption;

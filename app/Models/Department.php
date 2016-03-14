@@ -37,7 +37,7 @@ class Department extends Model
     }
 
     public function department_options(){
-        return $this->hasMany('App\Models\departmentOption');
+        return $this->hasMany('App\Models\DepartmentOption');
     }
 
     public function student_annuals(){
