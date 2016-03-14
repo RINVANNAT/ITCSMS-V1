@@ -22,7 +22,7 @@
                     <center>
                         <img style="width: 4cm;padding: 3px;border: 3px solid #d2d6de;"
                              class="profile-user-img img-responsive"
-                             src="{{isset($studentAnnual)?url('img/profiles/'.$studentAnnual->student->photo):url('img/profiles/avatar.png')}}" alt="User profile picture"> </img>
+                             src="{{(isset($studentAnnual) && !empty($studentAnnual->student->photo))?url('img/profiles/'.$studentAnnual->student->photo):url('img/profiles/avatar.png')}}" alt="User profile picture"> </img>
                         <div style="width: 5cm;">
                             {!! Form::file('photo', null,['id'=>'photo']) !!}
                         </div>
@@ -55,7 +55,7 @@
                     </div>
                     {!! Form::label('name', trans('labels.backend.students.fields.dob'), ['class' => 'col-lg-2 control-label required']) !!}
                     <div class="col-lg-10" style="padding-bottom: 10px;">
-                        {!! Form::text('dob', isset($studentAnnual)?$studentAnnual->student->dob:null, ['class' => 'form-control','required'=>'required']) !!}
+                        {!! Form::text('dob', isset($studentAnnual)?$studentAnnual->student->dob->format('d/m/Y'):null, ['class' => 'form-control','required'=>'required']) !!}
                     </div>
                     {!! Form::label('name', trans('labels.backend.students.fields.pob'), ['class' => 'col-lg-2 control-label']) !!}
                     <div class="col-lg-10" style="padding-bottom: 10px;">

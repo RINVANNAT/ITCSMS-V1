@@ -1,7 +1,9 @@
 <?php namespace App\Http\Controllers\Backend;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Backend\Student\CreateStudentRequest;
 use App\Http\Requests\Backend\Student\DeleteStudentRequest;
+use App\Http\Requests\Backend\Student\EditStudentRequest;
 use App\Http\Requests\Backend\Student\ImportStudentRequest;
 use App\Http\Requests\Backend\Student\RequestImportStudentRequest;
 use App\Http\Requests\Backend\Student\StoreStudentRequest;
@@ -65,9 +67,10 @@ class StudentAnnualController extends Controller
     /**
      * Show the form for creating a new resource.
      *
+     * @param CreateStudentRequest $request
      * @return \Illuminate\Http\Response
      */
-    public function create()
+    public function create(CreateStudentRequest $request)
     {
         //$last_academic_year = AcademicYear::orderBy('id','desc')->first();
         //$studentAnnuals = StudentAnnual::where('academic_year_id',$last_academic_year->id)->paginate(config('app.records_per_page'));
@@ -119,10 +122,11 @@ class StudentAnnualController extends Controller
     /**
      * Show the form for editing the specified resource.
      *
+     * @param EditStudentRequest $request
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function edit($id)
+    public function edit(EditStudentRequest $request, $id)
     {
         $studentAnnual = $this->students->findOrThrowException($id);
 
@@ -147,13 +151,13 @@ class StudentAnnualController extends Controller
     /**
      * Update the specified resource in storage.
      *
-     * @param  \Illuminate\Http\Request  $request
+     * @param  UpdateStudentRequest  $request
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
     public function update(UpdateStudentRequest $request, $id)
     {
-        $this->students->update($id, $request->all());
+        $this->students->update($id, $request);
         return redirect()->route('admin.studentAnnuals.index')->withFlashSuccess(trans('alerts.backend.generals.updated'));
     }
 

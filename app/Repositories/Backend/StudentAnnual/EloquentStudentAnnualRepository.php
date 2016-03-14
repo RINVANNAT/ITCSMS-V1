@@ -79,7 +79,13 @@ class EloquentStudentAnnualRepository implements StudentAnnualRepositoryContract
                 ->where('studentAnnuals.grade_id',1)
                 ->orderBy('students.id_card','desc')->first();
 
-            $student->id_card = 'e'.$last_academic_year->id.str_pad((int)substr($last_student->id_card, 5)+1, 4, '0', STR_PAD_LEFT);
+            if($last_student != null) {
+                $next_id = (int)substr($last_student->id_card, 5)+1;
+            } else {
+                $next_id = 1;
+            }
+
+            $student->id_card = 'e'.$last_academic_year->id.str_pad($next_id, 4, '0', STR_PAD_LEFT);
         }
 
         if (Student::where('id_card', $student->id_card)->first()) {

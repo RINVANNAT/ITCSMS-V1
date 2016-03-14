@@ -15,7 +15,7 @@
 @endsection
 
 @section('content')
-    {!! Form::model($studentAnnual, ['route' => ['admin.studentAnnuals.update', $studentAnnual->id],'class' => 'form-horizontal', 'role'=>'form', 'method' => 'patch']) !!}
+    {!! Form::model($studentAnnual, ['route' => ['admin.studentAnnuals.update', $studentAnnual->id],'class' => 'form-horizontal', 'role'=>'form', 'method' => 'patch','files' => true]) !!}
 
         <div class="box box-success">
             <div class="box-header with-border">
