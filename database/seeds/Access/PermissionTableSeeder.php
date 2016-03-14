@@ -325,7 +325,7 @@ class PermissionTableSeeder extends Seeder
         $permission_model              = config('access.permission');
         $deleteStudents               = new $permission_model;
         $deleteStudents->name         = 'delete-students';
-        $deleteStudents->display_name = 'Edit Students';
+        $deleteStudents->display_name = 'Delete Students';
         $deleteStudents->system       = true;
         $deleteStudents->group_id     = 6;
         $deleteStudents->sort         = 4;

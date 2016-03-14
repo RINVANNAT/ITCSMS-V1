@@ -11,6 +11,7 @@ use App\Models\Grade;
 use App\Models\Income;
 use App\Models\Outcome;
 use App\Models\School;
+use App\Models\SchoolFeeRate;
 use App\Models\StudentAnnual;
 use App\Repositories\Backend\Income\IncomeRepositoryContract;
 use Carbon\Carbon;
@@ -63,9 +64,16 @@ class IncomeController extends Controller
 
     public function student_payment_data(Request $request) // 0 mean, scholarship id is not applied
     {
+        $school_fee = SchoolFeeRate::select(['to_pay','to_pay_currency'])
+            ->where('degree_id' ,1)
+            ->whereIn('scholarship_id' ,[])
+            ->get();
+
+        dd($school_fee);
 
         $studentAnnuals = StudentAnnual::select([
-            'studentAnnuals.id','students.id_card','students.name_kh','students.dob as dob','students.name_latin', 'genders.code as gender', 'departmentOptions.code as option','payslip_client_id',
+            'studentAnnuals.id','students.id_card','students.name_kh','students.dob as dob','studentAnnuals.promotion_id','studentAnnuals.degree_id','studentAnnuals.grade_id','studentAnnuals.department_id',
+            'students.name_latin', 'genders.code as gender', 'departmentOptions.code as option','payslip_client_id',
             DB::raw("CONCAT(degrees.code,grades.code,departments.code) as class")
         ])
             ->leftJoin('students','students.id','=','studentAnnuals.student_id')
@@ -85,7 +93,27 @@ class IncomeController extends Controller
                 return route('admin.accounting.payslipHistory.data',$studentAnnual->payslip_client_id==null?0:$studentAnnual->payslip_client_id);
             })
             ->addColumn('to_pay', function ($studentAnnual){
-                return "200$";
+                $school_fee = SchoolFeeRate::select(['to_pay','to_pay_currency'])
+                    ->where('promotion_id' ,$studentAnnual->promotion_id)
+                    ->where('degree_id' ,$studentAnnual->degree_id)
+                    ->whereIn('scholarship_id' ,[])
+                    ->get();
+                if($school_fee->count() > 1){
+                    $school_fee = SchoolFeeRate::select(['to_pay','to_pay_currency'])
+                        ->where('promotion_id' ,$studentAnnual->promotion_id)
+                        ->where('degree_id' ,$studentAnnual->degree_id)
+                        ->where('grade_id' ,$studentAnnual->grade_id)
+                        ->get();
+                    if($school_fee->count() > 1){
+                        $school_fee = SchoolFeeRate::select(['to_pay','to_pay_currency'])
+                            ->where('promotion_id' ,$studentAnnual->promotion_id)
+                            ->where('degree_id' ,$studentAnnual->degree_id)
+                            ->where('grade_id' ,$studentAnnual->grade_id)
+                            ->where('department_id' ,$studentAnnual->department_id)
+                            ->get();
+                    }
+                }
+                return $school_fee->first()->to_pay." ".$school_fee->first()->to_pay_currency;
             })
             ->addColumn('debt', function ($studentAnnual){
                 return "0$";

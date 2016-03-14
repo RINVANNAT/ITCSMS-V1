@@ -148,9 +148,9 @@ class SchoolFeeRateController extends Controller
     public function data($with_scholarships,$scholarship_id)
     {
         $schoolFees = DB::table('schoolFeeRates')
-            ->join('degrees', 'schoolFeeRates.degree_id', '=', 'degrees.id')
-            ->join('promotions', 'schoolFeeRates.promotion_id', '=', 'promotions.id');
-        if($with_scholarships){
+            ->leftJoin('degrees', 'schoolFeeRates.degree_id', '=', 'degrees.id')
+            ->leftJoin('promotions', 'schoolFeeRates.promotion_id', '=', 'promotions.id');
+        if($with_scholarships == "true"){
             if($scholarship_id == 0) {
                 $schoolFees = $schoolFees
                     ->whereNotNull('scholarship_id');
@@ -159,7 +159,7 @@ class SchoolFeeRateController extends Controller
                     ->where('scholarship_id','=',$scholarship_id);
             }
             $schoolFees = $schoolFees
-                ->join('scholarships', 'schoolFeeRates.scholarship_id', '=', 'scholarships.id')
+                ->leftJoin('scholarships', 'schoolFeeRates.scholarship_id', '=', 'scholarships.id')
                 ->select(['schoolFeeRates.id','to_pay','to_pay_currency','degrees.name_kh as degree_name_kh','scholarships.code as scholarship_code','department_id','grade_id','promotions.name as promotion_name','academic_year_id', 'budget', 'budget_currency']);
 
             $datatables =  app('datatables')->of($schoolFees);

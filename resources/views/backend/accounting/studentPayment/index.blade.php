@@ -83,13 +83,6 @@
                     <button class="btn btn-primary btn-sm"><i class="fa fa-plus-circle"></i> Import
                     </button>
                 </a>
-
-                <div class="btn-group">
-                    <button class="btn btn-default btn-sm"><i class="fa fa-trash-o"></i></button>
-                    <button class="btn btn-default btn-sm"><i class="fa fa-reply"></i></button>
-                    <button class="btn btn-default btn-sm"><i class="fa fa-share"></i></button>
-                </div>
-                <!-- /.btn-group -->
                 <button class="btn btn-default btn-sm"><i class="fa fa-refresh"></i></button>
 
             </div>
@@ -168,22 +161,22 @@
                     { data: 'name_kh', name: 'students.name_kh'},
                     { data: 'name_latin', name: 'students.name_latin'},
                     { data: 'dob', name: 'dob'},
-                    { data: 'gender', name: 'gender',searchable:false},
-                    { data: 'class' , name: 'class',searchable:false},
-                    { data: 'option' , name: 'option',searchable:false},
-                    { data: 'to_pay' , name: 'to_pay',searchable:false},
-                    { data: 'debt' , name: 'debt',searchable:false},
+                    { data: 'gender', name: 'gender',orderable:false,searchable:false},
+                    { data: 'class' , name: 'class',orderable:false,searchable:false},
+                    { data: 'option' , name: 'option',orderable:false,searchable:false},
+                    { data: 'to_pay' , name: 'to_pay',orderable:false,searchable:false},
+                    { data: 'debt' , name: 'debt',orderable:false,searchable:false},
                     {
                         "className":      'details-control',
                         "orderable":      false,
+                        "searchable":       false,
                         "data":           null,
                         "defaultContent": ''
                     },
                 ]
             });
             $("div.toolbar").html(
-                    '&nbsp;&nbsp; <label for="name">Academic Year</label> '+
-                    '{!! Form::select('academic_year',$academicYears,null, array('class'=>'form-control','id'=>'filter_academic_year')) !!} '+
+                    ' {!! Form::select('academic_year',$academicYears,null, array('class'=>'form-control','id'=>'filter_academic_year')) !!} '+
                     ' &nbsp;<label for="name">Class</label> '+
                     '{!! Form::select('degree',$degrees,null, array('class'=>'form-control','id'=>'filter_degree','placeholder'=>'')) !!} '+
                     '{!! Form::select('grade',$grades,null, array('class'=>'form-control','id'=>'filter_grade','placeholder'=>'')) !!} '+
