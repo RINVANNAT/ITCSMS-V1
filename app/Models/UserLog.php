@@ -18,7 +18,6 @@ class UserLog extends Model
         "create_uid",
         "ip_address",
         "user_agent",
-        "developer"
     ];
 
     public static function log($data = [])
@@ -37,10 +36,6 @@ class UserLog extends Model
         $activity->model   = isset($data['model'])   ? $data['model']   : null;
         $activity->action       = isset($data['action'])      ? $data['action']      : null;
         $activity->data      = isset($data['data'])     ? $data['data']     : null;
-
-
-        //set developer flag
-        if(isset($data['developer'])) $activity->is_developer  = $data['developer'];
 
         $activity->ip_address = Request::getClientIp();
         $activity->user_agent = isset($_SERVER['HTTP_USER_AGENT']) ? $_SERVER['HTTP_USER_AGENT'] : 'No UserAgent';

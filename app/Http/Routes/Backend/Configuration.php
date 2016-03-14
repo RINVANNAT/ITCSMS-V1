@@ -47,6 +47,9 @@ Route::group([
     Route::group([], function() {
         Route::resource('outcomeTypes', 'OutcomeTypeController');
         Route::get('outcomeType-data', 'OutcomeTypeController@data')->name('admin.configuration.outcomeType.data');
+
+        Route::get('outcomeType-request-import', 'OutcomeTypeController@request_import')->name('admin.outcomeType.request_import');
+        Route::post('outcomeType-import', 'OutcomeTypeController@import')->name('admin.outcomeType.import');
     });
     Route::group([], function() {
         Route::resource('rooms', 'RoomController');

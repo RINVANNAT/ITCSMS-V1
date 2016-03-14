@@ -1586,7 +1586,7 @@ class PermissionTableSeeder extends Seeder
         $permission_model                   = config('access.permission');
         $viewRedoubleManagement               = new $permission_model;
         $viewRedoubleManagement->name         = 'view-log-viewer-management';
-        $viewRedoubleManagement->display_name = 'View Redouble Management';
+        $viewRedoubleManagement->display_name = 'View Log Viewer';
         $viewRedoubleManagement->system       = true;
         $viewRedoubleManagement->sort         = 1;
         $viewRedoubleManagement->created_at   = Carbon::now();

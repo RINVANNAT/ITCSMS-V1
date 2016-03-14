@@ -5,8 +5,12 @@ use App\Http\Requests\Backend\Configuration\OutcomeType\DeleteOutcomeTypeRequest
 use App\Http\Requests\Backend\Configuration\OutcomeType\EditOutcomeTypeRequest;
 use App\Http\Requests\Backend\Configuration\OutcomeType\StoreOutcomeTypeRequest;
 use App\Http\Requests\Backend\Configuration\OutcomeType\UpdateOutcomeTypeRequest;
+use App\Http\Requests\Backend\Configuration\OutcomeType\ImportOutcomeTypeRequest;
+use App\Http\Requests\Backend\Configuration\OutcomeType\RequestImportOutcomeTypeRequest;
 use App\Repositories\Backend\OutcomeType\OutcomeTypeRepositoryContract;
+use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
+use Maatwebsite\Excel\Facades\Excel;
 
 class OutcomeTypeController extends Controller
 {
@@ -131,6 +135,52 @@ class OutcomeTypeController extends Controller
                 ' <button class="btn btn-xs btn-danger btn-delete" data-remote="'.route('admin.configuration.outcomeTypes.destroy', $outcomeType->id) .'"><i class="fa fa-times" data-toggle="tooltip" data-placement="top" title="' . trans('buttons.general.crud.delete') . '"></i></button>';
             })
             ->make(true);
+    }
+
+    public function request_import(RequestImportOutcomeTypeRequest $request){
+
+        return view('backend.configuration.outcomeType.import');
+
+    }
+
+    public function import(ImportOutcomeTypeRequest $request){
+        $now = Carbon::now()->format('Y_m_d_H');
+
+        // try to move uploaded file to a temporary location
+        if($request->file('import')!= null){
+            $import = $now. '.' .$request->file('import')->getClientOriginalExtension();
+
+            $request->file('import')->move(
+                base_path() . '/public/assets/uploaded_file/temp/', $import
+            );
+
+            $storage_path = base_path() . '/public/assets/uploaded_file/temp/'.$import;
+
+            // and then read that data and store to database
+            //Excel::load($storage_path, function($reader) {
+            //    dd($reader->first());
+            //});
+
+
+            DB::beginTransaction();
+
+            try{
+                Excel::filter('chunk')->load($storage_path)->chunk(1000, function($results){
+                    //dd($results->first());
+                    // Loop through all rows
+                    $results->each(function($row) {
+
+                        $studentBac2 = $this->outcomeTypes->create($row->toArray());
+                    });
+                });
+
+            } catch(Exception $e){
+                DB::rollback();
+            }
+            DB::commit();
+
+            return redirect(route('admin.configuration.outcomeTypes.index'));
+        }
     }
 
 }

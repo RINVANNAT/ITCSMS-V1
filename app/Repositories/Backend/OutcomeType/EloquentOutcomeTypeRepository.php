@@ -67,7 +67,9 @@ class EloquentOutcomeTypeRepository implements OutcomeTypeRepositoryContract
         $outcomeType->code = $input['code'];
         $outcomeType->origin = $input['origin'];
         $outcomeType->name = $input['name'];
-        $outcomeType->description = $input['description'];
+        if(isset($input['description'])){
+            $outcomeType->description = $input['description'];
+        }
         $outcomeType->active = isset($input['active'])?true:false;
         $outcomeType->created_at = Carbon::now();
         $outcomeType->create_uid = auth()->id();
