@@ -63,7 +63,7 @@ Route::group([
     });
     Route::group([], function() {
         Route::resource('schoolFees', 'SchoolFeeRateController');
-        Route::get('schoolFee-data/{with_scholarships}/{scholarship_id}', 'SchoolFeeRateController@data')->name('admin.configuration.schoolFee.data');
+        Route::get('schoolFee-data/{with_scholarships}', 'SchoolFeeRateController@data')->name('admin.configuration.schoolFee.data');
         Route::get('schoolFee-request-import', 'SchoolFeeRateController@request_import')->name('admin.configuration.schoolFee.request_import');
         Route::post('schoolFee-import', 'SchoolFeeRateController@import')->name('admin.configuration.schoolFee.import');
     });

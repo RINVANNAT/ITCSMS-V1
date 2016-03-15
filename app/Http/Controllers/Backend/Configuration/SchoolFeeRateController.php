@@ -54,7 +54,7 @@ class SchoolFeeRateController extends Controller
      */
     public function create(CreateSchoolFeeRequest $request)
     {
-        $departments = Department::lists('name_kh','id');
+        $departments = Department::where('parent_id',11)->lists('name_kh','id');
         $grades = Grade::lists('name_kh','id');
         $promotions = Promotion::orderBy('name','desc')->limit(16)->lists('name','id');
         $scholarships = Scholarship::where('active',true)->lists('code','id');
@@ -70,7 +70,7 @@ class SchoolFeeRateController extends Controller
      */
     public function create_scholarship_fee(CreateSchoolFeeRequest $request)
     {
-        $departments = Department::lists('name_kh','id');
+        $departments = Department::where('parent_id',11)->lists('name_kh','id');
         $grades = Grade::lists('name_kh','id');
         $promotions = Promotion::orderBy('name','desc')->limit(5)->lists('name','id');
         $scholarships = Scholarship::lists('name_kh','id');
@@ -113,7 +113,13 @@ class SchoolFeeRateController extends Controller
 
         $schoolFee = $this->schoolFees->findOrThrowException($id);
 
-        return view('backend.configuration.schoolFee.edit',compact('schoolFee'));
+        $departments = Department::where('parent_id',11)->lists('name_kh','id');
+        $grades = Grade::lists('name_kh','id');
+        $promotions = Promotion::orderBy('name','desc')->limit(16)->lists('name','id');
+        $scholarships = Scholarship::where('active',true)->lists('code','id');
+        $degrees = Degree::lists('name_kh','id');
+
+        return view('backend.configuration.schoolFee.edit',compact('schoolFee','departments','grades','promotions','scholarships','degrees'));
     }
 
     /**
@@ -145,53 +151,60 @@ class SchoolFeeRateController extends Controller
         }
     }
 
-    public function data($with_scholarships,$scholarship_id)
+    public function data($with_scholarships)
     {
         $schoolFees = DB::table('schoolFeeRates')
             ->leftJoin('degrees', 'schoolFeeRates.degree_id', '=', 'degrees.id')
-            ->leftJoin('promotions', 'schoolFeeRates.promotion_id', '=', 'promotions.id');
-        if($with_scholarships == "true"){
-            if($scholarship_id == 0) {
-                $schoolFees = $schoolFees
-                    ->whereNotNull('scholarship_id');
-            } else {
-                $schoolFees = $schoolFees
-                    ->where('scholarship_id','=',$scholarship_id);
-            }
+            ->leftJoin('promotions', 'schoolFeeRates.promotion_id', '=', 'promotions.id')
+            ->leftJoin('scholarships', 'schoolFeeRates.scholarship_id', '=', 'scholarships.id');
+        if($with_scholarships == "true") {
             $schoolFees = $schoolFees
-                ->leftJoin('scholarships', 'schoolFeeRates.scholarship_id', '=', 'scholarships.id')
-                ->select(['schoolFeeRates.id','to_pay','to_pay_currency','degrees.name_kh as degree_name_kh','scholarships.code as scholarship_code','department_id','grade_id','promotions.name as promotion_name','academic_year_id', 'budget', 'budget_currency']);
-
-            $datatables =  app('datatables')->of($schoolFees);
-
-            return $datatables
-                ->editColumn('group', '{!! $degree_name_kh.$grade_id.$department_id !!}')
-                ->editColumn('promotion_name', '{!! $promotion_name !!}')
-                ->editColumn('scholarship_code', '{!! $scholarship_code !!}')
-                ->editColumn('to_pay', '{!! $to_pay." ".$to_pay_currency !!}')
-                ->editColumn('budget', '{!! $budget." ".$budget_currency !!}')
-                ->addColumn('action', function ($schoolFee) {
-                    return  '<a href="'.route('admin.configuration.schoolFees.edit',$schoolFee->id).'" class="btn btn-xs btn-primary"><i class="fa fa-pencil" data-toggle="tooltip" data-placement="top" title="" data-original-title="'.trans('buttons.general.crud.edit').'"></i> </a>'.
-                    ' <button class="btn btn-xs btn-danger btn-delete" data-remote="'.route('admin.configuration.schoolFees.destroy', $schoolFee->id) .'"><i class="fa fa-times" data-toggle="tooltip" data-placement="top" title="' . trans('buttons.general.crud.delete') . '"></i></button>';
-                })
-                ->make(true);
-
+                ->whereNotNull('scholarship_id');
         } else {
-            $schoolFees = $schoolFees->whereNull('scholarship_id')
-            ->select(['schoolFeeRates.id','to_pay','to_pay_currency','degrees.name_kh as degree_name_kh','department_id','grade_id','promotions.name as promotion_name','academic_year_id']);
-
-            $datatables =  app('datatables')->of($schoolFees);
-
-            return $datatables
-                ->editColumn('group', '{!! $degree_name_kh.$grade_id.$department_id !!}')
-                ->editColumn('promotion_name', '{!! $promotion_name !!}')
-                ->editColumn('to_pay', '{!! $to_pay." ".$to_pay_currency !!}')
-                ->addColumn('action', function ($schoolFee) {
-                    return  '<a href="'.route('admin.configuration.schoolFees.edit',$schoolFee->id).'" class="btn btn-xs btn-primary"><i class="fa fa-pencil" data-toggle="tooltip" data-placement="top" title="" data-original-title="'.trans('buttons.general.crud.edit').'"></i> </a>'.
-                    ' <button class="btn btn-xs btn-danger btn-delete" data-remote="'.route('admin.configuration.schoolFees.destroy', $schoolFee->id) .'"><i class="fa fa-times" data-toggle="tooltip" data-placement="top" title="' . trans('buttons.general.crud.delete') . '"></i></button>';
-                })
-                ->make(true);
+            $schoolFees = $schoolFees
+                ->whereNull('scholarship_id');
         }
+
+        $schoolFees = $schoolFees
+                ->select(['schoolFeeRates.id','to_pay','to_pay_currency','degrees.name_kh as degree_name_kh','scholarships.code as scholarship_code','promotions.name as promotion_name','academic_year_id']);
+
+
+        $datatables =  app('datatables')->of($schoolFees);
+
+        return $datatables
+            ->editColumn('to_pay', '{!! $to_pay." ".$to_pay_currency !!}')
+            ->addColumn('departments', function($schoolFee){
+
+                $related_departments = DB::table('departments')
+                    ->join('department_school_fee_rate','departments.id','=','department_school_fee_rate.department_id')
+                    ->where('department_school_fee_rate.school_fee_rate_id','=',$schoolFee->id)
+                    ->orderBy('name_kh','ASC')
+                    ->select('name_kh')->get();
+                $list = "";
+                foreach($related_departments as $department){
+                    $list .= $department->name_kh."<br/>";
+                }
+                return $list;
+            })
+            ->addColumn('grades', function($schoolFee){
+
+                $related_grades = DB::table('grades')
+                    ->join('grade_school_fee_rate','grades.id','=','grade_school_fee_rate.grade_id')
+                    ->where('grade_school_fee_rate.school_fee_rate_id','=',$schoolFee->id)
+                    ->orderBy('name_kh','ASC')
+                    ->select('name_kh')->get();
+                $list = "";
+                foreach($related_grades as $grade){
+                    $list .= $grade->name_kh."<br/>";
+                }
+                return $list;
+            })
+            ->addColumn('action', function ($schoolFee) {
+                return  '<a href="'.route('admin.configuration.schoolFees.edit',$schoolFee->id).'" class="btn btn-xs btn-primary"><i class="fa fa-pencil" data-toggle="tooltip" data-placement="top" title="" data-original-title="'.trans('buttons.general.crud.edit').'"></i> </a>'.
+                ' <button class="btn btn-xs btn-danger btn-delete" data-remote="'.route('admin.configuration.schoolFees.destroy', $schoolFee->id) .'"><i class="fa fa-times" data-toggle="tooltip" data-placement="top" title="' . trans('buttons.general.crud.delete') . '"></i></button>';
+            })
+            ->make(true);
+
     }
 
     public function request_import(RequestImportSchoolFeeRequest $request){
@@ -217,11 +230,15 @@ class SchoolFeeRateController extends Controller
 
             try{
                 Excel::filter('chunk')->load($storage_path)->chunk(10000, function($results){
-                    //dd($results->first());
-                    // Loop through all rows
-                    $results->each(function($row) {
 
-                        $schoolFee = $this->schoolFees->create($row->toArray());
+                    $results->each(function($row) {
+                        $data = $row->toArray();
+                        $data['departments'] = [1,2,3,4,5,6,7,8];
+                        $data['grades'] = [1,2,3,4,5];
+                        if($data['degree_id']==2){
+                            $data['grades'] = [1,2];
+                        }
+                        $schoolFee = $this->schoolFees->create($data);
                     });
                 });
 

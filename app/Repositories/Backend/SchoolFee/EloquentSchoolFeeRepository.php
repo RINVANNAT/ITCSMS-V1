@@ -21,7 +21,7 @@ class EloquentSchoolFeeRepository implements SchoolFeeRepositoryContract
     public function findOrThrowException($id)
     {
         if (! is_null(SchoolFeeRate::find($id))) {
-            return SchoolFeeRate::find($id);
+            return SchoolFeeRate::with(['departments','grades'])->find($id);
         }
 
         throw new GeneralException(trans('exceptions.backend.configuration.schoolFees.not_found'));
@@ -58,21 +58,13 @@ class EloquentSchoolFeeRepository implements SchoolFeeRepositoryContract
     public function create($input)
     {
 
-        $record = SchoolFeeRate::where('promotion_id', $input['promotion_id']);
-        if ($input['department_id']!="") {
-            $record->where('department_id',$input['department_id']);
-        }
-        if ($input['degree_id']!="") {
-            $record->where('degree_id',$input['degree_id']);
-        }
-        if ($input['grade_id']!="") {
-            $record->where('grade_id',$input['grade_id']);
-        }
-        if(isset($input['scholarship_id'])){
-            if ($input['scholarship_id']!="") {
-                $record->where('scholarship_id',$input['scholarship_id']);
-            }
-        }
+        $record = SchoolFeeRate::join('department_school_fee_rate','schoolFeeRates.id','=','department_school_fee_rate.school_fee_rate_id')
+            ->join('grade_school_fee_rate','schoolFeeRates.id','=','grade_school_fee_rate.school_fee_rate_id')
+            ->where('promotion_id', $input['promotion_id'])
+            ->where('degree_id',$input['degree_id'])
+            ->where('scholarship_id',$input['scholarship_id']==""?null:$input['scholarship_id'])
+            ->whereIn('department_school_fee_rate.department_id',$input['departments'])
+            ->whereIn('grade_school_fee_rate.grade_id',$input['grades']);
 
         if($record->first()) {
             throw new GeneralException(trans('exceptions.backend.general.already_exists'));
@@ -80,18 +72,12 @@ class EloquentSchoolFeeRepository implements SchoolFeeRepositoryContract
 
         $schoolFee = new SchoolFeeRate();
 
-        if(isset($input['scholarship_id'])){
-            $schoolFee->scholarship_id = $input['scholarship_id'];
-            $schoolFee->budget = $input['budget'];
-            $schoolFee->budget_currency = $input['budget_currency'];
-        }
-
         $schoolFee->to_pay = $input['to_pay'];
         $schoolFee->to_pay_currency = $input['to_pay_currency'];
-        $schoolFee->department_id = $input['department_id']==""?null:$input['department_id'];
         $schoolFee->degree_id = $input['degree_id']==""?null:$input['degree_id'];
-        $schoolFee->grade_id = $input['grade_id']==""?null:$input['grade_id'];
         $schoolFee->promotion_id = $input['promotion_id'];
+        $schoolFee->scholarship_id = $input['scholarship_id']==""?null:$input['scholarship_id'];
+
         if(isset($input['description'])){
             $schoolFee->description = $input['description'];
         }
@@ -101,6 +87,13 @@ class EloquentSchoolFeeRepository implements SchoolFeeRepositoryContract
         $schoolFee->create_uid = auth()->id();
 
         if ($schoolFee->save()) {
+
+            if(isset($input['departments'])){
+                $schoolFee->departments()->sync($input['departments']);
+            }
+            if(isset($input['grades'])){
+                $schoolFee->grades()->sync($input['grades']);
+            }
             return true;
         }
 
@@ -117,27 +110,28 @@ class EloquentSchoolFeeRepository implements SchoolFeeRepositoryContract
     {
         $schoolFee = $this->findOrThrowException($id);
 
-        if(isset($input['scholarship_id'])){
-            $schoolFee->scholarship_id = $input['scholarship_id'];
-            $schoolFee->budget = $input['budget'];
-            $schoolFee->budget_currency = $input['budget_currency'];
-        }
-
         $schoolFee->to_pay = $input['to_pay'];
         $schoolFee->to_pay_currency = $input['to_pay_currency'];
-        $schoolFee->department_id = $input['department_id']==""?null:$input['department_id'];
         $schoolFee->degree_id = $input['degree_id']==""?null:$input['degree_id'];
-        $schoolFee->grade_id = $input['grade_id']==""?null:$input['grade_id'];
         $schoolFee->promotion_id = $input['promotion_id'];
+        $schoolFee->scholarship_id = $input['scholarship_id']==""?null:$input['scholarship_id'];
+
         if(isset($input['description'])){
             $schoolFee->description = $input['description'];
         }
         $schoolFee->active = isset($input['active'])?true:false;
 
-        $schoolFee->updated_at = Carbon::now();
-        $schoolFee->write_uid = auth()->id();
+        $schoolFee->created_at = Carbon::now();
+        $schoolFee->create_uid = auth()->id();
 
         if ($schoolFee->save()) {
+
+            if(isset($input['departments'])){
+                $schoolFee->departments()->sync($input['departments']);
+            }
+            if(isset($input['grades'])){
+                $schoolFee->grades()->sync($input['grades']);
+            }
             return true;
         }
 

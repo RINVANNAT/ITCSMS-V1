@@ -179,7 +179,7 @@ class StudentAnnualController extends Controller
     public function data(Request $request, $scholarship_id) // 0 mean, scholarship id is not applied
     {
 
-        $keyword = "%".strtolower($_GET["search"]["value"])."%";
+        //$keyword = "%".strtolower($_GET["search"]["value"])."%";
 
         $studentAnnuals = StudentAnnual::select([
                 'studentAnnuals.id','students.id_card','students.name_kh','students.dob as dob','students.name_latin', 'genders.code as gender', 'departmentOptions.code as option',

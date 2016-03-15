@@ -17,111 +17,141 @@ class SchoolFeeRateTableSeeder extends Seeder
                 'scholarship_id'=>null,
                 'to_pay' => '600',
                 'to_pay_currency'=>'$',
-                'budget'=>0,
-                'budget_currency'=>'$',
                 'degree_id'=>1,
-                'department_id'=>null,
-                'grade_id'=>null,
                 'promotion_id'=>16,
                 'academic_year_id'=>null,
                 'create_uid' => 1,
                 'created_at' => Carbon\Carbon::now(),
-                'updated_at' => Carbon\Carbon::now()
+                'updated_at' => Carbon\Carbon::now(),
+
+                'grades' => array(
+                    1,2,3,4,5
+                ),
+                'departments' => array(
+                    1,2,3,4,5,6,7,8
+                )
             ),
             array(
                 'scholarship_id'=>null,
                 'to_pay' => '550',
                 'to_pay_currency'=>'$',
-                'budget'=>0,
-                'budget_currency'=>'$',
                 'degree_id'=>1,
-                'department_id'=>null,
-                'grade_id'=>null,
                 'promotion_id'=>15,
                 'academic_year_id'=>null,
                 'create_uid' => 1,
                 'created_at' => Carbon\Carbon::now(),
-                'updated_at' => Carbon\Carbon::now()
+                'updated_at' => Carbon\Carbon::now(),
+                'grades' => array(
+                    1,2,3,4,5
+                ),
+                'departments' => array(
+                    1,2,3,4,5,6,7,8
+                )
+
             ),
             array(
                 'scholarship_id'=>null,
                 'to_pay' => '550',
                 'to_pay_currency'=>'$',
-                'budget'=>0,
-                'budget_currency'=>'$',
                 'degree_id'=>1,
-                'department_id'=>null,
-                'grade_id'=>null,
                 'promotion_id'=>14,
                 'academic_year_id'=>null,
                 'create_uid' => 1,
                 'created_at' => Carbon\Carbon::now(),
-                'updated_at' => Carbon\Carbon::now()
+                'updated_at' => Carbon\Carbon::now(),
+                'grades' => array(
+                    1,2,3,4,5
+                ),
+                'departments' => array(
+                    1,2,3,4,5,6,7,8
+                )
             ),
             array(
                 'scholarship_id'=>null,
                 'to_pay' => '500',
                 'to_pay_currency'=>'$',
-                'budget'=>0,
-                'budget_currency'=>'$',
                 'degree_id'=>1,
-                'department_id'=>null,
-                'grade_id'=>null,
                 'promotion_id'=>13,
                 'academic_year_id'=>null,
                 'create_uid' => 1,
                 'created_at' => Carbon\Carbon::now(),
-                'updated_at' => Carbon\Carbon::now()
+                'updated_at' => Carbon\Carbon::now(),
+                'grades' => array(
+                    1,2,3,4,5
+                ),
+                'departments' => array(
+                    1,2,3,4,5,6,7,8
+                )
             ),
             array(
                 'scholarship_id'=>null,
                 'to_pay' => '450',
                 'to_pay_currency'=>'$',
-                'budget'=>0,
-                'budget_currency'=>'$',
                 'degree_id'=>1,
-                'department_id'=>null,
-                'grade_id'=>null,
                 'promotion_id'=>12,
                 'academic_year_id'=>null,
                 'create_uid' => 1,
                 'created_at' => Carbon\Carbon::now(),
-                'updated_at' => Carbon\Carbon::now()
+                'updated_at' => Carbon\Carbon::now(),
+                'grades' => array(
+                    1,2,3,4,5
+                ),
+                'departments' => array(
+                    1,2,3,4,5,6,7,8
+                )
             ),
             array(
                 'scholarship_id'=>null,
                 'to_pay' => '300',
                 'to_pay_currency'=>'$',
-                'budget'=>0,
-                'budget_currency'=>'$',
                 'degree_id'=>2,
-                'department_id'=>null,
-                'grade_id'=>null,
                 'promotion_id'=>3,
                 'academic_year_id'=>null,
                 'create_uid' => 1,
                 'created_at' => Carbon\Carbon::now(),
-                'updated_at' => Carbon\Carbon::now()
+                'updated_at' => Carbon\Carbon::now(),
+                'grades' => array(
+                    1,2
+                ),
+                'departments' => array(
+                    1,2,3,4,5,6,7,8
+                )
             ),
             array(
                 'scholarship_id'=>null,
                 'to_pay' => '300',
                 'to_pay_currency'=>'$',
-                'budget'=>0,
-                'budget_currency'=>'$',
                 'degree_id'=>2,
-                'department_id'=>null,
-                'grade_id'=>null,
                 'promotion_id'=>2,
                 'academic_year_id'=>null,
                 'create_uid' => 1,
                 'created_at' => Carbon\Carbon::now(),
-                'updated_at' => Carbon\Carbon::now()
+                'updated_at' => Carbon\Carbon::now(),
+                'grades' => array(
+                    1,2
+                ),
+                'departments' => array(
+                    1,2,3,4,5,6,7,8
+                )
             ),
         );
 
         foreach ($schoolFees as $schoolFee) {
-            DB::table('schoolFeeRates')->insert($schoolFee);
+
+            $fee = new \App\Models\SchoolFeeRate();
+            $fee->scholarship_id = $schoolFee['scholarship_id'];
+            $fee->to_pay = $schoolFee['to_pay'];
+            $fee->to_pay_currency = $schoolFee['to_pay_currency'];
+            $fee->degree_id = $schoolFee['degree_id'];
+            $fee->promotion_id = $schoolFee['promotion_id'];
+            $fee->academic_year_id = $schoolFee['academic_year_id'];
+            $fee->create_uid = $schoolFee['create_uid'];
+            $fee->updated_at = $schoolFee['updated_at'];
+
+            if($fee->save()){
+                $fee->grades()->sync($schoolFee['grades']);
+                $fee->departments()->sync($schoolFee['departments']);
+            }
         }
     }
 }

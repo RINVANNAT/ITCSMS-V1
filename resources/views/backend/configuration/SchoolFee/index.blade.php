@@ -64,6 +64,8 @@
                                 <th>{{ trans('labels.backend.schoolFees.fields.group') }}</th>
                                 <th>{{ trans('labels.backend.schoolFees.fields.promotion_id') }}</th>
                                 <th>{{ trans('labels.backend.schoolFees.fields.to_pay') }}</th>
+                                <th>{{ trans('labels.backend.schoolFees.fields.department_id') }}</th>
+                                <th>{{ trans('labels.backend.schoolFees.fields.grade_id') }}</th>
                                 <th>{{ trans('labels.general.actions') }}</th>
                             </tr>
                             </thead>
@@ -77,7 +79,8 @@
                                 <th>{{ trans('labels.backend.schoolFees.fields.scholarship_id') }}</th>
                                 <th>{{ trans('labels.backend.schoolFees.fields.promotion_id') }}</th>
                                 <th>{{ trans('labels.backend.schoolFees.fields.to_pay') }}</th>
-                                <th>{{ trans('labels.backend.schoolFees.fields.budget') }}</th>
+                                <th>{{ trans('labels.backend.schoolFees.fields.department_id') }}</th>
+                                <th>{{ trans('labels.backend.schoolFees.fields.grade_id') }}</th>
                                 <th>{{ trans('labels.general.actions') }}</th>
                             </tr>
                             </thead>
@@ -100,11 +103,13 @@
                 processing: true,
                 serverSide: true,
                 pageLength: {!! config('app.records_per_page')!!},
-                ajax: '{!! route('admin.configuration.schoolFee.data',["false",0]) !!}', // parameter 0 represent scholarship id, which mean all scholarships
+                ajax: '{!! route('admin.configuration.schoolFee.data',"false") !!}', // parameter 0 represent scholarship id, which mean all scholarships
                 columns: [
-                    { data: 'group', name: 'group', orderable:false, searchable:false},
-                    { data: 'promotion_name', name: 'promotion_name', orderable:false, searchable:false},
+                    { data: 'degree_name_kh', name: 'degrees.name_kh', orderable:false},
+                    { data: 'promotion_name', name: 'promotions.name', orderable:false},
                     { data: 'to_pay', name: 'to_pay', orderable:false, searchable:false},
+                    { data: 'departments', name: 'departments', orderable:false, searchable:false},
+                    { data: 'grades', name: 'grades', orderable:false, searchable:false},
                     { data: 'action', name: 'action',orderable: false, searchable: false}
                 ]
             });
@@ -112,13 +117,14 @@
                 processing: true,
                 serverSide: true,
                 pageLength: {!! config('app.records_per_page')!!},
-                ajax: '{!! route('admin.configuration.schoolFee.data',["true",0]) !!}',
+                ajax: '{!! route('admin.configuration.schoolFee.data',"true") !!}',
                 columns: [
-                    { data: 'group', name: 'group', orderable:false, searchable:false},
-                    { data: 'scholarship_code', name: 'scholarship_code', orderable:false, searchable:false},
-                    { data: 'promotion_name', name: 'promotion_name', orderable:false, searchable:false},
+                    { data: 'degree_name_kh', name: 'degrees.name_kh', orderable:false},
+                    { data: 'scholarship_code', name: 'scholarships.code', orderable:false},
+                    { data: 'promotion_name', name: 'promotions.name', orderable:false},
                     { data: 'to_pay', name: 'to_pay', orderable:false, searchable:false},
-                    { data: 'budget', name: 'budget', orderable:false, searchable:false},
+                    { data: 'departments', name: 'departments', orderable:false, searchable:false},
+                    { data: 'grades', name: 'grades', orderable:false, searchable:false},
                     { data: 'action', name: 'action',orderable: false, searchable: false}
                 ]
             });

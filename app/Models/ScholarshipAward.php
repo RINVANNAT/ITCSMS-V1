@@ -2,16 +2,15 @@
 
 use Illuminate\Database\Eloquent\Model as Model;
 
-class SchoolFeeRate extends Model
+class ScholarshipAward extends Model
 {
     
-	public $table = "schoolFeeRates";
+	public $table = "scholarshipAwards";
 
 
     public $fillable = [
         "scholarship_id",
-        "to_pay",
-        "to_pay_currency",
+        "award",
         "degree_id",
         "promotion_id",
         "academic_year_id",
@@ -27,12 +26,6 @@ class SchoolFeeRate extends Model
     public function degree(){
         return $this->belongsTo('App\Models\Degree');
     }
-    public function departments(){
-        return $this->belongsToMany('App\Models\Department');
-    }
-    public function grades(){
-        return $this->belongsToMany('App\Models\Grade');
-    }
 
     public function promotion(){
         return $this->belongsTo('App\Models\Promotion');
@@ -41,23 +34,5 @@ class SchoolFeeRate extends Model
     public function academic_year(){
         return $this->belongsTo('App\Models\AcademicYear');
     }
-
-    /**
-     * The attributes that should be casted to native types.
-     *
-     * @var array
-     */
-    protected $casts = [
-        "male_fee" => "integer",
-		"female_fee" => "integer",
-		"sport_fee" => "integer"
-    ];
-
-	public static $rules = [
-	    "to_pay" => "Required",
-		"to_pay_currency" => "Required",
-		"promotion_id" => "Required",
-        "degree_id" => "Required"
-	];
 
 }
