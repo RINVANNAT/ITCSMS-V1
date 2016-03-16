@@ -124,6 +124,7 @@
     <script>
         $(document).ready(function(){
             var template = Handlebars.compile($("#details-template").html());
+            var current_id = null;
 
             function initTable(tableId, data) {
                 $('#' + tableId).DataTable({
@@ -213,6 +214,44 @@
                 e.preventDefault();
             });
 
+            $("#income_dollar").keydown(function (e) {
+                allowNumberOnly(e);
+            });
+
+            $("#income_riel").keydown(function (e) {
+                allowNumberOnly(e);
+            });
+
+            $('#income_dollar').on('change', function () {
+                $('#income_dollar_kh').val(convertMoney($('#income_dollar').val())+" ដុល្លា");
+            });
+            $('#income_riel').on('change', function () {
+                $('#income_riel_kh').val(convertMoney($('#income_riel').val())+" រៀល");
+            });
+
+            $('#submit_payment').on('click',function(){
+                submitIncome();
+            });
+
+            function submitIncome(){
+                $.ajax({
+                    type:'POST',
+                    dataType:'json',
+                    data:$('#payslip_income_form').serialize(),
+                    url:'{{route('admin.accounting.incomes.store')}}',
+                    beforeSend:function(){
+                        // do nothing for now
+                    },
+                    success:function(data) {
+                        $('#add_payment_modal').modal('toggle');
+                        $('#'+current_id).DataTable().ajax.reload();
+                    },
+                    error:function(error){
+                        alert(error);
+                    }
+                });
+            }
+
             // Add event listener for opening and closing details
             $('#students-table tbody').on('click', 'td.details-control', function () {
                 var tr = $(this).closest('tr');
@@ -239,6 +278,8 @@
                     );
                     $(".btn_income_student").click(function(){
                         preparePayment(row.data());
+                        current_id = tableId;
+
                     });
                     tr.addClass('shown');
                     tr.next().find('td').addClass('no-padding bg-payment-detail');
@@ -250,55 +291,33 @@
 
             // This for payment part
             function preparePayment(data){
-                /*$("#payment_student_annual_id").val(data.student_annual_id) ;
-                $("#payment_payslip_client_id").val(data.payslip_client_id) ;*/
+                console.log(data);
+
+                var onlyBirthDate = data.dob;
+                var khmerBirthYear = convertKhmerNumber(onlyBirthDate.split('/')[2]);
+                var khmerBirthMonth = convertKhmerMonth(onlyBirthDate.split('/')[1]);
+                var khmerBirthDay = convertKhmerNumber(onlyBirthDate.split('/')[0]);
+
+                $("#payment_student_annual_id").val(data.id) ;
+                $("#payment_payslip_client_id").val(data.payslip_client_id) ;
                 $("#client_name_kh").html(data.name_kh);
                 $("#client_name_latin").html(data.name_latin);
-                /*$("#client_gender").html(data.gender);
-                $("#client_birthdate").html(data.birthdate);
-                $("#client_department").html(data.department);
-                $("#client_grade").html(data.grade);
-                $("#client_degree").html(data.degree);
+                $("#client_gender").html(convertKhmerGender(data.gender));
+                $("#client_birthdate").html(khmerBirthDay+' '+khmerBirthMonth+' '+khmerBirthYear);
+                $("#client_department").html(data.department_name_kh);
+                $("#client_grade").html(convertKhmerNumber(data.grade_id));
+                $("#client_degree").html(data.degree_name_kh);
                 $("#client_degree_id").val(data.degree_id);
-                $("#client_promotion").html(data.promotion);
-                $("#client_payment_sequence").html(data.sequence);
-                $("#client_academic_year").html(data.academic_year);
-                $('#client_current_date').html(data.current_date);*/
+                $("#client_promotion").html(convertKhmerNumber(data.promotion_name));
+                $("#client_payment_sequence").html(convertKhmerNumber(data.count_income+1));
+                $("#client_academic_year").html(data.academic_year_name_kh);
+                $('#client_current_date').html(getKhmerCurrentDate());
                 $("#add_payment_modal").modal({
                     backdrop: 'static',
                     keyboard: false
                 });
             }
 
-            //$(document).on('click',".btn_income_student",function () {
-                /*var student = studentAnnualsObj[$(this).val()];
-                selected_id = student.id;
-
-                var onlyBirthDate = student.student.dob;
-                var khmerBirthYear = convertKhmerNumber(onlyBirthDate.split('/')[2]);
-                var khmerBirthMonth = convertKhmerMonth(onlyBirthDate.split('/')[1]);
-                var khmerBirthDay = convertKhmerNumber(onlyBirthDate.split('/')[0]);
-
-                var data = {
-                    candidate_id:null,
-                    payslip_client_id:student.payslip_client_id,
-                    student_annual_id:student.id,
-                    name_kh:student.student.name_kh,
-                    name_latin:student.student.name_latin,
-                    gender:student.student.gender.name_kh,
-                    birthdate:khmerBirthDay+' '+khmerBirthMonth+' '+khmerBirthYear,
-                    department:student.department.name_kh,
-                    grade:student.grade.name_kh,
-                    degree:student.degree.name_kh,
-                    degree_id:student.degree.id,
-                    promotion:convertKhmerNumber(student.promotion.name),
-                    sequence:convertKhmerNumber((student.total_transaction.count_income+1)+""),
-                    academic_year:student.academic_year.name_kh,
-                    current_date:getKhmerCurrentDate()
-                };*/
-
-             //   preparePayment({});
-            //});
         });
     </script>
 

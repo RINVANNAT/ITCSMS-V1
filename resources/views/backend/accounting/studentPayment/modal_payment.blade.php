@@ -78,7 +78,7 @@
                                 <td colspan="3" align="right">
                                     <div class="col-md-6"></div>
                                     <div class="col-md-6" align="center" style="padding-top: 15px">
-                                        រាជធានីភ្នំពេញ, ថ្ងៃទី <strong id="client_current_date">​<!-- Auto generate --></strong><br/>
+                                        រាជធានីភ្នំពេញ, <strong id="client_current_date">​<!-- Auto generate --></strong><br/>
                                         អ្នកទទួលប្រាក់
                                     </div>
                                 </td>
@@ -101,8 +101,7 @@
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-default pull-left" data-dismiss="modal">{{trans('buttons.general.close')}}</button>
-                <button id="submit_candidate_payment" type="button" class="btn btn-primary">{{trans('buttons.general.save_close')}}</button>
-                <button id="submit_print_candidate_payment" type="button" class="btn btn-danger">{{trans('buttons.general.save_print')}}</button>
+                <button id="submit_payment" type="button" class="btn btn-primary">{{trans('buttons.general.save')}}</button>
             </div>
         </div><!-- /.modal-content -->
     </div><!-- /.modal-dialog -->

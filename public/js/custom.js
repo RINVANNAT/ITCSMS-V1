@@ -163,8 +163,10 @@ function convert1DigitKhmerNumber(number) {
 
 function convertKhmerNumber(ennumber) {
     //console.log(ennumber);
-
+    ennumber = ennumber+"";
     khnumber = ennumber.split('');
+
+
     result = "";
 
     $.each(khnumber, function (index, value) {
@@ -227,7 +229,7 @@ function convertKhmerMonth(number) {
 function convertKhmerGender(gender) {
     gender = gender.toLowerCase();
 
-    if (gender == 'male') {
+    if (gender == 'male' || gender =='M' || gender == 'ប') {
         return 'ប្រុស';
     } else {
         return 'ស្រី';

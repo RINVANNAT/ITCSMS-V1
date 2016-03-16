@@ -1,7 +1,9 @@
 <?php namespace App\Http\Controllers\Backend\Accounting;
 
 use App\Http\Controllers\Controller;
-use App\Http\Requests;
+use App\Http\Requests\Backend\Accounting\Income\CreateIncomeRequest;
+use App\Http\Requests\Backend\Accounting\Income\EditIncomeRequest;
+use App\Http\Requests\Backend\Accounting\Income\StoreIncomeRequest;
 use App\Models\AcademicYear;
 use App\Models\Degree;
 use App\Models\Department;
@@ -16,7 +18,6 @@ use App\Models\StudentAnnual;
 use App\Repositories\Backend\Income\IncomeRepositoryContract;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Http\Request;
 
 class IncomeController extends Controller
 {
@@ -62,14 +63,16 @@ class IncomeController extends Controller
         return view('backend.accounting.studentPayment.index',compact('departments','degrees','grades','genders','options','academicYears'));
     }
 
-    public function student_payment_data(Request $request) // 0 mean, scholarship id is not applied
+    public function student_payment_data(\Illuminate\Http\Request $request) // 0 mean, scholarship id is not applied
     {
         $total_topay = 0;
         $debt = "";
+        $count_income = 0;
 
         $studentAnnuals = StudentAnnual::select([
             'studentAnnuals.id','students.id_card','students.name_kh','students.dob as dob','studentAnnuals.promotion_id','studentAnnuals.degree_id','studentAnnuals.grade_id','studentAnnuals.department_id',
-            'students.name_latin', 'genders.code as gender', 'departmentOptions.code as option','payslip_client_id',
+            'students.name_latin', 'genders.code as gender', 'departmentOptions.code as option','payslip_client_id','degrees.name_kh as degree_name_kh','departments.name_kh as department_name_kh',
+            'promotions.name as promotion_name', 'academicYears.name_kh as academic_year_name_kh',
             DB::raw("CONCAT(degrees.code,grades.code,departments.code) as class")
         ])
             ->leftJoin('students','students.id','=','studentAnnuals.student_id')
@@ -77,7 +80,9 @@ class IncomeController extends Controller
             ->leftJoin('grades', 'studentAnnuals.grade_id', '=', 'grades.id')
             ->leftJoin('departmentOptions', 'studentAnnuals.department_option_id', '=', 'departmentOptions.id')
             ->leftJoin('departments', 'studentAnnuals.department_id', '=', 'departments.id')
-            ->leftJoin('degrees', 'studentAnnuals.degree_id', '=', 'degrees.id');
+            ->leftJoin('degrees', 'studentAnnuals.degree_id', '=', 'degrees.id')
+            ->leftJoin('promotions', 'studentAnnuals.promotion_id', '=', 'promotions.id')
+            ->leftJoin('academicYears', 'studentAnnuals.academic_year_id', '=', 'academicYears.id');
 
 
         $datatables = app('datatables')->of($studentAnnuals)
@@ -91,6 +96,8 @@ class IncomeController extends Controller
             ->addColumn('to_pay', function ($studentAnnual) {
                 global $total_topay;
                 global $debt;
+                global $count_income;
+
                 $total_paid = 0;
                 $currency = "";
 
@@ -135,6 +142,7 @@ class IncomeController extends Controller
                     ->where('payslip_client_id',$studentAnnual->payslip_client_id)->get();
 
                 foreach($paids as $paid){
+                    $count_income++;
                     if($paid->amount_dollar != ''){
                         $total_paid += floatval($paid->amount_dollar);
                     } else {
@@ -151,6 +159,11 @@ class IncomeController extends Controller
                 global $debt;
 
                 return $debt;
+            })
+            ->addColumn('count_income', function ($studentAnnual)  {
+                global $count_income;
+
+                return $count_income;
             });
 
         // additional search
@@ -222,9 +235,10 @@ class IncomeController extends Controller
     /**
      * Show the form for creating a new resource.
      *
+     * @param CreateIncomeRequest $request
      * @return \Illuminate\Http\Response
      */
-    public function create()
+    public function create(CreateIncomeRequest $request)
     {
         $departments = Department::lists('name_kh','id')->toArray();
         $schools = School::lists('name_kh','id')->toArray();
@@ -234,12 +248,15 @@ class IncomeController extends Controller
     /**
      * Store a newly created resource in storage.
      *
-     * @param  \Illuminate\Http\Request  $request
+     * @param  StoreIncomeRequest  $request
      * @return \Illuminate\Http\Response
      */
-    public function store(Request $request)
+    public function store(StoreIncomeRequest $request)
     {
         $this->incomes->create($request->all());
+        if($request->ajax()){
+            return json_encode(array("sucess"=>true));
+        }
         return redirect()->route('admin.accounting.incomes.index')->withFlashSuccess(trans('alerts.backend.roles.created'));
     }
 
@@ -257,10 +274,11 @@ class IncomeController extends Controller
     /**
      * Show the form for editing the specified resource.
      *
+     * @param EditIncomeRequest $request
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function edit($id)
+    public function edit(EditIncomeRequest $request, $id)
     {
         $departments = Department::lists('name_kh','id');
         $schools = School::lists('name_kh','id')->toArray();
