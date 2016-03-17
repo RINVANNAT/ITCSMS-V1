@@ -125,6 +125,7 @@
         $(document).ready(function(){
             var template = Handlebars.compile($("#details-template").html());
             var current_id = null;
+            var base_url = "{{url('/')}}";
 
             function initTable(tableId, data) {
                 $('#' + tableId).DataTable({
@@ -267,8 +268,8 @@
                     row.child(template(row.data())).show();
                     initTable(tableId, row.data());
                     $("div.payment_export_print").html(
-                        '<button class="btn btn-default btn-sm"><i class="fa fa-print"></i></button>'+
-                        '<button class="btn btn-default btn-sm"><i class="fa fa-reply"></i></button>'
+                        '<button class="btn btn-default btn-sm print_all"><i class="fa fa-print"></i></button>'+
+                        '<button class="btn btn-default btn-sm export_all"><i class="fa fa-file-excel-o"></i></button>'
                     );
                     $("div.payment_btn").html(
                             '<button class="btn btn-sm btn-primary btn_income_student">Income</button> &nbsp; <button class="btn btn-sm btn-success">Outcome</button>'
@@ -279,8 +280,13 @@
                     $(".btn_income_student").click(function(){
                         preparePayment(row.data());
                         current_id = tableId;
-
                     });
+
+                    $(".print_all").click(function(){
+                        console.log('print');
+                        window.open(base_url+'/admin/accounting/studentPayments/'+row.data().id+'/print','_blank');
+                    });
+
                     tr.addClass('shown');
                     tr.next().find('td').addClass('no-padding bg-payment-detail');
                 }

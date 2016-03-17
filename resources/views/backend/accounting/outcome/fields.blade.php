@@ -54,11 +54,8 @@
                 <td colspan="3">
 
                     <div class="col-md-2 outcome_label">បើកអោយលោក</div>
-                    <div class="col-md-4 input-group input-group-sm" style="padding-left: 15px;float: left;">
-                        {!! Form::text('client_name',null,['id'=>'client_name','class'=>"form-control"]) !!}
-                        <span class="input-group-btn">
-                            <button type="button" class="btn btn-info btn-flat" id="btn_search_client"><i class="glyphicon glyphicon-search"></i></button>
-                        </span>
+                    <div class="col-md-4">
+                        {!! Form::select('client_name',[],null,['id'=>'client_name','class'=>"select_client form-control"]) !!}
                     </div>
                     <div class="col-md-2 outcome_label"> អង្គភាព </div>
                     <div class="col-md-4 input-group input-group-sm" style="padding-left: 15px;">

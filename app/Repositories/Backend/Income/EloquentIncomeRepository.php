@@ -8,6 +8,7 @@ use App\Models\Candidate;
 use App\Models\Income;
 use App\Models\Outcome;
 use App\Models\PayslipClient;
+use App\Models\SchoolFeeRate;
 use App\Models\StudentAnnual;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
@@ -83,7 +84,7 @@ class EloquentIncomeRepository implements IncomeRepositoryContract
             $payslip_client->type = "Student";
             $payslip_client->create_uid =auth()->id();
             if($payslip_client->save()){ // New client id is created, so link to user
-                $client_id = $payslip_client->id();
+                $client_id = $payslip_client->id;
                 if($input['candidate_id']!=""){
                     $candidate = Candidate::find($input['candidate_id']);
                     $candidate->write_uid = auth()->id();
@@ -108,6 +109,7 @@ class EloquentIncomeRepository implements IncomeRepositoryContract
         }
 
         if($query_ok){
+            $income->sequence = Income::where('payslip_client_id',$client_id)->count()+1; // Sequence of student payment
             $income->payslip_client_id = $client_id;
             $income->pay_date = Carbon::now();
             if($input['degree_id']== config('access.degrees.degree_engineer') || $input['degree_id']== config('access.degrees.degree_associate')){
@@ -130,6 +132,79 @@ class EloquentIncomeRepository implements IncomeRepositoryContract
         }
 
         if($query_ok){
+            // now check if student has made the full payment
+
+            $total_topay = null;
+            $currency = null;
+
+            $studentAnnual = StudentAnnual::where('payslip_client_id',$income->payslip_client_id)->first();
+            //dd($studentAnnual);
+            $scholarship_ids = DB::table('scholarship_student_annual')->where('student_annual_id',$studentAnnual->id)->lists('scholarship_id');
+            $school_fee = SchoolFeeRate::leftJoin('department_school_fee_rate','schoolFeeRates.id','=','department_school_fee_rate.school_fee_rate_id')
+                ->leftJoin('grade_school_fee_rate','schoolFeeRates.id','=','grade_school_fee_rate.school_fee_rate_id')
+                ->where('promotion_id' ,$studentAnnual->promotion_id)
+                ->where('degree_id' ,$studentAnnual->degree_id)
+                ->where('grade_school_fee_rate.grade_id' ,$studentAnnual->grade_id)
+                ->where('department_school_fee_rate.department_id' ,$studentAnnual->department_id);
+            if(sizeof($scholarship_ids)>0){ //This student have scholarship, so his payment might be changed
+                $scolarship_fee = clone $school_fee;
+                $scolarship_fee = $scolarship_fee
+                    ->whereIn('scholarship_id' ,$scholarship_ids)
+                    ->select(['to_pay','to_pay_currency'])
+                    ->get();
+                if($scolarship_fee->count() > 0){
+                    $currency = $scolarship_fee->first()->to_pay_currency;
+                    $total_topay = floatval($scolarship_fee->first()->to_pay);
+                } else { // Scholarships student have, doesn't change school payment fee, so we need to check it again
+                    $school_fee = $school_fee
+                        ->select(['to_pay','to_pay_currency'])
+                        ->get();
+                    if($school_fee->count() == 0){
+                        $total_topay = null;
+                        $topay = "Not found";
+                    }
+                    $total_topay = floatval($school_fee->first()->to_pay);
+                    $currency = $school_fee->first()->to_pay_currency;
+                }
+            } else {
+                // This student doesn't have scholarship
+                $school_fee = $school_fee
+                    ->select(['to_pay','to_pay_currency'])
+                    ->get();
+                if($school_fee->count() == 0){
+                    $total_topay = null;
+                    $topay = "Not found"; // This mean, scholarship fee isn't update to the latest version, ask finance staff to update it !!
+                }
+                $total_topay = floatval($school_fee->first()->to_pay);
+                $currency = $school_fee->first()->to_pay_currency;
+            }
+
+            $paids = Income::select(['amount_dollar','amount_riel'])
+                ->where('payslip_client_id',$studentAnnual->payslip_client_id)->get();
+
+            $total_paid = 0;
+            foreach($paids as $paid){
+                if($paid->amount_dollar != ''){
+                    $total_paid += floatval($paid->amount_dollar);
+                } else {
+                    $total_paid += floatval($paid->amount_riel);
+                }
+            }
+
+            if($total_paid >= $total_topay){
+                // This student have made full payment, so let update paid field in table student for later quick query
+                $studentAnnual->is_paid = true;
+                if($studentAnnual->save()){
+                    $query_ok = true;
+                } else {
+                    $query_ok = false;
+                }
+            }
+
+
+        }
+
+        if($query_ok){
             DB::commit();
             return true;
         } else {
@@ -147,18 +222,6 @@ class EloquentIncomeRepository implements IncomeRepositoryContract
      */
     public function update($id, $input)
     {
-        $income = $this->findOrThrowException($id);
-
-        $income->name = $input['name'];
-        $income->description = $input['description'];
-        $income->active = isset($input['active'])?true:false;
-        $income->updated_at = Carbon::now();
-        $income->write_uid = auth()->id();
-
-        if ($income->save()) {
-            return true;
-        }
-
         throw new GeneralException(trans('exceptions.configuration.incomes.update_error'));
     }
 

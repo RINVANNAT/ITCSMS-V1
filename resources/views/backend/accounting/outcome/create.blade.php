@@ -10,6 +10,7 @@
 @endsection
 
 @section('after-styles-end')
+    {!! Html::style('plugins/select2/select2.min.css') !!}
     <style>
         .table-hover tbody tr:hover td, .table-hover tbody tr:hover th {
             background-color: #3c8dbc;
@@ -78,8 +79,9 @@
 @stop
 
 @section('after-scripts-end')
+    {!! HTML::script('plugins/select2/select2.full.min.js') !!}
     <script>
-        var $search_url = "{{url('/')}}"";
+        var $search_url = "{{route('admin.client.search')}}";
 
         $('#amount_dollar').on('change', function () {
             $('#amount_kh').val(convertMoney($('#amount_dollar').val())+" ដុល្លា");
@@ -95,11 +97,79 @@
             });
         });
 
+
+        $(".select_client").select2({
+
+            ajax: {
+                url: $search_url,
+                dataType: 'json',
+                delay: 250,
+                data: function (params) {
+                    return {
+                        q: params.term, // search term
+                        page: params.page
+                    };
+                },
+                processResults: function (data, params) {
+                    // parse the results into the format expected by Select2
+                    // since we are using custom formatting functions we do not need to
+                    // alter the remote JSON data, except to indicate that infinite
+                    // scrolling can be used
+                    params.page = params.page || 1;
+
+                    return {
+                        results: data.items,
+                        pagination: {
+                            more: (params.page * 30) < data.total_count
+                        }
+                    };
+                },
+                cache: true
+            },
+            escapeMarkup: function (markup) { return markup; }, // let our custom formatter work
+            minimumInputLength: 1,
+            templateResult: formatRepo, // omitted for brevity, see the source of this page
+            templateSelection: formatRepoSelection // omitted for brevity, see the source of this page
+        });
+
+        function formatRepo (repo) {
+            if (repo.loading) return repo.text;
+
+            var markup = "<div class='select2-result-repository clearfix'>" +
+                    "<div class='select2-result-repository__avatar'><img src='" + repo.owner.avatar_url + "' /></div>" +
+                    "<div class='select2-result-repository__meta'>" +
+                    "<div class='select2-result-repository__title'>" + repo.full_name + "</div>";
+
+            if (repo.description) {
+                markup += "<div class='select2-result-repository__description'>" + repo.description + "</div>";
+            }
+
+            markup += "<div class='select2-result-repository__statistics'>" +
+                    "<div class='select2-result-repository__forks'><i class='fa fa-flash'></i> " + repo.forks_count + " Forks</div>" +
+                    "<div class='select2-result-repository__stargazers'><i class='fa fa-star'></i> " + repo.stargazers_count + " Stars</div>" +
+                    "<div class='select2-result-repository__watchers'><i class='fa fa-eye'></i> " + repo.watchers_count + " Watchers</div>" +
+                    "</div>" +
+                    "</div></div>";
+
+            return markup;
+        }
+
+        function formatRepoSelection (repo) {
+            return repo.full_name || repo.text;
+        }
+
+
         $('#btn_modal_client_search').on('click',function(){
             $search_url = $search_url+"/"+$('#client_type').val()+"/search";
             $.ajax({
                 type:'POST',
-                data:$('#form_client_search').serialize(),
+                data:function(d){
+                    d.academic_year = $('#filter_academic_year').val();
+                    d.degree = $('#filter_degree').val();
+                    d.grade = $('#filter_grade').val();
+                    d.department = $('#filter_department').val();
+                    d.gender = $('#filter_gender').val();
+                },
                 dataType:'json',
                 url:$search_url,
                 beforeSend:function(){

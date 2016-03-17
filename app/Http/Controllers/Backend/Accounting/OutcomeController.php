@@ -2,7 +2,11 @@
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests;
+use App\Models\Account;
+use App\Models\Customer;
 use App\Models\Department;
+use App\Models\Employee;
+use App\Models\OutcomeType;
 use App\Models\School;
 use App\Repositories\Backend\Outcome\OutcomeRepositoryContract;
 use Illuminate\Support\Facades\DB;
@@ -42,8 +46,8 @@ class OutcomeController extends Controller
      */
     public function create()
     {
-        $outcomeTypes = \App\Models\OutcomeType::get()->lists('codeName','id');
-        $accounts = \App\Models\Account::lists('name','id');
+        $outcomeTypes = OutcomeType::get()->lists('codeName','id');
+        $accounts = Account::lists('name','id');
         return view('backend.accounting.outcome.create',compact('outcomeTypes','accounts'));
     }
 
@@ -117,23 +121,46 @@ class OutcomeController extends Controller
 
         //$studentAnnuals = StudentAnnual::with(['student','grade'])->select(['students.id_card','students.name_kh','students.name_latin','grades.name_kh']);
 
-        $outcomes = DB::table('incomes')
-            ->select(['id','number','amount_dollar','amount_riel','account_id','payslip_client_id']);
+        $outcomes = DB::table('outcomes')
+            ->leftJoin('accounts','outcomes.account_id','=','accounts.id')
+            ->leftJoin('employees','outcomes.payslip_client_id','=','employees.payslip_client_id')
+            ->leftJoin('studentAnnuals','outcomes.payslip_client_id','=','studentAnnuals.payslip_client_id')
+            ->leftJoin('customers','outcomes.payslip_client_id','=','customers.payslip_client_id')
+            ->leftJoin('students','studentAnnuals.student_id','=','students.id')
+            ->select([
+                'outcomes.id as outcome_id','outcomes.number','outcomes.amount_dollar','outcomes.amount_riel','accounts.name','outcomes.payslip_client_id',
+                DB::raw("CONCAT(customers.name,employees.name_kh,students.name_kh) as name")
+            ]);
 
         $datatables =  app('datatables')->of($outcomes);
 
 
         return $datatables
-            ->editColumn('number', '{!! $number !!}')
-            ->editColumn('amount_dollar', '{!! $amount_dollar !!}')
-            ->editColumn('amount_riel', '{!! $amount_riel !!}')
-            ->editColumn('account_id', '{!! $account_id !!}')
-            ->editColumn('payslip_client_id', '{!! $payslip_client_id !!}')
             ->addColumn('action', function ($outcome) {
-                return  '<a href="'.route('admin.accounting.incomes.edit',$outcome->id).'" class="btn btn-xs btn-primary"><i class="fa fa-pencil" data-toggle="tooltip" data-placement="top" title="" data-original-title="'.trans('buttons.general.crud.edit').'"></i> </a>'.
-                ' <button class="btn btn-xs btn-danger btn-delete" data-remote="'.route('admin.accounting.incomes.destroy', $outcome->id) .'"><i class="fa fa-times" data-toggle="tooltip" data-placement="top" title="' . trans('buttons.general.crud.delete') . '"></i></button>';
+                return  '<a href="'.route('admin.accounting.incomes.edit',$outcome->outcome_id).'" class="btn btn-xs btn-primary"><i class="fa fa-pencil" data-toggle="tooltip" data-placement="top" title="" data-original-title="'.trans('buttons.general.crud.edit').'"></i> </a>'.
+                ' <button class="btn btn-xs btn-danger btn-delete" data-remote="'.route('admin.accounting.incomes.destroy', $outcome->outcome_id) .'"><i class="fa fa-times" data-toggle="tooltip" data-placement="top" title="' . trans('buttons.general.crud.delete') . '"></i></button>';
             })
             ->make(true);
+    }
+
+    public function client_search(Request $request){
+        $input = $request->all();
+        $employees = DB::table('employees')
+            ->where('name_kh','LIKE','%'.$input['q']."%")
+            ->select([
+                'name_kh as name',
+                DB::raw("'employee' as group")
+            ]);
+        $customers = DB::table('customers')
+            ->where('name','LIKE','%'.$input['q']."%")
+            ->unionAll($employees)
+            ->select([
+                'name',
+                DB::raw("'employee' as group")
+            ])->get();
+
+        //$result = array()
+        dd($customers);
     }
 
 }

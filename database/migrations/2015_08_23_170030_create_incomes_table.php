@@ -27,6 +27,7 @@ class CreateIncomesTable extends Migration
             $table->boolean('active')->default(true);
             $table->boolean('is_refund')->default(false); // If set to true, this income payment is returned to student.
             $table->string('amount_refund')->nullable(); // Must be set if the transaction is refunded.
+            $table->integer('sequence')->nullable();
 
             $table->integer('create_uid')->unsigned();
             $table->foreign('create_uid')
