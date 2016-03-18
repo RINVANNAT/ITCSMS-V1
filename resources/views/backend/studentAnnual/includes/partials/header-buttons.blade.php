@@ -13,6 +13,16 @@
           </ul>
         </div><!--btn group-->
 
+        <div class="btn-group">
+            <button type="button" class="btn btn-primary btn-xs dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
+                Export data <span class="caret"></span>
+            </button>
+            <ul class="dropdown-menu" role="menu">
+                <li><a href="#" id="export_student_list">Export student list</a></li>
+
+            </ul>
+        </div><!--btn group-->
+
     </div><!--pull right-->
 
     <div class="clearfix"></div>

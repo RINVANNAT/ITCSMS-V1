@@ -59,8 +59,9 @@ class StudentAnnualController extends Controller
         $genders = Gender::lists('name_kh','id');
         $options = DepartmentOption::lists('code','id');
         $academicYears = AcademicYear::orderBy('id','desc')->lists('name_kh','id');
+        $origins = Origin::lists('name_kh','id');
 
-        return view('backend.studentAnnual.index',compact('departments','degrees','grades','genders','options','academicYears'));
+        return view('backend.studentAnnual.index',compact('departments','degrees','grades','genders','options','academicYears','origins'));
     }
 
     /**
@@ -222,6 +223,10 @@ class StudentAnnualController extends Controller
         }
         if ($option = $datatables->request->get('option')) {
             $datatables->where('studentAnnuals.department_option_id', '=', $option);
+        }
+
+        if ($origin = $datatables->request->get('origin')) {
+            $datatables->where('students.origin_id', '=', $origin);
         }
 
 
@@ -772,6 +777,145 @@ class StudentAnnualController extends Controller
         return view($view,compact('id','degrees','academicYears','departments'));
     }
 
+    public function export_list(){
+        $academic_year_id = 2016;
+        $degree_id = 1;
+        $grade_id = 1;
+        $department_id = 4;
+        $gender_id = 1;
+        $option_id  = 1;
+        $orgin_id = 1;
+
+        $studentAnnuals = StudentAnnual::select([
+            'studentAnnuals.id','students.id_card','students.name_kh','students.name_latin', 'students.dob as dob','genders.code as gender',
+            'origins.name_kh as origin_name_kh',
+            DB::raw("CONCAT(degrees.code,grades.code,departments.code) as class"),
+            'departmentOptions.code as option'
+        ])
+            ->leftJoin('students','students.id','=','studentAnnuals.student_id')
+            ->leftJoin('genders', 'students.gender_id', '=', 'genders.id')
+            ->leftJoin('grades', 'studentAnnuals.grade_id', '=', 'grades.id')
+            ->leftJoin('departmentOptions', 'studentAnnuals.department_option_id', '=', 'departmentOptions.id')
+            ->leftJoin('departments', 'studentAnnuals.department_id', '=', 'departments.id')
+            ->leftJoin('degrees', 'studentAnnuals.degree_id', '=', 'degrees.id')
+            ->leftJoin('origins', 'students.origin_id', '=', 'origins.id');
+
+        $title = 'បញ្ជីនិស្សិតុ';
+        // additional search
+        if ($degree = $_GET['degree']) {
+            $studentAnnuals = $studentAnnuals->where('studentAnnuals.degree_id', '=', $degree);
+
+            $degree_obj = Degree::where('id',$degree)->first();
+            $title .= "ថ្នាក់".$degree_obj->name_kh;
+        }
+
+        if ($academic_year = $_GET['academic_year']) {
+            $studentAnnuals = $studentAnnuals->where('studentAnnuals.academic_year_id', '=', $academic_year);
+
+            $academic_year_obj = AcademicYear::where('id',$academic_year)->first();
+            $title .= " ឆ្នាំសិក្សា ".$academic_year_obj->name_kh;
+        }
+
+        if ($grade = $_GET['grade']) {
+            $studentAnnuals = $studentAnnuals->where('studentAnnuals.grade_id', '=', $grade);
+
+            $grade_obj = Grade::where('id',$grade)->first();
+            $title .= " ".$grade_obj->name_kh;
+        }
+        if ($department = $_GET['department']) {
+            $studentAnnuals = $studentAnnuals->where('studentAnnuals.department_id', '=', $department);
+
+            $department_obj = Department::where('id',$department)->first();
+            $title .= " ដេប៉ាតឺម៉ង់ ".$department_obj->name_kh;
+        }
+        if ($gender = $_GET['gender']) {
+            $studentAnnuals = $studentAnnuals->where('students.gender_id', '=', $gender);
+
+            $gender_obj = Gender::where('id',$gender)->first();
+            $title .= " ភេទ".$gender_obj->name_kh;
+        }
+        if ($option = $_GET['option']) {
+            $studentAnnuals = $studentAnnuals->where('studentAnnuals.department_option_id', '=', $option);
+
+            $option_obj = DepartmentOption::where('id',$option)->first();
+            $title .= " ជំនាញ ".$option_obj->name_kh;
+        }
+        if ($origin = $_GET['origin']) {
+            $studentAnnuals = $studentAnnuals->where('students.origin_id', '=', $origin);
+        }
+
+        $data = $studentAnnuals->get()->toArray();
+
+
+        Excel::create('បញ្ជីនិស្សិត', function($excel) use ($data, $title) {
+
+
+            // Set the title
+            $excel->setTitle('បញ្ជីនិស្សិត');
+
+            // Chain the setters
+            $excel->setCreator('Department of Study & Student Affair')
+                ->setCompany('Institute of Technology of Cambodia');
+
+            $excel->sheet('New sheet', function($sheet) use ($data,$title) {
+
+                $sheet->setOrientation('landscape');
+                // Set top, right, bottom, left
+                $sheet->setPageMargin(array(
+                    0.25, 0.30, 0.25, 0.30
+                ));
+
+                // Set all margins
+                $sheet->setPageMargin(0.25);
+
+                $sheet->row(1, array(
+                    'ព្រះរាជាណាចក្រកម្ពុជា'
+                ));
+                $sheet->appendRow(array(
+                    'ជាតិ សាសនា ព្រះមហាក្សត្រ'
+                ));
+                $sheet->appendRow(array(
+                    'ក្រសួងអប់រំ យុវជន ​និងកីឡា'
+                ));
+                $sheet->appendRow(array(
+                    'វិទ្យាស្ថានបច្ចេកវិទ្យាកម្ពុជា'
+                ));
+                $sheet->appendRow(array(
+                    $title
+                ));
+
+                $sheet->rows(array(
+                    array('លរ','អត្តលេខ','ឈ្មោះខ្មែរ','ឈ្មោះឡាតាំង','ថ្ងៃខែឆ្នាំកំណើត','ភេទ','មកពី','ថ្នាក់','ជំនាញ')
+                ));
+                foreach ($data as $item) {
+
+                    $sheet->appendRow(
+                        $item
+                    );
+                }
+
+                $sheet->mergeCells('A1:I1');
+                $sheet->mergeCells('A2:I2');
+                $sheet->mergeCells('A3:I3');
+                $sheet->mergeCells('A4:I4');
+                $sheet->mergeCells('A5:I5');
+
+                $sheet->cells('A1:I2', function($cells) {
+                    $cells->setAlignment('center');
+                    $cells->setValignment('middle');
+                });
+
+                $sheet->cells('A5:I'.(6+count($data)), function($cells) {
+                    $cells->setAlignment('center');
+                    $cells->setValignment('middle');
+                });
+
+                $sheet->setBorder('A6:I'.(6+count($data)), 'thin');
+
+            });
+
+        })->export('xls');
+    }
     public function export($id){
         switch ($id) {
             case 1:

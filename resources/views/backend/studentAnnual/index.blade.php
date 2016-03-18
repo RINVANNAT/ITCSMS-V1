@@ -33,12 +33,6 @@
                     </button>
                 </a>
 
-                <div class="btn-group">
-                    <button class="btn btn-default btn-sm"><i class="fa fa-trash-o"></i></button>
-                    <button class="btn btn-default btn-sm"><i class="fa fa-reply"></i></button>
-                    <button class="btn btn-default btn-sm"><i class="fa fa-share"></i></button>
-                </div>
-                <!-- /.btn-group -->
                 <button class="btn btn-default btn-sm"><i class="fa fa-refresh"></i></button>
 
             </div>
@@ -77,7 +71,7 @@
     <script>
         $(document).ready(function(){
             var oTable = $('#students-table').DataTable({
-                dom: '<"toolbar">frtip',
+                dom: 'l<"toolbar">frtip',
                 processing: true,
                 serverSide: true,
                 pageLength: {!! config('app.records_per_page')!!},
@@ -89,6 +83,8 @@
                         d.grade = $('#filter_grade').val();
                         d.department = $('#filter_department').val();
                         d.gender = $('#filter_gender').val();
+                        d.option = $('#filter_option').val();
+                        d.origin = $('#filter_origin').val();
                     }
                 },
                 columns: [
@@ -103,7 +99,6 @@
                 ]
             });
             $("div.toolbar").html(
-                    '&nbsp;&nbsp; <label for="name">Academic Year</label> '+
                     '{!! Form::select('academic_year',$academicYears,null, array('class'=>'form-control','id'=>'filter_academic_year')) !!} '+
                     ' &nbsp;<label for="name">Class</label> '+
                     '{!! Form::select('degree',$degrees,null, array('class'=>'form-control','id'=>'filter_degree','placeholder'=>'')) !!} '+
@@ -112,7 +107,9 @@
                     '&nbsp;&nbsp; <label for="name">Gender</label> '+
                     '{!! Form::select('gender',$genders,null, array('class'=>'form-control','id'=>'filter_gender','placeholder'=>'')) !!} '+
                     '&nbsp;&nbsp; <label for="name">Option</label> '+
-                    '{!! Form::select('option',$options,null, array('class'=>'form-control','id'=>'filter_option','placeholder'=>'')) !!} '
+                    '{!! Form::select('option',$options,null, array('class'=>'form-control','id'=>'filter_option','placeholder'=>'')) !!} '+
+                    '&nbsp;&nbsp; <label for="name">Origin</label> '+
+                    '{!! Form::select('origiin',$origins,null, array('class'=>'form-control','id'=>'filter_origin','placeholder'=>'')) !!} '
             );
 
             $('#filter_academic_year').on('change', function(e) {
@@ -140,8 +137,40 @@
                 oTable.draw();
                 e.preventDefault();
             });
+            $('#filter_origin').on('change', function(e) {
+                oTable.draw();
+                e.preventDefault();
+            });
 
             enableDeleteRecord($('#students-table'));
+
+            $('#export_student_list').click(function(e){
+                e.preventDefault();
+                window.location = '{{route("admin.student.export")}}'+
+                        "?academic_year="+$('#filter_academic_year').val()+
+                        '&degree='+ $('#filter_degree').val()+
+                        '&grade=' + $('#filter_grade').val()+
+                        '&department=' + $('#filter_department').val()+
+                        '&gender='+$('#filter_gender').val()+
+                        '&option='+$('#filter_option').val()+
+                        '&origin='+$('#filter_origin').val();
+                /*$.ajax({
+                    type: 'POST',
+                    url: '{{route("admin.student.export")}}',
+                    data: {
+                        'academic_year': $('#filter_academic_year').val(),
+                        'degree': $('#filter_degree').val(),
+                        'grade':$('#filter_grade').val(),
+                        'department':$('#filter_department').val(),
+                        'gender':$('#filter_gender').val(),
+                        'option':$('#filter_option').val(),
+                        'origin':$('#filter_origin').val()
+                    },
+                    success: function(msg){
+                        alert('wow' + msg);
+                    }
+                });*/
+            });
         });
     </script>
 @stop
