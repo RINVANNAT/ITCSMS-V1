@@ -23,12 +23,7 @@
                     <button class="btn btn-primary btn-sm"><i class="fa fa-plus-circle"></i> Add
                     </button>
                 </a>
-                <div class="btn-group">
-                    <button class="btn btn-default btn-sm"><i class="fa fa-trash-o"></i></button>
-                    <button class="btn btn-default btn-sm"><i class="fa fa-reply"></i></button>
-                    <button class="btn btn-default btn-sm"><i class="fa fa-share"></i></button>
-                </div>
-                <!-- /.btn-group -->
+
                 <button class="btn btn-default btn-sm"><i class="fa fa-refresh"></i></button>
 
             </div>
@@ -68,10 +63,10 @@
                 pageLength: {!! config('app.records_per_page')!!},
                 ajax: '{!! route('admin.accounting.outcome.data') !!}',
                 columns: [
-                    { data: 'outcomes.number', name: 'outcomes.number'},
-                    { data: 'outcomes.amount_dollar', name: 'outcomes.amount_dollar'},
-                    { data: 'outcomes.amount_riel', name: 'outcomes.amount_riel'},
-                    { data: 'accounts.name', name: 'accounts.name'},
+                    { data: 'number', name: 'outcomes.number'},
+                    { data: 'amount_dollar', name: 'outcomes.amount_dollar'},
+                    { data: 'amount_riel', name: 'outcomes.amount_riel'},
+                    { data: 'account_name', name: 'accounts.name'},
                     { data: 'name', name: 'name'},
                     { data: 'action', name: 'action',orderable: false, searchable: false}
                 ]

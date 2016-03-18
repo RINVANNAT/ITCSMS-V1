@@ -1,6 +1,8 @@
 <?php
 
 namespace App\Repositories\Backend\Outcome;
+use App\Http\Requests\Backend\Accounting\Outcome\CreateOutcomeRequest;
+use App\Http\Requests\Backend\Accounting\Outcome\StoreOutcomeRequest;
 
 /**
  * Interface OutcomeRepositoryContract
@@ -30,10 +32,10 @@ interface OutcomeRepositoryContract
     public function getAllOutcomes($order_by = 'id', $sort = 'asc');
 
     /**
-     * @param  $input
+     * @param  StoreOutcomeRequest $request
      * @return mixed
      */
-    public function create($input);
+    public function create(StoreOutcomeRequest $request);
 
     /**
      * @param  $id

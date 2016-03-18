@@ -48,6 +48,17 @@ class CustomerController extends Controller
     }
 
     /**
+     * Show the form for creating a new resource in pop up window
+     *
+     * @param CreateCustomerRequest $request
+     * @return \Illuminate\Http\Response
+     */
+    public function popup_create(CreateCustomerRequest $request )
+    {
+        return view('backend.accounting.customer.popup_create',compact('departments','schools'));
+    }
+
+    /**
      * Store a newly created resource in storage.
      *
      * @param  StoreCustomerRequest  $request
@@ -55,8 +66,26 @@ class CustomerController extends Controller
      */
     public function store(StoreCustomerRequest $request)
     {
-        $this->customers->create($request->all());
-        return redirect()->route('admin.accounting.customers.index')->withFlashSuccess(trans('alerts.backend.generals.created'));
+        $customer = $this->customers->create($request->all());
+        if($request->ajax()){
+            return json_encode(array('success'=>true,'id'=>$customer->id));
+        } else {
+            return redirect()->route('admin.accounting.customers.index')->withFlashSuccess(trans('alerts.backend.generals.created'));
+        }
+    }
+
+    /**
+     * Store a newly created resource in storage.
+     *
+     * @param  StoreCustomerRequest  $request
+     * @return \Illuminate\Http\Response
+     */
+    public function popup_store(StoreCustomerRequest $request)
+    {
+        $customer = $this->customers->create($request->all());
+
+        return view('backend.accounting.customer.popup_success')->withFlashSuccess(trans('alerts.backend.generals.created'));
+
     }
 
     /**

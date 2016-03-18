@@ -29,6 +29,9 @@ Route::group([
     Route::group([], function() {
         Route::resource('customers', 'CustomerController');
         Route::get('customer-data', 'CustomerController@data')->name('admin.accounting.customer.data');
+        Route::get('customer/popup_create', 'CustomerController@popup_create')->name('admin.accounting.customer.popup_create');
+        Route::post('customer/popup_store', 'CustomerController@popup_store')->name('admin.accounting.customer.popup_store');
     });
 
 });
+

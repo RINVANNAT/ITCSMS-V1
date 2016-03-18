@@ -135,15 +135,9 @@
             $('#amount_kh').val(convertMoney($('#amount_riel').val())+" រៀល");
         });
         $('#current_date').html(getKhmerCurrentDate());
-        $('#btn_search_client').on('click',function(){
-            $("#modal_find_client").modal({
-                backdrop: 'static',
-                keyboard: false
-            });
-        });
 
 
-        $(".select_client").select2({
+        var client_search_box = $(".select_client").select2({
             placeholder: 'Enter name ...',
             allowClear: true,
             tags: true,
@@ -173,13 +167,17 @@
             templateSelection: formatRepoSelection, // omitted for brevity, see the source of this page
         });
 
+        $(document).on('mouseup', '.btn_add_new_customer', function (e) {
+            PopupCenterDual('{{route("admin.accounting.customer.popup_create")}}','NIGRAPHIC','570','822');
+        });
+
         function formatRepo (repo) {
             console.log(repo);
             if (repo.loading) {
                 return repo.text;
             }
             if (repo.newOption) {
-                return '<em>Add new customer</em> "'+repo.name+'"';
+                return '<a href="#" class="btn_add_new_customer"><em>Add new customer</em> "'+repo.name+'"</a>';
             } else {
                 var markup = "<div class='select2-result-repository clearfix'>" +
                                 "<div class='select2-result-repository__avatar'><img src='{{url('/img/profiles/avatar.png')}}' /></div>" +
@@ -195,14 +193,18 @@
                 return markup;
 
             }
-
-
         }
 
         function formatRepoSelection (repo) {
+
+            $('#client_name').val(repo.name);
+            $('#department').val(repo.department);
+            $('#payment_payslip_client_id').val(repo.payslip_client_id);
+            $('#form_client_type').val(repo.group);
+            $('#client_id').val(repo.id);
+
             return repo.name || repo.group;
         }
-
 
         $('#btn_modal_client_search').on('click',function(){
             $search_url = $search_url+"/"+$('#client_type').val()+"/search";

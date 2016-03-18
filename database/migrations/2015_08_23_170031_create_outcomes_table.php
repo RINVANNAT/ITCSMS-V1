@@ -17,9 +17,8 @@ class CreateOutcomesTable extends Migration
 		{
             $table->increments('id');
             $table->string('amount_dollar')->nullable();
-            $table->string('amount_dollar_kh')->nullable();
+            $table->string('amount_kh');
             $table->string('amount_riel')->nullable();
-            $table->string('amount_riel_kh')->nullable();
             $table->string('number')->nullable();
             $table->boolean('is_printed')->default(false);
             $table->timestamp('pay_date');

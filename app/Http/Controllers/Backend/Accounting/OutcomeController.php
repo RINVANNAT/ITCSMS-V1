@@ -1,7 +1,9 @@
 <?php namespace App\Http\Controllers\Backend\Accounting;
 
 use App\Http\Controllers\Controller;
-use App\Http\Requests;
+use App\Http\Requests\Backend\Accounting\Outcome\CreateOutcomeRequest;
+use App\Http\Requests\Backend\Accounting\Outcome\DeleteOutcomeRequest;
+use App\Http\Requests\Backend\Accounting\Outcome\StoreOutcomeRequest;
 use App\Models\Account;
 use App\Models\Customer;
 use App\Models\Department;
@@ -9,8 +11,8 @@ use App\Models\Employee;
 use App\Models\OutcomeType;
 use App\Models\School;
 use App\Repositories\Backend\Outcome\OutcomeRepositoryContract;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Input;
 
 class OutcomeController extends Controller
@@ -45,7 +47,7 @@ class OutcomeController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function create()
+    public function create(CreateOutcomeRequest $request)
     {
         $outcomeTypes = OutcomeType::get()->lists('codeName','id');
         $accounts = Account::lists('name','id');
@@ -58,9 +60,9 @@ class OutcomeController extends Controller
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
-    public function store(Request $request)
+    public function store(StoreOutcomeRequest $request)
     {
-        $this->outcomes->create($request->all());
+        $this->outcomes->create($request);
         return redirect()->route('admin.accounting.outcomes.index')->withFlashSuccess(trans('alerts.backend.roles.created'));
     }
 
@@ -109,7 +111,7 @@ class OutcomeController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function destroy($id)
+    public function destroy(DeleteOutcomeRequest $request, $id)
     {
         $this->outcomes->destroy($id);
         return redirect()->route('admin.accounting.academicYears.index')->withFlashSuccess(trans('alerts.backend.generals.deleted'));
@@ -129,14 +131,17 @@ class OutcomeController extends Controller
             ->leftJoin('customers','outcomes.payslip_client_id','=','customers.payslip_client_id')
             ->leftJoin('students','studentAnnuals.student_id','=','students.id')
             ->select([
-                'outcomes.id as outcome_id','outcomes.number','outcomes.amount_dollar','outcomes.amount_riel','accounts.name','outcomes.payslip_client_id',
+                'outcomes.id as outcome_id','outcomes.number','outcomes.amount_dollar','outcomes.amount_riel','accounts.name as account_name','outcomes.payslip_client_id',
                 DB::raw("CONCAT(customers.name,employees.name_kh,students.name_kh) as name")
             ]);
 
+        //dd($outcomes);
         $datatables =  app('datatables')->of($outcomes);
 
 
         return $datatables
+            ->editColumn('amount_dollar', '{!! $amount_dollar . " $" !!}')
+            ->editColumn('amount_riel', '{!! $amount_riel==null? "0 ៛": $amount_riel. " ៛" !!}')
             ->addColumn('action', function ($outcome) {
                 return  '<a href="'.route('admin.accounting.incomes.edit',$outcome->outcome_id).'" class="btn btn-xs btn-primary"><i class="fa fa-pencil" data-toggle="tooltip" data-placement="top" title="" data-original-title="'.trans('buttons.general.crud.edit').'"></i> </a>'.
                 ' <button class="btn btn-xs btn-danger btn-delete" data-remote="'.route('admin.accounting.incomes.destroy', $outcome->outcome_id) .'"><i class="fa fa-times" data-toggle="tooltip" data-placement="top" title="' . trans('buttons.general.crud.delete') . '"></i></button>';
@@ -151,18 +156,23 @@ class OutcomeController extends Controller
             $resultCount = 25;
             $offset = ($page - 1) * $resultCount;
             $employees = DB::table('employees')
-                ->where('name_kh', 'LIKE', '%' . Input::get("term") . "%")
+                ->where('employees.name_kh', 'LIKE', '%' . Input::get("term") . "%")
+                ->leftJoin('departments','departments.id','=','employees.department_id')
                 ->select([
-                    'id',
-                    'name_kh as name',
-                    DB::raw("'employee' as group")
+                    'employees.id as id',
+                    'departments.name_kh as department',
+                    'payslip_client_id',
+                    'employees.name_kh as name',
+                    DB::raw("'Staff' as group")
                 ]);
             $customers = DB::table('customers')
                 ->where('name', 'LIKE', '%' . Input::get("term") . "%")
                 ->select([
                     'id',
+                    'company as department',
+                    'payslip_client_id',
                     'name',
-                    DB::raw("'employee' as group")
+                    DB::raw("'Other' as group")
                 ]);
 
             $client = $customers

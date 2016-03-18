@@ -17,5 +17,9 @@ class Attachment extends Model
 		"write_uid"
 	];
 
+    public function outcome(){
+        return $this->belongsTo('App\Models\Outcome');
+    }
+
 
 }
