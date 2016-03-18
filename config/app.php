@@ -197,6 +197,18 @@ return [
          * Has to override the Collective\Html\HtmlServiceProvider form singleton
          */
         App\Providers\MacroServiceProvider::class,
+
+        /*
+         * scaffold Generator
+         * url :http://labs.infyom.com/laravelgenerator/docs
+         */
+
+        Laracasts\Flash\FlashServiceProvider::class,
+        Prettus\Repository\Providers\RepositoryServiceProvider::class,
+        \InfyOm\Generator\InfyOmGeneratorServiceProvider::class,
+        \InfyOm\CoreTemplates\CoreTemplatesServiceProvider::class,
+
+
     ],
 
     /*
@@ -255,6 +267,9 @@ return [
         'Socialite'   => Laravel\Socialite\Facades\Socialite::class,
         'Datatables' => Yajra\Datatables\Datatables::class,
         'Excel' => Maatwebsite\Excel\Facades\Excel::class,
+
+        'Form'      => Collective\Html\FormFacade::class,
+        'Flash'     => Laracasts\Flash\Flash::class
     ],
 
 ];
