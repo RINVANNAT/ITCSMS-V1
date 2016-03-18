@@ -11,6 +11,7 @@ use App\Models\School;
 use App\Repositories\Backend\Outcome\OutcomeRepositoryContract;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Input;
 
 class OutcomeController extends Controller
 {
@@ -144,23 +145,45 @@ class OutcomeController extends Controller
     }
 
     public function client_search(Request $request){
-        $input = $request->all();
-        $employees = DB::table('employees')
-            ->where('name_kh','LIKE','%'.$input['q']."%")
-            ->select([
-                'name_kh as name',
-                DB::raw("'employee' as group")
-            ]);
-        $customers = DB::table('customers')
-            ->where('name','LIKE','%'.$input['q']."%")
-            ->unionAll($employees)
-            ->select([
-                'name',
-                DB::raw("'employee' as group")
-            ])->get();
+        if($request->ajax()) {
 
-        //$result = array()
-        dd($customers);
+            $page = Input::get('page');
+            $resultCount = 25;
+            $offset = ($page - 1) * $resultCount;
+            $employees = DB::table('employees')
+                ->where('name_kh', 'LIKE', '%' . Input::get("term") . "%")
+                ->select([
+                    'id',
+                    'name_kh as name',
+                    DB::raw("'employee' as group")
+                ]);
+            $customers = DB::table('customers')
+                ->where('name', 'LIKE', '%' . Input::get("term") . "%")
+                ->select([
+                    'id',
+                    'name',
+                    DB::raw("'employee' as group")
+                ]);
+
+            $client = $customers
+                ->unionAll($employees)
+                ->orderBy('name')
+                ->skip($offset)
+                ->take($resultCount)
+                ->get();
+
+            $count = Count($customers->unionAll($employees)->get());
+            $endCount = $offset + $resultCount;
+            $morePages = $count > $endCount;
+
+            $results = array(
+                'results' => $client,
+                'pagination' => array(
+                    "more" => $morePages
+                )
+            );
+            return response()->json($results);
+        }
     }
 
 }

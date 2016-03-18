@@ -45,6 +45,51 @@
             background-image:none; !important;
             background-color: #00a65a; !important;
         }
+        .select2-result-repository {
+            padding-top: 4px;
+            padding-bottom: 3px;
+        }
+        .select2-result-repository__avatar {
+            float: left;
+            width: 60px;
+            margin-right: 10px;
+        }
+        .select2-result-repository__avatar img {
+            width: 100%;
+            height: auto;
+            border-radius: 2px;
+        }
+        img {
+            vertical-align: middle;
+        }
+        img {
+            border: 0;
+        }
+        .select2-result-repository__meta {
+            margin-left: 70px;
+        }
+        .select2-result-repository__title {
+            color: black;
+            font-weight: bold;
+            word-wrap: break-word;
+            line-height: 1.1;
+            margin-bottom: 4px;
+        }
+
+        .select2-result-repository__description {
+            font-size: 13px;
+            color: #777;
+            margin-top: 4px;
+        }
+        .select2-result-repository__forks, .select2-result-repository__stargazers, .select2-result-repository__watchers {
+            display: inline-block;
+            color: #aaa;
+            font-size: 11px;
+        }
+        .select2-result-repository__forks, .select2-result-repository__stargazers {
+            margin-right: 1em;
+        }
+
 
     </style>
 @stop
@@ -99,63 +144,63 @@
 
 
         $(".select_client").select2({
-
+            placeholder: 'Enter name ...',
+            allowClear: true,
+            tags: true,
+            createTag: function (params) {
+                return {
+                    id: params.term,
+                    name: params.term,
+                    group:'customer',
+                    newOption: true
+                }
+            },
             ajax: {
                 url: $search_url,
                 dataType: 'json',
                 delay: 250,
                 data: function (params) {
                     return {
-                        q: params.term, // search term
-                        page: params.page
-                    };
-                },
-                processResults: function (data, params) {
-                    // parse the results into the format expected by Select2
-                    // since we are using custom formatting functions we do not need to
-                    // alter the remote JSON data, except to indicate that infinite
-                    // scrolling can be used
-                    params.page = params.page || 1;
-
-                    return {
-                        results: data.items,
-                        pagination: {
-                            more: (params.page * 30) < data.total_count
-                        }
+                        term: params.term || '', // search term
+                        page: params.page || 1
                     };
                 },
                 cache: true
             },
             escapeMarkup: function (markup) { return markup; }, // let our custom formatter work
-            minimumInputLength: 1,
+            minimumInputLength: 3,
             templateResult: formatRepo, // omitted for brevity, see the source of this page
-            templateSelection: formatRepoSelection // omitted for brevity, see the source of this page
+            templateSelection: formatRepoSelection, // omitted for brevity, see the source of this page
         });
 
         function formatRepo (repo) {
-            if (repo.loading) return repo.text;
+            console.log(repo);
+            if (repo.loading) {
+                return repo.text;
+            }
+            if (repo.newOption) {
+                return '<em>Add new customer</em> "'+repo.name+'"';
+            } else {
+                var markup = "<div class='select2-result-repository clearfix'>" +
+                                "<div class='select2-result-repository__avatar'><img src='{{url('/img/profiles/avatar.png')}}' /></div>" +
+                                "<div class='select2-result-repository__meta'>" +
+                                    "<div class='select2-result-repository__title'>" + repo.name + "</div>"+
+                                    "<div class='select2-result-repository__description'>" + repo.group + "</div>"+
+                                    "<div class='select2-result-repository__statistics'>" +
+                                        "<div class='select2-result-repository__forks'><i class='fa fa-flash'></i> " + "sdfsdf" + " Forks</div>" +
+                                        "<div class='select2-result-repository__stargazers'><i class='fa fa-star'></i> " + "sdfsdf" + " Stars</div>" +
+                                    "</div>" +
+                                "</div>"+
+                            "</div>";
+                return markup;
 
-            var markup = "<div class='select2-result-repository clearfix'>" +
-                    "<div class='select2-result-repository__avatar'><img src='" + repo.owner.avatar_url + "' /></div>" +
-                    "<div class='select2-result-repository__meta'>" +
-                    "<div class='select2-result-repository__title'>" + repo.full_name + "</div>";
-
-            if (repo.description) {
-                markup += "<div class='select2-result-repository__description'>" + repo.description + "</div>";
             }
 
-            markup += "<div class='select2-result-repository__statistics'>" +
-                    "<div class='select2-result-repository__forks'><i class='fa fa-flash'></i> " + repo.forks_count + " Forks</div>" +
-                    "<div class='select2-result-repository__stargazers'><i class='fa fa-star'></i> " + repo.stargazers_count + " Stars</div>" +
-                    "<div class='select2-result-repository__watchers'><i class='fa fa-eye'></i> " + repo.watchers_count + " Watchers</div>" +
-                    "</div>" +
-                    "</div></div>";
 
-            return markup;
         }
 
         function formatRepoSelection (repo) {
-            return repo.full_name || repo.text;
+            return repo.name || repo.group;
         }
 
 
