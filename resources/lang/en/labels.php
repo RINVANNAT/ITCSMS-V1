@@ -599,6 +599,22 @@ return [
                 'employee_id' => 'Lecturer'
             ]
         ],
+         'Absence' => [
+                    'title' => 'Student Absence',
+                    'sub_index_title' => 'View Student Absence',
+                    'sub_edit_title' => 'Edit Student Absence',
+                    'sub_create_title' => 'Add Student Absence',
+                    'sub_detail_title' => 'Detail',
+                    'fields' => [
+                        'name' => "Name",
+                        'semester' => 'Semester',
+                        'academic_year_id' => 'Academic year',
+                        'department_id' => 'Department',
+                        'degree_id' => 'Degree',
+                        'grade_id' => 'Grade',
+                        'employee_id' => 'Lecturer'
+                    ]
+                ],
         'coursePrograms' => [
             'title' => 'Course Programs',
             'sub_index_title' => 'All existing course program',

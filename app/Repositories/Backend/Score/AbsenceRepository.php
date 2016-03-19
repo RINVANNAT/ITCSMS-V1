@@ -1,12 +1,9 @@
 <?php
 
-namespace App\Repositories\Backend\CourseAnnual;
+namespace App\Repositories\Backend\Score;
 
-/**
- * Interface CourseAnnualRepositoryContract
- * @package App\Repositories\Backend\CourseAnnual
- */
-interface CourseAnnualRepositoryContract
+
+interface AbsenceRepository
 {
     /**
      * @param  $id
