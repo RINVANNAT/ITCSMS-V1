@@ -231,6 +231,7 @@ return [
             'sub_edit_title' => 'Edit outcome type information',
             'sub_create_title' => 'Create new outcome type',
             'sub_detail_title' => 'Detail of an outcome type',
+            'sub_import_title' => 'Import outcome types',
             'fields'=>[
                 'code' => "Code",
                 'origin' => "Origin",
@@ -340,7 +341,8 @@ return [
                 'desc' => "Description",
                 'bac_year' => "BacII Year",
                 'status' => "Status",
-                'is_registered' => "Is Registered"
+                'is_registered' => "Is Registered",
+                'bac2_score_grade' =>"BacII Score/Grade"
             ]
         ],
 
@@ -483,6 +485,11 @@ return [
             'sub_create_title' => 'Register new candidate',
             'sub_detail_title' => 'Detail of candidate',
             'sub_import_title' => "Import candidates",
+            'header' => [
+                'personal_information' => 'Personal Information',
+                'study_record' => 'Study Record',
+                'academic_information' => 'Academic Information'
+            ],
             'fields'=>[
                 'name_latin' => 'Name Latin',
                 'name_kh' => 'Name Khmer',
@@ -497,12 +504,15 @@ return [
                 'is_paid' => "Paid",
                 'result' => "Result",
                 'register_from' => "Register From",
+                'math_score' => "Math Score",
                 'math_c' => "Math Correct",
                 'math_w' => "Math Wrong",
                 'math_na' => "Math No Answer",
+                'phys_chem_score' => "Physique/Chemistry Score",
                 'phys_chem_c' => "Physique/Chemistry Correct",
                 'phys_chem_w' => "Physique/Chemistry Wrong",
                 'phys_chem_na' => "Physique/Chemistry No Answer",
+                'logic_score' => "Logic Score",
                 'logic_c' => "Logic Correct",
                 'logic_w' => "Logic Wrong",
                 'logic_na' => "Logic No Answer",
@@ -512,6 +522,8 @@ return [
                 'active' => "Active",
                 'highschool_id' => "High School",
                 'promotion_id' => "Promotion",
+                'bac_grade_m_p_c' => 'BacII Math/Physique/Chemistry Grade',
+                'bac_total_score_grade' => "BacII Score/Grade",
                 'bac_total_grade' => "BacII Grade",
                 'bac_math_grade' => "BacII/Math Grade",
                 'bac_phys_grade' => "BacII/Physique Grade",
@@ -523,7 +535,9 @@ return [
                 'academic_year_id' => "Academic Year",
                 'degree_id' => "Degree",
                 'exam_id' => "Exam Date",
-                'payslip_client_id' => "Payment ID"
+                'payslip_client_id' => "Payment ID",
+                'origin_id' => "Origin",
+                'preferred_department' => "Prefered Departments"
             ]
         ],
         'reporting' => [
@@ -532,6 +546,22 @@ return [
             'department_id' => 'Department',
             'all_department' => 'All Department',
             'is_foreigner' => 'Only Foreigner'
+        ],
+        'error' => [
+            'reporting' => [
+                'title' => 'Reporting System',
+                'sub_index_title' => 'List of your suggestion & reporting',
+                'sub_create_title' => 'Report error or suggest your demand',
+                'sub_edit_title' => 'Edit your request and demand',
+                'fields' => [
+                    'title' => 'Title',
+                    'description' => 'Description',
+                    'status' => 'Status',
+                    'image' => 'Attachment Image',
+                    'created_at' => 'Created at',
+                ]
+            ],
+
         ],
         'accounting' => [
 
@@ -551,6 +581,18 @@ return [
             'sub_edit_title' => 'Edit income information',
             'sub_create_title' => 'Create new income',
             'sub_detail_title' => 'Detail of an income',
+            'fields' => [
+                'amount_dollar' => "Amount Dollar",
+                'amount_riel' => "Amount Riel",
+                'amount_kh' => "In Text",
+                'account_id' => "Account",
+                'active' => "Active",
+                'number' => "Number",
+                'client_name' => "Client Name",
+                'department' => "Department",
+                'income_type' => "Income Type",
+                'description' => "Description"
+            ]
         ],
         'outcomes' => [
             'title' => 'Outcomes',

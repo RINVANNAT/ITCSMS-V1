@@ -77,22 +77,32 @@
     {!! Html::script('plugins/datatables/dataTables.bootstrap.min.js') !!}
 
     <script>
+
+        var candidate_datatable = null;
         $(function(){
             $("#exam_show :input").attr("disabled", true);
 
-            $('#candidates-table').DataTable({
+            candidate_datatable = $('#candidates-table').DataTable({
                 processing: true,
                 serverSide: true,
                 pageLength: {!! config('app.records_per_page')!!},
-                ajax: '{!! route('admin.candidate.data') !!}',
+                ajax: '{!! route('admin.candidate.data')."?exam_id=".$exam->id !!}',
                 columns: [
                     { data: 'name_kh', name: 'name_kh'},
-                    { data: 'name_en', name: 'name_en'},
-                    { data: 'gender_id', name: 'gender_id'},
+                    { data: 'name_latin', name: 'name_en'},
+                    { data: 'gender_name_kh', name: 'genders.name_kh'},
                     { data: 'bac_total_grade', name: 'bac_total_grade'},
                     { data: 'action', name: 'action',orderable: false, searchable: false}
                 ]
             });
+
+            $(document).on('click', '#btn_add_candidate', function (e) {
+                PopupCenterDual('{{route("admin.studentBac2.popup_index")."?exam_id=".$exam->id}}','Add new customer','1200','960');
+            });
         });
+
+        function refresh_candidate_list (){
+            $('#candidates-table').DataTable().ajax.reload();
+        }
     </script>
 @stop

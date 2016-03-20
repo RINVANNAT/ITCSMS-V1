@@ -12,6 +12,7 @@ use App\Http\Requests\Backend\Configuration\StudentBac2\UpdateStudentBac2Request
 use App\Repositories\Backend\StudentBac2\StudentBac2RepositoryContract;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Input;
 use Maatwebsite\Excel\Facades\Excel;
 
 class StudentBac2Controller extends Controller
@@ -41,6 +42,12 @@ class StudentBac2Controller extends Controller
     {
         return view('backend.configuration.studentBac2.index');
     }
+    public function popup_index()
+    {
+        $exam_id = $_GET['exam_id'];
+        return view('backend.configuration.studentBac2.popup_index',compact('exam_id'));
+    }
+
 
     /**
      * Show the form for creating a new resource.
@@ -105,6 +112,7 @@ class StudentBac2Controller extends Controller
     /**
      * Remove the specified resource from storage.
      *
+     * @param DeleteStudentBac2Request $request
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
@@ -119,19 +127,28 @@ class StudentBac2Controller extends Controller
 
     public function data()
     {
+        $exam_id = Input::get('exam_id');
+
         $studentBac2s = DB::table('studentBac2s')
-            ->select(['id','name_kh','gender_id','dob']);
+            ->leftJoin('genders','studentBac2s.gender_id','=','genders.id')
+            ->leftJoin('highSchools','studentBac2s.highschool_id','=','highSchools.id')
+            ->leftJoin('gdeGrades','studentBac2s.grade','=','gdeGrades.id')
+            ->select(['studentBac2s.id','studentBac2s.name_kh','genders.name_kh as gender_name_kh','highSchools.name_kh as highSchool_name_kh','dob','percentile','gdeGrades.name_en as gdeGrade_name_en']);
 
         $datatables =  app('datatables')->of($studentBac2s);
 
 
         return $datatables
-            ->editColumn('name_kh', '{!! str_limit($name_kh, 60) !!}')
-            ->editColumn('dob', '{!! $dob !!}')
-            ->editColumn('gender_id', '{!! $gender_id !!}')
+            ->editColumn('dob', function($studentBac2){
+                $date = Carbon::createFromFormat('Y-m-d h:i:s',$studentBac2->dob);
+                return $date->format('d/m/Y');
+            })
             ->addColumn('action', function ($studentBac2) {
                 return  '<a href="'.route('admin.configuration.studentBac2s.edit',$studentBac2->id).'" class="btn btn-xs btn-primary"><i class="fa fa-pencil" data-toggle="tooltip" data-placement="top" title="" data-original-title="'.trans('buttons.general.crud.edit').'"></i> </a>'.
                 ' <button class="btn btn-xs btn-danger btn-delete" data-remote="'.route('admin.configuration.studentBac2s.destroy', $studentBac2->id) .'"><i class="fa fa-times" data-toggle="tooltip" data-placement="top" title="' . trans('buttons.general.crud.delete') . '"></i></button>';
+            })
+            ->addColumn('export', function ($studentBac2) use ($exam_id) {
+                return  '<a href="'.route('admin.candidate.popup_create').'?exam_id='.$exam_id.'&studentBac2_id='.$studentBac2->id.'" class="btn btn-xs btn-primary"><i class="fa fa-mail-forward" data-toggle="tooltip" data-placement="top" title="" data-original-title="'.trans('buttons.general.export').'"></i> </a>';
             })
             ->make(true);
     }

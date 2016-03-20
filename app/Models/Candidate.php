@@ -163,16 +163,9 @@ class Candidate extends Model
      * @var array
      */
     protected $casts = [
-        "name_latin" => "string",
-        "name_kh" => "string",
-		"mcs_no" => "string",
-		"can_id" => "string",
-		"phone" => "string",
     ];
 
 	public static $rules = [
-	    "name_latin" => "Required",
-        "name_kh" => "Required",
 	];
 
 }

@@ -68,11 +68,11 @@
                 pageLength: {!! config('app.records_per_page')!!},
                 ajax: '{!! route('admin.accounting.income.data') !!}',
                 columns: [
-                    { data: 'number', name: 'number'},
-                    { data: 'amount_dollar', name: 'amount_dollar'},
-                    { data: 'amount_riel', name: 'amount_riel'},
-                    { data: 'account_id', name: 'account_id'},
-                    { data: 'payslip_client_id', name: 'payslip_client_id'},
+                    { data: 'number', name: 'incomes.number'},
+                    { data: 'amount_dollar', name: 'incomes.amount_dollar'},
+                    { data: 'amount_riel', name: 'incomes.amount_riel'},
+                    { data: 'account_name', name: 'accounts.name'},
+                    { data: 'name', name: 'name',searchable:false},
                     { data: 'action', name: 'action',orderable: false, searchable: false}
                 ]
             });

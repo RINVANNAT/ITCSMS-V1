@@ -4,13 +4,16 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\Backend\Accounting\Income\CreateIncomeRequest;
 use App\Http\Requests\Backend\Accounting\Income\EditIncomeRequest;
 use App\Http\Requests\Backend\Accounting\Income\StoreIncomeRequest;
+use App\Http\Requests\Backend\Accounting\Income\UpdateIncomeRequest;
 use App\Models\AcademicYear;
+use App\Models\Account;
 use App\Models\Degree;
 use App\Models\Department;
 use App\Models\DepartmentOption;
 use App\Models\Gender;
 use App\Models\Grade;
 use App\Models\Income;
+use App\Models\IncomeType;
 use App\Models\Outcome;
 use App\Models\PayslipClient;
 use App\Models\School;
@@ -252,9 +255,9 @@ class IncomeController extends Controller
      */
     public function create(CreateIncomeRequest $request)
     {
-        $departments = Department::lists('name_kh','id')->toArray();
-        $schools = School::lists('name_kh','id')->toArray();
-        return view('backend.accounting.income.create',compact('departments','schools'));
+        $accounts = Account::lists('name','id')->toArray();
+        $incomeTypes = IncomeType::lists('name','id')->toArray();
+        return view('backend.accounting.income.create',compact('accounts','incomeTypes'));
     }
 
     /**
@@ -265,11 +268,11 @@ class IncomeController extends Controller
      */
     public function store(StoreIncomeRequest $request)
     {
-        $this->incomes->create($request->all());
+        $this->incomes->createSimpleIncome($request->all());
         if($request->ajax()){
             return json_encode(array("sucess"=>true));
         }
-        return redirect()->route('admin.accounting.incomes.index')->withFlashSuccess(trans('alerts.backend.roles.created'));
+        return redirect()->route('admin.accounting.incomes.index')->withFlashSuccess(trans('alerts.backend.general.created'));
     }
 
     /**
@@ -302,11 +305,11 @@ class IncomeController extends Controller
     /**
      * Update the specified resource in storage.
      *
-     * @param  \Illuminate\Http\Request  $request
+     * @param  UpdateIncomeRequest  $request
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, $id)
+    public function update(UpdateIncomeRequest $request, $id)
     {
         $this->incomes->update($id, $request->all());
         return redirect()->route('admin.accounting.incomes.index')->withFlashSuccess(trans('alerts.backend.generals.updated'));
@@ -327,17 +330,23 @@ class IncomeController extends Controller
     public function data()
     {
         $incomes = DB::table('incomes')
-            ->select(['id','number','amount_dollar','amount_riel','account_id','payslip_client_id']);
+            ->leftJoin('accounts','incomes.account_id','=','accounts.id')
+            ->leftJoin('employees','incomes.payslip_client_id','=','employees.payslip_client_id')
+            ->leftJoin('studentAnnuals','incomes.payslip_client_id','=','studentAnnuals.payslip_client_id')
+            ->leftJoin('customers','incomes.payslip_client_id','=','customers.payslip_client_id')
+            ->leftJoin('students','studentAnnuals.student_id','=','students.id')
+            ->select([
+                'incomes.id','incomes.number','incomes.amount_dollar','incomes.amount_riel','incomes.payslip_client_id','accounts.name as account_name',
+                DB::raw("CONCAT(customers.name,employees.name_kh,students.name_kh) as name")
+            ]);
 
         $datatables =  app('datatables')->of($incomes);
 
 
         return $datatables
-            ->editColumn('number', '{!! $number !!}')
-            ->editColumn('amount_dollar', '{!! $amount_dollar !!}')
-            ->editColumn('amount_riel', '{!! $amount_riel !!}')
-            ->editColumn('account_id', '{!! $account_id !!}')
-            ->editColumn('payslip_client_id', '{!! $payslip_client_id !!}')
+            ->editColumn('number','{{str_pad($number, 5, "0", STR_PAD_LEFT)}}')
+            ->editColumn('amount_dollar','{{$amount_dollar==""?0:$amount_dollar." $"}}')
+            ->editColumn('amount_riel','{{$amount_riel==null?0:$amount_riel." ៛"}}')
             ->addColumn('action', function ($income) {
                 return  '<a href="'.route('admin.accounting.incomes.edit',$income->id).'" class="btn btn-xs btn-primary"><i class="fa fa-pencil" data-toggle="tooltip" data-placement="top" title="" data-original-title="'.trans('buttons.general.crud.edit').'"></i> </a>'.
                 ' <button class="btn btn-xs btn-danger btn-delete" data-remote="'.route('admin.accounting.incomes.destroy', $income->id) .'"><i class="fa fa-times" data-toggle="tooltip" data-placement="top" title="' . trans('buttons.general.crud.delete') . '"></i></button>';

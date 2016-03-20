@@ -10,9 +10,8 @@ class Income extends Model
 
 	public $fillable = [
 	    "amount_dollar",
-		"amount_dollar_kh",
 		"amount_riel",
-		"amount_riel_kh",
+		"amount_kh",
 		"number",
 		"is_printed",
 		"pay_date",
@@ -36,10 +35,10 @@ class Income extends Model
 	}
 
 	public function creator(){
-		return $this->belongsTo('App\Models\Access\User','create_uid');
+		return $this->belongsTo('App\Models\Access\User\User','create_uid');
 	}
 	public function lastModifier(){
-		return $this->belongsTo('App\Models\Access\User','write_uid');
+		return $this->belongsTo('App\Models\Access\User\User','write_uid');
 	}
 
     /**
@@ -52,10 +51,6 @@ class Income extends Model
     ];
 
 	public static $rules = [
-	    "amount_dollar"=>'max:50',
-		"amount_dollar_kh"=>'max:255',
-		"amount_riel"=>'max:50',
-		"amount_riel_kh"=>'max:255',
 	];
 
 }

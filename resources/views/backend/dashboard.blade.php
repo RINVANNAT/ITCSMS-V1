@@ -20,7 +20,7 @@
             Welcome to ITC-School Management Information System. This application is under construction with partial release.
             </p>
             <p>
-            Please report the problems or your demanding to our developers by using this <a href="#">REPORTING SYSTEM</a>.
+            Please report the problems or your demanding to our developers by using this <a href="{{route('admin.reporting.index')}}">REPORTING SYSTEM</a>.
             </p>
             <p>
             We appreciate your contributions and we hope to run this system in full scale very soon.

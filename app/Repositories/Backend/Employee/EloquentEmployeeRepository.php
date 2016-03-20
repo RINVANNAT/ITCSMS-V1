@@ -81,8 +81,9 @@ class EloquentEmployeeRepository implements EmployeeRepositoryContract
         $employee->active = isset($input['active'])?true:false;
         $employee->gender_id = $input['gender_id'];
         $employee->department_id = $input['department_id'];
-        $employee->user_id = $input['user_id'];
-        
+        if(isset($input['user_id'])){
+            $employee->user_id = $input['user_id']==""?null:$input['user_id'];
+        }
         $employee->created_at = Carbon::now();
         $employee->create_uid = auth()->id();
 
@@ -113,7 +114,9 @@ class EloquentEmployeeRepository implements EmployeeRepositoryContract
         $employee->active = isset($input['active'])?true:false;
         $employee->gender_id = $input['gender_id'];
         $employee->department_id = $input['department_id'];
-        $employee->user_id = $input['user_id'];
+        if(isset($input['user_id'])){
+            $employee->user_id = $input['user_id']==""?null:$input['user_id'];
+        }
         
         $employee->updated_at = Carbon::now();
         $employee->write_uid = auth()->id();

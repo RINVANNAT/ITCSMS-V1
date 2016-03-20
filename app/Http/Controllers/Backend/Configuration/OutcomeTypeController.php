@@ -125,11 +125,6 @@ class OutcomeTypeController extends Controller
 
 
         return $datatables
-            ->editColumn('code', '{!! str_limit($code, 60) !!}')
-            ->editColumn('name', '{!! str_limit($name, 60) !!}')
-            ->editColumn('origin', '{!! str_limit($origin, 60) !!}')
-            ->editColumn('description', '{!! str_limit($description, 60) !!}')
-            ->editColumn('active', '{!! str_limit($active, 60) !!}')
             ->addColumn('action', function ($outcomeType) {
                 return  '<a href="'.route('admin.configuration.outcomeTypes.edit',$outcomeType->id).'" class="btn btn-xs btn-primary"><i class="fa fa-pencil" data-toggle="tooltip" data-placement="top" title="" data-original-title="'.trans('buttons.general.crud.edit').'"></i> </a>'.
                 ' <button class="btn btn-xs btn-danger btn-delete" data-remote="'.route('admin.configuration.outcomeTypes.destroy', $outcomeType->id) .'"><i class="fa fa-times" data-toggle="tooltip" data-placement="top" title="' . trans('buttons.general.crud.delete') . '"></i></button>';

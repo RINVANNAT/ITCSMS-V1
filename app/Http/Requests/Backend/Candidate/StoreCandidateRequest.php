@@ -28,7 +28,17 @@ class StoreCandidateRequest extends Request
     public function rules()
     {
         return [
-            'name' => 'required',
+            'name_kh' => 'required',
+            'name_latin' => 'required',
+            'pob' => 'required',
+            'dob' => 'required',
+            'gender_id' => 'required',
+            'register_from' => 'required',
+            'highschool_id' => 'required',
+            'bac_percentile' => 'required',
+            'bac_total_grade' => 'required',
+            'bac_year' => 'required',
+            'promotion_id' => 'required'
         ];
     }
 }

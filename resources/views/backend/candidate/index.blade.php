@@ -57,10 +57,10 @@
                 pageLength: {!! config('app.records_per_page')!!},
                 ajax: '{!! route('admin.candidate.data') !!}',
                 columns: [
-                    { data: 'name_kh', name: 'name_kh'},
-                    { data: 'name_en', name: 'name_en'},
-                    { data: 'gender_id', name: 'gender_id'},
-                    { data: 'bac_total_grade', name: 'bac_total_grade'},
+                    { data: 'name_kh', name: 'candidates.name_kh'},
+                    { data: 'name_latin', name: 'candidates.name_latin'},
+                    { data: 'gender_name_kh', name: 'genders.name_kh'},
+                    { data: 'bac_total_grade', name: 'gdeGrade.name_en'},
                     { data: 'action', name: 'action',orderable: false, searchable: false}
                 ]
             });

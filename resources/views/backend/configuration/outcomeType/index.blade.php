@@ -40,8 +40,8 @@
                 <table class="table table-striped table-bordered table-hover" id="outcomeTypes-table">
                     <thead>
                     <tr>
+                        <th>{{ trans('labels.backend.outcomeTypes.fields.code') }}</th>
                         <th>{{ trans('labels.backend.outcomeTypes.fields.name') }}</th>
-                        <th>{{ trans('labels.backend.outcomeTypes.fields.active') }}</th>
                         <th>{{ trans('labels.backend.outcomeTypes.fields.description') }}</th>
                         <th>{{ trans('labels.general.actions') }}</th>
                     </tr>
@@ -65,8 +65,8 @@
                 pageLength: {!! config('app.records_per_page')!!},
                 ajax: '{!! route('admin.configuration.outcomeType.data') !!}',
                 columns: [
+                    { data: 'code', name: 'code'},
                     { data: 'name', name: 'name'},
-                    { data: 'active', name: 'active'},
                     { data: 'description', name: 'description'},
                     { data: 'action', name: 'action',orderable: false, searchable: false}
                 ]

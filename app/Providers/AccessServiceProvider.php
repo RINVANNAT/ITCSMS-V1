@@ -228,6 +228,11 @@ class AccessServiceProvider extends ServiceProvider
             \App\Repositories\Backend\RoomType\EloquentRoomTypeRepository::class
         );
 
+        $this->app->bind(
+            \App\Repositories\Backend\Reporting\ReportingRepositoryContract::class,
+            \App\Repositories\Backend\Reporting\EloquentReportingRepository::class
+        );
+
     }
 
     /**

@@ -83,14 +83,9 @@ class StudentBac2 extends Model
      * @var array
      */
     protected $casts = [
-        "name_kh" => "string",
-        "name_latin" => "string",
-		"pob" => "string",
     ];
 
 	public static $rules = [
-	    "name_kh" => "Required",
-        "name_latin" => "Required"
 	];
 
 }

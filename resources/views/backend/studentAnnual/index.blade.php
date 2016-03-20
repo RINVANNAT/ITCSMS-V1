@@ -100,16 +100,12 @@
             });
             $("div.toolbar").html(
                     '{!! Form::select('academic_year',$academicYears,null, array('class'=>'form-control','id'=>'filter_academic_year')) !!} '+
-                    ' &nbsp;<label for="name">Class</label> '+
-                    '{!! Form::select('degree',$degrees,null, array('class'=>'form-control','id'=>'filter_degree','placeholder'=>'')) !!} '+
-                    '{!! Form::select('grade',$grades,null, array('class'=>'form-control','id'=>'filter_grade','placeholder'=>'')) !!} '+
-                    '{!! Form::select('department',$departments,null, array('class'=>'form-control','id'=>'filter_department','placeholder'=>'')) !!}' +
-                    '&nbsp;&nbsp; <label for="name">Gender</label> '+
-                    '{!! Form::select('gender',$genders,null, array('class'=>'form-control','id'=>'filter_gender','placeholder'=>'')) !!} '+
-                    '&nbsp;&nbsp; <label for="name">Option</label> '+
-                    '{!! Form::select('option',$options,null, array('class'=>'form-control','id'=>'filter_option','placeholder'=>'')) !!} '+
-                    '&nbsp;&nbsp; <label for="name">Origin</label> '+
-                    '{!! Form::select('origiin',$origins,null, array('class'=>'form-control','id'=>'filter_origin','placeholder'=>'')) !!} '
+                    '{!! Form::select('degree',$degrees,null, array('class'=>'form-control','id'=>'filter_degree','placeholder'=>'Degree')) !!} '+
+                    '{!! Form::select('grade',$grades,null, array('class'=>'form-control','id'=>'filter_grade','placeholder'=>'Grade')) !!} '+
+                    '{!! Form::select('department',$departments,null, array('class'=>'form-control','id'=>'filter_department','placeholder'=>'Department')) !!}' +
+                    '{!! Form::select('gender',$genders,null, array('class'=>'form-control','id'=>'filter_gender','placeholder'=>'Gender')) !!} '+
+                    '{!! Form::select('option',$options,null, array('class'=>'form-control','id'=>'filter_option','placeholder'=>'Option')) !!} '+
+                    '{!! Form::select('origin',$origins,null, array('class'=>'form-control','id'=>'filter_origin','placeholder'=>'Origin')) !!} '
             );
 
             $('#filter_academic_year').on('change', function(e) {
@@ -154,22 +150,6 @@
                         '&gender='+$('#filter_gender').val()+
                         '&option='+$('#filter_option').val()+
                         '&origin='+$('#filter_origin').val();
-                /*$.ajax({
-                    type: 'POST',
-                    url: '{{route("admin.student.export")}}',
-                    data: {
-                        'academic_year': $('#filter_academic_year').val(),
-                        'degree': $('#filter_degree').val(),
-                        'grade':$('#filter_grade').val(),
-                        'department':$('#filter_department').val(),
-                        'gender':$('#filter_gender').val(),
-                        'option':$('#filter_option').val(),
-                        'origin':$('#filter_origin').val()
-                    },
-                    success: function(msg){
-                        alert('wow' + msg);
-                    }
-                });*/
             });
         });
     </script>

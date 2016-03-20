@@ -10,7 +10,7 @@
 @endsection
 
 @section('content')
-    {!! Form::open(['route' => 'admin.configuration.candidates.store', 'class' => 'form-horizontal', 'role' => 'form', 'method' => 'post', 'id' => 'create-role']) !!}
+    {!! Form::open(['route' => 'admin.candidates.store', 'class' => 'form-horizontal', 'role' => 'form', 'method' => 'post', 'id' => 'create-role']) !!}
 
         <div class="box box-success">
             <div class="box-header with-border">
@@ -18,7 +18,7 @@
             </div><!-- /.box-header -->
 
             <div class="box-body">
-                @include('backend.configuration.grade.fields')
+                @include('backend.candidate.fields')
             </div><!-- /.box-body -->
         </div><!--box-->
 

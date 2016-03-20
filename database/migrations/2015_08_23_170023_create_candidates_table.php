@@ -135,6 +135,12 @@ class CreateCandidatesTable extends Migration
                 ->on('degrees')
                 ->onDelete('NO ACTION');
 
+            $table->integer('studentBac2_id')->unsigned()->index()->nullable();
+            $table->foreign('studentBac2_id')
+                ->references('id')
+                ->on('studentBac2s')
+                ->onDelete('NO ACTION');
+
             $table->integer('exam_id')->unsigned()->index()->nullable();
             $table->foreign('exam_id')
                 ->references('id')

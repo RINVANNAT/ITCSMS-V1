@@ -1,11 +1,11 @@
 @extends ('backend.layouts.master')
 
-@section ('title', trans('labels.backend.degrees.title') . ' | ' . trans('labels.backend.degrees.sub_create_title'))
+@section ('title', trans('labels.backend.outcomes.title') . ' | ' . trans('labels.backend.outcomes.sub_create_title'))
 
 @section('page-header')
     <h1>
-        {{ trans('labels.backend.degrees.title') }}
-        <small>{{ trans('labels.backend.degrees.sub_create_title') }}</small>
+        {{ trans('labels.backend.outcomes.title') }}
+        <small>{{ trans('labels.backend.outcomes.sub_create_title') }}</small>
     </h1>
 @endsection
 
@@ -100,7 +100,7 @@
 
         <div class="box box-success">
             <div class="box-header with-border">
-                <h3 class="box-title">{{ trans('labels.backend.degrees.sub_create_title') }}</h3>
+                <h3 class="box-title">{{ trans('labels.backend.outcomes.sub_create_title') }}</h3>
             </div><!-- /.box-header -->
 
             <div class="box-body">
@@ -130,11 +130,13 @@
 
         $('#amount_dollar').on('change', function () {
             $('#amount_kh').val(convertMoney($('#amount_dollar').val())+" ដុល្លា");
+            $('#amount_riel').prop('disabled', true);
         });
         $('#amount_riel').on('change', function () {
             $('#amount_kh').val(convertMoney($('#amount_riel').val())+" រៀល");
+            $('#amount_dollar').prop('disabled', true);
         });
-        $('#current_date').html(getKhmerCurrentDate());
+        $('.current_date').html(getKhmerCurrentDate());
 
 
         var client_search_box = $(".select_client").select2({
@@ -168,7 +170,7 @@
         });
 
         $(document).on('mouseup', '.btn_add_new_customer', function (e) {
-            PopupCenterDual('{{route("admin.accounting.customer.popup_create")}}','NIGRAPHIC','570','822');
+            PopupCenterDual('{{route("admin.accounting.customer.popup_create")}}','Add new customer','570','822');
         });
 
         function formatRepo (repo) {
@@ -206,7 +208,7 @@
             return repo.name || repo.group;
         }
 
-        $('#btn_modal_client_search').on('click',function(){
+        /*$('#btn_modal_client_search').on('click',function(){
             $search_url = $search_url+"/"+$('#client_type').val()+"/search";
             $.ajax({
                 type:'POST',
@@ -267,6 +269,6 @@
                             +no_result+'</p>');
                 }
             });
-        });
+        });*/
     </script>
 @stop

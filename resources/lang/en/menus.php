@@ -85,6 +85,10 @@ return [
             'report_student_redouble' => 'Students/Redouble Statistic',
             'report_student_degree' => 'Students/Techniques Statistic',
         ],
+
+        'error' => [
+            'reporting' => 'System Reporting',
+        ],
         'student' => [
             'title' => 'Student',
         ],

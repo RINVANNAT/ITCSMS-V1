@@ -191,8 +191,11 @@
                     </li>
                 </ul>
             </li>
-
             @endauth
+
+            <li class="{{ Active::pattern('admin/reporting*') }}">
+                <a href="{!!url('admin/reporting')!!}"><span>{{ trans('menus.backend.error.reporting') }}</span></a>
+            </li>
 
         </ul><!-- /.sidebar-menu -->
     </section>

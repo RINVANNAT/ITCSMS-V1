@@ -35,6 +35,8 @@ interface IncomeRepositoryContract
      */
     public function create($input);
 
+    public function createSimpleIncome($input);
+
     /**
      * @param  $id
      * @param  $input

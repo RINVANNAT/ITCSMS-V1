@@ -20,6 +20,7 @@ return [
             'already_exists' => 'This record is already exist. You cannot add the same record',
             'create_error' => 'There was a problem creating this record. Please try again.',
             'not_found' => 'That record does not exist.',
+            'no_permission' => 'You are not allow to do this operation. Contact your administrator to resolve this'
         ],
         'access' => [
             'permissions' => [

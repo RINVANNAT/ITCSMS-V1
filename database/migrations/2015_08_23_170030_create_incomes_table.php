@@ -17,9 +17,8 @@ class CreateIncomesTable extends Migration
 		{
 			$table->increments('id');
             $table->string('amount_dollar')->nullable();
-            $table->string('amount_dollar_kh')->nullable();
             $table->string('amount_riel')->nullable();
-            $table->string('amount_riel_kh')->nullable();
+            $table->string('amount_kh')->nullable();
 			$table->string('number');
             $table->boolean('is_printed')->default(false);
 			$table->timestamp('pay_date');
@@ -28,6 +27,7 @@ class CreateIncomesTable extends Migration
             $table->boolean('is_refund')->default(false); // If set to true, this income payment is returned to student.
             $table->string('amount_refund')->nullable(); // Must be set if the transaction is refunded.
             $table->integer('sequence')->nullable();
+            $table->string('description')->nullable();
 
             $table->integer('create_uid')->unsigned();
             $table->foreign('create_uid')

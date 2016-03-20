@@ -22,7 +22,7 @@
                 </td>
                 <td align="middle" width="20%" valign="top" style="padding:10px;">
                     គំរូលេខ ៣/​ ស.ប <br/>
-                    លេខ : <strong id="client_name_latin">142<!-- Auto generate --></strong> <br/>
+                    លេខ : <strong id="client_name_latin"><!-- Auto generate --></strong> <br/>
                 </td>
             </tr>
             <tr>
@@ -33,7 +33,7 @@
 
                 </td>
                 <td align="middle">
-                    <h5 id="current_date" style="font-family: bayon">ថ្ងៃទី ១២ ខែ ០២ ឆ្នាំ ២០១៦ </h5>
+                    <h5 class="current_date" style="font-family: bayon">ថ្ងៃទី ១២ ខែ ០២ ឆ្នាំ ២០១៦ </h5>
                 </td>
                 <td align="middle" valign="middle">
                     <div class="form-group col-md-12" style="padding-left: 0px;">
@@ -123,7 +123,7 @@
                 <td colspan="3" align="right">
                     <div class="col-md-6"></div>
                     <div class="col-md-6" align="center" style="padding-top: 15px">
-                        បានទទួល,  ថ្ងៃទី ០១ ខែ ០២ ឆ្នាំ ២០១៦<strong id="client_current_date">​<!-- Auto generate --></strong><br/>
+                        បានទទួល,  <span class="current_date"></span><strong id="client_current_date">​<!-- Auto generate --></strong><br/>
                     </div>
                 </td>
             </tr>

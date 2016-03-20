@@ -19,7 +19,7 @@ class CreateStudentBac2sTable extends Migration
             $table->string('can_id',25);
             $table->integer('mcs_no');
             $table->integer('province_id')->unsigned()->index();
-			$table->string('name_kh',100);
+			$table->string('name_kh',100)->index();
             $table->timestamp('dob');
             $table->integer('gender_id')->unsigned()->index();
             $table->string('father_name',100)->nullable();

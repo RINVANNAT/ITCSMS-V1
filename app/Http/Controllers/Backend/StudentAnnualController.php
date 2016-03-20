@@ -72,9 +72,7 @@ class StudentAnnualController extends Controller
      */
     public function create(CreateStudentRequest $request)
     {
-        //$last_academic_year = AcademicYear::orderBy('id','desc')->first();
-        //$studentAnnuals = StudentAnnual::where('academic_year_id',$last_academic_year->id)->paginate(config('app.records_per_page'));
-        //$candidates = Candidate::where('academic_year_id',$last_academic_year->id)->paginate(config('app.records_per_page'));
+
         $academic_years = AcademicYear::orderBy('id','desc')->lists('name_kh','id');
         $departments = Department::where('parent_id',11)->orderBy('id','DESC')->lists('code','id'); // 11 is for all academic departments
         $degrees = Degree::lists('name_kh','id');

@@ -113,8 +113,13 @@ class EloquentOutcomeRepository implements OutcomeRepositoryContract
 
         $outcome = new Outcome();
 
-        $outcome->amount_dollar = $input['amount_dollar']==''?null:$input['amount_dollar'];
-        $outcome->amount_riel = $input['amount_riel']==''?null:$input['amount_riel'];
+        if(isset($input['amount_dollar'])){
+            $outcome->amount_dollar = $input['amount_dollar']==''?null:$input['amount_dollar'];
+        }
+        if(isset($input['amount_riel'])){
+            $outcome->amount_riel = $input['amount_riel']==''?null:$input['amount_riel'];
+        }
+
         $outcome->amount_kh = $input['amount_kh'];
 
         $last_outcome = Outcome::orderBy('number','desc')->first();

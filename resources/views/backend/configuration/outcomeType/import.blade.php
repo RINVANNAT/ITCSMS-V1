@@ -1,10 +1,10 @@
 @extends ('backend.layouts.master')
 
-@section ('title', trans('labels.backend.outcomeTypes.index_title') . ' | ' . trans('labels.backend.outcomeTypes.sub_import_title'))
+@section ('title', trans('labels.backend.outcomeTypes.title') . ' | ' . trans('labels.backend.outcomeTypes.sub_import_title'))
 
 @section('page-header')
     <h1>
-        {{ trans('labels.backend.outcomeTypes.index_title') }}
+        {{ trans('labels.backend.outcomeTypes.title') }}
         <small>{{ trans('labels.backend.outcomeTypes.sub_import_title') }}</small>
     </h1>
 @endsection

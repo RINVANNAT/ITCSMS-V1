@@ -44,6 +44,9 @@
                         <th>{{ trans('labels.backend.studentBac2s.fields.name_kh') }}</th>
                         <th>{{ trans('labels.backend.studentBac2s.fields.dob') }}</th>
                         <th>{{ trans('labels.backend.studentBac2s.fields.gender_id') }}</th>
+                        <th>{{ trans('labels.backend.studentBac2s.fields.highschool_id') }}</th>
+                        <th>{{ trans('labels.backend.studentBac2s.fields.percentile') }}</th>
+                        <th>{{ trans('labels.backend.studentBac2s.fields.grade') }}</th>
                         <th>{{ trans('labels.general.actions') }}</th>
                     </tr>
                     </thead>
@@ -66,9 +69,12 @@
                 pageLength: {!! config('app.records_per_page')!!},
                 ajax: '{!! route('admin.configuration.studentBac2.data') !!}',
                 columns: [
-                    { data: 'name_kh', name: 'name_kh'},
-                    { data: 'dob', name: 'dob'},
-                    { data: 'gender_id', name: 'gender_id'},
+                    { data: 'name_kh', name: 'studentBac2s.name_kh'},
+                    { data: 'dob', name: 'studentBac2s.dob'},
+                    { data: 'gender_name_kh', name: 'genders.name_kh'},
+                    { data: 'highSchool_name_kh', name: 'highSchools.name_kh'},
+                    { data: 'percentile', name: 'percentile',searchable:false},
+                    { data: 'gdeGrade_name_en', name: 'gdeGrades.name_en'},
                     { data: 'action', name: 'action',orderable: false, searchable: false}
                 ]
             });

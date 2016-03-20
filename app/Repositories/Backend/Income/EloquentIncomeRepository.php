@@ -5,13 +5,16 @@ namespace App\Repositories\Backend\Income;
 
 use App\Exceptions\GeneralException;
 use App\Models\Candidate;
+use App\Models\Employee;
 use App\Models\Income;
+use App\Models\IncomeType;
 use App\Models\Outcome;
 use App\Models\PayslipClient;
 use App\Models\SchoolFeeRate;
 use App\Models\StudentAnnual;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
+use SwaggerFixures\Customer;
 
 /**
  * Class EloquentIncomeRepository
@@ -60,12 +63,98 @@ class EloquentIncomeRepository implements IncomeRepositoryContract
 
     }
 
+    public function createSimpleIncome($input){
+
+        $query_ok = true;
+        $client_id = null;
+        DB::beginTransaction();
+
+        if($input['payslip_client_id'] == ""){ // This is new client or employee/student who haven't any records
+            // Create a payslipClient record first
+            $payslip_client = new PayslipClient();
+            $payslip_client->type = $input['client_type'];
+            $payslip_client->create_uid =auth()->id();
+            $payslip_client->created_at = Carbon::now();
+
+            if($payslip_client->save()){
+
+                if ($input['client_type'] == "Staff"){// Update employee with this new payslip_client
+                    $employee = Employee::find($input['client_id']);
+                    $employee->write_uid = auth()->id();
+                    $employee->payslip_client_id = $payslip_client->id;
+                    if(!$employee->save()){
+                        $query_ok = false;
+                    }
+                } else if ($input['client_type']=="Student") { // Update student with this new payslip_client
+                    $student = StudentAnnual::find($input['client_id']);
+                    $student->write_uid = auth()->id();
+                    $student->payslip_client_id = $payslip_client->id;
+                    if(!$student->save()){
+                        $query_ok = false;
+                    }
+                } else { // This is other
+                    $customer = Customer::find($input['client_id']);
+                    $customer->write_uid = auth()->id();
+                    $customer->payslip_client_id = $payslip_client->id;
+                    if(!$customer->save()){
+                        $query_ok = false;
+                    }
+                }
+
+                $client_id = $payslip_client->id;
+
+            }else {
+                $query_ok = false;
+            }
+        }
+
+        $income = new Income();
+
+        if(isset($input['amount_dollar'])){
+            $income->amount_dollar = $input['amount_dollar']==''?null:$input['amount_dollar'];
+        }
+        if(isset($input['amount_riel'])){
+            $income->amount_riel = $input['amount_riel']==''?null:$input['amount_riel'];
+        }
+
+        $income->amount_kh = $input['amount_kh'];
+
+        $last_income = Income::orderBy('number','desc')->first();
+
+        if($last_income != null) {
+            $next_number = (int)substr($last_income->number, 5)+1;
+        } else {
+            $next_number = 1;
+        }
+
+        $income->number = $next_number;
+        $income->pay_date = Carbon::now();
+        $income->create_uid =auth()->id();
+        $income->created_at = Carbon::now();
+        $income->pay_date = Carbon::now();
+        $income->payslip_client_id = $client_id;
+        $income->account_id = $input['account_id'];
+        $income->income_type_id = $input['income_type_id'];
+
+        if($income->save()){
+        } else {
+            $query_ok = false;
+        }
+
+        if($query_ok){
+            DB::commit();
+            return true;
+        } else {
+            DB::rollback();
+            throw new GeneralException(trans('exceptions.backend.general.create_error'));
+        }
+    }
     /**
      * @param  $input
      * @throws GeneralException
      * @return bool
      */
-    public function create($input)
+    public function create($input) // This is for student
     {
         $client_id = null;
 
@@ -73,9 +162,14 @@ class EloquentIncomeRepository implements IncomeRepositoryContract
 
         $income->created_at = Carbon::now();
         $income->create_uid = auth()->id();
-        $income->number = Income::count() + Outcome::count() + 1;
-        $income->amount_dollar = $input['amount_dollar']==""?null:$input['amount_dollar'];
-        $income->amount_riel = $input['amount_riel']==""?null:$input['amount_riel'];
+        $income->number = Income::count() + 1;
+        if(isset($input['amount_dollar'])){
+            $income->amount_dollar = $input['amount_dollar']==""?null:$input['amount_dollar'];
+        }
+        if(isset($input['amount_riel'])){
+            $income->amount_riel = $input['amount_riel']==""?null:$input['amount_riel'];
+        }
+
 
         $query_ok = true;
         DB::beginTransaction();

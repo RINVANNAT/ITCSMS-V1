@@ -26,31 +26,32 @@
                     <!-- Menu toggle button -->
                     <a href="#" class="dropdown-toggle" data-toggle="dropdown">
                         <i class="fa fa-envelope-o"></i>
-                        <span class="label label-success">4</span>
+                        <!--<span class="label label-success">4</span> -->
                     </a>
                     <ul class="dropdown-menu">
-                        <li class="header">{{ trans_choice('strings.backend.general.you_have.messages', 4, ['number' => 4]) }}</li>
+                        <!-- <li class="header">{{ trans_choice('strings.backend.general.you_have.messages', 4, ['number' => 4]) }}</li>
                         <li>
-                            <!-- inner menu: contains the messages -->
+
                             <ul class="menu">
-                                <li><!-- start message -->
+                                <li>
                                     <a href="#">
                                         <div class="pull-left">
-                                            <!-- User Image -->
+
                                             <img src="{!! access()->user()->picture !!}" class="img-circle" alt="User Image"/>
                                         </div>
-                                        <!-- Message title and timestamp -->
+
                                         <h4>
                                             Support Team
                                             <small><i class="fa fa-clock-o"></i> 5 mins</small>
                                         </h4>
-                                        <!-- The message -->
+
                                         <p>Why not buy a new awesome theme?</p>
                                     </a>
-                                </li><!-- end message -->
-                            </ul><!-- /.menu -->
+                                </li>
+                            </ul>
                         </li>
                         <li class="footer"><a href="#">{{ trans('strings.backend.general.see_all.messages') }}</a></li>
+                        -->
                     </ul>
                 </li><!-- /.messages-menu -->
 
@@ -59,21 +60,22 @@
                     <!-- Menu toggle button -->
                     <a href="#" class="dropdown-toggle" data-toggle="dropdown">
                         <i class="fa fa-bell-o"></i>
-                        <span class="label label-warning">0</span>
+                        <!--<span class="label label-warning">0</span> -->
                     </a>
                     <ul class="dropdown-menu">
-                        <li class="header">{{ trans_choice('strings.backend.general.you_have.notifications', 0) }}</li>
+                        <!--<li class="header">{{ trans_choice('strings.backend.general.you_have.notifications', 0) }}</li>
                         <li>
-                            <!-- Inner Menu: contains the notifications -->
+
                             <ul class="menu">
-                                <li><!-- start notification -->
+
                                     <a href="#">
                                         <i class="fa fa-users text-aqua"></i> 5 new members joined today
                                     </a>
-                                </li><!-- end notification -->
+                                </li>
                             </ul>
                         </li>
                         <li class="footer"><a href="#">{{ trans('strings.backend.general.see_all.notifications') }}</a></li>
+                        -->
                     </ul>
                 </li>
 
@@ -82,34 +84,30 @@
                     <!-- Menu Toggle Button -->
                     <a href="#" class="dropdown-toggle" data-toggle="dropdown">
                         <i class="fa fa-flag-o"></i>
-                        <span class="label label-danger">1</span>
+                        <!--<span class="label label-danger">1</span>-->
                     </a>
                     <ul class="dropdown-menu">
-                        <li class="header">{{ trans_choice('strings.backend.general.you_have.tasks', 1) }}</li>
+                        <!--<li class="header">{{ trans_choice('strings.backend.general.you_have.tasks', 1) }}</li>
                         <li>
-                            <!-- Inner menu: contains the tasks -->
+
                             <ul class="menu">
-                                <li><!-- Task item -->
                                     <a href="#">
-                                        <!-- Task title and progress text -->
                                         <h3>
                                             Design some buttons
                                             <small class="pull-right">20%</small>
                                         </h3>
-                                        <!-- The progress bar -->
                                         <div class="progress xs">
-                                            <!-- Change the css width attribute to simulate progress -->
                                             <div class="progress-bar progress-bar-aqua" style="width: 20%" role="progressbar" aria-valuenow="20" aria-valuemin="0" aria-valuemax="100">
                                                 <span class="sr-only">20% Complete</span>
                                             </div>
                                         </div>
                                     </a>
-                                </li><!-- end task item -->
+                                </li><
                             </ul>
                         </li>
                         <li class="footer">
                             <a href="#">{{ trans('strings.backend.general.see_all.tasks') }}</a>
-                        </li>
+                        </li> -->
                     </ul>
                 </li>
 
@@ -129,19 +127,19 @@
                             <img src="{!! access()->user()->picture !!}" class="img-circle" alt="User Image" />
                             <p>
                                 {!! access()->user()->name !!} - {{ trans('roles.web_developer') }}
-                                <small>{{ trans('strings.backend.general.member_since') }} XX/XX/XXXX</small>
+                               <!-- <small>{{ trans('strings.backend.general.member_since') }} XX/XX/XXXX</small> -->
                             </p>
                         </li>
                         <!-- Menu Body -->
                         <li class="user-body">
                             <div class="col-xs-4 text-center">
-                                <a href="#">Link</a>
+                                <a href="#"></a>
                             </div>
                             <div class="col-xs-4 text-center">
-                                <a href="#">Link</a>
+                                <a href="#"></a>
                             </div>
                             <div class="col-xs-4 text-center">
-                                <a href="#">Link</a>
+                                <a href="#"></a>
                             </div>
                         </li>
                         <!-- Menu Footer-->

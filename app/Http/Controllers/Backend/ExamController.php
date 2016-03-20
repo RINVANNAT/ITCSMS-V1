@@ -68,7 +68,7 @@ class ExamController extends Controller
     public function store(StoreExamRequest $request, $id)
     {
         $this->exams->create($request->all());
-        return redirect()->route('admin.exam.index',$id)->withFlashSuccess(trans('alerts.backend.generals.created'));
+        return redirect()->route('admin.exams.show',$id)->withFlashSuccess(trans('alerts.backend.generals.created'));
     }
 
     /**
