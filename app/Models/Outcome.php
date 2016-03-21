@@ -6,6 +6,7 @@ class Outcome extends Model
 {
     
 	public $table = "outcomes";
+    protected  $dates = ['pay_date'];
 
 	public $fillable = [
 		"amount_dollar",
@@ -56,10 +57,6 @@ class Outcome extends Model
 	];
 
 	public static $rules = [
-		"amount_dollar"=>'max:50',
-		"amount_dollar_kh"=>'max:255',
-		"amount_riel"=>'max:50',
-		"amount_riel_kh"=>'max:255',
 	];
 
 }

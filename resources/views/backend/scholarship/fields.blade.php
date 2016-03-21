@@ -51,7 +51,7 @@
 <div class="form-group">
     {!! Form::label('name', trans('labels.backend.scholarships.fields.date_start_end'), ['class' => 'col-lg-2 control-label']) !!}
     <div class="col-lg-10">
-        <input type="text" name="date_start_end" class="form-control pull-right" id="date_start_end" value="{!! isset($scholarship)?$scholarship->start->format('d/m/Y')." - ".$scholarship->stop->format('d/m/Y'):"" !!}">
+        <input type="text" name="date_start_end" class="form-control pull-right" id="date_start_end" value="{!! isset($scholarship->start)?$scholarship->start->format('d/m/Y')." - ".$scholarship->stop->format('d/m/Y'):"" !!}">
     </div>
 </div><!--form control-->
 

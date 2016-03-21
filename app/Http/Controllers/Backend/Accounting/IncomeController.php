@@ -272,7 +272,7 @@ class IncomeController extends Controller
         if($request->ajax()){
             return json_encode(array("sucess"=>true));
         }
-        return redirect()->route('admin.accounting.incomes.index')->withFlashSuccess(trans('alerts.backend.general.created'));
+        return redirect()->route('admin.accounting.incomes.index')->withFlashSuccess(trans('alerts.backend.generals.created'));
     }
 
     /**
@@ -348,10 +348,33 @@ class IncomeController extends Controller
             ->editColumn('amount_dollar','{{$amount_dollar==""?0:$amount_dollar." $"}}')
             ->editColumn('amount_riel','{{$amount_riel==null?0:$amount_riel." ៛"}}')
             ->addColumn('action', function ($income) {
-                return  '<a href="'.route('admin.accounting.incomes.edit',$income->id).'" class="btn btn-xs btn-primary"><i class="fa fa-pencil" data-toggle="tooltip" data-placement="top" title="" data-original-title="'.trans('buttons.general.crud.edit').'"></i> </a>'.
-                ' <button class="btn btn-xs btn-danger btn-delete" data-remote="'.route('admin.accounting.incomes.destroy', $income->id) .'"><i class="fa fa-times" data-toggle="tooltip" data-placement="top" title="' . trans('buttons.general.crud.delete') . '"></i></button>';
+                //return  '<a href="'.route('admin.accounting.income.simple_print',$income->id).'" class="btn btn-xs btn-primary"><i class="fa fa-print" data-toggle="tooltip" data-placement="top" title="" data-original-title="'.trans('buttons.general.crud.edit').'"></i> </a>';
+                return  '<a href="#" class="btn btn-xs btn-primary"><i class="fa fa-print" data-toggle="tooltip" data-placement="top" title="" data-original-title="'.trans('buttons.general.crud.edit').'"></i> </a>';
             })
             ->make(true);
+    }
+
+    /**
+     * @param $id
+     * @return Print simple income
+     */
+    public function print_simple_income($id){
+
+        return true;
+
+        $income = Income::where('id',$id)->with([
+            "payslipClient",
+            "payslipClient.student",
+            "payslipClient.student.student",
+            "payslipClient.student.student.gender",
+            "payslipClient.student.department",
+            "payslipClient.student.grade",
+            "payslipClient.student.promotion",
+            "payslipClient.student.academic_year",
+        ])->first();
+
+
+        return view('backend.accounting.studentPayment.print.payslip_print',compact('income','count','debt'));
     }
 
     public function print_income($id){

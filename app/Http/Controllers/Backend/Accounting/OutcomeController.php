@@ -8,6 +8,7 @@ use App\Models\Account;
 use App\Models\Customer;
 use App\Models\Department;
 use App\Models\Employee;
+use App\Models\Outcome;
 use App\Models\OutcomeType;
 use App\Models\School;
 use App\Repositories\Backend\Outcome\OutcomeRepositoryContract;
@@ -140,11 +141,13 @@ class OutcomeController extends Controller
 
 
         return $datatables
-            ->editColumn('amount_dollar', '{!! $amount_dollar . " $" !!}')
+            ->editColumn('number','{{str_pad($number, 4, "0", STR_PAD_LEFT)}}')
+            ->editColumn('amount_dollar', '{!! $amount_dollar==null? "0 $" :$amount_dollar. " $" !!}')
             ->editColumn('amount_riel', '{!! $amount_riel==null? "0 ៛": $amount_riel. " ៛" !!}')
             ->addColumn('action', function ($outcome) {
-                return  '<a href="'.route('admin.accounting.incomes.edit',$outcome->outcome_id).'" class="btn btn-xs btn-primary"><i class="fa fa-pencil" data-toggle="tooltip" data-placement="top" title="" data-original-title="'.trans('buttons.general.crud.edit').'"></i> </a>'.
-                ' <button class="btn btn-xs btn-danger btn-delete" data-remote="'.route('admin.accounting.incomes.destroy', $outcome->outcome_id) .'"><i class="fa fa-times" data-toggle="tooltip" data-placement="top" title="' . trans('buttons.general.crud.delete') . '"></i></button>';
+                //return  '<a href="'.route('admin.accounting.incomes.edit',$outcome->outcome_id).'" class="btn btn-xs btn-primary"><i class="fa fa-pencil" data-toggle="tooltip" data-placement="top" title="" data-original-title="'.trans('buttons.general.crud.edit').'"></i> </a>'.
+                //' <button class="btn btn-xs btn-danger btn-delete" data-remote="'.route('admin.accounting.incomes.destroy', $outcome->outcome_id) .'"><i class="fa fa-times" data-toggle="tooltip" data-placement="top" title="' . trans('buttons.general.crud.delete') . '"></i></button>';
+                return  '<a href="'.route('admin.accounting.outcome.simple_print',$outcome->outcome_id).'" class="btn btn-xs btn-primary"><i class="fa fa-print" data-toggle="tooltip" data-placement="top" title="" data-original-title="'.trans('buttons.general.crud.edit').'"></i> </a>';
             })
             ->make(true);
     }
@@ -194,6 +197,31 @@ class OutcomeController extends Controller
             );
             return response()->json($results);
         }
+    }
+
+    /**
+     * @param $id
+     * @return Print simple outcome
+     */
+    public function print_simple_outcome($id){
+
+
+        $outcome = Outcome::where('id',$id)->with([
+            "payslipClient",
+            "payslipClient.employee",
+            "payslipClient.employee.department",
+            "payslipClient.customer",
+            "payslipClient.student",
+            "payslipClient.student.student",
+            "payslipClient.student.student.gender",
+            "payslipClient.student.department",
+            "payslipClient.student.grade",
+            "payslipClient.student.promotion",
+            "payslipClient.student.academic_year",
+            "outcomeType"
+        ])->first();
+
+        return view('backend.accounting.outcome.print.simple_print',compact('outcome'));
     }
 
 }

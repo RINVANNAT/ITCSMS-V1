@@ -131,11 +131,6 @@ class ScholarshipController extends Controller
 
 
         return $datatables
-            ->editColumn('name_kh', '{!! str_limit($name_kh, 60) !!}')
-            ->editColumn('name_en', '{!! str_limit($name_en, 60) !!}')
-            ->editColumn('name_fr', '{!! $name_fr !!}')
-            ->editColumn('code', '{!! $code !!}')
-            ->editColumn('founder', '{!! $founder !!}')
             ->addColumn('action', function ($scholarship) {
                 return  '<a href="'.route('admin.scholarships.edit',$scholarship->id).'" class="btn btn-xs btn-primary"><i class="fa fa-pencil" data-toggle="tooltip" data-placement="top" title="" data-original-title="'.trans('buttons.general.crud.edit').'"></i> </a>'.
                 ' <button class="btn btn-xs btn-danger btn-delete" data-remote="'.route('admin.scholarships.destroy', $scholarship->id) .'"><i class="fa fa-times" data-toggle="tooltip" data-placement="top" title="' . trans('buttons.general.crud.delete') . '"></i></button>'.

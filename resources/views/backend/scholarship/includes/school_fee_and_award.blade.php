@@ -6,7 +6,6 @@
                 <th>{{trans('labels.backend.scholarships.school_fee_and_award_tab.degree')}}</th>
                 <th>{{trans('labels.backend.scholarships.school_fee_and_award_tab.promotion')}}</th>
                 <th>{{trans('labels.backend.scholarships.school_fee_and_award_tab.school_fee_rate')}}</th>
-                <th>{{trans('labels.backend.scholarships.school_fee_and_award_tab.scholarship_budget')}}</th>
             </tr>
             </thead>
 

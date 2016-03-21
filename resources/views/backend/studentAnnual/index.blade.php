@@ -76,7 +76,7 @@
                 serverSide: true,
                 pageLength: {!! config('app.records_per_page')!!},
                 ajax: {
-                    url:"{!! route('admin.student.data',0) !!}",
+                    url:"{!! route('admin.student.data') !!}",
                     data:function(d){
                         d.academic_year = $('#filter_academic_year').val();
                         d.degree = $('#filter_degree').val();

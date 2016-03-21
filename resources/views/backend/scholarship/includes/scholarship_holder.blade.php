@@ -1,7 +1,7 @@
 <div class="panel box box-solid">
     <div class="box-header with-border">
         <h3 style="font-size: 16px;" class="box-title">
-
+            <button class="btn btn-primary btn-sm">{{trans('buttons.general.add')}}</button>
         </h3>
     </div>
     <div class="box-body">
@@ -17,7 +17,6 @@
             </thead>
 
         </table>
-        <button class="btn btn-danger btn-sm">{{trans('messages.add')}}</button>
     </div>
     <!-- /.box-body -->
 </div>

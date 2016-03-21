@@ -10,6 +10,7 @@ Route::group([
         Route::resource('incomes', 'IncomeController');
         Route::get('income-data', 'IncomeController@data')->name('admin.accounting.income.data');
         Route::get('income/{id}/print', 'IncomeController@print_income')->name('admin.accounting.income.print');
+        Route::get('income/{id}/simple_print', 'IncomeController@print_simple_income')->name('admin.accounting.income.simple_print');
 
     });
 
@@ -17,6 +18,8 @@ Route::group([
         Route::resource('outcomes', 'OutcomeController');
         Route::get('outcome-data', 'OutcomeController@data')->name('admin.accounting.outcome.data');
         Route::get('client/search', 'OutcomeController@client_search')->name('admin.client.search');
+
+        Route::get('outcome/{id}/simple_print', 'OutcomeController@print_simple_outcome')->name('admin.accounting.outcome.simple_print');
     });
 
     Route::group([], function() {

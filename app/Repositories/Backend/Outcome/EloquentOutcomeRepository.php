@@ -63,7 +63,7 @@ class EloquentOutcomeRepository implements OutcomeRepositoryContract
      * @throws GeneralException
      * @return bool
      */
-    public function create(StoreOutcomeRequest $request)
+    public function create(StoreOutcomeRequest $request)  // This is for general outcome, for student case, we are waiting for their feedback
     {
 
         $input = $request->all();
@@ -125,7 +125,7 @@ class EloquentOutcomeRepository implements OutcomeRepositoryContract
         $last_outcome = Outcome::orderBy('number','desc')->first();
 
         if($last_outcome != null) {
-            $next_number = (int)substr($last_outcome->number, 5)+1;
+            $next_number = $last_outcome->number+1;
         } else {
             $next_number = 1;
         }
@@ -135,9 +135,12 @@ class EloquentOutcomeRepository implements OutcomeRepositoryContract
         $outcome->create_uid =auth()->id();
         $outcome->created_at = Carbon::now();
         $outcome->pay_date = Carbon::now();
-        $outcome->payslip_client_id = $client_id;
+        $outcome->payslip_client_id = $client_id==null?$input['payslip_client_id']:$client_id;
         $outcome->account_id = $input['account_id'];
         $outcome->outcome_type_id = $input['outcome_type_id'];
+        if(isset($input['description'])){
+            $outcome->description = $input['description'];
+        }
         $outcome->attachment_name = $input['attachment_title']==""?null:$input['attachment_title'];
 
         if($outcome->save()){

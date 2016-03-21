@@ -144,7 +144,7 @@
             <span class="show_value col-sm-10">{{$studentAnnual->department->name_kh}} &nbsp;</span>
 
             <span class="show_label col-sm-2">{{trans('labels.backend.students.fields.department_option_id')}}</span>
-            <span class="show_value col-sm-10">{{$studentAnnual->department_option->name_kh}} &nbsp;</span>
+            <span class="show_value col-sm-10">{{isset($studentAnnual->department_option)?$studentAnnual->department_option->name_kh:""}} &nbsp;</span>
 
             <span class="show_label col-sm-2">{{trans('labels.backend.students.fields.group')}}</span>
             <span class="show_value col-sm-10">{{$studentAnnual->group}} &nbsp;</span>

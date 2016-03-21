@@ -175,7 +175,7 @@ class StudentAnnualController extends Controller
         }
     }
 
-    public function data(Request $request, $scholarship_id) // 0 mean, scholarship id is not applied
+    public function data(Request $request) // 0 mean, scholarship id is not applied
     {
 
         //$keyword = "%".strtolower($_GET["search"]["value"])."%";
@@ -189,7 +189,9 @@ class StudentAnnualController extends Controller
             ->leftJoin('grades', 'studentAnnuals.grade_id', '=', 'grades.id')
             ->leftJoin('departmentOptions', 'studentAnnuals.department_option_id', '=', 'departmentOptions.id')
             ->leftJoin('departments', 'studentAnnuals.department_id', '=', 'departments.id')
-            ->leftJoin('degrees', 'studentAnnuals.degree_id', '=', 'degrees.id');
+            ->leftJoin('degrees', 'studentAnnuals.degree_id', '=', 'degrees.id')
+            ->leftJoin('scholarship_student_annual','studentAnnuals.id','=','scholarship_student_annual.student_annual_id');
+
 
 
         $datatables = app('datatables')->of($studentAnnuals)
@@ -222,9 +224,11 @@ class StudentAnnualController extends Controller
         if ($option = $datatables->request->get('option')) {
             $datatables->where('studentAnnuals.department_option_id', '=', $option);
         }
-
         if ($origin = $datatables->request->get('origin')) {
             $datatables->where('students.origin_id', '=', $origin);
+        }
+        if ($scholarship = $datatables->request->get('scholarship')) {
+            $datatables->where('scholarship_student_annual.scholarship_id', '=', $scholarship);
         }
 
 

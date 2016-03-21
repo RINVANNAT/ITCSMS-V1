@@ -40,7 +40,7 @@
                         <th>{{ trans('labels.backend.accounting.fields.amount_dollar') }}</th>
                         <th>{{ trans('labels.backend.accounting.fields.amount_riel') }}</th>
                         <th>{{ trans('labels.backend.accounting.fields.account_id') }}</th>
-                        <th>{{ trans('labels.backend.accounting.fields.payslip_client_id') }}</th>
+                        <th>{{ trans('labels.backend.accounting.fields.client') }}</th>
                         <th>{{ trans('labels.general.actions') }}</th>
                     </tr>
                     </thead>

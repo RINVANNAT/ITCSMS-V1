@@ -54,17 +54,16 @@
                 pageLength: {!! config('app.records_per_page')!!},
                 ajax: '{!! route('admin.configuration.schoolFee.data',["true",$scholarship->id]) !!}',
                 columns: [
-                    { data: 'group', name: 'group', orderable:false, searchable:false},
+                    { data: 'degree_name_kh', name: 'degree_name_kh', orderable:false, searchable:false},
                     { data: 'promotion_name', name: 'promotion_name', orderable:false, searchable:false},
                     { data: 'to_pay', name: 'to_pay', orderable:false, searchable:false},
-                    { data: 'budget', name: 'budget', orderable:false, searchable:false},
                 ]
             });
             $('#scholarship_holder_table').DataTable({
                 processing: true,
                 serverSide: true,
                 pageLength: {!! config('app.records_per_page')!!},
-                ajax: '{!! route('admin.student.data',$scholarship->id) !!}',
+                ajax: '{!! route('admin.student.data')."?scholarship=".$scholarship->id !!}',
                 columns: [
                     { data: 'id_card', name: 'students.id_card',orderable:false,searchable:false },
                     { data: 'name_kh', name: 'students.name_kh',orderable:false,searchable:false },
