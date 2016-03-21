@@ -31,7 +31,8 @@ class CreateCandidatesTable extends Migration
 
 			$table->timestamps();
             $table->boolean('is_paid')->default(false);
-			$table->string('result')->nullable();
+            $table->boolean('is_register')->default(false);
+			$table->enum('result',['Pending','Pass','Fail','Rejected'])->default('Pending');
             $table->enum('register_from',['ITC', 'Ministry'])->default('ITC');
 
             $table->integer('math_c')->nullable();
@@ -133,6 +134,18 @@ class CreateCandidatesTable extends Migration
             $table->foreign('degree_id')
                 ->references('id')
                 ->on('degrees')
+                ->onDelete('NO ACTION');
+
+            $table->integer('grade_id')->unsigned()->default(1)->index();
+            $table->foreign('grade_id')
+                ->references('id')
+                ->on('grades')
+                ->onDelete('NO ACTION');
+
+            $table->integer('department_id')->unsigned()->index()->nullable(); // It will be defined when student passed.
+            $table->foreign('department_id')
+                ->references('id')
+                ->on('departments')
                 ->onDelete('NO ACTION');
 
             $table->integer('studentBac2_id')->unsigned()->index()->nullable();

@@ -11,6 +11,17 @@
 
 @section('after-styles-end')
     {!! Html::style('plugins/datatables/dataTables.bootstrap.css') !!}
+    <style>
+        .Pending {
+            background-color: #9FAFD1;
+        }
+        .Pass {
+            background-color: white;
+        }
+        .Fail {
+            background-color: #842210;
+        }
+    </style>
 @stop
 
 
@@ -88,12 +99,50 @@
                 pageLength: {!! config('app.records_per_page')!!},
                 ajax: '{!! route('admin.candidate.data')."?exam_id=".$exam->id !!}',
                 columns: [
-                    { data: 'name_kh', name: 'name_kh'},
-                    { data: 'name_latin', name: 'name_en'},
+                    { data: 'name_kh', name: 'candidates.name_kh'},
+                    { data: 'name_latin', name: 'candidates.name_en'},
                     { data: 'gender_name_kh', name: 'genders.name_kh'},
+                    { data: 'dob', name: 'candidates.dob'},
+                    { data: 'province', name: 'origins.name_kh'},
                     { data: 'bac_total_grade', name: 'bac_total_grade'},
+                    { data: 'result', name: 'candidates.result'},
                     { data: 'action', name: 'action',orderable: false, searchable: false}
                 ]
+            });
+            enableDeleteRecord($('#candidates-table'));
+
+            $('#candidates-table').on('click', '.btn-register[data-remote]', function (e) {
+                var url = $(this).data('remote');
+                e.preventDefault();
+                swal({
+                    title: "Confirm",
+                    text: "Register this candidate?",
+                    type: "info",
+                    showCancelButton: true,
+                    confirmButtonColor: "#DD6B55",
+                    confirmButtonText: "Yes, register it!",
+                    closeOnConfirm: true
+                }, function(confirmed) {
+                    if (confirmed) {
+                        $.ajaxSetup({
+                            headers: {
+                                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                            }
+                        });
+
+                        // confirm then
+                        $.ajax({
+                            url: url,
+                            type: 'GET',
+                            dataType: 'json',
+                            success:function(data) {
+                                candidate_datatable.draw();
+                            }
+                        });
+                    }
+                });
+                return false;
+
             });
 
             $(document).on('click', '#btn_add_candidate', function (e) {

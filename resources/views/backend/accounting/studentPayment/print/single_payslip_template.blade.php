@@ -22,12 +22,20 @@
         <td colspan="3">
             <div class="col-md-6 col-xs-6"> នាមត្រកូល និង នាមខ្លួន
                 <strong>
-                    {{$income->payslipClient->student->student->name_kh}}
+                    @if(isset($income->payslipClient->student))
+                        {{$income->payslipClient->student->student->name_kh}}
+                    @else
+                        {{$income->payslipClient->candidate->name_kh}}
+                    @endif
                 </strong>
             </div>
             <div class="col-md-6 col-xs-6"> អក្សរឡាតាំង
                 <strong>
-                    {{$income->payslipClient->student->student->name_latin}}
+                    @if(isset($income->payslipClient->student))
+                        {{$income->payslipClient->student->student->name_latin}}
+                    @else
+                        {{$income->payslipClient->candidate->name_latin}}
+                    @endif
                 </strong>
             </div>
         </td>
@@ -36,13 +44,21 @@
         <td colspan="3">
             <div class="col-md-6 col-xs-6" align="right">ភេទ
                 <strong style="padding-right: 30px;">
-                    {{$income->payslipClient->student->student->gender->name_kh}}
+                    @if(isset($income->payslipClient->student))
+                        {{$income->payslipClient->student->student->gender->name_kh}}
+                    @else
+                        {{$income->payslipClient->candidate->gender->name_kh}}
+                    @endif
                 </strong>
             </div>
             <div class="col-md-6 col-xs-6" style="padding-left: 0px;">ថ្ងែខែឆ្នាំកំណើត
                 <strong class="dob">
                     <?php
-                        $dob =  \Carbon\Carbon::createFromFormat('Y-m-d h:i:s',$income->payslipClient->student->student->dob);
+                        if(isset($income->payslipClient->student)){
+                            $dob =  \Carbon\Carbon::createFromFormat('Y-m-d h:i:s',$income->payslipClient->student->student->dob);
+                        } else {
+                            $dob =  \Carbon\Carbon::createFromFormat('Y-m-d h:i:s',$income->payslipClient->candidate->dob);
+                        }
                     ?>
                     {{$dob->format('d/m/Y')}}
                 </strong>
@@ -83,11 +99,21 @@
             <div class="col-md-12 col-xs-12">
                 ជានិស្សិតដេប៉ាតឺម៉ង់
                 <strong>
-                    {{$income->payslipClient->student->department->name_kh}}
+                    @if(isset($income->payslipClient->student))
+                        {{$income->payslipClient->student->department->name_kh}}
+                    @else
+                        @if(isset($income->payslipClient->candidate->department))
+                            {{$income->payslipClient->candidate->department->name_kh}}
+                        @endif
+                    @endif
 
                 </strong> ឆ្នាំទី
                 <strong>
-                    {{$income->payslipClient->student->grade->name_kh}}
+                    @if(isset($income->payslipClient->student))
+                        {{$income->payslipClient->student->grade->name_kh}}
+                    @else
+                        {{$income->payslipClient->candidate->grade->name_kh}}
+                    @endif
 
                 </strong>
             </div>
@@ -101,13 +127,21 @@
                     Ingenieur
                 </strong> ជំនាន់/វគ្គ
                 <strong id="candidate_promotion">
-                    {{$income->payslipClient->student->promotion->name}}
+                    @if(isset($income->payslipClient->student))
+                        {{$income->payslipClient->student->promotion->name}}
+                    @else
+                        {{$income->payslipClient->candidate->promotion->name}}
+                    @endif
                 </strong> បង់លើកទី
                 <strong class="sequence">
                     {{$income->sequence}}
                 </strong> ឆ្នាំសិក្សា
                 <strong id="candidate_academic_year">
-                    {{$income->payslipClient->student->academic_year->name_kh}}
+                    @if(isset($income->payslipClient->student))
+                        {{$income->payslipClient->student->academic_year->name_kh}}
+                    @else
+                        {{$income->payslipClient->candidate->academic_year->name_kh}}
+                    @endif
                 </strong>
             </div>
         </td>

@@ -537,7 +537,8 @@ return [
                 'exam_id' => "Exam Date",
                 'payslip_client_id' => "Payment ID",
                 'origin_id' => "Origin",
-                'preferred_department' => "Prefered Departments"
+                'preferred_department' => "Prefered Departments",
+                'class' => 'Class'
             ]
         ],
         'reporting' => [
@@ -753,6 +754,13 @@ return [
                 'observation' => 'Observation',
                 'active' => 'Active',
             ]
+        ],
+        'candidatePayments' => [
+            'title' => 'Candidate Payment',
+            'sub_index_title' => 'All existing candidate payments',
+            'sub_edit_title' => 'Edit candidate payment information',
+            'sub_create_title' => 'Create new payment',
+            'sub_detail_title' => 'Detail of a payment',
         ],
     ],
 

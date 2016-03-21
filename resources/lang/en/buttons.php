@@ -43,6 +43,7 @@ return [
         'export' => 'Export',
         'close' => 'Close',
         'save_close' => 'Save & Close',
-        'save_print' => 'Save & Print'
+        'save_print' => 'Save & Print',
+        'register' => 'Register'
     ],
 ];

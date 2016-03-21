@@ -31,6 +31,8 @@ interface StudentAnnualRepositoryContract
      */
     public function getAllStudentAnnuals($order_by = 'id', $sort = 'asc');
 
+    public function register($candidate);
+
     /**
      * @param  $input
      * @return mixed

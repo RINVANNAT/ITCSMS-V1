@@ -14,6 +14,7 @@ use App\Models\SchoolFeeRate;
 use App\Models\StudentAnnual;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Input;
 use SwaggerFixures\Customer;
 
 /**
@@ -175,7 +176,7 @@ class EloquentIncomeRepository implements IncomeRepositoryContract
         DB::beginTransaction();
         if($input['payslip_client_id']== ""){ //This is new client, generate a payslip client id for him/her
             $payslip_client = new PayslipClient();
-            $payslip_client->type = "Student";
+            $payslip_client->type = Input::get('type');
             $payslip_client->create_uid =auth()->id();
             if($payslip_client->save()){ // New client id is created, so link to user
                 $client_id = $payslip_client->id;
@@ -187,11 +188,19 @@ class EloquentIncomeRepository implements IncomeRepositoryContract
                         $query_ok = false;
                     }
                 }
-                if($input['student_annual_id']!=""){
+                if($input['student_annual_id']!=""){ // For student
                     $student = StudentAnnual::find($input['student_annual_id']);
                     $student->write_uid = auth()->id();
                     $student->payslip_client_id = $client_id;
                     if(!$student->save()){
+                        $query_ok = false;
+                    }
+                } else if($input['candidate_id']!= ""){ // For candidate
+                    $candidate = Candidate::find($input['candidate_id']);
+                    $candidate->write_uid = auth()->id();
+                    $candidate->payslip_client_id = $client_id;
+                    $candidate->is_paid = true;
+                    if(!$candidate->save()){
                         $query_ok = false;
                     }
                 }
@@ -225,7 +234,7 @@ class EloquentIncomeRepository implements IncomeRepositoryContract
             }
         }
 
-        if($query_ok){
+        if($query_ok && Input::get('type') == "student"){  // This operation is no need for candidate
             // now check if student has made the full payment
 
             $total_topay = null;

@@ -231,7 +231,7 @@
                     type:'POST',
                     dataType:'json',
                     data:$('#payslip_income_form').serialize(),
-                    url:'{{route('admin.accounting.incomes.store')."?type=student"}}',
+                    url:'{{route('admin.accounting.incomes.store')."?type=Student"}}', // Will be passed to table payslipClient as a type
                     beforeSend:function(){
                         // do nothing for now
                     },

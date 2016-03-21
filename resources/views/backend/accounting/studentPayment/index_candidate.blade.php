@@ -1,11 +1,11 @@
 @extends ('backend.layouts.master')
 
-@section ('title', trans('labels.backend.studentPayments.title'))
+@section ('title', trans('labels.backend.candidatePayments.title'))
 
 @section('page-header')
     <h1>
-        {{ trans('labels.backend.studentPayments.title') }}
-        <small>{{ trans('labels.backend.studentPayments.sub_index_title') }}</small>
+        {{ trans('labels.backend.candidatePayments.title') }}
+        <small>{{ trans('labels.backend.candidatePayments.sub_index_title') }}</small>
     </h1>
 
 @endsection
@@ -91,7 +91,9 @@
                         <th>{{ trans('labels.backend.candidates.fields.name_kh') }}</th>
                         <th>{{ trans('labels.backend.candidates.fields.name_latin') }}</th>
                         <th>{{ trans('labels.backend.candidates.fields.gender_id') }}</th>
-                        <th>{{ trans('labels.backend.candidates.fields.bac_total_grade') }}</th>
+                        <th>{{ trans('labels.backend.candidates.fields.dob') }}</th>
+                        <th>{{ trans('labels.backend.candidates.fields.province_id') }}</th>
+                        <th>{{ trans('labels.backend.candidates.fields.class') }}</th>
                         <th>{{ trans('labels.general.actions') }}</th>
                     </tr>
                     </thead>
@@ -138,18 +140,20 @@
                 ajax: {
                     url:"{!! route('admin.accounting.candidatePayment.data') !!}",
                     data:function(d){
-                        d.academic_year = $('#filter_academic_year').val();
-                        d.degree = $('#filter_degree').val();
-                        d.grade = $('#filter_grade').val();
-                        d.department = $('#filter_department').val();
-                        d.gender = $('#filter_gender').val();
+                        d.academic_year_id = $('#filter_academic_year').val();
+                        d.degree_id = $('#filter_degree').val();
+                        d.exam_id = $('#filter_exam').val();
+                        d.department_id = $('#filter_department').val();
+                        d.gender_id = $('#filter_gender').val();
                     }
                 },
                 columns: [
                     { data: 'name_kh', name: 'candidates.name_kh'},
-                    { data: 'name_latin', name: 'candidates.name_latin'},
+                    { data: 'name_latin', name: 'candidates.name_en'},
                     { data: 'gender_name_kh', name: 'genders.name_kh'},
-                    { data: 'bac_total_grade', name: 'gdeGrade.name_en'},
+                    { data: 'dob', name: 'candidates.dob'},
+                    { data: 'province', name: 'origins.name_kh'},
+                    { data: 'class', name: 'class',searchable:false,orderable:false},
                     {
                         "className":      'details-control',
                         "orderable":      false,
@@ -159,16 +163,14 @@
                     },
                 ]
             });
+
             $("div.toolbar").html(
                     ' {!! Form::select('academic_year',$academicYears,null, array('class'=>'form-control','id'=>'filter_academic_year')) !!} '+
-                    ' &nbsp;<label for="name">Class</label> '+
-                    '{!! Form::select('degree',$degrees,null, array('class'=>'form-control','id'=>'filter_degree','placeholder'=>'')) !!} '+
-                    '{!! Form::select('grade',$grades,null, array('class'=>'form-control','id'=>'filter_grade','placeholder'=>'')) !!} '+
-                    '{!! Form::select('department',$departments,null, array('class'=>'form-control','id'=>'filter_department','placeholder'=>'')) !!}' +
-                    '&nbsp;&nbsp; <label for="name">Gender</label> '+
-                    '{!! Form::select('gender',$genders,null, array('class'=>'form-control','id'=>'filter_gender','placeholder'=>'')) !!} '+
-                    '&nbsp;&nbsp; <label for="name">Option</label> '+
-                    '{!! Form::select('option',$options,null, array('class'=>'form-control','id'=>'filter_option','placeholder'=>'')) !!} '
+                    '{!! Form::select('exam',$exams,null, array('class'=>'form-control','id'=>'filter_exam','placeholder'=>'Exam')) !!} - '+
+                    '{!! Form::select('degree',$degrees,null, array('class'=>'form-control','id'=>'filter_degree','placeholder'=>'Degree')) !!} '+
+                    '{!! Form::select('department',$departments,null, array('class'=>'form-control','id'=>'filter_department','placeholder'=>'Department')) !!} ' +
+                    '{!! Form::select('gender',$genders,null, array('class'=>'form-control','id'=>'filter_gender','placeholder'=>'Gender')) !!} '
+
             );
 
             $('#filter_academic_year').on('change', function(e) {
@@ -180,10 +182,7 @@
                 oTable.draw();
                 e.preventDefault();
             });
-            $('#filter_grade').on('change', function(e) {
-                oTable.draw();
-                e.preventDefault();
-            });
+
             $('#filter_department').on('change', function(e) {
                 oTable.draw();
                 e.preventDefault();
@@ -192,7 +191,8 @@
                 oTable.draw();
                 e.preventDefault();
             });
-            $('#filter_option').on('change', function(e) {
+
+            $('#filter_exam').on('change', function(e) {
                 oTable.draw();
                 e.preventDefault();
             });
@@ -221,7 +221,7 @@
                     type:'POST',
                     dataType:'json',
                     data:$('#payslip_income_form').serialize(),
-                    url:'{{route('admin.accounting.incomes.store')."?type=student"}}',
+                    url:'{{route('admin.accounting.incomes.store')."?type=Candidate"}}',
                     beforeSend:function(){
                         // do nothing for now
                     },
@@ -267,7 +267,7 @@
 
                     $(".print_all").click(function(){
                         console.log('print');
-                        window.open(base_url+'/admin/accounting/studentPayments/'+row.data().id+'/print','_blank');
+                        window.open(base_url+'/admin/accounting/candidatePayments/'+row.data().id+'/print','_blank');
                     });
 
                     tr.addClass('shown');
@@ -285,11 +285,11 @@
                 var khmerBirthMonth = convertKhmerMonth(onlyBirthDate.split('/')[1]);
                 var khmerBirthDay = convertKhmerNumber(onlyBirthDate.split('/')[0]);
 
-                $("#payment_student_annual_id").val(data.id) ;
+                $("#payment_candidate_id").val(data.id) ;
                 $("#payment_payslip_client_id").val(data.payslip_client_id) ;
                 $("#client_name_kh").html(data.name_kh);
                 $("#client_name_latin").html(data.name_latin);
-                $("#client_gender").html(convertKhmerGender(data.gender));
+                $("#client_gender").html(data.gender_name_kh);
                 $("#client_birthdate").html(khmerBirthDay+' '+khmerBirthMonth+' '+khmerBirthYear);
                 $("#client_department").html(data.department_name_kh);
                 $("#client_grade").html(convertKhmerNumber(data.grade_id));
@@ -304,6 +304,7 @@
                     keyboard: false
                 });
             }
+
 
         });
     </script>

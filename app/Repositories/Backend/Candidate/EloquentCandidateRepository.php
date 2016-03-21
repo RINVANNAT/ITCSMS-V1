@@ -70,7 +70,6 @@ class EloquentCandidateRepository implements CandidateRepositoryContract
         $candidate->address = isset($input['address'])?$input['address']:null;
         $candidate->address_current = isset($input['address_current'])?$input['address_current']:null;
         $candidate->is_paid = isset($input['is_paid'])?true:false;
-        $candidate->result = isset($input['result'])?$input['result']:null;
         $candidate->register_from = isset($input['register_from'])?$input['register_from']:"ITC";
         if(isset($input['math_c'])){
             $candidate->math_c = $input['math_c']!=""?$input['math_c']:null;
@@ -109,10 +108,10 @@ class EloquentCandidateRepository implements CandidateRepositoryContract
         $candidate->active = isset($input['active'])?true:false;
         $candidate->highschool_id = isset($input['highschool_id'])?$input['highschool_id']:null;
         $candidate->promotion_id = isset($input['promotion_id'])?$input['promotion_id']:null;
-        $candidate->bac_total_grade = isset($input['bac_total_grade'])?$input['bac_total_grade']:null;
-        $candidate->bac_math_grade = isset($input['bac_math_grade'])?$input['bac_math_grade']:null;
-        $candidate->bac_phys_grade = isset($input['bac_phys_grade'])?$input['bac_phys_grade']:null;
-        $candidate->bac_chem_grade = isset($input['bac_chem_grade'])?$input['bac_chem_grade']:null;
+        $candidate->bac_total_grade = isset($input['bac_total_grade'])&&$input['bac_total_grade']!=""?$input['bac_total_grade']:null;
+        $candidate->bac_math_grade = isset($input['bac_math_grade'])&&$input['bac_math_grade']!=""?$input['bac_math_grade']:null;
+        $candidate->bac_phys_grade = isset($input['bac_phys_grade'])&&$input['bac_phys_grade']!=""?$input['bac_phys_grade']:null;
+        $candidate->bac_chem_grade = isset($input['bac_chem_grade'])&&$input['bac_chem_grade']!=""?$input['bac_chem_grade']:null;
         $candidate->bac_year = isset($input['bac_year'])?$input['bac_year']:null;
         $candidate->province_id = isset($input['province_id'])?$input['province_id']:null;
         $candidate->pob = isset($input['pob'])?$input['pob']:null;

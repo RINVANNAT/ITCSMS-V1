@@ -16,7 +16,7 @@ class CreatePayslipClientsTable extends Migration
 		Schema::create('payslipClients', function(Blueprint $table)
 		{
 			$table->increments('id');
-			$table->enum('type',['Student','Staff','Other']);
+			$table->enum('type',['Student','Staff','Candidate','Other']);
 			$table->boolean('active')->default(true);
 			$table->timestamps();
 

@@ -52,11 +52,6 @@ class Candidate extends Model
     public $table = "candidates";
     protected $dates = ['dob'];
 
-    public function getDobAttribute($date){
-        $dob = Carbon::createFromFormat('Y-m-d H:i:s', $date);
-        return $dob->format('d/m/Y');
-    }
-
     public function setDobAttribute($value)
     {
         $date = Carbon::createFromFormat('d/m/Y', $value);
@@ -95,7 +90,7 @@ class Candidate extends Model
 	public function lastModifier(){
 		return $this->belongsTo('App\Models\Access\User','write_uid');
 	}
-	public function academicYear(){
+	public function academic_year(){
 		return $this->belongsTo('App\Models\AcademicYear','academic_year_id');
 	}
 
@@ -137,7 +132,16 @@ class Candidate extends Model
     }
 
     public function department(){
-        return $this->belongsToMany('App\Models\Department')->withPivot('rank')->where('is_success',true);
+        return $this->belongsTo('App\Models\Department');
+    }
+
+    public function grade(){
+        return $this->belongsTo('App\Models\Grade');
+    }
+
+    public function departments(){
+        //return $this->belongsToMany('App\Models\Department')->withPivot('rank')->where('is_success',true);
+        return $this->belongsToMany('App\Models\Department')->withPivot('rank');
     }
 
 

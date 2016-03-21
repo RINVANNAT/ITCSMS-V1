@@ -10,6 +10,7 @@ use App\Models\Account;
 use App\Models\Degree;
 use App\Models\Department;
 use App\Models\DepartmentOption;
+use App\Models\Exam;
 use App\Models\Gender;
 use App\Models\Grade;
 use App\Models\Income;
@@ -75,42 +76,59 @@ class IncomeController extends Controller
     {
         $departments = Department::where('parent_id',11)->orderBy('id','DESC')->lists('code','id'); // 11 is for all academic departments
         $degrees = Degree::lists('name_kh','id');
-        $grades = Grade::lists('name_kh','id');
         $genders = Gender::lists('name_kh','id');
-        $options = DepartmentOption::lists('code','id');
         $academicYears = AcademicYear::orderBy('id','desc')->lists('name_kh','id');
+        $exams = Exam::lists('name','id');
 
-        return view('backend.accounting.studentPayment.index_candidate',compact('departments','degrees','grades','genders','options','academicYears'));
+        return view('backend.accounting.studentPayment.index_candidate',compact('departments','degrees','genders','exams','academicYears'));
     }
 
     public function candidate_payment_data()
     {
         $candidates = DB::table('candidates')
+            ->leftJoin('origins','candidates.province_id','=','origins.id')
             ->leftJoin('gdeGrades','candidates.bac_total_grade','=','gdeGrades.id')
             ->leftJoin('genders','candidates.gender_id','=','genders.id')
-            ->select(['candidates.id','candidates.name_kh','candidates.name_latin','genders.name_kh as gender_name_kh','gdeGrades.name_en as bac_total_grade']);
+            ->leftJoin('grades', 'candidates.grade_id', '=', 'grades.id')
+            ->leftJoin('departments', 'candidates.department_id', '=', 'departments.id')
+            ->leftJoin('degrees', 'candidates.degree_id', '=', 'degrees.id')
+            ->leftJoin('promotions', 'candidates.promotion_id', '=', 'promotions.id')
+            ->leftJoin('academicYears', 'candidates.academic_year_id', '=', 'academicYears.id')
+            ->select([
+                'candidates.id','candidates.payslip_client_id','candidates.name_kh','candidates.name_latin','promotions.name as promotion_name',
+                'origins.name_kh as province', 'dob','result',DB::raw("CONCAT(degrees.code,grades.code,departments.code) as class"),
+                'academicYears.name_kh as academic_year_name_kh','candidates.grade_id', 'candidates.degree_id','degrees.name_kh as degree_name_kh',
+                'genders.name_kh as gender_name_kh','gdeGrades.name_en as bac_total_grade'])
+            ->where('candidates.result','Pass');
 
         if($exam_id = Input::get('exam_id')){
             $candidates = $candidates->where('exam_id',$exam_id);
         }
         if($academic_year_id = Input::get('academic_year_id')){
-            $candidates = $candidates->where('academic_year_id',$exam_id);
+            $candidates = $candidates->where('academic_year_id',$academic_year_id);
         }
         if($degree_id = Input::get('degree_id')){
             $candidates = $candidates->where('degree_id',$degree_id);
+        }
+        if($department_id = Input::get('department_id')){
+            $candidates = $candidates->where('department_id',$department_id);
+        }
+        if($gender_id = Input::get('gender_id')){
+            $candidates = $candidates->where('gender_id',$gender_id);
         }
 
         $datatables =  app('datatables')->of($candidates);
 
 
         return $datatables
-            ->addColumn('action', function ($candidate) {
-                return  '<a href="'.route('admin.candidates.edit',$candidate->id).'" class="btn btn-xs btn-primary"><i class="fa fa-pencil" data-toggle="tooltip" data-placement="top" title="" data-original-title="'.trans('buttons.general.crud.edit').'"></i> </a>'.
-                ' <button class="btn btn-xs btn-danger btn-delete" data-remote="'.route('admin.candidates.destroy', $candidate->id) .'"><i class="fa fa-times" data-toggle="tooltip" data-placement="top" title="' . trans('buttons.general.crud.delete') . '"></i></button>';
+            ->editColumn('dob',function($candidate){
+                $date = Carbon::createFromFormat('Y-m-d h:i:s',$candidate->dob);
+                return $date->format('d/m/Y');
             })
             ->addColumn('details_url', function($candidate) {
                 return route('admin.accounting.payslipHistory.data',$candidate->payslip_client_id==null?0:$candidate->payslip_client_id);
             })
+            ->addColumn('count_income', 0)
             ->make(true);
     }
 
@@ -316,7 +334,7 @@ class IncomeController extends Controller
      */
     public function store(StoreIncomeRequest $request)
     {
-        if(Input::get('type') == "student"){
+        if(Input::get('type') == "Student" || Input::get('type') == "Candidate"){
             $this->incomes->create($request->all());
         } else {
             $this->incomes->createSimpleIncome($request->all());
@@ -459,11 +477,21 @@ class IncomeController extends Controller
             "payslipClient.student.grade",
             "payslipClient.student.promotion",
             "payslipClient.student.academic_year",
+            "payslipClient.candidate.gender",
+            "payslipClient.candidate.department",
+            "payslipClient.candidate.grade",
+            "payslipClient.candidate.promotion",
+            "payslipClient.candidate.academic_year",
         ])->first();
 
         //$student = StudentAnnual::where('payslip_client_id')
         //dd($income->payslipClient->student->to_pay['total']);
-        $debt = ($income->payslipClient->student->to_pay['total'] - $income->payslipClient->student->paid).' '.$income->payslipClient->student->to_pay['currency'];
+        if($income->payslipClient->student!= null){
+            $debt = ($income->payslipClient->student->to_pay['total'] - $income->payslipClient->student->paid).' '.$income->payslipClient->student->to_pay['currency'];
+        } else {
+            $debt = null;
+        }
+
 
         //$count = Income::where('payslip_client_id',$income->payslipClient->id)->count()+1;
         return view('backend.accounting.studentPayment.print.payslip_print',compact('income','count','debt'));
