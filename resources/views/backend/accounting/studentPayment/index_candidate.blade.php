@@ -85,19 +85,14 @@
 
         <div class="box-body">
             <div>
-                <table class="table table-striped table-bordered table-hover" id="students-table">
+                <table class="table table-striped table-bordered table-hover" id="candidates-table">
                     <thead>
                     <tr>
-                        <th>{{ trans('labels.backend.students.fields.id_card') }}</th>
-                        <th>{{ trans('labels.backend.students.fields.name_kh') }}</th>
-                        <th>{{ trans('labels.backend.students.fields.name_latin') }}</th>
-                        <th>{{ trans('labels.backend.students.fields.dob') }}</th>
-                        <th>{{ trans('labels.backend.students.fields.gender_id') }}</th>
-                        <th>{{ trans('labels.backend.students.fields.class') }}</th>
-                        <th>{{ trans('labels.backend.students.fields.department_option_id') }}</th>
-                        <th>{{ trans('labels.backend.students.fields.to_pay') }}</th>
-                        <th>{{ trans('labels.backend.students.fields.debt') }}</th>
-                        <th></th>
+                        <th>{{ trans('labels.backend.candidates.fields.name_kh') }}</th>
+                        <th>{{ trans('labels.backend.candidates.fields.name_latin') }}</th>
+                        <th>{{ trans('labels.backend.candidates.fields.gender_id') }}</th>
+                        <th>{{ trans('labels.backend.candidates.fields.bac_total_grade') }}</th>
+                        <th>{{ trans('labels.general.actions') }}</th>
                     </tr>
                     </thead>
                 </table>
@@ -135,13 +130,13 @@
                 })
             }
 
-            var oTable = $('#students-table').DataTable({
+            var oTable = $('#candidates-table').DataTable({
                 dom: '<"toolbar">frtip',
                 processing: true,
                 serverSide: true,
                 pageLength: {!! config('app.records_per_page')!!},
                 ajax: {
-                    url:"{!! route('admin.accounting.studentPayment.data') !!}",
+                    url:"{!! route('admin.accounting.candidatePayment.data') !!}",
                     data:function(d){
                         d.academic_year = $('#filter_academic_year').val();
                         d.degree = $('#filter_degree').val();
@@ -151,15 +146,10 @@
                     }
                 },
                 columns: [
-                    { data: 'id_card', name: 'students.id_card'},
-                    { data: 'name_kh', name: 'students.name_kh'},
-                    { data: 'name_latin', name: 'students.name_latin'},
-                    { data: 'dob', name: 'dob'},
-                    { data: 'gender', name: 'gender',orderable:false,searchable:false},
-                    { data: 'class' , name: 'class',orderable:false,searchable:false},
-                    { data: 'option' , name: 'option',orderable:false,searchable:false},
-                    { data: 'to_pay' , name: 'to_pay',orderable:false,searchable:false},
-                    { data: 'debt' , name: 'debt',orderable:false,searchable:false},
+                    { data: 'name_kh', name: 'candidates.name_kh'},
+                    { data: 'name_latin', name: 'candidates.name_latin'},
+                    { data: 'gender_name_kh', name: 'genders.name_kh'},
+                    { data: 'bac_total_grade', name: 'gdeGrade.name_en'},
                     {
                         "className":      'details-control',
                         "orderable":      false,
@@ -247,7 +237,7 @@
             }
 
             // Add event listener for opening and closing details
-            $('#students-table tbody').on('click', 'td.details-control', function () {
+            $('#candidates-table tbody').on('click', 'td.details-control', function () {
                 var tr = $(this).closest('tr');
                 var row = oTable.row(tr);
                 var tableId = 'students-' + row.data().id;
@@ -284,8 +274,6 @@
                     tr.next().find('td').addClass('no-padding bg-payment-detail');
                 }
             });
-
-            enableDeleteRecord($('#students-table'));
 
 
             // This for payment part

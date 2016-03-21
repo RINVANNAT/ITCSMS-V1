@@ -12,6 +12,12 @@
 
 @section('after-styles-end')
     {!! Html::style('plugins/datatables/dataTables.bootstrap.css') !!}
+    {!! Html::style('plugins/daterangepicker/daterangepicker-bs3.css') !!}
+    <style>
+        .toolbar {
+            float: left;
+        }
+    </style>
 @stop
 
 @section('content')
@@ -23,11 +29,11 @@
                     <button class="btn btn-primary btn-sm"><i class="fa fa-plus-circle"></i> Add
                     </button>
                 </a>
-
                 <button class="btn btn-default btn-sm"><i class="fa fa-refresh"></i></button>
-
             </div>
-
+            <div class="box-tools pull-right">
+                @include('backend.accounting.outcome.includes.partials.header-buttons')
+            </div>
 
         </div><!-- /.box-header -->
 
@@ -44,6 +50,18 @@
                         <th>{{ trans('labels.general.actions') }}</th>
                     </tr>
                     </thead>
+                    <tfoot>
+                    <tr>
+                        <th colspan="5" style="text-align: right; border:none">
+                            Total Sum ($) :<br/>
+                            Total Sum (៛) :
+                        </th>
+                        <th align="left" style="border: none">
+                            10000 <br/>
+                            1200000
+                        </th>
+                    </tr>
+                    </tfoot>
                 </table>
             </div>
 
@@ -55,13 +73,23 @@
 @section('after-scripts-end')
     {!! Html::script('plugins/datatables/jquery.dataTables.min.js') !!}
     {!! Html::script('plugins/datatables/dataTables.bootstrap.min.js') !!}
+    {!! Html::script('plugins/moment/moment.min.js') !!}
+    {!! Html::script('plugins/daterangepicker/daterangepicker.js') !!}
     <script>
         $(function() {
-            $('#outcomes-table').DataTable({
+            var oTable = $('#outcomes-table').DataTable({
+                dom: 'l<"toolbar">frtip',
                 processing: true,
                 serverSide: true,
                 pageLength: {!! config('app.records_per_page')!!},
-                ajax: '{!! route('admin.accounting.outcome.data') !!}',
+                ajax: {
+                    url:'{!! route('admin.accounting.outcome.data') !!}',
+                    data:function(d){
+                        d.account = $('#filter_account').val();
+                        d.outcome_type = $('#filter_outcomeType').val();
+                        d.date_range = $('#filter_date_range').val();
+                    }
+                },
                 columns: [
                     { data: 'number', name: 'outcomes.number'},
                     { data: 'amount_dollar', name: 'outcomes.amount_dollar'},
@@ -72,7 +100,40 @@
                 ]
             });
 
-            enableDeleteRecord($('#outcomes-table'));
+            $("div.toolbar").html(
+                    '{!! Form::text('date_start_end',null,array('class'=>'form-control','id'=>'filter_date_range','placeholder'=>'Date range')) !!} ' +
+                    '{!! Form::select('account',$accounts,null, array('class'=>'form-control','id'=>'filter_account','placeholder'=>'Account')) !!} '+
+                    '{!! Form::select('outcomeType',$outcomeTypes,null, array('class'=>'form-control','id'=>'filter_outcomeType','placeholder'=>'Outcome Type')) !!} '
+            );
+
+            $('#filter_date_range').daterangepicker({
+                format: 'DD/MM/YYYY',
+            });
+
+            $('#filter_date_range').daterangepicker({
+                format: 'DD/MM/YYYY',
+            });
+
+            $('#filter_account').on('change', function(e) {
+                oTable.draw();
+                e.preventDefault();
+            });
+            $('#filter_outcomeType').on('change', function(e) {
+                oTable.draw();
+                e.preventDefault();
+            });
+            $('#filter_date_range').on('change', function(e) {
+                oTable.draw();
+                e.preventDefault();
+            });
+
+            $('#export_outcome_list').click(function(e){
+                e.preventDefault();
+                window.location = '{{route("admin.accounting.outcome.export")}}'+
+                        "?date_range="+$('#filter_date_range').val()+
+                        '&account='+ $('#filter_account').val()+
+                        '&outcome_type=' + $('#filter_outcomeType').val();
+            });
         });
     </script>
 @stop

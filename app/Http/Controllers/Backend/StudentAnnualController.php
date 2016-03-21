@@ -780,13 +780,6 @@ class StudentAnnualController extends Controller
     }
 
     public function export_list(){
-        $academic_year_id = 2016;
-        $degree_id = 1;
-        $grade_id = 1;
-        $department_id = 4;
-        $gender_id = 1;
-        $option_id  = 1;
-        $orgin_id = 1;
 
         $studentAnnuals = StudentAnnual::select([
             'studentAnnuals.id','students.id_card','students.name_kh','students.name_latin', 'students.dob as dob','genders.code as gender',

@@ -111,6 +111,9 @@
                     <li class="{{ Active::pattern('admin/accounting/studentPayments*') }}">
                         <a href="{!! url('admin/accounting/studentPayments') !!}">{{ trans('menus.backend.accounting.student_payments') }}</a>
                     </li>
+                    <li class="{{ Active::pattern('admin/accounting/candidatePayments*') }}">
+                        <a href="{!! url('admin/accounting/candidatePayments') !!}">{{ trans('menus.backend.accounting.candidate_payments') }}</a>
+                    </li>
                     <li class="{{ Active::pattern('admin/accounting/customers*') }}">
                         <a href="{!! url('admin/accounting/customers') !!}">{{ trans('menus.backend.accounting.customers') }}</a>
                     </li>

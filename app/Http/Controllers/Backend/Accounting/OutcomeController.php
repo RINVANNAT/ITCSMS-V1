@@ -12,9 +12,11 @@ use App\Models\Outcome;
 use App\Models\OutcomeType;
 use App\Models\School;
 use App\Repositories\Backend\Outcome\OutcomeRepositoryContract;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Input;
+use Maatwebsite\Excel\Facades\Excel;
 
 class OutcomeController extends Controller
 {
@@ -40,7 +42,9 @@ class OutcomeController extends Controller
      */
     public function index()
     {
-        return view('backend.accounting.outcome.index');
+        $accounts = Account::lists('name','id');
+        $outcomeTypes = OutcomeType::lists('name','id');
+        return view('backend.accounting.outcome.index',compact('accounts','outcomeTypes'));
     }
 
     /**
@@ -127,20 +131,19 @@ class OutcomeController extends Controller
 
         $outcomes = DB::table('outcomes')
             ->leftJoin('accounts','outcomes.account_id','=','accounts.id')
+            ->leftJoin('outcomeTypes','outcomes.outcome_type_id','=','outcomeTypes.id')
             ->leftJoin('employees','outcomes.payslip_client_id','=','employees.payslip_client_id')
             ->leftJoin('studentAnnuals','outcomes.payslip_client_id','=','studentAnnuals.payslip_client_id')
             ->leftJoin('customers','outcomes.payslip_client_id','=','customers.payslip_client_id')
             ->leftJoin('students','studentAnnuals.student_id','=','students.id')
             ->select([
-                'outcomes.id as outcome_id','outcomes.number','outcomes.amount_dollar','outcomes.amount_riel','accounts.name as account_name','outcomes.payslip_client_id',
+                'outcomes.id as outcome_id','outcomes.number','outcomes.amount_dollar','outcomes.amount_riel','accounts.name as account_name',
+                'outcomes.payslip_client_id','outcomeTypes.name as outcome_type_name',
                 DB::raw("CONCAT(customers.name,employees.name_kh,students.name_kh) as name")
             ]);
 
         //dd($outcomes);
-        $datatables =  app('datatables')->of($outcomes);
-
-
-        return $datatables
+        $datatables =  app('datatables')->of($outcomes)
             ->editColumn('number','{{str_pad($number, 4, "0", STR_PAD_LEFT)}}')
             ->editColumn('amount_dollar', '{!! $amount_dollar==null? "0 $" :$amount_dollar. " $" !!}')
             ->editColumn('amount_riel', '{!! $amount_riel==null? "0 ៛": $amount_riel. " ៛" !!}')
@@ -148,7 +151,28 @@ class OutcomeController extends Controller
                 //return  '<a href="'.route('admin.accounting.incomes.edit',$outcome->outcome_id).'" class="btn btn-xs btn-primary"><i class="fa fa-pencil" data-toggle="tooltip" data-placement="top" title="" data-original-title="'.trans('buttons.general.crud.edit').'"></i> </a>'.
                 //' <button class="btn btn-xs btn-danger btn-delete" data-remote="'.route('admin.accounting.incomes.destroy', $outcome->outcome_id) .'"><i class="fa fa-times" data-toggle="tooltip" data-placement="top" title="' . trans('buttons.general.crud.delete') . '"></i></button>';
                 return  '<a href="'.route('admin.accounting.outcome.simple_print',$outcome->outcome_id).'" class="btn btn-xs btn-primary"><i class="fa fa-print" data-toggle="tooltip" data-placement="top" title="" data-original-title="'.trans('buttons.general.crud.edit').'"></i> </a>';
-            })
+            });
+
+
+        // additional search
+        if ($account = $datatables->request->get('account')) {
+            $datatables->where('outcomes.account_id', '=', $account);
+        }
+
+        if ($outcome_type = $datatables->request->get('outcome_type')) {
+            $datatables->where('outcomes.outcome_type_id', '=', $outcome_type);
+        }
+
+        if ($date_range = $datatables->request->get('date_range')) {
+            $date = explode(' - ',$date_range);
+
+            $start_date = Carbon::createFromFormat('d/m/Y',$date[0])->startOfDay()->format('Y-m-d')." 00:00:00";
+            $end_date = Carbon::createFromFormat('d/m/Y',$date[1])->endOfDay()->format('Y-m-d h:i:s');
+
+            $datatables->where('outcomes.pay_date', '<=', $end_date)->where('outcomes.pay_date', '>=', $start_date);
+        }
+
+        return $datatables
             ->make(true);
     }
 
@@ -222,6 +246,109 @@ class OutcomeController extends Controller
         ])->first();
 
         return view('backend.accounting.outcome.print.simple_print',compact('outcome'));
+    }
+
+    public function export(){
+
+        $outcomes = DB::table('outcomes')
+            ->leftJoin('accounts','outcomes.account_id','=','accounts.id')
+            ->leftJoin('outcomeTypes','outcomes.outcome_type_id','=','outcomeTypes.id')
+            ->leftJoin('employees','outcomes.payslip_client_id','=','employees.payslip_client_id')
+            ->leftJoin('studentAnnuals','outcomes.payslip_client_id','=','studentAnnuals.payslip_client_id')
+            ->leftJoin('customers','outcomes.payslip_client_id','=','customers.payslip_client_id')
+            ->leftJoin('students','studentAnnuals.student_id','=','students.id');
+
+        $title = 'ស្ថិតិចំណាយ';
+        // additional search
+        // additional search
+        if ($account = Input::get('account')) {
+            $outcomes = $outcomes->where('outcomes.account_id', '=', $account);
+        }
+
+        if ($outcome_type = Input::get('outcome_type')) {
+            $outcomes = $outcomes->where('outcomes.outcome_type_id', '=', $outcome_type);
+        }
+
+        if ($date_range = Input::get('date_range')) {
+            $date = explode(' - ',$date_range);
+
+            $start_date = Carbon::createFromFormat('d/m/Y',$date[0])->startOfDay()->format('Y-m-d')." 00:00:00";
+            $end_date = Carbon::createFromFormat('d/m/Y',$date[1])->endOfDay()->format('Y-m-d h:i:s');
+
+            $outcomes = $outcomes->where('outcomes.pay_date', '<=', $end_date)->where('outcomes.pay_date', '>=', $start_date);
+        }
+
+        $data = $outcomes->get();
+
+
+        Excel::create('ស្ថិតិចំណាយ', function($excel) use ($data, $title) {
+
+
+            // Set the title
+            $excel->setTitle('ស្ថិតិចំណាយ');
+
+            // Chain the setters
+            $excel->setCreator('Department of Finance')
+                ->setCompany('Institute of Technology of Cambodia');
+
+            $excel->sheet('New sheet', function($sheet) use ($data,$title) {
+
+                $sheet->setOrientation('landscape');
+                // Set top, right, bottom, left
+                $sheet->setPageMargin(array(
+                    0.25, 0.30, 0.25, 0.30
+                ));
+
+                // Set all margins
+                $sheet->setPageMargin(0.25);
+
+                $sheet->row(1, array(
+                    'ព្រះរាជាណាចក្រកម្ពុជា'
+                ));
+                $sheet->appendRow(array(
+                    'ជាតិ សាសនា ព្រះមហាក្សត្រ'
+                ));
+                $sheet->appendRow(array(
+                    'ក្រសួងអប់រំ យុវជន ​និងកីឡា'
+                ));
+                $sheet->appendRow(array(
+                    'វិទ្យាស្ថានបច្ចេកវិទ្យាកម្ពុជា'
+                ));
+                $sheet->appendRow(array(
+                    $title
+                ));
+
+                $sheet->rows(array(
+                    array('លរ','អត្តលេខ','ឈ្មោះខ្មែរ','ឈ្មោះឡាតាំង','ថ្ងៃខែឆ្នាំកំណើត','ភេទ','មកពី','ថ្នាក់','ជំនាញ')
+                ));
+                foreach ($data as $item) {
+
+                    $sheet->appendRow(
+                        $item
+                    );
+                }
+
+                $sheet->mergeCells('A1:I1');
+                $sheet->mergeCells('A2:I2');
+                $sheet->mergeCells('A3:I3');
+                $sheet->mergeCells('A4:I4');
+                $sheet->mergeCells('A5:I5');
+
+                $sheet->cells('A1:I2', function($cells) {
+                    $cells->setAlignment('center');
+                    $cells->setValignment('middle');
+                });
+
+                $sheet->cells('A5:I'.(6+count($data)), function($cells) {
+                    $cells->setAlignment('center');
+                    $cells->setValignment('middle');
+                });
+
+                $sheet->setBorder('A6:I'.(6+count($data)), 'thin');
+
+            });
+
+        })->export('xls');
     }
 
 }

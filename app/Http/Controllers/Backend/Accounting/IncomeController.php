@@ -22,6 +22,8 @@ use App\Models\StudentAnnual;
 use App\Repositories\Backend\Income\IncomeRepositoryContract;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Input;
+use Maatwebsite\Excel\Facades\Excel;
 
 class IncomeController extends Controller
 {
@@ -47,7 +49,9 @@ class IncomeController extends Controller
      */
     public function index()
     {
-        return view('backend.accounting.income.index');
+        $accounts = Account::lists('name','id');
+        $incomeTypes = IncomeType::lists('name','id');
+        return view('backend.accounting.income.index',compact('accounts','incomeTypes'));
     }
 
     /**
@@ -65,6 +69,49 @@ class IncomeController extends Controller
         $academicYears = AcademicYear::orderBy('id','desc')->lists('name_kh','id');
 
         return view('backend.accounting.studentPayment.index',compact('departments','degrees','grades','genders','options','academicYears'));
+    }
+
+    public function candidate_payment()
+    {
+        $departments = Department::where('parent_id',11)->orderBy('id','DESC')->lists('code','id'); // 11 is for all academic departments
+        $degrees = Degree::lists('name_kh','id');
+        $grades = Grade::lists('name_kh','id');
+        $genders = Gender::lists('name_kh','id');
+        $options = DepartmentOption::lists('code','id');
+        $academicYears = AcademicYear::orderBy('id','desc')->lists('name_kh','id');
+
+        return view('backend.accounting.studentPayment.index_candidate',compact('departments','degrees','grades','genders','options','academicYears'));
+    }
+
+    public function candidate_payment_data()
+    {
+        $candidates = DB::table('candidates')
+            ->leftJoin('gdeGrades','candidates.bac_total_grade','=','gdeGrades.id')
+            ->leftJoin('genders','candidates.gender_id','=','genders.id')
+            ->select(['candidates.id','candidates.name_kh','candidates.name_latin','genders.name_kh as gender_name_kh','gdeGrades.name_en as bac_total_grade']);
+
+        if($exam_id = Input::get('exam_id')){
+            $candidates = $candidates->where('exam_id',$exam_id);
+        }
+        if($academic_year_id = Input::get('academic_year_id')){
+            $candidates = $candidates->where('academic_year_id',$exam_id);
+        }
+        if($degree_id = Input::get('degree_id')){
+            $candidates = $candidates->where('degree_id',$degree_id);
+        }
+
+        $datatables =  app('datatables')->of($candidates);
+
+
+        return $datatables
+            ->addColumn('action', function ($candidate) {
+                return  '<a href="'.route('admin.candidates.edit',$candidate->id).'" class="btn btn-xs btn-primary"><i class="fa fa-pencil" data-toggle="tooltip" data-placement="top" title="" data-original-title="'.trans('buttons.general.crud.edit').'"></i> </a>'.
+                ' <button class="btn btn-xs btn-danger btn-delete" data-remote="'.route('admin.candidates.destroy', $candidate->id) .'"><i class="fa fa-times" data-toggle="tooltip" data-placement="top" title="' . trans('buttons.general.crud.delete') . '"></i></button>';
+            })
+            ->addColumn('details_url', function($candidate) {
+                return route('admin.accounting.payslipHistory.data',$candidate->payslip_client_id==null?0:$candidate->payslip_client_id);
+            })
+            ->make(true);
     }
 
     public function student_payment_data(\Illuminate\Http\Request $request) // 0 mean, scholarship id is not applied
@@ -102,6 +149,7 @@ class IncomeController extends Controller
                 global $debt;
                 global $count_income;
 
+                $count_income = 0;
                 $total_paid = 0;
                 $currency = "";
 
@@ -268,7 +316,12 @@ class IncomeController extends Controller
      */
     public function store(StoreIncomeRequest $request)
     {
-        $this->incomes->createSimpleIncome($request->all());
+        if(Input::get('type') == "student"){
+            $this->incomes->create($request->all());
+        } else {
+            $this->incomes->createSimpleIncome($request->all());
+        }
+
         if($request->ajax()){
             return json_encode(array("sucess"=>true));
         }
@@ -331,27 +384,45 @@ class IncomeController extends Controller
     {
         $incomes = DB::table('incomes')
             ->leftJoin('accounts','incomes.account_id','=','accounts.id')
+            ->leftJoin('incomeTypes','incomes.income_type_id','=','incomeTypes.id')
             ->leftJoin('employees','incomes.payslip_client_id','=','employees.payslip_client_id')
             ->leftJoin('studentAnnuals','incomes.payslip_client_id','=','studentAnnuals.payslip_client_id')
             ->leftJoin('customers','incomes.payslip_client_id','=','customers.payslip_client_id')
             ->leftJoin('students','studentAnnuals.student_id','=','students.id')
             ->select([
                 'incomes.id','incomes.number','incomes.amount_dollar','incomes.amount_riel','incomes.payslip_client_id','accounts.name as account_name',
+                'incomeTypes.name as income_type_name',
                 DB::raw("CONCAT(customers.name,employees.name_kh,students.name_kh) as name")
             ]);
 
-        $datatables =  app('datatables')->of($incomes);
-
-
-        return $datatables
+        $datatables =  app('datatables')->of($incomes)
             ->editColumn('number','{{str_pad($number, 5, "0", STR_PAD_LEFT)}}')
             ->editColumn('amount_dollar','{{$amount_dollar==""?0:$amount_dollar." $"}}')
             ->editColumn('amount_riel','{{$amount_riel==null?0:$amount_riel." ៛"}}')
             ->addColumn('action', function ($income) {
                 //return  '<a href="'.route('admin.accounting.income.simple_print',$income->id).'" class="btn btn-xs btn-primary"><i class="fa fa-print" data-toggle="tooltip" data-placement="top" title="" data-original-title="'.trans('buttons.general.crud.edit').'"></i> </a>';
                 return  '<a href="#" class="btn btn-xs btn-primary"><i class="fa fa-print" data-toggle="tooltip" data-placement="top" title="" data-original-title="'.trans('buttons.general.crud.edit').'"></i> </a>';
-            })
-            ->make(true);
+            });
+
+        // additional search
+        if ($account = $datatables->request->get('account')) {
+            $datatables->where('incomes.account_id', '=', $account);
+        }
+
+        if ($income_type = $datatables->request->get('income_type')) {
+            $datatables->where('incomes.income_type_id', '=', $income_type);
+        }
+
+        if ($date_range = $datatables->request->get('date_range')) {
+            $date = explode(' - ',$date_range);
+
+            $start_date = Carbon::createFromFormat('d/m/Y',$date[0])->startOfDay()->format('Y-m-d')." 00:00:00";
+            $end_date = Carbon::createFromFormat('d/m/Y',$date[1])->endOfDay()->format('Y-m-d h:i:s');
+
+            $datatables->where('incomes.pay_date', '<=', $end_date)->where('incomes.pay_date', '>=', $start_date);
+        }
+
+        return $datatables->make(true);
     }
 
     /**
@@ -408,5 +479,107 @@ class IncomeController extends Controller
         return view('backend.accounting.studentPayment.print.payslip_print',compact('income','count'));
     }
 
+    public function export(){
+
+        $incomes = DB::table('incomes')
+            ->leftJoin('accounts','incomes.account_id','=','accounts.id')
+            ->leftJoin('incomeTypes','incomes.income_type_id','=','incomeTypes.id')
+            ->leftJoin('employees','incomes.payslip_client_id','=','employees.payslip_client_id')
+            ->leftJoin('studentAnnuals','incomes.payslip_client_id','=','studentAnnuals.payslip_client_id')
+            ->leftJoin('customers','incomes.payslip_client_id','=','customers.payslip_client_id')
+            ->leftJoin('students','studentAnnuals.student_id','=','students.id');
+
+        $title = 'ស្ថិតិចំនូល';
+        // additional search
+        // additional search
+        if ($account = Input::get('account')) {
+            $incomes = $incomes->where('outcomes.account_id', '=', $account);
+        }
+
+        if ($outcome_type = Input::get('outcome_type')) {
+            $incomes = $incomes->where('outcomes.outcome_type_id', '=', $outcome_type);
+        }
+
+        if ($date_range = Input::get('date_range')) {
+            $date = explode(' - ',$date_range);
+
+            $start_date = Carbon::createFromFormat('d/m/Y',$date[0])->startOfDay()->format('Y-m-d')." 00:00:00";
+            $end_date = Carbon::createFromFormat('d/m/Y',$date[1])->endOfDay()->format('Y-m-d h:i:s');
+
+            $incomes = $incomes->where('outcomes.pay_date', '<=', $end_date)->where('outcomes.pay_date', '>=', $start_date);
+        }
+
+        $data = $incomes->get();
+
+
+        Excel::create('ស្ថិតិចំនូល', function($excel) use ($data, $title) {
+
+
+            // Set the title
+            $excel->setTitle('ស្ថិតិចំនូល');
+
+            // Chain the setters
+            $excel->setCreator('Department of Finance')
+                ->setCompany('Institute of Technology of Cambodia');
+
+            $excel->sheet('New sheet', function($sheet) use ($data,$title) {
+
+                $sheet->setOrientation('landscape');
+                // Set top, right, bottom, left
+                $sheet->setPageMargin(array(
+                    0.25, 0.30, 0.25, 0.30
+                ));
+
+                // Set all margins
+                $sheet->setPageMargin(0.25);
+
+                $sheet->row(1, array(
+                    'ព្រះរាជាណាចក្រកម្ពុជា'
+                ));
+                $sheet->appendRow(array(
+                    'ជាតិ សាសនា ព្រះមហាក្សត្រ'
+                ));
+                $sheet->appendRow(array(
+                    'ក្រសួងអប់រំ យុវជន ​និងកីឡា'
+                ));
+                $sheet->appendRow(array(
+                    'វិទ្យាស្ថានបច្ចេកវិទ្យាកម្ពុជា'
+                ));
+                $sheet->appendRow(array(
+                    $title
+                ));
+
+                $sheet->rows(array(
+                    array('លរ','អត្តលេខ','ឈ្មោះខ្មែរ','ឈ្មោះឡាតាំង','ថ្ងៃខែឆ្នាំកំណើត','ភេទ','មកពី','ថ្នាក់','ជំនាញ')
+                ));
+                foreach ($data as $item) {
+
+                    $sheet->appendRow(
+                        $item
+                    );
+                }
+
+                $sheet->mergeCells('A1:I1');
+                $sheet->mergeCells('A2:I2');
+                $sheet->mergeCells('A3:I3');
+                $sheet->mergeCells('A4:I4');
+                $sheet->mergeCells('A5:I5');
+
+                $sheet->cells('A1:I2', function($cells) {
+                    $cells->setAlignment('center');
+                    $cells->setValignment('middle');
+                });
+
+                $sheet->cells('A5:I'.(6+count($data)), function($cells) {
+                    $cells->setAlignment('center');
+                    $cells->setValignment('middle');
+                });
+
+                $sheet->setBorder('A6:I'.(6+count($data)), 'thin');
+
+            });
+
+        })->export('xls');
+    }
 
 }

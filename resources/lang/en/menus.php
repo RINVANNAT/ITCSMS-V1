@@ -97,7 +97,8 @@ return [
             'incomes' => 'Income',
             'outcomes' => 'Outcome',
             'customers' => 'Customer',
-            'student_payments' => 'Student Payment'
+            'student_payments' => 'Student Payment',
+            'candidate_payments' => 'Candidate Payment'
         ],
         'course' => [
             'title' => 'Course Management',

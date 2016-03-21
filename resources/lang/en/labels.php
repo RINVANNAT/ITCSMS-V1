@@ -573,7 +573,9 @@ return [
                 'account_id' => 'Account Name',
                 'payslip_client_id' => 'Income From',
                 'date' => 'Date of payment',
-                'client' => "Pay to"
+                'client' => "Pay to",
+                'incomeType_id' => "Income Type",
+                'outcomeType_id' => "Outcome Type"
             ]
         ],
         'incomes' => [

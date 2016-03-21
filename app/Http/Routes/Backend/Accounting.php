@@ -20,13 +20,20 @@ Route::group([
         Route::get('client/search', 'OutcomeController@client_search')->name('admin.client.search');
 
         Route::get('outcome/{id}/simple_print', 'OutcomeController@print_simple_outcome')->name('admin.accounting.outcome.simple_print');
+        Route::get('outcome/export', 'OutcomeController@export')->name('admin.accounting.outcome.export');
     });
 
     Route::group([], function() {
         Route::get('studentPayments', 'IncomeController@student_payment')->name('admin.accounting.studentPayment');
         Route::get('studentPayment-data', 'IncomeController@student_payment_data')->name('admin.accounting.studentPayment.data');
+
+        Route::get('candidatePayments', 'IncomeController@candidate_payment')->name('admin.accounting.candidatePayment');
+        Route::get('candidatePayment-data', 'IncomeController@candidate_payment_data')->name('admin.accounting.candidatePayment.data');
+
         Route::get('payslipHistory/{payslip_client_id}', 'IncomeController@payslip_history')->name('admin.accounting.payslipHistory.data');
         Route::get('studentPayments/{studentId}/print', 'IncomeController@print_student_payment')->name('admin.accounting.studentPayment.print');
+
+        Route::get('income/export', 'IncomeController@export')->name('admin.accounting.income.export');
     });
 
     Route::group([], function() {
