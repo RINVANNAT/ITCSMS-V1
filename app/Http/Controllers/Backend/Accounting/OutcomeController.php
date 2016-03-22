@@ -256,7 +256,11 @@ class OutcomeController extends Controller
             ->leftJoin('employees','outcomes.payslip_client_id','=','employees.payslip_client_id')
             ->leftJoin('studentAnnuals','outcomes.payslip_client_id','=','studentAnnuals.payslip_client_id')
             ->leftJoin('customers','outcomes.payslip_client_id','=','customers.payslip_client_id')
-            ->leftJoin('students','studentAnnuals.student_id','=','students.id');
+            ->leftJoin('students','studentAnnuals.student_id','=','students.id')
+            ->select([
+                'outcomes.number','outcomes.amount_dollar','outcomes.amount_riel','accounts.name as account_name','outcomeTypes.name as outcome_type_name',
+                DB::raw("CONCAT(customers.name,employees.name_kh,students.name_kh) as name"),'outcomes.pay_date'
+            ]);
 
         $title = 'ស្ថិតិចំណាយ';
         // additional search
@@ -319,32 +323,41 @@ class OutcomeController extends Controller
                 ));
 
                 $sheet->rows(array(
-                    array('លរ','អត្តលេខ','ឈ្មោះខ្មែរ','ឈ្មោះឡាតាំង','ថ្ងៃខែឆ្នាំកំណើត','ភេទ','មកពី','ថ្នាក់','ជំនាញ')
+                    array('លេខ','ចំនួនទឹកប្រាក់ ដុល្លា','ចំនួនទឹកប្រាក់រៀលរ','ចុះក្នុងគណនី','ប្រភេទចំនូល','អ្នកបង់ប្រាក់','ចុះថ្ងៃទី')
                 ));
                 foreach ($data as $item) {
 
+                    $array = array(
+                        str_pad($item->number, 4, '0', STR_PAD_LEFT),
+                        $item->amount_dollar == null?"0 $":$item->amount_dollar." $",
+                        $item->amount_riel == null?"0 ៛":$item->amount_riel. " ៛",
+                        $item->account_name,
+                        $item->outcome_type_name,
+                        $item->name,
+                        Carbon::createFromFormat('Y-m-d h:i:s',$item->pay_date)->format('d/m/Y')
+                    );
                     $sheet->appendRow(
-                        $item
+                        $array
                     );
                 }
 
-                $sheet->mergeCells('A1:I1');
-                $sheet->mergeCells('A2:I2');
-                $sheet->mergeCells('A3:I3');
-                $sheet->mergeCells('A4:I4');
-                $sheet->mergeCells('A5:I5');
+                $sheet->mergeCells('A1:G1');
+                $sheet->mergeCells('A2:G2');
+                $sheet->mergeCells('A3:G3');
+                $sheet->mergeCells('A4:G4');
+                $sheet->mergeCells('A5:G5');
 
-                $sheet->cells('A1:I2', function($cells) {
+                $sheet->cells('A1:G2', function($cells) {
                     $cells->setAlignment('center');
                     $cells->setValignment('middle');
                 });
 
-                $sheet->cells('A5:I'.(6+count($data)), function($cells) {
+                $sheet->cells('A5:G'.(6+count($data)), function($cells) {
                     $cells->setAlignment('center');
                     $cells->setValignment('middle');
                 });
 
-                $sheet->setBorder('A6:I'.(6+count($data)), 'thin');
+                $sheet->setBorder('A6:G'.(6+count($data)), 'thin');
 
             });
 

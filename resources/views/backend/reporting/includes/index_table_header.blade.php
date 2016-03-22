@@ -1,4 +1,4 @@
-<table class="table table-striped table-bordered table-hover" id="reporting-table">
+<table class="table table-striped table-bordered table-hover dt-responsive nowrap" cellspacing="0" width="100%" id="reporting-table">
     <thead>
     <tr>
         <th>{{ trans('labels.backend.error.reporting.fields.title') }}</th>

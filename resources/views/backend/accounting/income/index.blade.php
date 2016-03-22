@@ -47,7 +47,7 @@
 
         <div class="box-body">
             <div>
-                <table class="table table-striped table-bordered table-hover" id="incomes-table">
+                <table class="table table-striped table-bordered table-hover dt-responsive nowrap" cellspacing="0" width="100%" id="incomes-table">
                     <thead>
                     <tr>
                         <th>{{ trans('labels.backend.accounting.fields.number') }}</th>

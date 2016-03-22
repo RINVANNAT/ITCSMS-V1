@@ -58,7 +58,7 @@
 
                 <div class="tab-content">
                     <div role="tabpanel" class="tab-pane active" id="school_fee" style="padding-top:20px">
-                        <table class="table table-striped table-bordered table-hover" id="schoolFees-table">
+                        <table class="table table-striped table-bordered table-hover dt-responsive nowrap" cellspacing="0" width="100%" id="schoolFees-table">
                             <thead>
                             <tr>
                                 <th>{{ trans('labels.backend.schoolFees.fields.group') }}</th>
@@ -72,7 +72,7 @@
                         </table>
                     </div>
                     <div role="tabpanel" class="tab-pane" id="scholarship_fee" style="padding-top:20px">
-                        <table class="table table-striped table-bordered table-hover" id="scholarshipFees-table">
+                        <table class="table table-striped table-bordered table-hover dt-responsive nowrap" cellspacing="0" width="100%" id="scholarshipFees-table">
                             <thead>
                             <tr>
                                 <th>{{ trans('labels.backend.schoolFees.fields.group') }}</th>

@@ -38,7 +38,7 @@
 
         <div class="box-body">
             <div>
-                <table class="table table-striped table-bordered table-hover" id="degrees-table">
+                <table class="table table-striped table-bordered table-hover dt-responsive nowrap" cellspacing="0" width="100%" id="degrees-table">
                     <thead>
                     <tr>
                         <th>{{ trans('labels.backend.degrees.fields.code') }}</th>

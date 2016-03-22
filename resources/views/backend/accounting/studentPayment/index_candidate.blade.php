@@ -74,7 +74,7 @@
     <div class="box box-success">
         <div class="box-header with-border">
             <div class="mailbox-controls">
-                <button class="btn btn-default btn-sm"><i class="fa fa-refresh"></i></button>
+                <button id="refresh_table" class="btn btn-default btn-sm"><i class="fa fa-refresh"></i></button>
 
             </div>
             <div class="box-tools pull-right">
@@ -85,7 +85,7 @@
 
         <div class="box-body">
             <div>
-                <table class="table table-striped table-bordered table-hover" id="candidates-table">
+                <table class="table table-striped table-bordered table-hover dt-responsive nowrap" cellspacing="0" width="100%" id="candidates-table">
                     <thead>
                     <tr>
                         <th>{{ trans('labels.backend.candidates.fields.name_kh') }}</th>
@@ -216,6 +216,10 @@
                 submitIncome();
             });
 
+            $('#refresh_table').on('click',function(){
+                oTable.draw();
+            });
+
             function submitIncome(){
                 $.ajax({
                     type:'POST',
@@ -258,7 +262,7 @@
                             '<button class="btn btn-sm btn-primary btn_income_student">Income</button> &nbsp; <button class="btn btn-sm btn-success">Outcome</button>'
                     );
                     $("div.payment_info").html(
-                            '<span>To Pay: </span> 200$ / <span>Debt: </span> 50$'
+                            '<span>To Pay: </span> 450$ / <span>Debt: </span> 450$'
                     );
                     $(".btn_income_student").click(function(){
                         preparePayment(row.data());
@@ -311,7 +315,7 @@
 
     <script id="details-template" type="text/x-handlebars-template">
         <div class="label label-info">@{{name_kh}}'s Payments</div>
-        <table class="table details-table col-lg-8 bg-payment-detail" id="students-@{{id}}">
+        <table class="table details-table col-lg-8 bg-payment-detail dt-responsive nowrap" cellspacing="0" width="100%" id="students-@{{id}}">
             <thead>
             <tr>
                 <th>Number</th>

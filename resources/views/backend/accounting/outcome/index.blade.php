@@ -39,7 +39,7 @@
 
         <div class="box-body">
             <div>
-                <table class="table table-striped table-bordered table-hover" id="outcomes-table">
+                <table class="table table-striped table-bordered table-hover dt-responsive nowrap" cellspacing="0" width="100%" id="outcomes-table">
                     <thead>
                     <tr>
                         <th>{{ trans('labels.backend.accounting.fields.number') }}</th>
@@ -57,8 +57,8 @@
                             Total Sum (៛) :
                         </th>
                         <th align="left" style="border: none">
-                            10000 <br/>
-                            1200000
+                            0 <br/>
+                            0
                         </th>
                     </tr>
                     </tfoot>

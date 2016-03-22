@@ -515,36 +515,46 @@ class IncomeController extends Controller
             ->leftJoin('employees','incomes.payslip_client_id','=','employees.payslip_client_id')
             ->leftJoin('studentAnnuals','incomes.payslip_client_id','=','studentAnnuals.payslip_client_id')
             ->leftJoin('customers','incomes.payslip_client_id','=','customers.payslip_client_id')
-            ->leftJoin('students','studentAnnuals.student_id','=','students.id');
+            ->leftJoin('students','studentAnnuals.student_id','=','students.id')
+            ->select([
+               'incomes.number','incomes.amount_dollar','incomes.amount_riel','accounts.name as account_name','incomeTypes.name as income_type_name',
+                DB::raw("CONCAT(customers.name,employees.name_kh,students.name_kh) as name"),'incomes.pay_date'
+            ]);
 
         $title = 'ស្ថិតិចំនូល';
         // additional search
         // additional search
         if ($account = Input::get('account')) {
             $incomes = $incomes->where('outcomes.account_id', '=', $account);
+            $account_obj = Account::where('id',$account)->first();
+            $title.=" ក្នុងគណនី ".$account_obj->name;
         }
 
-        if ($outcome_type = Input::get('outcome_type')) {
-            $incomes = $incomes->where('outcomes.outcome_type_id', '=', $outcome_type);
+        if ($income_type = Input::get('income_type')) {
+            $incomes = $incomes->where('incomes.income_type_id', '=', $income_type);
+
+            $incomeType_obj = IncomeType::where('id',$income_type)->first();
+            $title.=" ប្រភេទចំនូល ".$incomeType_obj->name;
         }
 
         if ($date_range = Input::get('date_range')) {
             $date = explode(' - ',$date_range);
 
-            $start_date = Carbon::createFromFormat('d/m/Y',$date[0])->startOfDay()->format('Y-m-d')." 00:00:00";
-            $end_date = Carbon::createFromFormat('d/m/Y',$date[1])->endOfDay()->format('Y-m-d h:i:s');
+            $start_date = Carbon::createFromFormat('d/m/Y',$date[0]);
+            $end_date = Carbon::createFromFormat('d/m/Y',$date[1]);
 
-            $incomes = $incomes->where('outcomes.pay_date', '<=', $end_date)->where('outcomes.pay_date', '>=', $start_date);
+            $incomes = $incomes->where('outcomes.pay_date', '<=', $end_date->endOfDay()->format('Y-m-d h:i:s'))->where('outcomes.pay_date', '>=', $start_date->startOfDay()->format('Y-m-d')." 00:00:00");
+
+            $title.=" សំរាប់ពីថ្ងៃទី ".$date[0]. " ដល់ថ្ងៃទី ".$date[1];
         }
 
         $data = $incomes->get();
-
 
         Excel::create('ស្ថិតិចំនូល', function($excel) use ($data, $title) {
 
 
             // Set the title
-            $excel->setTitle('ស្ថិតិចំនូល');
+            $excel->setTitle($title);
 
             // Chain the setters
             $excel->setCreator('Department of Finance')
@@ -578,32 +588,41 @@ class IncomeController extends Controller
                 ));
 
                 $sheet->rows(array(
-                    array('លរ','អត្តលេខ','ឈ្មោះខ្មែរ','ឈ្មោះឡាតាំង','ថ្ងៃខែឆ្នាំកំណើត','ភេទ','មកពី','ថ្នាក់','ជំនាញ')
+                    array('លេខ','ចំនួនទឹកប្រាក់ ដុល្លា','ចំនួនទឹកប្រាក់រៀលរ','ចុះក្នុងគណនី','ប្រភេទចំនូល','អ្នកបង់ប្រាក់','ចុះថ្ងៃទី')
                 ));
                 foreach ($data as $item) {
 
+                    $array = array(
+                        str_pad($item->number, 4, '0', STR_PAD_LEFT),
+                        $item->amount_dollar == null?"0 $":$item->amount_dollar." $",
+                        $item->amount_riel == null?"0 ៛":$item->amount_riel. " ៛",
+                        $item->account_name,
+                        $item->income_type_name,
+                        $item->name,
+                        Carbon::createFromFormat('Y-m-d h:i:s',$item->pay_date)->format('d/m/Y')
+                    );
                     $sheet->appendRow(
-                        $item
+                        $array
                     );
                 }
 
-                $sheet->mergeCells('A1:I1');
-                $sheet->mergeCells('A2:I2');
-                $sheet->mergeCells('A3:I3');
-                $sheet->mergeCells('A4:I4');
-                $sheet->mergeCells('A5:I5');
+                $sheet->mergeCells('A1:G1');
+                $sheet->mergeCells('A2:G2');
+                $sheet->mergeCells('A3:G3');
+                $sheet->mergeCells('A4:G4');
+                $sheet->mergeCells('A5:G5');
 
-                $sheet->cells('A1:I2', function($cells) {
+                $sheet->cells('A1:G2', function($cells) {
                     $cells->setAlignment('center');
                     $cells->setValignment('middle');
                 });
 
-                $sheet->cells('A5:I'.(6+count($data)), function($cells) {
+                $sheet->cells('A5:G'.(6+count($data)), function($cells) {
                     $cells->setAlignment('center');
                     $cells->setValignment('middle');
                 });
 
-                $sheet->setBorder('A6:I'.(6+count($data)), 'thin');
+                $sheet->setBorder('A6:G'.(6+count($data)), 'thin');
 
             });
 

@@ -43,22 +43,20 @@
         </div><!-- /.box-header -->
 
         <div class="box-body">
-            <div>
-                <table class="table table-striped table-bordered table-hover" id="students-table">
-                    <thead>
-                    <tr>
-                        <th>{{ trans('labels.backend.students.fields.id_card') }}</th>
-                        <th>{{ trans('labels.backend.students.fields.name_kh') }}</th>
-                        <th>{{ trans('labels.backend.students.fields.name_latin') }}</th>
-                        <th>{{ trans('labels.backend.students.fields.dob') }}</th>
-                        <th>{{ trans('labels.backend.students.fields.gender_id') }}</th>
-                        <th>{{ trans('labels.backend.students.fields.class') }}</th>
-                        <th>{{ trans('labels.backend.students.fields.department_option_id') }}</th>
-                        <th>{{ trans('labels.general.actions') }}</th>
-                    </tr>
-                    </thead>
-                </table>
-            </div>
+            <table class="table table-striped table-bordered table-hover dt-responsive nowrap" cellspacing="0" width="100%" id="students-table">
+                <thead>
+                <tr>
+                    <th>{{ trans('labels.backend.students.fields.id_card') }}</th>
+                    <th>{{ trans('labels.backend.students.fields.name_kh') }}</th>
+                    <th>{{ trans('labels.backend.students.fields.name_latin') }}</th>
+                    <th>{{ trans('labels.backend.students.fields.dob') }}</th>
+                    <th>{{ trans('labels.backend.students.fields.gender_id') }}</th>
+                    <th>{{ trans('labels.backend.students.fields.class') }}</th>
+                    <th>{{ trans('labels.backend.students.fields.department_option_id') }}</th>
+                    <th>{{ trans('labels.general.actions') }}</th>
+                </tr>
+                </thead>
+            </table>
 
             <div class="clearfix"></div>
         </div><!-- /.box-body -->
@@ -102,7 +100,7 @@
                     '{!! Form::select('academic_year',$academicYears,null, array('class'=>'form-control','id'=>'filter_academic_year')) !!} '+
                     '{!! Form::select('degree',$degrees,null, array('class'=>'form-control','id'=>'filter_degree','placeholder'=>'Degree')) !!} '+
                     '{!! Form::select('grade',$grades,null, array('class'=>'form-control','id'=>'filter_grade','placeholder'=>'Grade')) !!} '+
-                    '{!! Form::select('department',$departments,null, array('class'=>'form-control','id'=>'filter_department','placeholder'=>'Department')) !!}' +
+                    '{!! Form::select('department',$departments,null, array('class'=>'form-control','id'=>'filter_department','placeholder'=>'Department')) !!} ' +
                     '{!! Form::select('gender',$genders,null, array('class'=>'form-control','id'=>'filter_gender','placeholder'=>'Gender')) !!} '+
                     '{!! Form::select('option',$options,null, array('class'=>'form-control','id'=>'filter_option','placeholder'=>'Option')) !!} '+
                     '{!! Form::select('origin',$origins,null, array('class'=>'form-control','id'=>'filter_origin','placeholder'=>'Origin')) !!} '

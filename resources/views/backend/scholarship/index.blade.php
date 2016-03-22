@@ -43,7 +43,7 @@
 
         <div class="box-body">
             <div>
-                <table class="table table-striped table-bordered table-hover" id="scholarships-table">
+                <table class="table table-striped table-bordered table-hover dt-responsive nowrap" cellspacing="0" width="100%" id="scholarships-table">
                     <thead>
                     <tr>
                         <th>{{ trans('labels.backend.scholarships.fields.name_kh') }}</th>

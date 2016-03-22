@@ -74,7 +74,7 @@
     <div class="box box-success">
         <div class="box-header with-border">
             <div class="mailbox-controls">
-                <button class="btn btn-default btn-sm"><i class="fa fa-refresh"></i></button>
+                <button id="refresh_table" class="btn btn-default btn-sm"><i class="fa fa-refresh"></i></button>
 
             </div>
             <div class="box-tools pull-right">
@@ -85,7 +85,7 @@
 
         <div class="box-body">
             <div>
-                <table class="table table-striped table-bordered table-hover" id="students-table">
+                <table class="table table-striped table-bordered table-hover dt-responsive nowrap" cellspacing="0" width="100%" id="students-table">
                     <thead>
                     <tr>
                         <th>{{ trans('labels.backend.students.fields.id_card') }}</th>
@@ -226,6 +226,10 @@
                 submitIncome();
             });
 
+            $('#refresh_table').on('click',function(){
+                oTable.draw();
+            });
+
             function submitIncome(){
                 $.ajax({
                     type:'POST',
@@ -322,7 +326,7 @@
 
     <script id="details-template" type="text/x-handlebars-template">
         <div class="label label-info">@{{name_kh}}'s Payments</div>
-        <table class="table details-table col-lg-8 bg-payment-detail" id="students-@{{id}}">
+        <table class="table details-table col-lg-8 bg-payment-detail dt-responsive nowrap" cellspacing="0" width="100%" id="students-@{{id}}">
             <thead>
             <tr>
                 <th>Number</th>

@@ -38,7 +38,7 @@
 
         <div class="box-body">
             <div>
-                <table class="table table-striped table-bordered table-hover" id="promotions-table">
+                <table class="table table-striped table-bordered table-hover dt-responsive nowrap" cellspacing="0" width="100%" id="promotions-table">
                     <thead>
                     <tr>
                         <th>{{ trans('labels.backend.promotions.fields.name') }}</th>

@@ -1,4 +1,4 @@
-<table class="table table-bordered" id="candidates-table">
+<table class="table table-bordered dt-responsive nowrap" cellspacing="0" width="100%" id="candidates-table">
     <thead>
     <tr>
         <th>{{ trans('labels.backend.candidates.fields.name_kh') }}</th>

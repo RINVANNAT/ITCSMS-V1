@@ -158,11 +158,6 @@
             <span class="show_label col-sm-2">{{trans('labels.backend.students.fields.scholarship_id')}}</span>
 
             <div class="col-sm-10" style="padding-left: 0px;">
-                <table class="table table-striped table-bordered table-hover">
-                    <tr><td>1</td><td>dfsdf</td><td>sfdsf</td></tr>
-                    <tr><td>2</td><td>dfsdf</td><td>sfdsf</td></tr>
-                    <tr><td>3</td><td>dfsdf</td><td>sfdsf</td></tr>
-                </table>
             </div>
 
         </div>
