@@ -57,8 +57,8 @@
                             Total Sum (៛) :
                         </th>
                         <th align="left" style="border: none">
-                            0 <br/>
-                            0
+                            <span id="total_dollar">0</span> <br/>
+                            <span id="total_riel">0</span>
                         </th>
                     </tr>
                     </tfoot>
@@ -81,6 +81,11 @@
                 dom: 'l<"toolbar">frtip',
                 processing: true,
                 serverSide: true,
+                initComplete: function (settings, json) {
+                    //console.log(json);
+                    $('#total_dollar').html(json.total_dollar);
+                    $('#total_riel').html(json.total_riel);
+                },
                 pageLength: {!! config('app.records_per_page')!!},
                 ajax: {
                     url:'{!! route('admin.accounting.outcome.data') !!}',
@@ -103,7 +108,7 @@
             $("div.toolbar").html(
                     '{!! Form::text('date_start_end',null,array('class'=>'form-control','id'=>'filter_date_range','placeholder'=>'Date range')) !!} ' +
                     '{!! Form::select('account',$accounts,null, array('class'=>'form-control','id'=>'filter_account','placeholder'=>'Account')) !!} '+
-                    '{!! Form::select('outcomeType',$outcomeTypes,null, array('class'=>'form-control','id'=>'filter_outcomeType','placeholder'=>'Outcome Type')) !!} '
+                    '{!! Form::select('outcomeType',$outcomeTypes,null, array('class'=>'form-control','id'=>'filter_outcomeType','placeholder'=>'Outcome Type','style'=>'width:200px;')) !!} '
             );
 
             $('#filter_date_range').daterangepicker({
@@ -137,3 +142,4 @@
         });
     </script>
 @stop
+

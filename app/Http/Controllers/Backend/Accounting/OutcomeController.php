@@ -172,8 +172,10 @@ class OutcomeController extends Controller
             $datatables->where('outcomes.pay_date', '<=', $end_date)->where('outcomes.pay_date', '>=', $start_date);
         }
 
-        return $datatables
-            ->make(true);
+        $data =  $datatables->with(['total_dollar' => 1000,'total_riel'=>1000])->make(true);
+        //$data->data->total_dollar = 1000;
+        //$data->data->total_riel = 1000;
+        return $data;
     }
 
     public function client_search(Request $request){
