@@ -45,14 +45,18 @@
                         <th>{{ trans('labels.backend.accounting.fields.number') }}</th>
                         <th>{{ trans('labels.backend.accounting.fields.amount_dollar') }}</th>
                         <th>{{ trans('labels.backend.accounting.fields.amount_riel') }}</th>
-                        <th>{{ trans('labels.backend.accounting.fields.account_id') }}</th>
                         <th>{{ trans('labels.backend.accounting.fields.client') }}</th>
-                        <th>{{ trans('labels.general.actions') }}</th>
+                        <th>{{ trans('labels.backend.accounting.fields.date') }}</th>
+                        <th>{{ trans('labels.backend.accounting.fields.account_id') }}</th>
+                        <th>{{ trans('labels.backend.accounting.fields.outcomeType_id') }}</th>
+                        <th>{{ trans('labels.backend.accounting.fields.description') }}</th>
+                        <th>{{ trans('labels.backend.accounting.fields.attachment') }}</th>
+                        <th style="width: 1cm;"></th>
                     </tr>
                     </thead>
                     <tfoot>
                     <tr>
-                        <th colspan="5" style="text-align: right; border:none">
+                        <th colspan="7" style="text-align: right; border:none">
                             Total Sum ($) :<br/>
                             Total Sum (៛) :
                         </th>
@@ -125,8 +129,12 @@
                     { data: 'number', name: 'outcomes.number'},
                     { data: 'amount_dollar', name: 'outcomes.amount_dollar'},
                     { data: 'amount_riel', name: 'outcomes.amount_riel'},
-                    { data: 'account_name', name: 'accounts.name'},
                     { data: 'name', name: 'name'},
+                    { data: 'pay_date', name: 'outcomes.pay_date'},
+                    { data: 'account_name', name: 'accounts.name'},
+                    { data: 'outcome_type_name', name: 'outcomeTypes.name'},
+                    { data: 'description', name: 'outcomes.description',searchable:false,orderable:false},
+                    { data: 'attachments', name: 'attachments',searchable:false,orderable:false},
                     { data: 'action', name: 'action',orderable: false, searchable: false}
                 ]
             });

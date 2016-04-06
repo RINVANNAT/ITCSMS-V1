@@ -121,10 +121,37 @@
 
             function initTable(tableId, data) {
                 payment_table = $('#' + tableId).DataTable({
-                    dom: 'i<"payment_info">t<"payment_export_print btn-group"><"payment_btn">',
+                    dom: 'i<"#payment_info_'+data.id+'">t<"payment_export_print btn-group"><"payment_btn">',
                     processing: true,
                     serverSide: true,
                     ajax: data.details_url,
+                    initComplete: function() {
+                        $('#payment_info_'+data.id).addClass('payment_info');
+                    },
+                    drawCallback: function (settings) {
+                        //$('#total_dollar').html(json.total_dollar);
+                        //$('#total_riel').html(json.total_riel);
+                        this.api().columns(1).every(function () {
+                            var column = this;
+                            var sum1 = column.data();
+                            if (sum1.length > 0) {
+                                sum1 = sum1.reduce(function (a, b) {
+                                    return parseInt(a, 10) + parseInt(b, 10);
+                                });
+                            } else {
+                                sum1 = 0;
+                            }
+
+                            to_pay = data.to_pay.split(" ");
+                            try{
+                                sum1 = sum1.split(" ");
+                                $('#debt-'+data.id).html((to_pay[0]-sum1[0])+" "+to_pay[1]);
+                            } catch (err) {
+                                $('#debt-'+data.id).html((to_pay[0]-sum1)+" "+to_pay[1]);
+                            }
+
+                        });
+                    },
                     columns: [
                         { data: 'number', name: 'number',searchable:false },
                         { data: 'income', name: 'income' ,searchable:false},
@@ -133,6 +160,7 @@
                         { data: 'action', name: 'action', orderable:false,searchable:false }
                     ]
                 })
+                console.log(payment_table);
             }
 
             var oTable = $('#students-table').DataTable({
@@ -242,7 +270,8 @@
                     success:function(data) {
                         $('#add_payment_modal').modal('toggle');
                         //$('#'+current_id).DataTable().ajax.reload();
-                        payment_table.draw();
+                        //payment_table.draw();
+                        payment_table.ajax.url( data.payslip_client_id ).load();
                     },
                     error:function(error){
                         alert(error);
@@ -254,6 +283,7 @@
             $('#students-table tbody').on('click', 'td.details-control', function () {
                 var tr = $(this).closest('tr');
                 var row = oTable.row(tr);
+
                 var tableId = 'students-' + row.data().id;
 
                 if (row.child.isShown()) {
@@ -271,8 +301,8 @@
                     $("div.payment_btn").html(
                             '<button class="btn btn-sm btn-primary btn_income_student">Income</button> &nbsp; <button class="btn btn-sm btn-success">Outcome</button>'
                     );
-                    $("div.payment_info").html(
-                            '<span>To Pay: </span> 200$ / <span>Debt: </span> 50$'
+                    $("#payment_info_"+row.data().id).html(
+                            '<span>To Pay: </span> '+row.data().to_pay+' / <span>Debt: </span> <span id="debt-'+row.data().id+'"></span>'
                     );
                     $(".btn_income_student").click(function(){
                         preparePayment(row.data());

@@ -155,7 +155,7 @@ class OutcomeController extends Controller
 
         $outcomes = $outcomes->select([
             'outcomes.id as outcome_id','outcomes.number','outcomes.amount_dollar','outcomes.amount_riel','accounts.name as account_name',
-            'outcomes.payslip_client_id','outcomeTypes.name as outcome_type_name',
+            'outcomes.payslip_client_id','outcomeTypes.name as outcome_type_name','outcomeTypes.code as outcome_type_code', 'outcomes.description','outcomes.attachment_name', 'outcomes.pay_date',
             DB::raw("CONCAT(customers.name,employees.name_kh,students.name_kh) as name")
         ]);
 
@@ -164,6 +164,25 @@ class OutcomeController extends Controller
             ->editColumn('number','{{str_pad($number, 4, "0", STR_PAD_LEFT)}}')
             ->editColumn('amount_dollar', '{!! $amount_dollar==null? "0 $" :$amount_dollar. " $" !!}')
             ->editColumn('amount_riel', '{!! $amount_riel==null? "0 ៛": $amount_riel. " ៛" !!}')
+            ->editColumn('outcome_type_name', '{!! $outcome_type_code. " | ".$outcome_type_name !!}')
+            ->editColumn('pay_date', function($outcome){
+                $date = Carbon::createFromFormat('Y-m-d h:i:s',$outcome->pay_date);
+                return $date->format('d/m/Y');
+            })
+            ->addColumn('attachments', function($outcome){
+
+                $related_attachments = DB::table('attachments')
+                    ->where('attachments.outcome_id','=',$outcome->outcome_id)
+                    ->orderBy('location','ASC')
+                    ->select('location')->get();
+                $list = $outcome->attachment_name;
+                $list .= '<ol type="1">';
+                foreach($related_attachments as $attachment){
+                    $list .= "<li><a href='".url('/img/attachments/'.$attachment->location)."' target='_blank'>".$attachment->location."</a></li>";
+                }
+                $list .= "</ol>";
+                return $list;
+            })
             ->addColumn('action', function ($outcome) {
                 //return  '<a href="'.route('admin.accounting.incomes.edit',$outcome->outcome_id).'" class="btn btn-xs btn-primary"><i class="fa fa-pencil" data-toggle="tooltip" data-placement="top" title="" data-original-title="'.trans('buttons.general.crud.edit').'"></i> </a>'.
                 //' <button class="btn btn-xs btn-danger btn-delete" data-remote="'.route('admin.accounting.incomes.destroy', $outcome->outcome_id) .'"><i class="fa fa-times" data-toggle="tooltip" data-placement="top" title="' . trans('buttons.general.crud.delete') . '"></i></button>';

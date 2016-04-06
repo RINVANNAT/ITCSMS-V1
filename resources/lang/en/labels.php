@@ -576,7 +576,9 @@ return [
                 'date' => 'Date of payment',
                 'client' => "Pay to",
                 'incomeType_id' => "Income Type",
-                'outcomeType_id' => "Outcome Type"
+                'outcomeType_id' => "Outcome Type",
+                'description' => "Description",
+                'attachment' => "Attachments"
             ]
         ],
         'incomes' => [

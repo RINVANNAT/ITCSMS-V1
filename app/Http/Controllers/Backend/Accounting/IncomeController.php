@@ -334,14 +334,15 @@ class IncomeController extends Controller
      */
     public function store(StoreIncomeRequest $request)
     {
+        $id = null;
         if(Input::get('type') == "Student" || Input::get('type') == "Candidate"){
-            $this->incomes->create($request->all());
+            $id = $this->incomes->create($request->all());
         } else {
             $this->incomes->createSimpleIncome($request->all());
         }
 
         if($request->ajax()){
-            return json_encode(array("sucess"=>true));
+            return json_encode(array("sucess"=>true,'payslip_client_id'=>$id));
         }
         return redirect()->route('admin.accounting.incomes.index')->withFlashSuccess(trans('alerts.backend.generals.created'));
     }
@@ -409,11 +410,12 @@ class IncomeController extends Controller
             ->leftJoin('students','studentAnnuals.student_id','=','students.id')
             ->select([
                 'incomes.id','incomes.number','incomes.amount_dollar','incomes.amount_riel','incomes.payslip_client_id','accounts.name as account_name',
-                'incomeTypes.name as income_type_name',
+                'incomeTypes.name as income_type_name', 'incomes.description',
                 DB::raw("CONCAT(customers.name,employees.name_kh,students.name_kh) as name")
             ]);
 
         $datatables =  app('datatables')->of($incomes)
+            ->filterColumn('name', 'whereRaw', "CONCAT(customers.name,employees.name_kh,students.name_kh) like ? ", ["%$1%"])
             ->editColumn('number','{{str_pad($number, 5, "0", STR_PAD_LEFT)}}')
             ->editColumn('amount_dollar','{{$amount_dollar==""?0:$amount_dollar." $"}}')
             ->editColumn('amount_riel','{{$amount_riel==null?0:$amount_riel." ៛"}}')
