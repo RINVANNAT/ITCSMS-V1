@@ -16,3 +16,9 @@ Route::group([
     });
 
 });
+
+
+Route::any('api/v1/courseAnnuals',[
+    'as' => 'courseAnnuals.api.v1',
+    'uses' => 'Restfull\CourseAnnualApiController@index',
+]);

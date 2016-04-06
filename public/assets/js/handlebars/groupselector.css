@@ -1,0 +1,52 @@
+.groupselector{
+    border-bottom: 1px solid black;
+    padding-bottom: 0px;
+    padding-top: 0px;
+}
+.option {
+
+    margin-right: 5px;
+    padding-bottom: 2px;
+}
+.optionitem {
+    padding-right: 13px;
+    padding-left: 13px;
+    padding-top: 2px;
+    padding-bottom: 2px;
+    margin-left: 9px;
+
+    font-family: "Helvetica Neue",Helvetica,Arial,sans-serif;
+    -moz-border-radius: 10px;
+    -webkit-border-radius: 10px;
+    border-radius: 10px;
+
+}
+.optionitem:hover{
+    background-color: #d2ebee;
+
+}
+.optionitem[manuleselected="1"] {
+    background-color: #3c8dbc;
+    color:white;
+}
+
+.optionlongitem{
+    padding-right: 15px;
+    padding-left: 15px;
+    padding-top: 3px;
+    padding-bottom: 3px;
+    margin-left: 10px;
+    font-family: "Helvetica Neue",Helvetica,Arial,sans-serif;
+    -moz-border-radius: 10px;
+    -webkit-border-radius: 10px;
+    border-radius: 10px;
+}
+
+.optionlongitem[manuleselected="1"] {
+    background-color: #3c8dbc;
+    color:white;
+}
+
+#swapper{
+    margin-top:2px;
+}

@@ -4,7 +4,7 @@ use Illuminate\Database\Eloquent\Model as Model;
 
 class Grade extends Model
 {
-    
+
 	public $table = "grades";
     
 

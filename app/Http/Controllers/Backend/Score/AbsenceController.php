@@ -1,27 +1,19 @@
 <?php namespace App\Http\Controllers\Backend\Score;
 
 use App\Http\Controllers\Controller;
-use App\Http\Requests\Backend\Configuration\CourseAnnual\CreateCourseAnnualRequest;
-use App\Http\Requests\Backend\Configuration\CourseProgram\DeleteCourseProgramRequest;
-use App\Http\Requests\Backend\Configuration\CourseProgram\EditCourseProgramRequest;
-use App\Http\Requests\Backend\Configuration\CourseProgram\StoreCourseProgramRequest;
-use App\Http\Requests\Backend\Configuration\CourseProgram\UpdateCourseProgramRequest;
-use App\Models\AcademicYear;
-use App\Models\Course;
-use App\Models\Degree;
-use App\Models\Department;
-use App\Models\Grade;
-use App\Repositories\Backend\Score\AbsenceRepository;
+use App\Repositories\Backend\Score\AbsenceRepository51;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Http\Request;
+use InfyOm\Generator\Controller\AppBaseController;
 
 
-class AbsenceController extends Controller
+class AbsenceController extends AppBaseController
 {
 
 	/** @var  AbsenceRepository */
 	private $absenceRepository;
 
-	function __construct(AbsenceRepository $absenceRepo)
+	function __construct(AbsenceRepository51 $absenceRepo)
 	{
 		$this->absenceRepository = $absenceRepo;
 	}
@@ -48,6 +40,7 @@ class AbsenceController extends Controller
 
     public function indexByGroup(Request $request)
     {
+
 		if ($request->has('filter'))
 		{
 			$params = json_decode($request["filter"],true);
@@ -55,13 +48,13 @@ class AbsenceController extends Controller
 			$results = $this->absenceRepository->getAbsenceByCourse($params);
 			$studentAnnuals = $results["studentAnnuales"];
 			$absencesCounts = $results["absencesCounts"];
-			return view('absences.tableByGroup', compact("studentAnnuals","absencesCounts"));
+			return view('backend.score.absence.tableByGroup', compact("studentAnnuals","absencesCounts"));
 		}
         $results = $this->absenceRepository->getAbsenceByCourse($request);
         $studentAnnuals = $results["studentAnnuales"];
         $absencesCounts = $results["absencesCounts"];
 
-        return view('absences.indexByGroup', compact("studentAnnuals","absencesCounts"));
+        return view('backend.score.absence.indexByGroup', compact("studentAnnuals","absencesCounts"));
     }
 
     public function editMany(Request $request)

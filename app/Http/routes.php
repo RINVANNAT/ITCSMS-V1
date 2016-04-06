@@ -20,7 +20,7 @@ Route::group(['middleware' => 'web'], function() {
 
 /**
  * Backend Routes
- * Namespaces indicate folder structure
+ * Namespaces `icate folder structure
  * Admin middleware groups web, auth, and routeNeedsPermission
  */
 Route::group(['namespace' => 'Backend', 'prefix' => 'admin', 'middleware' => 'admin'], function () {
@@ -53,8 +53,21 @@ Route::group(['namespace' => 'Backend', 'prefix' => 'admin', 'middleware' => 'ad
 |--------------------------------------------------------------------------
 */
 
-//Route::group(['prefix' => 'api', 'namespace' => 'API'], function () {
-//    Route::group(['prefix' => 'v1'], function () {
-//        require config('infyom.laravel_generator.path.api_routes');
-//    });
-//});
+Route::group([
+    'prefix' => 'api',
+    'namespace' => 'API'
+    ], function () {
+    Route::group([
+        'prefix' => 'v1'], function () {
+//            require config('infyom.laravel_generator.path.api_routes');
+        require (__DIR__ . '/api_routes.php');
+    });
+});
+
+
+Route::resource('testModule1s', 'TestModule1Controller');
+
+Route::get('testModule1s/delete/{id}', [
+    'as' => 'testModule1s.delete',
+    'uses' => 'TestModule1Controller@destroy',
+]);

@@ -83,5 +83,7 @@
 
     </script>
     @yield('after-scripts-end')
+
+
     </body>
 </html>

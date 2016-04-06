@@ -4,7 +4,7 @@ use Illuminate\Database\Eloquent\Model as Model;
 
 class CourseAnnual extends Model
 {
-    
+
 	public $table = "courseAnnuals";
     
 
@@ -58,7 +58,7 @@ class CourseAnnual extends Model
     ];
 
 	public static $rules = [
-	    
+
 	];
 
 }

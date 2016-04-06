@@ -4,7 +4,7 @@ use Illuminate\Database\Eloquent\Model as Model;
 
 class Department extends Model
 {
-    
+
 	public $table = "departments";
     
 
@@ -21,7 +21,7 @@ class Department extends Model
         "write_uid",
         "school_id",
         "type"
-		
+
 
 	];
 

@@ -1,25 +1,46 @@
-<?php App\Repositories\Backend\Score;
+<?php namespace App\Repositories\Backend\Score;
 
 use App\Models\Absence;
-use Bosnadev\Repositories\Eloquent\Repository;
-use Schema;
-use App\Models\StudentAnnual;
 use App\Models\AcademicYear;
+use App\Models\StudentAnnual;
 use Symfony\Component\HttpKernel\Exception\HttpException;
 use Debugbar;
 
-class AbsenceRepository51 extends Repository
+use InfyOm\Generator\Common\BaseRepository;
+
+class AbsenceRepository51 extends BaseRepository
 {
+    /**
+     * @var array
+     */
+    protected $fieldSearchable = [
+        'name'
+    ];
 
     /**
-    * Configure the Model
-    *
-    **/
+     * Configure the Model
+     **/
     public function model()
     {
-      return 'App\Models\Absence';
+        return Absence::class;
     }
 
+
+
+    /*---------------------------------------
+    Old
+    ----------------------------------------*/
+//{
+//
+//    /**
+//    * Configure the Model
+//    *
+//    **/
+//    public function model()
+//    {
+//      return 'App\Models\Absence';
+//    }
+//
 	public function search($input)
     {
         $query = Absence::query();
@@ -102,7 +123,7 @@ class AbsenceRepository51 extends Repository
     }
     public function getAbsenceByCourse($param)
     {
-        Debugbar::info($param);
+
         $degree_id= (int) $param["degree_id"];
         $grade_id= (int) $param["grade_id"];
         $department_id = (int) $param["department_id"];
@@ -111,7 +132,7 @@ class AbsenceRepository51 extends Repository
         if($param !=null && array_key_exists("academic_year_id", $param)){
             $academic_year_id = $param["academic_year_id"];
         }else{
-            $last_academic_year = AcademicYear::orderBy('code','desc')->first();
+            $last_academic_year = AcademicYear::orderBy('id','desc')->first();
             $academic_year_id = $last_academic_year->id;
         }
 
