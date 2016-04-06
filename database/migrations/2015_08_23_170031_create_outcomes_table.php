@@ -16,9 +16,9 @@ class CreateOutcomesTable extends Migration
 		Schema::create('outcomes', function(Blueprint $table)
 		{
             $table->increments('id');
-            $table->string('amount_dollar')->nullable();
+            $table->integer('amount_dollar')->nullable();
+            $table->integer('amount_riel')->nullable();
             $table->string('amount_kh');
-            $table->string('amount_riel')->nullable();
             $table->string('number')->nullable();
             $table->string('description')->nullable();
             $table->boolean('is_printed')->default(false);

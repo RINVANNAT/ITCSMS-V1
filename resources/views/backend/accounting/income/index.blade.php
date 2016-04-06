@@ -59,6 +59,18 @@
                         <th>{{ trans('labels.general.actions') }}</th>
                     </tr>
                     </thead>
+                    <tfoot>
+                    <tr>
+                        <th colspan="6" style="text-align: right; border:none">
+                            Total Sum ($) :<br/>
+                            Total Sum (៛) :
+                        </th>
+                        <th align="left" style="border: none">
+                            <span id="total_dollar">0</span> <br/>
+                            <span id="total_riel">0</span>
+                        </th>
+                    </tr>
+                    </tfoot>
                 </table>
             </div>
 
@@ -79,6 +91,37 @@
                 dom: 'l<"toolbar">frtip',
                 processing: true,
                 serverSide: true,
+                drawCallback: function (settings) {
+                    //$('#total_dollar').html(json.total_dollar);
+                    //$('#total_riel').html(json.total_riel);
+                    this.api().columns(1).every(function () {
+                        var column = this;
+                        var sum1 = column.data();
+                        if(sum1.length > 0){
+                            sum1  = sum1.reduce(function (a, b) {
+                                return parseInt(a, 10) + parseInt(b, 10);
+                            });
+                        } else {
+                            sum1 = 0;
+                        }
+
+                        $('#total_dollar').html(sum1);
+                    });
+
+                    this.api().columns(2).every(function () {
+                        var column = this;
+                        var sum2 = column.data();
+                        if(sum2.length > 0){
+                            sum2  = sum2.reduce(function (a, b) {
+                                return parseInt(a, 10) + parseInt(b, 10);
+                            });
+                        } else {
+                            sum2 = 0;
+                        }
+
+                        $('#total_riel').html(sum2);
+                    });
+                },
                 pageLength: {!! config('app.records_per_page')!!},
                 ajax: {
                     url:'{!! route('admin.accounting.income.data') !!}',

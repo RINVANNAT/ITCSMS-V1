@@ -107,6 +107,8 @@ class EloquentIncomeRepository implements IncomeRepositoryContract
             }else {
                 $query_ok = false;
             }
+        } else {
+            $client_id = $input['payslip_client_id'];
         }
 
         $income = new Income();

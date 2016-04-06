@@ -122,12 +122,8 @@ class OutcomeController extends Controller
         return redirect()->route('admin.accounting.academicYears.index')->withFlashSuccess(trans('alerts.backend.generals.deleted'));
     }
 
-    public function data()
+    public function data(Request $request)
     {
-        //$student = Student::join('studentAnnuals', 'studentAnnuals.student_id', '=', 'students.id')
-        //	->select(['students.id_card','students.name_kh','students.name_latin','studentAnnuals.grade_id']);
-
-        //$studentAnnuals = StudentAnnual::with(['student','grade'])->select(['students.id_card','students.name_kh','students.name_latin','grades.name_kh']);
 
         $outcomes = DB::table('outcomes')
             ->leftJoin('accounts','outcomes.account_id','=','accounts.id')
@@ -135,15 +131,36 @@ class OutcomeController extends Controller
             ->leftJoin('employees','outcomes.payslip_client_id','=','employees.payslip_client_id')
             ->leftJoin('studentAnnuals','outcomes.payslip_client_id','=','studentAnnuals.payslip_client_id')
             ->leftJoin('customers','outcomes.payslip_client_id','=','customers.payslip_client_id')
-            ->leftJoin('students','studentAnnuals.student_id','=','students.id')
-            ->select([
-                'outcomes.id as outcome_id','outcomes.number','outcomes.amount_dollar','outcomes.amount_riel','accounts.name as account_name',
-                'outcomes.payslip_client_id','outcomeTypes.name as outcome_type_name',
-                DB::raw("CONCAT(customers.name,employees.name_kh,students.name_kh) as name")
-            ]);
+            ->leftJoin('students','studentAnnuals.student_id','=','students.id');
 
-        //dd($outcomes);
+        // additional search
+        if ($account = $request->get('account')) {
+            $outcomes = $outcomes->where('outcomes.account_id', '=', $account);
+        }
+
+        if ($outcome_type = $request->get('outcome_type')) {
+            $outcomes = $outcomes->where('outcomes.outcome_type_id', '=', $outcome_type);
+        }
+
+        if ($date_range = $request->get('date_range')) {
+            $date = explode(' - ',$date_range);
+
+            $start_date = Carbon::createFromFormat('d/m/Y',$date[0])->startOfDay()->format('Y-m-d')." 00:00:00";
+            $end_date = Carbon::createFromFormat('d/m/Y',$date[1])->endOfDay()->format('Y-m-d h:i:s');
+
+            $outcomes = $outcomes->where('outcomes.pay_date', '<=', $end_date)->where('outcomes.pay_date', '>=', $start_date);
+        }
+
+        //$total = $outcomes->select(DB::raw('SUM(outcomes.amount_dollar) as amount_dollar'),DB::raw('SUM(outcomes.amount_riel) as amount_riel'))->first();
+
+        $outcomes = $outcomes->select([
+            'outcomes.id as outcome_id','outcomes.number','outcomes.amount_dollar','outcomes.amount_riel','accounts.name as account_name',
+            'outcomes.payslip_client_id','outcomeTypes.name as outcome_type_name',
+            DB::raw("CONCAT(customers.name,employees.name_kh,students.name_kh) as name")
+        ]);
+
         $datatables =  app('datatables')->of($outcomes)
+            ->filterColumn('name', 'whereRaw', "CONCAT(customers.name,employees.name_kh,students.name_kh) like ? ", ["%$1%"])
             ->editColumn('number','{{str_pad($number, 4, "0", STR_PAD_LEFT)}}')
             ->editColumn('amount_dollar', '{!! $amount_dollar==null? "0 $" :$amount_dollar. " $" !!}')
             ->editColumn('amount_riel', '{!! $amount_riel==null? "0 ៛": $amount_riel. " ៛" !!}')
@@ -154,27 +171,8 @@ class OutcomeController extends Controller
             });
 
 
-        // additional search
-        if ($account = $datatables->request->get('account')) {
-            $datatables->where('outcomes.account_id', '=', $account);
-        }
-
-        if ($outcome_type = $datatables->request->get('outcome_type')) {
-            $datatables->where('outcomes.outcome_type_id', '=', $outcome_type);
-        }
-
-        if ($date_range = $datatables->request->get('date_range')) {
-            $date = explode(' - ',$date_range);
-
-            $start_date = Carbon::createFromFormat('d/m/Y',$date[0])->startOfDay()->format('Y-m-d')." 00:00:00";
-            $end_date = Carbon::createFromFormat('d/m/Y',$date[1])->endOfDay()->format('Y-m-d h:i:s');
-
-            $datatables->where('outcomes.pay_date', '<=', $end_date)->where('outcomes.pay_date', '>=', $start_date);
-        }
-
-        $data =  $datatables->with(['total_dollar' => 1000,'total_riel'=>1000])->make(true);
-        //$data->data->total_dollar = 1000;
-        //$data->data->total_riel = 1000;
+        //$data =  $datatables->with(['total_dollar' => $total->amount_dollar==null?0:$total->amount_dollar,'total_riel'=>$total->amount_riel==null?0:$total->amount_riel])->make(true);
+        $data =  $datatables->make(true);
         return $data;
     }
 

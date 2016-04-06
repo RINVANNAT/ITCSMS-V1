@@ -81,10 +81,36 @@
                 dom: 'l<"toolbar">frtip',
                 processing: true,
                 serverSide: true,
-                initComplete: function (settings, json) {
-                    //console.log(json);
-                    $('#total_dollar').html(json.total_dollar);
-                    $('#total_riel').html(json.total_riel);
+                drawCallback: function (settings) {
+                    //$('#total_dollar').html(json.total_dollar);
+                    //$('#total_riel').html(json.total_riel);
+                    this.api().columns(1).every(function () {
+                        var column = this;
+                        var sum1 = column.data();
+                        if(sum1.length > 0){
+                            sum1  = sum1.reduce(function (a, b) {
+                                return parseInt(a, 10) + parseInt(b, 10);
+                            });
+                        } else {
+                            sum1 = 0;
+                        }
+
+                        $('#total_dollar').html(sum1);
+                    });
+
+                    this.api().columns(2).every(function () {
+                        var column = this;
+                        var sum2 = column.data();
+                        if(sum2.length > 0){
+                            sum2  = sum2.reduce(function (a, b) {
+                                return parseInt(a, 10) + parseInt(b, 10);
+                            });
+                        } else {
+                            sum2 = 0;
+                        }
+
+                        $('#total_riel').html(sum2);
+                    });
                 },
                 pageLength: {!! config('app.records_per_page')!!},
                 ajax: {
@@ -93,7 +119,7 @@
                         d.account = $('#filter_account').val();
                         d.outcome_type = $('#filter_outcomeType').val();
                         d.date_range = $('#filter_date_range').val();
-                    }
+                    },
                 },
                 columns: [
                     { data: 'number', name: 'outcomes.number'},
