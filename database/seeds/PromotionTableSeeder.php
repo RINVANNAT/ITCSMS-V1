@@ -12,11 +12,11 @@ class PromotionTableSeeder extends Seeder
      */
     public function run()
     {
-        $promotion_list = array('20','21','22','23','24','25','26','27','28','29','30','31','32','33','34','35');
+        //$promotion_list = array('1','2','3','4','5','6','7','8','20','21','22','23','24','25','26','27','28','29','30','31','32','33','34','35');
 
 
         $promotions = array();
-        foreach($promotion_list as $value){
+        for($value=1;$value<36;$value++ ){
             $temp = array(
                 'name'=>$value,
                 'create_uid'=>1,
