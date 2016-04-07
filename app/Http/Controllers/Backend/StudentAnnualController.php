@@ -16,7 +16,9 @@ use App\Models\Gender;
 use App\Models\Grade;
 use App\Models\HighSchool;
 use App\Models\History;
+use App\Models\Income;
 use App\Models\Origin;
+use App\Models\PayslipClient;
 use App\Models\Promotion;
 use App\Models\Redouble;
 use App\Models\Scholarship;
@@ -283,28 +285,58 @@ class StudentAnnualController extends Controller
                         unset($studentAnnual_data['observation']);
 
                         if($row->student_id == null){ // This student doesn't have any information before so add the general information first
+                            // let's find its id first, sometime it is already in database
                             $student_data = $row->toArray();
-                            $student_data['create_uid'] = 1;
-                            unset($student_data['student_id']);
-                            unset($student_data['history_id']);
-                            unset($student_data['degree_id']);
-                            unset($student_data['grade_id']);
-                            unset($student_data['department_id']);
-                            unset($student_data['option_id']);
-                            unset($student_data['group']);
-                            unset($student_data['promotion_id']);
-                            unset($student_data['academic_year_id']);
 
-                            $student = Student::create($student_data);
-                            if($student) {
-                                $studentAnnual_data['student_id'] = $student->id;
+                            $old_student = Student::where('id_card',$student_data['id_card'])->first();
+                            if($old_student == null){ // That id card is not found, create new record
+                                $student_data['create_uid'] = 1;
+                                unset($student_data['student_id']);
+                                unset($student_data['history_id']);
+                                unset($student_data['degree_id']);
+                                unset($student_data['grade_id']);
+                                unset($student_data['department_id']);
+                                unset($student_data['option_id']);
+                                unset($student_data['group']);
+                                unset($student_data['promotion_id']);
+                                unset($student_data['academic_year_id']);
+
+                                $student = Student::create($student_data);
+                                if($student) {
+                                    $studentAnnual_data['student_id'] = $student->id;
+                                }
+                            } else {// just get id
+                                $studentAnnual_data['student_id'] = $old_student->id;
                             }
                         }
+
+                        // Create client id for every student annual
+                        $payslip_client = new PayslipClient();
+                        $payslip_client->type = "Student";
+                        $payslip_client->create_uid =auth()->id();
+                        $payslip_client->save();
+
+                        $studentAnnual_data['payslip_client_id'] = $payslip_client->id;
 
                         $studentAnnual = StudentAnnual::create($studentAnnual_data);
                         if($studentAnnual){
                             if(isset($studentAnnual_data['scholarship_id']) && $studentAnnual_data['scholarship_id'] != null){
                                 $studentAnnual->scholarships()->attach($studentAnnual_data['scholarship_id']);
+                            }
+
+                            // Import payment
+
+                            if(isset($studentAnnual_data['1st_no']) && $studentAnnual_data['1st_no'] != "0" && $studentAnnual_data['1st_no'] != "#N/A"){
+                                $this->registerIncome($studentAnnual_data,$studentAnnual_data['1st_no'],$studentAnnual_data['1st']);
+                            }
+                            if(isset($studentAnnual_data['1st_no']) && $studentAnnual_data['2nd_no'] != "0" && $studentAnnual_data['2nd_no'] != "#N/A"){
+                                $this->registerIncome($studentAnnual_data,$studentAnnual_data['2nd_no'],$studentAnnual_data['2nd']);
+                            }
+                            if(isset($studentAnnual_data['1st_no']) && $studentAnnual_data['3rd_no'] != "0" && $studentAnnual_data['3rd_no'] != "#N/A"){
+                                $this->registerIncome($studentAnnual_data,$studentAnnual_data['3rd_no'],$studentAnnual_data['3rd']);
+                            }
+                            if(isset($studentAnnual_data['1st_no']) && $studentAnnual_data['sport_no'] != "0" && $studentAnnual_data['sport_no'] != "#N/A"){
+                                $this->registerIncome($studentAnnual_data,$studentAnnual_data['sport_no'],$studentAnnual_data['sport']);
                             }
                         }
 
@@ -329,6 +361,37 @@ class StudentAnnualController extends Controller
 
             return redirect(route('admin.studentAnnuals.index'));
         }
+    }
+
+    public function registerIncome($studentAnnual_data, $number, $payment){
+        $income = new Income();
+
+        $income->created_at = Carbon::now();
+        $income->create_uid = auth()->id();
+        $income->number = $number;
+        if($payment!= "120000"){ // We consider 120000 is for sport fee, it is not good but for now ,.... yes
+            $income->amount_dollar = $payment;
+        } else {
+            $income->amount_riel = $payment;
+        }
+
+
+        $income->sequence = Income::where('payslip_client_id',$studentAnnual_data['payslip_client_id'])->count()+1; // Sequence of student payment
+        $income->payslip_client_id = $studentAnnual_data['payslip_client_id'];
+        $income->pay_date = Carbon::now();
+
+        if($studentAnnual_data['degree_id']== config('access.degrees.degree_engineer') || $studentAnnual_data['degree_id']== config('access.degrees.degree_associate')){
+            $income->income_type_id = config('access.income_type.income_type_student_day');
+            $income->account_id = config('access.account.account_day_student');
+        } else if($studentAnnual_data['degree_id']== config('access.degrees.degree_bachelor')){
+            $income->income_type_id = config('access.income_type.income_type_student_night');
+            $income->account_id=config('access.account.account_night_student');
+        } else if($studentAnnual_data['degree_id']== config('access.degrees.degree_master')){
+            $income->income_type_id = config('access.income_type.income_type_student_master');
+            $income->account_id=config('access.account.account_master_student');
+        }
+
+        $income->save();
     }
 
 

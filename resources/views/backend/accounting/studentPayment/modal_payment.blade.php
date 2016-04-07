@@ -60,6 +60,7 @@
                                     </div>
                                 </td>
                             </tr>
+
                             <tr style="font-family: metal">
                                 <td colspan="3">
                                     <div class="col-md-12">
@@ -74,6 +75,15 @@
                                     </div>
                                 </td>
                             </tr>
+                            <tr style="font-family: metal;padding-top: 15px;">
+                                <td colspan="3">
+                                    <div class="form-group col-md-12">
+                                        {!! Form::label('descriptin', "កំណត់សំគាល់  ",['style'=>'margin-right:10px;']) !!}
+                                        {!! Form::textarea('description', null, ['id'=>'description', 'rows'=>2,'class'=>'col-md-12']) !!}
+                                    </div>
+                                </td>
+                            </tr>
+
                             <tr style="font-family: metal;">
                                 <td colspan="3" align="right">
                                     <div class="col-md-6"></div>

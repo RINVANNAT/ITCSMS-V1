@@ -145,29 +145,27 @@ class EloquentOutcomeRepository implements OutcomeRepositoryContract
 
         if($outcome->save()){
             if($request->file('import')[0] != null){ // It can have multiple files
-                $attachmentIds = array();
+                $count = 1;
                 foreach($request->file('import') as $file){
                     // Change file name
-                    $imageName = "outcome_".$next_number . '.' .$file->getClientOriginalExtension();
+                    $imageName = "outcome_".$next_number .'_'.$count. '_' .$file->getClientOriginalName();
                     // Move file
-                    $request->file('photo')->move(
+                    $file->move(
                         base_path() . '/public/img/attachments/', $imageName
                     );
 
                     // Save file location into table attachment
                     $attachment = new Attachment();
-                    $attachment->location = base_path() . '/public/img/attachments/'. $imageName;
+                    $attachment->location = $imageName;
                     $attachment->create_uid =auth()->id();
                     $attachment->created_at = Carbon::now();
+                    $attachment->outcome_id = $outcome->id;
 
-                    if($attachment->save()){
-                        array_push($attachmentIds,$attachment->id);
-                    } else {
+                    if(!$attachment->save()){
                         $query_ok = false;
                     }
-                }
-                if($query_ok){
-                    $outcome->attachments()->sync($attachmentIds);
+
+                    $count++;
                 }
 
             }

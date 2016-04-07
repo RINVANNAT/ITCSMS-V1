@@ -29,11 +29,6 @@
                     <button class="btn btn-primary btn-sm"><i class="fa fa-plus-circle"></i> Add
                     </button>
                 </a>
-                <div class="btn-group">
-                    <button class="btn btn-default btn-sm"><i class="fa fa-trash-o"></i></button>
-                    <button class="btn btn-default btn-sm"><i class="fa fa-reply"></i></button>
-                    <button class="btn btn-default btn-sm"><i class="fa fa-share"></i></button>
-                </div>
                 <!-- /.btn-group -->
                 <button class="btn btn-default btn-sm"><i class="fa fa-refresh"></i></button>
 
@@ -56,6 +51,7 @@
                         <th>{{ trans('labels.backend.accounting.fields.account_id') }}</th>
                         <th>{{ trans('labels.backend.accounting.fields.incomeType_id') }}</th>
                         <th>{{ trans('labels.backend.accounting.fields.payslip_client_id') }}</th>
+                        <th>{{ trans('labels.backend.accounting.fields.description') }}</th>
                         <th>{{ trans('labels.general.actions') }}</th>
                     </tr>
                     </thead>
@@ -137,7 +133,8 @@
                     { data: 'amount_riel', name: 'incomes.amount_riel'},
                     { data: 'account_name', name: 'accounts.name'},
                     { data: 'income_type_name', name: 'incomeTypes.name'},
-                    { data: 'name', name: 'name',searchable:false},
+                    { data: 'name', name: 'name'},
+                    { data: 'description', name: 'incomes.description'},
                     { data: 'action', name: 'action',orderable: false, searchable: false}
                 ]
             });

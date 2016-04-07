@@ -217,6 +217,7 @@ class EloquentIncomeRepository implements IncomeRepositoryContract
             $income->sequence = Income::where('payslip_client_id',$client_id)->count()+1; // Sequence of student payment
             $income->payslip_client_id = $client_id;
             $income->pay_date = Carbon::now();
+            $income->description = $input['description'];
             if($input['degree_id']== config('access.degrees.degree_engineer') || $input['degree_id']== config('access.degrees.degree_associate')){
                 $income->income_type_id = config('access.income_type.income_type_student_day');
                 $income->account_id = config('access.account.account_day_student');
@@ -311,7 +312,7 @@ class EloquentIncomeRepository implements IncomeRepositoryContract
 
         if($query_ok){
             DB::commit();
-            return true;
+            return route('admin.accounting.payslipHistory.data',$client_id);
         } else {
             DB::rollback();
             throw new GeneralException(trans('exceptions.backend.configuration.incomes.create_error'));
