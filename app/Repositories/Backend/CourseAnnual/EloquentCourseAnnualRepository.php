@@ -64,7 +64,6 @@ class EloquentCourseAnnualRepository implements CourseAnnualRepositoryContract
         $courseAnnual = new CourseAnnual();
 
         $courseAnnual->name = $input['name'];
-        $courseAnnual->description = $input['description'];
         $courseAnnual->active = isset($input['active'])?true:false;
         $courseAnnual->created_at = Carbon::now();
         $courseAnnual->create_uid = auth()->id();

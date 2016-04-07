@@ -14,6 +14,16 @@ use App\Models\Grade;
 use App\Repositories\Backend\CourseAnnual\CourseAnnualRepositoryContract;
 use Illuminate\Support\Facades\DB;
 
+use App\Http\Requests\Backend\Course\CourseAnnual\ImportCourseRequest;
+use App\Http\Requests\Backend\Course\CourseAnnual\RequestImportCourseRequest;
+use Carbon\Carbon;
+use Illuminate\Http\Request;
+use Maatwebsite\Excel\Facades\Excel;
+use App\Models\CourseAnnual;
+
+
+
+
 class CourseAnnualController extends Controller
 {
     /**
@@ -148,6 +158,62 @@ class CourseAnnualController extends Controller
                 ' <button class="btn btn-xs btn-danger btn-delete" data-remote="'.route('admin.course.courseAnnuals.destroy', $courseAnnual->id) .'"><i class="fa fa-times" data-toggle="tooltip" data-placement="top" title="' . trans('buttons.general.crud.delete') . '"></i></button>';
             })
             ->make(true);
+    }
+    public function request_import(RequestImportCourseRequest $request){
+
+        return view('backend.course.courseAnnual.import');
+
+    }
+
+    public function import(ImportCourseRequest $request){
+
+        $now = Carbon::now()->format('Y_m_d_H');
+
+        // try to move uploaded file to a temporary location
+        if($request->file('import')!= null){
+            $import = $now. '.' .$request->file('import')->getClientOriginalExtension();
+
+            $request->file('import')->move(
+                base_path() . '/public/assets/uploaded_file/temp/', $import
+            );
+
+            $storage_path = base_path() . '/public/assets/uploaded_file/temp/'.$import;
+
+            // and then read that data and store to database
+            //Excel::load($storage_path, function($reader) {
+            //    dd($reader->first());
+            //});
+
+
+            DB::beginTransaction();
+
+            try{
+                Excel::filter('chunk')->load($storage_path)->chunk(1000, function($results){
+                    //dd($results->first());
+                    // Loop through all rows
+
+                    $results->each(function($row) {
+                        // Clone an object for running query in studentAnnual
+                        $courseAnnual_data = $row->toArray();
+                        $courseAnnual_data["created_at"] = Carbon::now();
+                        $courseAnnual_data["create_uid"] = auth()->id();
+                        $courseAnnual = CourseAnnual::create($courseAnnual_data);
+
+
+                        if(  $courseAnnual){
+
+                        }
+
+                        $first = false;
+                    });
+                });
+
+            } catch(Exception $e){
+                DB::rollback();
+            }
+            DB::commit();
+            return redirect(route('admin.backend.course.courseAnnuals.index'));
+        }
     }
 
 }
