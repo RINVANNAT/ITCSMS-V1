@@ -17,7 +17,7 @@
             float: left;
         }
     </style>
-    @stop
+@stop
 
 
 @section('content')

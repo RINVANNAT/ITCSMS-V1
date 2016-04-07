@@ -1,5 +1,24 @@
 @extends ('backend.layouts.master')
 
+@section ('title', trans('labels.backend.students.title'))
+
+@section('page-header')
+    <h1>
+        {{ trans('labels.backend.students.title') }}
+        <small>{{ trans('labels.backend.students.sub_index_title') }}</small>
+    </h1>
+
+@endsection
+
+@section('after-styles-end')
+    {!! Html::style('plugins/datatables/dataTables.bootstrap.css') !!}
+    <style>
+        .toolbar {
+            float: left;
+        }
+    </style>
+@stop
+
 @section('content')
         <!-- Content Header (Page header) -->
 
@@ -17,10 +36,6 @@
                         <!-- Check all button -->
                         <button class="btn btn-default btn-sm checkbox-toggle"><i class="fa fa-square-o"></i>
                         </button>
-                        <a href="{!! route('groups.create') !!}">
-                            <button class="btn btn-primary btn-sm"><i class="fa fa-plus-circle"></i> {{trans('messages.add')}}
-                            </button>
-                        </a>
 
                         <div class="btn-group">
                             <button class="btn btn-default btn-sm"><i class="fa fa-trash-o"></i></button>
@@ -58,7 +73,7 @@
                         <!-- /.pull-right -->
                     </div>
                     <div id="table11">
-                        @include('absences.tableEditMany')
+                        @include('backend.score.absence.tableEditMany')
                     </div>
 
                 </div>
@@ -75,6 +90,13 @@
     </div>
 
 
+
+
+</section><!-- /.content -->
+@stop
+
+
+@section('after-scripts-end')
     <script src="{{url('assets/js/handlebars/template.js')}}">
     </script>
     <script src="{{url('assets/js/handlebars/groupsselector.js')}}">
@@ -82,12 +104,12 @@
     <script src="{{url('assets/js/handlebars/groupsselectorlong.js')}}">
     </script>
     <script src="{{url('assets/js/utility/jsutility.js')}}">
+        console.log("hello from the skype");
+    </script>
+    <script src="{{url('assets/js/mustache.js')}}">
     </script>
 
-</section><!-- /.content -->
-@endsection
 
-@section('js')
     <script>
 
         paramet = {};
@@ -96,8 +118,10 @@
             function callbackCourseAnnual(data){
                 $.extend(paramet, data);
                 var jsonStr = JSON.stringify(paramet);
-                var url = "{!! route('absences.editMany') !!}"+"?filter="+jsonStr;
+
+                var url = "{!! route('absences.input') !!}"+"?filter="+jsonStr;
                 console.log(url);
+
                 $.get( url , function( data2 ) {
                     $("#table11").html(data2);
                     $("#fillterdatahidden").attr("value",jsonStr);
@@ -107,10 +131,15 @@
             function callbackSelecGroup(data){
                 $.extend(paramet, data);
 
-                var url2 = ["{!! route('courseAnnuals.api.v1') !!}"+"?filter="+JSON.stringify(paramet)];
+                {{--var url2 = ["{!! route('courseAnnuals.api.v1') !!}"+"?filter="+JSON.stringify(paramet)];--}}
+                var shallowEncoded = $.param( paramet );
+
+                var url2 = ["{!! route('api.v1.courseAnnuals') !!}"+"?" +  shallowEncoded];
+                console.log("callback from group select");
                 console.log(url2);
+
                 //SMSFILERLONG.config(url2,callbackCourseAnnual);
-                var filter2 = new SMSFILERLONGo(url2,callbackCourseAnnual);
+                var filter = new SMSFILERLONGo(url2,callbackCourseAnnual);
             };
 
             var url = ["{!! route('degrees.api.v1') !!}","{!! route('grades.api.v1') !!}","{!! route('departments.api.v1') !!}"];
@@ -125,4 +154,4 @@
 
         });
     </script>
-@endsection
+@stop

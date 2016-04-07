@@ -204,7 +204,7 @@ class CourseController extends Controller
                 DB::rollback();
             }
             DB::commit();
-            return redirect(route('admin.backend.course.courseAnnuals.index'));
+            return redirect(route('admin.backend.course'));
         }
     }
 

@@ -57,7 +57,7 @@ class AbsenceController extends AppBaseController
         return view('backend.score.absence.indexByGroup', compact("studentAnnuals","absencesCounts"));
     }
 
-    public function editMany(Request $request)
+    public function input(Request $request)
     {
 		if ( $request->has('filter') )
 		{
@@ -68,9 +68,9 @@ class AbsenceController extends AppBaseController
 
 
             if ($request->has('redirect')){
-                return view('absences.editMany', compact("studentAnnuals","absencesCounts"));
+                return view('backend.score.absence.editMany', compact("studentAnnuals","absencesCounts"));
             }else{
-                return view('absences.tableEditMany', compact("studentAnnuals","absencesCounts"));
+                return view('backend.score.absence.tableEditMany', compact("studentAnnuals","absencesCounts"));
             }
 		}
 
@@ -79,7 +79,7 @@ class AbsenceController extends AppBaseController
         $studentAnnuals = $results["studentAnnuales"];
         $absencesCounts = $results["absencesCounts"];
 
-        return view('absences.editMany', compact("studentAnnuals","absencesCounts","abse"));
+        return view('backend.score.absence.editMany', compact("studentAnnuals","absencesCounts","abse"));
     }
 
     public function updateMany(Request $request )

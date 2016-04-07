@@ -21,8 +21,3 @@ Route::group([
         Route::post('course-program-import', 'CourseController@import')->name('admin.course.course_program.import');
     });
 });
-
-Route::any('api/v1/courseAnnuals',[
-    'as' => 'courseAnnuals.api.v1',
-    'uses' => 'Restfull\CourseAnnualApiController@index',
-]);

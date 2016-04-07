@@ -64,10 +64,3 @@ Route::group([
     });
 });
 
-
-Route::resource('testModule1s', 'TestModule1Controller');
-
-Route::get('testModule1s/delete/{id}', [
-    'as' => 'testModule1s.delete',
-    'uses' => 'TestModule1Controller@destroy',
-]);

@@ -18,6 +18,7 @@ class PromotionTableSeeder extends Seeder
         $promotions = array();
         for($value=1;$value<36;$value++ ){
             $temp = array(
+                'id'=>$value,
                 'name'=>$value,
                 'create_uid'=>1,
                 'created_at'=>Carbon\Carbon::now(),
