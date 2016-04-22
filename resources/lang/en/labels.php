@@ -683,6 +683,8 @@ return [
             'sub_edit_title' => 'Edit scholarship information',
             'sub_create_title' => 'Create new scholarship',
             'sub_detail_title' => 'Detail of a scholarship',
+            'sub_import_title' => 'Import scholarships',
+            'import_holder' => 'Import Scholarship Holders',
             'general_information' => 'General Information',
             'more_information' => 'More Information',
             'school_fee_and_award' => 'School Fee and Award',

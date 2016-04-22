@@ -29,6 +29,7 @@ use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Maatwebsite\Excel\Facades\Excel;
+use Illuminate\Support\Facades\Input;
 
 
 class StudentAnnualController extends Controller
@@ -64,6 +65,19 @@ class StudentAnnualController extends Controller
         $origins = Origin::lists('name_kh','id');
 
         return view('backend.studentAnnual.index',compact('departments','degrees','grades','genders','options','academicYears','origins'));
+    }
+
+    public function popup_index(){
+        $scholarship_id = $_GET['scholarship_id'];
+
+        $departments = Department::where('parent_id',11)->orderBy('id','DESC')->lists('code','id'); // 11 is for all academic departments
+        $degrees = Degree::lists('name_kh','id');
+        $grades = Grade::lists('name_kh','id');
+        $genders = Gender::lists('name_kh','id');
+        $options = DepartmentOption::lists('code','id');
+        $academicYears = AcademicYear::orderBy('id','desc')->lists('name_kh','id');
+        $origins = Origin::lists('name_kh','id');
+        return view('backend.studentAnnual.popup_index',compact('scholarship_id','departments','degrees','grades','genders','options','academicYears','origins'));
     }
 
     /**
@@ -180,7 +194,7 @@ class StudentAnnualController extends Controller
     public function data(Request $request) // 0 mean, scholarship id is not applied
     {
 
-        //$keyword = "%".strtolower($_GET["search"]["value"])."%";
+        $scholarship_id = Input::get('scholarship_id');
 
         $studentAnnuals = StudentAnnual::select([
                 'studentAnnuals.id','students.id_card','students.name_kh','students.dob as dob','students.name_latin', 'genders.code as gender', 'departmentOptions.code as option',
@@ -200,6 +214,10 @@ class StudentAnnualController extends Controller
             ->editColumn('dob', function ($studentAnnual){
                 $date = Carbon::createFromFormat("Y-m-d h:i:s",$studentAnnual->dob);
                 return $date->format('d/m/Y');
+            })
+            ->addColumn('export', function ($studentAnnual) use ($scholarship_id) {
+                return  '<a href="'.route('admin.scholarship.holder').'?scholarship_id='.$scholarship_id.'&studentAnnual_id='.$studentAnnual->id.'" class="btn btn-xs btn-primary"><i class="fa fa-mail-forward" data-toggle="tooltip" data-placement="top" title="" data-original-title="'.trans('buttons.general.export').'"></i> </a>';
+                //return  '<a href="'.route('admin.candidate.popup_create').'?exam_id='.$scholarship_id.'&studentBac2_id='.$studentBac2->id.'" class="btn btn-xs btn-primary"><i class="fa fa-mail-forward" data-toggle="tooltip" data-placement="top" title="" data-original-title="'.trans('buttons.general.export').'"></i> </a>';
             })
             ->addColumn('action', function ($studentAnnual) {
                 return '<a href="' . route('admin.studentAnnuals.edit', $studentAnnual->id) . '" class="btn btn-xs btn-primary"><i class="glyphicon glyphicon-edit" data-toggle="tooltip" data-placement="top" title="' . trans('buttons.general.crud.edit') . '"></i></a>' .

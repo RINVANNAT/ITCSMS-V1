@@ -14,4 +14,6 @@
         Route::get('student/{id}/reporting/export', 'StudentAnnualController@export')->name('admin.student.reporting.export');
         Route::get('student/{id}/reporting/print', 'StudentAnnualController@print_report')->name('admin.student.reporting.print');
         Route::get('student/{id}/reporting/preview', 'StudentAnnualController@preview_report')->name('admin.student.reporting.preview');
+
+        Route::get('student/popup_index', 'StudentAnnualController@popup_index')->name('admin.student.popup_index');
     });
