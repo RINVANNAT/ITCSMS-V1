@@ -14,16 +14,16 @@ class Redouble extends Model
 		"name_fr"
 	];
 
-	public function students(){
-		return $this->hasMany('App\Models\Student');
-	}
-
 	public function creator(){
 		return $this->belongsTo('App\User','create_uid');
 	}
 	public function lastModifier(){
 		return $this->belongsTo('App\User','write_uid');
 	}
+
+    public function students(){
+        return $this->belongsToMany('App\Models\Student');
+    }
 
     /**
      * The attributes that should be casted to native types.

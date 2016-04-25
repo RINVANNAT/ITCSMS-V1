@@ -67,6 +67,15 @@ class DepartmentOptionTableSeeder extends Seeder
                 'created_at'=>Carbon\Carbon::now(),
                 'updated_at'=>Carbon\Carbon::now()
             ),
+            array(
+                'name_en' => 'Geo-Resources & Geo-technical Engineering',
+                'code' => 'g',
+                'department_id' => 6,
+                'degree_id' => 1,
+                'create_uid'=>1,
+                'created_at'=>Carbon\Carbon::now(),
+                'updated_at'=>Carbon\Carbon::now()
+            ),
 
         )
         ;

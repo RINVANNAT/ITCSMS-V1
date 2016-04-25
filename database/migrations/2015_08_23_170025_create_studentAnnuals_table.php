@@ -33,6 +33,7 @@ class CreateStudentAnnualsTable extends Migration
             $table->integer('payslip_client_id')->unsigned()->nullable();
 
             $table->boolean('is_paid')->default(false);
+            $table->boolean('is_suspend')->default(false);
 
             $table->foreign('promotion_id')
                 ->references('id')

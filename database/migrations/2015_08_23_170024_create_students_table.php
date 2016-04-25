@@ -49,11 +49,11 @@ class CreateStudentsTable extends Migration
 				->on('origins')
 				->onDelete('NO ACTION');
 
-			$table->integer('redouble_id')->unsigned()->index()->nullable();
-			$table->foreign('redouble_id')
-				->references('id')
-				->on('redoubles')
-				->onDelete('NO ACTION');
+			//$table->integer('redouble_id')->unsigned()->index()->nullable();
+			//$table->foreign('redouble_id')
+			//	->references('id')
+			//	->on('redoubles')
+			//	->onDelete('NO ACTION');
 
 			$table->integer('gender_id')->unsigned()->index();
 			$table->foreign('gender_id')
@@ -91,6 +91,25 @@ class CreateStudentsTable extends Migration
                 ->on('users')
                 ->onDelete('NO ACTION');
 		});
+
+        Schema::create('redouble_student', function ($table) {
+            $table->increments('id')->unsigned();
+            $table->integer('redouble_id')->unsigned()->index();
+            $table->integer('student_id')->unsigned()->index();
+
+            /**
+             * Add Foreign/Unique/Index
+             */
+            $table->foreign('redouble_id')
+                ->references('id')
+                ->on('redoubles')
+                ->onDelete('cascade');
+
+            $table->foreign('student_id')
+                ->references('id')
+                ->on('students')
+                ->onDelete('cascade');
+        });
 	}
 
 	/**
@@ -100,6 +119,7 @@ class CreateStudentsTable extends Migration
 	 */
 	public function down()
 	{
+        Schema::drop('redouble_student');
 		Schema::drop('students');
 	}
 

@@ -28,7 +28,6 @@ class Student extends Model
 		'parent_address',
 		'parent_phone',
 		'pob',
-		'redouble_id',
 		'gender_id',
 		'high_school_id',
 		'origin_id',
@@ -59,9 +58,6 @@ class Student extends Model
     public function lastModifier(){
         return $this->belongsTo('App\Models\Access\User','write_uid');
     }
-	public function redouble(){
-		return $this->belongsTo('App\Models\Redouble');
-	}
 	public function gender(){
 		return $this->belongsTo('App\Models\Gender');
 	}
@@ -84,6 +80,10 @@ class Student extends Model
 	{
 		return $this->hasMany('App\Models\StudentEvalStatu');
 	}
+    public function redoubles(){
+        return $this->belongsToMany('App\Models\Redouble');
+    }
+
     /**
      * The attributes that should be casted to native types.
      *
