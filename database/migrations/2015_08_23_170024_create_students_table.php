@@ -67,7 +67,7 @@ class CreateStudentsTable extends Migration
 				->on('highSchools')
 				->onDelete('NO ACTION');
 
-			$table->integer('origin_id')->unsigned()->index();
+			$table->integer('origin_id')->unsigned()->index()->nullable();
 			$table->foreign('origin_id')
 				->references('id')
 				->on('origins')
