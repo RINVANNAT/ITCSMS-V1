@@ -9,7 +9,7 @@
         @foreach($student->studentAnnuals as $studentAnnual)
         <li role="presentation">
             <a href="#academic_{{$studentAnnual->academic_year->id}}" aria-controls="new_academic_year" role="tab" data-toggle="tab">
-                {{ $studentAnnual->academic_year->name_kh }} <i style="color: red">*</i>
+                {{ $studentAnnual->academic_year->name_kh }}
             </a>
         </li>
         @endforeach
@@ -43,7 +43,12 @@
                     <span class="show_value col-sm-10">{{$student->gender->name_kh}} &nbsp;</span>
 
                     <span class="show_label col-sm-2">{{trans('labels.backend.students.fields.dob')}}</span>
-                    <span class="show_value col-sm-10">{{$student->dob}} &nbsp;</span>
+                    <span class="show_value col-sm-10">
+                        <?php
+                            $dob = \Carbon\Carbon::createFromFormat('Y-m-d h:i:s', $student->dob);
+                        ?>
+                        {{$dob->format('d/m/Y')}} &nbsp;
+                    </span>
 
                     <span class="show_label col-sm-2">{{trans('labels.backend.students.fields.pob')}}</span>
                     <span class="show_value col-sm-10">{{$student->pob}} &nbsp;</span>
@@ -84,7 +89,7 @@
             <div class="tab-content">
                 <div role="tabpanel" class="tab-pane active" id="parent_info" style="padding-top:20px">
                     <span class="show_label col-sm-2">{{trans('labels.backend.students.fields.origin_id')}}</span>
-                    <span class="show_value col-sm-10">{{$student->origin_id}} &nbsp;</span>
+                    <span class="show_value col-sm-10">{{$student->origin->name_kh}} &nbsp;</span>
 
                     <span class="show_label col-sm-2">{{trans('labels.backend.students.fields.phone')}}</span>
                     <span class="show_value col-sm-10">{{$student->phone}} &nbsp;</span>
@@ -128,36 +133,86 @@
         </div>
         @foreach($student->studentAnnuals as $studentAnnual)
         <div role="tabpanel" class="tab-pane" id="academic_{{$studentAnnual->academic_year->id}}" style="padding-top:20px">
-            <span class="show_label col-sm-2">{{trans('labels.backend.students.fields.academic_year_id')}}</span>
-            <span class="show_value col-sm-10">{{$studentAnnual->academic_year->name_kh}} &nbsp;</span>
+            <div class="col-sm-6">
+                <div class="row no-margin no-padding">
+                    <span class="show_label col-sm-4">{{trans('labels.backend.students.fields.academic_year_id')}}</span>
+                    <span class="show_value col-sm-8">{{$studentAnnual->academic_year->name_kh}} &nbsp;</span>
 
-            <span class="show_label col-sm-2">{{trans('labels.backend.students.fields.promotion_id')}}</span>
-            <span class="show_value col-sm-10">{{$studentAnnual->promotion->name}} &nbsp;</span>
+                </div>
+                <div class="row no-margin no-padding">
+                    <span class="show_label col-sm-4">{{trans('labels.backend.students.fields.promotion_id')}}</span>
+                    <span class="show_value col-sm-8">{{$studentAnnual->promotion->name}} &nbsp;</span>
+                </div>
+                <div class="row no-margin no-padding">
+                    <span class="show_label col-sm-4">{{trans('labels.backend.students.fields.degree_id')}}</span>
+                    <span class="show_value col-sm-8">{{$studentAnnual->degree->name_kh}} &nbsp;</span>
+                </div>
+                <div class="row no-margin no-padding">
+                    <span class="show_label col-sm-4">{{trans('labels.backend.students.fields.grade_id')}}</span>
+                    <span class="show_value col-sm-8">{{$studentAnnual->grade->name_kh}} &nbsp;</span>
+                </div>
 
-            <span class="show_label col-sm-2">{{trans('labels.backend.students.fields.degree_id')}}</span>
-            <span class="show_value col-sm-10">{{$studentAnnual->degree->name_kh}} &nbsp;</span>
+                <div class="row no-margin no-padding">
+                    <span class="show_label col-sm-4">{{trans('labels.backend.students.fields.department_id')}}</span>
+                    <span class="show_value col-sm-8">{{$studentAnnual->department->name_kh}} &nbsp;</span>
+                </div>
 
-            <span class="show_label col-sm-2">{{trans('labels.backend.students.fields.grade_id')}}</span>
-            <span class="show_value col-sm-10">{{$studentAnnual->grade->name_kh}} &nbsp;</span>
+                <div class="row no-margin no-padding">
+                    <span class="show_label col-sm-4">{{trans('labels.backend.students.fields.department_option_id')}}</span>
+                    <span class="show_value col-sm-8">{{isset($studentAnnual->department_option)?$studentAnnual->department_option->name_kh:""}} &nbsp;</span>
+                </div>
 
-            <span class="show_label col-sm-2">{{trans('labels.backend.students.fields.department_id')}}</span>
-            <span class="show_value col-sm-10">{{$studentAnnual->department->name_kh}} &nbsp;</span>
+                <div class="row no-margin no-padding">
+                    <span class="show_label col-sm-4">{{trans('labels.backend.students.fields.group')}}</span>
+                    <span class="show_value col-sm-8">{{$studentAnnual->group}} &nbsp;</span>
+                </div>
 
-            <span class="show_label col-sm-2">{{trans('labels.backend.students.fields.department_option_id')}}</span>
-            <span class="show_value col-sm-10">{{isset($studentAnnual->department_option)?$studentAnnual->department_option->name_kh:""}} &nbsp;</span>
+                <div class="row no-margin no-padding">
+                    <span class="show_label col-sm-4">{{trans('labels.backend.students.fields.history_id')}}</span>
+                    <span class="show_value col-sm-8">{{$studentAnnual->history_id}} &nbsp;</span>
+                </div>
 
-            <span class="show_label col-sm-2">{{trans('labels.backend.students.fields.group')}}</span>
-            <span class="show_value col-sm-10">{{$studentAnnual->group}} &nbsp;</span>
+            </div>
+            <div class="col-sm-6">
+                <table class="table table-striped">
+                    <thead>
+                    <tr>
+                        <th colspan="4">{{trans('labels.backend.students.fields.scholarship_id')}}</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr style="color:#15c">
+                        <td>1</td>
+                        <td>Boursier M</td>
+                        <td>Ministry of Education Youth and Sport</td>
+                        <td>Full tuition fee</td>
+                    </tr>
+                    <tr style="color:#15c">
+                        <td>2</td>
+                        <td>Akaraka</td>
+                        <td>Akaraka foundation</td>
+                        <td>Full tuition fee and montly payment</td>
+                    </tr>
+                    </tbody>
+                </table>
 
-            <span class="show_label col-sm-2">{{trans('labels.backend.students.fields.history_id')}}</span>
-            <span class="show_value col-sm-10">{{$studentAnnual->history_id}} &nbsp;</span>
-
-            <span class="show_label col-sm-2">{{trans('labels.backend.students.fields.redouble_id')}}</span>
-            <span class="show_value col-sm-10">{{$studentAnnual->redouble_id}} &nbsp;</span>
-
-            <span class="show_label col-sm-2">{{trans('labels.backend.students.fields.scholarship_id')}}</span>
-
-            <div class="col-sm-10" style="padding-left: 0px;">
+                <table class="table table-striped">
+                    <thead>
+                    <tr>
+                        <th colspan="4">{{trans('labels.backend.students.fields.redouble_id')}}</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr style="color:#15c">
+                        <td>1</td>
+                        <td>Redouble I1</td>
+                    </tr>
+                    <tr style="color:#15c">
+                        <td>2</td>
+                        <td>Redouble I2</td>
+                    </tr>
+                    </tbody>
+                </table>
             </div>
 
         </div>

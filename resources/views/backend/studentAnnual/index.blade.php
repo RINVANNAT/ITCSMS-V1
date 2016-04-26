@@ -122,6 +122,7 @@
             });
 
             enableDeleteRecord($('#students-table'));
+            viewPopUpStudent($('#students-table'));
 
             $('#export_student_list').click(function(e){
                 e.preventDefault();
@@ -134,6 +135,7 @@
                         '&option='+$('#filter_option').val()+
                         '&origin='+$('#filter_origin').val();
             });
+
         });
     </script>
 @stop

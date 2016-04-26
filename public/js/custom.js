@@ -51,6 +51,18 @@ function enableDeleteRecord(datatable){
 
     });
 }
+
+function viewPopUpStudent(datatable){
+    datatable.on('click', '.btn-show[data-remote]', function (e) {
+        var url = $(this).data('remote');
+        e.preventDefault();
+
+        PopupCenterDual(url,'Student Detail','1200','960');
+        return false;
+
+    });
+}
+
 function toggleLoading(isLoading){
     if(isLoading){
         $('.loading').removeClass('hide');

@@ -13475,9 +13475,8 @@ body.stop-scrolling {
 
 .show_value {
   border-left: 1px solid #d3d3d3;
-  font-style: oblique;
   padding: 10px 10px 10px 15px;
-  color: #808080; }
+  color: #2A6DB5; }
 
 .loading {
   background-color: rgba(0, 0, 0, 0.5);

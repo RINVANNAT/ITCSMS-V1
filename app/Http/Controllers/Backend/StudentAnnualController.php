@@ -125,12 +125,13 @@ class StudentAnnualController extends Controller
     public function show($id)
     {
         $studentAnnual = $this->students->findOrThrowException($id);
-        $student = Student::with(['studentAnnuals','studentAnnuals.scholarships','gender','studentAnnuals.department',
+
+        $student = Student::with(['studentAnnuals','studentAnnuals.scholarships','gender','origin','studentAnnuals.department',
             'studentAnnuals.grade','studentAnnuals.degree','studentAnnuals.department_option','studentAnnuals.academic_year'])
-            ->find($studentAnnual->id);
+            ->find($studentAnnual->student_id);
 
-
-        return view('backend.studentAnnual.show',compact('student'));
+        //dd($student);
+        return view('backend.studentAnnual.popup_show',compact('student'));
     }
 
     /**
@@ -191,7 +192,7 @@ class StudentAnnualController extends Controller
         }
     }
 
-    public function data(Request $request) // 0 mean, scholarship id is not applied
+    public function data(Request $request)
     {
 
         $scholarship_id = Input::get('scholarship_id');
@@ -222,12 +223,15 @@ class StudentAnnualController extends Controller
             ->addColumn('action', function ($studentAnnual) {
                 return '<a href="' . route('admin.studentAnnuals.edit', $studentAnnual->id) . '" class="btn btn-xs btn-primary"><i class="glyphicon glyphicon-edit" data-toggle="tooltip" data-placement="top" title="' . trans('buttons.general.crud.edit') . '"></i></a>' .
                 ' <button class="btn btn-xs btn-danger btn-delete" data-remote="' . route('admin.studentAnnuals.destroy', $studentAnnual->id) . '"><i class="fa fa-times" data-toggle="tooltip" data-placement="top" title="' . trans('buttons.general.crud.delete') . '"></i></button>' .
-                ' <a href="' . route('admin.studentAnnuals.show', $studentAnnual->id) . '" class="btn btn-xs btn-info"><i class="fa fa-eye" data-toggle="tooltip" data-placement="top" title="" data-original-title="' . trans('buttons.general.view') . '"></i> </a>';
+                ' <button class="btn btn-xs btn-info btn-show" data-remote="' . route('admin.studentAnnuals.show', $studentAnnual->id) . '"><i class="fa fa-eye" data-toggle="tooltip" data-placement="top" title="' . trans('buttons.general.view') . '"></i></button>' ;
             });
 
         // additional search
         if ($academic_year = $datatables->request->get('academic_year')) {
             $datatables->where('studentAnnuals.academic_year_id', '=', $academic_year);
+        } else {
+            $last_academic_year_id =AcademicYear::orderBy('id','desc')->first()->id;
+            $datatables->where('studentAnnuals.academic_year_id', '=', $last_academic_year_id);
         }
         if ($degree = $datatables->request->get('degree')) {
             $datatables->where('studentAnnuals.degree_id', '=', $degree);
