@@ -255,7 +255,8 @@
         $( document ).ready(function() {
 
 
-//            tofix move to 5.2
+//           todo tofix move to 5.2
+
             {{--$.get( "{!! route('studentEvalStatusesr.api.v1') !!}", function(studentEvalStatuses){--}}
                 {{--console.log("type of returne status");--}}
                 {{--console.log(typeof studentEvalStatuses);--}}
@@ -447,7 +448,7 @@
 
 
 
-
+//                todo tofix move to 5.2
 {{--                url = "{!! route('attacheStudentEvalStatuses.api.v1') !!}"--}}
                 url += "?stuId="+stuId +"&evalId="+evalId;
                 console.log(url);
