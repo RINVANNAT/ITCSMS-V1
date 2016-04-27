@@ -124,7 +124,7 @@
             enableDeleteRecord($('#students-table'));
             viewPopUpStudent($('#students-table'));
 
-            $('#export_student_list').click(function(e){
+            /*$('#export_student_list').click(function(e){
                 e.preventDefault();
                 window.location = '{{route("admin.student.export")}}'+
                         "?academic_year="+$('#filter_academic_year').val()+
@@ -134,6 +134,20 @@
                         '&gender='+$('#filter_gender').val()+
                         '&option='+$('#filter_option').val()+
                         '&origin='+$('#filter_origin').val();
+            });*/
+
+            $(document).on('click', '#export_student_list', function (e) {
+                e.preventDefault();
+                var url = '{{route("admin.student.request_export")}}'+
+                        "?academic_year="+$('#filter_academic_year').val()+
+                        '&degree='+ $('#filter_degree').val()+
+                        '&grade=' + $('#filter_grade').val()+
+                        '&department=' + $('#filter_department').val()+
+                        '&gender='+$('#filter_gender').val()+
+                        '&option='+$('#filter_option').val()+
+                        '&origin='+$('#filter_origin').val();
+
+                PopupCenterDual(url,'Export student data','1200','960');
             });
 
         });

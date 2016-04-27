@@ -28,6 +28,7 @@ use App\Repositories\Backend\StudentAnnual\StudentAnnualRepositoryContract;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Schema;
 use Maatwebsite\Excel\Facades\Excel;
 use Illuminate\Support\Facades\Input;
 
@@ -864,6 +865,12 @@ class StudentAnnualController extends Controller
         return view($view,compact('id','degrees','academicYears','departments'));
     }
 
+    public function request_export_list(){
+        //$columns = Schema::getColumnListing('students'); // users table
+        //dd($columns); // dump the result and die
+        return view('backend.studentAnnual.popup_export',compact('scholarship_id','departments','degrees','grades','genders','options','academicYears','origins'));
+    }
+
     public function export_list(){
 
         $studentAnnuals = StudentAnnual::select([
@@ -996,7 +1003,7 @@ class StudentAnnualController extends Controller
 
         })->export('xls');
     }
-    public function export($id){
+    public function export($id){  // Export student report
         switch ($id) {
             case 1:
                 $data = $this->get_student_list_by_age($_GET['academic_year_id'],$_GET['degree_id']);
