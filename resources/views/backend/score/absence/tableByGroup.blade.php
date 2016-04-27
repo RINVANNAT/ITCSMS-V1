@@ -16,7 +16,8 @@
                 <td>{!! $studentAnnual->student->name_latin !!}</td>
                 <td>{!! $studentAnnual->student->id_card !!}</td>
                 <td>{!! $absencesCounts[ $studentAnnual->id] !!}</td>
-                <td><a class="linkeditmany" href="{!! route('absences.editMany')!!}">edit</a></td>
+                <!--- todo set url to edit page -->
+                <td><a class="linkeditmany" href="">edit</a></td>
             </tr>
         @endforeach
     </table>
