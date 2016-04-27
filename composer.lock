@@ -4,8 +4,8 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "hash": "06482aa51419357961ad8bf6f5d6e1ff",
-    "content-hash": "fbe050554afbe95c7a8b6b73d6f3fa49",
+    "hash": "9bd09fcc86fcf5bea7b109476b795a18",
+    "content-hash": "68b396f00aeb73587d091014cb01b64a",
     "packages": [
         {
             "name": "arcanedev/log-viewer",
@@ -1143,7 +1143,7 @@
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/InfyOmLabs/core-templates/zipball/4e5f24778de87d2b7461eea3e316bbe17ddb1790",
+                "url": "https://api.github.com/repos/InfyOmLabs/core-templates/zipball/20d7f4eb45bac2d0907c51120d3072bd69dac63e",
                 "reference": "4e5f24778de87d2b7461eea3e316bbe17ddb1790",
                 "shasum": ""
             },
@@ -1182,17 +1182,17 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/InfyOmLabs/laravel-generator.git",
-                "reference": "99a107dd6b0ef55c08a43797f3330dcfde20ea25"
+                "reference": "ff7dba5c973ece8657ac4b5cb07561a4ef8f0cb9"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/InfyOmLabs/laravel-generator/zipball/99a107dd6b0ef55c08a43797f3330dcfde20ea25",
-                "reference": "99a107dd6b0ef55c08a43797f3330dcfde20ea25",
+                "url": "https://api.github.com/repos/InfyOmLabs/laravel-generator/zipball/ff7dba5c973ece8657ac4b5cb07561a4ef8f0cb9",
+                "reference": "ff7dba5c973ece8657ac4b5cb07561a4ef8f0cb9",
                 "shasum": ""
             },
             "require": {
                 "illuminate/support": "~5.0",
-                "laracasts/flash": "~1.3",
+                "laracasts/flash": "~2.0",
                 "php": ">=5.5.9",
                 "prettus/l5-repository": "~2.1"
             },
@@ -1229,7 +1229,7 @@
                 "test",
                 "view"
             ],
-            "time": "2016-03-15 13:54:20"
+            "time": "2016-04-27 04:44:49"
         },
         {
             "name": "infyomlabs/swagger-generator",
@@ -1460,16 +1460,16 @@
         },
         {
             "name": "laracasts/flash",
-            "version": "1.3.4",
+            "version": "2.0.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/laracasts/flash.git",
-                "reference": "e0a048b911092e15920ce66f4b6a54b6befa30a3"
+                "reference": "4df7200127a71511bdf116bc8b7a2586612c7a35"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/laracasts/flash/zipball/e0a048b911092e15920ce66f4b6a54b6befa30a3",
-                "reference": "e0a048b911092e15920ce66f4b6a54b6befa30a3",
+                "url": "https://api.github.com/repos/laracasts/flash/zipball/4df7200127a71511bdf116bc8b7a2586612c7a35",
+                "reference": "4df7200127a71511bdf116bc8b7a2586612c7a35",
                 "shasum": ""
             },
             "require": {
@@ -1499,7 +1499,7 @@
                 }
             ],
             "description": "Easy flash notifications",
-            "time": "2015-12-22 15:52:08"
+            "time": "2016-03-14 15:55:34"
         },
         {
             "name": "laracasts/utilities",

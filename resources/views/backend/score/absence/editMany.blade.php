@@ -68,8 +68,6 @@
                         <div id="groupselectorcontainer">
                         </div>
 
-
-
                         <!-- /.pull-right -->
                     </div>
                     <div id="table11">
@@ -147,8 +145,8 @@
 
             var urlsemester = ["{!! route('semesters.api.v1') !!}"];
             var urlacademic = ["{!! route('academicYears.api.v1') !!}", ];
-            var filter1 = new SMSFILERLONGo(urlsemester,callbackCourseAnnual,"#selectsemester");
 
+            var filter1 = new SMSFILERLONGo(urlsemester,callbackCourseAnnual,"#selectsemester");
             var filter2 = new SMSFILERLONGo(urlacademic,callbackCourseAnnual,"#selectacademic");
 
 

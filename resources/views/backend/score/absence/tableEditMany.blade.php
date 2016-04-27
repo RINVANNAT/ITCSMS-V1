@@ -1,7 +1,7 @@
 @if($studentAnnuals->isEmpty())
     <div class="well text-center">No Absences found.</div>
 @else
-    {!! Form::open( array("url"=>"absences/updateMany","method"=>"PATCH"))!!}
+    {!! Form::open( array("url"=>"admin/score/absences/updateMany","method"=>"PATCH"))!!}
     <table class="table">
         <thead>
         <th>No</th>
