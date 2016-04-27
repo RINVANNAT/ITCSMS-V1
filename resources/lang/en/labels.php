@@ -663,6 +663,23 @@ return [
                         'employee_id' => 'Lecturer'
                     ]
                 ],
+        'score' => [
+            'title' => 'Score',
+            'sub_index_title' => 'View Score',
+            'sub_edit_title' => 'Edit Score',
+            'sub_create_title' => 'Add Score',
+            'sub_input_title' => 'Input Score',
+            'sub_detail_title' => 'Detail',
+            'fields' => [
+                'name' => "Name",
+                'semester' => 'Semester',
+                'academic_year_id' => 'Academic year',
+                'department_id' => 'Department',
+                'degree_id' => 'Degree',
+                'grade_id' => 'Grade',
+                'employee_id' => 'Lecturer'
+            ]
+        ],
         'coursePrograms' => [
             'title' => 'Course Programs',
             'sub_index_title' => 'All existing course program',

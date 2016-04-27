@@ -41,7 +41,7 @@
     <div class="wrapper">
         @include('backend.includes.header')
         @include('backend.includes.sidebar')
-        @include('flash::message')
+
 
         <!-- Content Wrapper. Contains page content -->
         <div class="content-wrapper">
