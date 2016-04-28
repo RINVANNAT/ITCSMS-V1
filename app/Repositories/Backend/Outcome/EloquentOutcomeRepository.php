@@ -130,12 +130,15 @@ class EloquentOutcomeRepository implements OutcomeRepositoryContract
             $next_number = 1;
         }
 
+        if($client_id == null){
+            $client_id = $input['payslip_client_id'];
+        }
         $outcome->number = $next_number;
         $outcome->pay_date = Carbon::now();
         $outcome->create_uid =auth()->id();
         $outcome->created_at = Carbon::now();
         $outcome->pay_date = Carbon::now();
-        $outcome->payslip_client_id = $client_id==null?$input['payslip_client_id']:$client_id;
+        $outcome->payslip_client_id = $client_id;
         $outcome->account_id = $input['account_id'];
         $outcome->outcome_type_id = $input['outcome_type_id'];
         if(isset($input['description'])){
@@ -175,7 +178,7 @@ class EloquentOutcomeRepository implements OutcomeRepositoryContract
 
         if($query_ok){
             DB::commit();
-            return true;
+            return route('admin.accounting.payslipHistory.data',$client_id);
         } else {
             DB::rollback();
             throw new GeneralException(trans('exceptions.backend.general.create_error'));

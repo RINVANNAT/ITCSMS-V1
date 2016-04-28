@@ -65,12 +65,16 @@
             background-color: #00a65a; !important;
         }
 
-
+        .refund_true {
+            background-color: #9FAFD1;
+        }
     </style>
+
 @stop
 
 @section('content')
-    @include('backend.accounting.studentPayment.modal_payment')
+    @include('backend.accounting.studentPayment.modal_income')
+    @include('backend.accounting.studentPayment.modal_outcome')
     <div class="box box-success">
         <div class="box-header with-border">
             <div class="mailbox-controls">
@@ -160,7 +164,9 @@
                         { data: 'action', name: 'action', orderable:false,searchable:false }
                     ]
                 })
-                console.log(payment_table);
+
+                refundStudent($('#' + tableId));
+                //console.log(payment_table);
             }
 
             var oTable = $('#students-table').DataTable({
@@ -246,12 +252,27 @@
             $('#income_dollar').on('change', function () {
                 $('#income_dollar_kh').val(convertMoney($('#income_dollar').val())+" ដុល្លា");
             });
+
             $('#income_riel').on('change', function () {
                 $('#income_riel_kh').val(convertMoney($('#income_riel').val())+" រៀល");
             });
 
+            $('#amount_dollar').on('change', function () {
+                $('#amount_kh').val(convertMoney($('#amount_dollar').val())+" ដុល្លា");
+                $('#amount_riel').prop('disabled', true);
+            });
+            $('#amount_riel').on('change', function () {
+                $('#amount_kh').val(convertMoney($('#amount_riel').val())+" រៀល");
+                $('#amount_dollar').prop('disabled', true);
+            });
+            $('.current_date').html(getKhmerCurrentDate());
+
             $('#submit_payment').on('click',function(){
                 submitIncome();
+            });
+
+            $('#submit_outcome').on('click',function(){
+                submitOutcome();
             });
 
             $('#refresh_table').on('click',function(){
@@ -271,6 +292,25 @@
                         $('#add_payment_modal').modal('toggle');
                         //$('#'+current_id).DataTable().ajax.reload();
                         //payment_table.draw();
+                        payment_table.ajax.url( data.payslip_client_id ).load();
+                    },
+                    error:function(error){
+                        alert(error);
+                    }
+                });
+            }
+
+            function submitOutcome(){
+                $.ajax({
+                    type:'POST',
+                    dataType:'json',
+                    data:$('#payslip_outcome_form').serialize(),
+                    url:'{{route('admin.accounting.outcomes.store')}}', // Will be passed to table payslipClient as a type
+                    beforeSend:function(){
+                        // do nothing for now
+                    },
+                    success:function(data) {
+                        $('#add_outcome_modal').modal('toggle');
                         payment_table.ajax.url( data.payslip_client_id ).load();
                     },
                     error:function(error){
@@ -299,13 +339,18 @@
                         '<button class="btn btn-default btn-sm export_all"><i class="fa fa-file-excel-o"></i></button>'
                     );
                     $("div.payment_btn").html(
-                            '<button class="btn btn-sm btn-primary btn_income_student">Income</button> &nbsp; <button class="btn btn-sm btn-success">Outcome</button>'
+                            '<button class="btn btn-sm btn-primary btn_income_student">Income</button> &nbsp; <button class="btn btn-sm btn-success btn_outcome_student">Outcome</button>'
                     );
                     $("#payment_info_"+row.data().id).html(
                             '<span>To Pay: </span> '+row.data().to_pay+' / <span>Debt: </span> <span id="debt-'+row.data().id+'"></span>'
                     );
                     $(".btn_income_student").click(function(){
                         preparePayment(row.data());
+                        current_id = tableId;
+                    });
+
+                    $(".btn_outcome_student").click(function(){
+                        prepareOutcome(row.data());
                         current_id = tableId;
                     });
 
@@ -345,7 +390,21 @@
                 $("#client_payment_sequence").html(convertKhmerNumber(data.count_income+1));
                 $("#client_academic_year").html(data.academic_year_name_kh);
                 $('#client_current_date').html(getKhmerCurrentDate());
+
                 $("#add_payment_modal").modal({
+                    backdrop: 'static',
+                    keyboard: false
+                });
+            }
+
+            function prepareOutcome(data){
+                console.log(data);
+                $("#client_box").html("<input type='text' class='form-control' value='"+data.name_kh+"'/>") ;
+                $("#department").val(data.department_name_kh);
+                $('#outcome_payslip_client_id').val(data.payslip_client_id);
+                $('#form_client_type').val("Student");
+                $('#client_id').val(data.id);
+                $("#add_outcome_modal").modal({
                     backdrop: 'static',
                     keyboard: false
                 });

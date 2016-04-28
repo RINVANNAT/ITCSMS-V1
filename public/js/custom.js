@@ -15,6 +15,43 @@ function PopupCenterDual(url, title, w, h) {
     }
 }
 
+function refundStudent(datatable){
+    datatable.on('click', '.btn-refund[data-remote]', function (e) {
+        var url = $(this).data('remote');
+        e.preventDefault();
+        swal({
+            title: "Warning",
+            text: "Are you sure you want to refund this payment?",
+            type: "warning",
+            showCancelButton: true,
+            confirmButtonColor: "#DD6B55",
+            confirmButtonText: "Yes, refund it!",
+            closeOnConfirm: true
+        }, function(confirmed) {
+            if (confirmed) {
+                $.ajaxSetup({
+                    headers: {
+                        'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                    }
+                });
+
+                console.log('refunded');
+                // confirm then
+                $.ajax({
+                    url: url,
+                    type: 'POST',
+                    dataType: 'json',
+                    data: {method: '_POST'},
+                }).always(function (data) {
+                    datatable.DataTable().draw(false);
+                });
+            }
+        });
+        return false;
+
+    });
+}
+
 function enableDeleteRecord(datatable){
     datatable.on('click', '.btn-delete[data-remote]', function (e) {
         var url = $(this).data('remote');
