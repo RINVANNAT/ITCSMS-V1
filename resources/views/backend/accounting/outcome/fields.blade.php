@@ -1,7 +1,7 @@
 <div class="row no-margin">
     <div class="col-xs-12">
 
-        {!! Form::hidden('payslip_client_id', null,['id'=>'payment_payslip_client_id']) !!}
+        {!! Form::hidden('payslip_client_id', null,['id'=>'outcome_payslip_client_id']) !!}
         {!! Form::hidden('client_type', null,['id'=>'form_client_type']) !!}
         {!! Form::hidden('client_id', null,['id'=>'client_id']) !!}
         <table width="100%" id="table_modal_payment">
@@ -22,7 +22,7 @@
                 </td>
                 <td align="middle" width="20%" valign="top" style="padding:10px;">
                     គំរូលេខ ៣/​ ស.ប <br/>
-                    លេខ : <strong id="client_name_latin"><!-- Auto generate --></strong> <br/>
+                    លេខ : {!! Form::text('outcome_number',null,['id'=>'outcome_number','style'=>'width:2cm;background-color:gray,border:none']) !!} <br/>
                 </td>
             </tr>
             <tr>
@@ -54,7 +54,7 @@
                 <td colspan="3">
 
                     <div class="col-md-2 outcome_label">បើកអោយលោក</div>
-                    <div class="col-md-4">
+                    <div class="col-md-4" id="client_box">
                         {!! Form::select('client_name',[],null,['id'=>'client_name','class'=>"select_client form-control"]) !!}
                     </div>
                     <div class="col-md-2 outcome_label"> អង្គភាព </div>

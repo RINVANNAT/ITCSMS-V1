@@ -10,6 +10,8 @@ class StudentAnnual extends Model
     
 
 	public $fillable = [
+        "to_pay",
+        "to_pay_currency",
         "group",
         "active",
 	    "promotion_id",
@@ -42,49 +44,56 @@ class StudentAnnual extends Model
         return $count_outcome;
     }
 
-    public function getToPayAttribute()
+    public function getToPayArrayAttribute()
     {
         $total_topay = null;
         $currency = null;
+        if($this->to_pay != null) {
+            $total_topay = $this->to_pay;
+            $currency = $this->to_pay_currency;
+            //$topay = $total_topay." ".$currency;
 
-        $scholarship_ids = DB::table('scholarship_student_annual')->where('student_annual_id',$this->id)->lists('scholarship_id');
-        $school_fee = SchoolFeeRate::leftJoin('department_school_fee_rate','schoolFeeRates.id','=','department_school_fee_rate.school_fee_rate_id')
-            ->leftJoin('grade_school_fee_rate','schoolFeeRates.id','=','grade_school_fee_rate.school_fee_rate_id')
-            ->where('promotion_id' ,$this->promotion_id)
-            ->where('degree_id' ,$this->degree_id)
-            ->where('grade_school_fee_rate.grade_id' ,$this->grade_id)
-            ->where('department_school_fee_rate.department_id' ,$this->department_id);
-        if(sizeof($scholarship_ids)>0){ //This student have scholarship, so his payment might be changed
-            $scolarship_fee = clone $school_fee;
-            $scolarship_fee = $scolarship_fee
-                ->whereIn('scholarship_id' ,$scholarship_ids)
-                ->select(['to_pay','to_pay_currency'])
-                ->get();
-            if($scolarship_fee->count() > 0){
-                $currency = $scolarship_fee->first()->to_pay_currency;
-                $total_topay = floatval($scolarship_fee->first()->to_pay);
-            } else { // Scholarships student have, doesn't change school payment fee, so we need to check it again
-                $school_fee = $school_fee
-                    ->select(['to_pay','to_pay_currency'])
-                    ->get();
-                if($school_fee->count() == 0){
-                    $total_topay = null;
-                    $topay = "Not found";
-                }
-                $total_topay = floatval($school_fee->first()->to_pay);
-                $currency = $school_fee->first()->to_pay_currency;
-            }
         } else {
-            // This student doesn't have scholarship
-            $school_fee = $school_fee
-                ->select(['to_pay','to_pay_currency'])
-                ->get();
-            if($school_fee->count() == 0){
-                $total_topay = null;
-                $topay = "Not found"; // This mean, scholarship fee isn't update to the latest version, ask finance staff to update it !!
+            $scholarship_ids = DB::table('scholarship_student_annual')->where('student_annual_id', $this->id)->lists('scholarship_id');
+            $school_fee = SchoolFeeRate::leftJoin('department_school_fee_rate', 'schoolFeeRates.id', '=', 'department_school_fee_rate.school_fee_rate_id')
+                ->leftJoin('grade_school_fee_rate', 'schoolFeeRates.id', '=', 'grade_school_fee_rate.school_fee_rate_id')
+                ->where('promotion_id', $this->promotion_id)
+                ->where('degree_id', $this->degree_id)
+                ->where('grade_school_fee_rate.grade_id', $this->grade_id)
+                ->where('department_school_fee_rate.department_id', $this->department_id);
+            if (sizeof($scholarship_ids) > 0) { //This student have scholarship, so his payment might be changed
+                $scolarship_fee = clone $school_fee;
+                $scolarship_fee = $scolarship_fee
+                    ->whereIn('scholarship_id', $scholarship_ids)
+                    ->select(['to_pay', 'to_pay_currency'])
+                    ->get();
+                if ($scolarship_fee->count() > 0) {
+                    $currency = $scolarship_fee->first()->to_pay_currency;
+                    $total_topay = floatval($scolarship_fee->first()->to_pay);
+                } else { // Scholarships student have, doesn't change school payment fee, so we need to check it again
+                    $school_fee = $school_fee
+                        ->select(['to_pay', 'to_pay_currency'])
+                        ->get();
+                    if ($school_fee->count() == 0) {
+                        $total_topay = null;
+                        $topay = "Not found";
+                    }
+                    $total_topay = floatval($school_fee->first()->to_pay);
+                    $currency = $school_fee->first()->to_pay_currency;
+                }
+            } else {
+                // This student doesn't have scholarship
+                $school_fee = $school_fee
+                    ->select(['to_pay', 'to_pay_currency'])
+                    ->get();
+                if ($school_fee->count() == 0) {
+                    $total_topay = null;
+                    $topay = "Not found"; // This mean, scholarship fee isn't update to the latest version, ask finance staff to update it !!
+                } else {
+                    $total_topay = floatval($school_fee->first()->to_pay);
+                    $currency = $school_fee->first()->to_pay_currency;
+                }
             }
-            $total_topay = floatval($school_fee->first()->to_pay);
-            $currency = $school_fee->first()->to_pay_currency;
         }
 
         return array('total'=>$total_topay,'currency'=>$currency);
@@ -92,7 +101,8 @@ class StudentAnnual extends Model
 
     public function getPaidAttribute(){
         $paids = Income::select(['amount_dollar','amount_riel'])
-            ->where('payslip_client_id',$this->payslip_client_id)->get();
+            ->where('payslip_client_id',$this->payslip_client_id)
+            ->where('is_refund',false)->get();
 
         $total_paid = 0;
         foreach($paids as $paid){

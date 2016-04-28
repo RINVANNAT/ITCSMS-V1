@@ -347,4 +347,18 @@ class EloquentIncomeRepository implements IncomeRepositoryContract
 
         throw new GeneralException(trans('exceptions.backend.general.delete_error'));
     }
+
+    public function refund($id)
+    {
+        $model = $this->findOrThrowException($id);
+        $model->is_refund = true;
+        $model->updated_at = Carbon::now();
+        $model->write_uid = auth()->id();
+
+        if($model->save()){
+            return true;
+        }
+
+        throw new GeneralException(trans('exceptions.configuration.candidates.update_error'));
+    }
 }

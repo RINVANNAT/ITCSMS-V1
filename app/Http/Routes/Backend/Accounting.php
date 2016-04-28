@@ -10,6 +10,7 @@ Route::group([
         Route::resource('incomes', 'IncomeController');
         Route::get('income-data', 'IncomeController@data')->name('admin.accounting.income.data');
         Route::get('income/{id}/print', 'IncomeController@print_income')->name('admin.accounting.income.print');
+        Route::post('income/{id}/refund', 'IncomeController@refund')->name('admin.accounting.income.refund');
         Route::get('income/{id}/simple_print', 'IncomeController@print_simple_income')->name('admin.accounting.income.simple_print');
 
     });
@@ -26,6 +27,8 @@ Route::group([
     Route::group([], function() {
         Route::get('studentPayments', 'IncomeController@student_payment')->name('admin.accounting.studentPayment');
         Route::get('studentPayment-data', 'IncomeController@student_payment_data')->name('admin.accounting.studentPayment.data');
+
+        Route::get('studentPayment/request-register-income/{id}', 'IncomeController@request_register_income')->name('admin.accounting.studentPayment.request_register_income');
 
         Route::get('candidatePayments', 'IncomeController@candidate_payment')->name('admin.accounting.candidatePayment');
         Route::get('candidatePayment-data', 'IncomeController@candidate_payment_data')->name('admin.accounting.candidatePayment.data');

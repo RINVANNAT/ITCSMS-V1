@@ -49,4 +49,6 @@ interface IncomeRepositoryContract
      * @return mixed
      */
     public function destroy($id);
+
+    public function refund($id);
 }

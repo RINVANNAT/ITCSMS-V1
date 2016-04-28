@@ -16,6 +16,7 @@ use App\Models\Grade;
 use App\Models\Income;
 use App\Models\IncomeType;
 use App\Models\Outcome;
+use App\Models\OutcomeType;
 use App\Models\PayslipClient;
 use App\Models\School;
 use App\Models\SchoolFeeRate;
@@ -68,8 +69,10 @@ class IncomeController extends Controller
         $genders = Gender::lists('name_kh','id');
         $options = DepartmentOption::lists('code','id');
         $academicYears = AcademicYear::orderBy('id','desc')->lists('name_kh','id');
+        $outcomeTypes = OutcomeType::lists('name','id');
+        $accounts = Account::lists('name','id');
 
-        return view('backend.accounting.studentPayment.index',compact('departments','degrees','grades','genders','options','academicYears'));
+        return view('backend.accounting.studentPayment.index',compact('departments','degrees','grades','genders','options','academicYears','outcomeTypes','accounts'));
     }
 
     public function candidate_payment()
@@ -173,54 +176,64 @@ class IncomeController extends Controller
 
                 $topay = "";
 
-                $scholarship_ids = DB::table('scholarship_student_annual')->where('student_annual_id',$studentAnnual->id)->lists('scholarship_id');
-                $school_fee = SchoolFeeRate::leftJoin('department_school_fee_rate','schoolFeeRates.id','=','department_school_fee_rate.school_fee_rate_id')
-                    ->leftJoin('grade_school_fee_rate','schoolFeeRates.id','=','grade_school_fee_rate.school_fee_rate_id')
-                    ->where('promotion_id' ,$studentAnnual->promotion_id)
-                    ->where('degree_id' ,$studentAnnual->degree_id)
-                    ->where('grade_school_fee_rate.grade_id' ,$studentAnnual->grade_id)
-                    ->where('department_school_fee_rate.department_id' ,$studentAnnual->department_id);
-                if(sizeof($scholarship_ids)>0){ //This student have scholarship, so his payment might be changed
-                    $scolarship_fee = clone $school_fee;
-                    $scolarship_fee = $scolarship_fee
-                        ->whereIn('scholarship_id' ,$scholarship_ids)
-                        ->select(['to_pay','to_pay_currency'])
-                        ->get();
-                    if($scolarship_fee->count() > 0){
-                        $currency = $scolarship_fee->first()->to_pay_currency;
-                        $total_topay = floatval($scolarship_fee->first()->to_pay);
-                        $topay = $scolarship_fee->first()->to_pay." ".$scolarship_fee->first()->to_pay_currency;
-                    } else { // Scholarships student have, doesn't change school payment fee, so we need to check it again
+                // We provide additional to pay field which attach directly to each student to avoid some data problem
+                // If data is correctly input, we will no need to use this field
+                if($studentAnnual->to_pay != null) {
+                    $total_topay = $studentAnnual->to_pay;
+                    $currency = $studentAnnual->to_pay_currency;
+                    $topay = $total_topay." ".$currency;
+
+                } else {
+                    $scholarship_ids = DB::table('scholarship_student_annual')->where('student_annual_id',$studentAnnual->id)->lists('scholarship_id');
+                    $school_fee = SchoolFeeRate::leftJoin('department_school_fee_rate','schoolFeeRates.id','=','department_school_fee_rate.school_fee_rate_id')
+                        ->leftJoin('grade_school_fee_rate','schoolFeeRates.id','=','grade_school_fee_rate.school_fee_rate_id')
+                        ->where('promotion_id' ,$studentAnnual->promotion_id)
+                        ->where('degree_id' ,$studentAnnual->degree_id)
+                        ->where('grade_school_fee_rate.grade_id' ,$studentAnnual->grade_id)
+                        ->where('department_school_fee_rate.department_id' ,$studentAnnual->department_id);
+                    if(sizeof($scholarship_ids)>0){ //This student have scholarship, so his payment might be changed
+                        $scolarship_fee = clone $school_fee;
+                        $scolarship_fee = $scolarship_fee
+                            ->whereIn('scholarship_id' ,$scholarship_ids)
+                            ->select(['to_pay','to_pay_currency'])
+                            ->get();
+                        if($scolarship_fee->count() > 0){
+                            $currency = $scolarship_fee->first()->to_pay_currency;
+                            $total_topay = floatval($scolarship_fee->first()->to_pay);
+                            $topay = $scolarship_fee->first()->to_pay." ".$scolarship_fee->first()->to_pay_currency;
+                        } else { // Scholarships student have, doesn't change school payment fee, so we need to check it again
+                            $school_fee = $school_fee
+                                ->select(['to_pay','to_pay_currency'])
+                                ->get();
+                            if($school_fee->count() == 0){
+                                $total_topay = null;
+                                $topay = "Not found";
+                            }
+                            $total_topay = floatval($school_fee->first()->to_pay);
+                            $currency = $school_fee->first()->to_pay_currency;
+                            $topay = $school_fee->first()->to_pay." ".$school_fee->first()->to_pay_currency;
+                        }
+                    } else {
+                        // If student doesn't have scholarship
                         $school_fee = $school_fee
                             ->select(['to_pay','to_pay_currency'])
                             ->get();
-                        if($school_fee->count() == 0){
+                        if($school_fee->count() == 0){ // Lack of data, request finance officer to get information on school fee rate
                             $total_topay = null;
                             $topay = "Not found";
+                        } else {
+                            $total_topay = floatval($school_fee->first()->to_pay);
+                            $currency = $school_fee->first()->to_pay_currency;
+                            $topay = $school_fee->first()->to_pay." ".$school_fee->first()->to_pay_currency;
                         }
-                        $total_topay = floatval($school_fee->first()->to_pay);
-                        $currency = $school_fee->first()->to_pay_currency;
-                        $topay = $school_fee->first()->to_pay." ".$school_fee->first()->to_pay_currency;
                     }
-                } else {
-                    // If student doesn't have scholarship
-                    $school_fee = $school_fee
-                        ->select(['to_pay','to_pay_currency'])
-                        ->get();
-                    if($school_fee->count() == 0){
-                        $total_topay = null;
-                        $topay = "Not found";
-                    }
-                    $total_topay = floatval($school_fee->first()->to_pay);
-                    $currency = $school_fee->first()->to_pay_currency;
-                    $topay = $school_fee->first()->to_pay." ".$school_fee->first()->to_pay_currency;
                 }
-
 
                 // For Debt
 
                 $paids = Income::select(['amount_dollar','amount_riel'])
-                    ->where('payslip_client_id',$studentAnnual->payslip_client_id)->get();
+                    ->where('payslip_client_id',$studentAnnual->payslip_client_id)
+                    ->where('is_refund',false)->get();
 
                 foreach($paids as $paid){
                     $count_income++;
@@ -250,6 +263,9 @@ class IncomeController extends Controller
         // additional search
         if ($academic_year = $datatables->request->get('academic_year')) {
             $datatables->where('studentAnnuals.academic_year_id', '=', $academic_year);
+        } else {
+            $last_academic_year_id =AcademicYear::orderBy('id','desc')->first()->id;
+            $datatables->where('studentAnnuals.academic_year_id', '=', $last_academic_year_id);
         }
         if ($degree = $datatables->request->get('degree')) {
             $datatables->where('studentAnnuals.degree_id', '=', $degree);
@@ -271,6 +287,10 @@ class IncomeController extends Controller
         return $datatables->make(true);
     }
 
+    public function request_register_income($id){
+        return view('backend.accounting.studentPayment.popup_payment',compact('scholarship_id','departments','degrees','grades','genders','options','academicYears','origins'));
+    }
+
     public function payslip_history($payslip_client_id){
         $incomes = Income:: select([
             'id','amount_dollar','amount_riel','number','created_at',DB::raw("'income' as name")
@@ -284,6 +304,9 @@ class IncomeController extends Controller
             ->unionAll($incomes);
 
         return $datatables = app('datatables')->of($payslips)
+            ->editColumn('number',function($payslip){
+                return str_pad($payslip->number, 5, "0", STR_PAD_LEFT);
+            })
             ->addColumn('income', function ($payslip){
                 if($payslip->name == "income"){
                     if($payslip->amount_dollar != ""){
@@ -308,9 +331,31 @@ class IncomeController extends Controller
                 }
             })
             ->addColumn('action', function ($payslip) {
-                return  '<a href="'.route('admin.accounting.income.print',$payslip->id).'" target="_blank"><i class="fa fa-print" data-toggle="tooltip" data-placement="top" title="" data-original-title="'.trans('buttons.general.print').'"></i> </a>';
+                if($payslip->name == "income"){
+                    $action = '<a href="'.route('admin.accounting.income.print',$payslip->id).'" target="_blank"><i class="fa fa-print" data-toggle="tooltip" data-placement="top" title="" data-original-title="'.trans('buttons.general.print').'"></i> </a>';
+                    if($payslip->is_refund != true){
+                        $action = $action.' <button class="btn btn-xs btn-danger btn-refund" data-remote="'.route('admin.accounting.income.refund', $payslip->id) .'"><i class="fa fa-times" data-toggle="tooltip" data-placement="top" title="' . trans('buttons.general.crud.delete') . '"></i></button>';
+                    }
+                    return  $action;
+                } else {
+                    return  '<a href="'.route('admin.accounting.outcome.simple_print',$payslip->id).'" target="_blank"><i class="fa fa-print" data-toggle="tooltip" data-placement="top" title="" data-original-title="'.trans('buttons.general.print').'"></i> </a>';
+                }
+
+            })
+            ->setRowClass(function ($payslip) {
+                //print_r($payslip->is_refund);
+                //if($payslip->is_refund == true){
+                    return "refund_".$payslip->is_refund;
+                //}
             })
             ->make(true);
+    }
+
+    public function refund($id,UpdateIncomeRequest $request){
+        $this->incomes->refund($id);
+        if($request->ajax()){
+            return json_encode(array('success'=>true));
+        }
     }
 
     /**
@@ -486,14 +531,74 @@ class IncomeController extends Controller
             "payslipClient.candidate.academic_year",
         ])->first();
 
-        //$student = StudentAnnual::where('payslip_client_id')
-        //dd($income->payslipClient->student->to_pay['total']);
-        if($income->payslipClient->student!= null){
-            $debt = ($income->payslipClient->student->to_pay['total'] - $income->payslipClient->student->paid).' '.$income->payslipClient->student->to_pay['currency'];
-        } else {
-            $debt = null;
-        }
 
+        $count_income = 0;
+        $total_paid = 0;
+        $currency = "";
+
+        $topay = "";
+
+        // We provide additional to pay field which attach directly to each student to avoid some data problem
+        // If data is correctly input, we will no need to use this field
+        if($income->payslipClient->student->to_pay != null) {
+            $total_topay = $income->payslipClient->student->to_pay;
+            $currency = $income->payslipClient->student->to_pay_currency;
+            $topay = $total_topay." ".$currency;
+
+        } else {
+            $scholarship_ids = DB::table('scholarship_student_annual')->where('student_annual_id', $income->payslipClient->student->id)->lists('scholarship_id');
+            $school_fee = SchoolFeeRate::leftJoin('department_school_fee_rate', 'schoolFeeRates.id', '=', 'department_school_fee_rate.school_fee_rate_id')
+                ->leftJoin('grade_school_fee_rate', 'schoolFeeRates.id', '=', 'grade_school_fee_rate.school_fee_rate_id')
+                ->where('promotion_id', $income->payslipClient->student->promotion_id)
+                ->where('degree_id', $income->payslipClient->student->degree_id)
+                ->where('grade_school_fee_rate.grade_id', $income->payslipClient->student->grade_id)
+                ->where('department_school_fee_rate.department_id', $income->payslipClient->student->department_id);
+            if (sizeof($scholarship_ids) > 0) { //This student have scholarship, so his payment might be changed
+                $scolarship_fee = clone $school_fee;
+                $scolarship_fee = $scolarship_fee
+                    ->whereIn('scholarship_id', $scholarship_ids)
+                    ->select(['to_pay', 'to_pay_currency'])
+                    ->get();
+                if ($scolarship_fee->count() > 0) {
+                    $currency = $scolarship_fee->first()->to_pay_currency;
+                    $total_topay = floatval($scolarship_fee->first()->to_pay);
+                    $topay = $scolarship_fee->first()->to_pay . " " . $scolarship_fee->first()->to_pay_currency;
+                } else { // Scholarships student have, doesn't change school payment fee, so we need to check it again
+                    $school_fee = $school_fee
+                        ->select(['to_pay', 'to_pay_currency'])
+                        ->get();
+                    if ($school_fee->count() == 0) {
+                        $total_topay = null;
+                        $topay = "Not found";
+                    }
+                    $total_topay = floatval($school_fee->first()->to_pay);
+                    $currency = $school_fee->first()->to_pay_currency;
+                    $topay = $school_fee->first()->to_pay . " " . $school_fee->first()->to_pay_currency;
+                }
+            } else {
+                // If student doesn't have scholarship
+                $school_fee = $school_fee
+                    ->select(['to_pay', 'to_pay_currency'])
+                    ->get();
+                if ($school_fee->count() == 0) { // Lack of data, request finance officer to get information on school fee rate
+                    $total_topay = null;
+                    $topay = "Not found";
+                } else {
+                    $total_topay = floatval($school_fee->first()->to_pay);
+                    $currency = $school_fee->first()->to_pay_currency;
+                    $topay = $school_fee->first()->to_pay . " " . $school_fee->first()->to_pay_currency;
+                }
+            }
+
+            //$student = StudentAnnual::where('payslip_client_id')
+            //dd($income->payslipClient->student->to_pay['total']);
+            if ($income->payslipClient->student != null) {
+                $debt = ($total_topay - $income->payslipClient->student->paid) . ' ' . $currency;
+            } else {
+                $debt = null;
+            }
+
+        }
 
         //$count = Income::where('payslip_client_id',$income->payslipClient->id)->count()+1;
         return view('backend.accounting.studentPayment.print.payslip_print',compact('income','count','debt'));

@@ -67,8 +67,14 @@ class OutcomeController extends Controller
      */
     public function store(StoreOutcomeRequest $request)
     {
-        $this->outcomes->create($request);
-        return redirect()->route('admin.accounting.outcomes.index')->withFlashSuccess(trans('alerts.backend.roles.created'));
+        $id = null;
+        $id = $this->outcomes->create($request);
+        if($request->ajax()){
+            return json_encode(array("success"=>true,'payslip_client_id'=>$id));
+        } else {
+            return redirect()->route('admin.accounting.outcomes.index')->withFlashSuccess(trans('alerts.backend.roles.created'));
+        }
+
     }
 
     /**
