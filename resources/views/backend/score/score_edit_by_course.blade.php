@@ -1,11 +1,10 @@
 @extends ('backend.layouts.master')
 
-@section ('title', trans('labels.backend.students.title'))
 
 @section('page-header')
     <h1>
-        {{ trans('labels.backend.students.title') }}
-        <small>{{ trans('labels.backend.students.sub_index_title') }}</small>
+        {{ trans('labels.backend.score.title') }}
+        <small>{{ trans('labels.backend.score.sub_input_title') }}</small>
     </h1>
 
 @endsection
@@ -19,8 +18,9 @@
     </style>
 @stop
 
+
 @section('content')
-        <!-- Content Header (Page header) -->
+<!-- Content Header (Page header) -->
 
 <!-- Main content -->
 <section class="content">
@@ -28,7 +28,6 @@
     <div class="row">
         <div class="col-xs-12">
             <div class="box box-primary">
-
                 <!-- /.box-header -->
                 <div class="box-body table-responsive">
 
@@ -36,6 +35,7 @@
                         <!-- Check all button -->
                         <button class="btn btn-default btn-sm checkbox-toggle"><i class="fa fa-square-o"></i>
                         </button>
+
 
                         <div class="btn-group">
                             <button class="btn btn-default btn-sm"><i class="fa fa-trash-o"></i></button>
@@ -62,16 +62,15 @@
                         <button class="btn btn-default btn-sm"><i class="fa fa-refresh"></i></button>
                         <div id="selectacademic">
                         </div>
-                        <div id="selectsemester">
-                        </div>
 
                         <div id="groupselectorcontainer">
                         </div>
 
+
                         <!-- /.pull-right -->
                     </div>
-                    <div id="table11">
-                        @include('backend.score.absence.tableEditMany')
+                    <div id="table-content">
+                        @include('backend.score.score_edit_by_course_table')
                     </div>
 
                 </div>
@@ -88,10 +87,39 @@
     </div>
 
 
-
-
 </section><!-- /.content -->
-@stop
+
+
+
+
+<div class="container">
+
+
+</div>
+
+
+
+@endsection
+
+
+
+@section('before-styles-end')
+    <style>
+        .form-score{
+            width: 70px;
+        }
+        .scoreinput th, td{
+            border:1px solid black;
+            padding:2px;
+        }
+        .scoreinput  td{
+        }
+        .scorecontent {
+            padding-left: 8px;
+        }
+
+    </style>
+@endsection
 
 
 @section('after-scripts-end')
@@ -106,50 +134,99 @@
     </script>
     <script src="{{url('assets/js/mustache.js')}}">
     </script>
+    <script src="{{url('assets/js/vue/vue.min.js')}}">
+    </script>
+
+    <script src="{{url('assets/js/vue/vue-resource.min.js')}}">
+    </script>
+
+
+
+
 
 
     <script>
 
         paramet = {};
         $( document ).ready(function() {
-
             function callbackCourseAnnual(data){
                 $.extend(paramet, data);
-                var jsonStr = JSON.stringify(paramet);
 
-                var url = "{!! route('absences.input') !!}"+"?filter="+jsonStr;
-                console.log(url);
-
-                $.get( url , function( data2 ) {
-                    $("#table11").html(data2);
-                    $("#fillterdatahidden").attr("value",jsonStr);
+                var url = "{!! route('score.input') !!}"+"?filter="+JSON.stringify(paramet);
+                console.log("url:"+url);
+                toggleLoading(true);
+                $.get( url , function( html ) {
+                    $("#table-content").html(html);
+                    toggleLoading(false);
                 });
             };
-
             function callbackSelecGroup(data){
                 $.extend(paramet, data);
-
-                {{--var url2 = ["{!! route('courseAnnuals.api.v1') !!}"+"?filter="+JSON.stringify(paramet)];--}}
                 var shallowEncoded = $.param( paramet );
+                console.log(shallowEncoded);
 
-                var url2 = ["{!! route('api.v1.courseAnnuals') !!}"+"?" +  shallowEncoded];
-                console.log("callback from group select");
+                var urltmp = "{!! route('api.v1.courseAnnuals') !!}" + "?" + shallowEncoded;
+
+                {{--var url2 = ["{!! route('api.v1.courseAnnuals') !!}"+"?filter="+JSON.stringify(paramet)];--}}
                 console.log(url2);
-
+                var url2 = [urltmp,];
                 //SMSFILERLONG.config(url2,callbackCourseAnnual);
-                var filter = new SMSFILERLONGo(url2,callbackCourseAnnual);
-            };
 
+                var filter2 = new SMSFILERLONGo(url2,callbackCourseAnnual);
+            };
             var url = ["{!! route('degrees.api.v1') !!}","{!! route('grades.api.v1') !!}","{!! route('departments.api.v1') !!}"];
             SMSFILER.config(url,callbackSelecGroup);
 
-            var urlsemester = ["{!! route('semesters.api.v1') !!}"];
-            var urlacademic = ["{!! route('academicYears.api.v1') !!}", ];
+            $(document).on("click",".linkeditmany", function(e){
+                var url = $(this).attr("href");
+                $(this).attr("href",url+"?redirect=1&fillterdata="+JSON.stringify(paramet));
+            });
 
-            var filter1 = new SMSFILERLONGo(urlsemester,callbackCourseAnnual,"#selectsemester");
-            var filter2 = new SMSFILERLONGo(urlacademic,callbackCourseAnnual,"#selectacademic");
+            //----------------------
+            // Academic Year Filter
+            //----------------------
+            var urlacademic = ["{!! route('academicYears.api.v1') !!}"];
+            function callbackAcademic(data){
+                console.log("in Academic callback");
+                console.log("testxxx:");
+                console.log(data);
+                $.extend(paramet, data);
 
+
+                var url = "{!! route('score.input') !!}"+"?filter="+JSON.stringify(paramet);
+
+                console.log(typeof(paramet));
+                var count = 0;
+                $.each(paramet, function(key,value){
+                    console.log("count:"+count);
+                    count = count +1;
+                });
+                if(count == 4){
+                    toggleLoading(true);
+                    console.log("in if"+count);
+                    $.get( url , function( html ) {
+                        $("#table-content").html(html);
+                        toggleLoading(false);
+                    });
+                }
+                console.log("count2:"+count);
+            };
+
+            var filter2 = new SMSFILERLONGo(urlacademic,callbackAcademic,"#selectacademic");
 
         });
+        $(document).on("submit","#scoreform", function(e){
+            var self = this;
+            e.preventDefault();
+            $("#redirectfilter").attr("value",JSON.stringify(paramet));
+            self.submit();
+
+
+            //$(this).attr("href",url+"?redirect=1&fillterdata="+JSON.stringify(paramet));
+        });
+
+        $("#scoreform")
+
     </script>
-@stop
+@endsection
+

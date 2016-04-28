@@ -16,6 +16,10 @@
         <!-- Styles -->
         @yield('before-styles-end')
         {!! Html::style(elixir('css/backend.css')) !!}
+        <link rel="stylesheet" href="{{url('assets/js/mcustomsearch/style.css')}}">
+        <link rel="stylesheet" href="{{url('assets/js/handlebars/groupselector.css')}}">
+
+
         <style>
             .content-wrapper{
                 background-image: url("/img/bg_contit.gif"); !important;
@@ -37,6 +41,7 @@
     <div class="wrapper">
         @include('backend.includes.header')
         @include('backend.includes.sidebar')
+
 
         <!-- Content Wrapper. Contains page content -->
         <div class="content-wrapper">

@@ -7,6 +7,8 @@ use Illuminate\Http\Request;
 use InfyOm\Generator\Controller\AppBaseController;
 
 
+
+
 class AbsenceController extends AppBaseController
 {
 
@@ -91,6 +93,7 @@ class AbsenceController extends AppBaseController
 		$studentAnnuals = $results["studentAnnuales"];
 		$absencesCounts = $results["absencesCounts"];
 
+        dd($params);
         if ($request->isMethod('patch')) {
 			$summitabsenceCounts = $request["absencecount"];
 			$stuids = $request["stuids"];
@@ -109,7 +112,7 @@ class AbsenceController extends AppBaseController
 				}
             }
         }
-        Flash::success('Absence updated successfully.');
+        // todo flash message when the data already save.
 
 
         return redirect(route('absences.indexByGroup')."?redirect=1&filter=".$request["filter"]);

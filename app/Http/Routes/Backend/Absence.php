@@ -12,6 +12,22 @@ Route::group([
             'uses' => 'AbsenceController@indexByGroup',
         ]);
 
+        Route::get('absences/editMany',[
+            'as' => 'absences.editMany',
+            'uses' => 'AbsenceController@editMany',
+        ]);
+
+        Route::any('absences/updateMany', [
+            'as' => 'absences.updateMany',
+            'uses' => 'AbsenceController@updateMany',
+        ]);
+
+        Route::get('absences/createMany', [
+            'as' => 'absences.craeteMany',
+            'uses' => 'AbsenceController@editMany',
+        ]);
+
+
         Route::get('absences/input', [
             'as' => 'absences.input',
             'uses' => 'AbsenceController@input',

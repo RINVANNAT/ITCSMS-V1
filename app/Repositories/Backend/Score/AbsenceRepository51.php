@@ -141,24 +141,21 @@ class AbsenceRepository51 extends BaseRepository
         }else{
             $semester_id=1;
         }
+        $absence_on = "2015/02/02 07:00";
 
-
-                $absence_on = "2015/02/02 07:00";
 
         $studentAnnualsquery = StudentAnnual::with("student");
-
         $studentAnnualsquery->where('degree_id',$degree_id);
         $studentAnnualsquery->where('grade_id', $grade_id);
         $studentAnnualsquery->where('department_id',$department_id);
-        $studentAnnualsquery->where('academic_year_id',$academic_year_id)
-//        $studentAnnualsquery->with(array('student'=>function($query){
-//            $query->orderBy('name_latin', 'ASC');
-//        }));
+        $studentAnnualsquery->where('academic_year_id',$academic_year_id);
+        $studentAnnualsquery
         ->join('students', 'studentAnnuals.student_id', '=', 'students.id')
         ->orderBy('students.name_latin', 'ASC');
 
 
         $studentAnnuals = $studentAnnualsquery->get();
+//        dd($studentAnnuals);
 
         $absencesCounts = array();
         foreach ($studentAnnuals as $studentAnnual) {

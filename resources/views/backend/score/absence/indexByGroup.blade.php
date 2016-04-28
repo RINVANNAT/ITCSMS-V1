@@ -118,7 +118,7 @@
 
 
     <script>
-        paramet = {"academic_year_id":2015};
+        paramet = {"academic_year_id":2016};
         console.log("hello from the skype");
         $( document ).ready(function() {
 
