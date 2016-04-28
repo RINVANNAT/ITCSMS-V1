@@ -46,6 +46,7 @@ class CourseController extends Controller
         return view('backend.course.courseProgram.index');
     }
 
+
     /**
      * Show the form for creating a new resource.
      *
@@ -139,9 +140,10 @@ class CourseController extends Controller
             ->editColumn('name_fr', '{!! $name_fr !!}')
             ->editColumn('code', '{!! $code !!}')
             ->editColumn('duration', '{!! $time_course."/".$time_tp."/".$time_td !!}')
+
             ->addColumn('action', function ($courseProgram) {
-                return  '<a href="'.route('admin.course.coursePrograms.edit',$courseProgram->id).'" class="btn btn-xs btn-primary"><i class="fa fa-pencil" data-toggle="tooltip" data-placement="top" title="" data-original-title="'.trans('buttons.general.crud.edit').'"></i> </a>'.
-                ' <button class="btn btn-xs btn-danger btn-delete" data-remote="'.route('admin.course.coursePrograms.destroy', $courseProgram->id) .'"><i class="fa fa-times" data-toggle="tooltip" data-placement="top" title="' . trans('buttons.general.crud.delete') . '"></i></button>';
+                return  '<a href="'.route('admin.course.course_program.edit',$courseProgram->id).'" class="btn btn-xs btn-primary"><i class="fa fa-pencil" data-toggle="tooltip" data-placement="top" title="" data-original-title="'.trans('buttons.general.crud.edit').'"></i> </a>'.
+                ' <button class="btn btn-xs btn-danger btn-delete" data-remote="'.route('admin.course.course_program.destroy', $courseProgram->id) .'"><i class="fa fa-times" data-toggle="tooltip" data-placement="top" title="' . trans('buttons.general.crud.delete') . '"></i></button>';
             })
             ->make(true);
     }
@@ -204,7 +206,7 @@ class CourseController extends Controller
                 DB::rollback();
             }
             DB::commit();
-            return redirect(route('admin.backend.course'));
+            return redirect(route('admin.course.coursePrograms.index'));
         }
     }
 

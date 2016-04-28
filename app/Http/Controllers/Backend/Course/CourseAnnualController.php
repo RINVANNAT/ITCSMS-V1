@@ -154,8 +154,8 @@ class CourseAnnualController extends Controller
             ->editColumn('grade_id', '{!! $grade_id !!}')
             ->editColumn('employee_id', '{!! $employee_id !!}')
             ->addColumn('action', function ($courseAnnual) {
-                return  '<a href="'.route('admin.course.courseAnnuals.edit',$courseAnnual->id).'" class="btn btn-xs btn-primary"><i class="fa fa-pencil" data-toggle="tooltip" data-placement="top" title="" data-original-title="'.trans('buttons.general.crud.edit').'"></i> </a>'.
-                ' <button class="btn btn-xs btn-danger btn-delete" data-remote="'.route('admin.course.courseAnnuals.destroy', $courseAnnual->id) .'"><i class="fa fa-times" data-toggle="tooltip" data-placement="top" title="' . trans('buttons.general.crud.delete') . '"></i></button>';
+                return  '<a href="'.route('admin.course.course_annual.edit',$courseAnnual->id).'" class="btn btn-xs btn-primary"><i class="fa fa-pencil" data-toggle="tooltip" data-placement="top" title="" data-original-title="'.trans('buttons.general.crud.edit').'"></i> </a>'.
+                ' <button class="btn btn-xs btn-danger btn-delete" data-remote="'.route('admin.course.course_annual.destroy', $courseAnnual->id) .'"><i class="fa fa-times" data-toggle="tooltip" data-placement="top" title="' . trans('buttons.general.crud.delete') . '"></i></button>';
             })
             ->make(true);
     }
@@ -212,7 +212,7 @@ class CourseAnnualController extends Controller
                 DB::rollback();
             }
             DB::commit();
-            return redirect(route('admin.backend.course.courseAnnuals.index'));
+            return redirect(route('admin.backend.course.course_annual.index'));
         }
     }
 

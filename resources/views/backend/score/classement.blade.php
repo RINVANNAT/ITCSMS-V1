@@ -257,16 +257,16 @@
 
 //           todo tofix move to 5.2
 
-            {{--$.get( "{!! route('studentEvalStatusesr.api.v1') !!}", function(studentEvalStatuses){--}}
-                {{--console.log("type of returne status");--}}
-                {{--console.log(typeof studentEvalStatuses);--}}
-                {{--new Vue({--}}
-                    {{--el: '#app',--}}
-                    {{--data: {--}}
-                        {{--studentEvalStatuses: studentEvalStatuses--}}
-                    {{--}--}}
-                {{--})--}}
-            {{--});--}}
+            $.get( "{!! route('studentEvaStatuses.api.v1') !!}", function(studentEvalStatuses){
+                console.log("type of returne status");
+                console.log(typeof studentEvalStatuses);
+                new Vue({
+                    el: '#app',
+                    data: {
+                        studentEvalStatuses: studentEvalStatuses
+                    }
+                })
+            });
 
             function callbackCourseAnnual(data){
                 $.extend(paramet, data);
@@ -314,21 +314,22 @@
             var url = ["{!! route('degrees.api.v1') !!}","{!! route('grades.api.v1') !!}","{!! route('departments.api.v1') !!}"];
             SMSFILER.config(url,callbackSelecGroup);
 
-            {{--$(document).on("click","#evaluation",function(e){--}}
-                {{--var url = "{!! route('scoreeval.api.v1') !!}"+"?filter="+JSON.stringify(paramet);--}}
-                {{--toggleLoading(true);--}}
-                {{--console.log(url);--}}
-                {{--$.get( url , function( html ) {--}}
+            $(document).on("click","#evaluation",function(e){
+                var url = "{!! route('scoreeval.api.v1') !!}"+"?filter="+JSON.stringify(paramet);
+                toggleLoading(true);
+                console.log(url);
+                $.get( url , function( html ) {
 
-                    {{--toggleLoading(false);--}}
-                    {{--alert("finish");--}}
-                {{--});--}}
+                    toggleLoading(false);
+                    alert("finish");
+                });
 
-            {{--});--}}
+            });
 
             var urlsemester = ["{!! route('semesters.api.v1') !!}"];
-            console.log(urlsemester);
+
             var urlacademic = ["{!! route('academicYears.api.v1') !!}"];
+            console.log(urlacademic);
             function callbackSemester(data){
                 console.log("in Semester callback");
                 $.extend(paramet, data);

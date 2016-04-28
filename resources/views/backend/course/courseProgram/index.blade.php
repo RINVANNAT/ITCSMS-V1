@@ -67,6 +67,7 @@
                 processing: true,
                 serverSide: true,
                 pageLength: {!! config('app.records_per_page')!!},
+
                 ajax: '{!! route('admin.course.course_program.data') !!}',
                 columns: [
                     { data: 'name_kh', name: 'name_kh'},

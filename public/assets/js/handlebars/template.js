@@ -32,8 +32,19 @@ MYTEMPLATE["fillter"]["longtemplate"] =  ''+
             '<span class="optionlongitem"  fillerdbname="{{fillerdbname}}" optionid="{{id}}" manuleselected="0"> {{name}} </span>'+
         '{{/name}}'+
         '{{^name}}'+
-        '<span class="optionlongitem"  fillerdbname="{{fillerdbname}}" optionid="{{id}}" manuleselected="0">  {{code}} </span>'+
+            '{{#name_en}}'+
+                '<span class="optionlongitem"  fillerdbname="{{fillerdbname}}" optionid="{{id}}" manuleselected="0">  {{name_en}} </span>'+
+            '{{/name_en}}'+
+            '{{^name_en}}'+
+                '{{#name_latin}}'+
+                    '<span class="optionlongitem"  fillerdbname="{{fillerdbname}}" optionid="{{id}}" manuleselected="0">  {{name_latin}} </span>'+
+                '{{/name_latin}}'+
+                '{{^name_latin}}'+
+                    '<span class="optionlongitem"  fillerdbname="{{fillerdbname}}" optionid="{{id}}" manuleselected="0">  {{code}} </span>'+
+                '{{/name_latin}}'+
+            '{{/name_en}}'+
         '{{/name}}'+
+
 
     '{{/options}}'+
     '{{^options}}'+
@@ -42,3 +53,5 @@ MYTEMPLATE["fillter"]["longtemplate"] =  ''+
 
     '</div>'+
     '</div>';
+
+

@@ -7,7 +7,7 @@
             <th ></th>
             <th class="coursetitle">
             </th>
-            <th width="500px"></th>
+            <th></th>
             <th ></th>
             <th></th>
             <th class="coursetitle" colspan="2" v-for="(index, courseAnnual) in courseAnnuals" >
@@ -27,7 +27,7 @@
         <thead>
             <th>No</th>
             <th><span id="student_id" toggle="0">ID</span> </th>
-            <th><span id="student_name" toggle="0">Student Name </span> </th>
+            <th><span id="student_name" toggle="0" style="word-wrap: break-word; max-width: 50px;">Student Name </span> </th>
             <th>Sex</th>
             <th><span id="abs_total" toggle="0">Abs Total</span> </th>
             <template v-for="courseAnnual in courseAnnuals" >

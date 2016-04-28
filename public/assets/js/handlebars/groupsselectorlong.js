@@ -190,7 +190,10 @@ var SMSFILERLONGo = function (urls, callback,tagResult) {
                 var filltername = ifhavequestionmark[0];
                 filltername = filltername.charAt(0).toUpperCase() + filltername.slice(1);
                 var fillerdbname = filltername.slice(0, -1).replace(/\.?([A-Z])/g, function (x,y){return "_" + y.toLowerCase()}).replace(/^_/, "")+"_id";
-                console.log(filltername);
+
+                console.log("long filter");
+                console.log(data.data);
+
                 self.fillers = {filltername:filltername,fillterlongname:filltername,fillerdbname:fillerdbname, options:data.data};
 
 

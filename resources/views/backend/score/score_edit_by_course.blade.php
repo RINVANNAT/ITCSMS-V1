@@ -153,6 +153,7 @@
                 $.extend(paramet, data);
 
                 var url = "{!! route('score.input') !!}"+"?filter="+JSON.stringify(paramet);
+
                 console.log("url:"+url);
                 toggleLoading(true);
                 $.get( url , function( html ) {
@@ -166,6 +167,7 @@
                 console.log(shallowEncoded);
 
                 var urltmp = "{!! route('api.v1.courseAnnuals') !!}" + "?" + shallowEncoded;
+
 
                 {{--var url2 = ["{!! route('api.v1.courseAnnuals') !!}"+"?filter="+JSON.stringify(paramet)];--}}
                 console.log(url2);

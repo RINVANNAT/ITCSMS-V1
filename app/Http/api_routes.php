@@ -37,3 +37,15 @@ Route::get('academicYears',[
     'as' => 'academicYears.api.v1',
     'uses' => 'AcademicYearAPIController@index',
 ]);
+
+Route::get('studentEvaStatuses',[
+    'as' => 'studentEvaStatuses.api.v1',
+    'uses' => 'StudentEvaStatusAPIController@index',
+]);
+
+
+Route::get('scoreEvaluations',[
+    'as' => 'scoreeval.api.v1',
+    'uses' => 'ScoreEvaluationAPIController@group',
+]);
+
