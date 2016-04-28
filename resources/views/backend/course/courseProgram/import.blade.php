@@ -1,11 +1,10 @@
 @extends ('backend.layouts.master')
 
-@section ('title', trans('labels.backend.courseAnnuals.title') . ' | ' . trans('labels.backend.courseAnnuals.sub_import_title'))
 
 @section('page-header')
     <h1>
-        {{ trans('labels.backend.students.title') }}
-        <small>{{ trans('labels.backend.students.sub_import_title') }}</small>
+        {{ trans('labels.backend.courseAnnuals.title') }}
+        <small>{{ trans('labels.backend.courseAnnuals.sub_import_title') }}</small>
     </h1>
 @endsection
 

@@ -23,6 +23,10 @@
                     <button class="btn btn-primary btn-sm"><i class="fa fa-plus-circle"></i> Add
                     </button>
                 </a>
+                <a href="{!! route('admin.course.course_program.request_import') !!}">
+                    <button class="btn btn-primary btn-sm"><i class="fa fa-plus-circle"></i> Import
+                    </button>
+                </a>
 
                 <div class="btn-group">
                     <button class="btn btn-default btn-sm"><i class="fa fa-trash-o"></i></button>
