@@ -35,11 +35,13 @@ class CourseAnnualAPIController extends AppBaseController
      * @param Request $request
      * @return Response
      */
-    public function index(Request $request)
+    public function index(CreateCourseAnnualAPIRequest $request)
     {
+
         $this->courseAnnualRepository->pushCriteria(new RequestCriteria($request));
         $this->courseAnnualRepository->pushCriteria(new LimitOffsetCriteria($request));
-        $courseAnnuals = $this->courseAnnualRepository->findWhere($request->all());
+
+        $courseAnnuals = $this->courseAnnualRepository->findWhere($request->only('degree_id','grade_id','department_id','academic_year_id'));
 
         return $this->sendResponse($courseAnnuals->toArray(), 'CourseAnnuals retrieved successfully');
     }

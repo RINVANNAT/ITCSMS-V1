@@ -169,13 +169,6 @@ class ScoreController extends AppBaseController
                     }
                     $score = $this->scoreRepository->update($dataScore, $id);
 
-					// update absence
-
-					// get student ids
-
-					//
-
-                    // old absence
 
                     $this->createAbsence($request["abs"][$key],$request['student_annual_ids'][$key],json_decode($request["filter"],true));
                 }
