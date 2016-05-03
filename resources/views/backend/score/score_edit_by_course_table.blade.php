@@ -20,17 +20,14 @@ start table render
             <th> total </th>
             </thead>
             <tbody>
-
-
-
-
             <template v-for="(index, studentAnnual) in studentAnnuals">
                 <tr>
                     <td>@{{ studentAnnual.no }}</td>
                     <td>@{{ studentAnnual.name }}</td>
                     <td>@{{ studentAnnual.id_card }}</td>
 
-                    <td>  @{{  absencesCounts[studentAnnua.id] }}</td>
+
+                    <td> {!! Form::text('abs[]', '@{{  absencesCounts[studentAnnua.id] }}', [ 'v-model'=>"absencesCounts[studentAnnual.id]", 'class' => 'form-score','placeholder'=>'']) !!}</td>
                     {!! Form::hidden('ids[]', '@{{ scores[studentAnnual.id].id }}') !!}
                     {!! Form::hidden('student_annual_ids[]', '@{{ studentAnnual.id }}') !!}
 

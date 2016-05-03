@@ -602,6 +602,8 @@ class ScoreRepository extends BaseRepository
             $absencesCounts[$studentAnnual->id]=count($absenceCount);
         }
 
+
+
         //-----------------------
         // Total Score sum 10+30+60
         //-----------------------\

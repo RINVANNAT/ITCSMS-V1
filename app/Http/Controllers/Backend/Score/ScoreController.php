@@ -140,14 +140,16 @@ class ScoreController extends AppBaseController
 	}
 
 	public  function  updateMany(Request $request){
+
 		if ($request->isMethod('patch')) {
+
+
                 foreach($request["ids"] as $key=>$id ){
 					$key = intval($key);
 					$id = intval($id);
 
-
-                    $score = $this->scoreRepository->find($id);
-
+                    // find record for update
+					$score = $this->scoreRepository->find($id);
                     if(empty($score))
                     {
                         Flash::error('Score not found');
@@ -165,14 +167,90 @@ class ScoreController extends AppBaseController
                     if( !empty($request['reexam'][$key]) ){
                         $dataScore["reexam"]=$request['reexam'][$key];
                     }
-                    //)updateRich(
                     $score = $this->scoreRepository->update($dataScore, $id);
+
+					// update absence
+
+					// get student ids
+
+					//
+
+                    // old absence
+
+                    $this->createAbsence($request["abs"][$key],$request['student_annual_ids'][$key],json_decode($request["filter"],true));
                 }
+
 			Flash::success('Score was updated');
 
 			return redirect(route('score.input')."?redirect=1&filter=".$request["filter"]);
 		}
 	}
+
+    public function  createAbsence($number,$studentId,$param)
+    {
+        $absence_on = "2015/02/02 07:00";
+
+
+        $degree_id= (int) $param["degree_id"];
+        $grade_id= (int) $param["grade_id"];
+        $department_id = (int) $param["department_id"];
+        $course_annual_id = (int) $param["course_annual_id"];
+
+        if($param !=null && array_key_exists("academic_year_id", $param)){
+            $academic_year_id = $param["academic_year_id"];
+        }else{
+            $academic_year_id = 2016;
+        }
+
+        if($param !=null && array_key_exists("semester_id", $param)){
+            $semester_id = $param["semester_id"];
+        }else{
+            $semester_id=1;
+        }
+
+        $oldAbsences = Absence::query()
+            ->where("degree_id",$degree_id)
+            ->where('grade_id', $grade_id)
+            ->where('department_id',$department_id)
+            ->where('academic_year_id',$academic_year_id)
+            ->where('course_annual_id',$course_annual_id)
+            ->where("student_annual_id",$studentId)->get();
+
+
+
+        foreach($oldAbsences as $oldAbsence)
+        {
+            $oldAbsence->delete();
+        }
+
+        $oldAbsences = Absence::query()
+            ->where('degree_id',$degree_id)
+            ->where('grade_id', $grade_id)
+            ->where('department_id',$department_id)
+            ->where('academic_year_id',$academic_year_id)
+            ->where('course_annual_id',$course_annual_id)
+            ->where("student_annual_id",$studentId)->get();
+
+
+
+        $absenc = array("degree_id"=>$degree_id,
+            "semester_id"=>$semester_id,
+            "grade_id"=>$grade_id,
+            "department_id"=>$department_id,
+            "academic_year_id"=>$academic_year_id,
+            "course_annual_id"=>$course_annual_id,
+            "student_annual_id"=>intval($studentId),
+            "absence_on"=>"2015/02/02 07:00");
+
+
+
+        for ($x = 1; $x <= intval($number); $x++) {
+            Absence::create($absenc);
+        }
+
+        return 1;
+    }
+
 
 	/**
 	 * Show the form for creating a new Score.

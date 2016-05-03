@@ -93,7 +93,7 @@ class AbsenceController extends AppBaseController
 		$studentAnnuals = $results["studentAnnuales"];
 		$absencesCounts = $results["absencesCounts"];
 
-        dd($params);
+
         if ($request->isMethod('patch')) {
 			$summitabsenceCounts = $request["absencecount"];
 			$stuids = $request["stuids"];
