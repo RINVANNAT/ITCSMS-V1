@@ -74,20 +74,23 @@
     </table>
 
 </div>
+
+
 <script>
-    courseAnnules = {!! $courseAnnuals->toJson() !!};
-    studentAnnuals = {!! json_encode($studentAnnuals) !!};
-    scoresDataViews = {!!  json_encode($scoresDataViews) !!};
-    absencesCounts = {!! json_encode($absencesCounts) !!};
-    evalStatus={!!json_encode($evalStatus)  !!};
-
-
 
     function  renderScoreTable(courseAnnuals, studentAnnuals, scoresDataViews, absencesCounts, evalStatus){
 
     }
 
+
     $( document ).ready(function() {
+        courseAnnules = {!! $courseAnnuals->toJson() !!};
+        studentAnnuals = {!! json_encode($studentAnnuals) !!};
+        scoresDataViews = {!!  json_encode($scoresDataViews) !!};
+        absencesCounts = {!! json_encode($absencesCounts) !!};
+        evalStatus={!!json_encode($evalStatus)  !!};
+
+
         new Vue({
             el: '#vue_table_score',
             data: {
@@ -235,9 +238,6 @@
             $(this).attr("toggle", "0");
         }
     });
-
-
-
 </script>
 @endif
 

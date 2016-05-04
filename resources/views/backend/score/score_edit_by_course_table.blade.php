@@ -25,17 +25,13 @@ start table render
                     <td>@{{ studentAnnual.no }}</td>
                     <td>@{{ studentAnnual.name }}</td>
                     <td>@{{ studentAnnual.id_card }}</td>
-
-
                     <td> {!! Form::text('abs[]', '@{{  absencesCounts[studentAnnua.id] }}', [ 'v-model'=>"absencesCounts[studentAnnual.id]", 'class' => 'form-score','placeholder'=>'']) !!}</td>
                     {!! Form::hidden('ids[]', '@{{ scores[studentAnnual.id].id }}') !!}
                     {!! Form::hidden('student_annual_ids[]', '@{{ studentAnnual.id }}') !!}
-
                     <td> {!! Form::text('score10[]', '@{{ scores[studentAnnual.id].score10}}', [ 'v-model'=>"scores[studentAnnual.id].score10", 'class' => 'form-score','placeholder'=>'']) !!}</td>
                     <td>{!! Form::text('score30[]', '@{{ scores[studentAnnual.id].score30}}' , ['v-model'=>"scores[studentAnnual.id].score30", 'class' => 'form-score','placeholder'=>""]) !!}</td>
                     <td>{!! Form::text('score60[]',  '@{{ scores[studentAnnual.id].score60}}' , ['v-model'=>"scores[studentAnnual.id].score60", 'class' => 'form-score', 'placeholder'=>""]) !!}</td>
                     <td>{!! Form::text('reexam[]',  '@{{ scores[studentAnnual.id].reexam}}',  ['v-model'=>"scores[studentAnnual.id].reexam", 'class' => 'form-score', 'placeholder'=>""]) !!}</td>
-
                     <td >@{{ (total(studentAnnual.id)).toFixed(2) }} </td>
                 </tr>
             </template>
@@ -51,6 +47,9 @@ start table render
         {!! Form::submit('Save', ['class' => 'btn btn-primary']) !!}
         {!! Form::close() !!}
     </template>
+
+
+
 
 <script type="text/javascript">
 

@@ -224,7 +224,8 @@
     </script>
 
 
-    <script>
+    <script type="text/javascript">
+
         $("#app").hide();
         function getCookie(cname) {
             var name = cname + "=";
@@ -515,12 +516,11 @@
                     document.cookie="sidebar-collapse=0";
                 }
             });
-            //--------------------------------------
 
-            //--------------------------------------
-            // Vue js table
-            //-------------------------------------
         });
+
+        //end of script in main file.
+
     </script>
 
-@endsection
+@stop

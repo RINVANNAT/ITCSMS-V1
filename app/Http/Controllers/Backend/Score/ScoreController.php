@@ -63,7 +63,14 @@ class ScoreController extends AppBaseController
 			$absencesCounts = $result["absencesCounts"];
             $evalStatus = $result["evalStatus"];
 			//dd($scoresDataViews);
-            return view('backend.score.classement_table', compact( "evalStatus","absencesCounts","courseAnnuals","studentAnnuals","scoresindex", "scores", "scoresDataViews"));
+
+			if($request->has("redirect")){
+				return view('backend.score.classement', compact( "evalStatus","absencesCounts","courseAnnuals","studentAnnuals","scoresindex", "scores", "scoresDataViews"));
+			}else{
+				return view('backend.score.classement_table', compact( "evalStatus","absencesCounts","courseAnnuals","studentAnnuals","scoresindex", "scores", "scoresDataViews"));
+			}
+
+
 		}else{
 
 		}

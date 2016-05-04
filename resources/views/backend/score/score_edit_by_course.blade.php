@@ -36,15 +36,13 @@
                         <button class="btn btn-default btn-sm checkbox-toggle"><i class="fa fa-square-o"></i>
                         </button>
 
-
-
-                        
-
-
                         <div class="btn-group">
                             <button class="btn btn-default btn-sm"><i class="fa fa-trash-o"></i></button>
                             <button class="btn btn-default btn-sm"><i class="fa fa-reply"></i></button>
                             <button class="btn btn-default btn-sm"><i class="fa fa-share"></i></button>
+                            <a id="score-report" href="{!! route('score.ranking') !!}" >
+                                <button class="btn btn-default btn-sm"> Score Report</button>
+                            </a>
 
                         </div>
                         <div class="pull-right">
@@ -65,6 +63,8 @@
                         <!-- /.btn-group -->
                         <button class="btn btn-default btn-sm"><i class="fa fa-refresh"></i></button>
                         <div id="selectacademic">
+                        </div>
+                        <div id="selectsemester">
                         </div>
 
                         <div id="groupselectorcontainer">
@@ -134,7 +134,7 @@
     <script src="{{url('assets/js/handlebars/groupsselectorlong.js')}}">
     </script>
     <script src="{{url('assets/js/utility/jsutility.js')}}">
-        console.log("hello from the skype");
+
     </script>
     <script src="{{url('assets/js/mustache.js')}}">
     </script>
@@ -150,7 +150,6 @@
 
 
     <script>
-
         paramet = {};
         $( document ).ready(function() {
             function callbackCourseAnnual(data){
@@ -220,6 +219,10 @@
 
             var filter2 = new SMSFILERLONGo(urlacademic,callbackAcademic,"#selectacademic");
 
+            var urlsemester = ["{!! route('semesters.api.v1') !!}"];
+            var filter3 = new SMSFILERLONGo(urlsemester,callbackAcademic,"#selectsemester");
+
+
         });
         $(document).on("submit","#scoreform", function(e){
             var self = this;
@@ -227,12 +230,16 @@
             $("#redirectfilter").attr("value",JSON.stringify(paramet));
             self.submit();
 
-
             //$(this).attr("href",url+"?redirect=1&fillterdata="+JSON.stringify(paramet));
         });
 
-        $("#scoreform")
+        $(document).on("click","#score-report", function(e){
+            $(this).attr("href", this.href + "?redirect=1&filter="+JSON.stringify(paramet));
 
+
+
+            //$(this).attr("href",url+"?redirect=1&fillterdata="+JSON.stringify(paramet));
+        });
     </script>
 @endsection
 
