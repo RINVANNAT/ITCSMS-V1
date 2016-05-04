@@ -13,6 +13,10 @@ Route::group([
         Route::post('income/{id}/refund', 'IncomeController@refund')->name('admin.accounting.income.refund');
         Route::get('income/{id}/simple_print', 'IncomeController@print_simple_income')->name('admin.accounting.income.simple_print');
 
+        Route::get('income-request-import', 'IncomeController@request_import')->name('admin.accounting.income.request_import');
+        Route::post('income-import', 'IncomeController@import')->name('admin.accounting.income.import');
+        Route::get('income-import-done', 'IncomeController@import_done')->name('admin.accounting.income.import_done');
+
     });
 
     Route::group([], function() {

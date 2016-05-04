@@ -17,12 +17,10 @@
                 <td align="middle">
                     <h3 style="font-family: khmerosmoulpali">ប័ណ្ណចំណាយ</h3>
                     <h5 style="font-family: tactieng;font-size: 40px; margin-bottom: 0px;margin-top: 0px;">3</h5>
-
-
                 </td>
                 <td align="middle" width="20%" valign="top" style="padding:10px;">
                     គំរូលេខ ៣/​ ស.ប <br/>
-                    លេខ : {!! Form::text('outcome_number',null,['id'=>'outcome_number','style'=>'width:2cm;background-color:gray,border:none']) !!} <br/>
+                    លេខ : {!! Form::text('number',$number,['id'=>'number','style'=>'width:2cm;text-align:right']) !!} <br/>
                 </td>
             </tr>
             <tr>
@@ -85,7 +83,7 @@
                         ប្រភេទចំណាយ
                     </div>
                     <div class="col-md-4 input-group input-group-sm" style="padding-left: 15px;">
-                        {!! Form::select('outcome_type_id', $outcomeTypes, null, array('class'=>'form-control','style'=>'width:80%')) !!}
+                        {!! Form::select('outcome_type_id', $outcomeTypes, null, array('class'=>'form-control','style'=>'width:80%','id'=>'outcome_type')) !!}
                         ់</div>
                 </td>
             </tr>

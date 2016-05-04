@@ -56,7 +56,16 @@ class OutcomeController extends Controller
     {
         $outcomeTypes = OutcomeType::get()->lists('codeName','id');
         $accounts = Account::lists('name','id');
-        return view('backend.accounting.outcome.create',compact('outcomeTypes','accounts'));
+
+        $number = 1;
+        $last_outcome = Outcome::orderBy('number','DESC')->first();
+        if($last_outcome != null){
+            $number = $last_outcome->number + 1;
+        }
+
+        $number = str_pad($number, 5, "0", STR_PAD_LEFT);
+
+        return view('backend.accounting.outcome.create',compact('outcomeTypes','accounts','number'));
     }
 
     /**

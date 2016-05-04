@@ -4,7 +4,7 @@
 <div class="form-group">
     {!! Form::label('name', trans('labels.backend.incomes.fields.number'), ['class' => 'col-lg-2 control-label']) !!}
     <div class="col-lg-2">
-        {!! Form::text('number', null, ['class' => 'form-control','disabled'=>'disabled']) !!}
+        {!! Form::text('number', $number, ['class' => 'form-control']) !!}
     </div>
 </div><!--form control-->
 <div class="form-group">

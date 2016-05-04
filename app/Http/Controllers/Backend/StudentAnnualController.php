@@ -215,7 +215,7 @@ class StudentAnnualController extends Controller
         $datatables = app('datatables')->of($studentAnnuals)
             ->editColumn('dob', function ($studentAnnual){
                 $date = Carbon::createFromFormat("Y-m-d h:i:s",$studentAnnual->dob);
-                return $date->format('d/m/Y');
+                return $date->toFormattedDateString();
             })
             ->addColumn('export', function ($studentAnnual) use ($scholarship_id) {
                 return  '<a href="'.route('admin.scholarship.holder').'?scholarship_id='.$scholarship_id.'&studentAnnual_id='.$studentAnnual->id.'" class="btn btn-xs btn-primary"><i class="fa fa-mail-forward" data-toggle="tooltip" data-placement="top" title="" data-original-title="'.trans('buttons.general.export').'"></i> </a>';

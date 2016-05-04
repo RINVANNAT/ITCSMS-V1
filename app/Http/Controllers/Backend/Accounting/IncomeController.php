@@ -20,6 +20,7 @@ use App\Models\OutcomeType;
 use App\Models\PayslipClient;
 use App\Models\School;
 use App\Models\SchoolFeeRate;
+use App\Models\Student;
 use App\Models\StudentAnnual;
 use App\Repositories\Backend\Income\IncomeRepositoryContract;
 use Carbon\Carbon;
@@ -72,7 +73,15 @@ class IncomeController extends Controller
         $outcomeTypes = OutcomeType::lists('name','id');
         $accounts = Account::lists('name','id');
 
-        return view('backend.accounting.studentPayment.index',compact('departments','degrees','grades','genders','options','academicYears','outcomeTypes','accounts'));
+        $number = 1;
+        $last_income = Income::orderBy('number','DESC')->first();
+        if($last_income != null){
+            $number = $last_income->number + 1;
+        }
+
+        $number = str_pad($number, 5, "0", STR_PAD_LEFT);
+
+        return view('backend.accounting.studentPayment.index',compact('departments','degrees','grades','genders','options','academicYears','outcomeTypes','accounts','number'));
     }
 
     public function candidate_payment()
@@ -293,12 +302,12 @@ class IncomeController extends Controller
 
     public function payslip_history($payslip_client_id){
         $incomes = Income:: select([
-            'id','amount_dollar','amount_riel','number','created_at',DB::raw("'income' as name")
+            'id','amount_dollar','amount_riel','number','created_at',DB::raw("'income' as name"),'is_refund'
         ])
             ->where('payslip_client_id',$payslip_client_id);
 
         $payslips = Outcome:: select([
-            'id','amount_dollar','amount_riel','number','created_at',DB::raw("'outcome' as name")
+            'id','amount_dollar','amount_riel','number','created_at',DB::raw("'outcome' as name"), DB::raw("'false' as is_refund"),
         ])
             ->where('payslip_client_id',$payslip_client_id)
             ->unionAll($incomes);
@@ -334,7 +343,7 @@ class IncomeController extends Controller
                 if($payslip->name == "income"){
                     $action = '<a href="'.route('admin.accounting.income.print',$payslip->id).'" target="_blank"><i class="fa fa-print" data-toggle="tooltip" data-placement="top" title="" data-original-title="'.trans('buttons.general.print').'"></i> </a>';
                     if($payslip->is_refund != true){
-                        $action = $action.' <button class="btn btn-xs btn-danger btn-refund" data-remote="'.route('admin.accounting.income.refund', $payslip->id) .'"><i class="fa fa-times" data-toggle="tooltip" data-placement="top" title="' . trans('buttons.general.crud.delete') . '"></i></button>';
+                        $action = $action.' <a href="#" class="btn-refund" data-remote="'.route('admin.accounting.income.refund', $payslip->id) .'"> <i class="fa fa-reply" data-toggle="tooltip" data-placement="top" title="' . "Refund" . '"></i></a>';
                     }
                     return  $action;
                 } else {
@@ -344,9 +353,9 @@ class IncomeController extends Controller
             })
             ->setRowClass(function ($payslip) {
                 //print_r($payslip->is_refund);
-                //if($payslip->is_refund == true){
+                if($payslip->is_refund == true){
                     return "refund_".$payslip->is_refund;
-                //}
+                }
             })
             ->make(true);
     }
@@ -368,7 +377,14 @@ class IncomeController extends Controller
     {
         $accounts = Account::lists('name','id')->toArray();
         $incomeTypes = IncomeType::lists('name','id')->toArray();
-        return view('backend.accounting.income.create',compact('accounts','incomeTypes'));
+        $number = 1;
+        $last_income = Income::orderBy('number','DESC')->first();
+        if($last_income != null){
+            $number = $last_income->number + 1;
+        }
+
+        $number = str_pad($number, 5, "0", STR_PAD_LEFT);
+        return view('backend.accounting.income.create',compact('accounts','incomeTypes','number'));
     }
 
     /**
@@ -734,6 +750,135 @@ class IncomeController extends Controller
             });
 
         })->export('xls');
+    }
+
+    public function request_import(CreateIncomeRequest $request){
+
+        return view('backend.accounting.income.import');
+
+    }
+
+    public function import_done(CreateIncomeRequest $request){
+
+        return view('backend.accounting.income.import_done');
+
+    }
+
+    public function import(CreateIncomeRequest $request){
+
+        $errors = array();
+
+        $now = Carbon::now()->format('Y_m_d_H');
+
+        // try to move uploaded file to a temporary location
+        if($request->file('import')!= null){
+            $import = $now. '.' .$request->file('import')->getClientOriginalExtension();
+
+            $request->file('import')->move(
+                base_path() . '/public/assets/uploaded_file/temp/', $import
+            );
+
+            $storage_path = base_path() . '/public/assets/uploaded_file/temp/'.$import;
+
+            DB::beginTransaction();
+
+            try{
+                Excel::filter('chunk')->load($storage_path)->chunk(1000, function($results) use ($errors){
+
+                    // Loop through all rows
+                    $results->each(function($row) use($errors) {
+                        $income_data = $row->toArray();
+
+                        $student = Student::where('id_card',$income_data['id_card'])
+                            ->where('studentAnnuals.academic_year_id',$income_data['academic_year_id'])
+                            ->join('studentAnnuals','students.id','=','studentAnnuals.student_id')->first();
+
+                        if($student != null){ // Student with given id is found
+                            $this->registerIncome($student,$income_data['pay_1_no'],$income_data['pay_1']);
+                            $this->registerIncome($student,$income_data['pay_2_no'],$income_data['pay_2']);
+                            $this->registerIncome($student,$income_data['pay_3_no'],$income_data['pay_3']);
+                            $this->registerIncome($student,$income_data['sport_no'],$income_data['sport']);
+                        } else {
+                            array_push($errors,$income_data);
+                        }
+                    });
+                });
+
+            } catch(Exception $e){
+                DB::rollback();
+            }
+            DB::commit();
+
+            /*UserLog
+            UserLog::log([
+                'model' => 'StudentBac2',
+                'action'   => 'Import',
+                'data'     => 'none', // if it is create action, store only the new id.
+                'developer'   => Auth::id() == 1?true:false
+            ]); */
+
+            return redirect(route('admin.accounting.income.import_done'));
+        }
+    }
+
+    public function registerIncome($studentAnnual_data, $number, $payment){
+
+        //dd($studentAnnual_data);
+
+        $number = str_replace(' ', '', $number);
+        $payment = str_replace(' ', '', $payment);
+
+        if(is_numeric($number) && is_numeric($payment)){  // both value can be converted to integer, so it is valid
+            // Convert both of them to integer
+            $number = intval($number);
+            $payment = intval($payment);
+
+            $income = new Income();
+
+            $income->created_at = Carbon::now();
+            $income->create_uid = auth()->id();
+            $income->number = $number;
+
+            if($payment < 10000){ // We consider 10000 is maximum to $ and it is sport fee, it is not good but for now ,.... yes
+                $income->amount_dollar = $payment;
+            } else {
+                $income->amount_riel = $payment;
+            }
+
+            $income->sequence = Income::where('payslip_client_id',$studentAnnual_data->payslip_client_id)->count()+1; // Sequence of student payment
+            $income->pay_date = Carbon::now();
+
+            //dd($studentAnnual_data->degree_id);
+            if($studentAnnual_data->degree_id== config('access.degrees.degree_engineer') || $studentAnnual_data->degree_id== config('access.degrees.degree_associate')){
+                $income->income_type_id = config('access.income_type.income_type_student_day');
+                $income->account_id = config('access.account.account_day_student');
+            } else if($studentAnnual_data->degree_id== config('access.degrees.degree_bachelor')){
+                $income->income_type_id = config('access.income_type.income_type_student_night');
+                $income->account_id=config('access.account.account_night_student');
+            } else if($studentAnnual_data->degree_id== config('access.degrees.degree_master')){
+                $income->income_type_id = config('access.income_type.income_type_student_master');
+                $income->account_id=config('access.account.account_master_student');
+            }
+
+            if($studentAnnual_data->payslip_client_id == "" || $studentAnnual_data->payslip_client_id == null){
+                // Create client id for every student annual
+                $payslip_client = new PayslipClient();
+                $payslip_client->type = "Student";
+                $payslip_client->create_uid =auth()->id();
+                $payslip_client->save();
+
+                $income->payslip_client_id = $payslip_client->id;
+            } else {
+                $income->payslip_client_id = $studentAnnual_data->payslip_client_id;
+            }
+
+            $income->save();
+
+            return true;
+        }
+
+        return false;  // Everything is fail, return fail
+
     }
 
 }

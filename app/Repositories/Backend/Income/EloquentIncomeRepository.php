@@ -12,6 +12,7 @@ use App\Models\Outcome;
 use App\Models\PayslipClient;
 use App\Models\SchoolFeeRate;
 use App\Models\StudentAnnual;
+use App\Models\UserLog;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Input;
@@ -79,6 +80,12 @@ class EloquentIncomeRepository implements IncomeRepositoryContract
 
             if($payslip_client->save()){
 
+                UserLog::log([
+                    'model' => 'PayslipClient',
+                    'action'=> 'Create',
+                    'data'  => $payslip_client->id, // if it is create action, store only the new id.
+                ]);
+
                 if ($input['client_type'] == "Staff"){// Update employee with this new payslip_client
                     $employee = Employee::find($input['client_id']);
                     $employee->write_uid = auth()->id();
@@ -122,15 +129,18 @@ class EloquentIncomeRepository implements IncomeRepositoryContract
 
         $income->amount_kh = $input['amount_kh'];
 
-        $last_income = Income::orderBy('number','desc')->first();
-
-        if($last_income != null) {
-            $next_number = (int)substr($last_income->number, 5)+1;
+        if(isset($input['number']) && $input['number'] != ""){
+            $income->number = intval($input['number']);
         } else {
-            $next_number = 1;
+            // number is not passed along, so we find it again
+            $last_income = Income::orderBy('number','DESC')->first();
+            if($last_income == null){
+                $income->number = 1;
+            } else {
+                $income->number = $last_income->number + 1;
+            }
         }
 
-        $income->number = $next_number;
         $income->pay_date = Carbon::now();
         $income->create_uid =auth()->id();
         $income->created_at = Carbon::now();
@@ -140,12 +150,18 @@ class EloquentIncomeRepository implements IncomeRepositoryContract
         $income->income_type_id = $input['income_type_id'];
 
         if($income->save()){
+            UserLog::log([
+                'model' => 'Income',
+                'action'=> 'Create',
+                'data'  => $income->id, // if it is create action, store only the new id.
+            ]);
         } else {
             $query_ok = false;
         }
 
         if($query_ok){
             DB::commit();
+
             return true;
         } else {
             DB::rollback();
@@ -165,7 +181,20 @@ class EloquentIncomeRepository implements IncomeRepositoryContract
 
         $income->created_at = Carbon::now();
         $income->create_uid = auth()->id();
-        $income->number = Income::count() + 1;
+
+
+        if(isset($input['number']) && $input['number'] != ""){
+            $income->number = intval($input['number']);
+        } else {
+            // number is not passed along, so we find it again
+            $last_income = Income::orderBy('number','DESC')->first();
+            if($last_income == null){
+                $income->number = 1;
+            } else {
+                $income->number = $last_income->number + 1;
+            }
+        }
+
         if(isset($input['amount_dollar'])){
             $income->amount_dollar = $input['amount_dollar']==""?null:$input['amount_dollar'];
         }
@@ -181,6 +210,13 @@ class EloquentIncomeRepository implements IncomeRepositoryContract
             $payslip_client->type = Input::get('type');
             $payslip_client->create_uid =auth()->id();
             if($payslip_client->save()){ // New client id is created, so link to user
+
+                UserLog::log([
+                    'model' => 'PayslipClient',
+                    'action'=> 'Create',
+                    'data'  => $payslip_client->id, // if it is create action, store only the new id.
+                ]);
+
                 $client_id = $payslip_client->id;
                 if($input['candidate_id']!=""){
                     $candidate = Candidate::find($input['candidate_id']);
@@ -231,6 +267,12 @@ class EloquentIncomeRepository implements IncomeRepositoryContract
 
 
             if($income->save()){
+                UserLog::log([
+                    'model' => 'Income',
+                    'action'=> 'Create',
+                    'data'  => $income->id, // if it is create action, store only the new id.
+                ]);
+
                 $query_ok = true;
             } else {
                 $query_ok = false;
@@ -312,6 +354,7 @@ class EloquentIncomeRepository implements IncomeRepositoryContract
 
         if($query_ok){
             DB::commit();
+
             return route('admin.accounting.payslipHistory.data',$client_id);
         } else {
             DB::rollback();
@@ -342,6 +385,11 @@ class EloquentIncomeRepository implements IncomeRepositoryContract
         $model = $this->findOrThrowException($id);
 
         if ($model->delete()) {
+            UserLog::log([
+                'model' => 'Income',
+                'action'=> 'Delete',
+                'data'  => $model->toJson(), // if it is create action, store only the new id.
+            ]);
             return true;
         }
 
@@ -356,6 +404,13 @@ class EloquentIncomeRepository implements IncomeRepositoryContract
         $model->write_uid = auth()->id();
 
         if($model->save()){
+
+            UserLog::log([
+                'model' => 'Income',
+                'action'=> 'Refund',
+                'data'  => $id, // if it is create action, store only the new id.
+            ]);
+
             return true;
         }
 

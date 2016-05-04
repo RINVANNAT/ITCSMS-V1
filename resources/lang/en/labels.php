@@ -587,6 +587,7 @@ return [
             'sub_edit_title' => 'Edit income information',
             'sub_create_title' => 'Create new income',
             'sub_detail_title' => 'Detail of an income',
+            'sub_import_title' => 'Import incomes',
             'fields' => [
                 'amount_dollar' => "Amount Dollar",
                 'amount_riel' => "Amount Riel",

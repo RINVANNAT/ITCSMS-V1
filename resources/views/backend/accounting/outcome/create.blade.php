@@ -138,6 +138,11 @@
         });
         $('.current_date').html(getKhmerCurrentDate());
 
+        /*$('#outcome_type').select2({
+            placeholder: "Select a state",
+            allowClear: true
+        })*/
+
 
         var client_search_box = $(".select_client").select2({
             placeholder: 'Enter name ...',

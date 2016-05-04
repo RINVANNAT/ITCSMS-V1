@@ -12,6 +12,7 @@ use App\Models\Employee;
 use App\Models\Outcome;
 use App\Models\PayslipClient;
 use App\Models\StudentAnnual;
+use App\Models\UserLog;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
 
@@ -81,6 +82,12 @@ class EloquentOutcomeRepository implements OutcomeRepositoryContract
 
             if($payslip_client->save()){
 
+                UserLog::log([
+                    'model' => 'PayslipClient',
+                    'action'=> 'Create',
+                    'data'  => $payslip_client->id, // if it is create action, store only the new id.
+                ]);
+
                 if ($input['client_type'] == "Staff"){// Update employee with this new payslip_client
                     $employee = Employee::find($input['client_id']);
                     $employee->write_uid = auth()->id();
@@ -122,18 +129,21 @@ class EloquentOutcomeRepository implements OutcomeRepositoryContract
 
         $outcome->amount_kh = $input['amount_kh'];
 
-        $last_outcome = Outcome::orderBy('number','desc')->first();
-
-        if($last_outcome != null) {
-            $next_number = $last_outcome->number+1;
+        if(isset($input['number']) && $input['number'] != ""){
+            $outcome->number = intval($input['number']);
         } else {
-            $next_number = 1;
+            // number is not passed along, so we find it again
+            $last_outcome = Outcome::orderBy('number','DESC')->first();
+            if($last_outcome == null){
+                $outcome->number = 1;
+            } else {
+                $outcome->number = $last_outcome->number + 1;
+            }
         }
 
         if($client_id == null){
             $client_id = $input['payslip_client_id'];
         }
-        $outcome->number = $next_number;
         $outcome->pay_date = Carbon::now();
         $outcome->create_uid =auth()->id();
         $outcome->created_at = Carbon::now();
@@ -147,11 +157,17 @@ class EloquentOutcomeRepository implements OutcomeRepositoryContract
         $outcome->attachment_name = $input['attachment_title']==""?null:$input['attachment_title'];
 
         if($outcome->save()){
+            UserLog::log([
+                'model' => 'Outcome',
+                'action'=> 'Create',
+                'data'  => $outcome->id, // if it is create action, store only the new id.
+            ]);
+
             if($request->file('import')[0] != null){ // It can have multiple files
                 $count = 1;
                 foreach($request->file('import') as $file){
                     // Change file name
-                    $imageName = "outcome_".$next_number .'_'.$count. '_' .$file->getClientOriginalName();
+                    $imageName = "outcome_".$outcome->number .'_'.$count. '_' .$file->getClientOriginalName();
                     // Move file
                     $file->move(
                         base_path() . '/public/img/attachments/', $imageName
@@ -166,6 +182,12 @@ class EloquentOutcomeRepository implements OutcomeRepositoryContract
 
                     if(!$attachment->save()){
                         $query_ok = false;
+                    } else {
+                        UserLog::log([
+                            'model' => 'Attachment',
+                            'action'=> 'Create',
+                            'data'  => $attachment->id, // if it is create action, store only the new id.
+                        ]);
                     }
 
                     $count++;
@@ -195,6 +217,8 @@ class EloquentOutcomeRepository implements OutcomeRepositoryContract
     {
         $outcome = $this->findOrThrowException($id);
 
+        $old_record = $outcome->toJson();
+
         $outcome->name = $input['name'];
         $outcome->description = $input['description'];
         $outcome->active = isset($input['active'])?true:false;
@@ -202,6 +226,11 @@ class EloquentOutcomeRepository implements OutcomeRepositoryContract
         $outcome->write_uid = auth()->id();
 
         if ($outcome->save()) {
+            UserLog::log([
+                'model' => 'Outcome',
+                'action'=> 'Update',
+                'data'  => $old_record, // if it is create action, store only the new id.
+            ]);
             return true;
         }
 
@@ -219,6 +248,11 @@ class EloquentOutcomeRepository implements OutcomeRepositoryContract
         $model = $this->findOrThrowException($id);
 
         if ($model->delete()) {
+            UserLog::log([
+                'model' => 'Outcome',
+                'action'=> 'Delete',
+                'data'  => $model->toJson(), // if it is create action, store only the new id.
+            ]);
             return true;
         }
 

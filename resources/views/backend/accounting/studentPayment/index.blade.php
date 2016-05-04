@@ -65,7 +65,7 @@
             background-color: #00a65a; !important;
         }
 
-        .refund_true {
+        .refund_1 {
             background-color: #9FAFD1;
         }
     </style>

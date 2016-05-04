@@ -29,6 +29,11 @@
                     <button class="btn btn-primary btn-sm"><i class="fa fa-plus-circle"></i> Add
                     </button>
                 </a>
+
+                <a href="{!! route('admin.accounting.income.request_import') !!}" class="import">
+                    <button class="btn btn-primary btn-sm"><i class="fa fa-plus-circle"></i> Import
+                    </button>
+                </a>
                 <!-- /.btn-group -->
                 <button class="btn btn-default btn-sm"><i class="fa fa-refresh"></i></button>
 
@@ -168,6 +173,13 @@
                         "?date_range="+$('#filter_date_range').val()+
                         '&account='+ $('#filter_account').val()+
                         '&income_type=' + $('#filter_incomeType').val();
+            });
+
+            $(document).on('click', '.import', function (e) {
+                e.preventDefault();
+                var url = '{{route("admin.accounting.income.request_import")}}'
+
+                PopupCenterDual(url,'Export student data','1200','960');
             });
         });
     </script>
