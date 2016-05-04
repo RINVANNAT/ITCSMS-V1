@@ -21,7 +21,49 @@ if (typeof SMSFILER !== 'object') {
             },
             template_filter : ""
         };
+    SMSFILER.beforeDraw  = function(){
+        // move some field in before display it.
+        console.log("in the group selectore");
+        console.log(SMSFILER.model.fillers);
+        $.each(SMSFILER.model.fillers, function(key,filllter){
+            if ( SMSFILER.model.fillers[key]["filltername"] == "Departments"){
+                //SMSFILER.model.fillers[key]["filltername"]
+
+               keyOptionToRemove = [];
+                optionToKeep = [];
+                $.each( SMSFILER.model.fillers[key]["options"] , function(key2,filllter2){
+
+                    codeName = filllter2["code"];
+                    console.log(codeName);
+                    if ( (codeName == "Study Office") || (codeName == "Finance") || (codeName =="Academic" )){
+                        keyOptionToRemove.push(key2);
+                    }else{
+                        optionToKeep.push(filllter2);
+                    }
+
+                });
+                SMSFILER.model.fillers[key]["options"] = optionToKeep;
+
+                console.log("this is keys to remove");
+                console.log(keyOptionToRemove);
+
+                //$.each( keyOptionToRemove, function(value){
+                //    $.each( SMSFILER.model.fillers[key]["options"], function(value){
+                //
+                //
+                //        SMSFILER.model.fillers[key]["options"].splice(value, 1);
+                //    });
+                //});
+
+
+            }
+
+
+        });
+
+    };
     SMSFILER.view.draw = function(){
+        SMSFILER.beforeDraw();
         var template2 = MYTEMPLATE["fillter"]["option2"];
         var fillterhtml = Mustache.to_html(template2, {fillters:SMSFILER.model.fillers});
         $('#groupselectorcontainer').html(fillterhtml);
@@ -41,12 +83,11 @@ if (typeof SMSFILER !== 'object') {
         }
         return result;
     };
+
     SMSFILER.getFillterData = function (){
         var ajaxdone = [];
         $.each(SMSFILER.model.fillterModelUrl, function(key,url){
-
             var request = $.get(url, function( data ) {
-
                 var sURLVariables = url.split('/');
                 var filltername = sURLVariables[sURLVariables.length-1];
                 filltername = filltername.charAt(0).toUpperCase() + filltername.slice(1);
@@ -82,7 +123,6 @@ if (typeof SMSFILER !== 'object') {
     };
 
     SMSFILER.handlerShowHideFillter = function(){
-
         $(document).on("click","#hideselectgroup", function(){
             var self = $(this);
             if(SMSFILER.fillterShowHide) {

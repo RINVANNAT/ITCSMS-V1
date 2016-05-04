@@ -39,7 +39,7 @@
                             <button class="btn btn-default btn-sm"><i class="fa fa-reply"></i></button>
                             <button class="btn btn-default btn-sm"><i class="fa fa-share"></i></button>
                             <button id="autoeval" class="btn btn-default btn-sm"> Generate AutoEvaluation </button>
-                            <button id="testshort" class="btn btn-default btn-sm">testshort</button>
+
                         </div>
                         <div class="pull-right">
                             <div class="input-group" style="width: 150px;">

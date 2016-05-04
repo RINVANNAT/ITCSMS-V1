@@ -103,15 +103,15 @@
         });
     });
 
-    $(document).on("click","#testshort", function(e){
-        //courseAnnules.splice(1, 1);
-
-        studentAnnuals.sort(function(a, b){
-            if(a.name_kh < b.name_kh) return -1;
-            if(a.name_kh > b.name_kh) return 1;
-            return 0;
-        })
-    });
+//    $(document).on("click","#testshort", function(e){
+//        //courseAnnules.splice(1, 1);
+//
+//        studentAnnuals.sort(function(a, b){
+//            if(a.name_kh < b.name_kh) return -1;
+//            if(a.name_kh > b.name_kh) return 1;
+//            return 0;
+//        })
+//    });
 
 
     $(document).on("click","#student_name", function(e){
