@@ -1,10 +1,8 @@
-<?php
-
-namespace App\Repositories\Backend\CourseProgram;
+<?php  namespace App\Repositories\Backend\CourseProgram;
 
 
 use App\Exceptions\GeneralException;
-use App\Models\CourseProgram;
+use App\Models\Course;
 use Carbon\Carbon;
 
 /**
@@ -20,8 +18,8 @@ class EloquentCourseProgramRepository implements CourseProgramRepositoryContract
      */
     public function findOrThrowException($id)
     {
-        if (! is_null(CourseProgram::find($id))) {
-            return CourseProgram::find($id);
+        if (! is_null(Course::find($id))) {
+            return Course::find($id);
         }
 
         throw new GeneralException(trans('exceptions.backend.general.not_found'));
@@ -35,7 +33,7 @@ class EloquentCourseProgramRepository implements CourseProgramRepositoryContract
      */
     public function getCourseProgramsPaginated($per_page, $order_by = 'sort', $sort = 'asc')
     {
-        return CourseProgram::orderBy($order_by, $sort)
+        return Course::orderBy($order_by, $sort)
             ->paginate($per_page);
     }
 
@@ -46,7 +44,7 @@ class EloquentCourseProgramRepository implements CourseProgramRepositoryContract
      */
     public function getAllCoursePrograms($order_by = 'sort', $sort = 'asc')
     {
-        return CourseProgram::orderBy($order_by, $sort)
+        return Course::orderBy($order_by, $sort)
             ->get();
     }
 
@@ -57,22 +55,20 @@ class EloquentCourseProgramRepository implements CourseProgramRepositoryContract
      */
     public function create($input)
     {
-        if (CourseProgram::where('name', $input['name'])->first()) {
-            throw new GeneralException(trans('exceptions.backend.general.already_exists'));
-        }
 
-        $courseProgram = new CourseProgram();
+        $courseProgram = new Course();
 
-        $courseProgram->name = $input['name'];
-        $courseProgram->description = $input['description'];
-        $courseProgram->active = isset($input['active'])?true:false;
-        $courseProgram->created_at = Carbon::now();
+        $courseProgram->name_kh = $input['name_kh'];
+        $courseProgram->name_en = $input['name_en'];
+        $courseProgram->name_fr = $input['name_fr'];
+
+        $courseProgram->time_course = $input['time_course'];
+        $courseProgram->time_tp = $input['time_tp'];
+        $courseProgram->time_td = $input['time_td'];
         $courseProgram->create_uid = auth()->id();
-
         if ($courseProgram->save()) {
             return true;
         }
-
         throw new GeneralException(trans('exceptions.backend.general.create_error'));
     }
 

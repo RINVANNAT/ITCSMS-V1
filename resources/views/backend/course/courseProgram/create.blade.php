@@ -10,7 +10,7 @@
 @endsection
 
 @section('content')
-    {!! Form::open(['route' => 'admin.course.coursePrograms.store', 'class' => 'form-horizontal', 'role' => 'form', 'method' => 'post', 'id' => 'create-role']) !!}
+    {!! Form::open(['route' => 'admin.course.course_program.store', 'class' => 'form-horizontal', 'role' => 'form', 'method' => 'post', 'id' => 'create-role']) !!}
 
         <div class="box box-success">
             <div class="box-header with-border">
@@ -25,7 +25,7 @@
         <div class="box box-success">
             <div class="box-body">
                 <div class="pull-left">
-                    <a href="{!! route('admin.coursePrograms.index') !!}" class="btn btn-danger btn-xs">{{ trans('buttons.general.cancel') }}</a>
+                    <a href="{!! route('admin.course.course_program.index') !!}" class="btn btn-danger btn-xs">{{ trans('buttons.general.cancel') }}</a>
                 </div>
 
                 <div class="pull-right">

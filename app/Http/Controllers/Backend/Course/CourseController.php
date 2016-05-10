@@ -66,8 +66,10 @@ class CourseController extends Controller
      */
     public function store(StoreCourseProgramRequest $request)
     {
+
         $this->coursePrograms->create($request->all());
-        return redirect()->route('admin.course.coursePrograms.index')->withFlashSuccess(trans('alerts.backend.roles.created'));
+
+        return redirect()->route('admin.course.course_program.index')->withFlashSuccess(trans('alerts.backend.roles.created'));
     }
 
     /**

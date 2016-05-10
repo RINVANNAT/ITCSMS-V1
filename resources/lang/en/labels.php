@@ -638,6 +638,7 @@ return [
             'sub_edit_title' => 'Edit course information',
             'sub_create_title' => 'Create new course',
             'sub_detail_title' => 'Detail of an course',
+            'sub_import_title' => 'Import course',
             'fields' => [
                 'name' => "Name",
                 'semester' => 'Semester',
@@ -648,6 +649,7 @@ return [
                 'employee_id' => 'Lecturer'
             ]
         ],
+
          'Absence' => [
                     'title' => 'Student Absence',
                     'sub_index_title' => 'View Student Absence',
@@ -693,6 +695,11 @@ return [
                 'name_fr' => 'Name French',
                 'duration' => 'Duration',
                 'code' => 'Code',
+                'time_tp' => " TP",
+                'time_td' => 'TD',
+                'time_course' => 'Course',
+
+
             ]
         ],
         'scholarships' => [

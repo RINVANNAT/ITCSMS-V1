@@ -14,7 +14,7 @@
 @stop
 
 @section('content')
-    {!! Form::open(['route' => 'admin.course.courseAnnuals.store', 'class' => 'form-horizontal', 'role' => 'form', 'method' => 'post', 'id' => 'create-role']) !!}
+    {!! Form::open(['route' => 'admin.course.course_annual.store', 'class' => 'form-horizontal', 'role' => 'form', 'method' => 'post', 'id' => 'create-role']) !!}
 
         <div class="box box-success">
             <div class="box-header with-border">

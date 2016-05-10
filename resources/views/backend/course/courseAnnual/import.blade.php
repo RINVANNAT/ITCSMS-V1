@@ -1,16 +1,14 @@
 @extends ('backend.layouts.master')
-
-@section ('title', trans('labels.backend.courseAnnuals.title') . ' | ' . trans('labels.backend.courseAnnuals.sub_import_title'))
-
+@section ('title', trans('labels.backend.courseAnnuals.title'))
 @section('page-header')
     <h1>
-        {{ trans('labels.backend.students.title') }}
-        <small>{{ trans('labels.backend.students.sub_import_title') }}</small>
+        {{ trans('labels.backend.courseAnnuals.title') }}
+        <small>{{ trans('labels.backend.courseAnnuals.sub_import_title') }}</small>
     </h1>
 @endsection
 
 @section('after-styles-end')
-    {!! Html::style('css/backend/plugin/jstree/themes/default/style.min.css') !!}
+    {!! Html::style('plugins/datatables/dataTables.bootstrap.css') !!}
 @stop
 
 @section('content')
@@ -18,7 +16,7 @@
     {!! Form::open(['route' => 'admin.course.course_annual.import','id' => 'import_form_student', 'role'=>'form','files' => true])!!}
     <div class="box box-success">
         <div class="box-header with-border">
-            <h3 class="box-title">{{ trans('labels.backend.students.sub_import_title') }}</h3>
+            <h3 class="box-title">{{ trans('labels.backend.courseAnnuals.sub_import_title') }}</h3>
         </div><!-- /.box-header -->
 
         <div class="box-body">
