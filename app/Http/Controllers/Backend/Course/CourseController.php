@@ -16,6 +16,8 @@ use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Maatwebsite\Excel\Facades\Excel;
 use App\Models\Course;
+use Illuminate\Foundation\Validation\ValidatesRequests;
+
 
 
 
@@ -66,9 +68,8 @@ class CourseController extends Controller
      */
     public function store(StoreCourseProgramRequest $request)
     {
-
+        $this->validate($request, Course::$rules);
         $this->coursePrograms->create($request->all());
-
         return redirect()->route('admin.course.course_program.index')->withFlashSuccess(trans('alerts.backend.roles.created'));
     }
 

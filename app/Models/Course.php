@@ -48,9 +48,9 @@ class Course extends Model
 	    "name_kh" => "Required",
 		"name_en" => "Required",
 		"name_fr" => "Required",
-		"time_tp" => "Required",
-		"time_td" => "Required",
-		"time_course" => "Required"
+		"time_tp" => "Required|numeric",
+		"time_td" => "Required|numeric",
+		"time_course" => "Required|numeric"
 	];
 
 }

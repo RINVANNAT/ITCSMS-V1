@@ -10,6 +10,11 @@
 @endsection
 
 @section('content')
+
+
+
+
+
     {!! Form::open(['route' => 'admin.course.course_program.store', 'class' => 'form-horizontal', 'role' => 'form', 'method' => 'post', 'id' => 'create-role']) !!}
 
         <div class="box box-success">
