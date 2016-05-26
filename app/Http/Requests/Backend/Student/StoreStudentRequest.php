@@ -44,7 +44,6 @@ class StoreStudentRequest extends Request
             'parent_address'=>'max:255',
             'gender_id' => 'required',
             'dob'=>'required',
-            'address_current'=>'required',
             'origin_id' =>'required'
         ];
     }

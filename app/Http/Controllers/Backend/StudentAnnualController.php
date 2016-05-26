@@ -196,6 +196,7 @@ class StudentAnnualController extends Controller
     public function data(Request $request)
     {
 
+
         $scholarship_id = Input::get('scholarship_id');
 
         $studentAnnuals = StudentAnnual::select([

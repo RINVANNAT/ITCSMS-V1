@@ -110,9 +110,9 @@
                     <div class="col-lg-10" style="padding-bottom: 10px;">
                         {!! Form::text('email',isset($studentAnnual)?$studentAnnual->student->email:null, array('class'=>'form-control')) !!}
                     </div>
-                    {!! Form::label('name', trans('labels.backend.students.fields.current_address'), ['class' => 'col-lg-2 control-label required']) !!}
+                    {!! Form::label('name', trans('labels.backend.students.fields.current_address'), ['class' => 'col-lg-2 control-label']) !!}
                     <div class="col-lg-10" style="padding-bottom: 10px;">
-                        {!! Form::text('address_current',isset($studentAnnual)?$studentAnnual->student->address_current:null, array('class'=>'form-control','required'=>'required')) !!}
+                        {!! Form::text('address_current',isset($studentAnnual)?$studentAnnual->student->address_current:null, array('class'=>'form-control')) !!}
                     </div>
                     {!! Form::label('name', trans('labels.backend.students.fields.permanent_address'), ['class' => 'col-lg-2 control-label']) !!}
                     <div class="col-lg-10" style="padding-bottom: 10px;">

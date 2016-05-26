@@ -97,10 +97,6 @@ class EloquentStudentAnnualRepository implements StudentAnnualRepositoryContract
         $student->parent_phone = null;
         $student->active = true;
         $student->pob = $candidate->pob;
-        $student->redouble_id = null;
-        $student->redouble_id = null;
-
-
         $student->gender_id = $candidate->gender_id;
 
         $student->high_school_id = null;
@@ -228,10 +224,10 @@ class EloquentStudentAnnualRepository implements StudentAnnualRepositoryContract
         $student->parent_phone = $input['parent_phone'];
         $student->active = isset($input['active'])?true:false;
         $student->pob = $input['pob'];
-        $student->redouble_id = null;
+
         if(isset($input['redouble_id'])){
             if($input['redouble_id']!= ""){
-                $student->redouble_id = $input['redouble_id'];
+                $student->redoubles()->attach($input['redouble_id']);
             }
         }
 
@@ -309,8 +305,7 @@ class EloquentStudentAnnualRepository implements StudentAnnualRepositoryContract
         $last_academic_year = AcademicYear::orderBy('id','desc')->first();
 
         // First create general information in table students first
-        $student = Student::find($studentAnnual->id);
-
+        $student = Student::find($studentAnnual->student_id);
 
         /* ------------------ work with photo ----------------*/
 
@@ -347,10 +342,10 @@ class EloquentStudentAnnualRepository implements StudentAnnualRepositoryContract
         $student->parent_phone = $input['parent_phone'];
         $student->active = isset($input['active'])?true:false;
         $student->pob = $input['pob'];
-        $student->redouble_id = null;
+
         if(isset($input['redouble_id'])){
             if($input['redouble_id']!= ""){
-                $student->redouble_id = $input['redouble_id'];
+                $student->redoubles()->attach($input['redouble_id']);
             }
         }
 
