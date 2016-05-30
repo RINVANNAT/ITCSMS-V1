@@ -53,6 +53,7 @@
     {!! Html::script('plugins/datatables/dataTables.bootstrap.min.js') !!}
     <script>
         $(document).ready(function(){
+            var custom_student_window = null;
             var oTable = $('#students-table').DataTable({
                 dom: 'l<"toolbar">frtip',
                 processing: true,
@@ -125,16 +126,16 @@
             viewPopUpStudent($('#students-table'));
 
             /*$('#export_student_list').click(function(e){
-                e.preventDefault();
-                window.location = '{{route("admin.student.export")}}'+
-                        "?academic_year="+$('#filter_academic_year').val()+
-                        '&degree='+ $('#filter_degree').val()+
-                        '&grade=' + $('#filter_grade').val()+
-                        '&department=' + $('#filter_department').val()+
-                        '&gender='+$('#filter_gender').val()+
-                        '&option='+$('#filter_option').val()+
-                        '&origin='+$('#filter_origin').val();
-            });*/
+             e.preventDefault();
+             window.location = '{{route("admin.student.export")}}'+
+             "?academic_year="+$('#filter_academic_year').val()+
+             '&degree='+ $('#filter_degree').val()+
+             '&grade=' + $('#filter_grade').val()+
+             '&department=' + $('#filter_department').val()+
+             '&gender='+$('#filter_gender').val()+
+             '&option='+$('#filter_option').val()+
+             '&origin='+$('#filter_origin').val();
+             });*/
 
             $(document).on('click', '#export_student_list', function (e) {
                 e.preventDefault();
@@ -150,6 +151,27 @@
                 PopupCenterDual(url,'Export student data','1200','960');
             });
 
+            $(document).on('click', '#export_student_list_custom', function (e) {
+                e.preventDefault();
+                var url = '{{route("admin.student.request_export_custom")}}';
+
+                custom_student_window = PopupCenterDual(url,'Export student data','1200','960');
+
+            });
+
+            $('#students-table').on('click', '.btn-export[data-remote]', function (e) {
+                var data = $(this).data('remote');
+                custom_student_window.addRow(data);
+            });
+
+            window.onbeforeunload = function(event)
+            {
+                if(custom_student_window!= null){
+                    custom_student_window.close();
+                }
+            };
+
         });
     </script>
 @stop
+

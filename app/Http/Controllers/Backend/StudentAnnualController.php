@@ -223,9 +223,27 @@ class StudentAnnualController extends Controller
                 //return  '<a href="'.route('admin.candidate.popup_create').'?exam_id='.$scholarship_id.'&studentBac2_id='.$studentBac2->id.'" class="btn btn-xs btn-primary"><i class="fa fa-mail-forward" data-toggle="tooltip" data-placement="top" title="" data-original-title="'.trans('buttons.general.export').'"></i> </a>';
             })
             ->addColumn('action', function ($studentAnnual) {
+                $date = Carbon::createFromFormat("Y-m-d h:i:s",$studentAnnual->dob);
+
+                $data = array();
+                $object = new \stdClass();
+                $object->id = $studentAnnual->id;
+                $object->id_card = $studentAnnual->id_card;
+                $object->name_kh = $studentAnnual->name_kh;
+                $object->name_latin = $studentAnnual->name_latin;
+                $object->dob = $date->toFormattedDateString();
+                $object->gender = $studentAnnual->gender;
+                $object->class = $studentAnnual->class;
+                $object->option = $studentAnnual->option;
+
+                $data[] = $object;
+
                 return '<a href="' . route('admin.studentAnnuals.edit', $studentAnnual->id) . '" class="btn btn-xs btn-primary"><i class="glyphicon glyphicon-edit" data-toggle="tooltip" data-placement="top" title="' . trans('buttons.general.crud.edit') . '"></i></a>' .
-                ' <button class="btn btn-xs btn-danger btn-delete" data-remote="' . route('admin.studentAnnuals.destroy', $studentAnnual->id) . '"><i class="fa fa-times" data-toggle="tooltip" data-placement="top" title="' . trans('buttons.general.crud.delete') . '"></i></button>' .
-                ' <button class="btn btn-xs btn-info btn-show" data-remote="' . route('admin.studentAnnuals.show', $studentAnnual->id) . '"><i class="fa fa-eye" data-toggle="tooltip" data-placement="top" title="' . trans('buttons.general.view') . '"></i></button>' ;
+                //' <button class="btn btn-xs btn-danger btn-delete" data-remote="' . route('admin.studentAnnuals.destroy', $studentAnnual->id) . '"><i class="fa fa-times" data-toggle="tooltip" data-placement="top" title="' . trans('buttons.general.crud.delete') . '"></i></button>' .
+                ' <button class="btn btn-xs btn-info btn-show" data-remote="' . route('admin.studentAnnuals.show', $studentAnnual->id) . '"><i class="fa fa-eye" data-toggle="tooltip" data-placement="top" title="' . trans('buttons.general.view') . '"></i></button>' .
+                " <button class='btn btn-xs btn-export' data-remote='" .
+                  json_encode($data)  .
+                "'><i class='fa fa-external-link-square' data-toggle='tooltip' data-placement='top' title='" . 'export' . "'></i></button>" ;
             });
 
         // additional search
@@ -870,6 +888,10 @@ class StudentAnnualController extends Controller
         //$columns = Schema::getColumnListing('students'); // users table
         //dd($columns); // dump the result and die
         return view('backend.studentAnnual.popup_export',compact('scholarship_id','departments','degrees','grades','genders','options','academicYears','origins'));
+    }
+
+    public function request_export_list_custom(){
+        return view('backend.studentAnnual.popup_export_custom');
     }
 
     public function export_list(){

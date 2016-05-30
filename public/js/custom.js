@@ -13,6 +13,8 @@ function PopupCenterDual(url, title, w, h) {
     if (window.focus) {
         newWindow.focus();
     }
+
+    return newWindow;
 }
 
 function refundStudent(datatable){

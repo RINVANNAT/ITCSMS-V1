@@ -166,7 +166,7 @@ class EloquentUserRepository implements UserContract
         $user = $this->findOrThrowException($id);
 
         //Passwords are hashed on the model
-        $user->password = $input['password'];
+        $user->password = bcrypt($input['password']);
         if ($user->save()) {
             return true;
         }

@@ -9,6 +9,7 @@
 
         Route::get('student/export', 'StudentAnnualController@export_list')->name('admin.student.export');
         Route::get('student/request-export', 'StudentAnnualController@request_export_list')->name('admin.student.request_export');
+        Route::get('student/request-export-custom', 'StudentAnnualController@request_export_list_custom')->name('admin.student.request_export_custom');
 
         Route::get('student/{id}/reporting', 'StudentAnnualController@reporting')->name('admin.student.reporting');
 

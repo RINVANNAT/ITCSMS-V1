@@ -18,7 +18,8 @@
                 Export data <span class="caret"></span>
             </button>
             <ul class="dropdown-menu" role="menu">
-                <li><a href="#" id="export_student_list">Export student list</a></li>
+                <li><a href="#" id="export_student_list">Export current student list</a></li>
+                <li><a href="#" id="export_student_list_custom">Export custom student list</a></li>
 
             </ul>
         </div><!--btn group-->
