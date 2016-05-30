@@ -19,7 +19,7 @@
         <div class="box-header with-border">
             <h3 class="box-title">Selected student to export:</h3>
             <div class="pull-right">
-                <button class="btn btn-sm" id="addRow">Export</button>
+                <button class="btn btn-sm" id="btn-export">Export</button>
             </div>
         </div><!-- /.box-header -->
 
@@ -65,6 +65,13 @@
             oTable.rows.add(
                 data
             ).draw();
+        }
+
+        $('#btn-export').on('click',function(){
+        });
+        window.onbeforeunload = function(){
+            console.log('close window');
+            window.opener.hideCustomExport();
         }
 
     </script>

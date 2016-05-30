@@ -52,6 +52,10 @@
     {!! Html::script('plugins/datatables/jquery.dataTables.min.js') !!}
     {!! Html::script('plugins/datatables/dataTables.bootstrap.min.js') !!}
     <script>
+        function hideCustomExport(){
+            $('.btn-export').hide();
+        }
+
         $(document).ready(function(){
             var custom_student_window = null;
             var oTable = $('#students-table').DataTable({
@@ -153,6 +157,7 @@
 
             $(document).on('click', '#export_student_list_custom', function (e) {
                 e.preventDefault();
+                $('.btn-export').show();
                 var url = '{{route("admin.student.request_export_custom")}}';
 
                 custom_student_window = PopupCenterDual(url,'Export student data','1200','960');
