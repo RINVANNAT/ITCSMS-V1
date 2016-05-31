@@ -45,5 +45,6 @@ return [
     'is_paid'=>"Is Paid",
     'is_suspend'=>"Is Suspend",
     'to_pay'=>"To Pay",
-    'to_pay_currency'=>"To Pay Currency"
+    'to_pay_currency'=>"To Pay Currency",
+    'class' => "Class"
 ];

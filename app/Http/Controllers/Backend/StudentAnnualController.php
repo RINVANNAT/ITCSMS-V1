@@ -884,21 +884,34 @@ class StudentAnnualController extends Controller
         return view($view,compact('id','degrees','academicYears','departments'));
     }
 
-    public function request_export_list(){
-        //$columns = Schema::getColumnListing('students'); // users table
-        //dd($columns); // dump the result and die
-        return view('backend.studentAnnual.popup_export',compact('scholarship_id','departments','degrees','grades','genders','options','academicYears','origins'));
+    public function request_export_fields(){
+        // In case it is passed directly from current list
+        $academic_year = isset($_GET['academic_year'])?$_GET['academic_year']:null;
+        $degree = isset($_GET['degree'])?$_GET['degree']:null;
+        $grade = isset($_GET['grade'])?$_GET['grade']:null;
+        $department = isset($_GET['department'])?$_GET['department']:null;
+        $gender = isset($_GET['gender'])?$_GET['gender']:null;
+        $option = isset($_GET['option'])?$_GET['option']:null;
+        $origin = isset($_GET['origin'])?$_GET['origin']:null;
+        // else, from custom list
+
+        $student_ids = isset($_GET['student_ids'])?$_GET['student_ids']:null;
+
+        return view('backend.studentAnnual.popup_export',compact('academic_year','department','degree','grade','gender','option','origin','student_ids'));
     }
 
     public function request_export_list_custom(){
         return view('backend.studentAnnual.popup_export_custom');
     }
 
-    public function export_list(){
+    public function export(){
 
         $studentAnnuals = StudentAnnual::select([
-            'studentAnnuals.id','students.id_card','students.name_kh','students.name_latin', 'students.dob as dob','genders.code as gender',
-            'origins.name_kh as origin_name_kh',
+            'studentAnnuals.id','students.id_card','students.name_kh','students.name_latin', 'students.dob as dob','genders.code as gender_id',
+            'origins.name_kh as origin_id', 'pob.name_kh as pob', 'studentAnnuals.group', 'studentAnnuals.promotion_id',
+            'studentAnnuals.academic_year_id', 'histories.name_kh as history_id', 'departmentOptions.code as department_option_id', 'students.radie', 'students.observation',
+            'students.mcs_no','students.can_id','highSchools.name_en as high_school_id', 'students.photo','students.phone','students.email', 'students.admission_date',
+            'students.address','students.address_current','students.parent_name','students.parent_occupation','students.parent_address','students.parent_phone',
             DB::raw("CONCAT(degrees.code,grades.code,departments.code) as class"),
             'departmentOptions.code as option'
         ])
@@ -908,57 +921,161 @@ class StudentAnnualController extends Controller
             ->leftJoin('departmentOptions', 'studentAnnuals.department_option_id', '=', 'departmentOptions.id')
             ->leftJoin('departments', 'studentAnnuals.department_id', '=', 'departments.id')
             ->leftJoin('degrees', 'studentAnnuals.degree_id', '=', 'degrees.id')
-            ->leftJoin('origins', 'students.origin_id', '=', 'origins.id');
+            ->leftJoin('origins', 'students.origin_id', '=', 'origins.id')
+            ->leftJoin('origins as pob', 'students.pob', '=', 'origins.id')
+            ->leftJoin('histories', 'studentAnnuals.history_id', '=', 'histories.id')
+            ->leftJoin('highSchools', 'students.high_school_id', '=', 'highSchools.id')
+        ;
 
         $title = 'បញ្ជីនិស្សិតុ';
-        // additional search
-        if ($degree = $_GET['degree']) {
-            $studentAnnuals = $studentAnnuals->where('studentAnnuals.degree_id', '=', $degree);
 
-            $degree_obj = Degree::where('id',$degree)->first();
-            $title .= "ថ្នាក់".$degree_obj->name_kh;
+        if($ids = $_POST['student_ids']){
+            $studentAnnuals = $studentAnnuals->whereIn('studentAnnuals.id',json_decode($ids));
+        } else {
+            // additional search
+            if ($degree = $_POST['filter_degree']) {
+                $studentAnnuals = $studentAnnuals->where('studentAnnuals.degree_id', '=', $degree);
+
+                $degree_obj = Degree::where('id',$degree)->first();
+                $title .= "ថ្នាក់".$degree_obj->name_kh;
+            }
+
+            if ($academic_year = $_POST['filter_academic_year']) {
+                $studentAnnuals = $studentAnnuals->where('studentAnnuals.academic_year_id', '=', $academic_year);
+
+                $academic_year_obj = AcademicYear::where('id',$academic_year)->first();
+                $title .= " ឆ្នាំសិក្សា ".$academic_year_obj->name_kh;
+            }
+
+            if ($grade = $_POST['filter_grade']) {
+                $studentAnnuals = $studentAnnuals->where('studentAnnuals.grade_id', '=', $grade);
+
+                $grade_obj = Grade::where('id',$grade)->first();
+                $title .= " ".$grade_obj->name_kh;
+            }
+            if ($department = $_POST['filter_department']) {
+                $studentAnnuals = $studentAnnuals->where('studentAnnuals.department_id', '=', $department);
+
+                $department_obj = Department::where('id',$department)->first();
+                $title .= " ដេប៉ាតឺម៉ង់ ".$department_obj->name_kh;
+            }
+            if ($gender = $_POST['filter_gender']) {
+                $studentAnnuals = $studentAnnuals->where('students.gender_id', '=', $gender);
+
+                $gender_obj = Gender::where('id',$gender)->first();
+                $title .= " ភេទ".$gender_obj->name_kh;
+            }
+            if ($option = $_POST['filter_option']) {
+                $studentAnnuals = $studentAnnuals->where('studentAnnuals.department_option_id', '=', $option);
+
+                $option_obj = DepartmentOption::where('id',$option)->first();
+                $title .= " ជំនាញ ".$option_obj->name_kh;
+            }
+            if ($origin = $_POST['filter_origin']) {
+                $studentAnnuals = $studentAnnuals->where('students.origin_id', '=', $origin);
+            }
         }
-
-        if ($academic_year = $_GET['academic_year']) {
-            $studentAnnuals = $studentAnnuals->where('studentAnnuals.academic_year_id', '=', $academic_year);
-
-            $academic_year_obj = AcademicYear::where('id',$academic_year)->first();
-            $title .= " ឆ្នាំសិក្សា ".$academic_year_obj->name_kh;
-        }
-
-        if ($grade = $_GET['grade']) {
-            $studentAnnuals = $studentAnnuals->where('studentAnnuals.grade_id', '=', $grade);
-
-            $grade_obj = Grade::where('id',$grade)->first();
-            $title .= " ".$grade_obj->name_kh;
-        }
-        if ($department = $_GET['department']) {
-            $studentAnnuals = $studentAnnuals->where('studentAnnuals.department_id', '=', $department);
-
-            $department_obj = Department::where('id',$department)->first();
-            $title .= " ដេប៉ាតឺម៉ង់ ".$department_obj->name_kh;
-        }
-        if ($gender = $_GET['gender']) {
-            $studentAnnuals = $studentAnnuals->where('students.gender_id', '=', $gender);
-
-            $gender_obj = Gender::where('id',$gender)->first();
-            $title .= " ភេទ".$gender_obj->name_kh;
-        }
-        if ($option = $_GET['option']) {
-            $studentAnnuals = $studentAnnuals->where('studentAnnuals.department_option_id', '=', $option);
-
-            $option_obj = DepartmentOption::where('id',$option)->first();
-            $title .= " ជំនាញ ".$option_obj->name_kh;
-        }
-        if ($origin = $_GET['origin']) {
-            $studentAnnuals = $studentAnnuals->where('students.origin_id', '=', $origin);
-        }
-
         $data = $studentAnnuals->get()->toArray();
 
 
-        Excel::create('បញ្ជីនិស្សិត', function($excel) use ($data, $title) {
+        $alpha = array();
+        $letter = 'A';
+        while ($letter !== 'AAA') {
+            $alpha[] = $letter++;
+        }
+        // Selected fields to export
 
+        $fields = array();
+
+        if(isset($_POST['id'])){
+            array_push($fields,$_POST['id']);
+        }
+        if(isset($_POST['id_card'])){
+            array_push($fields,$_POST['id_card']);
+        }
+        if(isset($_POST['name_latin'])){
+            array_push($fields,$_POST['name_latin']);
+        }
+        if(isset($_POST['name_kh'])){
+            array_push($fields,$_POST['name_kh']);
+        }
+        if(isset($_POST['dob'])){
+            array_push($fields,$_POST['dob']);
+        }
+        if(isset($_POST['gender_id'])){
+            array_push($fields,$_POST['gender_id']);
+        }
+        if(isset($_POST['origin_id'])){
+            array_push($fields,$_POST['origin_id']);
+        }
+        if(isset($_POST['pob'])){
+            array_push($fields,$_POST['pob']);
+        }
+        if(isset($_POST['class'])){
+            array_push($fields,$_POST['class']);
+        }
+        if(isset($_POST['group'])){
+            array_push($fields,$_POST['group']);
+        }
+        if(isset($_POST['promotion_id'])){
+            array_push($fields,$_POST['promotion_id']);
+        }
+        if(isset($_POST['academic_year_id'])){
+            array_push($fields,$_POST['academic_year_id']);
+        }
+        if(isset($_POST['history_id'])){
+            array_push($fields,$_POST['history_id']);
+        }
+        if(isset($_POST['department_option_id'])){
+            array_push($fields,$_POST['department_option_id']);
+        }
+        if(isset($_POST['radie'])){
+            array_push($fields,$_POST['radie']);
+        }
+        if(isset($_POST['observation'])){
+            array_push($fields,$_POST['observation']);
+        }
+        if(isset($_POST['mcs_no'])){
+            array_push($fields,$_POST['mcs_no']);
+        }
+        if(isset($_POST['can_id'])){
+            array_push($fields,$_POST['can_id']);
+        }
+        if(isset($_POST['high_school_id'])){
+            array_push($fields,$_POST['high_school_id']);
+        }
+        if(isset($_POST['photo'])){
+            array_push($fields,$_POST['photo']);
+        }
+        if(isset($_POST['phone'])){
+            array_push($fields,$_POST['phone']);
+        }
+        if(isset($_POST['email'])){
+            array_push($fields,$_POST['phone']);
+        }
+        if(isset($_POST['admission_date'])){
+            array_push($fields,$_POST['admission_date']);
+        }
+        if(isset($_POST['address'])){
+            array_push($fields,$_POST['address']);
+        }
+        if(isset($_POST['address_current'])){
+            array_push($fields,$_POST['address_current']);
+        }
+        if(isset($_POST['parent_name'])){
+            array_push($fields,$_POST['parent_name']);
+        }
+        if(isset($_POST['parent_occupation'])){
+            array_push($fields,$_POST['parent_occupation']);
+        }
+        if(isset($_POST['parent_address'])){
+            array_push($fields,$_POST['parent_address']);
+        }
+        if(isset($_POST['parent_phone'])){
+            array_push($fields,$_POST['parent_phone']);
+        }
+
+        Excel::create('បញ្ជីនិស្សិត', function($excel) use ($data, $title,$alpha,$fields) {
 
             // Set the title
             $excel->setTitle('បញ្ជីនិស្សិត');
@@ -967,7 +1084,9 @@ class StudentAnnualController extends Controller
             $excel->setCreator('Department of Study & Student Affair')
                 ->setCompany('Institute of Technology of Cambodia');
 
-            $excel->sheet('New sheet', function($sheet) use ($data,$title) {
+            $excel->sheet('New sheet', function($sheet) use ($data,$title,$alpha,$fields) {
+
+                $number_column = count($fields);
 
                 $sheet->setOrientation('landscape');
                 // Set top, right, bottom, left
@@ -993,40 +1112,51 @@ class StudentAnnualController extends Controller
                 $sheet->appendRow(array(
                     $title
                 ));
+                $header = array();
+                foreach ($fields as $field){
+                    array_push($header,trans('indexs.'.$field));
+                }
 
-                $sheet->rows(array(
-                    array('លរ','អត្តលេខ','ឈ្មោះខ្មែរ','ឈ្មោះឡាតាំង','ថ្ងៃខែឆ្នាំកំណើត','ភេទ','មកពី','ថ្នាក់','ជំនាញ')
-                ));
+                $sheet->rows(
+                    array($header)
+                );
                 foreach ($data as $item) {
 
+                    $row = array();
+                    foreach($fields as $field){
+                        $row[$field] = $item[$field];
+                    }
+
                     $sheet->appendRow(
-                        $item
+                        $row
                     );
                 }
 
-                $sheet->mergeCells('A1:I1');
-                $sheet->mergeCells('A2:I2');
-                $sheet->mergeCells('A3:I3');
-                $sheet->mergeCells('A4:I4');
-                $sheet->mergeCells('A5:I5');
+                $sheet->mergeCells('A1:'.$alpha[$number_column-1].'1');
+                $sheet->mergeCells('A2:'.$alpha[$number_column-1].'2');
+                $sheet->mergeCells('A3:'.$alpha[$number_column-1].'3');
+                $sheet->mergeCells('A4:'.$alpha[$number_column-1].'4');
+                $sheet->mergeCells('A5:'.$alpha[$number_column-1].'5');
 
-                $sheet->cells('A1:I2', function($cells) {
+                $sheet->cells('A1:'.$alpha[$number_column-1].'2', function($cells) {
                     $cells->setAlignment('center');
                     $cells->setValignment('middle');
                 });
 
-                $sheet->cells('A5:I'.(6+count($data)), function($cells) {
+                $sheet->cells('A5:'.$alpha[$number_column-1].(6+count($data)), function($cells) {
                     $cells->setAlignment('center');
                     $cells->setValignment('middle');
                 });
 
-                $sheet->setBorder('A6:I'.(6+count($data)), 'thin');
+                $sheet->setBorder('A6:'.$alpha[$number_column-1].(6+count($data)), 'thin');
 
             });
 
         })->export('xls');
+
     }
-    public function export($id){  // Export student report
+
+    public function report($id){  // Export student report
         switch ($id) {
             case 1:
                 $data = $this->get_student_list_by_age($_GET['academic_year_id'],$_GET['degree_id']);

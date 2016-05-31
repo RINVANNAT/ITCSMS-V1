@@ -68,6 +68,14 @@
         }
 
         $('#btn-export').on('click',function(){
+            var data = oTable.columns(0).data();
+
+            var url = '{{route("admin.student.request_export_fields")}}'+
+                    "?student_ids="+JSON.stringify(data[0]);
+
+            //PopupCenterDual(url,'Select fields to export','1200','960');
+            window.location.href = url;
+
         });
         window.onbeforeunload = function(){
             console.log('close window');

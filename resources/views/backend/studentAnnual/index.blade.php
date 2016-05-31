@@ -66,6 +66,7 @@
                 ajax: {
                     url:"{!! route('admin.student.data') !!}",
                     data:function(d){
+                        // In case additional fields is added for filter, modify export view as well: popup_export.blade.php
                         d.academic_year = $('#filter_academic_year').val();
                         d.degree = $('#filter_degree').val();
                         d.grade = $('#filter_grade').val();
@@ -143,7 +144,7 @@
 
             $(document).on('click', '#export_student_list', function (e) {
                 e.preventDefault();
-                var url = '{{route("admin.student.request_export")}}'+
+                var url = '{{route("admin.student.request_export_fields")}}'+
                         "?academic_year="+$('#filter_academic_year').val()+
                         '&degree='+ $('#filter_degree').val()+
                         '&grade=' + $('#filter_grade').val()+
@@ -152,7 +153,7 @@
                         '&option='+$('#filter_option').val()+
                         '&origin='+$('#filter_origin').val();
 
-                PopupCenterDual(url,'Export student data','1200','960');
+                PopupCenterDual(url,'Select fields to export','1200','960');
             });
 
             $(document).on('click', '#export_student_list_custom', function (e) {
