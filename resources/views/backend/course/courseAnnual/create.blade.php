@@ -22,14 +22,14 @@
             </div><!-- /.box-header -->
 
             <div class="box-body">
-                @include('backend.course.account.fields')
+                @include('backend.course.courseAnnual.fields')
             </div><!-- /.box-body -->
         </div><!--box-->
 
         <div class="box box-success">
             <div class="box-body">
                 <div class="pull-left">
-                    <a href="{!! route('admin.courseAnnuals.index') !!}" class="btn btn-danger btn-xs">{{ trans('buttons.general.cancel') }}</a>
+                    <a href="{!! route('admin.course.course_annual.index') !!}" class="btn btn-danger btn-xs">{{ trans('buttons.general.cancel') }}</a>
                 </div>
 
                 <div class="pull-right">
