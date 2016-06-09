@@ -697,11 +697,12 @@ return [
                 'name_fr' => 'Name French',
                 'duration' => 'Duration',
                 'code' => 'Code',
+                'credit'=> 'Credit',
                 'time_tp' => " TP",
                 'time_td' => 'TD',
                 'time_course' => 'Course',
-
-
+                'degree'=>"Degree",
+                'semester'=>"Semester"
             ]
         ],
         'scholarships' => [

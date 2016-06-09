@@ -96,7 +96,9 @@ class StudentAnnualController extends Controller
         $grades = Grade::lists('name_kh','id');
         $scholarships = Scholarship::lists('code','id');
         $origins = Origin::lists('name_kh','id');
+        
         $genders = Gender::lists('name_kh','id');
+        
         $highSchools = HighSchool::lists('name_kh','id');
         $promotions = Promotion::orderBy('name','DESC')->lists('name','id');
         $histories = History::lists('name_en','id');

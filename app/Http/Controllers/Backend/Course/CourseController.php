@@ -6,6 +6,10 @@ use App\Http\Requests\Backend\Course\CourseProgram\DeleteCourseProgramRequest;
 use App\Http\Requests\Backend\Course\CourseProgram\EditCourseProgramRequest;
 use App\Http\Requests\Backend\Course\CourseProgram\StoreCourseProgramRequest;
 use App\Http\Requests\Backend\Course\CourseProgram\UpdateCourseProgramRequest;
+use App\Models\Degree;
+use App\Models\Department;
+use App\Models\Grade;
+use App\Models\Semester;
 use App\Repositories\Backend\CourseProgram\CourseProgramRepositoryContract;
 use Illuminate\Support\Facades\DB;
 use App\Http\Requests\Backend\Course\CourseProgram\ImportCourseProgramRequest;
@@ -55,7 +59,11 @@ class CourseController extends Controller
      */
     public function create(CreateCourseProgramRequest $request)
     {
-        return view('backend.course.courseProgram.create');
+        $degrees = Degree::lists("name_en","id");
+        $grades = Grade::lists("name_en","id");
+        $departments = Department::lists("name_en","id");
+        $semesters = Semester::lists("name_en","id");
+        return view('backend.course.courseProgram.create', compact("degrees","grades","departments","semesters"));
     }
 
     /**
