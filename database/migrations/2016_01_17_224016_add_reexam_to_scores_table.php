@@ -27,6 +27,7 @@ class AddReexamToScoresTable extends Migration
     {
         Schema::table('scores', function (Blueprint $table) {
             //
+            $table->dropColumn('reexam');
         });
     }
 }

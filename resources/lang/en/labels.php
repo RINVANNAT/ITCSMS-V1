@@ -646,7 +646,9 @@ return [
                 'department_id' => 'Department',
                 'degree_id' => 'Degree',
                 'grade_id' => 'Grade',
-                'employee_id' => 'Lecturer'
+                'employee_id' => 'Lecturer',
+                'credit'=>"Credit",
+                'code'=>"Code"
             ]
         ],
 

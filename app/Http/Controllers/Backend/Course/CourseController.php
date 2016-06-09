@@ -1,15 +1,13 @@
 <?php namespace App\Http\Controllers\Backend\Course;
 
 use App\Http\Controllers\Controller;
-use App\Http\Requests\Backend\Configuration\CourseProgram\CreateCourseProgramRequest;
-use App\Http\Requests\Backend\Configuration\CourseProgram\DeleteCourseProgramRequest;
-use App\Http\Requests\Backend\Configuration\CourseProgram\EditCourseProgramRequest;
-use App\Http\Requests\Backend\Configuration\CourseProgram\StoreCourseProgramRequest;
-use App\Http\Requests\Backend\Configuration\CourseProgram\UpdateCourseProgramRequest;
+use App\Http\Requests\Backend\Course\CourseProgram\CreateCourseProgramRequest;
+use App\Http\Requests\Backend\Course\CourseProgram\DeleteCourseProgramRequest;
+use App\Http\Requests\Backend\Course\CourseProgram\EditCourseProgramRequest;
+use App\Http\Requests\Backend\Course\CourseProgram\StoreCourseProgramRequest;
+use App\Http\Requests\Backend\Course\CourseProgram\UpdateCourseProgramRequest;
 use App\Repositories\Backend\CourseProgram\CourseProgramRepositoryContract;
 use Illuminate\Support\Facades\DB;
-
-
 use App\Http\Requests\Backend\Course\CourseProgram\ImportCourseProgramRequest;
 use App\Http\Requests\Backend\Course\CourseProgram\RequestImportCourseProgramRequest;
 use Carbon\Carbon;

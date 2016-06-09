@@ -17,8 +17,14 @@ class Course extends Model
 		"time_td",
 		"time_course",
 		"credit",
+		"degree_id",
+		"grade_id",
+		"department_id",
+		"semester_id",
         "create_uid",
         "write_uid"
+		//chheang todo add field degree, grade, department to table courses
+
 	];
 
     public function creator(){
@@ -50,7 +56,22 @@ class Course extends Model
 		"name_fr" => "Required",
 		"time_tp" => "Required|numeric",
 		"time_td" => "Required|numeric",
-		"time_course" => "Required|numeric"
+		"time_course" => "Required|numeric",
+		"degree_id"=>"Required|numeric",
+		"grade_id"=>"Required|numeric",
+		"department_id"=>"Required|numeric",
+		"semester_id"=>"Required|numeric",
 	];
+
+	public function degree(){
+		return $this->belongsTo('App\Models\Degree');
+	}
+	public function department(){
+		return $this->belongsTo('App\Models\Department');
+	}
+	public function grade(){
+		return $this->belongsTo('App\Models\Grade');
+	}
+	
 
 }

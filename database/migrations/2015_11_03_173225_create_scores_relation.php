@@ -14,21 +14,25 @@ class CreateScoresRelation extends Migration
     {
         Schema::table('scores', function (Blueprint $table) {
             //
-
-            $table->foreign('student_annual_id')
-                ->references('id')
-                ->on('studentAnnuals')
-                ->onDelete('NO ACTION');
-
-            $table->foreign('course_annual_id')
-                ->references('id')
-                ->on('courseAnnuals')
-                ->onDelete('NO ACTION');
-
-            $table->foreign('academic_year_id')
-                ->references('id')
-                ->on('academicYears')
-                ->onDelete('NO ACTION');
+            //chheang todo testing if score still work
+            
+            //course_annual_id';
+            //student_annual_id;
+            //academic_year_id');
+//            $table->foreign('student_annual_id')
+//                ->references('id')
+//                ->on('studentAnnuals')
+//                ->onDelete('NO ACTION');
+//
+//            $table->foreign('course_annual_id')
+//                ->references('id')
+//                ->on('courseAnnuals')
+//                ->onDelete('NO ACTION');
+//
+//            $table->foreign('academic_year_id')
+//                ->references('id')
+//                ->on('academicYears')
+//                ->onDelete('NO ACTION');
 
         });
     }
@@ -40,8 +44,6 @@ class CreateScoresRelation extends Migration
      */
     public function down()
     {
-        Schema::table('scores', function (Blueprint $table) {
-            //
-        });
+
     }
 }
