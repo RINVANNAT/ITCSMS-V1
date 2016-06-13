@@ -191,7 +191,7 @@ class CourseController extends Controller
             );
             if (in_array($fileType, $fileContext)) {
                 Flash::error('file type is '.$fileType. ' Only excel or csv that import:'.$fileType." key:");
-                return redirect(route('admin.course.course_program.request_import'));
+                return redirect()->back();
             }
 
             // validation header
@@ -229,11 +229,11 @@ class CourseController extends Controller
             } catch(Exception $e){
                 DB::rollback();
                 Flash::error('data is not correct format ');
-                return redirect(route('admin.course.course_program.index'));
+                return redirect()->back();
             }
             DB::commit();
-            Flash::info('Import Successfully '.$GLOBALS['countRow'].' rows effected');
-            return redirect(route('admin.course.course_program.index'));
+            Flash::success('Import Successfully '.$GLOBALS['countRow'].' rows effected');
+            return redirect()->route('admin.course.course_program.index');
         }
     }
 

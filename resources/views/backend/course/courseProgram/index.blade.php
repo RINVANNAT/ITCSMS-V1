@@ -15,6 +15,13 @@
 @stop
 
 @section('content')
+    @if (Session::has('flash_notification.message'))
+        <div class="alert alert-{{ Session::get('flash_notification.level') }}">
+            <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
+
+            {{ Session::get('flash_notification.message') }}
+        </div>
+    @endif
     <div class="box box-success">
         <div class="box-header with-border">
             <div class="mailbox-controls">
