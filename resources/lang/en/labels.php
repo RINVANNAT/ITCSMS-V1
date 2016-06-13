@@ -691,6 +691,7 @@ return [
             'sub_edit_title' => 'Edit course program information',
             'sub_create_title' => 'Create new course program',
             'sub_detail_title' => 'Detail of a course program',
+            'sub_import_title'=> 'Import course program',
             'fields' => [
                 'name_kh' => "Name Khmer",
                 'name_en' => 'Name English',
@@ -702,6 +703,8 @@ return [
                 'time_td' => 'TD',
                 'time_course' => 'Course',
                 'degree'=>"Degree",
+                'grade'=>"Grade",
+                'department'=>"Department",
                 'semester'=>"Semester"
             ]
         ],

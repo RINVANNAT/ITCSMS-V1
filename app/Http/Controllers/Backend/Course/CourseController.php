@@ -18,6 +18,7 @@ use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Maatwebsite\Excel\Facades\Excel;
 use App\Models\Course;
+use Flash;
 use Illuminate\Foundation\Validation\ValidatesRequests;
 
 
@@ -161,61 +162,78 @@ class CourseController extends Controller
 
 
     public function request_import(RequestImportCourseProgramRequest $request){
-
         return view('backend.course.courseProgram.import');
-
     }
 
     public function import(ImportCourseProgramRequest $request){
-
         $now = Carbon::now()->format('Y_m_d_H');
-
-        // try to move uploaded file to a temporary location
-        if($request->file('import')!= null){
-            $import = $now. '.' .$request->file('import')->getClientOriginalExtension();
-
+        if($request->file('import')!= null) {
+            $import = $now . '.' . $request->file('import')->getClientOriginalExtension();
             $request->file('import')->move(
                 base_path() . '/public/assets/uploaded_file/temp/', $import
             );
 
-            $storage_path = base_path() . '/public/assets/uploaded_file/temp/'.$import;
+            $storage_path = base_path() . '/public/assets/uploaded_file/temp/' . $import;
 
             // and then read that data and store to database
             //Excel::load($storage_path, function($reader) {
             //    dd($reader->first());
             //});
 
+            // validation file type
+            $finfo = finfo_open(FILEINFO_MIME_TYPE); // return mime type ala mimetype extension
+            $fileType = finfo_file($finfo, $storage_path) . "\n";
+            finfo_close($finfo);
+            $fileContext = array(
+                "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+                "application/vnd.ms-excel",
+                "text/plain",
+            );
+            if (in_array($fileType, $fileContext)) {
+                Flash::error('file type is '.$fileType. ' Only excel or csv that import:'.$fileType." key:");
+                return redirect(route('admin.course.course_program.request_import'));
+            }
 
+            // validation header
+
+
+            $GLOBALS['countRow'] = 0;
             DB::beginTransaction();
-
             try{
                 Excel::filter('chunk')->load($storage_path)->chunk(1000, function($results){
-                    //dd($results->first());
-                    // Loop through all rows
+                    $requireKey = array_keys(Course::$rules);
+                    $aRow = array_keys( $results->first()->toArray());
+                    $result = count((array_intersect($aRow, $requireKey))) >= count($requireKey) ?true: false;
+                    if ( $result == false ){
+                        foreach ($requireKey as $requireKey2){
+                            if (!in_array($requireKey2, $aRow)){
+                                Flash::error('import file should have header '.$requireKey2);
+                                return redirect(route('admin.course.course_program.request_import'));
+                            }else{
 
-                    $results->each(function($row) {
-                        // Clone an object for running query in studentAnnual
-                        $courseAnnual_data = $row->toArray();
-
-
-                        $courseAnnual_data["created_at"] = Carbon::now();
-                        $courseAnnual_data["create_uid"] = auth()->id();
-                        $courseAnnual = Course::create($courseAnnual_data);
-
-
-                        if(  $courseAnnual){
+                            };
 
                         }
 
-                        $first = false;
+                    }
+
+                    $results->each(function($row) {
+                        $courseData = $row->toArray();
+                        $courseData["created_at"] = Carbon::now();
+                        $courseData["create_uid"] = auth()->id();
+                        $courseAnnual = Course::create($courseData);
+                        $GLOBALS['countRow'] = $GLOBALS['countRow'] + 1;
                     });
                 });
 
             } catch(Exception $e){
                 DB::rollback();
+                Flash::error('data is not correct format ');
+                return redirect(route('admin.course.course_program.index'));
             }
             DB::commit();
-            return redirect(route('admin.course.coursePrograms.index'));
+            Flash::info('Import Successfully '.$GLOBALS['countRow'].' rows effected');
+            return redirect(route('admin.course.course_program.index'));
         }
     }
 

@@ -23,8 +23,6 @@ class Course extends Model
 		"semester_id",
         "create_uid",
         "write_uid"
-		//chheang todo add field degree, grade, department to table courses
-
 	];
 
     public function creator(){
@@ -52,7 +50,6 @@ class Course extends Model
     ];
 
 	public static $rules = [
-	    "name_kh" => "Required",
 		"name_en" => "Required",
 		"name_fr" => "Required",
 		"time_tp" => "Required|numeric",

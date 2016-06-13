@@ -1,10 +1,9 @@
 @extends ('backend.layouts.master')
 
-
 @section('page-header')
     <h1>
-        {{ trans('labels.backend.courseAnnuals.title') }}
-        <small>{{ trans('labels.backend.courseAnnuals.sub_import_title') }}</small>
+        {{ trans('labels.backend.coursePrograms.title') }}
+        <small>{{ trans('labels.backend.coursePrograms.sub_import_title') }}</small>
     </h1>
 @endsection
 
@@ -13,11 +12,18 @@
 @stop
 
 @section('content')
+    @if (Session::has('flash_notification.message'))
+        <div class="alert alert-{{ Session::get('flash_notification.level') }}">
+            <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
+
+            {{ Session::get('flash_notification.message') }}
+        </div>
+    @endif
 
     {!! Form::open(['route' => 'admin.course.course_program.import','id' => 'import_form_student', 'role'=>'form','files' => true])!!}
     <div class="box box-success">
         <div class="box-header with-border">
-            <h3 class="box-title">{{ trans('labels.backend.students.sub_import_title') }}</h3>
+            <h3 class="box-title">{{ trans('labels.backend.coursePrograms.sub_import_title') }}</h3>
         </div><!-- /.box-header -->
 
         <div class="box-body">

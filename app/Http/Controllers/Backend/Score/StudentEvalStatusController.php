@@ -151,7 +151,6 @@ class StudentEvalStatusController extends AppBaseController
 		if(empty($studentEvalStatu))
 		{
 			Flash::error('StudentEvalStatu not found');
-
 			return redirect(route('studentEvalStatuses.index'));
 		}
 
