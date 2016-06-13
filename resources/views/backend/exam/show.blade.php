@@ -48,6 +48,11 @@
                         </a>
                     </li>
                     <li role="presentation">
+                        <a href="#course_info" aria-controls="courses" role="tab" data-toggle="tab">
+                            {{ trans('labels.backend.exams.show_tabs.course_info') }}
+                        </a>
+                    </li>
+                    <li role="presentation">
                         <a href="#room_info" aria-controls="rooms" role="tab" data-toggle="tab">
                             {{ trans('labels.backend.exams.show_tabs.room_info') }}
                         </a>
@@ -64,6 +69,9 @@
                         {!! Form::model($exam, ['#','class' => 'form-horizontal', 'role'=>'form', 'method' => 'patch', 'id'=> 'exam_show']) !!}
                         @include ("backend.exam.fields")
                         {!! Form::close() !!}
+                    </div>
+                    <div role="tabpanel" class="tab-pane" id="course_info" style="padding-top:20px">
+                        @include('backend.exam.show.exam_course')
                     </div>
                     <div role="tabpanel" class="tab-pane" id="candidate_info" style="padding-top:20px">
                         @include('backend.exam.show.exam_candidate')
@@ -90,6 +98,7 @@
     <script>
 
         var candidate_datatable = null;
+        var course_datatable = null;
         $(function(){
             $("#exam_show :input").attr("disabled", true);
 
@@ -109,6 +118,22 @@
                     { data: 'action', name: 'action',orderable: false, searchable: false}
                 ]
             });
+
+            course_datatable = $('#table-exam-course').DataTable({
+                processing: true,
+                serverSide: true,
+                pageLength: {!! config('app.records_per_page')!!},
+                ajax: '{!! route('admin.exam.get_courses',$exam->id) !!}',
+                columns: [
+                    { data: 'name_kh', name: 'courseAnnuals.name_kh'},
+                    { data: 'semester', name: 'courseAnnuals.semester'},
+                    { data: 'academic_year', name: 'academicYears.name_kh'},
+                    { data: 'class', name: 'class', orderable:false, searchable:false},
+                    { data: 'lecturer', name: 'employees.name_kh'},
+                    { data: 'action', name: 'action',orderable: false, searchable: false}
+                ]
+            });
+
             enableDeleteRecord($('#candidates-table'));
 
             $('#candidates-table').on('click', '.btn-register[data-remote]', function (e) {

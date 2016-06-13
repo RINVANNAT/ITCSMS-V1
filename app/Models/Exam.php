@@ -61,6 +61,10 @@ class Exam extends Model
         return $this->belongsToMany('App\Models\StudentAnnual');
     }
 
+    public function courses(){
+        return $this->belongsToMany('App\Models\CourseAnnual');
+    }
+
     public function candidates(){
         return $this->hasMany('App\Models\Candidate');
     }

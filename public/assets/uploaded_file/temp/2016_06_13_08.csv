@@ -1,0 +1,49 @@
+id,name_kh,name_en,name_fr,code,time_tp,time_td,time_course,credit,degree_id,grade_id,department_id,semester_id
+1,S1-Algorithme et Programmation,S1-Algorithme et Programmation,S1-Algorithme et Programmation,S1-Algorithme et Programmation,2,2,2,3.5,1,3,4,1
+2,S1-Architecture des Ordinateur,S1-Architecture des Ordinateur,S1-Architecture des Ordinateur,S1-Architecture des Ordinateur,2,2,2,1,1,3,4,1
+3,S1-Analyse et Conception du SI,S1-Analyse et Conception du SI,S1-Analyse et Conception du SI,S1-Analyse et Conception du SI,2,2,2,2,1,3,4,1
+4,S2-Introduction aux SI et Réseaux,S2-Introduction aux SI et Réseaux,S2-Introduction aux SI et Réseaux,S2-Introduction aux SI et Réseaux,2,2,2,2,1,3,4,1
+5,S1-Logique Combinatoire et Séquentielle,S1-Logique Combinatoire et Séquentielle,S1-Logique Combinatoire et Séquentielle,S1-Logique Combinatoire et Séquentielle,2,2,2,3,1,3,4,1
+6,S1-Electronique,S1-Electronique,S1-Electronique,S1-Electronique,2,2,2,1,1,3,4,1
+7,S1-Math Discrète,S1-Math Discrète,S1-Math Discrète,S1-Math Discrète,2,2,2,2,1,3,4,1
+8,S1-Statistique,S1-Statistique,S1-Statistique,S1-Statistique,2,2,2,2,1,3,4,1
+9,S1-Anglais,S1-Anglais,S1-Anglais,S1-Anglais,2,2,2,1,1,3,4,1
+10,S1-Français,S1-Français,S1-Français,S1-Français,2,2,2,2,1,3,4,1
+11,S2-Algorithme et Programmation,S2-Algorithme et Programmation,S2-Algorithme et Programmation,S2-Algorithme et Programmation,2,2,2,2.5,1,3,4,1
+12,S2-Architecture des Ordinateur,S2-Architecture des Ordinateur,S2-Architecture des Ordinateur,S2-Architecture des Ordinateur,2,2,2,2,1,3,4,1
+13,S2-Base de Données,S2-Base de Données,S2-Base de Données,S2-Base de Données,2,2,2,2,1,3,4,1
+14,S2-Informatique Théorique,S2-Informatique Théorique,S2-Informatique Théorique,S2-Informatique Théorique,2,2,2,2,1,3,4,1
+15,S2-Automate,S2-Automate,S2-Automate,S2-Automate,2,2,2,2,1,3,4,1
+16,S2-MATLAB,S2-MATLAB,S2-MATLAB,S2-MATLAB,2,2,2,1.5,1,3,4,1
+17,S2-Anglais,S2-Anglais,S2-Anglais,S2-Anglais,2,2,2,2,1,3,4,1
+18,S2-Français,S2-Français,S2-Français,S2-Français,2,2,2,1,1,3,4,1
+19,S1-Génie Logicie,S1-Génie Logicie,S1-Génie Logicie,S1-Génie Logicie,2,2,2,2.5,1,4,4,1
+20,S1-Programmation C/C++,S1-Programmation C/C++,S1-Programmation C/C++,S1-Programmation C/C++,2,2,2,2,1,4,4,1
+21,S1-Programmation Internet,S1-Programmation Internet,S1-Programmation Internet,S1-Programmation Internet,2,2,2,2,1,4,4,1
+22,S1-Réseaux,S1-Réseaux,S1-Réseaux,S1-Réseaux,2,2,2,1.5,1,4,4,1
+23,S1-Système d'Exploitation,S1-Système d'Exploitation,S1-Système d'Exploitation,S1-Système d'Exploitation,2,2,2,2,1,4,4,1
+24,S1-Anglais,S1-Anglais,S1-Anglais,S1-Anglais,2,2,2,1,1,4,4,1
+25,S1-Français,S1-Français,S1-Français,S1-Français,2,2,2,1,1,4,4,1
+26,S2-Administration et Réseaux,S2-Administration et Réseaux,S2-Administration et Réseaux,S2-Administration et Réseaux,2,2,2,2,1,4,4,1
+27,S2-Architecture Avancée,S2-Architecture Avancée,S2-Architecture Avancée,S2-Architecture Avancée,2,2,2,2,1,4,4,1
+28,S2-Base de Données Avancées,S2-Base de Données Avancées,S2-Base de Données Avancées,S2-Base de Données Avancées,2,2,2,2,1,4,4,1
+29,S2-Compilation,S2-Compilation,S2-Compilation,S2-Compilation,2,2,2,2,1,4,4,1
+30,S2-Génie Logiciel,S2-Génie Logiciel,S2-Génie Logiciel,S2-Génie Logiciel,2,2,2,2.5,1,4,4,1
+31,S2-Interface Homme Machine,S2-Interface Homme Machine,S2-Interface Homme Machine,S2-Interface Homme Machine,2,2,2,2,1,4,4,1
+32,S2-Programmation Internet,S2-Programmation Internet,S2-Programmation Internet,S2-Programmation Internet,2,2,2,2,1,4,4,1
+33,S2-Réseaux,S2-Réseaux,S2-Réseaux,S2-Réseaux,2,2,2,1.5,1,4,4,1
+34,S2-Système d'Exploitation,S2-Système d'Exploitation,S2-Système d'Exploitation,S2-Système d'Exploitation,2,2,2,1,1,4,4,1
+35,S2-Sécurité,S2-Sécurité,S2-Sécurité,S2-Sécurité,2,2,2,2,1,4,4,1
+36,S2-Télécomm,S2-Télécomm,S2-Télécomm,S2-Télécomm,2,2,2,2,1,4,4,1
+37,S2-Anglais,S2-Anglais,S2-Anglais,S2-Anglais,2,2,2,1,1,4,4,1
+38,S2-Français,S2-Français,S2-Français,S2-Français,2,2,2,1,1,4,4,1
+39,Réseaux et Sécurité,Réseaux et Sécurité,Réseaux et Sécurité,Réseaux et Sécurité,2,5,2,2,1,5,4,1
+40,Intelligent Artificielle,Intelligent Artificielle,Intelligent Artificielle,Intelligent Artificielle,2,2,2,2,1,5,4,1
+41,Multimédia,Multimédia,Multimédia,Multimédia,2,2,2,2,1,5,4,1
+42,Système Distributés,Système Distributés,Système Distributés,Système Distributés,2,2,2,2,1,5,4,1
+43,Traitement d'Image,Traitement d'Image,Traitement d'Image,Traitement d'Image,2,2,2,2,1,5,4,1
+44,Architecture Parallèle,Architecture Parallèle,Architecture Parallèle,Architecture Parallèle,2,2,2,2,1,5,4,1
+45,Anglais,Anglais,Anglais,Anglais,2,2,2,1,1,5,4,1
+46,Français,Français,Français,Français,2,2,2,1,1,5,4,1
+47,Stage I4,Stage I4,Stage I4,Stage I4,2,2,2,2,1,5,4,1
+48,Stage I5,Stage I5,Stage I5,Stage I5,2,2,2,9,1,5,4,1

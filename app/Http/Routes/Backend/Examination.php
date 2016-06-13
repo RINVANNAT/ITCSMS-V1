@@ -7,4 +7,5 @@ Route::group([], function() {
     Route::post('exams/{id}/store', 'ExamController@store')->name('admin.exam.store');
 
     Route::get('exams/{id}/data', 'ExamController@data')->name('admin.exam.data');
+    Route::get('exams/{id}/get_courses', 'ExamController@get_courses')->name('admin.exam.get_courses');
 });

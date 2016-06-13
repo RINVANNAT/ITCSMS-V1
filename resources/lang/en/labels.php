@@ -459,6 +459,7 @@ return [
             'show_tabs' => [
                 'general_info' => 'General Information',
                 'candidate_info' => 'Candidate Information',
+                'course_info' => 'Course Information',
                 'room_info' => 'Room Information',
                 'staff_info' => 'Staff Information'
             ],
@@ -646,6 +647,7 @@ return [
                 'department_id' => 'Department',
                 'degree_id' => 'Degree',
                 'grade_id' => 'Grade',
+                'class' => 'Class',
                 'employee_id' => 'Lecturer',
                 'credit'=>"Credit",
                 'code'=>"Code"
