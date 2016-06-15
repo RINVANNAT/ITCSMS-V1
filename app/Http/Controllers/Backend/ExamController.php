@@ -12,6 +12,7 @@ use App\Models\Exam;
 use App\Models\ExamType;
 use App\Repositories\Backend\Exam\ExamRepositoryContract;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Response;
 
 class ExamController extends Controller
 {
@@ -175,6 +176,41 @@ class ExamController extends Controller
                 ' <a href="'.route('admin.exams.show',$exam->id).'" class="btn btn-xs btn-info"><i class="fa fa-eye" data-toggle="tooltip" data-placement="top" title="" data-original-title="'.trans('buttons.general.view').'"></i> </a>';
             })
             ->make(true);
+    }
+
+    public function get_buildings($id){
+        $buildings = array(
+            array(
+                "id"=>"building_a",
+                "text" => "Building A",
+                "children"=>true,
+                "type"=>"building"
+            ),
+            array(
+                "id"=>"building_b",
+                "text" => "Building B",
+                "children"=>true,
+                "type"=>"building"
+            )
+        );
+
+        return Response::json($buildings);
+    }
+
+    public function get_rooms($id){
+        $rooms = array(
+            array(
+                "id"=>"207_b",
+                "text" => "207B",
+                "type"=>"room"
+            ),
+            array(
+                "id"=>"208_b",
+                "text" => "208B",
+                "type" => "room",
+            )
+        );
+        return Response::json($rooms);
     }
 
 }

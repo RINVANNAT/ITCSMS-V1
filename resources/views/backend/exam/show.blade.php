@@ -10,6 +10,7 @@
 @endsection
 
 @section('after-styles-end')
+    {!! Html::style('plugins/jstree/themes/default/style.min.css') !!}
     {!! Html::style('plugins/datatables/dataTables.bootstrap.css') !!}
     <style>
         .Pending {
@@ -20,6 +21,38 @@
         }
         .Fail {
             background-color: #842210;
+        }
+        #main-window, .side-window {
+            min-height: 650px;
+        }
+        #row-main {
+            overflow-x: hidden; /* necessary to hide collapsed sidebars */
+        }
+        #main-window {
+            background-color: lightyellow;
+
+            -webkit-transition: width 0.3s ease;
+            -moz-transition: width 0.3s ease;
+            -o-transition: width 0.3s ease;
+            transition: width 0.3s ease;
+        }
+        #main-window .btn-group {
+            margin-bottom: 10px;
+        }
+
+        .side-window {
+            background-color: lightgrey;
+
+            -webkit-transition: margin 0.3s ease;
+            -moz-transition: margin 0.3s ease;
+            -o-transition: margin 0.3s ease;
+            transition: margin 0.3s ease;
+        }
+        .collapsed {
+            display: none; /* hide it for small displays */
+        }
+        #side-window-right.collapsed {
+            margin-right: -25%; /* same width as sidebar */
         }
     </style>
 @stop
@@ -65,7 +98,7 @@
                 </ul>
 
                 <div class="tab-content">
-                    <div role="tabpanel" class="tab-pane active" id="general_info" style="padding-top:20px">
+                    <div role="tabpanel" class="tab-pane active" id="general_info" style="padding-top:20px;">
                         {!! Form::model($exam, ['#','class' => 'form-horizontal', 'role'=>'form', 'method' => 'patch', 'id'=> 'exam_show']) !!}
                         @include ("backend.exam.fields")
                         {!! Form::close() !!}
@@ -76,11 +109,11 @@
                     <div role="tabpanel" class="tab-pane" id="candidate_info" style="padding-top:20px">
                         @include('backend.exam.show.exam_candidate')
                     </div>
-                    <div role="tabpanel" class="tab-pane" id="room_info" style="padding-top:20px">
-                        sdfsd
+                    <div role="tabpanel" class="tab-pane" id="room_info" style="padding-top:20px;max-width: 100%;">
+                        @include('backend.exam.show.exam_room')
                     </div>
                     <div role="tabpanel" class="tab-pane" id="staff_info" style="padding-top:20px">
-                        sdfsd
+                        @include('backend.exam.show.exam_staff')
                     </div>
                 </div>
             </div>
@@ -94,11 +127,37 @@
 @section('after-scripts-end')
     {!! Html::script('plugins/datatables/jquery.dataTables.min.js') !!}
     {!! Html::script('plugins/datatables/dataTables.bootstrap.min.js') !!}
+    {!! Html::script('plugins/jstree/jstree.min.js') !!}
 
     <script>
 
         var candidate_datatable = null;
         var course_datatable = null;
+        function toggleSidebar() {
+            var right = $("#side-window-right"),
+                    content = $("#main-window"),
+                    contentClass = "";
+
+
+
+            // determine number of open sidebars
+            if (content.hasClass("col-sm-6")) {
+                contentClass = "col-sm-12";
+                right.hide();
+            } else {
+                contentClass = "col-sm-6";
+            }
+
+            // apply class to content
+            content.removeClass("col-sm-12 col-sm-9 col-sm-6")
+                    .addClass(contentClass);
+
+            if(content.hasClass("col-sm-6")){
+                right.delay(500).show(0);
+            }
+
+        }
+
         $(function(){
             $("#exam_show :input").attr("disabled", true);
 
@@ -173,10 +232,93 @@
             $(document).on('click', '#btn_add_candidate', function (e) {
                 PopupCenterDual('{{route("admin.studentBac2.popup_index")."?exam_id=".$exam->id}}','Add new customer','1200','960');
             });
+
+            $('#all_rooms').jstree({
+                "core" : {
+                    "animation":0,
+                    "check_callback" : true,
+                    'force_text' : true,
+                    "themes" : {
+                        "variant" : "large",
+                        "stripes" : true
+                    },
+                    "data":{
+                        'url' : function (node) {
+                            return node.id === '#' ? '{{route('admin.exam.get_buildings',1)}}' : '{{route('admin.exam.get_rooms',1)}}';
+                        },
+                        'data' : function (node) {
+                            return { 'id' : node.id };
+                        }
+                    }
+                },
+                "checkbox" : {
+                    "keep_selected_style" : false
+                },
+                "types" : {
+                    "#" : { "max_depth" : 3, "valid_children" : ["building","room"] },
+                    "building" : {
+                        "icon" : "{{url('plugins/jstree/img/building.png')}}",
+                        "valid_children" : ["room"]
+                    },
+                    "room" :{
+                        "icon" : "{{url('plugins/jstree/img/door.png')}}",
+                        "valid_children" : []
+                    }
+                },
+                "plugins" : [
+                    "wholerow",'checkbox', "contextmenu", "dnd", "search", "state","types"
+                ]
+            });
+
+            $('#selected_rooms').jstree({
+                "core" : {
+                    "animation":0,
+                    "check_callback" : true,
+                    'force_text' : true,
+                    "themes" : {
+                        "variant" : "large",
+                        "stripes" : true
+                    },
+                    "data":{
+                        'url' : function (node) {
+                            return node.id === '#' ? '{{route('admin.exam.get_buildings',1)}}' : '{{route('admin.exam.get_rooms',1)}}';
+                        },
+                        'data' : function (node) {
+                            return { 'id' : node.id };
+                        }
+                    }
+                },
+                "checkbox" : {
+                    "keep_selected_style" : false
+                },
+                "types" : {
+                    "#" : { "max_depth" : 3, "valid_children" : ["building","room"] },
+                    "building" : {
+                        "icon" : "{{url('plugins/jstree/img/building.png')}}",
+                        "valid_children" : ["room"]
+                    },
+                    "room" :{
+                        "icon" : "{{url('plugins/jstree/img/door.png')}}",
+                        "valid_children" : []
+                    }
+                },
+                "plugins" : [
+                    "wholerow",'checkbox', "contextmenu", "dnd", "search", "state","types"
+                ]
+            });
+
+            $("#btn").click(function () {
+                toggleSidebar();
+                //$('#side-window-right').toggleClass("collapsed");
+
+                return false;
+            });
+
         });
 
         function refresh_candidate_list (){
             $('#candidates-table').DataTable().ajax.reload();
         }
+
     </script>
 @stop
