@@ -33,6 +33,8 @@ Route::group([
     Route::group([], function() {
         Route::resource('buildings', 'BuildingController');
         Route::get('building-data', 'BuildingController@data')->name('admin.configuration.building.data');
+        Route::get('building-request-import', 'BuildingController@request_import')->name('admin.configuration.buildings.request_import');
+        Route::post('building-import', 'BuildingController@import')->name('admin.configuration.buildings.import');
     });
     Route::group([], function() {
         Route::resource('highSchools', 'HighSchoolController');
@@ -54,6 +56,8 @@ Route::group([
     Route::group([], function() {
         Route::resource('rooms', 'RoomController');
         Route::get('room-data', 'RoomController@data')->name('admin.configuration.room.data');
+        Route::get('room-request-import', 'RoomController@request_import')->name('admin.configuration.rooms.request_import');
+        Route::post('room-import', 'RoomController@import')->name('admin.configuration.rooms.import');
     });
     Route::group([], function() {
         Route::resource('studentBac2s', 'StudentBac2Controller');
@@ -83,6 +87,8 @@ Route::group([
     Route::group([], function() {
         Route::resource('roomTypes', 'RoomTypeController');
         Route::get('roomType-data', 'RoomTypeController@data')->name('admin.configuration.roomType.data');
+        Route::get('roomType-request-import', 'RoomTypeController@request_import')->name('admin.configuration.roomTypes.request_import');
+        Route::post('roomType-import', 'RoomTypeController@import')->name('admin.configuration.roomTypes.import');
     });
 
     Route::group([], function() {

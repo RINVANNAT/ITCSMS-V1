@@ -57,23 +57,26 @@ class EloquentRoomRepository implements RoomRepositoryContract
      */
     public function create($input)
     {
-        if (Room::where('name', $input['name'])->first()) {
-            throw new GeneralException(trans('exceptions.backend.configuration.rooms.already_exists'));
-        }
-
-
         $room = new Room();
         
         $room->name = $input['name'];
-        $room->nb_desk = $input['nb_desk'];
-        $room->nb_chair = $input['nb_chair'];
-        $room->nb_chair_exam = $input['nb_chair_exam'];
-        $room->description = $input['description'];
-        $room->size = $input['size'];
+        if(isset($input['nb_desk'])){
+            $room->nb_desk = $input['nb_desk'];
+        }
+        if(isset($input['nb_chair'])){
+            $room->nb_chair = $input['nb_chair'];
+        }
+        if(isset($input['nb_chair_exam'])) $room->nb_chair_exam = $input['nb_chair_exam'];
+
+        if(isset($input['description']))$room->description = $input['description'];
+        if(isset($input['size']))$room->size = $input['size'];
         $room->active = isset($input['active'])?true:false;
-        $room->room_type_id = $input['room_type_id'];
-        $room->department_id = $input['department_id'];
-        $room->building_id = $input['building_id'];
+        if(isset($input['room_type_id']))$room->room_type_id = $input['room_type_id'];
+        if(isset($input['department_id']))$room->department_id = $input['department_id'];
+        if(isset($input['building_id']))$room->building_id = $input['building_id'];
+
+        if(isset($input['is_exam_room']))$room->is_exam_room = $input['is_exam_room'];
+        
         $room->created_at = Carbon::now();
         $room->create_uid = auth()->id();
 
