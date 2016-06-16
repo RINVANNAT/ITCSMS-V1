@@ -63,6 +63,7 @@ class CourseController extends Controller
         return view('backend.course.courseProgram.index'
             , compact("degrees", "grades", "departments", "semesters", "academicYears"));
         // create dev branch test!
+        // test merge
 
     }
 
