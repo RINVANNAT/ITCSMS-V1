@@ -51,7 +51,7 @@
                     </tr>
                     </thead>
                 </table>
-            </div>
+            </div>​
 
             <div class="clearfix"></div>
         </div><!-- /.box-body -->

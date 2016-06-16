@@ -139,6 +139,12 @@
                     <li class="{{ Active::pattern('admin/configuration/academicYears*') }}">
                         <a href="{!! url('admin/configuration/academicYears') !!}">{{ trans('menus.backend.configuration.academicYears') }}</a>
                     </li>
+
+                    {{--course section import course --}}
+                    <li class="{{ Active::pattern('admin/configuration/academicYears*') }}">
+                        <a href="{{ route('admin.course.course_program.request_import_config')}}">{{ trans('menus.backend.configuration.course') }}</a>
+                    </li>
+
                     <li class="{{ Active::pattern('admin/configuration/accounts*') }}">
                         <a href="{!! url('admin/configuration/accounts') !!}">{{ trans('menus.backend.configuration.accounts') }}</a>
                     </li>

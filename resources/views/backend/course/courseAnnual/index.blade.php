@@ -77,7 +77,7 @@
                 ajax: '{!! route('admin.course.course_annual.data') !!}',
                 columns: [
                     { data: 'name', name: 'name'},
-                    { data: 'semester', name: 'semester'},
+                    { data: 'semester_id', name: 'semester_id'},
                     { data: 'academic_year_id', name: 'academic_year_id'},
                     { data: 'department_id', name: 'department_id'},
                     { data: 'degree_id', name: 'degree_id'},
@@ -87,7 +87,7 @@
                 ]
             });
 
-            enableDeleteRecord($('#courseAnnuals-table'));
+//            enableDeleteRecord($('#courseAnnuals-table'));
         });
     </script>
 @stop

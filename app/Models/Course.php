@@ -46,7 +46,6 @@ class Course extends Model
 		"time_td" => "integer",
 		"time_course" => "integer",
 		"credit" => "float"
-		
     ];
 
 	public static $rules = [

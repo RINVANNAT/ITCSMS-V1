@@ -97,6 +97,7 @@ class IncomeController extends Controller
 
     public function candidate_payment_data()
     {
+        //note
         $candidates = DB::table('candidates')
             ->leftJoin('origins','candidates.province_id','=','origins.id')
             ->leftJoin('gdeGrades','candidates.bac_total_grade','=','gdeGrades.id')

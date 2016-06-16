@@ -18,5 +18,8 @@ Route::group([
         Route::get('course-program-request-import', 'CourseController@request_import')->name('admin.course.course_program.request_import');
         Route::post('course-program-import', 'CourseController@import')->name('admin.course.course_program.import');
         Route::resource('course_program', 'CourseController');
+        Route::get('course-request-import-config', 'CourseController@request_import_config')->name('admin.course.course_program.request_import_config');
+        Route::post('course-import-config', 'CourseController@import_config')->name('admin.course.course_program.import_config');
+
     });
 });

@@ -19,6 +19,7 @@ class Employee extends Model
         "create_uid",
         "write_uid",
         "department_id",
+        "gender_id",
         "user_id"
 	];
 

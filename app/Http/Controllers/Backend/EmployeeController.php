@@ -67,6 +67,7 @@ class EmployeeController extends Controller
     public function store(StoreEmployeeRequest $request)
     {
         $this->employees->create($request->all());
+
         return redirect()->route('admin.employees.index')->withFlashSuccess(trans('alerts.backend.generals.created'));
     }
 

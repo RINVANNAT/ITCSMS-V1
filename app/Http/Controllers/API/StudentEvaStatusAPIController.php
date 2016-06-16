@@ -1,6 +1,4 @@
-<?php
-
-namespace App\Http\Controllers\API;
+<?php namespace App\Http\Controllers\API;
 
 use App\Http\Requests\API\CreateStudentEvaStatusAPIRequest;
 use App\Http\Requests\API\UpdateStudentEvaStatusAPIRequest;
@@ -14,15 +12,18 @@ use Prettus\Repository\Criteria\RequestCriteria;
 use Response;
 
 /**
- * Class StudentEvaStatusController
+ * Class StudentEvaStatusAPIController
  * @package App\Http\Controllers\API
  */
-
 class StudentEvaStatusAPIController extends AppBaseController
 {
     /** @var  StudentEvaStatusRepository */
     private $studentEvaStatusRepository;
 
+    /**
+     * StudentEvaStatusAPIController constructor.
+     * @param StudentEvaStatusRepository $studentEvaStatusRepo
+     */
     public function __construct(StudentEvaStatusRepository $studentEvaStatusRepo)
     {
         $this->studentEvaStatusRepository = $studentEvaStatusRepo;

@@ -62,6 +62,7 @@ return [
             'grades'=> 'Grades',
             'degrees' => 'Degrees',
             'academicYears' => 'Academic Years',
+            'course'=>"Course",
             'highSchools' => 'High School',
             'accounts' => 'Account',
             'incomeTypes' => 'Income Type',

@@ -5,7 +5,7 @@ use Illuminate\Database\Eloquent\Model as Model;
 class CourseAnnual extends Model
 {
 
-	public $table = "courseAnnuals";
+	public $table = "course_annuals";
     
 
 	public $fillable = [
@@ -14,8 +14,9 @@ class CourseAnnual extends Model
 		"degree_id",
 		"grade_id",
 		"academic_year_id",
+		"employee_id",
 		"course_id",
-		"semester",
+		"semester_id",
         "create_uid",
         "write_uid"
 	];
@@ -58,7 +59,13 @@ class CourseAnnual extends Model
     ];
 
 	public static $rules = [
-
+		"department_id" => "Required",
+		"degree_id" => "Required|numeric",
+		"grade_id" => "Required|numeric",
+		"academic_year_id" => "Required|numeric",
+		"employee_id"=>"Required|numeric",
+		"course_id"=>"Required|numeric",
+		"semester_id"=>"Required|numeric",
 	];
 
 }

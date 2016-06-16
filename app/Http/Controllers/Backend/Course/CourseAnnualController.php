@@ -2,10 +2,10 @@
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Backend\Configuration\CourseAnnual\CreateCourseAnnualRequest;
-use App\Http\Requests\Backend\Configuration\CourseProgram\DeleteCourseProgramRequest;
-use App\Http\Requests\Backend\Configuration\CourseProgram\EditCourseProgramRequest;
-use App\Http\Requests\Backend\Configuration\CourseProgram\StoreCourseProgramRequest;
-use App\Http\Requests\Backend\Configuration\CourseProgram\UpdateCourseProgramRequest;
+use App\Http\Requests\Backend\Configuration\CourseAnnual\DeleteCourseProgramRequest;
+use App\Http\Requests\Backend\Configuration\CourseAnnual\EditCourseProgramRequest;
+use App\Http\Requests\Backend\Configuration\CourseAnnual\StoreCourseProgramRequest;
+use App\Http\Requests\Backend\Configuration\CourseAnnual\UpdateCourseProgramRequest;
 use App\Models\AcademicYear;
 use App\Models\Course;
 use App\Models\Degree;
@@ -138,16 +138,29 @@ class CourseAnnualController extends Controller
 
     public function data()
     {
+        $courseAnnuals = DB::table('course_annuals')
+            ->leftJoin('courses','course_annuals.course_id', '=', 'courses.id')
+            ->leftJoin('employees','course_annuals.employee_id', '=', 'employees.id')
 
-        $courseAnnuals = DB::table('courseAnnuals')
-            ->select(['id','name','semester','active','academic_year_id','employee_id','department_id','degree_id','grade_id','course_id']);
+            ->select(
+                ['course_annuals.id',
+                    'courses.name_en as name',
+                    'course_annuals.semester_id',
+                    'course_annuals.active',
+                    'course_annuals.academic_year_id',
+                    'employees.name_latin as employee_id',
+                    'course_annuals.department_id',
+                    'course_annuals.degree_id',
+                    'course_annuals.grade_id',
+                    'course_annuals.course_id']);
+
 
         $datatables =  app('datatables')->of($courseAnnuals);
 
 
         return $datatables
             ->editColumn('name', '{!! $name !!}')
-            ->editColumn('semester', '{!! $semester !!}')
+            ->editColumn('semester_id', '{!! $semester_id !!}')
             ->editColumn('academic_year_id', '{!! $academic_year_id !!}')
             ->editColumn('department_id', '{!! $department_id !!}')
             ->editColumn('degree_id', '{!! $degree_id !!}')
