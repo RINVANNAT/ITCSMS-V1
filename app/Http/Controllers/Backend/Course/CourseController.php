@@ -6,6 +6,7 @@ use App\Http\Requests\Backend\Course\CourseProgram\DeleteCourseProgramRequest;
 use App\Http\Requests\Backend\Course\CourseProgram\EditCourseProgramRequest;
 use App\Http\Requests\Backend\Course\CourseProgram\StoreCourseProgramRequest;
 use App\Http\Requests\Backend\Course\CourseProgram\UpdateCourseProgramRequest;
+use App\Models\AcademicYear;
 use App\Models\Employee;
 use App\Repositories\Backend\CourseProgram\CourseProgramRepositoryContract;
 use App\Utils\StringUtils;
@@ -54,9 +55,15 @@ class CourseController extends Controller
      */
     public function index()
     {
-        return view('backend.course.courseProgram.index');
+        $academicYears = AcademicYear::lists("name_en", "id");
+        $degrees = Degree::lists("name_en", "id");
+        $grades = Grade::lists("name_en", "id");
+        $departments = Department::lists("name_en", "id");
+        $semesters = Semester::lists("name_en", "id");
+        return view('backend.course.courseProgram.index'
+            , compact("degrees", "grades", "departments", "semesters", "academicYears"));
         // create dev branch test!
-        
+
     }
 
 
@@ -143,7 +150,7 @@ class CourseController extends Controller
         }
     }
 
-    public function data()
+    public function data(Request $request)
     {
 
         $coursePrograms = DB::table('courses')

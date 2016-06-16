@@ -9,6 +9,12 @@
 
 @section('after-styles-end')
     {!! Html::style('plugins/datatables/dataTables.bootstrap.css') !!}
+    {!! Html::style('plugins/daterangepicker/daterangepicker-bs3.css') !!}
+    <style>
+        .toolbar {
+            float: left;
+        }
+    </style>
 @stop
 @section('content')
     @if (Session::has('flash_notification.message'))
@@ -70,11 +76,26 @@
     {!! Html::script('plugins/datatables/dataTables.bootstrap.min.js') !!}
     <script>
         $(function() {
-            $('#courseAnnuals-table').DataTable({
+            var oTable = $('#courseAnnuals-table').DataTable({
+                dom: 'l<"toolbar">frtip',
                 processing: true,
                 serverSide: true,
                 pageLength: {!! config('app.records_per_page')!!},
-                ajax: '{!! route('admin.course.course_annual.data') !!}',
+
+                ajax: {
+                    url:"{!! route('admin.course.course_annual.data') !!}",
+                    data:function(d){
+                        // In case additional fields is added for filter, modify export view as well: popup_export.blade.php
+                        d.academic_year = $('#filter_academic_year').val();
+//                        d.degree = $('#filter_degree').val();
+//                        d.grade = $('#filter_grade').val();
+//                        d.department = $('#filter_department').val();
+//                        d.gender = $('#filter_gender').val();
+//                        d.option = $('#filter_option').val();
+//                        d.origin = $('#filter_origin').val();
+                    }
+                },
+
                 columns: [
                     { data: 'name', name: 'name'},
                     { data: 'semester_id', name: 'semester_id'},
@@ -88,6 +109,18 @@
             });
 
 //            enableDeleteRecord($('#courseAnnuals-table'));
+
+            $("div.toolbar").html(
+                    '{!! Form::select('academic_year',$academicYears,null, array('class'=>'form-control','id'=>'filter_academic_year')) !!} '
+                    {{--'{!! Form::select('degree',$degrees,null, array('class'=>'form-control','id'=>'filter_degree','placeholder'=>'Degree')) !!} '+--}}
+                    {{--'{!! Form::select('grade',$grades,null, array('class'=>'form-control','id'=>'filter_grade','placeholder'=>'Grade')) !!} '+--}}
+                    {{--'{!! Form::select('department',$departments,null, array('class'=>'form-control','id'=>'filter_department','placeholder'=>'Department')) !!} ' +--}}
+                    {{----}}
+            );
+            $('#filter_academic_year').on('change', function(e) {
+                oTable.draw();
+                e.preventDefault();
+            });
         });
     </script>
 @stop

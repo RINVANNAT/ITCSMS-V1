@@ -48,7 +48,12 @@ class CourseAnnualController extends Controller
      */
     public function index()
     {
-        return view('backend.course.courseAnnual.index');
+        $departments = Department::lists('name_kh','id')->toArray();
+        $academicYears = AcademicYear::lists('name_kh','id')->toArray();
+        $degrees = Degree::lists('name_kh','id')->toArray();
+        $grades = Grade::lists('name_kh','id')->toArray();
+        $courses = Course::lists('name_kh','id')->toArray();
+        return view('backend.course.courseAnnual.index',compact('departments','academicYears','degrees','grades','courses'));
     }
 
     /**
@@ -136,7 +141,7 @@ class CourseAnnualController extends Controller
         return redirect()->route('admin.course.academicYears.index')->withFlashSuccess(trans('alerts.backend.generals.deleted'));
     }
 
-    public function data()
+    public function data(Request $request)
     {
         $courseAnnuals = DB::table('course_annuals')
             ->leftJoin('courses','course_annuals.course_id', '=', 'courses.id')
@@ -158,7 +163,7 @@ class CourseAnnualController extends Controller
         $datatables =  app('datatables')->of($courseAnnuals);
 
 
-        return $datatables
+        $datatables
             ->editColumn('name', '{!! $name !!}')
             ->editColumn('semester_id', '{!! $semester_id !!}')
             ->editColumn('academic_year_id', '{!! $academic_year_id !!}')
@@ -169,8 +174,15 @@ class CourseAnnualController extends Controller
             ->addColumn('action', function ($courseAnnual) {
                 return  '<a href="'.route('admin.course.course_annual.edit',$courseAnnual->id).'" class="btn btn-xs btn-primary"><i class="fa fa-pencil" data-toggle="tooltip" data-placement="top" title="" data-original-title="'.trans('buttons.general.crud.edit').'"></i> </a>'.
                 ' <button class="btn btn-xs btn-danger btn-delete" data-remote="'.route('admin.course.course_annual.destroy', $courseAnnual->id) .'"><i class="fa fa-times" data-toggle="tooltip" data-placement="top" title="' . trans('buttons.general.crud.delete') . '"></i></button>';
-            })
-            ->make(true);
+            });
+
+        if ($academic_year = $datatables->request->get('academic_year')) {
+            $datatables->where('course_annuals.academic_year_id', '=', $academic_year);
+        } else {
+            $last_academic_year_id =AcademicYear::orderBy('id','desc')->first()->id;
+            $datatables->where('course_annuals.academic_year_id', '=', $last_academic_year_id);
+        }
+        return $datatables->make(true);
     }
     public function request_import(RequestImportCourseRequest $request){
 
