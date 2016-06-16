@@ -182,6 +182,16 @@ class CourseAnnualController extends Controller
             $last_academic_year_id =AcademicYear::orderBy('id','desc')->first()->id;
             $datatables->where('course_annuals.academic_year_id', '=', $last_academic_year_id);
         }
+        if ($degree = $datatables->request->get('degree')) {
+            $datatables->where('course_annuals.degree_id', '=', $degree);
+        }
+        if ($grade = $datatables->request->get('grade')) {
+            $datatables->where('course_annuals.grade_id', '=', $grade);
+        }
+        if ($department = $datatables->request->get('department')) {
+            $datatables->where('course_annuals.department_id', '=', $department);
+        }
+
         return $datatables->make(true);
     }
     public function request_import(RequestImportCourseRequest $request){
