@@ -46,7 +46,9 @@ class CourseAnnual extends Model
 	public function course(){
 		return $this->belongsTo('App\Models\Course');
 	}
-
+	public function exams(){
+		return $this->belongsToMany('App\Models\Exam');
+	}
 
 
     /**

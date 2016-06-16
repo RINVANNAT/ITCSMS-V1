@@ -8,9 +8,11 @@ use App\Http\Requests\Backend\Exam\StoreExamRequest;
 use App\Http\Requests\Backend\Exam\UpdateExamRequest;
 use App\Models\AcademicYear;
 use App\Models\Department;
+use App\Models\Exam;
 use App\Models\ExamType;
 use App\Repositories\Backend\Exam\ExamRepositoryContract;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Response;
 
 class ExamController extends Controller
 {
@@ -62,12 +64,11 @@ class ExamController extends Controller
      * Store a newly created resource in storage.
      *
      * @param  StoreExamRequest  $request
-     * @param int $id
      * @return \Illuminate\Http\Response
      */
-    public function store(StoreExamRequest $request, $id)
+    public function store(StoreExamRequest $request)
     {
-        $this->exams->create($request->all());
+        $id = $this->exams->create($request->all());
         return redirect()->route('admin.exams.show',$id)->withFlashSuccess(trans('alerts.backend.generals.created'));
     }
 
@@ -108,7 +109,7 @@ class ExamController extends Controller
     /**
      * Update the specified resource in storage.
      *
-     * @param  \Illuminate\Http\Request  $request
+     * @param  UpdateExamRequest  $request
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
@@ -154,6 +155,62 @@ class ExamController extends Controller
                 ' <a href="'.route('admin.exams.show',$exam->id).'" class="btn btn-xs btn-info"><i class="fa fa-eye" data-toggle="tooltip" data-placement="top" title="" data-original-title="'.trans('buttons.general.view').'"></i> </a>';
             })
             ->make(true);
+    }
+    
+    public function get_courses($id){
+        $exam = $this->exams->findOrThrowException($id);
+        $course = $exam->courses();
+
+        //dd($course->get());
+        $datatables =  app('datatables')->of($course);
+
+
+        return $datatables
+            ->editColumn('name', '{!! $name !!}')
+            ->editColumn('date_start', '{!! $date_start !!}')
+            ->editColumn('date_end', '{!! $date_end !!}')
+            ->editColumn('description', '{!! $description !!}')
+            ->addColumn('action', function ($exam) {
+                return  '<a href="'.route('admin.exams.edit',$exam->id).'" class="btn btn-xs btn-primary"><i class="fa fa-pencil" data-toggle="tooltip" data-placement="top" title="" data-original-title="'.trans('buttons.general.crud.edit').'"></i> </a>'.
+                ' <button class="btn btn-xs btn-danger btn-delete" data-remote="'.route('admin.exams.destroy', $exam->id) .'"><i class="fa fa-times" data-toggle="tooltip" data-placement="top" title="' . trans('buttons.general.crud.delete') . '"></i></button>'.
+                ' <a href="'.route('admin.exams.show',$exam->id).'" class="btn btn-xs btn-info"><i class="fa fa-eye" data-toggle="tooltip" data-placement="top" title="" data-original-title="'.trans('buttons.general.view').'"></i> </a>';
+            })
+            ->make(true);
+    }
+
+    public function get_buildings($id){
+        $buildings = array(
+            array(
+                "id"=>"building_a",
+                "text" => "Building A",
+                "children"=>true,
+                "type"=>"building"
+            ),
+            array(
+                "id"=>"building_b",
+                "text" => "Building B",
+                "children"=>true,
+                "type"=>"building"
+            )
+        );
+
+        return Response::json($buildings);
+    }
+
+    public function get_rooms($id){
+        $rooms = array(
+            array(
+                "id"=>"207_b",
+                "text" => "207B",
+                "type"=>"room"
+            ),
+            array(
+                "id"=>"208_b",
+                "text" => "208B",
+                "type" => "room",
+            )
+        );
+        return Response::json($rooms);
     }
 
 }
