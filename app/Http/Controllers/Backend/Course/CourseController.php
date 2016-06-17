@@ -55,11 +55,11 @@ class CourseController extends Controller
      */
     public function index()
     {
-        $academicYears = AcademicYear::lists("name_en", "id");
-        $degrees = Degree::lists("name_en", "id");
-        $grades = Grade::lists("name_en", "id");
-        $departments = Department::lists("name_en", "id");
-        $semesters = Semester::lists("name_en", "id");
+//        $academicYears = AcademicYear::lists("name_en", "id");
+//        $degrees = Degree::lists("name_en", "id");
+//        $grades = Grade::lists("name_en", "id");
+//        $departments = Department::lists("name_en", "id");
+//        $semesters = Semester::lists("name_en", "id");
         return view('backend.course.courseProgram.index'
             , compact("degrees", "grades", "departments", "semesters", "academicYears"));
         // create dev branch test!
