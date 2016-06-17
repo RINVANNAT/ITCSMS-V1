@@ -8,7 +8,7 @@ Route::group([], function() {
 
     Route::get('exams/{id}/data', 'ExamController@data')->name('admin.exam.data');
     Route::get('exams/{id}/get_courses', 'ExamController@get_courses')->name('admin.exam.get_courses');
-    Route::get('exams/{id}/get_buildings', 'ExamController@get_buildings')->name('admin.exam.get_buildings');
-    Route::get('exams/{id}/get_rooms', 'ExamController@get_rooms')->name('admin.exam.get_rooms');
+    Route::get('exams/{id}/get_buildings/{type}', 'ExamController@get_buildings')->name('admin.exam.get_buildings');
+    Route::get('exams/{id}/get_rooms/{type}', 'ExamController@get_rooms')->name('admin.exam.get_rooms');
     Route::get('exams/{id}/get_staffs', 'ExamController@get_staffs')->name('admin.exam.get_staffs');
 });

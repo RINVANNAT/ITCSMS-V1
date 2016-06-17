@@ -7,6 +7,7 @@ use App\Http\Requests\Backend\Exam\EditExamRequest;
 use App\Http\Requests\Backend\Exam\StoreExamRequest;
 use App\Http\Requests\Backend\Exam\UpdateExamRequest;
 use App\Models\AcademicYear;
+use App\Models\Building;
 use App\Models\Department;
 use App\Models\Exam;
 use App\Models\ExamType;
@@ -178,8 +179,22 @@ class ExamController extends Controller
             ->make(true);
     }
 
-    public function get_buildings($id){
-        $buildings = array(
+    public function get_buildings($id, $type){
+        $data = array(
+            array()
+        );
+        if($type == "selected"){
+            $selected_building = DB::table('rooms')
+                ->select('buildings.name','buildings.id')
+                ->where('rooms.id','exam_room.room_id')
+                ->where('exam_room.exam_id',$id)
+                ->join('exam_room','rooms.id','=','exam_room.room_id')
+                ->join('buildings','rooms.building_id','=','buildings.id')
+                ->get();
+        } else if($type == "available"){
+
+        }
+        /*$buildings = array(
             array(
                 "id"=>"building_a",
                 "text" => "Building A",
@@ -192,12 +207,12 @@ class ExamController extends Controller
                 "children"=>true,
                 "type"=>"building"
             )
-        );
+        );*/
 
-        return Response::json($buildings);
+        return Response::json($data);
     }
 
-    public function get_rooms($id){
+    public function get_rooms($id,$type){
         $rooms = array(
             array(
                 "id"=>"207_b",

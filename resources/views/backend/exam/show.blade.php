@@ -237,7 +237,7 @@
                     },
                     "data":{
                         'url' : function (node) {
-                            return node.id === '#' ? '{{route('admin.exam.get_buildings',1)}}' : '{{route('admin.exam.get_rooms',1)}}';
+                            return node.id === '#' ? '{{route('admin.exam.get_buildings',[$exam->id,"available"])}}' : '{{route('admin.exam.get_rooms',[$exam->id,"available"])}}';
                         },
                         'data' : function (node) {
                             return { 'id' : node.id };
@@ -274,7 +274,7 @@
                     },
                     "data":{
                         'url' : function (node) {
-                            return node.id === '#' ? '{{route('admin.exam.get_buildings',1)}}' : '{{route('admin.exam.get_rooms',1)}}';
+                            return node.id === '#' ? '{{route('admin.exam.get_buildings',[$exam->id,"selected"])}}' : '{{route('admin.exam.get_rooms',[$exam->id,"selected"])}}';
                         },
                         'data' : function (node) {
                             return { 'id' : node.id };
