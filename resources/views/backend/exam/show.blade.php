@@ -29,8 +29,6 @@
             overflow-x: hidden; /* necessary to hide collapsed sidebars */
         }
         #main-window {
-            background-color: lightyellow;
-
             -webkit-transition: width 0.3s ease;
             -moz-transition: width 0.3s ease;
             -o-transition: width 0.3s ease;
@@ -41,8 +39,6 @@
         }
 
         .side-window {
-            background-color: lightgrey;
-
             -webkit-transition: margin 0.3s ease;
             -moz-transition: margin 0.3s ease;
             -o-transition: margin 0.3s ease;
@@ -137,9 +133,6 @@
             var right = $("#side-window-right"),
                     content = $("#main-window"),
                     contentClass = "";
-
-
-
             // determine number of open sidebars
             if (content.hasClass("col-sm-6")) {
                 contentClass = "col-sm-12";
@@ -153,7 +146,7 @@
                     .addClass(contentClass);
 
             if(content.hasClass("col-sm-6")){
-                right.delay(500).show(0);
+                right.delay(300).show(0);
             }
 
         }
@@ -307,7 +300,7 @@
                 ]
             });
 
-            $("#btn").click(function () {
+            $("#btn-add").click(function () {
                 toggleSidebar();
                 //$('#side-window-right').toggleClass("collapsed");
 

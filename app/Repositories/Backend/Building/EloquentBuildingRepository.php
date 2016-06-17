@@ -62,12 +62,14 @@ class EloquentBuildingRepository implements BuildingRepositoryContract
             throw new GeneralException(trans('exceptions.backend.configuration.buildings.already_exists'));
         }
 
-        $count = Building::count();
+        //$count = Building::count();
         $building = new Building();
 
-        $building->id = $count+1;
+        //$building->id = $count+1;
         $building->name = $input['name'];
-        $building->description = $input['description'];
+        if(isset($input['description']))$building->description = $input['description'];
+        if(isset($input['code']))$building->code = $input['code'];
+        
         $building->created_at = Carbon::now();
         $building->create_uid = auth()->id();
 

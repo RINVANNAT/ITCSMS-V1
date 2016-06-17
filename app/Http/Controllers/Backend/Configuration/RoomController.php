@@ -6,6 +6,8 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\Backend\Configuration\Room\CreateRoomRequest;
 use App\Http\Requests\Backend\Configuration\Room\DeleteRoomRequest;
 use App\Http\Requests\Backend\Configuration\Room\EditRoomRequest;
+use App\Http\Requests\Backend\Configuration\Room\ImportRoomRequest;
+use App\Http\Requests\Backend\Configuration\Room\RequestImportRoomRequest;
 use App\Http\Requests\Backend\Configuration\Room\StoreRoomRequest;
 use App\Http\Requests\Backend\Configuration\Room\UpdateRoomRequest;
 use App\Models\Building;
@@ -14,7 +16,9 @@ use App\Models\Room;
 use App\Models\RoomType;
 use App\Models\School;
 use App\Repositories\Backend\Room\RoomRepositoryContract;
+use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
+use Maatwebsite\Excel\Facades\Excel;
 
 class RoomController extends Controller
 {
@@ -147,6 +151,51 @@ class RoomController extends Controller
                 ' <button class="btn btn-xs btn-danger btn-delete" data-remote="'.route('admin.configuration.rooms.destroy', $room->room_id) .'"><i class="fa fa-times" data-toggle="tooltip" data-placement="top" title="' . trans('buttons.general.crud.delete') . '"></i></button>';
             })
             ->make(true);
+    }
+
+    public function request_import(RequestImportRoomRequest $request){
+
+        return view('backend.configuration.room.import');
+
+    }
+
+    public function import(ImportRoomRequest $request){
+        $now = Carbon::now()->format('Y_m_d_H');
+
+        // try to move uploaded file to a temporary location
+        if($request->file('import')!= null){
+            $import = $now. '.' .$request->file('import')->getClientOriginalExtension();
+
+            $request->file('import')->move(
+                base_path() . '/public/assets/uploaded_file/temp/', "room_".$import
+            );
+
+            $storage_path = base_path() . '/public/assets/uploaded_file/temp/room_'.$import;
+
+            DB::beginTransaction();
+
+            try{
+                Excel::filter('chunk')->load($storage_path)->chunk(100, function($results){
+
+                    $results->each(function($row) {
+                        $room = $this->rooms->create($row->toArray());
+                    });
+                });
+            } catch(Exception $e){
+                DB::rollback();
+            }
+            DB::commit();
+
+            //UserLog
+            /*UserLog::log([
+                'model' => 'HighSchool',
+                'action'      => 'Import',
+                'data'     => 'none', // if it is create action, store only the new id.
+                'developer'   => Auth::id() == 1?true:false
+            ]);*/
+
+            return redirect(route('admin.configuration.rooms.index'));
+        }
     }
 
 }

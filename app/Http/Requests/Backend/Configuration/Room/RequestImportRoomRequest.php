@@ -5,10 +5,10 @@ namespace App\Http\Requests\Backend\Configuration\Room;
 use App\Http\Requests\Request;
 
 /**
- * Class StoreRoomRequest
+ * Class RequestImportRoomRequest
  * @package App\Http\Requests\Backend\Configuration\Room
  */
-class StoreRoomRequest extends Request
+class RequestImportRoomRequest extends Request
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -28,10 +28,6 @@ class StoreRoomRequest extends Request
     public function rules()
     {
         return [
-            'name' => 'required|max:10',
-            'room_type_id' => 'required',
-            'building_id' => 'required',
-            'department_id' => 'required',
         ];
     }
 }
