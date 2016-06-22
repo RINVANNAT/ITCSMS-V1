@@ -179,53 +179,84 @@ class ExamController extends Controller
             ->make(true);
     }
 
-    public function get_buildings($id, $type){
-        $data = array(
-            array()
-        );
-        if($type == "selected"){
-            $selected_building = DB::table('rooms')
-                ->select('buildings.name','buildings.id')
-                ->where('rooms.id','exam_room.room_id')
-                ->where('exam_room.exam_id',$id)
-                ->join('exam_room','rooms.id','=','exam_room.room_id')
-                ->join('buildings','rooms.building_id','=','buildings.id')
-                ->get();
-        } else if($type == "available"){
+    public function get_buildings($id){
+        $type = $_GET['type'];
+        $data = array();
+        $all_ids = $this->get_all_room_ids();
+        $ids = $this->get_selected_room_ids($id);
 
+        if($type == "available"){
+            $ids = $this->get_available_room_ids($all_ids,$ids);
         }
-        /*$buildings = array(
-            array(
-                "id"=>"building_a",
-                "text" => "Building A",
+
+        $buildings = DB::table('rooms')
+            ->select('buildings.name','buildings.id')
+            ->whereIN('rooms.id',$ids)
+            ->join('buildings','rooms.building_id','=','buildings.id')
+            ->groupBy('buildings.id')
+            ->get();
+
+        foreach ($buildings as $building){
+            $element = array(
+                "id"=>$building->id,
+                "text" => $building->name,
                 "children"=>true,
                 "type"=>"building"
-            ),
-            array(
-                "id"=>"building_b",
-                "text" => "Building B",
-                "children"=>true,
-                "type"=>"building"
-            )
-        );*/
+            );
+            array_push($data,$element);
+        }
 
         return Response::json($data);
     }
 
-    public function get_rooms($id,$type){
-        $rooms = array(
-            array(
-                "id"=>"207_b",
-                "text" => "207B",
+    public function get_rooms($id){
+        $type = $_GET['type'];
+        $building = $_GET['id'];
+        $data = array();
+        $all_ids = $this->get_all_room_ids();
+        $ids = $this->get_selected_room_ids($id);
+
+        if($type == "available"){
+            $ids = $this->get_available_room_ids($all_ids,$ids);
+        }
+
+        $rooms = DB::table('rooms')
+            ->select('rooms.name','rooms.id','rooms.nb_chair_exam', 'buildings.code')
+            ->where('rooms.building_id',$building)
+            ->whereIN('rooms.id',$ids)
+            ->join('buildings','rooms.building_id','=','buildings.id')
+            ->get();
+
+        foreach ($rooms as $room){
+            $element = array(
+                "id" => $room->id,
+                "text" => $room->name.$room->code,
+                "children"=>false,
                 "type"=>"room"
-            ),
-            array(
-                "id"=>"208_b",
-                "text" => "208B",
-                "type" => "room",
-            )
-        );
-        return Response::json($rooms);
+            );
+            array_push($data,$element);
+        }
+        return Response::json($data);
+    }
+
+    private function get_all_room_ids(){
+        $ids = DB::table('rooms')->where('is_exam_room',true)->lists('id');
+
+        return $ids;
+    }
+
+    private function get_selected_room_ids($exam_id){
+        $ids = DB::table('rooms')
+            ->where('exam_room.exam_id',$exam_id)
+            ->join('exam_room','rooms.id','=','exam_room.room_id')
+            ->lists('rooms.id');
+
+        return $ids;
+    }
+
+    private function get_available_room_ids($all_ids, $selected_ids){
+        $ids = array_diff($all_ids,$selected_ids);
+        return $ids;
     }
 
 }
