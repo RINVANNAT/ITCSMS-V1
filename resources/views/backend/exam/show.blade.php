@@ -267,7 +267,7 @@
 
             initJsTree($('#all_rooms'),'available');
 
-            initJsTree($('#selected_rooms'),'available');
+            initJsTree($('#selected_rooms'),'selected');
 
             $("#btn-add").click(function () {
                 toggleSidebar();

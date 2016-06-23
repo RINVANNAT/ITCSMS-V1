@@ -198,7 +198,7 @@ class ExamController extends Controller
 
         foreach ($buildings as $building){
             $element = array(
-                "id"=>$building->id,
+                "id"=>'building_'.$building->id,
                 "text" => $building->name,
                 "children"=>true,
                 "type"=>"building"
@@ -211,7 +211,7 @@ class ExamController extends Controller
 
     public function get_rooms($id){
         $type = $_GET['type'];
-        $building = $_GET['id'];
+        $building = explode('_', $_GET['id'])[1];
         $data = array();
         $all_ids = $this->get_all_room_ids();
         $ids = $this->get_selected_room_ids($id);
@@ -229,8 +229,8 @@ class ExamController extends Controller
 
         foreach ($rooms as $room){
             $element = array(
-                "id" => $room->id,
-                "text" => $room->name.$room->code,
+                "id" => 'room_'.$room->id,
+                "text" => $room->name.'-'.$room->code.' ('.$room->nb_chair_exam.')',
                 "children"=>false,
                 "type"=>"room"
             );
