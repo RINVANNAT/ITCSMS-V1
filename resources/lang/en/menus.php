@@ -106,6 +106,17 @@ return [
             'course_annuals' => 'Courses Annually',
             'course_programs' => 'Courses Program'
         ],
+        'score' => [
+            'title' => 'Score Management',
+            'score' => 'Score',
+            'input' => 'Input Student Score',
+            'ranking' => 'View Student Ranking'
+        ],
+        'absences' => [
+            'title' => 'Absence Management',
+            'absences' => 'Absences',
+            'input'=>'Input Student Absences'
+        ],
         'candidate' => [
             'title' => 'Candidate',
         ],

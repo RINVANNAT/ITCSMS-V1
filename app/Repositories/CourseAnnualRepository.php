@@ -11,7 +11,12 @@ class CourseAnnualRepository extends BaseRepository
      * @var array
      */
     protected $fieldSearchable = [
-        'test'
+        "name",
+        "department_id",
+        "degree_id",
+        "grade_id",
+        "academic_year_id",
+        "employee_id",
     ];
 
     /**

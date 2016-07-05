@@ -65,7 +65,7 @@ class CourseAnnualController extends Controller
     public function create(CreateCourseAnnualRequest $request)
     {
         $departments = Department::lists('name_kh','id')->toArray();
-        $academicYears = AcademicYear::lists('name_kh','id')->toArray();
+        $academicYears = AcademicYear::lists('name_kh','id')->orderBy('id')->toArray();
         $degrees = Degree::lists('name_kh','id')->toArray();
         $grades = Grade::lists('name_kh','id')->toArray();
         $courses = Course::lists('name_kh','id')->toArray();

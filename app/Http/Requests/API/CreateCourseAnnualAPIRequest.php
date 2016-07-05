@@ -24,6 +24,11 @@ class CreateCourseAnnualAPIRequest extends APIRequest
      */
     public function rules()
     {
-        return CourseAnnual::$rules;
+        return [
+            "department_id" => "Required",
+            "degree_id" => "Required|numeric",
+            "grade_id" => "Required|numeric",
+            "academic_year_id" => "Required|numeric",
+        ];
     }
 }

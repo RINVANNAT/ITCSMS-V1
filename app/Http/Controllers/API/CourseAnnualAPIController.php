@@ -12,6 +12,7 @@ use InfyOm\Generator\Criteria\LimitOffsetCriteria;
 use InfyOm\Generator\Utils\ResponseUtil;
 use Prettus\Repository\Criteria\RequestCriteria;
 use Response;
+use Illuminate\Support\Facades\DB;
 
 /**
  * Class CourseAnnualController
@@ -37,11 +38,8 @@ class CourseAnnualAPIController extends AppBaseController
      */
     public function index(CreateCourseAnnualAPIRequest $request)
     {
-
         $this->courseAnnualRepository->pushCriteria(new RequestCriteria($request));
         $this->courseAnnualRepository->pushCriteria(new LimitOffsetCriteria($request));
-
-
         // fix filter null
         $filters = $request->only('degree_id','grade_id','department_id','academic_year_id');
         if ($filters["academic_year_id"] == null){
@@ -49,9 +47,24 @@ class CourseAnnualAPIController extends AppBaseController
         }
 
 
-        $courseAnnuals = $this->courseAnnualRepository->findWhere($filters);
 
-        return $this->sendResponse($courseAnnuals->toArray(), 'CourseAnnuals retrieved successfully');
+//        $courseAnnuals = $this->courseAnnualRepository->findWhere($filters)->with('courses');
+//
+//
+        $courseAnnuals = DB::table('course_annuals')
+            ->leftJoin('courses','course_annuals.course_id', '=', 'courses.id')
+            ->where('course_annuals.degree_id', $filters['degree_id'])
+            ->where('course_annuals.grade_id', $filters['grade_id'])
+            ->where('course_annuals.department_id', $filters['department_id'])
+            ->where('course_annuals.academic_year_id', $filters['academic_year_id'])
+            ->select(
+                ['course_annuals.id',
+                    'courses.name_en as name',
+                    'course_annuals.course_id'])->get();
+//
+
+
+        return $this->sendResponse($courseAnnuals, 'CourseAnnuals retrieved successfully');
     }
 
     /**
@@ -65,9 +78,7 @@ class CourseAnnualAPIController extends AppBaseController
     public function store(CreateCourseAnnualAPIRequest $request)
     {
         $input = $request->all();
-
         $courseAnnuals = $this->courseAnnualRepository->create($input);
-
         return $this->sendResponse($courseAnnuals->toArray(), 'CourseAnnual saved successfully');
     }
 

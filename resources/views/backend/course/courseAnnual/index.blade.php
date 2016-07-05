@@ -114,27 +114,27 @@
                     '{!! Form::select('department',$departments,null, array('class'=>'form-control','id'=>'filter_department','placeholder'=>'Department')) !!} '
 
             );
-            $('#filter_academic_year, #filter_degree, #filter_grade, #filter_department').on('change', function(e) {
+//            $('#filter_academic_year, #filter_degree, #filter_grade, #filter_department').on('change', function(e) {
+//                oTable.draw();
+//                e.preventDefault();
+//            });
+            $('#filter_academic_year').on('change', function(e) {
                 oTable.draw();
                 e.preventDefault();
             });
-//            $('#filter_academic_year').on('change', function(e) {
-//                oTable.draw();
-//                e.preventDefault();
-//            });
-//
-//            $('#filter_degree').on('change', function(e) {
-//                oTable.draw();
-//                e.preventDefault();
-//            });
-//            $('#filter_grade').on('change', function(e) {
-//                oTable.draw();
-//                e.preventDefault();
-//            });
-//            $('#filter_department').on('change', function(e) {
-//                oTable.draw();
-//                e.preventDefault();
-//            });
+
+            $('#filter_degree').on('change', function(e) {
+                oTable.draw();
+                e.preventDefault();
+            });
+            $('#filter_grade').on('change', function(e) {
+                oTable.draw();
+                e.preventDefault();
+            });
+            $('#filter_department').on('change', function(e) {
+                oTable.draw();
+                e.preventDefault();
+            });
         });
     </script>
 @stop

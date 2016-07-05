@@ -73,6 +73,7 @@
                     <li class="{{ Active::pattern('admin/exams/'.config('access.exam.entrance_dut').'/*') }}">
                         <a href="{!! route('admin.exam.index',config('access.exam.entrance_dut')) !!}">{{ trans('menus.backend.exam.entrances-dut') }}</a>
                     </li>
+
                     <li class="{{ Active::pattern('admin/exams/'.config('access.exam.final_semester').'/*') }}">
                         <a href="{!! route('admin.exam.index',config('access.exam.final_semester')) !!}">{{ trans('menus.backend.exam.finals') }}</a>
                     </li>
@@ -85,6 +86,7 @@
                     <span>{{ trans('menus.backend.course.title') }}</span>
                     <i class="fa fa-angle-left pull-right"></i>
                 </a>
+                {{--course annule --}}
                 <ul class="treeview-menu {{ Active::pattern('admin/course/*', 'menu-open') }}" style="display: none; {{ Active::pattern('admin/course*', 'display: block;') }}">
                     <li class="{{ Active::pattern('admin/course/course_annual*') }}">
                         <a href="{!! url('admin/course/course_annual') !!}">{{ trans('menus.backend.course.course_annuals') }}</a>
@@ -92,6 +94,19 @@
                     <li class="{{ Active::pattern('admin/course/course_program*') }}">
                         <a href="{!! url('admin/course/course_program') !!}">{{ trans('menus.backend.course.course_programs') }}</a>
                     </li>
+
+                    <li class="{{ Active::pattern('admin/score/absences/input*') }}">
+                        <a href="{!! route('absences.input') !!}">{{ trans('menus.backend.absences.input') }}</a>
+                    </li>
+                    <li class="{{ Active::pattern('admin/score/input*') }}">
+                        <a href="{{ route('score.input')}}">{{ trans('menus.backend.score.input') }}</a>
+                    </li>
+                    <li class="{{ Active::pattern('admin/score/ranking*') }}">
+                        <a href="{{ route('score.ranking')}}">{{ trans('menus.backend.score.ranking') }}</a>
+                    </li>
+
+                    {{--ranking--}}
+
                 </ul>
             </li>
             @endauth
