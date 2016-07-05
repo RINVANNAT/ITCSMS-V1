@@ -151,6 +151,45 @@
 
         }
 
+        function initJsTree(object,type){
+            object.jstree({
+                "core" : {
+                    "animation":0,
+                    "check_callback" : true,
+                    'force_text' : true,
+                    "themes" : {
+                        "variant" : "large",
+                        "stripes" : true
+                    },
+                    "data":{
+                        'url' : function (node) {
+                            return node.id === '#' ? '{{route('admin.exam.get_buildings',$exam->id)}}'+'?type='+type : '{{route('admin.exam.get_rooms',$exam->id)}}'+'?type='+type;
+                        },
+                        'data' : function (node) {
+                            return { 'id' : node.id };
+                        }
+                    }
+                },
+                "checkbox" : {
+                    "keep_selected_style" : false
+                },
+                "types" : {
+                    "#" : { "max_depth" : 3, "valid_children" : ["building","room"] },
+                    "building" : {
+                        "icon" : "{{url('plugins/jstree/img/building.png')}}",
+                        "valid_children" : ["room"]
+                    },
+                    "room" :{
+                        "icon" : "{{url('plugins/jstree/img/door.png')}}",
+                        "valid_children" : []
+                    }
+                },
+                "plugins" : [
+                    "wholerow",'checkbox', "contextmenu", "dnd", "search", "state","types"
+                ]
+            });
+        }
+
         $(function(){
             $("#exam_show :input").attr("disabled", true);
 
@@ -226,79 +265,9 @@
                 PopupCenterDual('{{route("admin.studentBac2.popup_index")."?exam_id=".$exam->id}}','Add new customer','1200','960');
             });
 
-            $('#all_rooms').jstree({
-                "core" : {
-                    "animation":0,
-                    "check_callback" : true,
-                    'force_text' : true,
-                    "themes" : {
-                        "variant" : "large",
-                        "stripes" : true
-                    },
-                    "data":{
-                        'url' : function (node) {
-                            return node.id === '#' ? '{{route('admin.exam.get_buildings',1)}}' : '{{route('admin.exam.get_rooms',1)}}';
-                        },
-                        'data' : function (node) {
-                            return { 'id' : node.id };
-                        }
-                    }
-                },
-                "checkbox" : {
-                    "keep_selected_style" : false
-                },
-                "types" : {
-                    "#" : { "max_depth" : 3, "valid_children" : ["building","room"] },
-                    "building" : {
-                        "icon" : "{{url('plugins/jstree/img/building.png')}}",
-                        "valid_children" : ["room"]
-                    },
-                    "room" :{
-                        "icon" : "{{url('plugins/jstree/img/door.png')}}",
-                        "valid_children" : []
-                    }
-                },
-                "plugins" : [
-                    "wholerow",'checkbox', "contextmenu", "dnd", "search", "state","types"
-                ]
-            });
+            initJsTree($('#all_rooms'),'available');
 
-            $('#selected_rooms').jstree({
-                "core" : {
-                    "animation":0,
-                    "check_callback" : true,
-                    'force_text' : true,
-                    "themes" : {
-                        "variant" : "large",
-                        "stripes" : true
-                    },
-                    "data":{
-                        'url' : function (node) {
-                            return node.id === '#' ? '{{route('admin.exam.get_buildings',1)}}' : '{{route('admin.exam.get_rooms',1)}}';
-                        },
-                        'data' : function (node) {
-                            return { 'id' : node.id };
-                        }
-                    }
-                },
-                "checkbox" : {
-                    "keep_selected_style" : false
-                },
-                "types" : {
-                    "#" : { "max_depth" : 3, "valid_children" : ["building","room"] },
-                    "building" : {
-                        "icon" : "{{url('plugins/jstree/img/building.png')}}",
-                        "valid_children" : ["room"]
-                    },
-                    "room" :{
-                        "icon" : "{{url('plugins/jstree/img/door.png')}}",
-                        "valid_children" : []
-                    }
-                },
-                "plugins" : [
-                    "wholerow",'checkbox', "contextmenu", "dnd", "search", "state","types"
-                ]
-            });
+            initJsTree($('#selected_rooms'),'selected');
 
             $("#btn-add").click(function () {
                 toggleSidebar();
