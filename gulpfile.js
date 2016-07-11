@@ -1,8 +1,7 @@
 var elixir = require('laravel-elixir');
 
 elixir(function(mix) {
- mix
-     .phpUnit()
+ mix.phpUnit()
 
     /**
      * Copy needed files from /node directories

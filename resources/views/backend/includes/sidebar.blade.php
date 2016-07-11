@@ -80,6 +80,7 @@
                 </ul>
             </li>
             @endauth
+
             @permission('view-course-management')
             <li class="{{ Active::pattern('admin/course*') }} treeview">
                 <a href="#">

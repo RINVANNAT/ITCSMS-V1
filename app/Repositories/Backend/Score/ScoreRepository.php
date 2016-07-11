@@ -523,7 +523,6 @@ class ScoreRepository extends BaseRepository
         $grade_id= (int) $param["grade_id"];
         $department_id = (int) $param["department_id"];
         $course_annual_id = (int) $param["course_annual_id"];
-        $academic_year_id = 2015;
         if($param !=null && array_key_exists("semester_id", $param)){
             $semester_id = $param["semester_id"];
         }else{
@@ -568,6 +567,7 @@ class ScoreRepository extends BaseRepository
                 $scoretmp = array("degree_id"=>$degree_id, "grade_id"=> $grade_id, "department_id"=>$department_id, "academic_year_id"=>$academic_year_id,
                     "course_annual_id"=>$course_annual_id, "student_annual_id"=>$studentAnnual->id, "score10"=>0,"score30"=>0,"score60"=>0,"reexam"=>0,"create_uid"=>1);
                 Score::create($scoretmp);
+
             }
             $scorequeries = Score::query()
                 ->where("degree_id", $degree_id)
