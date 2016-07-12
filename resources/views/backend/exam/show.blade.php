@@ -50,6 +50,27 @@
         #side-window-right.collapsed {
             margin-right: -25%; /* same width as sidebar */
         }
+
+        #side_window_right_staff_role.collapsed {
+            margin-right: -25%; /* same width as sidebar */
+        }
+
+        #main_window_staff_role, .side-window {
+            min-height: 650px;
+
+        }
+
+        #main_window_staff_role {
+            -webkit-transition: width 0.3s ease;
+            -moz-transition: width 0.3s ease;
+            -o-transition: width 0.3s ease;
+            transition: width 0.3s ease;
+        }
+
+        #main_window_staff_role .btn-group {
+            margin-bottom: 10px;
+        }
+
     </style>
 @stop
 
@@ -129,6 +150,7 @@
 
         var candidate_datatable = null;
         var course_datatable = null;
+
         function toggleSidebar() {
             var right = $("#side-window-right"),
                     content = $("#main-window"),
@@ -149,6 +171,31 @@
                 right.delay(300).show(0);
             }
 
+        }
+
+        function toggleSidebarStaffRole() {
+
+            var right_staff_role = $("#side_window_right_staff_role"),
+                        content = $("#main_window_staff_role"),
+                        contentClass = "";
+                // determine number of open sidebars
+                if (content.hasClass("col-sm-6")) {
+                    contentClass = "col-sm-12";
+                    right_staff_role.hide();
+                } else {
+                    contentClass = "col-sm-6";
+                }
+
+                // apply class to content
+                content.removeClass("col-sm-12 col-sm-9 col-sm-6")
+                        .addClass(contentClass);
+
+                if(content.hasClass("col-sm-6")){
+                    // console.log('this me vannat');
+                    // console.log(right);
+                    right_staff_role.delay(300).show(0);
+
+                }
         }
 
         function initJsTree(object,type){
@@ -273,6 +320,12 @@
                 toggleSidebar();
                 //$('#side-window-right').toggleClass("collapsed");
 
+                return false;
+            });
+
+            $("#btn_add_role").click(function () {
+
+                toggleSidebarStaffRole();
                 return false;
             });
 
