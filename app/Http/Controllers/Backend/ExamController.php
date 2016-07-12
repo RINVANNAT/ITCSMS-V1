@@ -255,6 +255,7 @@ class ExamController extends Controller
             $element = array(
                 "id" => 'room_'.$room->id,
                 "text" => $room->name.'-'.$room->code.' ('.$room->nb_chair_exam.')',
+                "data" => array("chair_exam" =>$room->nb_chair_exam),
                 "children"=>false,
                 "type"=>"room"
             );

@@ -221,7 +221,8 @@
                     }
                 },
                 "checkbox" : {
-                    "keep_selected_style" : false
+                    "keep_selected_style" : false,
+                    "tie_selection" :false
                 },
                 "types" : {
                     "#" : { "max_depth" : 3, "valid_children" : ["building","room"] },
@@ -319,6 +320,10 @@
 
             initJsTree($('#selected_rooms'),'selected');
 
+            $('#all_rooms').on("check_node.jstree", function (e, data) {
+                console.log(data);
+            });
+
             $("#btn-add").click(function () {
                 toggleSidebar();
                 return false;
@@ -328,7 +333,7 @@
                 return false;
             });
             $("#btn-save").click(function(){
-                console.log($('#all_rooms').jstree("get_selected"));
+
                 $.ajax({
                     type: 'POST',
                     url: save_room_url,
