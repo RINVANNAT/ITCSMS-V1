@@ -213,6 +213,26 @@ class ExamController extends Controller
         return Response::json($data);
     }
 
+    public function save_rooms($id){
+        $exam = $this->exams->findOrThrowException($id);
+
+        $room_ids = json_decode($_POST['room_ids']);
+        $ids = [];
+        foreach($room_ids as $room_id){
+            $tmp = explode('_',$room_id);
+            if($tmp[0] == "room"){  // Because ids that are pass alongs include buildings as well. We need to remove that.
+                array_push($ids,$tmp[1]);
+            }
+        }
+
+        if($exam->rooms()->sync($ids,false)) {  // Add room ids without deleting old ids
+            return Response::json(array("success"=>true));
+        } else {
+            return Response::json(array("success"=>false));
+        }
+
+    }
+
     public function get_rooms($id){
         $type = $_GET['type'];
         $building = explode('_', $_GET['id'])[1];
