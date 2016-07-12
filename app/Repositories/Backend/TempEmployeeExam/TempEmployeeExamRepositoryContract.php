@@ -15,7 +15,10 @@ interface TempEmployeeExamRepositoryContract
      */
 
     
-    public function getAllStaff($order_by='name_kh', $exam_id);
+    public function getAllStaffWithRoles($order_by='name_kh', $exam_id);
+
+
+    public function getAllStaffWithoutRoles($exam_id);
 
     /**
      * @param  string  $order_by

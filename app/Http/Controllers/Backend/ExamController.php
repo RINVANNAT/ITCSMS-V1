@@ -69,8 +69,10 @@ class ExamController extends Controller
      */
     public function store(StoreExamRequest $request)
     {
+       
         $id = $this->exams->create($request->all());
         return redirect()->route('admin.exams.show',$id)->withFlashSuccess(trans('alerts.backend.generals.created'));
+
     }
 
     /**
@@ -84,7 +86,9 @@ class ExamController extends Controller
         $exam = $this->exams->findOrThrowException($id);
 
         $type = $exam->type->id;
+   
         $academicYear = AcademicYear::where('id',$exam->academicYear->id)->lists('name_kh','id');
+
         $examType = ExamType::where('id',$type)->lists('name_kh','id')->toArray();
         return view('backend.exam.show',compact('exam','type','academicYear','examType'));
     }
