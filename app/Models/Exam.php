@@ -56,6 +56,22 @@ class Exam extends Model
     public function employees(){
         return $this->belongsToMany('App\Models\Employee');
     }
+//....the relation of temporary employee
+
+    public function rolePerminentStaffExam(){
+        return $this->hasMany('App\Models\role_permanent_staff_exams');
+    }
+
+    public function roleTemperorayStaffExam(){
+        return $this->hasMany('App\Models\role_temporary_staff_exams');
+    }
+
+    public function tempEmployees(){
+        return $this->belongsToMany('App\Models\TempEmployee');
+    }
+
+//.....this is the end 
+
 
     public function students(){
         return $this->belongsToMany('App\Models\StudentAnnual');

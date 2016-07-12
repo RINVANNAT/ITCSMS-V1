@@ -27,10 +27,7 @@
                                 </div>
                             </div>
                         @endif
-
-
                         
-
                         <div class="form-group">
                             <div class="col-md-6 col-md-offset-4">
                                 {!! Form::submit(trans('labels.general.buttons.save'), ['class' => 'btn btn-primary']) !!}
