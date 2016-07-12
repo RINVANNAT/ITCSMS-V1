@@ -150,7 +150,8 @@
 
         var candidate_datatable = null;
         var course_datatable = null;
-
+        var save_room_url = '{{route('admin.exam.save_rooms',$exam->id)}}';
+        
         function toggleSidebar() {
             var right = $("#side-window-right"),
                     content = $("#main-window"),
@@ -159,6 +160,7 @@
             if (content.hasClass("col-sm-6")) {
                 contentClass = "col-sm-12";
                 right.hide();
+                $("#btn-add").show();
             } else {
                 contentClass = "col-sm-6";
             }
@@ -169,6 +171,7 @@
 
             if(content.hasClass("col-sm-6")){
                 right.delay(300).show(0);
+                $("#btn-add").hide();
             }
 
         }
@@ -318,9 +321,24 @@
 
             $("#btn-add").click(function () {
                 toggleSidebar();
-                //$('#side-window-right').toggleClass("collapsed");
-
                 return false;
+            });
+            $("#btn-cancel").click(function () {
+                toggleSidebar();
+                return false;
+            });
+            $("#btn-save").click(function(){
+                console.log($('#all_rooms').jstree("get_selected"));
+                $.ajax({
+                    type: 'POST',
+                    url: save_room_url,
+                    data: {room_ids:JSON.stringify($('#all_rooms').jstree("get_selected"))},
+                    dataType: "json",
+                    success: function(resultData) {
+                        $('#all_rooms').jstree("refresh");
+                        $('#selected_rooms').jstree("refresh");
+                    }
+                });
             });
 
             $("#btn_add_role").click(function () {
