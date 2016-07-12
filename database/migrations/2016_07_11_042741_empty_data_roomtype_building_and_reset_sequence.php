@@ -12,7 +12,10 @@ class EmptyDataRoomtypeBuildingAndResetSequence extends Migration
      */
     public function up()
     {
-        //
+        DB::statement('DELETE from "roomTypes"');
+        DB::statement('DELETE from "buildings"');
+        DB::statement('ALTER SEQUENCE "roomTypes_id_seq" RESTART WITH 1');
+        DB::statement('ALTER SEQUENCE "buildings_id_seq" RESTART WITH 1');
     }
 
     /**
@@ -22,6 +25,6 @@ class EmptyDataRoomtypeBuildingAndResetSequence extends Migration
      */
     public function down()
     {
-        //
+        // Nothing can be reversed
     }
 }
