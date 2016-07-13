@@ -39,7 +39,7 @@ interface TempEmployeeExamRepositoryContract
      * @param  integer  $exam_id
      * @return mixed
      */
-    public function getAllRoles();
+    public function getAllRoles($exam_id);
 
     /**
      * @param  $input

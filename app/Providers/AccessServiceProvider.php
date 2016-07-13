@@ -239,6 +239,11 @@ class AccessServiceProvider extends ServiceProvider
             \App\Repositories\Backend\TempEmployeeExam\EloquentTempEmployeeExamRepository::class
         );
 
+        $this->app->bind(
+            \App\Repositories\Backend\DepartmentEmployeeExamPosition\DepartmentEmployeeExamPositionRepositoryContract::class,
+            \App\Repositories\Backend\DepartmentEmployeeExamPosition\EloquentDepartmentEmployeeExamPositionRepository::class
+        );
+
         /*---------------------------------------
             binding For Module score
         ----------------------------------------*/

@@ -19,58 +19,54 @@ use Illuminate\Support\Facades\Response;
 
 class employeeExamController extends Controller
 {
-   private $tempEmpolyeeExams;
+    private $tempEmpolyeeExams;
 
-   public function __construct( TempEmployeeExamRepositoryContract $tempEmpolyeeExams ) {
+    public function __construct(TempEmployeeExamRepositoryContract $tempEmpolyeeExams)
+    {
 
-   		$this->tempEmpolyeeExams = $tempEmpolyeeExams;
-   }
+        $this->tempEmpolyeeExams = $tempEmpolyeeExams;
+    }
 
-   public function index() {
+    public function getAll()
+    {
 
-   		return 'string';
-   }
+        $name = 'vanat';
+        $tmpEmployeeExam = $this->tempEmpolyeeExams->getAllStaff();
+        dd($tmpEmployeeExam);
 
-   public function getAll() {
+    }
 
-	   	$name = 'vanat';
-	   	$tmpEmployeeExam = $this->tempEmpolyeeExams->getAllStaff();
-	   	dd($tmpEmployeeExam);
+    public function getExaminationStaffByRole(Request $request, $id)
+    {
 
-   }
+        $role_id = explode('_', $_GET['id'])[1];
+        $res = $this->tempEmpolyeeExams->getStaffByRole($role_id, $id);
+        return $res;
+    }
 
-   public function getExaminationStaffByRole (Request $request) {
+    public function getExaminationStaff($id)
+    {
 
-      $role_id = 1;
-      $exam_id = 1;
-		$res = $this->tempEmpolyeeExams->getStaffByRole($role_id, $exam_id);
-		return $res;
-   }
+        $res = $this->tempEmpolyeeExams->getAllStaffWithRoles($order_by = 'name_kh', $id);
+        // $res = $this->tempEmpolyeeExams->getAllStaffWithoutRoles($exam_id);
 
-   public function getExaminationStaff () {
+        return Response::json($res);
+    }
 
-      $exam_id = 1;
-      $res = $this->tempEmpolyeeExams->getAllStaffWithRoles($order_by='name_kh', $exam_id);
-      // $res = $this->tempEmpolyeeExams->getAllStaffWithoutRoles($exam_id);
+    public function getAllRoles($id)
+    {
 
-      return $res;
+        $res = $this->tempEmpolyeeExams->getAllRoles($id);
+        return Response::json($res);
+    }
 
+    public function getRoleStaff()
+    {
 
-   }
-
-   public function getRoleStaff () {
-      
-      $exam_id = 1;
-      $staff_id = 3;
-      $res = $this->tempEmpolyeeExams->getRoleBytStaff($staff_id, $exam_id);
-      return $res;
-   }
-
-   public function getAllRoles () {
-
-      $res = $this->tempEmpolyeeExams->getAllRoles();
-      return $res;
-   }
-
+        $exam_id = 1;
+        $staff_id = 3;
+        $res = $this->tempEmpolyeeExams->getRoleBytStaff($staff_id, $exam_id);
+        return $res;
+    }
 
 }

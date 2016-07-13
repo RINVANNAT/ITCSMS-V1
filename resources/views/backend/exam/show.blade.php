@@ -145,6 +145,7 @@
     {!! Html::script('plugins/datatables/jquery.dataTables.min.js') !!}
     {!! Html::script('plugins/datatables/dataTables.bootstrap.min.js') !!}
     {!! Html::script('plugins/jstree/jstree.min.js') !!}
+    {!! Html::script('js/exam_staff.js') !!}
 
     <script>
 
@@ -176,30 +177,7 @@
 
         }
 
-        function toggleSidebarStaffRole() {
 
-            var right_staff_role = $("#side_window_right_staff_role"),
-                        content = $("#main_window_staff_role"),
-                        contentClass = "";
-                // determine number of open sidebars
-                if (content.hasClass("col-sm-6")) {
-                    contentClass = "col-sm-12";
-                    right_staff_role.hide();
-                } else {
-                    contentClass = "col-sm-6";
-                }
-
-                // apply class to content
-                content.removeClass("col-sm-12 col-sm-9 col-sm-6")
-                        .addClass(contentClass);
-
-                if(content.hasClass("col-sm-6")){
-                    // console.log('this me vannat');
-                    // console.log(right);
-                    right_staff_role.delay(300).show(0);
-
-                }
-        }
 
         function initJsTree(object,type){
             object.jstree({
@@ -320,6 +298,8 @@
 
             initJsTree($('#selected_rooms'),'selected');
 
+            initJsTree_StaffRole($('#selected_staffs'), '{{route('admin.exam.get-all-roles',$exam->id)}}', '{{route('admin.exam.get-staff-by-role',$exam->id)}}');
+
             $('#all_rooms').on("check_node.jstree", function (e, data) {
                 console.log(data);
             });
@@ -346,11 +326,7 @@
                 });
             });
 
-            $("#btn_add_role").click(function () {
 
-                toggleSidebarStaffRole();
-                return false;
-            });
 
         });
 

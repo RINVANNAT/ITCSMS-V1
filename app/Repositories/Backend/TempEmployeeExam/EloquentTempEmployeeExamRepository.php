@@ -15,136 +15,225 @@ use DB;
 class EloquentTempEmployeeExamRepository implements TempEmployeeExamRepositoryContract
 {
 
-    public function getAllStaffWithRoles($order_by='name_kh', $exam_id) {
+    public function getAllStaffWithRoles($order_by = 'name_kh', $exam_id)
+    {
         $allStaffs = [];
         $temporaryStaff = DB::table('tempEmployees')
-                        ->join('role_temporary_staff_exams', 'tempEmployees.id', '=', 'role_temporary_staff_exams.temp_employee_id')
-                        ->join('roleStaffs', 'roleStaffs.id', '=', 'role_temporary_staff_exams.role_staff_id')
-                        ->join('exams', 'exams.id', '=', 'role_temporary_staff_exams.exam_id')
-                        ->select('tempEmployees.name_kh', 'exams.name', 'roleStaffs.name')
-                        ->where('exams.id', '=', $exam_id)->get();
+            ->join('role_temporary_staff_exams', 'tempEmployees.id', '=', 'role_temporary_staff_exams.temp_employee_id')
+            ->join('roleStaffs', 'roleStaffs.id', '=', 'role_temporary_staff_exams.role_staff_id')
+            ->join('exams', 'exams.id', '=', 'role_temporary_staff_exams.exam_id')
+            ->select('tempEmployees.name_kh', 'tempEmployees.id', 'exams.name', 'roleStaffs.name')
+            ->where('exams.id', '=', $exam_id)->get();
 
         $permanentStaff = DB::table('employees')
-                        ->join('role_permanent_staff_exams', 'employees.id', '=', 'role_permanent_staff_exams.employee_id')
-                        ->join('roleStaffs', 'roleStaffs.id', '=', 'role_permanent_staff_exams.role_staff_id')
-                        ->join('exams', 'exams.id', '=', 'role_permanent_staff_exams.exam_id')
-                        ->select('employees.name_kh', 'exams.name', 'roleStaffs.name')
-                        ->where('exams.id', '=', $exam_id)->get();
+            ->join('role_permanent_staff_exams', 'employees.id', '=', 'role_permanent_staff_exams.employee_id')
+            ->join('roleStaffs', 'roleStaffs.id', '=', 'role_permanent_staff_exams.role_staff_id')
+            ->join('exams', 'exams.id', '=', 'role_permanent_staff_exams.exam_id')
+            ->select('employees.name_kh', 'employees.id', 'exams.name', 'roleStaffs.name')
+            ->where('exams.id', '=', $exam_id)->get();
 
         foreach ($temporaryStaff as $staff) {
-            array_push($allStaffs, $staff->name_kh);
+            //array_push($allStaffs, $staff->name_kh);
+            $element = array(
+                "id" => 'tmpstaff_' . $staff->id,
+                "text" => $staff->name_kh,
+                "children" => true,
+                "type" => "staff"
+            );
+            array_push($allStaffs, $element);
+
         }
         foreach ($permanentStaff as $perStaff) {
-            array_push($allStaffs, $perStaff->name_kh);
+            //array_push($allStaffs, $perStaff->name_kh);
+            $element = array(
+                "id" => 'perstaff_' . $perStaff->id,
+                "text" => $perStaff->name_kh,
+                "children" => true,
+                "type" => "staff"
+            );
+            array_push($allStaffs, $element);
         }
-        dd($allStaffs);
-    
+
+        return $allStaffs;
+
     }
 
-    public function getAllStaffWithoutRoles($exam_id) {
+    public function getAllStaffWithoutRoles($exam_id)
+    {
 
         $allStaffWithoutRoles = [];
 
         $staffWithoutRoles = DB::table('tempEmployees')
-                        ->join('role_temporary_staff_exams', 'tempEmployees.id', '=', 'role_temporary_staff_exams.temp_employee_id')
-                        ->select('tempEmployees.name_kh')
-                        ->where([
-                                    ['role_temporary_staff_exams.exam_id', '=', $exam_id],
-                                    ['role_temporary_staff_exams.role_staff_id', '=', null],
-                                ])->get();
+            ->join('role_temporary_staff_exams', 'tempEmployees.id', '=', 'role_temporary_staff_exams.temp_employee_id')
+            ->select('tempEmployees.name_kh')
+            ->where([
+                ['role_temporary_staff_exams.exam_id', '=', $exam_id],
+                ['role_temporary_staff_exams.role_staff_id', '=', null],
+            ])->get();
 
         $permanentStaffWithoutRoles = DB::table('employees')
-                        ->join('role_permanent_staff_exams', 'employees.id', '=', 'role_permanent_staff_exams.employee_id')
-                        ->select('employees.name_kh')
-                        ->where([
-                                    ['role_permanent_staff_exams.exam_id', '=', $exam_id],
-                                    ['role_permanent_staff_exams.role_staff_id', '=', null],
-                                ])->get();   
+            ->join('role_permanent_staff_exams', 'employees.id', '=', 'role_permanent_staff_exams.employee_id')
+            ->select('employees.name_kh')
+            ->where([
+                ['role_permanent_staff_exams.exam_id', '=', $exam_id],
+                ['role_permanent_staff_exams.role_staff_id', '=', null],
+            ])->get();
 
         foreach ($staffWithoutRoles as $staffWithoutRole) {
-            array_push($allStaffWithoutRoles, $staffWithoutRole->name_kh);
+            //array_push($allStaffWithoutRoles, $staffWithoutRole->name_kh);
+            $element = array(
+                "id" => 'tmpstaff_' . $staffWithoutRole->id,
+                "text" => $staffWithoutRole->name_kh,
+                "children" => true,
+                "type" => "staff"
+            );
+
+            array_push($allStaffWithoutRoles, $element);
         }
         foreach ($permanentStaffWithoutRoles as $permanentStaffWithoutRole) {
-            array_push($allStaffWithoutRoles, $permanentStaffWithoutRole->name_kh);
+            //array_push($allStaffWithoutRoles, $permanentStaffWithoutRole->name_kh);
+            $element = array(
+                "id" => 'tmpstaff_' . $permanentStaffWithoutRole->id,
+                "text" => $permanentStaffWithoutRole->name_kh,
+                "children" => true,
+                "type" => "staff"
+            );
+
+            array_push($allStaffWithoutRoles, $element);
         }
-        dd($allStaffWithoutRoles);     
+
+        return $allStaffWithoutRoles;
 
     }
 
-    public function getStaffByRole($role_id, $exam_id) {
+    public function getStaffByRole($role_id, $exam_id)
+    {
 
         $allStaffByRoles = [];
         $temporaryStaffByRoles = DB::table('tempEmployees')
-                        ->join('role_temporary_staff_exams', 'tempEmployees.id', '=', 'role_temporary_staff_exams.temp_employee_id')
-                        ->join('roleStaffs', 'roleStaffs.id', '=', 'role_temporary_staff_exams.role_staff_id')
-                        ->join('exams', 'exams.id', '=', 'role_temporary_staff_exams.exam_id')
-                        ->select('tempEmployees.name_kh', 'exams.name', 'roleStaffs.name')
-                        ->where([
-                                ['roleStaffs.id', '=', $role_id], 
-                                ['exams.id', '=', $exam_id],
-                        ])->get();
+            ->join('role_temporary_staff_exams', 'tempEmployees.id', '=', 'role_temporary_staff_exams.temp_employee_id')
+            ->join('roleStaffs', 'roleStaffs.id', '=', 'role_temporary_staff_exams.role_staff_id')
+            ->join('exams', 'exams.id', '=', 'role_temporary_staff_exams.exam_id')
+            ->select('tempEmployees.name_kh', 'tempEmployees.id', 'exams.name', 'roleStaffs.name')
+            ->where([
+                ['roleStaffs.id', '=', $role_id],
+                ['exams.id', '=', $exam_id],
+            ])->get();
 
 
         $permanentStaffByRoles = DB::table('employees')
-                        ->join('role_permanent_staff_exams', 'employees.id', '=', 'role_permanent_staff_exams.employee_id')
-                        ->join('roleStaffs', 'roleStaffs.id', '=', 'role_permanent_staff_exams.role_staff_id')
-                        ->join('exams', 'exams.id', '=', 'role_permanent_staff_exams.exam_id')
-                        ->select('employees.name_kh', 'exams.name', 'roleStaffs.name')
-                        ->where([
-                                ['roleStaffs.id', '=', $role_id],
-                                ['exams.id', '=', $exam_id],
-                        ])->get();
-       
-        foreach ($temporaryStaffByRoles as $staff) {
-            array_push($allStaffByRoles, $staff->name_kh);
+            ->join('role_permanent_staff_exams', 'employees.id', '=', 'role_permanent_staff_exams.employee_id')
+            ->join('roleStaffs', 'roleStaffs.id', '=', 'role_permanent_staff_exams.role_staff_id')
+            ->join('exams', 'exams.id', '=', 'role_permanent_staff_exams.exam_id')
+            ->select('employees.name_kh', 'employees.id', 'exams.name', 'roleStaffs.name')
+            ->where([
+                ['roleStaffs.id', '=', $role_id],
+                ['exams.id', '=', $exam_id],
+            ])->get();
+
+
+        foreach ($temporaryStaffByRoles as $temporaryStaffByRole) {
+            $element = array(
+                "id" => 'tmpstaff_' . $temporaryStaffByRole->id,
+                "text" => $temporaryStaffByRole->name_kh,
+                "children" => false,
+                "type" => "staff"
+            );
+
+            array_push($allStaffByRoles, $element);
         }
-        foreach ($permanentStaffByRoles as $perStaff) {
-            array_push($allStaffByRoles, $perStaff->name_kh);
+
+        foreach ($permanentStaffByRoles as $permanentStaffByRole) {
+            $element = array(
+                "id" => 'perstaff_' . $permanentStaffByRole->id,
+                "text" => $permanentStaffByRole->name_kh,
+                "children" => false,
+                "type" => "staff"
+            );
+
+            array_push($allStaffByRoles, $element);
         }
-      
         return $allStaffByRoles;
 
     }
 
-    public function getRoleBytStaff($staff_id, $exam_id) {
+    public function getRoleBytStaff($staff_id, $exam_id)
+    {
 
         $roleTemporary = DB::table('roleStaffs')
-                        ->join('role_temporary_staff_exams', 'roleStaffs.id', '=', 'role_temporary_staff_exams.role_staff_id')
-                        ->join('tempEmployees', 'tempEmployees.id', '=', 'role_temporary_staff_exams.temp_employee_id')
-                        ->join('exams', 'exams.id', '=', 'role_temporary_staff_exams.exam_id')
-                        ->select('roleStaffs.name')
-                        ->where([
-                                ['tempEmployees.id', '=', $staff_id], 
-                                ['exams.id', '=', $exam_id],
-                        ])->get();
+            ->join('role_temporary_staff_exams', 'roleStaffs.id', '=', 'role_temporary_staff_exams.role_staff_id')
+            ->join('tempEmployees', 'tempEmployees.id', '=', 'role_temporary_staff_exams.temp_employee_id')
+            ->join('exams', 'exams.id', '=', 'role_temporary_staff_exams.exam_id')
+            ->select('roleStaffs.name')
+            ->where([
+                ['tempEmployees.id', '=', $staff_id],
+                ['exams.id', '=', $exam_id],
+            ])->get();
 
         $rolePermanent = DB::table('roleStaffs')
-                        ->join('role_permanent_staff_exams', 'roleStaffs.id', '=', 'role_permanent_staff_exams.role_staff_id')
-                        ->join('employees', 'employees.id', '=', 'role_permanent_staff_exams.employee_id')
-                        ->join('exams', 'exams.id', '=', 'role_permanent_staff_exams.exam_id')
-                        ->select('roleStaffs.name')
-                        ->where([
-                                ['employees.id', '=', $staff_id], 
-                                ['exams.id', '=', $exam_id],
-                        ])->get();
+            ->join('role_permanent_staff_exams', 'roleStaffs.id', '=', 'role_permanent_staff_exams.role_staff_id')
+            ->join('employees', 'employees.id', '=', 'role_permanent_staff_exams.employee_id')
+            ->join('exams', 'exams.id', '=', 'role_permanent_staff_exams.exam_id')
+            ->select('roleStaffs.name')
+            ->where([
+                ['employees.id', '=', $staff_id],
+                ['exams.id', '=', $exam_id],
+            ])->get();
 
-        if( $roleTemporary != null && $rolePermanent == null) {
+        if ($roleTemporary != null && $rolePermanent == null) {
             return $roleTemporary;
-        } else if ( $roleTemporary == null && $rolePermanent != null ) {
+        } else if ($roleTemporary == null && $rolePermanent != null) {
             return $rolePermanent;
-        }else {
+        } else {
             return ['this is null'];
         }
 
     }
 
-    public function getAllRoles () {
+    public function getAllRoles($exam_id)
+    {
 
-        $roles = DB::table('roleStaffs')->get();
-        dd($roles) ;
+        $roles = [];
+        $roleTempStaffs = DB::table('roleStaffs')
+            ->join('role_temporary_staff_exams', 'roleStaffs.id', '=', 'role_temporary_staff_exams.role_staff_id')
+            ->select('roleStaffs.name', 'roleStaffs.id')
+            ->where('role_temporary_staff_exams.exam_id', '=', $exam_id)->get();
+
+        $rolePerStaffs = DB::table('roleStaffs')
+            ->join('role_permanent_staff_exams', 'roleStaffs.id', '=', 'role_permanent_staff_exams.role_staff_id')
+            ->select('roleStaffs.name', 'roleStaffs.id')
+            ->where('role_permanent_staff_exams.exam_id', '=', $exam_id)->get();
+
+        foreach ($roleTempStaffs as $roleTempStaff) {
+            $element = array(
+                "id" => 'role_' . $roleTempStaff->id,
+                "text" => $roleTempStaff->name,
+                "children" => true,
+                "type" => "role"
+            );
+
+            array_push($roles, $element);
+        }
+
+        foreach ($rolePerStaffs as $rolePerStaff) {
+            $element = array(
+                "id" => 'role_' . $rolePerStaff->id,
+                "text" => $rolePerStaff->name,
+                "children" => true,
+                "type" => "role"
+            );
+
+            array_push($roles, $element);
+        }
+
+        $roles = array_map("unserialize", array_unique(array_map("serialize", $roles)));
+
+        return $roles;
+
     }
 
-    public function create($input) {
+    public function create($input)
+    {
 
         echo 'hello create';
 
@@ -178,19 +267,22 @@ class EloquentTempEmployeeExamRepository implements TempEmployeeExamRepositoryCo
 
     }
 
-    public function update($id, $input) {
+    public function update($id, $input)
+    {
 
         echo 'hello update';
     }
 
-    public function destroy($id) {
+    public function destroy($id)
+    {
 
         echo 'hello destroy';
     }
 
-    public function search($name) {
+    public function search($name)
+    {
 
-        $val = TempEmployeeExam::where("name_kh","LIKE","%".$name."%")->orWhere("name_latin", "LIKE", "%".$name."%")->get();
+        $val = TempEmployeeExam::where("name_kh", "LIKE", "%" . $name . "%")->orWhere("name_latin", "LIKE", "%" . $name . "%")->get();
         return $val;
     }
 }

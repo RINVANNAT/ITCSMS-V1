@@ -1,14 +1,3 @@
-<!-- <div class="container-fluid">
-    <div class="row-fluid">
-        <div id="col2" class="span0"></div>
-        <div id="col1" class="span12">
-            <a id="trig" class="btn btn-inverse">Reflow Me</a>
-        </div>
-
-    </div>
-</div>
- -->
-
 
 <div class="row" id="row-main">
     <div class="col-sm-12" id="main_window_staff_role">
@@ -28,7 +17,7 @@
 
 
 
-                    
+
                 </blockquote>
             </div>
             <!-- /.box-body -->
@@ -41,8 +30,8 @@
                 <i class="fa fa-users" aria-hidden="true"></i>
 
                 <h3 class="box-title"> Asign Role for Each Staff </h3>
-                <button class="btn btn-sm btn-danger pull-right" id="btn-save" style="margin-left: 10px;">Save</button>
-                <button class="btn btn-sm btn-default pull-right" id="btn-cancel">Cancel</button>
+                <button class="btn btn-sm btn-danger pull-right" id="btn_save_staff_role" style="margin-left: 10px;">Save</button>
+                <button class="btn btn-sm btn-default pull-right" id="btn_cancel_staff_role">Cancel</button>
             </div>
             <!-- /.box-header -->
             <div class="box-body">
