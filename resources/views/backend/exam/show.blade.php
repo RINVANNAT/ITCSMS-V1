@@ -177,6 +177,41 @@
 
         }
 
+        function count_exam_seat(){
+            var checked_available_rooms = $('#all_rooms').jstree("get_checked");
+            var buildings = $('#all_rooms').data().jstree.get_json();
+
+            var total_exam_seat = 0 ;
+
+            $.each(checked_available_rooms, function (index, room_id){
+                $.each(buildings, function(index_building, building){
+                    $.each(building.children, function(index_room, room){
+                        if(room.id == room_id){
+                            total_exam_seat = total_exam_seat + room.data.chair_exam;
+                        }
+                    })
+                });
+            });
+
+            $("#selected_available_seat").html(total_exam_seat);
+        }
+
+        function count_availble_seat(){
+            var buildings = $('#all_rooms').data().jstree.get_json();
+
+            var total_exam_seat = 0 ;
+
+            console.log(buildings);
+
+            $.each(buildings, function(index_building, building){
+                $.each(building.children, function(index_room, room){
+                    total_exam_seat = total_exam_seat + room.data.chair_exam;
+                })
+            });
+
+            $("#all_available_seat").html(total_exam_seat);
+        }
+
 
 
         function initJsTree(object,type){
@@ -195,7 +230,13 @@
                         },
                         'data' : function (node) {
                             return { 'id' : node.id };
-                        }
+                        },
+                        /*'success': function(e){
+                            //console.log(type);
+                            if(type=="available"){
+                                count_availble_seat();
+                            }
+                        }*/
                     }
                 },
                 "checkbox" : {
@@ -219,9 +260,24 @@
             });
         }
 
+        function get_total_seat(ui_object,type){
+            $.ajax({
+                type: 'GET',
+                url: "{{route('admin.exam.count_seat_exam',$exam->id)}}"+"?type="+type,
+                dataType: "json",
+                success: function(resultData) {
+                    ui_object.html(resultData.seat_exam);
+                }
+            });
+        }
+
+        function refresh_candidate_list (){
+            $('#candidates-table').DataTable().ajax.reload();
+        }
+
+
         $(function(){
             $("#exam_show :input").attr("disabled", true);
-
             candidate_datatable = $('#candidates-table').DataTable({
                 processing: true,
                 serverSide: true,
@@ -300,9 +356,17 @@
 
             initJsTree_StaffRole($('#selected_staffs'), '{{route('admin.exam.get-all-roles',$exam->id)}}', '{{route('admin.exam.get-staff-by-role',$exam->id)}}');
 
+
+
             $('#all_rooms').on("check_node.jstree", function (e, data) {
-                console.log(data);
+                count_exam_seat();
+                //count_availble_seat();
             });
+
+            $('#all_rooms').on("uncheck_node.jstree", function (e, data) {
+                count_exam_seat();
+            });
+
 
             $("#btn-add").click(function () {
                 toggleSidebar();
@@ -327,12 +391,12 @@
             });
 
 
+            get_total_seat($("#all_available_seat"),"available");
+            get_total_seat($("#all_reserve_seat"),"selected");
+
 
         });
 
-        function refresh_candidate_list (){
-            $('#candidates-table').DataTable().ajax.reload();
-        }
 
     </script>
 @stop

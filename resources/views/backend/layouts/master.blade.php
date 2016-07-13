@@ -34,7 +34,7 @@
         <script src="https://oss.maxcdn.com/libs/respond.js/1.3.0/respond.min.js"></script>
         <![endif]-->
     </head>
-    <body class="skin-{!! config('backend.theme') !!}">
+    <body class="skin-{!! config('backend.theme') !!} {!! config('backend.layout') !!}">
     <div class="loading">
         <i class="fa fa-refresh fa-spin"></i>
     </div>
@@ -67,6 +67,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/2.1.4/jquery.min.js"></script>
     <script>window.jQuery || document.write('<script src="{{asset('js/vendor/jquery/jquery-2.1.4.min.js')}}"><\/script>')</script>
     {!! Html::script('js/vendor/bootstrap/bootstrap.min.js') !!}
+    {!! Html::script('plugins/slimScroll/jquery.slimscroll.min.js') !!}
 
     @yield('before-scripts-end')
     {!! HTML::script(elixir('js/backend.js')) !!}

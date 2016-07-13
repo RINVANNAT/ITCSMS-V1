@@ -264,6 +264,29 @@ class ExamController extends Controller
         return Response::json($data);
     }
 
+    public function count_seat_exam($id){
+        $type = $_GET['type'];
+        $all_ids = $this->get_all_room_ids();
+        $ids = $this->get_selected_room_ids($id);
+
+        $seat_exam = 0;
+        if($type == "available"){
+            $ids = $this->get_available_room_ids($all_ids,$ids);
+        }
+
+        $rooms = DB::table('rooms')
+            ->select('rooms.nb_chair_exam')
+            ->whereIN('rooms.id',$ids)
+            ->get();
+
+        foreach ($rooms as $room){
+            $seat_exam = $seat_exam + $room->nb_chair_exam;
+        }
+
+        return Response::json(array("seat_exam"=>$seat_exam));
+
+    }
+
     private function get_all_room_ids(){
         $ids = DB::table('rooms')->where('is_exam_room',true)->lists('id');
 

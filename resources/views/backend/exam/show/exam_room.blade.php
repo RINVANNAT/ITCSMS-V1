@@ -5,7 +5,7 @@
             <div class="box-header with-border">
                 <i class="fa fa-building-o"></i>
 
-                <h3 class="box-title">Buildings & Rooms</h3>
+                <h3 class="box-title">Buildings & Rooms <span id="all_reserve_seat">0</span></h3>
                 <button class="btn btn-sm btn-info pull-right" id="btn-add">Add Rooms</button>
             </div>
             <!-- /.box-header -->
@@ -25,7 +25,7 @@
             <div class="box-header with-border">
                 <i class="fa fa-building-o"></i>
 
-                <h3 class="box-title">Available Buildings & Rooms <span id="all_available_seat">3000</span> / <span id="selected_available_seat">0</span></h3>
+                <h3 class="box-title">Available Buildings & Rooms <span id="all_available_seat">0</span> / <span id="selected_available_seat">0</span></h3>
 
                 <button class="btn btn-sm btn-danger pull-right" id="btn-save" style="margin-left: 10px;">Save</button>
                 <button class="btn btn-sm btn-default pull-right" id="btn-cancel">Cancel</button>

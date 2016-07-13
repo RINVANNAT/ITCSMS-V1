@@ -15,6 +15,7 @@ return [
 
     'backend' => [
         'button' => 'Button',
+        'profile' => "Profile"
     ],
 
     'general' => [
