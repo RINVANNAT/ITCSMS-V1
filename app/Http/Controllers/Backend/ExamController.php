@@ -327,4 +327,27 @@ class ExamController extends Controller
         return $ids;
     }
 
+    public function view_room_secret_code($exam_id){
+        $exam = $this->exams->findOrThrowException($exam_id);
+
+        $rooms = $exam->rooms()->with('building')->withPivot('roomcode')->get()->toArray();
+
+        return view('backend.exam.includes.popup_room_secret_code',compact('rooms','exam_id'));
+    }
+
+    public function save_room_secret_code($exam_id){
+
+        $rooms = json_decode($_POST['room_ids']);
+        //dd($rooms);
+        foreach($rooms as $room){
+            DB::table('exam_room')
+                ->where('exam_id',$exam_id)
+                ->where('room_id',$room->room_id)
+                ->update(['roomcode'=>$room->secret_code]);
+        }
+
+        return Response::json(array('success'=>true));
+
+    }
+
 }

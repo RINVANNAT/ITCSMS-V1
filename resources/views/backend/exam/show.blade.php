@@ -411,6 +411,10 @@
                 });
             });
 
+            $("#btn-secret-code").click(function(){
+                PopupCenterDual('{{route("admin.exam.view_room_secret_code",$exam->id)}}','Room Secret Code','1200','960');
+            });
+
 
             get_total_seat($("#all_available_seat"),"available");
             get_total_seat($("#all_reserve_seat"),"selected");

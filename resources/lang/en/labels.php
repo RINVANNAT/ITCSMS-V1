@@ -459,6 +459,13 @@ return [
             'sub_create_title' => 'Register new examination',
             'sub_detail_title' => 'Detail of an examination',
             'sub_import_title' => "Import examinations",
+            'secret_code' => [
+                'title' => 'Secret Code',
+                'print' => 'Print Secret Codes',
+                'export' => 'Export Secret Codes',
+                'generate_auto' => 'Auto Generate',
+                'generate_manual' => 'Manually Enter'
+            ],
             'show_tabs' => [
                 'general_info' => 'General Information',
                 'candidate_info' => 'Candidate Information',

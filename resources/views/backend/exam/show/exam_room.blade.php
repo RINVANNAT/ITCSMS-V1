@@ -5,8 +5,9 @@
             <div class="box-header with-border">
                 <i class="fa fa-building-o"></i>
 
-                <h3 class="box-title">Buildings & Rooms <span class="label label-primary" style="margin-left: 50px;">Total Seat: <span id="all_reserve_seat">0</span></span></h3>
-                <button class="btn btn-sm btn-info pull-right" id="btn-add">Modify</button>
+                <h3 class="box-title">Buildings & Rooms <span class="label label-primary" style="margin-left: 10px;">Total Seat: <span id="all_reserve_seat">0</span></span></h3>
+                <button class="btn btn-sm btn-default pull-right" id="btn-secret-code" style="margin-left: 5px;"><i class="fa fa-user-secret"></i> Anonymus Code</button>
+                <button class="btn btn-sm btn-info pull-right" id="btn-add"><i class="fa fa-edit"></i> Modify</button>
                 <button class="btn btn-sm btn-danger pull-right" id="btn-delete" style="display: none">Delete</button>
             </div>
             <!-- /.box-header -->
@@ -26,7 +27,7 @@
             <div class="box-header with-border">
                 <i class="fa fa-building-o"></i>
 
-                <h3 class="box-title">Available Buildings & Rooms <span class="label label-primary" style="margin-left: 50px;">Total Seat: <span id="selected_available_seat">0</span> / <span id="all_available_seat">0</span></span></h3>
+                <h3 class="box-title">Available Buildings & Rooms <span class="label label-primary" style="margin-left: 10px;">Total Seat: <span id="selected_available_seat">0</span> / <span id="all_available_seat">0</span></span></h3>
 
                 <button class="btn btn-sm btn-danger pull-right" id="btn-save" style="margin-left: 10px;">Save</button>
                 <button class="btn btn-sm btn-default pull-right" id="btn-cancel">Cancel</button>

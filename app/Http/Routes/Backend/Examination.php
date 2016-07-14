@@ -9,10 +9,13 @@ Route::group([], function() {
     Route::get('exams/{id}/data', 'ExamController@data')->name('admin.exam.data');
     Route::post('exams/{id}/get_courses', 'ExamController@get_courses')->name('admin.exam.get_courses');
     Route::get('exams/{id}/get_buildings', 'ExamController@get_buildings')->name('admin.exam.get_buildings');
-    Route::get('exams/{id}/get_rooms', 'ExamController@get_rooms')->name('admin.exam.get_rooms');
+
     Route::get('exams/{id}/get_staffs', 'ExamController@get_staffs')->name('admin.exam.get_staffs');
     Route::get('exams/{id}/count_seat_exam', 'ExamController@count_seat_exam')->name('admin.exam.count_seat_exam');
 
+    Route::get('exams/{id}/get_rooms', 'ExamController@get_rooms')->name('admin.exam.get_rooms');
     Route::post('exams/{id}/save_rooms','ExamController@save_rooms')->name('admin.exam.save_rooms');
     Route::post('exams/{id}/delete_rooms','ExamController@delete_rooms')->name('admin.exam.delete_rooms');
+    Route::get('exams/{id}/view_room_secret_code', 'ExamController@view_room_secret_code')->name('admin.exam.view_room_secret_code');
+    Route::post('exams/{id}/save_room_secret_code', 'ExamController@save_room_secret_code')->name('admin.exam.save_room_secret_code');
 });
