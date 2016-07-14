@@ -282,7 +282,10 @@
                 processing: true,
                 serverSide: true,
                 pageLength: {!! config('app.records_per_page')!!},
-                ajax: '{!! route('admin.candidate.data')."?exam_id=".$exam->id !!}',
+                ajax: {
+                    url: '{!! route('admin.candidate.data')."?exam_id=".$exam->id !!}',
+                    method: 'POST'
+                },
                 columns: [
                     { data: 'name_kh', name: 'candidates.name_kh'},
                     { data: 'name_latin', name: 'candidates.name_en'},
@@ -299,7 +302,10 @@
                 processing: true,
                 serverSide: true,
                 pageLength: {!! config('app.records_per_page')!!},
-                ajax: '{!! route('admin.exam.get_courses',$exam->id) !!}',
+                ajax: {
+                    url: '{!! route('admin.exam.get_courses',$exam->id) !!}',
+                    method: 'POST'
+                },
                 columns: [
                     { data: 'name_kh', name: 'courseAnnuals.name_kh'},
                     { data: 'semester', name: 'courseAnnuals.semester'},

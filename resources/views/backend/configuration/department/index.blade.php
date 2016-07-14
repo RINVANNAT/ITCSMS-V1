@@ -67,7 +67,10 @@
                 processing: true,
                 serverSide: true,
                 pageLength: {!! config('app.records_per_page')!!},
-                ajax: '{!! route('admin.configuration.department.data') !!}',
+                ajax: {
+                    url: '{!! route('admin.configuration.department.data') !!}',
+                    method: 'POST'
+                },
                 columns: [
                     { data: 'id', name: 'id'},
                     { data: 'code', name: 'code'},

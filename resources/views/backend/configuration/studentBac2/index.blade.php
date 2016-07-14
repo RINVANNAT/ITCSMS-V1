@@ -67,7 +67,10 @@
                 processing: true,
                 serverSide: true,
                 pageLength: {!! config('app.records_per_page')!!},
-                ajax: '{!! route('admin.configuration.studentBac2.data') !!}',
+                ajax: {
+                    url: '{!! route('admin.configuration.studentBac2.data') !!}',
+                    method: 'POST'
+                },
                 columns: [
                     { data: 'name_kh', name: 'studentBac2s.name_kh'},
                     { data: 'dob', name: 'studentBac2s.dob'},

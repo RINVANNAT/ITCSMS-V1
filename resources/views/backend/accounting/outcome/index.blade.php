@@ -119,6 +119,7 @@
                 pageLength: {!! config('app.records_per_page')!!},
                 ajax: {
                     url:'{!! route('admin.accounting.outcome.data') !!}',
+                    method:'POST',
                     data:function(d){
                         d.account = $('#filter_account').val();
                         d.outcome_type = $('#filter_outcomeType').val();

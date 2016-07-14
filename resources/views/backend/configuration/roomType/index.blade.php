@@ -62,7 +62,10 @@
                 processing: true,
                 serverSide: true,
                 pageLength: {!! config('app.records_per_page')!!},
-                ajax: '{!! route('admin.configuration.roomType.data') !!}',
+                ajax: {
+                    url: '{!! route('admin.configuration.roomType.data') !!}',
+                    method: 'POST'
+                },
                 columns: [
                     { data: 'id', name: 'id'},
                     { data: 'name', name: 'name'},

@@ -23,11 +23,7 @@
                     <button class="btn btn-primary btn-sm"><i class="fa fa-plus-circle"></i> Add
                     </button>
                 </a>
-                <div class="btn-group">
-                    <button class="btn btn-default btn-sm"><i class="fa fa-trash-o"></i></button>
-                    <button class="btn btn-default btn-sm"><i class="fa fa-reply"></i></button>
-                    <button class="btn btn-default btn-sm"><i class="fa fa-share"></i></button>
-                </div>
+
                 <!-- /.btn-group -->
                 <button class="btn btn-default btn-sm"><i class="fa fa-refresh"></i></button>
 
