@@ -1,11 +1,11 @@
 @extends ('backend.layouts.master')
 
-@section ('title', trans('labels.backend.exams.title') . ' | ' . trans('labels.backend.exams.sub_show_title'))
+@section ('title', trans('labels.backend.exams.title') . ' | ' . trans('labels.backend.exams.sub_detail_title'))
 
 @section('page-header')
     <h1>
         {{ trans('labels.backend.exams.title') }}
-        <small>{{ trans('labels.backend.exams.sub_show_title') }}</small>
+        <small>{{ trans('labels.backend.exams.sub_detail_title') }}</small>
     </h1>
 @endsection
 
@@ -152,6 +152,7 @@
         var candidate_datatable = null;
         var course_datatable = null;
         var save_room_url = '{{route('admin.exam.save_rooms',$exam->id)}}';
+        var delete_room_url = '{{route('admin.exam.delete_rooms',$exam->id)}}';
         
         function toggleSidebar() {
             var right = $("#side-window-right"),
@@ -162,6 +163,7 @@
                 contentClass = "col-sm-12";
                 right.hide();
                 $("#btn-add").show();
+                $("#btn-delete").hide();
             } else {
                 contentClass = "col-sm-6";
             }
@@ -173,6 +175,7 @@
             if(content.hasClass("col-sm-6")){
                 right.delay(300).show(0);
                 $("#btn-add").hide();
+                $("#btn-delete").show();
             }
 
         }
@@ -230,13 +233,7 @@
                         },
                         'data' : function (node) {
                             return { 'id' : node.id };
-                        },
-                        /*'success': function(e){
-                            //console.log(type);
-                            if(type=="available"){
-                                count_availble_seat();
-                            }
-                        }*/
+                        }
                     }
                 },
                 "checkbox" : {
@@ -273,6 +270,13 @@
 
         function refresh_candidate_list (){
             $('#candidates-table').DataTable().ajax.reload();
+        }
+
+        function update_ui_room(){
+            $('#all_rooms').jstree("refresh");
+            $('#selected_rooms').jstree("refresh");
+            get_total_seat($("#all_available_seat"),"available");
+            get_total_seat($("#all_reserve_seat"),"selected");
         }
 
 
@@ -366,7 +370,6 @@
 
             $('#all_rooms').on("check_node.jstree", function (e, data) {
                 count_exam_seat();
-                //count_availble_seat();
             });
 
             $('#all_rooms').on("uncheck_node.jstree", function (e, data) {
@@ -387,11 +390,23 @@
                 $.ajax({
                     type: 'POST',
                     url: save_room_url,
-                    data: {room_ids:JSON.stringify($('#all_rooms').jstree("get_selected"))},
+                    data: {room_ids:JSON.stringify($('#all_rooms').jstree("get_checked"))},
                     dataType: "json",
                     success: function(resultData) {
-                        $('#all_rooms').jstree("refresh");
-                        $('#selected_rooms').jstree("refresh");
+                        update_ui_room(); // Data changed, so we need to refresh UI
+                    }
+                });
+            });
+
+            $("#btn-delete").click(function(){
+
+                $.ajax({
+                    type: 'POST',
+                    url: delete_room_url,
+                    data: {room_ids:JSON.stringify($('#selected_rooms').jstree("get_checked"))},
+                    dataType: "json",
+                    success: function(resultData) {
+                        update_ui_room(); // Data changed, so we need to refresh UI
                     }
                 });
             });
