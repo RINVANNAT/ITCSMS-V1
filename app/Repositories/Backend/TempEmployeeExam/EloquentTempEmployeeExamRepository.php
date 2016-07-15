@@ -5,6 +5,8 @@ namespace App\Repositories\Backend\TempEmployeeExam;
 
 use App\Exceptions\GeneralException;
 use App\Models\Exam;
+use App\Models\RoleStaff;
+use App\Models\Employee;
 use Carbon\Carbon;
 use DB;
 
@@ -17,23 +19,12 @@ class EloquentTempEmployeeExamRepository implements TempEmployeeExamRepositoryCo
 
     public function getAllStaffWithRoles($order_by = 'name_kh', $exam_id)
     {
+        $staffs = $this->getAllEmployeesFromDatabase($exam_id);
+        $temporaryStaff = $staffs[0];
+        $permanentStaff = $staffs[1];
         $allStaffs = [];
-        $temporaryStaff = DB::table('tempEmployees')
-            ->join('role_temporary_staff_exams', 'tempEmployees.id', '=', 'role_temporary_staff_exams.temp_employee_id')
-            ->join('roleStaffs', 'roleStaffs.id', '=', 'role_temporary_staff_exams.role_staff_id')
-            ->join('exams', 'exams.id', '=', 'role_temporary_staff_exams.exam_id')
-            ->select('tempEmployees.name_kh', 'tempEmployees.id', 'exams.name', 'roleStaffs.name')
-            ->where('exams.id', '=', $exam_id)->get();
-
-        $permanentStaff = DB::table('employees')
-            ->join('role_permanent_staff_exams', 'employees.id', '=', 'role_permanent_staff_exams.employee_id')
-            ->join('roleStaffs', 'roleStaffs.id', '=', 'role_permanent_staff_exams.role_staff_id')
-            ->join('exams', 'exams.id', '=', 'role_permanent_staff_exams.exam_id')
-            ->select('employees.name_kh', 'employees.id', 'exams.name', 'roleStaffs.name')
-            ->where('exams.id', '=', $exam_id)->get();
-
         foreach ($temporaryStaff as $staff) {
-            //array_push($allStaffs, $staff->name_kh);
+
             $element = array(
                 "id" => 'tmpstaff_' . $staff->id,
                 "text" => $staff->name_kh,
@@ -44,7 +35,7 @@ class EloquentTempEmployeeExamRepository implements TempEmployeeExamRepositoryCo
 
         }
         foreach ($permanentStaff as $perStaff) {
-            //array_push($allStaffs, $perStaff->name_kh);
+
             $element = array(
                 "id" => 'perstaff_' . $perStaff->id,
                 "text" => $perStaff->name_kh,
@@ -58,51 +49,36 @@ class EloquentTempEmployeeExamRepository implements TempEmployeeExamRepositoryCo
 
     }
 
-    public function getAllStaffWithoutRoles($exam_id)
+    private function getAllEmployeesFromDatabase($exam_id)
+    {
+        $temporaryStaff = DB::table('tempEmployees')
+            ->join('role_temporary_staff_exams', 'tempEmployees.id', '=', 'role_temporary_staff_exams.temp_employee_id')
+            ->join('roleStaffs', 'roleStaffs.id', '=', 'role_temporary_staff_exams.role_staff_id')
+            ->join('exams', 'exams.id', '=', 'role_temporary_staff_exams.exam_id')
+            ->select('tempEmployees.name_kh', 'tempEmployees.id', 'exams.name', 'roleStaffs.name as role_name', 'roleStaffs.id as role_id')
+            ->where('exams.id', '=', $exam_id)->get();
+
+        $permanentStaff = DB::table('employees')
+            ->join('role_permanent_staff_exams', 'employees.id', '=', 'role_permanent_staff_exams.employee_id')
+            ->join('roleStaffs', 'roleStaffs.id', '=', 'role_permanent_staff_exams.role_staff_id')
+            ->join('exams', 'exams.id', '=', 'role_permanent_staff_exams.exam_id')
+            ->select('employees.name_kh', 'employees.id', 'exams.name', 'roleStaffs.name as role_name', 'roleStaffs.id as role_id')
+            ->where('exams.id', '=', $exam_id)->get();
+
+        return array($temporaryStaff,$permanentStaff);
+    }
+
+    public function getEmployeeHaveRoleIds($exam_id)
     {
 
         $allStaffWithoutRoles = [];
+        $employeeIds = [];
 
-        $staffWithoutRoles = DB::table('tempEmployees')
-            ->join('role_temporary_staff_exams', 'tempEmployees.id', '=', 'role_temporary_staff_exams.temp_employee_id')
-            ->select('tempEmployees.name_kh')
-            ->where([
-                ['role_temporary_staff_exams.exam_id', '=', $exam_id],
-                ['role_temporary_staff_exams.role_staff_id', '=', null],
-            ])->get();
-
-        $permanentStaffWithoutRoles = DB::table('employees')
-            ->join('role_permanent_staff_exams', 'employees.id', '=', 'role_permanent_staff_exams.employee_id')
-            ->select('employees.name_kh')
-            ->where([
-                ['role_permanent_staff_exams.exam_id', '=', $exam_id],
-                ['role_permanent_staff_exams.role_staff_id', '=', null],
-            ])->get();
-
-        foreach ($staffWithoutRoles as $staffWithoutRole) {
-            //array_push($allStaffWithoutRoles, $staffWithoutRole->name_kh);
-            $element = array(
-                "id" => 'tmpstaff_' . $staffWithoutRole->id,
-                "text" => $staffWithoutRole->name_kh,
-                "children" => true,
-                "type" => "staff"
-            );
-
-            array_push($allStaffWithoutRoles, $element);
+        $temporaryAndPermanentStaffs = $this->getAllEmployeesFromDatabase($exam_id);
+        foreach($temporaryAndPermanentStaffs[1] as $permanentStaff) {
+            array_push($employeeIds, $permanentStaff->id);
         }
-        foreach ($permanentStaffWithoutRoles as $permanentStaffWithoutRole) {
-            //array_push($allStaffWithoutRoles, $permanentStaffWithoutRole->name_kh);
-            $element = array(
-                "id" => 'tmpstaff_' . $permanentStaffWithoutRole->id,
-                "text" => $permanentStaffWithoutRole->name_kh,
-                "children" => true,
-                "type" => "staff"
-            );
-
-            array_push($allStaffWithoutRoles, $element);
-        }
-
-        return $allStaffWithoutRoles;
+        return $employeeIds;
 
     }
 
@@ -194,20 +170,14 @@ class EloquentTempEmployeeExamRepository implements TempEmployeeExamRepositoryCo
     {
 
         $roles = [];
-        $roleTempStaffs = DB::table('roleStaffs')
-            ->join('role_temporary_staff_exams', 'roleStaffs.id', '=', 'role_temporary_staff_exams.role_staff_id')
-            ->select('roleStaffs.name', 'roleStaffs.id')
-            ->where('role_temporary_staff_exams.exam_id', '=', $exam_id)->get();
-
-        $rolePerStaffs = DB::table('roleStaffs')
-            ->join('role_permanent_staff_exams', 'roleStaffs.id', '=', 'role_permanent_staff_exams.role_staff_id')
-            ->select('roleStaffs.name', 'roleStaffs.id')
-            ->where('role_permanent_staff_exams.exam_id', '=', $exam_id)->get();
-
+        $roleInExam = $this->getAllEmployeesFromDatabase($exam_id);
+        $roleTempStaffs = $roleInExam[0];
+        $rolePerStaffs = $roleInExam[1];
+//        dd($roleInExam);
         foreach ($roleTempStaffs as $roleTempStaff) {
             $element = array(
-                "id" => 'role_' . $roleTempStaff->id,
-                "text" => $roleTempStaff->name,
+                "id" => 'role_' . $roleTempStaff->role_id,
+                "text" => $roleTempStaff->role_name,
                 "children" => true,
                 "type" => "role"
             );
@@ -217,8 +187,8 @@ class EloquentTempEmployeeExamRepository implements TempEmployeeExamRepositoryCo
 
         foreach ($rolePerStaffs as $rolePerStaff) {
             $element = array(
-                "id" => 'role_' . $rolePerStaff->id,
-                "text" => $rolePerStaff->name,
+                "id" => 'role_' . $rolePerStaff->role_id,
+                "text" => $rolePerStaff->role_name,
                 "children" => true,
                 "type" => "role"
             );
@@ -226,48 +196,38 @@ class EloquentTempEmployeeExamRepository implements TempEmployeeExamRepositoryCo
             array_push($roles, $element);
         }
 
+
         $roles = array_map("unserialize", array_unique(array_map("serialize", $roles)));
+        //$roles = array_unique($roles, SORT_REGULAR);
 
         return $roles;
 
     }
 
-    public function create($input)
+    public function getRoles()
     {
 
-        echo 'hello create';
+        $roles = RoleStaff::all();
 
-        // if (Exam::where('name', $input['name'])->first()) {
-        //     throw new GeneralException(trans('exceptions.backend.general.already_exists'));
-        // }
-
-        // $date_start_end = explode(" - ",$input['date_start_end']);
-
-        // $date_start = $date_start_end[0];
-        // $date_end = $date_start_end[1];
-
-        // $exam = new Exam();
-
-        // $exam->name = $input['name'];
-        // $exam->date_start = $date_start;
-        // $exam->date_end = $date_end;
-        // $exam->active = isset($input['active'])?true:false;
-        // $exam->description = $input['description'];
-        // $exam->academic_year_id = $input['academic_year_id'];
-        // $exam->type_id = $input['type_id'];
-
-        // $exam->created_at = Carbon::now();
-        // $exam->create_uid = auth()->id();
-
-        // if ($exam->save()) {
-        //     return true;
-        // }
-
-        // throw new GeneralException(trans('exceptions.backend.general.create_error'));
+        return ($roles);
 
     }
 
-    public function update($id, $input)
+    public function create($request)
+    {
+
+
+        $res = DB::table('roleStaffs')->insert([
+            [ 'name' => $request->role_name, 'description' => $request->description]
+        ]);
+        if($res){
+            return response()->json(['status' => 'success']);
+        } else {
+            return response()->json(['status' => 'fail']);
+        }
+    }
+
+    public function update($id, $request)
     {
 
         echo 'hello update';

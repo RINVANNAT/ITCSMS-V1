@@ -14,6 +14,7 @@ use App\Models\EntranceExamCourse;
 use App\Models\Exam;
 use App\Models\ExamType;
 use App\Repositories\Backend\Exam\ExamRepositoryContract;
+use App\Repositories\Backend\TempEmployeeExam\TempEmployeeExamRepositoryContract;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Response;
@@ -24,14 +25,17 @@ class ExamController extends Controller
      * @var ExamRepositoryContract
      */
     protected $exams;
+    protected $employeeExams;
 
     /**
      * @param ExamRepositoryContract $examRepo
      */
     public function __construct(
+        TempEmployeeExamRepositoryContract $empolyeeExams,
         ExamRepositoryContract $examRepo
     )
     {
+        $this->employeeExams = $empolyeeExams;
         $this->exams = $examRepo;
     }
 
@@ -74,7 +78,6 @@ class ExamController extends Controller
     {
        
         $id = $this->exams->create($request->all());
-
         return redirect()->route('admin.exams.show',$id)->withFlashSuccess(trans('alerts.backend.generals.created'));
 
     }
@@ -94,7 +97,13 @@ class ExamController extends Controller
         $academicYear = AcademicYear::where('id',$exam->academicYear->id)->lists('name_kh','id');
 
         $examType = ExamType::where('id',$type)->lists('name_kh','id')->toArray();
-        return view('backend.exam.show',compact('exam','type','academicYear','examType'));
+
+        $roles = $this->employeeExams->getRoles();
+
+        foreach($roles as $role) {}
+
+//        dd($roles);
+        return view('backend.exam.show',compact('exam','type','academicYear','examType', 'roles'));
     }
 
     /**

@@ -58,6 +58,9 @@ class Employee extends Model
     {
         return $this->belongsToMany(config('access.role'));
     }
+    public function positions() {
+        return $this->belongsToMany('App\Models\Position');
+    }
 
     /**
      * The attributes that should be casted to native types.

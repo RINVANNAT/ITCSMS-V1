@@ -71,6 +71,21 @@
             margin-bottom: 10px;
         }
 
+        .addRolePopUp {
+            background-color:#FFFFFF;
+            cursor:default;
+            display:none;
+            margin-top: 50px;
+            width:90%;
+            margin-left: 40px;
+        }
+
+        a.selected {
+            background-color:#1F75CC;
+            color:white;
+
+        }
+
     </style>
 @stop
 
@@ -392,7 +407,9 @@
 
             initJsTree($('#selected_rooms'),'selected');
 
-            initJsTree_StaffRole($('#selected_staffs'), '{{route('admin.exam.get-all-roles',$exam->id)}}', '{{route('admin.exam.get-staff-by-role',$exam->id)}}');
+            initJsTree_StaffSelected($('#selected_staffs'), '{{route('admin.exam.get-all-roles',$exam->id)}}', '{{route('admin.exam.get-staff-by-role',$exam->id)}}');
+
+            initJsTree_StaffRole($('#all_staff_role'), '{{route('admin.exam.get-all-departements',$exam->id)}}', '{{route('admin.exam.get-all-positions',$exam->id)}}','{{route('admin.exam.get-all-staffs-by-position',$exam->id)}}' );
 
 
 
@@ -455,4 +472,46 @@
 
 
     </script>
+
+    <script>
+
+        var baseUrl = "{{route('admin.exam.gsave-staff-role',$exam->id)}}";
+        var roleValue;
+        var baseData;
+        $("#btn_save_staff_role").click(function(){
+            baseData= {
+                role_id: $('#role :selected').val(),
+                staff_ids: JSON.stringify($('#all_staff_role').jstree("get_selected"))
+            }
+
+            if(baseData.role_id != null && baseData.staff_ids != '[]') {
+                console.log(baseData.staff_ids);
+                console.log(baseData.role_id);
+                ajaxRequest('POST', baseUrl, baseData);
+            } else{
+
+                alert("Please Select Role and Check On Staff Before Adding New Record !!!!");
+            }
+
+        });
+
+        $('#submit_new_role').click(function() {
+            var inputBaseUrl = "{{route('admin.exam.save-new-role', $exam->id)}}";
+            var inputBaseData= {
+                role_name: $('#new_role').val(),
+                description: $('#new_des').val()
+            }
+
+            if(inputBaseData.role_name != '' && inputBaseData.description != '') {
+                console.log(inputBaseData.role_name);
+                console.log(inputBaseData.description);
+                ajaxRequest('POST', inputBaseUrl,inputBaseData);
+            } else{
+
+                alert("Please Complete Record Before Submitting !!!!");
+            }
+
+        })
+    </script>
+
 @stop
