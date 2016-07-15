@@ -97,6 +97,7 @@
                             {{ trans('labels.backend.exams.show_tabs.candidate_info') }}
                         </a>
                     </li>
+                    @if($exam->type_id != 2)
                     <li role="presentation">
                         <a href="#course_info" aria-controls="courses" role="tab" data-toggle="tab">
                             {{ trans('labels.backend.exams.show_tabs.course_info') }}
@@ -112,6 +113,7 @@
                             {{ trans('labels.backend.exams.show_tabs.staff_info') }}
                         </a>
                     </li>
+                    @endif
                 </ul>
 
                 <div class="tab-content">
@@ -120,6 +122,7 @@
                         @include ("backend.exam.fields")
                         {!! Form::close() !!}
                     </div>
+                    @if($exam->type_id != 2)
                     <div role="tabpanel" class="tab-pane" id="course_info" style="padding-top:20px">
                         @include('backend.exam.show.exam_course')
                     </div>
@@ -132,6 +135,7 @@
                     <div role="tabpanel" class="tab-pane" id="staff_info" style="padding-top:20px">
                         @include('backend.exam.show.exam_staff')
                     </div>
+                    @endif
                 </div>
             </div>
 
@@ -153,6 +157,7 @@
         var course_datatable = null;
         var save_room_url = '{{route('admin.exam.save_rooms',$exam->id)}}';
         var delete_room_url = '{{route('admin.exam.delete_rooms',$exam->id)}}';
+        var exam_id = {{$exam->id}};
         
         function toggleSidebar() {
             var right = $("#side-window-right"),
@@ -279,6 +284,10 @@
             get_total_seat($("#all_reserve_seat"),"selected");
         }
 
+        function update_ui_course(){
+            course_datatable.draw();
+        }
+
 
         $(function(){
             $("#exam_show :input").attr("disabled", true);
@@ -302,23 +311,42 @@
                 ]
             });
 
-            course_datatable = $('#table-exam-course').DataTable({
-                processing: true,
-                serverSide: true,
-                pageLength: {!! config('app.records_per_page')!!},
-                ajax: {
-                    url: '{!! route('admin.exam.get_courses',$exam->id) !!}',
-                    method: 'POST'
-                },
-                columns: [
-                    { data: 'name_kh', name: 'courseAnnuals.name_kh'},
-                    { data: 'semester', name: 'courseAnnuals.semester'},
-                    { data: 'academic_year', name: 'academicYears.name_kh'},
-                    { data: 'class', name: 'class', orderable:false, searchable:false},
-                    { data: 'lecturer', name: 'employees.name_kh'},
-                    { data: 'action', name: 'action',orderable: false, searchable: false}
-                ]
-            });
+            if(exam_id == 1){
+                course_datatable = $('#table-exam-course').DataTable({
+                    processing: true,
+                    serverSide: true,
+                    pageLength: {!! config('app.records_per_page')!!},
+                    ajax: {
+                        url: '{!! route('admin.exam.get_entranceExamCourses',$exam->id) !!}',
+                        method: 'POST'
+                    },
+                    columns: [
+                        { data: 'name_kh', name: 'entranceExamCourses.name_kh'},
+                        { data: 'total_question', name: 'entranceExamCourses.total_question'},
+                        { data: 'description', name: 'entranceExamCourses.description'},
+                        { data: 'action', name: 'action',orderable: false, searchable: false}
+                    ]
+                });
+            } else {
+                course_datatable = $('#table-exam-course').DataTable({
+                    processing: true,
+                    serverSide: true,
+                    pageLength: {!! config('app.records_per_page')!!},
+                    ajax: {
+                        url: '{!! route('admin.exam.get_courses',$exam->id) !!}',
+                        method: 'POST'
+                    },
+                    columns: [
+                        { data: 'name_kh', name: 'courseAnnuals.name_kh'},
+                        { data: 'semester', name: 'courseAnnuals.semester'},
+                        { data: 'academic_year', name: 'academicYears.name_kh'},
+                        { data: 'class', name: 'class', orderable:false, searchable:false},
+                        { data: 'lecturer', name: 'employees.name_kh'},
+                        { data: 'action', name: 'action',orderable: false, searchable: false}
+                    ]
+                });
+            }
+
 
             enableDeleteRecord($('#candidates-table'));
 
@@ -415,6 +443,9 @@
                 PopupCenterDual('{{route("admin.exam.view_room_secret_code",$exam->id)}}','Room Secret Code','1200','960');
             });
 
+            $("#btn-add-course").click(function(){
+                PopupCenterDual('{{route("admin.exam.request_add_courses",$exam->id)}}','Course for exam','800','470');
+            });
 
             get_total_seat($("#all_available_seat"),"available");
             get_total_seat($("#all_reserve_seat"),"selected");

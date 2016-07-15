@@ -466,6 +466,15 @@ return [
                 'generate_auto' => 'Auto Generate',
                 'generate_manual' => 'Manually Enter'
             ],
+            'course' => [
+                'add_course' => 'Add new course for exam',
+                'choose_course' => 'Choose courses for exam',
+                'fields' => [
+                    "course_name" => "Course Name",
+                    "total_question" => "Total Questions",
+                    "description" => "Description"
+                ]
+            ],
             'show_tabs' => [
                 'general_info' => 'General Information',
                 'candidate_info' => 'Candidate Information',

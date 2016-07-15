@@ -1,6 +1,7 @@
 <?php namespace App\Http\Controllers\Backend;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Backend\Exam\CreateEntranceExamCourseRequest;
 use App\Http\Requests\Backend\Exam\CreateExamRequest;
 use App\Http\Requests\Backend\Exam\DeleteExamRequest;
 use App\Http\Requests\Backend\Exam\EditExamRequest;
@@ -9,9 +10,11 @@ use App\Http\Requests\Backend\Exam\UpdateExamRequest;
 use App\Models\AcademicYear;
 use App\Models\Building;
 use App\Models\Department;
+use App\Models\EntranceExamCourse;
 use App\Models\Exam;
 use App\Models\ExamType;
 use App\Repositories\Backend\Exam\ExamRepositoryContract;
+use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Response;
 
@@ -71,6 +74,7 @@ class ExamController extends Controller
     {
        
         $id = $this->exams->create($request->all());
+
         return redirect()->route('admin.exams.show',$id)->withFlashSuccess(trans('alerts.backend.generals.created'));
 
     }
@@ -166,7 +170,6 @@ class ExamController extends Controller
         $exam = $this->exams->findOrThrowException($id);
         $course = $exam->courses();
 
-        //dd($course->get());
         $datatables =  app('datatables')->of($course);
 
 
@@ -181,6 +184,21 @@ class ExamController extends Controller
                 ' <a href="'.route('admin.exams.show',$exam->id).'" class="btn btn-xs btn-info"><i class="fa fa-eye" data-toggle="tooltip" data-placement="top" title="" data-original-title="'.trans('buttons.general.view').'"></i> </a>';
             })
             ->make(true);
+    }
+
+    public function get_entranceExamCourses($id){
+        $exam = $this->exams->findOrThrowException($id);
+        $entranceExamCourse = $exam->entranceExamCourses();
+
+
+        $datatables =  app('datatables')->of($entranceExamCourse);
+
+        return $datatables
+            ->addColumn('action', function ($exam) {
+                return ' <button class="btn btn-xs btn-danger btn-delete" data-remote="'.route('admin.exams.destroy', $exam->id) .'"><i class="fa fa-times" data-toggle="tooltip" data-placement="top" title="' . trans('buttons.general.crud.delete') . '"></i></button>';
+            })
+            ->make(true);
+
     }
 
     public function get_buildings($id){
@@ -347,6 +365,30 @@ class ExamController extends Controller
         }
 
         return Response::json(array('success'=>true));
+    }
+
+    public function request_add_courses($exam_id){
+        $exam = $this->exams->findOrThrowException($exam_id);
+        if($exam->type_id == 1){  // This ID=1 is for entrance engineer
+            return view('backend.exam.includes.popup_add_course',compact('rooms','exam_id'));
+        } else{
+            return view('backend.exam.includes.popup_add_course',compact('rooms','exam_id'));
+        }
+    }
+
+    public function save_entrance_exam_course(CreateEntranceExamCourseRequest $request, $exam_id){
+        $input = $request->all();
+
+        $input['create_uid'] = auth()->id();
+        $input['created_at'] = Carbon::now();
+        $input['exam_id'] = $exam_id;
+
+        if(EntranceExamCourse::create($input)){
+            return Response::json(array('success'=>true));
+        } else {
+            return Response::json(array('success'=>false));
+        }
+
 
     }
 

@@ -102,7 +102,7 @@ class EloquentExamRepository implements ExamRepositoryContract
         $exam->create_uid = auth()->id();
 
         if ($exam->save()) {
-            return true;
+            return $exam->id;
         }
 
         throw new GeneralException(trans('exceptions.backend.general.create_error'));
