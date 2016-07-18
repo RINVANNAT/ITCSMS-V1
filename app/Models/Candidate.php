@@ -46,6 +46,7 @@ class Candidate extends Model
         "academic_year_id",
         "degree_id",
         "exam_id",
+        "studentBac2_id"
     ];
 
 

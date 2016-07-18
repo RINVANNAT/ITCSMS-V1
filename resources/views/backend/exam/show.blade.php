@@ -403,6 +403,10 @@
                 PopupCenterDual('{{route("admin.studentBac2.popup_index")."?exam_id=".$exam->id}}','Add new customer','1200','960');
             });
 
+            $(document).on('click', '#btn_add_candidate_manual', function (e) {
+                PopupCenterDual("{!! route('admin.candidate.popup_create').'?exam_id='.$exam->id.'&studentBac2_id=0' !!}",'Add new Candidate','1200','960');
+            });
+
             initJsTree($('#all_rooms'),'available');
 
             initJsTree($('#selected_rooms'),'selected');

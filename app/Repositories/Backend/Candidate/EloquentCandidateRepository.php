@@ -57,11 +57,22 @@ class EloquentCandidateRepository implements CandidateRepositoryContract
      */
     public function create($input)
     {
+
+        $result = array();
+
+        if (Candidate::where('register_id', $input['register_id'])->where('exam_id',$input['exam_id'])->first()) {
+            //throw new GeneralException(trans('exceptions.backend.access.roles.already_exists'));
+            $result["status"] = false;
+            $result["register_id"] = array("This register ID is already exist");
+
+            return $result;
+        }
+
         $candidate = new Candidate();
 
         $candidate->name_latin = $input['name_latin'];
         $candidate->name_kh = $input['name_kh'];
-        $candidate->register_id = isset($input['register_id'])?$input['register_id']:null;
+        $candidate->register_id = $input['register_id'];
         $candidate->dob = $input['dob'];
         $candidate->mcs_no = isset($input['mcs_no'])?$input['mcs_no']:null;
         $candidate->can_id = isset($input['can_id'])?$input['can_id']:null;
@@ -71,6 +82,7 @@ class EloquentCandidateRepository implements CandidateRepositoryContract
         $candidate->address_current = isset($input['address_current'])?$input['address_current']:null;
         $candidate->is_paid = isset($input['is_paid'])?true:false;
         $candidate->register_from = isset($input['register_from'])?$input['register_from']:"ITC";
+        $candidate->studentBac2_id = isset($input['studentBac2_id'])?$input['studentBac2_id']:null;
         if(isset($input['math_c'])){
             $candidate->math_c = $input['math_c']!=""?$input['math_c']:null;
         }
@@ -130,10 +142,16 @@ class EloquentCandidateRepository implements CandidateRepositoryContract
                 $candidate->departments()->sync($departmentIds);
             }
 
-            return true;
+            $result["status"] = true;
+            $result["messages"] = "Your information is successfully saved";
+
+
+        } else {
+            $result["status"] = false;
+            $result["messages"] = "Something went wrong!";
         }
 
-        throw new GeneralException(trans('exceptions.backend.configuration.candidates.create_error'));
+        return $result;
     }
 
     /**
