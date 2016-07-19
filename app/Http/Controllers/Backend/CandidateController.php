@@ -119,7 +119,12 @@ class CandidateController extends Controller
         $result = $this->candidates->create($request->all());
 
         if($request->ajax()){
-            return Response::json($result,422);
+            if($result['status']==true){
+                return Response::json($result);
+            } else {
+                return Response::json($result,422);
+            }
+
         }
 
     }
@@ -185,7 +190,7 @@ class CandidateController extends Controller
             ->leftJoin('gdeGrades','candidates.bac_total_grade','=','gdeGrades.id')
             ->leftJoin('genders','candidates.gender_id','=','genders.id')
             ->select([
-                'candidates.id','candidates.name_kh','candidates.name_latin','genders.name_kh as gender_name_kh','gdeGrades.name_en as bac_total_grade',
+                'candidates.id','candidates.register_id','candidates.name_kh','candidates.name_latin','genders.name_kh as gender_name_kh','gdeGrades.name_en as bac_total_grade',
                 'origins.name_kh as province', 'dob','result','is_paid','is_register'
             ]);
 

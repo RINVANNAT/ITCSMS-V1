@@ -18,6 +18,7 @@
         {!! Html::style(elixir('css/backend.css')) !!}
         <link rel="stylesheet" href="{{url('assets/js/mcustomsearch/style.css')}}">
         <link rel="stylesheet" href="{{url('assets/js/handlebars/groupselector.css')}}">
+        <link rel="stylesheet" href="{{url('plugins/toastr/toastr.min.css')}}">
 
 
         <style>
@@ -68,6 +69,8 @@
     <script>window.jQuery || document.write('<script src="{{asset('js/vendor/jquery/jquery-2.1.4.min.js')}}"><\/script>')</script>
     {!! Html::script('js/vendor/bootstrap/bootstrap.min.js') !!}
     {!! Html::script('plugins/slimScroll/jquery.slimscroll.min.js') !!}
+    {!! Html::script('plugins/toastr/toastr.min.js') !!}
+    {!! Html::script('plugins/jquery.validate.min.js') !!}
 
     @yield('before-scripts-end')
     {!! HTML::script(elixir('js/backend.js')) !!}

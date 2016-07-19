@@ -208,6 +208,7 @@ return [
         \InfyOm\Generator\InfyOmGeneratorServiceProvider::class,
         \InfyOm\CoreTemplates\CoreTemplatesServiceProvider::class,
         Barryvdh\LaravelIdeHelper\IdeHelperServiceProvider::class,
+        Proengsoft\JsValidation\JsValidationServiceProvider::class,
 
 
     ],
@@ -270,7 +271,8 @@ return [
         'Excel' => Maatwebsite\Excel\Facades\Excel::class,
 
         'Form'      => Collective\Html\FormFacade::class,
-        'Flash'     => Laracasts\Flash\Flash::class
+        'Flash'     => Laracasts\Flash\Flash::class,
+        'JsValidator' => Proengsoft\JsValidation\Facades\JsValidatorFacade::class,
     ],
 
 ];

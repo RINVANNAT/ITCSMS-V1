@@ -290,6 +290,7 @@
 
         function refresh_candidate_list (){
             $('#candidates-table').DataTable().ajax.reload();
+            notify("success","Info", "Candidate list is updated!");
         }
 
         function update_ui_room(){
@@ -315,6 +316,7 @@
                     method: 'POST'
                 },
                 columns: [
+                    { data: 'register_id', name: 'candidates.register_id'},
                     { data: 'name_kh', name: 'candidates.name_kh'},
                     { data: 'name_latin', name: 'candidates.name_en'},
                     { data: 'gender_name_kh', name: 'genders.name_kh'},
@@ -425,6 +427,9 @@
                 count_exam_seat();
             });
 
+            $("#btn-candidate-refresh").click(function(){
+                refresh_candidate_list();
+            });
 
             $("#btn-add").click(function () {
                 toggleSidebar();
