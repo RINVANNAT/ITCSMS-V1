@@ -68,7 +68,10 @@
                 processing: true,
                 serverSide: true,
                 pageLength: {!! config('app.records_per_page')!!},
-                ajax: '{!! route('admin.configuration.account.data') !!}',
+                ajax: {
+                    url: '{!! route('admin.configuration.account.data') !!}',
+                    method: 'POST'
+                },
                 columns: [
                     { data: 'name', name: 'name'},
                     { data: 'amount_dollar', name: 'amount_dollar'},

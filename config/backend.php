@@ -20,5 +20,6 @@ return [
      * yellow
      * yellow-light
      */
-    'theme' => 'blue',
+    'theme' => 'green',
+    'layout' => 'fixed',
 ];

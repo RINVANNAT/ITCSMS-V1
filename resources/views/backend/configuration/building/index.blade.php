@@ -5,7 +5,7 @@
 @section('page-header')
     <h1>
         {{ trans('labels.backend.buildings.title') }}
-        <small>{{ trans('labels.backend.buildings.sub_title') }}</small>
+        <small>{{ trans('labels.backend.buildings.sub_index_title') }}</small>
     </h1>
 
 @endsection
@@ -64,7 +64,10 @@
                 processing: true,
                 serverSide: true,
                 pageLength: {!! config('app.records_per_page')!!},
-                ajax: '{!! route('admin.configuration.building.data') !!}',
+                ajax: {
+                    url: '{!! route('admin.configuration.building.data') !!}',
+                    method: 'POST'
+                },
                 columns: [
                     { data: 'id', name: 'id'},
                     { data: 'name', name: 'name'},

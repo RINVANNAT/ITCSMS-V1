@@ -66,7 +66,10 @@
                 processing: true,
                 serverSide: true,
                 pageLength: {!! config('app.records_per_page')!!},
-                ajax: '{!! route('admin.configuration.highSchool.data') !!}',
+                ajax: {
+                    url: '{!! route('admin.configuration.highSchool.data') !!}',
+                    method: 'POST'
+                },
                 columns: [
                     { data: 'prefix_id', name: 'prefix_id'},
                     { data: 'highSchools.name_kh', name: 'highSchools.name_kh'},

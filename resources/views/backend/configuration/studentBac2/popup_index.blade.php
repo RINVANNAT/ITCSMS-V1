@@ -18,6 +18,7 @@
     <div class="box box-success">
         <div class="box-header with-border">
             <h3 class="box-title">{{ trans('labels.backend.candidates.sub_create_title') }}</h3>
+            <button id="btn-manual" class="btn btn-sm btn-info pull-right">Add Manually</button>
         </div><!-- /.box-header -->
 
         <div class="box-body">
@@ -52,7 +53,10 @@
                 processing: true,
                 serverSide: true,
                 pageLength: {!! config('app.records_per_page')!!},
-                ajax: '{!! route('admin.configuration.studentBac2.data')."?exam_id=".$exam_id !!}',
+                ajax: {
+                    url: '{!! route('admin.configuration.studentBac2.data')."?exam_id=".$exam_id !!}',
+                    method: 'POST'
+                },
                 columns: [
                     { data: 'name_kh', name: 'studentBac2s.name_kh'},
                     { data: 'dob', name: 'studentBac2s.dob',searchable:false},
@@ -64,6 +68,17 @@
                 ]
             });
             enableDeleteRecord($('#studentBac2s-table'));
+
+            $(document).on('click', ".export", function(e){
+                e.preventDefault();
+
+                PopupCenterDual($(this).attr('href'),'Add new Candidate','1200','960');
+
+            });
+
+            $("#btn-manual").on("click",function(){
+                PopupCenterDual("{!! route('admin.candidate.popup_create').'?exam_id='.$exam_id.'&studentBac2_id=0' !!}",'Add new Candidate','1200','960');
+            });
         });
     </script>
 @stop

@@ -270,7 +270,8 @@ return [
         'Excel' => Maatwebsite\Excel\Facades\Excel::class,
 
         'Form'      => Collective\Html\FormFacade::class,
-        'Flash'     => Laracasts\Flash\Flash::class
+        'Flash'     => Laracasts\Flash\Flash::class,
+
     ],
 
 ];

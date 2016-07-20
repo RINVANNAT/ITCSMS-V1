@@ -126,6 +126,7 @@
                 pageLength: {!! config('app.records_per_page')!!},
                 ajax: {
                     url:'{!! route('admin.accounting.income.data') !!}',
+                    method:'POST',
                     data:function(d){
                         d.account = $('#filter_account').val();
                         d.income_type = $('#filter_incomeType').val();

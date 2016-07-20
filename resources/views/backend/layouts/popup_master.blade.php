@@ -16,6 +16,7 @@
         <!-- Styles -->
         @yield('before-styles-end')
         {!! Html::style(elixir('css/backend.css')) !!}
+        <link rel="stylesheet" href="{{url('plugins/toastr/toastr.min.css')}}">
         <style>
             .content-wrapper{
                 background-image: url("/img/bg_contit.gif"); !important;
@@ -49,6 +50,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/2.1.4/jquery.min.js"></script>
     <script>window.jQuery || document.write('<script src="{{asset('js/vendor/jquery/jquery-2.1.4.min.js')}}"><\/script>')</script>
     {!! Html::script('js/vendor/bootstrap/bootstrap.min.js') !!}
+    {!! Html::script('plugins/toastr/toastr.min.js') !!}
 
     @yield('before-scripts-end')
     {!! HTML::script(elixir('js/backend.js')) !!}

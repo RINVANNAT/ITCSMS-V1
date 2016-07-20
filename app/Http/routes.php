@@ -45,6 +45,8 @@ Route::group(['namespace' => 'Backend', 'prefix' => 'admin', 'middleware' => 'ad
     require (__DIR__ . '/Routes/Backend/Absence.php');
     require (__DIR__ . '/Routes/Backend/Score.php');
     require (__DIR__ . '/Routes/Backend/Reporting.php');
+    
+    require (__DIR__ . '/Routes/Backend/employeeExamRole.php');
 });
 
 

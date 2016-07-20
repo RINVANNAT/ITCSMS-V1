@@ -206,6 +206,7 @@ return [
             'sub_edit_title' => 'Edit building information',
             'sub_create_title' => 'Create new building',
             'sub_detail_title' => 'Detail of an building',
+            'sub_import_title' => 'Import buildings',
             'fields'=>[
                 'name' => 'Name',
                 'description' => "Description",
@@ -271,6 +272,7 @@ return [
             'sub_edit_title' => 'Edit room information',
             'sub_create_title' => 'Create new room',
             'sub_detail_title' => 'Detail of a room',
+            'sub_import_title' => 'Import rooms',
             'fields'=>[
                 'active' => 'Is Active',
                 'name' => "Name",
@@ -290,6 +292,7 @@ return [
             'sub_edit_title' => 'Edit room type information',
             'sub_create_title' => 'Create new room type',
             'sub_detail_title' => 'Detail of a room type',
+            'sub_import_title' => 'Import room types',
             'fields'=>[
                 'id' => 'ID',
                 'active' => 'Is Active',
@@ -456,6 +459,22 @@ return [
             'sub_create_title' => 'Register new examination',
             'sub_detail_title' => 'Detail of an examination',
             'sub_import_title' => "Import examinations",
+            'secret_code' => [
+                'title' => 'Secret Code',
+                'print' => 'Print Secret Codes',
+                'export' => 'Export Secret Codes',
+                'generate_auto' => 'Auto Generate',
+                'generate_manual' => 'Manually Enter'
+            ],
+            'course' => [
+                'add_course' => 'Add new course for exam',
+                'choose_course' => 'Choose courses for exam',
+                'fields' => [
+                    "course_name" => "Course Name",
+                    "total_question" => "Total Questions",
+                    "description" => "Description"
+                ]
+            ],
             'show_tabs' => [
                 'general_info' => 'General Information',
                 'candidate_info' => 'Candidate Information',

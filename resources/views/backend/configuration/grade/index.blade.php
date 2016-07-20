@@ -65,7 +65,10 @@
                 processing: true,
                 serverSide: true,
                 pageLength: {!! config('app.records_per_page')!!},
-                ajax: '{!! route('admin.configuration.grade.data') !!}',
+                ajax: {
+                    url: '{!! route('admin.configuration.grade.data') !!}',
+                    method: 'POST'
+                },
                 columns: [
                     { data: 'code', name: 'code'},
                     { data: 'name_kh', name: 'name_kh'},

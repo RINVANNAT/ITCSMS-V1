@@ -122,11 +122,11 @@ class AcademicYearController extends Controller
             ->editColumn('id', '{!! str_limit($id, 60) !!}')
             ->editColumn('name_kh', '{!! str_limit($name_kh, 60) !!}')
             ->editColumn('date_start', function ($academicYear) {
-                $date = Carbon::createFromFormat('Y-m-d h:i:s', $academicYear->date_start);
+                $date = Carbon::createFromFormat('Y-m-d H:i:s', $academicYear->date_start);
                 return $date->format('d/m/Y');
             })
             ->editColumn('date_end', function ($academicYear) {
-                $date = Carbon::createFromFormat('Y-m-d h:i:s', $academicYear->date_end);
+                $date = Carbon::createFromFormat('Y-m-d H:i:s', $academicYear->date_end);
                 return $date->format('d/m/Y');
             })
             ->addColumn('action', function ($academicYear) {

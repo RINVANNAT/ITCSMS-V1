@@ -22,7 +22,7 @@
     <script>
         function return_back(){
             try {
-                window.opener.refresh_candidate_list();
+                window.opener.opener.refresh_candidate_list();
             } catch (err) {
                 alert(err.description || err) //or console.log or however you debug
             }

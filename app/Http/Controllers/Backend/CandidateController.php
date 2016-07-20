@@ -23,6 +23,8 @@ use App\Repositories\Backend\StudentAnnual\StudentAnnualRepositoryContract;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Input;
+use Illuminate\Support\Facades\Redirect;
+use Illuminate\Support\Facades\Response;
 
 class CandidateController extends Controller
 {
@@ -114,9 +116,16 @@ class CandidateController extends Controller
 
     public function popup_store(StoreCandidateRequest $request)
     {
-        $candidate = $this->candidates->create($request->all());
+        $result = $this->candidates->create($request->all());
 
-        return view('backend.candidate.popup_success')->withFlashSuccess(trans('alerts.backend.generals.created'));
+        if($request->ajax()){
+            if($result['status']==true){
+                return Response::json($result);
+            } else {
+                return Response::json($result,422);
+            }
+
+        }
 
     }
 
@@ -181,7 +190,7 @@ class CandidateController extends Controller
             ->leftJoin('gdeGrades','candidates.bac_total_grade','=','gdeGrades.id')
             ->leftJoin('genders','candidates.gender_id','=','genders.id')
             ->select([
-                'candidates.id','candidates.name_kh','candidates.name_latin','genders.name_kh as gender_name_kh','gdeGrades.name_en as bac_total_grade',
+                'candidates.id','candidates.register_id','candidates.name_kh','candidates.name_latin','genders.name_kh as gender_name_kh','gdeGrades.name_en as bac_total_grade',
                 'origins.name_kh as province', 'dob','result','is_paid','is_register'
             ]);
 

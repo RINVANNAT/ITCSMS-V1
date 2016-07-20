@@ -1,6 +1,7 @@
 <?php namespace App\Http\Controllers\Backend;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Backend\Exam\CreateEntranceExamCourseRequest;
 use App\Http\Requests\Backend\Exam\CreateExamRequest;
 use App\Http\Requests\Backend\Exam\DeleteExamRequest;
 use App\Http\Requests\Backend\Exam\EditExamRequest;
@@ -9,9 +10,12 @@ use App\Http\Requests\Backend\Exam\UpdateExamRequest;
 use App\Models\AcademicYear;
 use App\Models\Building;
 use App\Models\Department;
+use App\Models\EntranceExamCourse;
 use App\Models\Exam;
 use App\Models\ExamType;
 use App\Repositories\Backend\Exam\ExamRepositoryContract;
+use App\Repositories\Backend\TempEmployeeExam\TempEmployeeExamRepositoryContract;
+use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Response;
 
@@ -21,14 +25,17 @@ class ExamController extends Controller
      * @var ExamRepositoryContract
      */
     protected $exams;
+    protected $employeeExams;
 
     /**
      * @param ExamRepositoryContract $examRepo
      */
     public function __construct(
+        TempEmployeeExamRepositoryContract $empolyeeExams,
         ExamRepositoryContract $examRepo
     )
     {
+        $this->employeeExams = $empolyeeExams;
         $this->exams = $examRepo;
     }
 
@@ -69,8 +76,10 @@ class ExamController extends Controller
      */
     public function store(StoreExamRequest $request)
     {
+       
         $id = $this->exams->create($request->all());
         return redirect()->route('admin.exams.show',$id)->withFlashSuccess(trans('alerts.backend.generals.created'));
+
     }
 
     /**
@@ -84,9 +93,17 @@ class ExamController extends Controller
         $exam = $this->exams->findOrThrowException($id);
 
         $type = $exam->type->id;
+   
         $academicYear = AcademicYear::where('id',$exam->academicYear->id)->lists('name_kh','id');
+
         $examType = ExamType::where('id',$type)->lists('name_kh','id')->toArray();
-        return view('backend.exam.show',compact('exam','type','academicYear','examType'));
+
+        $roles = $this->employeeExams->getRoles();
+
+        foreach($roles as $role) {}
+
+//        dd($roles);
+        return view('backend.exam.show',compact('exam','type','academicYear','examType', 'roles'));
     }
 
     /**
@@ -162,7 +179,6 @@ class ExamController extends Controller
         $exam = $this->exams->findOrThrowException($id);
         $course = $exam->courses();
 
-        //dd($course->get());
         $datatables =  app('datatables')->of($course);
 
 
@@ -177,6 +193,21 @@ class ExamController extends Controller
                 ' <a href="'.route('admin.exams.show',$exam->id).'" class="btn btn-xs btn-info"><i class="fa fa-eye" data-toggle="tooltip" data-placement="top" title="" data-original-title="'.trans('buttons.general.view').'"></i> </a>';
             })
             ->make(true);
+    }
+
+    public function get_entranceExamCourses($id){
+        $exam = $this->exams->findOrThrowException($id);
+        $entranceExamCourse = $exam->entranceExamCourses();
+
+
+        $datatables =  app('datatables')->of($entranceExamCourse);
+
+        return $datatables
+            ->addColumn('action', function ($exam) {
+                return ' <button class="btn btn-xs btn-danger btn-delete" data-remote="'.route('admin.exams.destroy', $exam->id) .'"><i class="fa fa-times" data-toggle="tooltip" data-placement="top" title="' . trans('buttons.general.crud.delete') . '"></i></button>';
+            })
+            ->make(true);
+
     }
 
     public function get_buildings($id){
@@ -209,6 +240,46 @@ class ExamController extends Controller
         return Response::json($data);
     }
 
+    public function save_rooms($id){
+        $exam = $this->exams->findOrThrowException($id);
+
+        $room_ids = json_decode($_POST['room_ids']);
+        $ids = [];
+        foreach($room_ids as $room_id){
+            $tmp = explode('_',$room_id);
+            if($tmp[0] == "room"){  // Because ids that are pass alongs include buildings as well. We need to remove that.
+                array_push($ids,$tmp[1]);
+            }
+        }
+
+        if($exam->rooms()->sync($ids,false)) {  // Add room ids without deleting old ids
+            return Response::json(array("success"=>true));
+        } else {
+            return Response::json(array("success"=>false));
+        }
+
+    }
+
+    public function delete_rooms($id){
+        $exam = $this->exams->findOrThrowException($id);
+
+        $room_ids = json_decode($_POST['room_ids']);
+        $ids = [];
+        foreach($room_ids as $room_id){
+            $tmp = explode('_',$room_id);
+            if($tmp[0] == "room"){  // Because ids that are pass alongs include buildings as well. We need to remove that.
+                array_push($ids,$tmp[1]);
+            }
+        }
+
+        if($exam->rooms()->detach($ids)) {  // Add room ids without deleting old ids
+            return Response::json(array("success"=>true));
+        } else {
+            return Response::json(array("success"=>false));
+        }
+
+    }
+
     public function get_rooms($id){
         $type = $_GET['type'];
         $building = explode('_', $_GET['id'])[1];
@@ -231,12 +302,36 @@ class ExamController extends Controller
             $element = array(
                 "id" => 'room_'.$room->id,
                 "text" => $room->name.'-'.$room->code.' ('.$room->nb_chair_exam.')',
+                "data" => array("chair_exam" =>$room->nb_chair_exam),
                 "children"=>false,
                 "type"=>"room"
             );
             array_push($data,$element);
         }
         return Response::json($data);
+    }
+
+    public function count_seat_exam($id){
+        $type = $_GET['type'];
+        $all_ids = $this->get_all_room_ids();
+        $ids = $this->get_selected_room_ids($id);
+
+        $seat_exam = 0;
+        if($type == "available"){
+            $ids = $this->get_available_room_ids($all_ids,$ids);
+        }
+
+        $rooms = DB::table('rooms')
+            ->select('rooms.nb_chair_exam')
+            ->whereIN('rooms.id',$ids)
+            ->get();
+
+        foreach ($rooms as $room){
+            $seat_exam = $seat_exam + $room->nb_chair_exam;
+        }
+
+        return Response::json(array("seat_exam"=>$seat_exam));
+
     }
 
     private function get_all_room_ids(){
@@ -257,6 +352,53 @@ class ExamController extends Controller
     private function get_available_room_ids($all_ids, $selected_ids){
         $ids = array_diff($all_ids,$selected_ids);
         return $ids;
+    }
+
+    public function view_room_secret_code($exam_id){
+        $exam = $this->exams->findOrThrowException($exam_id);
+
+        $rooms = $exam->rooms()->with('building')->withPivot('roomcode')->get()->toArray();
+
+        return view('backend.exam.includes.popup_room_secret_code',compact('rooms','exam_id'));
+    }
+
+    public function save_room_secret_code($exam_id){
+
+        $rooms = json_decode($_POST['room_ids']);
+        //dd($rooms);
+        foreach($rooms as $room){
+            DB::table('exam_room')
+                ->where('exam_id',$exam_id)
+                ->where('room_id',$room->room_id)
+                ->update(['roomcode'=>$room->secret_code]);
+        }
+
+        return Response::json(array('success'=>true));
+    }
+
+    public function request_add_courses($exam_id){
+        $exam = $this->exams->findOrThrowException($exam_id);
+        if($exam->type_id == 1){  // This ID=1 is for entrance engineer
+            return view('backend.exam.includes.popup_add_course',compact('rooms','exam_id'));
+        } else{
+            return view('backend.exam.includes.popup_add_course',compact('rooms','exam_id'));
+        }
+    }
+
+    public function save_entrance_exam_course(CreateEntranceExamCourseRequest $request, $exam_id){
+        $input = $request->all();
+
+        $input['create_uid'] = auth()->id();
+        $input['created_at'] = Carbon::now();
+        $input['exam_id'] = $exam_id;
+
+        if(EntranceExamCourse::create($input)){
+            return Response::json(array('success'=>true));
+        } else {
+            return Response::json(array('success'=>false));
+        }
+
+
     }
 
 }

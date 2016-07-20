@@ -103,7 +103,10 @@
                 processing: true,
                 serverSide: true,
                 pageLength: {!! config('app.records_per_page')!!},
-                ajax: '{!! route('admin.configuration.schoolFee.data',"false") !!}', // parameter 0 represent scholarship id, which mean all scholarships
+                ajax: {
+                    url: '{!! route('admin.configuration.schoolFee.data',"false") !!}', // parameter 0 represent scholarship id, which mean all scholarships
+                    method: 'POST'
+                },
                 columns: [
                     { data: 'degree_name_kh', name: 'degrees.name_kh', orderable:false},
                     { data: 'promotion_name', name: 'promotions.name', orderable:false},
@@ -117,7 +120,10 @@
                 processing: true,
                 serverSide: true,
                 pageLength: {!! config('app.records_per_page')!!},
-                ajax: '{!! route('admin.configuration.schoolFee.data',"true") !!}',
+                ajax: {
+                    url: '{!! route('admin.configuration.schoolFee.data',"true") !!}',
+                    method: 'POST'
+                },
                 columns: [
                     { data: 'degree_name_kh', name: 'degrees.name_kh', orderable:false},
                     { data: 'scholarship_code', name: 'scholarships.code', orderable:false},

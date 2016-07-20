@@ -124,7 +124,7 @@ class AccountController extends Controller
             ->editColumn('amount_dollar', '{!! $amount_dollar==""? "0 $" : $amount_dollar. " $"  !!}')
             ->editColumn('amount_riel', '{!! $amount_riel==""? "0 ៛" : $amount_riel. " ៛" !!}')
             ->editColumn('updated_at', function ($account) {
-                $date = Carbon::createFromFormat('Y-m-d h:i:s', $account->updated_at);
+                $date = Carbon::createFromFormat('Y-m-d H:i:s', $account->updated_at);
                 return $date->diffForHumans();
             })
             ->addColumn('action', function ($account) {

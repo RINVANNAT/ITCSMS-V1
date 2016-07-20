@@ -63,7 +63,10 @@
                 processing: true,
                 serverSide: true,
                 pageLength: {!! config('app.records_per_page')!!},
-                ajax: '{!! route('admin.configuration.promotion.data') !!}',
+                ajax: {
+                    url: '{!! route('admin.configuration.promotion.data') !!}',
+                    method: 'POST'
+                },
                 columns: [
                     { data: 'name', name: 'name'},
                     { data: 'observation', name: 'observation'},
