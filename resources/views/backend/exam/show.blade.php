@@ -72,18 +72,11 @@
         }
 
         .addRolePopUp {
-            background-color:#FFFFFF;
             cursor:default;
             display:none;
-            margin-top: 50px;
-            width:90%;
-            margin-left: 40px;
-        }
-
-        a.selected {
-            background-color:#1F75CC;
-            color:white;
-
+            overflow:hidden;
+            background-color: #f5f5f5;
+            width:100%;
         }
 
     </style>
@@ -482,6 +475,8 @@
 
     </script>
 
+
+{{--vannat script--}}
     <script>
 
         var baseUrl = "{{route('admin.exam.gsave-staff-role',$exam->id)}}";
@@ -517,10 +512,39 @@
                 ajaxRequest('POST', inputBaseUrl,inputBaseData);
             } else{
 
-                alert("Please Complete Record Before Submitting !!!!");
+                console.log("Please Complete Record Before Submitting !!!!");
             }
-
         })
+
+        $("#btn_delete_node").click(function(){
+            var deleteNodeUrl = "{{route('admin.exam.delete-role-node',$exam->id)}}"
+            var baseData = {staff_ids:JSON.stringify($('#selected_staffs').jstree("get_checked"))};
+            if(baseData.staff_ids !== '[]') {
+                console.log(baseData);
+                ajaxRequest('DELETE',deleteNodeUrl, baseData);
+            } else {
+                console.log('no seleted value!');
+            }
+        });
+
+        $("#btn_save_chang_role").click(function(){
+            var changeNodeUrl = "{{route('admin.exam.update-role-node',$exam->id)}}"
+            var baseData = {staff_ids:JSON.stringify($('#selected_staffs').jstree("get_checked")),
+                            role_id:$('#role_change :selected').val()
+                            };
+            if(baseData.staff_ids !== '[]') {
+                console.log(baseData);
+                ajaxRequest('PUT',changeNodeUrl, baseData);
+                clickAddRole($('.popUpRoleDown'));
+                $('#btn_delete_node').show();
+                $('#btn_move_node').show();
+            } else {
+//                alert('no selected value')
+                $('#alert_add_role_staff').fadeIn().delay(2000).fadeOut();
+            }
+        });
+
+
     </script>
 
 @stop

@@ -14,7 +14,7 @@ class TempEmployee extends Model
 		"birthdate",
 		"address",
         "email",
-        "phone"
+        "phone",
         "gender_id"
 	];
 }

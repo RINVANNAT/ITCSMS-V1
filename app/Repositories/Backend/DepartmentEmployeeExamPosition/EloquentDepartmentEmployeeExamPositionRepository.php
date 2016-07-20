@@ -8,6 +8,7 @@ use App\Models\Exam;
 use App\Models\Department;
 use App\Models\Position;
 use App\Models\Employee;
+use App\Models\TempEmployee;
 use Carbon\Carbon;
 use DB;
 use App\Repositories\Backend\TempEmployeeExam\EloquentTempEmployeeExamRepository;
@@ -42,31 +43,55 @@ class EloquentDepartmentEmployeeExamPositionRepository extends EloquentTempEmplo
 
     public function getAllPositionByDepartements($department_id, $exam_id)
     {
-//        $arrayEmployeeIds = [];
-        $arrayPositions = [];
 
+        // index: 0 for permanent employee
+        // index: 1 for temporary employee
+
+        $arrayPositions = [];
         $employeeWithRoleIds = $this->getEmployeeHaveRoleIds($exam_id);
 
-        $employeePositions = Employee::join('employee_position', 'employees.id', '=', 'employee_position.employee_id')
-            ->join('positions', 'positions.id', '=', 'employee_position.position_id')
-            ->where('department_id', $department_id)
-            ->whereNotIn('employees.id', $employeeWithRoleIds)
-            ->select('employees.id', 'employee_position.position_id', 'positions.title')->get();
+        $departmentMinistryId = Department::where('name_en','Ministry')
+            ->select('name_kh','id')->get();
+        $ministryId = $departmentMinistryId->toarray();
 
+        if((int)$ministryId[0]['id'] !== (int)$department_id) {
 
-        foreach ($employeePositions as $employeePosition) {
+            $employeePositions = Employee::join('employee_position', 'employees.id', '=', 'employee_position.employee_id')
+                ->join('positions', 'positions.id', '=', 'employee_position.position_id')
+                ->where('department_id', $department_id)
+                ->whereNotIn('employees.id', $employeeWithRoleIds[0])
+                ->select('employees.id', 'employee_position.position_id', 'positions.title')->get();
 
-            $element = array(
-                "id" => 'position_' . $department_id . '_' . $employeePosition->position_id,
-                "text" => $employeePosition->title,
-                "children" => true,
-                "type" => "position"
-            );
-            array_push($arrayPositions, $element);
+            foreach ($employeePositions as $employeePosition) {
+
+                $element = array(
+                    "id" => 'position_' . $department_id . '_' . $employeePosition->position_id,
+                    "text" => $employeePosition->title,
+                    "children" => true,
+                    "type" => "position"
+                );
+                array_push($arrayPositions, $element);
+            }
+        } else {
+
+            $temporaryEmployeeWithoutRoles = TempEmployee::whereNotIn('tempEmployees.id',$employeeWithRoleIds[1] )
+                ->select('tempEmployees.id', 'tempEmployees.name_kh')->get();
+
+            foreach ($temporaryEmployeeWithoutRoles as $temporaryEmployeeWithoutRole) {
+
+                $element = array(
+                    "id" => 'tempstaff_' . $department_id . '_' . $temporaryEmployeeWithoutRole->id,
+                    "text" => $temporaryEmployeeWithoutRole->name_kh,
+                    "children" => false,
+                    "type" => "temporaryStaff"
+                );
+                array_push($arrayPositions, $element);
+            }
         }
 
-        $arrayPositions = array_map("unserialize", array_unique(array_map("serialize", $arrayPositions)));
+//        dd($arrayPositions);
 
+        $arrayPositions = array_map("unserialize", array_unique(array_map("serialize", $arrayPositions)));
 //        dd($arrayPositions);
         return $arrayPositions;
 
@@ -86,7 +111,7 @@ class EloquentDepartmentEmployeeExamPositionRepository extends EloquentTempEmplo
                 ['employee_position.position_id', '=', $position_id],
                 ['employees.department_id', '=', $selectedDepartment_id]
             ])
-            ->whereNotIn('employees.id', $employeeWithRoleIds)
+            ->whereNotIn('employees.id', $employeeWithRoleIds[0])
             ->get();
 
         foreach ($permanentStaffWithPositions as $permanentStaffWithPosition) {
@@ -110,6 +135,8 @@ class EloquentDepartmentEmployeeExamPositionRepository extends EloquentTempEmplo
         $employeeRepo = new EloquentEmployeeRepository;
 
         $staff_ids = json_decode($request->staff_ids);
+        $checked = 0;
+        $checkedTemp = 0;
 
         foreach ($staff_ids as $staff_id) {
             $employeePositionIds = explode('_', $staff_id);
@@ -125,10 +152,24 @@ class EloquentDepartmentEmployeeExamPositionRepository extends EloquentTempEmplo
 
                 $employees = $employeeRepo->findOrThrowException($employeeId);
                 $resEmployeePosition = $employees->positions()->sync([$positionId],false);
+                if($resEmployeeRole && $resEmployeePosition) {
+                    $checked++;
+                }
+            }
+
+            if ($employeePositionIds[0] == 'tempstaff') {
+//                $departmentId = (int)$employeePositionIds[1];
+                $tempEmployeeId = (int)$employeePositionIds[2];
+                $resTempEmployeeRole = DB::table('role_temporary_staff_exams')->insert([
+                    ['role_staff_id' => $request->role_id, 'exam_id' => $id, 'temp_employee_id' => $tempEmployeeId]
+                ]);
+                if($resTempEmployeeRole){
+                    $checkedTemp++;
+                }
 
             }
         }
-        if ($resEmployeeRole && $resEmployeePosition) {
+        if ($checked !== 0 || $checkedTemp !== 0) {
             return response()->json(['status' => 'success']);
         } else {
             return response()->json(['status' => 'fail']);

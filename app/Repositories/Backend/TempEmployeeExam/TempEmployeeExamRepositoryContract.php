@@ -58,7 +58,7 @@ interface TempEmployeeExamRepositoryContract
      * @param  $id
      * @return mixed
      */
-    public function destroy($id);
+    public function destroy($id, $request);
 
     /**
      * @param  $name

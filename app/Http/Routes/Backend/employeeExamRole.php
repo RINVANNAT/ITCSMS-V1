@@ -23,7 +23,15 @@ Route::group([], function() {
 
     Route::post('exams/{id}/save-staff-role', 'employeeExamController@saveStaffRoles')->name('admin.exam.gsave-staff-role');
 
-    Route::post('exams/{id}/save-new-role/new-role', 'employeeExamController@addNewRole')->name('admin.exam.save-new-role');
+    Route::post('exams/{id}/save-role-node/new-role', 'employeeExamController@addNewRole')->name('admin.exam.save-new-role');
+
+    Route::delete('exams/{id}/delete-role-node/delete-role', 'employeeExamController@deleteRoleNode')->name('admin.exam.delete-role-node');
+
+    Route::put('exams/{id}/update-role-node/update-role', 'employeeExamController@changeRoleStaffs')->name('admin.exam.update-role-node');
+
+
+//----------testing
+    Route::get('exams/{id}/get-roles', 'employeeExamController@getRoles')->name('admin.exam.get-roles');
 
     Route::get('employee-exam-role', 'employeeExamController@getAll');
 

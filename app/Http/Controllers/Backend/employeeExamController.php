@@ -66,12 +66,9 @@ class employeeExamController extends Controller
         return Response::json($result);
     }
 
-    public function getRoleStaff()
+    public function getRoles()
     {
-
-        $exam_id = 1;
-        $staff_id = 3;
-        $res = $this->tempEmpolyeeExams->getRoleBytStaff($staff_id, $exam_id);
+        $res = $this->tempEmpolyeeExams->getRoles();
         return $res;
     }
 
@@ -85,6 +82,8 @@ class employeeExamController extends Controller
     public function getPositionByDepartments($id)
     {
         $department_id = explode('_', $_GET['id'])[1];
+//        $department_id=12;
+
         $res = $this->departmentEmployees->getAllPositionByDepartements($department_id, $id);
         return Response::json($res);
     }
@@ -109,8 +108,17 @@ class employeeExamController extends Controller
 
     public function addNewRole(Request $request)
     {
-
         $res = $this->tempEmpolyeeExams->create($request);
+        return $res;
+    }
+
+    public function deleteRoleNode ($id, Request $request) {
+        $res = $this->tempEmpolyeeExams->destroy($id, $request);
+        return $res;
+    }
+
+    public function changeRoleStaffs($id, Request $request) {
+        $res = $this->tempEmpolyeeExams->update($id, $request);
         return $res;
     }
 
