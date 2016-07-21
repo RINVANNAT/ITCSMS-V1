@@ -9,6 +9,7 @@ use App\Http\Requests\Backend\Exam\StoreExamRequest;
 use App\Http\Requests\Backend\Exam\UpdateExamRequest;
 use App\Models\AcademicYear;
 use App\Models\Building;
+use App\Models\Candidate;
 use App\Models\Department;
 use App\Models\EntranceExamCourse;
 use App\Models\Exam;
@@ -407,6 +408,53 @@ class ExamController extends Controller
 //        dd($buildings);
         return view('backend.exam.includes.popup_add_input_score_course',compact('rooms','buildings'));
 //        dd($rooms);
+    }
+
+    public function generate_room($exam_id){
+        $exam = $this->exams->findOrThrowException($exam_id);
+        $candidates = $exam->candidates()->orderBy('register_id')->get()->toArray();
+        $rooms = $exam->rooms()->get()->toArray();
+
+        //dd($rooms);
+        $available_seat = 0;
+        foreach($rooms as &$room){
+            $room['current_seat'] = 0;
+            $available_seat = $available_seat + $room['nb_chair_exam'];
+        }
+
+        if(count($candidates) > $available_seat){
+            return Response::json(array('status'=>'false','message'=>'There is not enough seat for candidate!'));
+        }
+
+        $current_room = 0;
+        foreach($candidates as &$candidate){
+            $this->update_room_candidate($rooms,$current_room,$candidate);
+        }
+
+        //dd($candidates);
+        // Update candidate
+
+        foreach($candidates as $can){
+            DB::table('candidates')
+                ->where('id', $can['id'])
+                ->update(['room_id' => $can['room_id']]);
+        }
+
+        return Response::json(array('status'=>'true','message'=>'Operation is successful!'));
+    }
+
+    function update_room_candidate(&$rooms, &$current_room, &$candidate){
+        if($rooms[$current_room]['current_seat'] < $rooms[$current_room]['nb_chair_exam']){
+            $candidate['room_id'] = $rooms[$current_room]['id'];
+            $rooms[$current_room]['current_seat']++;
+            $current_room++;
+            if($current_room>=count($rooms)) $current_room = 0;
+            return true;
+        } else {
+            $current_room++;
+            if($current_room>=count($rooms)) $current_room = 0; // Reset index to 0 if over max
+            $this->update_room_candidate($rooms,$current_room,$candidate);
+        }
     }
 
 }

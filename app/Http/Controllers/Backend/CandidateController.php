@@ -189,8 +189,10 @@ class CandidateController extends Controller
             ->leftJoin('origins','candidates.province_id','=','origins.id')
             ->leftJoin('gdeGrades','candidates.bac_total_grade','=','gdeGrades.id')
             ->leftJoin('genders','candidates.gender_id','=','genders.id')
+            ->leftJoin('rooms','candidates.room_id','=','rooms.id')
+            ->leftJoin('buildings','rooms.building_id','=','buildings.id')
             ->select([
-                'candidates.id','candidates.register_id','candidates.name_kh','candidates.name_latin','genders.name_kh as gender_name_kh','gdeGrades.name_en as bac_total_grade',
+                'candidates.id',DB::raw("CONCAT(rooms.name,buildings.code) as room"),'candidates.register_id','candidates.name_kh','candidates.name_latin','genders.name_kh as gender_name_kh','gdeGrades.name_en as bac_total_grade',
                 'origins.name_kh as province', 'dob','result','is_paid','is_register'
             ]);
 
@@ -208,6 +210,13 @@ class CandidateController extends Controller
 
 
         return $datatables
+            ->editColumn('room',function($candidate){
+                if($candidate->room == "" || $candidate->room == null){
+                    return " - ";
+                } else {
+                    return $candidate->room;
+                }
+            })
             ->editColumn('result',function($candidate){
                 if($candidate->result == "Pending"){
                     return '<span class="label label-warning">'.$candidate->result.'</span>';

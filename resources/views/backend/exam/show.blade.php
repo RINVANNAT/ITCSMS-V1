@@ -13,7 +13,7 @@
     {!! Html::style('plugins/jstree/themes/default/style.min.css') !!}
     {!! Html::style('plugins/datatables/dataTables.bootstrap.css') !!}
     <style>
-        .Pending {
+        /*.Pending {
             background-color: #9FAFD1;
         }
         .Pass {
@@ -21,7 +21,7 @@
         }
         .Fail {
             background-color: #842210;
-        }
+        }*/
         #main-window, .side-window {
             min-height: 650px;
         }
@@ -95,12 +95,20 @@
             <div>
                 <!-- Nav tabs -->
                 <ul class="nav nav-tabs" role="tablist">
+                    @if($exam->type_id == 3)
                     <li role="presentation" class="active">
+                    @else
+                    <li role="presentation">
+                    @endif
                         <a href="#general_info" aria-controls="generals" role="tab" data-toggle="tab">
                             {{ trans('labels.backend.exams.show_tabs.general_info') }}
                         </a>
                     </li>
-                    <li role="presentation">
+                    @if($exam->type_id != 3)
+                        <li role="presentation" class="active">
+                    @else
+                        <li role="presentation">
+                    @endif
                         <a href="#candidate_info" aria-controls="candidates" role="tab" data-toggle="tab">
                             {{ trans('labels.backend.exams.show_tabs.candidate_info') }}
                         </a>
@@ -125,24 +133,34 @@
                 </ul>
 
                 <div class="tab-content">
-                    <div role="tabpanel" class="tab-pane active" id="general_info" style="padding-top:20px;">
+                    @if($exam->type_id == 3)
+                        <div role="tabpanel" class="tab-pane active" id="general_info" style="padding-top:20px;">
+                    @else
+                        <div role="tabpanel" class="tab-pane" id="general_info" style="padding-top:20px;">
+                    @endif
+
                         {!! Form::model($exam, ['#','class' => 'form-horizontal', 'role'=>'form', 'method' => 'patch', 'id'=> 'exam_show']) !!}
                         @include ("backend.exam.fields")
                         {!! Form::close() !!}
                     </div>
+                    @if($exam->type_id != 3)
+                        <div role="tabpanel" class="tab-pane active" id="candidate_info" style="padding-top:20px">
+                    @else
+                        <div role="tabpanel" class="tab-pane" id="candidate_info" style="padding-top:20px">
+                    @endif
+                            @include('backend.exam.show.exam_candidate')
+                        </div>
                     @if($exam->type_id != 2)
-                    <div role="tabpanel" class="tab-pane" id="course_info" style="padding-top:20px">
-                        @include('backend.exam.show.exam_course')
-                    </div>
-                    <div role="tabpanel" class="tab-pane" id="candidate_info" style="padding-top:20px">
-                        @include('backend.exam.show.exam_candidate')
-                    </div>
-                    <div role="tabpanel" class="tab-pane" id="room_info" style="padding-top:20px;max-width: 100%;">
-                        @include('backend.exam.show.exam_room')
-                    </div>
-                    <div role="tabpanel" class="tab-pane" id="staff_info" style="padding-top:20px">
-                        @include('backend.exam.show.exam_staff')
-                    </div>
+                        <div role="tabpanel" class="tab-pane" id="course_info" style="padding-top:20px">
+                            @include('backend.exam.show.exam_course')
+                        </div>
+
+                        <div role="tabpanel" class="tab-pane" id="room_info" style="padding-top:20px;max-width: 100%;">
+                            @include('backend.exam.show.exam_room')
+                        </div>
+                        <div role="tabpanel" class="tab-pane" id="staff_info" style="padding-top:20px">
+                            @include('backend.exam.show.exam_staff')
+                        </div>
                     @endif
                 </div>
             </div>
@@ -166,6 +184,10 @@
         var save_room_url = '{{route('admin.exam.save_rooms',$exam->id)}}';
         var delete_room_url = '{{route('admin.exam.delete_rooms',$exam->id)}}';
         var exam_id = {{$exam->id}};
+        var window_secret_code;
+        var window_course;
+        var window_bac2;
+        var window_candidate;
         
         function toggleSidebar() {
             var right = $("#side-window-right"),
@@ -316,6 +338,7 @@
                     { data: 'dob', name: 'candidates.dob'},
                     { data: 'province', name: 'origins.name_kh'},
                     { data: 'bac_total_grade', name: 'bac_total_grade'},
+                    { data: 'room', name: 'candidates.room', searchable:false},
                     { data: 'result', name: 'candidates.result'},
                     { data: 'action', name: 'action',orderable: false, searchable: false}
                 ]
@@ -395,11 +418,11 @@
             });
 
             $(document).on('click', '#btn_add_candidate', function (e) {
-                PopupCenterDual('{{route("admin.studentBac2.popup_index")."?exam_id=".$exam->id}}','Add new customer','1200','960');
+                window_bac2 = PopupCenterDual('{{route("admin.studentBac2.popup_index")."?exam_id=".$exam->id}}','Add new customer','1200','960');
             });
 
             $(document).on('click', '#btn_add_candidate_manual', function (e) {
-                PopupCenterDual("{!! route('admin.candidate.popup_create').'?exam_id='.$exam->id.'&studentBac2_id=0' !!}",'Add new Candidate','1200','960');
+                window_candidate = PopupCenterDual("{!! route('admin.candidate.popup_create').'?exam_id='.$exam->id.'&studentBac2_id=0' !!}",'Add new Candidate','1200','960');
             });
 
             initJsTree($('#all_rooms'),'available');
@@ -463,17 +486,49 @@
                 });
             });
 
+            $("#btn-candidate-generate-room").click(function(){
+                $.ajax({
+                    type: 'GET',
+                    url: "{{route('admin.exam.candidate.generate_room',$exam->id)}}",
+                    dataType: "json",
+                    success: function(resultData) {
+                        //update_ui_room(); // Data changed, so we need to refresh UI
+                        if(resultData.status = true){
+                            notify('success','Generate Room', resultData.message);
+                        } else {
+                            notify('error','Generate Room', resultData.message);
+                        }
+                    }
+                });
+            });
+
             $("#btn-secret-code").click(function(){
-                PopupCenterDual('{{route("admin.exam.view_room_secret_code",$exam->id)}}','Room Secret Code','1200','960');
+                window_secret_code = PopupCenterDual('{{route("admin.exam.view_room_secret_code",$exam->id)}}','Room Secret Code','1200','960');
             });
 
             $("#btn-add-course").click(function(){
-                PopupCenterDual('{{route("admin.exam.request_add_courses",$exam->id)}}','Course for exam','800','470');
+                window_course = PopupCenterDual('{{route("admin.exam.request_add_courses",$exam->id)}}','Course for exam','800','470');
             });
 
             get_total_seat($("#all_available_seat"),"available");
             get_total_seat($("#all_reserve_seat"),"selected");
 
+            // Close any open window upon this main window is closed or refreshed
+
+            window.onunload = function() {
+                if (window_bac2 && !window_bac2.closed) {
+                    window_bac2.close();
+                }
+                if (window_candidate && !window_candidate.closed) {
+                    window_candidate.close();
+                }
+                if (window_course && !window_course.closed) {
+                    window_course.close();
+                }
+                if (window_secret_code && !window_secret_code.closed) {
+                    window_secret_code.close();
+                }
+            };
 
         });
 

@@ -558,7 +558,8 @@ return [
                 'payslip_client_id' => "Payment ID",
                 'origin_id' => "Origin",
                 'preferred_department' => "Prefered Departments",
-                'class' => 'Class'
+                'class' => 'Class',
+                'room_id' => 'Room'
             ]
         ],
         'reporting' => [

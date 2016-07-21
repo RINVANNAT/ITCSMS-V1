@@ -25,4 +25,6 @@ Route::group([], function() {
     Route::post('exams/{id}/save_entrance_exam_course', 'ExamController@save_entrance_exam_course')->name('admin.exam.save_entrance_exam_course');
 
     Route::get('exams/{id}/request_input_score_courses', 'ExamController@requestInputScoreCourses')->name('admin.exam.request_input_score_courses');
+
+    Route::get('exams/{id}/candidate_generate_room', 'ExamController@generate_room')->name('admin.exam.candidate.generate_room');
 });

@@ -88,7 +88,15 @@
                      url: $("#candidate-form" ).attr('action'),
                      data: $("#candidate-form" ).serialize(),
                      success: function(response) {
-                        console.log(response);
+                        if(typeof response.status !== 'undefined'){
+                            if(response.status == true){
+                                return_back();
+                            } else {
+                                notify("error","Candidate Error",response.toString());
+                            }
+                        } else {
+                            notify("error","Candidate Error",response.toString());
+                        }
                      }
 
                  });

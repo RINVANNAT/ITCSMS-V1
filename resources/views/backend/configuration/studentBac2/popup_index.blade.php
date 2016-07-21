@@ -48,6 +48,7 @@
     {!! Html::script('plugins/datatables/jquery.dataTables.min.js') !!}
     {!! Html::script('plugins/datatables/dataTables.bootstrap.min.js') !!}
     <script>
+        var candidate_window;
         $(function() {
             $('#studentBac2s-table').DataTable({
                 processing: true,
@@ -72,13 +73,19 @@
             $(document).on('click', ".export", function(e){
                 e.preventDefault();
 
-                PopupCenterDual($(this).attr('href'),'Add new Candidate','1200','960');
+                candidate_window = PopupCenterDual($(this).attr('href'),'Add new Candidate','1200','960');
 
             });
 
             $("#btn-manual").on("click",function(){
-                PopupCenterDual("{!! route('admin.candidate.popup_create').'?exam_id='.$exam_id.'&studentBac2_id=0' !!}",'Add new Candidate','1200','960');
+                candidate_window = PopupCenterDual("{!! route('admin.candidate.popup_create').'?exam_id='.$exam_id.'&studentBac2_id=0' !!}",'Add new Candidate','1200','960');
             });
+
+            window.onunload = function() {
+                if (candidate_window && !candidate_window.closed) {
+                    candidate_window.close();
+                }
+            };
         });
     </script>
 @stop
