@@ -397,8 +397,16 @@ class ExamController extends Controller
         } else {
             return Response::json(array('success'=>false));
         }
+    }
 
+    public function requestInputScoreCourses($id) {
 
+        $exam = $this->exams->findOrThrowException($id);
+        $rooms = $exam->rooms()->withPivot('room_id')->get();
+        $buildings = Building::get();
+//        dd($buildings);
+        return view('backend.exam.includes.popup_add_input_score_course',compact('rooms','buildings'));
+//        dd($rooms);
     }
 
 }

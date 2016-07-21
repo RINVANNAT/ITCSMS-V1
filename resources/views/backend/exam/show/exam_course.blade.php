@@ -1,9 +1,10 @@
 <div style="padding-bottom: 20px;">
     <!-- Check all button -->
-    <button class="btn btn-primary btn-sm" id="btn-add-course"><i class="fa fa-plus-circle"></i> Add
-    </button>
-    <!-- /.btn-group -->
+    <button class="btn btn-primary btn-sm" id="btn-add-course"><i class="fa fa-plus-circle"></i> Add </button>
     <button class="btn btn-default btn-sm"><i class="fa fa-refresh"></i></button>
+    <button class="btn btn-primary btn-sm pull-right" id="btn_input_score_course"><i class="fa fa-plus-circle"></i> Input Score </button>
+    <!-- /.btn-group -->
+
 </div>
 
 <table class="table table-striped table-bordered table-hover dt-responsive nowrap" cellspacing="0" width="100%" id="table-exam-course">
@@ -27,3 +28,4 @@
     @endif
     </thead>
 </table>
+

@@ -18,6 +18,27 @@
                     </div>
 
                     <small>Selected staffs and roles</small>
+
+                    <div id="check_ok" class="col-md-12  no-padding alert-info" style="margin-bottom: 5px">
+                        <div class="col-md-9">
+                            <strong>Do you really want to delete the record ??</strong>
+                        </div>
+                        <div class="col-md-1 no-padding">
+                            <a id="ok_delete"  class="text-info" style="margin-right: 15px" href="#"> OK</a>
+                        </div>
+                        <div class="col-md-2 no-padding">
+                            <a id="cancel_delete" class="text-info" style="margin-left: 20px;" href="#"> Cancel</a>
+                        </div>
+                    </div>
+
+                    <div id="alert_delete_role_staff" class="alert-danger col-md-12" style="margin-bottom: 5px">
+                        <h5>Please Select Role and Check on Staff Before deleting!! </h5>
+                    </div>
+
+                    <div id="alert_delete_role_staff_success" class="alert-info col-md-12" style="margin-bottom: 5px">
+                        <h5>Your Selected Record Have Deleted!</h5>
+                    </div>
+
                     <div class="col-md-12 no-padding">
                         <div class="col-md-12 no-padding" style="margin-bottom: 5px;">
                             <button class="btn btn-sm btn-info pull-right" id="btn_add_role">Modify Group Role</button>
@@ -93,7 +114,9 @@
 
                     <div id="all_staff_role">
                     </div>
-
+                    <div id="alert_save_staff_role" class="alert-danger col-md-12">
+                        <h5> Please Select Role and Check On Staff Before Saving New Record !!!! </h5>
+                    </div>
                     <small>Staff and Roles</small>
                     <button class="btn btn-sm btn-danger pull-right" id="btn_save_staff_role" style=" margin-right: 20px;">Save</button>
                     <button class="btn btn-sm btn-default pull-right" id="btn_cancel_staff_role" style="margin-right: 8px;">Cancel</button>

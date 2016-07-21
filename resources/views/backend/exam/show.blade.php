@@ -406,10 +406,15 @@
 
             initJsTree($('#selected_rooms'),'selected');
 
-            initJsTree_StaffSelected($('#selected_staffs'), '{{route('admin.exam.get-all-roles',$exam->id)}}', '{{route('admin.exam.get-staff-by-role',$exam->id)}}');
+            var iconUrl1 = "{{url('plugins/jstree/img/department.png')}}";
+            var iconUrl2 = "{{url('plugins/jstree/img/role.png')}}";
+            var iconUrl3 = "{{url('plugins/jstree/img/employee.png')}}";
 
-            initJsTree_StaffRole($('#all_staff_role'), '{{route('admin.exam.get-all-departements',$exam->id)}}', '{{route('admin.exam.get-all-positions',$exam->id)}}','{{route('admin.exam.get-all-staffs-by-position',$exam->id)}}' );
+            initJsTree_StaffSelected($('#selected_staffs'), '{{route('admin.exam.get-all-roles',$exam->id)}}', '{{route('admin.exam.get-staff-by-role',$exam->id)}}', iconUrl2, iconUrl3);
 
+
+            initJsTree_StaffRole($('#all_staff_role'), '{{route('admin.exam.get-all-departements',$exam->id)}}', '{{route('admin.exam.get-all-positions',$exam->id)}}','{{route('admin.exam.get-all-staffs-by-position',$exam->id)}}', iconUrl1, iconUrl2, iconUrl3 );
+            $('#all_staff_role').jstree("load_all");
 
 
             $('#all_rooms').on("check_node.jstree", function (e, data) {
@@ -494,7 +499,8 @@
                 ajaxRequest('POST', baseUrl, baseData);
             } else{
 
-                alert("Please Select Role and Check On Staff Before Adding New Record !!!!");
+//                alert("Please Select Role and Check On Staff Before Adding New Record !!!!");
+                $('#alert_save_staff_role').fadeIn().delay(2000).fadeOut();
             }
 
         });
@@ -513,6 +519,7 @@
             } else{
 
                 console.log("Please Complete Record Before Submitting !!!!");
+                notify("error","info", "Please Complete Record Before Submitting !!!!");
             }
         })
 
@@ -521,11 +528,26 @@
             var baseData = {staff_ids:JSON.stringify($('#selected_staffs').jstree("get_checked"))};
             if(baseData.staff_ids !== '[]') {
                 console.log(baseData);
-                ajaxRequest('DELETE',deleteNodeUrl, baseData);
+                $('#check_ok').fadeIn();
+                $('#ok_delete').on('click', function() {
+                    $('#check_ok').fadeOut();
+                    ajaxRequest('DELETE',deleteNodeUrl, baseData);
+
+
+
+                });
+                $('#cancel_delete').on('click', function() {
+                    $('#check_ok').fadeOut();
+                });
+
             } else {
-                console.log('no seleted value!');
+//                console.log('no seleted value!');
+//
+                $('#alert_delete_role_staff').fadeIn().delay(2000).fadeOut();
             }
         });
+
+
 
         $("#btn_save_chang_role").click(function(){
             var changeNodeUrl = "{{route('admin.exam.update-role-node',$exam->id)}}"
@@ -543,7 +565,12 @@
                 $('#alert_add_role_staff').fadeIn().delay(2000).fadeOut();
             }
         });
-
+/*
+-----------------create inputscore in course page
+*/
+        $(document).on('click', '#btn_input_score_course', function (e) {
+            PopupCenterDual('{{route("admin.exam.request_input_score_courses",$exam->id)}}','Course for exam','800','470');
+        });
 
     </script>
 
