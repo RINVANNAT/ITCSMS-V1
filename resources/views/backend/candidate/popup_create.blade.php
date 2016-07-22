@@ -2,6 +2,11 @@
 
 @section ('title', trans('labels.backend.candidates.title') . ' | ' . trans('labels.backend.candidates.sub_create_title'))
 
+@section('after-styles-end')
+    {!! Html::style('plugins/datetimepicker/bootstrap-datetimepicker.min.css') !!}
+    {!! Html::style('plugins/select2/select2.min.css') !!}
+@endsection
+
 @section('page-header')
     <h1>
         {{ trans('labels.backend.candidates.title') }}
@@ -41,9 +46,13 @@
 @section('after-scripts-end')
 
     <script type="text/javascript" src="{{ url('vendor/jsvalidation/js/jsvalidation.js')}}"></script>
+    {!! Html::script('plugins/moment/moment.min.js') !!}
+    {!! Html::script('plugins/datetimepicker/bootstrap-datetimepicker.min.js') !!}
+    {!! HTML::script('plugins/select2/select2.full.min.js') !!}
     {!! JsValidator::formRequest('App\Http\Requests\Backend\Candidate\StoreCandidateRequest') !!}
 
     <script>
+
         function save_candidate(){
 
             /*var status = $( "#candidate-form" ).validate( {
@@ -81,12 +90,15 @@
 
             var status = $( "#candidate-form" ).validate().form();
             if(status ==true){
-                console.log("true");
+                var disabled = $("#candidate-form" ).find(':input:disabled').removeAttr('disabled');
+                var data = $("#candidate-form" ).serialize();
+                disabled.attr('disabled','disabled');
+
 
                  $.ajax({
                      type: 'POST',
                      url: $("#candidate-form" ).attr('action'),
-                     data: $("#candidate-form" ).serialize(),
+                     data: data,
                      success: function(response) {
                         if(typeof response.status !== 'undefined'){
                             if(response.status == true){
@@ -103,30 +115,7 @@
             } else {
                 console.log("false");
             }
-
-
         }
-
-        $('.input').keypress(function (e) {
-            if (e.which == 13) {
-                save_candidate();
-                return false;    //<---- Add this line
-            }
-        });
-
-
-        $("#btn-submit").on("click", function(e){
-
-            e.preventDefault();
-            save_candidate();
-        });
-
-
-
-        $("#btn-cancel").on("click",function(){
-           window.close();
-        });
-
 
         function return_back(){
             try {
@@ -138,5 +127,93 @@
 
             self.close();
         }
+
+        function formatRepo (repo) {
+            console.log(repo);
+            if (repo.loading) {
+                return repo.text;
+            }
+            if (repo.newOption) {
+                return '<a href="#" class="btn_add_new_customer"><em>Add new high school</em> "'+repo.name+'"</a>';
+            } else {
+                var markup =    "<div class='select2-result-repository clearfix'>" +
+                                    "<div class='select2-result-repository__meta'>" +
+                                        "<div class='select2-result-repository__title'>" + repo.name + "</div>"+
+                                    "</div>"+
+                                "</div>";
+                return markup;
+
+            }
+        }
+
+        function formatRepoSelection (repo) {
+
+            $('#candidate_highschool_name').val(repo.name);
+            $('#highschool_id').val(repo.id);
+
+            return repo.name || repo.group;
+        }
+
+
+        $(document).ready(function(){
+            var $search_url = "{{route('admin.configuration.highSchool.search')}}";
+
+            $('#candidate_dob').datetimepicker({
+                format: 'DD/MM/YYYY',
+            });
+            //$('#candidate_highschool_id').select2();
+            var highschool_search_box = $("#candidate_highschool_name").select2({
+                placeholder: 'Enter name ...',
+                allowClear: true,
+                tags: true,
+                createTag: function (params) {
+                    return {
+                        id: params.term,
+                        name: params.term,
+                        group:'highschool',
+                        newOption: true
+                    }
+                },
+                ajax: {
+                    url: $search_url,
+                    dataType: 'json',
+                    delay: 250,
+                    data: function (params) {
+                        return {
+                            term: params.term || '', // search term
+                            page: params.page || 1
+                        };
+                    },
+                    cache: true
+                },
+                escapeMarkup: function (markup) { return markup; }, // let our custom formatter work
+                minimumInputLength: 3,
+                templateResult: formatRepo, // omitted for brevity, see the source of this page
+                templateSelection: formatRepoSelection, // omitted for brevity, see the source of this page
+            });
+
+            $('.input').keypress(function (e) {
+                if (e.which == 13) {
+                    save_candidate();
+                    return false;    //<---- Add this line
+                }
+            });
+
+
+            $("#btn-submit").on("click", function(e){
+
+                e.preventDefault();
+                save_candidate();
+            });
+
+
+
+            $("#btn-cancel").on("click",function(){
+                window.close();
+            });
+        });
+
+
+
     </script>
 @stop

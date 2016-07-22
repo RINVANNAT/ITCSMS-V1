@@ -80,25 +80,32 @@ class CandidateController extends Controller
     {
         $studentBac2_id = Input::get('studentBac2_id');
         $exam_id = Input::get('exam_id');
+        $highschool = null;
 
         if($studentBac2_id==0){ // This allow to create candidate manually
             $studentBac2 = null;
+            $highschool = null;
         } else {
-            $studentBac2 = StudentBac2::where('id',$studentBac2_id)->first();
+            $studentBac2 = StudentBac2::find($studentBac2_id);
+            $highschool = HighSchool::find($studentBac2->highschool_id);
         }
 
+
+
+        //dd($highschool);
         $exam = Exam::where('id',$exam_id)->first();
 
         $degrees = Degree::lists('name_kh','id');
         $genders = Gender::lists('name_kh','id');
-        $promotions = Promotion::orderBy('name','desc')->lists('name','id');
-        $highSchools = HighSchool::lists('name_kh','id');
+        $promotions = Promotion::orderBy('id','desc')->lists('name','id');
+
+        //$highSchools = HighSchool::lists('name_kh','id');
         $provinces = Origin::lists('name_kh','id');
         $gdeGrades = GdeGrade::lists('name_en','id');
         $departments = Department::where('is_specialist',true)->where('parent_id',11)->get();
         $academicYears = AcademicYear::orderBy('name_latin','desc')->lists('name_latin','id');
 
-        return view('backend.candidate.popup_create',compact('departments','degrees','genders','promotions','highSchools','provinces','gdeGrades','academicYears','exam','studentBac2'));
+        return view('backend.candidate.popup_create',compact('departments','degrees','genders','promotions','provinces','gdeGrades','academicYears','exam','studentBac2','highschool'));
     }
 
 
