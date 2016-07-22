@@ -12,7 +12,7 @@
     <div class="form-group col-sm-6 required">
         {!! Form::label('register_id', trans('labels.backend.candidates.fields.register_id'),array('class'=>'col-sm-4 control-label required')) !!}
         <div class="col-sm-4">
-            {!! Form::text('register_id', null, array('class'=>'form-control input','placeholder'=>'Register ID','id'=>'candidate_register_id','required')) !!}
+            {!! Form::text('register_id', null, array('class'=>'form-control input','placeholder'=>'Register ID','id'=>'candidate_register_id','required','autofocus')) !!}
         </div>
     </div>
     <div class="form-group col-sm-6 required">

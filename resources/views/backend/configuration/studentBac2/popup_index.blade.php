@@ -111,6 +111,8 @@
                 candidate_window = PopupCenterDual("{!! route('admin.candidate.popup_create').'?exam_id='.$exam_id.'&studentBac2_id=0' !!}",'Add new Candidate','1200','960');
             });
 
+            $('div.dataTables_filter input').focus()
+
             window.onunload = function() {
                 if (candidate_window && !candidate_window.closed) {
                     candidate_window.close();
