@@ -108,6 +108,7 @@
             });
 
             $("#btn-manual").on("click",function(){
+                var me = 00;
                 candidate_window = PopupCenterDual("{!! route('admin.candidate.popup_create').'?exam_id='.$exam_id.'&studentBac2_id=0' !!}",'Add new Candidate','1200','960');
             });
 

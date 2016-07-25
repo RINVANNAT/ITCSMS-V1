@@ -170,19 +170,153 @@ class EloquentExamRepository implements ExamRepositoryContract
 
     public function requestInputScoreForm ($exam_id, $request) {
 
-        $test = DB::table('candidates')
-                ->join('candidate_entrance_exam_course', 'candidates.id', '=', 'candidate_entrance_exam_course.candidate_id')
-                ->join('entranceExamCourses', 'candidate_entrance_exam_course.entrance_course_id', '=', 'entranceExamCourses.id')
+        $candidates = DB::table('candidates')
+                ->join('rooms', 'rooms.id', '=', 'candidates.room_id')
+                ->join('exams', 'exams.id', '=', 'candidates.exam_id')
+                ->join('entranceExamCourses', 'entranceExamCourses.exam_id', '=', 'exams.id')
                 ->where([
                     ['candidates.room_id', '=', $request->room_id],
                     ['candidates.exam_id', '=', $exam_id],
                     ['entranceExamCourses.id', '=', $request->entrance_course_id]
                 ])
-                ->select('candidates.name_kh', 'candidates.id as candidate_id')->get();
+                ->select('candidates.id as candidate_id', 'candidates.name_kh as candidate_name', 'entranceExamCourses.name_kh as course_name','entranceExamCourses.total_question')
+                ->get();
 
-        dd($test);
-        return json_encode($test);
+        return $candidates;
     }
+
+    public function insertCandidateScore($exam_id, $request) {
+
+        $numberAttemp = $request->number_attemp;
+        $candidateIds = $request->candidate_ids;
+        $subjectId = $request->subject_id;
+//        $subjectName = $this->getExamCourseName($exam_id, $subjectId);
+        $totalAnsScores = $request->total_ans_score;
+        $roomId = $request->room_id;
+        $correctAns = $request->correct_ans_score;
+        $wrongAns = $request->wrong_ans_score;
+        $noAns = $request->no_ans_score;
+
+        if($numberAttemp == '1') {
+
+            $status = 0;
+            $checkSecondAttemps = DB::table('candidateEntranceExamScores')
+                ->join('candidates', 'candidates.id', '=', 'candidateEntranceExamScores.candidate_id')
+                ->whereIn('candidate_id', $candidateIds )
+                ->where([
+                    ['entrance_exam_course_id', '=', $subjectId],
+                    ['candidates.room_id', '=', $roomId],
+                    ['candidates.exam_id', '=', $exam_id]
+                ])
+                ->select('is_secondTime')->get();
+
+            foreach($checkSecondAttemps as $checkSecondAttemp) {
+                if($checkSecondAttemp->is_second === true) {
+                    $status++;
+                }
+            }
+
+            if($status === 0) {
+
+                $firstAttemp = true;
+                $secondAttemp = false;
+                $is_inserted = true;
+                $res = $this->insertValueByEachSubject($subjectId, $candidateIds, $firstAttemp, $secondAttemp, $correctAns, $wrongAns, $noAns, $is_inserted );
+
+                return $res;
+            } else {
+                return 'the record have beed added!';
+            }
+
+
+        } else if($numberAttemp == '2') {
+
+            $status = 0;
+            $checkFirstAttemps = DB::table('candidateEntranceExamScores')
+                ->join('candidates', 'candidates.id', '=', 'candidateEntranceExamScores.candidate_id')
+                ->whereIn('candidate_id', $candidateIds )
+                ->where([
+                    ['entrance_exam_course_id', '=', $subjectId],
+                    ['candidates.room_id', '=', $roomId],
+                    ['candidates.exam_id', '=', $exam_id]
+                ])
+                ->select('is_firstTime')->get();
+
+            foreach($checkFirstAttemps as $checkFirstAttemp) {
+                if($checkFirstAttemp->is_firstTime === true) {
+                    $status++;
+                }
+            }
+            if($status == count($checkFirstAttemps)) {
+
+                $firstAttemp = true;
+                $secondAttemp = true;
+                $is_inserted = true;
+                dd(count($checkFirstAttemps));
+                $res = $this->insertValueByEachSubject( $subjectId, $candidateIds, $firstAttemp, $secondAttemp, $correctAns, $wrongAns, $noAns, $is_inserted, $totalAnsScores );
+                return $res;
+
+            } else {
+
+                $firstAttemp = true;
+                $secondAttemp = false;
+                $is_inserted = false;
+                echo 'update the record';
+                $res = $this->insertValueByEachSubject( $subjectId, $candidateIds, $firstAttemp, $secondAttemp, $correctAns, $wrongAns, $noAns, $is_inserted, $totalAnsScores );
+
+                return $res;
+            }
+
+        }
+    }
+
+    private function insertValueByEachSubject($subjectId, $candidateIds, $first, $second, $correctAns, $wrongAns, $noAns, $is_inserted, $totalAnsScores ) {
+        if($is_inserted !== false) {
+
+            for ($i = 0; $i < count($candidateIds); $i++) {
+
+                $insertedVal = DB::table('candidateEntranceExamScores')->insertGetId([
+                    'candidate_id' => (int)$candidateIds[$i],
+                    'is_firstTime' => $first,
+                    'is_secondTime' => $second,
+                    'score_c' => (int)$correctAns[$i],
+                    'score_w' => (int)$wrongAns[$i],
+                    'score_na' => (int)$noAns[$i],
+                    'entrance_exam_course_id' => (int)$subjectId
+                ]);
+            }
+            return $insertedVal;
+
+        } else {
+
+            $updateRecord = DB::table('candidateEntranceExamScores')
+                            ->whereIn('candidate_id', $candidateIds)
+                            ->where('entrance_exam_course_id', '=', $subjectId )
+                            ->update(array( 'is_firstTime' => $first,
+                                            'is_secondTime' => $second,
+                                            'score_c' => $correctAns,
+                                            'score_w' => $wrongAns,
+                                            'score_na' => $noAns
+                            ));
+
+            return $updateRecord;
+        }
+
+
+    }
+
+
+
+    private function getExamCourseName($examId, $subjectId) {
+
+        $res = DB::table('entranceExamCourses')
+                        ->where([
+                            ['exam_id', '=', $examId],
+                            ['id', '=', $subjectId]
+                        ])->select('name_en')->get();
+        return $res;
+    }
+
 
 
 }
