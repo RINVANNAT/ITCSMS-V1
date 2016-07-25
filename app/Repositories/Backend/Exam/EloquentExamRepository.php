@@ -221,7 +221,7 @@ class EloquentExamRepository implements ExamRepositoryContract
                 $firstAttemp = true;
                 $secondAttemp = false;
                 $is_inserted = true;
-                $res = $this->insertValueByEachSubject($subjectId, $candidateIds, $firstAttemp, $secondAttemp, $correctAns, $wrongAns, $noAns, $is_inserted );
+                $res = $this->insertValueByEachSubject($subjectId, $candidateIds, $firstAttemp, $secondAttemp, $correctAns, $wrongAns, $noAns, $is_inserted, $totalAnsScores);
 
                 return $res;
             } else {
