@@ -495,6 +495,7 @@
                         //update_ui_room(); // Data changed, so we need to refresh UI
                         if(resultData.status = true){
                             notify('success','Generate Room', resultData.message);
+                            candidate_datatable.draw();
                         } else {
                             notify('error','Generate Room', resultData.message);
                         }

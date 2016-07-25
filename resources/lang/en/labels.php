@@ -345,7 +345,8 @@ return [
                 'bac_year' => "BacII Year",
                 'status' => "Status",
                 'is_registered' => "Is Registered",
-                'bac2_score_grade' =>"BacII Score/Grade"
+                'bac2_score_grade' =>"BacII Score/Grade",
+                'origin' =>'Origin'
             ]
         ],
 

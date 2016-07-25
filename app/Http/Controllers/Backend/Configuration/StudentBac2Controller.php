@@ -9,6 +9,8 @@ use App\Http\Requests\Backend\Configuration\StudentBac2\ImportStudentBac2Request
 use App\Http\Requests\Backend\Configuration\StudentBac2\RequestImportStudentBac2Request;
 use App\Http\Requests\Backend\Configuration\StudentBac2\StoreStudentBac2Request;
 use App\Http\Requests\Backend\Configuration\StudentBac2\UpdateStudentBac2Request;
+use App\Models\AcademicYear;
+use App\Models\Origin;
 use App\Repositories\Backend\StudentBac2\StudentBac2RepositoryContract;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
@@ -45,7 +47,9 @@ class StudentBac2Controller extends Controller
     public function popup_index()
     {
         $exam_id = $_GET['exam_id'];
-        return view('backend.configuration.studentBac2.popup_index',compact('exam_id'));
+        $academicYears = AcademicYear::orderBy('id','desc')->lists('name_kh','id');
+        $origins = Origin::lists('name_kh','id');
+        return view('backend.configuration.studentBac2.popup_index',compact('exam_id','academicYears','origins'));
     }
 
 
@@ -133,12 +137,10 @@ class StudentBac2Controller extends Controller
             ->leftJoin('genders','studentBac2s.gender_id','=','genders.id')
             ->leftJoin('highSchools','studentBac2s.highschool_id','=','highSchools.id')
             ->leftJoin('gdeGrades','studentBac2s.grade','=','gdeGrades.id')
-            ->select(['studentBac2s.id','studentBac2s.name_kh','genders.name_kh as gender_name_kh','highSchools.name_kh as highSchool_name_kh','dob','percentile','gdeGrades.name_en as gdeGrade_name_en']);
+            ->leftJoin('origins','studentBac2s.province_id','=','origins.id')
+            ->select(['studentBac2s.id','studentBac2s.bac_year','origins.name_kh as origin','studentBac2s.name_kh','genders.name_kh as gender_name_kh','highSchools.name_kh as highSchool_name_kh','dob','percentile','gdeGrades.name_en as gdeGrade_name_en']);
 
-        $datatables =  app('datatables')->of($studentBac2s);
-
-
-        return $datatables
+        $datatables =  app('datatables')->of($studentBac2s)
             ->editColumn('dob', function($studentBac2){
                 $date = Carbon::createFromFormat('Y-m-d h:i:s',$studentBac2->dob);
                 return $date->format('d/m/Y');
@@ -149,8 +151,16 @@ class StudentBac2Controller extends Controller
             })
             ->addColumn('export', function ($studentBac2) use ($exam_id) {
                 return  '<a href="'.route('admin.candidate.popup_create').'?exam_id='.$exam_id.'&studentBac2_id='.$studentBac2->id.'" class="btn btn-xs btn-primary export"><i class="fa fa-mail-forward" data-toggle="tooltip" data-placement="top" title="" data-original-title="'.trans('buttons.general.export').'"></i> </a>';
-            })
-            ->make(true);
+            });
+
+        if ($origin = $datatables->request->get('origin')) {
+            $datatables->where('studentBac2s.province_id', '=', $origin);
+        }
+        if ($academic_year = $datatables->request->get('academic_year')) {
+            $datatables->where('studentBac2s.bac_year', '=', $academic_year);
+        }
+
+        return $datatables->make(true);
     }
 
     public function request_import(RequestImportStudentBac2Request $request){

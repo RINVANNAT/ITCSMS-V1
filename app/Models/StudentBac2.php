@@ -74,7 +74,7 @@ class StudentBac2 extends Model
     }
 
     public function highSchool(){
-        return $this->belongsTo('App\Models\highSchools','highschool_id');
+        return $this->belongsTo('App\Models\HighSchool','highschool_id');
     }
 
     /**
