@@ -587,17 +587,12 @@
                 $('#ok_delete').on('click', function() {
                     $('#check_ok').fadeOut();
                     ajaxRequest('DELETE',deleteNodeUrl, baseData);
-
-
-
                 });
                 $('#cancel_delete').on('click', function() {
                     $('#check_ok').fadeOut();
                 });
 
             } else {
-//                console.log('no seleted value!');
-//
                 $('#alert_delete_role_staff').fadeIn().delay(2000).fadeOut();
             }
         });
@@ -626,6 +621,7 @@
         $(document).on('click', '#btn_input_score_course', function (e) {
             PopupCenterDual('{{route("admin.exam.request_input_score_courses",$exam->id)}}','Course for exam','800','470');
         });
+
 
     </script>
 

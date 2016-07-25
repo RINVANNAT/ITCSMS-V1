@@ -124,7 +124,6 @@ function initJsTree_StaffSelected( object, url_lv1, url_lv2, iconUrl2,iconUrl3 )
 
 }
 
-
 $(function(){
     $("#btn_add_role").click(function () {
         toggleSidebarStaffRole();

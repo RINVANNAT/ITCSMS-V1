@@ -6,6 +6,7 @@ namespace App\Repositories\Backend\Exam;
 use App\Exceptions\GeneralException;
 use App\Models\Exam;
 use Carbon\Carbon;
+use DB;
 
 /**
  * Class EloquentExamRepository
@@ -166,4 +167,54 @@ class EloquentExamRepository implements ExamRepositoryContract
 
         throw new GeneralException(trans('exceptions.backend.general.delete_error'));
     }
+
+    public function requestInputScoreForm ($exam_id, $request) {
+
+        $test = DB::table('candidates')
+                ->join('candidate_entrance_exam_course', 'candidates.id', '=', 'candidate_entrance_exam_course.candidate_id')
+                ->join('entranceExamCourses', 'candidate_entrance_exam_course.entrance_course_id', '=', 'entranceExamCourses.id')
+                ->where([
+                    ['candidates.room_id', '=', $request->room_id],
+                    ['candidates.exam_id', '=', $exam_id],
+                    ['entranceExamCourses.id', '=', $request->entrance_course_id]
+                ])
+                ->select('candidates.name_kh', 'candidates.id as candidate_id')->get();
+
+        dd($test);
+        return json_encode($test);
+    }
+
+
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

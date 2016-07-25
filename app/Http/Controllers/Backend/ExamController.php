@@ -14,11 +14,14 @@ use App\Models\Department;
 use App\Models\EntranceExamCourse;
 use App\Models\Exam;
 use App\Models\ExamType;
+use App\Models\Room;
 use App\Repositories\Backend\Exam\ExamRepositoryContract;
 use App\Repositories\Backend\TempEmployeeExam\TempEmployeeExamRepositoryContract;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Response;
+use Illuminate\Http\Request;
+use App\Http\Requests;
 
 class ExamController extends Controller
 {
@@ -402,13 +405,45 @@ class ExamController extends Controller
 
     public function requestInputScoreCourses($id) {
 
+        $exam_id = $id;
         $exam = $this->exams->findOrThrowException($id);
-        $rooms = $exam->rooms()->withPivot('room_id')->get();
+        $courses = EntranceExamCourse::where('exam_id',$id)->get();
+
         $buildings = Building::get();
-//        dd($buildings);
-        return view('backend.exam.includes.popup_add_input_score_course',compact('rooms','buildings'));
-//        dd($rooms);
+        foreach ($buildings as $building) {
+            $firstBuildingId = $building->id;
+            $rooms = $exam->rooms()->withPivot('room_id')->where('building_id', $firstBuildingId)->get();
+            return view('backend.exam.includes.popup_add_input_score_course',compact('rooms','buildings','courses', 'exam_id'));
+        }
     }
+
+    public function getBuildingRequestion($id, Request $request) {
+
+        $roomSelectedByBuilding = [];
+        $rooms = DB::table('rooms')
+                ->join('exam_room', 'rooms.id','=','exam_room.room_id')
+                ->join('exams', 'exams.id', '=', 'exam_room.exam_id')
+                ->where([
+                    ['exam_room.exam_id', '=', $id],
+                    ['rooms.building_id', '=', $request->building_id]
+                ])
+                ->select('rooms.name', 'rooms.id as room_id')->get();
+        foreach($rooms as $room) {
+            $element = array(
+                "room_id" =>  $room->room_id,
+                "room_name" => $room->name
+            );
+            array_push($roomSelectedByBuilding,$element);
+        }
+        return Response::json($roomSelectedByBuilding);
+    }
+
+    public function getRequestInputScoreForm($id, Request $request) {
+
+        $res = $this->exams->requestInputScoreForm($id, $request);
+        return $res;
+    }
+
 
     public function generate_room($exam_id){
         $exam = $this->exams->findOrThrowException($exam_id);

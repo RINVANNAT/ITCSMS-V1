@@ -24,7 +24,11 @@ Route::group([], function() {
     Route::get('exams/{id}/request_add_courses', 'ExamController@request_add_courses')->name('admin.exam.request_add_courses');
     Route::post('exams/{id}/save_entrance_exam_course', 'ExamController@save_entrance_exam_course')->name('admin.exam.save_entrance_exam_course');
 
+//-------------Vannat
+
     Route::get('exams/{id}/request_input_score_courses', 'ExamController@requestInputScoreCourses')->name('admin.exam.request_input_score_courses');
+    Route::get('exams/{id}/request_change_building_room', 'ExamController@getBuildingRequestion')->name('admin.exam.request_change_building_room');
+    Route::post('exams/{id}/request_input_score_form', 'ExamController@getRequestInputScoreForm')->name('admin.exam.request_input_score_form');
 
     Route::get('exams/{id}/candidate_generate_room', 'ExamController@generate_room')->name('admin.exam.candidate.generate_room');
 });
