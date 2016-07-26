@@ -252,7 +252,7 @@ class EloquentExamRepository implements ExamRepositoryContract
                 $firstAttemp = true;
                 $secondAttemp = true;
                 $is_inserted = true;
-                dd(count($checkFirstAttemps));
+//                dd(count($checkFirstAttemps));
                 $res = $this->insertValueByEachSubject( $subjectId, $candidateIds, $firstAttemp, $secondAttemp, $correctAns, $wrongAns, $noAns, $is_inserted, $totalAnsScores );
                 return $res;
 
@@ -261,7 +261,6 @@ class EloquentExamRepository implements ExamRepositoryContract
                 $firstAttemp = true;
                 $secondAttemp = false;
                 $is_inserted = false;
-                echo 'update the record';
                 $res = $this->insertValueByEachSubject( $subjectId, $candidateIds, $firstAttemp, $secondAttemp, $correctAns, $wrongAns, $noAns, $is_inserted, $totalAnsScores );
 
                 return $res;
@@ -271,6 +270,9 @@ class EloquentExamRepository implements ExamRepositoryContract
     }
 
     private function insertValueByEachSubject($subjectId, $candidateIds, $first, $second, $correctAns, $wrongAns, $noAns, $is_inserted, $totalAnsScores ) {
+
+        dd($totalAnsScores);
+
         if($is_inserted !== false) {
 
             for ($i = 0; $i < count($candidateIds); $i++) {

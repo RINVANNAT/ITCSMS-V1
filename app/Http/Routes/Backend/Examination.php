@@ -30,7 +30,7 @@ Route::group([], function() {
     Route::get('exams/{id}/request_change_building_room', 'ExamController@getBuildingRequestion')->name('admin.exam.request_change_building_room');
     Route::get('exams/{id}/request_input_score_form', 'ExamController@getRequestInputScoreForm')->name('admin.exam.request_input_score_form');
 
-    Route::post('exams/{id}/insert_exam_score_candidate', 'ExamController@generate_room')->name('admin.exam.insert_exam_score_candidate');
+    Route::post('exams/{id}/insert_exam_score_candidate', 'ExamController@insertScoreForEachCandiate')->name('admin.exam.insert_exam_score_candidate');
 
 
     Route::get('exams/{id}/candidate_generate_room', 'ExamController@generate_room')->name('admin.exam.candidate.generate_room');

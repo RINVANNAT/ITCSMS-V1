@@ -477,12 +477,6 @@ class ExamController extends Controller
 
     public function insertScoreForEachCandiate($exam_id, Request $request) {
 
-        $candidatesIds = $request->candidate_ids;
-        $correctAnsScores = $request->correct_ans_score;
-        $wrongtAnsScores = $request->wrong_ans_score;
-        $noAnsScores = $request->no_ans_score;
-
-//        dd($candidatesIds);
         $candidates = $this->exams->insertCandidateScore($exam_id, $request);
 
         return $candidates;
