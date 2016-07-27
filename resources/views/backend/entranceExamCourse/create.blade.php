@@ -10,8 +10,8 @@
         </div>
         <!-- /.box-header -->
         <div class="box-body">
-            {!! Form::open(['route' => ['admin.exam.save_entrance_exam_course',$exam_id], 'id'=> 'form_entrance_exam_course', 'class' => 'form-horizontal', 'role' => 'form', 'method' => 'post']) !!}
-
+            {!! Form::open(['route' => ['admin.entranceExamCourses.store'], 'id'=> 'form_entrance_exam_course', 'class' => 'form-horizontal', 'role' => 'form', 'method' => 'post']) !!}
+                @include('backend.entranceExamCourse.fields')
             {!! Form::close() !!}
         </div>
 
@@ -37,7 +37,7 @@
             $("#btn-save").click(function () {
                 $.ajax({
                     type: 'POST',
-                    url: "{{route('admin.exam.save_entrance_exam_course',$exam_id)}}",
+                    url: $("#form_entrance_exam_course").attr('action'),
                     data: $("#form_entrance_exam_course").serialize(),
                     dataType: "json",
                     success: function(resultData) {

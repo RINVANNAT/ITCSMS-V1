@@ -350,7 +350,7 @@
                     serverSide: true,
                     pageLength: {!! config('app.records_per_page')!!},
                     ajax: {
-                        url: '{!! route('admin.exam.get_entranceExamCourses',$exam->id) !!}',
+                        url: '{!! route('admin.entranceExamCourses.data',$exam->id) !!}',
                         method: 'POST'
                     },
                     columns: [
@@ -360,6 +360,7 @@
                         { data: 'action', name: 'action',orderable: false, searchable: false}
                     ]
                 });
+                enableDeleteRecord($('#table-exam-course'));
             } else {
                 course_datatable = $('#table-exam-course').DataTable({
                     processing: true,
@@ -508,7 +509,7 @@
             });
 
             $("#btn-add-course").click(function(){
-                window_course = PopupCenterDual('{{route("admin.exam.request_add_courses",$exam->id)}}','Course for exam','800','470');
+                window_course = PopupCenterDual('{{route("admin.entranceExamCourses.create")}}'+'?exam_id='+'{{$exam->id}}','Course for exam','800','470');
             });
 
             get_total_seat($("#all_available_seat"),"available");

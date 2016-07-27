@@ -1,14 +1,12 @@
-<?php
-
-namespace App\Http\Requests\Backend\Exam;
+<?php namespace App\Http\Requests\Backend\EntranceExamCourse;
 
 use App\Http\Requests\Request;
 
 /**
- * Class CreateEntranceExamCourseRequest
- * @package App\Http\Requests\Backend\Exam
+ * Class StoreEntranceExamCourseRequest
+ * @package App\Http\Requests\Backend\EntranceExamCourse
  */
-class CreateEntranceExamCourseRequest extends Request
+class StoreEntranceExamCourseRequest extends Request
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -29,8 +27,11 @@ class CreateEntranceExamCourseRequest extends Request
     {
         return [
             'name_kh' => 'required|max:255',
-            'description' => 'max:255',
+            'name_en' => 'max:255',
+            'name_fr' => 'max:255',
             'total_question' => 'integer',
+            'description' => 'max:255',
+            'exam_id' => 'required'
         ];
     }
 }

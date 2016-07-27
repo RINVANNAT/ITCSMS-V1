@@ -10,8 +10,8 @@
         </div>
         <!-- /.box-header -->
         <div class="box-body">
-            {!! Form::open(['route' => ['admin.exam.save_entrance_exam_course',$exam_id], 'id'=> 'form_entrance_exam_course', 'class' => 'form-horizontal', 'role' => 'form', 'method' => 'post']) !!}
-
+            {!! Form::model($entranceExamCourse, ['route' => ['admin.course.courseAnnuals.update', $courseAnnual->id],'class' => 'form-horizontal', 'role'=>'form', 'method' => 'patch','id'=> 'form_entrance_exam_course']) !!}
+            @include('backend.entranceExamCourse.fields')
             {!! Form::close() !!}
         </div>
 

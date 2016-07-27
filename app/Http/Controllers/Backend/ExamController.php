@@ -6,6 +6,7 @@ use App\Http\Requests\Backend\Exam\CreateExamRequest;
 use App\Http\Requests\Backend\Exam\DeleteExamRequest;
 use App\Http\Requests\Backend\Exam\EditExamRequest;
 use App\Http\Requests\Backend\Exam\StoreExamRequest;
+use App\Http\Requests\Backend\Exam\DeleteEntranceExamCourseRequest;
 use App\Http\Requests\Backend\Exam\UpdateExamRequest;
 use App\Models\AcademicYear;
 use App\Models\Building;
@@ -199,7 +200,7 @@ class ExamController extends Controller
             ->make(true);
     }
 
-    public function get_entranceExamCourses($id){
+    /*public function get_entranceExamCourses($id){
         $exam = $this->exams->findOrThrowException($id);
         $entranceExamCourse = $exam->entranceExamCourses();
 
@@ -207,11 +208,30 @@ class ExamController extends Controller
         $datatables =  app('datatables')->of($entranceExamCourse);
 
         return $datatables
-            ->addColumn('action', function ($exam) {
-                return ' <button class="btn btn-xs btn-danger btn-delete" data-remote="'.route('admin.exams.destroy', $exam->id) .'"><i class="fa fa-times" data-toggle="tooltip" data-placement="top" title="' . trans('buttons.general.crud.delete') . '"></i></button>';
+            ->addColumn('action', function ($item) {
+                return '<a href="'.route('admin.exams.edit',$item->id).'" class="btn btn-xs btn-primary"><i class="fa fa-pencil" data-toggle="tooltip" data-placement="top" title="" data-original-title="'.trans('buttons.general.crud.edit').'"></i> </a>'.
+                    ' <button class="btn btn-xs btn-danger btn-delete" data-remote="'.route('admin.exam.delete_entranceExamCourses', $item->id) .'"><i class="fa fa-times" data-toggle="tooltip" data-placement="top" title="' . trans('buttons.general.crud.delete') . '"></i></button>';
             })
             ->make(true);
 
+    }*/
+
+    public function delete_entranceExamCourses(DeleteEntranceExamCourseRequest $request, $course_id)
+    {
+        $course = EntranceExamCourse::find($course_id);
+
+        //Don't delete the role is there are users associated
+        /*if ($course->candidates()->count() > 0) {
+            throw new GeneralException(trans('exceptions.backend.exams.has_candidate'));
+        }*/
+
+        if ($course->delete()) {
+            if($request->ajax()){
+                return Response::json(array("success"=>true));
+            } else {
+                return redirect()->route('admin.exams.index')->withFlashSuccess(trans('alerts.backend.generals.deleted'));
+            }
+        }
     }
 
     public function get_buildings($id){
@@ -380,14 +400,14 @@ class ExamController extends Controller
         return Response::json(array('success'=>true));
     }
 
-    public function request_add_courses($exam_id){
+    /*public function request_add_courses($exam_id){
         $exam = $this->exams->findOrThrowException($exam_id);
         if($exam->type_id == 1){  // This ID=1 is for entrance engineer
             return view('backend.exam.includes.popup_add_course',compact('rooms','exam_id'));
         } else{
             return view('backend.exam.includes.popup_add_course',compact('rooms','exam_id'));
         }
-    }
+    }*/
 
     public function save_entrance_exam_course(CreateEntranceExamCourseRequest $request, $exam_id){
         $input = $request->all();
@@ -481,13 +501,6 @@ class ExamController extends Controller
 
         return $candidates;
     }
-
-
-
-
-
-
-
 
     public function generate_room($exam_id){
         $exam = $this->exams->findOrThrowException($exam_id);
