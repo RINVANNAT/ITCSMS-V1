@@ -42,7 +42,7 @@
                     dataType: "json",
                     success: function(resultData) {
                         opener.update_ui_course();
-                        window.close();
+                        //window.close();
                     }
                 });
             });

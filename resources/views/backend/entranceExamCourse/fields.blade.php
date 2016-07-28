@@ -1,6 +1,6 @@
 <input type="hidden" class="form-control" id="exam_id" name="exam_id" value="{{$exam_id}}">
-<div class="form-group">
-    <label for="name_kh" class="col-sm-3 control-label">Course Name - khmer</label>
+<div class="form-group required">
+    <label for="name_kh" class="col-sm-3 control-label required">Course Name - khmer</label>
 
     <div class="col-sm-9">
         <input type="text" class="form-control" id="name_kh" name="name_kh" placeholder="Name in Khmer" required>
@@ -32,6 +32,6 @@
     <label for="total_score" class="col-sm-3 control-label">Total Questions</label>
 
     <div class="col-sm-3">
-        <input type="number" class="form-control" id="total_score" name="total_score" placeholder="30">
+        <input type="number" class="form-control" id="total_question" name="total_question" placeholder="30">
     </div>
 </div>
