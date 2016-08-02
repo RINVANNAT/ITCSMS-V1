@@ -400,6 +400,16 @@ class ExamController extends Controller
         return Response::json(array('success'=>true));
     }
 
+    public function download_attendance_list($exam_id){
+
+        $exam = $this->exams->findOrThrowException($exam_id);
+        $rooms = $exam->rooms()->with('building')->with('candidates')->with('candidates.gender')->withPivot('roomcode')->get()->toArray();
+
+        //dd($rooms);
+        return view('backend.exam.includes.attendance_list',compact('rooms'));
+
+    }
+
     /*public function request_add_courses($exam_id){
         $exam = $this->exams->findOrThrowException($exam_id);
         if($exam->type_id == 1){  // This ID=1 is for entrance engineer

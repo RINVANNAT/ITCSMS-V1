@@ -56,17 +56,39 @@
                 height: 100%;
                 margin: 0;
                 padding: 0;
-                background-color: #ffffff;
+                background-color: #FAFAFA;
+                font: 12pt "Tahoma";
             }
-
+            * {
+                box-sizing: border-box;
+                -moz-box-sizing: border-box;
+            }
             .page {
                 width: 210mm;
-                height: 297mm;
-                margin: auto;
-                padding: 1.5cm;
+                min-height: 297mm;
+                padding: 20mm;
+                margin: 10mm auto;
+                border: 1px #D3D3D3 solid;
+                border-radius: 5px;
+                background: white;
+                box-shadow: 0 0 5px rgba(0, 0, 0, 0.1);
+                position: relative;
             }
-            @page { margin: 0; }
 
+
+            @media screen{
+                .footer{
+                    position: absolute;
+                    bottom: 10px;
+                    width: 100%;
+                    padding-right:40mm;
+                }
+            }
+
+            @page {
+                size: A4;
+                margin: 0;
+            }
             @media print {
                 html, body {
                     width: 210mm;
@@ -81,16 +103,22 @@
                     box-shadow: initial;
                     background: initial;
                     page-break-after: always;
+                    position: initial;
+                }
+                .footer{
+                    position: absolute;
+                    bottom: 10px;
+                    width: 100%;
+                    padding-right:40mm;
                 }
             }
+
         </style>
 
     </head>
     <body class="skin-{!! config('backend.theme') !!}" style="font-family: khmeros" onload="window.print()">
 
-        <div class="page">
-            @yield('content')
-        </div>
+        @yield('content')
 
         @yield('scripts')
     </body>

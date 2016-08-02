@@ -162,6 +162,10 @@ class Candidate extends Model
         return $this->belongsToMany('App\Models\Department')->withPivot('rank');
     }
 
+    public function room(){
+        return $this->belongsTo('App\Models\Room','room_id');
+    }
+
     /**
      * The attributes that should be casted to native types.
      *

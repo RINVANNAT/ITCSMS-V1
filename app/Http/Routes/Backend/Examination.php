@@ -21,10 +21,8 @@ Route::group([], function() {
 
     Route::post('exams/{id}/get_courses', 'ExamController@get_courses')->name('admin.exam.get_courses');
 
-    /*Route::post('exams/{id}/get_entranceExamCourses', 'ExamController@get_entranceExamCourses')->name('admin.exam.get_entranceExamCourses');
-    Route::get('exams/{id}/request_add_courses', 'ExamController@request_add_courses')->name('admin.exam.request_add_courses');
-    Route::delete('exams/delete_entranceExamCourses/{course_id}', 'ExamController@delete_entranceExamCourses')->name('admin.exam.delete_entranceExamCourses');
-    Route::post('exams/{id}/save_entrance_exam_course', 'ExamController@save_entrance_exam_course')->name('admin.exam.save_entrance_exam_course');*/
+    Route::get('exams/{id}/download_attendance_list', 'ExamController@download_attendance_list')->name('admin.exam.download_attendance_list');
+
 
 //-------------Vannat
 

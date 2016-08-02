@@ -481,7 +481,8 @@ return [
                 'candidate_info' => 'Candidate Information',
                 'course_info' => 'Course Information',
                 'room_info' => 'Room Information',
-                'staff_info' => 'Staff Information'
+                'staff_info' => 'Staff Information',
+                'download' => 'Download'
             ],
             'fields'=>[
                 'name' => 'Exam Name',

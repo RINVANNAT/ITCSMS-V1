@@ -79,6 +79,27 @@
             width:100%;
         }
 
+        div.img {
+            margin: 5px;
+            border: 1px solid #ccc;
+            float: left;
+            width: 180px;
+        }
+
+        div.img:hover {
+            border: 1px solid #777;
+        }
+
+        div.img img {
+            width: 100%;
+            height: auto;
+        }
+
+        div.desc {
+            padding: 15px;
+            text-align: center;
+        }
+
     </style>
 @stop
 
@@ -130,6 +151,11 @@
                         </a>
                     </li>
                     @endif
+                    <li role="presentation">
+                        <a href="#download_info" aria-controls="staffs" role="tab" data-toggle="tab">
+                            {{ trans('labels.backend.exams.show_tabs.download') }}
+                        </a>
+                    </li>
                 </ul>
 
                 <div class="tab-content">
@@ -162,6 +188,9 @@
                             @include('backend.exam.show.exam_staff')
                         </div>
                     @endif
+                    <div role="tabpanel" class="tab-pane" id="download_info" style="padding-top:20px">
+                        @include('backend.exam.show.download')
+                    </div>
                 </div>
             </div>
 
