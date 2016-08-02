@@ -4,9 +4,12 @@ namespace App\Repositories\Backend\Exam;
 
 
 use App\Exceptions\GeneralException;
+use App\Http\Requests\Backend\Exam\StoreEntranceExamScoreRequest;
 use App\Models\Exam;
 use Carbon\Carbon;
 use DB;
+use Object;
+use phpDocumentor\Reflection\Types\Object_;
 
 /**
  * Class EloquentExamRepository
@@ -168,158 +171,213 @@ class EloquentExamRepository implements ExamRepositoryContract
         throw new GeneralException(trans('exceptions.backend.general.delete_error'));
     }
 
-    public function requestInputScoreForm ($exam_id, $request) {
+    public function requestInputScoreForm ($exam_id, $request, $number_correction) {
 
+        $mergedObjects = [];
+        $candidateScoreForm = [];
         $candidates = DB::table('candidates')
-                ->join('rooms', 'rooms.id', '=', 'candidates.room_id')
-                ->join('exams', 'exams.id', '=', 'candidates.exam_id')
-                ->join('entranceExamCourses', 'entranceExamCourses.exam_id', '=', 'exams.id')
-                ->where([
-                    ['candidates.room_id', '=', $request->room_id],
-                    ['candidates.exam_id', '=', $exam_id],
-                    ['entranceExamCourses.id', '=', $request->entrance_course_id]
-                ])
-                ->select('candidates.id as candidate_id', 'candidates.name_kh as candidate_name', 'entranceExamCourses.name_kh as course_name','entranceExamCourses.total_question')
-                ->get();
+            ->leftJoin('entranceExamCourses', 'entranceExamCourses.exam_id', '=', 'candidates.exam_id')
+            ->where([
+                ['candidates.room_id', '=', $request->room_id],
+                ['candidates.exam_id', '=', $exam_id],
+                ['entranceExamCourses.id', '=', $request->entrance_course_id],
+            ])
 
-        return $candidates;
-    }
+            ->select( 'candidates.id as candidate_id', 'candidates.register_id', 'entranceExamCourses.name_kh as course_name','entranceExamCourses.total_question')
+            ->orderBy('candidates.register_id', 'ASC')->get();
 
-    public function insertCandidateScore($exam_id, $request) {
-
-        $numberAttemp = $request->number_attemp;
-        $candidateIds = $request->candidate_ids;
-        $subjectId = $request->subject_id;
-//        $subjectName = $this->getExamCourseName($exam_id, $subjectId);
-        $totalAnsScores = $request->total_ans_score;
-        $roomId = $request->room_id;
-        $correctAns = $request->correct_ans_score;
-        $wrongAns = $request->wrong_ans_score;
-        $noAns = $request->no_ans_score;
-
-        if($numberAttemp == '1') {
-
-            $status = 0;
-            $checkSecondAttemps = DB::table('candidateEntranceExamScores')
-                ->join('candidates', 'candidates.id', '=', 'candidateEntranceExamScores.candidate_id')
-                ->whereIn('candidate_id', $candidateIds )
-                ->where([
-                    ['entrance_exam_course_id', '=', $subjectId],
-                    ['candidates.room_id', '=', $roomId],
-                    ['candidates.exam_id', '=', $exam_id]
-                ])
-                ->select('is_secondTime')->get();
-
-            foreach($checkSecondAttemps as $checkSecondAttemp) {
-                if($checkSecondAttemp->is_second === true) {
-                    $status++;
-                }
-            }
-
-            if($status === 0) {
-
-                $firstAttemp = true;
-                $secondAttemp = false;
-                $is_inserted = true;
-                $res = $this->insertValueByEachSubject($subjectId, $candidateIds, $firstAttemp, $secondAttemp, $correctAns, $wrongAns, $noAns, $is_inserted, $totalAnsScores);
-
-                return $res;
-            } else {
-                return 'the record have beed added!';
-            }
-
-
-        } else if($numberAttemp == '2') {
-
-            $status = 0;
-            $checkFirstAttemps = DB::table('candidateEntranceExamScores')
-                ->join('candidates', 'candidates.id', '=', 'candidateEntranceExamScores.candidate_id')
-                ->whereIn('candidate_id', $candidateIds )
-                ->where([
-                    ['entrance_exam_course_id', '=', $subjectId],
-                    ['candidates.room_id', '=', $roomId],
-                    ['candidates.exam_id', '=', $exam_id]
-                ])
-                ->select('is_firstTime')->get();
-
-            foreach($checkFirstAttemps as $checkFirstAttemp) {
-                if($checkFirstAttemp->is_firstTime === true) {
-                    $status++;
-                }
-            }
-            if($status == count($checkFirstAttemps)) {
-
-                $firstAttemp = true;
-                $secondAttemp = true;
-                $is_inserted = true;
-//                dd(count($checkFirstAttemps));
-                $res = $this->insertValueByEachSubject( $subjectId, $candidateIds, $firstAttemp, $secondAttemp, $correctAns, $wrongAns, $noAns, $is_inserted, $totalAnsScores );
-                return $res;
-
-            } else {
-
-                $firstAttemp = true;
-                $secondAttemp = false;
-                $is_inserted = false;
-                $res = $this->insertValueByEachSubject( $subjectId, $candidateIds, $firstAttemp, $secondAttemp, $correctAns, $wrongAns, $noAns, $is_inserted, $totalAnsScores );
-
-                return $res;
-            }
-
+        foreach($candidates as $candidate) {
+            $candidateExamScore = DB::table('candidateEntranceExamScores')
+                                    ->where([
+                                        ['candidateEntranceExamScores.entrance_exam_course_id', '=', $request->entrance_course_id],
+                                        ['candidateEntranceExamScores.candidate_id', '=', $candidate->candidate_id],
+                                        ['candidateEntranceExamScores.sequence', '=', $number_correction]
+                                    ])->select('score_c', 'score_w', 'score_na', 'sequence', 'candidateEntranceExamScores.id as candidate_score_id')->get();
+            array_push($mergedObjects, (object) array('candidateProperties' => $candidate, 'scoreProperties' => $candidateExamScore) );
         }
+
+        foreach ($mergedObjects as $mergedObject) {
+
+            if($mergedObject->scoreProperties) {
+
+                foreach ($mergedObject->scoreProperties as $scoreProperty) {
+
+                    if ($number_correction == $scoreProperty->sequence) {
+
+                        $element = (object)array(
+                            'register_id' => $mergedObject->candidateProperties->register_id,
+                            'course_name' => $mergedObject->candidateProperties->course_name,
+                            'total_question' => $mergedObject->candidateProperties->total_question,
+                            'candidate_id' => $mergedObject->candidateProperties->candidate_id,
+                            'score_c' => $scoreProperty->score_c,
+                            'score_w' => $scoreProperty->score_w,
+                            'score_na' => $scoreProperty->score_na,
+                            'sequence' => $scoreProperty->sequence,
+                            'candidate_score_id' => $scoreProperty->candidate_score_id
+                        );
+                        array_push($candidateScoreForm, $element);
+
+                    }
+                }
+            } else {
+
+                $element = (object)array(
+                    'register_id' => $mergedObject->candidateProperties->register_id,
+                    'course_name' => $mergedObject->candidateProperties->course_name,
+                    'total_question' => $mergedObject->candidateProperties->total_question,
+                    'candidate_id' => $mergedObject->candidateProperties->candidate_id,
+                    'score_c' => '',
+                    'score_w' => '',
+                    'score_na' => '',
+                    'sequence' => '',
+                    'candidate_score_id' => ''
+                );
+                array_push($candidateScoreForm, $element);
+            }
+        }
+        return $candidateScoreForm;
     }
 
-    private function insertValueByEachSubject($subjectId, $candidateIds, $first, $second, $correctAns, $wrongAns, $noAns, $is_inserted, $totalAnsScores ) {
+    public function insertCandidateScore($exam_id, $requestDatas) {
 
-        dd($totalAnsScores);
 
-        if($is_inserted !== false) {
+        $numberCorrection = $requestDatas['candidate_score_id_1']['number_correction'];
 
-            for ($i = 0; $i < count($candidateIds); $i++) {
+        if($numberCorrection == '1') {
 
-                $insertedVal = DB::table('candidateEntranceExamScores')->insertGetId([
-                    'candidate_id' => (int)$candidateIds[$i],
-                    'is_firstTime' => $first,
-                    'is_secondTime' => $second,
-                    'score_c' => (int)$correctAns[$i],
-                    'score_w' => (int)$wrongAns[$i],
-                    'score_na' => (int)$noAns[$i],
-                    'entrance_exam_course_id' => (int)$subjectId
-                ]);
-            }
-            return $insertedVal;
+            $result = $this->checkEachCandidateScoreId($requestDatas, $numberCorrection );
+
+            return $result;
+
+        } else if($numberCorrection == '2') {
+
+            $result = $this->checkEachCandidateScoreId($requestDatas, $numberCorrection);
+
+            return $result;
 
         } else {
+            return 'false';
+        }
+    }
 
-            $updateRecord = DB::table('candidateEntranceExamScores')
-                            ->whereIn('candidate_id', $candidateIds)
-                            ->where('entrance_exam_course_id', '=', $subjectId )
-                            ->update(array( 'is_firstTime' => $first,
-                                            'is_secondTime' => $second,
-                                            'score_c' => $correctAns,
-                                            'score_w' => $wrongAns,
-                                            'score_na' => $noAns
-                            ));
+    private function checkEachCandidateScoreId ($requestDatas, $numberCorrection) {
 
-            return $updateRecord;
+        $empty = '';
+        $status = 0;
+
+        for($i = 1; $i <= count($requestDatas)-1; $i++) {
+
+            $eachCandidateScore = $requestDatas['candidate_score_id_'.$i]['score_id'];
+
+            $candidateId = $requestDatas['candidate_score_id_'.$i]['candidate_id'];
+            $subjectId = $requestDatas['candidate_score_id_'.$i]['subject_id'];
+            $correctAns = $requestDatas['candidate_score_id_'.$i]['correct'];
+            $wrongAns = $requestDatas['candidate_score_id_'.$i]['wrong'];
+            $noAns = $requestDatas['candidate_score_id_'.$i]['na'];
+
+            if($eachCandidateScore == $empty) {
+
+                if((int)$correctAns === 0 && (int)$wrongAns === 0 && (int)$noAns ===0 ) {
+
+                    continue;
+                } else {
+
+                    $insertResult = $this->storeCandidateScore($subjectId, $candidateId, $correctAns, $wrongAns, $noAns, $numberCorrection, $i);
+
+                    if($insertResult) {
+                        $status++;
+                    }
+                }
+
+            } else {
+
+                $updateResult = $this->updateCandidateScore($subjectId, $candidateId, $correctAns, $wrongAns, $noAns, $numberCorrection, $i);
+                if($updateResult) {
+                    $status++;
+                }
+            }
         }
 
+        if($status !==0) {
+            return ['status'=>true];
+        } else {
+            return ['status'=>false];
+        }
 
+    }
+
+    private function storeCandidateScore($subjectId, $candidateId, $correctAns, $wrongAns, $noAns, $numberCorrection, $orderInRoom) {
+
+        $insertedVal = DB::table('candidateEntranceExamScores')->insertGetId([
+            'candidate_id' => $candidateId,
+            'score_c' => (int)$correctAns,
+            'score_w' => (int)$wrongAns,
+            'score_na' => (int)$noAns,
+            'sequence' => (int)$numberCorrection,
+            'entrance_exam_course_id' => (int)$subjectId,
+            'candidate_number_in_room' => $orderInRoom
+        ]);
+
+        return $insertedVal;
+
+    }
+
+    private function updateCandidateScore($subjectId, $candidateId, $correctAns, $wrongAns, $noAns, $numberCorrection) {
+
+        $updateRecord = DB::table('candidateEntranceExamScores')
+            ->where([
+                ['entrance_exam_course_id', '=', $subjectId],
+                ['candidate_id', '=', $candidateId],
+                ['sequence', '=', $numberCorrection ]
+            ])
+            ->update(array(
+                'score_c' => (int)$correctAns,
+                'score_w' => (int)$wrongAns,
+                'score_na' => (int)$noAns,
+            ));
+
+        return $updateRecord;
     }
 
 
 
-    private function getExamCourseName($examId, $subjectId) {
 
-        $res = DB::table('entranceExamCourses')
-                        ->where([
-                            ['exam_id', '=', $examId],
-                            ['id', '=', $subjectId]
-                        ])->select('name_en')->get();
-        return $res;
+    public function addNewCorrectionCandidateScore($examId, StoreEntranceExamScoreRequest $request) {
+
+
+//        dd($request->score_c.'--'.$request->score_w.'--'.$request->score_na.'--'.$request->sequence.'--'.$request->course_id.'--'.$request->order.'--'.$request->candidate_id );
+
+        $checkSequenCandidateId = DB::table('candidateEntranceExamScores')
+                                    ->where([
+                                        ['candidate_id', '=', $request->candidate_id],
+                                        ['sequence', '=', $request->sequence ],
+                                        ['entrance_exam_course_id', '=', $request->course_id]
+
+                                    ])->select('id')->get();
+        if($checkSequenCandidateId) {
+            return (['status' => false]);
+        } else {
+
+            if($request->score_c + $request->score_w + $request->score_na == 0 ) {
+
+                return (['status' => false]);
+            } else {
+                $insertedVal = DB::table('candidateEntranceExamScores')->insertGetId([
+                    'candidate_id' => $request->candidate_id,
+                    'score_c' => (int)$request->score_c,
+                    'score_w' => (int)$request->score_w,
+                    'score_na' => (int)$request->score_na,
+                    'sequence' => (int)$request->sequence,
+                    'entrance_exam_course_id' => (int)$request->course_id,
+                    'candidate_number_in_room' => $request->order
+                ]);
+
+                return $insertedVal;
+
+            }
+
+        }
     }
-
-
 
 }
 

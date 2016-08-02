@@ -1,6 +1,7 @@
 <?php
 
 namespace App\Repositories\Backend\Exam;
+use App\Http\Requests\Backend\Exam\StoreEntranceExamScoreRequest;
 
 /**
  * Interface ExamRepositoryContract
@@ -62,4 +63,12 @@ interface ExamRepositoryContract
      * @return mixed
      */
     public function destroy($id);
+
+
+
+    public function requestInputScoreForm($exam_id, $request, $number_correction);
+
+    public function insertCandidateScore($exam_id, $requestDatas);
+
+    public function addNewCorrectionCandidateScore($examId, StoreEntranceExamScoreRequest $request);
 }

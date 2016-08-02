@@ -40,7 +40,7 @@
 
                             </div>
                             <div class="col-sm-2" style="border: 2px solid darkgreen; margin-top: 5px">
-                                <h5> {{ $numberAttemp }}</h5>
+                                <h5> {{ $number_correction }}</h5>
                             </div>
 
                         </div>
@@ -61,17 +61,46 @@
                         </thead>
                         <tbody>
                         <?php $i = 0 ;?>
-                        @foreach ($candidates as $candidate)
-                            <?php $i++; ?>
-                            <tr>
-                                <td style="text-align: center" class="candidate_score_id" candidate_id ="{{$candidate->candidate_id}}"><?php echo $i;?></td>
-                                <td><input type="text" id="correct_<?php echo $i;?>" class="correct_ans_score validate_<?php echo $i;?>" style="width: 40%;"></td>
-                                <td><input type="text" id="wrong_<?php echo $i;?>" class="wrong_ans_score validate_<?php echo $i;?>" style="width: 40%;"></td>
-                                <td><input type="text" id="no_<?php echo $i;?>" class="no_ans_score validate_<?php echo $i;?>" style="width: 40%;"></td>
-                                <td><input type="text" id="total_<?php echo $i;?>" class="total_ans_score" style="width: 40%;" placeholder="{{ $candidate->total_question }}"></td>
 
-                            </tr>
-                        @endforeach
+                        {!! Form::open(['route' => ['admin.exam.insert_exam_score_candidate',$exam_id], 'class' => 'form-horizontal table_score', 'role' => 'form', 'method' => 'post']) !!}
+
+                            @foreach ($candidates as $candidate)
+                                <?php $i++; ?>
+                                <tr>
+                                    <td style="text-align: center" class="candidate_score_id">
+                                        {!! Form::hidden('candidate_score_id_'.$i."[score_id]", $candidate->candidate_score_id, ['class' => 'form-control']) !!}
+
+                                        {!! Form::hidden('candidate_score_id_'.$i."[number_correction]", $number_correction, ['class' => 'form-control']) !!}
+
+                                        {!! Form::hidden('candidate_score_id_'.$i."[candidate_id]", $candidate->candidate_id, ['class' => 'form-control']) !!}
+
+                                        {!! Form::hidden('candidate_score_id_'.$i."[subject_id]", $subjectId, ['class' => 'form-control']) !!}
+
+                                        <?php echo $i;?>
+                                    </td>
+
+                                    <td>
+                                        {!! Form::text('candidate_score_id_'.$i."[correct]", $candidate->score_c, ['class' => 'form-control number_only validate_'.$i,'id'=>'correct_'.$i]) !!}
+                                    </td>
+
+                                    <td>
+                                        {!! Form::text('candidate_score_id_'.$i."[wrong]", $candidate->score_w, ['class' => 'form-control number_only validate_'.$i,'id'=>'wrong_ans_'.$i]) !!}
+                                    </td>
+
+                                    <td>
+                                        {!! Form::text('candidate_score_id_'.$i."[na]", $candidate->score_na, ['class' => 'form-control number_only validate_'.$i,'id'=>'no_'.$i]) !!}
+                                    </td>
+
+                                    <td>
+                                        {!! Form::text('candidate_score_id_'.$i."[total]", null, ['class' => 'form-control number_only validate_'.$i,'id'=>'total_'.$i, 'readonly', 'placeholder'=>$candidate->total_question]) !!}
+                                    </td>
+
+
+
+                                </tr>
+                            @endforeach
+
+                        {!! Form::close() !!}
 
                         </tbody>
                     </table>
@@ -116,74 +145,39 @@
                     data: baseData,
                     dataType: "json",
                     success: function(result) {
-                        console.log(result);
-                        notify("success","info", "You have done!");
+                        if(result.status) {
+                            notify("success","info", "You have done!");
+                            window.close();
+                        } else {
+                            notify("error","info", "Please Check Your Record Was Not Saved!");
+                        }
+
                     }
                 });
             }
 
             $("#btn_save_candidate_score").click(function() {
 
-                var candidate_ids       =  $('.candidate_score_id').map(function(){return $(this).attr('candidate_id');}).get();
-                var correct_ans_score   =  $('.correct_ans_score').map(function(){return $(this).val();}).get();
-                var wrong_ans_score     =  $('.wrong_ans_score').map(function(){return $(this).val();}).get();
-                var no_ans_score        =  $('.no_ans_score').map(function(){return $(this).val();}).get();
-                var total_ans_score     =  $('.total_ans_score').map(function(){return $(this).val();}).get();
-
-                baseData = {
-                    candidate_ids : candidate_ids,
-                    correct_ans_score: correct_ans_score,
-                    wrong_ans_score: wrong_ans_score,
-                    no_ans_score: no_ans_score,
-                    total_ans_score: total_ans_score,
-                    subject_name: '{{$subject}}',
-                    subject_id: '{{$subjectId}}',
-                    room_id:'{{$roomId}}',
-                    room_code: '{{$roomCode}}',
-                    number_attemp: "{{$numberAttemp}}"
-
-
-                };
-                baseUrl = "{{route('admin.exam.insert_exam_score_candidate',$exam_id)}}";
-
-                ajaxRequest('POST', baseUrl, baseData );
+                ajaxRequest('POST', $( "form.table_score").attr('action'), $( "form.table_score" ).serialize() );
             });
 
             $(document).ready(function () {
-                //called when key is pressed in textbox
 
-                $(".correct_ans_score").keypress(function (e) {
-
-
+                $(".number_only").keypress(function (e) {
                     if (e.which != 8 && e.which != 0 && (e.which < 48 || e.which > 57)) {
 //                        $("#errmsg").html("Digits Only").show().fadeOut("slow");
                         return false;
                     }
                 });
 
-                $(".wrong_ans_score").keypress(function (e) {
-
-                    if (e.which != 8 && e.which != 0 && (e.which < 48 || e.which > 57)) {
-                        return false;
-                    }
-                });
-
-                $(".no_ans_score").keypress(function (e) {
-
-                    if (e.which != 8 && e.which != 0 && (e.which < 48 || e.which > 57)) {
-                        return false;
-                    }
-                });
-
-
                 var length = JSON.parse('<?php echo $i ?>');
                 for(var k=1; k<=length; k++) {
+//                    console.log(k);
                     $('.validate_'+k).on('keydown keyup', function() {
+                        console.log(k);
                         calculateSum(length);
                     })
                 }
-                calculateSum(length);
-
 
             });
 
@@ -191,24 +185,24 @@
             function calculateSum(length) {
 
                 for(var i=1; i<=length; i++) {
-                    var sum = 0;
+                    var sum =0;
                     $(".validate_"+i).each(function() {
-                        //add only if the value is number
                         if (!isNaN(this.value) && this.value.length != 0) {
+                            var tmp = sum;
                             sum += parseInt(this.value);
                             $(this).css("background-color", "#FEFFB0");
-                            if(sum == 30) {
-//                                parseInt(question)
-                                $("input#total_"+i).val(sum).css("color", "");
+                            if(tmp == 30) {
+                                $("input#total_"+i).val(tmp).css("color", "");
 
                             } else {
-                                $("input#total_"+i).val(sum).css("color", "red");
+                                $("input#total_"+i).val(tmp).css("color", "red");
                             }
                         }
                         else if (this.value.length != 0){
                             $(this).css("background-color", "red");
                         }
                     });
+
                 }
 
             }

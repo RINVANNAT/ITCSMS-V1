@@ -445,27 +445,6 @@ class ExamController extends Controller
         return view('backend.exam.includes.popup_add_input_score_course',compact('rooms', 'courses', 'exam_id'));
     }
 
-//    public function getBuildingRequestion($id, Request $request) {
-//
-//        $roomSelectedByBuilding = [];
-//        $rooms = DB::table('rooms')
-//                ->join('exam_room', 'rooms.id','=','exam_room.room_id')
-//                ->join('exams', 'exams.id', '=', 'exam_room.exam_id')
-//                ->where([
-//                    ['exam_room.exam_id', '=', $id],
-//                    ['rooms.building_id', '=', $request->building_id]
-//                ])
-//                ->select('rooms.name', 'rooms.id as room_id')->get();
-//        foreach($rooms as $room) {
-//            $element = array(
-//                "room_id" =>  $room->room_id,
-//                "room_name" => $room->name
-//            );
-//            array_push($roomSelectedByBuilding,$element);
-//        }
-//        return Response::json(['Data' => $roomSelectedByBuilding, 'status' => 'room_success']);
-//    }
-
     public function getRequestInputScoreForm($exam_id, Request $request) {
 
         $subject = $request->course_name;
@@ -474,19 +453,19 @@ class ExamController extends Controller
         $roomCode = $request->room_code;
         $firstAttemp = $request->first_attemp;
         $secondAttemp = $request->second_attemp;
-//        dd($firstAttemp.'--'.$secondAttemp.'--'.$subject.'--'.$subject_id.'--'.$room_id.'--'.$roomCode);
 
         if( $firstAttemp != 'null' && $secondAttemp == 'null') {
 
-            $candidates = $this->exams->requestInputScoreForm($exam_id, $request);
-            $numberAttemp = $firstAttemp;
-            return view('backend.exam.includes.form_input_score_candidates',compact('candidates','exam_id','roomCode', 'subject','numberAttemp', 'subjectId', 'roomId'));
+            $number_correction = $firstAttemp;
+            $candidates = $this->exams->requestInputScoreForm($exam_id, $request, $number_correction);
 
+            return view('backend.exam.includes.form_input_score_candidates',compact('candidates','exam_id','roomCode', 'subject','number_correction', 'subjectId', 'roomId'));
         } else if ($firstAttemp == 'null' && $secondAttemp != 'null') {
 
-            $candidates = $this->exams->requestInputScoreForm($exam_id, $request);
-            $numberAttemp = $secondAttemp;
-            return view('backend.exam.includes.form_input_score_candidates',compact('candidates','exam_id','roomCode', 'subject','numberAttemp', 'subjectId', 'roomId'));
+            $number_correction = $secondAttemp;
+            $candidates = $this->exams->requestInputScoreForm($exam_id, $request, $number_correction);
+
+            return view('backend.exam.includes.form_input_score_candidates',compact('candidates','exam_id','roomCode', 'subject','number_correction', 'subjectId', 'roomId'));
 
         } else {
 
@@ -495,11 +474,100 @@ class ExamController extends Controller
 
     }
 
-    public function insertScoreForEachCandiate($exam_id, Request $request) {
+    public function insertScoreForEachCandiate($exam_id) {
 
-        $candidates = $this->exams->insertCandidateScore($exam_id, $request);
+        $requestDatas = $_POST;
+        $candidates = $this->exams->insertCandidateScore($exam_id, $requestDatas);
 
-        return $candidates;
+        if($candidates['status']) {
+            return Response::json(['status'=>true]);
+        } else {
+            return Response::json(['status'=>false]);
+        }
+
+    }
+
+    public function reportErrorCandidateScores($exam_id, Request $request) {
+
+        $errorCandidateScores = [];
+        $errors =[];
+        $candidateIds = DB::table('candidates')
+            ->join('exams', 'exams.id', '=', 'candidates.exam_id')
+            ->join('exam_room', 'exam_room.room_id', '=', 'candidates.room_id')
+            ->join('rooms', 'rooms.id', '=', 'candidates.room_id')
+            ->where('exams.id', '=', $exam_id)
+            ->select('candidates.id as candidate_id', 'register_id', 'exam_room.roomcode as room_code', 'rooms.id as room_id')
+            ->orderBy('register_id', 'ASC')
+            ->get();
+
+        foreach ($candidateIds as $candidateId) {
+            $statusCorrectScore = 0 ;
+            $statusWrongScore = 0;
+            $cadidateScores = DB::table('candidateEntranceExamScores')
+                ->join('entranceExamCourses', 'entranceExamCourses.id', '=', 'candidateEntranceExamScores.entrance_exam_course_id')
+                ->where([
+                    ['candidate_id', $candidateId->candidate_id],
+                    ['candidateEntranceExamScores.entrance_exam_course_id', '=', $request->course_id]
+                ])
+                ->select('entranceExamCourses.total_question', 'entranceExamCourses.id as course_id', 'candidateEntranceExamScores.id', 'candidate_number_in_room', 'entrance_exam_course_id', 'candidateEntranceExamScores.score_c', 'candidateEntranceExamScores.score_w', 'candidateEntranceExamScores.score_na', 'candidateEntranceExamScores.sequence')
+                ->get();
+
+            array_push($errors, (object) array('candidateProperties' => $candidateId, 'scoreErrors' => $cadidateScores) );
+
+            if ($cadidateScores) {
+                $length = count($cadidateScores);
+
+                for ($i = 0; $i < $length ; $i++) {
+                    $tmpScoreCorrect = $cadidateScores[$i]->score_c;
+                    $tmpScoreWrong = $cadidateScores[$i]->score_w;
+                    $tmpScoreNA = $cadidateScores[$i]->score_na;
+                    $tmpTotalQuestion = $cadidateScores[$i]->total_question;
+
+                    for ($j = $length-1; $j > $i ; $j--) {
+                        if ($tmpScoreCorrect == $cadidateScores[$j]->score_c && $tmpScoreWrong == $cadidateScores[$j]->score_w && $tmpScoreNA == $cadidateScores[$j]->score_na) {
+                            if( ($tmpScoreCorrect + $tmpScoreWrong + $tmpScoreNA) == $tmpTotalQuestion && $cadidateScores[$j]->score_c + $cadidateScores[$j]->score_w + $cadidateScores[$j]->score_na == $cadidateScores[$j]->total_question) {
+
+                                $statusCorrectScore++;
+                            } else {
+                                $statusWrongScore++;
+                            }
+                        } else {
+                            $statusWrongScore++;
+                        }
+                        if( $statusCorrectScore == 0 &&  $statusWrongScore == ($length*($length-1))/2 ) {
+                            array_push($errorCandidateScores, (object) array('candidateProperties' => $candidateId, 'scoreErrors' => $cadidateScores) );
+                        }
+
+                    }
+                }
+
+            }
+        }
+
+//        dd($errorCandidateScores);
+        return view('backend.exam.includes.popup_report_score_candidate', compact('exam_id', 'errorCandidateScores'));
+    }
+
+    public function addNewCorrectionScore($exam_id, Requests\Backend\Exam\StoreEntranceExamScoreRequest $request) {
+
+        $res = $this->exams->addNewCorrectionCandidateScore($exam_id, $request);
+        if($res) {
+            return Response::json(['status', true]);
+        } else {
+            return Response::json(['status', false]);
+        }
+    }
+
+    private function formatObjectToArrayIds ($objects, $str) {
+        $arrayIds = [];
+        if($objects) {
+            foreach($objects as $object) {
+                array_push($arrayIds, $object->$str);
+            }
+        }
+
+        return $arrayIds;
+
     }
 
     public function generate_room($exam_id){

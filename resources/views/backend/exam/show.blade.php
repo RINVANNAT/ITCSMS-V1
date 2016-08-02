@@ -542,6 +542,7 @@
     <script>
 
         var baseUrl = "{{route('admin.exam.gsave-staff-role',$exam->id)}}";
+        var report_score_url = "{{route("admin.exam.report_exam_score_candidate",$exam->id)}}";
         var roleValue;
         var baseData;
         $("#btn_save_staff_role").click(function(){
@@ -625,6 +626,13 @@
         });
 
 
+//        error popup page
+
+        $(document).on('click', '.btn-report-error', function (e) {
+            var course_id = $(this).data('remote');
+            window_report_error = PopupCenterDual(report_score_url+"?course_id="+course_id,'Error Inputted Score Form ','1250','960');
+
+        });
 
 
     </script>

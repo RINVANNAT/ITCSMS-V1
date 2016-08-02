@@ -2,7 +2,8 @@
     <!-- Check all button -->
     <button class="btn btn-primary btn-sm" id="btn-add-course"><i class="fa fa-plus-circle"></i> Add </button>
     <button class="btn btn-default btn-sm"><i class="fa fa-refresh"></i></button>
-    <button class="btn btn-primary btn-sm pull-right" id="btn_input_score_course"><i class="fa fa-plus-circle"></i> Input Score </button>
+    <button  class="btn btn-primary btn-sm pull-right" id="btn_input_score_course"><i class="fa fa-plus-circle" ></i> Input Score </button>
+    {{--<button class="btn btn-primary  btn-sm pull-right" id="btn_report_score_candidate" style="margin-right: 5px"><i class="fa fa-plus-circle"></i> Report Score </button>--}}
     <!-- /.btn-group -->
 
 </div>

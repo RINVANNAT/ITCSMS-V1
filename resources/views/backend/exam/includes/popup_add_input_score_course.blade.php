@@ -45,12 +45,12 @@
                 </div>
                 <div class="col-sm-12" style="margin-top: 15px">
                     <input id="first_scoring_attemp" value="1" type="checkbox" >
-                    <label style="margin-left: 10px" > First Attemp  </label>
+                    <label style="margin-left: 10px" > Correction 1  </label>
                 </div>
 
                 <div class="col-sm-12">
                     <input id="second_scoring_attemp" value="2" type="checkbox" >
-                    <label  style="margin-left: 10px"> Second Attemp  </label>
+                    <label  style="margin-left: 10px"> Correction 2  </label>
                 </div>
 
             </div>

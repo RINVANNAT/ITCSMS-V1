@@ -120,7 +120,8 @@ class EntranceExamCourseController extends Controller
         return $datatables
             ->addColumn('action', function ($item) {
                 return '<a href="'.route('admin.entranceExamCourses.edit',$item->id).'" class="btn btn-xs btn-primary"><i class="fa fa-pencil" data-toggle="tooltip" data-placement="top" title="" data-original-title="'.trans('buttons.general.crud.edit').'"></i> </a>'.
-                ' <button class="btn btn-xs btn-danger btn-delete" data-remote="'.route('admin.entranceExamCourses.destroy', $item->id) .'"><i class="fa fa-times" data-toggle="tooltip" data-placement="top" title="' . trans('buttons.general.crud.delete') . '"></i></button>';
+                ' <button class="btn btn-xs btn-danger btn-delete" data-remote="'.route('admin.entranceExamCourses.destroy', $item->id) .'"><i class="fa fa-times" data-toggle="tooltip" data-placement="top" title="' . trans('buttons.general.crud.delete') . '"></i></button>'.
+                ' <button class="btn btn-xs btn-info btn-report-error" data-remote="'. $item->id .'">Report Error</button>';
             })
             ->make(true);
     }

@@ -34,6 +34,11 @@ Route::group([], function() {
 
     Route::post('exams/{id}/insert_exam_score_candidate', 'ExamController@insertScoreForEachCandiate')->name('admin.exam.insert_exam_score_candidate');
 
+    Route::get('exams/{id}/report_exam_score_candidate', 'ExamController@reportErrorCandidateScores')->name('admin.exam.report_exam_score_candidate');
+
+
+    Route::post('exams/{id}/add_new_correction_score', 'ExamController@addNewCorrectionScore')->name('admin.exam.add_new_correction_score');
+
 
     Route::get('exams/{id}/candidate_generate_room', 'ExamController@generate_room')->name('admin.exam.candidate.generate_room');
 
