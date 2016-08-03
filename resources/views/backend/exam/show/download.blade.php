@@ -17,21 +17,21 @@
                 </div>
 
                 <div class="img">
-                    <a id="download_student_list" href="#">
+                    <a id="download_student_list" target="_blank" href="{{route('admin.exam.download_candidate_list',$exam->id)}}">
                         <img src="{{url('img/exam/student_list_by_room.png')}}" alt="Forest" width="300" height="200">
                     </a>
                     <div class="desc">Student List By Room ordering</div>
                 </div>
 
                 <div class="img">
-                    <a id="download_room_sticker" href="#">
+                    <a id="download_room_sticker" target="_blank" href="{{route('admin.exam.download_room_sticker',$exam->id)}}">
                         <img src="{{url('img/exam/room_sticker.png')}}" alt="Northern Lights" width="300" height="200">
                     </a>
                     <div class="desc">Room Sticker</div>
                 </div>
 
                 <div class="img">
-                    <a id="download_correction_sheet" href="#">
+                    <a id="download_correction_sheet" target="_blank" href="{{route('admin.exam.download_correction_sheet',$exam->id)}}">
                         <img src="{{url('img/exam/correction_sheet.png')}}" alt="Mountains" width="300" height="200">
                     </a>
                     <div class="desc">Correction sheets</div>

@@ -403,10 +403,34 @@ class ExamController extends Controller
     public function download_attendance_list($exam_id){
 
         $exam = $this->exams->findOrThrowException($exam_id);
+        $courses = $exam->entranceExamCourses()->get();
         $rooms = $exam->rooms()->with('building')->with('candidates')->with('candidates.gender')->withPivot('roomcode')->get();
 
-        return view('backend.exam.includes.attendance_list',compact('rooms'));
+        return view('backend.exam.print.attendance_list',compact('rooms','courses'));
+    }
 
+    public function download_candidate_list($exam_id){
+
+        $exam = $this->exams->findOrThrowException($exam_id);
+        $rooms = $exam->rooms()->with('building')->with('candidates')->with('candidates.gender')->withPivot('roomcode')->get();
+
+        return view('backend.exam.print.candidate_list',compact('rooms'));
+    }
+
+    public function download_room_sticker($exam_id){
+        $exam = $this->exams->findOrThrowException($exam_id);
+        $rooms = $exam->rooms()->with('building')->with('candidates')->with('candidates.gender')->withPivot('roomcode')->get();
+
+        return view('backend.exam.print.room_sticker',compact('rooms'));
+    }
+
+    public function download_correction_sheet($exam_id){
+        $exam = $this->exams->findOrThrowException($exam_id);
+        $courses = $exam->entranceExamCourses()->get();
+        $rooms = $exam->rooms()->with('building')->with('candidates')->with('candidates.gender')->withPivot('roomcode')->get();
+
+
+        return view('backend.exam.print.correction_sheet',compact('rooms','courses'));
     }
 
     /*public function request_add_courses($exam_id){

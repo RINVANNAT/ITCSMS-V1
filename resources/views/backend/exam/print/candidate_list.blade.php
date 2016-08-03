@@ -1,9 +1,7 @@
 @extends('backend.layouts.printing_portrait_a4')
-@section('css')
-    <style>
-
-    </style>
-@endsection
+@section('title')
+    ITC-SMS | បញ្ជីឈ្មោះបេក្ខជន⁣
+@stop
 @section('content')
     <?php
         $page_number = 1;
@@ -11,7 +9,7 @@
     ?>
     @foreach($rooms as $room)
         <div class="page">
-            <h2>បញ្ជីវត្តមានបេក្ខជន⁣ បន្ទប់ {{$room->name}}</h2>
+            <h2>បញ្ជីឈ្មោះបេក្ខជន⁣ <span class="pull-right"> &nbsp;&nbsp;បន្ទប់ {{$room->name}}</span></h2>
 
             <table class="table" width="100%">
                 <tr>
@@ -21,7 +19,6 @@
                     <th>ឈ្មោះឡាតាំង</th>
                     <th>ភេទ</th>
                     <th>ថ្ងៃខែឆ្នាំកំណើត</th>
-                    <th>ហត្ថលេខា</th>
                 </tr>
                 <?php
                 $index = 1;
@@ -34,7 +31,6 @@
                         <td>{{$candidate->name_latin}}</td>
                         <td>{{$candidate->gender->code}}</td>
                         <td>{{$candidate->dob->toFormattedDateString()}}</td>
-                        <td></td>
                         <?php $index++; ?>
                     </tr>
                 @endforeach

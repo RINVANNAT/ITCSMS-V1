@@ -6,7 +6,9 @@
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <meta name="_token" content="{{ csrf_token() }}" />
 
-        <title>ITC-SMS | Printing</title>
+        <title>
+            @yield('title')
+        </title>
 
         <!-- Meta -->
         <meta name="description" content="@yield('meta_description', 'Default Description')">
@@ -16,7 +18,6 @@
         <!-- Styles -->
         @yield('before-styles-end')
         {!! Html::style(elixir('css/backend.css')) !!}
-        @yield('after-styles-end')
 
         <style type="text/css">
             h1, h2, h3, h4, h5, h6, .h1, .h2, .h3, .h4, .h5, .h6 {
@@ -95,26 +96,31 @@
                     height: 297mm;
                 }
                 .page {
-                    margin: 0;
-                    padding-right: 0;
+                    padding-top: 20mm;
+                    padding-left: 20mm;
+                    padding-right: 0mm;
+                    padding-bottom: 20mm;
+                    margin: 10mm auto;
                     border: initial;
                     border-radius: initial;
-                    width: initial;
-                    min-height: initial;
+                    width: 210mm;
+                    min-height: 297mm;
                     box-shadow: initial;
                     background: initial;
                     page-break-after: always;
-                    position: initial;
+                    position: relative;
                 }
                 .footer{
                     position: absolute;
                     bottom: 10px;
                     width: 100%;
-                    padding-right:40mm;
+                    padding-right:20mm;
                 }
             }
 
         </style>
+
+        @yield('after-styles-end')
 
     </head>
     <body class="skin-{!! config('backend.theme') !!}" style="font-family: khmeros" onload="window.print()">
