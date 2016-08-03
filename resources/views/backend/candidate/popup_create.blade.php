@@ -53,9 +53,6 @@
 
     <script>
 
-        function notify_message(type, message, title){
-            alert('khkhlklkhlk');
-        }
 
         function save_candidate(){
 
@@ -108,10 +105,10 @@
                             if(response.status == true){
                                 return_back();
                             } else {
-                                notify_message("error","Candidate Error",response.toString());
+                                notify("error","Candidate Error",response.toString());
                             }
                         } else {
-                            notify_message("error","Candidate Error",response.toString());
+                            notify("error","Candidate Error",response.toString());
                         }
                      }
 
