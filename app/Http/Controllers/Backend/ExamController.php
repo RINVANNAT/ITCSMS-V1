@@ -403,9 +403,8 @@ class ExamController extends Controller
     public function download_attendance_list($exam_id){
 
         $exam = $this->exams->findOrThrowException($exam_id);
-        $rooms = $exam->rooms()->with('building')->with('candidates')->with('candidates.gender')->withPivot('roomcode')->get()->toArray();
+        $rooms = $exam->rooms()->with('building')->with('candidates')->with('candidates.gender')->withPivot('roomcode')->get();
 
-        //dd($rooms);
         return view('backend.exam.includes.attendance_list',compact('rooms'));
 
     }

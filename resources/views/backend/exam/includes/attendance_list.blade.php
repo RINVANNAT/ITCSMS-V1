@@ -11,14 +11,14 @@
     ?>
     @foreach($rooms as $room)
         <div class="page">
-            <h2>បញ្ជីវត្តមានបេក្ខជន⁣ បន្ទប់ {{$room['name']}}</h2>
+            <h2>បញ្ជីវត្តមានបេក្ខជន⁣ បន្ទប់ {{$room->name}}</h2>
 
-            <table class="table">
+            <table class="table" width="100%">
                 <tr>
                     <th>លេខរៀង</th>
                     <th>លេខបង្កាន់ដៃ</th>
-                    <th>ឈ្ោះ</th>
-                    <th>ឈ្ោះឡាតាំង</th>
+                    <th>ឈ្មោះ</th>
+                    <th>ឈ្មោះឡាតាំង</th>
                     <th>ភេទ</th>
                     <th>ថ្ងៃខែឆ្នាំកំណើត</th>
                     <th>ហត្ថលេខា</th>
@@ -26,14 +26,14 @@
                 <?php
                 $index = 1;
                 ?>
-                @foreach($room['candidates'] as $candidate)
+                @foreach($room->candidates as $candidate)
                     <tr>
                         <td>{{$index}}</td>
-                        <td>{{$candidate['register_id']}}</td>
-                        <td>{{$candidate['name_kh']}}</td>
-                        <td>{{$candidate['name_latin']}}</td>
-                        <td>{{$candidate['gender']['code']}}</td>
-                        <td>{{$candidate['dob']}}</td>
+                        <td>{{$candidate->register_id}}</td>
+                        <td>{{$candidate->name_kh}}</td>
+                        <td>{{$candidate->name_latin}}</td>
+                        <td>{{$candidate->gender->code}}</td>
+                        <td>{{$candidate->dob->toFormattedDateString()}}</td>
                         <td></td>
                         <?php $index++; ?>
                     </tr>

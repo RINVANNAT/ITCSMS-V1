@@ -96,6 +96,7 @@
                 }
                 .page {
                     margin: 0;
+                    padding-right: 0;
                     border: initial;
                     border-radius: initial;
                     width: initial;
