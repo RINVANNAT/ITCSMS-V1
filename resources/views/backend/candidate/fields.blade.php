@@ -139,35 +139,45 @@
     </div>
 
     <div class="form-group col-sm-6 required">
-        {!! Form::label('bac_percentile',trans('labels.backend.candidates.fields.bac_total_score_grade'),array('class'=>'col-sm-4 control-label required')) !!}
-        <div class="col-sm-4" style="padding-right: 2px;">
+        {!! Form::label('bac_percentile',trans('labels.backend.candidates.fields.bac_total_score'),array('class'=>'col-sm-4 control-label required')) !!}
+        <div class="col-sm-4">
             {!! Form::text('bac_percentile', isset($studentBac2)?$studentBac2->percentile:null, array('class'=>'form-control input','placeholder'=>'Score','id'=>'candidate_bac_percentile','required'=>'required',isset($studentBac2)?"disabled":"")) !!}
-        </div>
-        <div class="col-sm-4" style="padding-left: 2px;">
-            {!! Form::select('bac_total_grade',$gdeGrades, isset($studentBac2)?$studentBac2->grade:null, array('class'=>'form-control input','placeholder'=>'','id'=>'candidate_bac_total_grade','required'=>'required',isset($studentBac2)?"disabled":"")) !!}
         </div>
     </div>
     <div class="form-group col-sm-6 required">
-        {!! Form::label('bac_math_grade',trans('labels.backend.candidates.fields.bac_grade_m_p_c'),array('class'=>'col-sm-4 control-label')) !!}
-
-        <div class="col-sm-8" style="padding: 0px;">
-            <div class="col-sm-4" style="padding-right: 1px;">
-                {!! Form::select('bac_math_grade',$gdeGrades, isset($studentBac2->bac_math_grade)?$studentBac2->bac_math_grade:null, array('class'=>'form-control input','placeholder'=>'','id'=>'candidate_bac_math_grade',isset($studentBac2)?"disabled":"")) !!}
-            </div>
-            <div class="col-sm-4" style="padding-left: 8px;padding-right: 8px;">
-                {!! Form::select('bac_phys_grade',$gdeGrades, isset($studentBac2->bac_phys_grade)?$studentBac2->bac_phys_grade:null, array('class'=>'form-control input','placeholder'=>'','id'=>'candidate_bac_phys_grade',isset($studentBac2)?"disabled":"")) !!}
-            </div>
-            <div class="col-sm-4" style="padding-left: 1px;">
-                {!! Form::select('bac_chem_grade',$gdeGrades, isset($studentBac2->bac_chem_grade)?$studentBac2->bac_chem_grade:null, array('class'=>'form-control input','placeholder'=>'','id'=>'candidate_bac_chem_grade',isset($studentBac2)?"disabled":"")) !!}
-            </div>
+        {!! Form::label('bac_math_grade',trans('labels.backend.candidates.fields.bac_math_grade'),array('class'=>'col-sm-4 control-label')) !!}
+        <div class="col-sm-4">
+            {!! Form::select('bac_math_grade',$gdeGrades, isset($studentBac2->bac_math_grade)?$studentBac2->bac_math_grade:null, array('class'=>'form-control input','placeholder'=>'','id'=>'candidate_bac_math_grade',isset($studentBac2)?"disabled":"")) !!}
         </div>
+    </div>
 
+    <div class="form-group col-sm-6 required">
+        {!! Form::label('bac_total_grade',trans('labels.backend.candidates.fields.bac_total_grade'),array('class'=>'col-sm-4 control-label required')) !!}
+
+        <div class="col-sm-4">
+            {!! Form::select('bac_total_grade',$gdeGrades, isset($studentBac2)?$studentBac2->grade:null, array('class'=>'form-control input','placeholder'=>'','id'=>'candidate_bac_total_grade','required'=>'required',isset($studentBac2)?"disabled":"")) !!}
+        </div>
+    </div>
+
+    <div class="form-group col-sm-6 required">
+        {!! Form::label('bac_phys_grade',trans('labels.backend.candidates.fields.bac_phys_grade'),array('class'=>'col-sm-4 control-label')) !!}
+
+        <div class="col-sm-4">
+            {!! Form::select('bac_phys_grade',$gdeGrades, isset($studentBac2->bac_phys_grade)?$studentBac2->bac_phys_grade:null, array('class'=>'form-control input','placeholder'=>'','id'=>'candidate_bac_phys_grade',isset($studentBac2)?"disabled":"")) !!}
+        </div>
     </div>
 
     <div class="form-group col-sm-6 required">
         {!! Form::label('bac_year',trans('labels.backend.candidates.fields.bac_year'),array('class'=>'col-sm-4 control-label required')) !!}
         <div class="col-sm-8">
             {!! Form::select('bac_year', $academicYears,isset($studentBac2->bac_year)?$studentBac2->bac_year:null, array('class'=>'form-control input','placeholder'=>'BacII Year','id'=>'candidate_bac_year','required'=>'required',isset($studentBac2)?"disabled":"")) !!}
+        </div>
+    </div>
+
+    <div class="form-group col-sm-6 required">
+        {!! Form::label('bac_chem_grade',trans('labels.backend.candidates.fields.bac_chem_grade'),array('class'=>'col-sm-4 control-label')) !!}
+        <div class="col-sm-4">
+            {!! Form::select('bac_chem_grade',$gdeGrades, isset($studentBac2->bac_chem_grade)?$studentBac2->bac_chem_grade:null, array('class'=>'form-control input','placeholder'=>'','id'=>'candidate_bac_chem_grade',isset($studentBac2)?"disabled":"")) !!}
         </div>
     </div>
 

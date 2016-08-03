@@ -217,6 +217,9 @@ class CandidateController extends Controller
 
 
         return $datatables
+            ->editColumn('register_id',function($candidate){
+                return str_pad($candidate->register_id, 4, '0', STR_PAD_LEFT);
+            })
             ->editColumn('room',function($candidate){
                 if($candidate->room == "" || $candidate->room == null){
                     return " - ";

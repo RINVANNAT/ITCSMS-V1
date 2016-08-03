@@ -212,6 +212,10 @@
             $("#btn-cancel").on("click",function(){
                 window.close();
             });
+
+            $("#candidate_register_id").keydown(function (e) {
+                allowNumberOnly(e);
+            });
         });
 
 
