@@ -53,7 +53,7 @@
 
     <script>
 
-        function notify(type, message, title){
+        function notify_message(type, message, title){
             toastr.options = {
                 "closeButton": true,
                 "debug": false,
@@ -125,10 +125,10 @@
                             if(response.status == true){
                                 return_back();
                             } else {
-                                notify("error","Candidate Error",response.toString());
+                                notify_message("error","Candidate Error",response.toString());
                             }
                         } else {
-                            notify("error","Candidate Error",response.toString());
+                            notify_message("error","Candidate Error",response.toString());
                         }
                      }
 
