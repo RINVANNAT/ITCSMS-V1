@@ -213,6 +213,7 @@
         var save_room_url = '{{route('admin.exam.save_rooms',$exam->id)}}';
         var delete_room_url = '{{route('admin.exam.delete_rooms',$exam->id)}}';
         var exam_id = {{$exam->id}};
+        var exam_type_id = {{$exam->type_id}};
         var window_secret_code;
         var window_course;
         var window_bac2;
@@ -373,7 +374,7 @@
                 ]
             });
 
-            if(exam_id == 1){
+            if(exam_type_id == 1){
                 course_datatable = $('#table-exam-course').DataTable({
                     processing: true,
                     serverSide: true,
