@@ -26,7 +26,7 @@ function toggleSidebarStaffRole() {
 }
 
 
-function initJsTree_StaffRole( object, url_lv1, url_lv2, url_lv3) {
+function initJsTree_StaffRole( object, url_lv1, url_lv2, url_lv3, iconUrl1, iconUrl2, iconUrl3) {
 
     object.jstree({
         "core" : {
@@ -61,24 +61,28 @@ function initJsTree_StaffRole( object, url_lv1, url_lv2, url_lv3) {
             "keep_selected_style" : false
         },
         "types" : {
-            "#" : { "max_depth" : 3, "valid_children" : ["building","room"] },
-            "building" : {
-                "icon" : "{{url('plugins/jstree/img/building.png')}}",
-                "valid_children" : ["room"]
+            "#" : { "max_depth" : 3, "valid_children" : ["department","position", "staff"] },
+            "department" : {
+                "icon" : iconUrl1,
+                "valid_children" : ["position"]
             },
-            "room" :{
-                "icon" : "{{url('plugins/jstree/img/door.png')}}",
+            "position" :{
+                "icon" : iconUrl2,
+                "valid_children" : ["staff"]
+            },
+            "staff" :{
+                "icon" : iconUrl3,
                 "valid_children" : []
             }
         },
         "plugins" : [
-            "wholerow",'checkbox', "contextmenu", "dnd", "search", "state","types"
+            "wholerow",'checkbox', "contextmenu", "search", "state","types"
         ]
     });
 
 }
 
-function initJsTree_StaffSelected( object, url_lv1, url_lv2) {
+function initJsTree_StaffSelected( object, url_lv1, url_lv2, iconUrl2,iconUrl3 ) {
 
     object.jstree({
 
@@ -103,23 +107,22 @@ function initJsTree_StaffSelected( object, url_lv1, url_lv2) {
             "keep_selected_style" : false
         },
         "types" : {
-            "#" : { "max_depth" : 3, "valid_children" : ["building","room"] },
-            "building" : {
-                "icon" : "{{url('plugins/jstree/img/building.png')}}",
+            "#" : { "max_depth" : 3, "valid_children" : ["role","staff"] },
+            "role" : {
+                "icon" : iconUrl2,
                 "valid_children" : ["room"]
             },
-            "room" :{
-                "icon" : "{{url('plugins/jstree/img/door.png')}}",
+            "staff" :{
+                "icon" : iconUrl3,
                 "valid_children" : []
             }
         },
         "plugins" : [
-            "wholerow",'checkbox', "contextmenu", "dnd", "search", "state","types"
+            "wholerow",'checkbox', "contextmenu", "search", "state","types"
         ]
     });
 
 }
-
 
 $(function(){
     $("#btn_add_role").click(function () {
@@ -155,6 +158,7 @@ function ajaxRequest(method, baseUrl, baseData){
             }
             $('#all_staff_role').jstree("refresh");
             $('#selected_staffs').jstree("refresh");
+            notify("success","info", "You have done!");
 
         }
     });
@@ -201,3 +205,7 @@ $('#btn_add_new_role').on('click', function() {
 })
 
 $('#alert_add_role_staff').hide();
+$('#alert_save_staff_role').hide();
+$('#check_ok').hide();
+$('#alert_delete_role_staff').hide();
+$('#alert_delete_role_staff_success').hide();

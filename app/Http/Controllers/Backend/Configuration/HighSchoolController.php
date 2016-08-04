@@ -14,7 +14,9 @@ use App\Models\Origin;
 use App\Repositories\Backend\HighSchool\HighSchoolRepositoryContract;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Input;
 use Maatwebsite\Excel\Facades\Excel;
+use Illuminate\Http\Request;
 
 class HighSchoolController extends Controller
 {
@@ -186,6 +188,40 @@ class HighSchoolController extends Controller
             ]);*/
 
             return redirect(route('admin.configuration.highSchools.index'));
+        }
+    }
+
+    public function highschool_search(Request $request){
+        if($request->ajax()) {
+
+            $page = Input::get('page');
+            $resultCount = 25;
+            $offset = ($page - 1) * $resultCount;
+            $highschools = DB::table('highSchools')
+                ->where('highSchools.name_kh', 'LIKE', '%' . Input::get("term") . "%")
+                ->orWhere('highSchools.name_en', 'LIKE', '%' . Input::get("term") . "%")
+                ->select([
+                    'highSchools.id as id',
+                    'highSchools.name_kh as name'
+                ]);
+
+            $result = $highschools
+                ->orderBy('name')
+                ->skip($offset)
+                ->take($resultCount)
+                ->get();
+
+            $count = Count($highschools->get());
+            $endCount = $offset + $resultCount;
+            $morePages = $count > $endCount;
+
+            $results = array(
+                'results' => $result,
+                'pagination' => array(
+                    "more" => $morePages
+                )
+            );
+            return response()->json($results);
         }
     }
 

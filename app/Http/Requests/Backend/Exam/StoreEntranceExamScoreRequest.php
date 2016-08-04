@@ -5,10 +5,10 @@ namespace App\Http\Requests\Backend\Exam;
 use App\Http\Requests\Request;
 
 /**
- * Class CreateEntranceExamCourseRequest
+ * Class StoreEntranceExamScoreRequest
  * @package App\Http\Requests\Backend\Exam
  */
-class CreateEntranceExamCourseRequest extends Request
+class StoreEntranceExamScoreRequest extends Request
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -17,7 +17,7 @@ class CreateEntranceExamCourseRequest extends Request
      */
     public function authorize()
     {
-        return access()->allow('create-entrance-exam-courses');
+        return access()->allow('create-entrance-exam-score');
     }
 
     /**
@@ -28,9 +28,13 @@ class CreateEntranceExamCourseRequest extends Request
     public function rules()
     {
         return [
-            'name_kh' => 'required|max:255',
-            'description' => 'max:255',
-            'total_question' => 'integer',
+            'candidate_id' => 'required',
+            'course_id' => 'required',
+            'score_c' => 'integer',
+            'score_w' => 'integer',
+            'score_na' => 'integer',
+            'sequence' => 'required|unique_with:candidateEntranceExamScores,candidate_id,entrance_exam_course_id',
+
         ];
     }
 }

@@ -345,7 +345,8 @@ return [
                 'bac_year' => "BacII Year",
                 'status' => "Status",
                 'is_registered' => "Is Registered",
-                'bac2_score_grade' =>"BacII Score/Grade"
+                'bac2_score_grade' =>"BacII Score/Grade",
+                'origin' =>'Origin'
             ]
         ],
 
@@ -480,7 +481,8 @@ return [
                 'candidate_info' => 'Candidate Information',
                 'course_info' => 'Course Information',
                 'room_info' => 'Room Information',
-                'staff_info' => 'Staff Information'
+                'staff_info' => 'Staff Information',
+                'download' => 'Download'
             ],
             'fields'=>[
                 'name' => 'Exam Name',
@@ -542,8 +544,7 @@ return [
                 'active' => "Active",
                 'highschool_id' => "High School",
                 'promotion_id' => "Promotion",
-                'bac_grade_m_p_c' => 'BacII Math/Physique/Chemistry Grade',
-                'bac_total_score_grade' => "BacII Score/Grade",
+                'bac_total_score' => "BacII Score",
                 'bac_total_grade' => "BacII Grade",
                 'bac_math_grade' => "BacII/Math Grade",
                 'bac_phys_grade' => "BacII/Physique Grade",
@@ -558,7 +559,8 @@ return [
                 'payslip_client_id' => "Payment ID",
                 'origin_id' => "Origin",
                 'preferred_department' => "Prefered Departments",
-                'class' => 'Class'
+                'class' => 'Class',
+                'room_id' => 'Room'
             ]
         ],
         'reporting' => [

@@ -20,7 +20,28 @@ Route::group([], function() {
     Route::post('exams/{id}/save_room_secret_code', 'ExamController@save_room_secret_code')->name('admin.exam.save_room_secret_code');
 
     Route::post('exams/{id}/get_courses', 'ExamController@get_courses')->name('admin.exam.get_courses');
-    Route::post('exams/{id}/get_entranceExamCourses', 'ExamController@get_entranceExamCourses')->name('admin.exam.get_entranceExamCourses');
-    Route::get('exams/{id}/request_add_courses', 'ExamController@request_add_courses')->name('admin.exam.request_add_courses');
-    Route::post('exams/{id}/save_entrance_exam_course', 'ExamController@save_entrance_exam_course')->name('admin.exam.save_entrance_exam_course');
+
+    Route::get('exams/{id}/download_attendance_list', 'ExamController@download_attendance_list')->name('admin.exam.download_attendance_list');
+    Route::get('exams/{id}/download_candidate_list', 'ExamController@download_candidate_list')->name('admin.exam.download_candidate_list');
+    Route::get('exams/{id}/download_room_sticker', 'ExamController@download_room_sticker')->name('admin.exam.download_room_sticker');
+    Route::get('exams/{id}/download_correction_sheet', 'ExamController@download_correction_sheet')->name('admin.exam.download_correction_sheet');
+
+
+//-------------Vannat
+
+    Route::get('exams/{id}/request_input_score_courses', 'ExamController@requestInputScoreCourses')->name('admin.exam.request_input_score_courses');
+    Route::get('exams/{id}/request_change_building_room', 'ExamController@getBuildingRequestion')->name('admin.exam.request_change_building_room');
+    Route::get('exams/{id}/request_input_score_form', 'ExamController@getRequestInputScoreForm')->name('admin.exam.request_input_score_form');
+
+    Route::post('exams/{id}/insert_exam_score_candidate', 'ExamController@insertScoreForEachCandiate')->name('admin.exam.insert_exam_score_candidate');
+
+    Route::get('exams/{id}/report_exam_score_candidate', 'ExamController@reportErrorCandidateScores')->name('admin.exam.report_exam_score_candidate');
+
+
+    Route::post('exams/{id}/add_new_correction_score', 'ExamController@addNewCorrectionScore')->name('admin.exam.add_new_correction_score');
+
+
+    Route::get('exams/{id}/candidate_generate_room', 'ExamController@generate_room')->name('admin.exam.candidate.generate_room');
+
+
 });

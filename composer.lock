@@ -4,8 +4,8 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "hash": "36f0652765eeef400074843815dd4ed2",
-    "content-hash": "470af782f8ee6cb39c59e9bf44ef6ef1",
+    "hash": "32b1906626c240e9473c317637ac4721",
+    "content-hash": "4b90b48518aafcef76fa5a0dd5cb654e",
     "packages": [
         {
             "name": "arcanedev/log-viewer",
@@ -935,6 +935,52 @@
             "time": "2015-12-07 04:07:13"
         },
         {
+            "name": "felixkiss/uniquewith-validator",
+            "version": "2.0.7",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/felixkiss/uniquewith-validator.git",
+                "reference": "7b166096749923512615fc0fba992fd65b0c3b9e"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/felixkiss/uniquewith-validator/zipball/7b166096749923512615fc0fba992fd65b0c3b9e",
+                "reference": "7b166096749923512615fc0fba992fd65b0c3b9e",
+                "shasum": ""
+            },
+            "require": {
+                "illuminate/support": "5.x",
+                "illuminate/validation": "5.x",
+                "php": ">=5.4.0"
+            },
+            "require-dev": {
+                "mockery/mockery": "~0.9",
+                "phpunit/phpunit": "~4.0"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-0": {
+                    "Felixkiss\\UniqueWithValidator\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Felix Kiss",
+                    "email": "felix@felixkiss.com"
+                }
+            ],
+            "description": "Custom Laravel Validator for combined unique indexes",
+            "homepage": "https://github.com/felixkiss/uniquewith-validator",
+            "keywords": [
+                "laravel"
+            ],
+            "time": "2016-02-11 14:14:06"
+        },
+        {
             "name": "guzzle/guzzle",
             "version": "v3.8.1",
             "source": {
@@ -1254,12 +1300,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/InfyOmLabs/core-templates.git",
-                "reference": "86bb00064c22ad7262c2f8396ed5213e75f53098"
+                "reference": "5956c9425408b2a2ea64d6b7981cd23f9776c87d"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/InfyOmLabs/core-templates/zipball/86bb00064c22ad7262c2f8396ed5213e75f53098",
-                "reference": "86bb00064c22ad7262c2f8396ed5213e75f53098",
+                "url": "https://api.github.com/repos/InfyOmLabs/core-templates/zipball/5956c9425408b2a2ea64d6b7981cd23f9776c87d",
+                "reference": "5956c9425408b2a2ea64d6b7981cd23f9776c87d",
                 "shasum": ""
             },
             "require": {
@@ -1289,7 +1335,7 @@
                 "laravel",
                 "templates"
             ],
-            "time": "2016-07-02 13:04:25"
+            "time": "2016-07-21 04:40:53"
         },
         {
             "name": "infyomlabs/laravel-generator",
@@ -1662,16 +1708,16 @@
         },
         {
             "name": "laravel/framework",
-            "version": "v5.2.40",
+            "version": "5.2.41",
             "source": {
                 "type": "git",
                 "url": "https://github.com/laravel/framework.git",
-                "reference": "6195211140ed0881e89d79a296f893abc56987be"
+                "reference": "29ba2e310cfeb42ab6545bcd81ff4c2ec1f6b5c2"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/laravel/framework/zipball/6195211140ed0881e89d79a296f893abc56987be",
-                "reference": "6195211140ed0881e89d79a296f893abc56987be",
+                "url": "https://api.github.com/repos/laravel/framework/zipball/29ba2e310cfeb42ab6545bcd81ff4c2ec1f6b5c2",
+                "reference": "29ba2e310cfeb42ab6545bcd81ff4c2ec1f6b5c2",
                 "shasum": ""
             },
             "require": {
@@ -1788,7 +1834,7 @@
                 "framework",
                 "laravel"
             ],
-            "time": "2016-07-19 19:46:25"
+            "time": "2016-07-20 13:13:06"
         },
         {
             "name": "laravel/socialite",
@@ -4792,16 +4838,16 @@
         },
         {
             "name": "phpunit/phpunit",
-            "version": "4.8.26",
+            "version": "4.8.27",
             "source": {
                 "type": "git",
                 "url": "https://github.com/sebastianbergmann/phpunit.git",
-                "reference": "fc1d8cd5b5de11625979125c5639347896ac2c74"
+                "reference": "c062dddcb68e44b563f66ee319ddae2b5a322a90"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/sebastianbergmann/phpunit/zipball/fc1d8cd5b5de11625979125c5639347896ac2c74",
-                "reference": "fc1d8cd5b5de11625979125c5639347896ac2c74",
+                "url": "https://api.github.com/repos/sebastianbergmann/phpunit/zipball/c062dddcb68e44b563f66ee319ddae2b5a322a90",
+                "reference": "c062dddcb68e44b563f66ee319ddae2b5a322a90",
                 "shasum": ""
             },
             "require": {
@@ -4860,7 +4906,7 @@
                 "testing",
                 "xunit"
             ],
-            "time": "2016-05-17 03:09:28"
+            "time": "2016-07-21 06:48:14"
         },
         {
             "name": "phpunit/phpunit-mock-objects",

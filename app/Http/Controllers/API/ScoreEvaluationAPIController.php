@@ -7,7 +7,7 @@ use App\Http\Requests\API\UpdateScoreEvaluationAPIRequest;
 use App\Models\ScoreEvaluation;
 use App\Repositories\ScoreEvaluationRepository;
 use Illuminate\Http\Request;
-use App\Http\Controllers\AppBaseController;
+use InfyOm\Generator\Controller\AppBaseController;
 use InfyOm\Generator\Criteria\LimitOffsetCriteria;
 use InfyOm\Generator\Utils\ResponseUtil;
 use Prettus\Repository\Criteria\RequestCriteria;

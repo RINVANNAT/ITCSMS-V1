@@ -38,7 +38,9 @@ class UpdateCandidateRequest extends Request
             'bac_percentile' => 'required',
             'bac_total_grade' => 'required',
             'bac_year' => 'required',
-            'promotion_id' => 'required'
+            'promotion_id' => 'required',
+            'exam_id' => 'required',
+            'register_id' => 'integer|required|unique_with:candidates,exam_id',
         ];
     }
 }

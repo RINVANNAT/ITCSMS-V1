@@ -7,8 +7,14 @@
     <div class="box box-success">
         <div class="box-header with-border">
             <h3 class="box-title">{{ trans('labels.backend.exams.secret_code.title') }}</h3>
-            <input type="button" id="btn-auto" class="btn btn-success btn-xs pull-right" style="margin-left: 5px;" value="{{ trans('labels.backend.exams.secret_code.generate_auto') }}" />
-            <input type="button" id="btn-manual" class="btn btn-info btn-xs pull-right" value="{{ trans('labels.backend.exams.secret_code.generate_manual') }}" />
+            <input type="button" id="btn-auto" class="btn btn-success btn-xs pull-right" style="margin-left: 5px; margin-top: 3px;" value="{{ trans('labels.backend.exams.secret_code.generate_auto') }}" />
+            <span class="pull-right" id="form-secret-code" style="display: none">
+                <input type="text" id="min_range"/> -
+                <input type="text" id="max_range"/>
+
+                <input type="button" id="btn-auto-save" class="btn btn-danger btn-xs pull-right" style="margin-left: 5px; margin-top: 3px;" value="{{ trans('buttons.general.save') }}" />
+            </span>
+
         </div>
         <!-- /.box-header -->
         <div class="box-body">
@@ -67,8 +73,13 @@
 
         $(function() {
             $("#btn-auto").click(function () {
-                var min = 1000;
-                var max = 9999;
+                $(this).hide();
+                $('#form-secret-code').show();
+            });
+
+            $("#btn-auto-save").click(function () {
+                var min = parseInt($('#min_range').val());
+                var max = parseInt($('#max_range').val());
                 $(document).find('.secret_code').each(function(){
                     $(this).prop('disabled', false);
                     var code = Math.floor(Math.random()*(max-min + 1)) + min;
@@ -77,6 +88,9 @@
                     }
                     $(this).val(code);
                 });
+
+                $('#form-secret-code').hide();
+                $('#btn-auto').show();
             });
 
             $("#btn-save").click(function () {

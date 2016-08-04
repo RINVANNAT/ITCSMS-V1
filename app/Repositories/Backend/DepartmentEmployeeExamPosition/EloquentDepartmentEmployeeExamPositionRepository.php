@@ -83,7 +83,7 @@ class EloquentDepartmentEmployeeExamPositionRepository extends EloquentTempEmplo
                     "id" => 'tempstaff_' . $department_id . '_' . $temporaryEmployeeWithoutRole->id,
                     "text" => $temporaryEmployeeWithoutRole->name_kh,
                     "children" => false,
-                    "type" => "temporaryStaff"
+                    "type" => "staff"
                 );
                 array_push($arrayPositions, $element);
             }
@@ -120,6 +120,7 @@ class EloquentDepartmentEmployeeExamPositionRepository extends EloquentTempEmplo
                 "id" => 'staffbyposition_' . $selectedDepartment_id . '_' . $permanentStaffWithPosition->position_id . '_' . $permanentStaffWithPosition->id,
                 "text" => $permanentStaffWithPosition->name_kh,
                 "children" => false,
+                "i_attr" => "{class : fa fa-user}",
                 "type" => "staff"
             );
 
