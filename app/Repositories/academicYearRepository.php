@@ -2,16 +2,16 @@
 
 namespace App\Repositories;
 
-use App\Models\academicYear;
+use App\Models\AcademicYear;
 use InfyOm\Generator\Common\BaseRepository;
 
-class academicYearRepository extends BaseRepository
+class AcademicYearRepository extends BaseRepository
 {
     /**
      * @var array
      */
     protected $fieldSearchable = [
-        'name'
+        
     ];
 
     /**
@@ -19,6 +19,6 @@ class academicYearRepository extends BaseRepository
      **/
     public function model()
     {
-        return academicYear::class;
+        return AcademicYear::class;
     }
 }
