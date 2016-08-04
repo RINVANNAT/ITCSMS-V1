@@ -74,15 +74,18 @@ class EloquentCandidateRepository implements CandidateRepositoryContract
         $candidate->name_kh = $input['name_kh'];
         $candidate->register_id = $input['register_id'];
         $candidate->dob = $input['dob'];
-        $candidate->mcs_no = isset($input['mcs_no'])?$input['mcs_no']:null;
-        $candidate->can_id = isset($input['can_id'])?$input['can_id']:null;
-        $candidate->phone = isset($input['phone'])?$input['phone']:null;
-        $candidate->email = isset($input['email'])?$input['email']:null;
+
+        //dd(isset($input['mcs_no']) && $input['mcs_no']);
+
+        $candidate->mcs_no = isset($input['mcs_no']) && $input['mcs_no'] != "" ?$input['mcs_no']:null;
+        $candidate->can_id = isset($input['can_id']) && $input['can_id'] != "" ?$input['can_id']:null;
+        $candidate->phone = isset($input['phone']) && $input['phone'] != "" ?$input['phone']:null;
+        $candidate->email = isset($input['email']) && $input['email'] != "" ?$input['email']:null;
         $candidate->address = isset($input['address'])?$input['address']:null;
         $candidate->address_current = isset($input['address_current'])?$input['address_current']:null;
         $candidate->is_paid = isset($input['is_paid'])?true:false;
         $candidate->register_from = isset($input['register_from'])?$input['register_from']:"ITC";
-        $candidate->studentBac2_id = isset($input['studentBac2_id'])?$input['studentBac2_id']:null;
+        $candidate->studentBac2_id = isset($input['studentBac2_id']) && $input['studentBac2_id'] != ""?$input['studentBac2_id']:null;
         if(isset($input['math_c'])){
             $candidate->math_c = $input['math_c']!=""?$input['math_c']:null;
         }

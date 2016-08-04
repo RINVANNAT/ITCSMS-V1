@@ -32,6 +32,6 @@
     <label for="total_score" class="col-sm-3 control-label">Total Questions</label>
 
     <div class="col-sm-3">
-        <input type="number" class="form-control" id="total_question" name="total_question" placeholder="30">
+        <input type="number" class="form-control" id="total_question" name="total_question" placeholder="30" value="30">
     </div>
 </div>
