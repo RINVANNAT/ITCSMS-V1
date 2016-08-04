@@ -17,34 +17,36 @@
     </style>
 @stop
 @section('content')
+
     <?php
         $page_number = 1;
-        $total_page = count($rooms);
+        $total_page = count($chunk_candidates);
+            $index = 1;
     ?>
-    @foreach($rooms as $room)
+    @foreach($chunk_candidates as $chunk)
+
         <div class="page">
-            <h2>បញ្ជីឈ្មោះបេក្ខជន⁣ <span class="pull-right"> &nbsp;&nbsp;បន្ទប់ {{$room->name." ".$room->building->code}}</span></h2>
+            <h2>បំណែងចែកឈ្មោះបេក្ខជនតាមបន្ទប់ រៀបតាមលេខបង្កាន់ដៃ</h2>
 
             <table class="table" width="100%">
                 <tr>
                     <th>លេខរៀង</th>
                     <th>លេខបង្កាន់ដៃ</th>
+                    <th>បន្ទប់</th>
                     <th>ឈ្មោះ</th>
                     <th>ឈ្មោះឡាតាំង</th>
                     <th>ភេទ</th>
                     <th>ថ្ងៃខែឆ្នាំកំណើត</th>
                 </tr>
-                <?php
-                $index = 1;
-                ?>
-                @foreach($room->candidates()->with('gender')->orderBy('register_id')->get() as $candidate)
+                @foreach($chunk as $candidate)
                     <tr>
                         <td>{{$index}}</td>
-                        <td>{{$candidate->register_id}}</td>
-                        <td class="left">{{$candidate->name_kh}}</td>
-                        <td class="left">{{$candidate->name_latin}}</td>
-                        <td>{{$candidate->gender->code}}</td>
-                        <td>{{$candidate->dob->toFormattedDateString()}}</td>
+                        <td>{{str_pad($candidate['register_id'], 4, '0', STR_PAD_LEFT)}}</td>
+                        <td>{{$candidate['room']['name']." ".$candidate['room']['building']['code']}}</td>
+                        <td class="left">{{$candidate['name_kh']}}</td>
+                        <td class="left">{{$candidate['name_latin']}}</td>
+                        <td>{{$candidate['gender']['code']}}</td>
+                        <td>{{\Carbon\Carbon::createFromFormat("Y-m-d h:i:s",$candidate['dob'])->toFormattedDateString()}}</td>
                         <?php $index++; ?>
                     </tr>
                 @endforeach

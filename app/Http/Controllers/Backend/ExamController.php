@@ -404,7 +404,7 @@ class ExamController extends Controller
 
         $exam = $this->exams->findOrThrowException($exam_id);
         $courses = $exam->entranceExamCourses()->get();
-        $rooms = $exam->rooms()->with('building')->with('candidates')->with('candidates.gender')->withPivot('roomcode')->get();
+        $rooms = $exam->rooms()->with('building')->withPivot('roomcode')->get();
 
         return view('backend.exam.print.attendance_list',compact('rooms','courses'));
     }
@@ -412,14 +412,24 @@ class ExamController extends Controller
     public function download_candidate_list($exam_id){
 
         $exam = $this->exams->findOrThrowException($exam_id);
-        $rooms = $exam->rooms()->with('building')->with('candidates')->with('candidates.gender')->withPivot('roomcode')->get();
+        $rooms = $exam->rooms()->with('building')->withPivot('roomcode')->get();
 
         return view('backend.exam.print.candidate_list',compact('rooms'));
     }
 
+    public function download_candidate_list_by_register_id($exam_id){
+
+        $exam = $this->exams->findOrThrowException($exam_id);
+        $candidates = $exam->candidates()->with('gender')->with('room')->with('room.building')->orderBy('register_id')->get()->toArray();
+
+        $chunk_candidates = array_chunk($candidates,30);
+
+        return view('backend.exam.print.candidate_list_order_by_register_id',compact('chunk_candidates'));
+    }
+
     public function download_room_sticker($exam_id){
         $exam = $this->exams->findOrThrowException($exam_id);
-        $rooms = $exam->rooms()->with('building')->with('candidates')->with('candidates.gender')->withPivot('roomcode')->get();
+        $rooms = $exam->rooms()->with('building')->withPivot('roomcode')->get();
 
         return view('backend.exam.print.room_sticker',compact('rooms'));
     }

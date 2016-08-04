@@ -10,7 +10,7 @@
 
 <table class="table table-striped table-bordered table-hover dt-responsive nowrap" cellspacing="0" width="100%" id="table-exam-course">
     <thead>
-    @if($exam->id == 1)
+    @if($exam->type_id == 1)
         <tr>
             <th>{{ trans('labels.backend.exams.course.fields.course_name') }}</th>
             <th>{{ trans('labels.backend.exams.course.fields.total_question') }}</th>

@@ -25,6 +25,7 @@ Route::group([], function() {
     Route::get('exams/{id}/download_candidate_list', 'ExamController@download_candidate_list')->name('admin.exam.download_candidate_list');
     Route::get('exams/{id}/download_room_sticker', 'ExamController@download_room_sticker')->name('admin.exam.download_room_sticker');
     Route::get('exams/{id}/download_correction_sheet', 'ExamController@download_correction_sheet')->name('admin.exam.download_correction_sheet');
+    Route::get('exams/{id}/download_candidate_list_by_register_id', 'ExamController@download_candidate_list_by_register_id')->name('admin.exam.download_candidate_list_by_register_id');
 
 
 //-------------Vannat

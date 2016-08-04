@@ -87,19 +87,20 @@
             }
 
             @page {
-                size: A4;
+                size: 21cm 29.7cm;
                 margin: 0;
             }
             @media print {
                 html, body {
-                    width: 210mm;
-                    height: 297mm;
+                    width: 100%;
+                    height: 100%;
+                    margin: 0;
+                    padding: 0;
+                    background-color: #FAFAFA;
+                    font: 12pt "Tahoma";
                 }
                 .page {
-                    padding-top: 20mm;
-                    padding-left: 20mm;
-                    padding-right: 0mm;
-                    padding-bottom: 20mm;
+                    padding: 10mm;
                     margin: 10mm auto;
                     border: initial;
                     border-radius: initial;
