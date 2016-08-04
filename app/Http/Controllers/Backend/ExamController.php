@@ -522,63 +522,10 @@ class ExamController extends Controller
 
     public function reportErrorCandidateScores($exam_id, Request $request) {
 
-        $errorCandidateScores = [];
-        $errors =[];
-        $candidateIds = DB::table('candidates')
-            ->join('exams', 'exams.id', '=', 'candidates.exam_id')
-            ->join('exam_room', 'exam_room.room_id', '=', 'candidates.room_id')
-            ->join('rooms', 'rooms.id', '=', 'candidates.room_id')
-            ->where('exams.id', '=', $exam_id)
-            ->select('candidates.id as candidate_id', 'register_id', 'exam_room.roomcode as room_code', 'rooms.id as room_id')
-            ->orderBy('register_id', 'ASC')
-            ->get();
 
-        foreach ($candidateIds as $candidateId) {
-            $statusCorrectScore = 0 ;
-            $statusWrongScore = 0;
-            $cadidateScores = DB::table('candidateEntranceExamScores')
-                ->join('entranceExamCourses', 'entranceExamCourses.id', '=', 'candidateEntranceExamScores.entrance_exam_course_id')
-                ->where([
-                    ['candidate_id', $candidateId->candidate_id],
-                    ['candidateEntranceExamScores.entrance_exam_course_id', '=', $request->course_id]
-                ])
-                ->select('entranceExamCourses.total_question', 'entranceExamCourses.id as course_id', 'candidateEntranceExamScores.id', 'candidate_number_in_room', 'entrance_exam_course_id', 'candidateEntranceExamScores.score_c', 'candidateEntranceExamScores.score_w', 'candidateEntranceExamScores.score_na', 'candidateEntranceExamScores.sequence')
-                ->get();
-
-            array_push($errors, (object) array('candidateProperties' => $candidateId, 'scoreErrors' => $cadidateScores) );
-
-            if ($cadidateScores) {
-                $length = count($cadidateScores);
-
-                for ($i = 0; $i < $length ; $i++) {
-                    $tmpScoreCorrect = $cadidateScores[$i]->score_c;
-                    $tmpScoreWrong = $cadidateScores[$i]->score_w;
-                    $tmpScoreNA = $cadidateScores[$i]->score_na;
-                    $tmpTotalQuestion = $cadidateScores[$i]->total_question;
-
-                    for ($j = $length-1; $j > $i ; $j--) {
-                        if ($tmpScoreCorrect == $cadidateScores[$j]->score_c && $tmpScoreWrong == $cadidateScores[$j]->score_w && $tmpScoreNA == $cadidateScores[$j]->score_na) {
-                            if( ($tmpScoreCorrect + $tmpScoreWrong + $tmpScoreNA) == $tmpTotalQuestion && $cadidateScores[$j]->score_c + $cadidateScores[$j]->score_w + $cadidateScores[$j]->score_na == $cadidateScores[$j]->total_question) {
-
-                                $statusCorrectScore++;
-                            } else {
-                                $statusWrongScore++;
-                            }
-                        } else {
-                            $statusWrongScore++;
-                        }
-                        if( $statusCorrectScore == 0 &&  $statusWrongScore == ($length*($length-1))/2 ) {
-                            array_push($errorCandidateScores, (object) array('candidateProperties' => $candidateId, 'scoreErrors' => $cadidateScores) );
-                        }
-
-                    }
-                }
-
-            }
-        }
-
-//        dd($errorCandidateScores);
+        $errorCandidateScores = $this->exams->reportErrorCandidateExamScores($exam_id, $request->course_id);
         return view('backend.exam.includes.popup_report_score_candidate', compact('exam_id', 'errorCandidateScores'));
+
     }
 
     public function addNewCorrectionScore($exam_id, Requests\Backend\Exam\StoreEntranceExamScoreRequest $request) {
@@ -602,6 +549,139 @@ class ExamController extends Controller
         return $arrayIds;
 
     }
+
+    public function candidateResultExamScores($exam_id) {
+
+        $errorStatus=false;
+        $courseIds = DB::table('entranceExamCourses')
+                    ->where('exam_id', '=', $exam_id)
+                    ->select('id as course_id', 'name_kh as course_name')->get();
+        if($courseIds) {
+            foreach($courseIds as $courseId) {
+                $errorCandidateScores = $this->exams->reportErrorCandidateExamScores($exam_id, $courseId->course_id);
+                if($errorCandidateScores) {
+                    $errorStatus=true;
+                }
+            }
+            if($errorStatus !== false){
+                dd('there is at least one error of candidate score');
+            } else{
+                return view('backend.exam.includes.popup_get_form_result_score', compact('exam_id', 'courseIds'));
+            }
+        }
+
+    }
+
+    public function calculateCandidateScores($examId, Request $request) {
+
+        $requestData = $_POST;
+        $arrayResults = [];
+        $candidateResult = [];
+        $ids = [];
+        $passedCandidates = (int)$requestData['course_factor']['total_pass'];
+        $reservedCandidates = (int)$requestData['course_factor']['total_reserve'];
+        $checkPass = 0;
+        $checkReserve = 0;
+        $checkFail = 0;
+
+        foreach ($requestData['course_factor'] as $courseId => $factorValue) {
+            $candidateScores = DB::table('candidates')
+                ->join('exams', 'exams.id', '=', 'candidates.exam_id')
+                ->join('candidateEntranceExamScores', 'candidateEntranceExamScores.candidate_id', '=', 'candidates.id')
+                ->where([
+                    ['candidates.exam_id', '=', $examId],
+                    ['candidateEntranceExamScores.entrance_exam_course_id', '=', (int)$courseId ],
+                    ['candidateEntranceExamScores.is_completed', '=', true]
+                ])
+                ->select('candidateEntranceExamScores.entrance_exam_course_id','candidates.id as candidate_id','candidates.name_kh', 'candidateEntranceExamScores.score_c', 'candidateEntranceExamScores.score_w', 'candidateEntranceExamScores.score_na')
+                ->get();
+
+            foreach($candidateScores as $candidateScore) {
+                $totalScore = ($candidateScore->score_c * $factorValue) - $candidateScore->score_w;
+                $element = (object)array(
+                    'candidate_name'    => $candidateScore->name_kh,
+                    'candidate_id'      => $candidateScore->candidate_id,
+                    'course_id'         => $candidateScore->entrance_exam_course_id,
+                    'score_by_course'       => $totalScore
+                );
+                array_push($arrayResults, $element);
+            }
+        }
+
+        $candidateIds = DB::table('candidateEntranceExamScores')
+                    ->where('is_completed', '=', true)
+                    ->select('candidate_id')->get();
+        foreach($candidateIds as $candidateId) {
+            array_push($ids, $candidateId->candidate_id);
+        }
+        $ids = array_unique($ids);
+        $candidateIds = [];
+        foreach($ids as $id) {
+            array_push($candidateIds, $id);
+        }
+
+        for($i=0; $i<count($candidateIds); $i++) {
+            $totalSum = 0;
+            foreach($arrayResults as $arrayResult) {
+                if($candidateIds[$i] == $arrayResult->candidate_id){
+                    $totalSum = $totalSum+ $arrayResult->score_by_course;
+                }
+            }
+            array_push($candidateResult, (object)(['candidate_id'=> $candidateIds[$i], 'total_score' =>$totalSum]));
+        }
+        usort($candidateResult, array($this, "sortCandidateRank"));
+
+        if($passedCandidates + $reservedCandidates > count($candidateResult)) {
+            return \Illuminate\Http\Response::json(array('status'=>false,'message'=>'There are not enough candidates!'));
+        } else {
+            for($index =0; $index < $passedCandidates; $index++) {
+                $pass = $this->updateCandidateResultScore($candidateResult[$index]->candidate_id,$candidateResult[$index]->total_score, 'Pass' );
+
+                if($pass) {
+                    $checkPass++;
+                }
+            }
+            for($index=$passedCandidates; $index < count($candidateResult); $index++) {
+
+                $reserve = $this->updateCandidateResultScore($candidateResult[$index]->candidate_id,$candidateResult[$index]->total_score, 'Reserve' );
+                if($reserve) {
+                    $checkReserve++;
+                }
+            }
+            for($index=$passedCandidates + $reservedCandidates; $index < count($candidateResult); $index++) {
+
+                $fail = $this->updateCandidateResultScore($candidateResult[$index]->candidate_id,$candidateResult[$index]->total_score, 'Fail' );
+                if($fail) {
+                    $checkFail++;
+                }
+            }
+        }
+
+        if($checkPass != 0 || $checkReserve != 0 || $checkFail != 0) {
+//            dd('hello');
+
+            return Response::json(array('status'=>true,'message'=>'Success For Updating Candidates Result!'));
+        }
+    }
+
+    private function sortCandidateRank($a, $b)
+    {
+        return $b->total_score -$a->total_score;
+    }
+
+    private function updateCandidateResultScore($candidateId,$totalScore, $status) {
+
+        $updateCandidateScore = DB::table('candidates')
+            ->where('id', '=', $candidateId )
+            ->update(array(
+                'total_score' => $totalScore,
+                'result' => $status,
+            ));
+
+        return $updateCandidateScore;
+    }
+
+
 
     public function generate_room($exam_id){
         $exam = $this->exams->findOrThrowException($exam_id);

@@ -62,7 +62,7 @@
                         </div>
 
 
-                        <?php $k=0; $length = [];?>
+                        <?php $k=0; $length = []; $p=0;?>
                         @foreach($errorCandidateScores as $errorScoreProperties)
                             <?php $k++; $p=0;  ?>
 
@@ -250,8 +250,8 @@
            var scoreWrong = $(".score_w_"+i).map(function(){return $(this).text();}).get();
            var scoreNoan = $(".score_na_"+i).map(function(){return $(this).text();}).get();
 
-                console.log(scoreCorrect);
-//               compareScore(scoreCorrect,"#score_c_"+i+'_');
+//                console.log(scoreCorrect);
+               compareScore(scoreCorrect,i);
 //               compareScore(scoreWrong,$("#score_w_"+i+'_'));
 //               compareScore(scoreNoan,$("#score_na_"+i+'_'));
 
@@ -260,9 +260,8 @@
 
        }
 
-       var total = JSON.parse('{{$errorScore->total_question}}');
 
-       function compareScore(array, object) {
+       function compareScore(array, i) {
 //           console.log(array);
            var leng = array.length;
            console.log(leng);
@@ -271,8 +270,9 @@
 
                 if(parseInt(tmp) == parseInt(array[k])) {
                     console.log(array[k]);
+//                    console.log(object+k+1);
 //                    console.log(parseInt(tmp)+' == '+parseInt(array[k]))
-                   $(object+k+1).addClass('equal');
+                    $("#score_c_"+i+'_'+k).addClass('equal');
                 } else {
                     $(object+k+1).addClass('error');
                 }

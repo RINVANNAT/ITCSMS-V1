@@ -663,6 +663,10 @@
 
         });
 
+        $(document).on('click', '#btn_result_score_candidate', function (e) {
+            window_request_room = PopupCenterDual('{{route("admin.exam.candidate_exam_result_score",$exam->id)}}','Candidate Result Score','800','470');
+        });
+
 
     </script>
 
