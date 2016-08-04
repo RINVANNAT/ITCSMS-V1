@@ -97,7 +97,7 @@ start table render
 
 
 
-                    return parseFloat(this.scores[index].score30) + tmp;
+                    return  tmp;
                     //return index1 +1;
                 },
 
