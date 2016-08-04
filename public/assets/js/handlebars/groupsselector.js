@@ -126,9 +126,9 @@ if (typeof SMSFILER !== 'object') {
         $(document).on("click","#hideselectgroup", function(){
             var self = $(this);
             if(SMSFILER.fillterShowHide) {
-                $( "#groupselectorcontainer" ).slideUp( "fast", function() {}); self.html("Show Fillter"); SMSFILER.fillterShowHide = false;
+                $( "#groupselectorhideshow" ).slideUp( "fast", function() {}); self.html("Show Fillter"); SMSFILER.fillterShowHide = false;
             }else{
-                $( "#groupselectorcontainer" ).slideDown( "fast", function() {});self.html("Hide Fillter");SMSFILER.fillterShowHide = true;
+                $( "#groupselectorhideshow" ).slideDown( "fast", function() {});self.html("Hide Fillter");SMSFILER.fillterShowHide = true;
             }
         });
     };

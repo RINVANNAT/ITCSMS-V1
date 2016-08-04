@@ -57,12 +57,14 @@
                         <!-- /.btn-group -->
                         <button class="btn btn-default btn-sm"><i class="fa fa-refresh"></i></button>
                         <br>
-                        <div id="selectacademic">
-                        </div>
-                        <div id="selectsemester">
-                        </div>
+                        <div id="groupselectorhideshow">
+                            <div id="selectacademic">
+                            </div>
+                            <div id="selectsemester">
+                            </div>
 
-                        <div id="groupselectorcontainer">
+                            <div id="groupselectorcontainer">
+                            </div>
                         </div>
                     </div>
                     <div id="table-content">
