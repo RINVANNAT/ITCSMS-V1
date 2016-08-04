@@ -258,13 +258,16 @@
 
 //           todo tofix move to 5.2
 
-            $.get( "{!! route('studentEvaStatuses.api.v1') !!}", function(studentEvalStatuses){
+            url = "{!! route('studentEvaStatuses.api.v1') !!}";
+            console.log(url);
+            $.get( url, function(studentEvalStatuses){
                 console.log("type of returne status");
                 console.log(typeof studentEvalStatuses);
+                console.log(studentEvalStatuses);
                 new Vue({
                     el: '#app',
                     data: {
-                        studentEvalStatuses: studentEvalStatuses
+                        studentEvalStatuses: studentEvalStatuses.data
                     }
                 })
             });
@@ -451,7 +454,8 @@
 
 
 //                todo tofix move to 5.2
-{{--                url = "{!! route('attacheStudentEvalStatuses.api.v1') !!}"--}}
+                // fix this
+                url = "{!! route('attacheStudentEvalStatuses.api.v1') !!}"
                 url += "?stuId="+stuId +"&evalId="+evalId;
                 console.log(url);
                 toggleLoading(true);

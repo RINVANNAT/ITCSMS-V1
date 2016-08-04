@@ -22,4 +22,6 @@ Thumbs.db
 _ide_helper.php
 composer.phar
 error.log
+/.vagrant
 Todo.rtf
+bin/

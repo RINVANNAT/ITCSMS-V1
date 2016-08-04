@@ -10,6 +10,7 @@ use InfyOm\Generator\Criteria\LimitOffsetCriteria;
 use InfyOm\Generator\Utils\ResponseUtil;
 use Prettus\Repository\Criteria\RequestCriteria;
 use Response;
+use App\Models\StudentAnnual;
 
 /**
  * Class StudentEvaStatusAPIController
@@ -44,6 +45,20 @@ class StudentEvaStatusAPIController extends AppBaseController
 
         return $this->sendResponse($studentEvaStatuses->toArray(), 'StudentEvaStatuses retrieved successfully');
     }
+
+    public function attache(Request $request){
+
+        if($request->has("stuId") & $request->has("evalId")){
+            $studentAnnual = StudentAnnual::find($request["stuId"]);
+            $olsstatus = $studentAnnual->evalStatus()->get();
+            foreach($olsstatus as $olsstatu){
+                $studentAnnual->evalStatus()->detach($olsstatu);
+            }
+            $studentAnnual->evalStatus()->attach($request["evalId"]);
+        }
+        return 1;
+    }
+
 
     /**
      * Store a newly created StudentEvaStatus in storage.

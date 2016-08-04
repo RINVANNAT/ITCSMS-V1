@@ -12,6 +12,7 @@ use Schema;
 use Symfony\Component\HttpKernel\Exception\HttpException;
 use Debugbar;
 use InfyOm\Generator\Common\BaseRepository;
+use Illuminate\Support\Facades\DB;
 
 
 class ScoreRepository extends BaseRepository
@@ -294,20 +295,31 @@ class ScoreRepository extends BaseRepository
 
 
         if($semester_id==1){
-            $courseAnnuals = CourseAnnual::with("course")
-                ->where('degree_id',$degree_id)
-                ->where('grade_id', $grade_id)
-                ->where('department_id',$department_id)
-                ->where('academic_year_id',$academic_year_id)
-                ->where('semester',$semester_id)->get();
-            //dd($courseAnnuals);
+
+
+
+            $courseAnnuals = DB::table('course_annuals')
+                ->join('courses', 'course_annuals.course_id', '=', 'courses.id')
+                ->where('course_annuals.degree_id',$degree_id)
+                ->where('course_annuals.grade_id', $grade_id)
+                ->where('course_annuals.department_id',$department_id)
+                ->where('course_annuals.academic_year_id',$academic_year_id)
+                ->where('course_annuals.semester',$semester_id)
+                ->select('courses.name_en as name', 'course_annuals.id as id', 'courses.credit as credit')->get();
+
+
         }else{
-            $courseAnnuals = CourseAnnual::with("course")
-                ->where('degree_id',$degree_id)
-                ->where('grade_id', $grade_id)
-                ->where('department_id',$department_id)
-                ->where('academic_year_id',$academic_year_id)->get();
+
+            $courseAnnuals = DB::table('course_annuals')
+                ->join('courses', 'courses.id', '=', 'course_annuals.course_id')
+                ->where('course_annuals.degree_id',$degree_id)
+                ->where('course_annuals.grade_id', $grade_id)
+                ->where('course_annuals.department_id',$department_id)
+                ->where('course_annuals.academic_year_id',$academic_year_id)
+                ->select('courses.name_en as name + course_annuals.semester', 'course_annuals.id as id','courses.credit as credit')->get();
+
         }
+
 
         // fetch credit by course id
         // fetch total credits of all courses to calculate moyenen
@@ -315,8 +327,8 @@ class ScoreRepository extends BaseRepository
         $credit_by_id = array();
         $courseAnualIds = array();
         foreach($courseAnnuals as $courseAnnual){
-            $credit_by_id[$courseAnnual->id] = $courseAnnual->course->credit;
-            $totalcredit += $courseAnnual->course->credit;
+            $credit_by_id[$courseAnnual->id] = $courseAnnual->credit;
+            $totalcredit += $courseAnnual->credit;
             array_push($courseAnualIds, $courseAnnual->id);
         }
 
@@ -631,13 +643,6 @@ class ScoreRepository extends BaseRepository
             $fetchResult["name"] = $studentAnnual->student->name_latin;
             array_push($studentAnnualsFetchResult, $fetchResult);
         }
-
-
-
-
-
-
-
         return compact("studentAnnuals","scores","absencesCounts","total","studentAnnualsFetchResult" );
     }
 

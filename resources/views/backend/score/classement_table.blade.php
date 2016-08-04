@@ -84,12 +84,14 @@
 
 
     $( document ).ready(function() {
-        courseAnnules = {!! $courseAnnuals->toJson() !!};
+        courseAnnules = {!! json_encode($courseAnnuals) !!};
+
         studentAnnuals = {!! json_encode($studentAnnuals) !!};
         scoresDataViews = {!!  json_encode($scoresDataViews) !!};
         absencesCounts = {!! json_encode($absencesCounts) !!};
         evalStatus={!!json_encode($evalStatus)  !!};
-
+        console.log("log course ");
+        console.log(courseAnnules);
 
         new Vue({
             el: '#vue_table_score',
