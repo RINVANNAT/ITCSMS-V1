@@ -3,11 +3,23 @@
 @section ('title', trans('labels.backend.exams.title') . ' | ' . trans('labels.backend.exams.course.add_course'))
 
 @section('content')
+    <style>
+        .text_font{
+            font-size: 18pt;
+        }
+        .area{
+            font-size: 26px;
+            border-radius: 0;
+            background: transparent;
+            width: 180px;
+            text-indent: 10px;
+        }
 
+    </style>
 
         <div class="box box-success">
-            <div class="box-header with-border">
-                <h3 class="box-title">Request Input Score</h3>
+            <div class="box-header with-border text_font">
+                <h1 class="box-title"> <span class="text_font">Request Input Score</span></h1>
             </div>
             <!-- /.box-header -->
             <div class="box-body">
@@ -21,18 +33,18 @@
                             {{--@endforeach--}}
                         {{--</select>--}}
                     {{--</div>--}}
-                    <label class="col-sm-3"> Select Room Code: </label>
-                    <div class="col-sm-3 no-padding" style="margin-left: -30px;">
-                        <select name="room" id="room_id_input_score">
+                    <label class="col-sm-4 text_font"> Select Room Code: </label>
+                    <div class="col-sm-2 no-padding text_font" `>
+                        <select name="room" class="area" id="room_id_input_score" style= " float: left; margin-left: -50px; ">
                             @foreach($rooms as $room)
-                                <option class="col-sm-4" value="{{$room['room_id']}}"> {{$room['room_code']}}</option>
+                                <option  value="{{$room['room_id']}}"> {{$room['room_code']}}</option>
                             @endforeach
                         </select>
                     </div>
 
-                    <label class="col-sm-3 no-padding"> Select Subject: </label>
-                    <div class="col-sm-3 no-padding">
-                        <select  name="subject" id="subject_id" style="float: left; margin-left: -75px">
+                    <label class="col-sm-4 no-padding text_font"> Select Subject: </label>
+                    <div class="col-sm-2 no-padding text_font">
+                        <select  name="subject" class="area" id="subject_id" style="float: left; margin-left: -125px;">
                             @foreach($courses as $course)
                                 <option class="col-sm-4" value="{{$course->id}}"> {{$course->name_kh}}</option>
                             @endforeach
@@ -40,15 +52,15 @@
                     </div>
                 </div>
 
-                <div class="col-sm-12">
+                <div class="col-sm-12 text_font">
 
                 </div>
-                <div class="col-sm-12" style="margin-top: 15px">
+                <div class="col-sm-12 text_font" style="margin-top: 15px">
                     <input id="first_scoring_attemp" value="1" type="checkbox" >
                     <label style="margin-left: 10px" > Correction 1  </label>
                 </div>
 
-                <div class="col-sm-12">
+                <div class="col-sm-12 text_font">
                     <input id="second_scoring_attemp" value="2" type="checkbox" >
                     <label  style="margin-left: 10px"> Correction 2  </label>
                 </div>
@@ -177,10 +189,6 @@
                }
 
            });
-
-
-
-
 
    </script>
 @stop

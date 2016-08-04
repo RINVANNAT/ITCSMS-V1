@@ -652,7 +652,7 @@
 -----------------create inputscore in course page
 */
         $(document).on('click', '#btn_input_score_course', function (e) {
-            window_request_room = PopupCenterDual('{{route("admin.exam.request_input_score_courses",$exam->id)}}','Course for exam','800','470');
+            window_request_room = PopupCenterDual('{{route("admin.exam.request_input_score_courses",$exam->id)}}','Course for exam','1000','350');
         });
 
 
