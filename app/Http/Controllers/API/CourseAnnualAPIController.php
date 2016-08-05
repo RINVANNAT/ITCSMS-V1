@@ -6,14 +6,16 @@ use App\Http\Requests\API\CreateCourseAnnualAPIRequest;
 use App\Http\Requests\API\UpdateCourseAnnualAPIRequest;
 use App\Models\CourseAnnual;
 use App\Repositories\CourseAnnualRepository;
-use Illuminate\Http\Request;
+
 use InfyOm\Generator\Controller\AppBaseController;
 use InfyOm\Generator\Criteria\LimitOffsetCriteria;
 use InfyOm\Generator\Utils\ResponseUtil;
 use Prettus\Repository\Criteria\RequestCriteria;
 use Response;
 use Illuminate\Support\Facades\DB;
-
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Http\Request;
+use App\Models\Employee;
 /**
  * Class CourseAnnualController
  * @package App\Http\Controllers\API
@@ -36,14 +38,29 @@ class CourseAnnualAPIController extends AppBaseController
      * @param Request $request
      * @return Response
      */
-    public function index(CreateCourseAnnualAPIRequest $request)
+    public function index(Request $request)
     {
         $this->courseAnnualRepository->pushCriteria(new RequestCriteria($request));
         $this->courseAnnualRepository->pushCriteria(new LimitOffsetCriteria($request));
         // fix filter null
-        $filters = $request->only('degree_id','grade_id','department_id','academic_year_id');
+        $filters = $request->only('degree_id','grade_id','department_id','academic_year_id','user_id');
         if ($filters["academic_year_id"] == null){
             unset($filters["academic_year_id"]);
+        }
+
+
+//        to fix
+        $employeeId = 8;
+//        dd($request->user());
+        if (true){
+            if (Auth::check()) {
+                $id = Auth::id();
+
+//                dd($employee->id);
+
+            }else{
+//                dd("not check");
+            }
         }
 
 
@@ -56,10 +73,19 @@ class CourseAnnualAPIController extends AppBaseController
             ->where('course_annuals.degree_id', $filters['degree_id'])
             ->where('course_annuals.grade_id', $filters['grade_id'])
             ->where('course_annuals.department_id', $filters['department_id'])
-            ->where('course_annuals.academic_year_id', $filters['academic_year_id'])
-            ->select(
+            ->where('course_annuals.academic_year_id', $filters['academic_year_id']);
+
+
+        if ($filters["user_id"] != null){
+            $employee = Employee::where("user_id","=",$filters["user_id"])->first();
+            $courseAnnuals->where('course_annuals.employee_id', $employee->id);
+        }
+
+        $courseAnnuals = $courseAnnuals->select(
                 ['course_annuals.id',
                     'courses.name_en as name',
+                    'course_annuals.semester_id as semester',
+
                     'course_annuals.course_id'])->get();
 //
 

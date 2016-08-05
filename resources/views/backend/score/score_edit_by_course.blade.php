@@ -152,10 +152,17 @@
 
 
     <script>
+        smsData = {
+            "user_id":"{!! $user_id !!}",
+            "user_type":"{!! $user_id !!}"
+        }
         paramet = {};
         $( document ).ready(function() {
             function callbackCourseAnnual(data){
                 $.extend(paramet, data);
+
+
+
 
                 var url = "{!! route('score.input') !!}"+"?filter="+JSON.stringify(paramet);
 
@@ -168,6 +175,10 @@
             };
             function callbackSelecGroup(data){
                 $.extend(paramet, data);
+
+//                if (smsData.userRole = "teacher"){
+                    $.extend(paramet, smsData);
+//                }
                 var shallowEncoded = $.param( paramet );
                 console.log(shallowEncoded);
 

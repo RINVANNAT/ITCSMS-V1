@@ -9,13 +9,13 @@ use App\Models\UserLog;
 use Debugbar;
 use Flash;
 use Response;
-//use Illuminate\Support\Facades\Auth;
 
 use App\Http\Controllers\Controller;
 use App\Repositories\Backend\Score\AbsenceRepository51;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Http\Request;
 use InfyOm\Generator\Controller\AppBaseController;
+use Illuminate\Support\Facades\Auth;
 
 
 class ScoreController extends AppBaseController
@@ -51,6 +51,8 @@ class ScoreController extends AppBaseController
 
             ),
         );
+
+
 		if ($request->has("fillter")){
             $fillterdata= json_decode($request["fillterdata"],true);
 
@@ -135,15 +137,16 @@ class ScoreController extends AppBaseController
 		if ($request->has("filter")){
 			$fillterdata= json_decode($request["filter"],true);
 			$results = $this->scoreRepository->getScoresbyCourse($fillterdata);
-
 			if($request->has("redirect")){
 				return view('backend.score.score_edit_by_course', $results);
 			}else{
 				return view('backend.score.score_edit_by_course_table', $results);
 			}
 		}
+
+        $user_id = Auth::id();
         $studentAnnuals = collect([]);
-		return view('backend.score.score_edit_by_course', compact("studentAnnuals","scoresindex", "scores"));
+		return view('backend.score.score_edit_by_course', compact("studentAnnuals","scoresindex", "scores", 'user_id'));
 	}
 
 	public  function  updateMany(Request $request){
