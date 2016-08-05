@@ -1,6 +1,6 @@
 @extends ('backend.layouts.popup_master')
 
-@section ('title', trans('labels.backend.exams.title') . ' | ' . trans('labels.backend.exams.course.add_course'))
+@section ('title', trans('labels.backend.exams.title') . ' | ' . 'Request Input Score Form')
 
 @section('content')
     <style>
@@ -126,9 +126,7 @@
 
 
        $('#btn_cancel_request_input').on('click', function() {
-           window.onunload = function() {
-//               candidate_window.close();
-           };
+           window.close();
        });
 
 

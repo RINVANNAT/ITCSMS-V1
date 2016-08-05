@@ -642,7 +642,8 @@ class ExamController extends Controller
         usort($candidateResult, array($this, "sortCandidateRank"));
 
         if($passedCandidates + $reservedCandidates > count($candidateResult)) {
-            return \Illuminate\Http\Response::json(array('status'=>false,'message'=>'There are not enough candidates!'));
+            return Response::json(array('status'=>false,'message'=>'There are not enough candidates!'));
+
         } else {
             for($index =0; $index < $passedCandidates; $index++) {
                 $pass = $this->updateCandidateResultScore($candidateResult[$index]->candidate_id,$candidateResult[$index]->total_score, 'Pass' );

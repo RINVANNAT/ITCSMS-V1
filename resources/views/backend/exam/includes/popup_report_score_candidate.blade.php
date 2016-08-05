@@ -1,6 +1,6 @@
 @extends ('backend.layouts.popup_master')
 
-@section ('title', trans('labels.backend.exams.title') . ' | ' . trans('labels.backend.exams.course.add_course'))
+@section ('title', trans('labels.backend.exams.title') . ' | ' . 'Report Candidates Score Error')
 
 @section('content')
 
@@ -10,6 +10,12 @@
         }
         .equal{
             color: darkgreen;
+        }
+        .enlarge-number{
+            font-size: 20px;
+        }
+        .number_only{
+            border: 1px solid black;
         }
     </style>
     <div class="box box-success">
@@ -41,10 +47,10 @@
                                 <label for="order"> Order </label>
                             </div>
                             <div class="col-sm-2  no-padding ">
-                                <label for="Wrong Answer"> Correct Answer </label>
+                                <label for="Wrong Answer"> Correct  </label>
                             </div>
                             <div class="col-sm-2  no-padding ">
-                                <label for="Wrong Answer"> Wrong Answer </label>
+                                <label for="Wrong Answer"> Wrong  </label>
                             </div>
                             <div class="col-sm-2  no-padding">
                                 <label for="NA">No Answer </label>
@@ -68,31 +74,31 @@
 
                             <div class="box-body with-border" id="correction_score_<?php echo $k;?>">
 
-                                <div class="col-sm-12">
+                                <div class="col-sm-12" style="background-color: #F5EAEC; padding-top: 5px;">
 
                                     @foreach($errorScoreProperties->scoreErrors as $errorScore)
                                         <?php  $p++; ?>
 
-                                            <div class="col-sm-2">
+                                            <div class="col-sm-2 enlarge-number">
                                                 <p > {{$errorScoreProperties->candidateProperties->room_code}} </p>
                                             </div>
-                                            <div class="col-sm-1">
+                                            <div class="col-sm-1 enlarge-number">
                                                 <p >{{$errorScore->candidate_number_in_room}}</p>
                                             </div>
                                             <div class="col-sm-2">
-                                                <p class="score_c_<?php echo $k;?>" id="score_c_<?php echo $k.'_'.$p;?>">{{$errorScore->score_c}}</p>
+                                                <p class="score_c_<?php echo $k;?> enlarge-number" id="score_c_<?php echo $k.'_'.$p;?>">{{$errorScore->score_c}}</p>
                                             </div>
                                             <div class="col-sm-2">
-                                                <p class="score_w_<?php echo $k;?>" id="score_w_<?php echo $k.'_'.$p;?>" >{{$errorScore->score_w}}</p>
+                                                <p class="score_w_<?php echo $k;?> enlarge-number" id="score_w_<?php echo $k.'_'.$p;?>" >{{$errorScore->score_w}}</p>
                                             </div>
                                             <div class="col-sm-2">
-                                                <p class="score_na_<?php echo $k;?>" id="score_na_<?php echo $k.'_'.$p;?>" >{{$errorScore->score_na}}</p>
+                                                <p class="score_na_<?php echo $k;?> enlarge-number" id="score_na_<?php echo $k.'_'.$p;?>" >{{$errorScore->score_na}}</p>
                                             </div>
                                             <div class="col-sm-1">
-                                                <p class="score_total_<?php echo $k;?>" id="score_total_<?php echo $k.'_'.$p;?>">{{$errorScore->score_c + $errorScore->score_w + $errorScore->score_na}}</p>
+                                                <p class="score_total_<?php echo $k;?> enlarge-number" id="score_total_<?php echo $k.'_'.$p;?>">{{$errorScore->score_c + $errorScore->score_w + $errorScore->score_na}}</p>
                                             </div>
                                             <div class="col-sm-1">
-                                                <p class="socre_properties_<?php echo $k;?>" style="border: 2px solid orangered; text-align: center"> {{$errorScore->sequence}}</p>
+                                                <p class="socre_properties_<?php echo $k;?> enlarge-number" style="border: 2px solid orangered; text-align: center"> {{$errorScore->sequence}}</p>
                                             </div>
 
                                     @endforeach
@@ -100,53 +106,51 @@
 
                                         <?php array_push($length,$p)?>
                                         <div class="col-sm-1">
-                                            <button class="btn-xs btn_add_new_correction_score"  onclick="AddNewCorrection(<?php echo $k;?>)"> Add </button>
+                                            <button class="btn-xs btn_add_new_correction_score "  onclick="AddNewCorrection(<?php echo $k;?>)"> Add </button>
                                         </div>
                                 </div>
                             </div>
 
-                            <div id="new_correction_score_<?php echo $k;?>" class="col-sm-12">
 
-                                <div class="col-sm-2">
+                            <div id="new_correction_score_<?php echo $k;?>" class="col-sm-12 " style="background-color: #F5EAEC">
+
+                                <div class="col-sm-2 enlarge-number">
                                     <label for="order">{{$errorScoreProperties->candidateProperties->room_code}}</label>
                                     {!! Form::hidden('candidate_score_id_'."[candidate_id]", $errorScoreProperties->candidateProperties->candidate_id, ['class' => 'form-control', 'id'=>'candidate_id_'.$k ]) !!}
 
                                 </div>
 
-                                <div class="col-sm-1" >
+                                <div class="col-sm-1 enlarge-number" >
                                     <label for="roomCode">{{$errorScore->candidate_number_in_room}}</label>
                                     {!! Form::hidden('candidate_score_id_'."[order]", $errorScore->candidate_number_in_room, ['class' => 'form-control', 'id'=>'ordering_id_'.$k]) !!}
                                 </div>
                                 <div class="col-sm-2">
-                                    {!! Form::text('candidate_score_id_'."[score_c]", null, ['class' => 'form-control', 'id'=>'correct_'.$k]) !!}
+                                    {!! Form::text('candidate_score_id_'."[score_c]", null, ['class' => 'form-control number_only enlarge-number validate_score_'.$k, 'id'=>'correct_'.$k]) !!}
 
                                 </div>
                                 <div class="col-sm-2">
-                                    {!! Form::text('candidate_score_id_'."[score_w]", null, ['class' => 'form-control', 'id'=>'wrong_'.$k]) !!}
+                                    {!! Form::text('candidate_score_id_'."[score_w]", null, ['class' => 'form-control number_only enlarge-number validate_score_'.$k, 'id'=>'wrong_'.$k]) !!}
 
                                 </div>
                                 <div class="col-sm-2">
-                                    {!! Form::text('candidate_score_id_'."[score_na]", null, ['class' => 'form-control', 'id'=>'na_'.$k]) !!}
+                                    {!! Form::text('candidate_score_id_'."[score_na]", null, ['class' => 'form-control number_only enlarge-number validate_score_'.$k, 'id'=>'na_'.$k]) !!}
                                     {!! Form::hidden('candidate_score_id_'."[course_id]", $errorScore->course_id, ['class' => 'form-control', 'id'=>'course_id_'.$k]) !!}
                                 </div>
 
                                 <div class="col-sm-1">
-                                    {!! Form::text('candidate_score_id_'."[score_total]", null, ['class' => 'form-control', 'id'=>'toal_'.$k]) !!}
+                                    {!! Form::text('candidate_score_id_'."[score_total]", null, ['class' => 'form-control enlarge-number total_score_'.$k, 'disabled', 'id'=>'total_score_'.$k]) !!}
                                 </div>
 
-                                <div class="col-sm-1 ">
+                                <div class="col-sm-1 enlarge-number ">
                                         <p style="border: 2px solid orangered; text-align: center" > {{$errorScore->sequence + 1}}</p>
                                         {!! Form::hidden('candidate_score_id_'."[sequence]", $errorScore->sequence + 1, ['class' => 'form-control', 'id'=>'new_sequence_'.$k ]) !!}
                                 </div>
 
-                                <div class="col-sm-1 no-padding" >
-                                    <div class="col-sm-6">
-                                        <button class="btn btn-primary btn-xs" id="save_correction_<?php echo $k;?>"> save </button>
+                                <div class="col-sm-1 " style="margin-top: 5px" >
 
-                                    </div>
-                                    <div class="col-sm-6">
-                                        <button class="btn btn-primary btn-xs" id="cancel_correction_<?php echo $k;?>"> cancel </button>
-                                    </div>
+                                        <button class="btn btn-info btn-xs " id="save_correction_<?php echo $k;?>"> <i class="fa fa-save"> </i> </button>
+
+                                        <button class="btn btn-danger btn-xs " id="cancel_correction_<?php echo $k;?>"><i class="fa fa-times"> </i> </button>
 
 
                                 </div>
@@ -182,6 +186,16 @@
    {{--here my script --}}
 
    <script>
+       $(document).ready(function () {
+
+           $(".number_only").keypress(function (e) {
+               if (e.which != 8 && e.which != 0 && (e.which < 48 || e.which > 57)) {
+                   return false;
+               }
+           });
+
+       });
+
        var length = JSON.parse('<?php echo $k ?>');
        for(var i =1; i <=length; i++) {
            $('#new_correction_score_'+i).hide();
@@ -219,6 +233,13 @@
                }
            });
 
+           $('.validate_score_'+key).on('keydown keyup', function() {
+               console.log(key);
+               calculateSum(key);
+           });
+
+
+
        }
 
        function ajaxRequest(method, baseUrl, baseData){
@@ -239,9 +260,28 @@
            window.close();
        });
 
+       function calculateSum(k) {
+           console.log('call me ');
+               var sum =0;
+               $(".validate_score_"+k).each(function() {
+                   if (!isNaN(this.value) && this.value.length != 0) {
+                       sum += parseInt(this.value);
+                       console.log(sum);
+                       $(this).css("background-color", "#FEFFB0");
+                       if(sum == 30) {
+                           $("input#total_score_"+k).val(sum).css("color", "");
+
+                       } else {
+                           $("input#total_score_"+k).val(sum).css("color", "red");
+                       }
+                   }
+                   else if (this.value.length != 0){
+                       $(this).css("background-color", "red");
+                   }
+               });
+       }
+
         var scoreLength = JSON.parse('<?php echo $p?>');
-
-
        var arrayIds = JSON.parse('<?php echo json_encode($length);?>');
 //        console.log(arrayIds.length);
 
@@ -249,14 +289,6 @@
            var scoreCorrect = $(".score_c_"+i).map(function(){return $(this).text();}).get();
            var scoreWrong = $(".score_w_"+i).map(function(){return $(this).text();}).get();
            var scoreNoan = $(".score_na_"+i).map(function(){return $(this).text();}).get();
-
-//                console.log(scoreCorrect);
-               compareScore(scoreCorrect,i);
-//               compareScore(scoreWrong,$("#score_w_"+i+'_'));
-//               compareScore(scoreNoan,$("#score_na_"+i+'_'));
-
-
-//           console.log(scoreCorrect);
 
        }
 

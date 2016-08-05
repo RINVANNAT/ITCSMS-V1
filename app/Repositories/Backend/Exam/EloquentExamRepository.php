@@ -195,7 +195,7 @@ class EloquentExamRepository implements ExamRepositoryContract
                                     ])->select('score_c', 'score_w', 'score_na', 'sequence', 'candidateEntranceExamScores.id as candidate_score_id')->get();
             array_push($mergedObjects, (object) array('candidateProperties' => $candidate, 'scoreProperties' => $candidateExamScore) );
         }
-
+        usort($mergedObjects, array($this, "sortObject"));
         foreach ($mergedObjects as $mergedObject) {
 
             if($mergedObject->scoreProperties) {
@@ -235,7 +235,14 @@ class EloquentExamRepository implements ExamRepositoryContract
                 array_push($candidateScoreForm, $element);
             }
         }
+
+//        dd($candidateScoreForm);
         return $candidateScoreForm;
+    }
+
+    private function sortObject($a, $b)
+    {
+        return $a->candidateProperties->register_id - $b->candidateProperties->register_id;
     }
 
     public function insertCandidateScore($exam_id, $requestDatas) {
@@ -264,7 +271,6 @@ class EloquentExamRepository implements ExamRepositoryContract
 
         $empty = '';
         $status = 0;
-
         for($i = 1; $i <= count($requestDatas)-1; $i++) {
 
             $eachCandidateScore = $requestDatas['candidate_score_id_'.$i]['score_id'];
@@ -276,12 +282,7 @@ class EloquentExamRepository implements ExamRepositoryContract
             $noAns = $requestDatas['candidate_score_id_'.$i]['na'];
 
             if($eachCandidateScore == $empty) {
-
-                if((int)$correctAns === 0 && (int)$wrongAns === 0 && (int)$noAns ===0 ) {
-
-                    continue;
-                } else {
-
+                if($correctAns != null || $wrongAns != null  || $noAns !=null ) {
                     $insertResult = $this->storeCandidateScore($subjectId, $candidateId, $correctAns, $wrongAns, $noAns, $numberCorrection, $i);
 
                     if($insertResult) {
@@ -415,9 +416,11 @@ class EloquentExamRepository implements ExamRepositoryContract
                     $tmpTotalQuestion = $cadidateScores[$i]->total_question;
 
                     for ($j = $length-1; $j > $i ; $j--) {
+
                         if ($tmpScoreCorrect == $cadidateScores[$j]->score_c && $tmpScoreWrong == $cadidateScores[$j]->score_w && $tmpScoreNA == $cadidateScores[$j]->score_na) {
+
                             if( ($tmpScoreCorrect + $tmpScoreWrong + $tmpScoreNA) == $tmpTotalQuestion && $cadidateScores[$j]->score_c + $cadidateScores[$j]->score_w + $cadidateScores[$j]->score_na == $cadidateScores[$j]->total_question ||
-                                ($tmpScoreCorrect + $tmpScoreWrong + $tmpScoreNA) == $tmpTotalQuestion && $cadidateScores[$j]->score_c + $cadidateScores[$j]->score_w + $cadidateScores[$j]->score_na == 0) {
+                                ($tmpScoreCorrect + $tmpScoreWrong + $tmpScoreNA) == 0 && $cadidateScores[$j]->score_c + $cadidateScores[$j]->score_w + $cadidateScores[$j]->score_na == 0) {
 
                                 $statusCorrectScore++;
 

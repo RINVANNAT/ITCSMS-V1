@@ -1,6 +1,6 @@
 @extends ('backend.layouts.popup_master')
 
-@section ('title', trans('labels.backend.exams.title') . ' | ' . trans('labels.backend.exams.course.add_course'))
+@section ('title', trans('labels.backend.exams.title') . ' | ' . 'Form Input Candidates Scores')
 
 @section('content')
 
