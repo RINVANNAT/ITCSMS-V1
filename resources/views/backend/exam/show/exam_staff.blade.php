@@ -41,9 +41,11 @@
 
                     <div class="col-md-12 no-padding">
                         <div class="col-md-12 no-padding" style="margin-bottom: 5px;">
+                            @permission('modify-exam-staff')
                             <button class="btn btn-sm btn-info pull-right" id="btn_add_role">Modify Group Role</button>
-                            <button class="btn btn-sm btn-danger pull-righ" style="float: right;" id="btn_delete_node">Delete Role</button>
-                            <button class="btn btn-sm btn-default pull-righ" style="float: right; margin-right: 5px;" id="btn_move_node" onclick="clickAddRole( $('.popUpRoleDown'));">Change Role</button>
+                            <button class="btn btn-sm btn-danger pull-right" style="float: right;" id="btn_delete_node">Delete Role</button>
+                            <button class="btn btn-sm btn-default pull-right" style="float: right; margin-right: 5px;" id="btn_move_node" onclick="clickAddRole( $('.popUpRoleDown'));">Change Role</button>
+                            @endauth
                         </div>
                         <div class=" popUpRoleDown col-md-12 no-padding " style="display:none;">
                             <div class="col-md-10 " style="padding-left: 0px !important">

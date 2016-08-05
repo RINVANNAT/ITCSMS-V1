@@ -534,7 +534,7 @@ class ExamController extends Controller
 
 
         $errorCandidateScores = $this->exams->reportErrorCandidateExamScores($exam_id, $request->course_id);
-        return view('backend.exam.includes.popup_report_score_candidate', compact('exam_id', 'errorCandidateScores'));
+        return view('backend.exam.includes.popup_report_error_score_candidate', compact('exam_id', 'errorCandidateScores'));
 
     }
 
@@ -574,7 +574,10 @@ class ExamController extends Controller
                 }
             }
             if($errorStatus !== false){
-                dd('there is at least one error of candidate score');
+
+                return view('backend.exam.includes.error_popup_message')->with(['message'=>'There is an existing score error']);
+
+
             } else{
                 return view('backend.exam.includes.popup_get_form_result_score', compact('exam_id', 'courseIds'));
             }
@@ -641,13 +644,15 @@ class ExamController extends Controller
         }
         usort($candidateResult, array($this, "sortCandidateRank"));
 
+        $candidateIds = [];
+
         if($passedCandidates + $reservedCandidates > count($candidateResult)) {
             return Response::json(array('status'=>false,'message'=>'There are not enough candidates!'));
 
         } else {
             for($index =0; $index < $passedCandidates; $index++) {
                 $pass = $this->updateCandidateResultScore($candidateResult[$index]->candidate_id,$candidateResult[$index]->total_score, 'Pass' );
-
+                array_push($candidateIds,$candidateResult[$index]->candidate_id);
                 if($pass) {
                     $checkPass++;
                 }
@@ -655,6 +660,7 @@ class ExamController extends Controller
             for($index=$passedCandidates; $index < count($candidateResult); $index++) {
 
                 $reserve = $this->updateCandidateResultScore($candidateResult[$index]->candidate_id,$candidateResult[$index]->total_score, 'Reserve' );
+                array_push($candidateIds,$candidateResult[$index]->candidate_id);
                 if($reserve) {
                     $checkReserve++;
                 }
@@ -662,16 +668,29 @@ class ExamController extends Controller
             for($index=$passedCandidates + $reservedCandidates; $index < count($candidateResult); $index++) {
 
                 $fail = $this->updateCandidateResultScore($candidateResult[$index]->candidate_id,$candidateResult[$index]->total_score, 'Fail' );
+                array_push($candidateIds,$candidateResult[$index]->candidate_id);
                 if($fail) {
                     $checkFail++;
                 }
+            }
+
+            $nonExamingCandidateIds = DB::table('candidates')->select('candidates.id as candidate_id')
+                ->whereNotIn('candidates.id', $candidateIds)
+                ->get();
+
+            foreach($nonExamingCandidateIds as $nonExamingCandidateId) {
+                $fail = $this->updateCandidateResultScore($nonExamingCandidateId->candidate_id,0, 'Fail' );
             }
         }
 
         if($checkPass != 0 || $checkReserve != 0 || $checkFail != 0) {
 //            dd('hello');
 
-            return Response::json(array('status'=>true,'message'=>'Success For Updating Candidates Result!'));
+//            return Response::json(array('status'=>true,'message'=>'Success For Updating Candidates Result!'));
+
+            $candidatesResults = DB::table('candidates')->select('name_kh','result','total_score', 'id')->get();
+            usort($candidatesResults, array($this, "sortCandidateRank"));
+            dd($candidatesResults);
         }
     }
 
