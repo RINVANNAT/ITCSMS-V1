@@ -26,6 +26,8 @@
         }
         table th, table td {
             text-align: center;
+            padding-top: 3px !important;
+            padding-bottom: 3px !important;
         }
 
         .table-bordered > thead > tr > th,
@@ -34,7 +36,18 @@
         .table-bordered > thead > tr > td,
         .table-bordered > tbody > tr > td,
         .table-bordered > tfoot > tr > td {
-            border:2px solid #000000;
+            border:2px solid #000000 !important;
+        }
+
+        @media print{
+            .table-bordered > thead > tr > th,
+            .table-bordered > tbody > tr > th,
+            .table-bordered > tfoot > tr > th,
+            .table-bordered > thead > tr > td,
+            .table-bordered > tbody > tr > td,
+            .table-bordered > tfoot > tr > td {
+                border:2px solid #000000 !important;
+            }
         }
     </style>
 @endsection
@@ -78,7 +91,7 @@
                        Nom du correcteur: .................................
                    </div>
 
-                    <table class="table table-bordered" width="100%">
+                    <table class="table table-bordered" width="100%" style="table-layout: fixed;height: 100%">
                         <tr>
                             <th>Numero</th>
                             <th>Bon</th>

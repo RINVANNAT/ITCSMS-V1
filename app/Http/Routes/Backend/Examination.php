@@ -25,6 +25,7 @@ Route::group([], function() {
     Route::get('exams/{id}/download_candidate_list', 'ExamController@download_candidate_list')->name('admin.exam.download_candidate_list');
     Route::get('exams/{id}/download_room_sticker', 'ExamController@download_room_sticker')->name('admin.exam.download_room_sticker');
     Route::get('exams/{id}/download_correction_sheet', 'ExamController@download_correction_sheet')->name('admin.exam.download_correction_sheet');
+    Route::get('exams/{id}/download_candidate_list_by_register_id', 'ExamController@download_candidate_list_by_register_id')->name('admin.exam.download_candidate_list_by_register_id');
 
 
 //-------------Vannat
@@ -39,6 +40,12 @@ Route::group([], function() {
 
 
     Route::post('exams/{id}/add_new_correction_score', 'ExamController@addNewCorrectionScore')->name('admin.exam.add_new_correction_score');
+
+    Route::get('exams/{id}/candidate_exam_result_score', 'ExamController@candidateResultExamScores')->name('admin.exam.candidate_exam_result_score');
+
+    Route::post('exams/{id}/candidate_calculatioin_exam_score', 'ExamController@calculateCandidateScores')->name('admin.exam.candidate_calculatioin_exam_score');
+
+
 
 
     Route::get('exams/{id}/candidate_generate_room', 'ExamController@generate_room')->name('admin.exam.candidate.generate_room');

@@ -2,6 +2,21 @@
 @section('title')
     ITC-SMS | បញ្ជីវត្តមានបេក្ខជន⁣
 @stop
+
+@section('after-styles-end')
+    <style>
+
+        .left{
+            text-align: left;
+        }
+
+        table th, table td {
+            text-align: center;
+            padding-top: 3px !important;
+            padding-bottom: 3px !important;
+        }
+    </style>
+@stop
 @section('content')
     <?php
         $page_number = 1;
@@ -10,7 +25,7 @@
     @foreach($courses as $course)
         @foreach($rooms as $room)
             <div class="page">
-                <h3>បញ្ជីវត្តមានបេក្ខជន⁣ បន្ទប់ {{$room->name}} <span class="pull-right">{{$course->name_kh}}</span></h3>
+                <h3>បញ្ជីវត្តមានបេក្ខជន⁣ បន្ទប់ {{$room->name." ".$room->building->code}} <span class="pull-right">{{$course->name_kh}}</span></h3>
 
                 <table class="table" width="100%">
                     <tr>
@@ -25,12 +40,13 @@
                     <?php
                     $index = 1;
                     ?>
-                    @foreach($room->candidates as $candidate)
+                    @foreach($room->candidates()->with('gender')->orderBy('register_id')->get() as $candidate)
+
                         <tr>
                             <td>{{$index}}</td>
-                            <td>{{$candidate->register_id}}</td>
-                            <td>{{$candidate->name_kh}}</td>
-                            <td>{{$candidate->name_latin}}</td>
+                            <td>{{str_pad($candidate->register_id, 4, '0', STR_PAD_LEFT)}}</td>
+                            <td class="left">{{$candidate->name_kh}}</td>
+                            <td class="left">{{$candidate->name_latin}}</td>
                             <td>{{$candidate->gender->code}}</td>
                             <td>{{$candidate->dob->toFormattedDateString()}}</td>
                             <td></td>

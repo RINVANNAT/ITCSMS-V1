@@ -14,6 +14,13 @@
         h2{
             font-weight: 900;
         }
+
+        @media print{
+            .page{
+                padding: 10mm !important;
+                margin: 0mm auto !important;
+            }
+        }
     </style>
 @endsection
 @section('content')
@@ -24,11 +31,11 @@
     @foreach($rooms as $room)
         <div class="page">
 
-            @foreach($room->candidates as $candidate)
+            @foreach($room->candidates()->orderBy('register_id')->get() as $candidate)
                 <div class="col-md-3 col-sm-3 col-xs-3 sticker">
                     <div class="col-md-12 col-sm-12 col-xs-12 border">
-                        <center><h2>{{$candidate->register_id}}</h2></center>
-                        <span>{{$room->name}}</span>
+                        <center><h2>{{str_pad($candidate->register_id, 4, '0', STR_PAD_LEFT)}}</h2></center>
+                        <span>{{$room->name." ".$room->building->code}}</span>
                     </div>
                 </div>
             @endforeach

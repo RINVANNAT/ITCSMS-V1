@@ -71,4 +71,6 @@ interface ExamRepositoryContract
     public function insertCandidateScore($exam_id, $requestDatas);
 
     public function addNewCorrectionCandidateScore($examId, StoreEntranceExamScoreRequest $request);
+
+    public function reportErrorCandidateExamScores($examId, $request);
 }

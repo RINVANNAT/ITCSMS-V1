@@ -23,7 +23,7 @@
             <h3 class="box-title">{{ trans('labels.backend.candidates.sub_create_title') }}</h3>
         </div><!-- /.box-header -->
 
-        <div class="box-body">
+        <div class="box-body" style="background-color: #ddd !important;">
             @include('backend.candidate.fields')
         </div><!-- /.box-body -->
     </div><!--box-->
