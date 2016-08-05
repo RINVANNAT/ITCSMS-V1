@@ -206,7 +206,6 @@
             var urlacademic = ["{!! route('academicYears.api.v1') !!}"];
             function callbackAcademic(data){
                 console.log("in Academic callback");
-                console.log("testxxx:");
                 console.log(data);
                 $.extend(paramet, data);
 
@@ -227,31 +226,21 @@
                         toggleLoading(false);
                     });
                 }
-                console.log("count2:"+count);
             };
 
             var filter2 = new SMSFILERLONGo(urlacademic,callbackAcademic,"#selectacademic");
-
             var urlsemester = ["{!! route('semesters.api.v1') !!}"];
             var filter3 = new SMSFILERLONGo(urlsemester,callbackAcademic,"#selectsemester");
-
-
         });
         $(document).on("submit","#scoreform", function(e){
             var self = this;
             e.preventDefault();
             $("#redirectfilter").attr("value",JSON.stringify(paramet));
             self.submit();
-
-            //$(this).attr("href",url+"?redirect=1&fillterdata="+JSON.stringify(paramet));
         });
 
         $(document).on("click","#score-report", function(e){
             $(this).attr("href", this.href + "?redirect=1&filter="+JSON.stringify(paramet));
-
-
-
-            //$(this).attr("href",url+"?redirect=1&fillterdata="+JSON.stringify(paramet));
         });
     </script>
 @endsection

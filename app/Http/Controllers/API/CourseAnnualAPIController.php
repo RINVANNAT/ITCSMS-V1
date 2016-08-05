@@ -69,7 +69,11 @@ class CourseAnnualAPIController extends AppBaseController
 //
 //
         $courseAnnuals = DB::table('course_annuals')
-            ->leftJoin('courses','course_annuals.course_id', '=', 'courses.id')
+            ->join('courses','course_annuals.course_id', '=', 'courses.id')
+            ->select(
+                ['course_annuals.id',
+                    'courses.name_en as name',
+                    'course_annuals.course_id'])
             ->where('course_annuals.degree_id', $filters['degree_id'])
             ->where('course_annuals.grade_id', $filters['grade_id'])
             ->where('course_annuals.department_id', $filters['department_id'])
@@ -81,12 +85,7 @@ class CourseAnnualAPIController extends AppBaseController
             $courseAnnuals->where('course_annuals.employee_id', $employee->id);
         }
 
-        $courseAnnuals = $courseAnnuals->select(
-                ['course_annuals.id',
-                    'courses.name_en as name',
-                    'course_annuals.semester_id as semester',
-
-                    'course_annuals.course_id'])->get();
+        $courseAnnuals = $courseAnnuals->get();
 //
 
 
