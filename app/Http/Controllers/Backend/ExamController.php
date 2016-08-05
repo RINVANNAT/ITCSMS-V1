@@ -517,7 +517,7 @@ class ExamController extends Controller
 
     }
 
-    public function insertScoreForEachCandiate($exam_id) {
+    public function insertScoreForEachCandiate($exam_id, Requests\Backend\Exam\StoreEntranceExamScoreRequest $request) {
 
         $requestDatas = $_POST;
         $candidates = $this->exams->insertCandidateScore($exam_id, $requestDatas);

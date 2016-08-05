@@ -448,7 +448,6 @@ class EloquentExamRepository implements ExamRepositoryContract
 
             }
         }
-//        dd($errorCandidateScores);
         return $errorCandidateScores;
 
     }
