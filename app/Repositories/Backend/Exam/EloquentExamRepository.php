@@ -271,6 +271,7 @@ class EloquentExamRepository implements ExamRepositoryContract
 
         $empty = '';
         $status = 0;
+//        dd(count($requestDatas));
         for($i = 1; $i <= count($requestDatas)-1; $i++) {
 
             $eachCandidateScore = $requestDatas['candidate_score_id_'.$i]['score_id'];

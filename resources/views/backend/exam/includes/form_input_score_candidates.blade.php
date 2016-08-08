@@ -93,15 +93,15 @@
                                 <tr class="enlarge-number">
                                     <td style="text-align: center" class="candidate_score_id">
                                         {!! Form::hidden('candidate_score_id_'.$i."[score_id]", $candidate->candidate_score_id, ['class' => 'form-control']) !!}
-                                        <input type="hidden" name="sequence" value="{{$number_correction}}">
+                                        {{--<input type="hidden" name="sequence" value="{{$number_correction}}">--}}
 
                                         {!! Form::hidden('candidate_score_id_'.$i."[sequence]", $number_correction, ['class' => 'form-control ']) !!}
 
-                                        <input type="hidden" name="candidate_id" value="{{$candidate->candidate_id}}">
+                                        {{--<input type="hidden" name="candidate_id" value="{{$candidate->candidate_id}}">--}}
 
                                         {!! Form::hidden('candidate_score_id_'.$i."[candidate_id]", $candidate->candidate_id, ['class' => 'form-control']) !!}
 
-                                        <input type="hidden" name="course_id" value="{{$subjectId}}">
+                                        {{--<input type="hidden" name="course_id" value="{{$subjectId}}">--}}
 
                                         {!! Form::hidden('candidate_score_id_'.$i."[course_id]", $subjectId, ['class' => 'form-control']) !!}
 
