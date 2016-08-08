@@ -62,6 +62,8 @@ class EloquentDepartmentEmployeeExamPositionRepository extends EloquentTempEmplo
                 ->whereNotIn('employees.id', $employeeWithRoleIds[0])
                 ->select('employees.id', 'employee_position.position_id', 'positions.title')->get();
 
+
+            dd($employeePositions);
             foreach ($employeePositions as $employeePosition) {
 
                 $element = array(
