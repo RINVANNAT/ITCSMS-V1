@@ -153,7 +153,7 @@
                         );
                         $("#new_role").val(null);
                         $("#new_des").val(null);
-                        clickAddRole($('#popUpRole'));
+                        clickAddRole();
                         $('.popUpRole').slideFadeToggle();
 
                     });
@@ -177,9 +177,8 @@
         object2.hide();
     }
 
-    function clickAddRole (object) {
+    function clickAddRole () {
         disableButton($('#btn_delete_node'), $('#btn_move_node') );
-
     }
 
     $.fn.slideFadeToggle = function(easing, callback) {
@@ -199,7 +198,8 @@
 
     $('#btn_cancel_chang_role').on('click', function() {
 
-        clickAddRole($('.popUpRoleDown'));
+        clickAddRole();
+        $('.popUpRoleDown').slideFadeToggle();
         $('#btn_delete_node').show();
         $('#btn_move_node').show();
     })
