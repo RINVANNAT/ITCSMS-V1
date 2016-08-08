@@ -123,7 +123,6 @@ class EloquentDepartmentEmployeeExamPositionRepository extends EloquentTempEmplo
                 "id" => 'staffbyposition_' . $selectedDepartment_id . '_' . $permanentStaffWithPosition->position_id . '_' . $permanentStaffWithPosition->id,
                 "text" => $permanentStaffWithPosition->name_kh,
                 "children" => false,
-                "i_attr" => "{class : fa fa-user}",
                 "type" => "staff"
             );
 
