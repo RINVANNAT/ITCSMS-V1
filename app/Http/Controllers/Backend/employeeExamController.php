@@ -82,10 +82,13 @@ class employeeExamController extends Controller
     public function getPositionByDepartments($id)
     {
         $department_id = explode('_', $_GET['id'])[1];
-//        $department_id=12;
 
         $res = $this->departmentEmployees->getAllPositionByDepartements($department_id, $id);
-        return Response::json($res);
+        $result = [];
+        foreach ($res as $a) {
+            array_push($result, $a);
+        }
+        return Response::json($result);
     }
 
     public function getStaffWithoutRoleByPositions($id)
@@ -95,6 +98,7 @@ class employeeExamController extends Controller
         $selectedDepartment_id = $node_id[1];
 
         $res = $this->departmentEmployees->getAllStaffWithoutRoleByPosition($selectedDepartment_id, $position_id, $role_id = null, $id);
+
         return Response::json($res);
     }
 
@@ -109,6 +113,7 @@ class employeeExamController extends Controller
     public function addNewRole(Request $request)
     {
         $res = $this->tempEmpolyeeExams->create($request);
+
         return $res;
     }
 
