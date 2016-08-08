@@ -50,6 +50,7 @@ class EloquentDepartmentEmployeeExamPositionRepository extends EloquentTempEmplo
         $arrayPositions = [];
         $employeeWithRoleIds = $this->getEmployeeHaveRoleIds($exam_id);
 
+
         $departmentMinistryId = Department::where('name_en','Ministry')
             ->select('name_kh','id')->get();
         $ministryId = $departmentMinistryId->toarray();
@@ -116,7 +117,6 @@ class EloquentDepartmentEmployeeExamPositionRepository extends EloquentTempEmplo
             ->whereNotIn('employees.id', $employeeWithRoleIds[0])
             ->get();
 
-
         foreach ($permanentStaffWithPositions as $permanentStaffWithPosition) {
 
             $element = array(
@@ -128,8 +128,6 @@ class EloquentDepartmentEmployeeExamPositionRepository extends EloquentTempEmplo
 
             array_push($allStaffWithoutRoles, $element);
         }
-
-        dd($allStaffWithoutRoles);
 
         return ($allStaffWithoutRoles);
 

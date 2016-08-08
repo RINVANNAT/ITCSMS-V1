@@ -468,7 +468,7 @@
 
 
             initJsTree_StaffRole($('#all_staff_role'), '{{route('admin.exam.get-all-departements',$exam->id)}}', '{{route('admin.exam.get-all-positions',$exam->id)}}','{{route('admin.exam.get-all-staffs-by-position',$exam->id)}}', iconUrl1, iconUrl2, iconUrl3 );
-            $('#all_staff_role').jstree("load_all");
+//            $('#all_staff_role').jstree("load_all");
 
 
             $('#all_rooms').on("check_node.jstree", function (e, data) {
