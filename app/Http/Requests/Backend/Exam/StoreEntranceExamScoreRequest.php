@@ -33,7 +33,7 @@ class StoreEntranceExamScoreRequest extends Request
             'score_c' => 'integer',
             'score_w' => 'integer',
             'score_na' => 'integer',
-            'sequence' => 'required|unique_with:candidateEntranceExamScores,candidate_id,entrance_exam_course_id',
+            'sequence' => 'required|unique_with:candidateEntranceExamScores,candidate_id,course_id',
 
         ];
     }
