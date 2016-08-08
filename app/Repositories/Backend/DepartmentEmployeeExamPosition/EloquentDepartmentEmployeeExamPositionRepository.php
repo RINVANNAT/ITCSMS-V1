@@ -63,7 +63,7 @@ class EloquentDepartmentEmployeeExamPositionRepository extends EloquentTempEmplo
                 ->select('employees.id', 'employee_position.position_id', 'positions.title')->get();
 
 
-            dd($employeePositions);
+
             foreach ($employeePositions as $employeePosition) {
 
                 $element = array(
@@ -74,6 +74,8 @@ class EloquentDepartmentEmployeeExamPositionRepository extends EloquentTempEmplo
                 );
                 array_push($arrayPositions, $element);
             }
+
+            dd($arrayPositions);
         } else {
 
             $temporaryEmployeeWithoutRoles = TempEmployee::whereNotIn('tempEmployees.id',$employeeWithRoleIds[1] )
