@@ -248,7 +248,7 @@ class EloquentExamRepository implements ExamRepositoryContract
     public function insertCandidateScore($exam_id, $requestDatas) {
 
 
-        $numberCorrection = $requestDatas['candidate_score_id_1']['number_correction'];
+        $numberCorrection = $requestDatas['candidate_score_id_1']['sequence'];
 
         if($numberCorrection == '1') {
 
@@ -276,7 +276,7 @@ class EloquentExamRepository implements ExamRepositoryContract
             $eachCandidateScore = $requestDatas['candidate_score_id_'.$i]['score_id'];
 
             $candidateId = $requestDatas['candidate_score_id_'.$i]['candidate_id'];
-            $subjectId = $requestDatas['candidate_score_id_'.$i]['subject_id'];
+            $subjectId = $requestDatas['candidate_score_id_'.$i]['course_id'];
             $correctAns = $requestDatas['candidate_score_id_'.$i]['correct'];
             $wrongAns = $requestDatas['candidate_score_id_'.$i]['wrong'];
             $noAns = $requestDatas['candidate_score_id_'.$i]['na'];
