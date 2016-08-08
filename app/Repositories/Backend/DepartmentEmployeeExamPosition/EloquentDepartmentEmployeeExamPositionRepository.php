@@ -74,8 +74,6 @@ class EloquentDepartmentEmployeeExamPositionRepository extends EloquentTempEmplo
                 );
                 array_push($arrayPositions, $element);
             }
-
-            dd($arrayPositions);
         } else {
 
             $temporaryEmployeeWithoutRoles = TempEmployee::whereNotIn('tempEmployees.id',$employeeWithRoleIds[1] )
@@ -118,6 +116,7 @@ class EloquentDepartmentEmployeeExamPositionRepository extends EloquentTempEmplo
             ->whereNotIn('employees.id', $employeeWithRoleIds[0])
             ->get();
 
+
         foreach ($permanentStaffWithPositions as $permanentStaffWithPosition) {
 
             $element = array(
@@ -130,6 +129,8 @@ class EloquentDepartmentEmployeeExamPositionRepository extends EloquentTempEmplo
 
             array_push($allStaffWithoutRoles, $element);
         }
+
+        dd($allStaffWithoutRoles);
 
         return ($allStaffWithoutRoles);
 
