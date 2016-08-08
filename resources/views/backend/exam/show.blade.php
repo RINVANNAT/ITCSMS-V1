@@ -640,7 +640,6 @@
             if(baseData.staff_ids !== '[]') {
                 console.log(baseData);
                 ajaxRequest('PUT',changeNodeUrl, baseData);
-                clickAddRole();
                 $('.popUpRoleDown').slideFadeToggle();
                 $('#btn_delete_node').show();
                 $('#btn_move_node').show();
