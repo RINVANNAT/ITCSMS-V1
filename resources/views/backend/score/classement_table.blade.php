@@ -32,10 +32,10 @@
             <th><span id="abs_total" toggle="0">Abs Total</span> </th>
             <template v-for="courseAnnual in courseAnnuals" >
                 <th>
-                    @{{ courseAnnual.credit }}
+                    Abs
                 </th>
                 <th>
-                    Abs
+                    @{{ courseAnnual.credit }}
                 </th>
             </template>
             <th> </th>

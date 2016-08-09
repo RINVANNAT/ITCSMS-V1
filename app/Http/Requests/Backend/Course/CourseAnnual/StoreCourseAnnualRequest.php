@@ -1,6 +1,4 @@
-<?php
-
-namespace App\Http\Requests\Backend\Configuration\CourseAnnual;
+<?php namespace App\Http\Requests\Backend\Course\CourseAnnual;
 
 use App\Http\Requests\Request;
 
@@ -28,8 +26,7 @@ class StoreCourseAnnualRequest extends Request
     public function rules()
     {
         return [
-            'name' => 'max:255',
-            'semester' => 'required',
+            'semester_id' => 'required',
             'academic_year_id' => 'required',
             'department_id' => 'required',
             'degree_id' => 'required',

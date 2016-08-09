@@ -58,6 +58,10 @@ class ScoreController extends AppBaseController
 
             $result =  $this->scoreRepository->getScores($fillterdata);
             $courseAnnuals = $result["courseAnnuals"];
+
+            if(count($courseAnnuals)==0){
+                Flash::error('No course, Please create course in group before view ranking');
+            }
             $studentAnnuals = $result["studentAnnuals"];
             $scoresindex = $result["scoresindex"];
             $scores = $result["scores"];

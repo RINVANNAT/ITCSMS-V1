@@ -57,16 +57,20 @@ class EloquentCourseAnnualRepository implements CourseAnnualRepositoryContract
      */
     public function create($input)
     {
-        if (CourseAnnual::where('name', $input['name'])->first()) {
-            throw new GeneralException(trans('exceptions.backend.general.already_exists'));
-        }
-
         $courseAnnual = new CourseAnnual();
+        $courseAnnual->course_id = $input['course_id'];
+        $courseAnnual->employee_id = isset($input['employee_id'])?true:false;
+        $courseAnnual->academic_year_id = $input['academic_year_id'];
+        $courseAnnual->semester_id = $input['semester_id'];
 
-        $courseAnnual->name = $input['name'];
+        $courseAnnual->grade_id = $input['grade_id'];
+        $courseAnnual->degree_id = $input['degree_id'];
+        $courseAnnual->department_id = $input['department_id'];
+
         $courseAnnual->active = isset($input['active'])?true:false;
         $courseAnnual->created_at = Carbon::now();
         $courseAnnual->create_uid = auth()->id();
+
 
         if ($courseAnnual->save()) {
             return true;

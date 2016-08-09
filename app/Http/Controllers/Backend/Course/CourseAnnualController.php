@@ -1,25 +1,26 @@
 <?php namespace App\Http\Controllers\Backend\Course;
 
 use App\Http\Controllers\Controller;
-use App\Http\Requests\Backend\Configuration\CourseAnnual\CreateCourseAnnualRequest;
-use App\Http\Requests\Backend\Configuration\CourseAnnual\DeleteCourseProgramRequest;
-use App\Http\Requests\Backend\Configuration\CourseAnnual\EditCourseProgramRequest;
-use App\Http\Requests\Backend\Configuration\CourseAnnual\StoreCourseProgramRequest;
-use App\Http\Requests\Backend\Configuration\CourseAnnual\UpdateCourseProgramRequest;
+use App\Http\Requests\Backend\Course\CourseAnnual\CreateCourseAnnualRequest;
+use App\Http\Requests\Backend\Course\CourseAnnual\DeleteCourseAnnualRequest;
+use App\Http\Requests\Backend\Course\CourseAnnual\EditCourseAnnualRequest;
+use App\Http\Requests\Backend\Course\CourseAnnual\StoreCourseAnnualRequest;
+use App\Http\Requests\Backend\Course\CourseAnnual\UpdateCourseAnnualRequest;
 use App\Models\AcademicYear;
 use App\Models\Course;
 use App\Models\Degree;
 use App\Models\Department;
+use App\Models\Employee;
 use App\Models\Grade;
 use App\Repositories\Backend\CourseAnnual\CourseAnnualRepositoryContract;
 use Illuminate\Support\Facades\DB;
-
 use App\Http\Requests\Backend\Course\CourseAnnual\ImportCourseRequest;
 use App\Http\Requests\Backend\Course\CourseAnnual\RequestImportCourseRequest;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Maatwebsite\Excel\Facades\Excel;
 use App\Models\CourseAnnual;
+use App\Models\Semester;
 
 
 
@@ -65,12 +66,14 @@ class CourseAnnualController extends Controller
     public function create(CreateCourseAnnualRequest $request)
     {
         $departments = Department::lists('name_kh','id')->toArray();
-        $academicYears = AcademicYear::lists('name_kh','id')->orderBy('id')->toArray();
+        $academicYears = AcademicYear::lists('name_kh','id')->toArray();
         $degrees = Degree::lists('name_kh','id')->toArray();
         $grades = Grade::lists('name_kh','id')->toArray();
         $courses = Course::lists('name_kh','id')->toArray();
+        $semesters = Semester::lists("name_kh", "id");
+        $employees = Employee::lists("name_kh","id");
 
-        return view('backend.course.courseAnnual.create',compact('departments','academicYears','degrees','grades','courses'));
+        return view('backend.course.courseAnnual.create',compact('departments','academicYears','degrees','grades','courses',"semesters","employees"));
     }
 
     /**
@@ -79,10 +82,12 @@ class CourseAnnualController extends Controller
      * @param  StoreCourseProgramRequest $request
      * @return \Illuminate\Http\Response
      */
-    public function store(StoreCourseProgramRequest $request)
+
+    public function store(StoreCourseAnnualRequest $request)
     {
-        $this->courseAnnuals->create($request->all());
-        return redirect()->route('admin.course.courseAnnuals.index')->withFlashSuccess(trans('alerts.backend.general.created'));
+        $data = $request->all();
+        $this->courseAnnuals->create($data);
+        return redirect()->route('backend.course.courseAnnual.index')->withFlashSuccess(trans('alerts.backend.general.created'));
     }
 
     /**
@@ -103,7 +108,7 @@ class CourseAnnualController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function edit(EditCourseProgramRequest $request, $id)
+    public function edit(EditCourseAnnualRequest $request, $id)
     {
         $courseAnnual = $this->courseAnnuals->findOrThrowException($id);
 
@@ -112,7 +117,11 @@ class CourseAnnualController extends Controller
         $degrees = Degree::lists('name_kh','id')->toArray();
         $grades = Grade::lists('name_kh','id')->toArray();
         $courses = Course::lists('name_kh','id')->toArray();
-        return view('backend.course.courseAnnual.edit',compact('courseAnnual','departments','academicYears','degrees','grades','courses'));
+        $semesters = Semester::lists("name_kh", "id");
+        $employees = Employee::lists("name_kh","id");
+
+
+        return view('backend.course.courseAnnual.edit',compact('courseAnnual','departments','academicYears','degrees','grades','courses','employees','semesters'));
     }
 
     /**
@@ -122,7 +131,7 @@ class CourseAnnualController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function update(UpdateCourseProgramRequest $request, $id)
+    public function update(UpdateCourseAnnualRequest $request, $id)
     {
         $this->courseAnnuals->update($id, $request->all());
         return redirect()->route('admin.course.courseAnnuals.index')->withFlashSuccess(trans('alerts.backend.generals.updated'));
@@ -135,7 +144,7 @@ class CourseAnnualController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function destroy(DeleteCourseProgramRequest $request, $id)
+    public function destroy(DeleteCourseAnnualRequest $request, $id)
     {
         $this->courseAnnuals->destroy($id);
         return redirect()->route('admin.course.academicYears.index')->withFlashSuccess(trans('alerts.backend.generals.deleted'));

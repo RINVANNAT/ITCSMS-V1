@@ -9,7 +9,6 @@ class CourseAnnual extends Model
     
 
 	public $fillable = [
-	    "name",
 		"department_id",
 		"degree_id",
 		"grade_id",
@@ -57,7 +56,6 @@ class CourseAnnual extends Model
      * @var array
      */
     protected $casts = [
-        "name" => "string"
     ];
 
 	public static $rules = [
@@ -67,7 +65,7 @@ class CourseAnnual extends Model
 		"academic_year_id" => "Required|numeric",
 		"employee_id"=>"Required|numeric",
 		"course_id"=>"Required|numeric",
-		"semester_id"=>"Required|numeric",
+		"semester_id"=>"Required",
 	];
 
 }

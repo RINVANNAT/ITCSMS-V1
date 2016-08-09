@@ -321,6 +321,8 @@ class ScoreRepository extends BaseRepository
         }
 
 
+
+
         // fetch credit by course id
         // fetch total credits of all courses to calculate moyenen
         $totalcredit =0;
@@ -354,6 +356,8 @@ class ScoreRepository extends BaseRepository
             $scoresDataViews[$scorequery->student_annual_id]["ranking"] = 0;
             $scoresDataViews[$scorequery->student_annual_id]["status"] = 0;
         }
+
+
         $i = 0;
         $student_ids = array();
         foreach($scorequeries as $scorequery){
@@ -419,11 +423,14 @@ class ScoreRepository extends BaseRepository
         $i =1;
         foreach($studentAnnuals as $studentAnnual){
             $scoresDataViews[$studentAnnual->id]["moyennehighlight"] = "";
-            if($scoresDataViews[$studentAnnual->id]["moyenne"] < 30){
-                $scoresDataViews[$studentAnnual->id]["moyennehighlight"]="red";
-            }else if($scoresDataViews[$studentAnnual->id]["moyenne"] < 50){
-                $scoresDataViews[$studentAnnual->id]["moyennehighlight"]="yellow";
+            if (isset($scoresDataViews[$studentAnnual->id]["moyenne"])){
+                if($scoresDataViews[$studentAnnual->id]["moyenne"] < 30){
+                    $scoresDataViews[$studentAnnual->id]["moyennehighlight"]="red";
+                }else if($scoresDataViews[$studentAnnual->id]["moyenne"] < 50){
+                    $scoresDataViews[$studentAnnual->id]["moyennehighlight"]="yellow";
+                }
             }
+
             $studentAnnual["no"]  = $i++;
 
         }
@@ -480,21 +487,15 @@ class ScoreRepository extends BaseRepository
 
 
         if(array_key_exists("autoeval",$param)){
-
             foreach($studentAnnuals as $studentAnnual){
-
                 foreach($evalRulse as $evalRule){
-
                     if($evalRule["param"] == "average" and $evalRule["operator"] == "getter"){
-
-
                         if ($scoresDataViews[$studentAnnual->id]["moyenne"] > $evalRule["value"]){
                             //check if rule already exist
                             $olsstatus = $studentAnnual->evalStatus()->get();
                             foreach($olsstatus as $olsstatu){
                                 $studentAnnual->evalStatus()->detach($olsstatu);
                             }
-
                             $studentAnnual->evalStatus()->attach($evalRule["result"]);
                         }
                     }else if ($evalRule["param"] == "average" and $evalRule["operator"] == "smaller"){
@@ -508,7 +509,6 @@ class ScoreRepository extends BaseRepository
                         }
                     }
                 }
-
             }
         }
 

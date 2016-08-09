@@ -1,6 +1,5 @@
-<?php
+<?php namespace App\Http\Requests\Backend\Course\CourseAnnual;
 
-namespace App\Http\Requests\Backend\Configuration\CourseAnnual;
 
 use App\Http\Requests\Request;
 

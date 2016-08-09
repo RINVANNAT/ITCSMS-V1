@@ -662,14 +662,15 @@ return [
             'sub_detail_title' => 'Detail of an course',
             'sub_import_title' => 'Import course',
             'fields' => [
+                'course'=>'Cource Name',
                 'name' => "Name",
                 'semester' => 'Semester',
-                'academic_year_id' => 'Academic year',
-                'department_id' => 'Department',
-                'degree_id' => 'Degree',
-                'grade_id' => 'Grade',
+                'academic_year' => 'Academic year',
+                'department' => 'Department',
+                'degree' => 'Degree',
+                'grade' => 'Grade',
                 'class' => 'Class',
-                'employee_id' => 'Lecturer',
+                'employee' => 'Lecturer',
                 'credit'=>"Credit",
                 'code'=>"Code"
             ]

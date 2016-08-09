@@ -17,6 +17,7 @@ Homestead.json
 Thumbs.db
 *.sublime-project
 *.sublime-workspace
+.vagrant
 .idea
 .project
 _ide_helper.php

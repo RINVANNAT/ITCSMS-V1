@@ -1,6 +1,4 @@
-<?php
-
-namespace App\Repositories\Backend\CourseAnnual;
+<?php namespace App\Repositories\Backend\CourseAnnual;
 
 /**
  * Interface CourseAnnualRepositoryContract

@@ -98,8 +98,10 @@ class EmployeeController extends Controller
         $genders = Gender::lists('name_en','id')->toArray();
         $roles = $this->roles->getAllRoles('sort', 'asc', true);
 
+        
         //$selected_role_ids = $employee->roles()->lists('role_id')->toArray();
         //dd($selected_role_ids);
+        
 
         return view('backend.employee.edit',compact('employee','departments','users','genders','roles'));
     }
