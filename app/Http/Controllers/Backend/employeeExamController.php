@@ -127,4 +127,53 @@ class employeeExamController extends Controller
         return $res;
     }
 
+    public function requestImportTempEmployees(Request $request){
+
+        return view('backend.exam.includes.import_temp_employee');
+
+    }
+
+    public function importTempEmployees(Request $request){
+        $now = Carbon::now()->format('Y_m_d_H');
+
+        if($request->file('import')!= null){
+            $import = $now. '.' .$request->file('import')->getClientOriginalExtension();
+
+            $request->file('import')->move(
+                base_path() . '/public/assets/uploaded_file/temp/', "tempEmployee_".$import
+            );
+
+            dd($import);
+
+            $storage_path = base_path() . '/public/assets/uploaded_file/temp/tempEmployee__'.$import;
+
+            DB::beginTransaction();
+
+            try{
+                Excel::filter('chunk')->load($storage_path)->chunk(100, function($results){
+
+                    $results->each(function($row) {
+                        $tempEmployee = $this->tempEmployees->create($row->toArray());
+                    });
+
+                });
+
+            } catch(Exception $e){
+                DB::rollback();
+            }
+            DB::commit();
+
+            //UserLog
+            /*UserLog::log([
+                'model' => 'HighSchool',
+                'action'      => 'Import',
+                'data'     => 'none', // if it is create action, store only the new id.
+                'developer'   => Auth::id() == 1?true:false
+            ]);*/
+
+
+//            return redirect(route('admin.configuration.rooms.index'));
+        }
+    }
+
 }

@@ -543,9 +543,9 @@ class ExamController extends Controller
 
         $res = $this->exams->addNewCorrectionCandidateScore($exam_id, $request);
         if($res) {
-            return Response::json(['status', true]);
+            return Response::json(['status'=> true]);
         } else {
-            return Response::json(['status', false]);
+            return Response::json(['status'=> false]);
         }
     }
 
@@ -638,7 +638,7 @@ class ExamController extends Controller
             $totalSum = 0;
             foreach($arrayResults as $arrayResult) {
                 if($candidateIds[$i] == $arrayResult->candidate_id){
-                    $totalSum = $totalSum+ $arrayResult->score_by_course;
+                    $totalSum = $totalSum + $arrayResult->score_by_course;
                 }
             }
             array_push($candidateResult, (object)(['candidate_id'=> $candidateIds[$i], 'total_score' =>$totalSum]));
