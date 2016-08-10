@@ -35,9 +35,10 @@ class AcademicYearAPIController extends AppBaseController
      */
     public function index(Request $request)
     {
-        $this->academicYearRepository->pushCriteria(new RequestCriteria($request));
-        $this->academicYearRepository->pushCriteria(new LimitOffsetCriteria($request));
-        $academicYears = $this->academicYearRepository->all();
+//        $this->academicYearRepository->pushCriteria(new RequestCriteria($request));
+//        $this->academicYearRepository->pushCriteria(new LimitOffsetCriteria($request));
+
+        $academicYears = AcademicYear::all();
         return $this->sendResponse($academicYears->toArray(), 'AcademicYears retrieved successfully');
     }
 
