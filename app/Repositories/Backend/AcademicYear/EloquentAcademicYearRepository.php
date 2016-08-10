@@ -1,7 +1,4 @@
-<?php
-
-namespace App\Repositories\Backend\AcademicYear;
-
+<?php namespace App\Repositories\Backend\AcademicYear;
 
 use App\Exceptions\GeneralException;
 use App\Models\AcademicYear;

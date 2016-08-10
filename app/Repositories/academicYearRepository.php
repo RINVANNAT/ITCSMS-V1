@@ -1,6 +1,4 @@
-<?php
-
-namespace App\Repositories;
+<?php namespace App\Repositories;
 
 use App\Models\AcademicYear;
 use InfyOm\Generator\Common\BaseRepository;
@@ -19,6 +17,6 @@ class academicYearRepository extends BaseRepository
      **/
     public function model()
     {
-        return AcademicYear::class;
+        return \App\Models\AcademicYear::class;
     }
 }

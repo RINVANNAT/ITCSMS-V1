@@ -1,6 +1,4 @@
-<?php
-
-namespace App\Repositories;
+<?php namespace App\Repositories;
 
 use App\Models\CourseAnnual;
 use InfyOm\Generator\Common\BaseRepository;

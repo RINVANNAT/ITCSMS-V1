@@ -5,10 +5,7 @@ use Illuminate\Database\Eloquent\Model as Model;
 
 class AcademicYear extends Model
 {
-
 	public $table = "academicYears";
-    
-
 	public $fillable = [
 		"id",
 	    "name_kh",
@@ -19,19 +16,16 @@ class AcademicYear extends Model
         "create_uid",
         "write_uid"
 	];
-
 	public function setDateStartAttribute($value)
 	{
 		$date = Carbon::createFromFormat('d/m/Y', $value);
 		$this->attributes['date_start'] = $date->format('Y/m/d');
 	}
-
 	public function setDateEndAttribute($value)
 	{
 		$date = Carbon::createFromFormat('d/m/Y', $value);
 		$this->attributes['date_end'] = $date->format('Y/m/d');
 	}
-
 	protected $dates = ['date_start','date_end'];
 
     public function student_annuals(){
@@ -52,9 +46,7 @@ class AcademicYear extends Model
     public function lastModifier(){
         return $this->belongsTo('App\Models\Access\User','write_uid');
     }
-
 	public function scopeLastestAcademicYear($query){
 		$query->orderBy('code','desc')->first();
 	}
-
 }
