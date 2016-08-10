@@ -21,9 +21,9 @@ class AcademicYearAPIController extends AppBaseController
     /** @var  AcademicYearRepository */
     private $academicYearRepository;
 
-    public function __construct(AcademicYearRepository $academicYearRepo)
+    public function __construct()
     {
-        $this->academicYearRepository = $academicYearRepo;
+//        $this->academicYearRepository = $academicYearRepo;
     }
 
     /**
@@ -38,6 +38,7 @@ class AcademicYearAPIController extends AppBaseController
 //        $this->academicYearRepository->pushCriteria(new RequestCriteria($request));
 //        $this->academicYearRepository->pushCriteria(new LimitOffsetCriteria($request));
 
+        dd("hello");
         $academicYears = AcademicYear::all();
         return $this->sendResponse($academicYears->toArray(), 'AcademicYears retrieved successfully');
     }
