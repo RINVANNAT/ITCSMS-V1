@@ -19,6 +19,6 @@ class academicYearRepository extends BaseRepository
      **/
     public function model()
     {
-        return academicYear::class;
+        return AcademicYear::class;
     }
 }
