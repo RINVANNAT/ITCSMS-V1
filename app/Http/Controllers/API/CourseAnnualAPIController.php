@@ -82,6 +82,7 @@ class CourseAnnualAPIController extends AppBaseController
 
         if ($filters["user_id"] != null){
             $employee = Employee::where("user_id","=",$filters["user_id"])->first();
+            dd($employee);
             $courseAnnuals->where('course_annuals.employee_id', $employee->id);
         }
 
