@@ -116,12 +116,17 @@
 
                     <div id="all_staff_role">
                     </div>
+
                     <div id="alert_save_staff_role" class="alert-danger col-md-12">
                         <h5> Please Select Role and Check On Staff Before Saving New Record !!!! </h5>
                     </div>
-                    <small>Staff and Roles</small>
-                    <button class="btn btn-sm btn-danger pull-right" id="btn_save_staff_role" style=" margin-right: 20px;">Save</button>
-                    <button class="btn btn-sm btn-default pull-right" id="btn_cancel_staff_role" style="margin-right: 8px;">Cancel</button>
+                    {{--<small>Staff and Roles</small>--}}
+
+                    <div style="margin-top: 5px">
+                        <button class="btn btn-primary btn-xs" id="import_temp_employee"><i class="fa fa-plus-circle"></i> Import</button>
+                        <button class="btn btn-xs btn-danger pull-right " id="btn_save_staff_role">Save</button>
+                        <button class="btn btn-xs btn-default pull-right " id="btn_cancel_staff_role" style="margin-right: 5px;">Cancel</button>
+                    </div>
 
                 </blockquote>
             </div>
@@ -130,3 +135,5 @@
         <!-- /.box -->
     </div>
 </div>
+
+

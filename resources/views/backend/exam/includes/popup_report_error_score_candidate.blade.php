@@ -250,8 +250,14 @@
                dataType: "json",
                success: function(result) {
 
+                   console.log(result);
+                   if(result.status){
+                       notify("success","info", "you done it");
+                   } else{
+                       notify("error","info", "there is an error");
+                   }
                    location.reload();
-                   notify("error","info", "you done it");
+
                }
            });
        }

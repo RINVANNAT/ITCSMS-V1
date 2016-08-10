@@ -90,12 +90,9 @@ class EloquentDepartmentEmployeeExamPositionRepository extends EloquentTempEmplo
                 );
                 array_push($arrayPositions, $element);
             }
+
         }
-
-//        dd($arrayPositions);
-
         $arrayPositions = array_map("unserialize", array_unique(array_map("serialize", $arrayPositions)));
-//        dd($arrayPositions);
         return $arrayPositions;
 
     }

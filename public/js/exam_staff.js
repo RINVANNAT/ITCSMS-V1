@@ -57,7 +57,8 @@
                     }
                 }
             },
-            "checkbox" : {
+
+        "checkbox" : {
                 "keep_selected_style" : false
             },
             "types" : {
@@ -76,7 +77,7 @@
                 }
             },
             "plugins" : [
-                "wholerow",'checkbox', "contextmenu", "search", "state","types"
+                "wholerow",'checkbox', "contextmenu", "search", "state","types", "html_data"
             ]
         });
 
