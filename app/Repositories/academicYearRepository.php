@@ -3,7 +3,7 @@
 use App\Models\AcademicYear;
 use InfyOm\Generator\Common\BaseRepository;
 
-class academicYearRepository extends BaseRepository
+class AcademicYearRepository extends BaseRepository
 {
     /**
      * @var array

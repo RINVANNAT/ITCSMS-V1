@@ -1,6 +1,4 @@
-<?php
-
-namespace App\Http\Controllers\API;
+<?php namespace App\Http\Controllers\API;
 
 use App\Http\Requests\API\CreateAcademicYearAPIRequest;
 use App\Http\Requests\API\UpdateAcademicYearAPIRequest;
