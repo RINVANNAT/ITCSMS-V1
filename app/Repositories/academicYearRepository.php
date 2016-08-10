@@ -2,7 +2,7 @@
 
 namespace App\Repositories;
 
-use App\Models\academicYear;
+use App\Models\AcademicYear;
 use InfyOm\Generator\Common\BaseRepository;
 
 class academicYearRepository extends BaseRepository
