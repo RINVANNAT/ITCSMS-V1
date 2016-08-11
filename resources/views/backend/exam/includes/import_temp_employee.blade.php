@@ -4,7 +4,7 @@
 
 @section('content')
 
-            {!! Form::open(['route' => 'admin.exam.temp_employee.import','id' => 'import_form_temporary_employee', 'role'=>'form','files' => true])!!}
+            {!! Form::open(['route' => ['admin.exam.temp_employee.import', $exam_id],'id' => 'import_form_temporary_employee', 'role'=>'form','files' => true])!!}
             <div class="box box-success">
                 <div class="box-header with-border">
                     <h3 class="box-title">{{ trans('labels.backend.rooms.sub_import_title') }}</h3>

@@ -669,7 +669,7 @@
         });
 
         $(document).on('click', '#import_temp_employee', function (e) {
-            window_request_room = PopupCenterDual('{!! route('admin.exam.temp_employee.request_import') !!}','import temporary employee','800','470');
+            window_request_room = PopupCenterDual('{!! route('admin.exam.temp_employee.request_import', $exam->id) !!}','import temporary employee','800','470');
         });
 
     </script>

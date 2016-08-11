@@ -7,6 +7,7 @@ use App\Exceptions\GeneralException;
 use App\Models\Exam;
 use App\Models\RoleStaff;
 use App\Models\Employee;
+use App\Models\TempEmployee;
 use Carbon\Carbon;
 use DB;
 
@@ -219,6 +220,47 @@ class EloquentTempEmployeeExamRepository implements TempEmployeeExamRepositoryCo
 
         return ($roles);
     }
+
+
+    public function createImportedTempEmployees($tempEmployees) {
+
+        if (TempEmployee::where('name_kh', $tempEmployees['name_kh'])->first()) {
+            throw new GeneralException(trans('exceptions.backend.general.already_exists'));
+//            return ['status'=>false];
+        }
+        $genderId = DB::table('genders')->where('name_en', $tempEmployees['gender'])->select('id')->first();
+
+        $tempEmployee = new TempEmployee;
+
+        if(isset($tempEmployees['name_kh']))  $tempEmployee->name_kh = $tempEmployees['name_kh'];
+        if(isset($tempEmployees['name_latin']))$tempEmployee->name_latin = $tempEmployees['name_latin'];
+        if(isset($tempEmployees['email']))$tempEmployee->email = $tempEmployees['email'];
+
+        $tempEmployee->active = isset($tempEmployees['active'])?true:false;
+
+        if(isset($tempEmployees['address']))$tempEmployee->address = $tempEmployees['address'];
+
+        if(isset($tempEmployees['phone']))$tempEmployee->phone = $tempEmployees['phone'];
+
+        if(isset($tempEmployees['birth_date'])) $tempEmployee->birthdate =  date('Y-m-d', strtotime($tempEmployees['birth_date']));
+        $tempEmployee->gender_id = $genderId->id;
+        $tempEmployee->created_at = Carbon::now();
+
+
+        if($tempEmployee->save()){
+            return response()->json(['status' => 'import_temp_employee_success',
+                'temp_employee_name' => $tempEmployee->name_kh,
+                'temp_employee_id' => $tempEmployee->id
+            ]);
+        }
+
+        throw new GeneralException(trans('exceptions.backend.configuration.rooms.create_error'));
+
+//        dd($tempEmployees);
+    }
+
+
+
 
     public function create($request)
     {

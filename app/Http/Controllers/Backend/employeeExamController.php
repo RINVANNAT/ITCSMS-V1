@@ -17,6 +17,8 @@ use App\Repositories\Backend\TempEmployeeExam\TempEmployeeExamRepositoryContract
 use App\Repositories\Backend\DepartmentEmployeeExamPosition\DepartmentEmployeeExamPositionRepositoryContract;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Response;
+use Carbon\Carbon;
+use Maatwebsite\Excel\Facades\Excel;
 
 class employeeExamController extends Controller
 {
@@ -127,13 +129,16 @@ class employeeExamController extends Controller
         return $res;
     }
 
-    public function requestImportTempEmployees(Request $request){
+    public function requestImportTempEmployees($exam_id, Request $request){
 
-        return view('backend.exam.includes.import_temp_employee');
+        return view('backend.exam.includes.import_temp_employee', compact('exam_id'));
 
     }
 
-    public function importTempEmployees(Request $request){
+    public function importTempEmployees($exam_id, Request $request){
+
+
+
         $now = Carbon::now()->format('Y_m_d_H');
 
         if($request->file('import')!= null){
@@ -143,17 +148,14 @@ class employeeExamController extends Controller
                 base_path() . '/public/assets/uploaded_file/temp/', "tempEmployee_".$import
             );
 
-            dd($import);
-
-            $storage_path = base_path() . '/public/assets/uploaded_file/temp/tempEmployee__'.$import;
+            $storage_path = base_path() . '/public/assets/uploaded_file/temp/tempEmployee_'.$import;
 
             DB::beginTransaction();
-
             try{
                 Excel::filter('chunk')->load($storage_path)->chunk(100, function($results){
 
                     $results->each(function($row) {
-                        $tempEmployee = $this->tempEmployees->create($row->toArray());
+                        $tempEmployee = $this->tempEmpolyeeExams->createImportedTempEmployees($row->toArray());
                     });
 
                 });
@@ -163,16 +165,7 @@ class employeeExamController extends Controller
             }
             DB::commit();
 
-            //UserLog
-            /*UserLog::log([
-                'model' => 'HighSchool',
-                'action'      => 'Import',
-                'data'     => 'none', // if it is create action, store only the new id.
-                'developer'   => Auth::id() == 1?true:false
-            ]);*/
-
-
-//            return redirect(route('admin.configuration.rooms.index'));
+            return redirect(route('admin.exam.index', $exam_id));
         }
     }
 

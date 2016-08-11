@@ -88,46 +88,45 @@
 
                         {!! Form::open(['route' => ['admin.exam.insert_exam_score_candidate',$exam_id], 'class' => 'form-horizontal table_score', 'role' => 'form', 'method' => 'post']) !!}
 
-                            @foreach ($candidates as $candidate)
-                                <?php $i++; ?>
-                                <tr class="enlarge-number">
-                                    <td style="text-align: center" class="candidate_score_id">
-                                        {!! Form::hidden('candidate_score_id_'.$i."[score_id]", $candidate->candidate_score_id, ['class' => 'form-control']) !!}
-                                        {{--<input type="hidden" name="sequence" value="{{$number_correction}}">--}}
+                            @if($candidates)
+                                @foreach ($candidates as $candidate)
+                                    <?php $i++; ?>
+                                    <tr class="enlarge-number">
+                                        <td style="text-align: center" class="candidate_score_id">
+                                            {!! Form::hidden('candidate_score_id_'.$i."[score_id]", $candidate->candidate_score_id, ['class' => 'form-control']) !!}
+                                            {{--<input type="hidden" name="sequence" value="{{$number_correction}}">--}}
 
-                                        {!! Form::hidden('candidate_score_id_'.$i."[sequence]", $number_correction, ['class' => 'form-control ']) !!}
+                                            {!! Form::hidden('candidate_score_id_'.$i."[sequence]", $number_correction, ['class' => 'form-control ']) !!}
 
-                                        {{--<input type="hidden" name="candidate_id" value="{{$candidate->candidate_id}}">--}}
+                                            {{--<input type="hidden" name="candidate_id" value="{{$candidate->candidate_id}}">--}}
 
-                                        {!! Form::hidden('candidate_score_id_'.$i."[candidate_id]", $candidate->candidate_id, ['class' => 'form-control']) !!}
+                                            {!! Form::hidden('candidate_score_id_'.$i."[candidate_id]", $candidate->candidate_id, ['class' => 'form-control']) !!}
 
-                                        {{--<input type="hidden" name="course_id" value="{{$subjectId}}">--}}
+                                            {{--<input type="hidden" name="course_id" value="{{$subjectId}}">--}}
 
-                                        {!! Form::hidden('candidate_score_id_'.$i."[course_id]", $subjectId, ['class' => 'form-control']) !!}
+                                            {!! Form::hidden('candidate_score_id_'.$i."[course_id]", $subjectId, ['class' => 'form-control']) !!}
 
-                                        <?php echo $i;?>
-                                    </td>
+                                            <?php echo $i;?>
+                                        </td>
 
-                                    <td>
-                                        {!! Form::text('candidate_score_id_'.$i."[correct]", $candidate->score_c, ['class' => 'form-control inputs_score enlarge-number number_only validate_'.$i,'id'=>'correct_'.$i]) !!}
-                                    </td>
+                                        <td>
+                                            {!! Form::text('candidate_score_id_'.$i."[correct]", $candidate->score_c, ['class' => 'form-control inputs_score enlarge-number number_only validate_'.$i,'id'=>'correct_'.$i]) !!}
+                                        </td>
 
-                                    <td>
-                                        {!! Form::text('candidate_score_id_'.$i."[wrong]", $candidate->score_w, ['class' => 'form-control  inputs_score enlarge-number number_only validate_'.$i,'id'=>'wrong_ans_'.$i]) !!}
-                                    </td>
+                                        <td>
+                                            {!! Form::text('candidate_score_id_'.$i."[wrong]", $candidate->score_w, ['class' => 'form-control  inputs_score enlarge-number number_only validate_'.$i,'id'=>'wrong_ans_'.$i]) !!}
+                                        </td>
 
-                                    <td>
-                                        {!! Form::text('candidate_score_id_'.$i."[na]", $candidate->score_na, ['class' => 'form-control inputs_score enlarge-number number_only validate_'.$i,'id'=>'no_'.$i]) !!}
-                                    </td>
+                                        <td>
+                                            {!! Form::text('candidate_score_id_'.$i."[na]", $candidate->score_na, ['class' => 'form-control inputs_score enlarge-number number_only validate_'.$i,'id'=>'no_'.$i]) !!}
+                                        </td>
 
-                                    <td>
-                                        {!! Form::text('candidate_score_id_'.$i."[total]", null, ['class' => 'form-control enlarge-number number_only validate_'.$i,'id'=>'total_'.$i, 'disabled', 'placeholder'=>$candidate->total_question]) !!}
-                                    </td>
-
-
-
-                                </tr>
-                            @endforeach
+                                        <td>
+                                            {!! Form::text('candidate_score_id_'.$i."[total]", null, ['class' => 'form-control enlarge-number number_only validate_'.$i,'id'=>'total_'.$i, 'disabled', 'placeholder'=>$candidate->total_question]) !!}
+                                        </td>
+                                    </tr>
+                                @endforeach
+                            @endif
 
                         {!! Form::close() !!}
 
@@ -172,8 +171,8 @@
                     dataType: "json",
                     success: function(result) {
                         if(result.status) {
-                            notify("success","info", "You have done!");
-                            window.close();
+                            notify("success","info", "your record have been save!");
+//                            window.close().delay(300);
                         } else {
                             notify("error","info", "Please Check Your Record Was Not Saved!");
                         }
@@ -196,6 +195,7 @@
                 });
 
                 var length = JSON.parse('<?php echo $i ?>');
+
                 for(var k=1; k<=length; k++) {
                     $('.validate_'+k).on('keydown keyup', function() {
                         console.log(k);
@@ -218,7 +218,7 @@
             });
 
             function calculateSum(length) {
-
+                var total_question = JSON.parse('{{$candidate->total_question}}');
                 for(var i=1; i<=length; i++) {
                     var sum =0;
                     $(".validate_"+i).each(function() {
@@ -226,7 +226,7 @@
                             var tmp = sum;
                             sum += parseInt(this.value);
                             $(this).css("background-color", "#FEFFB0");
-                            if(tmp == 30) {
+                            if(tmp == total_question) {
                                 $("input#total_"+i).val(tmp).css("color", "");
 
                             } else {

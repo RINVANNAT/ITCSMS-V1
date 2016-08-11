@@ -267,14 +267,14 @@
        });
 
        function calculateSum(k) {
-           console.log('call me ');
+                var total_question = JSON.parse('{{$totalQuestion}}');
                var sum =0;
                $(".validate_score_"+k).each(function() {
                    if (!isNaN(this.value) && this.value.length != 0) {
                        sum += parseInt(this.value);
                        console.log(sum);
                        $(this).css("background-color", "#FEFFB0");
-                       if(sum == 30) {
+                       if(sum == total_question) {
                            $("input#total_score_"+k).val(sum).css("color", "");
 
                        } else {

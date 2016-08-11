@@ -533,9 +533,15 @@ class ExamController extends Controller
 
     public function reportErrorCandidateScores($exam_id, Request $request) {
 
-
         $errorCandidateScores = $this->exams->reportErrorCandidateExamScores($exam_id, $request->course_id);
-        return view('backend.exam.includes.popup_report_error_score_candidate', compact('exam_id', 'errorCandidateScores'));
+        $totalQuestions = DB::table('entranceExamCourses')->select('total_question')->get();
+        foreach($totalQuestions as $totalQuestion) {
+            $totalQuestion = $totalQuestion->total_question;
+        }
+
+        return view('backend.exam.includes.popup_report_error_score_candidate', compact('exam_id', 'errorCandidateScores', 'totalQuestion'));
+
+
 
     }
 
