@@ -28,7 +28,7 @@ class UpdateCourseAnnualRequest extends Request
     {
         return [
             'name' => 'max:255',
-            'semester' => 'required',
+            'semester_id' => 'required',
             'academic_year_id' => 'required',
             'department_id' => 'required',
             'degree_id' => 'required',

@@ -68,6 +68,7 @@
 
                 ajax: {
                     url:"{!! route('admin.course.course_annual.data') !!}",
+                    type:"POST",
                     data:function(d){
                         // In case additional fields is added for filter, modify export view as well: popup_export.blade.php
                         d.academic_year = $('#filter_academic_year').val();
@@ -89,7 +90,7 @@
                 ]
             });
 
-//            enableDeleteRecord($('#courseAnnuals-table'));
+            enableDeleteRecord($('#courseAnnuals-table'));
 
             $("div.toolbar").html(
                     '{!! Form::select('academic_year',$academicYears,null, array('class'=>'form-control','id'=>'filter_academic_year')) !!} ' +

@@ -8,7 +8,7 @@ Route::group([
 
     Route::group([], function() {
         Route::resource('course_annual', 'CourseAnnualController');
-        Route::get('course-annual-data', 'CourseAnnualController@data')->name('admin.course.course_annual.data');
+        Route::post('course-annual-data', 'CourseAnnualController@data')->name('admin.course.course_annual.data');
         Route::get('course-request-import', 'CourseAnnualController@request_import')->name('admin.course.course_annual.request_import');
         Route::post('course-import', 'CourseAnnualController@import')->name('admin.course.course_annual.import');
 

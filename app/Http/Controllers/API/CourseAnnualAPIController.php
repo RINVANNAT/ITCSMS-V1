@@ -40,57 +40,25 @@ class CourseAnnualAPIController extends AppBaseController
      */
     public function index(Request $request)
     {
-        $this->courseAnnualRepository->pushCriteria(new RequestCriteria($request));
-        $this->courseAnnualRepository->pushCriteria(new LimitOffsetCriteria($request));
-        // fix filter null
         $filters = $request->only('degree_id','grade_id','department_id','academic_year_id','user_id');
         if ($filters["academic_year_id"] == null){
             unset($filters["academic_year_id"]);
         }
-
-
-//        to fix
-        $employeeId = 8;
-//        dd($request->user());
-        if (true){
-            if (Auth::check()) {
-                $id = Auth::id();
-
-//                dd($employee->id);
-
-            }else{
-//                dd("not check");
-            }
-        }
-
-
-
 //        $courseAnnuals = $this->courseAnnualRepository->findWhere($filters)->with('courses');
-//
-//
         $courseAnnuals = DB::table('course_annuals')
             ->join('courses','course_annuals.course_id', '=', 'courses.id')
-            ->select(
-                ['course_annuals.id',
-                    'courses.name_en as name',
-                    'course_annuals.course_id'])
+            ->select(['course_annuals.id', 'courses.name_en as name', 'course_annuals.course_id'])
             ->where('course_annuals.degree_id', $filters['degree_id'])
             ->where('course_annuals.grade_id', $filters['grade_id'])
             ->where('course_annuals.department_id', $filters['department_id'])
             ->where('course_annuals.academic_year_id', $filters['academic_year_id']);
-
-
         if ($filters["user_id"] != null){
-            $employee = Employee::where("user_id","=",$filters["user_id"])->first();
-            dd($employee);
-            dd($employee);
-            $courseAnnuals->where('course_annuals.employee_id', $employee->id);
+            $employee = Employee::where("user_id", "=", $filters["user_id"])->first();
+            if ($employee != null){
+                $courseAnnuals->where('course_annuals.employee_id', $employee->id);
+            }
         }
-
         $courseAnnuals = $courseAnnuals->get();
-//
-
-
         return $this->sendResponse($courseAnnuals, 'CourseAnnuals retrieved successfully');
     }
 

@@ -155,7 +155,8 @@ class CourseController extends Controller
     {
 
         $coursePrograms = DB::table('courses')
-            ->select(['id', 'name_kh', 'name_en', 'name_fr', 'code', 'time_tp', 'time_td', 'time_course']);
+            ->select(['id', 'name_kh', 'name_en', 'name_fr', 'code', 'time_tp', 'time_td', 'time_course'])
+            ->orderBy('updated_at','desc');
 
         $datatables = app('datatables')->of($coursePrograms);
 
@@ -243,8 +244,6 @@ class CourseController extends Controller
             } catch (Exception $e) {
                 DB::rollback();
 //              todo change id sequence to last one. "ALTER SEQUENCE couress_id_seq RESTART WITH 1";
-
-
                 Flash::error('data is not correct format ');
                 return redirect()->back();
 

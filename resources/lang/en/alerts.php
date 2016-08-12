@@ -12,6 +12,7 @@ return [
     | according to your application's requirements.
     |
     */
+    
 
     'backend' => [
         'generals'=> [

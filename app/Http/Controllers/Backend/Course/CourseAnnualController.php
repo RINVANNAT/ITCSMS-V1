@@ -50,10 +50,10 @@ class CourseAnnualController extends Controller
     public function index()
     {
         $departments = Department::lists('name_kh','id')->toArray();
-        $academicYears = AcademicYear::lists('name_kh','id')->toArray();
+        $academicYears = AcademicYear::orderBy("id","desc")->lists('name_kh','id')->toArray();
         $degrees = Degree::lists('name_kh','id')->toArray();
         $grades = Grade::lists('name_kh','id')->toArray();
-        $courses = Course::lists('name_kh','id')->toArray();
+        $courses = Course::orderBy("updated_at","desc")->lists('name_kh','id')->toArray();
         return view('backend.course.courseAnnual.index',compact('departments','academicYears','degrees','grades','courses'));
     }
 
@@ -66,13 +66,12 @@ class CourseAnnualController extends Controller
     public function create(CreateCourseAnnualRequest $request)
     {
         $departments = Department::lists('name_kh','id')->toArray();
-        $academicYears = AcademicYear::lists('name_kh','id')->toArray();
+        $academicYears = AcademicYear::orderBy('id', 'desc')->lists('name_kh','id')->toArray();
         $degrees = Degree::lists('name_kh','id')->toArray();
         $grades = Grade::lists('name_kh','id')->toArray();
-        $courses = Course::lists('name_kh','id')->toArray();
+        $courses = Course::orderBy('updated_at', 'desc')->lists('name_kh','id')->toArray();
         $semesters = Semester::lists("name_kh", "id");
-        $employees = Employee::lists("name_kh","id");
-
+        $employees = Employee::orderBy('updated_at', 'desc')->lists("name_kh","id");
         return view('backend.course.courseAnnual.create',compact('departments','academicYears','degrees','grades','courses',"semesters","employees"));
     }
 
@@ -87,7 +86,8 @@ class CourseAnnualController extends Controller
     {
         $data = $request->all();
         $this->courseAnnuals->create($data);
-        return redirect()->route('backend.course.courseAnnual.index')->withFlashSuccess(trans('alerts.backend.general.created'));
+        
+        return redirect()->route('admin.course.course_annual.index')->withFlashSuccess(trans('alerts.backend.general.created'));
     }
 
     /**
@@ -111,7 +111,6 @@ class CourseAnnualController extends Controller
     public function edit(EditCourseAnnualRequest $request, $id)
     {
         $courseAnnual = $this->courseAnnuals->findOrThrowException($id);
-
         $departments = Department::lists('name_kh','id')->toArray();
         $academicYears = AcademicYear::lists('name_kh','id')->toArray();
         $degrees = Degree::lists('name_kh','id')->toArray();
@@ -119,8 +118,6 @@ class CourseAnnualController extends Controller
         $courses = Course::lists('name_kh','id')->toArray();
         $semesters = Semester::lists("name_kh", "id");
         $employees = Employee::lists("name_kh","id");
-
-
         return view('backend.course.courseAnnual.edit',compact('courseAnnual','departments','academicYears','degrees','grades','courses','employees','semesters'));
     }
 
@@ -134,7 +131,7 @@ class CourseAnnualController extends Controller
     public function update(UpdateCourseAnnualRequest $request, $id)
     {
         $this->courseAnnuals->update($id, $request->all());
-        return redirect()->route('admin.course.courseAnnuals.index')->withFlashSuccess(trans('alerts.backend.generals.updated'));
+        return redirect()->route('admin.course.course_annual.index')->withFlashSuccess(trans('alerts.backend.generals.updated'));
     }
 
     /**
@@ -155,7 +152,11 @@ class CourseAnnualController extends Controller
         $courseAnnuals = DB::table('course_annuals')
             ->leftJoin('courses','course_annuals.course_id', '=', 'courses.id')
             ->leftJoin('employees','course_annuals.employee_id', '=', 'employees.id')
+            ->leftJoin('departments','course_annuals.department_id', '=', 'departments.id')
+            ->leftJoin('degrees','course_annuals.degree_id', '=', 'degrees.id')
+//            ->leftJoin('grades','course_annuals.grade_id', '=', 'grade.id')
 
+            ->orderBy("course_annuals.updated_at","desc")
             ->select(
                 ['course_annuals.id',
                     'courses.name_en as name',
@@ -163,15 +164,15 @@ class CourseAnnualController extends Controller
                     'course_annuals.active',
                     'course_annuals.academic_year_id',
                     'employees.name_latin as employee_id',
-                    'course_annuals.department_id',
-                    'course_annuals.degree_id',
-                    'course_annuals.grade_id',
-                    'course_annuals.course_id']);
+                    'departments.code as department_id',
+                    'degrees.code as degree_id',
+//                    'grades.code  as grade_id',
+                    'courses.grade_id',
+                    'course_annuals.course_id']
+            );
 
 
         $datatables =  app('datatables')->of($courseAnnuals);
-
-
         $datatables
             ->editColumn('name', '{!! $name !!}')
             ->editColumn('semester_id', '{!! $semester_id !!}')
@@ -184,7 +185,6 @@ class CourseAnnualController extends Controller
                 return  '<a href="'.route('admin.course.course_annual.edit',$courseAnnual->id).'" class="btn btn-xs btn-primary"><i class="fa fa-pencil" data-toggle="tooltip" data-placement="top" title="" data-original-title="'.trans('buttons.general.crud.edit').'"></i> </a>'.
                 ' <button class="btn btn-xs btn-danger btn-delete" data-remote="'.route('admin.course.course_annual.destroy', $courseAnnual->id) .'"><i class="fa fa-times" data-toggle="tooltip" data-placement="top" title="' . trans('buttons.general.crud.delete') . '"></i></button>';
             });
-
         if ($academic_year = $datatables->request->get('academic_year')) {
             $datatables->where('course_annuals.academic_year_id', '=', $academic_year);
         } else {
@@ -200,54 +200,30 @@ class CourseAnnualController extends Controller
         if ($department = $datatables->request->get('department')) {
             $datatables->where('course_annuals.department_id', '=', $department);
         }
-
         return $datatables->make(true);
     }
     public function request_import(RequestImportCourseRequest $request){
-
         return view('backend.course.courseAnnual.import');
-
     }
 
     public function import(ImportCourseRequest $request){
-
         $now = Carbon::now()->format('Y_m_d_H');
-
         // try to move uploaded file to a temporary location
         if($request->file('import')!= null){
             $import = $now. '.' .$request->file('import')->getClientOriginalExtension();
-
             $request->file('import')->move(
                 base_path() . '/public/assets/uploaded_file/temp/', $import
             );
-
             $storage_path = base_path() . '/public/assets/uploaded_file/temp/'.$import;
-
-            // and then read that data and store to database
-            //Excel::load($storage_path, function($reader) {
-            //    dd($reader->first());
-            //});
-
-
             DB::beginTransaction();
-
             try{
                 Excel::filter('chunk')->load($storage_path)->chunk(1000, function($results){
-                    //dd($results->first());
-                    // Loop through all rows
-
                     $results->each(function($row) {
                         // Clone an object for running query in studentAnnual
                         $courseAnnual_data = $row->toArray();
                         $courseAnnual_data["created_at"] = Carbon::now();
                         $courseAnnual_data["create_uid"] = auth()->id();
                         $courseAnnual = CourseAnnual::create($courseAnnual_data);
-
-
-                        if(  $courseAnnual){
-
-                        }
-
                         $first = false;
                     });
                 });

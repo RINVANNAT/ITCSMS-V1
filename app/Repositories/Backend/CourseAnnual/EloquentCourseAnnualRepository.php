@@ -59,18 +59,15 @@ class EloquentCourseAnnualRepository implements CourseAnnualRepositoryContract
     {
         $courseAnnual = new CourseAnnual();
         $courseAnnual->course_id = $input['course_id'];
-        $courseAnnual->employee_id = isset($input['employee_id'])?true:false;
+        $courseAnnual->employee_id = isset($input['employee_id'])?$input['employee_id']:1;
         $courseAnnual->academic_year_id = $input['academic_year_id'];
         $courseAnnual->semester_id = $input['semester_id'];
-
         $courseAnnual->grade_id = $input['grade_id'];
         $courseAnnual->degree_id = $input['degree_id'];
         $courseAnnual->department_id = $input['department_id'];
-
         $courseAnnual->active = isset($input['active'])?true:false;
         $courseAnnual->created_at = Carbon::now();
         $courseAnnual->create_uid = auth()->id();
-
 
         if ($courseAnnual->save()) {
             return true;
@@ -88,10 +85,10 @@ class EloquentCourseAnnualRepository implements CourseAnnualRepositoryContract
     public function update($id, $input)
     {
         $courseAnnual = $this->findOrThrowException($id);
-
-        $courseAnnual->name = $input['name'];
-        $courseAnnual->description = $input['description'];
+        $courseAnnual->course_id = $input['course_id'];
+        $courseAnnual->semester_id = $input['semester_id'];
         $courseAnnual->active = isset($input['active'])?true:false;
+        $courseAnnual->employee_id = isset($input['employee_id'])?$input['employee_id']:1;
         $courseAnnual->updated_at = Carbon::now();
         $courseAnnual->write_uid = auth()->id();
 
