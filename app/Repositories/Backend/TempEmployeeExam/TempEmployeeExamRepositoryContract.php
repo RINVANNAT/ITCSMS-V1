@@ -41,6 +41,8 @@ interface TempEmployeeExamRepositoryContract
      */
     public function getAllRoles($exam_id);
 
+    public function createImportedTempEmployees($tempEmployees);
+
     /**
      * @param  $input
      * @return mixed

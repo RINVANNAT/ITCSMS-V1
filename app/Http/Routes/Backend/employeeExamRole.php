@@ -29,9 +29,9 @@ Route::group([], function() {
 
     Route::put('exams/{id}/update-role-node/update-role', 'employeeExamController@changeRoleStaffs')->name('admin.exam.update-role-node');
 
-    Route::get('temp-employee-request-import', 'employeeExamController@requestImportTempEmployees')->name('admin.exam.temp_employee.request_import');
+    Route::get('exams/{id}/temp-employee-request-import', 'employeeExamController@requestImportTempEmployees')->name('admin.exam.temp_employee.request_import');
 
-    Route::post('temp-employee-import', 'employeeExamController@importTempEmployees')->name('admin.exam.temp_employee.import');
+    Route::post('exams/{id}/temp-employee-import', 'employeeExamController@importTempEmployees')->name('admin.exam.temp_employee.import');
 
 
 

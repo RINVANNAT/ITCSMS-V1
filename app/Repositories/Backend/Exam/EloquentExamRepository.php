@@ -390,67 +390,69 @@ class EloquentExamRepository implements ExamRepositoryContract
             ->orderBy('register_id', 'ASC')
             ->get();
 
-        foreach ($candidateIds as $candidateId) {
-            $statusCorrectScore = 0 ;
-            $statusWrongScore = 0;
-            $cadidateScores = DB::table('candidateEntranceExamScores')
-                ->join('entranceExamCourses', 'entranceExamCourses.id', '=', 'candidateEntranceExamScores.entrance_exam_course_id')
-                ->where([
-                    ['candidate_id', $candidateId->candidate_id],
-                    ['candidateEntranceExamScores.entrance_exam_course_id', '=', $courseId]
-                ])
-                ->select('entranceExamCourses.total_question', 'entranceExamCourses.id as course_id', 'candidateEntranceExamScores.id', 'candidate_number_in_room', 'entrance_exam_course_id', 'candidateEntranceExamScores.score_c', 'candidateEntranceExamScores.score_w', 'candidateEntranceExamScores.score_na', 'candidateEntranceExamScores.sequence')
-                ->orderBy('sequence', 'ASC')
-                ->get();
+        if($candidateIds) {
+            foreach ($candidateIds as $candidateId) {
+                $statusCorrectScore = 0 ;
+                $statusWrongScore = 0;
+                $cadidateScores = DB::table('candidateEntranceExamScores')
+                    ->join('entranceExamCourses', 'entranceExamCourses.id', '=', 'candidateEntranceExamScores.entrance_exam_course_id')
+                    ->where([
+                        ['candidate_id', $candidateId->candidate_id],
+                        ['candidateEntranceExamScores.entrance_exam_course_id', '=', $courseId]
+                    ])
+                    ->select('entranceExamCourses.total_question', 'entranceExamCourses.id as course_id', 'candidateEntranceExamScores.id', 'candidate_number_in_room', 'entrance_exam_course_id', 'candidateEntranceExamScores.score_c', 'candidateEntranceExamScores.score_w', 'candidateEntranceExamScores.score_na', 'candidateEntranceExamScores.sequence')
+                    ->orderBy('sequence', 'ASC')
+                    ->get();
 
 //            dd($cadidateScores);
 
-            array_push($errors, (object) array('candidateProperties' => $candidateId, 'scoreErrors' => $cadidateScores) );
+                array_push($errors, (object) array('candidateProperties' => $candidateId, 'scoreErrors' => $cadidateScores) );
 
-            if ($cadidateScores) {
-                $length = count($cadidateScores);
+                if ($cadidateScores) {
+                    $length = count($cadidateScores);
 
-                for ($i = 0; $i < $length ; $i++) {
-                    $tmpScoreCorrect = $cadidateScores[$i]->score_c;
-                    $tmpScoreWrong = $cadidateScores[$i]->score_w;
-                    $tmpScoreNA = $cadidateScores[$i]->score_na;
-                    $tmpTotalQuestion = $cadidateScores[$i]->total_question;
+                    for ($i = 0; $i < $length ; $i++) {
+                        $tmpScoreCorrect = $cadidateScores[$i]->score_c;
+                        $tmpScoreWrong = $cadidateScores[$i]->score_w;
+                        $tmpScoreNA = $cadidateScores[$i]->score_na;
+                        $tmpTotalQuestion = $cadidateScores[$i]->total_question;
 
-                    for ($j = $length-1; $j > $i ; $j--) {
+                        for ($j = $length-1; $j > $i ; $j--) {
 
-                        if ($tmpScoreCorrect == $cadidateScores[$j]->score_c && $tmpScoreWrong == $cadidateScores[$j]->score_w && $tmpScoreNA == $cadidateScores[$j]->score_na) {
+                            if ($tmpScoreCorrect == $cadidateScores[$j]->score_c && $tmpScoreWrong == $cadidateScores[$j]->score_w && $tmpScoreNA == $cadidateScores[$j]->score_na) {
 
-                            if( ($tmpScoreCorrect + $tmpScoreWrong + $tmpScoreNA) == $tmpTotalQuestion && $cadidateScores[$j]->score_c + $cadidateScores[$j]->score_w + $cadidateScores[$j]->score_na == $cadidateScores[$j]->total_question ||
-                                ($tmpScoreCorrect + $tmpScoreWrong + $tmpScoreNA) == 0 && $cadidateScores[$j]->score_c + $cadidateScores[$j]->score_w + $cadidateScores[$j]->score_na == 0) {
+                                if( ($tmpScoreCorrect + $tmpScoreWrong + $tmpScoreNA) == $tmpTotalQuestion && $cadidateScores[$j]->score_c + $cadidateScores[$j]->score_w + $cadidateScores[$j]->score_na == $cadidateScores[$j]->total_question ||
+                                    ($tmpScoreCorrect + $tmpScoreWrong + $tmpScoreNA) == 0 && $cadidateScores[$j]->score_c + $cadidateScores[$j]->score_w + $cadidateScores[$j]->score_na == 0) {
 
-                                $statusCorrectScore++;
+                                    $statusCorrectScore++;
 
-                                DB::table('candidateEntranceExamScores')
-                                    ->where([
-                                        ['entrance_exam_course_id', '=', $cadidateScores[$j]->entrance_exam_course_id],
-                                        ['candidate_id', '=', $candidateId->candidate_id],
-                                        ['sequence', '=', $cadidateScores[$j]->sequence ]
-                                    ])
-                                    ->update(array(
-                                        'is_completed' => true
-                                    ));
+                                    DB::table('candidateEntranceExamScores')
+                                        ->where([
+                                            ['entrance_exam_course_id', '=', $cadidateScores[$j]->entrance_exam_course_id],
+                                            ['candidate_id', '=', $candidateId->candidate_id],
+                                            ['sequence', '=', $cadidateScores[$j]->sequence ]
+                                        ])
+                                        ->update(array(
+                                            'is_completed' => true
+                                        ));
+                                } else {
+                                    $statusWrongScore++;
+                                }
                             } else {
                                 $statusWrongScore++;
                             }
-                        } else {
-                            $statusWrongScore++;
-                        }
-                        if( $statusCorrectScore == 0 &&  $statusWrongScore == ($length*($length-1))/2 ) {
-                            array_push($errorCandidateScores, (object) array('candidateProperties' => $candidateId, 'scoreErrors' => $cadidateScores) );
-                        }
+                            if( $statusCorrectScore == 0 &&  $statusWrongScore == ($length*($length-1))/2 ) {
+                                array_push($errorCandidateScores, (object) array('candidateProperties' => $candidateId, 'scoreErrors' => $cadidateScores) );
+                            }
 
+                        }
                     }
+
                 }
-
             }
-        }
-        return $errorCandidateScores;
 
+            return $errorCandidateScores;
+        }
     }
 
     public function calculationCandidateScores() {
