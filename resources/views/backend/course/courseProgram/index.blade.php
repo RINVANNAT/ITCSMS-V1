@@ -4,7 +4,6 @@
 
 @section('page-header')
     <h1>
-        HELLO HELLO
         {{ trans('labels.backend.coursePrograms.title') }}
         <small>{{ trans('labels.backend.coursePrograms.sub_index_title') }}</small>
     </h1>
