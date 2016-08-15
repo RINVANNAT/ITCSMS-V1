@@ -79,7 +79,10 @@
                 serverSide: true,
                 pageLength: {!! config('app.records_per_page')!!},
 
-                ajax: '{!! route('admin.course.course_program.data') !!}',
+                ajax: {
+                    url:'{!! route('admin.course.course_program.data') !!}',
+                    method:'POST',
+                },
                 columns: [
                     { data: 'name_kh', name: 'name_kh'},
                     { data: 'name_en', name: 'name_en'},
@@ -90,7 +93,7 @@
                 ]
             });
 
-            enableDeleteRecord($('#course-table'));
+            enableDeleteRecord($('#coursePrograms-table'));
         });
     </script>
 @stop

@@ -10,7 +10,7 @@
 @endsection
 
 @section('content')
-    {!! Form::model($courseProgram, ['route' => ['admin.course.coursePrograms.update', $courseProgram->id],'class' => 'form-horizontal', 'role'=>'form', 'method' => 'patch']) !!}
+    {!! Form::model($courseProgram, ['route' => ['admin.course.course_program.update', $courseProgram->id],'class' => 'form-horizontal', 'role'=>'form', 'method' => 'patch']) !!}
 
         <div class="box box-success">
             <div class="box-header with-border">
@@ -25,7 +25,7 @@
         <div class="box box-success">
             <div class="box-body">
                 <div class="pull-left">
-                    <a href="{!! route('admin.course.coursePrograms.index') !!}" class="btn btn-danger btn-xs">{{ trans('buttons.general.cancel') }}</a>
+                    <a href="{!! route('admin.course.course_program.index') !!}" class="btn btn-danger btn-xs">{{ trans('buttons.general.cancel') }}</a>
                 </div>
 
                 <div class="pull-right">

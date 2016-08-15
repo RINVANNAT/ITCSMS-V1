@@ -6,7 +6,7 @@ use App\Http\Requests\Request;
  * Class StoreRoleRequest
  * @package App\Http\Requests\Backend\Access\Role
  */
-class ImportCourseRequest extends Request
+class ImportCourseAnnualRequest extends Request
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -15,7 +15,7 @@ class ImportCourseRequest extends Request
      */
     public function authorize()
     {
-        return access()->allow('create-course');
+        return access()->allow('import-courseAnnulas');
     }
 
     /**

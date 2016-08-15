@@ -117,8 +117,12 @@ class CourseController extends Controller
     public function edit(EditCourseProgramRequest $request, $id)
     {
         $courseProgram = $this->coursePrograms->findOrThrowException($id);
+        $degrees = Degree::lists("name_en", "id");
+        $grades = Grade::lists("name_en", "id");
+        $departments = Department::lists("name_en", "id");
+        $semesters = Semester::lists("name_en", "id");
 
-        return view('backend.course.courseProgram.edit', compact('courseProgram'));
+        return view('backend.course.courseProgram.edit', compact('courseProgram','degrees','grades','departments','semesters'));
     }
 
     /**

@@ -15,7 +15,7 @@ class RequestImportCourseRequest extends Request
      */
     public function authorize()
     {
-        return access()->allow('create-course');
+        return access()->allow('import-courseAnnulas');
     }
 
     /**

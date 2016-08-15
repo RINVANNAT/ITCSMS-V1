@@ -202,11 +202,11 @@ class CourseAnnualController extends Controller
         }
         return $datatables->make(true);
     }
-    public function request_import(RequestImportCourseRequest $request){
+    public function request_import(RequestImportCourseAnnualRequest $request){
         return view('backend.course.courseAnnual.import');
     }
 
-    public function import(ImportCourseRequest $request){
+    public function import(ImportCourseAnnualRequest $request){
         $now = Carbon::now()->format('Y_m_d_H');
         // try to move uploaded file to a temporary location
         if($request->file('import')!= null){

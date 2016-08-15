@@ -1232,7 +1232,6 @@
                 }
 
                 html += '</select> ';
-
                 if (this.timePickerSeconds) {
                     html += ': <select class="secondselect">';
 
@@ -1246,13 +1245,10 @@
                             html += '<option value="' + i + '">' + num + '</option>';
                         }
                     }
-
                     html += '</select>';
                 }
-
                 if (this.timePicker12Hour) {
                     html += '<select class="ampmselect">';
-
                     // Disallow selection before the minDate or after the maxDate
                     var am_html = '';
                     var pm_html = '';
@@ -1272,9 +1268,7 @@
                     }
                     html += '</select>';
                 }
-
                 html += '</div>';
-
             }
 
             return html;
