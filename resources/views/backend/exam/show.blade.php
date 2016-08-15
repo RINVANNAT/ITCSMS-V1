@@ -630,8 +630,6 @@
             }
         });
 
-
-
         $("#btn_save_chang_role").click(function(){
             var changeNodeUrl = "{{route('admin.exam.update-role-node',$exam->id)}}"
             var baseData = {staff_ids:JSON.stringify($('#selected_staffs').jstree("get_checked")),
@@ -671,6 +669,10 @@
         $(document).on('click', '#import_temp_employee', function (e) {
             window_request_room = PopupCenterDual('{!! route('admin.exam.temp_employee.request_import', $exam->id) !!}','import temporary employee','800','470');
         });
+
+
+
+
 
     </script>
 

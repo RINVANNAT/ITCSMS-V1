@@ -84,6 +84,7 @@ class employeeExamController extends Controller
     public function getPositionByDepartments($id)
     {
         $department_id = explode('_', $_GET['id'])[1];
+//        $department_id = (int)($_GET['department_id']);
 
         $res = $this->departmentEmployees->getAllPositionByDepartements($department_id, $id);
         $result = [];

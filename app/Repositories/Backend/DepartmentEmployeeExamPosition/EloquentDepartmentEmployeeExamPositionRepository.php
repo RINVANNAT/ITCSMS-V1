@@ -25,19 +25,47 @@ class EloquentDepartmentEmployeeExamPositionRepository extends EloquentTempEmplo
     public function getAllDepartements($exam_id)
     {
         $allDepartments = [];
+        $employeeWithRoleIds = $this->getEmployeeHaveRoleIds($exam_id);
         $departments = Department::all();
         foreach ($departments as $department) {
-            $element = array(
-                "id" => 'department_' . $department->id,
-                "text" => $department->name_kh,
-                "children" => true,
-                "type" => "department"
-            );
-            array_push($allDepartments, $element);
+//            dd($department->id);
+            $employeePositions = DB::table('employees')
+                ->join('employee_position', 'employees.id', '=', 'employee_position.employee_id')
+                ->join('positions', 'positions.id', '=', 'employee_position.position_id')
+                ->where('department_id', $department->id)
+                ->whereNotIn('employees.id', $employeeWithRoleIds[0])
+                ->select('employees.id', 'employee_position.position_id', 'positions.title')->get();
+
+            if($employeePositions != null) {
+
+                $element = array(
+                    "id" => 'department_' . $department->id,
+                    "text" => $department->name_kh,
+                    "children" => true,
+                    "type" => "department"
+                );
+                array_push($allDepartments, $element);
+            }
+            if($department->name_en == 'Ministry') {
+                $temporaryEmployeeWithoutRoles = TempEmployee::whereNotIn('tempEmployees.id',$employeeWithRoleIds[1] )
+                    ->select('tempEmployees.id', 'tempEmployees.name_kh')->get();
+
+                if($temporaryEmployeeWithoutRoles) {
+
+                    $element = array(
+                        "id" => 'department_' . $department->id,
+                        "text" => $department->name_kh,
+                        "children" => true,
+                        "type" => "department"
+                    );
+                    array_push($allDepartments, $element);
+
+                }
+            }
+
         }
 
         return $allDepartments;
-
 
     }
 
@@ -57,7 +85,8 @@ class EloquentDepartmentEmployeeExamPositionRepository extends EloquentTempEmplo
 
         if((int)$ministryId[0]['id'] !== (int)$department_id) {
 
-            $employeePositions = Employee::join('employee_position', 'employees.id', '=', 'employee_position.employee_id')
+            $employeePositions = DB::table('employees')
+                ->join('employee_position', 'employees.id', '=', 'employee_position.employee_id')
                 ->join('positions', 'positions.id', '=', 'employee_position.position_id')
                 ->where('department_id', $department_id)
                 ->whereNotIn('employees.id', $employeeWithRoleIds[0])
