@@ -52,12 +52,15 @@ class CourseAnnualAPIController extends AppBaseController
             ->where('course_annuals.grade_id', $filters['grade_id'])
             ->where('course_annuals.department_id', $filters['department_id'])
             ->where('course_annuals.academic_year_id', $filters['academic_year_id']);
-        if ($filters["user_id"] != null){
-            $employee = Employee::where("user_id", "=", $filters["user_id"])->first();
-            if ($employee != null){
-                $courseAnnuals->where('course_annuals.employee_id', $employee->id);
-            }
-        }
+//        if ($filters["user_id"] != null){
+//            $employee = Employee::where("user_id", "=", $filters["user_id"])->first();
+//            if ($employee != null){
+//                $courseAnnuals->where('course_annuals.employee_id', $employee->id);
+//            }
+//        }
+//
+//
+//
         $courseAnnuals = $courseAnnuals->get();
         return $this->sendResponse($courseAnnuals, 'CourseAnnuals retrieved successfully');
     }

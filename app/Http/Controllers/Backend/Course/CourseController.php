@@ -135,7 +135,7 @@ class CourseController extends Controller
     public function update(UpdateCourseProgramRequest $request, $id)
     {
         $this->coursePrograms->update($id, $request->all());
-        return redirect()->route('admin.course.course_programs.index')->withFlashSuccess(trans('alerts.backend.generals.updated'));
+        return redirect()->route('admin.course.course_program.index')->withFlashSuccess(trans('alerts.backend.generals.updated'));
     }
 
     /**
