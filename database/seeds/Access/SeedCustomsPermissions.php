@@ -20,7 +20,6 @@ class SeedCustomsPermissions extends Seeder
             'groups'=>[
                 [
                     'name'=>'User',
-                    'sort'=>1,
                     'groups' => [
 
                     ],
@@ -65,7 +64,6 @@ class SeedCustomsPermissions extends Seeder
                 ],
                 [
                     'name'=>'Role',
-                    'sort'=>2,
                     'groups' => [
 
                     ],
@@ -86,7 +84,6 @@ class SeedCustomsPermissions extends Seeder
                 ],
                 [
                     'name'=>'Permission',
-                    'sort'=>3,
                     'groups' => [
 
                     ],
@@ -140,11 +137,9 @@ class SeedCustomsPermissions extends Seeder
         /* Student affair permissions */
         $roots[] = [
             'name'=>'Student & Study Affair',
-            'sort'=>2,
             'groups'=>[
                 [
                     'name'=>'Student',
-                    'sort'=>1,
                     'groups' => [
 
                     ],
@@ -169,7 +164,6 @@ class SeedCustomsPermissions extends Seeder
                 ],
                 [
                     'name'=>'Candidate',
-                    'sort'=>2,
                     'groups' => [
 
                     ],
@@ -202,11 +196,9 @@ class SeedCustomsPermissions extends Seeder
         /* Accounting Permissions */
         $roots[] = [
             'name'=>'Accounting',
-            'sort'=>3,
             'groups'=>[
                 [
                     'name'=>'Income',
-                    'sort'=>1,
                     'groups' => [
 
                     ],
@@ -231,7 +223,6 @@ class SeedCustomsPermissions extends Seeder
                 ],
                 [
                     'name'=>'Outcome',
-                    'sort'=>2,
                     'groups' => [
 
                     ],
@@ -256,7 +247,6 @@ class SeedCustomsPermissions extends Seeder
                 ],
                 [
                     'name'=>'Student Payment',
-                    'sort'=>3,
                     'groups' => [
 
                     ],
@@ -270,7 +260,6 @@ class SeedCustomsPermissions extends Seeder
                 ],
                 [
                     'name'=>'Customer',
-                    'sort'=>4,
                     'groups' => [
 
                     ],
@@ -306,7 +295,6 @@ class SeedCustomsPermissions extends Seeder
         /* Scholarship Permissions */
         $roots[] = [
             'name'=>'Scholarship',
-            'sort'=>4,
             'groups'=>[
             ],
             'permissions' => [
@@ -333,7 +321,6 @@ class SeedCustomsPermissions extends Seeder
         /* Examination Permissions */
         $roots[] = [
             'name'=>'Examination',
-            'sort'=>5,
             'groups'=>[
             ],
             'permissions' => [
@@ -361,7 +348,6 @@ class SeedCustomsPermissions extends Seeder
         /* Course Permissions */
         $roots[] = [
             'name'=>'Course',
-            'sort'=>6,
             'groups'=>[
             ],
             'permissions' => [
@@ -388,7 +374,6 @@ class SeedCustomsPermissions extends Seeder
         /* Employee Permissions */
         $roots[] = [
             'name'=>'Employee',
-            'sort'=>7,
             'groups'=>[
             ],
             'permissions' => [
@@ -415,7 +400,6 @@ class SeedCustomsPermissions extends Seeder
         /* Inventory Permissions */
         $roots[] = [
             'name'=>'Inventory',
-            'sort'=>8,
             'groups'=>[
             ],
             'permissions' => [
@@ -442,11 +426,9 @@ class SeedCustomsPermissions extends Seeder
         /* Configuration Permissions */
         $roots[] = [
             'name'=>'Configuration',
-            'sort'=>9,
             'groups'=>[
                 [
                     'name'=>'Department',
-                    'sort'=>1,
                     'groups'=>[
                     ],
                     'permissions' => [
@@ -471,7 +453,6 @@ class SeedCustomsPermissions extends Seeder
                 ],
                 [
                     'name'=>'Degree',
-                    'sort'=>2,
                     'groups'=>[
                     ],
                     'permissions' => [
@@ -496,7 +477,6 @@ class SeedCustomsPermissions extends Seeder
                 ],
                 [
                     'name'=>'Grade',
-                    'sort'=>3,
                     'groups'=>[
                     ],
                     'permissions' => [
@@ -521,7 +501,6 @@ class SeedCustomsPermissions extends Seeder
                 ],
                 [
                     'name'=>'Academic Year',
-                    'sort'=>4,
                     'groups'=>[
                     ],
                     'permissions' => [
@@ -546,7 +525,6 @@ class SeedCustomsPermissions extends Seeder
                 ],
                 [
                     'name'=>'Account',
-                    'sort'=>5,
                     'groups'=>[
                     ],
                     'permissions' => [
@@ -571,7 +549,6 @@ class SeedCustomsPermissions extends Seeder
                 ],
                 [
                     'name'=>'Building',
-                    'sort'=>6,
                     'groups'=>[
                     ],
                     'permissions' => [
@@ -596,7 +573,6 @@ class SeedCustomsPermissions extends Seeder
                 ],
                 [
                     'name'=>'High School',
-                    'sort'=>7,
                     'groups'=>[
                     ],
                     'permissions' => [
@@ -621,7 +597,6 @@ class SeedCustomsPermissions extends Seeder
                 ],
                 [
                     'name'=>'Income Type',
-                    'sort'=>8,
                     'groups'=>[
                     ],
                     'permissions' => [
@@ -646,7 +621,6 @@ class SeedCustomsPermissions extends Seeder
                 ],
                 [
                     'name'=>'Outcome Type',
-                    'sort'=>9,
                     'groups'=>[
                     ],
                     'permissions' => [
@@ -671,7 +645,6 @@ class SeedCustomsPermissions extends Seeder
                 ],
                 [
                     'name'=>'School & Scholarship Fee',
-                    'sort'=>10,
                     'groups'=>[
                     ],
                     'permissions' => [
@@ -696,7 +669,6 @@ class SeedCustomsPermissions extends Seeder
                 ],
                 [
                     'name'=>'Room',
-                    'sort'=>11,
                     'groups'=>[
                     ],
                     'permissions' => [
@@ -721,7 +693,6 @@ class SeedCustomsPermissions extends Seeder
                 ],
                 [
                     'name'=>'Room Type',
-                    'sort'=>12,
                     'groups'=>[
                     ],
                     'permissions' => [
@@ -746,7 +717,6 @@ class SeedCustomsPermissions extends Seeder
                 ],
                 [
                     'name'=>'Student BacII',
-                    'sort'=>13,
                     'groups'=>[
                     ],
                     'permissions' => [
@@ -771,7 +741,6 @@ class SeedCustomsPermissions extends Seeder
                 ],
                 [
                     'name'=>'Department Option/ Technique',
-                    'sort'=>14,
                     'groups'=>[
                     ],
                     'permissions' => [
@@ -796,7 +765,6 @@ class SeedCustomsPermissions extends Seeder
                 ],
                 [
                     'name'=>'Promotion',
-                    'sort'=>15,
                     'groups'=>[
                     ],
                     'permissions' => [
@@ -821,7 +789,6 @@ class SeedCustomsPermissions extends Seeder
                 ],
                 [
                     'name'=>'Redouble',
-                    'sort'=>16,
                     'groups'=>[
                     ],
                     'permissions' => [
@@ -856,30 +823,49 @@ class SeedCustomsPermissions extends Seeder
             ]
         ];
 
-        foreach($roots as $index => $permission){
+        $this->saveGroupPemission($roots, null);
 
-            $group_model        = config('access.group');
-            $group             = $group_model::updateOrCreate(['name'=>$permission['name']]);
-            $group->sort       = $permission['sort'];
+    }
+
+    private function saveGroupPemission($groupPermission,$parent_id){
+        for($a=0;$a<count($groupPermission);$a++){
+            $permission = $groupPermission[$a];
+
+            // Save group first
+            $group_model       = config('access.group');
+            $group             = $group_model::where('name',$permission['name'])->first();
+            if($group == null) $group = new $group_model;
+
+            $group->name       = $permission['name'];
+            $group->sort       = $a+1; // Sort start from 1
+            $group->parent_id  = $parent_id;
             $group->created_at = Carbon::now();
             $group->updated_at = Carbon::now();
             $group->save();
 
+            // Save permissions for current group second
+            for($b=0;$b<count($permission['permissions']);$b++){
 
-            $sort = 0;
-            foreach($permission['childs'] as $key => $child){
-                $sort++;
+                $child  = $permission['permissions'][$b];
+
                 $permission_model= config('access.permission');
-                $p               = $permission_model::updateOrCreate(['name'=>$child['permission']]);
-                $p->display_name = $child['name'];
+                $p               = $permission_model::where('name',$child['name'])->first();
+                if($p==null) $p = new $permission_model;
+
+                $p->display_name = $child['display_name'];
+                $p->name = $child['name'];
                 $p->system       = true;
                 $p->group_id     = $group->id;
-                $p->sort         = $sort;
+                $p->sort         = $b+1;
                 $p->created_at   = Carbon::now();
                 $p->updated_at   = Carbon::now();
                 $p->save();
             }
-        }
 
+            // Save Child groups third, and repeat
+            if(!empty($permission['groups'])){
+                $this->saveGroupPemission($permission['groups'],$group->id);
+            }
+        }
     }
 }
