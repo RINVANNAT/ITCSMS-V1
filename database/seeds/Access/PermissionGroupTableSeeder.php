@@ -340,7 +340,7 @@ class PermissionGroupTableSeeder extends Seeder
 
         $group_model      = config('access.group');
         $promotion             = new $group_model;
-        $promotion->name       = 'Prmotion';
+        $promotion->name       = 'Promotion';
         $promotion->sort       = 15;
         $promotion->parent_id  = $configuration->id;
         $promotion->created_at = Carbon::now();

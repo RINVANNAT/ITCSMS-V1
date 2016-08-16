@@ -435,7 +435,7 @@ class PermissionTableSeeder extends Seeder
         $permission_model              = config('access.permission');
         $deleteIncomes               = new $permission_model;
         $deleteIncomes->name         = 'delete-incomes';
-        $deleteIncomes->display_name = 'Edit Incomes';
+        $deleteIncomes->display_name = 'Delete Incomes';
         $deleteIncomes->system       = true;
         $deleteIncomes->group_id     = 9;
         $deleteIncomes->sort         = 4;
@@ -546,7 +546,7 @@ class PermissionTableSeeder extends Seeder
         $permission_model              = config('access.permission');
         $deleteCustomers               = new $permission_model;
         $deleteCustomers->name         = 'delete-customers';
-        $deleteCustomers->display_name = 'Edit Customers';
+        $deleteCustomers->display_name = 'Delete Customers';
         $deleteCustomers->system       = true;
         $deleteCustomers->group_id     = 12;
         $deleteCustomers->sort         = 4;
@@ -594,7 +594,7 @@ class PermissionTableSeeder extends Seeder
         $permission_model              = config('access.permission');
         $deleteScholarships               = new $permission_model;
         $deleteScholarships->name         = 'delete-scholarships';
-        $deleteScholarships->display_name = 'Edit Scholarships';
+        $deleteScholarships->display_name = 'Delete Scholarships';
         $deleteScholarships->system       = true;
         $deleteScholarships->group_id     = 13;
         $deleteScholarships->sort         = 4;
@@ -642,7 +642,7 @@ class PermissionTableSeeder extends Seeder
         $permission_model              = config('access.permission');
         $deleteExams               = new $permission_model;
         $deleteExams->name         = 'delete-exams';
-        $deleteExams->display_name = 'Edit Exams';
+        $deleteExams->display_name = 'Delete Exams';
         $deleteExams->system       = true;
         $deleteExams->group_id     = 14;
         $deleteExams->sort         = 4;
@@ -691,7 +691,7 @@ class PermissionTableSeeder extends Seeder
         $permission_model              = config('access.permission');
         $deleteCourses               = new $permission_model;
         $deleteCourses->name         = 'delete-courses';
-        $deleteCourses->display_name = 'Edit Courses';
+        $deleteCourses->display_name = 'Delete Courses';
         $deleteCourses->system       = true;
         $deleteCourses->group_id     = 15;
         $deleteCourses->sort         = 4;
@@ -739,7 +739,7 @@ class PermissionTableSeeder extends Seeder
         $permission_model              = config('access.permission');
         $deleteEmployees               = new $permission_model;
         $deleteEmployees->name         = 'delete-employees';
-        $deleteEmployees->display_name = 'Edit Employees';
+        $deleteEmployees->display_name = 'Delete Employees';
         $deleteEmployees->system       = true;
         $deleteEmployees->group_id     = 16;
         $deleteEmployees->sort         = 4;

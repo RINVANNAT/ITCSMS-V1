@@ -14,444 +14,849 @@ class SeedCustomsPermissions extends Seeder
      */
     public function run()
     {
-        $permissions[] = [
-            'name'=>'Office',
-            'sort'=>1,
-            'childs'=>[
+        /* Access Permissions */
+        $roots[] = [
+            'name'=>'Access',
+            'groups'=>[
                 [
-                    'permission'=>'list-office',
-                    'name' => 'List Office'
+                    'name'=>'User',
+                    'sort'=>1,
+                    'groups' => [
+
+                    ],
+                    'permissions' => [
+                        [
+                            'name'         => 'create-users',
+                            'display_name' => 'Create Users',
+                        ],
+                        [
+                            'name'         => 'edit-users',
+                            'display_name' => 'Edit Users',
+                        ],
+                        [
+                            'name'         => 'delete-users',
+                            'display_name' => 'Delete Users',
+                        ],
+                        [
+                            'name'         => 'change-user-password',
+                            'display_name' => 'Change User Password',
+                        ],
+                        [
+                            'name'         => 'deactivate-users',
+                            'display_name' => 'Deactivate Users',
+                        ],
+                        [
+                            'name'         => 'reactivate-users',
+                            'display_name' => 'Re-Activate Users',
+                        ],
+                        [
+                            'name'         => 'undelete-users',
+                            'display_name' => 'Restore Users',
+                        ],
+                        [
+                            'name'         => 'permanently-delete-users',
+                            'display_name' => 'Permanently Delete Users',
+                        ],
+                        [
+                            'name'         => 'resend-user-confirmation-email',
+                            'display_name' => 'Resend Confirmation E-mail',
+                        ],
+                    ]
                 ],
                 [
-                    'permission'=>'create-office',
-                    'name' => 'Create Office'
-                ],[
-                    'permission'=>'delete-office',
-                    'name' => 'Delete Office'
-                ],[
-                    'permission'=>'update-office',
-                    'name' => 'Update Office'
-                ],[
-                    'permission'=>'assign-employee-office',
-                    'name' => 'Assign Employee Office'
-                ],[
-                    'permission'=>'unassign-employee-office',
-                    'name' => 'Unassign Employee Office'
+                    'name'=>'Role',
+                    'sort'=>2,
+                    'groups' => [
+
+                    ],
+                    'permissions' => [
+                        [
+                            'name'         => 'create-roles',
+                            'display_name' => 'Create Roles',
+                        ],
+                        [
+                            'name'         => 'edit-roles',
+                            'display_name' => 'Edit Roles',
+                        ],
+                        [
+                            'name'         => 'delete-roles',
+                            'display_name' => 'Delete Roles',
+                        ]
+                    ]
+                ],
+                [
+                    'name'=>'Permission',
+                    'sort'=>3,
+                    'groups' => [
+
+                    ],
+                    'permissions' => [
+                        /* Permissions Group */
+                        [
+                            'name'         => 'create-permission-groups',
+                            'display_name' => 'Create Permission Groups',
+                        ],
+                        [
+                            'name'         => 'edit-permission-groups',
+                            'display_name' => 'Edit Permission Groups',
+                        ],
+                        [
+                            'name'         => 'delete-permission-groups',
+                            'display_name' => 'Delete Permission Groups',
+                        ],
+                        [
+                            'name'         => 'sort-permission-groups',
+                            'display_name' => 'Sort Permission Groups',
+                        ],
+                        /* Permissions */
+                        [
+                            'name'         => 'create-permissions',
+                            'display_name' => 'Create Permissions',
+                        ],
+                        [
+                            'name'         => 'edit-permissions',
+                            'display_name' => 'Edit Permissions',
+                        ],
+                        [
+                            'name'         => 'delete-permissions',
+                            'display_name' => 'Delete Permissions',
+                        ]
+                    ]
+                ]
+            ],
+            'permissions' => [
+                // Leave it empty if there is none
+                [
+                    'name'         => 'view-backend',
+                    'display_name' => 'View Backend',
+                ],
+                [
+                    'name'         => 'view-access-management',
+                    'display_name' => 'View Access Management',
                 ]
             ]
         ];
-        $permissions[] = [
-            'name'=>'Professional',
+
+        /* Student affair permissions */
+        $roots[] = [
+            'name'=>'Student & Study Affair',
             'sort'=>2,
-            'childs'=>[
+            'groups'=>[
                 [
-                    'permission'=>'create-professional',
-                    'name' => 'Create Professional'
-                ],[
-                    'permission'=>'delete-professional',
-                    'name' => 'Delete Professional'
-                ],[
-                    'permission'=>'update-professional',
-                    'name' => 'Update Professional'
-                ],[
-                    'permission'=>'assign-employee-professional',
-                    'name' => 'Assign Employee Professional'
-                ],[
-                    'permission'=>'unassign-employee-professional',
-                    'name' => 'Unassign Employee Professional'
+                    'name'=>'Student',
+                    'sort'=>1,
+                    'groups' => [
+
+                    ],
+                    'permissions' => [
+                        [
+                            'name'         => 'view-student-management',
+                            'display_name' => 'View Student Management',
+                        ],
+                        [
+                            'name'         => 'create-students',
+                            'display_name' => 'Create Students',
+                        ],
+                        [
+                            'name'         => 'edit-students',
+                            'display_name' => 'Edit Students',
+                        ],
+                        [
+                            'name'         => 'delete-students',
+                            'display_name' => 'Delete Students',
+                        ]
+                    ]
+                ],
+                [
+                    'name'=>'Candidate',
+                    'sort'=>2,
+                    'groups' => [
+
+                    ],
+                    'permissions' => [
+                        [
+                            'name'         => 'view-candidate-management',
+                            'display_name' => 'View Candidate Management',
+                        ],
+                        [
+                            'name'         => 'create-candidates',
+                            'display_name' => 'Create Candidates',
+                        ],
+                        [
+                            'name'         => 'edit-candidates',
+                            'display_name' => 'Edit Candidates',
+                        ],
+                        [
+                            'name'         => 'delete-candidates',
+                            'display_name' => 'Edit Candidates',
+                        ]
+                    ]
                 ]
+            ],
+            'permissions' => [
+                // Leave it empty if there is none
+
             ]
         ];
-        $permissions[] = [
-            'name'=>'Course',
+
+        /* Accounting Permissions */
+        $roots[] = [
+            'name'=>'Accounting',
             'sort'=>3,
-            'childs'=>[
+            'groups'=>[
                 [
-                    'permission'=>'create-course',
-                    'name' => 'Create Course'
-                ],[
-                    'permission'=>'delete-course',
-                    'name' => 'Delete Course'
-                ],[
-                    'permission'=>'update-course',
-                    'name' => 'Update Course'
-                ],[
-                    'permission'=>'assign-employee-course',
-                    'name' => 'Assign Employee Course'
-                ],[
-                    'permission'=>'unassign-employee-course',
-                    'name' => 'Unassign Employee Course'
-                ],[
-                    'permission'=>'view-course',
-                    'name' => 'View Course'
+                    'name'=>'Income',
+                    'sort'=>1,
+                    'groups' => [
+
+                    ],
+                    'permissions' => [
+                        [
+                            'name'         => 'view-income-management',
+                            'display_name' => 'View Income Management',
+                        ],
+                        [
+                            'name'         => 'create-incomes',
+                            'display_name' => 'Create Incomes',
+                        ],
+                        [
+                            'name'         => 'edit-incomes',
+                            'display_name' => 'Edit Incomes',
+                        ],
+                        [
+                            'name'         => 'delete-incomes',
+                            'display_name' => 'Delete Incomes',
+                        ],
+                    ]
+                ],
+                [
+                    'name'=>'Outcome',
+                    'sort'=>2,
+                    'groups' => [
+
+                    ],
+                    'permissions' => [
+                        [
+                            'name'         => 'view-outcome-management',
+                            'display_name' => 'View Outcome Management',
+                        ],
+                        [
+                            'name'         => 'create-outcomes',
+                            'display_name' => 'Create Outcomes',
+                        ],
+                        [
+                            'name'         => 'edit-outcomes',
+                            'display_name' => 'Edit Outcomes',
+                        ],
+                        [
+                            'name'         => 'delete-outcomes',
+                            'display_name' => 'Edit Outcomes',
+                        ],
+                    ]
+                ],
+                [
+                    'name'=>'Student Payment',
+                    'sort'=>3,
+                    'groups' => [
+
+                    ],
+                    'permissions' => [
+                        [
+                            'name'         => 'view-student-payment-management',
+                            'display_name' => 'View Student Payment Management',
+                        ]
+
+                    ]
+                ],
+                [
+                    'name'=>'Customer',
+                    'sort'=>4,
+                    'groups' => [
+
+                    ],
+                    'permissions' => [
+                        [
+                            'name'         => 'view-customer-management',
+                            'display_name' => 'View Customer Management',
+                        ],
+                        [
+                            'name'         => 'create-customers',
+                            'display_name' => 'Create Customers',
+                        ],
+                        [
+                            'name'         => 'edit-customers',
+                            'display_name' => 'Edit Customers',
+                        ],
+                        [
+                            'name'         => 'delete-customers',
+                            'display_name' => 'Delete Customers',
+                        ]
+                    ]
+                ]
+            ],
+            'permissions' => [
+                // Leave it empty if there is none
+                [
+                    'name'         => 'view-accounting-management',
+                    'display_name' => 'View Accounting Management',
                 ]
             ]
         ];
-        $permissions[] = [
-            'name'=>'Education',
+
+        /* Scholarship Permissions */
+        $roots[] = [
+            'name'=>'Scholarship',
             'sort'=>4,
-            'childs'=>[
+            'groups'=>[
+            ],
+            'permissions' => [
+                // Leave it empty if there is none
                 [
-                    'permission'=>'list-education',
-                    'name' => 'List Education'
-                ],[
-                    'permission'=>'create-education',
-                    'name' => 'Create Education'
-                ],[
-                    'permission'=>'delete-education',
-                    'name' => 'Delete Education'
-                ],[
-                    'permission'=>'update-education',
-                    'name' => 'Update Education'
-                ],[
-                    'permission'=>'assign-employee-education',
-                    'name' => 'Assign Employee Education'
-                ],[
-                    'permission'=>'unassign-employee-education',
-                    'name' => 'Unassign Employee Education'
-                ],[
-                    'permission'=>'view-education',
-                    'name' => 'View Education'
+                    'name'         => 'view-scholarship-management',
+                    'display_name' => 'View Scholarship Management',
+                ],
+                [
+                    'name'         => 'create-scholarships',
+                    'display_name' => 'Create Scholarships',
+                ],
+                [
+                    'name'         => 'edit-scholarships',
+                    'display_name' => 'Edit Scholarships',
+                ],
+                [
+                    'name'         => 'delete-scholarships',
+                    'display_name' => 'Delete Scholarships',
                 ]
             ]
         ];
-        $permissions[] = [
-            'name'=>'Children',
+
+        /* Examination Permissions */
+        $roots[] = [
+            'name'=>'Examination',
             'sort'=>5,
-            'childs'=>[
+            'groups'=>[
+            ],
+            'permissions' => [
+                // Leave it empty if there is none
+
                 [
-                    'permission'=>'list-children',
-                    'name' => 'List Children'
-                ],[
-                    'permission'=>'create-children',
-                    'name' => 'Create Children'
-                ],[
-                    'permission'=>'delete-children',
-                    'name' => 'Delete Children'
-                ],[
-                    'permission'=>'update-children',
-                    'name' => 'Update Children'
-                ],[
-                    'permission'=>'view-children',
-                    'name' => 'View Children'
+                    'name'         => 'view-exam-management',
+                    'display_name' => 'View Exam Management',
+                ],
+                [
+                    'name'         => 'create-exams',
+                    'display_name' => 'Create Exams',
+                ],
+                [
+                    'name'         => 'edit-exams',
+                    'display_name' => 'Edit Exams',
+                ],
+                [
+                    'name'         => 'delete-exams',
+                    'display_name' => 'Delete Exams',
                 ]
             ]
         ];
-        $permissions[] = [
-            'name'=>'Spouse',
+
+        /* Course Permissions */
+        $roots[] = [
+            'name'=>'Course',
             'sort'=>6,
-            'childs'=>[
+            'groups'=>[
+            ],
+            'permissions' => [
+                // Leave it empty if there is none
                 [
-                    'permission'=>'list-spouse',
-                    'name' => 'List Spouse'
-                ],[
-                    'permission'=>'create-spouse',
-                    'name' => 'Create Spouse'
-                ],[
-                    'permission'=>'delete-spouse',
-                    'name' => 'Delete Spouse'
-                ],[
-                    'permission'=>'update-spouse',
-                    'name' => 'Update Spouse'
-                ],[
-                    'permission'=>'view-spouse',
-                    'name' => 'View Spouse'
+                    'name'         => 'view-course-management',
+                    'display_name' => 'View Course Management',
+                ],
+                [
+                    'name'         => 'create-courses',
+                    'display_name' => 'Create Courses',
+                ],
+                [
+                    'name'         => 'edit-courses',
+                    'display_name' => 'Edit Courses',
+                ],
+                [
+                    'name'         => 'delete-courses',
+                    'display_name' => 'Delete Courses',
                 ]
             ]
         ];
-        $permissions[] = [
-            'name'=>'Mission',
-            'sort'=>7,
-            'childs'=>[
-                [
-                    'permission'=>'list-mission',
-                    'name' => 'List Mission'
-                ],[
-                    'permission'=>'create-mission',
-                    'name' => 'Create Mission'
-                ],[
-                    'permission'=>'delete-mission',
-                    'name' => 'Delete Mission'
-                ],[
-                    'permission'=>'update-mission',
-                    'name' => 'Update Mission'
-                ],[
-                    'permission'=>'view-mission',
-                    'name' => 'view Mission'
-                ]
-            ]
-        ];
-        $permissions[] = [
-            'name'=>'Censure',
-            'sort'=>8,
-            'childs'=>[
-                [
-                    'permission'=>'list-censure',
-                    'name' => 'List Censure'
-                ],[
-                    'permission'=>'create-censure',
-                    'name' => 'Create Censure'
-                ],[
-                    'permission'=>'delete-censure',
-                    'name' => 'Delete Censure'
-                ],[
-                    'permission'=>'update-censure',
-                    'name' => 'Update Censure'
-                ],[
-                    'permission'=>'view-censure',
-                    'name' => 'View Censure'
-                ]
-            ]
-        ];
-        $permissions[] = [
-            'name'=>'Place',
-            'sort'=>9,
-            'childs'=>[
-                [
-                    'permission'=>'list-place',
-                    'name' => 'List Place'
-                ],[
-                    'permission'=>'create-place',
-                    'name' => 'Create Place'
-                ],[
-                    'permission'=>'delete-place',
-                    'name' => 'Delete Place'
-                ],[
-                    'permission'=>'update-place',
-                    'name' => 'Update Place'
-                ],[
-                    'permission'=>'view-place',
-                    'name' => 'View Place'
-                ]
-            ]
-        ];
-        $permissions[] = [
-            'name'=>'Job',
-            'sort'=>10,
-            'childs'=>[
-                [
-                    'permission'=>'list-job',
-                    'name' => 'List Job'
-                ],[
-                    'permission'=>'create-job',
-                    'name' => 'Create Job'
-                ],[
-                    'permission'=>'delete-job',
-                    'name' => 'Delete Job'
-                ],[
-                    'permission'=>'update-job',
-                    'name' => 'Update Job'
-                ],[
-                    'permission'=>'view-job',
-                    'name' => 'View Job'
-                ]
-            ]
-        ];
-        $permissions[] = [
-            'name'=>'Rank',
-            'sort'=>10,
-            'childs'=>[
-                [
-                    'permission'=>'list-rank',
-                    'name' => 'List Rank'
-                ],[
-                    'permission'=>'create-rank',
-                    'name' => 'Create Rank'
-                ],[
-                    'permission'=>'delete-rank',
-                    'name' => 'Delete Rank'
-                ],[
-                    'permission'=>'update-rank',
-                    'name' => 'Update Rank'
-                ],[
-                    'permission'=>'view-rank',
-                    'name' => 'View Rank'
-                ]
-            ]
-        ];
-        $permissions[] = [
+
+        /* Employee Permissions */
+        $roots[] = [
             'name'=>'Employee',
-            'sort'=>10,
-            'childs'=>[
+            'sort'=>7,
+            'groups'=>[
+            ],
+            'permissions' => [
+                // Leave it empty if there is none
                 [
-                    'permission'=>'list-employee',
-                    'name' => 'List Employee'
-                ],[
-                    'permission'=>'list-retirement-employee',
-                    'name' => 'List Retirment Employee'
-                ],[
-                    'permission'=>'create-employee',
-                    'name' => 'Create Employee'
-                ],[
-                    'permission'=>'delete-employee',
-                    'name' => 'Delete Employee'
-                ],[
-                    'permission'=>'update-employee',
-                    'name' => 'Update Employee'
-                ],[
-                    'permission'=>'view-employee',
-                    'name' => 'View Employee'
-                ]
-            ]
-        ];
-        $permissions[] = [
-            'name'=>'Reward',
-            'sort'=>10,
-            'childs'=>[
-                [
-                    'permission'=>'list-reward',
-                    'name' => 'List Reward'
-                ],[
-                    'permission'=>'create-reward',
-                    'name' => 'Create Reward'
-                ],[
-                    'permission'=>'delete-reward',
-                    'name' => 'Delete Reward'
-                ],[
-                    'permission'=>'update-reward',
-                    'name' => 'Update Reward'
-                ],[
-                    'permission'=>'view-reward',
-                    'name' => 'View Reward'
-                ]
-            ]
-        ];
-        $permissions[] = [
-            'name'=>'Organization',
-            'sort'=>11,
-            'childs'=>[
-                [
-                    'permission'=>'list-organization',
-                    'name' => 'List Organization'
-                ],[
-                    'permission'=>'create-organization',
-                    'name' => 'Create Organization'
-                ],[
-                    'permission'=>'delete-organization',
-                    'name' => 'Delete Organization'
-                ],[
-                    'permission'=>'update-organization',
-                    'name' => 'Update Organization'
-                ],[
-                    'permission'=>'view-organization',
-                    'name' => 'View Organization'
-                ]
-            ]
-        ];
-        $permissions[] = [
-            'name'=>'Institute',
-            'sort'=>11,
-            'childs'=>[
-                [
-                    'permission'=>'list-institute',
-                    'name' => 'List Institute'
-                ],[
-                    'permission'=>'create-institute',
-                    'name' => 'Create Institute'
-                ],[
-                    'permission'=>'delete-institute',
-                    'name' => 'Delete Institute'
-                ],[
-                    'permission'=>'update-institute',
-                    'name' => 'Update Institute'
-                ],[
-                    'permission'=>'view-institute',
-                    'name' => 'View Institute'
-                ]
-            ]
-        ];
-        $permissions[] = [
-            'name'=>'Certificate',
-            'sort'=>12,
-            'childs'=>[
-                [
-                    'permission'=>'list-certificate',
-                    'name' => 'List Certificate'
-                ],[
-                    'permission'=>'create-certificate',
-                    'name' => 'Create Certificate'
-                ],[
-                    'permission'=>'delete-certificate',
-                    'name' => 'Delete Certificate'
-                ],[
-                    'permission'=>'update-certificate',
-                    'name' => 'Update Certificate'
-                ],[
-                    'permission'=>'view-certificate',
-                    'name' => 'view Certificate'
-                ]
-            ]
-        ];
-        $permissions[] = [
-            'name'=>'Decider',
-            'sort'=>12,
-            'childs'=>[
-                [
-                    'permission'=>'list-decider',
-                    'name' => 'List Decider'
-                ],[
-                    'permission'=>'create-decider',
-                    'name' => 'Create Decider'
-                ],[
-                    'permission'=>'delete-decider',
-                    'name' => 'Delete Decider'
-                ],[
-                    'permission'=>'update-decider',
-                    'name' => 'Update Decider'
-                ],[
-                    'permission'=>'view-decider',
-                    'name' => 'view Decider'
-                ]
-            ]
-        ];
-        $permissions[] = [
-            'name'=>'Evaluation',
-            'sort'=>13,
-            'childs'=>[
-                [
-                    'permission'=>'list-evaluation',
-                    'name' => 'List Evaluation'
+                    'name'         => 'view-employee-management',
+                    'display_name' => 'View Employee Management',
                 ],
                 [
-                    'permission'=>'view-evaluation',
-                    'name' => 'View Evaluation'
+                    'name'         => 'create-employees',
+                    'display_name' => 'Create Employees',
                 ],
                 [
-                    'permission'=>'create-evaluation',
-                    'name' => 'Create Evaluation'
-                ],[
-                    'permission'=>'delete-evaluation',
-                    'name' => 'Delete Evaluation'
-                ],[
-                    'permission'=>'update-evaluation',
-                    'name' => 'Update Evaluation'
+                    'name'         => 'edit-employees',
+                    'display_name' => 'Edit Employees',
+                ],
+                [
+                    'name'         => 'delete-employees',
+                    'display_name' => 'Delete Employees',
                 ]
             ]
         ];
-        $permissions[] = [
-            'name'=>'Attendance',
-            'sort'=>14,
-            'childs'=>[
+
+        /* Inventory Permissions */
+        $roots[] = [
+            'name'=>'Inventory',
+            'sort'=>8,
+            'groups'=>[
+            ],
+            'permissions' => [
+                // Leave it empty if there is none
                 [
-                    'permission'=>'list-attendance',
-                    'name' => 'List Attendance'
-                ],[
-                    'permission'=>'view-attendance',
-                    'name' => 'View Attendance'
+                    'name'         => 'view-inventory-management',
+                    'display_name' => 'View Inventory Management',
                 ],
                 [
-                    'permission'=>'create-attendance',
-                    'name' => 'Create Attendance'
-                ],[
-                    'permission'=>'delete-attendance',
-                    'name' => 'Delete Attendance'
-                ],[
-                    'permission'=>'update-attendance',
-                    'name' => 'Update Attendance'
+                    'name'         => 'create-inventories',
+                    'display_name' => 'Create Inventories',
+                ],
+                [
+                    'name'         => 'edit-inventories',
+                    'display_name' => 'Edit Inventories',
+                ],
+                [
+                    'name'         => 'delete-inventories',
+                    'display_name' => 'Delete Inventories',
                 ]
             ]
         ];
-        foreach($permissions as $index => $permission){
+
+        /* Configuration Permissions */
+        $roots[] = [
+            'name'=>'Configuration',
+            'sort'=>9,
+            'groups'=>[
+                [
+                    'name'=>'Department',
+                    'sort'=>1,
+                    'groups'=>[
+                    ],
+                    'permissions' => [
+                        // Leave it empty if there is none
+                        [
+                            'name'         => 'view-department-management',
+                            'display_name' => 'View Department Management',
+                        ],
+                        [
+                            'name'         => 'create-departments',
+                            'display_name' => 'Create Departments',
+                        ],
+                        [
+                            'name'         => 'edit-departments',
+                            'display_name' => 'Edit Departments',
+                        ],
+                        [
+                            'name'         => 'delete-departments',
+                            'display_name' => 'Delete Departments',
+                        ]
+                    ]
+                ],
+                [
+                    'name'=>'Degree',
+                    'sort'=>2,
+                    'groups'=>[
+                    ],
+                    'permissions' => [
+                        // Leave it empty if there is none
+                        [
+                            'name'         => 'view-degree-management',
+                            'display_name' => 'View Degree Management',
+                        ],
+                        [
+                            'name'         => 'create-degrees',
+                            'display_name' => 'Create Degrees',
+                        ],
+                        [
+                            'name'         => 'edit-degrees',
+                            'display_name' => 'Edit Degrees',
+                        ],
+                        [
+                            'name'         => 'delete-degrees',
+                            'display_name' => 'Delete Degrees',
+                        ]
+                    ]
+                ],
+                [
+                    'name'=>'Grade',
+                    'sort'=>3,
+                    'groups'=>[
+                    ],
+                    'permissions' => [
+                        // Leave it empty if there is none
+                        [
+                            'name'         => 'view-grade-management',
+                            'display_name' => 'View Grade Management',
+                        ],
+                        [
+                            'name'         => 'create-grades',
+                            'display_name' => 'Create Grades',
+                        ],
+                        [
+                            'name'         => 'edit-grades',
+                            'display_name' => 'Edit Grades',
+                        ],
+                        [
+                            'name'         => 'delete-grades',
+                            'display_name' => 'Delete Grades',
+                        ]
+                    ]
+                ],
+                [
+                    'name'=>'Academic Year',
+                    'sort'=>4,
+                    'groups'=>[
+                    ],
+                    'permissions' => [
+                        // Leave it empty if there is none
+                        [
+                            'name'         => 'view-academicYear-management',
+                            'display_name' => 'View Academic Year Management',
+                        ],
+                        [
+                            'name'         => 'create-academicYears',
+                            'display_name' => 'Create Academic Years',
+                        ],
+                        [
+                            'name'         => 'edit-academicYears',
+                            'display_name' => 'Edit Academic Years',
+                        ],
+                        [
+                            'name'         => 'delete-academicYears',
+                            'display_name' => 'Delete Academic Years',
+                        ]
+                    ]
+                ],
+                [
+                    'name'=>'Account',
+                    'sort'=>5,
+                    'groups'=>[
+                    ],
+                    'permissions' => [
+                        // Leave it empty if there is none
+                        [
+                            'name'         => 'view-account-management',
+                            'display_name' => 'View Account Management',
+                        ],
+                        [
+                            'name'         => 'create-accounts',
+                            'display_name' => 'Create Accounts',
+                        ],
+                        [
+                            'name'         => 'edit-accounts',
+                            'display_name' => 'Edit Accounts',
+                        ],
+                        [
+                            'name'         => 'delete-accounts',
+                            'display_name' => 'Delete Accounts',
+                        ]
+                    ]
+                ],
+                [
+                    'name'=>'Building',
+                    'sort'=>6,
+                    'groups'=>[
+                    ],
+                    'permissions' => [
+                        // Leave it empty if there is none
+                        [
+                            'name'         => 'view-building-management',
+                            'display_name' => 'View Building Management',
+                        ],
+                        [
+                            'name'         => 'create-buildings',
+                            'display_name' => 'Create Buildings',
+                        ],
+                        [
+                            'name'         => 'edit-buildings',
+                            'display_name' => 'Edit Buildings',
+                        ],
+                        [
+                            'name'         => 'delete-buildings',
+                            'display_name' => 'Delete Buildings',
+                        ]
+                    ]
+                ],
+                [
+                    'name'=>'High School',
+                    'sort'=>7,
+                    'groups'=>[
+                    ],
+                    'permissions' => [
+                        // Leave it empty if there is none
+                        [
+                            'name'         => 'view-highSchool-management',
+                            'display_name' => 'View High School Management',
+                        ],
+                        [
+                            'name'         => 'create-highSchools',
+                            'display_name' => 'Create High Schools',
+                        ],
+                        [
+                            'name'         => 'edit-highSchools',
+                            'display_name' => 'Edit High Schools',
+                        ],
+                        [
+                            'name'         => 'delete-highSchools',
+                            'display_name' => 'Delete High Schools',
+                        ]
+                    ]
+                ],
+                [
+                    'name'=>'Income Type',
+                    'sort'=>8,
+                    'groups'=>[
+                    ],
+                    'permissions' => [
+                        // Leave it empty if there is none
+                        [
+                            'name'         => 'view-incomeType-management',
+                            'display_name' => 'View Income Type Management',
+                        ],
+                        [
+                            'name'         => 'create-incomeTypes',
+                            'display_name' => 'Create Income Types',
+                        ],
+                        [
+                            'name'         => 'edit-incomeTypes',
+                            'display_name' => 'Edit Income Types',
+                        ],
+                        [
+                            'name'         => 'delete-incomeTypes',
+                            'display_name' => 'Delete Income Types',
+                        ]
+                    ]
+                ],
+                [
+                    'name'=>'Outcome Type',
+                    'sort'=>9,
+                    'groups'=>[
+                    ],
+                    'permissions' => [
+                        // Leave it empty if there is none
+                        [
+                            'name'         => 'view-outcomeType-management',
+                            'display_name' => 'View Outcome Type Management',
+                        ],
+                        [
+                            'name'         => 'create-outcomeTypes',
+                            'display_name' => 'Create Outcome Types',
+                        ],
+                        [
+                            'name'         => 'edit-outcomeTypes',
+                            'display_name' => 'Edit Outcome Types',
+                        ],
+                        [
+                            'name'         => 'delete-outcomeTypes',
+                            'display_name' => 'Delete Outcome Types',
+                        ]
+                    ]
+                ],
+                [
+                    'name'=>'School & Scholarship Fee',
+                    'sort'=>10,
+                    'groups'=>[
+                    ],
+                    'permissions' => [
+                        // Leave it empty if there is none
+                        [
+                            'name'         => 'view-schoolFee-management',
+                            'display_name' => 'View School Fee Management',
+                        ],
+                        [
+                            'name'         => 'create-schoolFees',
+                            'display_name' => 'Create School Fees',
+                        ],
+                        [
+                            'name'         => 'edit-schoolFees',
+                            'display_name' => 'Edit School Fees',
+                        ],
+                        [
+                            'name'         => 'delete-schoolFees',
+                            'display_name' => 'Delete School Fees',
+                        ]
+                    ]
+                ],
+                [
+                    'name'=>'Room',
+                    'sort'=>11,
+                    'groups'=>[
+                    ],
+                    'permissions' => [
+                        // Leave it empty if there is none
+                        [
+                            'name'         => 'view-room-management',
+                            'display_name' => 'View Room Management',
+                        ],
+                        [
+                            'name'         => 'create-rooms',
+                            'display_name' => 'Create Rooms',
+                        ],
+                        [
+                            'name'         => 'edit-rooms',
+                            'display_name' => 'Edit Rooms',
+                        ],
+                        [
+                            'name'         => 'delete-rooms',
+                            'display_name' => 'Delete Rooms',
+                        ]
+                    ]
+                ],
+                [
+                    'name'=>'Room Type',
+                    'sort'=>12,
+                    'groups'=>[
+                    ],
+                    'permissions' => [
+                        // Leave it empty if there is none
+                        [
+                            'name'         => 'view-roomType-management',
+                            'display_name' => 'View Room Type Management',
+                        ],
+                        [
+                            'name'         => 'create-roomTypes',
+                            'display_name' => 'Create Room Types',
+                        ],
+                        [
+                            'name'         => 'edit-roomTypes',
+                            'display_name' => 'Edit Room Types',
+                        ],
+                        [
+                            'name'         => 'delete-roomTypes',
+                            'display_name' => 'Delete Room Types',
+                        ]
+                    ]
+                ],
+                [
+                    'name'=>'Student BacII',
+                    'sort'=>13,
+                    'groups'=>[
+                    ],
+                    'permissions' => [
+                        // Leave it empty if there is none
+                        [
+                            'name'         => 'view-studentBac2-management',
+                            'display_name' => 'View Student BacII Management',
+                        ],
+                        [
+                            'name'         => 'create-studentBac2s',
+                            'display_name' => 'Create Student BacII',
+                        ],
+                        [
+                            'name'         => 'edit-studentBac2s',
+                            'display_name' => 'Edit Student BacII',
+                        ],
+                        [
+                            'name'         => 'delete-studentBac2s',
+                            'display_name' => 'Delete Student BacII',
+                        ]
+                    ]
+                ],
+                [
+                    'name'=>'Department Option/ Technique',
+                    'sort'=>14,
+                    'groups'=>[
+                    ],
+                    'permissions' => [
+                        // Leave it empty if there is none
+                        [
+                            'name'         => 'view-departmentOption-management',
+                            'display_name' => 'View Department Option Management',
+                        ],
+                        [
+                            'name'         => 'create-departmentOptions',
+                            'display_name' => 'Create Department Options',
+                        ],
+                        [
+                            'name'         => 'edit-departmentOptions',
+                            'display_name' => 'Edit Department Options',
+                        ],
+                        [
+                            'name'         => 'delete-departmentOptions',
+                            'display_name' => 'Delete Department Options',
+                        ]
+                    ]
+                ],
+                [
+                    'name'=>'Promotion',
+                    'sort'=>15,
+                    'groups'=>[
+                    ],
+                    'permissions' => [
+                        // Leave it empty if there is none
+                        [
+                            'name'         => 'view-promotion-management',
+                            'display_name' => 'View Promotion Management',
+                        ],
+                        [
+                            'name'         => 'create-promotions',
+                            'display_name' => 'Create Promotions',
+                        ],
+                        [
+                            'name'         => 'edit-promotions',
+                            'display_name' => 'Edit Promotions',
+                        ],
+                        [
+                            'name'         => 'delete-promotions',
+                            'display_name' => 'Delete Promotions',
+                        ]
+                    ]
+                ],
+                [
+                    'name'=>'Redouble',
+                    'sort'=>16,
+                    'groups'=>[
+                    ],
+                    'permissions' => [
+                        // Leave it empty if there is none
+                        [
+                            'name'         => 'view-redouble-management',
+                            'display_name' => 'View Redouble Management',
+                        ],
+                        [
+                            'name'         => 'create-redoubles',
+                            'display_name' => 'Create Redoubles',
+                        ],
+                        [
+                            'name'         => 'edit-redoubles',
+                            'display_name' => 'Edit Redoubles',
+                        ],
+                        [
+                            'name'         => 'delete-redoubles',
+                            'display_name' => 'Delete Redoubles',
+                        ]
+                    ]
+                ],
+
+            ],
+            'permissions' => [
+                // Permissions for configuration
+                // Leave it empty if there is none
+                [
+                    'name'         => 'view-configuration-management',
+                    'display_name' => 'View Configuration Management',
+                ]
+            ]
+        ];
+
+        foreach($roots as $index => $permission){
 
             $group_model        = config('access.group');
             $group             = $group_model::updateOrCreate(['name'=>$permission['name']]);
