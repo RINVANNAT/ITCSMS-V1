@@ -8,15 +8,17 @@
             contentClass = "col-sm-12";
             right_staff_role.hide();
             $('#btn_add_role').show();
+
             if($("#selected_staffs").jstree('get_selected').length !== 0) {
 
                 $('#btn_delete_node').show();
                 $('#btn_move_node').show();
             } else {
-                console.log('else');
                 $('#btn_delete_node').hide();
                 $('#btn_move_node').hide();
             }
+
+
 
         } else {
             contentClass = "col-sm-6";
@@ -186,15 +188,15 @@
                 $('.popUpRoleDown').slideFadeToggle().addClass('show');
 
             });
-            $('#btn_cancel_staff_role').on('click',function() {
-                $('.popUpRoleDown').hide();
-                toggleSidebarStaffRole();
-                return false;
-            })
-
         });
 
     });
+
+    $('#btn_cancel_staff_role').on('click',function() {
+        $('.popUpRoleDown').hide();
+        toggleSidebarStaffRole();
+        return false;
+    })
 
     $('#btn_cancel_chang_role').on('click', function() {
         $('.popUpRoleDown').slideFadeToggle().removeClass('show');
@@ -236,17 +238,6 @@
                 }
                 $('#all_staff_role').jstree("refresh");
                 $('#selected_staffs').jstree("refresh");
-
-
-                //if($("#selected_staffs").jstree('get_selected').length !== 0) {
-                //
-                //    $('#btn_delete_node').show();
-                //    $('#btn_move_node').show();
-                //} else {
-                //    console.log('else');
-                //    $('#btn_delete_node').hide();
-                //    $('#btn_move_node').hide();
-                //}
                 notify("success","info", "You have done!");
             }
         });
@@ -289,11 +280,14 @@
         //console.log($("#all_staff_role").jstree('get_selected'));
 
         var selected_arr = $("#all_staff_role").jstree('get_selected');
+        console.log(selected_arr);
         var only_staff = [];
         for (var i=0;i<selected_arr.length;i++){
             var element = selected_arr[i].split('_');
 
-            if(element.length > 3) {
+            console.log(element);
+
+            if(element.length >3) {
                 only_staff.push(element);
             }
         }
@@ -317,3 +311,13 @@
     $('#check_ok').hide();
     $('#alert_delete_role_staff').hide();
     $('#alert_delete_role_staff_success').hide();
+
+    function toggleLoading(isLoading){
+        if(isLoading){
+            $('.loading').removeClass('hide');
+        } else {
+            $('.loading').addClass('hide');
+        }
+    }
+
+

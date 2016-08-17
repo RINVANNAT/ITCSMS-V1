@@ -2,7 +2,6 @@
 
 use Illuminate\Database\Seeder;
 use Carbon\Carbon;
-use Illuminate\Support\Facades\DB;
 
 class SeedCustomsPermissions extends Seeder
 {
@@ -462,6 +461,21 @@ class SeedCustomsPermissions extends Seeder
         $roots[] = [
             'name'=>'Examination',
             'groups'=>[
+                [
+                    'name'=>'Staff',
+                    'groups' => [
+                    ],
+                    'permissions' => [
+                        [
+                            'name'         => 'modify-examination-staff',
+                            'display_name' => 'Modify Examination Staff',
+                        ],
+                        [
+                            'name'         => 'add-temporary-examination-staff',
+                            'display_name' => 'Add/Import Examination Staff from Ministry',
+                        ],
+                    ]
+                ]
             ],
             'permissions' => [
                 // Leave it empty if there is none

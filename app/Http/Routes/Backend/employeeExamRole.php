@@ -33,6 +33,8 @@ Route::group([], function() {
 
     Route::post('exams/{id}/temp-employee-import', 'employeeExamController@importTempEmployees')->name('admin.exam.temp_employee.import');
 
+    Route::get('exams/{id}/temp-employee-export', 'employeeExamController@exportTempEmployees')->name('admin.exam.temp_employee.export');
+
 
 
 

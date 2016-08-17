@@ -138,8 +138,6 @@ class employeeExamController extends Controller
 
     public function importTempEmployees($exam_id, Request $request){
 
-
-
         $now = Carbon::now()->format('Y_m_d_H');
 
         if($request->file('import')!= null){
@@ -165,9 +163,61 @@ class employeeExamController extends Controller
                 DB::rollback();
             }
             DB::commit();
-
-            return redirect(route('admin.exam.index', $exam_id));
+            $status = true;
+            return view('backend.exam.includes.after_import_success', compact('status'));
+        } else {
+            $status = false;
+            return view('backend.exam.includes.after_import_success', compact('status'));
         }
+    }
+
+    public function exportTempEmployees($exam_id) {
+
+        $data = [];
+        $tempEmployees = DB::table('tempEmployees')
+                    ->select('id', 'name_kh', 'name_latin', 'email', 'phone', 'birthdate', 'address', 'gender_id', 'academic_year_id')
+                    ->get();
+        foreach( $tempEmployees as $tempEmployee) {
+            $gender = DB::table('genders')->where('id', $tempEmployee->gender_id)->select('name_en')->first();
+            $academicYear = DB::table('academicYears')->where('id',$tempEmployee->academic_year_id)->select('name_latin')->first();
+            $birthDate = explode(" ",$tempEmployee->birthdate);
+            if($gender) {
+                if($academicYear) {
+                    $element = array(
+                        'Name khmer'         => $tempEmployee->name_kh,
+                        'Name Latin'         => $tempEmployee->name_latin,
+                        'E-mail'             => $tempEmployee->email,
+                        'Phone'              => $tempEmployee->phone,
+                        'Birth Date'         => $birthDate[0],
+                        'Address'            => $tempEmployee->address,
+                        'Gender'             => $gender->name_en,
+                        'Academic Year'      => $academicYear->name_latin
+                    );
+                    $data[] = $element;
+                }
+
+            }
+
+        }
+        $fields= ['Name khmer', 'Name Latin', 'Email', 'Phone', 'Birth Date', 'Address', 'Gender', 'Academic Year'];
+        $title = 'List of Temporary Staffs For Entrance Examination';
+        $alpha = [];
+        $letter = 'A';
+        while ($letter !== 'AAA') {
+            $alpha[] = $letter++;
+        }
+            Excel::create('temp-employees', function($excel) use ($data, $title,$alpha,$fields) {
+
+
+            $excel->setTitle('List of Temporary Staffs For Entrance Examination');
+            $excel->setCreator('Department of Study & Student Affair')
+                ->setCompany('Institute of Technology of Cambodia');
+            $excel->sheet('Sheetname', function($sheet) use($data,$title,$alpha,$fields) {
+
+                $sheet->fromArray($data);
+            });
+
+        })->download('csv');
     }
 
 }

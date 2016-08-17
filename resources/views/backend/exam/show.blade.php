@@ -671,6 +671,12 @@
         });
 
 
+        $('#export_temp_employee').on('click', function() {
+            var baseUrl = '{!! route('admin.exam.temp_employee.export', $exam->id) !!}';
+            window.location.href = baseUrl;
+        })
+
+
 
 
 

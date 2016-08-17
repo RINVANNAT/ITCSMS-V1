@@ -288,6 +288,7 @@ class StudentAnnualController extends Controller
     }
 
     public function import(ImportStudentRequest $request){
+
         $now = Carbon::now()->format('Y_m_d_H');
 
         // try to move uploaded file to a temporary location
@@ -1076,6 +1077,8 @@ class StudentAnnualController extends Controller
         if(isset($_POST['parent_phone'])){
             array_push($fields,$_POST['parent_phone']);
         }
+
+        dd($data);
 
         Excel::create('បញ្ជីនិស្សិត', function($excel) use ($data, $title,$alpha,$fields) {
 

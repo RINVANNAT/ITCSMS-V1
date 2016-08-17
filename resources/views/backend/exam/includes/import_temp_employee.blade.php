@@ -34,7 +34,7 @@
                     </div>
 
                     <div class="pull-right">
-                        <input type="submit" class="btn btn-success btn-xs" value="{{ trans('buttons.general.import') }}" />
+                        <input type="submit" class="btn btn-success btn-xs" id = "submit_temp_employee" value="{{ trans('buttons.general.import') }}"/>
                     </div>
                     <div class="clearfix"></div>
                 </div><!-- /.box-body -->
@@ -50,6 +50,14 @@
     <script>
         $('#cancel_import').on('click', function() {
             window.close();
-        })
+        });
+
+        $(function(){
+            $('#submit_temp_employee').on('click',function(){
+                toggleLoading(true);
+            });
+        });
+
+
     </script>
 @stop

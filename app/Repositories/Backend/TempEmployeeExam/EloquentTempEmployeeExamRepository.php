@@ -224,17 +224,22 @@ class EloquentTempEmployeeExamRepository implements TempEmployeeExamRepositoryCo
 
     public function createImportedTempEmployees($tempEmployees) {
 
-        if (TempEmployee::where('name_kh', $tempEmployees['name_kh'])->first()) {
-            throw new GeneralException(trans('exceptions.backend.general.already_exists'));
+        $academicYearId = DB::table('academicYears')->where('name_latin', $tempEmployees['academic_year'])->select('id')->first();
+
+        if($academicYearId) {
+            if (TempEmployee::where([ ['name_kh', $tempEmployees['name_khmer']], ['academic_year_id', $academicYearId->id] ])->first()) {
+                throw new GeneralException(trans('exceptions.backend.general.already_exists'));
 //            return ['status'=>false];
+            }
         }
+
         $genderId = DB::table('genders')->where('name_en', $tempEmployees['gender'])->select('id')->first();
 
         $tempEmployee = new TempEmployee;
 
-        if(isset($tempEmployees['name_kh']))  $tempEmployee->name_kh = $tempEmployees['name_kh'];
+        if(isset($tempEmployees['name_khmer']))  $tempEmployee->name_kh = $tempEmployees['name_khmer'];
         if(isset($tempEmployees['name_latin']))$tempEmployee->name_latin = $tempEmployees['name_latin'];
-        if(isset($tempEmployees['email']))$tempEmployee->email = $tempEmployees['email'];
+        if(isset($tempEmployees['e_mail']))$tempEmployee->email = $tempEmployees['e_mail'];
 
         $tempEmployee->active = isset($tempEmployees['active'])?true:false;
 
@@ -244,6 +249,8 @@ class EloquentTempEmployeeExamRepository implements TempEmployeeExamRepositoryCo
 
         if(isset($tempEmployees['birth_date'])) $tempEmployee->birthdate =  date('Y-m-d', strtotime($tempEmployees['birth_date']));
         $tempEmployee->gender_id = $genderId->id;
+        $tempEmployee->academic_year_id = $academicYearId->id;
+
         $tempEmployee->created_at = Carbon::now();
 
 
