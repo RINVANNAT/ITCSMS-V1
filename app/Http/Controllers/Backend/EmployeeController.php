@@ -1,6 +1,7 @@
 <?php namespace App\Http\Controllers\Backend;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Backend\Employee\CreateEmployeeRequest;
 use App\Http\Requests\Backend\Employee\DeleteEmployeeRequest;
 use App\Http\Requests\Backend\Employee\EditEmployeeRequest;
 use App\Http\Requests\Backend\Employee\StoreEmployeeRequest;
@@ -12,6 +13,10 @@ use App\Models\Gender;
 use App\Repositories\Backend\Employee\EmployeeRepositoryContract;
 use App\Repositories\Backend\Role\RoleRepositoryContract;
 use Illuminate\Support\Facades\DB;
+use Carbon\Carbon;
+use Maatwebsite\Excel\Facades\Excel;
+use Flash;
+use App\Utils\ArrayUtils;
 
 class EmployeeController extends Controller
 {
@@ -165,4 +170,105 @@ class EmployeeController extends Controller
             ->make(true);
     }
 
+    public function request_import()
+    {
+        return view('backend.employee.import_config');
+    }
+
+
+    public function import(CreateEmployeeRequest $request)
+    {
+        $now = Carbon::now()->format('Y_m_d_H');
+
+        $messageSuccess = "";
+        if ($request->file('import') != null) {
+            $import = $now . '.' . $request->file('import')->getClientOriginalExtension();
+            $request->file('import')->move(
+                base_path() . '/public/assets/uploaded_file/temp/', $import
+            );
+
+            $storage_path = base_path() . '/public/assets/uploaded_file/temp/' . $import;
+            $finfo = finfo_open(FILEINFO_MIME_TYPE); // return mime type ala mimetype extension
+            $fileType = finfo_file($finfo, $storage_path) . "\n";
+            finfo_close($finfo);
+            $fileContext = array(
+                "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+                "application/vnd.ms-excel",
+                "text/plain",
+            );
+
+            if (in_array($fileType, $fileContext)) {
+                Flash::error('file type is ' . $fileType . ' Only excel or csv that import:' . $fileType . " key:");
+                return redirect()->back();
+            }
+            $GLOBALS['countRow'] = 0;
+            $GLOBALS['countRowEmployee'] = 0;
+            $GLOBALS['employees'] = array();
+
+
+            /**
+             * 1. Import Employee
+             */
+            DB::beginTransaction();
+            try {
+                Excel::filter('chunk')->load($storage_path)->chunk(1000, function ($results) {
+                    $aRow = array_keys($results->first()->toArray());
+                    $results->each(function ($row) {
+
+//                        check data format
+//                        flash message error with row
+//                        else go.
+                        $employeeData = array();
+                        $employeeData["name_kh"] = $row["name_kh"];
+                        $employeeData["name_latin"] = $row["name_latin"];
+                        $employeeData["email"] = $row["email"];
+                        $employeeData["phone"] = $row["phone"];
+                        $employeeData["active"] = true;
+                        $employeeData["gender_id"] = $row["gender_id"];
+                        $employeeData["birthdate"] = $row["birthdate"];;
+                        $employeeData["assignees_roles"] = array("3");
+                        $employeeData["department_id"] = $row["department_id"];
+                        $employeeData["created_at"] = Carbon::now()->format('Y_m_d_H');
+                        $employeeData["create_uid"] = auth()->id();
+                        array_push($GLOBALS['employees'], $employeeData);
+                    });
+                });
+            } catch (Exception $e) {
+//                return redirect()->back();
+            }
+
+
+            $countNewEmployeeImport = 0 ;
+
+
+            foreach ($GLOBALS['employees'] as $employee){
+                $employee["name_kh"];
+            }
+
+
+            try {
+                $uniqueEmployees = ArrayUtils::unique_multidim_array($GLOBALS['employees'], "name_latin");
+                foreach ($uniqueEmployees as $employee){
+                    $employeeDataBase = Employee::where('name_latin', $employee['name_latin'])->first();
+                    if($employeeDataBase == null) {
+                        if ($employee['name_latin']==null){
+                            Flash::error("name of lecture can not be empty");
+                            return redirect()->back();
+                        }
+                        Employee::create($employee);
+                        $countNewEmployeeImport = $countNewEmployeeImport + 1;
+                    }
+                }
+                $messageSuccess = "Number of Employee that had been import: ".$countNewEmployeeImport."<br>";
+            } catch (Exception $e) {
+                DB::rollback();
+                Flash::error('Employee Error: Data is not correct format ');
+            }
+            DB::commit();
+            Flash::success('Import Successfully ' . $GLOBALS['countRow'] . ' rows effected');
+            return redirect()->route('admin.employees.index');
+        }else{
+            Flash::error("Please select import file");
+        }
+    }
 }

@@ -137,6 +137,7 @@
             </li>
             @endauth
             @permission('view-configuration-management')
+
             <li class="{{ Active::pattern('admin/configuration*') }} treeview">
                 <a href="#">
                     <span>{{ trans('menus.backend.configuration.main') }}</span>

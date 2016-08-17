@@ -23,7 +23,7 @@
                     <button class="btn btn-primary btn-sm"><i class="fa fa-plus-circle"></i> Add
                     </button>
                 </a>
-                <a href="#">
+                <a href="{!! route('admin.employee.request_import') !!}">
                     <button class="btn btn-primary btn-sm"><i class="fa fa-plus-circle"></i> Import
                     </button>
                 </a>

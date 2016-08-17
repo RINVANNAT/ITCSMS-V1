@@ -1,6 +1,4 @@
-<?php
-
-namespace App\Http\Requests\Backend\Employee;
+<?php  namespace App\Http\Requests\Backend\Employee;
 
 use App\Http\Requests\Request;
 

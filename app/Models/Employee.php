@@ -10,6 +10,7 @@ class Employee extends Model
 
     //protected $dates = ['birthdate'];
     public $fillable = [
+        "id",
 	    "name_kh",
 		"name_latin",
 		"birthdate",

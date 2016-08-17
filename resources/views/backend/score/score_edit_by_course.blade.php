@@ -153,8 +153,8 @@
 
     <script>
         smsData = {
-            "user_id":"{!! $user_id !!}",
-            "user_type":"{!! $user_id !!}"
+            {{--"user_id":"{!! $user_id !!}",--}}
+            {{--"user_type":"{!! $user_id !!}"--}}
         }
         paramet = {};
         $( document ).ready(function() {
@@ -177,10 +177,9 @@
                 $.extend(paramet, data);
 
 //                if (smsData.userRole = "teacher"){
-                    $.extend(paramet,smsData);
+//                    $.extend(paramet,smsData);
 //                }
                 var shallowEncoded = $.param( paramet );
-                console.log(shallowEncoded);
 
                 var urltmp = "{!! route('api.v1.courseAnnuals') !!}" + "?" + shallowEncoded;
 

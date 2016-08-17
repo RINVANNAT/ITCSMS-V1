@@ -14,8 +14,7 @@ use App\Models\Employee;
 use App\Models\Grade;
 use App\Repositories\Backend\CourseAnnual\CourseAnnualRepositoryContract;
 use Illuminate\Support\Facades\DB;
-use App\Http\Requests\Backend\Course\CourseAnnual\ImportCourseRequest;
-use App\Http\Requests\Backend\Course\CourseAnnual\RequestImportCourseRequest;
+use App\Http\Requests\Backend\Course\CourseAnnual\ImportCourseAnnualRequest;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Maatwebsite\Excel\Facades\Excel;
@@ -202,7 +201,7 @@ class CourseAnnualController extends Controller
         }
         return $datatables->make(true);
     }
-    public function request_import(RequestImportCourseAnnualRequest $request){
+    public function request_import(){
         return view('backend.course.courseAnnual.import');
     }
 

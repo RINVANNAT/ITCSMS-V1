@@ -148,9 +148,10 @@ class ScoreController extends AppBaseController
 			}
 		}
 
-        $user_id = Auth::id();
+
+//        $user_id = Auth::id();
         $studentAnnuals = collect([]);
-		return view('backend.score.score_edit_by_course', compact("studentAnnuals","scoresindex", "scores", 'user_id'));
+		return view('backend.score.score_edit_by_course', compact("studentAnnuals","scoresindex", "scores"));
 	}
 
 	public  function  updateMany(Request $request){

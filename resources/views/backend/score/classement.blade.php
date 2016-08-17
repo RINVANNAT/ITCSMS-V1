@@ -1,19 +1,11 @@
 @extends ('backend.layouts.master')
-
-
 @section('page-header')
     <h1>
         {{ trans('labels.backend.score.title') }}
-        <small>{{ trans('labels.backend.score.sub_input_title') }}</small>
+        <small>{{ trans('labels.backend.score.sub_title') }}</small>
     </h1>
 
 @stop
-
-
-
-
-
-
 @section('content')
 <!-- Main content -->
 <section class="content">

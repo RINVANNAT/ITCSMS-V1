@@ -191,31 +191,24 @@ class CourseController extends Controller
             $request->file('import')->move(
                 base_path() . '/public/assets/uploaded_file/temp/', $import
             );
-
             $storage_path = base_path() . '/public/assets/uploaded_file/temp/' . $import;
-
-            // and then read that data and store to database
-            //Excel::load($storage_path, function($reader) {
-            //    dd($reader->first());
-            //});
 
             // validation file type
             $finfo = finfo_open(FILEINFO_MIME_TYPE); // return mime type ala mimetype extension
             $fileType = finfo_file($finfo, $storage_path) . "\n";
             finfo_close($finfo);
+
             $fileContext = array(
                 "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
                 "application/vnd.ms-excel",
                 "text/plain",
             );
+
             if (in_array($fileType, $fileContext)) {
                 Flash::error('file type is ' . $fileType . ' Only excel or csv that import:' . $fileType . " key:");
                 return redirect()->back();
             }
-
             // validation header
-
-
             $GLOBALS['countRow'] = 0;
             DB::beginTransaction();
             try {
@@ -241,6 +234,7 @@ class CourseController extends Controller
                         $courseData["created_at"] = Carbon::now();
                         $courseData["create_uid"] = auth()->id();
                         $courseAnnual = Course::create($courseData);
+
                         $GLOBALS['countRow'] = $GLOBALS['countRow'] + 1;
                     });
                 });
