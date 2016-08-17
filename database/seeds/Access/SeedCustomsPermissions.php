@@ -469,10 +469,16 @@ class SeedCustomsPermissions extends Seeder
                         [
                             'name'         => 'modify-examination-staff',
                             'display_name' => 'Modify Examination Staff',
+                            'dependency'   => [
+                                'view-backend','view-exam-management'
+                            ]
                         ],
                         [
                             'name'         => 'add-temporary-examination-staff',
                             'display_name' => 'Add/Import Examination Staff from Ministry',
+                            'dependency'   => [
+                                'view-backend','view-exam-management'
+                            ]
                         ],
                     ]
                 ]
