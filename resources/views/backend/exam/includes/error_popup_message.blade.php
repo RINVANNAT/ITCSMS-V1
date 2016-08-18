@@ -11,11 +11,17 @@
         </div>
         <!-- /.box-header -->
         <div class="box-body">
-
-            <div class="alert-danger col-sm-12">
+            <div class="col-sm-12">
                 <h3>Woow! there are inputed score errors.</h3>
-                <h3>please check!!</h3>
             </div>
+
+            @foreach($courses as $course)
+
+                <div class="alert-danger col-sm-12">
+                    <h3>please check on {{$course}}</h3>
+                </div>
+            @endforeach
+
 
         </div>
 
@@ -40,8 +46,11 @@
     {{--myscript--}}
 
     <script>
-
-
+        $( document ).ready(function() {
+            setTimeout(function(){
+                window.close();
+            },3000);
+        });
     </script>
 
 

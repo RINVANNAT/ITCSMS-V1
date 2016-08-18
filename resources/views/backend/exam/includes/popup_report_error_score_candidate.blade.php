@@ -105,6 +105,7 @@
 
 
                                         <?php array_push($length,$p)?>
+
                                         <div class="col-sm-1">
                                             <button class="btn-xs btn_add_new_correction_score "  onclick="AddNewCorrection(<?php echo $k;?>)"> Add </button>
                                         </div>
@@ -201,8 +202,8 @@
            $('#new_correction_score_'+i).hide();
        }
 
-       function AddNewCorrection (key,e) {
-           var click=0;
+       function AddNewCorrection (key) {
+
            $('#correction_score_'+key).append( $('#new_correction_score_'+key).delay(200).show(0));
            $('#cancel_correction_'+key).on('click', function() {
                $('#new_correction_score_'+key).delay(200).hide(0);
@@ -224,17 +225,13 @@
 
                if(baseData.score_c + baseData.score_w + baseData.score_na == 0) {
                    notify("error","info", "Please Check Your Record Was Not Saved!");
+                   location.reload();
                } else {
-                   if( click==0) {
-                       ajaxRequest('POST', baseUrl,baseData );
-                       click++;
-                   }
-
+                   ajaxRequest('POST', baseUrl,baseData );
                }
            });
 
            $('.validate_score_'+key).on('keydown keyup', function() {
-               console.log(key);
                calculateSum(key);
            });
 
@@ -253,10 +250,12 @@
                    console.log(result);
                    if(result.status){
                        notify("success","info", "you done it");
+                       location.reload();
                    } else{
                        notify("error","info", "there is an error");
+                       location.reload();
                    }
-                   location.reload();
+
 
                }
            });
@@ -267,56 +266,27 @@
        });
 
        function calculateSum(k) {
-                var total_question = JSON.parse('{{$totalQuestion}}');
-               var sum =0;
-               $(".validate_score_"+k).each(function() {
-                   if (!isNaN(this.value) && this.value.length != 0) {
-                       sum += parseInt(this.value);
-                       console.log(sum);
-                       $(this).css("background-color", "#FEFFB0");
-                       if(sum == total_question) {
-                           $("input#total_score_"+k).val(sum).css("color", "");
+           var total_question = JSON.parse('{{$totalQuestion}}');
+           var sum =0;
+           $(".validate_score_"+k).each(function() {
+               if (!isNaN(this.value) && this.value.length != 0) {
+                   sum += parseInt(this.value);
+                   console.log(sum);
+                   $(this).css("background-color", "#FEFFB0");
+                   if(sum == total_question) {
+                       $("input#total_score_"+k).val(sum).css("color", "");
 
-                       } else {
-                           $("input#total_score_"+k).val(sum).css("color", "red");
-                       }
+                   } else {
+                       $("input#total_score_"+k).val(sum).css("color", "red");
                    }
-                   else if (this.value.length != 0){
-                       $(this).css("background-color", "red");
-                   }
-               });
-       }
-
-        var scoreLength = JSON.parse('<?php echo $p?>');
-       var arrayIds = JSON.parse('<?php echo json_encode($length);?>');
-//        console.log(arrayIds.length);
-
-       for(var i =1; i <=arrayIds.length; i++) {
-           var scoreCorrect = $(".score_c_"+i).map(function(){return $(this).text();}).get();
-           var scoreWrong = $(".score_w_"+i).map(function(){return $(this).text();}).get();
-           var scoreNoan = $(".score_na_"+i).map(function(){return $(this).text();}).get();
-
+               }
+               else if (this.value.length != 0){
+                   $(this).css("background-color", "red");
+               }
+           });
        }
 
 
-       function compareScore(array, i) {
-//           console.log(array);
-           var leng = array.length;
-           console.log(leng);
-           var tmp = array[0];
-           for(var k=0; k < leng; k++) {
-
-                if(parseInt(tmp) == parseInt(array[k])) {
-                    console.log(array[k]);
-//                    console.log(object+k+1);
-//                    console.log(parseInt(tmp)+' == '+parseInt(array[k]))
-                    $("#score_c_"+i+'_'+k).addClass('equal');
-                } else {
-                    $(object+k+1).addClass('error');
-                }
-
-           }
-       }
 
    </script>
 @stop

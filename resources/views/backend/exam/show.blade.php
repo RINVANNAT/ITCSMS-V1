@@ -623,11 +623,15 @@
                 $('#alert_add_role_staff').fadeIn().delay(2000).fadeOut();
             }
         });
+
+        $('#btn-course-refresh').on('click',function(e){
+           course_datatable.draw();
+        });
 /*
 -----------------create inputscore in course page
 */
         $(document).on('click', '#btn_input_score_course', function (e) {
-            window_request_room = PopupCenterDual('{{route("admin.exam.request_input_score_courses",$exam->id)}}','Course for exam','1000','350');
+            window_request_room = PopupCenterDual('{{route("admin.exam.request_input_score_courses",$exam->id)}}','Course for exam','1000','450');
         });
 
 

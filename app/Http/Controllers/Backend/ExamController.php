@@ -503,24 +503,59 @@ class ExamController extends Controller
 
     public function requestInputScoreCourses($exam_id) {
 
-
-        $rooms = [];
         $courses = EntranceExamCourse::where('exam_id',$exam_id)->get();
-        $roomCodes = Room::join('exam_room', 'rooms.id', '=', 'exam_room.room_id')
-                        ->join('exams', 'exams.id', '=', 'exam_room.exam_id')
-                        ->where('exams.id','=', $exam_id)
-                        ->select('exam_room.roomcode as room_code', 'exam_room.room_id')->get();
+        return view('backend.exam.includes.popup_add_input_score_course',compact('exam_id', 'courses'));
+    }
 
-        foreach($roomCodes as $roomCode) {
-            if($roomCode->room_code !== null){
-                $element= array(
-                    'room_code' =>  $roomCode->room_code,
-                    'room_id'   =>  $roomCode->room_id
-                );
-                array_push($rooms, $element);
+    public function requestRoomCourseSelection ($exam_id, Request $request) {
+
+        $correction = $request->number_correction;
+        $subjectId = $request->entrance_course_id;
+        $rooms = [];
+
+        if($correction != null) {
+
+            $roomCodes = DB::table('rooms')
+                ->join('exam_room', 'rooms.id', '=', 'exam_room.room_id')
+                ->join('exams', 'exams.id', '=', 'exam_room.exam_id')
+                ->where('exams.id','=', $exam_id)
+                ->select('exam_room.roomcode as room_code', 'exam_room.room_id')->get();
+
+            if($roomCodes) {
+
+                foreach($roomCodes as $roomCode) {
+
+                    $check =0;
+                    $numberOfCandidateInEachRoom = DB::table('candidates')->where('candidates.room_id', $roomCode->room_id)->select('candidates.id as candidate_id')->get();
+
+                    if($numberOfCandidateInEachRoom) {
+
+                        foreach($numberOfCandidateInEachRoom as $eachCandidateRoom) {
+
+                            $sequences = DB::table('candidateEntranceExamScores')
+                                ->where([
+                                    ['candidateEntranceExamScores.candidate_id', $eachCandidateRoom->candidate_id],
+                                    ['candidateEntranceExamScores.entrance_exam_course_id', $subjectId]
+                                ])
+                                ->select('candidateEntranceExamScores.sequence as number_correction')
+                                ->get();
+
+                            if($sequences) {
+                                foreach($sequences as $sequence) {
+                                    if($sequence->number_correction == $correction) {
+                                        $check++;
+                                    }
+                                }
+                            }
+                        }
+                        if($check !== count($numberOfCandidateInEachRoom)) {
+                            $rooms[$roomCode->room_id]=$roomCode->room_code;
+                        }
+                    }
+                }
+                return view('backend.exam.includes.partial_selection_room_course', compact('rooms'))->render();
             }
         }
-        return view('backend.exam.includes.popup_add_input_score_course',compact('rooms', 'courses', 'exam_id'));
     }
 
     public function getRequestInputScoreForm($exam_id, Request $request) {
@@ -529,21 +564,19 @@ class ExamController extends Controller
         $subjectId = $request->entrance_course_id;
         $roomId = $request->room_id;
         $roomCode = $request->room_code;
-        $firstAttemp = $request->first_attemp;
-        $secondAttemp = $request->second_attemp;
+        $number_correction = (int)$request->number_correction;
 
-        if( $firstAttemp != 'null' && $secondAttemp == 'null') {
+        if( $number_correction !== 0) {
 
-            $number_correction = $firstAttemp;
             $candidates = $this->exams->requestInputScoreForm($exam_id, $request, $number_correction);
 
-            return view('backend.exam.includes.form_input_score_candidates',compact('candidates','exam_id','roomCode', 'subject','number_correction', 'subjectId', 'roomId'));
-        } else if ($firstAttemp == 'null' && $secondAttemp != 'null') {
+            if($candidates) {
+                $status = true;
+            } else {
+                $status = false;
+            }
 
-            $number_correction = $secondAttemp;
-            $candidates = $this->exams->requestInputScoreForm($exam_id, $request, $number_correction);
-
-            return view('backend.exam.includes.form_input_score_candidates',compact('candidates','exam_id','roomCode', 'subject','number_correction', 'subjectId', 'roomId'));
+            return view('backend.exam.includes.form_input_score_candidates',compact('status', 'candidates','exam_id','roomCode', 'subject','number_correction', 'subjectId', 'roomId'));
 
         } else {
 
@@ -605,6 +638,7 @@ class ExamController extends Controller
     public function candidateResultExamScores($exam_id) {
 
         $errorStatus=false;
+        $courses = [];
         $courseIds = DB::table('entranceExamCourses')
                     ->where('exam_id', '=', $exam_id)
                     ->select('id as course_id', 'name_kh as course_name')->get();
@@ -612,12 +646,15 @@ class ExamController extends Controller
             foreach($courseIds as $courseId) {
                 $errorCandidateScores = $this->exams->reportErrorCandidateExamScores($exam_id, $courseId->course_id);
                 if($errorCandidateScores) {
+                    $courses[]=$courseId->course_name;
                     $errorStatus=true;
                 }
             }
+
+//            dd($courses);
             if($errorStatus !== false){
 
-                return view('backend.exam.includes.error_popup_message')->with(['message'=>'There is an existing score error']);
+                return view('backend.exam.includes.error_popup_message', compact('courses'))->with(['message'=>'There is an existing score error']);
 
 
             } else{
@@ -635,6 +672,7 @@ class ExamController extends Controller
         $ids = [];
         $passedCandidates = (int)$requestData['course_factor']['total_pass'];
         $reservedCandidates = (int)$requestData['course_factor']['total_reserve'];
+        $coefficient = (int)$requestData['course_factor']['coefficient'];
         $checkPass = 0;
         $checkReserve = 0;
         $checkFail = 0;
@@ -682,7 +720,8 @@ class ExamController extends Controller
                     $totalSum = $totalSum + $arrayResult->score_by_course;
                 }
             }
-            array_push($candidateResult, (object)(['candidate_id'=> $candidateIds[$i], 'total_score' =>$totalSum]));
+            $finalScore = $totalSum * $coefficient;
+            array_push($candidateResult, (object)(['candidate_id'=> $candidateIds[$i], 'total_score' =>$finalScore]));
         }
         usort($candidateResult, array($this, "sortCandidateRank"));
 
@@ -726,13 +765,38 @@ class ExamController extends Controller
         }
 
         if($checkPass != 0 || $checkReserve != 0 || $checkFail != 0) {
-//            dd('hello');
 
-//            return Response::json(array('status'=>true,'message'=>'Success For Updating Candidates Result!'));
+            return Response::json(['status' => true, 'exam_id' => $examId]);
 
-            $candidatesResults = DB::table('candidates')->select('name_kh','result','total_score', 'id')->get();
+//            return redirect (route('admin.exam.candidate_result_lists',$examId));
+
+        }
+    }
+
+    public function candidateResultLists() {
+
+        $candidatesResults = DB::table('candidates')->select('name_kh','name_latin', 'result','total_score', 'id')->get();
+
+        usort($candidatesResults, array($this, "sortCandidateRank"));
+
+        //$candidatesResults = array_chunk($candidatesResults, 15);
+
+        return view('backend.exam.includes.examination_candidates_result', compact('candidatesResults'));
+    }
+
+    public function printCandidateResultLists(Request $request) {
+
+        if($request->status == 'request_print_page') {
+            return Response::json(['status'=> true]);
+
+        } else {
+            $candidatesResults = DB::table('candidates')->select('name_kh','name_latin', 'result','total_score', 'id')->get();
+
             usort($candidatesResults, array($this, "sortCandidateRank"));
-            dd($candidatesResults);
+
+            $candidatesResults = array_chunk($candidatesResults, 15);
+
+            return view('backend.exam.print.examination_candidates_result', compact('candidatesResults'));
         }
     }
 

@@ -41,10 +41,10 @@
 
                     <div class="col-md-12 no-padding">
                         <div class="col-md-12 no-padding" style="margin-bottom: 5px;">
-                            @permission('modify-exam-staff')
-                            <button class="btn btn-sm btn-info pull-right" id="btn_add_role">Modify Group Role</button>
-                            <button class="btn btn-sm btn-danger pull-right" style="float: right; margin-right: 5px" id="btn_delete_node">Delete Role</button>
-                            <button class="btn btn-sm btn-default pull-right" style="float: right; margin-right: 5px;" id="btn_move_node">Change Role</button>
+                            @permission('modify-examination-staff')
+                                <button class="btn btn-sm btn-info pull-right" id="btn_add_role">Modify Group Role</button>
+                                <button class="btn btn-sm btn-danger pull-right" style="float: right; margin-right: 5px" id="btn_delete_node">Delete Role</button>
+                                <button class="btn btn-sm btn-default pull-right" style="float: right; margin-right: 5px;" id="btn_move_node">Change Role</button>
                             @endauth
                         </div>
                         <div class=" popUpRoleDown col-md-12 no-padding " style="display:none;">
@@ -123,8 +123,11 @@
                     {{--<small>Staff and Roles</small>--}}
 
                     <div style="margin-top: 5px">
-                        <button class="btn btn-primary btn-xs" id="import_temp_employee"><i class="fa fa-plus-circle"></i> Import</button>
-                        <button class="btn btn-primary btn-xs" id="export_temp_employee"><i class="fa fa-plus-circle"></i> Export</button>
+                        @permission('add-temporary-examination-staff')
+                            <button class="btn btn-primary btn-xs" id="import_temp_employee"><i class="fa fa-plus-circle"></i> Import</button>
+                            <button class="btn btn-primary btn-xs" id="export_temp_employee"><i class="fa fa-plus-circle"></i> Export</button>
+                        @endauth
+
                         <button class="btn btn-xs btn-danger pull-right " id="btn_save_staff_role">Save</button>
                         <button class="btn btn-xs btn-default pull-right " id="btn_cancel_staff_role" style="margin-right: 5px;">Cancel</button>
                     </div>
