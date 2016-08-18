@@ -15,6 +15,7 @@ Route::group([], function() {
 
     Route::get('exams/{id}/get_rooms', 'ExamController@get_rooms')->name('admin.exam.get_rooms');
     Route::post('exams/{id}/save_rooms','ExamController@save_rooms')->name('admin.exam.save_rooms');
+    Route::post('exams/{id}/generate_rooms','ExamController@generate_rooms')->name('admin.exam.generate_rooms');
     Route::post('exams/{id}/delete_rooms','ExamController@delete_rooms')->name('admin.exam.delete_rooms');
     Route::get('exams/{id}/view_room_secret_code', 'ExamController@view_room_secret_code')->name('admin.exam.view_room_secret_code');
     Route::post('exams/{id}/save_room_secret_code', 'ExamController@save_room_secret_code')->name('admin.exam.save_room_secret_code');
@@ -44,9 +45,6 @@ Route::group([], function() {
     Route::get('exams/{id}/candidate_exam_result_score', 'ExamController@candidateResultExamScores')->name('admin.exam.candidate_exam_result_score');
 
     Route::post('exams/{id}/candidate_calculatioin_exam_score', 'ExamController@calculateCandidateScores')->name('admin.exam.candidate_calculatioin_exam_score');
-
-
-
 
     Route::get('exams/{id}/candidate_generate_room', 'ExamController@generate_room')->name('admin.exam.candidate.generate_room');
 

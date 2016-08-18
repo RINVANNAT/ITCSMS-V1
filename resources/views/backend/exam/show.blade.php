@@ -211,6 +211,7 @@
         var candidate_datatable = null;
         var course_datatable = null;
         var save_room_url = '{{route('admin.exam.save_rooms',$exam->id)}}';
+        var generate_room_url = '{{route('admin.exam.generate_rooms',$exam->id)}}';
         var delete_room_url = '{{route('admin.exam.delete_rooms',$exam->id)}}';
         var exam_id = {{$exam->id}};
         var exam_type_id = {{$exam->type_id}};
@@ -280,47 +281,6 @@
             $("#all_available_seat").html(total_exam_seat);
         }
 
-
-
-        function initJsTree(object,type){
-            object.jstree({
-                "core" : {
-                    "animation":0,
-                    "check_callback" : true,
-                    'force_text' : true,
-                    "themes" : {
-                        "variant" : "large",
-                        "stripes" : true
-                    },
-                    "data":{
-                        'url' : function (node) {
-                            return node.id === '#' ? '{{route('admin.exam.get_buildings',$exam->id)}}'+'?type='+type : '{{route('admin.exam.get_rooms',$exam->id)}}'+'?type='+type;
-                        },
-                        'data' : function (node) {
-                            return { 'id' : node.id };
-                        }
-                    }
-                },
-                "checkbox" : {
-                    "keep_selected_style" : false,
-                    "tie_selection" :false
-                },
-                "types" : {
-                    "#" : { "max_depth" : 3, "valid_children" : ["building","room"] },
-                    "building" : {
-                        "icon" : "{{url('plugins/jstree/img/building.png')}}",
-                        "valid_children" : ["room"]
-                    },
-                    "room" :{
-                        "icon" : "{{url('plugins/jstree/img/door.png')}}",
-                        "valid_children" : []
-                    }
-                },
-                "plugins" : [
-                    "wholerow",'checkbox', "contextmenu", "dnd", "search", "state","types"
-                ]
-            });
-        }
 
         function get_total_seat(ui_object,type){
             $.ajax({
@@ -456,10 +416,6 @@
                 window_candidate = PopupCenterDual("{!! route('admin.candidate.popup_create').'?exam_id='.$exam->id.'&studentBac2_id=0' !!}",'Add new Candidate','1200','960');
             });
 
-            initJsTree($('#all_rooms'),'available');
-
-            initJsTree($('#selected_rooms'),'selected');
-
             var iconUrl1 = "{{url('plugins/jstree/img/department.png')}}";
             var iconUrl2 = "{{url('plugins/jstree/img/role.png')}}";
             var iconUrl3 = "{{url('plugins/jstree/img/employee.png')}}";
@@ -562,6 +518,27 @@
                 }
             };
 
+            /* ---------  Room Exam Section ----------*/
+            $("#generate_room_exam").click(function () {
+                $('#empty_room_notification').hide();
+                $('#form_generate_room_wrapper').show();
+            });
+
+            $("#exam_chair").on("keyup",function(){
+               $("#exam_seat_estimation").html($("#exam_chair").val()*$("#available_room").val());
+            });
+
+            $("#submit_exam_room").on("click",function(){
+                $.ajax({
+                    type: 'POST',
+                    url: generate_room_url,
+                    data: $("#form_generate_exam_room").serialize(),
+                    dataType: "json",
+                    success: function(resultData) {
+                        alert(resultData);
+                    }
+                });
+            });
         });
 
 

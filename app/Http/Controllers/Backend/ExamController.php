@@ -14,6 +14,7 @@ use App\Models\Candidate;
 use App\Models\Department;
 use App\Models\EntranceExamCourse;
 use App\Models\Exam;
+use App\Models\ExamRoom;
 use App\Models\ExamType;
 use App\Models\Room;
 use App\Repositories\Backend\Exam\ExamRepositoryContract;
@@ -262,6 +263,40 @@ class ExamController extends Controller
         }
 
         return Response::json($data);
+    }
+
+    public function generate_rooms($id){
+        $exam = $this->exams->findOrThrowException($id);
+        $exam_rooms = $exam->rooms();
+
+        foreach($exam_rooms as $room) {
+            $room->delete(); // delete all realted room first because this is the first genration
+        }
+
+        $rooms = DB::table('rooms')
+            ->select('id','nb_chair_exam')
+            ->where('is_exam_room',true)
+            ->get();
+
+        foreach($rooms as $room){
+            $exam_room = new ExamRoom();
+            if($room->nb_chair_exam > $_POST['exam_chair']+ 5 || $_POST['exam_chair'] -5){
+                $exam_room->nb_chair_exam = $room->nb_chair_exam;
+            } else {
+                $exam_room->nb_chair_exam = $_POST['exam_chair'];
+            }
+
+            $exam_room->created_at = Carbon::now();
+            $exam_room->create_uid = auth()->id();
+            $exam_room->exam_id = $id;
+            $exam_room->room_id = $room->id;
+
+            $exam_room->save();
+        }
+
+        return Response::json(array("success"=>true));
+
+
     }
 
     public function save_rooms($id){

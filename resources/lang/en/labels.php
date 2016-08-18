@@ -284,6 +284,7 @@ return [
                 'building_id' => 'Building',
                 'department_id' => 'Department',
                 'description' => "Description",
+                'is_exam_room' => "Is an Exam Room"
             ]
         ],
         'roomTypes' => [

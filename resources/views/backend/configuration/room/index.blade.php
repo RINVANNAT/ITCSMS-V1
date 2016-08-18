@@ -12,6 +12,13 @@
 
 @section('after-styles-end')
     {!! Html::style('plugins/datatables/dataTables.bootstrap.css') !!}
+    <style>
+        tr.group,
+        tr.group:hover {
+            background-color: #ddd !important;
+            font-size: larger;
+        }
+    </style>
 @stop
 
 @section('content')
@@ -47,6 +54,7 @@
                         <th>{{ trans('labels.backend.rooms.fields.size') }}</th>
                         <th>{{ trans('labels.backend.rooms.fields.room_type_id') }}</th>
                         <th>{{ trans('labels.backend.rooms.fields.building_id') }}</th>
+                        <th>{{ trans('labels.backend.rooms.fields.is_exam_room') }}</th>
                         <th>{{ trans('labels.general.actions') }}</th>
                     </tr>
                     </thead>
@@ -71,15 +79,34 @@
                     url: '{!! route('admin.configuration.room.data') !!}',
                     method: 'POST'
                 },
-                columns: [
-                    { data: 'rooms.name', name: 'rooms.name'},
-                    { data: 'nb_desk', name: 'nb_desk'},
-                    { data: 'nb_chair', name: 'nb_chair'},
-                    { data: 'nb_chair_exam', name: 'nb_chair_exam'},
-                    { data: 'size', name: 'size'},
-                    { data: 'roomTypes.id', name: 'roomTypes.id'},
-                    { data: 'buildings.id', name: 'buildings.id'},
+                order: [ [6, 'asc'] ],
+                columnDefs: [
+                    { "visible": false, "targets": 6 }
+                ],
+                drawCallback: function ( settings ) {
+                    var api = this.api();
+                    var rows = api.rows( {page:'current'} ).nodes();
+                    var last=null;
 
+                    api.column(6, {page:'current'} ).data().each( function ( group, i ) {
+                        if ( last !== group ) {
+                            $(rows).eq( i ).before(
+                                    '<tr class="group"><td colspan="7">'+group+'</td></tr>'
+                            );
+
+                            last = group;
+                        }
+                    } );
+                },
+                columns: [
+                    { data: 'rooms.name', name: 'rooms.name', orderable:false},
+                    { data: 'nb_desk', name: 'nb_desk', orderable:false},
+                    { data: 'nb_chair', name: 'nb_chair', orderable:false},
+                    { data: 'nb_chair_exam', name: 'nb_chair_exam', orderable:false},
+                    { data: 'size', name: 'size', orderable:false},
+                    { data: 'roomTypes.id', name: 'roomTypes.id', orderable:false},
+                    { data: 'buildings.id', name: 'buildings.id', orderable:false},
+                    { data: 'is_exam_room', name: 'is_exam_room', orderable:false,searchable: false},
                     { data: 'action', name: 'action',orderable: false, searchable: false}
                 ]
             });

@@ -13,7 +13,56 @@
             <!-- /.box-header -->
             <div class="box-body">
                 <blockquote>
+                    <div id="empty_room_notification" class="well">
+                        There is no any room selected.
+
+                        <button class="btn btn-sm btn-info pull-right" id="generate_room_exam">
+                            Generate Rooms
+                        </button>
+                    </div>
+                    <div id="form_generate_room_wrapper" class="well" style="display: none">
+
+                        <form class="form-horizontal" id="form_generate_exam_room">
+                            <div class="form-group">
+                                <label for="available_room" class="col-sm-2 control-label">Total Available Room</label>
+
+                                <div class="col-sm-2">
+                                    <input type="number" name="available_room" class="form-control" id="available_room" value="125" disabled>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label for="exam_chair" class="col-sm-2 control-label">Number of seat</label>
+
+                                <div class="col-sm-5">
+                                    <input type="number" name="exam_chair" class="form-control" id="exam_chair">
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <div class="col-sm-offset-2 col-sm-10">
+                                    <span class="text-muted">Estimation: <span id="exam_seat_estimation">0</span></span>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <div class="col-sm-offset-2 col-sm-10">
+                                    <i class="glyphicon glyphicon-info-sign text-danger"></i> Total Available Room can be changed from room management.
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <div class="col-sm-offset-2 col-sm-10">
+                                    <i class="glyphicon glyphicon-info-sign text-danger"></i> Number of seat is the maximum that each room can take. You may modify it later.
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <div class="col-sm-offset-2 col-sm-10">
+                                    <button type="button" id="submit_exam_room" class="btn btn-danger">Generate</button>
+
+                                </div>
+                            </div>
+                        </form>
+
+                    </div>
                     <div id="selected_rooms">
+
                     </div>
                     <small>Selected rooms and buildings</small>
                 </blockquote>
