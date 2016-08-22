@@ -163,7 +163,7 @@ class Candidate extends Model
     }
 
     public function room(){
-        return $this->belongsTo('App\Models\Room','room_id');
+        return $this->belongsTo('App\Models\ExamRoom','room_id');
     }
 
     /**

@@ -22,7 +22,7 @@
 
 
         <style>
-            .content-wrapper{
+            .content-wrapper, .modal-content{
                 background-image: url("/img/bg_contit.gif"); !important;
             }
             .highlight{

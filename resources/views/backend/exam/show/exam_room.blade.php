@@ -19,6 +19,7 @@
             <!-- /.box-header -->
             <div class="box-body">
                 <blockquote>
+                    <div id="selected_rooms">
                     @if(count($exam_rooms) == 0)
                         <div id="empty_room_notification" class="well">
                             There is no any room selected.
@@ -69,10 +70,9 @@
 
                         </div>
                     @else
-                        <div id="selected_rooms">
-                            @include('backend.exam.includes.exam_room_list')
-                        </div>
+                        @include('backend.exam.includes.exam_room_list')
                     @endif
+                    </div>
                     <small>Selected rooms and buildings</small>
                 </blockquote>
             </div>

@@ -103,11 +103,12 @@ class ExamController extends Controller
         $examType = ExamType::where('id',$type)->lists('name_kh','id')->toArray();
         $usable_room_exam = Room::where('is_exam_room',true)->count();
         $exam_rooms = $exam->rooms()->with(['building'])->get();
+        $buildings = Building::lists('name','id');
 
         $roles = $this->employeeExams->getRoles();
 
         foreach($roles as $role) {}
-        return view('backend.exam.show',compact('exam','type','academicYear','examType', 'roles','usable_room_exam','exam_rooms'));
+        return view('backend.exam.show',compact('exam','type','academicYear','examType', 'roles','usable_room_exam','exam_rooms','buildings'));
     }
 
     /**
@@ -263,6 +264,10 @@ class ExamController extends Controller
         return Response::json($data);
     }
 
+    public function merge_rooms($id){
+        dd($_POST);
+    }
+
     public function generate_rooms($id){
         $exam = $this->exams->findOrThrowException($id);
         $exam_rooms = $exam->rooms()->get();
@@ -297,9 +302,8 @@ class ExamController extends Controller
             $exam_room->save();
         }
 
-        return Response::json(array("success"=>true));
-
-
+        $exam_rooms = $exam->rooms()->with(['building'])->get();
+        return view('backend.exam.includes.exam_room_list',compact('exam_rooms'));
     }
 
     public function save_rooms($id){
@@ -328,7 +332,7 @@ class ExamController extends Controller
         $room_ids = $_POST['exam_room'];
         ExamRoom::destroy($room_ids);
 
-        $exam_rooms = $exam->rooms()->with(['room','room.building'])->get();
+        $exam_rooms = $exam->rooms()->with(['building'])->get();
         return view('backend.exam.includes.exam_room_list',compact('exam_rooms'));
 
     }
@@ -394,10 +398,9 @@ class ExamController extends Controller
     }
 
     private function get_selected_room_ids($exam_id){
-        $ids = DB::table('rooms')
-            ->where('exam_room.exam_id',$exam_id)
-            ->join('exam_room','rooms.id','=','exam_room.room_id')
-            ->lists('rooms.id');
+        $ids = DB::table('examRooms')
+            ->where('examRooms.exam_id',$exam_id)
+            ->lists('examRooms.id');
 
         return $ids;
     }
@@ -420,9 +423,9 @@ class ExamController extends Controller
         $rooms = json_decode($_POST['room_ids']);
         //dd($rooms);
         foreach($rooms as $room){
-            DB::table('exam_room')
+            DB::table('examRooms')
                 ->where('exam_id',$exam_id)
-                ->where('room_id',$room->room_id)
+                ->where('id',$room->room_id)
                 ->update(['roomcode'=>$room->secret_code]);
         }
 
@@ -509,11 +512,8 @@ class ExamController extends Controller
 
         if($correction != null) {
 
-            $roomCodes = DB::table('rooms')
-                ->join('exam_room', 'rooms.id', '=', 'exam_room.room_id')
-                ->join('exams', 'exams.id', '=', 'exam_room.exam_id')
-                ->where('exams.id','=', $exam_id)
-                ->select('exam_room.roomcode as room_code', 'exam_room.room_id')->get();
+            $roomCodes = DB::table('examRooms')
+                ->select('examRooms.roomcode as room_code', 'examRooms.id as room_id')->get();
 
             if($roomCodes) {
 

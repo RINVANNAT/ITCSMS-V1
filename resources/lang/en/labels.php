@@ -477,6 +477,17 @@ return [
                     "description" => "Description"
                 ]
             ],
+            'exam_room' => [
+                'title' => [
+                    'merge' => 'Merge Room',
+                    'split' => 'Split Room'
+                ],
+                'field' => [
+                    'name' => 'Name',
+                    'capacity' => 'Capacity',
+                    'Building' => 'Building'
+                ]
+            ],
             'show_tabs' => [
                 'general_info' => 'General Information',
                 'candidate_info' => 'Candidate Information',

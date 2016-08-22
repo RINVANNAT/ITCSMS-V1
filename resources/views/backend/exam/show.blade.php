@@ -212,6 +212,7 @@
         var course_datatable = null;
         var save_room_url = '{{route('admin.exam.save_rooms',$exam->id)}}';
         var generate_room_url = '{{route('admin.exam.generate_rooms',$exam->id)}}';
+        var merge_room_url = '{{route('admin.exam.merge_rooms',$exam->id)}}';
         var delete_room_url = '{{route('admin.exam.delete_rooms',$exam->id)}}';
         var exam_id = {{$exam->id}};
         var exam_type_id = {{$exam->type_id}};
@@ -506,11 +507,10 @@
                     type: 'POST',
                     url: generate_room_url,
                     data: $("#form_generate_exam_room").serialize(),
-                    dataType: "json",
+                    dataType: "html",
                     success: function(resultData) {
-                        //alert(resultData);
                         $('#form_generate_room_wrapper').hide();
-                        $('#selected_room').html("<table><tr><th>Room</th><th>Size</th></tr></table>");
+                        $('#selected_rooms').html(resultData);
                     }
                 });
             });
@@ -525,6 +525,28 @@
 
             $("#btn_room_merge").click(function () {
                 $('#modal_exam_room_merge').modal('toggle');
+            });
+
+            $("#btn_merge_save").click(function () {
+                var data = $("#form_exam_room_merge").serializeArray();
+                var selected_rooms = $('#exam_room_list_table input:checkbox:checked').map(function () {
+                    return $(this).val();
+                }).get();
+
+                $.each(selected_rooms, function (index, value){
+                    data.push({name: 'rooms[]', value: value});
+                });
+
+                $.ajax({
+                    type: 'POST',
+                    url: merge_room_url,
+                    data: data,
+                    dataType: "html",
+                    success: function(resultData) {
+                        //$('#form_generate_room_wrapper').hide();
+                        $('#selected_rooms').html(resultData);
+                    }
+                });
             });
 
 

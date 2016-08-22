@@ -387,10 +387,9 @@ class EloquentExamRepository implements ExamRepositoryContract
         $errors =[];
         $candidateIds = DB::table('candidates')
             ->join('exams', 'exams.id', '=', 'candidates.exam_id')
-            ->join('examRooms', 'examRooms.room_id', '=', 'candidates.room_id')
-            ->join('rooms', 'rooms.id', '=', 'candidates.room_id')
+            ->join('examRooms', 'examRooms.id', '=', 'candidates.room_id')
             ->where('exams.id', '=', $examId)
-            ->select('candidates.id as candidate_id', 'register_id', 'examRooms.roomcode as room_code', 'rooms.id as room_id')
+            ->select('candidates.id as candidate_id', 'register_id', 'examRooms.roomcode as room_code', 'examRooms.id as room_id')
             ->orderBy('register_id', 'ASC')
             ->get();
 
