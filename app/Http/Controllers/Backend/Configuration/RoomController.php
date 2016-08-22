@@ -216,4 +216,7 @@ class RoomController extends Controller
         }
     }
 
+    /*-------------- Room API ----------------*/
+
+
 }

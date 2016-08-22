@@ -26,9 +26,17 @@ class ExamRoom extends Model
     public function lastModifier(){
         return $this->belongsTo('App\Models\Access\User','write_uid');
     }
-
     public function exam(){
         return $this->belongsTo('App\Models\Exam');
+    }
+    public function building(){
+        return $this->belongsTo('App\Models\Building');
+    }
+    public function department(){
+        return $this->belongsTo('App\Models\Department');
+    }
+    public function room_type(){
+        return $this->belongsTo('App\Models\RoomType');
     }
 
 

@@ -94,22 +94,20 @@ class ExamController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
+
     public function show($id)
     {
         $exam = $this->exams->findOrThrowException($id);
-
         $type = $exam->type->id;
-   
         $academicYear = AcademicYear::where('id',$exam->academicYear->id)->lists('name_kh','id');
-
         $examType = ExamType::where('id',$type)->lists('name_kh','id')->toArray();
+        $usable_room_exam = Room::where('is_exam_room',true)->count();
+        $exam_rooms = $exam->rooms()->with(['building'])->get();
 
         $roles = $this->employeeExams->getRoles();
 
         foreach($roles as $role) {}
-
-//        dd($roles);
-        return view('backend.exam.show',compact('exam','type','academicYear','examType', 'roles'));
+        return view('backend.exam.show',compact('exam','type','academicYear','examType', 'roles','usable_room_exam','exam_rooms'));
     }
 
     /**
@@ -267,14 +265,16 @@ class ExamController extends Controller
 
     public function generate_rooms($id){
         $exam = $this->exams->findOrThrowException($id);
-        $exam_rooms = $exam->rooms();
+        $exam_rooms = $exam->rooms()->get();
+
 
         foreach($exam_rooms as $room) {
-            $room->delete(); // delete all realted room first because this is the first genration
+            //$room->delete(); // delete all realted room first because this is the first genration
+            ExamRoom::destroy($room->id);
         }
 
         $rooms = DB::table('rooms')
-            ->select('id','nb_chair_exam')
+            ->select('id','nb_chair_exam','name','room_type_id','building_id','department_id')
             ->where('is_exam_room',true)
             ->get();
 
@@ -289,7 +289,10 @@ class ExamController extends Controller
             $exam_room->created_at = Carbon::now();
             $exam_room->create_uid = auth()->id();
             $exam_room->exam_id = $id;
-            $exam_room->room_id = $room->id;
+            $exam_room->name = $room->name;
+            $exam_room->department_id = $room->department_id;
+            $exam_room->building_id = $room->building_id;
+            $exam_room->room_type_id = $room->room_type_id;
 
             $exam_room->save();
         }
@@ -322,20 +325,11 @@ class ExamController extends Controller
     public function delete_rooms($id){
         $exam = $this->exams->findOrThrowException($id);
 
-        $room_ids = json_decode($_POST['room_ids']);
-        $ids = [];
-        foreach($room_ids as $room_id){
-            $tmp = explode('_',$room_id);
-            if($tmp[0] == "room"){  // Because ids that are pass alongs include buildings as well. We need to remove that.
-                array_push($ids,$tmp[1]);
-            }
-        }
+        $room_ids = $_POST['exam_room'];
+        ExamRoom::destroy($room_ids);
 
-        if($exam->rooms()->detach($ids)) {  // Add room ids without deleting old ids
-            return Response::json(array("success"=>true));
-        } else {
-            return Response::json(array("success"=>false));
-        }
+        $exam_rooms = $exam->rooms()->with(['room','room.building'])->get();
+        return view('backend.exam.includes.exam_room_list',compact('exam_rooms'));
 
     }
 

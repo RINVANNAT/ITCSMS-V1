@@ -25,6 +25,10 @@
             .content-wrapper{
                 background-image: url("/img/bg_contit.gif"); !important;
             }
+            .highlight{
+                background-color: #BFE2F0;
+            }
+
         </style>
         @yield('after-styles-end')
 
