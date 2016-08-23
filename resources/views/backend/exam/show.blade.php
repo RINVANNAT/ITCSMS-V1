@@ -524,6 +524,16 @@
             });
 
             $("#btn_room_merge").click(function () {
+                var selected_rooms = $('#exam_room_list_table input:checkbox:checked').map(function () {
+                    return $(this).data('roomname');
+                }).get();
+                var temporary_name = "";
+                $.each(selected_rooms, function(index, value){
+                    temporary_name = value+temporary_name;
+                });
+
+                $('#form_exam_room_merge input[name=name]').val(temporary_name);
+
                 $('#modal_exam_room_merge').modal('toggle');
             });
 

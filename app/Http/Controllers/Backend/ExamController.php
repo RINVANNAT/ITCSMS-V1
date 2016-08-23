@@ -265,7 +265,28 @@ class ExamController extends Controller
     }
 
     public function merge_rooms($id){
-        dd($_POST);
+
+        $exam = $this->exams->findOrThrowException($id);
+        $rooms = $_POST['rooms'];
+
+        $room_0 = ExamRoom::find($rooms[0]);
+        foreach($rooms as $room){
+            ExamRoom::destroy($room);
+        }
+
+        $exam_room = new ExamRoom();
+        $exam_room->name = $_POST['name'];
+        $exam_room->building_id = $_POST['building_id'];
+        $exam_room->nb_chair_exam = $_POST['nb_chair_exam'];
+        $exam_room->exam_id = $room_0->exam_id;
+        $exam_room->create_uid = auth()->id();
+        $exam_room->room_type_id = $room_0->room_type_id;
+        $exam_room->created_at = Carbon::now();
+
+        $exam_room->save();
+
+        $exam_rooms = $exam->rooms()->with(['building'])->get();
+        return view('backend.exam.includes.exam_room_list',compact('exam_rooms'));
     }
 
     public function generate_rooms($id){

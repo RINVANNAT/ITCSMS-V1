@@ -13,13 +13,26 @@
     <tbody>
         <?php
                 $index = 1;
+                $average_seat = 0;
+                foreach ($exam_rooms as $exam_room) {
+                    $average_seat = $average_seat+$exam_room->nb_chair_exam;
+                }
+
+                $average_seat = $average_seat / count($exam_rooms);
+
         ?>
         @foreach($exam_rooms as $exam_room)
             <tr>
-                <td class="room_editing" style="display: none"><input type="checkbox" name="exam_room[]" value="{{$exam_room->id}}" disabled/></td>
+                <td class="room_editing" style="display: none"><input type="checkbox" name="exam_room[]" data-roomname="{{$exam_room->name." ".$exam_room->building->code}}" value="{{$exam_room->id}}" disabled/></td>
                 <td>{{$index}}</td>
                 <td>{{$exam_room->name." ".$exam_room->building->code}}</td>
-                <td>{{$exam_room->nb_chair_exam}}</td>
+                @if($exam_room->nb_chair_exam > $average_seat +5 || $exam_room->nb_chair_exam < $average_seat -5 )
+                <td class="badge bg-red">
+                @else
+                <td>
+                @endif
+                    {{$exam_room->nb_chair_exam}}
+                </td>
                 <td>{{$exam_room->building->name}}</td>
                 <td class="room_editing" style="display: none">
                     <button type="button" class="btn btn-sm btn-warning" style="color: #fff; border-color: #3c8dbc;"><i class="fa fa-long-arrow-left"></i> <i class="fa fa-long-arrow-right"></i> Split</button>
