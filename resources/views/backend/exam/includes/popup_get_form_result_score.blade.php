@@ -40,6 +40,19 @@
                     </div>
 
                 @endforeach
+
+                <div class="col-sm-12" style="margin-bottom: 5px">
+                    <div class="col-sm-2">
+
+                    </div>
+                    <div class="col-sm-4 no-padding enlarge-number">
+                        <label for="total_pass"> Coefficient </label>
+                    </div>
+                    <div class="col-sm-3 no-padding">
+                        {!! Form::text('course_factor'."[coefficient]", null, ['class' => 'form-control enlarge-number', 'id'=> 'coefficient']) !!}
+                    </div>
+                </div>
+
                 <div class="col-sm-12" style="margin-bottom: 5px">
                     <div class="col-sm-2">
 
@@ -96,12 +109,12 @@
                 type: method,
                 url: baseUrl,
                 data: baseData,
-                dataType: "json",
                 success: function(result) {
                     console.log(result);
+
                     if(result.status) {
-                        notify("success","info", "You have done!");
-                        window.delay(200).close();
+                        window.close();
+                        window_request_room = PopupCenterDual('{!! route('candidate_result_lists') !!}','import temporary employee','1000','1200');
                     } else {
                         notify("error","info", "There are not enough candidates!!!");
                     }
@@ -122,12 +135,12 @@
             }
             if(check == 0) {
                 ajaxRequest('POST', $( "form.calculation_score").attr('action'), $( "form.calculation_score" ).serialize() );
+
             } else{
                 notify("error","info", "Please Input All Value");
             }
 
         })
-
 
         $('#btn_cancel_candidate_result').on('click', function() {
             window.close();

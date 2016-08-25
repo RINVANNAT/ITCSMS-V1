@@ -133,19 +133,37 @@ class RoomController extends Controller
         $rooms = DB::table('rooms')
             ->join('roomTypes', 'rooms.room_type_id', '=', 'roomTypes.id')
             ->join('buildings', 'rooms.building_id', '=', 'buildings.id')
-            ->select(['rooms.id as room_id','rooms.name as room_name','nb_desk','nb_chair','nb_chair_exam', 'size', 'roomTypes.name as room_type_name', 'buildings.name as building_name']);
+            ->select([
+                'rooms.id as room_id',
+                'rooms.name as room_name',
+                'nb_desk','nb_chair',
+                'nb_chair_exam', 'size',
+                'is_exam_room',
+                'roomTypes.name as room_type_name',
+                'buildings.name as building_name',
+                'buildings.code as building_code'
+            ]);
 
         $datatables =  app('datatables')->of($rooms);
 
 
         return $datatables
-            ->editColumn('rooms.name', '{!! $room_name !!}')
+            ->editColumn('rooms.name', function($room){
+                return $room->room_name." ".$room->building_code;
+            })
             ->editColumn('nb_desk', '{!! $nb_desk !!}')
             ->editColumn('nb_chair', '{!! $nb_chair !!}')
             ->editColumn('nb_chair_exam', '{!! $nb_chair_exam !!}')
             ->editColumn('size', '{!! $size !!}')
             ->editColumn('roomTypes.id', '{!! $room_type_name !!}')
             ->editColumn('buildings.id', '{!! $building_name !!}')
+            ->editColumn('is_exam_room', function($room){
+                if($room->is_exam_room){
+                    return "<i class='glyphicon glyphicon-ok'></i>";
+                } else {
+                    return "<i class='glyphicon glyphicon-remove text-danger'></i>";
+                }
+            })
             ->addColumn('action', function ($room) {
                 return  '<a href="'.route('admin.configuration.rooms.edit',$room->room_id).'" class="btn btn-xs btn-primary"><i class="fa fa-pencil" data-toggle="tooltip" data-placement="top" title="" data-original-title="'.trans('buttons.general.crud.edit').'"></i> </a>'.
                 ' <button class="btn btn-xs btn-danger btn-delete" data-remote="'.route('admin.configuration.rooms.destroy', $room->room_id) .'"><i class="fa fa-times" data-toggle="tooltip" data-placement="top" title="' . trans('buttons.general.crud.delete') . '"></i></button>';
@@ -197,5 +215,8 @@ class RoomController extends Controller
             return redirect(route('admin.configuration.rooms.index'));
         }
     }
+
+    /*-------------- Room API ----------------*/
+
 
 }

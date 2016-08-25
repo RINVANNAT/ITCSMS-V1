@@ -183,12 +183,13 @@
                     }
             });
 
-            $('#btn_move_node').on('click', function() {
-                disableButton($('#btn_delete_node'), $('#btn_move_node') );
-                $('.popUpRoleDown').slideFadeToggle().addClass('show');
-
-            });
         });
+
+    });
+
+    $('#btn_move_node').on('click', function() {
+        disableButton($('#btn_delete_node'), $('#btn_move_node') );
+        $('.popUpRoleDown').slideFadeToggle().addClass('show');
 
     });
 

@@ -9,9 +9,11 @@ use App\Http\Requests\Backend\EntranceExamCourse\CreateEntranceExamCourseRequest
 use App\Http\Requests\Backend\EntranceExamCourse\DeleteEntranceExamCourseRequest;
 use App\Models\Exam;
 use App\Repositories\Backend\EntranceExamCourse\EntranceExamCourseRepositoryContract;
+use App\Repositories\Backend\Exam\ExamRepositoryContract;
 
 use Illuminate\Http\Request;
 use Flash;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Response;
 
 
@@ -21,15 +23,18 @@ class EntranceExamCourseController extends Controller
      * @var EntranceExamCourseRepositoryContract
      */
     protected $entranceExamCourse;
+    protected $exams;
 
     /**
      * @param EntranceExamCourseRepositoryContract $courseProgramRepo
      */
     public function __construct(
-        EntranceExamCourseRepositoryContract $entranceExamCourseRepo
+        EntranceExamCourseRepositoryContract $entranceExamCourseRepo,
+        ExamRepositoryContract $examRepo
     )
     {
         $this->entranceExamCourse = $entranceExamCourseRepo;
+        $this->exams = $examRepo;
     }
 
 
@@ -114,14 +119,22 @@ class EntranceExamCourseController extends Controller
         $exam = Exam::find($exam_id);
         $entranceExamCourse = $exam->entranceExamCourses();
 
-
         $datatables =  app('datatables')->of($entranceExamCourse);
 
         return $datatables
-            ->addColumn('action', function ($item) {
-                //return '<a href="'.route('admin.entranceExamCourses.edit',$item->id).'" class="btn btn-xs btn-primary"><i class="fa fa-pencil" data-toggle="tooltip" data-placement="top" title="" data-original-title="'.trans('buttons.general.crud.edit').'"></i> </a>'.
-                return ' <button class="btn btn-xs btn-danger btn-delete" data-remote="'.route('admin.entranceExamCourses.destroy', $item->id) .'"><i class="fa fa-times" data-toggle="tooltip" data-placement="top" title="' . trans('buttons.general.crud.delete') . '"></i></button>'.
-                ' <button class="btn btn-xs btn-info btn-report-error" data-remote="'. $item->id .'">Report Error</button>';
+            ->addColumn('action', function ($item) use ($exam_id)  {
+                $result = ' <button class="btn btn-xs btn-danger btn-delete" data-remote="'.route('admin.entranceExamCourses.destroy', $item->id) .'"><i class="fa fa-times" data-toggle="tooltip" data-placement="top" title="' . trans('buttons.general.crud.delete') . '"></i></button>';
+                if(!Auth::user()->allow('report-error-on-inputted-score')){
+                    return $result;
+                } else {
+                    $errorCandidateScores = $this->exams->reportErrorCandidateExamScores($exam_id, $item->id);
+
+                    if(!empty($errorCandidateScores)){
+                        return $result.' <button class="btn btn-xs btn-danger btn-report-error" data-remote="'. $item->id .'">Report Error</button>';
+                    } else {
+                        return $result;
+                    }
+                }
             })
             ->make(true);
     }

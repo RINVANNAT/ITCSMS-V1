@@ -481,6 +481,44 @@ class SeedCustomsPermissions extends Seeder
                             ]
                         ],
                     ]
+                ],
+                [
+                    'name'      => 'Examination Course',
+                    'groups'    => [
+
+                    ],
+                    'permissions'   => [
+                        [
+                            'name'          => 'create-entrance-exam-score',
+                            'display_name'  => 'Input Entrance Exam Score',
+                            'dependency'   => [
+                                'view-backend','view-exam-management'
+                            ]
+
+                        ],
+                        [
+                            'name'          => 'get-candidate-result-score',
+                            'display_name'  => 'Generate Candidate Score',
+                            'dependency'   => [
+                                'view-backend','view-exam-management'
+                            ]
+
+                        ],
+                        [
+                            'name'          => 'request-input-score-form',
+                            'display_name'  => 'Get/Request Candidate List Form to Insert The Correction',
+                            'dependency'   => [
+                                'view-backend','view-exam-management'
+                            ]
+                        ],
+                        [
+                            'name'          => 'report-error-on-inputted-score',
+                            'display_name'  => 'Get Inputted Score Error && Add New Correction',
+                            'dependency'   => [
+                                'view-backend','view-exam-management', 'create-entrance-exam-score'
+                            ]
+                        ]
+                    ]
                 ]
             ],
             'permissions' => [

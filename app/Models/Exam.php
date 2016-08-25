@@ -50,7 +50,7 @@ class Exam extends Model
     }
 
     public function rooms(){
-        return $this->belongsToMany('App\Models\Room');
+        return $this->hasMany('App\Models\ExamRoom');
     }
 
     public function employees(){

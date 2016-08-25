@@ -19,7 +19,7 @@ class Commune extends Model
      *
      * @var array
      */
-    protected $casts = [
+    protected $casts = [„
         "name_en" => "string",
 		"name_en" => "string",
 		"district_id" => "integer"

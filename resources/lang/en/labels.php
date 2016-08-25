@@ -284,6 +284,7 @@ return [
                 'building_id' => 'Building',
                 'department_id' => 'Department',
                 'description' => "Description",
+                'is_exam_room' => "Is an Exam Room"
             ]
         ],
         'roomTypes' => [
@@ -474,6 +475,17 @@ return [
                     "course_name" => "Course Name",
                     "total_question" => "Total Questions",
                     "description" => "Description"
+                ]
+            ],
+            'exam_room' => [
+                'title' => [
+                    'merge' => 'Merge Room',
+                    'split' => 'Split Room'
+                ],
+                'field' => [
+                    'name' => 'Name',
+                    'capacity' => 'Capacity',
+                    'Building' => 'Building'
                 ]
             ],
             'show_tabs' => [

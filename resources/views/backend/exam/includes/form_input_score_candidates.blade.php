@@ -84,52 +84,61 @@
                         </tr>
                         </thead>
                         <tbody>
-                        <?php $i = 0 ;?>
 
-                        {!! Form::open(['route' => ['admin.exam.insert_exam_score_candidate',$exam_id], 'class' => 'form-horizontal table_score', 'role' => 'form', 'method' => 'post']) !!}
+                            @if($status)
+                                <?php $i = 0 ;?>
 
-                            @if($candidates)
-                                @foreach ($candidates as $candidate)
-                                    <?php $i++; ?>
-                                    <tr class="enlarge-number">
-                                        <td style="text-align: center" class="candidate_score_id">
-                                            {!! Form::hidden('candidate_score_id_'.$i."[score_id]", $candidate->candidate_score_id, ['class' => 'form-control']) !!}
-                                            {{--<input type="hidden" name="sequence" value="{{$number_correction}}">--}}
+                                {!! Form::open(['route' => ['admin.exam.insert_exam_score_candidate',$exam_id], 'class' => 'form-horizontal table_score', 'role' => 'form', 'method' => 'post']) !!}
 
-                                            {!! Form::hidden('candidate_score_id_'.$i."[sequence]", $number_correction, ['class' => 'form-control ']) !!}
+                                @if($candidates)
+                                    @foreach ($candidates as $candidate)
+                                        <?php $i++; ?>
+                                        <tr class="enlarge-number">
+                                            <td style="text-align: center" class="candidate_score_id">
+                                                {!! Form::hidden('candidate_score_id_'.$i."[score_id]", $candidate->candidate_score_id, ['class' => 'form-control']) !!}
+                                                {{--<input type="hidden" name="sequence" value="{{$number_correction}}">--}}
 
-                                            {{--<input type="hidden" name="candidate_id" value="{{$candidate->candidate_id}}">--}}
+                                                {!! Form::hidden('candidate_score_id_'.$i."[sequence]", $number_correction, ['class' => 'form-control ']) !!}
 
-                                            {!! Form::hidden('candidate_score_id_'.$i."[candidate_id]", $candidate->candidate_id, ['class' => 'form-control']) !!}
+                                                {{--<input type="hidden" name="candidate_id" value="{{$candidate->candidate_id}}">--}}
 
-                                            {{--<input type="hidden" name="course_id" value="{{$subjectId}}">--}}
+                                                {!! Form::hidden('candidate_score_id_'.$i."[candidate_id]", $candidate->candidate_id, ['class' => 'form-control']) !!}
 
-                                            {!! Form::hidden('candidate_score_id_'.$i."[course_id]", $subjectId, ['class' => 'form-control']) !!}
+                                                {{--<input type="hidden" name="course_id" value="{{$subjectId}}">--}}
 
-                                            <?php echo $i;?>
-                                        </td>
+                                                {!! Form::hidden('candidate_score_id_'.$i."[course_id]", $subjectId, ['class' => 'form-control']) !!}
 
-                                        <td>
-                                            {!! Form::text('candidate_score_id_'.$i."[correct]", $candidate->score_c, ['class' => 'form-control inputs_score enlarge-number number_only validate_'.$i,'id'=>'correct_'.$i]) !!}
-                                        </td>
+                                                <?php echo $i;?>
+                                            </td>
 
-                                        <td>
-                                            {!! Form::text('candidate_score_id_'.$i."[wrong]", $candidate->score_w, ['class' => 'form-control  inputs_score enlarge-number number_only validate_'.$i,'id'=>'wrong_ans_'.$i]) !!}
-                                        </td>
+                                            <td>
+                                                {!! Form::text('candidate_score_id_'.$i."[correct]", $candidate->score_c, ['class' => 'form-control inputs_score enlarge-number number_only validate_'.$i,'id'=>'correct_'.$i]) !!}
+                                            </td>
 
-                                        <td>
-                                            {!! Form::text('candidate_score_id_'.$i."[na]", $candidate->score_na, ['class' => 'form-control inputs_score enlarge-number number_only validate_'.$i,'id'=>'no_'.$i]) !!}
-                                        </td>
+                                            <td>
+                                                {!! Form::text('candidate_score_id_'.$i."[wrong]", $candidate->score_w, ['class' => 'form-control  inputs_score enlarge-number number_only validate_'.$i,'id'=>'wrong_ans_'.$i]) !!}
+                                            </td>
 
-                                        <td>
-                                            {!! Form::text('candidate_score_id_'.$i."[total]", null, ['class' => 'form-control enlarge-number number_only validate_'.$i,'id'=>'total_'.$i, 'disabled', 'placeholder'=>$candidate->total_question]) !!}
-                                        </td>
-                                    </tr>
-                                @endforeach
+                                            <td>
+                                                {!! Form::text('candidate_score_id_'.$i."[na]", $candidate->score_na, ['class' => 'form-control inputs_score enlarge-number number_only validate_'.$i,'id'=>'no_'.$i]) !!}
+                                            </td>
+
+                                            <td>
+                                                {!! Form::text('candidate_score_id_'.$i."[total]", null, ['class' => 'form-control enlarge-number number_only validate_'.$i,'id'=>'total_'.$i, 'disabled', 'placeholder'=>$candidate->total_question]) !!}
+                                            </td>
+                                        </tr>
+                                    @endforeach
+                                @endif
+
+                            {!! Form::close() !!}
+                            @else
+                                <div class="col-sm-12">
+                                    <div class="alert-info">
+                                        <?php $i = 0 ;?>
+                                        <h3>There are no candidate in this room</h3>
+                                    </div>
+                                </div>
                             @endif
-
-                        {!! Form::close() !!}
-
                         </tbody>
                     </table>
                 </div>
@@ -154,11 +163,12 @@
     </div><!--box-->
 @stop
 
-@section('after-scripts-end')
-    <script>
+@if($status)
+    @section('after-scripts-end')
+        <script>
 
             $("#btn_cancel_form").click(function () {
-//                opener.update_ui_course();
+    //                opener.update_ui_course();
                 window.close();
             });
 
@@ -172,7 +182,9 @@
                     success: function(result) {
                         if(result.status) {
                             notify("success","info", "your record have been save!");
-//                            window.close().delay(300);
+                            setTimeout(function(){
+                                window.close();
+                            },3000);
                         } else {
                             notify("error","info", "Please Check Your Record Was Not Saved!");
                         }
@@ -242,5 +254,7 @@
 
             }
 
-    </script>
-@stop
+        </script>
+    @stop
+
+@endif
