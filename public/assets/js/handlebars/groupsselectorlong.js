@@ -76,12 +76,23 @@ if (typeof SMSFILERLONG !== 'object') {
             ajaxdone.push(request);
         });
         $.when.apply($, ajaxdone).always(function() {
+            SMSFILERLONG.orderModelBeforeRender();
             SMSFILERLONG.view.draw();
             if ( Object.keys(SMSFILERLONG.model.selectedIndex).length > 0){
                 SMSFILERLONG.view.drawForRedirect();
             };
         });
 
+    }
+
+    SMSFILERLONG.orderModelBeforeRender = function () {
+
+        console.log("ordering filter");
+
+        console.log(SMSFILERLONG.model.fillers );
+        $.each(SMSFILERLONG.model.fillterModelUrl, function(key,url){
+
+        });
     }
     SMSFILERLONG.handleRedirect = function (){
 

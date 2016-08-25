@@ -101,6 +101,7 @@ if (typeof SMSFILER !== 'object') {
             ajaxdone.push(request);
         });
         $.when.apply($, ajaxdone).always(function() {
+            SMSFILER.orderModelBeforeRender();
             SMSFILER.view.draw();
             if (Object.keys(SMSFILER.model.redirect).length > 0  ){
                 $.each(SMSFILER.model.redirect, function(key,value){
@@ -111,6 +112,23 @@ if (typeof SMSFILER !== 'object') {
         });
 
     };
+
+    SMSFILER.orderModelBeforeRender = function () {
+
+        var ordering = {
+            "degree_id":0,
+            "grade_id":1,
+            "department_id":2}
+
+
+        SMSFILER.model.fillers.sort(function(a, b){
+            if(ordering[a.fillerdbname] < ordering[b.fillerdbname]) return -1;
+            if(ordering[a.fillerdbname] > ordering[b.fillerdbname]) return 1;
+            return 0;
+        })
+
+    }
+
     SMSFILER.handlerOptionClick = function(){
         $(document).on("click", ".optionitem", function(){
             var fillerdbname = $(this).attr("fillerdbname");

@@ -137,7 +137,6 @@ class ScoreController extends AppBaseController
 
 
 	public function input( Request $request ){
-
 		if ($request->has("filter")){
 			$fillterdata= json_decode($request["filter"],true);
 			$results = $this->scoreRepository->getScoresbyCourse($fillterdata);
@@ -147,11 +146,10 @@ class ScoreController extends AppBaseController
 				return view('backend.score.score_edit_by_course_table', $results);
 			}
 		}
-
-
-//        $user_id = Auth::id();
+        $user_id = Auth::id();
         $studentAnnuals = collect([]);
-		return view('backend.score.score_edit_by_course', compact("studentAnnuals","scoresindex", "scores"));
+		
+		return view('backend.score.score_edit_by_course', compact("studentAnnuals","scoresindex", "scores", "user_id"));
 	}
 
 	public  function  updateMany(Request $request){

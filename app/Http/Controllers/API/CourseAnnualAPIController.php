@@ -51,7 +51,7 @@ class CourseAnnualAPIController extends AppBaseController
 //        $courseAnnuals = $this->courseAnnualRepository->findWhere($filters)->with('courses');
         $courseAnnuals = DB::table('course_annuals')
             ->join('courses','course_annuals.course_id', '=', 'courses.id')
-            ->select(['course_annuals.id', 'courses.name_en as name', 'course_annuals.course_id'])
+            ->select(['course_annuals.id', 'courses.name_en as name', 'course_annuals.course_id', 'course_annuals.semester_id as semester_id'])
             ->where('course_annuals.degree_id', $filters['degree_id'])
             ->where('course_annuals.grade_id', $filters['grade_id'])
             ->where('course_annuals.department_id', $filters['department_id'])
@@ -64,6 +64,9 @@ class CourseAnnualAPIController extends AppBaseController
 //            }
 //        }
         $courseAnnuals = $courseAnnuals->get();
+        foreach ($courseAnnuals as $courseAnnual){
+            $courseAnnual->name = $courseAnnual->name." ".$courseAnnual->semester_id;
+        }
         return $this->sendResponse($courseAnnuals, 'CourseAnnuals retrieved successfully');
     }
 

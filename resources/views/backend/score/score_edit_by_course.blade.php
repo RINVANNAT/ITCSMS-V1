@@ -241,6 +241,10 @@
         $(document).on("click","#score-report", function(e){
             $(this).attr("href", this.href + "?redirect=1&filter="+JSON.stringify(paramet));
         });
+
+
+
+
     </script>
 @endsection
 

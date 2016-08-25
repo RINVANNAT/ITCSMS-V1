@@ -48,12 +48,19 @@ class CourseAnnualController extends Controller
      */
     public function index()
     {
-        $departments = Department::lists('name_kh','id')->toArray();
-        $academicYears = AcademicYear::orderBy("id","desc")->lists('name_kh','id')->toArray();
-        $degrees = Degree::lists('name_kh','id')->toArray();
-        $grades = Grade::lists('name_kh','id')->toArray();
-        $courses = Course::orderBy("updated_at","desc")->lists('name_kh','id')->toArray();
-        return view('backend.course.courseAnnual.index',compact('departments','academicYears','degrees','grades','courses'));
+        $departments = Department::orderBy("code")
+            ->where("code","!=","Study Office")
+            ->where("code","!=","Academic")
+            ->where("code","!=","Finance")
+            ->lists('code','id')->toArray();
+
+        $academicYears = AcademicYear::orderBy("id","desc")->lists('name_latin','id')->toArray();
+        $degrees = Degree::lists('name_en','id')->toArray();
+        $grades = Grade::lists('name_en','id')->toArray();
+        $courses = Course::orderBy("updated_at","desc")->lists('name_en','id')->toArray();
+
+        $employees = Employee::lists("name_latin","id")->toArray();
+        return view('backend.course.courseAnnual.index',compact('departments','academicYears','degrees','grades','courses','employees'));
     }
 
     /**
@@ -64,8 +71,8 @@ class CourseAnnualController extends Controller
      */
     public function create(CreateCourseAnnualRequest $request)
     {
-        $departments = Department::lists('name_kh','id')->toArray();
-        $academicYears = AcademicYear::orderBy('id', 'desc')->lists('name_kh','id')->toArray();
+        $departments = Department::lists('name_en','id')->toArray();
+        $academicYears = AcademicYear::orderBy('id', 'desc')->lists('name_latin','id')->toArray();
         $degrees = Degree::lists('name_kh','id')->toArray();
         $grades = Grade::lists('name_kh','id')->toArray();
         $courses = Course::orderBy('updated_at', 'desc')->lists('name_kh','id')->toArray();
@@ -111,7 +118,8 @@ class CourseAnnualController extends Controller
     {
         $courseAnnual = $this->courseAnnuals->findOrThrowException($id);
         $departments = Department::lists('name_kh','id')->toArray();
-        $academicYears = AcademicYear::lists('name_kh','id')->toArray();
+
+        $academicYears = AcademicYear::lists('name_latin','id')->toArray();
         $degrees = Degree::lists('name_kh','id')->toArray();
         $grades = Grade::lists('name_kh','id')->toArray();
         $courses = Course::lists('name_kh','id')->toArray();
@@ -199,6 +207,12 @@ class CourseAnnualController extends Controller
         if ($department = $datatables->request->get('department')) {
             $datatables->where('course_annuals.department_id', '=', $department);
         }
+
+        if ($lecturer = $datatables->request->get('lecturer')) {
+            $datatables->where('course_annuals.employee_id', '=', $lecturer);
+        }
+
+
         return $datatables->make(true);
     }
     public function request_import(){
