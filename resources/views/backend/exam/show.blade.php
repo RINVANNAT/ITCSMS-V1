@@ -727,10 +727,27 @@
             window.location.href = baseUrl;
         })
 
+        {{--function ajaxViewRoleStaff(method, baseUrl, baseData) {--}}
+            {{--$.ajax({--}}
+                {{--type: method,--}}
+                {{--url: baseUrl,--}}
+                {{--data: baseData,--}}
+                {{--success: function (result) {--}}
+                    {{--console.log(result);--}}
+                    {{--if (result.status) {--}}
+                        {{--window.close();--}}
+                        {{--var printUrl = "{!! route('print_candidate_result_lists') !!}";--}}
+                        {{--window_print_candidate_result = PopupCenterDual(printUrl + '?status=' + 'print_page' + '?exam_id=' + exam_id, 'print candidates result', '1000', '1200');--}}
+                    {{--}--}}
+                {{--}--}}
+            {{--});--}}
+        {{--}--}}
 
+        $('#view_role_staff').on('click', function() {
 
-
-
+            var baseUrl  = '{!! route('admin.exam.view_role_staff_lists', $exam->id) !!}';
+            var window_view_role_staff = PopupCenterDual(baseUrl, 'View Role For Each staff', '1000', '1200');
+        })
     </script>
 
 @stop

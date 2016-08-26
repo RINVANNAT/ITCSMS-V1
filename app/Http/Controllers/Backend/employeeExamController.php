@@ -126,7 +126,7 @@ class employeeExamController extends Controller
     }
 
     public function changeRoleStaffs($id, Request $request) {
-        $res = $this->tempEmpolyeeExams->update($id, $request);
+        $res = $this->tempEmpolyeeExams->modifyStaffRole($id, $request);
         return $res;
     }
 
@@ -220,4 +220,355 @@ class employeeExamController extends Controller
         })->download('csv');
     }
 
+    public function printViewRoleStaffLists($examId) {
+
+        $roles = $this->tempEmpolyeeExams->printStaffByEachRole($examId);
+
+        return view('backend.exam.print.examination_staff_role', compact('roles'));
+    }
+
+    public function viewRoleStaffLists($examId) {
+
+        $res = $this->tempEmpolyeeExams->viewStaffByEachRoleLists($examId);
+
+        return view('backend.exam.includes.popup_view_examination_staff_role', compact('examId', 'res'));
+
+    }
+
+    private function mergeUniqueArray($staffIds) {
+
+        $arrayIds = [];
+        $tempStaffWithRoomIds = array_unique($staffIds);
+
+        foreach($tempStaffWithRoomIds as $tempStaffWithRoomId) {
+            $arrayIds[] = $tempStaffWithRoomId;
+        }
+
+        return $arrayIds;
+    }
+
+    private function getRoomByStaff($staffId, $departmentName) {
+
+
+        if($departmentName == 'Ministry') {
+            $tempRooms = DB::table('rooms')
+                ->join('role_temporary_staff_exams', 'role_temporary_staff_exams.room_id', '=', 'rooms.id')
+                ->join('tempEmployees', 'tempEmployees.id', '=', 'role_temporary_staff_exams.temp_employee_id')
+                ->join('buildings', 'rooms.building_id', '=', 'buildings.id')
+                ->where([
+                    ['tempEmployees.id', '=', $staffId],
+                    ['rooms.is_exam_room', true]
+                ])
+                ->select('rooms.name as room_name', 'rooms.id as room_id', 'buildings.code')
+                ->get();
+
+            if($tempRooms) {
+                return $tempRooms;
+            }
+        } else {
+            $perRooms = DB::table('rooms')
+                ->join('role_permanent_staff_exams', 'role_permanent_staff_exams.room_id', '=', 'rooms.id')
+                ->join('employees', 'employees.id', '=', 'role_permanent_staff_exams.employee_id')
+                ->join('buildings', 'rooms.building_id', '=', 'buildings.id')
+                ->where([
+                    ['role_permanent_staff_exams.employee_id', '=', $staffId],
+                    ['rooms.is_exam_room', true]
+                ])
+                ->select('rooms.name as room_name', 'rooms.id as room_id', 'buildings.code')
+                ->get();
+            if($perRooms) {
+                return $perRooms;
+            }
+        }
+
+    }
+
+    public function getStaffByRoleCourse($exam_id, Request $request) {
+
+
+        $roleId = $request->role_id;
+        $courseId = $request->course_id;
+        $tempStaffWithRoomIds = [];
+        $perStaffWithRoomIds = [];
+        $perStaffIds = [];
+        $tempStaffIds = [];
+        $selectedRooms = [];
+        $newElementStaffWithRooms = [];
+        $staffs = $this->tempEmpolyeeExams->getStaffByRole($roleId, $exam_id);
+        $staffWithSelectedRooms = $this->tempEmpolyeeExams->staffWithselectedRooms();
+
+        foreach($staffWithSelectedRooms as $staffWithSelectedRoom) {
+
+            if($staffWithSelectedRoom->department_name != 'Ministry') {
+
+                $perStaffWithRoomIds[] = $staffWithSelectedRoom->staff_id;
+            } else {
+                $tempStaffWithRoomIds[] = $staffWithSelectedRoom->staff_id;
+            }
+        }
+
+        $perStaffIds = $this->mergeUniqueArray($perStaffWithRoomIds);
+        $tempStaffIds = $this->mergeUniqueArray($tempStaffWithRoomIds);
+
+        if($staffWithSelectedRooms) {
+//            dd($staffs);
+            foreach($staffs as $staff) {
+                $arrayRooms = [];
+                $statusPerStaff = 0;
+                $statusTempStaff = 0;
+
+                if($staff['department_name'] != 'Ministry') {
+
+                    if($perStaffIds) {
+                        foreach($perStaffIds as  $perStaffId) {
+
+                            if($staff['staff_id'] == $perStaffId) {
+
+                                $rooms = $this->getRoomByStaff((int)$perStaffId, $staff['department_name']);
+                                if($rooms) {
+                                    foreach($rooms as $room) {
+                                        $arrayRooms[] = ['room_name' => $room->room_name.''.$room->code, 'room_id' => $room->room_id];
+                                    }
+                                }
+
+                                $element = array(
+                                    'id' => $staff['id'],
+                                    'text' => $staff['text'],
+                                    'staff_id' => $staff['staff_id'],
+                                    'room_name' => $arrayRooms,
+                                    'department_name' => $staff['department_name']
+                                );
+
+                                $newElementStaffWithRooms[] = $element;
+                            } else {
+                                $statusPerStaff++;
+                            }
+                        }
+
+                        if($statusPerStaff == count($perStaffIds)) {
+
+                            $newElementStaffWithRooms[] = $staff;
+                        }
+
+                    } else {
+                        $newElementStaffWithRooms[] = $staff;
+                    }
+
+                } else {
+
+                    if($tempStaffIds) {
+
+                        foreach($tempStaffIds as  $tempStaffId) {
+
+                            if($staff['staff_id'] == $tempStaffId) {
+
+                                $rooms = $this->getRoomByStaff((int)$tempStaffId, $staff['department_name']);
+                                if($rooms) {
+                                    foreach($rooms as $room) {
+                                        $arrayRooms[] = ['room_name' => $room->room_name.''.$room->code, 'room_id' => $room->room_id];
+                                    }
+                                }
+                                $element = array(
+                                    'id' => $staff['id'],
+                                    'text' => $staff['text'],
+                                    'staff_id' => $staff['staff_id'],
+                                    'room_name' => $arrayRooms,
+                                    'department_name' => $staff['department_name']
+                                );
+
+                                $newElementStaffWithRooms[] = $element;
+                            } else {
+                                $statusTempStaff++;
+                            }
+                        }
+
+                        if($statusTempStaff == count($tempStaffIds)) {
+                            $newElementStaffWithRooms[] = $staff;
+                        }
+                    } else {
+
+                        $newElementStaffWithRooms[] = $staff;
+                    }
+
+                }
+            }
+
+            $staffs = $newElementStaffWithRooms;
+            return view('backend.exam.includes.partial_staff_by_role', compact('staffs'));
+        } else {
+            return view('backend.exam.includes.partial_staff_by_role', compact('staffs'));
+        }
+
+    }
+
+    public function updateStaffRoom($exam_id, Request $request) {
+
+        $staffIds = $request->staff_id;
+        $roomIds = $request->room_id;
+        $roleId = $request->role_id;
+
+        $checkTemp = 0;
+        $checkPer = 0;
+
+        foreach($staffIds as $staffId) {
+
+            $id = explode('_', $staffId);
+            if($id[0] == 'perstaff') {
+                $roomByStaff = $this->getRoomByStaff($id[2], $TypeStaff = 'perstaff');
+
+                if($roomByStaff) {
+                    foreach($roomIds as $roomId) {
+                        $result = $this->tempEmpolyeeExams->insertRolePerStaffExam($exam_id, $id[2], $roleId, $roomId, $request->course_id);
+                    }
+                } else {
+                    $roomId = null;
+                    $res = $this->tempEmpolyeeExams->destroyRolePerStaffExam($roleId, $id[2], $exam_id, $roomId);
+                    foreach($roomIds as $roomId) {
+                        $result = $this->tempEmpolyeeExams->insertRolePerStaffExam($exam_id, $id[2], $roleId, $roomId, $request->course_id);
+                    }
+                }
+
+                if($result) {
+                    $checkPer++;
+                }
+
+            } else if($id[0] == 'tmpstaff') {
+
+                $roomByStaff = $this->getRoomByStaff($id[2], $TypeStaff = 'Ministry');
+
+                if($roomByStaff) {
+                    foreach($roomIds as $roomId) {
+                        $result = $this->tempEmpolyeeExams->insertRoleTempStaffExam($exam_id, $id[2], $roleId, $roomId, $request->course_id);
+                    }
+
+                } else{
+                    $roomId = null;
+                    $tempRes = $this->tempEmpolyeeExams->destroyRoleTempStaffExam($roleId, $id[2], $exam_id, $roomId);
+                    foreach($roomIds as $roomId) {
+                        $result = $this->tempEmpolyeeExams->insertRoleTempStaffExam($exam_id, $id[2], $roleId, $roomId, $request->course_id);
+                    }
+                }
+
+                if($result) {
+                    $checkTemp++;
+                }
+
+            }
+        }
+
+        if($checkPer != 0 || $checkTemp != 0) {
+            return Response::json(['status' => true]);
+        } else {
+            return Response::json(['status' => false]);
+        }
+    }
+
+    public function getRoomByRole($examId, Request $request) {
+
+        $arrayRoomIds = [];
+        $roomIds=[] ;
+        $arrayRooms = [];
+        $roleId = $request->role_id;
+        $staffByroles = $this->tempEmpolyeeExams->getStaffByRole($roleId, $examId);
+
+        foreach ($staffByroles as $staffByrole ) {
+
+            $staffId = $staffByrole['staff_id'];
+            $departmentName = $staffByrole['department_name'];
+            $roomByStaffIds = (object)$this->getRoomByStaff($staffId, $departmentName);
+
+            foreach($roomByStaffIds as $roomByStaffId) {
+                $arrayRoomIds[] = $roomByStaffId->room_id;
+            }
+
+        }
+        $tempArray = array_unique($arrayRoomIds);
+        foreach($tempArray as $roomId) {
+            $roomIds[] = $roomId;
+        }
+
+        $notSelectedRooms = DB::table('rooms')
+            ->join('buildings', 'rooms.building_id', '=', 'buildings.id')
+            ->whereNotIn('rooms.id', $roomIds)
+            ->where('is_exam_room', true)
+            ->select('rooms.name as room_name', 'rooms.id as room_id', 'buildings.code')
+            ->get();
+
+        foreach($notSelectedRooms as $notSelectedRoom) {
+            $arrayRooms[] = ['room_name' => $notSelectedRoom->room_name.''.$notSelectedRoom->code, 'room_id' => $notSelectedRoom->room_id];
+        }
+        return view('backend.exam.includes.partial_room_by_role_staff', compact('arrayRooms'));
+    }
+
+    public function getPopUpMessage($examId, Request $request) {
+
+        $staffRole = $request->staff_role_id;
+        $staffRole = explode('_',$staffRole);
+        $staffType = $staffRole[0];
+        $roleId = $staffRole[1];
+        $staffId = $staffRole[2];
+        $roomName = $staffRole[3];
+        $roomId = $request->room_id;
+
+        return view('backend.exam.includes.popup_delete_cancel_room', compact('staffType', 'roleId', 'staffId', 'roomName', 'roomId', 'examId'));
+    }
+
+    public function deleteRoomFromStaff($examId, Request $request) {
+
+        $staffType = $request->staff_type;
+        $roleId = $request->role_id;
+        $staffId =$request->staff_id;
+        $roomId = $request->room_id;
+
+
+//        dd($staffType.'--'.$roleId.'--'.$staffId.'--'.$roomId);
+
+
+
+
+        if($staffType == 'perstaff') {
+
+            $rooms = $this->getRoomByStaff($staffId, $departmentName='perstaff');
+
+            if($rooms) {
+                if(count($rooms) > 1) {
+
+                    $del = $this->tempEmpolyeeExams->destroyRolePerStaffExam($roleId, $staffId, $examId, $roomId);
+                    if($del) {
+                        return Response::json(['status'=> true]);
+                    }
+                } else if(count($rooms) == 1) {
+
+                    $update = $this->tempEmpolyeeExams->updateRoleStaffPerEmployee($examId, $staffId, $roleId, $roomId = null, $course_id=null);
+                    if($update) {
+                        return Response::json(['status'=> true]);
+                    }
+                }
+            }
+
+        } else if($staffType == 'tmpstaff') {
+
+            $rooms = $this->getRoomByStaff($staffId, $departmentName='Ministry');
+
+            if($rooms) {
+                if(count($rooms) > 1) {
+
+                    $del = $this->tempEmpolyeeExams->destroyRoleTempStaffExam($roleId, $staffId, $examId, $roomId);
+
+                    if($del) {
+                        return Response::json(['status'=> true]);
+                    }
+                } else if(count($rooms) == 1) {
+                    $update = $this->tempEmpolyeeExams->updateRoleStaffTempEmployee($examId, $staffId, $roleId, $roomId= null, $course_id= null);
+                    if($update) {
+                        return Response::json(['status'=> true]);
+                    }
+                }
+            }
+
+        } else {
+            return Response::json(['status'=> false]);
+        }
+
+    }
 }

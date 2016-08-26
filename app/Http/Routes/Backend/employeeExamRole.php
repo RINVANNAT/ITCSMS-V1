@@ -36,6 +36,25 @@ Route::group([], function() {
     Route::get('exams/{id}/temp-employee-export', 'employeeExamController@exportTempEmployees')->name('admin.exam.temp_employee.export');
 
 
+    Route::get('exams/{id}/view-role-staff-lists', 'employeeExamController@viewRoleStaffLists')->name('admin.exam.view_role_staff_lists');
+
+
+    Route::get('exams/{id}/print-role-staff-lists', 'employeeExamController@printViewRoleStaffLists')->name('admin.exam.print_role_staff_lists');
+
+
+    Route::get('exams/{id}/get-staff-by-role-course', 'employeeExamController@getStaffByRoleCourse')->name('admin.exam.get_staff_by_role_course');
+
+    Route::get('exams/{id}/get-room-list-by-role', 'employeeExamController@getRoomByRole')->name('admin.exam.get_room_list_by_role');
+
+    Route::put('exams/{id}/update-staff-with-room', 'employeeExamController@updateStaffRoom')->name('admin.exam.update_staff_with_room');
+
+    Route::get('exams/{id}/get-popup-view-yes-no', 'employeeExamController@getPopUpMessage')->name('admin.exam.get_popup_view_yes_no');
+
+    Route::delete('exams/{id}/delete-room-from-staff', 'employeeExamController@deleteRoomFromStaff')->name('admin.exam.delete_room_from_staff');
+
+
+
+
 
 
 //----------testing

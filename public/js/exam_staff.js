@@ -136,32 +136,32 @@
     $('#btn_delete_node').hide();
     $('#btn_move_node').hide();
 
-    $(function(){
-        $("#btn_add_role").click(function () {
+    $(document).ready(function() {
 
+        $("#btn_add_role").click(function () {
             toggleSidebarStaffRole();
 
-            if($("#selected_staffs").jstree('get_selected').length !== 0) {
+                if($("#selected_staffs").jstree('get_selected').length !== 0) {
 
-                $('#btn_delete_node').show();
-                $('#btn_move_node').show();
-            } else {
-                $('#btn_delete_node').hide();
-                $('#btn_move_node').hide();
-            }
-
-            $("#selected_staffs").bind('select_node.jstree', function(e) {
-
-                if($('.popUpRoleDown').hasClass('show')) {
-                    $('#btn_delete_node').hide();
-                    $('#btn_move_node').hide();
-                } else {
                     $('#btn_delete_node').show();
                     $('#btn_move_node').show();
+                } else {
+                    $('#btn_delete_node').hide();
+                    $('#btn_move_node').hide();
                 }
 
+                $("#selected_staffs").bind('select_node.jstree', function(e) {
 
-            }).bind("deselect_node.jstree", function(evt, data) {
+                    if($('.popUpRoleDown').hasClass('show')) {
+                        $('#btn_delete_node').hide();
+                        $('#btn_move_node').hide();
+                    } else {
+                        $('#btn_delete_node').show();
+                        $('#btn_move_node').show();
+                    }
+
+
+                }).bind("deselect_node.jstree", function(evt, data) {
 
                     if($("#selected_staffs").jstree('get_selected').length != 0) {
                         if($('.popUpRoleDown').hasClass('show')) {
@@ -172,7 +172,7 @@
                             $('#btn_move_node').show();
                         }
                     } else {
-                        console.log($("#selected_staffs").jstree('get_selected').length);
+                        //console.log($("#selected_staffs").jstree('get_selected').length);
                         $('#btn_delete_node').hide();
                         $('#btn_move_node').hide();
 
@@ -181,23 +181,33 @@
                         }
 
                     }
-            });
+                });
 
         });
 
+
+        $('#btn_cancel_staff_role').on('click',function() {
+
+            $('.popUpRoleDown').hide();
+            toggleSidebarStaffRole();
+            return false;
+        });
+
+
     });
+
+
+
 
     $('#btn_move_node').on('click', function() {
         disableButton($('#btn_delete_node'), $('#btn_move_node') );
         $('.popUpRoleDown').slideFadeToggle().addClass('show');
 
+
+
     });
 
-    $('#btn_cancel_staff_role').on('click',function() {
-        $('.popUpRoleDown').hide();
-        toggleSidebarStaffRole();
-        return false;
-    })
+
 
     $('#btn_cancel_chang_role').on('click', function() {
         $('.popUpRoleDown').slideFadeToggle().removeClass('show');
@@ -320,5 +330,10 @@
             $('.loading').addClass('hide');
         }
     }
+
+
+
+
+
 
 

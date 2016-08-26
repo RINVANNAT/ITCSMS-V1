@@ -24,57 +24,55 @@
 
                 @foreach($courseIds as $courseId)
                     <div class="col-sm-12" style="margin-bottom: 5px">
-                        <div class="col-sm-2">
-
+                        <div class="col-sm-3 no-padding enlarge-number">
+                            <label for="course_name"> {{$courseId->course_name}}: </label>
                         </div>
-                        <div class="col-sm-4 no-padding enlarge-number">
-                            <label for="course_name"> {{$courseId->course_name}} </label>
-                        </div>
-                        <div class="col-sm-3 no-padding">
-                            {!! Form::text('course_factor'."[$courseId->course_id]", null, ['class' => 'form-control enlarge-number']) !!}
+                        <div class="col-sm-2 no-padding">
+                            {!! Form::text('course_factor'."[$courseId->course_id]", 4, ['class' => 'form-control enlarge-number']) !!}
                             {{--{!! Form::hidden('course_factor_'."[course_id]",$courseId->course_id, ['class' => 'form-control']) !!}--}}
                         </div>
-                        <div class="col-sm-3">
-
+                        <div class="col-sm-2 enlarge-number">
+                            <label for="coefficient">Coe: </label>
                         </div>
+                        <div class="col-sm-3">
+                            {!! Form::text('course_factor'."[subject_coe_$courseId->course_id]", null, ['class' => 'form-control enlarge-number']) !!}
+                        </div>
+
                     </div>
 
                 @endforeach
 
+                {{--<div class="col-sm-12" style="margin-bottom: 5px">--}}
+                    {{--<div class="col-sm-2">--}}
+
+                    {{--</div>--}}
+                    {{--<div class="col-sm-4 no-padding enlarge-number">--}}
+                        {{--<label for="total_pass"> Coefficient </label>--}}
+                    {{--</div>--}}
+                    {{--<div class="col-sm-3 no-padding">--}}
+                        {{--{!! Form::text('course_factor'."[coefficient]", null, ['class' => 'form-control enlarge-number', 'id'=> 'coefficient']) !!}--}}
+                    {{--</div>--}}
+                {{--</div>--}}
+
                 <div class="col-sm-12" style="margin-bottom: 5px">
-                    <div class="col-sm-2">
 
+                    <div class="col-sm-7 no-padding enlarge-number">
+                        <label for="total_passed"> Number of Student Passed: </label>
                     </div>
-                    <div class="col-sm-4 no-padding enlarge-number">
-                        <label for="total_pass"> Coefficient </label>
-                    </div>
-                    <div class="col-sm-3 no-padding">
-                        {!! Form::text('course_factor'."[coefficient]", null, ['class' => 'form-control enlarge-number', 'id'=> 'coefficient']) !!}
-                    </div>
-                </div>
-
-                <div class="col-sm-12" style="margin-bottom: 5px">
-                    <div class="col-sm-2">
-
-                    </div>
-                    <div class="col-sm-4 no-padding enlarge-number">
-                        <label for="total_pass"> Student Pass</label>
-                    </div>
-                    <div class="col-sm-3 no-padding">
+                    <div class="col-sm-3 ">
                         {!! Form::text('course_factor'."[total_pass]", null, ['class' => 'form-control enlarge-number', 'id'=> 'total_pass']) !!}
                     </div>
                 </div>
 
                 <div class="col-sm-12" style="margin-bottom: 5px">
-                    <div class="col-sm-2">
 
+                    <div class="col-sm-7 no-padding enlarge-number">
+                        <label for="total_reserved" >Number of Student Reserved: </label>
                     </div>
-                    <div class="col-sm-4 no-padding enlarge-number">
-                        <label for="total_pass">Student Reserve</label>
-                    </div>
-                    <div class="col-sm-3 no-padding">
+                    <div class="col-sm-3 ">
                         {!! Form::text('course_factor'."[total_reserve]", null, ['class' => 'form-control enlarge-number', 'id'=> 'total_reserve']) !!}
                     </div>
+
                 </div>
 
             {!! Form::close() !!}
@@ -114,7 +112,8 @@
 
                     if(result.status) {
                         window.close();
-                        window_request_room = PopupCenterDual('{!! route('candidate_result_lists') !!}','import temporary employee','1000','1200');
+                        var Url = '{!! route('candidate_result_lists') !!}';
+                        window_request_room = PopupCenterDual(Url+'?exam_id='+result.exam_id,'Candidates Result List','1000','1200');
                     } else {
                         notify("error","info", "There are not enough candidates!!!");
                     }

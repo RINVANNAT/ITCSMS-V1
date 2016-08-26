@@ -41,7 +41,13 @@ interface TempEmployeeExamRepositoryContract
      */
     public function getAllRoles($exam_id);
 
+    public function viewStaffByEachRoleLists($examId);
+
+    public function printStaffByEachRole($examId);
+
     public function createImportedTempEmployees($tempEmployees);
+
+    public function modifyStaffRole($exam_id, $request);
 
     /**
      * @param  $input
@@ -54,7 +60,17 @@ interface TempEmployeeExamRepositoryContract
      * @param  $input
      * @return mixed
      */
-    public function update($id, $request);
+    public function updateRoleStaffTempEmployee($examId, $employeeId, $roleChangeId, $roomId, $course_id);
+
+    public function updateRoleStaffPerEmployee($examId, $employeeId, $roleChangeId, $room_id, $course_id);
+
+    public function insertRolePerStaffExam($examId, $employeeId, $roleId, $roomId, $courseId);
+
+    public function insertRoleTempStaffExam($examId, $tempEmployeeId, $roleId, $roomId, $courseId);
+
+    public function destroyRoleTempStaffExam($roleId, $tempEmployeeId, $examId, $roomId);
+
+    public function destroyRolePerStaffExam($roleId, $employeeId, $examId, $roomId);
 
     /**
      * @param  $id

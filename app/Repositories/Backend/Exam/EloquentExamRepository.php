@@ -176,70 +176,73 @@ class EloquentExamRepository implements ExamRepositoryContract
         $mergedObjects = [];
         $candidateScoreForm = [];
 
-        $candidates = DB::table('candidates')
-            ->leftJoin('entranceExamCourses', 'entranceExamCourses.exam_id', '=', 'candidates.exam_id')
-            ->where([
-                ['candidates.room_id', '=', $request->room_id],
-                ['candidates.exam_id', '=', $exam_id],
-                ['entranceExamCourses.id', '=', $request->entrance_course_id],
-            ])
+        if($request->room_id != 'undefined') {
 
-            ->select( 'candidates.id as candidate_id', 'candidates.register_id', 'entranceExamCourses.name_kh as course_name','entranceExamCourses.total_question')
-            ->orderBy('candidates.register_id', 'ASC')->get();
+            $candidates = DB::table('candidates')
+                ->leftJoin('entranceExamCourses', 'entranceExamCourses.exam_id', '=', 'candidates.exam_id')
+                ->where([
+                    ['candidates.room_id', '=', $request->room_id],
+                    ['candidates.exam_id', '=', $exam_id],
+                    ['entranceExamCourses.id', '=', $request->entrance_course_id],
+                ])
 
-        if($candidates) {
-            foreach($candidates as $candidate) {
-                $candidateExamScore = DB::table('candidateEntranceExamScores')
-                    ->where([
-                        ['candidateEntranceExamScores.entrance_exam_course_id', '=', $request->entrance_course_id],
-                        ['candidateEntranceExamScores.candidate_id', '=', $candidate->candidate_id],
-                        ['candidateEntranceExamScores.sequence', '=', $number_correction]
-                    ])->select('score_c', 'score_w', 'score_na', 'sequence', 'candidateEntranceExamScores.id as candidate_score_id')->get();
-                array_push($mergedObjects, (object) array('candidateProperties' => $candidate, 'scoreProperties' => $candidateExamScore) );
-            }
-            usort($mergedObjects, array($this, "sortObject"));
-            foreach ($mergedObjects as $mergedObject) {
+                ->select( 'candidates.id as candidate_id', 'candidates.register_id', 'entranceExamCourses.name_kh as course_name','entranceExamCourses.total_question')
+                ->orderBy('candidates.register_id', 'ASC')->get();
 
-                if($mergedObject->scoreProperties) {
-
-                    foreach ($mergedObject->scoreProperties as $scoreProperty) {
-
-                        if ($number_correction == $scoreProperty->sequence) {
-
-                            $element = (object)array(
-                                'register_id' => $mergedObject->candidateProperties->register_id,
-                                'course_name' => $mergedObject->candidateProperties->course_name,
-                                'total_question' => $mergedObject->candidateProperties->total_question,
-                                'candidate_id' => $mergedObject->candidateProperties->candidate_id,
-                                'score_c' => $scoreProperty->score_c,
-                                'score_w' => $scoreProperty->score_w,
-                                'score_na' => $scoreProperty->score_na,
-                                'sequence' => $scoreProperty->sequence,
-                                'candidate_score_id' => $scoreProperty->candidate_score_id
-                            );
-                            array_push($candidateScoreForm, $element);
-
-                        }
-                    }
-                } else {
-
-                    $element = (object)array(
-                        'register_id' => $mergedObject->candidateProperties->register_id,
-                        'course_name' => $mergedObject->candidateProperties->course_name,
-                        'total_question' => $mergedObject->candidateProperties->total_question,
-                        'candidate_id' => $mergedObject->candidateProperties->candidate_id,
-                        'score_c' => '',
-                        'score_w' => '',
-                        'score_na' => '',
-                        'sequence' => '',
-                        'candidate_score_id' => ''
-                    );
-                    array_push($candidateScoreForm, $element);
+            if($candidates) {
+                foreach($candidates as $candidate) {
+                    $candidateExamScore = DB::table('candidateEntranceExamScores')
+                        ->where([
+                            ['candidateEntranceExamScores.entrance_exam_course_id', '=', $request->entrance_course_id],
+                            ['candidateEntranceExamScores.candidate_id', '=', $candidate->candidate_id],
+                            ['candidateEntranceExamScores.sequence', '=', $number_correction]
+                        ])->select('score_c', 'score_w', 'score_na', 'sequence', 'candidateEntranceExamScores.id as candidate_score_id')->get();
+                    array_push($mergedObjects, (object) array('candidateProperties' => $candidate, 'scoreProperties' => $candidateExamScore) );
                 }
-            }
-            return $candidateScoreForm;
-        }
+                usort($mergedObjects, array($this, "sortObject"));
+                foreach ($mergedObjects as $mergedObject) {
 
+                    if($mergedObject->scoreProperties) {
+
+                        foreach ($mergedObject->scoreProperties as $scoreProperty) {
+
+                            if ($number_correction == $scoreProperty->sequence) {
+
+                                $element = (object)array(
+                                    'register_id' => $mergedObject->candidateProperties->register_id,
+                                    'course_name' => $mergedObject->candidateProperties->course_name,
+                                    'total_question' => $mergedObject->candidateProperties->total_question,
+                                    'candidate_id' => $mergedObject->candidateProperties->candidate_id,
+                                    'score_c' => $scoreProperty->score_c,
+                                    'score_w' => $scoreProperty->score_w,
+                                    'score_na' => $scoreProperty->score_na,
+                                    'sequence' => $scoreProperty->sequence,
+                                    'candidate_score_id' => $scoreProperty->candidate_score_id
+                                );
+                                array_push($candidateScoreForm, $element);
+
+                            }
+                        }
+                    } else {
+
+                        $element = (object)array(
+                            'register_id' => $mergedObject->candidateProperties->register_id,
+                            'course_name' => $mergedObject->candidateProperties->course_name,
+                            'total_question' => $mergedObject->candidateProperties->total_question,
+                            'candidate_id' => $mergedObject->candidateProperties->candidate_id,
+                            'score_c' => '',
+                            'score_w' => '',
+                            'score_na' => '',
+                            'sequence' => '',
+                            'candidate_score_id' => ''
+                        );
+                        array_push($candidateScoreForm, $element);
+                    }
+                }
+                return $candidateScoreForm;
+            }
+
+        }
         return $candidateScoreForm;
 
     }
@@ -328,7 +331,7 @@ class EloquentExamRepository implements ExamRepositoryContract
 
     }
 
-    private function updateCandidateScore($subjectId, $candidateId, $correctAns, $wrongAns, $noAns, $numberCorrection) {
+    private function updateCandidateScore($subjectId, $candidateId, $correctAns, $wrongAns, $noAns, $numberCorrection, $orderInRoom) {
 
         $updateRecord = DB::table('candidateEntranceExamScores')
             ->where([
@@ -340,6 +343,7 @@ class EloquentExamRepository implements ExamRepositoryContract
                 'score_c' => (int)$correctAns,
                 'score_w' => (int)$wrongAns,
                 'score_na' => (int)$noAns,
+                'candidate_number_in_room' => $orderInRoom
             ));
 
         return $updateRecord;
