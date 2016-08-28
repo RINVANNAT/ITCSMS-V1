@@ -17,7 +17,8 @@ Route::group([], function() {
     Route::post('exams/{id}/save_rooms','ExamController@save_rooms')->name('admin.exam.save_rooms');
     Route::post('exams/{id}/generate_rooms','ExamController@generate_rooms')->name('admin.exam.generate_rooms');
     Route::post('exams/{id}/merge_rooms','ExamController@merge_rooms')->name('admin.exam.merge_rooms');
-    Route::post('exams/{id}/split_rooms','ExamController@split_rooms')->name('admin.exam.split_rooms');
+    Route::post('exams/{id}/split_room','ExamController@split_room')->name('admin.exam.split_room');
+    Route::post('exams/{id}/add_room','ExamController@add_room')->name('admin.exam.add_room');
     Route::post('exams/{id}/delete_rooms','ExamController@delete_rooms')->name('admin.exam.delete_rooms');
     Route::get('exams/{id}/view_room_secret_code', 'ExamController@view_room_secret_code')->name('admin.exam.view_room_secret_code');
     Route::post('exams/{id}/save_room_secret_code', 'ExamController@save_room_secret_code')->name('admin.exam.save_room_secret_code');

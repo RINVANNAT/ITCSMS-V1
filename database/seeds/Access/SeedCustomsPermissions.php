@@ -234,43 +234,8 @@ class SeedCustomsPermissions extends Seeder
                             ]
                         ]
                     ]
-                ],
-                [
-                    'name'=>'Candidate',
-                    'groups' => [
-
-                    ],
-                    'permissions' => [
-                        [
-                            'name'         => 'view-candidate-management',
-                            'display_name' => 'View Candidate Management',
-                            'dependency'   => [
-                                'view-backend'
-                            ]
-                        ],
-                        [
-                            'name'         => 'create-candidates',
-                            'display_name' => 'Create Candidates',
-                            'dependency'   => [
-                                'view-backend','view-candidate-management'
-                            ]
-                        ],
-                        [
-                            'name'         => 'edit-candidates',
-                            'display_name' => 'Edit Candidates',
-                            'dependency'   => [
-                                'view-backend','view-candidate-management'
-                            ]
-                        ],
-                        [
-                            'name'         => 'delete-candidates',
-                            'display_name' => 'Edit Candidates',
-                            'dependency'   => [
-                                'view-backend','view-candidate-management'
-                            ]
-                        ]
-                    ]
                 ]
+
             ],
             'permissions' => [
                 // Leave it empty if there is none
@@ -489,6 +454,37 @@ class SeedCustomsPermissions extends Seeder
                     ],
                     'permissions'   => [
                         [
+                            'name'          => 'view-entrance-exam-course',
+                            'display_name'  => "View entrance exam's courses",
+                            'dependency'   => [
+                                'view-backend','view-exam-management'
+                            ]
+                        ],
+                        [
+                            'name'          => 'create-entrance-exam-course',
+                            'display_name'  => 'Add new entrance exam course',
+                            'dependency'   => [
+                                'view-backend','view-exam-management','view-entrance-exam-course'
+                            ]
+
+                        ],
+                        [
+                            'name'          => 'edit-entrance-exam-course',
+                            'display_name'  => 'Edit entrance exam course',
+                            'dependency'   => [
+                                'view-backend','view-exam-management','view-entrance-exam-course'
+                            ]
+
+                        ],
+                        [
+                            'name'          => 'delete-entrance-exam-course',
+                            'display_name'  => 'Delete entrance exam course',
+                            'dependency'   => [
+                                'view-backend','view-exam-management','view-entrance-exam-course'
+                            ]
+
+                        ],
+                        [
                             'name'          => 'create-entrance-exam-score',
                             'display_name'  => 'Input Entrance Exam Score',
                             'dependency'   => [
@@ -518,6 +514,90 @@ class SeedCustomsPermissions extends Seeder
                                 'view-backend','view-exam-management', 'create-entrance-exam-score'
                             ]
                         ]
+                    ]
+                ],
+                [
+                    'name'      => 'Examination Candidate',
+                    'groups'    => [
+
+                    ],
+                    'permissions'   => [
+                        [
+                            'name'          => 'view-exam-candidate',
+                            'display_name'  => "View exam's candidate",
+                            'dependency'   => [
+                                'view-backend','view-exam-management'
+                            ]
+                        ],
+                        [
+                            'name'          => 'create-exam-candidate',
+                            'display_name'  => 'Add new exam candidate',
+                            'dependency'   => [
+                                'view-backend','view-exam-management','view-exam-candidate'
+                            ]
+
+                        ],
+                        [
+                            'name'          => 'edit-exam-candidate',
+                            'display_name'  => 'Edit exam candidate',
+                            'dependency'   => [
+                                'view-backend','view-exam-management','view-exam-candidate'
+                            ]
+
+                        ],
+                        [
+                            'name'          => 'delete-exam-candidate',
+                            'display_name'  => 'Delete exam candidate',
+                            'dependency'   => [
+                                'view-backend','view-exam-management','view-exam-candidate'
+                            ]
+
+                        ],
+                        [
+                            'name'          => 'register-exam-candidate',
+                            'display_name'  => 'Register candidate',
+                            'dependency'   => [
+                                'view-backend','view-exam-management','view-exam-candidate'
+                            ]
+
+                        ],
+                        [
+                            'name'          => 'generate-room-exam-candidate',
+                            'display_name'  => 'Generate examination room',
+                            'dependency'   => [
+                                'view-backend','view-exam-management','view-exam-candidate'
+                            ]
+
+                        ],
+                    ]
+                ],
+                [
+                    'name'      => 'Examination Room',
+                    'groups'    => [
+
+                    ],
+                    'permissions'   => [
+                        [
+                            'name'          => 'view-exam-room',
+                            'display_name'  => "View exam's room",
+                            'dependency'   => [
+                                'view-backend','view-exam-management'
+                            ]
+                        ],
+                        [
+                            'name'          => 'modify-exam-room',
+                            'display_name'  => 'Modify exam room',
+                            'dependency'   => [
+                                'view-backend','view-exam-management','view-exam-room'
+                            ]
+                        ],
+                        [
+                            'name'          => 'generate-exam-room-secret-code',
+                            'display_name'  => "Generate exam's rooms secret code",
+                            'dependency'   => [
+                                'view-backend','view-exam-management','view-exam-room'
+                            ]
+                        ],
                     ]
                 ]
             ],

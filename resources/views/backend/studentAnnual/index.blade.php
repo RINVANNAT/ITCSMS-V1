@@ -65,6 +65,7 @@
                 pageLength: {!! config('app.records_per_page')!!},
                 ajax: {
                     url:"{!! route('admin.student.data') !!}",
+                    method:'POST',
                     data:function(d){
                         // In case additional fields is added for filter, modify export view as well: popup_export.blade.php
                         d.academic_year = $('#filter_academic_year').val();

@@ -17,7 +17,7 @@ class RegisterCandidateRequest extends Request
      */
     public function authorize()
     {
-        return access()->allow('register-candidates');
+        return access()->allow('register-exam-candidate');
     }
 
     /**

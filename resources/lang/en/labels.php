@@ -480,7 +480,8 @@ return [
             'exam_room' => [
                 'title' => [
                     'merge' => 'Merge Room',
-                    'split' => 'Split Room'
+                    'split' => 'Split Room',
+                    'add' => 'Add Room'
                 ],
                 'field' => [
                     'name' => 'Name',

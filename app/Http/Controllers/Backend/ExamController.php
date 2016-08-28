@@ -264,6 +264,25 @@ class ExamController extends Controller
         return Response::json($data);
     }
 
+    public function add_room($id){
+
+        $exam = $this->exams->findOrThrowException($id);
+
+        $exam_room = new ExamRoom();
+        $exam_room->name = $_POST['name'];
+        $exam_room->building_id = $_POST['building_id'];
+        $exam_room->nb_chair_exam = $_POST['nb_chair_exam'];
+        $exam_room->description = $_POST['description'];
+        $exam_room->exam_id = $id;
+        $exam_room->create_uid = auth()->id();
+        $exam_room->created_at = Carbon::now();
+
+        $exam_room->save();
+
+        $exam_rooms = $exam->rooms()->with(['building'])->orderBy('building_id')->orderBy('name')->get();
+        return view('backend.exam.includes.exam_room_list',compact('exam_rooms'));
+    }
+
     public function merge_rooms($id){
 
         $exam = $this->exams->findOrThrowException($id);
@@ -278,6 +297,7 @@ class ExamController extends Controller
         $exam_room->name = $_POST['name'];
         $exam_room->building_id = $_POST['building_id'];
         $exam_room->nb_chair_exam = $_POST['nb_chair_exam'];
+        $exam_room->description = $_POST['description'];
         $exam_room->exam_id = $room_0->exam_id;
         $exam_room->create_uid = auth()->id();
         $exam_room->room_type_id = $room_0->room_type_id;
@@ -285,7 +305,30 @@ class ExamController extends Controller
 
         $exam_room->save();
 
-        $exam_rooms = $exam->rooms()->with(['building'])->get();
+        $exam_rooms = $exam->rooms()->with(['building'])->orderBy('building_id')->orderBy('name')->get();
+        return view('backend.exam.includes.exam_room_list',compact('exam_rooms'));
+    }
+
+    public function split_room($id){
+
+        //dd($_POST);
+        $exam = $this->exams->findOrThrowException($id);
+        ExamRoom::destroy($_POST['split_room']);
+
+        for ($i=0;$i<count($_POST['name']);$i++){
+            $exam_room = new ExamRoom();
+            $exam_room->name = $_POST['name'][$i];
+            $exam_room->building_id = $_POST['building_id'][$i];
+            $exam_room->nb_chair_exam = $_POST['nb_chair_exam'][$i];
+            $exam_room->description = $_POST['description'][$i];
+            $exam_room->exam_id = $id;
+            $exam_room->create_uid = auth()->id();
+            $exam_room->created_at = Carbon::now();
+
+            $exam_room->save();
+        }
+
+        $exam_rooms = $exam->rooms()->with(['building'])->orderBy('building_id')->orderBy('name')->get();
         return view('backend.exam.includes.exam_room_list',compact('exam_rooms'));
     }
 

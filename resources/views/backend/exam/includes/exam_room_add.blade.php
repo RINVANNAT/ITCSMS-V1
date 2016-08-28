@@ -1,15 +1,15 @@
-<div class="modal fade" id="modal_exam_room_merge">
+<div class="modal fade" id="modal_exam_room_add">
     <div class="modal-dialog" style="width: 1000px">
         <div class="modal-content">
             <div class="modal-body">
                 <div class="box box-success">
                     <div class="box-header with-border">
-                        <h3 class="box-title">{{ trans('labels.backend.exams.exam_room.title.merge') }}</h3>
+                        <h3 class="box-title">{{ trans('labels.backend.exams.exam_room.title.add') }}</h3>
                     </div><!-- /.box-header -->
 
                     <div class="box-body">
                         <div class="col-xs-12">
-                            <form class="form-horizontal" id="form_exam_room_merge">
+                            <form class="form-horizontal" id="form_exam_room_add">
                                 <div class="form-group">
                                     <label for="name" class="col-sm-3 control-label">Name</label>
 
@@ -51,7 +51,7 @@
                         </div>
 
                         <div class="pull-right">
-                            <input type="button" id="btn_merge_save" class="btn btn-danger btn-xs" value="{{ trans('buttons.general.save') }}" />
+                            <input type="button" id="btn_add_save" class="btn btn-danger btn-xs" value="{{ trans('buttons.general.save') }}" />
                         </div>
                         <div class="clearfix"></div>
                     </div><!-- /.box-body -->
