@@ -30,7 +30,9 @@
 
 <!-- Main content -->
 <section class="content">
-    @include('flash::message')
+    <div id="flashMessage">
+        @include('flash::message')
+    </div>
     <div class="row">
         <div class="col-xs-12">
             <div class="box box-primary">

@@ -66,11 +66,15 @@ start table render
                 total: function ( index ) {
                     // `this` points tscoreso the vm instance
                     var tmp;
-                    if(parseFloat(this.scores[index].score60) < parseFloat(this.scores[index].reexam)){
+                    var total = parseFloat(this.scores[index].score10) + parseFloat(this.scores[index].score30) + parseFloat(this.scores[index].score60)
+
+                    if( total< parseFloat(this.scores[index].reexam)){
                         tmp = parseFloat(this.scores[index].reexam);
                     }else{
                         tmp = parseFloat(this.scores[index].score60);
                     }
+
+
                     if (!!this.scores[index].score10) {
                         tmp = tmp + parseFloat( this.scores[index].score10);
                     }else{
@@ -82,7 +86,7 @@ start table render
                         this.scores[index].score30  =0;
                     }
                     if (!!!this.scores[index].score60) {
-                        this.scores[index].score60  =0;
+                        this.scores[index].score60  = 0;
                     }
                     return  tmp;
                 },
@@ -102,12 +106,14 @@ start table render
 
                 totalValidationAll: function () {
                     var len = this.studentAnnuals.length;
-                    console.log(len);
-                    var validated = true;
-                    console.log(validated);
 
+                    console.log(this.studentAnnuals);
+                    var validated = true;
                     for ( var i = 0; i < len ; i++){
-                        var tmp = parseFloat(this.scores[index].score60)+ parseFloat( this.scores[index].score10) +parseFloat( this.scores[index].score30);
+                        var tmp = parseFloat(!!!this.scores[this.studentAnnuals[i].id].score60?0:this.scores[this.studentAnnuals[i].id].score60)
+                                + parseFloat( !!!this.scores[this.studentAnnuals[i].id].score10?0:this.scores[this.studentAnnuals[i].id].score10)
+                                +parseFloat( !!!this.scores[this.studentAnnuals[i].id].score30?0:this.scores[this.studentAnnuals[i].id].score30);
+                        console.log(tmp);
                         if (tmp > 100){
                             return  false;
                         }
@@ -226,17 +232,28 @@ start table render
 
         $('#scoreform').submit(function (e) {
             e.preventDefault();
-            
-            // Check if empty of not
-            alert(test.totalValidationAll());
-            if (test.totalValidationAll()  == false) {
-                alert('Text-field is empty.');
-                return false;
+            var validation = test.totalValidationAll();
+
+            if (validation == false ){
+                message = new Vue({
+                    el: '#flashMessage',
+                    template: '<div class="alert alert-error"> Score is not valide! </div>',
+                    data: {
+                        messages: []
+                    },
+                });
+
+                $('html,body').animate({
+                    scrollTop: $("#flashMessage").offset().top - 70
+                });
             }
+            return validation;
+
+
 
         });
 
-
+//        // Validation Score before sent
 
 
     });

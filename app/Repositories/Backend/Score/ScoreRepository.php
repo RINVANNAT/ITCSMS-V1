@@ -1,5 +1,6 @@
 <?php namespace App\Repositories\Backend\Score;
 
+use App\Models\AcademicYear;
 use App\Models\CourseAnnual;
 use App\Models\Score;
 use App\Models\Degree;
@@ -273,6 +274,8 @@ class ScoreRepository extends BaseRepository
             $academic_year_id = $param["academic_year_id"];
         }else{
             $academic_year_id = 2016;
+            $acad = AcademicYear::orderBy("id", "desc")->first();
+            $academic_year_id = $acad->id;
         }
         if($param !=null && array_key_exists("semester_id", $param)){
             $semester_id = (int) $param["semester_id"];
@@ -305,10 +308,13 @@ class ScoreRepository extends BaseRepository
                 ->where('course_annuals.department_id',$department_id)
                 ->where('course_annuals.academic_year_id',$academic_year_id)
                 ->where('course_annuals.semester',$semester_id)
-                ->select('courses.name_en as name', 'course_annuals.id as id', 'courses.credit as credit')->get();
+                ->select(DB::raw("courses.name_en::text || ' ' || course_annuals.semester_id::text AS name "), 'course_annuals.id as id','courses.credit as credit', 'course_annuals.semester_id as semester')
+                ->orderBy("semester")
+                ->orderBy("name")
+                ->get();
 
-
-        }else{
+        }
+        else{
 
             $courseAnnuals = DB::table('course_annuals')
                 ->join('courses', 'courses.id', '=', 'course_annuals.course_id')
@@ -316,9 +322,14 @@ class ScoreRepository extends BaseRepository
                 ->where('course_annuals.grade_id', $grade_id)
                 ->where('course_annuals.department_id',$department_id)
                 ->where('course_annuals.academic_year_id',$academic_year_id)
-                ->select('courses.name_en as name + course_annuals.semester', 'course_annuals.id as id','courses.credit as credit')->get();
+                ->select(DB::raw("courses.name_en::text || ' ' || course_annuals.semester_id::text AS name "), 'course_annuals.id as id','courses.credit as credit', 'course_annuals.semester_id as semester')
+                ->orderBy("semester")
+                ->orderBy("name")
+                ->get();
 
         }
+
+
 
 
 
