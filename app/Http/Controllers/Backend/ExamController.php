@@ -1,25 +1,22 @@
 <?php namespace App\Http\Controllers\Backend;
 
 use App\Http\Controllers\Controller;
-use App\Http\Requests\Backend\Exam\CreateEntranceExamCourseRequest;
 use App\Http\Requests\Backend\Exam\CreateExamRequest;
 use App\Http\Requests\Backend\Exam\DeleteExamRequest;
 use App\Http\Requests\Backend\Exam\EditExamRequest;
 use App\Http\Requests\Backend\Exam\StoreExamRequest;
-use App\Http\Requests\Backend\Exam\DeleteEntranceExamCourseRequest;
+use App\Http\Requests\Backend\Exam\ViewExamRequest;
 use App\Http\Requests\Backend\Exam\UpdateExamRequest;
 use App\Models\AcademicYear;
 use App\Models\Building;
-use App\Models\Candidate;
-use App\Models\Department;
 use App\Models\EntranceExamCourse;
-use App\Models\Exam;
 use App\Models\ExamRoom;
 use App\Models\ExamType;
 use App\Models\Room;
 use App\Repositories\Backend\Exam\ExamRepositoryContract;
 use App\Repositories\Backend\TempEmployeeExam\TempEmployeeExamRepositoryContract;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Response;
 use Illuminate\Http\Request;
@@ -34,6 +31,7 @@ class ExamController extends Controller
     protected $employeeExams;
 
     /**
+     * @param TempEmployeeExamRepositoryContract $empolyeeExams
      * @param ExamRepositoryContract $examRepo
      */
     public function __construct(
@@ -47,11 +45,12 @@ class ExamController extends Controller
 
     /**
      * Display a listing of the exams base on its type (engineer or DUT or final semester).
+     * @param ViewExamRequest $request
      * @param  int $id
      * @return \Illuminate\Http\Response
      */
 
-    public function index($id)
+    public function index(ViewExamRequest $request, $id)
     {
         $type = $id;
         return view('backend.exam.index',compact('type'));
@@ -84,7 +83,7 @@ class ExamController extends Controller
     {
        
         $id = $this->exams->create($request->all());
-        return redirect()->route('admin.exams.show',$id)->withFlashSuccess(trans('alerts.backend.generals.created'));
+        return redirect()->route('admin.exam.show',[$request->get('type_id'),$id])->withFlashSuccess(trans('alerts.backend.generals.created'));
 
     }
 
@@ -95,9 +94,9 @@ class ExamController extends Controller
      * @return \Illuminate\Http\Response
      */
 
-    public function show($id)
+    public function show(ViewExamRequest $request, $type_id, $exam_id)
     {
-        $exam = $this->exams->findOrThrowException($id);
+        $exam = $this->exams->findOrThrowException($exam_id);
         $type = $exam->type->id;
         $academicYear = AcademicYear::where('id',$exam->academicYear->id)->lists('name_kh','id');
         $examType = ExamType::where('id',$type)->lists('name_kh','id')->toArray();
@@ -162,20 +161,29 @@ class ExamController extends Controller
     {
         $exams = DB::table('exams')
             ->where('type_id',$id)
-            ->select(['id','name','date_start','date_end','description']);
+            ->select(['id','type_id','name','date_start','date_end','description']);
 
         $datatables =  app('datatables')->of($exams);
 
 
         return $datatables
-            ->editColumn('name', '{!! $name !!}')
-            ->editColumn('date_start', '{!! $date_start !!}')
-            ->editColumn('date_end', '{!! $date_end !!}')
-            ->editColumn('description', '{!! $description !!}')
+            ->editColumn('date_start',function($exam){
+                return Carbon::createFromFormat('Y-m-d h:i:s',$exam->date_start)->toFormattedDateString();
+            })
+            ->editColumn('date_end',function($exam){
+                return Carbon::createFromFormat('Y-m-d h:i:s',$exam->date_end)->toFormattedDateString();
+            })
             ->addColumn('action', function ($exam) {
-                return  '<a href="'.route('admin.exams.edit',$exam->id).'" class="btn btn-xs btn-primary"><i class="fa fa-pencil" data-toggle="tooltip" data-placement="top" title="" data-original-title="'.trans('buttons.general.crud.edit').'"></i> </a>'.
-                ' <button class="btn btn-xs btn-danger btn-delete" data-remote="'.route('admin.exams.destroy', $exam->id) .'"><i class="fa fa-times" data-toggle="tooltip" data-placement="top" title="' . trans('buttons.general.crud.delete') . '"></i></button>'.
-                ' <a href="'.route('admin.exams.show',$exam->id).'" class="btn btn-xs btn-info"><i class="fa fa-eye" data-toggle="tooltip" data-placement="top" title="" data-original-title="'.trans('buttons.general.view').'"></i> </a>';
+                $action = "";
+                if(Auth::user()->allow('edit-exams')){
+                    $action = $action.'<a href="'.route('admin.exam.edit',[$exam->type_id,$exam->id]).'" class="btn btn-xs btn-primary"><i class="fa fa-pencil" data-toggle="tooltip" data-placement="top" title="" data-original-title="'.trans('buttons.general.crud.edit').'"></i> </a>';
+                }
+                if(Auth::user()->allow('delete-exams')){
+                    $action = $action.' <button class="btn btn-xs btn-danger btn-delete" data-remote="'.route('admin.exams.destroy', $exam->id) .'"><i class="fa fa-times" data-toggle="tooltip" data-placement="top" title="' . trans('buttons.general.crud.delete') . '"></i></button>';
+                }
+
+                $action = $action.' <a href="'.route('admin.exam.show',[$exam->type_id,$exam->id]).'" class="btn btn-xs btn-info"><i class="fa fa-eye" data-toggle="tooltip" data-placement="top" title="" data-original-title="'.trans('buttons.general.view').'"></i> </a>';
+                return  $action;
             })
             ->make(true);
     }
@@ -214,16 +222,16 @@ class ExamController extends Controller
             })
             ->make(true);
 
-    }*/
+    }
 
     public function delete_entranceExamCourses(DeleteEntranceExamCourseRequest $request, $course_id)
     {
         $course = EntranceExamCourse::find($course_id);
 
         //Don't delete the role is there are users associated
-        /*if ($course->candidates()->count() > 0) {
-            throw new GeneralException(trans('exceptions.backend.exams.has_candidate'));
-        }*/
+        //if ($course->candidates()->count() > 0) {
+        //    throw new GeneralException(trans('exceptions.backend.exams.has_candidate'));
+       // }
 
         if ($course->delete()) {
             if($request->ajax()){
@@ -232,7 +240,7 @@ class ExamController extends Controller
                 return redirect()->route('admin.exams.index')->withFlashSuccess(trans('alerts.backend.generals.deleted'));
             }
         }
-    }
+    }*/
 
     public function get_buildings($id){
         $type = $_GET['type'];
@@ -401,51 +409,11 @@ class ExamController extends Controller
 
     }
 
-    public function get_rooms($id){
-        $type = $_GET['type'];
-        $building = explode('_', $_GET['id'])[1];
-        $data = array();
-        $all_ids = $this->get_all_room_ids();
-        $ids = $this->get_selected_room_ids($id);
-
-        if($type == "available"){
-            $ids = $this->get_available_room_ids($all_ids,$ids);
-        }
-
-        $rooms = DB::table('rooms')
-            ->select('rooms.name','rooms.id','rooms.nb_chair_exam', 'buildings.code')
-            ->where('rooms.building_id',$building)
-            ->whereIN('rooms.id',$ids)
-            ->join('buildings','rooms.building_id','=','buildings.id')
-            ->get();
-
-        foreach ($rooms as $room){
-            $element = array(
-                "id" => 'room_'.$room->id,
-                "text" => $room->name.'-'.$room->code.' ('.$room->nb_chair_exam.')',
-                "data" => array("chair_exam" =>$room->nb_chair_exam),
-                "children"=>false,
-                "type"=>"room"
-            );
-            array_push($data,$element);
-        }
-        return Response::json($data);
-    }
-
     public function count_seat_exam($id){
-        $type = $_GET['type'];
-        $all_ids = $this->get_all_room_ids();
-        $ids = $this->get_selected_room_ids($id);
+        $exam = $this->exams->findOrThrowException($id);
+        $rooms = $exam->rooms()->get();
 
         $seat_exam = 0;
-        if($type == "available"){
-            $ids = $this->get_available_room_ids($all_ids,$ids);
-        }
-
-        $rooms = DB::table('rooms')
-            ->select('rooms.nb_chair_exam')
-            ->whereIN('rooms.id',$ids)
-            ->get();
 
         foreach ($rooms as $room){
             $seat_exam = $seat_exam + $room->nb_chair_exam;
@@ -453,25 +421,6 @@ class ExamController extends Controller
 
         return Response::json(array("seat_exam"=>$seat_exam));
 
-    }
-
-    private function get_all_room_ids(){
-        $ids = DB::table('rooms')->where('is_exam_room',true)->lists('id');
-
-        return $ids;
-    }
-
-    private function get_selected_room_ids($exam_id){
-        $ids = DB::table('examRooms')
-            ->where('examRooms.exam_id',$exam_id)
-            ->lists('examRooms.id');
-
-        return $ids;
-    }
-
-    private function get_available_room_ids($all_ids, $selected_ids){
-        $ids = array_diff($all_ids,$selected_ids);
-        return $ids;
     }
 
     public function view_room_secret_code($exam_id){

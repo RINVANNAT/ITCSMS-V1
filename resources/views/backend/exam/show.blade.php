@@ -143,17 +143,21 @@
                         </a>
                     </li>
                     @endauth
+                    @permission('view-exam-staff')
                     <li role="presentation">
                         <a href="#staff_info" aria-controls="staffs" role="tab" data-toggle="tab">
                             {{ trans('labels.backend.exams.show_tabs.staff_info') }}
                         </a>
-                    </li>
+
+                    @endauth
                 @endif
+                    @permission('view-exam-document')
                     <li role="presentation">
                         <a href="#download_info" aria-controls="staffs" role="tab" data-toggle="tab">
                             {{ trans('labels.backend.exams.show_tabs.download') }}
                         </a>
                     </li>
+                    @endauth
                 </ul>
 
                 <div class="tab-content">
@@ -178,13 +182,17 @@
                             @include('backend.exam.show.exam_room')
                         </div>
                         @endauth
+                        @permission('view-exam-staff')
                         <div role="tabpanel" class="tab-pane" id="staff_info" style="padding-top:20px">
                             @include('backend.exam.show.exam_staff')
                         </div>
+                        @endauth
                     @endif
+                    @permission('view-exam-document')
                     <div role="tabpanel" class="tab-pane" id="download_info" style="padding-top:20px">
                         @include('backend.exam.show.download')
                     </div>
+                    @endauth
                 </div>
             </div>
 
@@ -217,63 +225,10 @@
         var window_bac2;
         var window_candidate;
 
-        function count_exam_seat(){
-            var checked_available_rooms = $('#all_rooms').jstree("get_checked");
-            var buildings = $('#all_rooms').data().jstree.get_json();
-
-            var total_exam_seat = 0 ;
-
-            $.each(checked_available_rooms, function (index, room_id){
-                $.each(buildings, function(index_building, building){
-                    $.each(building.children, function(index_room, room){
-                        if(room.id == room_id){
-                            total_exam_seat = total_exam_seat + room.data.chair_exam;
-                        }
-                    })
-                });
-            });
-
-            $("#selected_available_seat").html(total_exam_seat);
-        }
-
-        function count_availble_seat(){
-            var buildings = $('#all_rooms').data().jstree.get_json();
-
-            var total_exam_seat = 0 ;
-
-            console.log(buildings);
-
-            $.each(buildings, function(index_building, building){
-                $.each(building.children, function(index_room, room){
-                    total_exam_seat = total_exam_seat + room.data.chair_exam;
-                })
-            });
-
-            $("#all_available_seat").html(total_exam_seat);
-        }
-
-
-        function get_total_seat(ui_object,type){
-            $.ajax({
-                type: 'GET',
-                url: "{{route('admin.exam.count_seat_exam',$exam->id)}}"+"?type="+type,
-                dataType: "json",
-                success: function(resultData) {
-                    ui_object.html(resultData.seat_exam);
-                }
-            });
-        }
-
         function refresh_candidate_list (){
             $('#candidates-table').DataTable().ajax.reload();
             notify("success","Info", "Candidate list is updated!");
         }
-
-//        function update_ui_room(){
-//            $('#selected_rooms').html("refresh");
-//            get_total_seat($("#all_available_seat"),"available");
-//            get_total_seat($("#all_reserve_seat"),"selected");
-//        }
 
         function update_ui_course(){
             course_datatable.draw();
@@ -394,38 +349,10 @@
 
 
             initJsTree_StaffRole($('#all_staff_role'), '{{route('admin.exam.get-all-departements',$exam->id)}}', '{{route('admin.exam.get-all-positions',$exam->id)}}','{{route('admin.exam.get-all-staffs-by-position',$exam->id)}}', iconUrl1, iconUrl2, iconUrl3 );
-//            $('#all_staff_role').jstree("load_all");
-
-
-            $('#all_rooms').on("check_node.jstree", function (e, data) {
-                count_exam_seat();
-            });
-
-            $('#all_rooms').on("uncheck_node.jstree", function (e, data) {
-                count_exam_seat();
-            });
 
             $("#btn-candidate-refresh").click(function(){
                 refresh_candidate_list();
             });
-
-            $("#btn-cancel").click(function () {
-                toggleSidebar();
-                return false;
-            });
-//            $("#btn-save").click(function(){
-//
-//                $.ajax({
-//                    type: 'POST',
-//                    url: save_room_url,
-//                    data: {room_ids:JSON.stringify($('#all_rooms').jstree("get_checked"))},
-//                    dataType: "json",
-//                    success: function(resultData) {
-//                        update_ui_room(); // Data changed, so we need to refresh UI
-//                    }
-//                });
-//            });
-
 
             $("#btn-candidate-generate-room").click(function(){
                 $.ajax({
@@ -451,9 +378,6 @@
                 window_course = PopupCenterDual('{{route("admin.entranceExamCourses.create")}}'+'?exam_id='+'{{$exam->id}}','Course for exam','800','470');
             });
 
-            get_total_seat($("#all_available_seat"),"available");
-            get_total_seat($("#all_reserve_seat"),"selected");
-
             // Close any open window upon this main window is closed or refreshed
 
             window.onunload = function() {
@@ -473,6 +397,17 @@
 
             /* ------------------------------------------------  Room Exam Section -------------------------------------------*/
             /* -------- Function Area -------- */
+            function get_total_seat(){
+                $.ajax({
+                    type: 'GET',
+                    url: "{{route('admin.exam.count_seat_exam',$exam->id)}}",
+                    dataType: "json",
+                    success: function(resultData) {
+                        $('#all_reserve_seat').html(resultData.seat_exam);
+                    }
+                });
+            }
+
             function disable_room_editing(){
                 $('#exam_room_list_table tbody').removeClass('editing');
                 $('#exam_room_list_table input:checkbox').prop("disabled", true);
@@ -498,6 +433,8 @@
             }
 
             /* ---------- Event Area --------- */
+            get_total_seat(); // Count total seat after page ready
+
             $("#generate_room_exam").click(function () {
                 $('#empty_room_notification').hide();
                 $('#form_generate_room_wrapper').show();
@@ -547,6 +484,7 @@
                         //$('#form_generate_room_wrapper').hide();
                         $('#selected_rooms').html(resultData);
                         $('#modal_exam_room_add').modal('toggle');
+                        get_total_seat(); // Added new roo, so update total seat
                         enable_room_editing();
                     }
                 });
@@ -587,6 +525,7 @@
                         //$('#form_generate_room_wrapper').hide();
                         $('#selected_rooms').html(resultData);
                         $('#modal_exam_room_merge').modal('toggle');
+                        get_total_seat(); // Merge ready, so update seat
                         enable_room_editing();
                     }
                 });
@@ -666,6 +605,7 @@
                         $('#modal_exam_room_split').modal('toggle');
                         $('#selected_rooms').html(resultData);
                         enable_room_editing();
+                        get_total_seat(); // Split ready, so update seat
                     }
                 });
             });
@@ -705,7 +645,7 @@
                     success: function(resultData) {
                         //update_ui_room(); // Data changed, so we need to refresh UI
                         $('#selected_rooms').html(resultData);
-
+                        get_total_seat(); // Delete ready, so update seat
                         enable_room_editing();
                     }
                 });

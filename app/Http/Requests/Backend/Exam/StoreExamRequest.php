@@ -29,6 +29,8 @@ class StoreExamRequest extends Request
     {
         return [
             'name' => 'required|max:255',
+            'date_start_end' => 'required',
+            'academic_year_id' => 'required',
             'description' => 'max:255',
             'type_id' => 'required'
         ];
