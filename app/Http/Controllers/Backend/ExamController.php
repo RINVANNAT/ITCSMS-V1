@@ -144,17 +144,15 @@ class ExamController extends Controller
     /**
      * Remove the specified resource from storage.
      *
+     * @param DeleteExamRequest $request
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
     public function destroy(DeleteExamRequest $request, $id)
     {
-            $this->exams->destroy($id);
-        if($request->ajax()){
-            return json_encode(array("success"=>true));
-        } else {
-            return redirect()->route('admin.exams.index')->withFlashSuccess(trans('alerts.backend.generals.deleted'));
-        }
+        $exam = $this->exams->findOrThrowException($id);
+        $this->exams->destroy($id);
+
     }
 
     public function data($id)
@@ -341,6 +339,7 @@ class ExamController extends Controller
     }
 
     public function generate_rooms($id){
+
         $exam = $this->exams->findOrThrowException($id);
         $exam_rooms = $exam->rooms()->get();
 
@@ -357,7 +356,7 @@ class ExamController extends Controller
 
         foreach($rooms as $room){
             $exam_room = new ExamRoom();
-            if($room->nb_chair_exam > $_POST['exam_chair']+ 5 || $_POST['exam_chair'] -5){
+            if($room->nb_chair_exam > $_POST['exam_chair']+ 5 || $room->nb_chair_exam < $_POST['exam_chair'] -5){
                 $exam_room->nb_chair_exam = $room->nb_chair_exam;
             } else {
                 $exam_room->nb_chair_exam = $_POST['exam_chair'];

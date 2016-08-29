@@ -1,14 +1,16 @@
 <div style="padding-bottom: 20px;">
     <!-- Check all button -->
-    <button class="btn btn-primary btn-sm" id="btn-add-course"><i class="fa fa-plus-circle"></i> Add </button>
+    @permission('create-entrance-exam-course')
+    <button class="btn btn-primary btn-sm" id="btn-add-course"><i class="fa fa-plus-circle"></i> {!! trans('buttons.general.add') !!} </button>
+    @endauth
     <button class="btn btn-default btn-sm" id="btn-course-refresh"><i class="fa fa-refresh"></i></button>
 
     @permission('get-candidate-result-score')
-        <button  class="btn btn-primary btn-sm pull-right" id="btn_input_score_course"><i class="fa fa-plus-circle" ></i> Input Score </button>
+        <button  class="btn btn-primary btn-sm pull-right" id="btn_input_score_course"><i class="fa fa-plus-circle" ></i> {!! trans('buttons.exam.course.input_score') !!} </button>
     @endauth
 
     @permission('request-input-score-form')
-        <button class="btn btn-primary  btn-sm pull-right" id="btn_result_score_candidate" style="margin-right: 5px"><i class="fa fa-plus-circle"></i> Result Score </button>
+        <button class="btn btn-primary  btn-sm pull-right" id="btn_result_score_candidate" style="margin-right: 5px"><i class="fa fa-plus-circle"></i> {!! trans('buttons.exam.course.generate_score') !!} </button>
     @endauth
     <!-- /.btn-group -->
 

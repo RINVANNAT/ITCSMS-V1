@@ -46,4 +46,15 @@ return [
         'save_print' => 'Save & Print',
         'register' => 'Register'
     ],
+    'exam' => [
+        'candidate' => [
+            'add_from_bac2' => "Add From BacII",
+            'add_manually' => "Add Manually",
+            'generate_room' => "Generate Rooms"
+        ],
+        'course' => [
+            'generate_score' => "Generate Score",
+            'input_score' => "Input Score"
+        ]
+    ]
 ];

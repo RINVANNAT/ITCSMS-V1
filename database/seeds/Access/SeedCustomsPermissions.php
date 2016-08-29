@@ -439,7 +439,7 @@ class SeedCustomsPermissions extends Seeder
                             ]
                         ],
                         [
-                            'name'         => 'download-examination-staff',
+                            'name'         => 'download-examination-document',
                             'display_name' => "Download examination's documents",
                             'dependency'   => [
                                 'view-backend','view-exam-management','view-exam-document'

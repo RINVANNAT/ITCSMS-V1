@@ -26,7 +26,8 @@ class EntranceExamCourseController extends Controller
     protected $exams;
 
     /**
-     * @param EntranceExamCourseRepositoryContract $courseProgramRepo
+     * @param EntranceExamCourseRepositoryContract $entranceExamCourseRepo
+     * @param ExamRepositoryContract $examRepo
      */
     public function __construct(
         EntranceExamCourseRepositoryContract $entranceExamCourseRepo,
@@ -41,7 +42,7 @@ class EntranceExamCourseController extends Controller
     /**
      * Show the form for creating a new resource.
      *
-     * @param CreateCourseProgramRequest $request
+     * @param CreateEntranceExamCourseRequest $request
      * @return \Illuminate\Http\Response
      */
     public function create(CreateEntranceExamCourseRequest $request)
@@ -53,7 +54,7 @@ class EntranceExamCourseController extends Controller
     /**
      * Store a newly created resource in storage.
      *
-     * @param  StoreCourseProgramRequest $request
+     * @param  StoreEntranceExamCourseRequest $request
      * @return \Illuminate\Http\Response
      */
     public function store(StoreEntranceExamCourseRequest $request)
@@ -72,7 +73,7 @@ class EntranceExamCourseController extends Controller
     /**
      * Show the form for editing the specified resource.
      *
-     * @param EditCourseProgramRequest $request
+     * @param EditEntranceExamCourseRequest $request
      * @param  int $id
      * @return \Illuminate\Http\Response
      */
@@ -86,7 +87,7 @@ class EntranceExamCourseController extends Controller
     /**
      * Update the specified resource in storage.
      *
-     * @param  UpdateCourseProgramRequest $request
+     * @param  UpdateEntranceExamCourseRequest $request
      * @param  int $id
      * @return \Illuminate\Http\Response
      */
@@ -99,7 +100,7 @@ class EntranceExamCourseController extends Controller
     /**
      * Remove the specified resource from storage.
      *
-     * @param DeleteCourseProgramRequest $request
+     * @param DeleteEntranceExamCourseRequest $request
      * @param  int $id
      * @return \Illuminate\Http\Response
      */
@@ -123,7 +124,10 @@ class EntranceExamCourseController extends Controller
 
         return $datatables
             ->addColumn('action', function ($item) use ($exam_id)  {
-                $result = ' <button class="btn btn-xs btn-danger btn-delete" data-remote="'.route('admin.entranceExamCourses.destroy', $item->id) .'"><i class="fa fa-times" data-toggle="tooltip" data-placement="top" title="' . trans('buttons.general.crud.delete') . '"></i></button>';
+                $result = '';
+                if(Auth::user()->allow('delete-entrance-exam-courses')){
+                    $result = $result.' <button class="btn btn-xs btn-danger btn-delete" data-remote="'.route('admin.entranceExamCourses.destroy', $item->id) .'"><i class="fa fa-times" data-toggle="tooltip" data-placement="top" title="' . trans('buttons.general.crud.delete') . '"></i></button>';
+                }
                 if(!Auth::user()->allow('report-error-on-inputted-score')){
                     return $result;
                 } else {

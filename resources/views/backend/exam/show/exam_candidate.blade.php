@@ -1,14 +1,14 @@
 <div style="padding-bottom: 20px;">
     <!-- Check all button -->
     @permission('create-exam-candidate')
-    <button class="btn btn-primary btn-sm" id="btn_add_candidate"><i class="fa fa-plus-circle"></i> Add from BacII</button>
-    <button class="btn btn-info btn-sm" id="btn_add_candidate_manual"><i class="fa fa-plus-circle"></i> Add Manually</button>
+    <button class="btn btn-primary btn-sm" id="btn_add_candidate"><i class="fa fa-plus-circle"></i> {!! trans('buttons.exam.candidate.add_from_bac2') !!}</button>
+    <button class="btn btn-info btn-sm" id="btn_add_candidate_manual"><i class="fa fa-plus-circle"></i> {!! trans('buttons.exam.candidate.add_manually') !!}</button>
     @endauth
     <!-- /.btn-group -->
     <button class="btn btn-default btn-sm" id="btn-candidate-refresh"><i class="fa fa-refresh"></i></button>
 
     @permission('generate-room-exam-candidate')
-    <button class="btn btn-default btn-sm pull-right" id="btn-candidate-generate-room"><i class="fa fa-map-signs"></i> Generate Room</button>
+    <button class="btn btn-default btn-sm pull-right" id="btn-candidate-generate-room"><i class="fa fa-map-signs"></i> {!! trans('buttons.exam.candidate.generate_room') !!}</button>
     @endauth
 </div>
 
