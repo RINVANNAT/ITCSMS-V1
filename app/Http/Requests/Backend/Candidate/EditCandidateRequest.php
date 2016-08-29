@@ -17,7 +17,7 @@ class EditCandidateRequest extends Request
      */
     public function authorize()
     {
-        return access()->allow('edit-candidates');
+        return access()->allow('edit-exam-candidate');
     }
 
     /**

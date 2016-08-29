@@ -3,7 +3,7 @@
     Route::group([], function() {
         /* -------------------- Resource -----------------------*/
         Route::resource('studentAnnuals', 'StudentAnnualController');
-        Route::get('student-data', 'StudentAnnualController@data')->name('admin.student.data');
+        Route::post('student-data', 'StudentAnnualController@data')->name('admin.student.data');
 
         /* -------------------- IMPORT -----------------------*/
         Route::get('student-request-import', 'StudentAnnualController@request_import')->name('admin.student.request_import');

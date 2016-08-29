@@ -45,8 +45,8 @@
                                 <?php $i++;?>
                                 <tr>
                                     <td><?php echo $i;?></td>
-                                    <td>{{$result->name_latin}}</td>
                                     <td>{{$result->name_kh}}</td>
+                                    <td>{{$result->name_latin}}</td>
                                     <td>{{$result->result}}</td>
                                     <td>{{$result->total_score}}</td>
                                 </tr>
@@ -63,6 +63,7 @@
 
 @section('after-scripts-end')
     <script>
+        var exam_id = JSON.parse('<?php echo $examId; ?>');
 
         function ajaxRequest(method, baseUrl, baseData){
 
@@ -75,7 +76,7 @@
                     if(result.status) {
                         window.close();
                         var printUrl = "{!! route('print_candidate_result_lists') !!}";
-                        window_request_room = PopupCenterDual(printUrl+'?status='+'print_page','print candidates result','1000','1200');
+                        window_print_candidate_result = PopupCenterDual(printUrl+'?status='+'print_page'+'?exam_id='+exam_id,'print candidates result','1000','1200');
                     }
                 }
             });

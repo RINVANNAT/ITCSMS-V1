@@ -1,4 +1,6 @@
 @include('backend.exam.includes.exam_room_merge')
+@include('backend.exam.includes.exam_room_split')
+@include('backend.exam.includes.exam_room_add')
 <div class="row" id="row-main">
     <div class="col-sm-12">
         <div class="box box-solid">
@@ -6,14 +8,18 @@
                 <i class="fa fa-building-o"></i>
 
                 <h3 class="box-title">Buildings & Rooms <span class="label label-primary" style="margin-left: 10px;">Total Seat: <span id="all_reserve_seat">0</span></span></h3>
+                @permission('generate-exam-room-secret-code')
                 <button class="btn btn-sm btn-default pull-right" id="btn-secret-code" style="margin-left: 5px;"><i class="fa fa-user-secret"></i> Anonymus Code</button>
+                @endauth
+                @permission('modify-exam-room')
                 <button class="btn btn-sm btn-info pull-right" id="btn_room_modify" style="margin-left: 5px;"><i class="fa fa-edit"></i> Modify</button>
                 <button class="btn btn-sm btn-danger pull-right room_editing" id="btn_room_cancel" style="margin-left: 5px; display: none">Cancel</button>
                 <div class="btn-group pull-right room_editing" style="display: none;">
-                    <button type="button" class="btn btn-sm btn-warning" style="color: #fff; border-color: #3c8dbc;"><i class="fa fa-plus-square-o"></i> Add</button>
+                    <button type="button" id="btn_room_add" class="btn btn-sm btn-warning" style="color: #fff; border-color: #3c8dbc;"><i class="fa fa-plus-square-o"></i> Add</button>
                     <button type="button" id="btn_room_merge" class="btn btn-sm btn-warning" style="color: #fff; border-color: #3c8dbc;" disabled><i class="fa fa-long-arrow-right"></i><i class="fa fa-long-arrow-left"></i> Merge</button>
                     <button type="button" id="btn_room_delete" class="btn btn-sm btn-warning" style="color: #fff; border-color: #3c8dbc;" disabled><i class="glyphicon glyphicon-trash"></i> Delete</button>
                 </div>
+                @endauth
             </div>
 
             <!-- /.box-header -->

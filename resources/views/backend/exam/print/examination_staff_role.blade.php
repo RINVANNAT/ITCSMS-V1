@@ -20,33 +20,32 @@
 @section('content')
 
     <?php   $page_number = 1;
-    $total_page = count($candidatesResults);
+    $total_page = count($roles);
     ?>
-    @foreach($candidatesResults as $candidatesResult)
+    @foreach($roles as $role)
 
         <div class="page">
-            <h2>Result of Standadize Testing Exam 2016-2017</h2>
+            <h2>{{$role->name}}</h2>
+
 
             <table class="table" width="100%">
                 <tr>
-                    <th>Order</th>
-                    <th>Khmer</th>
-                    <th>Latin</th>
-                    <th>Result</th>
-                    <th>Score</th>
+                    <th>Name</th>
+                    <th>ROOMS</th>
                 </tr>
-                <?php $i =0;?>
-                @foreach($candidatesResult as $result)
-                    <?php $i++;?>
                     <tr>
-                        <td><?php echo $i;?></td>
-                        <td>{{$result->name_kh}}</td>
-                        <td>{{$result->name_latin}}</td>
-                        <td>{{$result->result}}</td>
-                        <td>{{$result->total_score}}</td>
+                        <td>{{$role->staff_role['text']}}</td>
+                        <td>
+                            @foreach($role->room as $room)
+                                <li>{{$room}}</li>
+                            @endforeach
+                        </td>
                     </tr>
-                @endforeach
             </table>
+
+
+
+
             <div class="footer">
                 <hr/>
                 <span>Concours d'entree ITC 2016</span>

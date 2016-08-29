@@ -116,41 +116,39 @@
             <div>
                 <!-- Nav tabs -->
                 <ul class="nav nav-tabs" role="tablist">
-                    @if($exam->type_id == 3)
                     <li role="presentation" class="active">
-                    @else
-                    <li role="presentation">
-                    @endif
                         <a href="#general_info" aria-controls="generals" role="tab" data-toggle="tab">
                             {{ trans('labels.backend.exams.show_tabs.general_info') }}
                         </a>
                     </li>
-                    @if($exam->type_id != 3)
-                        <li role="presentation" class="active">
-                    @else
-                        <li role="presentation">
-                    @endif
+                    @permission('view-exam-candidate')
+                    <li role="presentation">
                         <a href="#candidate_info" aria-controls="candidates" role="tab" data-toggle="tab">
                             {{ trans('labels.backend.exams.show_tabs.candidate_info') }}
                         </a>
                     </li>
-                    @if($exam->type_id != 2)
+                    @endauth
+                @if($exam->type_id != 2)  {{-- If this is DUT Examination, there is no course, room and staff --}}
+                    @permission('view-entrance-exam-course')
                     <li role="presentation">
                         <a href="#course_info" aria-controls="courses" role="tab" data-toggle="tab">
                             {{ trans('labels.backend.exams.show_tabs.course_info') }}
                         </a>
                     </li>
+                    @endauth
+                    @permission('view-exam-room')
                     <li role="presentation">
                         <a href="#room_info" aria-controls="rooms" role="tab" data-toggle="tab">
                             {{ trans('labels.backend.exams.show_tabs.room_info') }}
                         </a>
                     </li>
+                    @endauth
                     <li role="presentation">
                         <a href="#staff_info" aria-controls="staffs" role="tab" data-toggle="tab">
                             {{ trans('labels.backend.exams.show_tabs.staff_info') }}
                         </a>
                     </li>
-                    @endif
+                @endif
                     <li role="presentation">
                         <a href="#download_info" aria-controls="staffs" role="tab" data-toggle="tab">
                             {{ trans('labels.backend.exams.show_tabs.download') }}
@@ -159,31 +157,27 @@
                 </ul>
 
                 <div class="tab-content">
-                    @if($exam->type_id == 3)
-                        <div role="tabpanel" class="tab-pane active" id="general_info" style="padding-top:20px;">
-                    @else
-                        <div role="tabpanel" class="tab-pane" id="general_info" style="padding-top:20px;">
-                    @endif
-
+                    <div role="tabpanel" class="tab-pane active" id="general_info" style="padding-top:20px;">
                         {!! Form::model($exam, ['#','class' => 'form-horizontal', 'role'=>'form', 'method' => 'patch', 'id'=> 'exam_show']) !!}
                         @include ("backend.exam.fields")
                         {!! Form::close() !!}
                     </div>
-                    @if($exam->type_id != 3)
-                        <div role="tabpanel" class="tab-pane active" id="candidate_info" style="padding-top:20px">
-                    @else
-                        <div role="tabpanel" class="tab-pane" id="candidate_info" style="padding-top:20px">
-                    @endif
-                            @include('backend.exam.show.exam_candidate')
-                        </div>
+                    @permission('view-exam-candidate')
+                    <div role="tabpanel" class="tab-pane" id="candidate_info" style="padding-top:20px">
+                        @include('backend.exam.show.exam_candidate')
+                    </div>
+                    @endauth
                     @if($exam->type_id != 2)
+                        @permission('view-entrance-exam-course')
                         <div role="tabpanel" class="tab-pane" id="course_info" style="padding-top:20px">
                             @include('backend.exam.show.exam_course')
                         </div>
-
+                        @endauth
+                        @permission('view-exam-room')
                         <div role="tabpanel" class="tab-pane" id="room_info" style="padding-top:20px;max-width: 100%;">
                             @include('backend.exam.show.exam_room')
                         </div>
+                        @endauth
                         <div role="tabpanel" class="tab-pane" id="staff_info" style="padding-top:20px">
                             @include('backend.exam.show.exam_staff')
                         </div>
@@ -213,6 +207,8 @@
         var save_room_url = '{{route('admin.exam.save_rooms',$exam->id)}}';
         var generate_room_url = '{{route('admin.exam.generate_rooms',$exam->id)}}';
         var merge_room_url = '{{route('admin.exam.merge_rooms',$exam->id)}}';
+        var add_room_url = '{{route('admin.exam.add_room',$exam->id)}}';
+        var split_room_url = '{{route('admin.exam.split_room',$exam->id)}}';
         var delete_room_url = '{{route('admin.exam.delete_rooms',$exam->id)}}';
         var exam_id = {{$exam->id}};
         var exam_type_id = {{$exam->type_id}};
@@ -476,6 +472,7 @@
             };
 
             /* ------------------------------------------------  Room Exam Section -------------------------------------------*/
+            /* -------- Function Area -------- */
             function disable_room_editing(){
                 $('#exam_room_list_table tbody').removeClass('editing');
                 $('#exam_room_list_table input:checkbox').prop("disabled", true);
@@ -486,12 +483,21 @@
             }
 
             function enable_room_editing(){
+                if(($('[name="exam_room[]"]:checked').length > 0)){
+                    $('#btn_room_merge').prop('disabled',false);
+                    $('#btn_room_delete').prop('disabled',false);
+                }else{
+                    $('#btn_room_merge').prop('disabled',true);
+                    $('#btn_room_delete').prop('disabled',true);
+                }
+
                 $('#exam_room_list_table tbody').addClass('editing');
                 $('#exam_room_list_table input:checkbox').prop("disabled", false);
                 $('#btn_room_modify').hide();
                 $('.room_editing').show();
             }
 
+            /* ---------- Event Area --------- */
             $("#generate_room_exam").click(function () {
                 $('#empty_room_notification').hide();
                 $('#form_generate_room_wrapper').show();
@@ -515,14 +521,39 @@
                 });
             });
 
+            // Click button modify in room section
             $("#btn_room_modify").click(function () {
                 enable_room_editing();
             });
 
+            // Close editing mode
             $("#btn_room_cancel").click(function () {
                 disable_room_editing();
             });
 
+            /* ---------------- Add Section ---------------- */
+
+            $("#btn_room_add").click(function () {
+                $('#modal_exam_room_add').modal('toggle');
+            });
+
+            $("#btn_add_save").click(function () {
+                $.ajax({
+                    type: 'POST',
+                    url: add_room_url,
+                    data: $('#form_exam_room_add').serialize(),
+                    dataType: "html",
+                    success: function(resultData) {
+                        //$('#form_generate_room_wrapper').hide();
+                        $('#selected_rooms').html(resultData);
+                        $('#modal_exam_room_add').modal('toggle');
+                        enable_room_editing();
+                    }
+                });
+            });
+
+            /* ---------------- Merge Section ---------------- */
+            // Merge Room after select room
             $("#btn_room_merge").click(function () {
                 var selected_rooms = $('#exam_room_list_table input:checkbox:checked').map(function () {
                     return $(this).data('roomname');
@@ -555,11 +586,91 @@
                     success: function(resultData) {
                         //$('#form_generate_room_wrapper').hide();
                         $('#selected_rooms').html(resultData);
+                        $('#modal_exam_room_merge').modal('toggle');
+                        enable_room_editing();
                     }
                 });
             });
 
+            /* --------------------- Split Room Section ---------------------- */
+            var next_split_index = null;
+            var name_split = null;
+            var size_split = null;
+            var building_split = null;
+            var buildings = {!! $buildings !!};
+            var option_buildings = null;
+            $.each(buildings, function(index, value){
+               option_buildings = option_buildings+'<option value="'+index+'">'+value+'</option>';
+            });
 
+            function add_more_split(){
+
+                var item =  '<div class="col-md-12 col-xs-12 room_split_added">'+
+                                '<div class=" form-group col-md-6">' +
+                                    '<div class="col-md-6">'+
+                                        '<input type="text" name="name[]" value="'+name_split+"-"+next_split_index+'" class="form-control">'+
+                                    '</div>'+
+                                    '<div class="col-md-6">'+
+                                        '<input type="number" name="nb_chair_exam[]" class="form-control" value="'+Math.floor(size_split/next_split_index)+'">'+
+                                    '</div>'+
+                                '</div>'+
+                                '<div class=" form-group col-md-6">'+
+                                    '<div class="col-md-6">'+
+                                        '<select name="building_id[]" class="form-control room_split_building">'+
+                                            option_buildings+
+                                        '</select>'+
+                                    '</div>'+
+                                    '<div class="col-md-6">'+
+                                        '<input type="text" name="description[]" class="form-control">'+
+                                    '</div>'+
+                                '</div>'+
+                            '</div>';
+                return item;
+            }
+
+            // Pop up split room panel
+            $(document).on('click','.btn_room_split',function () {
+                next_split_index = 1;
+                name_split = $(this).data('roomname');
+                size_split = $(this).data('capacity');
+                building_split = $(this).data('building');
+                $('#form_exam_room_split .room_split_name').each(function(i, obj) {
+                    $(obj).val(name_split+"-"+next_split_index);
+                    next_split_index++;
+                });
+                $('#split_room').val($(this).data('roomid'));
+                $('.room_split_capacity').val(Math.floor(size_split/2));
+                $('.room_split_building').val(building_split);
+                $('.room_split_added').remove();
+                $('#modal_exam_room_split').modal('toggle');
+            });
+
+            // Split more rooms
+            $("#btn_add_more_split").click(function () {
+                $('#room_split_wrapper').append(
+                    add_more_split()
+                );
+                next_split_index++;
+                $('.room_split_building').val(building_split);
+            });
+
+            // Save splitted room
+            $("#btn_split_save").click(function () {
+
+                $.ajax({
+                    type: 'POST',
+                    url: split_room_url,
+                    data: $("#form_exam_room_split").serialize(),
+                    dataType: "html",
+                    success: function(resultData) {
+                        $('#modal_exam_room_split').modal('toggle');
+                        $('#selected_rooms').html(resultData);
+                        enable_room_editing();
+                    }
+                });
+            });
+
+            /* ------------------ Checkbox Event ---------------------*/
             $(document).on("click","#exam_room_list_table input:checkbox", function(){
                 if($(this).is(":checked")){
                     $(this).closest('tr').addClass('highlight');
@@ -575,8 +686,6 @@
                     $('#btn_room_merge').prop('disabled',true);
                     $('#btn_room_delete').prop('disabled',true);
                 }
-
-
             });
 
             // Apply class editing on tbody or table to allow the below behavior
@@ -596,13 +705,7 @@
                     success: function(resultData) {
                         //update_ui_room(); // Data changed, so we need to refresh UI
                         $('#selected_rooms').html(resultData);
-                        if(($('[name="exam_room[]"]:checked').length > 0)){
-                            $('#btn_room_merge').prop('disabled',false);
-                            $('#btn_room_delete').prop('disabled',false);
-                        }else{
-                            $('#btn_room_merge').prop('disabled',true);
-                            $('#btn_room_delete').prop('disabled',true);
-                        }
+
                         enable_room_editing();
                     }
                 });
@@ -727,10 +830,27 @@
             window.location.href = baseUrl;
         })
 
+        {{--function ajaxViewRoleStaff(method, baseUrl, baseData) {--}}
+            {{--$.ajax({--}}
+                {{--type: method,--}}
+                {{--url: baseUrl,--}}
+                {{--data: baseData,--}}
+                {{--success: function (result) {--}}
+                    {{--console.log(result);--}}
+                    {{--if (result.status) {--}}
+                        {{--window.close();--}}
+                        {{--var printUrl = "{!! route('print_candidate_result_lists') !!}";--}}
+                        {{--window_print_candidate_result = PopupCenterDual(printUrl + '?status=' + 'print_page' + '?exam_id=' + exam_id, 'print candidates result', '1000', '1200');--}}
+                    {{--}--}}
+                {{--}--}}
+            {{--});--}}
+        {{--}--}}
 
+        $('#view_role_staff').on('click', function() {
 
-
-
+            var baseUrl  = '{!! route('admin.exam.view_role_staff_lists', $exam->id) !!}';
+            var window_view_role_staff = PopupCenterDual(baseUrl, 'View Role For Each staff', '1000', '1200');
+        })
     </script>
 
 @stop

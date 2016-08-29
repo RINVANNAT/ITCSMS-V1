@@ -17,7 +17,7 @@ class StoreCandidateRequest extends Request
      */
     public function authorize()
     {
-        return access()->allow('create-candidates');
+        return access()->allow('create-exam-candidate');
     }
 
     /**

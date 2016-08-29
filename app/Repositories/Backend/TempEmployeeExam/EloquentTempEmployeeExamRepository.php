@@ -8,6 +8,7 @@ use App\Models\Exam;
 use App\Models\RoleStaff;
 use App\Models\Employee;
 use App\Models\TempEmployee;
+use App\Models\Room;
 use Carbon\Carbon;
 use DB;
 
@@ -96,6 +97,7 @@ class EloquentTempEmployeeExamRepository implements TempEmployeeExamRepositoryCo
     {
 
         $allStaffByRoles = [];
+        $arrayStaffByRoles = [];
         $temporaryStaffByRoles = DB::table('tempEmployees')
             ->join('role_temporary_staff_exams', 'tempEmployees.id', '=', 'role_temporary_staff_exams.temp_employee_id')
             ->join('roleStaffs', 'roleStaffs.id', '=', 'role_temporary_staff_exams.role_staff_id')
@@ -108,10 +110,11 @@ class EloquentTempEmployeeExamRepository implements TempEmployeeExamRepositoryCo
 
 
         $permanentStaffByRoles = DB::table('employees')
+            ->join('departments', 'employees.department_id', '=', 'departments.id')
             ->join('role_permanent_staff_exams', 'employees.id', '=', 'role_permanent_staff_exams.employee_id')
             ->join('roleStaffs', 'roleStaffs.id', '=', 'role_permanent_staff_exams.role_staff_id')
             ->join('exams', 'exams.id', '=', 'role_permanent_staff_exams.exam_id')
-            ->select('employees.name_kh', 'employees.id', 'exams.name', 'roleStaffs.name', 'roleStaffs.id as role_id')
+            ->select('employees.name_kh', 'employees.id', 'departments.name_en as department_name', 'exams.name', 'roleStaffs.name', 'roleStaffs.id as role_id')
             ->where([
                 ['roleStaffs.id', '=', $role_id],
                 ['exams.id', '=', $exam_id],
@@ -123,7 +126,10 @@ class EloquentTempEmployeeExamRepository implements TempEmployeeExamRepositoryCo
                 "id" => 'tmpstaff_' . $temporaryStaffByRole->role_id . '_' . $temporaryStaffByRole->id,
                 "text" => $temporaryStaffByRole->name_kh,
                 "children" => false,
-                "type" => "staff"
+                "type" => "staff",
+                "staff_id" => $temporaryStaffByRole->id,
+                "room_name" => '',
+                "department_name" => 'Ministry'
             );
 
             array_push($allStaffByRoles, $element);
@@ -134,12 +140,23 @@ class EloquentTempEmployeeExamRepository implements TempEmployeeExamRepositoryCo
                 "id" => 'perstaff_' . $permanentStaffByRole->role_id . '_' . $permanentStaffByRole->id,
                 "text" => $permanentStaffByRole->name_kh,
                 "children" => false,
-                "type" => "staff"
+                "type" => "staff",
+                "staff_id" => $permanentStaffByRole->id,
+                "room_name" => '',
+                "department_name" =>$permanentStaffByRole->department_name
             );
 
             array_push($allStaffByRoles, $element);
         }
-        return $allStaffByRoles;
+
+
+        $allStaffByRoles = array_map("unserialize", array_unique(array_map("serialize", $allStaffByRoles)));
+
+        foreach($allStaffByRoles as $allStaffByRole) {
+            $arrayStaffByRoles[] = $allStaffByRole;
+        }
+
+        return $arrayStaffByRoles;
 
     }
 
@@ -266,9 +283,6 @@ class EloquentTempEmployeeExamRepository implements TempEmployeeExamRepositoryCo
 //        dd($tempEmployees);
     }
 
-
-
-
     public function create($request)
     {
         if (RoleStaff::where('name', $request->role_name)->first()) {
@@ -284,8 +298,11 @@ class EloquentTempEmployeeExamRepository implements TempEmployeeExamRepositoryCo
                                 ]);
     }
 
-    public function update($id, $request)
+    public function modifyStaffRole($exam_id, $request)
     {
+
+        $deleteFirst = $this->destroy($exam_id, $request);
+
         $staffIds = json_decode($request->staff_ids);
         $roleChangeId = $request->role_id;
 
@@ -294,33 +311,25 @@ class EloquentTempEmployeeExamRepository implements TempEmployeeExamRepositoryCo
             if($staffRoleIds[0] == 'perstaff') {
                 $employeeId = $staffRoleIds[2];
 
-                $res = DB::table('role_permanent_staff_exams')
-                    ->where([
-                        ['exam_id', '=', $id],
-                        ['employee_id', '=', $employeeId]
-                    ])->update(['role_staff_id'=> (int)$roleChangeId]);
+                $res = $this->insertRolePerStaffExam($exam_id, $employeeId, $roleChangeId, $roomId = null, $courseId=null);
 
             } else {
                 $res = [];
             }
             if($staffRoleIds[0] == 'tmpstaff') {
                 $tempEmployeeId = $staffRoleIds[2];
-
-                $resTemp = DB::table('role_temporary_staff_exams')
-                    ->where([
-                        ['exam_id', '=', $id],
-                        ['temp_employee_id', '=', $tempEmployeeId]
-                    ])->update(['role_staff_id' => $roleChangeId]);
+                $resTemp= $this->insertRoleTempStaffExam($exam_id, $tempEmployeeId, $roleChangeId, $roomId = null, $courseId=null);
             } else {
                 $resTemp = [];
             }
         }
-
         return $this->checkedResponse($res, $resTemp);
+
     }
 
     public function destroy($id,$request)
     {
+        $roomId = null;
 
         $staffIds = json_decode($request->staff_ids);
 //        dd($staffIds);
@@ -331,24 +340,14 @@ class EloquentTempEmployeeExamRepository implements TempEmployeeExamRepositoryCo
                 if ($employeeRoleIds[0] == 'perstaff') {
                     $employeeId = $employeeRoleIds[2];
                     $roleId = $employeeRoleIds[1];
-                    $res = DB::table('role_permanent_staff_exams')
-                        ->where([
-                            ['role_staff_id', '=', $roleId],
-                            ['exam_id', '=', $id],
-                            ['employee_id', '=', $employeeId]
-                        ])->delete();
+                    $res = $this->destroyRolePerStaffExam($roleId, $employeeId, $id, $roomId);
                 } else {
                     $res = [];
                 }
                 if($employeeRoleIds[0] == 'tmpstaff') {
                     $tempEmployeeId = $employeeRoleIds[2];
                     $roleId = $employeeRoleIds[1];
-                    $resTemp = DB::table('role_temporary_staff_exams')
-                        ->where([
-                            ['role_staff_id', '=', $roleId],
-                            ['exam_id', '=', $id],
-                            ['temp_employee_id', '=', $tempEmployeeId]
-                        ])->delete();
+                    $resTemp = $this->destroyRoleTempStaffExam($roleId, $tempEmployeeId, $id, $roomId);
                 } else {
                     $resTemp = [];
                 }
@@ -356,6 +355,62 @@ class EloquentTempEmployeeExamRepository implements TempEmployeeExamRepositoryCo
             return $this->checkedResponse($res, $resTemp);
         }
         return response()->json(['status' => false]);
+    }
+
+    public function destroyRoleTempStaffExam($roleId, $tempEmployeeId, $examId, $roomId) {
+
+        if($roomId) {
+            $resTemp = DB::table('role_temporary_staff_exams')
+                ->where([
+                    ['role_staff_id', '=', $roleId],
+                    ['exam_id', '=', $examId],
+                    ['temp_employee_id', '=', $tempEmployeeId],
+                    ['room_id', '=', $roomId]
+                ])->delete();
+
+            return $resTemp;
+        } else {
+
+            $resTemp = DB::table('role_temporary_staff_exams')
+                ->where([
+                    ['role_staff_id', '=', $roleId],
+                    ['exam_id', '=', $examId],
+                    ['temp_employee_id', '=', $tempEmployeeId]
+                ])->delete();
+
+            return $resTemp;
+        }
+
+
+
+    }
+
+    public function destroyRolePerStaffExam($roleId, $employeeId, $examId, $roomId) {
+
+        if($roomId) {
+            $res = DB::table('role_permanent_staff_exams')
+                ->where([
+                    ['role_staff_id', '=', $roleId],
+                    ['exam_id', '=', $examId],
+                    ['employee_id', '=', $employeeId],
+                    ['room_id', '=', $roomId]
+                ])->delete();
+
+            return $res;
+
+        } else {
+
+            $res = DB::table('role_permanent_staff_exams')
+                ->where([
+                    ['role_staff_id', '=', $roleId],
+                    ['exam_id', '=', $examId],
+                    ['employee_id', '=', $employeeId]
+                ])->delete();
+
+            return $res;
+        }
+
+
     }
 
     public function search($name)
@@ -371,5 +426,156 @@ class EloquentTempEmployeeExamRepository implements TempEmployeeExamRepositoryCo
         } else {
             return Response::json(['status' => false]);
         }
+    }
+
+
+    public function viewStaffByEachRoleLists($examId) {
+
+        $roles = $this->getRoles();
+        $course = DB::table('entranceExamCourses')
+            ->where('entranceExamCourses.exam_id', $examId)
+            ->select('entranceExamCourses.name_en as course_name','entranceExamCourses.id as course_id')
+            ->get();
+
+        return array($roles, $course);
+    }
+
+    public function printStaffByEachRole($examId) {
+
+        $allStaffRoles = [];
+        $controllers = [];
+        $roles = $this->getRoles();
+        $rooms = $this->getNotSelectedRooms();
+
+        return $controllers;
+
+    }
+
+    private function getNotSelectedRooms() {
+
+        $arrayRooms = [];
+        $selectedRoomIds = [];
+
+        $staffWithselectedRooms = $this->staffWithselectedRooms();
+
+        foreach($staffWithselectedRooms as $staffWithselectedRoom) {
+
+            $selectedRoomIds[] = $staffWithselectedRoom->room_id;
+        }
+
+        $rooms = DB::table('rooms')
+            ->join('buildings', 'rooms.building_id', '=', 'buildings.id')
+            ->where('is_exam_room', true)
+            ->whereNotIn('rooms.id', $selectedRoomIds)
+            ->select('rooms.name as room_name', 'rooms.id as room_id', 'buildings.code')
+            ->get();
+
+        foreach($rooms as $room) {
+            $arrayRooms[] = ['room_name' => $room->room_name.''.$room->code, 'room_id' => $room->room_id];
+        }
+        return $arrayRooms;
+    }
+
+
+
+    public function staffWithselectedRooms() {
+
+        $allSeletedRoomIds = [];
+
+        $roomForTempStaffs = DB::table('rooms')
+            ->join('role_temporary_staff_exams', 'rooms.id', '=', 'role_temporary_staff_exams.room_id')
+            ->join('tempEmployees', 'tempEmployees.id', '=', 'role_temporary_staff_exams.temp_employee_id')
+            ->join('buildings', 'buildings.id', '=', 'rooms.building_id')
+            ->select('tempEmployees.name_kh as staff_name ', 'tempEmployees.id as staff_id', 'rooms.name as room_name', 'rooms.id as room_id', 'buildings.code as building_code')
+            ->get();
+
+        $roomForPermanentStaffs = DB::table('rooms')
+            ->join('role_permanent_staff_exams', 'rooms.id', '=', 'role_permanent_staff_exams.room_id')
+            ->join('employees', 'employees.id', '=', 'role_permanent_staff_exams.employee_id')
+            ->join('buildings', 'buildings.id', '=', 'rooms.building_id')
+            ->join('departments', 'employees.department_id', '=', 'departments.id')
+            ->select('employees.name_kh as staff_name ', 'employees.id as staff_id', 'rooms.name as room_name', 'rooms.id as room_id', 'buildings.code as building_code', 'departments.name_en as department_name')
+            ->get();
+
+        if($roomForTempStaffs) {
+
+            foreach($roomForTempStaffs as $roomForTempStaff ) {
+                $element = (object)([
+                   'room_name'      => $roomForTempStaff->room_name.''.$roomForTempStaff->building_code,
+                    'room_id'       => $roomForTempStaff->room_id,
+                    'staff_name'    => $roomForTempStaff->staff_name,
+                    'staff_id'      => $roomForTempStaff->staff_id,
+                    'department_name'=> 'Ministry'
+                ]);
+                $allSeletedRoomIds[] = $element;
+            }
+        }
+
+        if($roomForPermanentStaffs) {
+
+            foreach($roomForPermanentStaffs as $roomForPermanentStaff ) {
+                $element = (object)([
+                    'room_name'     => $roomForPermanentStaff->room_name.''. $roomForPermanentStaff->building_code,
+                    'room_id'       => $roomForPermanentStaff->room_id,
+                    'staff_name'    => $roomForPermanentStaff->staff_name,
+                    'staff_id'      => $roomForPermanentStaff->staff_id,
+                    'department_name' => $roomForPermanentStaff->department_name
+                ]);
+                $allSeletedRoomIds[] = $element;
+            }
+        }
+        return $allSeletedRoomIds;
+    }
+
+    public function updateRoleStaffTempEmployee($examId, $tempEmployeeId, $roleChangeId, $roomId, $course_id)
+    {
+        $res = DB::table('role_temporary_staff_exams')
+            ->where([
+                ['exam_id', '=', $examId],
+                ['temp_employee_id', '=', $tempEmployeeId]
+            ])->update(['role_staff_id'=> (int)$roleChangeId, 'room_id' => $roomId, 'entrance_exam_course_id' => $course_id]);
+
+        return $res;
+    }
+
+    public function updateRoleStaffPerEmployee($examId, $employeeId, $roleChangeId, $roomId, $course_id)
+    {
+        $res = DB::table('role_permanent_staff_exams')
+            ->where([
+                ['exam_id', '=', $examId],
+                ['employee_id', '=', $employeeId]
+            ])->update(['role_staff_id'=> (int)$roleChangeId, 'room_id' => $roomId, 'entrance_exam_course_id' => $course_id]);
+
+        return $res;
+    }
+
+
+    public function insertRoleTempStaffExam($examId, $tempEmployeeId, $roleId, $roomId, $courseId) {
+
+        $insert = DB::table('role_temporary_staff_exams')->insert([
+
+                'role_staff_id'             => $roleId,
+                'exam_id'                   => $examId ,
+                'temp_employee_id'          => $tempEmployeeId,
+                'room_id'                   => $roomId,
+                'entrance_exam_course_id'   => $courseId
+        ]);
+
+        return $insert;
+    }
+
+    public function insertRolePerStaffExam($examId, $employeeId, $roleId, $roomId, $courseId) {
+
+       $insert =  DB::table('role_permanent_staff_exams')->insert([
+
+            'role_staff_id'             => $roleId,
+            'exam_id'                   => $examId ,
+            'employee_id'               => $employeeId,
+            'room_id'                   => $roomId,
+            'entrance_exam_course_id'   => $courseId
+        ]);
+
+        return $insert;
+
     }
 }

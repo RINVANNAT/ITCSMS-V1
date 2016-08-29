@@ -17,7 +17,7 @@ class DeleteCandidateRequest extends Request
      */
     public function authorize()
     {
-        return access()->allow('delete-candidates');
+        return access()->allow('delete-exam-candidate');
     }
 
     /**

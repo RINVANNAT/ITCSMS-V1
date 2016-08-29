@@ -19,6 +19,10 @@
 
                     <small>Selected staffs and roles</small>
 
+                    <div>
+                        <button class="btn btn-primary btn-xs" id="view_role_staff"> View Role </button>
+                    </div>
+
                     <div id="check_ok" class="col-md-12  no-padding alert-info" style="margin-bottom: 5px">
                         <div class="col-md-9">
                             <strong>Do you really want to delete the record ??</strong>

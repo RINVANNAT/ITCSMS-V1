@@ -25,6 +25,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Input;
 use Illuminate\Support\Facades\Redirect;
 use Illuminate\Support\Facades\Response;
+use Yajra\Datatables\Datatables;
 
 class CandidateController extends Controller
 {
@@ -36,6 +37,7 @@ class CandidateController extends Controller
 
     /**
      * @param CandidateRepositoryContract $candidateRepo
+     * @param StudentAnnualRepositoryContract $studentRepo
      */
     public function __construct(
         CandidateRepositoryContract $candidateRepo,
@@ -59,10 +61,10 @@ class CandidateController extends Controller
 
     /**
      * Show the form for creating a new resource.
-     *
+     * @param CreateCandidateRequest $request
      * @return \Illuminate\Http\Response
      */
-    public function create()
+    public function create(CreateCandidateRequest $request)
     {
         $exam = Exam::where('id',1)->first();
         $degrees = Degree::lists('name_kh','id');
@@ -76,6 +78,11 @@ class CandidateController extends Controller
         return view('backend.candidate.create',compact('departments','degrees','genders','promotions','highSchools','provinces','gdeGrades','academicYears','exam'));
     }
 
+    /**
+     * Show the form for creating a new resource (Pop Up).
+     * @param CreateCandidateRequest $request
+     * @return \Illuminate\Http\Response
+     */
     public function popup_create(CreateCandidateRequest $request)
     {
         $studentBac2_id = Input::get('studentBac2_id');
@@ -108,7 +115,6 @@ class CandidateController extends Controller
         return view('backend.candidate.popup_create',compact('departments','degrees','genders','promotions','provinces','gdeGrades','academicYears','exam','studentBac2','highschool'));
     }
 
-
     /**
      * Store a newly created resource in storage.
      *
@@ -121,6 +127,12 @@ class CandidateController extends Controller
         return redirect()->route('admin.candidates.index')->withFlashSuccess(trans('alerts.backend.generals.created'));
     }
 
+    /**
+     * Store a newly created resource in storage.
+     *
+     * @param  StoreCandidateRequest  $request
+     * @return \Illuminate\Http\Response
+     */
     public function popup_store(StoreCandidateRequest $request)
     {
         $result = $this->candidates->create($request->all());
@@ -150,6 +162,7 @@ class CandidateController extends Controller
     /**
      * Show the form for editing the specified resource.
      *
+     * @param EditCandidateRequest $request
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
@@ -164,7 +177,7 @@ class CandidateController extends Controller
     /**
      * Update the specified resource in storage.
      *
-     * @param  \Illuminate\Http\Request  $request
+     * @param  UpdateCandidateRequest $request
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
@@ -177,6 +190,7 @@ class CandidateController extends Controller
     /**
      * Remove the specified resource from storage.
      *
+     * @param DeleteCandidateRequest $request
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
@@ -190,6 +204,11 @@ class CandidateController extends Controller
         }
     }
 
+    /**
+     * Return data for candidate datatable in Exam Management.
+     *
+     * @return Datatables
+     */
     public function data()
     {
         $candidates = DB::table('candidates')
@@ -246,13 +265,20 @@ class CandidateController extends Controller
                 $action = "";
 
                 if($candidate->result == "Pending"){
-                    $action = '<a href="'.route('admin.candidates.edit',$candidate->id).'" class="btn btn-xs btn-primary"><i class="fa fa-pencil" data-toggle="tooltip" data-placement="top" title="" data-original-title="'.trans('buttons.general.crud.edit').'"></i> </a>'.
-                        ' <button class="btn btn-xs btn-danger btn-delete" data-remote="'.route('admin.candidates.destroy', $candidate->id) .'"><i class="fa fa-times" data-toggle="tooltip" data-placement="top" title="' . trans('buttons.general.crud.delete') . '"></i></button>';
+                    $action = '';
+                    if(Auth::user()->allow('edit-exam-candidate')){
+                       $action = $action .'<a href="'.route('admin.candidates.edit',$candidate->id).'" class="btn btn-xs btn-primary"><i class="fa fa-pencil" data-toggle="tooltip" data-placement="top" title="" data-original-title="'.trans('buttons.general.crud.edit').'"></i> </a>';
+                    }
+                    if(Auth::user()->allow('delete-exam-candidate')) {
+                        $action = $action. ' <button class="btn btn-xs btn-danger btn-delete" data-remote="'.route('admin.candidates.destroy', $candidate->id) .'"><i class="fa fa-times" data-toggle="tooltip" data-placement="top" title="' . trans('buttons.general.crud.delete') . '"></i></button>';
+                    }
                 } else {
                     if($candidate->is_register){
                         $action = '<span style="color:green"><i class="fa fa-check"></i></span>';
                     } else if($candidate->is_paid){
-                        $action = ' <button class="btn btn-xs btn-register" data-remote="'.route('admin.candidate.register', $candidate->id) .'"><i class="fa fa-check-circle-o" data-toggle="tooltip" data-placement="top" title="' . trans('buttons.general.register') . '"></i></button>';
+                        if(Auth::user()->allow('register-exam-candidate')) {
+                            $action = ' <button class="btn btn-xs btn-register" data-remote="' . route('admin.candidate.register', $candidate->id) . '"><i class="fa fa-check-circle-o" data-toggle="tooltip" data-placement="top" title="' . trans('buttons.general.register') . '"></i></button>';
+                        }
                     }
                 }
                 return $action;
@@ -264,6 +290,13 @@ class CandidateController extends Controller
             ->make(true);
     }
 
+    /**
+     * Register candidate, to become first year student
+     *
+     * @param RegisterCandidateRequest $request
+     * @param  int  $id
+     * @return \Illuminate\Http\Response
+     */
     public function register(RegisterCandidateRequest $request, $id){
         $candidate = Candidate::where('id',$id)->first();
 
