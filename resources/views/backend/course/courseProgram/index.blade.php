@@ -74,14 +74,22 @@
     {!! Html::script('plugins/datatables/dataTables.bootstrap.min.js') !!}
     <script>
         $(function() {
-            $('#coursePrograms-table').DataTable({
+            var oTable = $('#coursePrograms-table').DataTable({
                 processing: true,
                 serverSide: true,
+                dom: 'l<"toolbar">frtip',
                 pageLength: {!! config('app.records_per_page')!!},
 
                 ajax: {
                     url:'{!! route('admin.course.course_program.data') !!}',
                     method:'POST',
+                    data:function(d){
+                        // In case additional fields is added for filter, modify export view as well: popup_export.blade.php
+                        d.degree = $('#filter_degree').val();
+                        d.grade = $('#filter_grade').val();
+                        d.department = $('#filter_department').val();
+
+                    }
                 },
                 columns: [
                     { data: 'name_kh', name: 'name_kh'},
@@ -94,6 +102,27 @@
             });
 
             enableDeleteRecord($('#coursePrograms-table'));
+
+            $("div.toolbar").html(
+                    '{!! Form::select('degree',$degrees,null, array('class'=>'form-control','id'=>'filter_degree','placeholder'=>'Degree')) !!} '+
+                    '{!! Form::select('grade',$grades,null, array('class'=>'form-control','id'=>'filter_grade','placeholder'=>'Year')) !!} '+
+                    '{!! Form::select('department',$departments,null, array('class'=>'form-control','id'=>'filter_department','placeholder'=>'Department')) !!} '
+            );
+
+
+
+            $('#filter_degree').on('change', function(e) {
+                oTable.draw();
+                e.preventDefault();
+            });
+            $('#filter_grade').on('change', function(e) {
+                oTable.draw();
+                e.preventDefault();
+            });
+            $('#filter_department').on('change', function(e) {
+                oTable.draw();
+                e.preventDefault();
+            });
         });
     </script>
 @stop

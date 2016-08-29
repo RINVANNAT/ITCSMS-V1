@@ -60,6 +60,27 @@ class CourseController extends Controller
 //        $grades = Grade::lists("name_en", "id");
 //        $departments = Department::lists("name_en", "id");
 //        $semesters = Semester::lists("name_en", "id");
+
+        $departments = Department::orderBy("code")
+            ->where("code","!=","Study Office")
+            ->where("code","!=","Academic")
+            ->where("code","!=","Finance")
+            ->get();
+
+        $departmentTmps = array();
+        foreach ($departments as $value){
+            array_push($departmentTmps,$value['code']." - ".$value["name_en"]);
+        }
+        $departments = $departmentTmps;
+
+
+
+        $academicYears = AcademicYear::orderBy("id","desc")->lists('name_latin','id')->toArray();
+        $degrees = Degree::lists('name_en','id')->toArray();
+
+        
+        $grades = Grade::lists('name_en','id')->toArray();
+
         return view('backend.course.courseProgram.index'
             , compact("degrees", "grades", "departments", "semesters", "academicYears"));
         // create dev branch test!
@@ -165,7 +186,7 @@ class CourseController extends Controller
         $datatables = app('datatables')->of($coursePrograms);
 
 
-        return $datatables
+         $datatables
             ->editColumn('name_kh', '{!! $name_kh !!}')
             ->editColumn('name_en', '{!! $name_en !!}')
             ->editColumn('name_fr', '{!! $name_fr !!}')
@@ -174,8 +195,20 @@ class CourseController extends Controller
             ->addColumn('action', function ($courseProgram) {
                 return '<a href="' . route('admin.course.course_program.edit', $courseProgram->id) . '" class="btn btn-xs btn-primary"><i class="fa fa-pencil" data-toggle="tooltip" data-placement="top" title="" data-original-title="' . trans('buttons.general.crud.edit') . '"></i> </a>' .
                 ' <button class="btn btn-xs btn-danger btn-delete" data-remote="' . route('admin.course.course_program.destroy', $courseProgram->id) . '"><i class="fa fa-times" data-toggle="tooltip" data-placement="top" title="' . trans('buttons.general.crud.delete') . '"></i></button>';
-            })
-            ->make(true);
+            });
+
+
+        if ($degree = $datatables->request->get('degree')) {
+            $datatables->where('courses.degree_id', '=', $degree);
+        }
+        if ($grade = $datatables->request->get('grade')) {
+            $datatables->where('courses.grade_id', '=', $grade);
+        }
+        if ($department = $datatables->request->get('department')) {
+            $datatables->where('courses.department_id', '=', $department);
+        }
+        
+        return $datatables->make(true);
     }
 
     public function request_import(RequestImportCourseProgramRequest $request)

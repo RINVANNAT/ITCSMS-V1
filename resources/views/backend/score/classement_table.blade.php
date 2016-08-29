@@ -1,5 +1,5 @@
 @if($studentAnnuals->isEmpty())
-    no student found
+
 @else
 <div  id="vue_table_score">
     <table>
@@ -26,8 +26,9 @@
 
         <thead>
             <th>No</th>
+
+            <th><span id="student_name" toggle="0" style="word-wrap: break-word; max-width: 50px;">Name </span> </th>
             <th><span id="student_id" toggle="0">ID</span> </th>
-            <th><span id="student_name" toggle="0" style="word-wrap: break-word; max-width: 50px;">Student Name </span> </th>
             <th>Sex</th>
             <th><span id="abs_total" toggle="0">Abs Total</span> </th>
             <template v-for="courseAnnual in courseAnnuals" >
@@ -46,9 +47,10 @@
             <template v-for="(index, student)  in studentAnnuals ">
                 <tr>
                     <td>@{{ student.no }}</td>
+
+                    <td style="max-width: 200px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">@{{ student.name_latin }}</td>
                     <td>@{{ student.id_card }} </td>
-                    <td style="max-width: 200px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">@{{ student.name_kh }}</td>
-                    <td>@{{ student.gender.code  }}</td>
+                    <td>@{{ gender(student.gender_id)  }}</td>
                     <td> @{{ absencesCounts["totalabs"][student.id]}}</td>
                     <template v-for="courseAnnual in courseAnnuals" >
                         <td>
@@ -90,8 +92,6 @@
         scoresDataViews = {!!  json_encode($scoresDataViews) !!};
         absencesCounts = {!! json_encode($absencesCounts) !!};
         evalStatus={!!json_encode($evalStatus)  !!};
-        console.log("log course ");
-        console.log(courseAnnules);
 
         new Vue({
             el: '#vue_table_score',
@@ -100,7 +100,14 @@
                 studentAnnuals:studentAnnuals,
                 scoresDataViews:scoresDataViews,
                 absencesCounts:absencesCounts,
-                evalStatus:evalStatus
+                evalStatus:evalStatus,
+                gender:function (number) {
+                    if (number == 1){
+                        return "M"
+                    }if (number == 2){
+                        return "F"
+                    }
+                }
             }
         });
     });

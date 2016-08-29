@@ -525,6 +525,9 @@ class ScoreRepository extends BaseRepository
 
         $results = array();
 
+
+
+
         return array( "evalStatus"=>$evalStatus, "absencesCounts"=>$absencesCounts,"studentAnnuals"=>$studentAnnuals,"courseAnnuals"=>$courseAnnuals, "scoresindex"=>$scores, "scores"=>$scorequeries ,"scoresDataViews"=>$scoresDataViews);
     }
 

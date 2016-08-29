@@ -15,6 +15,12 @@
         .toolbar {
             float: left;
         }
+        .total_validate{
+            color:cornflowerblue;
+        }
+        .total_not_validate{
+            background-color: orangered;
+        }
     </style>
 @stop
 

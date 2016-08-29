@@ -48,11 +48,19 @@ class CourseAnnualController extends Controller
      */
     public function index()
     {
+
         $departments = Department::orderBy("code")
             ->where("code","!=","Study Office")
             ->where("code","!=","Academic")
             ->where("code","!=","Finance")
-            ->lists('code','id')->toArray();
+            ->get();
+
+        $departmentTmps = array();
+        foreach ($departments as $value){
+            array_push($departmentTmps,$value['code']." - ".$value["name_en"]);
+        }
+        $departments = $departmentTmps;
+
 
         $academicYears = AcademicYear::orderBy("id","desc")->lists('name_latin','id')->toArray();
         $degrees = Degree::lists('name_en','id')->toArray();

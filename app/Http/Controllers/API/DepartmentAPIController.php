@@ -39,7 +39,14 @@ class DepartmentAPIController extends AppBaseController
     {
         $this->departmentRepository->pushCriteria(new RequestCriteria($request));
         $this->departmentRepository->pushCriteria(new LimitOffsetCriteria($request));
-        $departments = $this->departmentRepository->all();
+//        $departments = $this->departmentRepository->all();
+        $departments = Department::orderBy("code")
+            ->where("code","!=","Study Office")
+            ->where("code","!=","Academic")
+            ->where("code","!=","Finance")
+            ->get();
+
+
 
         return $this->sendResponse($departments->toArray(), 'Departments retrieved successfully');
     }

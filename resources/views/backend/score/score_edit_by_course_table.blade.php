@@ -9,13 +9,14 @@ start table render
         {!! Form::model('', ['route' => ['score.updateMany'], 'method' => 'patch',"id"=>"scoreform"]) !!}
         <table class="scoreinput" style="border:1px black solid">
             <thead>
-            <th>no</th>
-            <th>Student Name</th>
-            <th>Student id</th>
+            <th> No </th>
+            <th> Student Name </th>
+            <th> ID </th>
             <th style="display:none;">Abs</th>
-            <th> score 10 </th>
-            <th> score 30 </th>
-            <th> score 60 </th>
+            <th> Abs </th>
+            <th> Score 10 </th>
+            <th> Score 30 </th>
+            <th> Score 60 </th>
             <th style="display:none;"> re-exam </th>
             <th> total </th>
             </thead>
@@ -25,14 +26,14 @@ start table render
                     <td>@{{ studentAnnual.no }}</td>
                     <td>@{{ studentAnnual.name }}</td>
                     <td>@{{ studentAnnual.id_card }}</td>
-                    <td style="display:none;"> {!! Form::text('abs[]', '@{{  absencesCounts[studentAnnua.id] }}', [ 'v-model'=>"absencesCounts[studentAnnual.id]", 'class' => 'form-score','placeholder'=>'']) !!}</td>
+                    <td> {!! Form::text('abs[]', '@{{  absencesCounts[studentAnnua.id] }}', [ 'v-model'=>"absencesCounts[studentAnnual.id]", 'class' => 'form-score','id'=>'@{{index}}-0','placeholder'=>'']) !!}</td>
                     {!! Form::hidden('ids[]', '@{{ scores[studentAnnual.id].id }}') !!}
                     {!! Form::hidden('student_annual_ids[]', '@{{ studentAnnual.id }}') !!}
                     <td> {!! Form::text('score10[]', '@{{ scores[studentAnnual.id].score10}}', [ 'v-model'=>"scores[studentAnnual.id].score10", 'id'=>'@{{index}}-1','class' => 'form-score','placeholder'=>'']) !!}</td>
                     <td>{!! Form::text('score30[]', '@{{ scores[studentAnnual.id].score30}}' , ['v-model'=>"scores[studentAnnual.id].score30", 'id'=>'@{{index}}-2','class' => 'form-score','placeholder'=>""]) !!}</td>
                     <td>{!! Form::text('score60[]',  '@{{ scores[studentAnnual.id].score60}}' , ['v-model'=>"scores[studentAnnual.id].score60", 'id'=>'@{{index}}-3', 'class' => 'form-score', 'placeholder'=>""]) !!}</td>
                     <td style="display:none;">{!! Form::text('reexam[]',  '@{{ scores[studentAnnual.id].reexam}}',  ['v-model'=>"scores[studentAnnual.id].reexam", 'class' => 'form-score', 'placeholder'=>""]) !!}</td>
-                    <td >@{{ (total(studentAnnual.id)).toFixed(2) }} </td>
+                    <td class="@{{ totalValidation(studentAnnual.id)}}" >@{{(total(studentAnnual.id)).toFixed(2) }} </td>
                 </tr>
             </template>
             {!! Form::hidden('filter', "", ['id' => 'redirectfilter', "value"=>""]) !!}
@@ -85,21 +86,30 @@ start table render
                     }
                     return  tmp;
                 },
-                validation: function () {
-                    var len = this.scores.length;
+                totalValidation: function ( index ) {
+                    // `this` points tscoreso the vm instance
+                    var tmp = parseFloat(this.scores[index].score60)+ parseFloat( this.scores[index].score10) +parseFloat( this.scores[index].score30);
+
+                    console.log(tmp);
+                    if (tmp <= 100){
+                        return "total_validate";
+                    }else if (tmp > 100){
+                        return "total_not_validate";
+                    }else {
+                        return "total_not_validate";
+                    }
+                },
+
+                totalValidationAll: function () {
+                    var len = this.studentAnnuals.length;
+                    console.log(len);
                     var validated = true;
                     console.log(validated);
 
                     for ( var i = 0; i < len ; i++){
-                        console.log(validated);
-                        if ( scores[i].score30 > 30){
-                            validated = false;
-                            break;
-                        }
-                        if ( scores[i].score60 > 60){
-                            validated = false;
-                            console.log(validated);
-                            break;
+                        var tmp = parseFloat(this.scores[index].score60)+ parseFloat( this.scores[index].score10) +parseFloat( this.scores[index].score30);
+                        if (tmp > 100){
+                            return  false;
                         }
                     }
                     return validated;
@@ -120,44 +130,112 @@ start table render
                 },
             }
         });
-        $(document).keydown(function(e) {
-            var $focused = $(':focus');
-            var $focusedId = $focused.attr("id")
-            var rowCol = $focusedId.split("-");
-            rowCol[0] = parseInt(rowCol[0]);
-            rowCol[1] = parseInt(rowCol[1]);
-            console.log(rowCol);
-            var newId = rowCol;
-            switch(e.which) {
-                case 37: // lef
-                    console.log("left");
-                    newId[1] -= 1;
-                    $('#'+newId[0]+"-"+newId[1]).focus();
-                    break;
 
-                case 38: // up
-                    console.log("up");
-                    newId[0] -= 1;
-                    $('#'+newId[0]+"-"+newId[1]).focus();
-                    break;
+        var delay = (function(){
+            var timer = 0;
+            return function(callback, ms){
+                clearTimeout (timer);
+                timer = setTimeout(callback, ms);
+            };
+        })();
 
-                case 39: // right
 
-                    newId[1] += 1;
-                    $('#'+newId[0]+"-"+newId[1]).focus();
-                    break;
+        $(document).keyup(function(e) {
+            var selfe = e;
+            if ($("input.form-score").is(":focus")){
+                selfe.preventDefault();
+                var $focused = $(':focus');
+                var $focusedId = $focused.attr("id")
+                var rowCol = $focusedId.split("-");
+                rowCol[0] = parseInt(rowCol[0]);
+                rowCol[1] = parseInt(rowCol[1]);
+                var newId = rowCol;
+                switch(selfe.which) {
+                    case 37: // lef
+                        console.log("left");
+                        newId[1] -= 1;
+                        $('#'+newId[0]+"-"+newId[1]).focus();
+                        break;
 
-                case 40: // down
-                    console.log("down");
-                    newId[0] += 1;
-                    $('#'+newId[0]+"-"+newId[1]).focus();
+                    case 38: // up
+                        console.log("up");
+                        newId[0] -= 1;
+                        $('#'+newId[0]+"-"+newId[1]).focus();
+                        break;
 
-                    break;
+                    case 39: // right
+                        newId[1] += 1;
+                        $('#'+newId[0]+"-"+newId[1]).focus();
+                        break;
 
-                default: return; // exit this handler for other keys
-            }
-            e.preventDefault(); // prevent the default action (scroll / move caret)
+                    case 40: // down
+                        console.log("down");
+                        newId[0] += 1;
+                        $('#'+newId[0]+"-"+newId[1]).focus();
+                        break;
+
+
+                    default: return; // exit this handler for other keys
+                }
+            };
+
+            $("input.form-score").focusin(function () {
+                var value = $(this).val();
+                if (value == "0"){
+                    $(this).val("");
+                }
+                if (value == 0){
+                    $(this).val("");
+                }
+            });
+            $("input.form-score").focusout(function () {
+                var value = $(this).val();
+                if (value == ""){
+                    $(this).val(0);
+                }
+            });
+
+            // prevent the default action (scroll / move caret)
         });
+
+        $(window).keydown(function(event){
+            if(event.keyCode == 13) {
+                event.preventDefault();
+
+                if ($("input.form-score").is(":focus")){
+                    var $focused = $(':focus');
+                    var $focusedId = $focused.attr("id")
+                    var rowCol = $focusedId.split("-");
+                    rowCol[0] = parseInt(rowCol[0]);
+                    rowCol[1] = parseInt(rowCol[1]);
+                    var newId = rowCol;
+                    if (newId[1] == 3){
+                        newId[1]=0;
+                        newId[0]+=1;
+
+                    }else{
+                        newId[1]+=1;
+                    }
+                    $('#'+newId[0]+"-"+newId[1]).focus();
+                }
+                return false;
+            }
+
+        });
+
+
+        $('#scoreform').submit(function (e) {
+            e.preventDefault();
+            
+            // Check if empty of not
+            alert(test.totalValidationAll());
+            if (test.totalValidationAll()  == false) {
+                alert('Text-field is empty.');
+                return false;
+            }
+
+        });
+
 
 
 
