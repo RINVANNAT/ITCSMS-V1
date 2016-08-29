@@ -427,22 +427,50 @@ class SeedCustomsPermissions extends Seeder
             'name'=>'Examination',
             'groups'=>[
                 [
+                    'name'=>'Examination Documents',
+                    'groups' => [
+                    ],
+                    'permissions' => [
+                        [
+                            'name'         => 'view-exam-document',
+                            'display_name' => "View exam's documents",
+                            'dependency'   => [
+                                'view-backend','view-exam-management'
+                            ]
+                        ],
+                        [
+                            'name'         => 'download-examination-staff',
+                            'display_name' => "Download examination's documents",
+                            'dependency'   => [
+                                'view-backend','view-exam-management','view-exam-document'
+                            ]
+                        ],
+                    ]
+                ],
+                [
                     'name'=>'Staff',
                     'groups' => [
                     ],
                     'permissions' => [
                         [
+                            'name'         => 'view-exam-staff',
+                            'display_name' => "View exam's staffs",
+                            'dependency'   => [
+                                'view-backend','view-exam-management'
+                            ]
+                        ],
+                        [
                             'name'         => 'modify-examination-staff',
                             'display_name' => 'Modify Examination Staff',
                             'dependency'   => [
-                                'view-backend','view-exam-management'
+                                'view-backend','view-exam-management','view-exam-staff'
                             ]
                         ],
                         [
                             'name'         => 'add-temporary-examination-staff',
                             'display_name' => 'Add/Import Examination Staff from Ministry',
                             'dependency'   => [
-                                'view-backend','view-exam-management'
+                                'view-backend','view-exam-management','view-exam-staff'
                             ]
                         ],
                     ]
@@ -1532,6 +1560,23 @@ class SeedCustomsPermissions extends Seeder
                 [
                     'name'         => 'view-configuration-management',
                     'display_name' => 'View Configuration Management',
+                    'dependency'   => [
+                        'view-backend'
+                    ]
+                ]
+            ]
+        ];
+
+        $roots[] = [
+            'name'=>'Other',
+            'groups'=>[
+
+            ],
+            'permissions' => [
+                // Leave it empty if there is none
+                [
+                    'name'         => 'view-log-viewer-management',
+                    'display_name' => 'View Log Viewer',
                     'dependency'   => [
                         'view-backend'
                     ]

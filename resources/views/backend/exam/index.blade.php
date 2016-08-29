@@ -18,13 +18,12 @@
     <div class="box box-success">
         <div class="box-header with-border">
             <div class="mailbox-controls">
-                <!-- Check all button -->
+                @permission('create-exams')
                 <a href="{!! route('admin.exam.create',$type) !!}">
-                    <button class="btn btn-primary btn-sm"><i class="fa fa-plus-circle"></i> Add
+                    <button class="btn btn-primary btn-sm"><i class="fa fa-plus-circle"></i> {{trans('buttons.general.add')}}
                     </button>
                 </a>
-
-                <!-- /.btn-group -->
+                @endauth
                 <button class="btn btn-default btn-sm"><i class="fa fa-refresh"></i></button>
 
             </div>
@@ -61,7 +60,10 @@
                 processing: true,
                 serverSide: true,
                 pageLength: {!! config('app.records_per_page')!!},
-                ajax: '{!! route('admin.exam.data',$type) !!}',
+                ajax: {
+                    url:"{!! route('admin.exam.data',$type) !!}",
+                    method:'POST'
+                },
                 columns: [
                     { data: 'name', name: 'name'},
                     { data: 'date_start', name: 'date_start'},

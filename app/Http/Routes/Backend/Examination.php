@@ -1,19 +1,21 @@
 <?php
 
 Route::group([], function() {
-    Route::resource('exams', 'ExamController', ['except' => ['index','create','store']]);
-    Route::get('exams/{id}/index', 'ExamController@index')->name('admin.exam.index');
-    Route::get('exams/{id}/create', 'ExamController@create')->name('admin.exam.create');
-    Route::post('exams/{id}/store', 'ExamController@store')->name('admin.exam.store');
+    /* ---------- Exam Resources ---------- */
+    Route::resource('exams', 'ExamController', ['except' => ['index','create','store','show','edit']]);
+    Route::get('exams/{type_id}/index', 'ExamController@index')->name('admin.exam.index');
+    Route::get('exams/{type_id}/create', 'ExamController@create')->name('admin.exam.create');
+    Route::post('exams/{exam_id}/store', 'ExamController@store')->name('admin.exam.store');
+    Route::get('exams/{type_id}/detail/{exam_id}', 'ExamController@show')->name('admin.exam.show');
+    Route::get('exams/{type_id}/edit/{exam_id}', 'ExamController@edit')->name('admin.exam.edit');
 
-    Route::get('exams/{id}/data', 'ExamController@data')->name('admin.exam.data');
+    Route::post('exams/{id}/data', 'ExamController@data')->name('admin.exam.data');
 
     Route::get('exams/{id}/get_buildings', 'ExamController@get_buildings')->name('admin.exam.get_buildings');
 
     Route::get('exams/{id}/get_staffs', 'ExamController@get_staffs')->name('admin.exam.get_staffs');
     Route::get('exams/{id}/count_seat_exam', 'ExamController@count_seat_exam')->name('admin.exam.count_seat_exam');
 
-    Route::get('exams/{id}/get_rooms', 'ExamController@get_rooms')->name('admin.exam.get_rooms');
     Route::post('exams/{id}/save_rooms','ExamController@save_rooms')->name('admin.exam.save_rooms');
     Route::post('exams/{id}/generate_rooms','ExamController@generate_rooms')->name('admin.exam.generate_rooms');
     Route::post('exams/{id}/merge_rooms','ExamController@merge_rooms')->name('admin.exam.merge_rooms');

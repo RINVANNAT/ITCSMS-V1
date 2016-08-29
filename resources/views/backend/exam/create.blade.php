@@ -42,8 +42,10 @@
 @stop
 
 @section('after-scripts-end')
+    <script type="text/javascript" src="{{ url('vendor/jsvalidation/js/jsvalidation.js')}}"></script>
     {!! Html::script('plugins/moment/moment.min.js') !!}
     {!! Html::script('plugins/daterangepicker/daterangepicker.js') !!}
+
 
     <script>
         $(function(){
