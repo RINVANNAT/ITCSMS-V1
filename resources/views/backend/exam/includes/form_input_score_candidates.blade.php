@@ -200,6 +200,7 @@
 
             $(document).ready(function () {
 
+                // to disable of string inputted
                 $(".number_only").keypress(function (e) {
                     if (e.which != 8 && e.which != 0 && (e.which < 48 || e.which > 57)) {
                         return false;
@@ -209,6 +210,7 @@
                 var length = JSON.parse('<?php echo $i ?>');
 
                 for(var k=1; k<=length; k++) {
+
                     $('.validate_'+k).on('keydown keyup', function() {
                         console.log(k);
                         calculateSum(length);
@@ -222,12 +224,16 @@
 
             });
 
+            // when typing enter key to focus on the under input field
             $('.inputs_score').keydown(function (e) {
                 if (e.which === 13) {
                     var index = $('.inputs_score').index(this) + 3;
                     $('.inputs_score').eq(index).focus();
                 }
             });
+
+
+            // calculation input value on each row
 
             function calculateSum(length) {
                 var total_question = JSON.parse('{{$candidate->total_question}}');

@@ -476,11 +476,9 @@ class EloquentTempEmployeeExamRepository implements TempEmployeeExamRepositoryCo
         return $arrayRooms;
     }
 
-
-
     public function staffWithselectedRooms() {
 
-        $allSeletedRoomIds = [];
+        $allstaffWithselectedRooms = [];
 
         $roomForTempStaffs = DB::table('rooms')
             ->join('role_temporary_staff_exams', 'rooms.id', '=', 'role_temporary_staff_exams.room_id')
@@ -507,7 +505,7 @@ class EloquentTempEmployeeExamRepository implements TempEmployeeExamRepositoryCo
                     'staff_id'      => $roomForTempStaff->staff_id,
                     'department_name'=> 'Ministry'
                 ]);
-                $allSeletedRoomIds[] = $element;
+                $allstaffWithselectedRooms[] = $element;
             }
         }
 
@@ -521,10 +519,10 @@ class EloquentTempEmployeeExamRepository implements TempEmployeeExamRepositoryCo
                     'staff_id'      => $roomForPermanentStaff->staff_id,
                     'department_name' => $roomForPermanentStaff->department_name
                 ]);
-                $allSeletedRoomIds[] = $element;
+                $allstaffWithselectedRooms[] = $element;
             }
         }
-        return $allSeletedRoomIds;
+        return $allstaffWithselectedRooms;
     }
 
     public function updateRoleStaffTempEmployee($examId, $tempEmployeeId, $roleChangeId, $roomId, $course_id)

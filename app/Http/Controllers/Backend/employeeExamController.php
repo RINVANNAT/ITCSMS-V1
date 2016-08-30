@@ -181,6 +181,7 @@ class employeeExamController extends Controller
             $gender = DB::table('genders')->where('id', $tempEmployee->gender_id)->select('name_en')->first();
             $academicYear = DB::table('academicYears')->where('id',$tempEmployee->academic_year_id)->select('name_latin')->first();
             $birthDate = explode(" ",$tempEmployee->birthdate);
+
             if($gender) {
                 if($academicYear) {
                     $element = array(
@@ -523,9 +524,6 @@ class employeeExamController extends Controller
 
 //        dd($staffType.'--'.$roleId.'--'.$staffId.'--'.$roomId);
 
-
-
-
         if($staffType == 'perstaff') {
 
             $rooms = $this->getRoomByStaff($staffId, $departmentName='perstaff');
@@ -569,6 +567,67 @@ class employeeExamController extends Controller
         } else {
             return Response::json(['status'=> false]);
         }
+    }
+    public function staffRoleRoomExport($examId) {
+
+        $allStaffRoleRoomExport = [];
+        $concatRoom = [];
+        $data = [];
+
+        $roles =  $this->tempEmpolyeeExams->getRoles();
+        if($roles) {
+
+            foreach($roles as $role) {
+                $staffs = $this->tempEmpolyeeExams->getStaffByRole($role->id, $examId);
+
+                if($staffs) {
+
+                    foreach($staffs as $staff) {
+                        $rooms = $this->getRoomByStaff($staff['staff_id'], $staff['department_name']);
+
+                        if($rooms) {
+
+                            foreach($rooms as $room) {
+                                $concatRoom[] =$room->room_name.''.$room->code.',';
+                            }
+                            $allRooms = trim(implode(' ', $concatRoom), ",");
+
+                            $element= array(
+
+                                'Staff Name'    =>  $staff['text'],
+                                'Role'          =>  $role->name,
+                                'Department'    =>  $staff['department_name'],
+                                'Room'          =>  $allRooms
+                            );
+
+                            $data[] = $element;
+                        }
+
+                    }
+
+                }
+            }
+            $fields= ['Staff Name', 'Role', 'Department', 'Room'];
+            $title = 'List Staff Role && Room';
+            $alpha = [];
+            $letter = 'A';
+            while ($letter !== 'AAA') {
+                $alpha[] = $letter++;
+            }
+            Excel::create('Staff Role Room', function($excel) use ($data, $title,$alpha,$fields) {
+
+
+                $excel->setTitle('List Staff Role && Room');
+                $excel->setCreator('Department of Study & Student Affair')
+                    ->setCompany('Institute of Technology of Cambodia');
+                $excel->sheet('Staff_role_room', function($sheet) use($data,$title,$alpha,$fields) {
+
+                    $sheet->fromArray($data);
+                });
+
+            })->download('csv');
+        }
+
 
     }
 }

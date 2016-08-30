@@ -72,9 +72,9 @@
                         @foreach($errorCandidateScores as $errorScoreProperties)
                             <?php $k++; $p=0;  ?>
 
-                            <div class="box-body with-border" id="correction_score_<?php echo $k;?>">
+                            <div class="box-body with-border">
 
-                                <div class="col-sm-12" style="background-color: #F5EAEC; padding-top: 5px;">
+                                <div class="col-sm-12 old_correction" style="background-color: #F5EAEC; padding-top: 5px;">
 
                                     @foreach($errorScoreProperties->scoreErrors as $errorScore)
                                         <?php  $p++; ?>
@@ -107,55 +107,55 @@
                                         <?php array_push($length,$p)?>
 
                                         <div class="col-sm-1">
-                                            <button class="btn-xs btn_add_new_correction_score "  onclick="AddNewCorrection(<?php echo $k;?>)"> Add </button>
+                                            <button class="btn-xs" onclick="addNewCorrection(this)"> Add </button>
                                         </div>
                                 </div>
-                            </div>
+                                <div class="col-sm-12 new_correction" style="background-color: #F5EAEC;display: none;">
+                                    <form class="new_correction_form">
+                                        <div class="col-sm-2 enlarge-number">
+                                            <label for="order">{{$errorScoreProperties->candidateProperties->room_code}}</label>
+                                            {!! Form::hidden('candidate_id', $errorScoreProperties->candidateProperties->candidate_id, ['class' => 'form-control']) !!}
 
+                                        </div>
 
-                            <div id="new_correction_score_<?php echo $k;?>" class="col-sm-12 " style="background-color: #F5EAEC">
+                                        <div class="col-sm-1 enlarge-number" >
+                                            <label for="roomCode">{{$errorScore->candidate_number_in_room}}</label>
+                                            {!! Form::hidden('order', $errorScore->candidate_number_in_room, ['class' => 'form-control']) !!}
+                                        </div>
+                                        <div class="col-sm-2">
+                                            {!! Form::text('score_c', null, ['class' => 'form-control number_only enlarge-number score_c input_new_correction']) !!}
 
-                                <div class="col-sm-2 enlarge-number">
-                                    <label for="order">{{$errorScoreProperties->candidateProperties->room_code}}</label>
-                                    {!! Form::hidden('candidate_score_id_'."[candidate_id]", $errorScoreProperties->candidateProperties->candidate_id, ['class' => 'form-control', 'id'=>'candidate_id_'.$k ]) !!}
+                                        </div>
+                                        <div class="col-sm-2">
+                                            {!! Form::text('score_w', null, ['class' => 'form-control number_only enlarge-number score_w input_new_correction']) !!}
 
-                                </div>
+                                        </div>
+                                        <div class="col-sm-2">
+                                            {!! Form::text('score_na', null, ['class' => 'form-control number_only enlarge-number score_na input_new_correction']) !!}
+                                            {!! Form::hidden('course_id', $errorScore->course_id, ['class' => 'form-control']) !!}
+                                        </div>
 
-                                <div class="col-sm-1 enlarge-number" >
-                                    <label for="roomCode">{{$errorScore->candidate_number_in_room}}</label>
-                                    {!! Form::hidden('candidate_score_id_'."[order]", $errorScore->candidate_number_in_room, ['class' => 'form-control', 'id'=>'ordering_id_'.$k]) !!}
-                                </div>
-                                <div class="col-sm-2">
-                                    {!! Form::text('candidate_score_id_'."[score_c]", null, ['class' => 'form-control number_only enlarge-number validate_score_'.$k, 'id'=>'correct_'.$k]) !!}
+                                        <div class="col-sm-1">
+                                            {!! Form::text('score_total', null, ['class' => 'form-control enlarge-number score_total', 'disabled']) !!}
+                                        </div>
 
-                                </div>
-                                <div class="col-sm-2">
-                                    {!! Form::text('candidate_score_id_'."[score_w]", null, ['class' => 'form-control number_only enlarge-number validate_score_'.$k, 'id'=>'wrong_'.$k]) !!}
+                                        <div class="col-sm-1 enlarge-number ">
+                                            <p style="border: 2px solid orangered; text-align: center" > {{$errorScore->sequence + 1}}</p>
+                                            {!! Form::hidden('sequence', $errorScore->sequence + 1, ['class' => 'form-control' ]) !!}
+                                        </div>
 
-                                </div>
-                                <div class="col-sm-2">
-                                    {!! Form::text('candidate_score_id_'."[score_na]", null, ['class' => 'form-control number_only enlarge-number validate_score_'.$k, 'id'=>'na_'.$k]) !!}
-                                    {!! Form::hidden('candidate_score_id_'."[course_id]", $errorScore->course_id, ['class' => 'form-control', 'id'=>'course_id_'.$k]) !!}
-                                </div>
+                                        <div class="col-sm-1 " style="margin-top: 5px" >
 
-                                <div class="col-sm-1">
-                                    {!! Form::text('candidate_score_id_'."[score_total]", null, ['class' => 'form-control enlarge-number total_score_'.$k, 'disabled', 'id'=>'total_score_'.$k]) !!}
-                                </div>
+                                            <button type="submit" class="btn btn-info btn-xs btn_save_new_correction"> <i class="fa fa-save"> </i> </button>
+                                            <button type="button" onclick="cancelNewCorrection(this)" class="btn btn-danger btn-xs"><i class="fa fa-times"> </i> </button>
 
-                                <div class="col-sm-1 enlarge-number ">
-                                        <p style="border: 2px solid orangered; text-align: center" > {{$errorScore->sequence + 1}}</p>
-                                        {!! Form::hidden('candidate_score_id_'."[sequence]", $errorScore->sequence + 1, ['class' => 'form-control', 'id'=>'new_sequence_'.$k ]) !!}
-                                </div>
-
-                                <div class="col-sm-1 " style="margin-top: 5px" >
-
-                                        <button class="btn btn-info btn-xs " id="save_correction_<?php echo $k;?>"> <i class="fa fa-save"> </i> </button>
-
-                                        <button class="btn btn-danger btn-xs " id="cancel_correction_<?php echo $k;?>"><i class="fa fa-times"> </i> </button>
-
+                                        </div>
+                                    </form>
 
                                 </div>
                             </div>
+
+
 
                         @endforeach
 
@@ -195,6 +195,18 @@
                }
            });
 
+           $(".new_correction_form").on('submit',function(e){
+               e.preventDefault();
+               var baseData =$(this).serialize();
+               var baseUrl = "{{route('admin.exam.add_new_correction_score',$exam_id)}}";
+               ajaxRequest('POST', baseUrl,baseData );
+           });
+
+           $('.input_new_correction').on('keyup', function() {
+                calculateSum(this);
+           });
+
+
        });
 
        var length = JSON.parse('<?php echo $k ?>');
@@ -202,41 +214,13 @@
            $('#new_correction_score_'+i).hide();
        }
 
-       function AddNewCorrection (key) {
+       function cancelNewCorrection(obj){
+           $(obj).closest('.new_correction').hide();
+       }
 
-           $('#correction_score_'+key).append( $('#new_correction_score_'+key).delay(200).show(0));
-           $('#cancel_correction_'+key).on('click', function() {
-               $('#new_correction_score_'+key).delay(200).hide(0);
-           });
-
-           $('#save_correction_'+key).on('click', function(e) {
-
-               console.log(key);
-               var baseData = {
-                   score_c: $('#correct_'+key).val(),
-                   score_w: $('#wrong_'+key).val(),
-                   score_na: $('#na_'+key).val(),
-                   sequence: $('#new_sequence_'+key).val(),
-                   course_id: $('#course_id_'+key).val(),
-                   order: $('#ordering_id_'+key).val(),
-                   candidate_id: $("#candidate_id_"+key).val()
-               }
-               var baseUrl = "{{route('admin.exam.add_new_correction_score',$exam_id)}}";
-
-               if(baseData.score_c + baseData.score_w + baseData.score_na == 0) {
-                   notify("error","info", "Please Check Your Record Was Not Saved!");
-                   location.reload();
-               } else {
-                   ajaxRequest('POST', baseUrl,baseData );
-               }
-           });
-
-           $('.validate_score_'+key).on('keydown keyup', function() {
-               calculateSum(key);
-           });
-
-
-
+       function addNewCorrection(obj){
+           //console.log("new");
+           $(obj).closest('.old_correction').next('.new_correction').show();
        }
 
        function ajaxRequest(method, baseUrl, baseData){
@@ -255,8 +239,6 @@
                        notify("error","info", "there is an error");
                        location.reload();
                    }
-
-
                }
            });
        }
@@ -265,25 +247,22 @@
            window.close();
        });
 
-       function calculateSum(k) {
-           var total_question = JSON.parse('{{$totalQuestion}}');
-           var sum =0;
-           $(".validate_score_"+k).each(function() {
-               if (!isNaN(this.value) && this.value.length != 0) {
-                   sum += parseInt(this.value);
-                   console.log(sum);
-                   $(this).css("background-color", "#FEFFB0");
-                   if(sum == total_question) {
-                       $("input#total_score_"+k).val(sum).css("color", "");
+       function calculateSum(obj) {
 
-                   } else {
-                       $("input#total_score_"+k).val(sum).css("color", "red");
-                   }
-               }
-               else if (this.value.length != 0){
-                   $(this).css("background-color", "red");
-               }
-           });
+           var total_question = JSON.parse('{{$totalQuestion}}');
+           var score_c = isNaN(parseInt($(obj).closest('.new_correction').find('.score_c').val()))?0:parseInt($(obj).closest('.new_correction').find('.score_c').val());
+           var score_w = isNaN(parseInt($(obj).closest('.new_correction').find('.score_w').val()))?0:parseInt($(obj).closest('.new_correction').find('.score_w').val());
+           var score_na = isNaN(parseInt($(obj).closest('.new_correction').find('.score_na').val()))?0:parseInt($(obj).closest('.new_correction').find('.score_na').val());
+
+           $(obj).css("background-color", "#FEFFB0")
+           var sum =score_c+score_na+score_w;
+           if(sum == total_question) {
+               $(obj).closest('.new_correction').find('.score_total').val(sum).css("color", "");
+
+           } else {
+               $(obj).closest('.new_correction').find('.score_total').val(sum).css("color", "red");
+           }
+
        }
 
 

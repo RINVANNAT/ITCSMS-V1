@@ -21,7 +21,7 @@
                             foreach($staff['room_name'] as $room) {
                                 $i++;
                             ?>
-                                <a href="#" value="{{$room['room_id']}}" id="room_<?php echo $staff['id'].'_'.$room['room_name'];?>" onclick="deleteRoom(<?php echo "'".$staff['id'].'_'.$room['room_name']."'";?>)">{{$room['room_name']}}</a>
+                                <a name="<?php echo $room['room_name'];?>" href="#" value="{{$room['room_id']}}" id="room_<?php echo $staff['id'].'_'.$room['room_id'];?>" onclick="deleteRoom(<?php echo "'".$staff['id'].'_'.$room['room_id']."'";?>)">{{$room['room_name']}}</a>
 
                             <?php } ?>
 

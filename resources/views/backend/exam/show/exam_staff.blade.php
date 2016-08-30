@@ -20,7 +20,7 @@
                     <small>Selected staffs and roles</small>
 
                     <div>
-                        <button class="btn btn-primary btn-xs" id="view_role_staff"> View Role </button>
+                        <button class="btn btn-primary btn-xs" id="assign_role_staff" style="display: none;"> Assign Role </button>
                     </div>
 
                     <div id="check_ok" class="col-md-12  no-padding alert-info" style="margin-bottom: 5px">
@@ -47,8 +47,8 @@
                         <div class="col-md-12 no-padding" style="margin-bottom: 5px;">
                             @permission('modify-examination-staff')
                                 <button class="btn btn-sm btn-info pull-right" id="btn_add_role">Modify Group Role</button>
-                                <button class="btn btn-sm btn-danger pull-right" style="float: right; margin-right: 5px" id="btn_delete_node">Delete Role</button>
-                                <button class="btn btn-sm btn-default pull-right" style="float: right; margin-right: 5px;" id="btn_move_node">Change Role</button>
+                                <button class="btn btn-sm btn-danger pull-right" style="float: right; margin-right: 5px;display: none;" id="btn_delete_node">Delete Role</button>
+                                <button class="btn btn-sm btn-default pull-right" style="float: right; margin-right: 5px;display: none;" id="btn_move_node">Change Role</button>
                             @endauth
                         </div>
                         <div class=" popUpRoleDown col-md-12 no-padding " style="display:none;">

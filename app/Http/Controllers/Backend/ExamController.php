@@ -670,7 +670,6 @@ class ExamController extends Controller
         $ids = [];
         $passedCandidates = (int)$requestData['course_factor']['total_pass'];
         $reservedCandidates = (int)$requestData['course_factor']['total_reserve'];
-
         $checkPass = 0;
         $checkReserve = 0;
         $checkFail = 0;
@@ -678,6 +677,7 @@ class ExamController extends Controller
         foreach ($requestData['course_factor'] as $courseId => $factorValue) {
 
             if(is_numeric($courseId)) {
+
                 // this query is to get candidate score by each subject
                 // calculate only for copleted score of the candidate
                 $candidateScores = DB::table('candidates')
@@ -694,11 +694,15 @@ class ExamController extends Controller
                 if($candidateScores) {
 
                     $subjectCoefficient = $requestData['course_factor']['subject_coe_'.$courseId];
+                    $wrongCoefficient = $requestData['course_factor']['wrong_coe_'.$courseId];
+
 
                     foreach($candidateScores as $candidateScore) {
 
                         // total score foreach subject: (score_correct * factor)- (score_wrong * 1)) * coefficient
-                        $totalScore = (($candidateScore->score_c * $factorValue) - $candidateScore->score_w) * $subjectCoefficient;
+
+                        $totalScore = (($candidateScore->score_c * $factorValue) - ($candidateScore->score_w * $wrongCoefficient) ) * $subjectCoefficient;
+
                         $element = (object)array(
                             'candidate_name'    => $candidateScore->name_kh,
                             'candidate_id'      => $candidateScore->candidate_id,
@@ -748,16 +752,18 @@ class ExamController extends Controller
                     if($candidateResult[$passedCandidates-1]->total_score == $candidateResult[$key]->total_score) {
                         $statusStudentPassed++;
                     }
-
-                    if($candidateResult[ $passedCandidates + $reservedCandidates + $statusStudentPassed -1]->total_score == $candidateResult[$key]->total_score) {
-                        $statusStudentReserved++;
-                    }
                 }
+            }
 
+            for($key = $passedCandidates + $reservedCandidates + $statusStudentPassed ; $key < count($candidateResult); $key++) {
+
+                if($candidateResult[ $passedCandidates + $reservedCandidates + $statusStudentPassed -1]->total_score == $candidateResult[$key]->total_score) {
+                    $statusStudentReserved++;
+                }
             }
 
             $passedCandidates = $passedCandidates + $statusStudentPassed;
-            $reservedCandidates = $reservedCandidates + $statusStudentReserved-1;// -1 because we compare redandancy of the index
+            $reservedCandidates = $reservedCandidates + $statusStudentReserved;// -1 because we compare redandancy of the index
         }
 //        dd($passedCandidates.'--'.$reservedCandidates);
 
@@ -828,7 +834,7 @@ class ExamController extends Controller
 
             usort($candidatesResults, array($this, "sortCandidateRank"));
 
-            $candidatesResults = array_chunk($candidatesResults, 15);
+            $candidatesResults = array_chunk($candidatesResults, 30);
 
             return view('backend.exam.print.examination_candidates_result', compact('candidatesResults'));
         }

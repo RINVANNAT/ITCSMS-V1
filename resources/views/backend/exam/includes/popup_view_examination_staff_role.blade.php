@@ -201,7 +201,10 @@
         function deleteRoom(key) {
             var roomId = $('#room_'+key).attr('value');
             var params = key.split('_');
-            var res =confirm('Do you want to delete ROOM : '+params[3]);
+            var roomName = $('#room_'+key).attr('name');
+
+            console.log(params);
+            var res =confirm('Do you want to delete ROOM : '+roomName);
             var baseUrl = "{{route('admin.exam.delete_room_from_staff',$examId)}}";
             var baseData ={
                 room_id: roomId,
@@ -214,10 +217,7 @@
                 Request('DELETE', baseUrl,baseData );
             }
 
-
-
-
-            window_report_error = PopupCenterDual(popUpUrl+"?staff_role_id=" + key+"&&room_id=" +roomId,'Error Inputted Score Form ','250','200');
+//            window_report_error = PopupCenterDual(popUpUrl+"?staff_role_id=" + key+"&&room_id=" +roomId,'Error Inputted Score Form ','250','200');
         }
 
 
@@ -232,6 +232,9 @@
 
 
         $('#print_staff_role').on('click', function() {
+
+            var baseUrl = '{!! route('admin.exam.staff_role_room_examination_export', $examId) !!}';
+            window.location.href = baseUrl;
 
             {{--var baseUrl  = "{!! route('admin.exam.print_role_staff_lists', $examId) !!}";--}}
 

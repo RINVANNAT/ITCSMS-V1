@@ -672,8 +672,8 @@
             }
 
             if(baseData.role_id != null && baseData.staff_ids != '[]') {
-                console.log(baseData.staff_ids);
-                console.log(baseData.role_id);
+//                console.log(baseData.staff_ids);
+//                console.log(baseData.role_id);
                 ajaxRequest('POST', baseUrl, baseData);
             } else{
 
@@ -701,26 +701,10 @@
             }
         })
 
-        $("#btn_delete_node").click(function(){
-            var deleteNodeUrl = "{{route('admin.exam.delete-role-node',$exam->id)}}"
-            var baseData = {staff_ids:JSON.stringify($('#selected_staffs').jstree("get_checked"))};
-            if(baseData.staff_ids !== '[]') {
-                console.log(baseData);
-                $('#check_ok').fadeIn();
-                $('#ok_delete').on('click', function() {
-                    $('#check_ok').fadeOut();
-                    ajaxRequest('DELETE',deleteNodeUrl, baseData);
-                });
-                $('#cancel_delete').on('click', function() {
-                    $('#check_ok').fadeOut();
-                });
 
-            } else {
-                $('#alert_delete_role_staff').fadeIn().delay(2000).fadeOut();
-            }
-        });
 
         $("#btn_save_chang_role").click(function(){
+
             var changeNodeUrl = "{{route('admin.exam.update-role-node',$exam->id)}}"
             var baseData = {staff_ids:JSON.stringify($('#selected_staffs').jstree("get_checked")),
                             role_id:$('#role_change :selected').val()
@@ -728,9 +712,9 @@
             if(baseData.staff_ids !== '[]') {
                 console.log(baseData);
                 ajaxRequest('PUT',changeNodeUrl, baseData);
-                $('.popUpRoleDown').slideFadeToggle();
-                $('#btn_delete_node').show();
-                $('#btn_move_node').show();
+
+                enable_modify_staff();
+
             } else {
 //                alert('no selected value')
                 $('#alert_add_role_staff').fadeIn().delay(2000).fadeOut();
@@ -743,6 +727,33 @@
 /*
 -----------------create inputscore in course page
 */
+
+        $("#btn_delete_node").click(function(){
+            var deleteNodeUrl = "{{route('admin.exam.delete-role-node',$exam->id)}}"
+            var baseData = {staff_ids:JSON.stringify($('#selected_staffs').jstree("get_checked"))};
+
+            if(baseData.staff_ids !== '[]') {
+
+                swal({
+                    title: "Confirm",
+                    text: "Delete these staff?",
+                    type: "info",
+                    showCancelButton: true,
+                    confirmButtonColor: "#DD6B55",
+                    confirmButtonText: "Yes, delete it!",
+                    closeOnConfirm: true
+                }, function(confirmed) {
+                    if (confirmed) {
+                        ajaxRequest('DELETE',deleteNodeUrl, baseData);
+                    }
+                });
+
+            } else {
+                $('#alert_delete_role_staff').fadeIn().delay(2000).fadeOut();
+            }
+        });
+
+
         $(document).on('click', '#btn_input_score_course', function (e) {
             window_request_room = PopupCenterDual('{{route("admin.exam.request_input_score_courses",$exam->id)}}','Course for exam','1000','450');
         });
@@ -786,9 +797,9 @@
             {{--});--}}
         {{--}--}}
 
-        $('#view_role_staff').on('click', function() {
+        $('#assign_role_staff').on('click', function() {
 
-            var baseUrl  = '{!! route('admin.exam.view_role_staff_lists', $exam->id) !!}';
+            var baseUrl  = '{!! route('admin.exam.assign_role_staff_lists', $exam->id) !!}';
             var window_view_role_staff = PopupCenterDual(baseUrl, 'View Role For Each staff', '1000', '1200');
         })
     </script>
