@@ -55,6 +55,7 @@ class StudentBac2Controller extends Controller
 
     /**
      * Show the form for creating a new resource.
+     * @param CreateStudentBac2Request $request
      *
      * @return \Illuminate\Http\Response
      */
@@ -66,7 +67,7 @@ class StudentBac2Controller extends Controller
     /**
      * Store a newly created resource in storage.
      *
-     * @param  \Illuminate\Http\Request  $request
+     * @param  StoreStudentBac2Request  $request
      * @return \Illuminate\Http\Response
      */
     public function store(StoreStudentBac2Request $request)
@@ -89,6 +90,7 @@ class StudentBac2Controller extends Controller
     /**
      * Show the form for editing the specified resource.
      *
+     * @param EditStudentBac2Request $request
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
@@ -103,7 +105,7 @@ class StudentBac2Controller extends Controller
     /**
      * Update the specified resource in storage.
      *
-     * @param  \Illuminate\Http\Request  $request
+     * @param  UpdateStudentBac2Request  $request
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
@@ -138,7 +140,7 @@ class StudentBac2Controller extends Controller
             ->leftJoin('highSchools','studentBac2s.highschool_id','=','highSchools.id')
             ->leftJoin('gdeGrades','studentBac2s.grade','=','gdeGrades.id')
             ->leftJoin('origins','studentBac2s.province_id','=','origins.id')
-            ->select(['studentBac2s.id','studentBac2s.bac_year','origins.name_kh as origin','studentBac2s.name_kh','genders.name_kh as gender_name_kh','highSchools.name_kh as highSchool_name_kh','dob','percentile','gdeGrades.name_en as gdeGrade_name_en']);
+            ->select(['studentBac2s.id','studentBac2s.bac_year','origins.name_kh as origin','studentBac2s.name_kh','studentBac2s.status','genders.name_kh as gender_name_kh','highSchools.name_kh as highSchool_name_kh','dob','percentile','gdeGrades.name_en as gdeGrade_name_en']);
 
         $datatables =  app('datatables')->of($studentBac2s)
             ->editColumn('dob', function($studentBac2){

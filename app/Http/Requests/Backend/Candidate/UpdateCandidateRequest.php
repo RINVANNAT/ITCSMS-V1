@@ -40,7 +40,7 @@ class UpdateCandidateRequest extends Request
             'bac_year' => 'required',
             'promotion_id' => 'required',
             'exam_id' => 'required',
-            'register_id' => 'integer|required|unique_with:candidates,exam_id',
+            'register_id' => 'integer|required',
         ];
     }
 }

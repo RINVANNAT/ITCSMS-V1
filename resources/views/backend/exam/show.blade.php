@@ -609,6 +609,13 @@
                     }
                 });
             });
+            /* ------------------------------------------------------------------------ Candidate Section ------------------------------------------------------------------ */
+
+            var candidate_window = null;
+            $(document).on('click','.btn_candidate_edit',function(e){
+                e.preventDefault();
+                candidate_window = PopupCenterDual($(this).attr('href'),'Update Candidate','1200','960');
+            });
 
             /* ------------------ Checkbox Event ---------------------*/
             $(document).on("click","#exam_room_list_table input:checkbox", function(){
@@ -654,6 +661,13 @@
             /* ----------------------------------------------------------------------------------------------------------------*/
         });
 
+
+        // Close all relevant windows
+        window.onunload = function() {
+            if (candidate_window && !candidate_window.closed) {
+                candidate_window.close();
+            }
+        };
 
     </script>
 

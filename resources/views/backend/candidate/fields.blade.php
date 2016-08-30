@@ -2,9 +2,8 @@
 {!! Form::hidden('academic_year_id',$exam->academic_year_id)!!}
 {!! Form::hidden('studentBac2_id',$studentBac2==null?null:$studentBac2->id)!!}
 {!! Form::hidden('degree_id',1) !!}
-{!! Form::hidden('highschool_id',isset($studentBac2)?$studentBac2->highschool_id:null,['id'=>'highschool_id']) !!}
-
-
+{!! Form::text('highschool_id',isset($studentBac2) ?$studentBac2->highschool_id:null,['id'=>'highschool_id','style'=>'display:none;']) !!}
+{{--<input type="hidden" name="highschool_id" value="{{isset($studentBac2) ?$studentBac2->highschool_id:null}}" id="highschool_id" />--}}
 <h3 style="font-size: 20px;"><i class="fa fa-user"></i> {{trans('labels.backend.candidates.header.personal_information')}}
 </h3>
 <hr style="margin-top:0px;"/>
@@ -123,11 +122,15 @@
     <div class="form-group col-sm-6 required">
         {!! Form::label('highschool_id',trans('labels.backend.candidates.fields.highschool_id'),array('class'=>'col-sm-4 control-label required')) !!}
         <div class="col-sm-8">
-            @if(isset($highschool))
-                {!! Form::text('highschool_name', $highschool->name_kh, array('class'=>'form-control input',isset($studentBac2)?"disabled":"")) !!}
-            @else
-                {!! Form::select('highschool_name',[], null, array('class'=>'form-control input','placeholder'=>'High school','id'=>'candidate_highschool_name','required'=>'required')) !!}
-            @endif
+
+            <select name="highschool_name" class="form-control input" id="candidate_highschool_name" required {{isset($studentBac2)?"disabled":""}}>
+                @if($selected_high_school != null)
+                    <option value="{{$selected_high_school->id}}" selected="selected">{{$selected_high_school->name}}</option>
+                @endif
+            </select>
+
+{{--                {!! Form::select('highschool_name',[], null, array('class'=>'form-control input','placeholder'=>'High school','id'=>'candidate_highschool_name','required'=>'required')) !!}--}}
+
         </div>
     </div>
 

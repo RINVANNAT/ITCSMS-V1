@@ -40,11 +40,6 @@
                 <a href="{!!url('admin/studentAnnuals')!!}"><span>{{ trans('menus.backend.student.title') }}</span></a>
             </li>
             @endauth
-            @permission('view-candidate-management')
-            <li class="{{ Active::pattern('admin/candidates') }}">
-                <a href="{!!url('admin/candidates')!!}"><span>{{ trans('menus.backend.candidate.title') }}</span></a>
-            </li>
-            @endauth
             @permission('view-employee-management')
             <li class="{{ Active::pattern('admin/employees') }}">
                 <a href="{!!url('admin/employees')!!}"><span>{{ trans('menus.backend.employee.title') }}</span></a>
