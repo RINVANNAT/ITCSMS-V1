@@ -33,7 +33,7 @@
                     <td>{{$i}}.</td>
                     <td>{{$room['name']." ".$room['building']['code']}}</td>
                     <td>
-                        <input class="secret_code" name="{{$room['id']}}" id="{{$room['id']}}" style="text-align: center;" disabled type="text" placeholder=" - " value="{{$room['pivot']['roomcode']}}"/>
+                        <input class="secret_code" name="{{$room['id']}}" id="{{$room['id']}}" style="text-align: center;" disabled type="text" placeholder=" - " value="{{$room['roomcode']}}"/>
                     </td>
                 </tr>
                 <?php $i++?>

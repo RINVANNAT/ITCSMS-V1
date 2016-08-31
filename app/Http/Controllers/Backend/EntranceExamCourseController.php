@@ -79,9 +79,10 @@ class EntranceExamCourseController extends Controller
      */
     public function edit(EditEntranceExamCourseRequest $request, $id)
     {
-        $entranceExamCourse = $this->entranceExamCourse->findOrThrowException($id);
 
-        return view('backend.course.courseProgram.edit', compact('entranceExamCourse'));
+        $entranceExamCourse = $this->entranceExamCourse->findOrThrowException($id);
+        $exam_id = $entranceExamCourse->exam_id;
+        return view('backend.entranceExamCourse.edit', compact('entranceExamCourse','exam_id'));
     }
 
     /**
@@ -93,8 +94,15 @@ class EntranceExamCourseController extends Controller
      */
     public function update(UpdateEntranceExamCourseRequest $request, $id)
     {
-        $this->entranceExamCourse->update($id, $request->all());
-        return redirect()->route('admin.course.entranceExamCourse.index')->withFlashSuccess(trans('alerts.backend.generals.updated'));
+        $result = $this->entranceExamCourse->update($id, $request->all());
+        if($request->ajax()){
+            if($result['status']==true){
+                return Response::json($result);
+            } else {
+                return Response::json($result,422);
+            }
+
+        }
     }
 
     /**
@@ -118,7 +126,7 @@ class EntranceExamCourseController extends Controller
     {
 
         $exam = Exam::find($exam_id);
-        $entranceExamCourse = $exam->entranceExamCourses();
+        $entranceExamCourse = $exam->entranceExamCourses()->where('active',true);
 
         $datatables =  app('datatables')->of($entranceExamCourse);
 
@@ -127,6 +135,9 @@ class EntranceExamCourseController extends Controller
                 $result = '';
                 if(Auth::user()->allow('delete-entrance-exam-courses')){
                     $result = $result.' <button class="btn btn-xs btn-danger btn-delete" data-remote="'.route('admin.entranceExamCourses.destroy', $item->id) .'"><i class="fa fa-times" data-toggle="tooltip" data-placement="top" title="' . trans('buttons.general.crud.delete') . '"></i></button>';
+                }
+                if(Auth::user()->allow('edit-entrance-exam-courses')){
+                    $result = $result.' <button class="btn btn-xs btn-info btn_course_edit" data-remote="'.route('admin.entranceExamCourses.edit', $item->id) .'"><i class="fa fa-pencil" data-toggle="tooltip" data-placement="top" title="' . trans('buttons.general.crud.edit') . '"></i></button>';
                 }
                 if(!Auth::user()->allow('report-error-on-inputted-score')){
                     return $result;

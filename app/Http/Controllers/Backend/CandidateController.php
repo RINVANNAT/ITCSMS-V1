@@ -150,7 +150,7 @@ class CandidateController extends Controller
         $academicYears = AcademicYear::orderBy('name_latin','desc')->lists('name_latin','id');
         $selected_high_school = HighSchool::where('id',$candidate->highschool_id)->select(['id', 'name_kh as name'])->first();
 
-        //dd(isset($studentBac2));
+        //dd($candidate);
         return view('backend.candidate.edit',compact('selected_high_school','departments','exam','degrees','genders','promotions','provinces','gdeGrades','academicYears','candidate','studentBac2'));
     }
 
@@ -183,7 +183,7 @@ class CandidateController extends Controller
      */
     public function destroy(DeleteCandidateRequest $request, $id)
     {
-            $this->candidates->destroy($id);
+        $this->candidates->destroy($id);
         if($request->ajax()){
             return json_encode(array("success"=>true));
         } else {
@@ -204,6 +204,7 @@ class CandidateController extends Controller
             ->leftJoin('genders','candidates.gender_id','=','genders.id')
             ->leftJoin('rooms','candidates.room_id','=','rooms.id')
             ->leftJoin('buildings','rooms.building_id','=','buildings.id')
+            ->where('candidates.active',true)
             ->select([
                 'candidates.id',DB::raw("CONCAT(rooms.name,buildings.code) as room"),'candidates.register_id','candidates.name_kh','candidates.name_latin','genders.name_kh as gender_name_kh','gdeGrades.name_en as bac_total_grade',
                 'origins.name_kh as province', 'dob','result','is_paid','is_register'

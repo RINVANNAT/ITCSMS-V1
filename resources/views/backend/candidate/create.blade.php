@@ -91,11 +91,10 @@
         }
 
         function return_back(){
-            try {
+            if(window.opener.opener != null){
                 window.opener.opener.refresh_candidate_list();
-                window.close();
-            } catch (err) {
-                alert(err.description || err) //or console.log or however you debug
+            } else {
+                window.opener.refresh_candidate_list();
             }
 
             self.close();
@@ -121,7 +120,7 @@
 
         function formatRepoSelection (repo) {
 
-            $('#candidate_highschool_name').val(repo.name);
+            $('#candidate_highschool_name').val(repo.id);
             $('#highschool_id').val(repo.id);
 
             return repo.text || repo.name;

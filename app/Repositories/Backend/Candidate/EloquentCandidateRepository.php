@@ -5,6 +5,7 @@ namespace App\Repositories\Backend\Candidate;
 
 use App\Exceptions\GeneralException;
 use App\Models\Candidate;
+use App\Models\UserLog;
 use Carbon\Carbon;
 
 /**
@@ -152,6 +153,12 @@ class EloquentCandidateRepository implements CandidateRepositoryContract
             }
             $result["status"] = true;
             $result["messages"] = "Your information is successfully saved";
+
+            UserLog::log([
+                'model' => 'Candidate',
+                'action'=> 'Create',
+                'data'  => $candidate->id, // Store only id because we didn't really delete the record
+            ]);
         } else {
             $result["status"] = false;
             $result["messages"] = "Something went wrong!";
@@ -169,6 +176,7 @@ class EloquentCandidateRepository implements CandidateRepositoryContract
     public function update($id, $input)
     {
         $candidate = $this->findOrThrowException($id);
+        $old_record = json_encode($candidate);
         foreach($input as &$element){
             if($element=="")$element=null;
         }
@@ -185,6 +193,12 @@ class EloquentCandidateRepository implements CandidateRepositoryContract
             }
             $result["status"] = true;
             $result["messages"] = "Your information is successfully saved";
+
+            UserLog::log([
+                'model' => 'Candidate',
+                'action'=> 'Update',
+                'data'  => $old_record, // Store only id because we didn't really delete the record
+            ]);
         } else {
             $result["status"] = false;
             $result["messages"] = "Something went wrong!";
@@ -202,8 +216,17 @@ class EloquentCandidateRepository implements CandidateRepositoryContract
     {
 
         $model = $this->findOrThrowException($id);
+        $model->active = false; // Instead of real delete, just change active to false.
+        $model->updated_at = Carbon::now();
+        $model->write_uid = auth()->id();
 
-        if ($model->delete()) {
+
+        if ($model->save()) {
+            UserLog::log([
+                'model' => 'Candidate',
+                'action'=> 'Delete',
+                'data'  => $id, // Store only id because we didn't really delete the record
+            ]);
             return true;
         }
 

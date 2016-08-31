@@ -5,6 +5,7 @@ namespace App\Repositories\Backend\EntranceExamCourse;
 
 use App\Exceptions\GeneralException;
 use App\Models\EntranceExamCourse;
+use App\Models\UserLog;
 use Carbon\Carbon;
 
 /**
@@ -61,7 +62,13 @@ class EloquentEntranceExamCourseRepository implements EntranceExamCourseReposito
         $input['create_uid'] = auth()->id();
         $input['created_at'] = Carbon::now();
 
-        if(EntranceExamCourse::create($input)){
+        $entranceExamCourse = EntranceExamCourse::create($input);
+        if($entranceExamCourse != null){
+            UserLog::log([
+                'model' => 'EntranceExamCourse',
+                'action'=> 'Create',
+                'data'  => $entranceExamCourse->id, // Store only id because we didn't really delete the record
+            ]);
             return true;
         } else {
             return false;
@@ -78,17 +85,26 @@ class EloquentEntranceExamCourseRepository implements EntranceExamCourseReposito
     {
         $entranceExamCourse = $this->findOrThrowException($id);
 
-        $entranceExamCourse->name = $input['name'];
-        $entranceExamCourse->description = $input['description'];
-        $entranceExamCourse->active = isset($input['active'])?true:false;
+        $old_record = json_encode($entranceExamCourse);
+
+        $entranceExamCourse->fill($input);
         $entranceExamCourse->updated_at = Carbon::now();
         $entranceExamCourse->write_uid = auth()->id();
 
         if ($entranceExamCourse->save()) {
-            return true;
+            $result["status"] = true;
+            $result["messages"] = "Your information is successfully saved";
+            UserLog::log([
+                'model' => 'EntranceExamCourse',
+                'action'=> 'Update',
+                'data'  => $old_record
+            ]);
+        } else {
+            $result["status"] = false;
+            $result["messages"] = "Something went wrong!";
         }
 
-        throw new GeneralException(trans('exceptions.backend.general.update_error'));
+        return $result;
     }
 
     /**
@@ -100,8 +116,16 @@ class EloquentEntranceExamCourseRepository implements EntranceExamCourseReposito
     {
 
         $model = $this->findOrThrowException($id);
+        $model->active = false;
+        $model->write_uid = auth()->id();
+        $model->updated_at = Carbon::now();
 
-        if ($model->delete()) {
+        if ($model->save()) {
+            UserLog::log([
+                'model' => 'EntranceExamCourse',
+                'action'=> 'Delete',
+                'data'  => $id
+            ]);
             return true;
         }
 

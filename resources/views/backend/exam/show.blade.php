@@ -617,6 +617,15 @@
                 candidate_window = PopupCenterDual($(this).attr('href'),'Update Candidate','1200','960');
             });
 
+            /* ------------------------------------------------------------------------ Candidate Section ------------------------------------------------------------------ */
+
+            var course_window = null;
+            $(document).on('click','.btn_course_edit',function(e){
+                e.preventDefault();
+                course_window = PopupCenterDual($(this).data('remote'),'Update Entrance Exam Course','1200','960');
+            });
+
+
             /* ------------------ Checkbox Event ---------------------*/
             $(document).on("click","#exam_room_list_table input:checkbox", function(){
                 if($(this).is(":checked")){
@@ -666,6 +675,10 @@
         window.onunload = function() {
             if (candidate_window && !candidate_window.closed) {
                 candidate_window.close();
+            }
+
+            if (course_window && !course_window.closed) {
+                course_window.close();
             }
         };
 

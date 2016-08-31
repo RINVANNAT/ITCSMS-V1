@@ -17,10 +17,16 @@ use App\Repositories\Backend\Exam\ExamRepositoryContract;
 use App\Repositories\Backend\TempEmployeeExam\TempEmployeeExamRepositoryContract;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Crypt;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Response;
 use Illuminate\Http\Request;
 use App\Http\Requests;
+use App\Http\Requests\Backend\Exam\ViewSecretCodeRequest;
+use App\Http\Requests\Backend\EntranceExamCourse\CreateEntranceExamCourseRequest;
+use App\Http\Requests\Backend\Exam\ModifyExamRoomRequest;
+use App\Http\Requests\Backend\Exam\GenerateRoomExamRequest;
+use App\Http\Requests\Backend\Exam\DownloadExaminationDocumentsRequest;
 
 class ExamController extends Controller
 {
@@ -157,7 +163,7 @@ class ExamController extends Controller
         $this->exams->destroy($id);
     }
 
-    public function data($id)
+    public function data(ViewExamRequest $request, $id)
     {
         $exams = DB::table('exams')
             ->where('type_id',$id)
@@ -243,37 +249,37 @@ class ExamController extends Controller
         }
     }*/
 
-    public function get_buildings($id){
-        $type = $_GET['type'];
-        $data = array();
-        $all_ids = $this->get_all_room_ids();
-        $ids = $this->get_selected_room_ids($id);
+//    public function get_buildings($id){
+//        $type = $_GET['type'];
+//        $data = array();
+//        $all_ids = $this->get_all_room_ids();
+//        $ids = $this->get_selected_room_ids($id);
+//
+//        if($type == "available"){
+//            $ids = $this->get_available_room_ids($all_ids,$ids);
+//        }
+//
+//        $buildings = DB::table('rooms')
+//            ->select('buildings.name','buildings.id')
+//            ->whereIN('rooms.id',$ids)
+//            ->join('buildings','rooms.building_id','=','buildings.id')
+//            ->groupBy('buildings.id')
+//            ->get();
+//
+//        foreach ($buildings as $building){
+//            $element = array(
+//                "id"=>'building_'.$building->id,
+//                "text" => $building->name,
+//                "children"=>true,
+//                "type"=>"building"
+//            );
+//            array_push($data,$element);
+//        }
+//
+//        return Response::json($data);
+//    }
 
-        if($type == "available"){
-            $ids = $this->get_available_room_ids($all_ids,$ids);
-        }
-
-        $buildings = DB::table('rooms')
-            ->select('buildings.name','buildings.id')
-            ->whereIN('rooms.id',$ids)
-            ->join('buildings','rooms.building_id','=','buildings.id')
-            ->groupBy('buildings.id')
-            ->get();
-
-        foreach ($buildings as $building){
-            $element = array(
-                "id"=>'building_'.$building->id,
-                "text" => $building->name,
-                "children"=>true,
-                "type"=>"building"
-            );
-            array_push($data,$element);
-        }
-
-        return Response::json($data);
-    }
-
-    public function add_room($id){
+    public function add_room(ModifyExamRoomRequest$request, $id){
 
         $exam = $this->exams->findOrThrowException($id);
 
@@ -292,7 +298,7 @@ class ExamController extends Controller
         return view('backend.exam.includes.exam_room_list',compact('exam_rooms'));
     }
 
-    public function merge_rooms($id){
+    public function merge_rooms(ModifyExamRoomRequest $request, $id){
 
         $exam = $this->exams->findOrThrowException($id);
         $rooms = $_POST['rooms'];
@@ -318,7 +324,7 @@ class ExamController extends Controller
         return view('backend.exam.includes.exam_room_list',compact('exam_rooms'));
     }
 
-    public function split_room($id){
+    public function split_room(ModifyExamRoomRequest$request, $id){
 
         //dd($_POST);
         $exam = $this->exams->findOrThrowException($id);
@@ -341,7 +347,7 @@ class ExamController extends Controller
         return view('backend.exam.includes.exam_room_list',compact('exam_rooms'));
     }
 
-    public function generate_rooms($id){
+    public function generate_rooms(GenerateRoomExamRequest $request, $id){
 
         $exam = $this->exams->findOrThrowException($id);
         $exam_rooms = $exam->rooms()->get();
@@ -380,27 +386,27 @@ class ExamController extends Controller
         return view('backend.exam.includes.exam_room_list',compact('exam_rooms'));
     }
 
-    public function save_rooms($id){
-        $exam = $this->exams->findOrThrowException($id);
+//    public function save_rooms($id){
+//        $exam = $this->exams->findOrThrowException($id);
+//
+//        $room_ids = json_decode($_POST['room_ids']);
+//        $ids = [];
+//        foreach($room_ids as $room_id){
+//            $tmp = explode('_',$room_id);
+//            if($tmp[0] == "room"){  // Because ids that are pass alongs include buildings as well. We need to remove that.
+//                array_push($ids,$tmp[1]);
+//            }
+//        }
+//
+//        if($exam->rooms()->sync($ids,false)) {  // Add room ids without deleting old ids
+//            return Response::json(array("success"=>true));
+//        } else {
+//            return Response::json(array("success"=>false));
+//        }
+//
+//    }
 
-        $room_ids = json_decode($_POST['room_ids']);
-        $ids = [];
-        foreach($room_ids as $room_id){
-            $tmp = explode('_',$room_id);
-            if($tmp[0] == "room"){  // Because ids that are pass alongs include buildings as well. We need to remove that.
-                array_push($ids,$tmp[1]);
-            }
-        }
-
-        if($exam->rooms()->sync($ids,false)) {  // Add room ids without deleting old ids
-            return Response::json(array("success"=>true));
-        } else {
-            return Response::json(array("success"=>false));
-        }
-
-    }
-
-    public function delete_rooms($id){
+    public function delete_rooms(ModifyExamRoomRequest $request, $id){
         $exam = $this->exams->findOrThrowException($id);
 
         $room_ids = $_POST['exam_room'];
@@ -425,15 +431,19 @@ class ExamController extends Controller
 
     }
 
-    public function view_room_secret_code($exam_id){
+    public function view_room_secret_code(ViewSecretCodeRequest $request, $exam_id){
         $exam = $this->exams->findOrThrowException($exam_id);
 
-        $rooms = $exam->rooms()->with('building')->withPivot('roomcode')->get()->toArray();
+        $rooms = $exam->rooms()->with('building')->get()->toArray();
+
+        foreach($rooms as &$room){
+            $room['roomcode'] = Crypt::decrypt($room['roomcode']);
+        }
 
         return view('backend.exam.includes.popup_room_secret_code',compact('rooms','exam_id'));
     }
 
-    public function save_room_secret_code($exam_id){
+    public function save_room_secret_code(ViewSecretCodeRequest $request, $exam_id){
 
         $rooms = json_decode($_POST['room_ids']);
         //dd($rooms);
@@ -441,13 +451,13 @@ class ExamController extends Controller
             DB::table('examRooms')
                 ->where('exam_id',$exam_id)
                 ->where('id',$room->room_id)
-                ->update(['roomcode'=>$room->secret_code]);
+                ->update(['roomcode'=> Crypt::encrypt($room->secret_code)]);
         }
 
         return Response::json(array('success'=>true));
     }
 
-    public function download_attendance_list($exam_id){
+    public function download_attendance_list(DownloadExaminationDocumentsRequest $request, $exam_id){
 
         $exam = $this->exams->findOrThrowException($exam_id);
         $courses = $exam->entranceExamCourses()->get();
@@ -456,7 +466,7 @@ class ExamController extends Controller
         return view('backend.exam.print.attendance_list',compact('rooms','courses'));
     }
 
-    public function download_candidate_list($exam_id){
+    public function download_candidate_list(DownloadExaminationDocumentsRequest $request,$exam_id){
 
         $exam = $this->exams->findOrThrowException($exam_id);
         $rooms = $exam->rooms()->with('building')->withPivot('roomcode')->get();
@@ -464,7 +474,7 @@ class ExamController extends Controller
         return view('backend.exam.print.candidate_list',compact('rooms'));
     }
 
-    public function download_candidate_list_by_register_id($exam_id){
+    public function download_candidate_list_by_register_id(DownloadExaminationDocumentsRequest $request,$exam_id){
 
         $exam = $this->exams->findOrThrowException($exam_id);
         $candidates = $exam->candidates()->with('gender')->with('room')->with('room.building')->orderBy('register_id')->get()->toArray();
@@ -474,14 +484,14 @@ class ExamController extends Controller
         return view('backend.exam.print.candidate_list_order_by_register_id',compact('chunk_candidates'));
     }
 
-    public function download_room_sticker($exam_id){
+    public function download_room_sticker(DownloadExaminationDocumentsRequest $request,$exam_id){
         $exam = $this->exams->findOrThrowException($exam_id);
         $rooms = $exam->rooms()->with('building')->withPivot('roomcode')->get();
 
         return view('backend.exam.print.room_sticker',compact('rooms'));
     }
 
-    public function download_correction_sheet($exam_id){
+    public function download_correction_sheet(DownloadExaminationDocumentsRequest $request,$exam_id){
         $exam = $this->exams->findOrThrowException($exam_id);
         $courses = $exam->entranceExamCourses()->get();
         $rooms = $exam->rooms()->with('building')->with('candidates')->with('candidates.gender')->withPivot('roomcode')->get();
@@ -864,10 +874,9 @@ class ExamController extends Controller
 
     public function generate_room($exam_id){
         $exam = $this->exams->findOrThrowException($exam_id);
-        $candidates = $exam->candidates()->orderBy('register_id')->get()->toArray();
+        $candidates = $exam->candidates()->where('active',true)->orderBy('register_id')->get()->toArray();
         $rooms = $exam->rooms()->get()->toArray();
 
-        //dd($rooms);
         $available_seat = 0;
         foreach($rooms as &$room){
             $room['current_seat'] = 0;

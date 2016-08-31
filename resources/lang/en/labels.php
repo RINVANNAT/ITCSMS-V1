@@ -470,6 +470,7 @@ return [
             ],
             'course' => [
                 'add_course' => 'Add new course for exam',
+                'edit_course' => 'Edit course for exam',
                 'choose_course' => 'Choose courses for exam',
                 'fields' => [
                     "course_name" => "Course Name",
