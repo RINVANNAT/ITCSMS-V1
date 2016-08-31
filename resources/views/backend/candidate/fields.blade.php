@@ -124,8 +124,10 @@
         <div class="col-sm-8">
 
             <select name="highschool_name" class="form-control input" id="candidate_highschool_name" required {{isset($studentBac2)?"disabled":""}}>
-                @if($selected_high_school != null)
+                @if(isset($selected_high_school) && $selected_high_school != null)
                     <option value="{{$selected_high_school->id}}" selected="selected">{{$selected_high_school->name}}</option>
+                @elseif(isset($highschool) && $highschool != null)
+                    <option value="{{$highschool->id}}" selected="selected">{{$highschool->name}}</option>
                 @endif
             </select>
 

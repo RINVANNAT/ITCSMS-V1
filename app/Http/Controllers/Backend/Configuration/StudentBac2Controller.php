@@ -152,7 +152,7 @@ class StudentBac2Controller extends Controller
                 ' <button class="btn btn-xs btn-danger btn-delete" data-remote="'.route('admin.configuration.studentBac2s.destroy', $studentBac2->id) .'"><i class="fa fa-times" data-toggle="tooltip" data-placement="top" title="' . trans('buttons.general.crud.delete') . '"></i></button>';
             })
             ->addColumn('export', function ($studentBac2) use ($exam_id) {
-                return  '<a href="'.route('admin.candidate.popup_create').'?exam_id='.$exam_id.'&studentBac2_id='.$studentBac2->id.'" class="btn btn-xs btn-primary export"><i class="fa fa-mail-forward" data-toggle="tooltip" data-placement="top" title="" data-original-title="'.trans('buttons.general.export').'"></i> </a>';
+                return  '<a href="'.route('admin.candidates.create').'?exam_id='.$exam_id.'&studentBac2_id='.$studentBac2->id.'" class="btn btn-xs btn-primary export"><i class="fa fa-mail-forward" data-toggle="tooltip" data-placement="top" title="" data-original-title="'.trans('buttons.general.export').'"></i> </a>';
             });
 
         if ($origin = $datatables->request->get('origin')) {

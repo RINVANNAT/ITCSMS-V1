@@ -90,7 +90,9 @@ class ExamController extends Controller
     /**
      * Display the specified resource.
      *
-     * @param  int  $id
+     * @param ViewExamRequest $request
+     * @param int $type_id
+     * @param  int  $exam_id
      * @return \Illuminate\Http\Response
      */
 
@@ -113,15 +115,17 @@ class ExamController extends Controller
     /**
      * Show the form for editing the specified resource.
      *
-     * @param  int  $id
+     * @param EditExamRequest $request
+     * @param  int  $type_id
+     * @param int $exam_id
      * @return \Illuminate\Http\Response
      */
-    public function edit(EditExamRequest $request, $id)
+    public function edit(EditExamRequest $request, $type_id, $exam_id)
     {
 
-        $exam = $this->exams->findOrThrowException($id);
+        $exam = $this->exams->findOrThrowException($exam_id);
 
-        $type = $exam->type->id;
+        $type = $type_id;
         $academicYear = AcademicYear::where('id',$exam->academicYear->id)->lists('name_kh','id');
         $examType = ExamType::where('id',$type)->lists('name_kh','id')->toArray();
 
@@ -150,15 +154,14 @@ class ExamController extends Controller
      */
     public function destroy(DeleteExamRequest $request, $id)
     {
-        $exam = $this->exams->findOrThrowException($id);
         $this->exams->destroy($id);
-
     }
 
     public function data($id)
     {
         $exams = DB::table('exams')
             ->where('type_id',$id)
+            ->where('active',true)
             ->select(['id','type_id','name','date_start','date_end','description']);
 
         $datatables =  app('datatables')->of($exams);

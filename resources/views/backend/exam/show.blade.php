@@ -338,7 +338,7 @@
             });
 
             $(document).on('click', '#btn_add_candidate_manual', function (e) {
-                window_candidate = PopupCenterDual("{!! route('admin.candidate.popup_create').'?exam_id='.$exam->id.'&studentBac2_id=0' !!}",'Add new Candidate','1200','960');
+                window_candidate = PopupCenterDual("{!! route('admin.candidates.create').'?exam_id='.$exam->id.'&studentBac2_id=0' !!}",'Add new Candidate','1200','960');
             });
 
             var iconUrl1 = "{{url('plugins/jstree/img/department.png')}}";

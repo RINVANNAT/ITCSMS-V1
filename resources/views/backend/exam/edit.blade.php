@@ -2,6 +2,10 @@
 
 @section ('title', trans('labels.backend.candidates.title') . ' | ' . trans('labels.backend.candidates.sub_edit_title'))
 
+@section('after-styles-end')
+    {!! Html::style('plugins/daterangepicker/daterangepicker-bs3.css') !!}
+@endsection
+
 @section('page-header')
     <h1>
         {{ trans('labels.backend.candidates.title') }}
@@ -35,4 +39,20 @@
             </div><!-- /.box-body -->
         </div><!--box-->
     {!! Form::close() !!}
+@stop
+
+@section('after-scripts-end')
+    <script type="text/javascript" src="{{ url('vendor/jsvalidation/js/jsvalidation.js')}}"></script>
+    {!! Html::script('plugins/moment/moment.min.js') !!}
+    {!! Html::script('plugins/daterangepicker/daterangepicker.js') !!}
+
+
+    <script>
+        $(function(){
+            //$('#date_start').datetimepicker();
+            $('#date_start_end').daterangepicker({
+                format: 'DD/MM/YYYY',
+            });
+        });
+    </script>
 @stop

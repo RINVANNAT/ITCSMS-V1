@@ -28,7 +28,7 @@
 
         <div class="box-body">
             <div>
-                <table class="table table-striped table-bordered table-hover" id="studentBac2s-table">
+                <table width="100%" class="table table-striped table-bordered table-hover" id="studentBac2s-table">
                     <thead>
                     <tr>
                         <th>{{ trans('labels.backend.studentBac2s.fields.name_kh') }}</th>
@@ -110,7 +110,7 @@
             });
 
             $("#btn-manual").on("click",function(){
-                candidate_window = PopupCenterDual("{!! route('admin.candidate.popup_create').'?exam_id='.$exam_id.'&studentBac2_id=0' !!}",'Add new Candidate','1200','960');
+                candidate_window = PopupCenterDual("{!! route('admin.candidates.create').'?exam_id='.$exam_id.'&studentBac2_id=0' !!}",'Add new Candidate','1200','960');
             });
 
             $('div.dataTables_filter input').focus()

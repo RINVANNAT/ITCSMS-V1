@@ -150,11 +150,8 @@ class EloquentCandidateRepository implements CandidateRepositoryContract
                 $departmentIds = $input['departments'];
                 $candidate->departments()->sync($departmentIds);
             }
-
             $result["status"] = true;
             $result["messages"] = "Your information is successfully saved";
-
-
         } else {
             $result["status"] = false;
             $result["messages"] = "Something went wrong!";

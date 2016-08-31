@@ -61,30 +61,11 @@ class CandidateController extends Controller
     }
 
     /**
-     * Show the form for creating a new resource.
-     * @param CreateCandidateRequest $request
-     * @return \Illuminate\Http\Response
-     */
-    public function create(CreateCandidateRequest $request)
-    {
-        $exam = Exam::where('id',1)->first();
-        $degrees = Degree::lists('name_kh','id');
-        $genders = Gender::lists('name_kh','id');
-        $promotions = Promotion::orderBy('name','desc')->lists('name','id');
-        $highSchools = HighSchool::lists('name_kh','id');
-        $provinces = Origin::lists('name_kh','id');
-        $gdeGrades = GdeGrade::lists('name_en','id');
-        $departments = Department::where('is_specialist',true)->where('parent_id',11)->get();
-        $academicYears = AcademicYear::orderBy('name_latin','desc')->lists('name_latin','id');
-        return view('backend.candidate.create',compact('departments','degrees','genders','promotions','highSchools','provinces','gdeGrades','academicYears','exam'));
-    }
-
-    /**
      * Show the form for creating a new resource (Pop Up).
      * @param CreateCandidateRequest $request
      * @return \Illuminate\Http\Response
      */
-    public function popup_create(CreateCandidateRequest $request)
+    public function create(CreateCandidateRequest $request)
     {
         $studentBac2_id = Input::get('studentBac2_id');
         $exam_id = Input::get('exam_id');
@@ -95,10 +76,9 @@ class CandidateController extends Controller
             $highschool = null;
         } else {
             $studentBac2 = StudentBac2::find($studentBac2_id);
-            $highschool = HighSchool::find($studentBac2->highschool_id);
+            $highschool = HighSchool::where('id',$studentBac2->highschool_id)->select(['id', 'name_kh as name'])->first();
         }
-
-
+        
 
         //dd($highschool);
         $exam = Exam::where('id',$exam_id)->first();

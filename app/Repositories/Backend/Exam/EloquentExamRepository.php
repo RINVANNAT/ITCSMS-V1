@@ -6,6 +6,7 @@ namespace App\Repositories\Backend\Exam;
 use App\Exceptions\GeneralException;
 use App\Http\Requests\Backend\Exam\StoreEntranceExamScoreRequest;
 use App\Models\Exam;
+use App\Models\UserLog;
 use Carbon\Carbon;
 use DB;
 use Object;
@@ -97,7 +98,7 @@ class EloquentExamRepository implements ExamRepositoryContract
         $exam->name = $input['name'];
         $exam->date_start = $date_start;
         $exam->date_end = $date_end;
-        $exam->active = isset($input['active'])?true:false;
+        $exam->active = true;
         $exam->description = $input['description'];
         $exam->academic_year_id = $input['academic_year_id'];
         $exam->type_id = $input['type_id'];
@@ -106,6 +107,11 @@ class EloquentExamRepository implements ExamRepositoryContract
         $exam->create_uid = auth()->id();
 
         if ($exam->save()) {
+            UserLog::log([
+                'model' => 'Exam',
+                'action'=> 'Create',
+                'data'  => $exam->id, // if it is create action, store only the new id.
+            ]);
             return $exam->id;
         }
 
@@ -121,6 +127,7 @@ class EloquentExamRepository implements ExamRepositoryContract
     public function update($id, $input)
     {
         $exam = $this->findOrThrowException($id);
+        $old_record = json_encode($exam);
 
         $date_start_end = explode(" - ",$input['date_start_end']);
 
@@ -135,10 +142,15 @@ class EloquentExamRepository implements ExamRepositoryContract
         $exam->academic_year_id = $input['academic_year_id'];
         $exam->type_id = $input['type_id'];
 
-        $exam->created_at = Carbon::now();
-        $exam->create_uid = auth()->id();
+        $exam->updated_at = Carbon::now();
+        $exam->write_uid = auth()->id();
 
         if ($exam->save()) {
+            UserLog::log([
+                'model' => 'Exam',
+                'action'=> 'Update',
+                'data'  => $old_record, // store all old record so we can role back
+            ]);
             return true;
         }
 
@@ -155,6 +167,10 @@ class EloquentExamRepository implements ExamRepositoryContract
 
         $exam = $this->findOrThrowException($id);
 
+        $exam->active = false; // Instead of real delete, just change active to false.
+        $exam->updated_at = Carbon::now();
+        $exam->write_uid = auth()->id();
+
         //Don't delete the role is there are users associated
 //        if ($exam->candidates()->count() > 0) {
 //            throw new GeneralException(trans('exceptions.backend.exams.has_candidate'));
@@ -164,7 +180,12 @@ class EloquentExamRepository implements ExamRepositoryContract
 //        $exam->employees()->sync([]);
 //        $exam->students()->sync([]);
 
-        if ($exam->delete()) {
+        if ($exam->save()) {
+            UserLog::log([
+                'model' => 'Exam',
+                'action'=> 'Delete',
+                'data'  => $id, // Store only id because we didn't really delete the record
+            ]);
             return true;
         }
 

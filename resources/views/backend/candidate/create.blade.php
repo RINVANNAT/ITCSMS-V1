@@ -16,7 +16,7 @@
 
 
 @section('content')
-    {!! Form::open(['route' => 'admin.candidate.popup_store', 'id'=> 'candidate-form', 'class' => 'form-horizontal', 'role' => 'form', 'method' => 'post']) !!}
+    {!! Form::open(['route' => 'admin.candidates.store', 'id'=> 'candidate-form', 'class' => 'form-horizontal', 'role' => 'form', 'method' => 'post']) !!}
 
     <div class="box box-success">
         <div class="box-header with-border">
@@ -55,39 +55,6 @@
 
 
         function save_candidate(){
-
-            /*var status = $( "#candidate-form" ).validate( {
-                rules: {
-                    register_id: "required",
-                },
-                messages: {
-                    register_id: "Please enter your register id",
-                },
-                errorElement: "em",
-                errorPlacement: function ( error, element ) {
-                    // Add the `help-block` class to the error element
-                    error.addClass( "help-block" );
-
-                    // Add `has-feedback` class to the parent div.form-group
-                    // in order to add icons to inputs
-                    element.parents( ".col-sm-6" ).addClass( "has-feedback" );
-
-                    if ( element.prop( "type" ) === "checkbox" ) {
-                        error.insertAfter( element.parent( "label" ) );
-                    } else {
-                        error.insertAfter( element );
-                    }
-                },
-                success: function ( label, element ) {
-
-                },
-                highlight: function ( element, errorClass, validClass ) {
-                    $( element ).parents( ".col-sm-6" ).addClass( "has-error" );
-                },
-                unhighlight: function ( element, errorClass, validClass ) {
-                    $( element ).parents( ".col-sm-6" ).removeClass( "has-error" );
-                }
-            }).form();*/
 
             var status = $( "#candidate-form" ).validate().form();
             if(status ==true){
@@ -157,7 +124,7 @@
             $('#candidate_highschool_name').val(repo.name);
             $('#highschool_id').val(repo.id);
 
-            return repo.name || repo.group;
+            return repo.text || repo.name;
         }
 
 
