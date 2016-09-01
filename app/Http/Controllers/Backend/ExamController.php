@@ -438,7 +438,11 @@ class ExamController extends Controller
         $rooms = $exam->rooms()->with('building')->get()->toArray();
 
         foreach($rooms as &$room){
-            $room['roomcode'] = Crypt::decrypt($room['roomcode']);
+            if($room['roomcode'] == ""){
+                $room['roomcode'] = "";
+            } else {
+                $room['roomcode'] = Crypt::decrypt($room['roomcode']);
+            }
         }
 
         return view('backend.exam.includes.popup_room_secret_code',compact('rooms','exam_id'));

@@ -62,6 +62,10 @@ class EloquentEntranceExamCourseRepository implements EntranceExamCourseReposito
         $input['create_uid'] = auth()->id();
         $input['created_at'] = Carbon::now();
 
+        foreach($input as &$item){
+            if($item == "") $item =null;
+        }
+
         $entranceExamCourse = EntranceExamCourse::create($input);
         if($entranceExamCourse != null){
             UserLog::log([
