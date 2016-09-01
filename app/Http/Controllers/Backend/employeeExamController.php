@@ -400,6 +400,9 @@ class employeeExamController extends Controller
         $roomIds = $request->room_id;
         $roleId = $request->role_id;
 
+
+//        dd($request->request);
+
         $checkTemp = 0;
         $checkPer = 0;
 
