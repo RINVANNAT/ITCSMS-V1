@@ -74,6 +74,24 @@
 
                 {{--</div>--}}
 
+                <div class="col-sm-12" style="margin-top: 15px">
+                    <div class="col-sm-6 no-padding">
+
+                    </div>
+                    <div class="col-sm-6 no-padding">
+                        <div class="col-sm-3 no-padding" style="margin-top: 5px">
+                            <label for="corrector_name"> Corrector Name : </label>
+                        </div>
+
+                        <div class="col-sm-9 no-padding">
+                            {!! Form::text('corrector', null, ['class' => 'form-control', 'placeholder'=>'name corrector', 'id'=> 'corrector_name', 'required']) !!}
+                        </div>
+
+
+                    </div>
+
+                </div>
+
                 <div class="col-sm-12 no-padding " style="margin-top: 5px">
 
                     <table class="table">
@@ -128,6 +146,10 @@
                                             <td>
                                                 {!! Form::text('score_total[]', null, ['class' => 'form-control enlarge-number number_only validate_'.$i,'id'=>'total_'.$i, 'disabled', 'placeholder'=>$candidate->total_question]) !!}
                                             </td>
+
+                                            {{--<td style="width: 20%">--}}
+                                                {{--{!! Form::text('corrector[]', null, ['class' => 'form-control', 'placeholder'=>'name corrector']) !!}--}}
+                                            {{--</td>--}}
                                         </tr>
                                     @endforeach
                                 @endif
@@ -198,6 +220,8 @@
             $("#btn_save_candidate_score").click(function() {
 
                 var data = $( "form.table_score" ).serializeArray();
+                var baseData = $( "form.table_score" ).serialize();
+                var corrector_name = $('#corrector_name').val();
                 var check =0;
                 var status = 0;
                 $.each(data, function(index, value) {
@@ -212,25 +236,31 @@
                        status++;
                    }
                }
-                if(status > 0) {
 
-                    swal({
-                        title: "Confirm",
-                        text: "You have inputted 0 Value!!!",
-                        type: "info",
-                        showCancelButton: true,
-                        confirmButtonColor: "#DD6B55",
-                        confirmButtonText: "Yes",
-                        closeOnConfirm: true
-                    }, function(confirmed) {
-                        if (confirmed) {
-                            ajaxRequest('POST', $( "form.table_score").attr('action'), $( "form.table_score" ).serialize());
-                        }
-                    });
+                if(corrector_name != '' ) {
+
+                    console.log(corrector_name);
+                    if(status > 0) {
+                        swal({
+                            title: "Confirm",
+                            text: "You have inputted 0 Value!!!",
+                            type: "info",
+                            showCancelButton: true,
+                            confirmButtonColor: "#DD6B55",
+                            confirmButtonText: "Yes",
+                            closeOnConfirm: true
+                        }, function(confirmed) {
+                            if (confirmed) {
+                                ajaxRequest('POST', $( "form.table_score").attr('action')+'?corrector_name='+corrector_name, $( "form.table_score" ).serialize());
+                            }
+                        });
+                    } else {
+                        ajaxRequest('POST', $( "form.table_score").attr('action')+'?corrector_name='+corrector_name, $( "form.table_score" ).serialize());
+                    }
                 } else {
-                    ajaxRequest('POST', $( "form.table_score").attr('action'), $( "form.table_score" ).serialize());
-                }
 
+                    notify("error","info", "Please Add The Corrector Name!!");
+                }
             });
 
             // to disable of string inputted

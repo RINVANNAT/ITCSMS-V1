@@ -274,19 +274,19 @@ class EloquentExamRepository implements ExamRepositoryContract
         return $a->candidateProperties->register_id - $b->candidateProperties->register_id;
     }
 
-    public function insertCandidateScore($exam_id, $requestDatas) {
+    public function insertCandidateScore($exam_id, $requestDatas, $correctorName) {
 
         $numberCorrection = $requestDatas['sequence'];
 
         if($numberCorrection == '1') {
 
-            $result = $this->checkEachCandidateScoreId($requestDatas, $numberCorrection );
+            $result = $this->checkEachCandidateScoreId($requestDatas, $numberCorrection, $correctorName);
 
             return $result;
 
         } else if($numberCorrection == '2') {
 
-            $result = $this->checkEachCandidateScoreId($requestDatas, $numberCorrection);
+            $result = $this->checkEachCandidateScoreId($requestDatas, $numberCorrection, $correctorName);
 
             return $result;
 
@@ -295,7 +295,7 @@ class EloquentExamRepository implements ExamRepositoryContract
         }
     }
 
-    private function checkEachCandidateScoreId ($requestDatas, $numberCorrection) {
+    private function checkEachCandidateScoreId ($requestDatas, $numberCorrection, $correctorName) {
 
         $empty = '';
         $status = 0;
@@ -315,7 +315,7 @@ class EloquentExamRepository implements ExamRepositoryContract
                     if($correctAns != null || $wrongAns != null  || $noAns !=null ) {
 
 
-                        $insertResult = $this->storeCandidateScore($subjectId[$i], $candidateId[$i], $correctAns[$i], $wrongAns[$i], $noAns[$i], $numberCorrection, $i+1);
+                        $insertResult = $this->storeCandidateScore($subjectId[$i], $candidateId[$i], $correctAns[$i], $wrongAns[$i], $noAns[$i], $numberCorrection, $i+1, $correctorName);
 
                         if($insertResult) {
                             $status++;
@@ -324,7 +324,7 @@ class EloquentExamRepository implements ExamRepositoryContract
 
                 } else {
 
-                    $updateResult = $this->updateCandidateScore($subjectId[$i], $candidateId[$i], $correctAns[$i], $wrongAns[$i], $noAns[$i], $numberCorrection, $i);
+                    $updateResult = $this->updateCandidateScore($subjectId[$i], $candidateId[$i], $correctAns[$i], $wrongAns[$i], $noAns[$i], $numberCorrection, $i+1, $correctorName);
                     if($updateResult) {
                         $status++;
                     }
@@ -337,20 +337,31 @@ class EloquentExamRepository implements ExamRepositoryContract
             }
 
         }
+
+
         return ['status'=>false];
     }
 
-    private function storeCandidateScore($subjectId, $candidateId, $correctAns, $wrongAns, $noAns, $numberCorrection, $orderInRoom) {
+    private function getCandidateScore($candidateId, $subjectId, $sequence) {
 
 
-        $check = DB::table('candidateEntranceExamScores')
-            ->where([
-                ['candidate_id', '=', $candidateId],
-                ['sequence', '=', $numberCorrection],
-                ['entrance_exam_course_id', '=', $subjectId],
+       $CandidateScore =  DB::table('candidateEntranceExamScores')
+                            ->where([
+                                ['candidate_id', '=', $candidateId],
+                                ['sequence', '=', $sequence],
+                                ['entrance_exam_course_id', '=', $subjectId],
 
-            ])
-            ->get();
+                            ])
+                            ->get();
+
+        return $CandidateScore;
+
+    }
+
+    private function storeCandidateScore($subjectId, $candidateId, $correctAns, $wrongAns, $noAns, $numberCorrection, $orderInRoom, $correctorName) {
+
+
+        $check = $this->getCandidateScore($candidateId,$subjectId, $numberCorrection );
 
         if($check) {
             return false;
@@ -362,15 +373,31 @@ class EloquentExamRepository implements ExamRepositoryContract
                 'score_na' => (int)$noAns,
                 'sequence' => (int)$numberCorrection,
                 'entrance_exam_course_id' => (int)$subjectId,
+                'corrector' => $correctorName,
                 'candidate_number_in_room' => $orderInRoom
             ]);
+            //UserLog
+            $this->getUserLog($insertedVal,$model ='CandidateEntranceExamScores', $action = 'Create');
             return $insertedVal;
         }
 
 
     }
 
-    private function updateCandidateScore($subjectId, $candidateId, $correctAns, $wrongAns, $noAns, $numberCorrection, $orderInRoom) {
+    public function getUserLog($data, $model, $action) {
+        $storeData = json_encode($data);
+        UserLog::log([
+            'model' => $model,
+            'action'   => $action, // Import, Create, Delete, Update
+            'data'     => $storeData // if it is create action, store only the new id.
+        ]);
+
+    }
+
+
+    private function updateCandidateScore($subjectId, $candidateId, $correctAns, $wrongAns, $noAns, $numberCorrection, $orderInRoom, $correctorName) {
+
+        $previousRecord = $this->getCandidateScore($candidateId, $subjectId, $numberCorrection);
 
         $updateRecord = DB::table('candidateEntranceExamScores')
             ->where([
@@ -382,13 +409,18 @@ class EloquentExamRepository implements ExamRepositoryContract
                 'score_c' => (int)$correctAns,
                 'score_w' => (int)$wrongAns,
                 'score_na' => (int)$noAns,
+                'corrector' => $correctorName,
                 'candidate_number_in_room' => $orderInRoom
             ));
 
+        if($updateRecord) {
+            //UserLog
+            $this->getUserLog($previousRecord,$model ='CandidateEntranceExamScores', $action = 'Update');
+        }
         return $updateRecord;
     }
 
-    public function addNewCorrectionCandidateScore($examId, StoreEntranceExamScoreRequest $request) {
+    public function addNewCorrectionCandidateScore($examId, StoreEntranceExamScoreRequest $request, $correctorName) {
 
 //        dd($request->score_c.'--'.$request->score_w.'--'.$request->score_na.'--'.$request->sequence.'--'.$request->course_id.'--'.$request->order.'--'.$request->candidate_id );
 
@@ -408,7 +440,7 @@ class EloquentExamRepository implements ExamRepositoryContract
                 return (['status' => false]);
             } else {
 
-                $res = $this->storeCandidateScore($request->course_id[0], $request->candidate_id[0], $request->score_c[0], $request->score_w[0], $request->score_na[0], $request->sequence[0], $request->order[0]);
+                $res = $this->storeCandidateScore($request->course_id[0], $request->candidate_id[0], $request->score_c[0], $request->score_w[0], $request->score_na[0], $request->sequence[0], $request->order[0], $correctorName);
                 return $res;
 
             }
@@ -475,15 +507,22 @@ class EloquentExamRepository implements ExamRepositoryContract
 
                                         $statusCorrectScore++; // every score is equal and total question is correct
 
-                                        DB::table('candidateEntranceExamScores')
-                                            ->where([
-                                                ['entrance_exam_course_id', '=', $cadidateScores[$j]->entrance_exam_course_id],
-                                                ['candidate_id', '=', $candidateId->candidate_id],
-                                                ['sequence', '=', $cadidateScores[$j]->sequence ]
-                                            ])
-                                            ->update(array(
-                                                'is_completed' => true
-                                            ));
+                                        $previousRecord = $this->getCandidateScore($candidateId->candidate_id, $cadidateScores[$j]->entrance_exam_course_id, $cadidateScores[$j]->sequence);
+
+                                        $res = DB::table('candidateEntranceExamScores')
+                                                ->where([
+                                                    ['entrance_exam_course_id', '=', $cadidateScores[$j]->entrance_exam_course_id],
+                                                    ['candidate_id', '=', $candidateId->candidate_id],
+                                                    ['sequence', '=', $cadidateScores[$j]->sequence ]
+                                                ])
+                                                ->update(array(
+                                                    'is_completed' => true
+                                                ));
+                                        if($res) {
+                                            //UserLog
+                                            $this->getUserLog($previousRecord,$model ='CandidateEntranceExamScores', $action = 'Update');
+                                        }
+
                                     } else {
                                         $statusWrongScore++;
                                     }

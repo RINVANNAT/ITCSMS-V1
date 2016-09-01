@@ -321,6 +321,14 @@ class EloquentTempEmployeeExamRepository implements TempEmployeeExamRepositoryCo
         $role->name = $request->role_name;
         $role->description = $request->description;
         $role->save();
+
+        if( $role->save()) {
+            UserLog::log([
+                'model' => 'RoleStaff',
+                'action'   => 'Create', // Import, Create, Delete, Update
+                'data'     => $role->id, // if it is create action, store only the new id.
+            ]);
+        }
         return response()->json(['status' => 'add_role_success',
                                  'role_name' => $role->name,
                                  'role_id' => $role->id
@@ -521,7 +529,7 @@ class EloquentTempEmployeeExamRepository implements TempEmployeeExamRepositoryCo
             ->join('buildings', 'buildings.id', '=', 'rooms.building_id')
             ->where([
                 ['rooms.active', '=', true],
-                ['room.is_exam_room', '=', true],
+                ['rooms.is_exam_room', '=', true],
                 ['tempEmployees.active', '=', true]
             ])
             ->select('tempEmployees.name_kh as staff_name ', 'tempEmployees.id as staff_id', 'rooms.name as room_name', 'rooms.id as room_id', 'buildings.code as building_code')
@@ -534,7 +542,7 @@ class EloquentTempEmployeeExamRepository implements TempEmployeeExamRepositoryCo
             ->join('departments', 'employees.department_id', '=', 'departments.id')
             ->where([
                 ['rooms.active', '=', true],
-                ['room.is_exam_room', '=', true],
+                ['rooms.is_exam_room', '=', true],
                 ['employees.active', '=', true]
             ])
             ->select('employees.name_kh as staff_name ', 'employees.id as staff_id', 'rooms.name as room_name', 'rooms.id as room_id', 'buildings.code as building_code', 'departments.name_en as department_name')

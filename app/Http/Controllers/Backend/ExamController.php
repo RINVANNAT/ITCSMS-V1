@@ -617,14 +617,17 @@ class ExamController extends Controller
 
     public function insertScoreForEachCandiate($exam_id, Requests\Backend\Exam\StoreEntranceExamScoreRequest $request) {
 
-//        dd($request->request);
-
         $requestDatas = $_POST;
+        $correctorName = $request->corrector_name;
 
-        $candidates = $this->exams->insertCandidateScore($exam_id, $requestDatas);
+        if($correctorName) {
+            $candidates = $this->exams->insertCandidateScore($exam_id, $requestDatas, $correctorName);
 
-        if($candidates['status']) {
-            return Response::json(['status'=>true]);
+            if($candidates['status']) {
+                return Response::json(['status'=>true]);
+            } else {
+                return Response::json(['status'=>false]);
+            }
         } else {
             return Response::json(['status'=>false]);
         }
@@ -644,18 +647,24 @@ class ExamController extends Controller
 
         return view('backend.exam.includes.popup_report_error_score_candidate', compact('exam_id', 'errorCandidateScores', 'totalQuestion'));
 
-
-
     }
 
     public function addNewCorrectionScore($exam_id, Requests\Backend\Exam\StoreEntranceExamScoreRequest $request) {
 
-        $res = $this->exams->addNewCorrectionCandidateScore($exam_id, $request);
-        if($res) {
-            return Response::json(['status'=> true]);
+        $correctorName  = $request->corrector_name;
+
+        if($correctorName) {
+            $res = $this->exams->addNewCorrectionCandidateScore($exam_id, $request, $correctorName);
+            if($res) {
+                return Response::json(['status'=> true]);
+            } else {
+                return Response::json(['status'=> false]);
+            }
         } else {
             return Response::json(['status'=> false]);
         }
+
+
     }
 
     public function candidateResultExamScores($exam_id) {
@@ -923,6 +932,8 @@ class ExamController extends Controller
 
     private function updateCandidateResultScore($candidateId,$totalScore, $status) {
 
+        $candidate = Candidate::where('id',$candidateId )->get();
+
         $updateCandidateScore = DB::table('candidates')
             ->where([
                 ['id', '=', $candidateId ],
@@ -932,6 +943,11 @@ class ExamController extends Controller
                 'total_score' => $totalScore,
                 'result' => $status,
             ));
+
+        if($updateCandidateScore) {
+            //UserLog
+            $this->exams->getUserLog($candidate,$model='Candidate', $action='Update');
+        }
 
         return $updateCandidateScore;
     }

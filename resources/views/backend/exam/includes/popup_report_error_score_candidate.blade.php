@@ -20,7 +20,21 @@
     </style>
     <div class="box box-success">
         <div class="box-header with-border">
-            <h3  style="text-align: center"> Error Inputed Score </h3>
+            <div class="col-sm-12">
+                <div class="col-sm-6">
+                    <h4> Error Inputed Score </h4>
+                </div>
+
+                <div class="col-sm-6 no-padding">
+                    <div class="col-sm-3 no-padding" style="margin-top: 5px">
+                        <label for="corrector_name"> Corrector Name : </label>
+                    </div>
+
+                    <div class="col-sm-9 no-padding">
+                        {!! Form::text('corrector', null, ['class' => 'form-control', 'placeholder'=>'name corrector', 'id'=> 'corrector_error_score', 'required']) !!}
+                    </div>
+                </div>
+            </div>
         </div>
         <!-- /.box-header -->
         <div class="box-body">
@@ -199,7 +213,14 @@
                e.preventDefault();
                var baseData =$(this).serialize();
                var baseUrl = "{{route('admin.exam.add_new_correction_score',$exam_id)}}";
-               ajaxRequest('POST', baseUrl,baseData );
+               var corrector_name = $('#corrector_error_score').val();
+
+               if(corrector_name != '') {
+                   ajaxRequest('POST', baseUrl+'?corrector_name='+corrector_name,baseData );
+               } else {
+                   notify("error","info", "Please Add The Corrector Name!!!");
+               }
+
            });
 
            $('.input_new_correction').on('keyup', function() {
