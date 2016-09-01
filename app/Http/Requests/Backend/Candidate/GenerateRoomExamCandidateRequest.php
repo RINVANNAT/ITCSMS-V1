@@ -1,12 +1,12 @@
 <?php
 
-namespace App\Http\Requests\Backend\Exam;
+namespace App\Http\Requests\Backend\Candidate;
 
 use App\Http\Requests\Request;
 
 /**
  * Class GenerateRoomExamRequest
- * @package App\Http\Requests\Backend\Exam
+ * @package App\Http\Requests\Backend\Candidate
  */
 class GenerateRoomExamRequest extends Request
 {

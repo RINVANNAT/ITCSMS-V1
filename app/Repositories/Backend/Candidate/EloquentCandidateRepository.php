@@ -216,16 +216,13 @@ class EloquentCandidateRepository implements CandidateRepositoryContract
     {
 
         $model = $this->findOrThrowException($id);
-        $model->active = false; // Instead of real delete, just change active to false.
-        $model->updated_at = Carbon::now();
-        $model->write_uid = auth()->id();
+        $old_record = json_encode($model);
 
-
-        if ($model->save()) {
+        if ($model->delete()) {
             UserLog::log([
                 'model' => 'Candidate',
-                'action'=> 'Delete',
-                'data'  => $id, // Store only id because we didn't really delete the record
+                'action'=> 'Delete-Full',
+                'data'  => $old_record, // Candidate need to completly remove, else problem will occur when registering new candidate (unique register_id +exam_id)
             ]);
             return true;
         }

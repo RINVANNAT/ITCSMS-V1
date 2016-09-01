@@ -86,11 +86,12 @@
 
                  });
             } else {
-                console.log("false");
+
             }
         }
 
         function return_back(){
+
             if(window.opener.opener != null){
                 window.opener.opener.refresh_candidate_list();
             } else {
@@ -101,7 +102,7 @@
         }
 
         function formatRepo (repo) {
-            console.log(repo);
+
             if (repo.loading) {
                 return repo.text;
             }
@@ -120,8 +121,9 @@
 
         function formatRepoSelection (repo) {
 
+            console.log(repo.id);
             $('#candidate_highschool_name').val(repo.id);
-            $('#highschool_id').val(repo.id);
+            $('input[name=highschool_id]').val(repo.id+"");
 
             return repo.text || repo.name;
         }
@@ -164,7 +166,7 @@
                 templateSelection: formatRepoSelection, // omitted for brevity, see the source of this page
             });
 
-            $('.input').keypress(function (e) {
+            $('input').keypress(function (e) {
                 if (e.which == 13) {
                     save_candidate();
                     return false;    //<---- Add this line

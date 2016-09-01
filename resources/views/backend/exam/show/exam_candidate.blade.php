@@ -1,3 +1,8 @@
+<div class="alert alert-warning alert-dismissible" style="display: none" id="candidate_notification">
+    <button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>
+    <h4><i class="icon fa fa-warning"></i> Candidates are missing!</h4>
+    There are some missing candidates. Click <a href="{!! route('admin.exam.find_missing_candidates',$exam->id) !!}" id="btn_show_missing_candidate">here</a> to see missing register ID.
+</div>
 <div style="padding-bottom: 20px;">
     <!-- Check all button -->
     @permission('create-exam-candidate')

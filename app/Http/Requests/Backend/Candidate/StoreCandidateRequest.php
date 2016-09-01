@@ -34,7 +34,6 @@ class StoreCandidateRequest extends Request
             'dob' => 'required',
             'gender_id' => 'required',
             'register_from' => 'required',
-            'highschool_id' => 'required',
             'highschool_name' => 'required',
             'bac_percentile' => 'required',
             'bac_total_grade' => 'required',

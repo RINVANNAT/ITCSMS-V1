@@ -9,6 +9,7 @@ use App\Http\Requests\Backend\Exam\ViewExamRequest;
 use App\Http\Requests\Backend\Exam\UpdateExamRequest;
 use App\Models\AcademicYear;
 use App\Models\Building;
+use App\Models\Candidate;
 use App\Models\EntranceExamCourse;
 use App\Models\ExamRoom;
 use App\Models\ExamType;
@@ -25,7 +26,7 @@ use App\Http\Requests;
 use App\Http\Requests\Backend\Exam\ViewSecretCodeRequest;
 use App\Http\Requests\Backend\EntranceExamCourse\CreateEntranceExamCourseRequest;
 use App\Http\Requests\Backend\Exam\ModifyExamRoomRequest;
-use App\Http\Requests\Backend\Exam\GenerateRoomExamRequest;
+use App\Http\Requests\Backend\Candidate\GenerateRoomExamRequest;
 use App\Http\Requests\Backend\Exam\DownloadExaminationDocumentsRequest;
 
 class ExamController extends Controller
@@ -347,7 +348,7 @@ class ExamController extends Controller
         return view('backend.exam.includes.exam_room_list',compact('exam_rooms'));
     }
 
-    public function generate_rooms(GenerateRoomExamRequest $request, $id){
+    public function generate_rooms(ModifyExamRoomRequest $request, $id){ // In Room section
 
         $exam = $this->exams->findOrThrowException($id);
         $exam_rooms = $exam->rooms()->get();
@@ -954,7 +955,7 @@ class ExamController extends Controller
 
 
 
-    public function generate_room($exam_id){
+    public function generate_room(GenerateRoomExamRequest $request, $exam_id){ // In candidate section
         $exam = $this->exams->findOrThrowException($exam_id);
         $candidates = $exam->candidates()->where('active',true)->orderBy('register_id')->get()->toArray();
         $rooms = $exam->rooms()->get()->toArray();
@@ -998,6 +999,25 @@ class ExamController extends Controller
             if($current_room>=count($rooms)) $current_room = 0; // Reset index to 0 if over max
             $this->update_room_candidate($rooms,$current_room,$candidate);
         }
+    }
+
+    public function check_missing_candidates($exam_id){
+        $candidate_register_ids = Candidate::where('exam_id',$exam_id)->orderBy('register_id', 'ASC')->lists('register_id')->toArray();
+        //dd($candidate_register_ids);
+        $missing = array_diff(range(1, max($candidate_register_ids)), $candidate_register_ids);
+
+        if(count($missing)>0){
+            return Response::json(array('status'=>true));
+        } else {
+            return Response::json(array('status'=>false));
+        }
+    }
+
+    public function find_missing_candidates($exam_id){
+        $candidate_register_ids = Candidate::where('exam_id',$exam_id)->orderBy('register_id', 'ASC')->lists('register_id')->toArray();
+        $missing = array_diff(range(1, max($candidate_register_ids)), $candidate_register_ids);
+
+        return view('backend.exam.includes.popup_view_missing_candidate', compact('missing'));
     }
 
 }

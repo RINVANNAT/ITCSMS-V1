@@ -76,10 +76,10 @@ class CandidateController extends Controller
             $highschool = null;
         } else {
             $studentBac2 = StudentBac2::find($studentBac2_id);
-            $highschool = HighSchool::where('id',$studentBac2->highschool_id)->select(['id', 'name_kh as name'])->first();
+            $highschool = HighSchool::where('id',$studentBac2->highschool_id)->lists('id', 'name_kh as name')->toArray();
         }
-        
 
+        //$highschool->id = str_pad($highschool->id,12,"0",STR_PAD_LEFT);
         //dd($highschool);
         $exam = Exam::where('id',$exam_id)->first();
 
@@ -148,10 +148,10 @@ class CandidateController extends Controller
         $gdeGrades = GdeGrade::lists('name_en','id');
         $departments = Department::where('is_specialist',true)->where('parent_id',11)->get();
         $academicYears = AcademicYear::orderBy('name_latin','desc')->lists('name_latin','id');
-        $selected_high_school = HighSchool::where('id',$candidate->highschool_id)->select(['id', 'name_kh as name'])->first();
-
+        //$selected_high_school = HighSchool::where('id',$candidate->highschool_id)->select(['id', 'name_kh as name'])->first();
+        $highschool = HighSchool::where('id',$studentBac2->highschool_id)->lists('id', 'name_kh as name')->toArray();
         //dd($candidate);
-        return view('backend.candidate.edit',compact('selected_high_school','departments','exam','degrees','genders','promotions','provinces','gdeGrades','academicYears','candidate','studentBac2'));
+        return view('backend.candidate.edit',compact('highschool','departments','exam','degrees','genders','promotions','provinces','gdeGrades','academicYears','candidate','studentBac2'));
     }
 
     /**

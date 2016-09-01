@@ -218,20 +218,80 @@
         var add_room_url = '{{route('admin.exam.add_room',$exam->id)}}';
         var split_room_url = '{{route('admin.exam.split_room',$exam->id)}}';
         var delete_room_url = '{{route('admin.exam.delete_rooms',$exam->id)}}';
+        var check_missing_candidates_url = '{{route('admin.exam.check_missing_candidates',$exam->id)}}';
+        var find_missing_candidates_url = '{{route('admin.exam.find_missing_candidates',$exam->id)}}';
         var exam_id = {{$exam->id}};
         var exam_type_id = {{$exam->type_id}};
+
         var window_secret_code;
         var window_course;
         var window_bac2;
         var window_candidate;
+        var window_missing_candidate;
+
+        /*---------- Functions for candidates ---------*/
+
+        function check_missing_candidates(){
+            $.ajax({
+                type: 'GET',
+                url: check_missing_candidates_url,
+                dataType: "json",
+                success: function(resultData) {
+                    if(resultData.status == true){
+                        $("#candidate_notification").show();
+                    } else {
+                        $("#candidate_notification").hide();
+                    }
+                }
+            });
+        }
 
         function refresh_candidate_list (){
             $('#candidates-table').DataTable().ajax.reload();
             notify("success","Info", "Candidate list is updated!");
+            check_missing_candidates();
         }
+
+        /*---------- Functions for course ---------*/
 
         function update_ui_course(){
             course_datatable.draw();
+        }
+
+        /* -------- Function for room -------- */
+        function get_total_seat(){
+            $.ajax({
+                type: 'GET',
+                url: "{{route('admin.exam.count_seat_exam',$exam->id)}}",
+                dataType: "json",
+                success: function(resultData) {
+                    $('#all_reserve_seat').html(resultData.seat_exam);
+                }
+            });
+        }
+
+        function disable_room_editing(){
+            $('#exam_room_list_table tbody').removeClass('editing');
+            $('#exam_room_list_table input:checkbox').prop("disabled", true);
+            $('#exam_room_list_table tr').removeClass('highlight');
+            $('#exam_room_list_table input:checkbox').prop('checked',false);
+            $('#btn_room_modify').show();
+            $('.room_editing').hide();
+        }
+
+        function enable_room_editing(){
+            if(($('[name="exam_room[]"]:checked').length > 0)){
+                $('#btn_room_merge').prop('disabled',false);
+                $('#btn_room_delete').prop('disabled',false);
+            }else{
+                $('#btn_room_merge').prop('disabled',true);
+                $('#btn_room_delete').prop('disabled',true);
+            }
+
+            $('#exam_room_list_table tbody').addClass('editing');
+            $('#exam_room_list_table input:checkbox').prop("disabled", false);
+            $('#btn_room_modify').hide();
+            $('.room_editing').show();
         }
 
 
@@ -333,14 +393,6 @@
 
             });
 
-            $(document).on('click', '#btn_add_candidate', function (e) {
-                window_bac2 = PopupCenterDual('{{route("admin.studentBac2.popup_index")."?exam_id=".$exam->id}}','Add new customer','1200','960');
-            });
-
-            $(document).on('click', '#btn_add_candidate_manual', function (e) {
-                window_candidate = PopupCenterDual("{!! route('admin.candidates.create').'?exam_id='.$exam->id.'&studentBac2_id=0' !!}",'Add new Candidate','1200','960');
-            });
-
             var iconUrl1 = "{{url('plugins/jstree/img/department.png')}}";
             var iconUrl2 = "{{url('plugins/jstree/img/role.png')}}";
             var iconUrl3 = "{{url('plugins/jstree/img/employee.png')}}";
@@ -350,87 +402,17 @@
 
             initJsTree_StaffRole($('#all_staff_role'), '{{route('admin.exam.get-all-departements',$exam->id)}}', '{{route('admin.exam.get-all-positions',$exam->id)}}','{{route('admin.exam.get-all-staffs-by-position',$exam->id)}}', iconUrl1, iconUrl2, iconUrl3 );
 
-            $("#btn-candidate-refresh").click(function(){
-                refresh_candidate_list();
-            });
-
-            $("#btn-candidate-generate-room").click(function(){
-                $.ajax({
-                    type: 'GET',
-                    url: "{{route('admin.exam.candidate.generate_room',$exam->id)}}",
-                    dataType: "json",
-                    success: function(resultData) {
-                        if(resultData.status = true){
-                            notify('success','Generate Room', resultData.message);
-                            candidate_datatable.draw();
-                        } else {
-                            notify('error','Generate Room', resultData.message);
-                        }
-                    }
-                });
-            });
 
             $("#btn-secret-code").click(function(){
                 window_secret_code = PopupCenterDual('{{route("admin.exam.view_room_secret_code",$exam->id)}}','Room Secret Code','1200','960');
             });
 
-            $("#btn-add-course").click(function(){
-                window_course = PopupCenterDual('{{route("admin.entranceExamCourses.create")}}'+'?exam_id='+'{{$exam->id}}','Course for exam','800','470');
-            });
 
             // Close any open window upon this main window is closed or refreshed
 
-            window.onunload = function() {
-                if (window_bac2 && !window_bac2.closed) {
-                    window_bac2.close();
-                }
-                if (window_candidate && !window_candidate.closed) {
-                    window_candidate.close();
-                }
-                if (window_course && !window_course.closed) {
-                    window_course.close();
-                }
-                if (window_secret_code && !window_secret_code.closed) {
-                    window_secret_code.close();
-                }
-            };
 
             /* ------------------------------------------------  Room Exam Section -------------------------------------------*/
-            /* -------- Function Area -------- */
-            function get_total_seat(){
-                $.ajax({
-                    type: 'GET',
-                    url: "{{route('admin.exam.count_seat_exam',$exam->id)}}",
-                    dataType: "json",
-                    success: function(resultData) {
-                        $('#all_reserve_seat').html(resultData.seat_exam);
-                    }
-                });
-            }
 
-            function disable_room_editing(){
-                $('#exam_room_list_table tbody').removeClass('editing');
-                $('#exam_room_list_table input:checkbox').prop("disabled", true);
-                $('#exam_room_list_table tr').removeClass('highlight');
-                $('#exam_room_list_table input:checkbox').prop('checked',false);
-                $('#btn_room_modify').show();
-                $('.room_editing').hide();
-            }
-
-            function enable_room_editing(){
-                if(($('[name="exam_room[]"]:checked').length > 0)){
-                    $('#btn_room_merge').prop('disabled',false);
-                    $('#btn_room_delete').prop('disabled',false);
-                }else{
-                    $('#btn_room_merge').prop('disabled',true);
-                    $('#btn_room_delete').prop('disabled',true);
-                }
-
-                $('#exam_room_list_table tbody').addClass('editing');
-                $('#exam_room_list_table input:checkbox').prop("disabled", false);
-                $('#btn_room_modify').hide();
-                $('.room_editing').show();
-            }
 
             /* ---------- Event Area --------- */
             get_total_seat(); // Count total seat after page ready
@@ -609,22 +591,65 @@
                     }
                 });
             });
+
             /* ------------------------------------------------------------------------ Candidate Section ------------------------------------------------------------------ */
 
-            var candidate_window = null;
+
+            $(document).on('click', '#btn_add_candidate', function (e) {
+                window_bac2 = PopupCenterDual('{{route("admin.studentBac2.popup_index")."?exam_id=".$exam->id}}','Add new customer','1200','960');
+            });
+
+            $(document).on('click', '#btn_add_candidate_manual', function (e) {
+                window_candidate = PopupCenterDual("{!! route('admin.candidates.create').'?exam_id='.$exam->id.'&studentBac2_id=0' !!}",'Add new Candidate','1200','960');
+            });
+
+            $("#btn-candidate-refresh").click(function(){
+                refresh_candidate_list();
+            });
+
+            // check if there is missing candidates in a separate request
+            $(document).ready(function(){
+                check_missing_candidates();
+            });
+
+            $("#btn-candidate-generate-room").click(function(){
+                $.ajax({
+                    type: 'GET',
+                    url: "{{route('admin.exam.candidate.generate_room',$exam->id)}}",
+                    dataType: "json",
+                    success: function(resultData) {
+                        if(resultData.status = true){
+                            notify('success','Generate Room', resultData.message);
+                            candidate_datatable.draw();
+                        } else {
+                            notify('error','Generate Room', resultData.message);
+                        }
+                    }
+                });
+            });
+
+
+
             $(document).on('click','.btn_candidate_edit',function(e){
                 e.preventDefault();
                 candidate_window = PopupCenterDual($(this).attr('href'),'Update Candidate','1200','960');
             });
 
-            /* ------------------------------------------------------------------------ Candidate Section ------------------------------------------------------------------ */
 
-            var course_window = null;
-            $(document).on('click','.btn_course_edit',function(e){
+            $(document).on('click','#btn_show_missing_candidate',function(e){
                 e.preventDefault();
-                course_window = PopupCenterDual($(this).data('remote'),'Update Entrance Exam Course','1200','960');
+                window_missing_candidate = PopupCenterDual($(this).attr('href'),'Missing Candidate Register IDs','1200','960');
             });
 
+            /* ------------------------------------------------------------------------ Course Section ------------------------------------------------------------------ */
+            $("#btn-add-course").click(function(){
+                window_course = PopupCenterDual('{{route("admin.entranceExamCourses.create")}}'+'?exam_id='+'{{$exam->id}}','Course for exam','800','470');
+            });
+
+            $(document).on('click','.btn_course_edit',function(e){
+                e.preventDefault();
+                window_course = PopupCenterDual($(this).data('remote'),'Update Entrance Exam Course','1200','960');
+            });
 
             /* ------------------ Checkbox Event ---------------------*/
             $(document).on("click","#exam_room_list_table input:checkbox", function(){
@@ -671,16 +696,25 @@
         });
 
 
-        // Close all relevant windows
         window.onunload = function() {
-            if (candidate_window && !candidate_window.closed) {
-                candidate_window.close();
+            if (window_bac2 && !window_bac2.closed) {
+                window_bac2.close();
+            }
+            if (window_candidate && !window_candidate.closed) {
+                window_candidate.close();
+            }
+            if (window_course && !window_course.closed) {
+                window_course.close();
+            }
+            if (window_secret_code && !window_secret_code.closed) {
+                window_secret_code.close();
             }
 
-            if (course_window && !course_window.closed) {
-                course_window.close();
+            if (window_missing_candidate && !window_missing_candidate.closed) {
+                window_missing_candidate.close();
             }
         };
+
 
     </script>
 
