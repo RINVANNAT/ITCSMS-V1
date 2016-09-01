@@ -1003,14 +1003,18 @@ class ExamController extends Controller
 
     public function check_missing_candidates($exam_id){
         $candidate_register_ids = Candidate::where('exam_id',$exam_id)->orderBy('register_id', 'ASC')->lists('register_id')->toArray();
-        //dd($candidate_register_ids);
-        $missing = array_diff(range(1, max($candidate_register_ids)), $candidate_register_ids);
+        if(count($candidate_register_ids)>0){
+            $missing = array_diff(range(1, max($candidate_register_ids)), $candidate_register_ids);
 
-        if(count($missing)>0){
-            return Response::json(array('status'=>true));
+            if(count($missing)>0){
+                return Response::json(array('status'=>true)); // There are some missing
+            } else {
+                return Response::json(array('status'=>false));
+            }
         } else {
-            return Response::json(array('status'=>false));
+            return Response::json(array('status'=>false)); // Nothing is missing
         }
+
     }
 
     public function find_missing_candidates($exam_id){
