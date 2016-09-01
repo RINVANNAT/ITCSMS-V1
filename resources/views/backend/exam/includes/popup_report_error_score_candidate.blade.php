@@ -137,20 +137,20 @@
                                             {!! Form::hidden('order[]', $errorScore->candidate_number_in_room, ['class' => 'form-control']) !!}
                                         </div>
                                         <div class="col-sm-2">
-                                            {!! Form::text('score_c[]', null, ['class' => 'form-control number_only enlarge-number score_c input_new_correction']) !!}
+                                            {!! Form::text('score_c[]', 0, ['class' => 'form-control number_only enlarge-number score_c input_new_correction']) !!}
 
                                         </div>
                                         <div class="col-sm-2">
-                                            {!! Form::text('score_w[]', null, ['class' => 'form-control number_only enlarge-number score_w input_new_correction']) !!}
+                                            {!! Form::text('score_w[]', 0, ['class' => 'form-control number_only enlarge-number score_w input_new_correction']) !!}
 
                                         </div>
                                         <div class="col-sm-2">
-                                            {!! Form::text('score_na[]', null, ['class' => 'form-control number_only enlarge-number score_na input_new_correction']) !!}
+                                            {!! Form::text('score_na[]', 0, ['class' => 'form-control number_only enlarge-number score_na input_new_correction']) !!}
                                             {!! Form::hidden('course_id[]', $errorScore->course_id, ['class' => 'form-control']) !!}
                                         </div>
 
                                         <div class="col-sm-1">
-                                            {!! Form::text('score_total[]', null, ['class' => 'form-control enlarge-number score_total', 'disabled']) !!}
+                                            {!! Form::text('score_total[]', 0, ['class' => 'form-control enlarge-number score_total', 'disabled']) !!}
                                         </div>
 
                                         <div class="col-sm-1 enlarge-number ">
@@ -211,12 +211,36 @@
 
            $(".new_correction_form").on('submit',function(e){
                e.preventDefault();
+               var data = $(this).serializeArray();
+               var status = 0;
+               $.each(data, function(index,value) {
+                    if(value.name =='score_c[]') {
+                        if(value.value == '') {
+                            status++
+                        }
+                    }
+                   if(value.name =='score_w[]') {
+                       if(value.value == '') {
+                           status++
+                       }
+                   }
+                   if(value.name =='score_na[]') {
+                       if(value.value == '') {
+                           status++
+                       }
+                   }
+               });
                var baseData =$(this).serialize();
                var baseUrl = "{{route('admin.exam.add_new_correction_score',$exam_id)}}";
                var corrector_name = $('#corrector_error_score').val();
 
                if(corrector_name != '') {
-                   ajaxRequest('POST', baseUrl+'?corrector_name='+corrector_name,baseData );
+                   if(status == 0) {
+                       ajaxRequest('POST', baseUrl+'?corrector_name='+corrector_name,baseData );
+                   } else {
+                       notify("error","info", "Required Score Value!!");
+                   }
+
                } else {
                    notify("error","info", "Please Add The Corrector Name!!!");
                }
