@@ -503,14 +503,10 @@ class EloquentTempEmployeeExamRepository implements TempEmployeeExamRepositoryCo
             $selectedRoomIds[] = $staffWithselectedRoom->room_id;
         }
 
-        $rooms = DB::table('rooms')
+        $rooms = DB::table('examRooms')
             ->join('buildings', 'rooms.building_id', '=', 'buildings.id')
-            ->where([
-                ['is_exam_room', '=', true],
-                ['rooms.active', '=', true]
-            ])
-            ->whereNotIn('rooms.id', $selectedRoomIds)
-            ->select('rooms.name as room_name', 'rooms.id as room_id', 'buildings.code')
+            ->whereNotIn('examRooms.id', $selectedRoomIds)
+            ->select('examRooms.name as room_name', 'examRooms.id as room_id', 'buildings.code')
             ->get();
 
         foreach($rooms as $room) {
@@ -523,29 +519,25 @@ class EloquentTempEmployeeExamRepository implements TempEmployeeExamRepositoryCo
 
         $allstaffWithselectedRooms = [];
 
-        $roomForTempStaffs = DB::table('rooms')
-            ->join('role_temporary_staff_exams', 'rooms.id', '=', 'role_temporary_staff_exams.room_id')
+        $roomForTempStaffs = DB::table('examRooms')
+            ->join('role_temporary_staff_exams', 'examRooms.id', '=', 'role_temporary_staff_exams.room_id')
             ->join('tempEmployees', 'tempEmployees.id', '=', 'role_temporary_staff_exams.temp_employee_id')
-            ->join('buildings', 'buildings.id', '=', 'rooms.building_id')
+            ->join('buildings', 'buildings.id', '=', 'examRooms.building_id')
             ->where([
-                ['rooms.active', '=', true],
-                ['rooms.is_exam_room', '=', true],
                 ['tempEmployees.active', '=', true]
             ])
-            ->select('tempEmployees.name_kh as staff_name ', 'tempEmployees.id as staff_id', 'rooms.name as room_name', 'rooms.id as room_id', 'buildings.code as building_code')
+            ->select('tempEmployees.name_kh as staff_name ', 'tempEmployees.id as staff_id', 'examRooms.name as room_name', 'examRooms.id as room_id', 'buildings.code as building_code')
             ->get();
 
-        $roomForPermanentStaffs = DB::table('rooms')
-            ->join('role_permanent_staff_exams', 'rooms.id', '=', 'role_permanent_staff_exams.room_id')
+        $roomForPermanentStaffs = DB::table('examRooms')
+            ->join('role_permanent_staff_exams', 'examRooms.id', '=', 'role_permanent_staff_exams.room_id')
             ->join('employees', 'employees.id', '=', 'role_permanent_staff_exams.employee_id')
-            ->join('buildings', 'buildings.id', '=', 'rooms.building_id')
+            ->join('buildings', 'buildings.id', '=', 'examRooms.building_id')
             ->join('departments', 'employees.department_id', '=', 'departments.id')
             ->where([
-                ['rooms.active', '=', true],
-                ['rooms.is_exam_room', '=', true],
                 ['employees.active', '=', true]
             ])
-            ->select('employees.name_kh as staff_name ', 'employees.id as staff_id', 'rooms.name as room_name', 'rooms.id as room_id', 'buildings.code as building_code', 'departments.name_en as department_name')
+            ->select('employees.name_kh as staff_name ', 'employees.id as staff_id', 'examRooms.name as room_name', 'examRooms.id as room_id', 'buildings.code as building_code', 'departments.name_en as department_name')
             ->get();
 
         if($roomForTempStaffs) {

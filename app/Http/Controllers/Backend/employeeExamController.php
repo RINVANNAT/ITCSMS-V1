@@ -244,34 +244,30 @@ class employeeExamController extends Controller
 
 
         if($departmentName == 'Ministry') {
-            $tempRooms = DB::table('rooms')
-                ->join('role_temporary_staff_exams', 'role_temporary_staff_exams.room_id', '=', 'rooms.id')
+            $tempRooms = DB::table('examRooms')
+                ->join('role_temporary_staff_exams', 'role_temporary_staff_exams.room_id', '=', 'examRooms.id')
                 ->join('tempEmployees', 'tempEmployees.id', '=', 'role_temporary_staff_exams.temp_employee_id')
                 ->join('buildings', 'rooms.building_id', '=', 'buildings.id')
                 ->where([
                     ['tempEmployees.id', '=', $staffId],
-                    ['rooms.is_exam_room', true],
-                    ['rooms.active', true],
                     ['tempEmployees.active', true]
                 ])
-                ->select('rooms.name as room_name', 'rooms.id as room_id', 'buildings.code')
+                ->select('examRooms.name as room_name', 'examRooms.id as room_id', 'buildings.code')
                 ->get();
 
             if($tempRooms) {
                 return $tempRooms;
             }
         } else {
-            $perRooms = DB::table('rooms')
-                ->join('role_permanent_staff_exams', 'role_permanent_staff_exams.room_id', '=', 'rooms.id')
+            $perRooms = DB::table('examRooms')
+                ->join('role_permanent_staff_exams', 'role_permanent_staff_exams.room_id', '=', 'examRooms.id')
                 ->join('employees', 'employees.id', '=', 'role_permanent_staff_exams.employee_id')
-                ->join('buildings', 'rooms.building_id', '=', 'buildings.id')
+                ->join('buildings', 'examRooms.building_id', '=', 'buildings.id')
                 ->where([
                     ['role_permanent_staff_exams.employee_id', '=', $staffId],
-                    ['rooms.is_exam_room', true],
-                    ['rooms.active', true],
                     ['employees.active', true]
                 ])
-                ->select('rooms.name as room_name', 'rooms.id as room_id', 'buildings.code')
+                ->select('examRooms.name as room_name', 'examRooms.id as room_id', 'buildings.code')
                 ->get();
             if($perRooms) {
                 return $perRooms;
@@ -484,14 +480,10 @@ class employeeExamController extends Controller
             $roomIds[] = $roomId;
         }
 
-        $notSelectedRooms = DB::table('rooms')
-            ->join('buildings', 'rooms.building_id', '=', 'buildings.id')
-            ->whereNotIn('rooms.id', $roomIds)
-            ->where([
-                ['is_exam_room', '=', true],
-                ['rooms.active', '=', true]
-            ])
-            ->select('rooms.name as room_name', 'rooms.id as room_id', 'buildings.code')
+        $notSelectedRooms = DB::table('examRooms')
+            ->join('buildings', 'examRooms.building_id', '=', 'buildings.id')
+            ->whereNotIn('examRooms.id', $roomIds)
+            ->select('examRooms.name as room_name', 'examRooms.id as room_id', 'buildings.code')
             ->get();
 
         foreach($notSelectedRooms as $notSelectedRoom) {
