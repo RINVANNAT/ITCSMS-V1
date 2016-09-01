@@ -545,7 +545,13 @@ class ExamController extends Controller
                 foreach($roomCodes as $roomCode) {
 
                     $check =0;
-                    $numberOfCandidateInEachRoom = DB::table('candidates')->where('candidates.room_id', $roomCode->room_id)->select('candidates.id as candidate_id')->get();
+                    $numberOfCandidateInEachRoom = DB::table('candidates')
+                        ->where([
+                            ['candidates.room_id', $roomCode->room_id],
+                            ['candidates.active', '=', true]
+                        ])
+                        ->select('candidates.id as candidate_id')
+                        ->get();
 
                     if($numberOfCandidateInEachRoom) {
 
@@ -609,10 +615,12 @@ class ExamController extends Controller
 
     }
 
-    public function insertScoreForEachCandiate($exam_id, Request $request) {
-//        Requests\Backend\Exam\StoreEntranceExamScoreRequest
+    public function insertScoreForEachCandiate($exam_id, Requests\Backend\Exam\StoreEntranceExamScoreRequest $request) {
+
+//        dd($request->request);
+
         $requestDatas = $_POST;
-//        dd($requestDatas);
+
         $candidates = $this->exams->insertCandidateScore($exam_id, $requestDatas);
 
         if($candidates['status']) {
@@ -626,7 +634,10 @@ class ExamController extends Controller
     public function reportErrorCandidateScores($exam_id, Request $request) {
 
         $errorCandidateScores = $this->exams->reportErrorCandidateExamScores($exam_id, $request->course_id);
-        $totalQuestions = DB::table('entranceExamCourses')->select('total_question')->get();
+        $totalQuestions = DB::table('entranceExamCourses')
+            ->where('entranceExamCourses.active', '=', true)
+            ->select('total_question')
+            ->get();
         foreach($totalQuestions as $totalQuestion) {
             $totalQuestion = $totalQuestion->total_question;
         }
@@ -652,7 +663,10 @@ class ExamController extends Controller
         $errorStatus=false;
         $courses = [];
         $courseIds = DB::table('entranceExamCourses')
-                    ->where('exam_id', '=', $exam_id)
+                    ->where([
+                        ['exam_id', '=', $exam_id],
+                        ['entranceExamCourses.active', '=', true]
+                    ])
                     ->select('id as course_id', 'name_en as course_name')->get();
         if($courseIds) {
             foreach($courseIds as $courseId) {
@@ -699,6 +713,7 @@ class ExamController extends Controller
                     ->where([
                         ['candidates.exam_id', '=', $examId],
                         ['candidateEntranceExamScores.entrance_exam_course_id', '=', $courseId ],
+                        ['candidates.active', '=', true],
                         ['candidateEntranceExamScores.is_completed', '=', true]
                     ])
                     ->select('candidateEntranceExamScores.entrance_exam_course_id','candidates.id as candidate_id','candidates.name_kh', 'candidateEntranceExamScores.score_c', 'candidateEntranceExamScores.score_w', 'candidateEntranceExamScores.score_na')
@@ -811,12 +826,14 @@ class ExamController extends Controller
                 }
             }
 
-            $nonExamingCandidateIds = DB::table('candidates')->select('candidates.id as candidate_id')
+            $nonExamingCandidateIds = DB::table('candidates')
+                ->select('candidates.id as candidate_id')
                 ->whereNotIn('candidates.id', $candidateIds)
+                ->where('candidates.active', '=', true)
                 ->get();
 
             foreach($nonExamingCandidateIds as $nonExamingCandidateId) {
-                $fail = $this->updateCandidateResultScore($nonExamingCandidateId->candidate_id,0, 'Fail' );
+                $fail = $this->updateCandidateResultScore($nonExamingCandidateId->candidate_id,null, 'Reject' );
             }
         }
 
@@ -829,11 +846,60 @@ class ExamController extends Controller
     public function candidateResultLists(Request $request) {
 
         $examId = $request->exam_id;
-        $candidatesResults = DB::table('candidates')->select('name_kh','name_latin', 'result','total_score', 'id')->get();
-
-        usort($candidatesResults, array($this, "sortCandidateRank"));
+        $candidatesResults = $this->getCandidateResult();
 
         return view('backend.exam.includes.examination_candidates_result', compact('candidatesResults', 'examId'));
+    }
+
+    private function getCandidateResult() {
+
+        $studentPassed = DB::table('candidates')
+            ->where([
+                ['candidates.result', '=', 'Pass'],
+                ['candidates.active', '=', true]
+
+            ])
+            ->select('name_kh','name_latin', 'result','total_score', 'id')
+            ->get();
+
+        $studentReserved = DB::table('candidates')
+            ->where([
+                ['candidates.result', '=', 'Reserve'],
+                ['candidates.active', '=', true]
+            ])
+            ->select('name_kh','name_latin', 'result','total_score', 'id')
+            ->get();
+
+        $studentFail = DB::table('candidates')
+            ->where([
+                ['candidates.result', '=', 'Fail'],
+                ['candidates.active', '=', true]
+        ])
+            ->select('name_kh','name_latin', 'result','total_score', 'id')
+            ->get();
+
+        $studentReject = DB::table('candidates')
+            ->where([
+                ['candidates.result', '=', 'Reject'],
+                ['candidates.active', '=', true]
+            ])
+            ->select('name_kh','name_latin', 'result','total_score', 'id')
+            ->get();
+
+        usort($studentPassed, array($this, "sortCandidateRank"));
+        usort($studentReserved, array($this, "sortCandidateRank"));
+        usort($studentFail, array($this, "sortCandidateRank"));
+
+
+        $candidateTmp1 =  array_merge((array) $studentPassed, (array) $studentReserved);
+        $candidateTmp2 = array_merge((array) $studentFail, (array) $studentReject);
+
+        $candidateResults = array_merge((array) $candidateTmp1, (array) $candidateTmp2);
+
+
+        return $candidateResults;
+
+
     }
 
     public function printCandidateResultLists(Request $request) {
@@ -843,10 +909,7 @@ class ExamController extends Controller
 
         } else {
 
-            $candidatesResults = DB::table('candidates')->select('name_kh','name_latin', 'result','total_score', 'id')->get();
-
-            usort($candidatesResults, array($this, "sortCandidateRank"));
-
+            $candidatesResults = $this->getCandidateResult();
             $candidatesResults = array_chunk($candidatesResults, 30);
 
             return view('backend.exam.print.examination_candidates_result', compact('candidatesResults'));
@@ -861,7 +924,10 @@ class ExamController extends Controller
     private function updateCandidateResultScore($candidateId,$totalScore, $status) {
 
         $updateCandidateScore = DB::table('candidates')
-            ->where('id', '=', $candidateId )
+            ->where([
+                ['id', '=', $candidateId ],
+                ['candidates.active', '=', true]
+            ])
             ->update(array(
                 'total_score' => $totalScore,
                 'result' => $status,

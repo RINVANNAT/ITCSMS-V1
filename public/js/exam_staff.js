@@ -87,6 +87,8 @@
             "plugins" : [
                 "wholerow",'checkbox', "contextmenu", "search", "state","types", "html_data"
             ]
+        }).on('loaded.jstree', function() {
+            object.jstree('open_all');
         });
 
     }
@@ -129,9 +131,13 @@
             "plugins" : [
                 "wholerow",'checkbox', "contextmenu", "search", "state","types"
             ]
+        }).on('loaded.jstree', function() {
+            object.jstree('open_all');
         });
 
     }
+
+
 
     function remove_role(mix_array){
         var result = [];
@@ -239,8 +245,24 @@
 
                     });
                 }
+
                 $('#all_staff_role').jstree("refresh");
                 $('#selected_staffs').jstree("refresh");
+
+                $('#selected_staffs').on("refreshed.jstree", function (event, data)
+                {
+                    $('#selected_staffs').jstree("open_all");
+                });
+
+
+
+                $('#all_staff_role').on("refreshed.jstree", function (event, data)
+                {
+                    $('#selected_staffs').jstree("open_all");
+                });
+
+
+
                 if($("#all_staff_role").jstree('get_selected').length == 0) {
                     $('#btn_save_staff_role').hide();
                 }

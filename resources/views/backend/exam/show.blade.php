@@ -828,7 +828,9 @@
 
             var baseUrl  = '{!! route('admin.exam.assign_role_staff_lists', $exam->id) !!}';
             var window_view_role_staff = PopupCenterDual(baseUrl, 'View Role For Each staff', '1000', '1200');
-        })
+        });
+
+
     </script>
 
 @stop

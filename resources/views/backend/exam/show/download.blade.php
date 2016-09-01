@@ -64,6 +64,19 @@
                     <div class="desc">Correction sheets</div>
                 </div>
 
+                <div class="img">
+                    @permission('download-examination-document')
+                    <a id="download_candidate_result" target="_blank" href="{{route('print_candidate_result_lists', '/status='.'request_print_page')}}">
+                    @endauth
+
+                        <img src="{{url('img/exam/candidate_score_list.png')}}" alt="Mountains" width="300" height="200">
+
+                    @permission('download-examination-document')
+                    </a>
+                    @endauth
+                    <div class="desc">Candidate Result Sheet</div>
+                </div>
+
             </div>
         </div>
 

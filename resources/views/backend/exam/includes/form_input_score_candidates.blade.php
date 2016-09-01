@@ -12,6 +12,9 @@
             .enlarge-number{
                 font-size: 28px;
             }
+            .defaul_numer{
+                color: darkred;
+            }
         </style>
         <div class="box-header with-border">
             <h3 class="box-title "> <span class="enlarge-number">Input Score</span> </h3>
@@ -90,41 +93,40 @@
 
                                 {!! Form::open(['route' => ['admin.exam.insert_exam_score_candidate',$exam_id], 'class' => 'form-horizontal table_score', 'role' => 'form', 'method' => 'post']) !!}
 
+                                {!! Form::hidden('sequence', $number_correction, ['class' => 'form-control ']) !!}
                                 @if($candidates)
                                     @foreach ($candidates as $candidate)
                                         <?php $i++; ?>
                                         <tr class="enlarge-number">
                                             <td style="text-align: center" class="candidate_score_id">
-                                                {!! Form::hidden('candidate_score_id_'.$i."[score_id]", $candidate->candidate_score_id, ['class' => 'form-control']) !!}
+                                                {!! Form::hidden('score_id[]', $candidate->candidate_score_id, ['class' => 'form-control']) !!}
                                                 {{--<input type="hidden" name="sequence" value="{{$number_correction}}">--}}
-
-                                                {!! Form::hidden('candidate_score_id_'.$i."[sequence]", $number_correction, ['class' => 'form-control ']) !!}
 
                                                 {{--<input type="hidden" name="candidate_id" value="{{$candidate->candidate_id}}">--}}
 
-                                                {!! Form::hidden('candidate_score_id_'.$i."[candidate_id]", $candidate->candidate_id, ['class' => 'form-control']) !!}
+                                                {!! Form::hidden('candidate_id[]', $candidate->candidate_id, ['class' => 'form-control']) !!}
 
                                                 {{--<input type="hidden" name="course_id" value="{{$subjectId}}">--}}
 
-                                                {!! Form::hidden('candidate_score_id_'.$i."[course_id]", $subjectId, ['class' => 'form-control']) !!}
+                                                {!! Form::hidden('course_id[]', $subjectId, ['class' => 'form-control']) !!}
 
                                                 <?php echo $i;?>
                                             </td>
 
                                             <td>
-                                                {!! Form::text('candidate_score_id_'.$i."[correct]", $candidate->score_c, ['class' => 'form-control inputs_score enlarge-number number_only validate_'.$i,'id'=>'correct_'.$i]) !!}
+                                                {!! Form::text('score_c[]', $candidate->score_c==null?0:$candidate->score_c, ['class' => 'form-control inputs_score enlarge-number number_only validate_score input_score_c validate_'.$i,'id'=>'correct_'.$i]) !!}
                                             </td>
 
                                             <td>
-                                                {!! Form::text('candidate_score_id_'.$i."[wrong]", $candidate->score_w, ['class' => 'form-control  inputs_score enlarge-number number_only validate_'.$i,'id'=>'wrong_ans_'.$i]) !!}
+                                                {!! Form::text('score_w[]', $candidate->score_w==null?0:$candidate->score_w, ['class' => 'form-control  inputs_score enlarge-number number_only validate_score input_score_w validate_'.$i,'id'=>'wrong_ans_'.$i]) !!}
                                             </td>
 
                                             <td>
-                                                {!! Form::text('candidate_score_id_'.$i."[na]", $candidate->score_na, ['class' => 'form-control inputs_score enlarge-number number_only validate_'.$i,'id'=>'no_'.$i]) !!}
+                                                {!! Form::text('score_na[]', $candidate->score_na==null?0:$candidate->score_na, ['class' => 'form-control inputs_score enlarge-number number_only validate_score input_score_na validate_'.$i,'id'=>'no_'.$i]) !!}
                                             </td>
 
                                             <td>
-                                                {!! Form::text('candidate_score_id_'.$i."[total]", null, ['class' => 'form-control enlarge-number number_only validate_'.$i,'id'=>'total_'.$i, 'disabled', 'placeholder'=>$candidate->total_question]) !!}
+                                                {!! Form::text('score_total[]', null, ['class' => 'form-control enlarge-number number_only validate_'.$i,'id'=>'total_'.$i, 'disabled', 'placeholder'=>$candidate->total_question]) !!}
                                             </td>
                                         </tr>
                                     @endforeach
@@ -195,33 +197,47 @@
 
             $("#btn_save_candidate_score").click(function() {
 
-                ajaxRequest('POST', $( "form.table_score").attr('action'), $( "form.table_score" ).serialize() );
-            });
-
-            $(document).ready(function () {
-
-                // to disable of string inputted
-                $(".number_only").keypress(function (e) {
-                    if (e.which != 8 && e.which != 0 && (e.which < 48 || e.which > 57)) {
-                        return false;
+                var data = $( "form.table_score" ).serializeArray();
+                var check =0;
+                var status = 0;
+                $.each(data, function(index, value) {
+                    if(value.name == 'score_id[]') {
+                        check++;
                     }
                 });
 
-                var length = JSON.parse('<?php echo $i ?>');
+               for(var i =1 ; i <= check; i++) {
+                   if( $("input#total_"+i).val() == 0) {
+                       console.log($("input#total_"+i).val());
+                       status++;
+                   }
+               }
+                if(status > 0) {
 
-                for(var k=1; k<=length; k++) {
-
-                    $('.validate_'+k).on('keydown keyup', function() {
-                        console.log(k);
-                        calculateSum(length);
+                    swal({
+                        title: "Confirm",
+                        text: "You have inputted 0 Value!!!",
+                        type: "info",
+                        showCancelButton: true,
+                        confirmButtonColor: "#DD6B55",
+                        confirmButtonText: "Yes",
+                        closeOnConfirm: true
+                    }, function(confirmed) {
+                        if (confirmed) {
+                            ajaxRequest('POST', $( "form.table_score").attr('action'), $( "form.table_score" ).serialize());
+                        }
                     });
-
-                    if($('.validate_'+k).val()) {
-                        calculateSum(length);
-                        $('.validate_'+k).css("background-color", "#FEFFB0");
-                    }
+                } else {
+                    ajaxRequest('POST', $( "form.table_score").attr('action'), $( "form.table_score" ).serialize());
                 }
 
+            });
+
+            // to disable of string inputted
+            $(".number_only").keypress(function (e) {
+                if (e.which != 8 && e.which != 0 && (e.which < 48 || e.which > 57)) {
+                    return false;
+                }
             });
 
             // when typing enter key to focus on the under input field
@@ -232,32 +248,46 @@
                 }
             });
 
-
             // calculation input value on each row
 
+            var length = JSON.parse('<?php echo $i ?>');
+            calculateSum(length);
+
+            for(var k=1; k<=length; k++) {
+
+                $('.validate_'+k).on('keyup', function() {
+
+                    calculateSum(length);
+
+                });
+            }
             function calculateSum(length) {
+
                 var total_question = JSON.parse('{{$candidate->total_question}}');
-                for(var i=1; i<=length; i++) {
+
+                for(var i=1; i<= length; i++) {
                     var sum =0;
                     $(".validate_"+i).each(function() {
                         if (!isNaN(this.value) && this.value.length != 0) {
+
                             var tmp = sum;
                             sum += parseInt(this.value);
                             $(this).css("background-color", "#FEFFB0");
-                            if(tmp == total_question) {
-                                $("input#total_"+i).val(tmp).css("color", "");
+                            if(sum == total_question) {
 
+                                $("input#total_"+i).val(sum).css("color", "");
+
+
+                            } else if(sum == 0) {
+                                $(".validate_"+i).css("color", "red");
                             } else {
+                                $(".validate_"+i).css("color", "");
                                 $("input#total_"+i).val(tmp).css("color", "red");
                             }
-                        }
-                        else if (this.value.length != 0){
-                            $(this).css("background-color", "red");
                         }
                     });
 
                 }
-
             }
 
         </script>

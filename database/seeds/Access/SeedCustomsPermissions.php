@@ -529,13 +529,6 @@ class SeedCustomsPermissions extends Seeder
 
                         ],
                         [
-                            'name'          => 'request-input-score-form',
-                            'display_name'  => 'Get/Request Candidate List Form to Insert The Correction',
-                            'dependency'   => [
-                                'view-backend','view-exam-management'
-                            ]
-                        ],
-                        [
                             'name'          => 'report-error-on-inputted-score',
                             'display_name'  => 'Get Inputted Score Error && Add New Correction',
                             'dependency'   => [

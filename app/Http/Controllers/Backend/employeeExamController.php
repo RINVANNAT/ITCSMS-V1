@@ -32,15 +32,6 @@ class employeeExamController extends Controller
         $this->tempEmpolyeeExams = $tempEmpolyeeExams;
     }
 
-    public function getAll()
-    {
-
-        $name = 'vanat';
-        $tmpEmployeeExam = $this->tempEmpolyeeExams->getAllStaff();
-        dd($tmpEmployeeExam);
-
-    }
-
     public function getExaminationStaffByRole(Request $request, $id)
     {
 
@@ -175,6 +166,7 @@ class employeeExamController extends Controller
 
         $data = [];
         $tempEmployees = DB::table('tempEmployees')
+                    ->where('tempEmployees.active', '=', true)
                     ->select('id', 'name_kh', 'name_latin', 'email', 'phone', 'birthdate', 'address', 'gender_id', 'academic_year_id')
                     ->get();
         foreach( $tempEmployees as $tempEmployee) {
@@ -258,7 +250,9 @@ class employeeExamController extends Controller
                 ->join('buildings', 'rooms.building_id', '=', 'buildings.id')
                 ->where([
                     ['tempEmployees.id', '=', $staffId],
-                    ['rooms.is_exam_room', true]
+                    ['rooms.is_exam_room', true],
+                    ['rooms.active', true],
+                    ['tempEmployees.active', true]
                 ])
                 ->select('rooms.name as room_name', 'rooms.id as room_id', 'buildings.code')
                 ->get();
@@ -273,7 +267,9 @@ class employeeExamController extends Controller
                 ->join('buildings', 'rooms.building_id', '=', 'buildings.id')
                 ->where([
                     ['role_permanent_staff_exams.employee_id', '=', $staffId],
-                    ['rooms.is_exam_room', true]
+                    ['rooms.is_exam_room', true],
+                    ['rooms.active', true],
+                    ['employees.active', true]
                 ])
                 ->select('rooms.name as room_name', 'rooms.id as room_id', 'buildings.code')
                 ->get();
@@ -491,7 +487,10 @@ class employeeExamController extends Controller
         $notSelectedRooms = DB::table('rooms')
             ->join('buildings', 'rooms.building_id', '=', 'buildings.id')
             ->whereNotIn('rooms.id', $roomIds)
-            ->where('is_exam_room', true)
+            ->where([
+                ['is_exam_room', '=', true],
+                ['rooms.active', '=', true]
+            ])
             ->select('rooms.name as room_name', 'rooms.id as room_id', 'buildings.code')
             ->get();
 

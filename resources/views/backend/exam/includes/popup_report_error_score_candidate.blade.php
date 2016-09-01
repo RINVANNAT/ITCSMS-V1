@@ -114,34 +114,34 @@
                                     <form class="new_correction_form">
                                         <div class="col-sm-2 enlarge-number">
                                             <label for="order">{{$errorScoreProperties->candidateProperties->room_code}}</label>
-                                            {!! Form::hidden('candidate_id', $errorScoreProperties->candidateProperties->candidate_id, ['class' => 'form-control']) !!}
+                                            {!! Form::hidden('candidate_id[]', $errorScoreProperties->candidateProperties->candidate_id, ['class' => 'form-control']) !!}
 
                                         </div>
 
                                         <div class="col-sm-1 enlarge-number" >
                                             <label for="roomCode">{{$errorScore->candidate_number_in_room}}</label>
-                                            {!! Form::hidden('order', $errorScore->candidate_number_in_room, ['class' => 'form-control']) !!}
+                                            {!! Form::hidden('order[]', $errorScore->candidate_number_in_room, ['class' => 'form-control']) !!}
                                         </div>
                                         <div class="col-sm-2">
-                                            {!! Form::text('score_c', null, ['class' => 'form-control number_only enlarge-number score_c input_new_correction']) !!}
+                                            {!! Form::text('score_c[]', null, ['class' => 'form-control number_only enlarge-number score_c input_new_correction']) !!}
 
                                         </div>
                                         <div class="col-sm-2">
-                                            {!! Form::text('score_w', null, ['class' => 'form-control number_only enlarge-number score_w input_new_correction']) !!}
+                                            {!! Form::text('score_w[]', null, ['class' => 'form-control number_only enlarge-number score_w input_new_correction']) !!}
 
                                         </div>
                                         <div class="col-sm-2">
-                                            {!! Form::text('score_na', null, ['class' => 'form-control number_only enlarge-number score_na input_new_correction']) !!}
-                                            {!! Form::hidden('course_id', $errorScore->course_id, ['class' => 'form-control']) !!}
+                                            {!! Form::text('score_na[]', null, ['class' => 'form-control number_only enlarge-number score_na input_new_correction']) !!}
+                                            {!! Form::hidden('course_id[]', $errorScore->course_id, ['class' => 'form-control']) !!}
                                         </div>
 
                                         <div class="col-sm-1">
-                                            {!! Form::text('score_total', null, ['class' => 'form-control enlarge-number score_total', 'disabled']) !!}
+                                            {!! Form::text('score_total[]', null, ['class' => 'form-control enlarge-number score_total', 'disabled']) !!}
                                         </div>
 
                                         <div class="col-sm-1 enlarge-number ">
                                             <p style="border: 2px solid orangered; text-align: center" > {{$errorScore->sequence + 1}}</p>
-                                            {!! Form::hidden('sequence', $errorScore->sequence + 1, ['class' => 'form-control' ]) !!}
+                                            {!! Form::hidden('sequence[]', $errorScore->sequence + 1, ['class' => 'form-control' ]) !!}
                                         </div>
 
                                         <div class="col-sm-1 " style="margin-top: 5px" >
@@ -250,6 +250,7 @@
        function calculateSum(obj) {
 
            var total_question = JSON.parse('{{$totalQuestion}}');
+
            var score_c = isNaN(parseInt($(obj).closest('.new_correction').find('.score_c').val()))?0:parseInt($(obj).closest('.new_correction').find('.score_c').val());
            var score_w = isNaN(parseInt($(obj).closest('.new_correction').find('.score_w').val()))?0:parseInt($(obj).closest('.new_correction').find('.score_w').val());
            var score_na = isNaN(parseInt($(obj).closest('.new_correction').find('.score_na').val()))?0:parseInt($(obj).closest('.new_correction').find('.score_na').val());
