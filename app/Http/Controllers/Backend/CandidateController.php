@@ -202,16 +202,17 @@ class CandidateController extends Controller
             ->leftJoin('origins','candidates.province_id','=','origins.id')
             ->leftJoin('gdeGrades','candidates.bac_total_grade','=','gdeGrades.id')
             ->leftJoin('genders','candidates.gender_id','=','genders.id')
-            ->leftJoin('rooms','candidates.room_id','=','rooms.id')
-            ->leftJoin('buildings','rooms.building_id','=','buildings.id')
+            ->leftJoin('examRooms','candidates.room_id','=','examRooms.id')
+            ->leftJoin('buildings','examRooms.building_id','=','buildings.id')
             ->where('candidates.active',true)
             ->select([
-                'candidates.id',DB::raw("CONCAT(rooms.name,buildings.code) as room"),'candidates.register_id','candidates.name_kh','candidates.name_latin','genders.name_kh as gender_name_kh','gdeGrades.name_en as bac_total_grade',
+                'candidates.id',DB::raw("CONCAT(\"examRooms\".name,buildings.code) as room"),
+                'candidates.register_id','candidates.name_kh','candidates.name_latin','genders.name_kh as gender_name_kh','gdeGrades.name_en as bac_total_grade',
                 'origins.name_kh as province', 'dob','result','is_paid','is_register'
             ]);
 
         if($exam_id = Input::get('exam_id')){
-            $candidates = $candidates->where('exam_id',$exam_id);
+            $candidates = $candidates->where('candidates.exam_id',$exam_id);
         }
         if($academic_year_id = Input::get('academic_year_id')){
             $candidates = $candidates->where('academic_year_id',$exam_id);

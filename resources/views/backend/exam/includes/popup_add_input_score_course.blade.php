@@ -88,7 +88,7 @@
        var input_score_url = "{{route('admin.exam.request_input_score_form',$exam_id)}}";
 
        function ajaxRequest(method, baseUrl, baseData){
-           console.log('hello');
+
            $.ajax({
                type: method,
                url: baseUrl,

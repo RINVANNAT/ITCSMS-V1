@@ -308,7 +308,7 @@
                 columns: [
                     { data: 'register_id', name: 'candidates.register_id'},
                     { data: 'name_kh', name: 'candidates.name_kh'},
-                    { data: 'name_latin', name: 'candidates.name_en'},
+                    { data: 'name_latin', name: 'candidates.name_latin'},
                     { data: 'gender_name_kh', name: 'genders.name_kh'},
                     { data: 'dob', name: 'candidates.dob'},
                     { data: 'province', name: 'origins.name_kh'},

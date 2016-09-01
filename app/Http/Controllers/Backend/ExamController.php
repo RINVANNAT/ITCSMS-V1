@@ -29,6 +29,7 @@ use App\Http\Requests\Backend\Exam\ModifyExamRoomRequest;
 use App\Http\Requests\Backend\Candidate\GenerateRoomExamRequest;
 use App\Http\Requests\Backend\Exam\DownloadExaminationDocumentsRequest;
 
+
 class ExamController extends Controller
 {
     /**
@@ -579,7 +580,8 @@ class ExamController extends Controller
                             }
                         }
                         if($check !== count($numberOfCandidateInEachRoom)) {
-                            $rooms[$roomCode->room_id]=$roomCode->room_code;
+
+                            $rooms[$roomCode->room_id]=Crypt::decrypt($roomCode->room_code);
                         }
                     }
                 }
