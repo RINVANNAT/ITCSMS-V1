@@ -110,7 +110,7 @@
                     data: {room_ids:JSON.stringify(rooms)},
                     dataType: "json",
                     success: function(resultData) {
-                        alert('success');
+                        notify('success','Generate secret code', resultData.message);
                         $(document).find('.secret_code').each(function() {
                             $(this).prop('disabled', true);
                         });

@@ -254,7 +254,7 @@
             check_missing_candidates();
         }
 
-        /*---------- Functions for course ---------*/
+        /*----------------------------------------------------------------- Functions for course -------------------------------------------------------------------*/
 
         function update_ui_course(){
             course_datatable.draw();
@@ -299,110 +299,6 @@
 
         $(function(){
             $("#exam_show :input").attr("disabled", true);
-            candidate_datatable = $('#candidates-table').DataTable({
-                processing: true,
-                serverSide: true,
-                pageLength: {!! config('app.records_per_page')!!},
-                ajax: {
-                    url: '{!! route('admin.candidate.data')."?exam_id=".$exam->id !!}',
-                    method: 'POST'
-                },
-                columns: [
-                    { data: 'register_id', name: 'candidates.register_id'},
-                    { data: 'name_kh', name: 'candidates.name_kh'},
-                    { data: 'name_latin', name: 'candidates.name_latin'},
-                    { data: 'gender_name_kh', name: 'genders.name_kh'},
-                    { data: 'dob', name: 'candidates.dob'},
-                    { data: 'province', name: 'origins.name_kh'},
-                    { data: 'bac_total_grade', name: 'bac_total_grade'},
-                    { data: 'room', name: 'candidates.room', searchable:false},
-                    { data: 'result', name: 'candidates.result'},
-                    { data: 'action', name: 'action',orderable: false, searchable: false}
-                ]
-            });
-
-            if(exam_type_id == 1){
-                course_datatable = $('#table-exam-course').DataTable({
-                    processing: true,
-                    serverSide: true,
-                    pageLength: {!! config('app.records_per_page')!!},
-                    ajax: {
-                        url: '{!! route('admin.entranceExamCourses.data',$exam->id) !!}',
-                        method: 'POST',
-                        data:function(d){
-                            d.check_course_error = check_course_error;
-                        }
-                    },
-                    columns: [
-                        { data: 'name_kh', name: 'entranceExamCourses.name_kh'},
-                        { data: 'total_question', name: 'entranceExamCourses.total_question'},
-                        { data: 'description', name: 'entranceExamCourses.description'},
-                        { data: 'action', name: 'action',orderable: false, searchable: false}
-                    ]
-                });
-                enableDeleteRecord($('#table-exam-course'));
-            } else {
-                course_datatable = $('#table-exam-course').DataTable({
-                    processing: true,
-                    serverSide: true,
-                    pageLength: {!! config('app.records_per_page')!!},
-                    ajax: {
-                        url: '{!! route('admin.exam.get_courses',$exam->id) !!}',
-                        method: 'POST'
-                    },
-                    columns: [
-                        { data: 'name_kh', name: 'courseAnnuals.name_kh'},
-                        { data: 'semester', name: 'courseAnnuals.semester'},
-                        { data: 'academic_year', name: 'academicYears.name_kh'},
-                        { data: 'class', name: 'class', orderable:false, searchable:false},
-                        { data: 'lecturer', name: 'employees.name_kh'},
-                        { data: 'action', name: 'action',orderable: false, searchable: false}
-                    ]
-                });
-            }
-
-
-            enableDeleteRecord($('#candidates-table'));
-
-            $('#btn_check_course_error').on('click', function() {
-
-                check_course_error = true;
-                course_datatable.draw();
-            });
-
-            $('#candidates-table').on('click', '.btn-register[data-remote]', function (e) {
-                var url = $(this).data('remote');
-                e.preventDefault();
-                swal({
-                    title: "Confirm",
-                    text: "Register this candidate?",
-                    type: "info",
-                    showCancelButton: true,
-                    confirmButtonColor: "#DD6B55",
-                    confirmButtonText: "Yes, register it!",
-                    closeOnConfirm: true
-                }, function(confirmed) {
-                    if (confirmed) {
-                        $.ajaxSetup({
-                            headers: {
-                                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-                            }
-                        });
-
-                        // confirm then
-                        $.ajax({
-                            url: url,
-                            type: 'GET',
-                            dataType: 'json',
-                            success:function(data) {
-                                candidate_datatable.draw();
-                            }
-                        });
-                    }
-                });
-                return false;
-
-            });
 
             var iconUrl1 = "{{url('plugins/jstree/img/department.png')}}";
             var iconUrl2 = "{{url('plugins/jstree/img/role.png')}}";
@@ -414,11 +310,6 @@
             initJsTree_StaffRole($('#all_staff_role'), '{{route('admin.exam.get-all-departements',$exam->id)}}', '{{route('admin.exam.get-all-positions',$exam->id)}}','{{route('admin.exam.get-all-staffs-by-position',$exam->id)}}', iconUrl1, iconUrl2, iconUrl3 );
 
 
-            $("#btn-secret-code").click(function(){
-                window_secret_code = PopupCenterDual('{{route("admin.exam.view_room_secret_code",$exam->id)}}','Room Secret Code','1200','960');
-            });
-
-
             // Close any open window upon this main window is closed or refreshed
 
 
@@ -427,6 +318,10 @@
 
             /* ---------- Event Area --------- */
             get_total_seat(); // Count total seat after page ready
+
+            $("#btn-secret-code").click(function(){
+                window_secret_code = PopupCenterDual('{{route("admin.exam.view_room_secret_code",$exam->id)}}','Room Secret Code','1200','960');
+            });
 
             $("#generate_room_exam").click(function () {
                 $('#empty_room_notification').hide();
@@ -603,73 +498,21 @@
                 });
             });
 
-            /* ------------------------------------------------------------------------ Candidate Section ------------------------------------------------------------------ */
-
-
-            $(document).on('click', '#btn_add_candidate', function (e) {
-                window_bac2 = PopupCenterDual('{{route("admin.studentBac2.popup_index")."?exam_id=".$exam->id}}','Add new customer','1200','960');
-            });
-
-            $(document).on('click', '#btn_add_candidate_manual', function (e) {
-                window_candidate = PopupCenterDual("{!! route('admin.candidates.create').'?exam_id='.$exam->id.'&studentBac2_id=0' !!}",'Add new Candidate','1200','960');
-            });
-
-            $("#btn-candidate-refresh").click(function(){
-                refresh_candidate_list();
-            });
-
-            // check if there is missing candidates in a separate request
-            $(document).ready(function(){
-                check_missing_candidates();
-            });
-
-            $("#btn-candidate-generate-room").click(function(){
-                $.ajax({
-                    type: 'GET',
-                    url: "{{route('admin.exam.candidate.generate_room',$exam->id)}}",
-                    dataType: "json",
-                    success: function(resultData) {
-                        if(resultData.status = true){
-                            notify('success','Generate Room', resultData.message);
-                            candidate_datatable.draw();
-                        } else {
-                            notify('error','Generate Room', resultData.message);
-                        }
-                    }
-                });
-            });
-
-
-
-            $(document).on('click','.btn_candidate_edit',function(e){
-                e.preventDefault();
-                candidate_window = PopupCenterDual($(this).attr('href'),'Update Candidate','1200','960');
-            });
-
-
-            $(document).on('click','#btn_show_missing_candidate',function(e){
-                e.preventDefault();
-                window_missing_candidate = PopupCenterDual($(this).attr('href'),'Missing Candidate Register IDs','1200','960');
-            });
-
-            /* ------------------------------------------------------------------------ Course Section ------------------------------------------------------------------ */
-            $("#btn-add-course").click(function(){
-                window_course = PopupCenterDual('{{route("admin.entranceExamCourses.create")}}'+'?exam_id='+'{{$exam->id}}','Course for exam','800','470');
-            });
-
-            $(document).on('click','.btn_course_edit',function(e){
-                e.preventDefault();
-                window_course = PopupCenterDual($(this).data('remote'),'Update Entrance Exam Course','1200','960');
+            $("#exam_room_header").click(function(e){
+                if($(this).is(":checked")){
+                    $(".exam_room_checkbox:not(:checked)").trigger("click");
+                } else {
+                    $(".exam_room_checkbox:checked").trigger("click");
+                }
             });
 
             /* ------------------ Checkbox Event ---------------------*/
-            $(document).on("click","#exam_room_list_table input:checkbox", function(){
+            $(document).on("click","#exam_room_list_table [name='exam_room[]']", function(){
                 if($(this).is(":checked")){
                     $(this).closest('tr').addClass('highlight');
                 } else {
                     $(this).closest('tr').removeClass('highlight');
                 }
-
 
                 if(($('[name="exam_room[]"]:checked').length > 0)){
                     $('#btn_room_merge').prop('disabled',false);
@@ -702,6 +545,163 @@
                     }
                 });
             });
+            /* ------------------------------------------------------------------------ Candidate Section ------------------------------------------------------------------ */
+
+            candidate_datatable = $('#candidates-table').DataTable({
+                processing: true,
+                serverSide: true,
+                pageLength: {!! config('app.records_per_page')!!},
+                ajax: {
+                    url: '{!! route('admin.candidate.data')."?exam_id=".$exam->id !!}',
+                    method: 'POST'
+                },
+                columns: [
+                    { data: 'register_id', name: 'candidates.register_id'},
+                    { data: 'name_kh', name: 'candidates.name_kh'},
+                    { data: 'name_latin', name: 'candidates.name_latin'},
+                    { data: 'gender_name_kh', name: 'genders.name_kh'},
+                    { data: 'dob', name: 'candidates.dob'},
+                    { data: 'province', name: 'origins.name_kh'},
+                    { data: 'bac_total_grade', name: 'bac_total_grade'},
+                    { data: 'room', name: 'candidates.room', searchable:false},
+                    { data: 'result', name: 'candidates.result'},
+                    { data: 'action', name: 'action',orderable: false, searchable: false}
+                ]
+            });
+
+            $('#candidates-table').on('click', '.btn-register[data-remote]', function (e) {
+                var url = $(this).data('remote');
+                e.preventDefault();
+                swal({
+                    title: "Confirm",
+                    text: "Register this candidate?",
+                    type: "info",
+                    showCancelButton: true,
+                    confirmButtonColor: "#DD6B55",
+                    confirmButtonText: "Yes, register it!",
+                    closeOnConfirm: true
+                }, function(confirmed) {
+                    if (confirmed) {
+                        $.ajaxSetup({
+                            headers: {
+                                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                            }
+                        });
+
+                        // confirm then
+                        $.ajax({
+                            url: url,
+                            type: 'GET',
+                            dataType: 'json',
+                            success:function(data) {
+                                candidate_datatable.draw();
+                            }
+                        });
+                    }
+                });
+                return false;
+            });
+            enableDeleteRecord($('#candidates-table'));
+
+            $(document).on('click', '#btn_add_candidate', function (e) {
+                window_bac2 = PopupCenterDual('{{route("admin.studentBac2.popup_index")."?exam_id=".$exam->id}}','Add new customer','1200','960');
+            });
+
+            $(document).on('click', '#btn_add_candidate_manual', function (e) {
+                window_candidate = PopupCenterDual("{!! route('admin.candidates.create').'?exam_id='.$exam->id.'&studentBac2_id=0' !!}",'Add new Candidate','1200','960');
+            });
+
+            $("#btn-candidate-refresh").click(function(){
+                refresh_candidate_list();
+            });
+
+            // check if there is missing candidates in a separate request
+            $(document).ready(function(){
+                check_missing_candidates();
+            });
+
+            $("#btn-candidate-generate-room").click(function(){
+                toggleLoading(true);
+                $.ajax({
+                    type: 'GET',
+                    url: "{{route('admin.exam.candidate.generate_room',$exam->id)}}",
+                    dataType: "json",
+                    success: function(resultData) {
+                        if(resultData.status = true){
+                            toggleLoading(false);
+                            notify('success','Generate Room', resultData.message);
+                            candidate_datatable.draw();
+                        } else {
+                            notify('error','Generate Room', resultData.message);
+                        }
+                    }
+                });
+            });
+
+
+
+            $(document).on('click','.btn_candidate_edit',function(e){
+                e.preventDefault();
+                candidate_window = PopupCenterDual($(this).attr('href'),'Update Candidate','1200','960');
+            });
+
+
+            $(document).on('click','#btn_show_missing_candidate',function(e){
+                e.preventDefault();
+                window_missing_candidate = PopupCenterDual($(this).attr('href'),'Missing Candidate Register IDs','1200','960');
+            });
+
+            /* ------------------------------------------------------------------------ Course Section ------------------------------------------------------------------ */
+
+            if(exam_type_id == 1){
+                course_datatable = $('#table-exam-course').DataTable({
+                    processing: true,
+                    serverSide: true,
+                    pageLength: {!! config('app.records_per_page')!!},
+                    ajax: {
+                        url: '{!! route('admin.entranceExamCourses.data',$exam->id) !!}',
+                        method: 'POST'
+                    },
+                    columns: [
+                        { data: 'name_kh', name: 'entranceExamCourses.name_kh'},
+                        { data: 'total_question', name: 'entranceExamCourses.total_question'},
+                        { data: 'description', name: 'entranceExamCourses.description'},
+                        { data: 'action', name: 'action',orderable: false, searchable: false}
+                    ]
+                });
+
+            } else {
+                course_datatable = $('#table-exam-course').DataTable({
+                    processing: true,
+                    serverSide: true,
+                    pageLength: {!! config('app.records_per_page')!!},
+                    ajax: {
+                        url: '{!! route('admin.exam.get_courses',$exam->id) !!}',
+                        method: 'POST'
+                    },
+                    columns: [
+                        { data: 'name_kh', name: 'courseAnnuals.name_kh'},
+                        { data: 'semester', name: 'courseAnnuals.semester'},
+                        { data: 'academic_year', name: 'academicYears.name_kh'},
+                        { data: 'class', name: 'class', orderable:false, searchable:false},
+                        { data: 'lecturer', name: 'employees.name_kh'},
+                        { data: 'action', name: 'action',orderable: false, searchable: false}
+                    ]
+                });
+            }
+
+            enableDeleteRecord($('#table-exam-course'));
+
+            $("#btn-add-course").click(function(){
+                window_course = PopupCenterDual('{{route("admin.entranceExamCourses.create")}}'+'?exam_id='+'{{$exam->id}}','Course for exam','800','470');
+            });
+
+            $(document).on('click','.btn_course_edit',function(e){
+                e.preventDefault();
+                window_course = PopupCenterDual($(this).data('remote'),'Update Entrance Exam Course','1200','960');
+            });
+
+
 
             /* ----------------------------------------------------------------------------------------------------------------*/
         });

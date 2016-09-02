@@ -460,7 +460,7 @@ class ExamController extends Controller
                 ->update(['roomcode'=> Crypt::encrypt($room->secret_code)]);
         }
 
-        return Response::json(array('success'=>true));
+        return Response::json(array('success'=>true,'message'=>"Secret code is saved successfully"));
     }
 
     public function download_attendance_list(DownloadExaminationDocumentsRequest $request, $exam_id){

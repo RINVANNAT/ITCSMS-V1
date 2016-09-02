@@ -13,6 +13,7 @@
             text-align: center;
             padding-top: 3px !important;
             padding-bottom: 3px !important;
+
         }
     </style>
 @stop
@@ -30,7 +31,7 @@
 
             <table class="table" width="100%">
                 <tr>
-                    <th>លេខរៀង</th>
+                    <th width="15px;">ល.រ</th>
                     <th>លេខបង្កាន់ដៃ</th>
                     <th>បន្ទប់</th>
                     <th>ឈ្មោះ</th>
@@ -46,7 +47,7 @@
                         <td class="left">{{$candidate['name_kh']}}</td>
                         <td class="left">{{$candidate['name_latin']}}</td>
                         <td>{{$candidate['gender']['code']}}</td>
-                        <td>{{\Carbon\Carbon::createFromFormat("Y-m-d h:i:s",$candidate['dob'])->toFormattedDateString()}}</td>
+                        <td class="left">{{\Carbon\Carbon::createFromFormat("Y-m-d h:i:s",$candidate['dob'])->formatLocalized("%d/%b/%Y")}}</td>
                         <?php $index++; ?>
                     </tr>
                 @endforeach
