@@ -5,9 +5,14 @@
     @endauth
     <button class="btn btn-default btn-sm" id="btn-course-refresh"><i class="fa fa-refresh"></i></button>
 
-    @permission('get-candidate-result-score')
+    @permission('report-error-on-inputted-score')
     <button  class="btn btn-primary btn-sm pull-right" id="btn_check_course_error"><i class="fa fa-plus-circle" ></i> Check</button>
     @endauth
+
+    @permission('get-candidate-result-score')
+    <button class="btn btn-primary  btn-sm pull-right" id="btn_result_score_candidate" style="margin-right: 5px"><i class="fa fa-plus-circle"></i> {!! trans('buttons.exam.course.generate_score') !!} </button>
+    @endauth
+
     <!-- /.btn-group -->
 
 </div>
