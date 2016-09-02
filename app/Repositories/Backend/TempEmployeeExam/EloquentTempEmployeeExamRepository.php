@@ -504,7 +504,7 @@ class EloquentTempEmployeeExamRepository implements TempEmployeeExamRepositoryCo
         }
 
         $rooms = DB::table('examRooms')
-            ->join('buildings', 'rooms.building_id', '=', 'buildings.id')
+            ->join('buildings', 'examRooms.building_id', '=', 'buildings.id')
             ->whereNotIn('examRooms.id', $selectedRoomIds)
             ->select('examRooms.name as room_name', 'examRooms.id as room_id', 'buildings.code')
             ->get();

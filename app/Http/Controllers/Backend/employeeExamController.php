@@ -247,7 +247,7 @@ class employeeExamController extends Controller
             $tempRooms = DB::table('examRooms')
                 ->join('role_temporary_staff_exams', 'role_temporary_staff_exams.room_id', '=', 'examRooms.id')
                 ->join('tempEmployees', 'tempEmployees.id', '=', 'role_temporary_staff_exams.temp_employee_id')
-                ->join('buildings', 'rooms.building_id', '=', 'buildings.id')
+                ->join('buildings', 'examRooms.building_id', '=', 'buildings.id')
                 ->where([
                     ['tempEmployees.id', '=', $staffId],
                     ['tempEmployees.active', true]

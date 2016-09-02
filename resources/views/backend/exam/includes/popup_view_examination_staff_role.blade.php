@@ -189,7 +189,7 @@
                 type: "info",
                 showCancelButton: true,
                 confirmButtonColor: "#DD6B55",
-                confirmButtonText: "Yes, register it!",
+                confirmButtonText: "Yes",
                 closeOnConfirm: true
             }, function(confirmed) {
                 if (confirmed) {
