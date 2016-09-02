@@ -312,9 +312,12 @@
 
             // Close any open window upon this main window is closed or refreshed
 
+            /* ------------------------------------------------  Staff Exam Section -------------------------------------------*/
+            @permission('view-exam-staff')
 
+            @endauth
             /* ------------------------------------------------  Room Exam Section -------------------------------------------*/
-
+            @permission('view-exam-room')
 
             /* ---------- Event Area --------- */
             get_total_seat(); // Count total seat after page ready
@@ -545,8 +548,9 @@
                     }
                 });
             });
+            @endauth
             /* ------------------------------------------------------------------------ Candidate Section ------------------------------------------------------------------ */
-
+            @permission('view-exam-candidate')
             candidate_datatable = $('#candidates-table').DataTable({
                 processing: true,
                 serverSide: true,
@@ -651,8 +655,9 @@
                 window_missing_candidate = PopupCenterDual($(this).attr('href'),'Missing Candidate Register IDs','1200','960');
             });
 
+            @endauth
             /* ------------------------------------------------------------------------ Course Section ------------------------------------------------------------------ */
-
+            @permission('view-entrance-exam-course')
             if(exam_type_id == 1){
                 course_datatable = $('#table-exam-course').DataTable({
                     processing: true,
@@ -702,7 +707,7 @@
             });
 
 
-
+            @endauth
             /* ----------------------------------------------------------------------------------------------------------------*/
         });
 
