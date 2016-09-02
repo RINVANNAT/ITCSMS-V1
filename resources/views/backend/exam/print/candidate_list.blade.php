@@ -23,7 +23,7 @@
     ?>
     @foreach($rooms as $room)
         <div class="page">
-            <h2>បញ្ជីឈ្មោះបេក្ខជន⁣ <span class="pull-right"> &nbsp;&nbsp;បន្ទប់ {{$room->name." ".$room->building->code}}</span></h2>
+            <h2>បញ្ជីឈ្មោះបេក្ខជន⁣ <span class="pull-right"> &nbsp;&nbsp;បន្ទប់ {{$room->building->code."-".$room->name}}</span></h2>
 
             <table class="table" width="100%">
                 <tr>

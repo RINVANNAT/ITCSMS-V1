@@ -42,7 +42,7 @@
                     <tr>
                         <td>{{$index}}</td>
                         <td>{{str_pad($candidate['register_id'], 4, '0', STR_PAD_LEFT)}}</td>
-                        <td>{{$candidate['room']['name']." ".$candidate['room']['building']['code']}}</td>
+                        <td>{{$candidate['room']['building']['code']."-".$candidate['room']['name']}}</td>
                         <td class="left">{{$candidate['name_kh']}}</td>
                         <td class="left">{{$candidate['name_latin']}}</td>
                         <td>{{$candidate['gender']['code']}}</td>

@@ -25,7 +25,7 @@
     @foreach($courses as $course)
         @foreach($rooms as $room)
             <div class="page">
-                <h3>បញ្ជីវត្តមានបេក្ខជន⁣ បន្ទប់ {{$room->name." ".$room->building->code}} <span class="pull-right">{{$course->name_kh}}</span></h3>
+                <h3>បញ្ជីវត្តមានបេក្ខជន⁣ បន្ទប់ {{$room->building->code."-".$room->name}} <span class="pull-right">{{$course->name_kh}}</span></h3>
 
                 <table class="table" width="100%">
                     <tr>
