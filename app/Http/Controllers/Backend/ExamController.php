@@ -711,6 +711,7 @@ class ExamController extends Controller
         $arrayResults = [];
         $candidateResult = [];
         $ids = [];
+        $candidateCompletedScoreIds = [];
         $passedCandidates = (int)$requestData['course_factor']['total_pass'];
         $reservedCandidates = (int)$requestData['course_factor']['total_reserve'];
         $checkPass = 0;
@@ -735,11 +736,12 @@ class ExamController extends Controller
                     ->select('candidateEntranceExamScores.entrance_exam_course_id','candidates.id as candidate_id','candidates.name_kh', 'candidateEntranceExamScores.score_c', 'candidateEntranceExamScores.score_w', 'candidateEntranceExamScores.score_na')
                     ->get();
 
+//                dd($candidateScores);
+
                 if($candidateScores) {
 
                     $subjectCoefficient = $requestData['course_factor']['subject_coe_'.$courseId];
                     $wrongCoefficient = $requestData['course_factor']['wrong_coe_'.$courseId];
-
 
                     foreach($candidateScores as $candidateScore) {
 
@@ -754,24 +756,24 @@ class ExamController extends Controller
                             'score_by_course'   => $totalScore
                         );
                         array_push($arrayResults, $element);
+                        $candidateCompletedScoreIds[] =  $candidateScore->candidate_id;
                     }
                 }
 
             }
         }
-        //this query will get candidate with completed score in all subject for the exam
-        $candidateIds = DB::table('candidateEntranceExamScores')
-                    ->where('is_completed', '=', true)
-                    ->select('candidate_id')->get();
-
-        foreach($candidateIds as $candidateId) {
-            array_push($ids, $candidateId->candidate_id);
-        }
-        $ids = array_unique($ids);
+        $candidateCompletedScoreIds = array_unique($candidateCompletedScoreIds);
         $candidateIds = [];
-        foreach($ids as $id) {
+        foreach($candidateCompletedScoreIds as $id) {
             array_push($candidateIds, $id);
         }
+
+        $nonExamingCandidateIds = DB::table('candidates')
+            ->select('candidates.id as candidate_id')
+            ->whereNotIn('candidates.id', $candidateIds)
+            ->where('candidates.active', '=', true)
+            ->get();
+
         //this is to calculate each candidate score for all subjects == (total_math + total_physic....)
         for($i=0; $i<count($candidateIds); $i++) {
             $totalSum = 0;
@@ -791,11 +793,8 @@ class ExamController extends Controller
 
             for($key = $passedCandidates; $key < count($candidateResult); $key++) {
 
-                if($key+1 < count($candidateResult)) {
-
-                    if($candidateResult[$passedCandidates-1]->total_score == $candidateResult[$key]->total_score) {
-                        $statusStudentPassed++;
-                    }
+                if($candidateResult[$passedCandidates-1]->total_score == $candidateResult[$key]->total_score) {
+                    $statusStudentPassed++;
                 }
             }
 
@@ -805,51 +804,55 @@ class ExamController extends Controller
                     $statusStudentReserved++;
                 }
             }
-
             $passedCandidates = $passedCandidates + $statusStudentPassed;
             $reservedCandidates = $reservedCandidates + $statusStudentReserved;// -1 because we compare redandancy of the index
+
         }
-//        dd($passedCandidates.'--'.$reservedCandidates);
 
         // this where to update candidate score base on passed or reserved
-        $candidateIds = [];
 
-        if($passedCandidates + $reservedCandidates > count($candidateResult)) {
-            return Response::json(array('status'=>false,'message'=>'There are not enough candidates!'));
+        if($passedCandidates == count($candidateResult)) {
 
-        } else {
             for($index =0; $index < $passedCandidates; $index++) {
                 $pass = $this->updateCandidateResultScore($candidateResult[$index]->candidate_id,$candidateResult[$index]->total_score, 'Pass' );
-                array_push($candidateIds,$candidateResult[$index]->candidate_id);
                 if($pass) {
                     $checkPass++;
                 }
             }
-            for($index=$passedCandidates; $index < count($candidateResult); $index++) {
-
-                $reserve = $this->updateCandidateResultScore($candidateResult[$index]->candidate_id,$candidateResult[$index]->total_score, 'Reserve' );
-                array_push($candidateIds,$candidateResult[$index]->candidate_id);
-                if($reserve) {
-                    $checkReserve++;
-                }
-            }
-            for($index=$passedCandidates + $reservedCandidates; $index < count($candidateResult); $index++) {
-
-                $fail = $this->updateCandidateResultScore($candidateResult[$index]->candidate_id,$candidateResult[$index]->total_score, 'Fail' );
-                array_push($candidateIds,$candidateResult[$index]->candidate_id);
-                if($fail) {
-                    $checkFail++;
-                }
-            }
-
-            $nonExamingCandidateIds = DB::table('candidates')
-                ->select('candidates.id as candidate_id')
-                ->whereNotIn('candidates.id', $candidateIds)
-                ->where('candidates.active', '=', true)
-                ->get();
-
             foreach($nonExamingCandidateIds as $nonExamingCandidateId) {
                 $fail = $this->updateCandidateResultScore($nonExamingCandidateId->candidate_id,null, 'Reject' );
+            }
+        } else {
+            if($passedCandidates + $reservedCandidates > count($candidateResult)) {
+            return Response::json(array('status'=>false,'message'=>'There are not enough candidates!'));
+//                dd($passedCandidates + $reservedCandidates);
+
+            } else {
+                for($index =0; $index < $passedCandidates; $index++) {
+                    $pass = $this->updateCandidateResultScore($candidateResult[$index]->candidate_id,$candidateResult[$index]->total_score, 'Pass' );
+                    if($pass) {
+                        $checkPass++;
+                    }
+                }
+                for($index=$passedCandidates; $index < count($candidateResult); $index++) {
+
+                    $reserve = $this->updateCandidateResultScore($candidateResult[$index]->candidate_id,$candidateResult[$index]->total_score, 'Reserve' );
+                    if($reserve) {
+                        $checkReserve++;
+                    }
+                }
+                for($index=$passedCandidates + $reservedCandidates; $index < count($candidateResult); $index++) {
+
+                    $fail = $this->updateCandidateResultScore($candidateResult[$index]->candidate_id,$candidateResult[$index]->total_score, 'Fail' );
+                    array_push($candidateIds,$candidateResult[$index]->candidate_id);
+                    if($fail) {
+                        $checkFail++;
+                    }
+                }
+
+                foreach($nonExamingCandidateIds as $nonExamingCandidateId) {
+                    $fail = $this->updateCandidateResultScore($nonExamingCandidateId->candidate_id,null, 'Reject' );
+                }
             }
         }
 
@@ -926,9 +929,17 @@ class ExamController extends Controller
         } else {
 
             $candidatesResults = $this->getCandidateResult();
-            $candidatesResults = array_chunk($candidatesResults, 30);
 
-            return view('backend.exam.print.examination_candidates_result', compact('candidatesResults'));
+            if($candidatesResults) {
+                $status = true;
+                $candidatesResults = array_chunk($candidatesResults, 30);
+                return view('backend.exam.print.examination_candidates_result', compact('candidatesResults', 'status'));
+            } else {
+                $status = false;
+                return view('backend.exam.print.examination_candidates_result', compact('status'));
+            }
+
+
         }
     }
 

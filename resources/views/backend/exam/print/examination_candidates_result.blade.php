@@ -19,9 +19,12 @@
 @stop
 @section('content')
 
+
+@if($status)
     <?php   $page_number = 1;
     $total_page = count($candidatesResults);
     ?>
+
     @foreach($candidatesResults as $candidatesResult)
 
         <div class="page">
@@ -55,7 +58,12 @@
         </div>
         <?php $page_number++; ?>
     @endforeach
+@else
+    <div class="col-sm-12 alert-danger">
+        <h3>There are no result of candidates!!</h3>
+    </div>
 
+@endif
 @endsection
 
 @section('scripts')

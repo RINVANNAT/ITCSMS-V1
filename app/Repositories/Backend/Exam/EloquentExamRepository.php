@@ -9,6 +9,7 @@ use App\Models\Exam;
 use App\Models\UserLog;
 use Carbon\Carbon;
 use DB;
+use Illuminate\Support\Facades\Crypt;
 use Object;
 use phpDocumentor\Reflection\Types\Object_;
 
@@ -464,7 +465,9 @@ class EloquentExamRepository implements ExamRepositoryContract
             ->get();
 
         if($candidateIds) {
-            foreach ($candidateIds as $candidateId) {
+            foreach ($candidateIds as &$candidateId) {
+
+                $candidateId->room_code = Crypt::decrypt($candidateId->room_code);
                 $statusCorrectScore = 0 ;
                 $statusWrongScore = 0;
                 $cadidateScores = DB::table('candidateEntranceExamScores')

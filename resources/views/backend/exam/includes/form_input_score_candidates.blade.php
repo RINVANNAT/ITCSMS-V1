@@ -274,7 +274,7 @@
             $('.inputs_score').keydown(function (e) {
                 if (e.which === 13) {
                     var index = $('.inputs_score').index(this) + 3;
-                    $('.inputs_score').eq(index).focus();
+                    $('.inputs_score').eq(index).focus().select();
                 }
             });
 
