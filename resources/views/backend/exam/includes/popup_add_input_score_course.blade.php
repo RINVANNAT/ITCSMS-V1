@@ -79,11 +79,19 @@
             <div class="clearfix"></div>
         </div><!-- /.box-body -->
     </div><!--box-->
+
+    <div class="loading">
+        <i class="fa fa-refresh fa-spin"></i>
+    </div>
 @stop
 
 @section('after-scripts-end')
    {{--here where i need to write the js script --}}
    <script>
+
+       $(document).ready(function(){
+           toggleLoading(false);
+       });
 
        var input_score_url = "{{route('admin.exam.request_input_score_form',$exam_id)}}";
 
@@ -96,8 +104,6 @@
                success: function(result) {
                    console.log(result);
                    $('.selection_room_course').html(result);
-
-
                }
            });
        }

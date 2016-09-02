@@ -131,7 +131,7 @@ class EntranceExamCourseController extends Controller
         $datatables =  app('datatables')->of($entranceExamCourse);
 
         return $datatables
-            ->addColumn('action', function ($item) use ($exam_id)  {
+            ->addColumn('action', function ($item) use ($exam_id,$request)  {
                 $result = '';
                 if(Auth::user()->allow('delete-entrance-exam-courses')){
                     $result = $result.' <button class="btn btn-xs btn-danger btn-delete" data-remote="'.route('admin.entranceExamCourses.destroy', $item->id) .'"><i class="fa fa-times" data-toggle="tooltip" data-placement="top" title="' . trans('buttons.general.crud.delete') . '"></i></button>';
@@ -139,17 +139,16 @@ class EntranceExamCourseController extends Controller
                 if(Auth::user()->allow('edit-entrance-exam-courses')){
                     $result = $result.' <button class="btn btn-xs btn-info btn_course_edit" data-remote="'.route('admin.entranceExamCourses.edit', $item->id) .'"><i class="fa fa-pencil" data-toggle="tooltip" data-placement="top" title="' . trans('buttons.general.crud.edit') . '"></i></button>';
                 }
-                if(!Auth::user()->allow('report-error-on-inputted-score')){
-                    return $result;
-                } else {
-                    $errorCandidateScores = $this->exams->reportErrorCandidateExamScores($exam_id, $item->id);
+                if($request->check_course_error == "true"){
+                    if(Auth::user()->allow('report-error-on-inputted-score')){
+                        $errorCandidateScores = $this->exams->reportErrorCandidateExamScores($exam_id, $item->id);
 
-                    if(!empty($errorCandidateScores)){
-                        return $result.' <button class="btn btn-xs btn-danger btn-report-error" data-remote="'. $item->id .'">Report Error</button>';
-                    } else {
-                        return $result;
+                        if(!empty($errorCandidateScores)){
+                            $result = $result.' <button class="btn btn-xs btn-danger btn-report-error" data-remote="'. $item->id .'">Report Error</button>';
+                        }
                     }
                 }
+                return $result;
             })
             ->make(true);
     }

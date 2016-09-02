@@ -40,9 +40,11 @@
         <![endif]-->
     </head>
     <body class="skin-{!! config('backend.theme') !!} {!! config('backend.layout') !!}">
+
     <div class="loading">
         <i class="fa fa-refresh fa-spin"></i>
     </div>
+
     <div class="wrapper">
         @include('backend.includes.header')
         @include('backend.includes.sidebar')

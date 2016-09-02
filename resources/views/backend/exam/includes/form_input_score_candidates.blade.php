@@ -232,7 +232,6 @@
 
                for(var i =1 ; i <= check; i++) {
                    if( $("input#total_"+i).val() == 0) {
-                       console.log($("input#total_"+i).val());
                        status++;
                    }
                }
@@ -299,16 +298,14 @@
                     var sum =0;
                     $(".validate_"+i).each(function() {
                         if (!isNaN(this.value) && this.value.length != 0) {
-
                             var tmp = sum;
                             sum += parseInt(this.value);
                             $(this).css("background-color", "#FEFFB0");
-                            if(sum == total_question) {
-
-                                $("input#total_"+i).val(sum).css("color", "");
-
-
-                            } else if(sum == 0) {
+                            $("input#total_"+i).val(tmp);
+                            if( $("input#total_"+i).val() == total_question) {
+                                $(".validate_"+i).css("color", "");
+                                $("input#total_"+i).css("color", "");
+                            } else if( $("input#total_"+i).val() == 0) {
                                 $(".validate_"+i).css("color", "red");
                             } else {
                                 $(".validate_"+i).css("color", "");

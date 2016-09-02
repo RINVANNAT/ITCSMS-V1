@@ -229,6 +229,8 @@
         var window_candidate;
         var window_missing_candidate;
 
+        var check_course_error = false;
+
         /*---------- Functions for candidates ---------*/
 
         function check_missing_candidates(){
@@ -326,7 +328,10 @@
                     pageLength: {!! config('app.records_per_page')!!},
                     ajax: {
                         url: '{!! route('admin.entranceExamCourses.data',$exam->id) !!}',
-                        method: 'POST'
+                        method: 'POST',
+                        data:function(d){
+                            d.check_course_error = check_course_error;
+                        }
                     },
                     columns: [
                         { data: 'name_kh', name: 'entranceExamCourses.name_kh'},
@@ -358,6 +363,12 @@
 
 
             enableDeleteRecord($('#candidates-table'));
+
+            $('#btn_check_course_error').on('click', function() {
+
+                check_course_error = true;
+                course_datatable.draw();
+            });
 
             $('#candidates-table').on('click', '.btn-register[data-remote]', function (e) {
                 var url = $(this).data('remote');
@@ -816,8 +827,10 @@
 
 
         $(document).on('click', '#btn_input_score_course', function (e) {
+
             window_request_room = PopupCenterDual('{{route("admin.exam.request_input_score_courses",$exam->id)}}','Course for exam','1000','450');
         });
+
 
 
 //        error popup page
