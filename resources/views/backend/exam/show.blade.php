@@ -786,7 +786,10 @@
                     pageLength: {!! config('app.records_per_page')!!},
                     ajax: {
                         url: '{!! route('admin.entranceExamCourses.data',$exam->id) !!}',
-                        method: 'POST'
+                        method: 'POST',
+                        data: function(d){
+                            d.check_course_error= check_course_error
+                        }
                     },
                     columns: [
                         { data: 'name_kh', name: 'entranceExamCourses.name_kh'},
@@ -823,6 +826,11 @@
                 window_report_error = PopupCenterDual(report_score_url+"?course_id="+course_id,'Error Inputted Score Form ','1250','960');
 
             });
+
+            $('#btn_check_course_error').on('click', function() {
+                check_course_error = true;
+                course_datatable.draw();
+            })
 
             $("#btn-add-course").click(function(){
                 window_course = PopupCenterDual('{{route("admin.entranceExamCourses.create")}}'+'?exam_id='+'{{$exam->id}}','Course for exam','800','470');
