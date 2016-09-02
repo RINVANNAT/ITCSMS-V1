@@ -544,7 +544,8 @@ class ExamController extends Controller
         if($correction != null) {
 
             $roomCodes = DB::table('examRooms')
-                ->select('examRooms.roomcode as room_code', 'examRooms.id as room_id')->get();
+                ->select('examRooms.roomcode as room_code', 'examRooms.id as room_id')
+                ->orderBy('room_code', 'ASC')->get();
 
             if($roomCodes) {
 
@@ -585,6 +586,8 @@ class ExamController extends Controller
                         }
                     }
                 }
+
+                asort($rooms);
 
                 return view('backend.exam.includes.partial_selection_room_course', compact('rooms'))->render();
             } else {
