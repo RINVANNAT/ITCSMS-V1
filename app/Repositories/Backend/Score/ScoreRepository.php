@@ -657,7 +657,18 @@ class ScoreRepository extends BaseRepository
             $fetchResult["name"] = $studentAnnual->student->name_latin;
             array_push($studentAnnualsFetchResult, $fetchResult);
         }
-        return compact("studentAnnuals","scores","absencesCounts","total","studentAnnualsFetchResult" );
+
+        $course_annual = CourseAnnual::where("id",$course_annual_id)->first();
+
+        $course_annual_fetch = array();
+        $course_annual_fetch["id"] = $course_annual->id;
+        $course_annual_fetch["score_percentage_column_1"] = $course_annual->score_percentage_column_1;
+        $course_annual_fetch["score_percentage_column_2"] = $course_annual->score_percentage_column_2;
+        $course_annual_fetch["score_percentage_column_3"] = $course_annual->score_percentage_column_3;
+        $course_annual_fetch["isScoreRuleChange"] = $course_annual->isScoreRuleChange();
+       
+
+        return compact("studentAnnuals","scores","absencesCounts","total","studentAnnualsFetchResult","course_annual_fetch" );
     }
 
 

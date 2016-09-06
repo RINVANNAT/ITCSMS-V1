@@ -4,6 +4,7 @@ namespace App\Http\Controllers\API;
 
 use App\Http\Requests\API\CreateCourseAnnualAPIRequest;
 use App\Http\Requests\API\UpdateCourseAnnualAPIRequest;
+use App\Models\AcademicYear;
 use App\Models\CourseAnnual;
 use App\Repositories\CourseAnnualRepository;
 
@@ -44,6 +45,8 @@ class CourseAnnualAPIController extends AppBaseController
 //        $filters = $request->only('degree_id','grade_id','department_id','academic_year_id','user_id');
         if ($filters["academic_year_id"] == null){
             unset($filters["academic_year_id"]);
+            $filters["academic_year_id"] = AcademicYear::orderBy("id","desc")->first()->id;
+            
         }
 
        

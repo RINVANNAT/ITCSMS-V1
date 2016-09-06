@@ -66,6 +66,10 @@ class EloquentCourseAnnualRepository implements CourseAnnualRepositoryContract
         $courseAnnual->degree_id = $input['degree_id'];
         $courseAnnual->department_id = $input['department_id'];
         $courseAnnual->active = isset($input['active'])?true:false;
+
+        $courseAnnual->score_percentage_column_1 = isset($input['score_percentage_column_1'])?$input['score_percentage_column_1']:10;
+        $courseAnnual->score_percentage_column_2 = isset($input['score_percentage_column_2'])?$input['score_percentage_column_2']:30;
+        $courseAnnual->score_percentage_column_3 = isset($input['score_percentage_column_3'])?$input['score_percentage_column_3']:60;
         $courseAnnual->created_at = Carbon::now();
         $courseAnnual->create_uid = auth()->id();
 
@@ -90,6 +94,10 @@ class EloquentCourseAnnualRepository implements CourseAnnualRepositoryContract
         $courseAnnual->active = isset($input['active'])?true:false;
         $courseAnnual->employee_id = isset($input['employee_id'])?$input['employee_id']:1;
         $courseAnnual->updated_at = Carbon::now();
+        $courseAnnual->score_percentage_column_1 = isset($input['score_percentage_column_1'])?$input['score_percentage_column_1']:10;
+        $courseAnnual->score_percentage_column_2 = isset($input['score_percentage_column_2'])?$input['score_percentage_column_2']:30;
+        $courseAnnual->score_percentage_column_3 = isset($input['score_percentage_column_3'])?$input['score_percentage_column_3']:60;
+
         $courseAnnual->write_uid = auth()->id();
 
         if ($courseAnnual->save()) {

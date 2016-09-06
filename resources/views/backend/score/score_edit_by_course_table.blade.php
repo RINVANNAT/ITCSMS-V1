@@ -1,46 +1,97 @@
 <!-- ****************************
 start table render
 ******************************-->
+
+
 @if($studentAnnuals->isEmpty())
-    <div class="well text-center">No Scores found.</div>
+    <div class="well text-center">No Scores found. </div>
 @else
-
     <template id="vue_score_edit">
+
         {!! Form::model('', ['route' => ['score.updateMany'], 'method' => 'patch',"id"=>"scoreform"]) !!}
-        <table class="scoreinput" style="border:1px black solid">
-            <thead>
-            <th> No </th>
-            <th> Student Name </th>
-            <th> ID </th>
-            <th style="display:none;">Abs</th>
-            <th> Abs </th>
-            <th> Score 10 </th>
-            <th> Score 30 </th>
-            <th> Score 60 </th>
-            <th style="display:none;"> re-exam </th>
-            <th> total </th>
-            </thead>
-            <tbody>
-            <template v-for="(index, studentAnnual) in studentAnnuals">
-                <tr>
-                    <td>@{{ studentAnnual.no }}</td>
-                    <td>@{{ studentAnnual.name }}</td>
-                    <td>@{{ studentAnnual.id_card }}</td>
-                    <td> {!! Form::text('abs[]', '@{{  absencesCounts[studentAnnua.id] }}', [ 'v-model'=>"absencesCounts[studentAnnual.id]", 'class' => 'form-score','id'=>'@{{index}}-0','placeholder'=>'']) !!}</td>
-                    {!! Form::hidden('ids[]', '@{{ scores[studentAnnual.id].id }}') !!}
-                    {!! Form::hidden('student_annual_ids[]', '@{{ studentAnnual.id }}') !!}
-                    <td> {!! Form::text('score10[]', '@{{ scores[studentAnnual.id].score10}}', [ 'v-model'=>"scores[studentAnnual.id].score10", 'id'=>'@{{index}}-1','class' => 'form-score','placeholder'=>'']) !!}</td>
-                    <td>{!! Form::text('score30[]', '@{{ scores[studentAnnual.id].score30}}' , ['v-model'=>"scores[studentAnnual.id].score30", 'id'=>'@{{index}}-2','class' => 'form-score','placeholder'=>""]) !!}</td>
-                    <td>{!! Form::text('score60[]',  '@{{ scores[studentAnnual.id].score60}}' , ['v-model'=>"scores[studentAnnual.id].score60", 'id'=>'@{{index}}-3', 'class' => 'form-score', 'placeholder'=>""]) !!}</td>
-                    <td style="display:none;">{!! Form::text('reexam[]',  '@{{ scores[studentAnnual.id].reexam}}',  ['v-model'=>"scores[studentAnnual.id].reexam", 'class' => 'form-score', 'placeholder'=>""]) !!}</td>
-                    <td class="@{{ totalValidation(studentAnnual.id)}}" >@{{(total(studentAnnual.id)).toFixed(2) }} </td>
-                </tr>
-            </template>
-            {!! Form::hidden('filter', "", ['id' => 'redirectfilter', "value"=>""]) !!}
+        @if($course_annual_fetch["isScoreRuleChange"])
 
-            </tbody>
+            <script type="javascript">
+                console.log("test");
+                console.log(test.$data.course_annual)
+            </script>
 
-        </table>
+            <table class="scoreinput" style="border:1px black solid">
+                <thead>
+                <th> No </th>
+                <th> Student Name </th>
+                <th> ID </th>
+                <th style="display:none;">Abs</th>
+                <th> Abs </th>
+
+                <th class="" v-show="course_annual.score_percentage_column_1> 0"> Score @{{ course_annual.score_percentage_column_1 }} </th>
+                <th class="" v-show="course_annual.score_percentage_column_2> 0"> Score @{{ course_annual.score_percentage_column_2 }} </th>
+                <th class="" v-show="course_annual.score_percentage_column_3> 0"> Score @{{ course_annual.score_percentage_column_3 }} </th>
+                <th style="display:none;"> re-exam </th>
+                <th> total </th>
+                </thead>
+                <tbody>
+                <template v-for="(index, studentAnnual) in studentAnnuals">
+                    <tr>
+                        <td>@{{ studentAnnual.no }}</td>
+                        <td>@{{ studentAnnual.name }}</td>
+                        <td>@{{ studentAnnual.id_card }}</td>
+                        <td> {!! Form::text('abs[]', '@{{  absencesCounts[studentAnnua.id] }}', [ 'v-model'=>"absencesCounts[studentAnnual.id]", 'class' => 'form-score','id'=>'@{{index}}-0','placeholder'=>'']) !!}</td>
+                        {!! Form::hidden('ids[]', '@{{ scores[studentAnnual.id].id }}') !!}
+                        {!! Form::hidden('student_annual_ids[]', '@{{ studentAnnual.id }}') !!}
+                        <td v-show="course_annual.score_percentage_column_1> 0"> {!! Form::text('score10[]', '@{{ scores[studentAnnual.id].score10}}', [ 'v-model'=>"scores[studentAnnual.id].score10", 'id'=>'@{{index}}-1','class' => 'form-score','placeholder'=>'']) !!}</td>
+                        <td v-show="course_annual.score_percentage_column_2> 0">{!! Form::text('score30[]', '@{{ scores[studentAnnual.id].score30}}' , ['v-model'=>"scores[studentAnnual.id].score30", 'id'=>'@{{index}}-2','class' => 'form-score','placeholder'=>""]) !!}</td>
+                        <td v-show="course_annual.score_percentage_column_3> 0">{!! Form::text('score60[]',  '@{{ scores[studentAnnual.id].score60}}' , ['v-model'=>"scores[studentAnnual.id].score60", 'id'=>'@{{index}}-3', 'class' => 'form-score', 'placeholder'=>""]) !!}</td>
+                        <td style="display:none;">{!! Form::text('reexam[]',  '@{{ scores[studentAnnual.id].reexam}}',  ['v-model'=>"scores[studentAnnual.id].reexam", 'class' => 'form-score', 'placeholder'=>""]) !!}</td>
+                        <td class="@{{ totalValidation(studentAnnual.id)}}" >@{{(total(studentAnnual.id)).toFixed(2) }} </td>
+                    </tr>
+                </template>
+                {!! Form::hidden('filter', "", ['id' => 'redirectfilter', "value"=>""]) !!}
+
+                </tbody>
+
+            </table>
+        @else
+            <table class="scoreinput" style="border:1px black solid">
+                <thead>
+                <th> No </th>
+                <th> Student Name </th>
+                <th> ID </th>
+                <th style="display:none;">Abs</th>
+                <th> Abs </th>
+                <th> Score 10 </th>
+                <th> Score 30 </th>
+                <th> Score 60 </th>
+                <th style="display:none;"> re-exam </th>
+                <th> total </th>
+                </thead>
+                <tbody>
+                <template v-for="(index, studentAnnual) in studentAnnuals">
+                    <tr>
+                        <td>@{{ studentAnnual.no }}</td>
+                        <td>@{{ studentAnnual.name }}</td>
+                        <td>@{{ studentAnnual.id_card }}</td>
+                        <td> {!! Form::text('abs[]', '@{{  absencesCounts[studentAnnua.id] }}', [ 'v-model'=>"absencesCounts[studentAnnual.id]", 'class' => 'form-score','id'=>'@{{index}}-0','placeholder'=>'']) !!}</td>
+                        {!! Form::hidden('ids[]', '@{{ scores[studentAnnual.id].id }}') !!}
+                        {!! Form::hidden('student_annual_ids[]', '@{{ studentAnnual.id }}') !!}
+                        <td> {!! Form::text('score10[]', '@{{ scores[studentAnnual.id].score10}}', [ 'v-model'=>"scores[studentAnnual.id].score10", 'id'=>'@{{index}}-1','class' => 'form-score','placeholder'=>'']) !!}</td>
+
+                        <td>{!! Form::text('score30[]', '@{{ scores[studentAnnual.id].score30}}' , ['v-model'=>"scores[studentAnnual.id].score30", 'id'=>'@{{index}}-2','class' => 'form-score','placeholder'=>""]) !!}</td>
+
+                        <td>{!! Form::text('score60[]',  '@{{ scores[studentAnnual.id].score60}}' , ['v-model'=>"scores[studentAnnual.id].score60", 'id'=>'@{{index}}-3', 'class' => 'form-score', 'placeholder'=>""]) !!}</td>
+                        <td style="display:none;">{!! Form::text('reexam[]',  '@{{ scores[studentAnnual.id].reexam}}',  ['v-model'=>"scores[studentAnnual.id].reexam", 'class' => 'form-score', 'placeholder'=>""]) !!}</td>
+                        <td class="@{{ totalValidation(studentAnnual.id)}}" >@{{(total(studentAnnual.id)).toFixed(2) }} </td>
+                    </tr>
+                </template>
+                {!! Form::hidden('filter', "", ['id' => 'redirectfilter', "value"=>""]) !!}
+
+                </tbody>
+
+            </table>
+
+        @endif
+
+
         <br>
         {!! Form::submit('Save', ['class' => 'btn btn-primary']) !!}
         {!! Form::close() !!}
@@ -48,11 +99,11 @@ start table render
 
 
 
-
 <script type="text/javascript">
     studentAnnuals = {!! json_encode($studentAnnualsFetchResult) !!};
     absencesCounts = {!! json_encode($absencesCounts) !!};
     scores = {!! json_encode($scores) !!};
+    course_annual = {!! json_encode($course_annual_fetch) !!};
 
     var test;
     $(document).ready(function() {
@@ -61,6 +112,7 @@ start table render
             data: {
                 studentAnnuals:  studentAnnuals,
                 absencesCounts: absencesCounts,
+                course_annual: course_annual,
                 scores: scores,
                 // a computed getter
                 total: function ( index ) {
@@ -233,7 +285,6 @@ start table render
         $('#scoreform').submit(function (e) {
             e.preventDefault();
             var validation = test.totalValidationAll();
-
             if (validation == false ){
                 message = new Vue({
                     el: '#flashMessage',
@@ -242,15 +293,11 @@ start table render
                         messages: []
                     },
                 });
-
                 $('html,body').animate({
                     scrollTop: $("#flashMessage").offset().top - 70
                 });
             }
             return validation;
-
-
-
         });
 
 //        // Validation Score before sent

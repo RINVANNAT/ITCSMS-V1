@@ -160,7 +160,6 @@ class ScoreController extends AppBaseController
                 foreach($request["ids"] as $key=>$id ){
 					$key = intval($key);
 					$id = intval($id);
-
                     // find record for update
 					$score = $this->scoreRepository->find($id);
                     if(empty($score))
@@ -168,7 +167,6 @@ class ScoreController extends AppBaseController
                         Flash::error('Score not found');
                         return redirect(route('scores.index'));
                     }
-
                     $dataScore = array(
                         "id"=>$id,
                         "student_annual_id"=>$request['student_annual_ids'][$key],
@@ -181,8 +179,6 @@ class ScoreController extends AppBaseController
                         $dataScore["reexam"]=$request['reexam'][$key];
                     }
                     $score = $this->scoreRepository->update($dataScore, $id);
-
-
                     $this->createAbsence($request["abs"][$key],$request['student_annual_ids'][$key],json_decode($request["filter"],true));
                 }
 

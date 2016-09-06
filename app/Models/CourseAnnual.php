@@ -17,6 +17,9 @@ class CourseAnnual extends Model
 		"course_id",
 		"semester_id",
         "create_uid",
+		"score_percentage_column_1",
+		"score_percentage_column_2",
+		"score_percentage_column_3",
         "write_uid"
 	];
 
@@ -47,6 +50,24 @@ class CourseAnnual extends Model
 	}
 	public function exams(){
 		return $this->belongsToMany('App\Models\Exam');
+	}
+
+	public function isScoreRuleChange(){
+
+
+		if ( $this->score_percentage_column_1 == 10 and
+			$this->score_percentage_column_2 == 30 and
+			$this->score_percentage_column_3 == 60 ){
+
+
+			$test = false;
+		}else {
+			$test  = true;
+		}
+
+       
+
+		return $test;
 	}
 
 

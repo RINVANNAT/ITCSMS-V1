@@ -48,4 +48,24 @@
     </div>
 </div>
 
+<div class="form-group">
+    {!! Form::label('', "Absence score percentage", ['class' => 'col-lg-2 control-label required']) !!}
+    <div class="col-lg-7">
+        {{ Form::text('score_percentage_column_1',  null, ['class' => 'form-control']) }}
+    </div>
+</div>
+
+<div class="form-group">
+    {!! Form::label('departments', "TP score percentage", ['class' => 'col-lg-2 control-label required']) !!}
+    <div class="col-lg-7">
+        {{ Form::text('score_percentage_column_2',  null, ['class' => 'form-control']) }}
+    </div>
+</div>
+
+<div class="form-group">
+    {!! Form::label('departments', "Final score percentage", ['class' => 'col-lg-2 control-label required']) !!}
+    <div class="col-lg-7">
+        {{ Form::text('score_percentage_column_3',  null, ['class' => 'form-control']) }}
+    </div>
+</div>
 
