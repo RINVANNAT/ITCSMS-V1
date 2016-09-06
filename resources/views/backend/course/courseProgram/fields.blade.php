@@ -25,30 +25,41 @@
     </div>
 </div>
 
+<div id="creditholdertop">
+<div id="credittemplate">
+
 <div class="form-group">
     {!! Form::label('time_course', trans('labels.backend.coursePrograms.fields.time_course'), ['class' => 'col-lg-2 control-label required']) !!}
     <div class="col-lg-7">
-        {!! Form::text('time_course', null, ['class' => 'form-control','required'=>'required']) !!}
+        {!! Form::text('time_course', null, ['class' => 'form-control','required'=>'required', "v-model"=>"hourcourse"]) !!}
     </div>
 </div>
 
 <div class="form-group">
     {!! Form::label('time_tp', trans('labels.backend.coursePrograms.fields.time_tp'), ['class' => 'col-lg-2 control-label required']) !!}
     <div class="col-lg-7">
-        {!! Form::text('time_tp', null, ['class' => 'form-control','required'=>'required']) !!}
+        {!! Form::text('time_tp', null, ['class' => 'form-control','required'=>'required',"v-model"=>"hourtp"]) !!}
     </div>
 </div>
 <div class="form-group">
     {!! Form::label('time_td', trans('labels.backend.coursePrograms.fields.time_td'), ['class' => 'col-lg-2 control-label required']) !!}
     <div class="col-lg-7">
-        {!! Form::text('time_td', null, ['class' => 'form-control','required'=>'required']) !!}
+        {!! Form::text('time_td', null, ['class' => 'form-control','required'=>'required',"v-model"=>"hourtd"]) !!}
     </div>
 </div>
+
+
 <div class="form-group">
     {!! Form::label('credit', trans('labels.backend.coursePrograms.fields.credit'), ['class' => 'col-lg-2 control-label required']) !!}
     <div class="col-lg-7">
-        {!! Form::text('credit', null, ['class' => 'form-control','required'=>'required']) !!}
+        <div id="creditlabel">
+            @{{credit}}
+        </div>
+        {!! Form::hidden('credit', null, ['class' => 'form-control','required'=>'required',"id"=>"credithidhen","v-model"=>"credit" ]) !!}
     </div>
+</div>
+
+</div>
 </div>
 
 <div class="form-group">

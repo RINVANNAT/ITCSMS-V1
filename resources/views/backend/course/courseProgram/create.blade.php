@@ -42,3 +42,44 @@
     </div><!--box-->
 {!! Form::close() !!}
 @stop
+
+
+@section('after-scripts-end')
+    {!! Html::script('plugins/moment/moment.min.js') !!}
+    {!! Html::script('plugins/datetimepicker/bootstrap-datetimepicker.min.js') !!}
+    <script src="{{url('assets/js/vue/vue.min.js')}}">
+    </script>
+
+
+    <script>
+        $(function(){
+
+            $(document).ready(function () {
+//                $("#creditlabel").
+//                #("#credithidhen")
+                new Vue({
+                    el: '#credittemplate',
+                    data: {
+                        hourcourse:0,
+                        hourtp:0,
+                        hourtd:0,
+
+
+                    },
+                    computed: {
+                        // a computed getter
+                        credit: function () {
+                            // `this` points to the vm instance
+
+//                            C/16 + (TD+TP)/ 32
+                            return parseInt((parseInt(this.hourcourse)/16) + ((parseInt(this.hourtp) + parseInt(this.hourtd))/32));
+                        }
+                    }
+                });
+
+
+
+            });
+        });
+    </script>
+@stop
