@@ -535,6 +535,32 @@ class ExamController extends Controller
         return view('backend.exam.includes.popup_add_input_score_course',compact('exam_id', 'courses'));
     }
 
+
+    public function getAllRooms($exam_id, Request $request) {
+
+        $rooms = [];
+        $roomFromDB = $this->getRoomsFromDB();
+        if($roomFromDB) {
+            foreach ($roomFromDB as $room) {
+                $rooms[$room->room_id] = Crypt::decrypt($room->room_code);
+            }
+            asort($rooms);
+            return view('backend.exam.includes.partial_selection_room_course', compact('rooms'))->render();
+
+        }
+    }
+
+    private function getRoomsFromDB() {
+
+        $roomFromDB = DB::table('examRooms')
+            ->select('examRooms.roomcode as room_code', 'examRooms.id as room_id')
+            ->get();
+
+        return $roomFromDB;
+
+    }
+
+
     public function requestRoomCourseSelection ($exam_id, Request $request) {
 
         $correction = $request->number_correction;
@@ -597,14 +623,48 @@ class ExamController extends Controller
         }
     }
 
+    private function sortRoomCodes($a, $b)
+    {
+        return  $a->room_code - $b->room_code ;
+    }
+
     public function getRequestInputScoreForm($exam_id, Request $request) {
+
 
         $subject = $request->course_name;
         $subjectId = $request->entrance_course_id;
         $roomId = $request->room_id;
-
         $roomCode = $request->room_code;
         $number_correction = (int)$request->number_correction;
+        $rooms = [];
+        $allRooms = $this->getRoomsFromDB();
+        $roomForSelection = [];
+
+        if($allRooms) {
+
+            foreach ($allRooms as $room) {
+                $rooms[] = (object)['room_id' => $room->room_id, 'room_code' =>Crypt::decrypt($room->room_code)];
+                $roomForSelection[$room->room_id] = Crypt::decrypt($room->room_code);
+            }
+            asort($roomForSelection);
+            usort($rooms, array($this, "sortRoomCodes"));
+        }
+
+        for($index =0; $index< count($rooms); $index++) {
+
+            if($rooms[$index]->room_id == $roomId) {
+                if($index == count($rooms)-1) {
+                    $nextRoom = ['room_id'=>$rooms[0]->room_id, 'room_code'=> $rooms[0]->room_code];
+                } else {
+                    $nextRoom = ['room_id'=>$rooms[$index+1]->room_id, 'room_code'=> $rooms[$index+1]->room_code];
+                }
+                if($index == 0) {
+                    $preRoom = ['room_id'=>$rooms[count($rooms)-1]->room_id, 'room_code'=> $rooms[count($rooms)-1]->room_code];
+                } else {
+                    $preRoom = ['room_id'=>$rooms[$index-1]->room_id, 'room_code'=> $rooms[$index-1]->room_code];
+                }
+            }
+        }
 
         if( $number_correction !== 0) {
 
@@ -616,7 +676,7 @@ class ExamController extends Controller
                 $status = false;
             }
 
-            return view('backend.exam.includes.form_input_score_candidates',compact('status', 'candidates','exam_id','roomCode', 'subject','number_correction', 'subjectId', 'roomId'));
+            return view('backend.exam.includes.form_input_score_candidates',compact('status', 'candidates','exam_id','roomCode', 'subject','number_correction', 'subjectId', 'roomId', 'nextRoom', 'preRoom', 'roomForSelection'));
 
         } else {
 
@@ -646,6 +706,7 @@ class ExamController extends Controller
 
     public function reportErrorCandidateScores($exam_id, Request $request) {
 
+        $courseId = $request->course_id;
         $errorCandidateScores = $this->exams->reportErrorCandidateExamScores($exam_id, $request->course_id);
         $totalQuestions = DB::table('entranceExamCourses')
             ->where('entranceExamCourses.active', '=', true)
@@ -655,7 +716,7 @@ class ExamController extends Controller
             $totalQuestion = $totalQuestion->total_question;
         }
 
-        return view('backend.exam.includes.popup_report_error_score_candidate', compact('exam_id', 'errorCandidateScores', 'totalQuestion'));
+        return view('backend.exam.includes.popup_report_error_score_candidate', compact('exam_id', 'errorCandidateScores', 'totalQuestion', 'courseId'));
 
     }
 
@@ -971,6 +1032,35 @@ class ExamController extends Controller
         }
 
         return $updateCandidateScore;
+    }
+
+
+    public function printCandidateErrorScore($examId, Request $request) {
+
+        $arrayRoomCodes = [];
+        $roomCodes = [];
+        $object=[];
+        $candidateIds = explode(',', $request->candidate_array_ids);
+        $orderInRoom = explode(',',$request->order_in_room );
+        $roomCode = explode(',', $request->room_code_ids);
+        $tmpArray = array_unique($roomCode);
+        foreach ($tmpArray as $val) {
+            $roomCodes[] = $val;
+        }
+
+
+        for($key = 0; $key <count($roomCodes); $key++) {
+
+            for($j = 0; $j <count($roomCode); $j++) {
+               if($roomCode[$j] == $roomCodes[$key]) {
+                   $object[$roomCodes[$key]][] = $orderInRoom[$j];
+               }
+            }
+        }
+
+//        $errorCandidates = array_chunk($object, 3);
+
+        return view('backend.exam.print.candidate_score_error', compact('object'));
     }
 
 
