@@ -13,6 +13,9 @@
             text-align: center;
             padding-top: 3px !important;
             padding-bottom: 3px !important;
+            border-bottom: 1px solid black;
+            border-top: 1px solid black;
+            border-collapse: collapse;
         }
     </style>
 @stop
@@ -23,11 +26,11 @@
     ?>
     @foreach($rooms as $room)
         <div class="page">
-            <h2>បញ្ជីឈ្មោះបេក្ខជន⁣ <span class="pull-right"> &nbsp;&nbsp;បន្ទប់ {{$room->name." ".$room->building->code}}</span></h2>
+            <h2>បញ្ជីឈ្មោះបេក្ខជន⁣ <span class="pull-right"> &nbsp;&nbsp;បន្ទប់ {{$room->building->code."-".$room->name}}</span></h2>
 
             <table class="table" width="100%">
                 <tr>
-                    <th>លេខរៀង</th>
+                    <th width="20px;">ល.រ</th>
                     <th>លេខបង្កាន់ដៃ</th>
                     <th>ឈ្មោះ</th>
                     <th>ឈ្មោះឡាតាំង</th>
@@ -40,11 +43,11 @@
                 @foreach($room->candidates()->with('gender')->orderBy('register_id')->get() as $candidate)
                     <tr>
                         <td>{{$index}}</td>
-                        <td>{{$candidate->register_id}}</td>
+                        <td>{{str_pad($candidate->register_id, 4, '0', STR_PAD_LEFT)}}</td>
                         <td class="left">{{$candidate->name_kh}}</td>
                         <td class="left">{{$candidate->name_latin}}</td>
                         <td>{{$candidate->gender->code}}</td>
-                        <td>{{$candidate->dob->toFormattedDateString()}}</td>
+                        <td class="left">{{$candidate->dob->formatLocalized("%d/%b/%Y")}}</td>
                         <?php $index++; ?>
                     </tr>
                 @endforeach

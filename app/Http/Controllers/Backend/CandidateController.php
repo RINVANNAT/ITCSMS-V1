@@ -21,6 +21,7 @@ use App\Models\StudentBac2;
 use App\Repositories\Backend\Candidate\CandidateRepositoryContract;
 use App\Repositories\Backend\StudentAnnual\StudentAnnualRepositoryContract;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Input;
 use Illuminate\Support\Facades\Redirect;
@@ -60,30 +61,11 @@ class CandidateController extends Controller
     }
 
     /**
-     * Show the form for creating a new resource.
-     * @param CreateCandidateRequest $request
-     * @return \Illuminate\Http\Response
-     */
-    public function create(CreateCandidateRequest $request)
-    {
-        $exam = Exam::where('id',1)->first();
-        $degrees = Degree::lists('name_kh','id');
-        $genders = Gender::lists('name_kh','id');
-        $promotions = Promotion::orderBy('name','desc')->lists('name','id');
-        $highSchools = HighSchool::lists('name_kh','id');
-        $provinces = Origin::lists('name_kh','id');
-        $gdeGrades = GdeGrade::lists('name_en','id');
-        $departments = Department::where('is_specialist',true)->where('parent_id',11)->get();
-        $academicYears = AcademicYear::orderBy('name_latin','desc')->lists('name_latin','id');
-        return view('backend.candidate.create',compact('departments','degrees','genders','promotions','highSchools','provinces','gdeGrades','academicYears','exam'));
-    }
-
-    /**
      * Show the form for creating a new resource (Pop Up).
      * @param CreateCandidateRequest $request
      * @return \Illuminate\Http\Response
      */
-    public function popup_create(CreateCandidateRequest $request)
+    public function create(CreateCandidateRequest $request)
     {
         $studentBac2_id = Input::get('studentBac2_id');
         $exam_id = Input::get('exam_id');
@@ -94,11 +76,10 @@ class CandidateController extends Controller
             $highschool = null;
         } else {
             $studentBac2 = StudentBac2::find($studentBac2_id);
-            $highschool = HighSchool::find($studentBac2->highschool_id);
+            $highschool = HighSchool::where('id',$studentBac2->highschool_id)->lists('id', 'name_kh as name')->toArray();
         }
 
-
-
+        //$highschool->id = str_pad($highschool->id,12,"0",STR_PAD_LEFT);
         //dd($highschool);
         $exam = Exam::where('id',$exam_id)->first();
 
@@ -112,7 +93,7 @@ class CandidateController extends Controller
         $departments = Department::where('is_specialist',true)->where('parent_id',11)->get();
         $academicYears = AcademicYear::orderBy('name_latin','desc')->lists('name_latin','id');
 
-        return view('backend.candidate.popup_create',compact('departments','degrees','genders','promotions','provinces','gdeGrades','academicYears','exam','studentBac2','highschool'));
+        return view('backend.candidate.create',compact('departments','degrees','genders','promotions','provinces','gdeGrades','academicYears','exam','studentBac2','highschool'));
     }
 
     /**
@@ -122,18 +103,6 @@ class CandidateController extends Controller
      * @return \Illuminate\Http\Response
      */
     public function store(StoreCandidateRequest $request)
-    {
-        $this->candidates->create($request->all());
-        return redirect()->route('admin.candidates.index')->withFlashSuccess(trans('alerts.backend.generals.created'));
-    }
-
-    /**
-     * Store a newly created resource in storage.
-     *
-     * @param  StoreCandidateRequest  $request
-     * @return \Illuminate\Http\Response
-     */
-    public function popup_store(StoreCandidateRequest $request)
     {
         $result = $this->candidates->create($request->all());
 
@@ -145,8 +114,8 @@ class CandidateController extends Controller
             }
 
         }
-
     }
+
 
     /**
      * Display the specified resource.
@@ -168,10 +137,21 @@ class CandidateController extends Controller
      */
     public function edit(EditCandidateRequest $request, $id)
     {
-        $departments = Department::lists('name_kh','id');
         $candidate = $this->candidates->findOrThrowException($id);
-        $selected_departments = $candidate->departments->lists('id')->toArray();
-        return view('backend.candidate.edit',compact('candidate','departments','selected_departments'));
+        $exam = Exam::where('id',$candidate->exam_id)->first();
+        $studentBac2 = StudentBac2::find($candidate->studentBac2_id);
+
+        $degrees = Degree::lists('name_kh','id');
+        $genders = Gender::lists('name_kh','id');
+        $promotions = Promotion::orderBy('id','desc')->lists('name','id');
+        $provinces = Origin::lists('name_kh','id');
+        $gdeGrades = GdeGrade::lists('name_en','id');
+        $departments = Department::where('is_specialist',true)->where('parent_id',11)->get();
+        $academicYears = AcademicYear::orderBy('name_latin','desc')->lists('name_latin','id');
+        //$selected_high_school = HighSchool::where('id',$candidate->highschool_id)->select(['id', 'name_kh as name'])->first();
+        $highschool = HighSchool::where('id',$studentBac2->highschool_id)->lists('id', 'name_kh as name')->toArray();
+        //dd($candidate);
+        return view('backend.candidate.edit',compact('highschool','departments','exam','degrees','genders','promotions','provinces','gdeGrades','academicYears','candidate','studentBac2'));
     }
 
     /**
@@ -183,8 +163,15 @@ class CandidateController extends Controller
      */
     public function update(UpdateCandidateRequest $request, $id)
     {
-        $this->candidates->update($id, $request->all());
-        return redirect()->route('admin.candidates.index')->withFlashSuccess(trans('alerts.backend.generals.updated'));
+        $result = $this->candidates->update($id, $request->all());
+        if($request->ajax()){
+            if($result['status']==true){
+                return Response::json($result);
+            } else {
+                return Response::json($result,422);
+            }
+
+        }
     }
 
     /**
@@ -196,7 +183,7 @@ class CandidateController extends Controller
      */
     public function destroy(DeleteCandidateRequest $request, $id)
     {
-            $this->candidates->destroy($id);
+        $this->candidates->destroy($id);
         if($request->ajax()){
             return json_encode(array("success"=>true));
         } else {
@@ -215,15 +202,17 @@ class CandidateController extends Controller
             ->leftJoin('origins','candidates.province_id','=','origins.id')
             ->leftJoin('gdeGrades','candidates.bac_total_grade','=','gdeGrades.id')
             ->leftJoin('genders','candidates.gender_id','=','genders.id')
-            ->leftJoin('rooms','candidates.room_id','=','rooms.id')
-            ->leftJoin('buildings','rooms.building_id','=','buildings.id')
+            ->leftJoin('examRooms','candidates.room_id','=','examRooms.id')
+            ->leftJoin('buildings','examRooms.building_id','=','buildings.id')
+            ->where('candidates.active',true)
             ->select([
-                'candidates.id',DB::raw("CONCAT(rooms.name,buildings.code) as room"),'candidates.register_id','candidates.name_kh','candidates.name_latin','genders.name_kh as gender_name_kh','gdeGrades.name_en as bac_total_grade',
+                'candidates.id',DB::raw("CONCAT(\"examRooms\".name,buildings.code) as room"),
+                'candidates.register_id','candidates.name_kh','candidates.name_latin','genders.name_kh as gender_name_kh','gdeGrades.name_en as bac_total_grade',
                 'origins.name_kh as province', 'dob','result','is_paid','is_register'
             ]);
 
         if($exam_id = Input::get('exam_id')){
-            $candidates = $candidates->where('exam_id',$exam_id);
+            $candidates = $candidates->where('candidates.exam_id',$exam_id);
         }
         if($academic_year_id = Input::get('academic_year_id')){
             $candidates = $candidates->where('academic_year_id',$exam_id);
@@ -259,7 +248,7 @@ class CandidateController extends Controller
             })
             ->editColumn('dob',function($candidate){
                 $date = Carbon::createFromFormat('Y-m-d h:i:s',$candidate->dob);
-                return $date->format('d/m/Y');
+                return $date->toFormattedDateString();
             })
             ->addColumn('action', function ($candidate) {
                 $action = "";
@@ -267,7 +256,7 @@ class CandidateController extends Controller
                 if($candidate->result == "Pending"){
                     $action = '';
                     if(Auth::user()->allow('edit-exam-candidate')){
-                       $action = $action .'<a href="'.route('admin.candidates.edit',$candidate->id).'" class="btn btn-xs btn-primary"><i class="fa fa-pencil" data-toggle="tooltip" data-placement="top" title="" data-original-title="'.trans('buttons.general.crud.edit').'"></i> </a>';
+                       $action = $action .'<a href="'.route('admin.candidates.edit',$candidate->id).'" class="btn_candidate_edit btn btn-xs btn-primary"><i class="fa fa-pencil" data-toggle="tooltip" data-placement="top" title="" data-original-title="'.trans('buttons.general.crud.edit').'"></i> </a>';
                     }
                     if(Auth::user()->allow('delete-exam-candidate')) {
                         $action = $action. ' <button class="btn btn-xs btn-danger btn-delete" data-remote="'.route('admin.candidates.destroy', $candidate->id) .'"><i class="fa fa-times" data-toggle="tooltip" data-placement="top" title="' . trans('buttons.general.crud.delete') . '"></i></button>';

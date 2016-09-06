@@ -87,6 +87,8 @@
             "plugins" : [
                 "wholerow",'checkbox', "contextmenu", "search", "state","types", "html_data"
             ]
+        }).on('loaded.jstree', function() {
+            object.jstree('open_all');
         });
 
     }
@@ -129,71 +131,68 @@
             "plugins" : [
                 "wholerow",'checkbox', "contextmenu", "search", "state","types"
             ]
+        }).on('loaded.jstree', function() {
+            object.jstree('open_all');
         });
 
     }
 
-    $('#btn_delete_node').hide();
-    $('#btn_move_node').hide();
 
-    $(document).ready(function() {
 
-        $("#btn_add_role").click(function () {
-            toggleSidebarStaffRole();
+    function remove_role(mix_array){
+        var result = [];
+        $.each(mix_array,function(index,element){
+           if(element.split("_")[0] != 'role'){
+                result.push(element);
+           }
+        });
 
-                if($("#selected_staffs").jstree('get_selected').length !== 0) {
+        return result;
+    }
 
-                    $('#btn_delete_node').show();
-                    $('#btn_move_node').show();
-                } else {
+    function enable_modify_staff(){
+        if(!$("#btn_add_role").is(":visible")){
+
+            if(remove_role($("#selected_staffs").jstree('get_selected')).length > 0) {
+                if($('.popUpRoleDown').is(":visible")) {
                     $('#btn_delete_node').hide();
                     $('#btn_move_node').hide();
+                } else {
+                    $('#btn_delete_node').show();
+                    $('#btn_move_node').show();
                 }
+            } else {
+                disable_modify_staff();
+            }
+        }
+    }
 
-                $("#selected_staffs").bind('select_node.jstree', function(e) {
+    function disable_modify_staff(){
+        $('#btn_delete_node').hide();
+        $('#btn_move_node').hide();
+        $('.popUpRoleDown').hide();
+    }
 
-                    if($('.popUpRoleDown').hasClass('show')) {
-                        $('#btn_delete_node').hide();
-                        $('#btn_move_node').hide();
-                    } else {
-                        $('#btn_delete_node').show();
-                        $('#btn_move_node').show();
-                    }
+    // Button modify role is clicked
+    $("#btn_add_role").click(function () {
+        toggleSidebarStaffRole();
+        enable_modify_staff();
+        $('#assign_role_staff').show();
+    });
 
-
-                }).bind("deselect_node.jstree", function(evt, data) {
-
-                    if($("#selected_staffs").jstree('get_selected').length != 0) {
-                        if($('.popUpRoleDown').hasClass('show')) {
-                            $('#btn_delete_node').hide();
-                            $('#btn_move_node').hide();
-                        } else {
-                            $('#btn_delete_node').show();
-                            $('#btn_move_node').show();
-                        }
-                    } else {
-                        //console.log($("#selected_staffs").jstree('get_selected').length);
-                        $('#btn_delete_node').hide();
-                        $('#btn_move_node').hide();
-
-                        if($('.popUpRoleDown').hasClass('show')) {
-                            $('.popUpRoleDown').slideFadeToggle().removeClass('show');
-                        }
-
-                    }
-                });
-
-        });
+    $("#selected_staffs")
+    .bind('changed.jstree', function(e) { // Bind event select on jstree
+        enable_modify_staff();
+    });
 
 
-        $('#btn_cancel_staff_role').on('click',function() {
+    $('#btn_cancel_staff_role').on('click',function() {
 
-            $('.popUpRoleDown').hide();
-            toggleSidebarStaffRole();
-            return false;
-        });
-
-
+        $('.popUpRoleDown').hide();
+        toggleSidebarStaffRole();
+        disable_modify_staff();
+        $('#assign_role_staff').hide();
+        return false;
     });
 
 
@@ -201,7 +200,7 @@
 
     $('#btn_move_node').on('click', function() {
         disableButton($('#btn_delete_node'), $('#btn_move_node') );
-        $('.popUpRoleDown').slideFadeToggle().addClass('show');
+        $('.popUpRoleDown').show();
 
 
 
@@ -224,14 +223,13 @@
 
 
     function ajaxRequest(method, baseUrl, baseData){
-        console.log('hello');
+
          $.ajax({
             type: method,
             url: baseUrl,
             data: baseData,
             dataType: "json",
             success: function(resultData) {
-                console.log(resultData);
                 if(resultData.status=='add_role_success'){
                     var myOptions = {
                         val1: resultData.role_id
@@ -247,8 +245,28 @@
 
                     });
                 }
+
                 $('#all_staff_role').jstree("refresh");
                 $('#selected_staffs').jstree("refresh");
+
+                $('#selected_staffs').on("refreshed.jstree", function (event, data)
+                {
+                    $('#selected_staffs').jstree("open_all");
+                });
+
+
+
+                $('#all_staff_role').on("refreshed.jstree", function (event, data)
+                {
+                    $('#selected_staffs').jstree("open_all");
+                });
+
+
+
+                if($("#all_staff_role").jstree('get_selected').length == 0) {
+                    $('#btn_save_staff_role').hide();
+                }
+                enable_modify_staff();
                 notify("success","info", "You have done!");
             }
         });

@@ -9,6 +9,7 @@ use App\Http\Requests\Backend\Exam\ViewExamRequest;
 use App\Http\Requests\Backend\Exam\UpdateExamRequest;
 use App\Models\AcademicYear;
 use App\Models\Building;
+use App\Models\Candidate;
 use App\Models\EntranceExamCourse;
 use App\Models\ExamRoom;
 use App\Models\ExamType;
@@ -17,10 +18,17 @@ use App\Repositories\Backend\Exam\ExamRepositoryContract;
 use App\Repositories\Backend\TempEmployeeExam\TempEmployeeExamRepositoryContract;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Crypt;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Response;
 use Illuminate\Http\Request;
 use App\Http\Requests;
+use App\Http\Requests\Backend\Exam\ViewSecretCodeRequest;
+use App\Http\Requests\Backend\EntranceExamCourse\CreateEntranceExamCourseRequest;
+use App\Http\Requests\Backend\Exam\ModifyExamRoomRequest;
+use App\Http\Requests\Backend\Candidate\GenerateRoomExamRequest;
+use App\Http\Requests\Backend\Exam\DownloadExaminationDocumentsRequest;
+
 
 class ExamController extends Controller
 {
@@ -90,7 +98,9 @@ class ExamController extends Controller
     /**
      * Display the specified resource.
      *
-     * @param  int  $id
+     * @param ViewExamRequest $request
+     * @param int $type_id
+     * @param  int  $exam_id
      * @return \Illuminate\Http\Response
      */
 
@@ -113,15 +123,17 @@ class ExamController extends Controller
     /**
      * Show the form for editing the specified resource.
      *
-     * @param  int  $id
+     * @param EditExamRequest $request
+     * @param  int  $type_id
+     * @param int $exam_id
      * @return \Illuminate\Http\Response
      */
-    public function edit(EditExamRequest $request, $id)
+    public function edit(EditExamRequest $request, $type_id, $exam_id)
     {
 
-        $exam = $this->exams->findOrThrowException($id);
+        $exam = $this->exams->findOrThrowException($exam_id);
 
-        $type = $exam->type->id;
+        $type = $type_id;
         $academicYear = AcademicYear::where('id',$exam->academicYear->id)->lists('name_kh','id');
         $examType = ExamType::where('id',$type)->lists('name_kh','id')->toArray();
 
@@ -144,23 +156,20 @@ class ExamController extends Controller
     /**
      * Remove the specified resource from storage.
      *
+     * @param DeleteExamRequest $request
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
     public function destroy(DeleteExamRequest $request, $id)
     {
-            $this->exams->destroy($id);
-        if($request->ajax()){
-            return json_encode(array("success"=>true));
-        } else {
-            return redirect()->route('admin.exams.index')->withFlashSuccess(trans('alerts.backend.generals.deleted'));
-        }
+        $this->exams->destroy($id);
     }
 
-    public function data($id)
+    public function data(ViewExamRequest $request, $id)
     {
         $exams = DB::table('exams')
             ->where('type_id',$id)
+            ->where('active',true)
             ->select(['id','type_id','name','date_start','date_end','description']);
 
         $datatables =  app('datatables')->of($exams);
@@ -242,37 +251,37 @@ class ExamController extends Controller
         }
     }*/
 
-    public function get_buildings($id){
-        $type = $_GET['type'];
-        $data = array();
-        $all_ids = $this->get_all_room_ids();
-        $ids = $this->get_selected_room_ids($id);
+//    public function get_buildings($id){
+//        $type = $_GET['type'];
+//        $data = array();
+//        $all_ids = $this->get_all_room_ids();
+//        $ids = $this->get_selected_room_ids($id);
+//
+//        if($type == "available"){
+//            $ids = $this->get_available_room_ids($all_ids,$ids);
+//        }
+//
+//        $buildings = DB::table('rooms')
+//            ->select('buildings.name','buildings.id')
+//            ->whereIN('rooms.id',$ids)
+//            ->join('buildings','rooms.building_id','=','buildings.id')
+//            ->groupBy('buildings.id')
+//            ->get();
+//
+//        foreach ($buildings as $building){
+//            $element = array(
+//                "id"=>'building_'.$building->id,
+//                "text" => $building->name,
+//                "children"=>true,
+//                "type"=>"building"
+//            );
+//            array_push($data,$element);
+//        }
+//
+//        return Response::json($data);
+//    }
 
-        if($type == "available"){
-            $ids = $this->get_available_room_ids($all_ids,$ids);
-        }
-
-        $buildings = DB::table('rooms')
-            ->select('buildings.name','buildings.id')
-            ->whereIN('rooms.id',$ids)
-            ->join('buildings','rooms.building_id','=','buildings.id')
-            ->groupBy('buildings.id')
-            ->get();
-
-        foreach ($buildings as $building){
-            $element = array(
-                "id"=>'building_'.$building->id,
-                "text" => $building->name,
-                "children"=>true,
-                "type"=>"building"
-            );
-            array_push($data,$element);
-        }
-
-        return Response::json($data);
-    }
-
-    public function add_room($id){
+    public function add_room(ModifyExamRoomRequest$request, $id){
 
         $exam = $this->exams->findOrThrowException($id);
 
@@ -291,7 +300,7 @@ class ExamController extends Controller
         return view('backend.exam.includes.exam_room_list',compact('exam_rooms'));
     }
 
-    public function merge_rooms($id){
+    public function merge_rooms(ModifyExamRoomRequest $request, $id){
 
         $exam = $this->exams->findOrThrowException($id);
         $rooms = $_POST['rooms'];
@@ -317,7 +326,7 @@ class ExamController extends Controller
         return view('backend.exam.includes.exam_room_list',compact('exam_rooms'));
     }
 
-    public function split_room($id){
+    public function split_room(ModifyExamRoomRequest$request, $id){
 
         //dd($_POST);
         $exam = $this->exams->findOrThrowException($id);
@@ -340,7 +349,8 @@ class ExamController extends Controller
         return view('backend.exam.includes.exam_room_list',compact('exam_rooms'));
     }
 
-    public function generate_rooms($id){
+    public function generate_rooms(ModifyExamRoomRequest $request, $id){ // In Room section
+
         $exam = $this->exams->findOrThrowException($id);
         $exam_rooms = $exam->rooms()->get();
 
@@ -357,7 +367,7 @@ class ExamController extends Controller
 
         foreach($rooms as $room){
             $exam_room = new ExamRoom();
-            if($room->nb_chair_exam > $_POST['exam_chair']+ 5 || $_POST['exam_chair'] -5){
+            if($room->nb_chair_exam > $_POST['exam_chair']+ 5 || $room->nb_chair_exam < $_POST['exam_chair'] -5){
                 $exam_room->nb_chair_exam = $room->nb_chair_exam;
             } else {
                 $exam_room->nb_chair_exam = $_POST['exam_chair'];
@@ -378,27 +388,27 @@ class ExamController extends Controller
         return view('backend.exam.includes.exam_room_list',compact('exam_rooms'));
     }
 
-    public function save_rooms($id){
-        $exam = $this->exams->findOrThrowException($id);
+//    public function save_rooms($id){
+//        $exam = $this->exams->findOrThrowException($id);
+//
+//        $room_ids = json_decode($_POST['room_ids']);
+//        $ids = [];
+//        foreach($room_ids as $room_id){
+//            $tmp = explode('_',$room_id);
+//            if($tmp[0] == "room"){  // Because ids that are pass alongs include buildings as well. We need to remove that.
+//                array_push($ids,$tmp[1]);
+//            }
+//        }
+//
+//        if($exam->rooms()->sync($ids,false)) {  // Add room ids without deleting old ids
+//            return Response::json(array("success"=>true));
+//        } else {
+//            return Response::json(array("success"=>false));
+//        }
+//
+//    }
 
-        $room_ids = json_decode($_POST['room_ids']);
-        $ids = [];
-        foreach($room_ids as $room_id){
-            $tmp = explode('_',$room_id);
-            if($tmp[0] == "room"){  // Because ids that are pass alongs include buildings as well. We need to remove that.
-                array_push($ids,$tmp[1]);
-            }
-        }
-
-        if($exam->rooms()->sync($ids,false)) {  // Add room ids without deleting old ids
-            return Response::json(array("success"=>true));
-        } else {
-            return Response::json(array("success"=>false));
-        }
-
-    }
-
-    public function delete_rooms($id){
+    public function delete_rooms(ModifyExamRoomRequest $request, $id){
         $exam = $this->exams->findOrThrowException($id);
 
         $room_ids = $_POST['exam_room'];
@@ -423,15 +433,23 @@ class ExamController extends Controller
 
     }
 
-    public function view_room_secret_code($exam_id){
+    public function view_room_secret_code(ViewSecretCodeRequest $request, $exam_id){
         $exam = $this->exams->findOrThrowException($exam_id);
 
-        $rooms = $exam->rooms()->with('building')->withPivot('roomcode')->get()->toArray();
+        $rooms = $exam->rooms()->with('building')->get()->toArray();
+
+        foreach($rooms as &$room){
+            if($room['roomcode'] == ""){
+                $room['roomcode'] = "";
+            } else {
+                $room['roomcode'] = Crypt::decrypt($room['roomcode']);
+            }
+        }
 
         return view('backend.exam.includes.popup_room_secret_code',compact('rooms','exam_id'));
     }
 
-    public function save_room_secret_code($exam_id){
+    public function save_room_secret_code(ViewSecretCodeRequest $request, $exam_id){
 
         $rooms = json_decode($_POST['room_ids']);
         //dd($rooms);
@@ -439,30 +457,30 @@ class ExamController extends Controller
             DB::table('examRooms')
                 ->where('exam_id',$exam_id)
                 ->where('id',$room->room_id)
-                ->update(['roomcode'=>$room->secret_code]);
+                ->update(['roomcode'=> Crypt::encrypt($room->secret_code)]);
         }
 
-        return Response::json(array('success'=>true));
+        return Response::json(array('success'=>true,'message'=>"Secret code is saved successfully"));
     }
 
-    public function download_attendance_list($exam_id){
+    public function download_attendance_list(DownloadExaminationDocumentsRequest $request, $exam_id){
 
         $exam = $this->exams->findOrThrowException($exam_id);
         $courses = $exam->entranceExamCourses()->get();
-        $rooms = $exam->rooms()->with('building')->withPivot('roomcode')->get();
+        $rooms = $exam->rooms()->with('building')->get();
 
         return view('backend.exam.print.attendance_list',compact('rooms','courses'));
     }
 
-    public function download_candidate_list($exam_id){
+    public function download_candidate_list(DownloadExaminationDocumentsRequest $request,$exam_id){
 
         $exam = $this->exams->findOrThrowException($exam_id);
-        $rooms = $exam->rooms()->with('building')->withPivot('roomcode')->get();
+        $rooms = $exam->rooms()->with('building')->get();
 
         return view('backend.exam.print.candidate_list',compact('rooms'));
     }
 
-    public function download_candidate_list_by_register_id($exam_id){
+    public function download_candidate_list_by_register_id(DownloadExaminationDocumentsRequest $request,$exam_id){
 
         $exam = $this->exams->findOrThrowException($exam_id);
         $candidates = $exam->candidates()->with('gender')->with('room')->with('room.building')->orderBy('register_id')->get()->toArray();
@@ -472,17 +490,17 @@ class ExamController extends Controller
         return view('backend.exam.print.candidate_list_order_by_register_id',compact('chunk_candidates'));
     }
 
-    public function download_room_sticker($exam_id){
+    public function download_room_sticker(DownloadExaminationDocumentsRequest $request,$exam_id){
         $exam = $this->exams->findOrThrowException($exam_id);
-        $rooms = $exam->rooms()->with('building')->withPivot('roomcode')->get();
+        $rooms = $exam->rooms()->with('building')->get();
 
         return view('backend.exam.print.room_sticker',compact('rooms'));
     }
 
-    public function download_correction_sheet($exam_id){
+    public function download_correction_sheet(DownloadExaminationDocumentsRequest $request,$exam_id){
         $exam = $this->exams->findOrThrowException($exam_id);
         $courses = $exam->entranceExamCourses()->get();
-        $rooms = $exam->rooms()->with('building')->with('candidates')->with('candidates.gender')->withPivot('roomcode')->get();
+        $rooms = $exam->rooms()->with('building')->with('candidates')->with('candidates.gender')->get();
 
 
         return view('backend.exam.print.correction_sheet',compact('rooms','courses'));
@@ -526,14 +544,21 @@ class ExamController extends Controller
         if($correction != null) {
 
             $roomCodes = DB::table('examRooms')
-                ->select('examRooms.roomcode as room_code', 'examRooms.id as room_id')->get();
+                ->select('examRooms.roomcode as room_code', 'examRooms.id as room_id')
+                ->orderBy('room_code', 'ASC')->get();
 
             if($roomCodes) {
 
                 foreach($roomCodes as $roomCode) {
 
                     $check =0;
-                    $numberOfCandidateInEachRoom = DB::table('candidates')->where('candidates.room_id', $roomCode->room_id)->select('candidates.id as candidate_id')->get();
+                    $numberOfCandidateInEachRoom = DB::table('candidates')
+                        ->where([
+                            ['candidates.room_id', $roomCode->room_id],
+                            ['candidates.active', '=', true]
+                        ])
+                        ->select('candidates.id as candidate_id')
+                        ->get();
 
                     if($numberOfCandidateInEachRoom) {
 
@@ -556,10 +581,13 @@ class ExamController extends Controller
                             }
                         }
                         if($check !== count($numberOfCandidateInEachRoom)) {
-                            $rooms[$roomCode->room_id]=$roomCode->room_code;
+
+                            $rooms[$roomCode->room_id]=Crypt::decrypt($roomCode->room_code);
                         }
                     }
                 }
+
+                asort($rooms);
 
                 return view('backend.exam.includes.partial_selection_room_course', compact('rooms'))->render();
             } else {
@@ -597,14 +625,19 @@ class ExamController extends Controller
 
     }
 
-    public function insertScoreForEachCandiate($exam_id, Request $request) {
-//        Requests\Backend\Exam\StoreEntranceExamScoreRequest
-        $requestDatas = $_POST;
-//        dd($requestDatas);
-        $candidates = $this->exams->insertCandidateScore($exam_id, $requestDatas);
+    public function insertScoreForEachCandiate($exam_id, Requests\Backend\Exam\StoreEntranceExamScoreRequest $request) {
 
-        if($candidates['status']) {
-            return Response::json(['status'=>true]);
+        $requestDatas = $_POST;
+        $correctorName = $request->corrector_name;
+
+        if($correctorName) {
+            $candidates = $this->exams->insertCandidateScore($exam_id, $requestDatas, $correctorName);
+
+            if($candidates['status']) {
+                return Response::json(['status'=>true]);
+            } else {
+                return Response::json(['status'=>false]);
+            }
         } else {
             return Response::json(['status'=>false]);
         }
@@ -614,25 +647,34 @@ class ExamController extends Controller
     public function reportErrorCandidateScores($exam_id, Request $request) {
 
         $errorCandidateScores = $this->exams->reportErrorCandidateExamScores($exam_id, $request->course_id);
-        $totalQuestions = DB::table('entranceExamCourses')->select('total_question')->get();
+        $totalQuestions = DB::table('entranceExamCourses')
+            ->where('entranceExamCourses.active', '=', true)
+            ->select('total_question')
+            ->get();
         foreach($totalQuestions as $totalQuestion) {
             $totalQuestion = $totalQuestion->total_question;
         }
 
         return view('backend.exam.includes.popup_report_error_score_candidate', compact('exam_id', 'errorCandidateScores', 'totalQuestion'));
 
-
-
     }
 
     public function addNewCorrectionScore($exam_id, Requests\Backend\Exam\StoreEntranceExamScoreRequest $request) {
 
-        $res = $this->exams->addNewCorrectionCandidateScore($exam_id, $request);
-        if($res) {
-            return Response::json(['status'=> true]);
+        $correctorName  = $request->corrector_name;
+
+        if($correctorName) {
+            $res = $this->exams->addNewCorrectionCandidateScore($exam_id, $request, $correctorName);
+            if($res) {
+                return Response::json(['status'=> true]);
+            } else {
+                return Response::json(['status'=> false]);
+            }
         } else {
             return Response::json(['status'=> false]);
         }
+
+
     }
 
     public function candidateResultExamScores($exam_id) {
@@ -640,7 +682,10 @@ class ExamController extends Controller
         $errorStatus=false;
         $courses = [];
         $courseIds = DB::table('entranceExamCourses')
-                    ->where('exam_id', '=', $exam_id)
+                    ->where([
+                        ['exam_id', '=', $exam_id],
+                        ['entranceExamCourses.active', '=', true]
+                    ])
                     ->select('id as course_id', 'name_en as course_name')->get();
         if($courseIds) {
             foreach($courseIds as $courseId) {
@@ -669,9 +714,9 @@ class ExamController extends Controller
         $arrayResults = [];
         $candidateResult = [];
         $ids = [];
+        $candidateCompletedScoreIds = [];
         $passedCandidates = (int)$requestData['course_factor']['total_pass'];
         $reservedCandidates = (int)$requestData['course_factor']['total_reserve'];
-
         $checkPass = 0;
         $checkReserve = 0;
         $checkFail = 0;
@@ -679,6 +724,7 @@ class ExamController extends Controller
         foreach ($requestData['course_factor'] as $courseId => $factorValue) {
 
             if(is_numeric($courseId)) {
+
                 // this query is to get candidate score by each subject
                 // calculate only for copleted score of the candidate
                 $candidateScores = DB::table('candidates')
@@ -687,19 +733,25 @@ class ExamController extends Controller
                     ->where([
                         ['candidates.exam_id', '=', $examId],
                         ['candidateEntranceExamScores.entrance_exam_course_id', '=', $courseId ],
+                        ['candidates.active', '=', true],
                         ['candidateEntranceExamScores.is_completed', '=', true]
                     ])
                     ->select('candidateEntranceExamScores.entrance_exam_course_id','candidates.id as candidate_id','candidates.name_kh', 'candidateEntranceExamScores.score_c', 'candidateEntranceExamScores.score_w', 'candidateEntranceExamScores.score_na')
                     ->get();
 
+//                dd($candidateScores);
+
                 if($candidateScores) {
 
                     $subjectCoefficient = $requestData['course_factor']['subject_coe_'.$courseId];
+                    $wrongCoefficient = $requestData['course_factor']['wrong_coe_'.$courseId];
 
                     foreach($candidateScores as $candidateScore) {
 
                         // total score foreach subject: (score_correct * factor)- (score_wrong * 1)) * coefficient
-                        $totalScore = (($candidateScore->score_c * $factorValue) - $candidateScore->score_w) * $subjectCoefficient;
+
+                        $totalScore = (($candidateScore->score_c * $factorValue) - ($candidateScore->score_w * $wrongCoefficient) ) * $subjectCoefficient;
+
                         $element = (object)array(
                             'candidate_name'    => $candidateScore->name_kh,
                             'candidate_id'      => $candidateScore->candidate_id,
@@ -707,24 +759,24 @@ class ExamController extends Controller
                             'score_by_course'   => $totalScore
                         );
                         array_push($arrayResults, $element);
+                        $candidateCompletedScoreIds[] =  $candidateScore->candidate_id;
                     }
                 }
 
             }
         }
-        //this query will get candidate with completed score in all subject for the exam
-        $candidateIds = DB::table('candidateEntranceExamScores')
-                    ->where('is_completed', '=', true)
-                    ->select('candidate_id')->get();
-
-        foreach($candidateIds as $candidateId) {
-            array_push($ids, $candidateId->candidate_id);
-        }
-        $ids = array_unique($ids);
+        $candidateCompletedScoreIds = array_unique($candidateCompletedScoreIds);
         $candidateIds = [];
-        foreach($ids as $id) {
+        foreach($candidateCompletedScoreIds as $id) {
             array_push($candidateIds, $id);
         }
+
+        $nonExamingCandidateIds = DB::table('candidates')
+            ->select('candidates.id as candidate_id')
+            ->whereNotIn('candidates.id', $candidateIds)
+            ->where('candidates.active', '=', true)
+            ->get();
+
         //this is to calculate each candidate score for all subjects == (total_math + total_physic....)
         for($i=0; $i<count($candidateIds); $i++) {
             $totalSum = 0;
@@ -744,61 +796,66 @@ class ExamController extends Controller
 
             for($key = $passedCandidates; $key < count($candidateResult); $key++) {
 
-                if($key+1 < count($candidateResult)) {
-
-                    if($candidateResult[$passedCandidates-1]->total_score == $candidateResult[$key]->total_score) {
-                        $statusStudentPassed++;
-                    }
-
-                    if($candidateResult[ $passedCandidates + $reservedCandidates + $statusStudentPassed -1]->total_score == $candidateResult[$key]->total_score) {
-                        $statusStudentReserved++;
-                    }
+                if($candidateResult[$passedCandidates-1]->total_score == $candidateResult[$key]->total_score) {
+                    $statusStudentPassed++;
                 }
-
             }
 
+            for($key = $passedCandidates + $reservedCandidates + $statusStudentPassed ; $key < count($candidateResult); $key++) {
+
+                if($candidateResult[ $passedCandidates + $reservedCandidates + $statusStudentPassed -1]->total_score == $candidateResult[$key]->total_score) {
+                    $statusStudentReserved++;
+                }
+            }
             $passedCandidates = $passedCandidates + $statusStudentPassed;
-            $reservedCandidates = $reservedCandidates + $statusStudentReserved-1;// -1 because we compare redandancy of the index
+            $reservedCandidates = $reservedCandidates + $statusStudentReserved;// -1 because we compare redandancy of the index
+
         }
-//        dd($passedCandidates.'--'.$reservedCandidates);
 
         // this where to update candidate score base on passed or reserved
-        $candidateIds = [];
 
-        if($passedCandidates + $reservedCandidates > count($candidateResult)) {
-            return Response::json(array('status'=>false,'message'=>'There are not enough candidates!'));
+        if($passedCandidates == count($candidateResult)) {
 
-        } else {
             for($index =0; $index < $passedCandidates; $index++) {
                 $pass = $this->updateCandidateResultScore($candidateResult[$index]->candidate_id,$candidateResult[$index]->total_score, 'Pass' );
-                array_push($candidateIds,$candidateResult[$index]->candidate_id);
                 if($pass) {
                     $checkPass++;
                 }
             }
-            for($index=$passedCandidates; $index < count($candidateResult); $index++) {
-
-                $reserve = $this->updateCandidateResultScore($candidateResult[$index]->candidate_id,$candidateResult[$index]->total_score, 'Reserve' );
-                array_push($candidateIds,$candidateResult[$index]->candidate_id);
-                if($reserve) {
-                    $checkReserve++;
-                }
-            }
-            for($index=$passedCandidates + $reservedCandidates; $index < count($candidateResult); $index++) {
-
-                $fail = $this->updateCandidateResultScore($candidateResult[$index]->candidate_id,$candidateResult[$index]->total_score, 'Fail' );
-                array_push($candidateIds,$candidateResult[$index]->candidate_id);
-                if($fail) {
-                    $checkFail++;
-                }
-            }
-
-            $nonExamingCandidateIds = DB::table('candidates')->select('candidates.id as candidate_id')
-                ->whereNotIn('candidates.id', $candidateIds)
-                ->get();
-
             foreach($nonExamingCandidateIds as $nonExamingCandidateId) {
-                $fail = $this->updateCandidateResultScore($nonExamingCandidateId->candidate_id,0, 'Fail' );
+                $fail = $this->updateCandidateResultScore($nonExamingCandidateId->candidate_id,null, 'Reject' );
+            }
+        } else {
+            if($passedCandidates + $reservedCandidates > count($candidateResult)) {
+            return Response::json(array('status'=>false,'message'=>'There are not enough candidates!'));
+//                dd($passedCandidates + $reservedCandidates);
+
+            } else {
+                for($index =0; $index < $passedCandidates; $index++) {
+                    $pass = $this->updateCandidateResultScore($candidateResult[$index]->candidate_id,$candidateResult[$index]->total_score, 'Pass' );
+                    if($pass) {
+                        $checkPass++;
+                    }
+                }
+                for($index=$passedCandidates; $index < count($candidateResult); $index++) {
+
+                    $reserve = $this->updateCandidateResultScore($candidateResult[$index]->candidate_id,$candidateResult[$index]->total_score, 'Reserve' );
+                    if($reserve) {
+                        $checkReserve++;
+                    }
+                }
+                for($index=$passedCandidates + $reservedCandidates; $index < count($candidateResult); $index++) {
+
+                    $fail = $this->updateCandidateResultScore($candidateResult[$index]->candidate_id,$candidateResult[$index]->total_score, 'Fail' );
+                    array_push($candidateIds,$candidateResult[$index]->candidate_id);
+                    if($fail) {
+                        $checkFail++;
+                    }
+                }
+
+                foreach($nonExamingCandidateIds as $nonExamingCandidateId) {
+                    $fail = $this->updateCandidateResultScore($nonExamingCandidateId->candidate_id,null, 'Reject' );
+                }
             }
         }
 
@@ -811,11 +868,60 @@ class ExamController extends Controller
     public function candidateResultLists(Request $request) {
 
         $examId = $request->exam_id;
-        $candidatesResults = DB::table('candidates')->select('name_kh','name_latin', 'result','total_score', 'id')->get();
-
-        usort($candidatesResults, array($this, "sortCandidateRank"));
+        $candidatesResults = $this->getCandidateResult();
 
         return view('backend.exam.includes.examination_candidates_result', compact('candidatesResults', 'examId'));
+    }
+
+    private function getCandidateResult() {
+
+        $studentPassed = DB::table('candidates')
+            ->where([
+                ['candidates.result', '=', 'Pass'],
+                ['candidates.active', '=', true]
+
+            ])
+            ->select('name_kh','name_latin', 'result','total_score', 'id')
+            ->get();
+
+        $studentReserved = DB::table('candidates')
+            ->where([
+                ['candidates.result', '=', 'Reserve'],
+                ['candidates.active', '=', true]
+            ])
+            ->select('name_kh','name_latin', 'result','total_score', 'id')
+            ->get();
+
+        $studentFail = DB::table('candidates')
+            ->where([
+                ['candidates.result', '=', 'Fail'],
+                ['candidates.active', '=', true]
+        ])
+            ->select('name_kh','name_latin', 'result','total_score', 'id')
+            ->get();
+
+        $studentReject = DB::table('candidates')
+            ->where([
+                ['candidates.result', '=', 'Reject'],
+                ['candidates.active', '=', true]
+            ])
+            ->select('name_kh','name_latin', 'result','total_score', 'id')
+            ->get();
+
+        usort($studentPassed, array($this, "sortCandidateRank"));
+        usort($studentReserved, array($this, "sortCandidateRank"));
+        usort($studentFail, array($this, "sortCandidateRank"));
+
+
+        $candidateTmp1 =  array_merge((array) $studentPassed, (array) $studentReserved);
+        $candidateTmp2 = array_merge((array) $studentFail, (array) $studentReject);
+
+        $candidateResults = array_merge((array) $candidateTmp1, (array) $candidateTmp2);
+
+
+        return $candidateResults;
+
+
     }
 
     public function printCandidateResultLists(Request $request) {
@@ -825,13 +931,18 @@ class ExamController extends Controller
 
         } else {
 
-            $candidatesResults = DB::table('candidates')->select('name_kh','name_latin', 'result','total_score', 'id')->get();
+            $candidatesResults = $this->getCandidateResult();
 
-            usort($candidatesResults, array($this, "sortCandidateRank"));
+            if($candidatesResults) {
+                $status = true;
+                $candidatesResults = array_chunk($candidatesResults, 30);
+                return view('backend.exam.print.examination_candidates_result', compact('candidatesResults', 'status'));
+            } else {
+                $status = false;
+                return view('backend.exam.print.examination_candidates_result', compact('status'));
+            }
 
-            $candidatesResults = array_chunk($candidatesResults, 15);
 
-            return view('backend.exam.print.examination_candidates_result', compact('candidatesResults'));
         }
     }
 
@@ -842,24 +953,33 @@ class ExamController extends Controller
 
     private function updateCandidateResultScore($candidateId,$totalScore, $status) {
 
+        $candidate = Candidate::where('id',$candidateId )->get();
+
         $updateCandidateScore = DB::table('candidates')
-            ->where('id', '=', $candidateId )
+            ->where([
+                ['id', '=', $candidateId ],
+                ['candidates.active', '=', true]
+            ])
             ->update(array(
                 'total_score' => $totalScore,
                 'result' => $status,
             ));
+
+        if($updateCandidateScore) {
+            //UserLog
+            $this->exams->getUserLog($candidate,$model='Candidate', $action='Update');
+        }
 
         return $updateCandidateScore;
     }
 
 
 
-    public function generate_room($exam_id){
+    public function generate_room(GenerateRoomExamRequest $request, $exam_id){ // In candidate section
         $exam = $this->exams->findOrThrowException($exam_id);
-        $candidates = $exam->candidates()->orderBy('register_id')->get()->toArray();
+        $candidates = $exam->candidates()->where('active',true)->orderBy('register_id')->get()->toArray();
         $rooms = $exam->rooms()->get()->toArray();
 
-        //dd($rooms);
         $available_seat = 0;
         foreach($rooms as &$room){
             $room['current_seat'] = 0;
@@ -899,6 +1019,29 @@ class ExamController extends Controller
             if($current_room>=count($rooms)) $current_room = 0; // Reset index to 0 if over max
             $this->update_room_candidate($rooms,$current_room,$candidate);
         }
+    }
+
+    public function check_missing_candidates($exam_id){
+        $candidate_register_ids = Candidate::where('exam_id',$exam_id)->orderBy('register_id', 'ASC')->lists('register_id')->toArray();
+        if(count($candidate_register_ids)>0){
+            $missing = array_diff(range(1, max($candidate_register_ids)), $candidate_register_ids);
+
+            if(count($missing)>0){
+                return Response::json(array('status'=>true)); // There are some missing
+            } else {
+                return Response::json(array('status'=>false));
+            }
+        } else {
+            return Response::json(array('status'=>false)); // Nothing is missing
+        }
+
+    }
+
+    public function find_missing_candidates($exam_id){
+        $candidate_register_ids = Candidate::where('exam_id',$exam_id)->orderBy('register_id', 'ASC')->lists('register_id')->toArray();
+        $missing = array_diff(range(1, max($candidate_register_ids)), $candidate_register_ids);
+
+        return view('backend.exam.includes.popup_view_missing_candidate', compact('missing'));
     }
 
 }

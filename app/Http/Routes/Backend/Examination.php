@@ -33,6 +33,8 @@ Route::group([], function() {
     Route::get('exams/{id}/download_correction_sheet', 'ExamController@download_correction_sheet')->name('admin.exam.download_correction_sheet');
     Route::get('exams/{id}/download_candidate_list_by_register_id', 'ExamController@download_candidate_list_by_register_id')->name('admin.exam.download_candidate_list_by_register_id');
 
+    Route::get('exams/{id}/check_missing_candidates', 'ExamController@check_missing_candidates')->name('admin.exam.check_missing_candidates');
+    Route::get('exams/{id}/find_missing_candidates', 'ExamController@find_missing_candidates')->name('admin.exam.find_missing_candidates');
 
 //-------------Vannat
 

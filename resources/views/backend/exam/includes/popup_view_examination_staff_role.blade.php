@@ -15,7 +15,7 @@
             <h3 class="box-title">Listes of Staff Role</h3>
             <div class="pull-right">
                 <button id="assign_room" class="btn btn-primary"> Assign </button>
-                <button class="btn btn-primary" id="print_staff_role"> Print </button>
+                <button class="btn btn-primary" id="export_staff_role"> Export </button>
             </div>
         </div>
         <!-- /.box-header -->
@@ -125,8 +125,11 @@
                 data: baseData,
                 dataType:'json',
                 success: function(result) {
-                    console.log(result);
+
                     if(result.status == true) {
+
+                        notify("success","Info", "Good Job!!");
+
                         var baseUrl = "{{route('admin.exam.get_staff_by_role_course',$examId)}}";
                         var roomUrl = "{{route('admin.exam.get_room_list_by_role',$examId)}}";
 
@@ -173,51 +176,37 @@
             return staffWithRooms;
 
         }
-
-        function getStaffByRole () {
-
-            var course_id =  $('#entran_exam_course :selected').val();
-            var role_name =  $('#staff_role_selection :selected').text();
-
-
-
-            for(var key = 0; key< AllStaffs.length; key++) {
-
-                if( AllStaffs[key].role_name == role_name.trim()) {
-
-                    console.log(AllStaffs[key].staffs);
-
-                    for (var i = 0; i < AllStaffs[key].staffs.length; i++) {
-
-                        var newItem = $("<tbody class='table'><tr>" + "<td>" + i + "</td>" + "<td>" + AllStaffs[key].staffs[i].text + "<td>" + '' + "</td>"+ "</td>"+ "</tr></tbody>");
-
-                        console.log(newItem.html());
-
-                        $("#staff_tab").after(newItem.html());
-                    }
-                }
-            }
-        }
         function deleteRoom(key) {
             var roomId = $('#room_'+key).attr('value');
             var params = key.split('_');
-            var res =confirm('Do you want to delete ROOM : '+params[3]);
-            var baseUrl = "{{route('admin.exam.delete_room_from_staff',$examId)}}";
-            var baseData ={
-                room_id: roomId,
-                staff_id: params[2],
-                role_id: params[1],
-                staff_type: params[0],
+            var roomName = $('#room_'+key).attr('name');
 
-            };
-            if(res == true) {
-                Request('DELETE', baseUrl,baseData );
-            }
+//            var res =confirm('Do you want to delete ROOM : '+roomName);
 
+            swal({
+                title: "Confirm",
+                text: 'Do you want to delete ROOM : '+roomName,
+                type: "info",
+                showCancelButton: true,
+                confirmButtonColor: "#DD6B55",
+                confirmButtonText: "Yes",
+                closeOnConfirm: true
+            }, function(confirmed) {
+                if (confirmed) {
+                    var baseUrl = "{{route('admin.exam.delete_room_from_staff',$examId)}}";
+                    var baseData ={
+                        room_id: roomId,
+                        staff_id: params[2],
+                        role_id: params[1],
+                        staff_type: params[0],
 
+                    };
 
+                    Request('DELETE', baseUrl,baseData );
+                }
+            });
 
-            window_report_error = PopupCenterDual(popUpUrl+"?staff_role_id=" + key+"&&room_id=" +roomId,'Error Inputted Score Form ','250','200');
+//            window_report_error = PopupCenterDual(popUpUrl+"?staff_role_id=" + key+"&&room_id=" +roomId,'Error Inputted Score Form ','250','200');
         }
 
 
@@ -226,12 +215,19 @@
 
             var baseUrl = "{{route('admin.exam.update_staff_with_room',$examId)}}";
             var baseData =  storeStaffRoleRooms(getRoomCheckedVal(), getStaffCheckedVal());
-            Request('PUT', baseUrl, baseData);
+            if(baseData.staff_id.length > 0 && baseData.room_id.length > 0) {
+                Request('PUT', baseUrl, baseData);
+            } else{
 
+                notify("error","Info", "Please check before assign room!!");
+            }
         })
 
 
-        $('#print_staff_role').on('click', function() {
+        $('#export_staff_role').on('click', function() {
+
+            var baseUrl = '{!! route('admin.exam.staff_role_room_examination_export', $examId) !!}';
+            window.location.href = baseUrl;
 
             {{--var baseUrl  = "{!! route('admin.exam.print_role_staff_lists', $examId) !!}";--}}
 

@@ -14,22 +14,28 @@
             text-align: center;
             padding-top: 3px !important;
             padding-bottom: 3px !important;
+            border-bottom: 1px solid black;
+            border-top: 1px solid black;
+            border-collapse: collapse;
+
         }
     </style>
 @stop
 @section('content')
     <?php
-        $page_number = 1;
         $total_page = count($rooms);
     ?>
     @foreach($courses as $course)
+        <?php
+            $page_number = 1;
+        ?>
         @foreach($rooms as $room)
             <div class="page">
-                <h3>បញ្ជីវត្តមានបេក្ខជន⁣ បន្ទប់ {{$room->name." ".$room->building->code}} <span class="pull-right">{{$course->name_kh}}</span></h3>
+                <h3>បញ្ជីវត្តមានបេក្ខជន⁣ បន្ទប់ {{$room->building->code."-".$room->name}} <span class="pull-right">{{$course->name_kh}}</span></h3>
 
                 <table class="table" width="100%">
                     <tr>
-                        <th>លេខរៀង</th>
+                        <th width="15px;">ល.រ</th>
                         <th>លេខបង្កាន់ដៃ</th>
                         <th>ឈ្មោះ</th>
                         <th>ឈ្មោះឡាតាំង</th>
@@ -48,7 +54,7 @@
                             <td class="left">{{$candidate->name_kh}}</td>
                             <td class="left">{{$candidate->name_latin}}</td>
                             <td>{{$candidate->gender->code}}</td>
-                            <td>{{$candidate->dob->toFormattedDateString()}}</td>
+                            <td class="left">{{$candidate->dob->formatLocalized("%d/%b/%Y")}}</td>
                             <td></td>
                             <?php $index++; ?>
                         </tr>

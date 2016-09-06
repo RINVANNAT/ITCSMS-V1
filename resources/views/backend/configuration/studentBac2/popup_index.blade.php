@@ -28,7 +28,7 @@
 
         <div class="box-body">
             <div>
-                <table class="table table-striped table-bordered table-hover" id="studentBac2s-table">
+                <table width="100%" class="table table-striped table-bordered table-hover" id="studentBac2s-table">
                     <thead>
                     <tr>
                         <th>{{ trans('labels.backend.studentBac2s.fields.name_kh') }}</th>
@@ -39,6 +39,7 @@
                         <th>{{ trans('labels.backend.studentBac2s.fields.grade') }}</th>
                         <th>{{ trans('labels.backend.studentBac2s.fields.origin') }}</th>
                         <th>{{ trans('labels.backend.studentBac2s.fields.bac_year') }}</th>
+                        <th>Apply from</th>
                         <th>{{ trans('labels.general.actions') }}</th>
                     </tr>
                     </thead>
@@ -80,6 +81,7 @@
                     { data: 'gdeGrade_name_en', name: 'gdeGrades.name_en',searchable:false},
                     { data: 'origin', name: 'origins.name_kh',searchable:false},
                     { data: 'bac_year', name: 'studentBac2s.bac_year',searchable:false},
+                    { data: 'status', name: 'studentBac2s.status',searchable:false},
                     { data: 'export', name: 'export',orderable: false, searchable: false}
                 ]
             });
@@ -108,8 +110,7 @@
             });
 
             $("#btn-manual").on("click",function(){
-                var me = 00;
-                candidate_window = PopupCenterDual("{!! route('admin.candidate.popup_create').'?exam_id='.$exam_id.'&studentBac2_id=0' !!}",'Add new Candidate','1200','960');
+                candidate_window = PopupCenterDual("{!! route('admin.candidates.create').'?exam_id='.$exam_id.'&studentBac2_id=0' !!}",'Add new Candidate','1200','960');
             });
 
             $('div.dataTables_filter input').focus()

@@ -30,9 +30,11 @@
                         <div id="empty_room_notification" class="well">
                             There is no any room selected.
 
+                            @permission('modify-exam-room')
                             <button class="btn btn-sm btn-info pull-right" id="generate_room_exam">
                                 Generate Rooms
                             </button>
+                            @endauth
                         </div>
                         <div id="form_generate_room_wrapper" class="well" style="display: none">
 

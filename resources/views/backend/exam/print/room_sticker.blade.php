@@ -35,7 +35,7 @@
                 <div class="col-md-3 col-sm-3 col-xs-3 sticker">
                     <div class="col-md-12 col-sm-12 col-xs-12 border">
                         <center><h2>{{str_pad($candidate->register_id, 4, '0', STR_PAD_LEFT)}}</h2></center>
-                        <span>{{$room->name." ".$room->building->code}}</span>
+                        <span>{{$room->building->code."-".$room->name}}</span>
                     </div>
                 </div>
             @endforeach

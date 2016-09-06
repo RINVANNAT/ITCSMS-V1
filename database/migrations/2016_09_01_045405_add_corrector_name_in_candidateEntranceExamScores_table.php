@@ -3,7 +3,7 @@
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
 
-class AddIsRegisterItcFieldToStudentBac2s extends Migration
+class AddCorrectorNameInCandidateEntranceExamScoresTable extends Migration
 {
     /**
      * Run the migrations.
@@ -12,8 +12,8 @@ class AddIsRegisterItcFieldToStudentBac2s extends Migration
      */
     public function up()
     {
-        Schema::table('studentBac2s', function (Blueprint $table) {
-            $table->boolean('is_register_itc')->default(false)->nullable();
+        Schema::table('candidateEntranceExamScores', function (Blueprint $table) {
+            $table->string('corrector')->nullable();
         });
     }
 
@@ -24,8 +24,8 @@ class AddIsRegisterItcFieldToStudentBac2s extends Migration
      */
     public function down()
     {
-        Schema::table('studentBac2s', function (Blueprint $table) {
-            $table->dropColumn('is_register_itc');
+        Schema::table('candidateEntranceExamScores', function (Blueprint $table) {
+            $table->dropColumn('corrector');
         });
     }
 }

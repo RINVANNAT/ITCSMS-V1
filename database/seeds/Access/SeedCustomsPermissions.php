@@ -439,7 +439,7 @@ class SeedCustomsPermissions extends Seeder
                             ]
                         ],
                         [
-                            'name'         => 'download-examination-staff',
+                            'name'         => 'download-examination-document',
                             'display_name' => "Download examination's documents",
                             'dependency'   => [
                                 'view-backend','view-exam-management','view-exam-document'
@@ -527,13 +527,6 @@ class SeedCustomsPermissions extends Seeder
                                 'view-backend','view-exam-management'
                             ]
 
-                        ],
-                        [
-                            'name'          => 'request-input-score-form',
-                            'display_name'  => 'Get/Request Candidate List Form to Insert The Correction',
-                            'dependency'   => [
-                                'view-backend','view-exam-management'
-                            ]
                         ],
                         [
                             'name'          => 'report-error-on-inputted-score',

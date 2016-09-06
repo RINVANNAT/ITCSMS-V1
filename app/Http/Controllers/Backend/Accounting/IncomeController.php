@@ -813,7 +813,7 @@ class IncomeController extends Controller
             /*UserLog
             UserLog::log([
                 'model' => 'StudentBac2',
-                'action'   => 'Import',
+                'action'   => 'Import', // Import, Create, Delete, Update
                 'data'     => 'none', // if it is create action, store only the new id.
                 'developer'   => Auth::id() == 1?true:false
             ]); */

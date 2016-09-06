@@ -79,16 +79,24 @@
             <div class="clearfix"></div>
         </div><!-- /.box-body -->
     </div><!--box-->
+
+    <div class="loading">
+        <i class="fa fa-refresh fa-spin"></i>
+    </div>
 @stop
 
 @section('after-scripts-end')
    {{--here where i need to write the js script --}}
    <script>
 
+       $(document).ready(function(){
+           toggleLoading(false);
+       });
+
        var input_score_url = "{{route('admin.exam.request_input_score_form',$exam_id)}}";
 
        function ajaxRequest(method, baseUrl, baseData){
-           console.log('hello');
+
            $.ajax({
                type: method,
                url: baseUrl,
@@ -96,8 +104,6 @@
                success: function(result) {
                    console.log(result);
                    $('.selection_room_course').html(result);
-
-
                }
            });
        }
@@ -138,7 +144,7 @@
            if(requestData.room_id) {
                if(numberCorrection !== null) {
                    console.log(numberCorrection);
-                   input_score_window = PopupCenterDual(input_score_url+"?room_id="+requestData.room_id+"&entrance_course_id="+requestData.entrance_course_id+"&number_correction="+ numberCorrection +"&course_name="+requestData.entrance_course_name + "&room_code=" + requestData.room_code,'request input form ','1200','960');
+                   input_score_window = PopupCenterDual(input_score_url+"?room_id="+requestData.room_id+"&entrance_course_id="+requestData.entrance_course_id+"&number_correction="+ numberCorrection +"&course_name="+requestData.entrance_course_name + "&room_code=" + requestData.room_code,'request input form ','1250','960');
                }
            }
 

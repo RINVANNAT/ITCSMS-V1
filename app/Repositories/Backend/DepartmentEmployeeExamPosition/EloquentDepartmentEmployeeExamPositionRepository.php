@@ -32,7 +32,10 @@ class EloquentDepartmentEmployeeExamPositionRepository extends EloquentTempEmplo
             $employeePositions = DB::table('employees')
                 ->join('employee_position', 'employees.id', '=', 'employee_position.employee_id')
                 ->join('positions', 'positions.id', '=', 'employee_position.position_id')
-                ->where('department_id', $department->id)
+                ->where([
+                    ['department_id', $department->id],
+                    ['employees.active', '=', true]
+                ])
                 ->whereNotIn('employees.id', $employeeWithRoleIds[0])
                 ->select('employees.id', 'employee_position.position_id', 'positions.title')->get();
 
@@ -88,7 +91,10 @@ class EloquentDepartmentEmployeeExamPositionRepository extends EloquentTempEmplo
             $employeePositions = DB::table('employees')
                 ->join('employee_position', 'employees.id', '=', 'employee_position.employee_id')
                 ->join('positions', 'positions.id', '=', 'employee_position.position_id')
-                ->where('department_id', $department_id)
+                ->where([
+                    ['department_id', $department_id],
+                    ['employees.active', '=', true]
+                ])
                 ->whereNotIn('employees.id', $employeeWithRoleIds[0])
                 ->select('employees.id', 'employee_position.position_id', 'positions.title')->get();
 
@@ -138,6 +144,7 @@ class EloquentDepartmentEmployeeExamPositionRepository extends EloquentTempEmplo
             ->select('employees.name_kh', 'employees.id', 'employees.department_id', 'positions.title', 'positions.id as position_id')
             ->where([
                 ['employee_position.position_id', '=', $position_id],
+                ['employees.active', '=', true],
                 ['employees.department_id', '=', $selectedDepartment_id]
             ])
             ->whereNotIn('employees.id', $employeeWithRoleIds[0])

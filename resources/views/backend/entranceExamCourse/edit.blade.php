@@ -6,11 +6,11 @@
 
     <div class="box box-success">
         <div class="box-header with-border">
-            <h3 class="box-title">{{ trans('labels.backend.exams.secret_code.title') }}</h3>
+            <h3 class="box-title">{{ trans('labels.backend.exams.course.edit_course') }}</h3>
         </div>
         <!-- /.box-header -->
         <div class="box-body">
-            {!! Form::model($entranceExamCourse, ['route' => ['admin.course.courseAnnuals.update', $courseAnnual->id],'class' => 'form-horizontal', 'role'=>'form', 'method' => 'patch','id'=> 'form_entrance_exam_course']) !!}
+            {!! Form::model($entranceExamCourse, ['route' => ['admin.entranceExamCourses.update', $entranceExamCourse->id],'class' => 'form-horizontal', 'role'=>'form', 'method' => 'patch','id'=> 'form_entrance_exam_course']) !!}
             @include('backend.entranceExamCourse.fields')
             {!! Form::close() !!}
         </div>
@@ -32,19 +32,34 @@
 @stop
 
 @section('after-scripts-end')
+    <script type="text/javascript" src="{{ url('vendor/jsvalidation/js/jsvalidation.js')}}"></script>
+    {!! JsValidator::formRequest('App\Http\Requests\Backend\EntranceExamCourse\UpdateEntranceExamCourseRequest') !!}
     <script>
-        $(function() {
-            $("#btn-save").click(function () {
+        function save_course(){
+            var status = $( "#form_entrance_exam_course" ).validate().form();
+            if(status ==true){
                 $.ajax({
                     type: 'POST',
-                    url: "{{route('admin.exam.save_entrance_exam_course',$exam_id)}}",
+                    url: $("#form_entrance_exam_course").attr('action'),
                     data: $("#form_entrance_exam_course").serialize(),
                     dataType: "json",
                     success: function(resultData) {
                         opener.update_ui_course();
-                        window.close();
+                        self.close();
                     }
                 });
+            }
+        }
+        $(function() {
+            $('#form_entrance_exam_course input').keypress(function (e) {
+                if (e.which == 13) {
+                    save_course();
+                    return false;
+                }
+            });
+
+            $("#btn-save").click(function () {
+                save_course();
             });
 
             $("#btn-cancel").click(function () {

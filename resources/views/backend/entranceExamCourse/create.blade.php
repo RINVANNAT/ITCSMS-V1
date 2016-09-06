@@ -32,9 +32,12 @@
 @stop
 
 @section('after-scripts-end')
+    <script type="text/javascript" src="{{ url('vendor/jsvalidation/js/jsvalidation.js')}}"></script>
+    {!! JsValidator::formRequest('App\Http\Requests\Backend\EntranceExamCourse\StoreEntranceExamCourseRequest') !!}
     <script>
-        $(function() {
-            $("#btn-save").click(function () {
+        function save_course(){
+            var status = $( "#form_entrance_exam_course" ).validate().form();
+            if(status ==true){
                 $.ajax({
                     type: 'POST',
                     url: $("#form_entrance_exam_course").attr('action'),
@@ -42,9 +45,21 @@
                     dataType: "json",
                     success: function(resultData) {
                         opener.update_ui_course();
-                        //window.close();
+                        self.close();
                     }
                 });
+            }
+        }
+        $(function() {
+            $('#form_entrance_exam_course input').keypress(function (e) {
+                if (e.which == 13) {
+                    save_course();
+                    return false;
+                }
+            });
+
+            $("#btn-save").click(function () {
+                save_course();
             });
 
             $("#btn-cancel").click(function () {

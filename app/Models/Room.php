@@ -34,10 +34,6 @@ class Room extends Model
         return $this->belongsTo('App\Models\RoomType');
     }
 
-    public function candidates(){
-        return $this->hasMany('App\Models\Candidate');
-    }
-
     /**
      * The attributes that should be casted to native types.
      *

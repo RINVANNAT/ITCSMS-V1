@@ -26,7 +26,8 @@ class EntranceExamCourseController extends Controller
     protected $exams;
 
     /**
-     * @param EntranceExamCourseRepositoryContract $courseProgramRepo
+     * @param EntranceExamCourseRepositoryContract $entranceExamCourseRepo
+     * @param ExamRepositoryContract $examRepo
      */
     public function __construct(
         EntranceExamCourseRepositoryContract $entranceExamCourseRepo,
@@ -41,7 +42,7 @@ class EntranceExamCourseController extends Controller
     /**
      * Show the form for creating a new resource.
      *
-     * @param CreateCourseProgramRequest $request
+     * @param CreateEntranceExamCourseRequest $request
      * @return \Illuminate\Http\Response
      */
     public function create(CreateEntranceExamCourseRequest $request)
@@ -53,7 +54,7 @@ class EntranceExamCourseController extends Controller
     /**
      * Store a newly created resource in storage.
      *
-     * @param  StoreCourseProgramRequest $request
+     * @param  StoreEntranceExamCourseRequest $request
      * @return \Illuminate\Http\Response
      */
     public function store(StoreEntranceExamCourseRequest $request)
@@ -72,34 +73,42 @@ class EntranceExamCourseController extends Controller
     /**
      * Show the form for editing the specified resource.
      *
-     * @param EditCourseProgramRequest $request
+     * @param EditEntranceExamCourseRequest $request
      * @param  int $id
      * @return \Illuminate\Http\Response
      */
     public function edit(EditEntranceExamCourseRequest $request, $id)
     {
-        $entranceExamCourse = $this->entranceExamCourse->findOrThrowException($id);
 
-        return view('backend.course.courseProgram.edit', compact('entranceExamCourse'));
+        $entranceExamCourse = $this->entranceExamCourse->findOrThrowException($id);
+        $exam_id = $entranceExamCourse->exam_id;
+        return view('backend.entranceExamCourse.edit', compact('entranceExamCourse','exam_id'));
     }
 
     /**
      * Update the specified resource in storage.
      *
-     * @param  UpdateCourseProgramRequest $request
+     * @param  UpdateEntranceExamCourseRequest $request
      * @param  int $id
      * @return \Illuminate\Http\Response
      */
     public function update(UpdateEntranceExamCourseRequest $request, $id)
     {
-        $this->entranceExamCourse->update($id, $request->all());
-        return redirect()->route('admin.course.entranceExamCourse.index')->withFlashSuccess(trans('alerts.backend.generals.updated'));
+        $result = $this->entranceExamCourse->update($id, $request->all());
+        if($request->ajax()){
+            if($result['status']==true){
+                return Response::json($result);
+            } else {
+                return Response::json($result,422);
+            }
+
+        }
     }
 
     /**
      * Remove the specified resource from storage.
      *
-     * @param DeleteCourseProgramRequest $request
+     * @param DeleteEntranceExamCourseRequest $request
      * @param  int $id
      * @return \Illuminate\Http\Response
      */
@@ -117,24 +126,29 @@ class EntranceExamCourseController extends Controller
     {
 
         $exam = Exam::find($exam_id);
-        $entranceExamCourse = $exam->entranceExamCourses();
+        $entranceExamCourse = $exam->entranceExamCourses()->where('active',true);
 
         $datatables =  app('datatables')->of($entranceExamCourse);
 
         return $datatables
-            ->addColumn('action', function ($item) use ($exam_id)  {
-                $result = ' <button class="btn btn-xs btn-danger btn-delete" data-remote="'.route('admin.entranceExamCourses.destroy', $item->id) .'"><i class="fa fa-times" data-toggle="tooltip" data-placement="top" title="' . trans('buttons.general.crud.delete') . '"></i></button>';
-                if(!Auth::user()->allow('report-error-on-inputted-score')){
-                    return $result;
-                } else {
-                    $errorCandidateScores = $this->exams->reportErrorCandidateExamScores($exam_id, $item->id);
+            ->addColumn('action', function ($item) use ($exam_id,$request)  {
+                $result = '';
+                if(Auth::user()->allow('delete-entrance-exam-courses')){
+                    $result = $result.' <button class="btn btn-xs btn-danger btn-delete" data-remote="'.route('admin.entranceExamCourses.destroy', $item->id) .'"><i class="fa fa-times" data-toggle="tooltip" data-placement="top" title="' . trans('buttons.general.crud.delete') . '"></i></button>';
+                }
+                if(Auth::user()->allow('edit-entrance-exam-courses')){
+                    $result = $result.' <button class="btn btn-xs btn-info btn_course_edit" data-remote="'.route('admin.entranceExamCourses.edit', $item->id) .'"><i class="fa fa-pencil" data-toggle="tooltip" data-placement="top" title="' . trans('buttons.general.crud.edit') . '"></i></button>';
+                }
+                if($request->check_course_error == "true"){
+                    if(Auth::user()->allow('report-error-on-inputted-score')){
+                        $errorCandidateScores = $this->exams->reportErrorCandidateExamScores($exam_id, $item->id);
 
-                    if(!empty($errorCandidateScores)){
-                        return $result.' <button class="btn btn-xs btn-danger btn-report-error" data-remote="'. $item->id .'">Report Error</button>';
-                    } else {
-                        return $result;
+                        if(!empty($errorCandidateScores)){
+                            $result = $result.' <button class="btn btn-xs btn-danger btn-report-error" data-remote="'. $item->id .'">Report Error</button>';
+                        }
                     }
                 }
+                return $result;
             })
             ->make(true);
     }

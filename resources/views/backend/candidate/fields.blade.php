@@ -2,9 +2,11 @@
 {!! Form::hidden('academic_year_id',$exam->academic_year_id)!!}
 {!! Form::hidden('studentBac2_id',$studentBac2==null?null:$studentBac2->id)!!}
 {!! Form::hidden('degree_id',1) !!}
-{!! Form::hidden('highschool_id',isset($studentBac2)?$studentBac2->highschool_id:null,['id'=>'highschool_id']) !!}
-
-
+@if(isset($candidate) && $candidate != null)
+    <input type="text" name="highschool_id" style="visibility: hidden;position: absolute;" value="{{$candidate->highschool_id}}" id="highschdool_id" />
+@else
+    <input type="text" name="highschool_id" style="visibility: hidden;position: absolute;" value="{!!isset($studentBac2) ?$studentBac2->highschool_id:null !!}" id="highschdool_id" />
+@endif
 <h3 style="font-size: 20px;"><i class="fa fa-user"></i> {{trans('labels.backend.candidates.header.personal_information')}}
 </h3>
 <hr style="margin-top:0px;"/>
@@ -34,7 +36,11 @@
     <div class="form-group col-sm-6 required">
         {!! Form::label('dob',trans('labels.backend.candidates.fields.dob'),array('class'=>'col-sm-4 control-label required')) !!}
         <div class="col-sm-8">
-            {!! Form::text('dob', isset($studentBac2)?$studentBac2->dob:null, array('class'=>'form-control date-form input','placeholder'=>'Birth Date','id'=>'candidate_dob','required'=>'required',isset($studentBac2)?"disabled":"")) !!}
+            @if(isset($candidate) && $candidate != null)
+                {!! Form::text('dob', $candidate->dob->format("d/m/Y"), array('class'=>'form-control date-form input','placeholder'=>'Birth Date','id'=>'candidate_dob','required'=>'required',isset($studentBac2)?"disabled":"")) !!}
+            @else
+                {!! Form::text('dob', isset($studentBac2)?$studentBac2->dob:null, array('class'=>'form-control date-form input','placeholder'=>'Birth Date','id'=>'candidate_dob','required'=>'required',isset($studentBac2)?"disabled":"")) !!}
+            @endif
         </div>
     </div>
 
@@ -72,112 +78,83 @@
     </div>
 </div>
 
-<div class="row no-margin">
-
-
-    <!--<div class="form-group col-sm-6">
-        {!! Form::label('email',trans('labels.backend.candidates.fields.email'),array('class'=>'col-sm-4 control-label')) !!}
-        <div class="col-sm-8">
-            {!! Form::text('email', null, array('class'=>'form-control input','placeholder'=>'Email','id'=>'candidate_email')) !!}
-        </div>
-    </div> -->
-
-</div>
-
-<!--<div class="row no-margin">
-
-    <div class="form-group col-sm-6">
-        {!! Form::label('address_current',trans('labels.backend.candidates.fields.address_current'),array('class'=>'col-sm-4 control-label')) !!}
-        <div class="col-sm-8">
-            {!! Form::textarea('address_current', null, array('class'=>'form-control input','placeholder'=>'Current Address','rows'=>2,'id'=>'candidate_address_current')) !!}
-        </div>
-    </div>
-
-    <div class="form-group col-sm-6">
-        {!! Form::label('address',trans('labels.backend.candidates.fields.address'),array('class'=>'col-sm-4 control-label')) !!}
-        <div class="col-sm-8">
-            {!! Form::textarea('address', null, array('class'=>'form-control input','placeholder'=>'Permanent Address','rows'=>2,'id'=>'candidate_address_permanent')) !!}
-        </div>
-    </div>
-
-</div> -->
-
 
 <h3 style="font-size: 20px;"><i class="fa fa-history"></i> {{trans('labels.backend.candidates.header.study_record')}}
 </h3>
 <hr style="margin-top:0px;"/>
 
 <div class="row no-margin">
-    <!--<div class="form-group col-sm-6 required">
-        {!! Form::label('mcs_no',trans('labels.backend.candidates.fields.mcs_no'),array('class'=>'col-sm-4 control-label')) !!}
-        <div class="col-sm-8">
-            {!! Form::text('mcs_no', isset($studentBac2->mcs_no)?$studentBac2->mcs_no:null, array('class'=>'form-control input','placeholder'=>'Ministry ID','id'=>'candidate_mcs_no')) !!}
-        </div>
-    </div>
-    <div class="form-group col-sm-6 required">
-        {!! Form::label('can_id',trans('labels.backend.candidates.fields.can_id'),array('class'=>'col-sm-4 control-label')) !!}
-        <div class="col-sm-8">
-            {!! Form::text('can_id', isset($studentBac2->can_id)?$studentBac2->can_id:null, array('class'=>'form-control input','placeholder'=>'BacII No','id'=>'candidate_can_id')) !!}
-        </div>
-    </div> -->
-    <div class="form-group col-sm-6 required">
-        {!! Form::label('highschool_id',trans('labels.backend.candidates.fields.highschool_id'),array('class'=>'col-sm-4 control-label required')) !!}
-        <div class="col-sm-8">
-            @if(isset($highschool))
-                {!! Form::text('highschool_name', $highschool->name_kh, array('class'=>'form-control input',isset($studentBac2)?"disabled":"")) !!}
-            @else
-                {!! Form::select('highschool_name',[], null, array('class'=>'form-control input','placeholder'=>'High school','id'=>'candidate_highschool_name','required'=>'required')) !!}
-            @endif
-        </div>
-    </div>
+    <div class="row no-margin">
+        <div class="form-group col-sm-6 required">
+            {!! Form::label('highschool_id',trans('labels.backend.candidates.fields.highschool_id'),array('class'=>'col-sm-4 control-label required')) !!}
+            <div class="col-sm-8">
 
-    <div class="form-group col-sm-6 required">
-        {!! Form::label('province_id',trans('labels.backend.candidates.fields.origin_id'),array('class'=>'col-sm-4 control-label required')) !!}
-        <div class="col-sm-8">
-            {!! Form::select('province_id',$provinces, isset($studentBac2->province_id)?$studentBac2->province_id:null, array('class'=>'form-control input','placeholder'=>'Origin','rows'=>3,'id'=>'candidate_province_id','required'=>'required',isset($studentBac2)?"disabled":"")) !!}
+                <select name="highschool_name" class="form-control input" id="candidate_highschool_name" required {{isset($studentBac2)?"disabled":""}}>
+                    @if(isset($highschool) && $highschool != null)
+                        @foreach($highschool as $key => $value)
+                        <option value="{!!$value!!}" selected="selected">{{$key}}</option>
+                        @endforeach
+                    @endif
+                </select>
+
+                {{--                {!! Form::select('highschool_name',[], null, array('class'=>'form-control input','placeholder'=>'High school','id'=>'candidate_highschool_name','required'=>'required')) !!}--}}
+
+            </div>
+        </div>
+
+        <div class="form-group col-sm-6 required">
+            {!! Form::label('province_id',trans('labels.backend.candidates.fields.origin_id'),array('class'=>'col-sm-4 control-label required')) !!}
+            <div class="col-sm-8">
+                {!! Form::select('province_id',$provinces, isset($studentBac2->province_id)?$studentBac2->province_id:null, array('class'=>'form-control input','placeholder'=>'Origin','rows'=>3,'id'=>'candidate_province_id','required'=>'required',isset($studentBac2)?"disabled":"")) !!}
+            </div>
         </div>
     </div>
 
-    <div class="form-group col-sm-6 required">
-        {!! Form::label('bac_percentile',trans('labels.backend.candidates.fields.bac_total_score'),array('class'=>'col-sm-4 control-label required')) !!}
-        <div class="col-sm-4">
-            {!! Form::text('bac_percentile', isset($studentBac2)?$studentBac2->percentile:null, array('class'=>'form-control input','placeholder'=>'Score','id'=>'candidate_bac_percentile','required'=>'required',isset($studentBac2)?"disabled":"")) !!}
+    <div class="row no-margin">
+        <div class="form-group col-sm-6 required">
+            {!! Form::label('bac_percentile',trans('labels.backend.candidates.fields.bac_total_score'),array('class'=>'col-sm-4 control-label required')) !!}
+            <div class="col-sm-4">
+                {!! Form::text('bac_percentile', isset($studentBac2)?$studentBac2->percentile:null, array('class'=>'form-control input','placeholder'=>'Score','id'=>'candidate_bac_percentile','required'=>'required',isset($studentBac2)?"disabled":"")) !!}
+            </div>
         </div>
-    </div>
-    <div class="form-group col-sm-6 required">
-        {!! Form::label('bac_math_grade',trans('labels.backend.candidates.fields.bac_math_grade'),array('class'=>'col-sm-4 control-label')) !!}
-        <div class="col-sm-4">
-            {!! Form::select('bac_math_grade',$gdeGrades, isset($studentBac2->bac_math_grade)?$studentBac2->bac_math_grade:null, array('class'=>'form-control input','placeholder'=>'','id'=>'candidate_bac_math_grade',isset($studentBac2)?"disabled":"")) !!}
-        </div>
-    </div>
-
-    <div class="form-group col-sm-6 required">
-        {!! Form::label('bac_total_grade',trans('labels.backend.candidates.fields.bac_total_grade'),array('class'=>'col-sm-4 control-label required')) !!}
-
-        <div class="col-sm-4">
-            {!! Form::select('bac_total_grade',$gdeGrades, isset($studentBac2)?$studentBac2->grade:null, array('class'=>'form-control input','placeholder'=>'','id'=>'candidate_bac_total_grade','required'=>'required',isset($studentBac2)?"disabled":"")) !!}
+        <div class="form-group col-sm-6 required">
+            {!! Form::label('bac_math_grade',trans('labels.backend.candidates.fields.bac_math_grade'),array('class'=>'col-sm-4 control-label')) !!}
+            <div class="col-sm-4">
+                {!! Form::select('bac_math_grade',$gdeGrades, isset($studentBac2->bac_math_grade)?$studentBac2->bac_math_grade:null, array('class'=>'form-control input','placeholder'=>'','id'=>'candidate_bac_math_grade',isset($studentBac2)?"disabled":"")) !!}
+            </div>
         </div>
     </div>
 
-    <div class="form-group col-sm-6 required">
-        {!! Form::label('bac_phys_grade',trans('labels.backend.candidates.fields.bac_phys_grade'),array('class'=>'col-sm-4 control-label')) !!}
+    <div class="row no-margin">
+        <div class="form-group col-sm-6 required">
+            {!! Form::label('bac_total_grade',trans('labels.backend.candidates.fields.bac_total_grade'),array('class'=>'col-sm-4 control-label required')) !!}
 
-        <div class="col-sm-4">
-            {!! Form::select('bac_phys_grade',$gdeGrades, isset($studentBac2->bac_phys_grade)?$studentBac2->bac_phys_grade:null, array('class'=>'form-control input','placeholder'=>'','id'=>'candidate_bac_phys_grade',isset($studentBac2)?"disabled":"")) !!}
+            <div class="col-sm-4">
+                {!! Form::select('bac_total_grade',$gdeGrades, isset($studentBac2)?$studentBac2->grade:null, array('class'=>'form-control input','placeholder'=>'','id'=>'candidate_bac_total_grade','required'=>'required',isset($studentBac2)?"disabled":"")) !!}
+            </div>
+        </div>
+
+        <div class="form-group col-sm-6 required">
+            {!! Form::label('bac_phys_grade',trans('labels.backend.candidates.fields.bac_phys_grade'),array('class'=>'col-sm-4 control-label')) !!}
+
+            <div class="col-sm-4">
+                {!! Form::select('bac_phys_grade',$gdeGrades, isset($studentBac2->bac_phys_grade)?$studentBac2->bac_phys_grade:null, array('class'=>'form-control input','placeholder'=>'','id'=>'candidate_bac_phys_grade',isset($studentBac2)?"disabled":"")) !!}
+            </div>
         </div>
     </div>
-
-    <div class="form-group col-sm-6 required">
-        {!! Form::label('bac_year',trans('labels.backend.candidates.fields.bac_year'),array('class'=>'col-sm-4 control-label required')) !!}
-        <div class="col-sm-8">
-            {!! Form::select('bac_year', $academicYears,isset($studentBac2->bac_year)?$studentBac2->bac_year:null, array('class'=>'form-control input','placeholder'=>'BacII Year','id'=>'candidate_bac_year','required'=>'required',isset($studentBac2)?"disabled":"")) !!}
+    <div class="row no-margin">
+        <div class="form-group col-sm-6 required">
+            {!! Form::label('bac_year',trans('labels.backend.candidates.fields.bac_year'),array('class'=>'col-sm-4 control-label required')) !!}
+            <div class="col-sm-8">
+                {!! Form::select('bac_year', $academicYears,isset($studentBac2->bac_year)?$studentBac2->bac_year:null, array('class'=>'form-control input','placeholder'=>'BacII Year','id'=>'candidate_bac_year','required'=>'required',isset($studentBac2)?"disabled":"")) !!}
+            </div>
         </div>
-    </div>
 
-    <div class="form-group col-sm-6 required">
-        {!! Form::label('bac_chem_grade',trans('labels.backend.candidates.fields.bac_chem_grade'),array('class'=>'col-sm-4 control-label')) !!}
-        <div class="col-sm-4">
-            {!! Form::select('bac_chem_grade',$gdeGrades, isset($studentBac2->bac_chem_grade)?$studentBac2->bac_chem_grade:null, array('class'=>'form-control input','placeholder'=>'','id'=>'candidate_bac_chem_grade',isset($studentBac2)?"disabled":"")) !!}
+        <div class="form-group col-sm-6 required">
+            {!! Form::label('bac_chem_grade',trans('labels.backend.candidates.fields.bac_chem_grade'),array('class'=>'col-sm-4 control-label')) !!}
+            <div class="col-sm-4">
+                {!! Form::select('bac_chem_grade',$gdeGrades, isset($studentBac2->bac_chem_grade)?$studentBac2->bac_chem_grade:null, array('class'=>'form-control input','placeholder'=>'','id'=>'candidate_bac_chem_grade',isset($studentBac2)?"disabled":"")) !!}
+            </div>
         </div>
     </div>
 
@@ -195,85 +172,6 @@
 </div>
 @if($exam->type_id == 1)
 
-        <!--<div class="row no-margin">
-        <div class="form-group col-sm-6">
-
-            {!! Form::label('math_c',trans('labels.backend.candidates.fields.math_score'),array('class'=>'col-sm-4 control-label')) !!}
-            <div class="col-sm-8" style="padding: 0px;">
-                <div class="col-sm-4" style="padding-right: 1px; display: table">
-                    <div style="width: 80%;padding-right: 0px;">
-                        {!! Form::text('math_c', null, array('class'=>'form-control input','placeholder'=>'C','style'=>'padding-left:5px;padding-right:5px;')) !!}
-                    </div>
-                    <span style="display:table-cell;padding-left: 0px;padding-right: 0px;float: none;vertical-align: middle;width: 20%">/30</span>
-                </div>
-                <div class="col-sm-4" style="padding-left: 8px;padding-right: 8px; display: table">
-                    <div style="width: 80%;padding-right: 0px;">
-                        {!! Form::text('math_w', null, array('class'=>'form-control input','placeholder'=>'W','style'=>'padding-left:5px;padding-right:5px;')) !!}
-                    </div>
-                    <span style="display:table-cell;padding-left: 0px;padding-right: 0px;float: none;vertical-align: middle;width: 20%">/30</span>
-                </div>
-                <div class="col-sm-4" style="padding-left: 1px; display: table">
-                    <div style="width: 80%;padding-right: 0px;">
-                        {!! Form::text('math_na', null, array('class'=>'form-control input','placeholder'=>'NA','style'=>'padding-left:5px;padding-right:5px;')) !!}
-                    </div>
-                    <span style="display:table-cell;padding-left: 0px;padding-right: 0px;float: none;vertical-align: middle;width: 20%">/30</span>
-                </div>
-
-
-            </div>
-        </div>
-        <div class="form-group col-sm-6">
-            {!! Form::label('phys_chem_c',trans('labels.backend.candidates.fields.phys_chem_score'),array('class'=>'col-sm-4 control-label')) !!}
-            <div class="col-sm-8" style="padding: 0px;">
-                <div class="col-sm-4" style="padding-right: 1px; display: table">
-                    <div style="width: 80%;padding-right: 0px;">
-                        {!! Form::text('phys_chem_c', null, array('class'=>'form-control input','placeholder'=>'C','style'=>'padding-left:5px;padding-right:5px;')) !!}
-                    </div>
-                    <span style="display:table-cell;padding-left: 0px;padding-right: 0px;float: none;vertical-align: middle;width: 20%">/30</span>
-                </div>
-                <div class="col-sm-4" style="padding-left: 8px;padding-right: 8px; display: table">
-                    <div style="width: 80%;padding-right: 0px;">
-                        {!! Form::text('phys_chem_w', null, array('class'=>'form-control input','placeholder'=>'W','style'=>'padding-left:5px;padding-right:5px;')) !!}
-                    </div>
-                    <span style="display:table-cell;padding-left: 0px;padding-right: 0px;float: none;vertical-align: middle;width: 20%">/30</span>
-                </div>
-                <div class="col-sm-4" style="padding-left: 1px; display: table">
-                    <div style="width: 80%;padding-right: 0px;">
-                        {!! Form::text('phys_chem_na', null, array('class'=>'form-control input','placeholder'=>'NA','style'=>'padding-left:5px;padding-right:5px;')) !!}
-                    </div>
-                    <span style="display:table-cell;padding-left: 0px;padding-right: 0px;float: none;vertical-align: middle;width: 20%">/30</span>
-                </div>
-
-
-            </div>
-        </div>
-        <div class="form-group col-sm-6">
-            {!! Form::label('logic_c',trans('labels.backend.candidates.fields.logic_score'),array('class'=>'col-sm-4 control-label')) !!}
-            <div class="col-sm-8" style="padding: 0px;">
-                <div class="col-sm-4" style="padding-right: 1px; display: table">
-                    <div style="width: 80%;padding-right: 0px;">
-                        {!! Form::text('logic_c', null, array('class'=>'form-control input','placeholder'=>'C','style'=>'padding-left:5px;padding-right:5px;')) !!}
-                    </div>
-                    <span style="display:table-cell;padding-left: 0px;padding-right: 0px;float: none;vertical-align: middle;width: 20%">/30</span>
-                </div>
-                <div class="col-sm-4" style="padding-left: 8px;padding-right: 8px; display: table">
-                    <div style="width: 80%;padding-right: 0px;">
-                        {!! Form::text('logic_w', null, array('class'=>'form-control input','placeholder'=>'W','style'=>'padding-left:5px;padding-right:5px;')) !!}
-                    </div>
-                    <span style="display:table-cell;padding-left: 0px;padding-right: 0px;float: none;vertical-align: middle;width: 20%">/30</span>
-                </div>
-                <div class="col-sm-4" style="padding-left: 1px; display: table">
-                    <div style="width: 80%;padding-right: 0px;">
-                        {!! Form::text('logic_na', null, array('class'=>'form-control input','placeholder'=>'NA','style'=>'padding-left:5px;padding-right:5px;')) !!}
-                    </div>
-                    <span style="display:table-cell;padding-left: 0px;padding-right: 0px;float: none;vertical-align: middle;width: 20%">/30</span>
-                </div>
-
-
-            </div>
-        </div>
-
-    </div>-->
 @elseif($exam->type_id == 2)
     <div class="row no-margin">
         <div class="form-group col-sm-12 required" id="choose_department">

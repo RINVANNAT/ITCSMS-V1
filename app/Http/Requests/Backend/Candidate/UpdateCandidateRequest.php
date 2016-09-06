@@ -34,13 +34,12 @@ class UpdateCandidateRequest extends Request
             'dob' => 'required',
             'gender_id' => 'required',
             'register_from' => 'required',
-            'highschool_id' => 'required',
             'bac_percentile' => 'required',
             'bac_total_grade' => 'required',
             'bac_year' => 'required',
             'promotion_id' => 'required',
             'exam_id' => 'required',
-            'register_id' => 'integer|required|unique_with:candidates,exam_id',
+            'register_id' => 'integer|required',
         ];
     }
 }

@@ -11,7 +11,7 @@
                 font-size: 36px;
             }
             .enlarge-number{
-                font-size: 28px;
+                font-size: 22px;
             }
         </style>
         <div class="box-header with-border">
@@ -24,17 +24,26 @@
 
                 @foreach($courseIds as $courseId)
                     <div class="col-sm-12" style="margin-bottom: 5px">
-                        <div class="col-sm-3 no-padding enlarge-number">
-                            <label for="course_name"> {{$courseId->course_name}}: </label>
+                        <div class="col-sm-4 no-padding enlarge-number">
+                            <label for="course_name"> {{$courseId->course_name}}: Correct</label>
                         </div>
-                        <div class="col-sm-2 no-padding">
+                        <div class="col-sm-1 no-padding ">
                             {!! Form::text('course_factor'."[$courseId->course_id]", 4, ['class' => 'form-control enlarge-number']) !!}
                             {{--{!! Form::hidden('course_factor_'."[course_id]",$courseId->course_id, ['class' => 'form-control']) !!}--}}
                         </div>
+
                         <div class="col-sm-2 enlarge-number">
-                            <label for="coefficient">Coe: </label>
+                            <label for="wrong"> Wrong </label>
                         </div>
-                        <div class="col-sm-3">
+                        <div class="col-sm-1 no-padding">
+                            {!! Form::text('course_factor'."[wrong_coe_$courseId->course_id]", 1, ['class' => 'form-control enlarge-number']) !!}
+                        </div>
+
+
+                        <div class="col-sm-1 no-padding enlarge-number">
+                            <label for="coefficient" style="margin-left: 5px">Coe: </label>
+                        </div>
+                        <div class="col-sm-1 no-padding">
                             {!! Form::text('course_factor'."[subject_coe_$courseId->course_id]", null, ['class' => 'form-control enlarge-number']) !!}
                         </div>
 
@@ -56,20 +65,20 @@
 
                 <div class="col-sm-12" style="margin-bottom: 5px">
 
-                    <div class="col-sm-7 no-padding enlarge-number">
-                        <label for="total_passed"> Number of Student Passed: </label>
+                    <div class="col-sm-4 no-padding enlarge-number">
+                        <label for="total_passed"> Student Passed: </label>
                     </div>
-                    <div class="col-sm-3 ">
+                    <div class="col-sm-4 no-padding ">
                         {!! Form::text('course_factor'."[total_pass]", null, ['class' => 'form-control enlarge-number', 'id'=> 'total_pass']) !!}
                     </div>
                 </div>
 
                 <div class="col-sm-12" style="margin-bottom: 5px">
 
-                    <div class="col-sm-7 no-padding enlarge-number">
-                        <label for="total_reserved" >Number of Student Reserved: </label>
+                    <div class="col-sm-4 no-padding enlarge-number">
+                        <label for="total_reserved" > Student Reserved: </label>
                     </div>
-                    <div class="col-sm-3 ">
+                    <div class="col-sm-4 no-padding ">
                         {!! Form::text('course_factor'."[total_reserve]", null, ['class' => 'form-control enlarge-number', 'id'=> 'total_reserve']) !!}
                     </div>
 

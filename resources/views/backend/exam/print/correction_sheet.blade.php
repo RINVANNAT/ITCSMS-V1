@@ -74,7 +74,7 @@
                     </div>
                     <div class="row no-margin">
                         <div class="col-md-4 col-sm-4 col-xs-4">
-                            <h1 style="font-weight: 900; font-size: 3em;padding: 0px;margin-top: 0px;margin-bottom: 0px;" class="left">{{$room->pivot->roomcode}}</h1>
+                            <h1 style="font-weight: 900; font-size: 3em;padding: 0px;margin-top: 0px;margin-bottom: 0px;" class="left">{{$room->roomcode}}</h1>
                         </div>
                         <div class="col-md-4 col-sm-4 col-xs-4">
                             <h1 class="center" style="margin-top: 5px;margin-bottom: 0px;">{{$course->name_kh}}</h1>
