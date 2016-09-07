@@ -709,14 +709,18 @@ class ExamController extends Controller
         $courseId = $request->course_id;
         $errorCandidateScores = $this->exams->reportErrorCandidateExamScores($exam_id, $request->course_id);
         $totalQuestions = DB::table('entranceExamCourses')
-            ->where('entranceExamCourses.active', '=', true)
-            ->select('total_question')
-            ->get();
-        foreach($totalQuestions as $totalQuestion) {
-            $totalQuestion = $totalQuestion->total_question;
-        }
+            ->where([
+                ['entranceExamCourses.active', '=', true],
+                ['entranceExamCourses.id', '=',$courseId ]
+            ])
+            ->select('total_question', 'name_en')
+            ->first();
 
-        return view('backend.exam.includes.popup_report_error_score_candidate', compact('exam_id', 'errorCandidateScores', 'totalQuestion', 'courseId'));
+        $totalQuestion = $totalQuestions->total_question;
+        $courseName = $totalQuestions->name_en;
+
+
+        return view('backend.exam.includes.popup_report_error_score_candidate', compact('exam_id', 'errorCandidateScores', 'totalQuestion', 'courseId', 'courseName'));
 
     }
 
@@ -1037,30 +1041,60 @@ class ExamController extends Controller
 
     public function printCandidateErrorScore($examId, Request $request) {
 
-        $arrayRoomCodes = [];
+
         $roomCodes = [];
-        $object=[];
+        $tmp =0;
+        $arraySplitPages =[];
+        $pages = [];
         $candidateIds = explode(',', $request->candidate_array_ids);
         $orderInRoom = explode(',',$request->order_in_room );
-        $roomCode = explode(',', $request->room_code_ids);
-        $tmpArray = array_unique($roomCode);
+        $room_Code = explode(',', $request->room_code_ids);
+        $courseName = $request->course_name;
+        $tmpArray = array_unique($room_Code);
+        asort($tmpArray);
         foreach ($tmpArray as $val) {
             $roomCodes[] = $val;
         }
-
-
         for($key = 0; $key <count($roomCodes); $key++) {
 
-            for($j = 0; $j <count($roomCode); $j++) {
-               if($roomCode[$j] == $roomCodes[$key]) {
-                   $object[$roomCodes[$key]][] = $orderInRoom[$j];
-               }
+            $status_object1= 0;
+            $object1=[];
+
+            for($j = 0; $j <count($room_Code); $j++) {
+                if($room_Code[$j] == $roomCodes[$key]) {
+                    $status_object1++;
+                    $object1[$roomCodes[$key]][] = $orderInRoom[$j];
+                }
+            }
+
+            if($status_object1 < 20) {
+
+                $tmp = $tmp + $status_object1;
+
+                if($tmp < 20) {
+
+                    $pages = $pages + $object1;
+                    if($key == count($roomCodes)-1) {
+                        $arraySplitPages[] =  $pages ;
+
+                    }
+                } else if($tmp == 20) {
+                    $pages = $pages + $object1;
+                    $arraySplitPages[] = $pages;
+                    $pages=[];
+                    $tmp =0;
+                } else {
+                    $arraySplitPages[] = $object1;
+                    $tmp =0;
+                }
+            } else {
+                $arraySplitPages[] = $object1;
             }
         }
 
-//        $errorCandidates = array_chunk($object, 3);
 
-        return view('backend.exam.print.candidate_score_error', compact('object'));
+
+        return view('backend.exam.print.candidate_score_error', compact('arraySplitPages', 'courseName'));
     }
 
 
