@@ -207,8 +207,10 @@
     </div><!--box-->
 @stop
 
+@section('after-scripts-end')
+
 @if($status)
-    @section('after-scripts-end')
+
         <script>
 
             $("#btn_cancel_form").click(function () {
@@ -336,11 +338,18 @@
                 }
             }
 
+
+
+        </script>
+
+    @endif
+
+        <script>
             var baseUrl = '{!! route('admin.exam.request_input_score_form', $exam_id) !!}';
             var course_id = $('#course_id').val();
             var number_correction = JSON.parse('{{$number_correction}}');
 
-           $('#next_room').on('click', function(){
+            $('#next_room').on('click', function(){
                 var room_id =  $(this).attr('room_id');
                 var room_code = $(this).text();
                 window.location.href = baseUrl+'?room_id='+ room_id + '&room_code=' + room_code + '&entrance_course_id=' + course_id + '&number_correction=' + number_correction;
@@ -359,8 +368,7 @@
                 console.log(room_id + '--' + room_code);
                 window.location.href = baseUrl+'?room_id='+ room_id + '&room_code=' + room_code + '&entrance_course_id=' + course_id + '&number_correction=' + number_correction;
             });
-
         </script>
-    @stop
 
-@endif
+@stop
+
