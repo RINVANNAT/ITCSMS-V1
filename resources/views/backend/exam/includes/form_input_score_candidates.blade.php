@@ -118,7 +118,10 @@
                             <th> Correct </th>
                             <th> Wrong  </th>
                             <th> No Answer </th>
-                            <th> Total: {{$candidates[0]->total_question}} </th>
+                            @if($candidates)
+                                <th> Total: {{$candidates[0]->total_question}} </th>
+                            @endif
+
                         </tr>
                         </thead>
                         <tbody>
