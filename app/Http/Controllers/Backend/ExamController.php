@@ -554,6 +554,7 @@ class ExamController extends Controller
 
         $roomFromDB = DB::table('examRooms')
             ->select('examRooms.roomcode as room_code', 'examRooms.id as room_id')
+            ->WhereNotNull('examRooms.roomcode')
             ->get();
 
         return $roomFromDB;
