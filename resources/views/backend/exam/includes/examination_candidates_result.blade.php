@@ -14,6 +14,17 @@
             .enlarge-number{
                 font-size: 28px;
             }
+
+
+            .modal {
+                position: fixed;
+                top: 0;
+                left: 0;
+                right: 0;
+                bottom: 0;
+                background: rgba(0,0,0,0.8);
+                z-index: 1;
+            }
         </style>
         <div class="box-header with-border">
             <h3 class="box-title">Candidates Result</h3>
@@ -58,11 +69,19 @@
 
         </div>
 
+        <div class="modal">
+
+        </div>
+
     </div>
 @stop
 
 @section('after-scripts-end')
     <script>
+        window.onload = function() {
+            $('.modal').style.display = "none";
+        };
+
         var exam_id = JSON.parse('<?php echo $examId; ?>');
 
         function ajaxRequest(method, baseUrl, baseData){
