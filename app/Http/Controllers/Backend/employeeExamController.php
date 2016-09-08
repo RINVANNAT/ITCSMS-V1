@@ -107,7 +107,6 @@ class employeeExamController extends Controller
     public function addNewRole(Request $request)
     {
         $res = $this->tempEmpolyeeExams->create($request);
-
         return $res;
     }
 
