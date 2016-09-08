@@ -54,11 +54,9 @@
                 new Vue({
                     el: '#credittemplate',
                     data: {
-                        hourcourse:$("input[name=time_course]").val(),
+                        hourcourse:0,
                         hourtp:0,
                         hourtd:0,
-
-
                     },
                     computed: {
                         // a computed getter
