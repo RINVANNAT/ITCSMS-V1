@@ -143,6 +143,7 @@
                         window.close();
 
                     } else {
+                        $('.modal').hide();
                         notify("error","info", "There are not enough candidates!!!");
                     }
 
