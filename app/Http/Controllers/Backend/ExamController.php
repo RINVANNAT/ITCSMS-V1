@@ -746,6 +746,7 @@ class ExamController extends Controller
     public function candidateResultExamScores($exam_id) {
 
         $errorStatus=false;
+        $check =0;
         $courses = [];
         $courseIds = DB::table('entranceExamCourses')
                     ->where([
@@ -753,22 +754,31 @@ class ExamController extends Controller
                         ['entranceExamCourses.active', '=', true]
                     ])
                     ->select('id as course_id', 'name_en as course_name')->get();
+
         if($courseIds) {
             foreach($courseIds as $courseId) {
-                $errorCandidateScores = $this->exams->reportErrorCandidateExamScores($exam_id, $courseId->course_id);
-                if($errorCandidateScores) {
+                $restult = DB::table('statusCandidateScores')
+                    ->select('status')
+                    ->where([
+                            ['exam_id', '=', $exam_id],
+                            ['entrance_exam_course_id', '=', $courseId->course_id]
+                            ])
+                    ->first();
+
+                if($restult->status == false) {
+                    $check++;
+                } else {
                     $courses[]=$courseId->course_name;
-                    $errorStatus=true;
                 }
+
             }
 
-            if($errorStatus !== false){
+            if($check == count($courseIds)) {
 
-                return view('backend.exam.includes.error_popup_message', compact('courses'))->with(['message'=>'There is an existing score error']);
-
-
-            } else{
                 return view('backend.exam.includes.popup_get_form_result_score', compact('exam_id', 'courseIds'));
+
+            } else {
+                return view('backend.exam.includes.error_popup_message', compact('courses'))->with(['message'=>'There is an existing score error']);
             }
         }
 
