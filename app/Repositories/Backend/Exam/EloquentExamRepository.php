@@ -545,14 +545,40 @@ class EloquentExamRepository implements ExamRepositoryContract
                 }
             }
 
+            if($errorCandidateScores) {
+
+                $status = true;
+                $this->deleteStatusCandidateScores($examId, $courseId);
+                $this->insertStatusCandidateScores($examId, $courseId, $status);
+            } else {
+                $status = false;
+                $this->deleteStatusCandidateScores($examId, $courseId);
+                $this->insertStatusCandidateScores($examId, $courseId, $status);
+            }
+
             return $errorCandidateScores;
         }
     }
 
-    public function calculationCandidateScores() {
 
+    private function insertStatusCandidateScores($examId, $courseId, $status) {
+
+        $res = DB::table('statusCandidateScores')->insert(
+            ['exam_id' => $examId, 'status' => $status, 'entrance_exam_course_id' =>$courseId ]
+        );
+
+        return $res;
+    }
+
+    private function deleteStatusCandidateScores($examId, $courseId) {
+
+        DB::table('statusCandidateScores')->where([
+            ['entrance_exam_course_id', '=', $courseId],
+            ['exam_id', '=', $examId]
+        ])->delete();
 
     }
+
 
 }
 

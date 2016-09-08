@@ -89,11 +89,9 @@
    {{--here where i need to write the js script --}}
    <script>
 
-       $(document).ready(function(){
-           toggleLoading(false);
-       });
 
        var input_score_url = "{{route('admin.exam.request_input_score_form',$exam_id)}}";
+
 
        function ajaxRequest(method, baseUrl, baseData){
 
@@ -102,8 +100,9 @@
                url: baseUrl,
                data: baseData,
                success: function(result) {
-                   console.log(result);
+
                    $('.selection_room_course').html(result);
+                   getNotSelectedRooms();
                }
            });
        }
@@ -119,6 +118,7 @@
            var baseData = { number_correction: numberCorrection,
                entrance_course_id: $('#subject_id :selected').val()};
            ajaxRequest('GET',baseUrl, baseData);
+
        });
 
        $('#subject_id').on('change', function() {
@@ -129,11 +129,37 @@
                    entrance_course_id: $(this).val()};
                ajaxRequest('GET',baseUrl, baseData);
            }
+
+
        });
 
 
+       function getNotSelectedRooms() {
+           var selected_room_id = $('#room_id_input_score :selected').val();
+           var room_ids = [];
+           var room_names = [];
+           var not_selected_rooms = [];
+           $("#room_id_input_score option").each(function()
+           {
+               var id =  $(this).val();
+               var name = $(this).text();
+               if(selected_room_id != id) {
+                   room_ids.push(id);
+                   room_names.push(name);
+               }
+           });
+
+
+           not_selected_rooms[0] =room_ids,
+           not_selected_rooms[1] = room_names;
+           return not_selected_rooms;
+
+       }
+
 
        $("#btn_ok_request_input_score").on("click",function(){
+
+           var not_selected_rooms = getNotSelectedRooms();
 
            var requestData = {
                room_id: $('#room_id_input_score :selected').val(),
@@ -141,10 +167,12 @@
                entrance_course_id: $('#subject_id :selected').val(),
                entrance_course_name: $('#subject_id :selected').text()
            };
+
+           console.log(requestData);
            if(requestData.room_id) {
                if(numberCorrection !== null) {
                    console.log(numberCorrection);
-                   input_score_window = PopupCenterDual(input_score_url+"?room_id="+requestData.room_id+"&entrance_course_id="+requestData.entrance_course_id+"&number_correction="+ numberCorrection +"&course_name="+requestData.entrance_course_name + "&room_code=" + requestData.room_code,'request input form ','1250','960');
+                   input_score_window = PopupCenterDual(input_score_url+"?room_id="+requestData.room_id+"&entrance_course_id="+requestData.entrance_course_id+"&number_correction="+ numberCorrection +"&course_name="+requestData.entrance_course_name + "&room_code=" + requestData.room_code + '&not_selected_rooms='+ not_selected_rooms,'request input form ','1250','960');
                }
            }
 

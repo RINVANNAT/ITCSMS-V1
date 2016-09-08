@@ -336,15 +336,14 @@
             });
 
             $('#submit_new_role').click(function() {
+
                 var inputBaseUrl = "{{route('admin.exam.save-new-role', $exam->id)}}";
                 var inputBaseData= {
                     role_name: $('#new_role').val(),
                     description: $('#new_des').val()
                 }
 
-                if(inputBaseData.role_name != '' && inputBaseData.description != '') {
-                    console.log(inputBaseData.role_name);
-                    console.log(inputBaseData.description);
+                if(inputBaseData.role_name != '') {
                     ajaxRequest('POST', inputBaseUrl,inputBaseData);
                 } else{
 

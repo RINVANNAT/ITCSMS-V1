@@ -82,7 +82,7 @@
                         </div>
 
 
-                        <?php $k=0; $length = []; $p=0;?>
+                        <?php $k=0; $length = []; $p=0; $arrayRoomCode = []; $arrayOrderInRoom = [];?>
                         @foreach($errorCandidateScores as $errorScoreProperties)
                             <?php $k++; $p=0;  ?>
 
@@ -91,7 +91,7 @@
                                 <div class="col-sm-12 old_correction" style="background-color: #F5EAEC; padding-top: 5px;">
 
                                     @foreach($errorScoreProperties->scoreErrors as $errorScore)
-                                        <?php  $p++; ?>
+                                        <?php  $p++;?>
 
                                             <div class="col-sm-2 enlarge-number">
                                                 <p > {{$errorScoreProperties->candidateProperties->room_code}} </p>
@@ -118,7 +118,7 @@
                                     @endforeach
 
 
-                                        <?php array_push($length,$p)?>
+                                        <?php array_push($length,$p);   $arrayRoomCode[] =  $errorScoreProperties->candidateProperties->room_code; $arrayOrderInRoom[] = $errorScore->candidate_number_in_room;?>
 
                                         <div class="col-sm-1">
                                             <button class="btn-xs" onclick="addNewCorrection(this)"> Add </button>
@@ -128,13 +128,13 @@
                                     <form class="new_correction_form">
                                         <div class="col-sm-2 enlarge-number">
                                             <label for="order">{{$errorScoreProperties->candidateProperties->room_code}}</label>
-                                            {!! Form::hidden('candidate_id[]', $errorScoreProperties->candidateProperties->candidate_id, ['class' => 'form-control']) !!}
+                                            {!! Form::hidden('candidate_id[]', $errorScoreProperties->candidateProperties->candidate_id, ['class' => 'form-control candidate_has_score_error_id']) !!}
 
                                         </div>
 
                                         <div class="col-sm-1 enlarge-number" >
                                             <label for="roomCode">{{$errorScore->candidate_number_in_room}}</label>
-                                            {!! Form::hidden('order[]', $errorScore->candidate_number_in_room, ['class' => 'form-control']) !!}
+                                            {!! Form::hidden('order[]', $errorScore->candidate_number_in_room, ['class' => 'form-control candidate_order_in_room']) !!}
                                         </div>
                                         <div class="col-sm-2">
                                             {!! Form::text('score_c[]', 0, ['class' => 'form-control number_only enlarge-number score_c input_new_correction']) !!}
@@ -190,7 +190,7 @@
             </div>
 
             <div class="pull-right">
-                <input type="button" id="btn_save_candidate_score" class="btn btn-danger btn-xs" value="Print Report" />
+                <input type="button" id="btn_candidate_error_socre" class="btn btn-danger btn-xs" value="Print Error" />
             </div>
             <div class="clearfix"></div>
         </div><!-- /.box-body -->
@@ -310,6 +310,38 @@
            }
 
        }
+
+       @if($errorCandidateScores)
+
+
+
+           $('#btn_candidate_error_socre').on('click', function() {
+
+           var course_id = JSON.parse('<?php echo json_encode($courseId)?>');
+           var course_name = JSON.parse('<?php echo json_encode($courseName)?>');
+           var baseUrl = '{!! route('admin.exam.print_candidate_error_socre', $exam_id) !!}';
+
+           var array_candidate_ids = $(".candidate_has_score_error_id").map(function(){return $(this).val();}).get();
+           var array_room_code_id = JSON.parse('<?php echo json_encode($arrayRoomCode)?>');
+           var order = $(".candidate_order_in_room").map(function(){return $(this).val();}).get();
+
+//           window.location.href = baseUrl+'?course_id=' + course_id +'&candidate_array_ids='+array_candidate_ids+'&room_code_ids='+ array_room_code_id +'&order_in_room=' +order;
+
+           window_request_room = PopupCenterDual(baseUrl+'?course_id=' + course_id +'&candidate_array_ids='+array_candidate_ids+'&room_code_ids='+ array_room_code_id +'&order_in_room=' +order + '&course_name=' + course_name,'Candidates Result List','1000','1200');
+
+
+//           for(var index =0; index< candidate_score_error.length; index++) {
+//
+//               var tmp = candidate_score_error[index].candidateProperties.room_code;
+//               for(var key= index+1; key< candidate_score_error.length; key++) {
+//                   if(tmp == candidate_score_error[key].candidateProperties.room_code) {
+//                       candidate_number_in_room.push(candidate_score_error[key].scoreErrors.canididate_number_in_room);
+//                       unique_room_code.push(tmp);
+//                   }
+//               }
+//           }
+           })
+       @endif
 
 
 

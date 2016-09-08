@@ -9,6 +9,7 @@ use App\Models\RoleStaff;
 use App\Models\Employee;
 use App\Models\TempEmployee;
 use App\Models\Room;
+use App\Models\UserLog;
 use Carbon\Carbon;
 use DB;
 
@@ -317,9 +318,16 @@ class EloquentTempEmployeeExamRepository implements TempEmployeeExamRepositoryCo
         if (RoleStaff::where('name', $request->role_name)->first()) {
             throw new GeneralException(trans('exceptions.backend.general.already_exists'));
         }
+
+        if($request->description) {
+            $des = $request->description;
+        } else {
+            $des = '';
+        }
+
         $role = new RoleStaff;
         $role->name = $request->role_name;
-        $role->description = $request->description;
+        $role->description = $des;
         $role->save();
 
         if( $role->save()) {

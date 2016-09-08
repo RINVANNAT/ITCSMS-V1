@@ -15,6 +15,15 @@
             .defaul_numer{
                 color: darkred;
             }
+
+            .enlarge-selection{
+                margin-top: 10px;
+                font-size: 22px;
+                border-radius: 0;
+                background: transparent;
+                width: 100px;
+                text-indent: 10px;
+            }
         </style>
         <div class="box-header with-border">
             <h3 class="box-title "> <span class="enlarge-number">Input Score</span> </h3>
@@ -30,9 +39,30 @@
                         <div class="col-sm-12 ">
                             <h3> ROOM CODE  </h3>
                         </div>
-                        <div class="col-sm-12  " style="margin-top: -5px">
-                            <h5><span class="text-info enlarge-text">{{ $roomCode }}</span></h5>
-                        </div>
+
+
+                       <div>
+                           {{--here we need --}}
+
+                           <div class="col-sm-12 text-center">
+                               <div class="col-sm-3 text-info btn btn-primary no-padding enlarge-number" id="pre_room" room_id="{{$preRoom['room_id']}}"  style="margin-top: 7px">
+                                   {{ $preRoom['room_code'] }}
+                               </div>
+
+                               <div class="col-sm-4 text-info enlarge-number no-padding" id="selected_room" room_id="{{$roomId}}" style="margin-top: -10px">
+                                 <strong> <h1> {{ $roomCode }}</h1></strong>
+                               </div>
+
+                               <div class="col-sm-3 text-info btn btn-primary no-padding enlarge-number" id="next_room" room_id="{{$nextRoom['room_id']}}" style="margin-top: 7px">
+                                   {{ $nextRoom['room_code'] }}
+                               </div>
+
+                               <div class="col-sm-2 ">
+                                   {!! Form::select('room',$roomForSelection, null, array('class'=>'form-control enlarge-selection','id'=>'room_selection')) !!}
+                               </div>
+
+                           </div>
+                       </div>
 
                     </div>
                     <div class="col-sm-4" style="text-align: center">
@@ -40,6 +70,7 @@
                             <h3>SCORING SHEET</h3>
                         </div>
                         <div class="col-sm-12" style="margin-top: -5px">
+                            {!! Form::hidden('subject_id', $subjectId, ['class' => 'form-control', 'id'=>'course_id']) !!}
                             <h5> <span class="text-info enlarge-text">{{$subject}}</span></h5>
                         </div>
                     </div>
@@ -59,20 +90,6 @@
                         </div>
                     </div>
                 </div>
-
-                {{--<div class="col-sm-12"> <p style="border-bottom: 2px solid darkgreen"></p> </div>--}}
-                {{--<div class="col-sm-12 pull-right no-padding">--}}
-                    {{--<div class="col-sm-4">--}}
-
-                    {{--</div>--}}
-                    {{--<div class="col-sm-4">--}}
-                        {{--<h4 class="text-info">Corrector Name</h4>--}}
-                    {{--</div>--}}
-                    {{--<div class="col-sm-4 pull-left">--}}
-                        {{--<h4> RIN VANNAT</h4>--}}
-                    {{--</div>--}}
-
-                {{--</div>--}}
 
                 <div class="col-sm-12" style="margin-top: 15px">
                     <div class="col-sm-6 no-padding">
@@ -101,7 +118,10 @@
                             <th> Correct </th>
                             <th> Wrong  </th>
                             <th> No Answer </th>
-                            <th> Total  </th>
+                            @if($candidates)
+                                <th> Total: {{$candidates[0]->total_question}} </th>
+                            @endif
+
                         </tr>
                         </thead>
                         <tbody>
@@ -187,8 +207,10 @@
     </div><!--box-->
 @stop
 
+@section('after-scripts-end')
+
 @if($status)
-    @section('after-scripts-end')
+
         <script>
 
             $("#btn_cancel_form").click(function () {
@@ -205,10 +227,9 @@
                     dataType: "json",
                     success: function(result) {
                         if(result.status) {
+
                             notify("success","info", "your record have been save!");
-                            setTimeout(function(){
-                                window.close();
-                            },3000);
+                            location.reload();
                         } else {
                             notify("error","info", "Please Check Your Record Was Not Saved!");
                         }
@@ -317,7 +338,37 @@
                 }
             }
 
-        </script>
-    @stop
 
-@endif
+
+        </script>
+
+    @endif
+
+        <script>
+            var baseUrl = '{!! route('admin.exam.request_input_score_form', $exam_id) !!}';
+            var course_id = $('#course_id').val();
+            var number_correction = JSON.parse('{{$number_correction}}');
+
+            $('#next_room').on('click', function(){
+                var room_id =  $(this).attr('room_id');
+                var room_code = $(this).text();
+                window.location.href = baseUrl+'?room_id='+ room_id + '&room_code=' + room_code + '&entrance_course_id=' + course_id + '&number_correction=' + number_correction;
+
+            });
+
+            $('#pre_room').on('click', function(){
+                var room_id =  $(this).attr('room_id');
+                var room_code = $(this).text();
+                window.location.href = baseUrl+'?room_id='+ room_id + '&room_code=' + room_code + '&entrance_course_id=' + course_id + '&number_correction=' + number_correction;
+            });
+
+            $('#room_selection').on('change', function() {
+                var room_id = $(this).val();
+                var room_code = $('#room_selection :selected' ).text();
+                console.log(room_id + '--' + room_code);
+                window.location.href = baseUrl+'?room_id='+ room_id + '&room_code=' + room_code + '&entrance_course_id=' + course_id + '&number_correction=' + number_correction;
+            });
+        </script>
+
+@stop
+

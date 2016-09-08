@@ -42,7 +42,7 @@ Route::group([], function() {
     Route::get('exams/{id}/request_change_building_room', 'ExamController@getBuildingRequestion')->name('admin.exam.request_change_building_room');
     Route::get('exams/{id}/request_input_score_form', 'ExamController@getRequestInputScoreForm')->name('admin.exam.request_input_score_form');
 
-    Route::get('exams/{id}/ajax_request_room_course_selection', 'ExamController@requestRoomCourseSelection')->name('admin.exam.ajax_request_room_course_selection');
+    Route::get('exams/{id}/ajax_request_room_course_selection', 'ExamController@getAllRooms')->name('admin.exam.ajax_request_room_course_selection');
 
     Route::post('exams/{id}/insert_exam_score_candidate', 'ExamController@insertScoreForEachCandiate')->name('admin.exam.insert_exam_score_candidate');
 
@@ -58,6 +58,8 @@ Route::group([], function() {
     Route::get('/candidate_result_lists', 'ExamController@candidateResultLists')->name('candidate_result_lists');
 
     Route::get('print/print_candidate_result_lists', 'ExamController@printCandidateResultLists')->name('print_candidate_result_lists');
+
+    Route::get('exams/{id}/print_candidate_error_score', 'ExamController@printCandidateErrorScore')->name('admin.exam.print_candidate_error_socre');
 
 
 

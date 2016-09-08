@@ -13,6 +13,7 @@ class ModifyForeignKeyRoleTemporaryStaffExams extends Migration
     public function up()
     {
         Schema::table('role_temporary_staff_exams', function (Blueprint $table) {
+
             $table->dropForeign('role_temporary_staff_exams_room_id_foreign');
 
             $table->foreign('room_id')

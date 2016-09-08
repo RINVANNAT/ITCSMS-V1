@@ -13,6 +13,17 @@
             .enlarge-number{
                 font-size: 22px;
             }
+
+
+            .modal {
+                position: fixed;
+                top: 0;
+                left: 0;
+                right: 0;
+                bottom: 0;
+                background: rgba(0,0,0,0.8);
+                z-index: 1;
+            }
         </style>
         <div class="box-header with-border">
             <h3 class="box-title">Get Result Score</h3>
@@ -88,6 +99,11 @@
 
         </div>
 
+
+        <div class="modal" style="display: none; text-align: center">
+            <img src="{{url('img/exam/loader.gif')}}" alt="loading" style="margin-top: 200px">
+        </div>
+
     </div>
 
     <div class="box box-success">
@@ -120,10 +136,14 @@
                     console.log(result);
 
                     if(result.status) {
-                        window.close();
+//
+                        $('.modal').hide();
                         var Url = '{!! route('candidate_result_lists') !!}';
                         window_request_room = PopupCenterDual(Url+'?exam_id='+result.exam_id,'Candidates Result List','1000','1200');
+                        window.close();
+
                     } else {
+                        $('.modal').hide();
                         notify("error","info", "There are not enough candidates!!!");
                     }
 
@@ -142,7 +162,10 @@
                 }
             }
             if(check == 0) {
+
+                $('.modal').show();
                 ajaxRequest('POST', $( "form.calculation_score").attr('action'), $( "form.calculation_score" ).serialize() );
+
 
             } else{
                 notify("error","info", "Please Input All Value");

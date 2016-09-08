@@ -231,6 +231,7 @@
             dataType: "json",
             success: function(resultData) {
                 if(resultData.status=='add_role_success'){
+                    console.log(resultData);
                     var myOptions = {
                         val1: resultData.role_id
                     }
