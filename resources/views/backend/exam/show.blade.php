@@ -411,9 +411,9 @@
                 window.location.href = baseUrl;
             })
 
-            $('#assign_role_staff').on('click', function() {
+            $('#assign_room_staff').on('click', function() {
 
-                var baseUrl  = '{!! route('admin.exam.assign_role_staff_lists', $exam->id) !!}';
+                var baseUrl  = '{!! route('admin.exam.assign_room_staff_lists', $exam->id) !!}';
                 var window_view_role_staff = PopupCenterDual(baseUrl, 'View Role For Each staff', '1000', '1200');
             });
             @endauth

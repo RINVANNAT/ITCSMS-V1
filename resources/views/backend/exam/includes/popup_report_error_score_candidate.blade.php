@@ -17,6 +17,17 @@
         .number_only{
             border: 1px solid black;
         }
+
+        .myloading {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: white;
+            z-index: 1;
+        }
+
     </style>
     <div class="box box-success">
         <div class="box-header with-border">
@@ -37,9 +48,15 @@
             </div>
         </div>
         <!-- /.box-header -->
+
+        <div class="myloading" style=" text-align: center">
+            <img src="{{url('img/exam/loader.gif')}}" alt="load" style="margin-top: 400px">
+
+        </div>
         <div class="box-body">
             {{--here what i need to write--}}
             <div class="container">
+
                 <div class="col-sm-12 no-padding" style="margin-top: -15px">
 
                 </div>
@@ -177,12 +194,14 @@
                     </table>
                 </div>
 
+
+
+
+
             </div>
 
         </div>
-
     </div>
-
     <div class="box box-success">
         <div class="box-body">
             <div class="pull-left">
@@ -202,6 +221,7 @@
 
    <script>
        $(document).ready(function () {
+           $('.myloading').hide();
 
            $(".number_only").keypress(function (e) {
                if (e.which != 8 && e.which != 0 && (e.which < 48 || e.which > 57)) {

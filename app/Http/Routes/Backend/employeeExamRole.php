@@ -36,7 +36,7 @@ Route::group([], function() {
     Route::get('exams/{id}/temp-employee-export', 'employeeExamController@exportTempEmployees')->name('admin.exam.temp_employee.export');
 
 
-    Route::get('exams/{id}/assign-role-staff-lists', 'employeeExamController@viewRoleStaffLists')->name('admin.exam.assign_role_staff_lists');
+    Route::get('exams/{id}/assign-room-staff-lists', 'employeeExamController@viewRoleStaffLists')->name('admin.exam.assign_room_staff_lists');
 
 
     Route::get('exams/{id}/print-role-staff-lists', 'employeeExamController@printViewRoleStaffLists')->name('admin.exam.print_role_staff_lists');
