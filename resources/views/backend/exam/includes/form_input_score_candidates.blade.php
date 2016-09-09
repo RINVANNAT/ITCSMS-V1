@@ -360,14 +360,14 @@
             $('#pre_room').on('click', function(){
                 var room_id =  $(this).attr('room_id');
                 var room_code = $(this).text();
-                window.location.href = baseUrl+'?room_id='+ room_id + '&room_code=' + room_code + '&entrance_course_id=' + course_id + '&number_correction=' + number_correction;
+                window.location.href = baseUrl+'?room_id='+ room_id + '&room_code=' + room_code + '&entrance_course_id=' + course_id + '&course_name=' + course_name + '&number_correction=' + number_correction;
             });
 
             $('#room_selection').on('change', function() {
                 var room_id = $(this).val();
                 var room_code = $('#room_selection :selected' ).text();
                 console.log(room_id + '--' + room_code);
-                window.location.href = baseUrl+'?room_id='+ room_id + '&room_code=' + room_code + '&entrance_course_id=' + course_id + '&number_correction=' + number_correction;
+                window.location.href = baseUrl+'?room_id='+ room_id + '&room_code=' + room_code + '&entrance_course_id=' + course_id + '&course_name=' + course_name +'&number_correction=' + number_correction;
             });
         </script>
 
