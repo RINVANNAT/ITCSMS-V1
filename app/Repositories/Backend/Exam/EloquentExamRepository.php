@@ -460,6 +460,7 @@ class EloquentExamRepository implements ExamRepositoryContract
                 ['exams.id', '=', $examId],
                 ['candidates.active', '=', true]
             ])
+            ->whereNotNull('examRooms.roomcode')
             ->select('candidates.id as candidate_id', 'register_id', 'examRooms.roomcode as room_code', 'examRooms.id as room_id')
             ->orderBy('register_id', 'ASC')
             ->get();

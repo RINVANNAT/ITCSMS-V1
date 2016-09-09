@@ -347,12 +347,13 @@
         <script>
             var baseUrl = '{!! route('admin.exam.request_input_score_form', $exam_id) !!}';
             var course_id = $('#course_id').val();
+            var course_name = '{{$subject}}';
             var number_correction = JSON.parse('{{$number_correction}}');
 
             $('#next_room').on('click', function(){
                 var room_id =  $(this).attr('room_id');
                 var room_code = $(this).text();
-                window.location.href = baseUrl+'?room_id='+ room_id + '&room_code=' + room_code + '&entrance_course_id=' + course_id + '&number_correction=' + number_correction;
+                window.location.href = baseUrl+'?room_id='+ room_id + '&room_code=' + room_code + '&entrance_course_id=' + course_id + '&course_name=' + course_name + '&number_correction=' + number_correction;
 
             });
 
