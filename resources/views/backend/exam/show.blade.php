@@ -740,6 +740,8 @@
                 window_request_room = PopupCenterDual('{{route("admin.exam.request_input_score_courses",$exam->id)}}','Course for exam','1000','450');
             });
 
+
+
             $(document).on('click', '#btn_result_score_candidate', function (e) {
                 window_request_room = PopupCenterDual('{{route("admin.exam.candidate_exam_result_score",$exam->id)}}','Candidate Result Score','800','470');
             });
@@ -826,7 +828,7 @@
                     pageLength: {!! config('app.records_per_page')!!},
                     ajax: {
                         url: '{!! route('admin.exam.get_courses',$exam->id) !!}',
-                        method: 'POST'
+                        method: 'POST',
                     },
                     columns: [
                         { data: 'name_kh', name: 'courseAnnuals.name_kh'},
@@ -847,9 +849,22 @@
 
             });
 
+            $('#btn_result_score_candidate').hide();
+
             $('#btn_check_course_error').on('click', function() {
                 check_course_error = true;
                 course_datatable.draw();
+                var baseUrl ='{{route("admin.exam.ajax_check_candidate_score", $exam->id)}} ';
+
+                $.ajax({
+                    type: 'GET',
+                    url: baseUrl,
+                    success: function(result) {
+                        if(result.status == false) {
+                            $('#btn_result_score_candidate').show();
+                        }
+                    }
+                });
             })
 
             $("#btn-add-course").click(function(){

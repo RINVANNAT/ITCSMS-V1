@@ -12,13 +12,24 @@
     <!-- /.btn-group -->
     <button class="btn btn-default btn-sm" id="btn-candidate-refresh"><i class="fa fa-refresh"></i></button>
 
-    @permission('generate-room-exam-candidate')
-    <button class="btn btn-default btn-sm pull-right" id="btn-candidate-generate-room"><i class="fa fa-map-signs"></i> {!! trans('buttons.exam.candidate.generate_room') !!}</button>
-    @endauth
+    @if($exam->type_id == 2)
+        @permission('create-entrance-exam-score')
+        <button  class="btn btn-primary btn-sm pull-right" id="btn_generate_result" style="margin-right: 5px"><i class="fa fa-plus-circle" ></i> Generate Result </button>
+        @endauth
+    @endif
 
-    @permission('create-entrance-exam-score')
-    <button  class="btn btn-primary btn-sm pull-right" id="btn_input_score_course" style="margin-right: 5px"><i class="fa fa-plus-circle" ></i> {!! trans('buttons.exam.course.input_score') !!} </button>
-    @endauth
+    @if($exam->type_id == 1)
+
+        @permission('generate-room-exam-candidate')
+        <button class="btn btn-default btn-sm pull-right" id="btn-candidate-generate-room"><i class="fa fa-map-signs"></i> {!! trans('buttons.exam.candidate.generate_room') !!}</button>
+        @endauth
+
+        @permission('create-entrance-exam-score')
+        <button  class="btn btn-primary btn-sm pull-right" id="btn_input_score_course" style="margin-right: 5px"><i class="fa fa-plus-circle" ></i> {!! trans('buttons.exam.course.input_score') !!} </button>
+        @endauth
+
+    @endif
+
 
 </div>
 

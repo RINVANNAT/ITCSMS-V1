@@ -70,7 +70,7 @@
 @stop
 
 @section('content')
-    @include('backend.accounting.studentPayment.modal_payment')
+    @include('backend.accounting.studentPayment.modal_income')
     <div class="box box-success">
         <div class="box-header with-border">
             <div class="mailbox-controls">
