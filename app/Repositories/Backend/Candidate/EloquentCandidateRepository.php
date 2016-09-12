@@ -222,7 +222,7 @@ class EloquentCandidateRepository implements CandidateRepositoryContract
             UserLog::log([
                 'model' => 'Candidate',
                 'action'=> 'Delete-Full',
-                'data'  => $old_record, // Candidate need to completly remove, else problem will occur when registering new candidate (unique register_id +exam_id)
+                'data'  => $old_record, // Candidate need to completely remove, else problem will occur when registering new candidate (unique register_id +exam_id)
             ]);
             return true;
         }

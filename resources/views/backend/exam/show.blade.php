@@ -411,9 +411,9 @@
                 window.location.href = baseUrl;
             })
 
-            $('#assign_role_staff').on('click', function() {
+            $('#assign_room_staff').on('click', function() {
 
-                var baseUrl  = '{!! route('admin.exam.assign_role_staff_lists', $exam->id) !!}';
+                var baseUrl  = '{!! route('admin.exam.assign_room_staff_lists', $exam->id) !!}';
                 var window_view_role_staff = PopupCenterDual(baseUrl, 'View Role For Each staff', '1000', '1200');
             });
             @endauth
@@ -426,6 +426,9 @@
 
             /* ------------------------------------------------  Room Exam Section -------------------------------------------*/
             @permission('view-exam-room')
+
+            var room_exam_add_title = "{{ trans('labels.backend.exams.exam_room.title.add') }}";
+            var room_exam_edit_title = "{{ trans('labels.backend.exams.exam_room.title.edit') }}";
 
             /* ---------- Event Area --------- */
             get_total_seat(); // Count total seat after page ready
@@ -469,8 +472,26 @@
 
             /* ---------------- Add Section ---------------- */
 
-            $("#btn_room_add").click(function () {
-                $('#modal_exam_room_add').modal('toggle');
+            $(document).on("click",".btn_room_edit",function () {
+                $("#modal_exam_room_id").val($(this).data('roomid'));
+                $("#modal_exam_room_name").val($(this).data('roomname'));
+                $("#modal_exam_room_seat").val($(this).data('capacity'));
+                $("#modal_exam_room_building").val($(this).data('building'));
+                $("#modal_exam_room_description").val($(this).data('description'));
+
+                $("#modal_exam_room_title").html(room_exam_edit_title);
+                $('#modal_exam_room_modify').modal('toggle');
+            });
+
+            $(document).on("click","#btn_room_add",function () {
+                $("#modal_exam_room_id").val(null);
+                $("#modal_exam_room_name").val(null);
+                $("#modal_exam_room_seat").val(null);
+                $("#modal_exam_room_building").val(null);
+                $("#modal_exam_room_description").val(null);
+
+                $("#modal_exam_room_title").html(room_exam_add_title);
+                $('#modal_exam_room_modify').modal('toggle');
             });
 
             $("#btn_add_save").click(function () {
@@ -609,7 +630,7 @@
                 });
             });
 
-            $("#exam_room_header").click(function(e){
+            $(document).on('click',"#exam_room_header",function(e){
                 if($(this).is(":checked")){
                     $(".exam_room_checkbox:not(:checked)").trigger("click");
                 } else {

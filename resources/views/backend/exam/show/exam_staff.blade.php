@@ -20,7 +20,7 @@
                     <small>Selected staffs and roles</small>
 
                     <div>
-                        <button class="btn btn-primary btn-xs" id="assign_role_staff" style="display: none;"> Assign Role </button>
+                        <button class="btn btn-primary btn-xs" id="assign_room_staff" style="display: none;"> Assign Room </button>
                     </div>
 
                     <div id="check_ok" class="col-md-12  no-padding alert-info" style="margin-bottom: 5px">

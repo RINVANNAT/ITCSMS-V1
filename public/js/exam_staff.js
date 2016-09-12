@@ -177,7 +177,7 @@
     $("#btn_add_role").click(function () {
         toggleSidebarStaffRole();
         enable_modify_staff();
-        $('#assign_role_staff').show();
+        $('#assign_room_staff').show();
     });
 
     $("#selected_staffs")
@@ -191,7 +191,7 @@
         $('.popUpRoleDown').hide();
         toggleSidebarStaffRole();
         disable_modify_staff();
-        $('#assign_role_staff').hide();
+        $('#assign_room_staff').hide();
         return false;
     });
 

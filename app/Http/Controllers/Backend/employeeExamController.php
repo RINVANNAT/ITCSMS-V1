@@ -485,6 +485,7 @@ class employeeExamController extends Controller
         $notSelectedRooms = DB::table('examRooms')
             ->join('buildings', 'examRooms.building_id', '=', 'buildings.id')
             ->whereNotIn('examRooms.id', $roomIds)
+            ->whereNotNull('examRooms.roomcode')
             ->select('examRooms.name as room_name', 'examRooms.id as room_id', 'buildings.code')
             ->get();
 

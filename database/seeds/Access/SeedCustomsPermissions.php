@@ -613,10 +613,17 @@ class SeedCustomsPermissions extends Seeder
                             ]
                         ],
                         [
+                            'name'          => 'view-secret-codes',
+                            'display_name'  => "View exam's rooms secret code",
+                            'dependency'   => [
+                                'view-backend','view-exam-management','view-exam-room'
+                            ]
+                        ],
+                        [
                             'name'          => 'generate-exam-room-secret-code',
                             'display_name'  => "Generate exam's rooms secret code",
                             'dependency'   => [
-                                'view-backend','view-exam-management','view-exam-room'
+                                'view-backend','view-exam-management','view-exam-room','view-secret-codes'
                             ]
                         ],
                     ]
@@ -1555,6 +1562,44 @@ class SeedCustomsPermissions extends Seeder
                     'display_name' => 'View Configuration Management',
                     'dependency'   => [
                         'view-backend'
+                    ]
+                ]
+            ]
+        ];
+
+        /* Inventory Permissions */
+        $roots[] = [
+            'name'=>'Error Reporting',
+            'groups'=>[
+            ],
+            'permissions' => [
+                // Leave it empty if there is none
+                [
+                    'name'         => 'view-reporting-management',
+                    'display_name' => 'View Error Reporting Management',
+                    'dependency'   => [
+                        'view-backend'
+                    ]
+                ],
+                [
+                    'name'         => 'create-reporting',
+                    'display_name' => 'Create error reporting',
+                    'dependency'   => [
+                        'view-backend','view-reporting-management'
+                    ]
+                ],
+                [
+                    'name'         => 'edit-reporting',
+                    'display_name' => 'Edit error reporting',
+                    'dependency'   => [
+                        'view-backend','view-reporting-management'
+                    ]
+                ],
+                [
+                    'name'         => 'delete-reporting',
+                    'display_name' => 'Delete error reporting',
+                    'dependency'   => [
+                        'view-backend','view-reporting-management'
                     ]
                 ]
             ]

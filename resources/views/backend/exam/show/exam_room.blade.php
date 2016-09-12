@@ -1,6 +1,6 @@
 @include('backend.exam.includes.exam_room_merge')
 @include('backend.exam.includes.exam_room_split')
-@include('backend.exam.includes.exam_room_add')
+@include('backend.exam.includes.exam_room_modify')
 <div class="row" id="row-main">
     <div class="col-sm-12">
         <div class="box box-solid">

@@ -1,3 +1,4 @@
+
 <?php
 
 return [
@@ -29,6 +30,7 @@ return [
     'general' => [
         'cancel' => 'Cancel',
         'search' => 'Search',
+        'generate' => 'Generate',
         'crud' => [
             'create' => 'Create',
             'delete' => 'Delete',
@@ -44,7 +46,8 @@ return [
         'close' => 'Close',
         'save_close' => 'Save & Close',
         'save_print' => 'Save & Print',
-        'register' => 'Register'
+        'register' => 'Register',
+        'ok' => 'OK'
     ],
     'exam' => [
         'candidate' => [

@@ -9,10 +9,10 @@
             <h3 class="box-title">{{ trans('labels.backend.exams.secret_code.title') }}</h3>
             <input type="button" id="btn-auto" class="btn btn-success btn-xs pull-right" style="margin-left: 5px; margin-top: 3px;" value="{{ trans('labels.backend.exams.secret_code.generate_auto') }}" />
             <span class="pull-right" id="form-secret-code" style="display: none">
-                <input type="text" id="min_range"/> -
-                <input type="text" id="max_range"/>
+                <input type="number" id="min_range"/> -
+                <input type="number" id="max_range"/>
 
-                <input type="button" id="btn-auto-save" class="btn btn-danger btn-xs pull-right" style="margin-left: 5px; margin-top: 3px;" value="{{ trans('buttons.general.save') }}" />
+                <input type="button" id="btn-auto-save" class="btn btn-danger btn-xs pull-right" style="margin-left: 5px; margin-top: 3px;" value="{{ trans('buttons.general.ok') }}" />
             </span>
 
         </div>
@@ -80,17 +80,27 @@
             $("#btn-auto-save").click(function () {
                 var min = parseInt($('#min_range').val());
                 var max = parseInt($('#max_range').val());
-                $(document).find('.secret_code').each(function(){
-                    $(this).prop('disabled', false);
-                    var code = Math.floor(Math.random()*(max-min + 1)) + min;
-                    while(is_secret_code_exist(code)){
-                        code = Math.floor(Math.random()*(max-min + 1)) + min;
-                    }
-                    $(this).val(code);
-                });
+                var rooms = $(document).find('.secret_code');
+                if(min>max){
+                    notify("error","info", "You entered incorrect number!");
+                } else {
+                    if(rooms.length > (max-min)){
+                        notify("error","info", "Bigger number gap is required!");
+                    } else {
+                        $.each(rooms,function(){
+                            $(this).prop('disabled', false);
+                            var code = Math.floor(Math.random()*(max-min + 1)) + min;
+                            while(is_secret_code_exist(code)){
+                                code = Math.floor(Math.random()*(max-min + 1)) + min;
+                            }
+                            $(this).val(code);
+                        });
 
-                $('#form-secret-code').hide();
-                $('#btn-auto').show();
+                        $('#form-secret-code').hide();
+                        $('#btn-auto').show();
+                    }
+                }
+
             });
 
             $("#btn-save").click(function () {
