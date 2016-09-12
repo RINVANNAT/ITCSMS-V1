@@ -608,7 +608,11 @@ class ScoreRepository extends BaseRepository
         $scores = array();
         foreach($scorequeries as $scorequery){
             $scores[$scorequery->student_annual_id] = $scorequery;
+
+
         }
+
+
 
         // get student eval status
 

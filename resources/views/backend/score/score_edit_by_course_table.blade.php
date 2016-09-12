@@ -24,9 +24,9 @@ start table render
                 <th style="display:none;">Abs</th>
                 <th> Abs </th>
 
-                <th class="" v-show="course_annual.score_percentage_column_1> 0"> Score @{{ course_annual.score_percentage_column_1 }} </th>
-                <th class="" v-show="course_annual.score_percentage_column_2> 0"> Score @{{ course_annual.score_percentage_column_2 }} </th>
-                <th class="" v-show="course_annual.score_percentage_column_3> 0"> Score @{{ course_annual.score_percentage_column_3 }} </th>
+                <th class="scoreper" v-show="course_annual.score_percentage_column_1> 0"> <a href="{{ route("admin.course.course_annual.edit",$course_annual_fetch["id"]) }}">Score @{{ course_annual.score_percentage_column_1 }} </a> </th>
+                <th class="scoreper" v-show="course_annual.score_percentage_column_2> 0"> <a href="{{ route("admin.course.course_annual.edit",$course_annual_fetch["id"]) }}"> Score @{{ course_annual.score_percentage_column_2 }} </a></th>
+                <th class="scoreper" v-show="course_annual.score_percentage_column_3> 0"> <a href="{{ route("admin.course.course_annual.edit",$course_annual_fetch["id"]) }}">Score @{{ course_annual.score_percentage_column_3 }} </a></th>
                 <th style="display:none;"> re-exam </th>
                 <th> total </th>
                 </thead>
@@ -39,9 +39,10 @@ start table render
                         <td> {!! Form::text('abs[]', '@{{  absencesCounts[studentAnnua.id] }}', [ 'v-model'=>"absencesCounts[studentAnnual.id]", 'class' => 'form-score','id'=>'@{{index}}-0','placeholder'=>'']) !!}</td>
                         {!! Form::hidden('ids[]', '@{{ scores[studentAnnual.id].id }}') !!}
                         {!! Form::hidden('student_annual_ids[]', '@{{ studentAnnual.id }}') !!}
-                        <td v-show="course_annual.score_percentage_column_1> 0"> {!! Form::text('score10[]', '@{{ scores[studentAnnual.id].score10}}', [ 'v-model'=>"scores[studentAnnual.id].score10", 'id'=>'@{{index}}-1','class' => 'form-score','placeholder'=>'']) !!}</td>
-                        <td v-show="course_annual.score_percentage_column_2> 0">{!! Form::text('score30[]', '@{{ scores[studentAnnual.id].score30}}' , ['v-model'=>"scores[studentAnnual.id].score30", 'id'=>'@{{index}}-2','class' => 'form-score','placeholder'=>""]) !!}</td>
-                        <td v-show="course_annual.score_percentage_column_3> 0">{!! Form::text('score60[]',  '@{{ scores[studentAnnual.id].score60}}' , ['v-model'=>"scores[studentAnnual.id].score60", 'id'=>'@{{index}}-3', 'class' => 'form-score', 'placeholder'=>""]) !!}</td>
+                        <td v-show="course_annual.score_percentage_column_1> 0"> {!! Form::text('score10[]', '@{{ scores[studentAnnual.id].score10}}', [ 'v-model'=>"scores[studentAnnual.id].score10", 'id'=>'@{{index}}-1',
+                        'class' => "form-score @{{ inRow1Validation(studentAnnual.id)}}",'placeholder'=>'']) !!}   </td>
+                        <td v-show="course_annual.score_percentage_column_2> 0">{!! Form::text('score30[]', '@{{ scores[studentAnnual.id].score30}}' , ['v-model'=>"scores[studentAnnual.id].score30", 'id'=>'@{{index}}-2','class' => 'form-score @{{ inRow2Validation(studentAnnual.id)}}'        ,'placeholder'=>""]) !!}    </td>
+                        <td v-show="course_annual.score_percentage_column_3> 0">{!! Form::text('score60[]',  '@{{ scores[studentAnnual.id].score60}}' , ['v-model'=>"scores[studentAnnual.id].score60", 'id'=>'@{{index}}-3', 'class' => 'form-score @{{ inRow3Validation(studentAnnual.id)}}'      ,'placeholder'=>""]) !!} </td>
                         <td style="display:none;">{!! Form::text('reexam[]',  '@{{ scores[studentAnnual.id].reexam}}',  ['v-model'=>"scores[studentAnnual.id].reexam", 'class' => 'form-score', 'placeholder'=>""]) !!}</td>
                         <td class="@{{ totalValidation(studentAnnual.id)}}" >@{{(total(studentAnnual.id)).toFixed(2) }} </td>
                     </tr>
@@ -59,9 +60,9 @@ start table render
                 <th> ID </th>
                 <th style="display:none;">Abs</th>
                 <th> Abs </th>
-                <th> Score 10 </th>
-                <th> Score 30 </th>
-                <th> Score 60 </th>
+                <th class="scoreper"> <a href="{{ route("admin.course.course_annual.edit",$course_annual_fetch["id"]) }}">Score 10 </a></th>
+                <th class="scoreper"> <a href="{{ route("admin.course.course_annual.edit",$course_annual_fetch["id"]) }}">Score 30 </a> </th>
+                <th class="scoreper"> <a href="{{ route("admin.course.course_annual.edit",$course_annual_fetch["id"]) }}">Score 60 </a></th>
                 <th style="display:none;"> re-exam </th>
                 <th> total </th>
                 </thead>
@@ -74,11 +75,11 @@ start table render
                         <td> {!! Form::text('abs[]', '@{{  absencesCounts[studentAnnua.id] }}', [ 'v-model'=>"absencesCounts[studentAnnual.id]", 'class' => 'form-score','id'=>'@{{index}}-0','placeholder'=>'']) !!}</td>
                         {!! Form::hidden('ids[]', '@{{ scores[studentAnnual.id].id }}') !!}
                         {!! Form::hidden('student_annual_ids[]', '@{{ studentAnnual.id }}') !!}
-                        <td> {!! Form::text('score10[]', '@{{ scores[studentAnnual.id].score10}}', [ 'v-model'=>"scores[studentAnnual.id].score10", 'id'=>'@{{index}}-1','class' => 'form-score','placeholder'=>'']) !!}</td>
+                        <td> {!! Form::text('score10[]', '@{{ scores[studentAnnual.id].score10}}', [ 'v-model'=>"scores[studentAnnual.id].score10", 'id'=>'@{{index}}-1', 'class' => "form-score @{{ inRow1Validation(studentAnnual.id)}}",'placeholder'=>'']) !!}</td>
 
-                        <td>{!! Form::text('score30[]', '@{{ scores[studentAnnual.id].score30}}' , ['v-model'=>"scores[studentAnnual.id].score30", 'id'=>'@{{index}}-2','class' => 'form-score','placeholder'=>""]) !!}</td>
+                        <td>{!! Form::text('score30[]', '@{{ scores[studentAnnual.id].score30}}' , ['v-model'=>"scores[studentAnnual.id].score30", 'id'=>'@{{index}}-2','class' => 'form-score @{{ inRow2Validation(studentAnnual.id)}}','placeholder'=>""]) !!}</td>
 
-                        <td>{!! Form::text('score60[]',  '@{{ scores[studentAnnual.id].score60}}' , ['v-model'=>"scores[studentAnnual.id].score60", 'id'=>'@{{index}}-3', 'class' => 'form-score', 'placeholder'=>""]) !!}</td>
+                        <td>{!! Form::text('score60[]',  '@{{ scores[studentAnnual.id].score60}}' , ['v-model'=>"scores[studentAnnual.id].score60", 'id'=>'@{{index}}-3', 'class' => 'form-score @{{ inRow3Validation(studentAnnual.id)}}', 'placeholder'=>""]) !!}</td>
                         <td style="display:none;">{!! Form::text('reexam[]',  '@{{ scores[studentAnnual.id].reexam}}',  ['v-model'=>"scores[studentAnnual.id].reexam", 'class' => 'form-score', 'placeholder'=>""]) !!}</td>
                         <td class="@{{ totalValidation(studentAnnual.id)}}" >@{{(total(studentAnnual.id)).toFixed(2) }} </td>
                     </tr>
@@ -125,8 +126,6 @@ start table render
                     }else{
                         tmp = parseFloat(this.scores[index].score60);
                     }
-
-
                     if (!!this.scores[index].score10) {
                         tmp = tmp + parseFloat( this.scores[index].score10);
                     }else{
@@ -142,6 +141,41 @@ start table render
                     }
                     return  tmp;
                 },
+                inRow1Validation: function ( index ) {
+                    // `this` points tscoreso the vm instance
+                    var tmp = parseFloat( parseFloat( this.scores[index].score10));
+                    if (tmp <= this.course_annual.score_percentage_column_1){
+                        return "total_validate";
+                    }else if (tmp > this.course_annual.score_percentage_column_1){
+                        return "total_not_validate";
+                    }else {
+                        return "total_not_validate";
+                    }
+                },
+                inRow2Validation: function ( index ) {
+                    // `this` points tscoreso the vm instance
+                    var tmp = parseFloat( parseFloat( this.scores[index].score30));
+                    if (tmp <= this.course_annual.score_percentage_column_2){
+                        return "total_validate";
+                    }else if (tmp > this.course_annual.score_percentage_column_2){
+                        return "total_not_validate";
+                    }else {
+                        return "total_not_validate";
+                    }
+                },
+                inRow3Validation: function ( index ) {
+                    // `this` points tscoreso the vm instance
+                    var tmp = parseFloat( parseFloat( this.scores[index].score60));
+                    if (tmp <= this.course_annual.score_percentage_column_3){
+                        return "total_validate";
+                    }else if (tmp > this.course_annual.score_percentage_column_3){
+                        return "total_not_validate";
+                    }else {
+                        return "total_not_validate";
+                    }
+                },
+
+
                 totalValidation: function ( index ) {
                     // `this` points tscoreso the vm instance
                     var tmp = parseFloat(this.scores[index].score60)+ parseFloat( this.scores[index].score10) +parseFloat( this.scores[index].score30);
@@ -187,6 +221,22 @@ start table render
                     }
                 },
             }
+        });
+
+
+
+
+
+        $(document).on("contextmenu", ".scoreper", function (e) {
+           console.log("click");
+
+            if( e.button == 2 ) {
+
+
+                alert('Right mouse button!');
+                return false;
+            }
+            return true;
         });
 
         var delay = (function(){

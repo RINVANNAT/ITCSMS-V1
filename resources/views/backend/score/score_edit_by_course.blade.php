@@ -21,6 +21,10 @@
         .total_not_validate{
             background-color: orangered;
         }
+
+        .not_valide_input{
+            background-color: orangered;
+        }
     </style>
 @stop
 
@@ -51,6 +55,8 @@
                             <a id="score-report" href="{!! route('score.ranking') !!}" >
                                 <button class="btn btn-default btn-sm"> Score Report</button>
                             </a>
+
+
 
                         </div>
                         <div class="pull-right">
