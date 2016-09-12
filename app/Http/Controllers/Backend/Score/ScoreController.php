@@ -3,6 +3,7 @@
 use App\Http\Requests;
 use App\Http\Requests\CreateScoreRequest;
 use App\Http\Requests\UpdateScoreRequest;
+use App\Models\Score;
 use App\Repositories\Backend\Score\ScoreRepository;
 use App\Models\Absence;
 use App\Models\UserLog;
@@ -150,6 +151,18 @@ class ScoreController extends AppBaseController
         $studentAnnuals = collect([]);
 		
 		return view('backend.score.score_edit_by_course', compact("studentAnnuals","scoresindex", "scores", "user_id"));
+	}
+
+	public function gen( Request $request ){
+
+		$scores = Score::all();
+		foreach ($scores as $score ){
+			$score->score10 = rand(0, 10);
+			$score->score30 = rand(0, 30);
+			$score->score60 = rand(0, 60);
+			$score->save();
+		}
+		return "ok";
 	}
 
 	public  function  updateMany(Request $request){

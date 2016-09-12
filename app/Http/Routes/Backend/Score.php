@@ -22,5 +22,10 @@ Route::group([
             'uses' => 'ScoreController@ranking',
         ]);
 
+        Route::get('gen',[
+            'as' => 'score.gen',
+            'uses' => 'ScoreController@gen',
+        ]);
+
     });
 });
