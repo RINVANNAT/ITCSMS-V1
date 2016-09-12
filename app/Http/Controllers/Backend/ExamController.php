@@ -755,24 +755,48 @@ class ExamController extends Controller
 
     public function candidateResultExamScores($exam_id) {
 
-        $errorStatus=false;
+        $courseIds = $this->getAllExamCourses($exam_id);
+        $checkScore = $this-> checkEntranceExamScores($exam_id, $courseIds);
+        $check =$checkScore[0];
+        $courses = $checkScore[1];
+
+        if($courseIds) {
+            if($check == count($courseIds)) {
+
+                return view('backend.exam.includes.popup_get_form_result_score', compact('exam_id', 'courseIds'));
+
+            } else {
+                return view('backend.exam.includes.error_popup_message', compact('courses'))->with(['message'=>'There is an existing score error']);
+            }
+        }
+
+
+    }
+
+    private function getAllExamCourses($exam_id) {
+
+        $courseIds = DB::table('entranceExamCourses')
+            ->where([
+                ['exam_id', '=', $exam_id],
+                ['entranceExamCourses.active', '=', true]
+            ])
+            ->select('id as course_id', 'name_en as course_name')->get();
+
+        return $courseIds;
+    }
+
+    private function checkEntranceExamScores($exam_id, $courseIds) {
+
         $check =0;
         $courses = [];
-        $courseIds = DB::table('entranceExamCourses')
-                    ->where([
-                        ['exam_id', '=', $exam_id],
-                        ['entranceExamCourses.active', '=', true]
-                    ])
-                    ->select('id as course_id', 'name_en as course_name')->get();
-
         if($courseIds) {
             foreach($courseIds as $courseId) {
                 $restult = DB::table('statusCandidateScores')
                     ->select('status')
                     ->where([
-                            ['exam_id', '=', $exam_id],
-                            ['entrance_exam_course_id', '=', $courseId->course_id]
-                            ])
+                        ['exam_id', '=', $exam_id],
+                        ['entrance_exam_course_id', '=', $courseId->course_id]
+                    ])
                     ->first();
 
                 if($restult->status == false) {
@@ -783,13 +807,20 @@ class ExamController extends Controller
 
             }
 
-            if($check == count($courseIds)) {
+            return [$check, $courses];
 
-                return view('backend.exam.includes.popup_get_form_result_score', compact('exam_id', 'courseIds'));
+        }
+    }
 
-            } else {
-                return view('backend.exam.includes.error_popup_message', compact('courses'))->with(['message'=>'There is an existing score error']);
-            }
+    public function checkCandidateScores($examId) {
+
+        $courseIds = $this->getAllExamCourses($examId);
+        $checkScore = $this->checkEntranceExamScores($examId, $courseIds);
+
+        if($checkScore[0]== count($courseIds)) {
+             return Response::json(['status'=> false]);
+        } else{
+            return Response::json(['status'=> true]);
         }
 
     }
@@ -1067,7 +1098,6 @@ class ExamController extends Controller
         $tmp =0;
         $arraySplitPages =[];
         $pages = [];
-        $candidateIds = explode(',', $request->candidate_array_ids);
         $orderInRoom = explode(',',$request->order_in_room );
         $room_Code = explode(',', $request->room_code_ids);
         $courseName = $request->course_name;
@@ -1076,6 +1106,7 @@ class ExamController extends Controller
         foreach ($tmpArray as $val) {
             $roomCodes[] = $val;
         }
+
         for($key = 0; $key <count($roomCodes); $key++) {
 
             $status_object1= 0;
@@ -1085,6 +1116,7 @@ class ExamController extends Controller
                 if($room_Code[$j] == $roomCodes[$key]) {
                     $status_object1++;
                     $object1[$roomCodes[$key]][] = $orderInRoom[$j];
+
                 }
             }
 
@@ -1097,7 +1129,6 @@ class ExamController extends Controller
                     $pages = $pages + $object1;
                     if($key == count($roomCodes)-1) {
                         $arraySplitPages[] =  $pages ;
-
                     }
                 } else if($tmp == 20) {
                     $pages = $pages + $object1;
@@ -1106,13 +1137,21 @@ class ExamController extends Controller
                     $tmp =0;
                 } else {
                     $arraySplitPages[] = $object1;
-                    $tmp =0;
+                    $tmp = $tmp - $status_object1;
+
+                    if($key == count($roomCodes)-1) {
+                        $arraySplitPages[] =  $pages ;
+                    }
                 }
             } else {
+
                 $arraySplitPages[] = $object1;
+
+                if($key == count($roomCodes)-1) {
+                    $arraySplitPages[] =  $pages ;
+                }
             }
         }
-
 
 
         return view('backend.exam.print.candidate_score_error', compact('arraySplitPages', 'courseName'));

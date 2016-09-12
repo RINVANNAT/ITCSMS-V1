@@ -219,7 +219,7 @@
             });
 
             function ajaxRequest(method, baseUrl, baseData){
-                console.log('hello');
+
                 $.ajax({
                     type: method,
                     url: baseUrl,

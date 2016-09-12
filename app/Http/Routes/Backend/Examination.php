@@ -61,6 +61,8 @@ Route::group([], function() {
 
     Route::get('exams/{id}/print_candidate_error_score', 'ExamController@printCandidateErrorScore')->name('admin.exam.print_candidate_error_socre');
 
+    Route::get('exams/{id}/ajax-check-candidate_socore', 'ExamController@checkCandidateScores')->name('admin.exam.ajax_check_candidate_score');
+
 
 
 

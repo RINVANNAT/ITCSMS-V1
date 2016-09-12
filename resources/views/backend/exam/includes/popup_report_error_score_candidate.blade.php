@@ -347,7 +347,7 @@
 
 //           window.location.href = baseUrl+'?course_id=' + course_id +'&candidate_array_ids='+array_candidate_ids+'&room_code_ids='+ array_room_code_id +'&order_in_room=' +order;
 
-           window_request_room = PopupCenterDual(baseUrl+'?course_id=' + course_id +'&candidate_array_ids='+array_candidate_ids+'&room_code_ids='+ array_room_code_id +'&order_in_room=' +order + '&course_name=' + course_name,'Candidates Result List','1000','1200');
+           window_request_room = PopupCenterDual(baseUrl+'?course_id=' + course_id +'&room_code_ids='+ array_room_code_id +'&order_in_room=' +order + '&course_name=' + course_name,'Candidates Result List','1000','1200');
 
 
 //           for(var index =0; index< candidate_score_error.length; index++) {
