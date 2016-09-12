@@ -92,7 +92,15 @@ class IncomeController extends Controller
         $academicYears = AcademicYear::orderBy('id','desc')->lists('name_kh','id');
         $exams = Exam::lists('name','id');
 
-        return view('backend.accounting.studentPayment.index_candidate',compact('departments','degrees','genders','exams','academicYears'));
+        $number = 1;
+        $last_income = Income::orderBy('number','DESC')->first();
+        if($last_income != null){
+            $number = $last_income->number + 1;
+        }
+
+        $number = str_pad($number, 5, "0", STR_PAD_LEFT);
+
+        return view('backend.accounting.studentPayment.index_candidate',compact('departments','degrees','genders','exams','academicYears','number'));
     }
 
     public function candidate_payment_data()
@@ -112,7 +120,8 @@ class IncomeController extends Controller
                 'origins.name_kh as province', 'dob','result',DB::raw("CONCAT(degrees.code,grades.code,departments.code) as class"),
                 'academicYears.name_kh as academic_year_name_kh','candidates.grade_id', 'candidates.degree_id','degrees.name_kh as degree_name_kh',
                 'genders.name_kh as gender_name_kh','gdeGrades.name_en as bac_total_grade'])
-            ->where('candidates.result','Pass');
+            ->where('candidates.result','Pass')
+            ->orWhere('candidates.result','Reserve');
 
         if($exam_id = Input::get('exam_id')){
             $candidates = $candidates->where('exam_id',$exam_id);
