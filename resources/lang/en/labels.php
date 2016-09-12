@@ -482,7 +482,8 @@ return [
                 'title' => [
                     'merge' => 'Merge Room',
                     'split' => 'Split Room',
-                    'add' => 'Add Room'
+                    'add' => 'Add Room',
+                    'edit' => 'Edit Room'
                 ],
                 'field' => [
                     'name' => 'Name',

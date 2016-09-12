@@ -1,34 +1,35 @@
-<div class="modal fade" id="modal_exam_room_add">
+<div class="modal fade" id="modal_exam_room_modify">
     <div class="modal-dialog" style="width: 1000px">
         <div class="modal-content">
             <div class="modal-body">
                 <div class="box box-success">
                     <div class="box-header with-border">
-                        <h3 class="box-title">{{ trans('labels.backend.exams.exam_room.title.add') }}</h3>
+                        <h3 class="box-title" id="modal_exam_room_title"></h3>
                     </div><!-- /.box-header -->
 
                     <div class="box-body">
                         <div class="col-xs-12">
                             <form class="form-horizontal" id="form_exam_room_add">
+                                {!! Form::hidden('room_id', null, ['class' => 'form-control','id'=>"modal_exam_room_id"]) !!}
                                 <div class="form-group">
                                     <label for="name" class="col-sm-3 control-label">Name</label>
 
                                     <div class="col-sm-5">
-                                        <input type="text" name="name" class="form-control">
+                                        <input type="text" id="modal_exam_room_name" name="name" class="form-control">
                                     </div>
                                 </div>
                                 <div class="form-group">
                                     <label for="nb_chair_exam" class="col-sm-3 control-label">Capacity</label>
 
                                     <div class="col-sm-5">
-                                        <input type="number" name="nb_chair_exam" class="form-control">
+                                        <input type="number" id="modal_exam_room_seat" name="nb_chair_exam" class="form-control">
                                     </div>
                                 </div>
                                 <div class="form-group">
                                     <label for="building" class="col-sm-3 control-label">Building</label>
 
                                     <div class="col-sm-5">
-                                        {!! Form::select('building_id',$buildings, null, ['class' => 'form-control']) !!}
+                                        {!! Form::select('building_id',$buildings, null, ['class' => 'form-control', 'id'=>"modal_exam_room_building"]) !!}
                                     </div>
                                 </div>
 
@@ -36,7 +37,7 @@
                                     <label for="description" class="col-sm-3 control-label">Description</label>
 
                                     <div class="col-sm-5">
-                                        <input type="text" name="description" class="form-control">
+                                        <input type="text" name="description" class="form-control" id="modal_exam_room_description">
                                     </div>
                                 </div>
                             </form>

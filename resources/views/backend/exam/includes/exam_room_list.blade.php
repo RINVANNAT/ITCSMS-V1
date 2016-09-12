@@ -7,6 +7,7 @@
             <th>Room Name</th>
             <th>Capacity</th>
             <th>Building</th>
+            <th>Description</th>
             <th class="room_editing" style="display: none">Action</th>
         </tr>
     </thead>
@@ -18,7 +19,7 @@
                     $average_seat = $average_seat+$exam_room->nb_chair_exam;
                 }
 
-                if(count($exam_room)>0){
+                if(count($exam_rooms)>0){
                     $average_seat = $average_seat / count($exam_rooms);
                 }
 
@@ -38,9 +39,13 @@
                     {{$exam_room->nb_chair_exam}}
                 </td>
                 <td>{{$exam_room->building->name}}</td>
+                <td>{{$exam_room->description}}</td>
                 <td class="room_editing" style="display: none">
                     <button type="button" class="btn_room_split btn btn-sm btn-warning" data-roomname="{{$exam_room->name}}" data-roomid="{{$exam_room->id}}" data-capacity="{{$exam_room->nb_chair_exam}}" data-building="{{$exam_room->building->id}}" style="color: #fff; border-color: #3c8dbc;">
                         <i class="fa fa-long-arrow-left"></i> <i class="fa fa-long-arrow-right"></i> Split
+                    </button>
+                    <button type="button" class="btn_room_edit btn btn-sm btn-info" data-roomname="{{$exam_room->name}}" data-roomid="{{$exam_room->id}}" data-capacity="{{$exam_room->nb_chair_exam}}" data-building="{{$exam_room->building->id}}" data-description="{{$exam_room->description}}" style="color: #fff; border-color: #3c8dbc;">
+                        <i class="fa fa-pencil-square-o"></i> Edit
                     </button>
                 </td>
             </tr>

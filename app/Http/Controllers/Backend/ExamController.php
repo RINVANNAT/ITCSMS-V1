@@ -111,7 +111,7 @@ class ExamController extends Controller
         $academicYear = AcademicYear::where('id',$exam->academicYear->id)->lists('name_kh','id');
         $examType = ExamType::where('id',$type)->lists('name_kh','id')->toArray();
         $usable_room_exam = Room::where('is_exam_room',true)->count();
-        $exam_rooms = $exam->rooms()->with(['building'])->get();
+        $exam_rooms = $exam->rooms()->with(['building'])->orderBy('building_id')->orderBy('name')->get();
         $buildings = Building::lists('name','id');
 
         $roles = $this->employeeExams->getRoles();
@@ -285,14 +285,24 @@ class ExamController extends Controller
 
         $exam = $this->exams->findOrThrowException($id);
 
-        $exam_room = new ExamRoom();
+        if(isset($_POST['room_id']) && $_POST['room_id'] != null){ //This one is for edit
+            $exam_room = ExamRoom::find($_POST['room_id']);
+
+            $exam_room->write_uid = auth()->id();
+            $exam_room->updated_at = Carbon::now();
+
+        } else { // This is for add
+            $exam_room = new ExamRoom();
+
+            $exam_room->exam_id = $id;
+            $exam_room->create_uid = auth()->id();
+            $exam_room->created_at = Carbon::now();
+        }
+
         $exam_room->name = $_POST['name'];
         $exam_room->building_id = $_POST['building_id'];
         $exam_room->nb_chair_exam = $_POST['nb_chair_exam'];
         $exam_room->description = $_POST['description'];
-        $exam_room->exam_id = $id;
-        $exam_room->create_uid = auth()->id();
-        $exam_room->created_at = Carbon::now();
 
         $exam_room->save();
 

@@ -613,10 +613,17 @@ class SeedCustomsPermissions extends Seeder
                             ]
                         ],
                         [
+                            'name'          => 'view-secret-codes',
+                            'display_name'  => "View exam's rooms secret code",
+                            'dependency'   => [
+                                'view-backend','view-exam-management','view-exam-room'
+                            ]
+                        ],
+                        [
                             'name'          => 'generate-exam-room-secret-code',
                             'display_name'  => "Generate exam's rooms secret code",
                             'dependency'   => [
-                                'view-backend','view-exam-management','view-exam-room'
+                                'view-backend','view-exam-management','view-exam-room','view-secret-codes'
                             ]
                         ],
                     ]
