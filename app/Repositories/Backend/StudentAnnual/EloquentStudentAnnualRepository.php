@@ -57,6 +57,7 @@ class EloquentStudentAnnualRepository implements StudentAnnualRepositoryContract
     }
 
     public function register($candidate){
+
         $student = new Student();
 
         $last_academic_year = AcademicYear::orderBy('id','desc')->first();
@@ -121,7 +122,7 @@ class EloquentStudentAnnualRepository implements StudentAnnualRepositoryContract
             $studentAnnual->group = null;
             $studentAnnual->active = true;
             $studentAnnual->promotion_id = $candidate->promotion_id;
-            $studentAnnual->department_id = $candidate->department_id;
+            $studentAnnual->department_id = 8; // Department TC
             $studentAnnual->degree_id = $candidate->degree_id;
             $studentAnnual->created_at = Carbon::now();
             $studentAnnual->create_uid = auth()->id();
@@ -143,6 +144,8 @@ class EloquentStudentAnnualRepository implements StudentAnnualRepositoryContract
 
             if ($studentAnnual->save()) {
                 DB::commit();
+                $candidate->is_register = true;
+                $candidate->save();
                 return true;
             }
             DB::rollback();
