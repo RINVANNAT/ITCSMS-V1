@@ -575,7 +575,8 @@ return [
                 'origin_id' => "Origin",
                 'preferred_department' => "Prefered Departments",
                 'class' => 'Class',
-                'room_id' => 'Room'
+                'room_id' => 'Room',
+                'priority_number' => "Number"
             ]
         ],
         'reporting' => [

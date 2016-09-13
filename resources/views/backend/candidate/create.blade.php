@@ -189,6 +189,18 @@
             $("#candidate_register_id").keydown(function (e) {
                 allowNumberOnly(e);
             });
+
+            $(".department_choice").keydown(function (e) {
+                allowNumberOnly(e);
+            });
+            $(".department_choice").keyup(function (e) {
+                if ((e.shiftKey || (e.keyCode < 48 || e.keyCode > 57)) && (e.keyCode < 96 || e.keyCode > 105)) {
+                    // Do nothing here
+                } else {
+                    $(this).closest('.choose_department_cell').next('.choose_department_cell').find('.department_choice').focus();
+                }
+
+            });
         });
 
 

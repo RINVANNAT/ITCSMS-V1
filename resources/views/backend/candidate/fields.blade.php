@@ -23,7 +23,6 @@
             {!! Form::select('gender_id', $genders, isset($studentBac2)?$studentBac2->gender_id:null, array('class'=>'form-control input','placeholder'=>'Gender','id'=>'candidate_gender_id','required'=>'required',isset($studentBac2)?"disabled":"")) !!}
         </div>
     </div>
-
 </div>
 <div class="row no-margin">
     <div class="form-group col-sm-6 required">
@@ -96,8 +95,6 @@
                         @endforeach
                     @endif
                 </select>
-
-                {{--                {!! Form::select('highschool_name',[], null, array('class'=>'form-control input','placeholder'=>'High school','id'=>'candidate_highschool_name','required'=>'required')) !!}--}}
 
             </div>
         </div>
@@ -175,8 +172,22 @@
 @elseif($exam->type_id == 2)
     <div class="row no-margin">
         <div class="form-group col-sm-12 required" id="choose_department">
-            {!! Form::hidden('degree_id',3) !!}
-            {!! Form::label('GCA_rank',trans('labels.backend.candidates.fields.preferred_department'),array('class'=>'col-sm-12 control-label','style'=>'padding-bottom:10px;')) !!}
+            {!! Form::hidden('degree_id',2) !!}
+            <div class="row no-margin">
+                <div class="col-sm-6">
+                    <div class="col-sm-4">
+                        {!! Form::label('GCA_rank',trans('labels.backend.candidates.fields.preferred_department'),array('class'=>'control-label required','style'=>'padding-bottom:10px;')) !!}
+                    </div>
+                    <div class="col-sm-8">
+
+                    </div>
+                </div>
+                <div class="col-sm-6">
+
+                </div>
+
+            </div>
+
             <div class="col-sm-12">
                 <table id="choose_department_table">
                     <tr>
@@ -193,10 +204,10 @@
                         @foreach($departments as $department)
                             <td class="choose_department_cell">
                                 <div class="col-md-7 col-sm-7" style="height: 50px;display: table;">
-                                    <span style="display: table-cell;vertical-align: middle">{{trans('labels.backend.candidates.priority_number')}}</span>
+                                    <span style="display: table-cell;vertical-align: middle">{{trans('labels.backend.candidates.fields.priority_number')}}</span>
                                 </div>
                                 <div class="col-md-5 col-sm-5">
-                                    {!! Form::text($department->code.'_rank', null, array('class'=>'form-control department_choice input','id'=>$department->code.'_rank','style'=>'padding:0px;border:0;border-bottom: 2px dotted;',"maxlength"=>"1",'required'=>'required')) !!}
+                                    {!! Form::text('choice_department['.$department->id.']', null, array('class'=>'form-control department_choice input','id'=>$department->code.'_rank','style'=>'padding:0px;border:0;border-bottom: 2px dotted;',"maxlength"=>"1",'required'=>'required')) !!}
                                 </div>
                             </td>
                         @endforeach

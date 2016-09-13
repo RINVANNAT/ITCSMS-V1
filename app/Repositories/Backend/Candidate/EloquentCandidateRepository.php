@@ -7,6 +7,7 @@ use App\Exceptions\GeneralException;
 use App\Models\Candidate;
 use App\Models\UserLog;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\DB;
 
 /**
  * Class EloquentCandidateRepository
@@ -59,6 +60,7 @@ class EloquentCandidateRepository implements CandidateRepositoryContract
     public function create($input)
     {
 
+        //dd($input['choice_department']);
         $result = array();
 
         if (Candidate::where('register_id', $input['register_id'])->where('exam_id',$input['exam_id'])->first()) {
@@ -146,10 +148,18 @@ class EloquentCandidateRepository implements CandidateRepositoryContract
         $input['created_at'] = Carbon::now();
         $input['create_uid'] = auth()->id();
         $candidate = Candidate::create($input);
+
+
         if ($candidate != null) {
-            if(isset($input['departments'])){
-                $departmentIds = $input['departments'];
-                $candidate->departments()->sync($departmentIds);
+            if(isset($input['choice_department'])){
+                //$departmentIds = $input['departments'];
+                //$candidate->departments()->sync($departmentIds);
+                foreach($input['choice_department'] as $department_id => $choice_department){
+                    DB::table('candidate_department')->insert([
+                        ['candidate_id' => $candidate->id, 'department_id' => $department_id, 'rank' => $choice_department, 'is_success' =>false]
+                    ]);
+                }
+
             }
             $result["status"] = true;
             $result["messages"] = "Your information is successfully saved";
