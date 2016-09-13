@@ -53,7 +53,7 @@ class Employee extends Model
 		return $this->belongsTo('App\Models\PayslipClient');
 	}
     public function user(){
-        return $this->hasOne('App\Models\Access\User','user_id');
+        return $this->hasOne('App\Models\Access\User\User','user_id');
     }
     public function roles()
     {

@@ -41,6 +41,24 @@ class CourseAnnualAPIController extends AppBaseController
      */
     public function index(Request $request)
     {
+        if($request->has("employee_id")){
+            $employee_id = $request["employee_id"];
+            $employee = Employee::find($employee_id);
+
+            $courseAnnuals = DB::table('course_annuals')
+                ->join('courses','course_annuals.course_id', '=', 'courses.id')
+                ->select(['course_annuals.id', 'courses.name_en as name', 'course_annuals.course_id', 'course_annuals.semester_id as semester_id'])
+//                ->where('course_annuals.academic_year_id', $filters['academic_year_id'])
+                ->where('course_annuals.employee_id', (int)$employee_id)
+                ->orderBy('courses.name_en','asc');
+
+            $courseAnnuals = $courseAnnuals->get();
+            foreach ($courseAnnuals as $courseAnnual){
+                $courseAnnual->name = $courseAnnual->name." ".$courseAnnual->semester_id;
+            }
+            return $this->sendResponse($courseAnnuals, 'CourseAnnuals retrieved successfully');
+        }
+
         $filters = $request->only('degree_id','grade_id','department_id','academic_year_id');
 //        $filters = $request->only('degree_id','grade_id','department_id','academic_year_id','user_id');
         if ($filters["academic_year_id"] == null){

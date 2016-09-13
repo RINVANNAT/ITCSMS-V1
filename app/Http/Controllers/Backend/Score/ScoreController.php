@@ -3,6 +3,7 @@
 use App\Http\Requests;
 use App\Http\Requests\CreateScoreRequest;
 use App\Http\Requests\UpdateScoreRequest;
+use App\Models\Employee;
 use App\Models\Score;
 use App\Repositories\Backend\Score\ScoreRepository;
 use App\Models\Absence;
@@ -17,6 +18,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Http\Request;
 use InfyOm\Generator\Controller\AppBaseController;
 use Illuminate\Support\Facades\Auth;
+use App\Models\CourseAnnual;
 
 
 class ScoreController extends AppBaseController
@@ -49,7 +51,6 @@ class ScoreController extends AppBaseController
 		//test if score of course exist
         $config = array(
             "absencestotalconfig"=>array(
-
             ),
         );
 
@@ -138,22 +139,50 @@ class ScoreController extends AppBaseController
 
 
 	public function input( Request $request ){
+//        get user role
+//		dd(Auth::user()->employees()->first()->roles()->get()->toArray());
+//        name==Head of Department
 
-		dd(Auth::id());
-        
+        $empployee = Auth::user()->employees()->first();
+        if($empployee !=null){
+            $roles = $empployee->roles()->get()->toArray();
+        }
+
+        $isHead = false;
+        foreach ($roles as $role){
+            if ($role["name"] == "Head of Department" or $role["name"] == "Administrator"){
+                $isHead = true;
+            }
+        }
+
+        $isTeacher = false;
+        foreach ($roles as $role){
+            if ($role["name"] == "Teacher"){
+                $isTeacher = true;
+            }
+        }
+        $usertype = array("isHead"=>$isHead, "isTeacher"=>$isTeacher, "employee_id"=>$empployee->id);
+
+
+
+
+
 		if ($request->has("filter")){
 			$fillterdata= json_decode($request["filter"],true);
 			$results = $this->scoreRepository->getScoresbyCourse($fillterdata);
-			if($request->has("redirect")){
+            $results["usertype"] = $usertype;
+            if($request->has("redirect")){
 				return view('backend.score.score_edit_by_course', $results);
 			}else{
 				return view('backend.score.score_edit_by_course_table', $results);
 			}
 		}
+
+
         $user_id = Auth::id();
         $studentAnnuals = collect([]);
 		
-		return view('backend.score.score_edit_by_course', compact("studentAnnuals","scoresindex", "scores", "user_id"));
+		return view('backend.score.score_edit_by_course', compact("studentAnnuals","scoresindex", "scores", "user_id", "usertype"));
 	}
 
 	public function gen( Request $request ){
@@ -170,6 +199,7 @@ class ScoreController extends AppBaseController
 
 	public  function  updateMany(Request $request){
 
+
 		if ($request->isMethod('patch')) {
 
 
@@ -183,6 +213,8 @@ class ScoreController extends AppBaseController
                         Flash::error('Score not found');
                         return redirect(route('scores.index'));
                     }
+
+
                     $dataScore = array(
                         "id"=>$id,
                         "student_annual_id"=>$request['student_annual_ids'][$key],
@@ -195,6 +227,8 @@ class ScoreController extends AppBaseController
                         $dataScore["reexam"]=$request['reexam'][$key];
                     }
                     $score = $this->scoreRepository->update($dataScore, $id);
+
+
                     $this->createAbsence($request["abs"][$key],$request['student_annual_ids'][$key],json_decode($request["filter"],true));
                 }
 
@@ -206,13 +240,25 @@ class ScoreController extends AppBaseController
 
     public function  createAbsence($number,$studentId,$param)
     {
+
+        $course_annual_id = (int) $param["course_annual_id"];
+
+        if(!array_key_exists("degree_id",$param)){
+            $course_annual = CourseAnnual::find($course_annual_id);
+            $degree_id= (int) $course_annual->degree_id;
+            $grade_id= (int) $course_annual->grade_id;
+            $department_id = (int) $course_annual->department_id;
+            $param["academic_year_id"] = (int) $course_annual->academic_year_id;
+
+        }else{
+            $degree_id= (int) $param["degree_id"];
+            $grade_id= (int) $param["grade_id"];
+            $department_id = (int) $param["department_id"];
+            $course_annual_id = (int) $param["course_annual_id"];
+        }
+
         $absence_on = "2015/02/02 07:00";
 
-
-        $degree_id= (int) $param["degree_id"];
-        $grade_id= (int) $param["grade_id"];
-        $department_id = (int) $param["department_id"];
-        $course_annual_id = (int) $param["course_annual_id"];
 
         if($param !=null && array_key_exists("academic_year_id", $param)){
             $academic_year_id = $param["academic_year_id"];
@@ -290,11 +336,8 @@ class ScoreController extends AppBaseController
 	public function store(CreateScoreRequest $request)
 	{
 		$input = $request->all();
-
 		$score = $this->scoreRepository->create($input);
-
 		Flash::success('Score saved successfully.');
-
 		return redirect(route('scores.index'));
 	}
 
@@ -309,11 +352,9 @@ class ScoreController extends AppBaseController
 	{
 
 		$score = $this->scoreRepository->find($id);
-
 		if(empty($score))
 		{
 			Flash::error('Score not found');
-
 			return redirect(route('scores.index'));
 		}
 
@@ -330,14 +371,11 @@ class ScoreController extends AppBaseController
 	public function edit($id)
 	{
 		$score = $this->scoreRepository->find($id);
-
 		if(empty($score))
 		{
 			Flash::error('Score not found');
-
 			return redirect(route('scores.index'));
 		}
-
 		return view('scores.edit')->with('score', $score);
 	}
 
@@ -352,16 +390,13 @@ class ScoreController extends AppBaseController
 	public function update($id, UpdateScoreRequest $request)
 	{
 		$score = $this->scoreRepository->find($id);
-
 		if(empty($score))
 		{
 			Flash::error('Score not found');
-
 			return redirect(route('scores.index'));
 		}
 
 		$score = $this->scoreRepository->updateRich($request->all(), $id);
-
 		Flash::success('Score updated successfully.');
 
 		return redirect(route('scores.index'));
@@ -405,9 +440,7 @@ class ScoreController extends AppBaseController
 				while (($data = fgetcsv($handle, 1000, ',')) !==FALSE)
 				{
 					$absence = array();
-
 					foreach ($header as $oldkey => $value){
-
 						if ($value=="degree_id"){
 							$absence["degree_id"] = $data[$oldkey] ;
 						}else if ($value=="grade_id"){

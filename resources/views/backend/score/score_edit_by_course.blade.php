@@ -75,16 +75,23 @@
 
                         </div>
                         <!-- /.btn-group -->
-                        <button class="btn btn-default btn-sm"><i class="fa fa-refresh"></i></button>
-                        <div id="groupselectorhideshow">
-                            <div id="selectacademic">
-                            </div>
-                            <div id="selectsemester">
-                            </div>
-                            <div id="groupselectorcontainer">
+
+
+
+                            <button class="btn btn-default btn-sm"><i class="fa fa-refresh"></i></button>
+                            <div id="groupselectorhideshow">
+                                <div id="selectacademic">
+                                </div>
+                                <div id="selectsemester">
+                                </div>
+                                <div id="groupselectorcontainer">
+                                </div>
+                                <div id="groupselectorcontainerlong">
+                                </div>
+
+
                             </div>
 
-                        </div>
 
 
                         <!-- /.pull-right -->
@@ -172,6 +179,12 @@
         }
         paramet = {};
         $( document ).ready(function() {
+
+            usertype =  {!! json_encode($usertype) !!};
+            console.log("User type ");
+            console.log(usertype);
+
+
             function callbackCourseAnnual(data){
                 $.extend(paramet, data);
 
@@ -180,7 +193,7 @@
 
                 var url = "{!! route('score.input') !!}"+"?filter="+JSON.stringify(paramet);
 
-                console.log("url:"+url);
+//                console.log("url:"+url);
                 toggleLoading(true);
                 $.get( url , function( html ) {
                     $("#table-content").html(html);
@@ -190,9 +203,9 @@
             function callbackSelecGroup(data){
                 $.extend(paramet, data);
 
-//                if (smsData.userRole = "teacher"){
-//                    $.extend(paramet,smsData);
-//                }
+                if (usertype.isTeacher){
+                    $.extend(paramet,usertype);
+                }
                 var shallowEncoded = $.param( paramet );
 
                 var urltmp = "{!! route('api.v1.courseAnnuals') !!}" + "?" + shallowEncoded;
@@ -201,12 +214,26 @@
                 {{--var url2 = ["{!! route('api.v1.courseAnnuals') !!}"+"?filter="+JSON.stringify(paramet)];--}}
                 console.log(url2);
                 var url2 = [urltmp,];
-                //SMSFILERLONG.config(url2,callbackCourseAnnual);
+                SMSFILERLONG.config(url2,callbackCourseAnnual);
+
+
 
                 var filter2 = new SMSFILERLONGo(url2,callbackCourseAnnual);
             };
+            if (usertype.isTeacher){
+                callbackSelecGroup();
+            }
+
+
             var url = ["{!! route('degrees.api.v1') !!}","{!! route('grades.api.v1') !!}","{!! route('departments.api.v1') !!}"];
-            SMSFILER.config(url,callbackSelecGroup);
+
+
+
+
+            if( usertype.isHead ){
+                SMSFILER.config(url,callbackSelecGroup);
+            }
+
 
             $(document).on("click",".linkeditmany", function(e){
                 var url = $(this).attr("href");
@@ -218,22 +245,22 @@
             //----------------------
             var urlacademic = ["{!! route('academicYears.api.v1') !!}"];
             function callbackAcademic(data){
-                console.log("in Academic callback");
-                console.log(data);
+//                console.log("in Academic callback");
+//                console.log(data);
                 $.extend(paramet, data);
 
 
                 var url = "{!! route('score.input') !!}"+"?filter="+JSON.stringify(paramet);
 
-                console.log(typeof(paramet));
+//                console.log(typeof(paramet));
                 var count = 0;
                 $.each(paramet, function(key,value){
-                    console.log("count:"+count);
+//                    console.log("count:"+count);
                     count = count +1;
                 });
                 if(count == 4){
                     toggleLoading(true);
-                    console.log("in if"+count);
+//                    console.log("in if"+count);
                     $.get( url , function( html ) {
                         $("#table-content").html(html);
                         toggleLoading(false);
@@ -241,10 +268,23 @@
                 }
             };
 
-            var filter2 = new SMSFILERLONGo(urlacademic,callbackAcademic,"#selectacademic");
-            var urlsemester = ["{!! route('semesters.api.v1') !!}"];
-            var filter3 = new SMSFILERLONGo(urlsemester,callbackAcademic,"#selectsemester");
+            if( usertype.isHead){
+                var filter2 = new SMSFILERLONGo(urlacademic,callbackAcademic,"#selectacademic");
+                var urlsemester = ["{!! route('semesters.api.v1') !!}"];
+                var filter3 = new SMSFILERLONGo(urlsemester,callbackAcademic,"#selectsemester");
+            }
+
+
+
+
+//            groupselectorhideshow
+
+
+
+
+
         });
+
         $(document).on("submit","#scoreform", function(e){
             var self = this;
             e.preventDefault();

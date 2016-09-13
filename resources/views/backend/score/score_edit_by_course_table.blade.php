@@ -1,7 +1,7 @@
 <!-- ****************************
 start table render
 ******************************-->
-
+<br/>
 
 @if($studentAnnuals->isEmpty())
     <div class="well text-center">No Scores found. </div>

@@ -35,4 +35,8 @@ class User extends Authenticatable
      * @var array
      */
     protected $dates = ['deleted_at'];
+
+    public function employees(){
+        return $this->hasMany('App\Models\Employee','user_id');
+    }
 }

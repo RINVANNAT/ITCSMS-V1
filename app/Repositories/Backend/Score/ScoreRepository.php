@@ -545,10 +545,25 @@ class ScoreRepository extends BaseRepository
 
     public function getScoresbyCourse($param){
 
-        $degree_id= (int) $param["degree_id"];
-        $grade_id= (int) $param["grade_id"];
-        $department_id = (int) $param["department_id"];
         $course_annual_id = (int) $param["course_annual_id"];
+
+        if(!array_key_exists("degree_id",$param)){
+            $course_annual = CourseAnnual::find($course_annual_id);
+            $degree_id= (int) $course_annual->degree_id;
+            $grade_id= (int) $course_annual->grade_id;
+            $department_id = (int) $course_annual->department_id;
+            $param["academic_year_id"] = (int) $course_annual->academic_year_id;
+
+        }else{
+            $degree_id= (int) $param["degree_id"];
+            $grade_id= (int) $param["grade_id"];
+            $department_id = (int) $param["department_id"];
+        }
+
+
+
+
+
         if($param !=null && array_key_exists("semester_id", $param)){
             $semester_id = $param["semester_id"];
         }else{
@@ -574,6 +589,8 @@ class ScoreRepository extends BaseRepository
             ->get();
 
 
+
+
         //dd($studentAnnuals->toArray());
         //dd($studentAnnuals[0]["student"]["name_latin"]);
         $course = 1;
@@ -585,8 +602,6 @@ class ScoreRepository extends BaseRepository
             ->where('academic_year_id',$academic_year_id)
             ->where('course_annual_id',$course_annual_id)
             ->get();
-
-
 
         if( count($scorequeries) == 0  ){
             foreach($studentAnnuals as $studentAnnual){
@@ -614,6 +629,8 @@ class ScoreRepository extends BaseRepository
 
 
 
+
+
         // get student eval status
 
         //-----------------------
@@ -631,6 +648,8 @@ class ScoreRepository extends BaseRepository
                 ->where("student_annual_id",$studentAnnual->id)->get();
             $absencesCounts[$studentAnnual->id]=count($absenceCount);
         }
+
+       
 
 
 
