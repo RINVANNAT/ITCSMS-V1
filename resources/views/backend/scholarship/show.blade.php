@@ -57,7 +57,10 @@
                 processing: true,
                 serverSide: true,
                 pageLength: {!! config('app.records_per_page')!!},
-                ajax: '{!! route('admin.configuration.schoolFee.data',["true",$scholarship->id]) !!}',
+                ajax: {
+                    url:"{!! route('admin.configuration.schoolFee.data',["true",$scholarship->id]) !!}",
+                    method:"post"
+                },
                 columns: [
                     { data: 'degree_name_kh', name: 'degree_name_kh', orderable:false, searchable:false},
                     { data: 'promotion_name', name: 'promotion_name', orderable:false, searchable:false},
@@ -71,6 +74,7 @@
                 pageLength: {!! config('app.records_per_page')!!},
                 ajax: {
                     url:"{!! route('admin.student.data')."?scholarship=".$scholarship->id !!}",
+                    method:"post",
                     data:function(d){
                         d.academic_year = $('#filter_academic_year').val();
                         d.degree = $('#filter_degree').val();
