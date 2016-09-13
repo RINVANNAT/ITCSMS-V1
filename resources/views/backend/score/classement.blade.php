@@ -2,7 +2,7 @@
 @section('page-header')
     <h1>
         {{ trans('labels.backend.score.title') }}
-        <small>{{ trans('labels.backend.score.sub_title') }}</small>
+        <small>{{ trans('labels.backend.score.sub_ranking') }}</small>
     </h1>
 
 @stop
@@ -440,7 +440,6 @@
 
 
             $(document).on("click",".eval", function(e){
-                alert("hello");
                 updatedepence = $( this );
 
                 var evalId = $( this).attr("evalid");

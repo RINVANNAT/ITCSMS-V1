@@ -710,6 +710,7 @@ return [
         'score' => [
             'title' => 'Score',
             'sub_index_title' => 'View Score',
+            "sub_ranking"=>"Score Ranking",
             'sub_edit_title' => 'Edit Score',
             'sub_create_title' => 'Add Score',
             'sub_input_title' => 'Input Score',

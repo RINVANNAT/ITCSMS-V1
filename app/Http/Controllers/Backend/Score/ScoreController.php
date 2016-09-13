@@ -138,6 +138,9 @@ class ScoreController extends AppBaseController
 
 
 	public function input( Request $request ){
+
+		dd(Auth::id());
+        
 		if ($request->has("filter")){
 			$fillterdata= json_decode($request["filter"],true);
 			$results = $this->scoreRepository->getScoresbyCourse($fillterdata);
