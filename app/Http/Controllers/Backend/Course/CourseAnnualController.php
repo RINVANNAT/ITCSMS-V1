@@ -20,6 +20,8 @@ use Illuminate\Http\Request;
 use Maatwebsite\Excel\Facades\Excel;
 use App\Models\CourseAnnual;
 use App\Models\Semester;
+use Response;
+use InfyOm\Generator\Utils\ResponseUtil;
 
 
 
@@ -147,6 +149,22 @@ class CourseAnnualController extends Controller
     {
         $this->courseAnnuals->update($id, $request->all());
         return redirect()->route('admin.course.course_annual.index')->withFlashSuccess(trans('alerts.backend.generals.updated'));
+    }
+
+    /**
+     * Update the specified resource in storage.
+     *
+     * @param  update_score_per  $request
+     * @param  int  $id
+     * @return \Illuminate\Http\Response
+     */
+    public function update_score_per(Request $request, $id)
+    {
+        $this->courseAnnuals->update_score_per($id, $request->all());
+//        return redirect()->route('admin.course.course_annual.index')->withFlashSuccess(trans('alerts.backend.generals.updated'));
+
+        return Response::json(ResponseUtil::makeResponse("ok", "ok"));
+
     }
 
     /**

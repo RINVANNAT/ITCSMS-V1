@@ -163,24 +163,22 @@ class ScoreController extends AppBaseController
         }
         $usertype = array("isHead"=>$isHead, "isTeacher"=>$isTeacher, "employee_id"=>$empployee->id);
 
-
-
-
-
+		
 		if ($request->has("filter")){
 			$fillterdata= json_decode($request["filter"],true);
 			$results = $this->scoreRepository->getScoresbyCourse($fillterdata);
             $results["usertype"] = $usertype;
+            
             if($request->has("redirect")){
 				return view('backend.score.score_edit_by_course', $results);
 			}else{
 				return view('backend.score.score_edit_by_course_table', $results);
 			}
 		}
-
-
+		
         $user_id = Auth::id();
         $studentAnnuals = collect([]);
+        
 		
 		return view('backend.score.score_edit_by_course', compact("studentAnnuals","scoresindex", "scores", "user_id", "usertype"));
 	}

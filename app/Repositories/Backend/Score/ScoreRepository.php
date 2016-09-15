@@ -561,9 +561,6 @@ class ScoreRepository extends BaseRepository
         }
 
 
-
-
-
         if($param !=null && array_key_exists("semester_id", $param)){
             $semester_id = $param["semester_id"];
         }else{
@@ -603,6 +600,18 @@ class ScoreRepository extends BaseRepository
             ->where('course_annual_id',$course_annual_id)
             ->get();
 
+
+        $course_annual = CourseAnnual::where("id",$course_annual_id)->first();
+        $courseAnnual = $course_annual;
+
+        $course_annual_fetch = array();
+        $course_annual_fetch["id"] = $course_annual->id;
+        $course_annual_fetch["score_percentage_column_1"] = $course_annual->score_percentage_column_1;
+        $course_annual_fetch["score_percentage_column_2"] = $course_annual->score_percentage_column_2;
+        $course_annual_fetch["score_percentage_column_3"] = $course_annual->score_percentage_column_3;
+        $course_annual_fetch["isScoreRuleChange"] = $course_annual->isScoreRuleChange();
+
+
         if( count($scorequeries) == 0  ){
             foreach($studentAnnuals as $studentAnnual){
                 $scoretmp = array("degree_id"=>$degree_id, "grade_id"=> $grade_id, "department_id"=>$department_id, "academic_year_id"=>$academic_year_id,
@@ -617,14 +626,29 @@ class ScoreRepository extends BaseRepository
                 ->where('academic_year_id',$academic_year_id)
                 ->where('course_annual_id',$course_annual_id)
                 ->get();
+        }else {
+            if ( $course_annual->score_percentage_column_1 == 0){
+                foreach($scorequeries as $scorequery){
+                    $scorequery->score10 = 0;
+                    $scorequery->save();
+                }
+            }else if( $course_annual->score_percentage_column_2 == 0 ){
+                foreach($scorequeries as $scorequery){
+                    $scorequery->score30 = 0;
+                    $scorequery->save();
+                }
+            }else if ($course_annual->score_percentage_column_3 == 0){
+                foreach($scorequeries as $scorequery){
+                    $scorequery->score60 = 0;
+                    $scorequery->save();
+                }
+            }
         }
 
 
         $scores = array();
         foreach($scorequeries as $scorequery){
             $scores[$scorequery->student_annual_id] = $scorequery;
-
-
         }
 
 
@@ -681,17 +705,10 @@ class ScoreRepository extends BaseRepository
             array_push($studentAnnualsFetchResult, $fetchResult);
         }
 
-        $course_annual = CourseAnnual::where("id",$course_annual_id)->first();
 
-        $course_annual_fetch = array();
-        $course_annual_fetch["id"] = $course_annual->id;
-        $course_annual_fetch["score_percentage_column_1"] = $course_annual->score_percentage_column_1;
-        $course_annual_fetch["score_percentage_column_2"] = $course_annual->score_percentage_column_2;
-        $course_annual_fetch["score_percentage_column_3"] = $course_annual->score_percentage_column_3;
-        $course_annual_fetch["isScoreRuleChange"] = $course_annual->isScoreRuleChange();
        
 
-        return compact("studentAnnuals","scores","absencesCounts","total","studentAnnualsFetchResult","course_annual_fetch" );
+        return compact("studentAnnuals","scores","absencesCounts","total","studentAnnualsFetchResult","course_annual_fetch","courseAnnual" );
     }
 
 

@@ -3,6 +3,70 @@ start table render
 ******************************-->
 <br/>
 
+<!-- Modal -->
+<div id="myModal" class="modal fade" role="dialog">
+    <div class="modal-dialog">
+        @if(isset($courseAnnual))
+        <!-- Modal content-->
+        <div class="modal-content">
+            <div class="box box-success">
+                <div class="box-body">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+                <h3 class="box-title">{{ trans('labels.backend.courseAnnuals.sub_edit_title') }}</h3>
+            </div>
+                {!! Form::model($courseAnnual, ['route' => ['admin.course.course_annual.update_score_per', $courseAnnual->id],'class' => 'form-horizontal', "id"=>"editForm", 'role'=>'form', 'method' => 'patch']) !!}
+                        <br/>
+                        <div id="course_message" style="display: none; text-align: center;">
+                            <spna style="color:red"> The addition of the 3 must be equal to 100 % </spna>
+                            <br/>
+                        </div>
+                        <div class="form-group">
+                            {!! Form::label('', "Absence score percentage", ['class' => 'col-lg-5 control-label required']) !!}
+                            <div class="col-lg-4">
+                                {{ Form::text('score_percentage_column_1',  null, ['class' => 'form-control']) }}
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            {!! Form::label('departments', "TP score percentage", ['class' => 'col-lg-5 control-label required']) !!}
+                            <div class="col-lg-4">
+                                {{ Form::text('score_percentage_column_2',  null, ['class' => 'form-control']) }}
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            {!! Form::label('departments', "Final score percentage", ['class' => 'col-lg-5 control-label required']) !!}
+                            <div class="col-lg-4">
+                                {{ Form::text('score_percentage_column_3',  null, ['class' => 'form-control']) }}
+                            </div>
+                        </div>
+            <div class="modal-footer">
+
+                    <br/>
+                    <div class="pull-left">
+                        <button class="btn btn-info close hidden" type="button" id="close_course_edit"  data-dismiss="modal"> Close </button>
+                    </div>
+                        <div class="pull-right">
+
+                            <input type="submit" class="btn btn-info" value="{{ trans('buttons.general.crud.update') }}"/>
+
+                        </div>
+
+            </div>
+
+                    {!! Form::close() !!}
+
+
+                </div><!-- /.box-body -->
+            </div><!--box-->
+        </div>
+    @endif
+
+
+
+</div></div>
+
 @if($studentAnnuals->isEmpty())
     <div class="well text-center">No Scores found. </div>
 @else
@@ -24,9 +88,9 @@ start table render
                 <th style="display:none;">Abs</th>
                 <th> Abs </th>
 
-                <th class="scoreper" v-show="course_annual.score_percentage_column_1> 0"> <a href="{{ route("admin.course.course_annual.edit",$course_annual_fetch["id"]) }}">Score @{{ course_annual.score_percentage_column_1 }} </a> </th>
-                <th class="scoreper" v-show="course_annual.score_percentage_column_2> 0"> <a href="{{ route("admin.course.course_annual.edit",$course_annual_fetch["id"]) }}"> Score @{{ course_annual.score_percentage_column_2 }} </a></th>
-                <th class="scoreper" v-show="course_annual.score_percentage_column_3> 0"> <a href="{{ route("admin.course.course_annual.edit",$course_annual_fetch["id"]) }}">Score @{{ course_annual.score_percentage_column_3 }} </a></th>
+                <th class="scoreper" v-show="course_annual.score_percentage_column_1> 0"> <a href="" data-toggle="modal" data-target="#myModal">Score @{{ course_annual.score_percentage_column_1 }} </a> </th>
+                <th class="scoreper" v-show="course_annual.score_percentage_column_2> 0"> <a href="" data-toggle="modal" data-target="#myModal"> Score @{{ course_annual.score_percentage_column_2 }} </a></th>
+                <th class="scoreper" v-show="course_annual.score_percentage_column_3> 0"> <a href="" data-toggle="modal" data-target="#myModal">Score @{{ course_annual.score_percentage_column_3 }} </a></th>
                 <th style="display:none;"> re-exam </th>
                 <th> total </th>
                 </thead>
@@ -60,9 +124,9 @@ start table render
                 <th> ID </th>
                 <th style="display:none;">Abs</th>
                 <th> Abs </th>
-                <th class="scoreper"> <a href="{{ route("admin.course.course_annual.edit",$course_annual_fetch["id"]) }}">Score 10 </a></th>
-                <th class="scoreper"> <a href="{{ route("admin.course.course_annual.edit",$course_annual_fetch["id"]) }}">Score 30 </a> </th>
-                <th class="scoreper"> <a href="{{ route("admin.course.course_annual.edit",$course_annual_fetch["id"]) }}">Score 60 </a></th>
+                <th class="scoreper"> <a href="" data-toggle="modal" data-target="#myModal">Score 10 </a></th>
+                <th class="scoreper"> <a href="" data-toggle="modal" data-target="#myModal">Score 30 </a> </th>
+                <th class="scoreper"> <a href="" data-toggle="modal" data-target="#myModal">Score 60 </a></th>
                 <th style="display:none;"> re-exam </th>
                 <th> total </th>
                 </thead>
@@ -228,11 +292,7 @@ start table render
 
 
         $(document).on("contextmenu", ".scoreper", function (e) {
-           console.log("click");
-
             if( e.button == 2 ) {
-
-
                 alert('Right mouse button!');
                 return false;
             }
@@ -261,6 +321,7 @@ start table render
                 switch(selfe.which) {
                     case 37: // lef
                         console.log("left");
+
                         newId[1] -= 1;
                         $('#'+newId[0]+"-"+newId[1]).focus();
                         break;
@@ -281,7 +342,6 @@ start table render
                         newId[0] += 1;
                         $('#'+newId[0]+"-"+newId[1]).focus();
                         break;
-
 
                     default: return; // exit this handler for other keys
                 }
@@ -350,9 +410,81 @@ start table render
             return validation;
         });
 
-//        // Validation Score before sent
 
+        button = $(document).find("button#close_course_edit");
+        console.log("button");
+        console.log(button);
 
+        function validateInputScorePersentage() {
+            var result = false;
+
+            var per10 = $("input[name=score_percentage_column_1]").val();
+            var per30 = $("input[name=score_percentage_column_2]").val();
+            var per60 = $("input[name=score_percentage_column_3]").val();
+
+            console.log("val");
+            console.log(per10)
+            console.log(per30)
+            console.log(per60)
+
+            if (parseInt(per10) + parseInt(per30) + parseInt(per60) == 100){
+                result = true;
+            }
+
+            // message
+            if (result){
+                $("#course_message").hide();
+            }else{
+                $("#course_message").show();
+            }
+
+            return result;
+        }
+
+        $(document).on('submit','form#editForm',function(e){
+            e.preventDefault();
+
+            var form = $("#editForm");
+            $.ajaxSetup({
+                headers: {
+                    'X-XSRF-TOKEN': $('meta[name="_token"]').attr('content')
+                }
+            });
+
+            var validation = validateInputScorePersentage();
+            console.log(validation);
+
+            if (validation == true){
+                $.ajax({
+                            url: form.attr("action"),
+                            type:"POST",
+                            data: form.serialize(),
+                            dataType: "json",
+                            success: function (json) {
+//                            toastr.success(json.message, "Notifications");
+                                button.click();
+                                reloadThisPage();
+                            },
+                            error: function (jqXhr, json, errorThrown) {
+                                var errors = jqXhr.responseJSON;
+                                var errorsHtml = '';
+                                $.each(errors, function (key, value) {
+                                    errorsHtml += '<li>' + value[0] + '</li>';
+                                });
+//                            toastr.error(errorsHtml, "Error " + jqXhr.status + ': ' + errorThrown);
+                            }
+                        })
+                        .done(function (response) {
+                            console.log("ajax sent");
+                        })
+                        .fail(function (jqXHR, json) {
+                            //
+                        });
+            }else{
+
+            }
+            return false;
+        });
     });
 </script>
 @endif

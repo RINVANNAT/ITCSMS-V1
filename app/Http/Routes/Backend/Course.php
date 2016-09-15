@@ -7,12 +7,13 @@ Route::group([
 ], function() {
 
     Route::group([], function() {
+        Route::any('update_score_per/{id}/', 'CourseAnnualController@update_score_per')->name('admin.course.course_annual.update_score_per');
         Route::resource('course_annual', 'CourseAnnualController');
         Route::post('course-annual-data', 'CourseAnnualController@data')->name('admin.course.course_annual.data');
         Route::get('course-request-import', 'CourseAnnualController@request_import')->name('admin.course.course_annual.request_import');
         Route::post('course-import', 'CourseAnnualController@import')->name('admin.course.course_annual.import');
-
     });
+
     Route::group([], function() {
         Route::post('course-program-data', 'CourseController@data')->name('admin.course.course_program.data');
         Route::get('course-program-request-import', 'CourseController@request_import')->name('admin.course.course_program.request_import');

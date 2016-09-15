@@ -42,6 +42,13 @@ interface CourseAnnualRepositoryContract
 
     /**
      * @param  $id
+     * @param  $input
+     * @return mixed
+     */
+    public function update_score_per($id, $input);
+
+    /**
+     * @param  $id
      * @return mixed
      */
     public function destroy($id);

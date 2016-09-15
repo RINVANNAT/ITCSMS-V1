@@ -440,9 +440,6 @@
                 updatedepence = $( this );
 
                 var evalId = $( this).attr("evalid");
-
-
-
 //                todo tofix move to 5.2
                 // fix this
                 url = "{!! route('attacheStudentEvalStatuses.api.v1') !!}"

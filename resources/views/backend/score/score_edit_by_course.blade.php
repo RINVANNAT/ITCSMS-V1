@@ -187,12 +187,7 @@
 
             function callbackCourseAnnual(data){
                 $.extend(paramet, data);
-
-
-
-
                 var url = "{!! route('score.input') !!}"+"?filter="+JSON.stringify(paramet);
-
 //                console.log("url:"+url);
                 toggleLoading(true);
                 $.get( url , function( html ) {
@@ -295,6 +290,16 @@
         $(document).on("click","#score-report", function(e){
             $(this).attr("href", this.href + "?redirect=1&filter="+JSON.stringify(paramet));
         });
+        
+        function reloadThisPage() {
+            var url = "{!! route('score.input') !!}"+"?filter="+JSON.stringify(paramet);
+//                console.log("url:"+url);
+            toggleLoading(true);
+            $.get( url , function( html ) {
+                $("#table-content").html(html);
+                toggleLoading(false);
+            });
+        }
 
 
 

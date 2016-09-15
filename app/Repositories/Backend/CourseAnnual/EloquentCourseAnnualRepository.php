@@ -107,6 +107,27 @@ class EloquentCourseAnnualRepository implements CourseAnnualRepositoryContract
         throw new GeneralException(trans('exceptions.backend.general.update_error'));
     }
 
+    public function update_score_per($id, $input)
+    {
+
+
+//        $courseAnnual = $this->findOrThrowException($id);
+
+        $courseAnnual = CourseAnnual::find($id);
+        $courseAnnual->updated_at = Carbon::now();
+        $courseAnnual->score_percentage_column_1 = isset($input['score_percentage_column_1'])?$input['score_percentage_column_1']:10;
+        $courseAnnual->score_percentage_column_2 = isset($input['score_percentage_column_2'])?$input['score_percentage_column_2']:30;
+        $courseAnnual->score_percentage_column_3 = isset($input['score_percentage_column_3'])?$input['score_percentage_column_3']:60;
+        $courseAnnual->write_uid = auth()->id();
+        $courseAnnual->save();
+
+
+        return true;
+//        throw new GeneralException(trans('exceptions.backend.general.update_error'));
+    }
+
+
+
     /**
      * @param  $id
      * @throws GeneralException
