@@ -184,6 +184,9 @@
                     <li class="{{ Active::pattern('admin/configuration/studentBac2s*') }}">
                         <a href="{!! url('admin/configuration/studentBac2s') !!}">{{ trans('menus.backend.configuration.studentBac2s') }}</a>
                     </li>
+                    <li class="{{ Active::pattern('admin/configuration/candidatesFromMoeys*') }}">
+                        <a href="{!! url('admin/configuration/candidatesFromMoeys') !!}">{{ trans('menus.backend.configuration.candidatesFromMoeys') }}</a>
+                    </li>
                     <li class="{{ Active::pattern('admin/configuration/departmentOptions*') }}">
                         <a href="{!! url('admin/configuration/departmentOptions') !!}">{{ trans('menus.backend.configuration.departmentOptions') }}</a>
                     </li>

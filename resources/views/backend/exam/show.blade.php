@@ -281,6 +281,21 @@
             });
         }
 
+        function count_assigned_seat(){
+            $.ajax({
+                type: 'GET',
+                url: "{{route('admin.exam.count_assigned_seat',$exam->id)}}",
+                dataType: "json",
+                success: function(resultData) {
+                    var result = "";
+                    $.each(resultData, function(key,value){
+                        result = result+"<span class='badge'><em>"+key+" :</em> "+value+" rooms</span> ";
+                    });
+                    $('#count_assigned_seat').html(result);
+                }
+            });
+        }
+
         function disable_room_editing(){
             $('#exam_room_list_table tbody').removeClass('editing');
             $('#exam_room_list_table input:checkbox').prop("disabled", true);
@@ -432,6 +447,7 @@
 
             /* ---------- Event Area --------- */
             get_total_seat(); // Count total seat after page ready
+            count_assigned_seat();
 
             $("#btn-secret-code").click(function(){
                 window_secret_code = PopupCenterDual('{{route("admin.exam.view_room_secret_code",$exam->id)}}','Room Secret Code','1200','960');
@@ -774,6 +790,7 @@
                             toggleLoading(false);
                             notify('success','Generate Room', resultData.message);
                             candidate_datatable.draw();
+                            count_assigned_seat();
                         } else {
                             notify('error','Generate Room', resultData.message);
                         }

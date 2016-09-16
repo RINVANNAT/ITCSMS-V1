@@ -70,6 +70,7 @@ return [
             'buildings' => 'Building',
             'rooms' => 'Room',
             'studentBac2s' => 'Student Bac II',
+            'candidatesFromMoeys'=>'Student Bac II - Moeys',
             'examTypes' => 'Exam Types',
             'departmentOptions' => 'Department Option / Technique',
             'origins' => 'Room',

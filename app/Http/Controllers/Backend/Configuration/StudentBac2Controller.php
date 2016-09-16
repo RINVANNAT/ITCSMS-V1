@@ -9,6 +9,7 @@ use App\Http\Requests\Backend\Configuration\StudentBac2\ImportStudentBac2Request
 use App\Http\Requests\Backend\Configuration\StudentBac2\RequestImportStudentBac2Request;
 use App\Http\Requests\Backend\Configuration\StudentBac2\StoreStudentBac2Request;
 use App\Http\Requests\Backend\Configuration\StudentBac2\UpdateStudentBac2Request;
+use App\Http\Requests\Request;
 use App\Models\AcademicYear;
 use App\Models\Origin;
 use App\Repositories\Backend\StudentBac2\StudentBac2RepositoryContract;
@@ -209,6 +210,30 @@ class StudentBac2Controller extends Controller
 
             return redirect(route('studentBac2s.index'));
         }
+    }
+
+    // Candiate From Moeys
+    public function get_candidate_from_moeys(){
+        return view('backend.configuration.candidatesFromMoeys.index');
+    }
+
+    public function candidates_from_moyes_data(\Illuminate\Http\Request $request){
+
+        $candidatesFromMoeys = DB::table('candidatesFromMoeys')
+            ->leftJoin('studentBac2s','studentBac2s.can_id','=','candidatesFromMoeys.can_id')
+            ->leftJoin('genders','studentBac2s.gender_id','=','genders.id')
+            ->leftJoin('highSchools','studentBac2s.highschool_id','=','highSchools.id')
+            ->leftJoin('gdeGrades','studentBac2s.grade','=','gdeGrades.id')
+            ->leftJoin('origins','studentBac2s.province_id','=','origins.id')
+            ->select(['candidatesFromMoeys.id','candidatesFromMoeys.bac_year','candidatesFromMoeys.can_id','origins.name_kh as origin','studentBac2s.name_kh','studentBac2s.status','studentBac2s.highschool_id','genders.name_kh as gender_name_kh','highSchools.name_kh as highSchool_name_kh','dob','percentile','gdeGrades.name_en as gdeGrade_name_en']);
+
+        $datatables =  app('datatables')->of($candidatesFromMoeys)
+            ->editColumn('dob', function($studentBac2){
+                $date = Carbon::createFromFormat('Y-m-d h:i:s',$studentBac2->dob);
+                return $date->format('d/m/Y');
+            });
+
+        return $datatables->make(true);
     }
 
 }

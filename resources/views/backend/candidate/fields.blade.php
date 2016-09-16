@@ -72,7 +72,12 @@
     <div class="form-group col-sm-6">
         {!! Form::label('register_from',trans('labels.backend.candidates.fields.register_from'),array('class'=>'col-sm-4 control-label required')) !!}
         <div class="col-sm-8">
-            {!! Form::select('register_from', ['ITC'=>'ITC','Ministry'=>'Ministry'],isset($studentBac2)?$studentBac2->status:null, array('class'=>'form-control input','id'=>'candidate_register_from','required'=>'required',isset($studentBac2)?"disabled":"")) !!}
+            @if(isset($candidate) && $candidate != null)
+                {!! Form::select('register_from', ['ITC'=>'ITC','Ministry'=>'Ministry'],$candidate->register_from, array('class'=>'form-control input','id'=>'candidate_register_from','required'=>'required')) !!}
+            @else
+                {!! Form::select('register_from', [""=>"",'ITC'=>'ITC','Ministry'=>'Ministry'],null, array('class'=>'form-control input','id'=>'candidate_register_from','required'=>'required')) !!}
+            @endif
+
         </div>
     </div>
 </div>

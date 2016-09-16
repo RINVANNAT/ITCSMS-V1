@@ -440,7 +440,23 @@ class ExamController extends Controller
         }
 
         return Response::json(array("seat_exam"=>$seat_exam));
+    }
 
+    public function count_assigned_seat($id){
+        $rooms = DB::table('candidates')
+            ->select(DB::raw('count(*) as room_count, room_id'))
+            ->groupBy('room_id')
+            ->get();
+
+        $result = [];
+        foreach($rooms as $room){
+            if(isset($result[$room->room_count])){
+                $result[$room->room_count] = $result[$room->room_count]+1;
+            } else {
+                $result[$room->room_count] = 1;
+            }
+        }
+        return Response::json($result);
     }
 
     public function view_room_secret_code(ViewSecretCodeRequest $request, $exam_id){

@@ -15,6 +15,7 @@ Route::group([], function() {
 
     Route::get('exams/{id}/get_staffs', 'ExamController@get_staffs')->name('admin.exam.get_staffs');
     Route::get('exams/{id}/count_seat_exam', 'ExamController@count_seat_exam')->name('admin.exam.count_seat_exam');
+    Route::get('exams/{id}/count_assigned_seat', 'ExamController@count_assigned_seat')->name('admin.exam.count_assigned_seat');
 
     Route::post('exams/{id}/save_rooms','ExamController@save_rooms')->name('admin.exam.save_rooms');
     Route::post('exams/{id}/generate_rooms','ExamController@generate_rooms')->name('admin.exam.generate_rooms');

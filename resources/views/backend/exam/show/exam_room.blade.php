@@ -7,7 +7,11 @@
             <div class="box-header with-border">
                 <i class="fa fa-building-o"></i>
 
-                <h3 class="box-title">Buildings & Rooms <span class="label label-primary" style="margin-left: 10px;">Total Seat: <span id="all_reserve_seat">0</span></span></h3>
+                <h3 class="box-title">
+                    Buildings & Rooms
+                    <span class="label label-primary" style="margin-left: 10px;">Total Seat: <span id="all_reserve_seat">0</span></span>
+                    <span id="count_assigned_seat"></span>
+                </h3>
                 @permission('generate-exam-room-secret-code')
                 <button class="btn btn-sm btn-default pull-right" id="btn-secret-code" style="margin-left: 5px;"><i class="fa fa-user-secret"></i> Anonymus Code</button>
                 @endauth
