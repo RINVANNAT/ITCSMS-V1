@@ -209,6 +209,7 @@ return [
             'sub_import_title' => 'Import buildings',
             'fields'=>[
                 'name' => 'Name',
+                'code' => 'Code',
                 'description' => "Description",
             ]
         ],

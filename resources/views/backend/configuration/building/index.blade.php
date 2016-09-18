@@ -44,6 +44,8 @@
                     <tr>
                         <th>{{ trans('labels.general.id') }}</th>
                         <th>{{ trans('labels.backend.buildings.fields.name') }}</th>
+                        <th>{{ trans('labels.backend.buildings.fields.code') }}</th>
+                        <th>{{ trans('labels.backend.buildings.fields.description') }}</th>
                         <th>{{ trans('labels.general.actions') }}</th>
                     </tr>
                     </thead>
@@ -71,9 +73,13 @@
                 columns: [
                     { data: 'id', name: 'id'},
                     { data: 'name', name: 'name'},
+                    { data: 'code', name: 'code'},
+                    { data: 'description', name: 'description'},
                     { data: 'action', name: 'action',orderable: false, searchable: false}
                 ]
             });
+
+            enableDeleteRecord($('#buildings-table'));
         });
     </script>
 @stop

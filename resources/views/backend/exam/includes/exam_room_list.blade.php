@@ -28,7 +28,7 @@
             <tr>
                 <td class="room_editing" style="display: none"><input type="checkbox" class="exam_room_checkbox" name="exam_room[]" data-roomname="{{$exam_room->name}}" value="{{$exam_room->id}}" disabled/></td>
                 <td>{{$index}}</td>
-                <td>{{$exam_room->name." ".$exam_room->building->code}}</td>
+                <td>{{$exam_room->building->code.$exam_room->name}}</td>
                 @if($exam_room->nb_chair_exam < $average_seat -5 )
                 <td class="badge bg-red">
                 @elseif($exam_room->nb_chair_exam > $average_seat +5)

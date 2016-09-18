@@ -23,7 +23,7 @@ class BuildingController extends Controller
     protected $buildings;
 
     /**
-     * @param BuildingRepositoryContract       $buildings
+     * @param BuildingRepositoryContract $buildingRepo
      */
     public function __construct(
         BuildingRepositoryContract $buildingRepo
@@ -55,7 +55,7 @@ class BuildingController extends Controller
     /**
      * Store a newly created resource in storage.
      *
-     * @param  \Illuminate\Http\Request  $request
+     * @param  StoreBuildingRequest  $request
      * @return \Illuminate\Http\Response
      */
     public function store(StoreBuildingRequest $request)
@@ -91,7 +91,7 @@ class BuildingController extends Controller
     /**
      * Update the specified resource in storage.
      *
-     * @param  \Illuminate\Http\Request  $request
+     * @param  UpdateBuildingRequest  $request
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
@@ -115,22 +115,14 @@ class BuildingController extends Controller
 
     public function data()
     {
-        //$student = Student::join('studentAnnuals', 'studentAnnuals.student_id', '=', 'students.id')
-        //	->select(['students.id_card','students.name_kh','students.name_latin','studentAnnuals.grade_id']);
-
-        //$studentAnnuals = StudentAnnual::with(['student','grade'])->select(['students.id_card','students.name_kh','students.name_latin','grades.name_kh']);
 
         $buildings = DB::table('buildings')
-            //->whereNull('parent_id')
-            ->select(['id','name','description']);
+            ->select(['id','name','code','description']);
 
         $datatables =  app('datatables')->of($buildings);
 
 
         return $datatables
-            ->editColumn('id', '{!! str_limit($id, 60) !!}')
-            ->editColumn('name', '{!! str_limit($name, 60) !!}')
-            ->editColumn('description', '{!! str_limit($description, 200) !!}')
             ->addColumn('action', function ($building) {
                 return  '<a href="'.route('admin.configuration.buildings.edit',$building->id).'" class="btn btn-xs btn-primary"><i class="fa fa-pencil" data-toggle="tooltip" data-placement="top" title="" data-original-title="'.trans('buttons.general.crud.edit').'"></i> </a>'.
                 ' <button class="btn btn-xs btn-danger btn-delete" data-remote="'.route('admin.configuration.buildings.destroy', $building->id) .'"><i class="fa fa-times" data-toggle="tooltip" data-placement="top" title="' . trans('buttons.general.crud.delete') . '"></i></button>';

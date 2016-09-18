@@ -25,7 +25,7 @@
         <div class="box box-success">
             <div class="box-body">
                 <div class="pull-left">
-                    <a href="{!! route('admin.access.roles.index') !!}" class="btn btn-danger btn-xs">{{ trans('buttons.general.cancel') }}</a>
+                    <a href="{!! route('admin.configuration.buildings.index') !!}" class="btn btn-danger btn-xs">{{ trans('buttons.general.cancel') }}</a>
                 </div>
 
                 <div class="pull-right">

@@ -91,7 +91,7 @@
                     api.column(6, {page:'current'} ).data().each( function ( group, i ) {
                         if ( last !== group ) {
                             $(rows).eq( i ).before(
-                                    '<tr class="group"><td colspan="7">'+group+'</td></tr>'
+                                    '<tr class="group"><td colspan="8">'+group+'</td></tr>'
                             );
 
                             last = group;
@@ -99,14 +99,14 @@
                     } );
                 },
                 columns: [
-                    { data: 'rooms.name', name: 'rooms.name', orderable:false},
-                    { data: 'nb_desk', name: 'nb_desk', orderable:false},
-                    { data: 'nb_chair', name: 'nb_chair', orderable:false},
-                    { data: 'nb_chair_exam', name: 'nb_chair_exam', orderable:false},
-                    { data: 'size', name: 'size', orderable:false},
-                    { data: 'roomTypes.id', name: 'roomTypes.id', orderable:false},
-                    { data: 'buildings.id', name: 'buildings.id', orderable:false},
-                    { data: 'is_exam_room', name: 'is_exam_room', orderable:false,searchable: false},
+                    { data: 'rooms.name', name: 'rooms.name'},
+                    { data: 'nb_desk', name: 'nb_desk'},
+                    { data: 'nb_chair', name: 'nb_chair'},
+                    { data: 'nb_chair_exam', name: 'nb_chair_exam'},
+                    { data: 'size', name: 'size'},
+                    { data: 'roomTypes.id', name: 'roomTypes.id'},
+                    { data: 'buildings.id', name: 'buildings.id'},
+                    { data: 'is_exam_room', name: 'is_exam_room',searchable: false},
                     { data: 'action', name: 'action',orderable: false, searchable: false}
                 ]
             });

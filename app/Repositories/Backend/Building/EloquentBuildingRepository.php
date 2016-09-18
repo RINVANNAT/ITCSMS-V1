@@ -92,6 +92,7 @@ class EloquentBuildingRepository implements BuildingRepositoryContract
 
         $building->name = $input['name'];
         $building->description = $input['description'];
+        $building->code = $input['code'];
         $building->updated_at = Carbon::now();
         $building->write_uid = auth()->id();
 
