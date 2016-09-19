@@ -31,6 +31,7 @@
                 <table width="100%" class="table table-striped table-bordered table-hover" id="studentBac2s-table">
                     <thead>
                     <tr>
+                        <th></th>
                         <th>{{ trans('labels.backend.studentBac2s.fields.name_kh') }}</th>
                         <th>{{ trans('labels.backend.studentBac2s.fields.dob') }}</th>
                         <th>{{ trans('labels.backend.studentBac2s.fields.gender_id') }}</th>
@@ -40,7 +41,7 @@
                         <th>{{ trans('labels.backend.studentBac2s.fields.origin') }}</th>
                         <th>{{ trans('labels.backend.studentBac2s.fields.bac_year') }}</th>
                         <th>Apply from</th>
-                        <th>{{ trans('labels.general.actions') }}</th>
+
                     </tr>
                     </thead>
                 </table>
@@ -73,6 +74,7 @@
                     }
                 },
                 columns: [
+                    { data: 'export', name: 'export',orderable: false, searchable: false},
                     { data: 'name_kh', name: 'studentBac2s.name_kh'},
                     { data: 'dob', name: 'studentBac2s.dob',searchable:false},
                     { data: 'gender_name_kh', name: 'genders.name_kh',searchable:false},
@@ -82,7 +84,7 @@
                     { data: 'origin', name: 'origins.name_kh',searchable:false},
                     { data: 'bac_year', name: 'studentBac2s.bac_year',searchable:false},
                     { data: 'status', name: 'studentBac2s.status',searchable:false},
-                    { data: 'export', name: 'export',orderable: false, searchable: false}
+
                 ]
             });
             $("div.toolbar").html(

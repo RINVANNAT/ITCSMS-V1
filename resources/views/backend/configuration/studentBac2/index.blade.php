@@ -72,13 +72,13 @@
                     method: 'POST'
                 },
                 columns: [
+                    { data: 'action', name: 'action',orderable: false, searchable: false},
                     { data: 'name_kh', name: 'studentBac2s.name_kh'},
                     { data: 'dob', name: 'studentBac2s.dob'},
                     { data: 'gender_name_kh', name: 'genders.name_kh'},
                     { data: 'highSchool_name_kh', name: 'highSchools.name_kh'},
                     { data: 'percentile', name: 'percentile',searchable:false},
                     { data: 'gdeGrade_name_en', name: 'gdeGrades.name_en'},
-                    { data: 'action', name: 'action',orderable: false, searchable: false}
                 ]
             });
             enableDeleteRecord($('#studentBac2s-table'));
