@@ -811,6 +811,16 @@
                 window_missing_candidate = PopupCenterDual($(this).attr('href'),'Missing Candidate Register IDs','1200','960');
             });
 
+
+            // ---------DUT Examination------
+
+            $('#btn_generate_result').on('click', function() {
+
+                PopupCenterDual('{!! route('admin.exam.request_form_generate_score', $exam->id) !!}','Form To Generate Score','900','450');
+
+            });
+
+
             @endauth
             /* ------------------------------------------------------------------------ Course Section ------------------------------------------------------------------ */
             @permission('view-entrance-exam-course')
