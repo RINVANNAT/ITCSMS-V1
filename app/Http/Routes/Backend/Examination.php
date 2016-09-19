@@ -65,10 +65,17 @@ Route::group([], function() {
 
     Route::get('exams/{id}/ajax-check-candidate_socore', 'ExamController@checkCandidateScores')->name('admin.exam.ajax_check_candidate_score');
 
-
-
-
     Route::get('exams/{id}/candidate_generate_room', 'ExamController@generate_room')->name('admin.exam.candidate.generate_room');
+
+
+    //-----DUT Examination
+
+    Route::get('exams/{id}/request-form-generate-score', 'ExamController@formGenerateScores')->name('admin.exam.request_form_generate_score');
+
+    Route::get('exams/{id}/candidate-DUT-generate-result', 'ExamController@generateCandidateDUTResult')->name('admin.exam.candidate_dut_generate_result');
+
+    Route::get('exams/{id}/DUT-candidate-result-lists', 'ExamController@getDUTCandidateResultLists')->name('admin.exam.dut_candidate_result_lists');
+
 
 
 });

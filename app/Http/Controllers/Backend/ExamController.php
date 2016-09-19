@@ -655,6 +655,8 @@ class ExamController extends Controller
             ->WhereNotNull('examRooms.roomcode')
             ->get();
 
+//        dd($roomFromDB);
+
         return $roomFromDB;
 
     }
@@ -1315,5 +1317,228 @@ class ExamController extends Controller
 
         return view('backend.exam.includes.popup_view_missing_candidate', compact('missing'));
     }
+
+
+    public function formGenerateScores($examId) {
+
+        $departments = $this->getAllDepartments();
+
+        return view('backend.exam.includes.form_generate_DUT_score', compact('examId', 'departments'));
+    }
+
+
+
+    private function isAvalaibleDept($arrayNumberOfCandInEachDept, $deptId, $studentRate, $findsum) {
+
+        $totalSelectionCands =0;
+        $selectedDepartment[$deptId] = $studentRate;
+        $check =0;
+
+      foreach( $arrayNumberOfCandInEachDept as $key => $value) {
+
+          if($findsum != null) { // calculation of the total selection of number of student
+
+              $totalSelectionCands = $totalSelectionCands + (int)$value;
+
+          } else {
+
+              if($key == $deptId) {
+                return $value;
+              }
+          }
+      }
+    return $totalSelectionCands;
+
+    }
+
+    public function generateCandidateDUTResult($examId, Request $request) {
+
+
+        $studentIncrement = 0;
+        $storeSelectedDepts =[];
+        $tmp =[];
+        $arrayCandidateInEachDept = $request->number_candidate;
+        $count =0;
+        $totalCands = $this->isAvalaibleDept($arrayCandidateInEachDept, null, null, $findsum = 'true');
+
+
+        $dUTCandidates = $this->getAllDUTCandidates($examId);
+
+//        $test = [];
+
+
+        if($dUTCandidates) {
+
+            $this->resetCandidateDUTResult();
+
+            foreach($dUTCandidates as $dUTCandidate) {
+
+                $count++;
+                $statusRank =1;
+
+                if($count <= $totalCands) {
+
+                    $candidateDepts = $this->getCandidateDept($dUTCandidate->candidate_id);
+
+
+                    foreach($candidateDepts as $candidateDept) {// loop candidate department option from the 1 choice to the end 1->8
+
+                        if($candidateDept->rank == $statusRank) {
+
+                            $statusAvailableDept = $this->isAvalaibleDept($arrayCandidateInEachDept, $candidateDept->department_id,$studentIncrement, $findsum = null);
+                            if($statusAvailableDept != 0) {
+                                $tmp[$candidateDept->department_id][] = $statusAvailableDept--;
+
+                            }
+                            if($studentIncrement <= $statusAvailableDept) {
+
+                                $test[] = array ('incre= '.$studentIncrement,'rank= '.$candidateDept->rank, 'dept= '. $candidateDept->department_id, 'cand_id='.$dUTCandidate->candidate_id);
+                                $update = $this-> updateCandiateDepartment($dUTCandidate->candidate_id, $candidateDept->department_id,$candidateDept->rank);
+                                if($update) {
+                                    $candResult = $this->updateDutCandResult($examId, $dUTCandidate->candidate_id, $candRes = 'Pass');
+                                    break;
+                                }
+                            }
+
+                            if($statusAvailableDept) {
+
+//                              dd($studentIncrement.'---'.$statusRank.'--'.$candidateDept->department_id);
+                                $test[] = array ('incre= '.$studentIncrement,'rank= '.$candidateDept->rank, 'dept= '. $candidateDept->department_id, 'cand_id='.$dUTCandidate->candidate_id);
+                                $update = $this-> updateCandiateDepartment($dUTCandidate->candidate_id, $candidateDept->department_id,$candidateDept->rank);
+                                if($update) {
+                                    $candResult = $this->updateDutCandResult($examId, $dUTCandidate->candidate_id, $candRes = 'Pass');
+                                    break;
+                                }
+                            } else {
+//                                dd($dUTCandidate->candidate_id);
+                                $statusRank++;
+                                $studentIncrement = 0;
+                            }
+                        }
+                    }
+                } else {
+
+                    //these are not selected student so they are reserved
+                    // update these candidate to reserve
+
+                    $candResult = $this->updateDutCandResult($examId, $dUTCandidate->candidate_id, $candRes = 'Reserve');
+                }
+            }
+
+            dd($test);
+
+            //return view list of candidate who pass with selected department and student whow reserve with selected department options
+
+            return Response::json(['status'=>true]);
+        } else {
+            return Response::json(['status'=>false]);
+        }
+
+
+
+    }
+
+    public function getDUTCandidateResultLists ($examId) {
+
+        $candidateDUTs = $this->getSucceedCandidateDUTFromDB($examId);
+        dd($candidateDUTs);
+
+        return  view('backend.exam.includes.examination_DUT_candidate_result', compact('candidateDUTs', 'examId'));
+
+//        dd($candidateDUTs);
+    }
+
+
+
+    private function updateCandiateDepartment($candidate_id, $department_id, $rank) {
+
+        $res = DB::table('candidate_department')
+            ->where([
+                ['candidate_id', '=', $candidate_id],
+                ['department_id', '=', $department_id],
+                ['rank', '=', $rank ]
+            ])
+            ->update(array(
+                'is_success' => true
+            ));
+        return $res;
+    }
+
+    private function resetCandidateDUTResult() { // set the field is_success to false
+
+        $res = DB::table('candidate_department')
+
+            ->update(array(
+                'is_success' => false
+            ));
+    }
+
+    private function updateDutCandResult($examId, $candidateId, $canResult) {
+        $res = DB::table('candidates')
+            ->where([
+                ['id', '=', $candidateId],
+                ['exam_id', '=', $examId ]
+            ])
+            ->update(array(
+                'result' => $canResult
+            ));
+        return $res;
+    }
+
+    private function getAllDepartments() {
+
+        $dept = DB::table('departments')
+            ->select('departments.id as department_id', 'departments.name_en as department_name', 'departments.code as name_abr')
+            ->where([
+                ['departments.active', '=', true],
+                ['is_specialist', '=', true]
+            ])
+            ->get();
+
+        return $dept;
+    }
+
+    private function getCandidateDept($candidateId) {
+
+        $candidateDept = DB::table('candidate_department')
+            ->where('candidate_department.candidate_id', '=', $candidateId)
+            ->select('candidate_department.department_id', 'candidate_department.rank')
+            ->orderBy('rank', 'ASC')
+            ->get();
+
+        return $candidateDept;
+    }
+
+
+    private function getAllDUTCandidates($examId) {
+
+        $dUTCandidates = DB::table('candidates')
+            ->select('candidates.id as candidate_id', 'candidates.bac_percentile', 'candidates.name_latin')
+            ->where('candidates.exam_id', '=', $examId)
+            ->orderBy('bac_percentile', 'DESC')
+            ->get();
+
+        return $dUTCandidates;
+    }
+
+    private function getSucceedCandidateDUTFromDB($examId) {
+
+      $dUTCandidates = DB::table('candidates')
+          ->join('candidate_department', 'candidates.id', '=', 'candidate_department.candidate_id')
+          ->join('departments', 'departments.id', '=', 'candidate_department.department_id')
+          ->where([
+              ['candidate_department.is_success', '=', true],
+              ['candidates.exam_id', '=', $examId]
+          ])
+          ->select('candidates.id as candidate_id', 'candidates.name_kh', 'candidates.name_latin', 'candidate_department.rank', 'departments.code as department_name', 'departments.id as department_id', 'candidates.bac_percentile')
+          ->orderBy('candidates.bac_percentile', 'DESC')
+          ->get();
+
+        return $dUTCandidates;
+
+
+    }
+
+
 
 }
