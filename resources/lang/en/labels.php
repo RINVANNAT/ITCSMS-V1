@@ -351,6 +351,13 @@ return [
                 'origin' =>'Origin'
             ]
         ],
+        'studentBac2OldRecords' => [
+            'title' => 'Student Bac II - Old Records',
+            'sub_index_title' => 'All existing student Bac II - Old Records',
+            'sub_edit_title' => 'Edit student Bac II information - Old Records',
+            'sub_create_title' => 'Create new student Bac II - Old Records',
+            'sub_detail_title' => 'Detail of a student Bac II - Old Records',
+        ],
 
         'highSchools' => [
             'title' => 'High School',

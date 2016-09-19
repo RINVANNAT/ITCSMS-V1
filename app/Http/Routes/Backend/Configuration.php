@@ -65,8 +65,11 @@ Route::group([
         Route::post('studentBac2-data', 'StudentBac2Controller@data')->name('admin.configuration.studentBac2.data');
         Route::get('studentBac2-request-import', 'StudentBac2Controller@request_import')->name('admin.configuration.studentBac2.request_import');
         Route::post('studentBac2-import', 'StudentBac2Controller@import')->name('admin.configuration.studentBac2.import');
-
         Route::get('studentBac2/popup_index', 'StudentBac2Controller@popup_index')->name('admin.studentBac2.popup_index');
+
+        Route::resource('studentBac2OldRecords', 'StudentBac2OldRecordController');
+        Route::post('studentBac2OldRecords-data', 'StudentBac2OldRecordController@data')->name('admin.configuration.studentBac2OldRecords.data');
+        Route::get('studentBac2OldRecords/popup_index', 'StudentBac2OldRecordController@popup_index')->name('admin.studentBac2OldRecords.popup_index');
 
         Route::get('candidatesFromMoeys', 'StudentBac2Controller@get_candidate_from_moeys')->name('admin.candidatesFromMoeys.index');
         Route::post('candidatesFromMoeys-data', 'StudentBac2Controller@candidates_from_moyes_data')->name('admin.candidatesFromMoeys.data');
