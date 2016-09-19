@@ -32,14 +32,15 @@
         </div>
     </div>
 
-    <div class="form-group col-sm-6 required">
-        {!! Form::label('dob',trans('labels.backend.candidates.fields.dob'),array('class'=>'col-sm-4 control-label required')) !!}
+    <div class="form-group col-sm-6">
+        {!! Form::label('register_from',trans('labels.backend.candidates.fields.register_from'),array('class'=>'col-sm-4 control-label required')) !!}
         <div class="col-sm-8">
             @if(isset($candidate) && $candidate != null)
-                {!! Form::text('dob', $candidate->dob->format("d/m/Y"), array('class'=>'form-control date-form input','placeholder'=>'Birth Date','id'=>'candidate_dob','required'=>'required',isset($studentBac2)?"disabled":"")) !!}
+                {!! Form::select('register_from', ['ITC'=>'ITC','Ministry'=>'Ministry'],$candidate->register_from, array('class'=>'form-control input','id'=>'candidate_register_from','required'=>'required')) !!}
             @else
-                {!! Form::text('dob', isset($studentBac2)?$studentBac2->dob:null, array('class'=>'form-control date-form input','placeholder'=>'Birth Date','id'=>'candidate_dob','required'=>'required',isset($studentBac2)?"disabled":"")) !!}
+                {!! Form::select('register_from', [""=>"",'ITC'=>'ITC','Ministry'=>'Ministry'],null, array('class'=>'form-control input','id'=>'candidate_register_from','required'=>'required')) !!}
             @endif
+
         </div>
     </div>
 
@@ -69,15 +70,14 @@
         </div>
     </div>
 
-    <div class="form-group col-sm-6">
-        {!! Form::label('register_from',trans('labels.backend.candidates.fields.register_from'),array('class'=>'col-sm-4 control-label required')) !!}
+    <div class="form-group col-sm-6 required">
+        {!! Form::label('dob',trans('labels.backend.candidates.fields.dob'),array('class'=>'col-sm-4 control-label required')) !!}
         <div class="col-sm-8">
             @if(isset($candidate) && $candidate != null)
-                {!! Form::select('register_from', ['ITC'=>'ITC','Ministry'=>'Ministry'],$candidate->register_from, array('class'=>'form-control input','id'=>'candidate_register_from','required'=>'required')) !!}
+                {!! Form::text('dob', $candidate->dob->format("d/m/Y"), array('class'=>'form-control date-form input','placeholder'=>'Birth Date','id'=>'candidate_dob','required'=>'required',isset($studentBac2)?"disabled":"")) !!}
             @else
-                {!! Form::select('register_from', [""=>"",'ITC'=>'ITC','Ministry'=>'Ministry'],null, array('class'=>'form-control input','id'=>'candidate_register_from','required'=>'required')) !!}
+                {!! Form::text('dob', isset($studentBac2)?$studentBac2->dob:null, array('class'=>'form-control date-form input','placeholder'=>'Birth Date','id'=>'candidate_dob','required'=>'required',isset($studentBac2)?"disabled":"")) !!}
             @endif
-
         </div>
     </div>
 </div>
