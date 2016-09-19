@@ -28,6 +28,7 @@ use App\Http\Requests\Backend\EntranceExamCourse\CreateEntranceExamCourseRequest
 use App\Http\Requests\Backend\Exam\ModifyExamRoomRequest;
 use App\Http\Requests\Backend\Candidate\GenerateRoomExamRequest;
 use App\Http\Requests\Backend\Exam\DownloadExaminationDocumentsRequest;
+use Maatwebsite\Excel\Facades\Excel;
 
 
 class ExamController extends Controller
@@ -487,6 +488,77 @@ class ExamController extends Controller
         }
 
         return Response::json(array('success'=>true,'message'=>"Secret code is saved successfully"));
+    }
+
+    public function export_room_secret_code(ViewSecretCodeRequest $request, $exam_id){
+        $exam = $this->exams->findOrThrowException($exam_id);
+
+        $rooms = $exam->rooms()->with('building')->get()->toArray();
+
+        foreach($rooms as &$room){
+            if($room['roomcode'] == ""){
+                $room['roomcode'] = "";
+            } else {
+                $room['roomcode'] = Crypt::decrypt($room['roomcode']);
+            }
+        }
+
+
+        $alpha = array();
+        $letter = 'A';
+        while ($letter !== 'AAA') {
+            $alpha[] = $letter++;
+        }
+        Excel::create('Room secret code', function($excel) use ($rooms,$alpha) {
+
+            // Set the title
+            $excel->setTitle('Room secret code');
+
+            // Chain the setters
+            $excel->setCreator('Director of development & planning')
+                ->setCompany('Institute of Technology of Cambodia');
+
+            $excel->sheet('Secret codes', function($sheet) use ($rooms,$alpha) {
+
+                $header = array('#',"Room Name","Room Code");
+                $sheet->setOrientation('portrait');
+                // Set top, right, bottom, left
+                $sheet->setPageMargin(array(
+                    0.25, 0.30, 0.25, 0.30
+                ));
+
+                // Set all margins
+                $sheet->setPageMargin(0.25);
+
+                $sheet->appendRow(array(
+                    'Room Secret Code'
+                ));
+
+                $sheet->rows(
+                    array($header)
+                );
+
+                $index = 1;
+                foreach ($rooms as $item) {
+
+                    $row = array($index,$item['building']['code'].$item['name'],$item['roomcode']);
+
+                    $sheet->appendRow(
+                        $row
+                    );
+                    $index++;
+                }
+
+                $sheet->mergeCells('A1:C1');
+                $sheet->cells('A1:C'.count($rooms)+1, function($cells) {
+                    $cells->setAlignment('center');
+                    $cells->setValignment('middle');
+                });
+                $sheet->setBorder('A2:C'.(2+count($rooms)), 'thin');
+
+            });
+
+        })->export('xls');
     }
 
     public function download_attendance_list(DownloadExaminationDocumentsRequest $request, $exam_id){

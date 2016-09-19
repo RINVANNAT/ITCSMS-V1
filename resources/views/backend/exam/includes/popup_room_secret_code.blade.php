@@ -51,6 +51,7 @@
             </div>
 
             <div class="pull-right">
+                <a href="{{route('admin.exam.export_room_secret_code',$exam_id)}}" id="btn-export" class="btn btn-info btn-xs">{{ trans('buttons.general.export') }}</a>
                 <input type="button" id="btn-save" class="btn btn-danger btn-xs" value="{{ trans('buttons.general.save') }}" />
             </div>
             <div class="clearfix"></div>

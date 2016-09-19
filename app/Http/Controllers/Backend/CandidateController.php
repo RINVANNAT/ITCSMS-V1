@@ -91,7 +91,7 @@ class CandidateController extends Controller
         $provinces = Origin::lists('name_kh','id');
         $gdeGrades = GdeGrade::lists('name_en','id');
         $departments = Department::where('is_specialist',true)->where('parent_id',11)->get();
-        $academicYears = AcademicYear::orderBy('name_latin','desc')->lists('name_latin','id');
+        $academicYears = AcademicYear::orderBy('id','desc')->lists('id','id');
 
         return view('backend.candidate.create',compact('departments','degrees','genders','promotions','provinces','gdeGrades','academicYears','exam','studentBac2','highschool'));
     }

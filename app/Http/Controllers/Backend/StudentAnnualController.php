@@ -1078,7 +1078,7 @@ class StudentAnnualController extends Controller
             array_push($fields,$_POST['parent_phone']);
         }
 
-        dd($data);
+        //dd($data);
 
         Excel::create('បញ្ជីនិស្សិត', function($excel) use ($data, $title,$alpha,$fields) {
 
