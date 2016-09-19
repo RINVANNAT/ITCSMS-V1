@@ -259,7 +259,7 @@
 
         function refresh_candidate_list (){
             $('#candidates-table').DataTable().ajax.reload();
-            notify("success","Info", "Candidate list is updated!");
+            //notify("success","Info", "Candidate list is updated!");
             check_missing_candidates();
         }
 
