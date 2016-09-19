@@ -28,6 +28,16 @@
             <p>
             - Developer Team
             </p>
+            <a href="#" id="test">#</a>
         </div><!-- /.box-body -->
     </div><!--box box-success-->
 @endsection
+
+@section('after-scripts-end')
+    <script>
+        $("#test").click(function(e){
+            e.preventDefault();
+            notify("success","Info", "Candidate list is updated!");
+        });
+    </script>
+@stop
