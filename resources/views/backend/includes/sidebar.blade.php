@@ -139,66 +139,103 @@
                     <i class="fa fa-angle-left pull-right"></i>
                 </a>
                 <ul class="treeview-menu {{ Active::pattern('admin/configuration/*', 'menu-open') }}" style="display: none; {{ Active::pattern('admin/configuration*', 'display: block;') }}">
+                    @permission('view-department-management')
                     <li class="{{ Active::pattern('admin/configuration/departments*') }}">
                         <a href="{!! url('admin/configuration/departments') !!}">{{ trans('menus.backend.configuration.departments') }}</a>
                     </li>
+                    @endauth
+                    @permission('view-degree-management')
                     <li class="{{ Active::pattern('admin/configuration/degrees*') }}">
                         <a href="{!! url('admin/configuration/degrees') !!}">{{ trans('menus.backend.configuration.degrees') }}</a>
                     </li>
+                    @endauth
+                    @permission('view-grade-management')
                     <li class="{{ Active::pattern('admin/configuration/grades*') }}">
                         <a href="{!! url('admin/configuration/grades') !!}">{{ trans('menus.backend.configuration.grades') }}</a>
                     </li>
+                    @endauth
+                    @permission('view-academicYear-management')
                     <li class="{{ Active::pattern('admin/configuration/academicYears*') }}">
                         <a href="{!! url('admin/configuration/academicYears') !!}">{{ trans('menus.backend.configuration.academicYears') }}</a>
                     </li>
+                    @endauth
 
                     {{--course section import course --}}
-                    <li class="{{ Active::pattern('admin/configuration/academicYears*') }}">
+                    @permission('view-course-management')
+                    <li class="{{ Active::pattern('admin/configuration/course*') }}">
                         <a href="{{ route('admin.course.course_program.request_import_config')}}">{{ trans('menus.backend.configuration.course') }}</a>
                     </li>
-
+                    @endauth
+                    @permission('view-account-management')
                     <li class="{{ Active::pattern('admin/configuration/accounts*') }}">
                         <a href="{!! url('admin/configuration/accounts') !!}">{{ trans('menus.backend.configuration.accounts') }}</a>
                     </li>
+                    @endauth
+                    @permission('view-building-management')
                     <li class="{{ Active::pattern('admin/configuration/buildings*') }}">
                         <a href="{!! url('admin/configuration/buildings') !!}">{{ trans('menus.backend.configuration.buildings') }}</a>
                     </li>
+                    @endauth
+                    @permission('view-highSchool-management')
                     <li class="{{ Active::pattern('admin/configuration/highSchools*') }}">
                         <a href="{!! url('admin/configuration/highSchools') !!}">{{ trans('menus.backend.configuration.highSchools') }}</a>
                     </li>
+                    @endauth
+                    @permission('view-incomeType-management')
                     <li class="{{ Active::pattern('admin/configuration/incomeTypes*') }}">
                         <a href="{!! url('admin/configuration/incomeTypes') !!}">{{ trans('menus.backend.configuration.incomeTypes') }}</a>
                     </li>
+                    @endauth
+                    @permission('view-outcomeType-management')
                     <li class="{{ Active::pattern('admin/configuration/outcomeTypes*') }}">
                         <a href="{!! url('admin/configuration/outcomeTypes') !!}">{{ trans('menus.backend.configuration.outcomeTypes') }}</a>
                     </li>
+                    @endauth
+                    @permission('view-schoolFee-management')
                     <li class="{{ Active::pattern('admin/configuration/schoolFees*') }}">
                         <a href="{!! url('admin/configuration/schoolFees') !!}">{{ trans('menus.backend.configuration.schoolFees') }}</a>
                     </li>
+                    @endauth
+                    @permission('view-room-management')
                     <li class="{{ Active::pattern('admin/configuration/rooms*') }}">
                         <a href="{!! url('admin/configuration/rooms') !!}">{{ trans('menus.backend.configuration.rooms') }}</a>
                     </li>
+                    @endauth
+                    @permission('view-roomType-management')
                     <li class="{{ Active::pattern('admin/configuration/roomTypes*') }}">
                         <a href="{!! url('admin/configuration/roomTypes') !!}">{{ trans('menus.backend.configuration.roomTypes') }}</a>
                     </li>
+                    @endauth
+                    @permission('view-studentBac2-management')
                     <li class="{{ Active::pattern('admin/configuration/studentBac2OldRecords*') }}">
                         <a href="{!! url('admin/configuration/studentBac2OldRecords') !!}">{{ trans('menus.backend.configuration.studentBac2OldRecords') }}</a>
                     </li>
+                    @endauth
+                    @permission('view-studentBac2-management')
                     <li class="{{ Active::pattern('admin/configuration/studentBac2s*') }}">
                         <a href="{!! url('admin/configuration/studentBac2s') !!}">{{ trans('menus.backend.configuration.studentBac2s') }}</a>
                     </li>
+                    @endauth
+                    @permission('view-studentBac2-management')
                     <li class="{{ Active::pattern('admin/configuration/candidatesFromMoeys*') }}">
                         <a href="{!! url('admin/configuration/candidatesFromMoeys') !!}">{{ trans('menus.backend.configuration.candidatesFromMoeys') }}</a>
                     </li>
+                    @endauth
+                    @permission('view-departmentOption-management')
                     <li class="{{ Active::pattern('admin/configuration/departmentOptions*') }}">
                         <a href="{!! url('admin/configuration/departmentOptions') !!}">{{ trans('menus.backend.configuration.departmentOptions') }}</a>
                     </li>
+                    @endauth
+                    @permission('view-promotion-management')
                     <li class="{{ Active::pattern('admin/configuration/promotions*') }}">
                         <a href="{!! url('admin/configuration/promotions') !!}">{{ trans('menus.backend.configuration.promotions') }}</a>
                     </li>
+                    @endauth
+                    @permission('view-redouble-management')
                     <li class="{{ Active::pattern('admin/configuration/redoubles*') }}">
                         <a href="{!! url('admin/configuration/redoubles') !!}">{{ trans('menus.backend.configuration.redoubles') }}</a>
                     </li>
+                    @endauth
                 </ul>
             </li>
             @endauth

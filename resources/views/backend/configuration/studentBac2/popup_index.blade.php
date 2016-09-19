@@ -100,7 +100,6 @@
 
             $('#filter_academic_year').on('change', function(e) {
                 oTable.draw();
-                //table.ajax.url( 'newData.json' ).load();
                 e.preventDefault();
             });
 
