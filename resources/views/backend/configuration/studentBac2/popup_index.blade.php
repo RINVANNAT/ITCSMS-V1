@@ -13,7 +13,11 @@
     {!! Html::style('plugins/datatables/dataTables.bootstrap.css') !!}
     <style>
         .toolbar {
-            float: left;
+            float: right;
+        }
+
+        #studentBac2s-table_filter{
+            float:left;
         }
     </style>
 @stop
@@ -60,7 +64,7 @@
         var candidate_window;
         $(function() {
             var oTable = $('#studentBac2s-table').DataTable({
-                dom: 'l<"toolbar">frtip',
+                dom: 'lf<"toolbar">rtip',
                 processing: true,
                 serverSide: true,
                 pageLength: {!! config('app.records_per_page')!!},

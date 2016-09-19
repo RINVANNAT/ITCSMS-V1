@@ -20,6 +20,10 @@
     <div class="box box-success">
         <div class="box-header with-border">
             <h3 class="box-title">{{ trans('labels.backend.candidates.sub_create_title') }}</h3>
+            <div class="pull-right">
+                <a href="#" id="btn-cancel" class="btn btn-danger btn-xs">{{ trans('buttons.general.cancel') }}</a>
+                <input id="btn-submit" type="submit" class="btn btn-success btn-xs" value="{{ trans('buttons.general.crud.create') }}" />
+            </div>
         </div><!-- /.box-header -->
 
         <div class="box-body" style="background-color: #ddd !important;">
@@ -27,18 +31,6 @@
         </div><!-- /.box-body -->
     </div><!--box-->
 
-    <div class="box box-success">
-        <div class="box-body">
-            <div class="pull-left">
-                <a href="#" id="btn-cancel" class="btn btn-danger btn-xs">{{ trans('buttons.general.cancel') }}</a>
-            </div>
-
-            <div class="pull-right">
-                <input id="btn-submit" type="submit" class="btn btn-success btn-xs" value="{{ trans('buttons.general.crud.create') }}" />
-            </div>
-            <div class="clearfix"></div>
-        </div><!-- /.box-body -->
-    </div><!--box-->
     {!! Form::close() !!}
 @stop
 
