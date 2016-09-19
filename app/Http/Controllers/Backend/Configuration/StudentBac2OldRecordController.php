@@ -45,92 +45,7 @@ class StudentBac2OldRecordController extends Controller
     {
         return view('backend.configuration.studentBac2OldRecord.index');
     }
-    public function popup_index()
-    {
-        $exam_id = $_GET['exam_id'];
-        $academicYears = AcademicYear::orderBy('id','desc')->lists('name_kh','id');
-        $origins = Origin::lists('name_kh','id');
-        return view('backend.configuration.studentBac2.popup_index',compact('exam_id','academicYears','origins'));
-    }
 
-
-    /**
-     * Show the form for creating a new resource.
-     * @param CreateStudentBac2Request $request
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function create(CreateStudentBac2Request $request)
-    {
-        return view('backend.configuration.studentBac2.create');
-    }
-
-    /**
-     * Store a newly created resource in storage.
-     *
-     * @param  StoreStudentBac2Request  $request
-     * @return \Illuminate\Http\Response
-     */
-    public function store(StoreStudentBac2Request $request)
-    {
-        $this->studentBac2sOldRecord->create($request->all());
-        return redirect()->route('admin.configuration.studentBac2sOldRecord.index')->withFlashSuccess(trans('alerts.backend.generals.created'));
-    }
-
-    /**
-     * Display the specified resource.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function show($id)
-    {
-        //
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     *
-     * @param EditStudentBac2Request $request
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function edit(EditStudentBac2Request $request, $id)
-    {
-
-        $studentBac2 = $this->studentBac2sOldRecord->findOrThrowException($id);
-
-        return view('backend.configuration.studentBac2.edit',compact('studentBac2'));
-    }
-
-    /**
-     * Update the specified resource in storage.
-     *
-     * @param  UpdateStudentBac2Request  $request
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function update(UpdateStudentBac2Request $request, $id)
-    {
-        $this->studentBac2sOldRecord->update($id, $request->all());
-        return redirect()->route('admin.configuration.studentBac2sOldRecord.index')->withFlashSuccess(trans('alerts.backend.generals.updated'));
-    }
-
-    /**
-     * Remove the specified resource from storage.
-     *
-     * @param DeleteStudentBac2Request $request
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function destroy(DeleteStudentBac2Request $request, $id)
-    {
-        if($request->ajax()){
-            $this->studentBac2sOldRecord->destroy($id);
-        } else {
-            return redirect()->route('admin.configuration.studentBac2sOldRecord.index')->withFlashSuccess(trans('alerts.backend.generals.deleted'));
-        }
-    }
 
     public function data()
     {
@@ -139,9 +54,26 @@ class StudentBac2OldRecordController extends Controller
         $studentBac2sOldRecord = DB::table('student_bac2s_old_record')
             ->leftJoin('genders','student_bac2s_old_record.gender_id','=','genders.id')
             ->leftJoin('highSchools','student_bac2s_old_record.highschool_id','=','highSchools.id')
-            ->leftJoin('gdeGrades','student_bac2s_old_record.grade','=','gdeGrades.id')
+            ->leftJoin('gdeGrades as total_grade','student_bac2s_old_record.grade','=','total_grade.id')
+            ->leftJoin('gdeGrades as math_grade','student_bac2s_old_record.bac_math_grade','=','math_grade.id')
+            ->leftJoin('gdeGrades as phys_grade','student_bac2s_old_record.bac_phys_grade','=','phys_grade.id')
+            ->leftJoin('gdeGrades as chem_grade','student_bac2s_old_record.bac_chem_grade','=','chem_grade.id')
             ->leftJoin('origins','student_bac2s_old_record.province_id','=','origins.id')
-            ->select(['student_bac2s_old_record.id','student_bac2s_old_record.bac_year','origins.name_kh as origin','student_bac2s_old_record.name_kh','student_bac2s_old_record.status','student_bac2s_old_record.highschool_id','genders.name_kh as gender_name_kh','highSchools.name_kh as highSchool_name_kh','dob','percentile','gdeGrades.name_en as gdeGrade_name_en']);
+            ->select([
+                'student_bac2s_old_record.id',
+                'student_bac2s_old_record.bac_year',
+                'origins.name_kh as origin',
+                'student_bac2s_old_record.name_kh',
+                'student_bac2s_old_record.status',
+                'student_bac2s_old_record.highschool_id',
+                'genders.name_kh as gender_name_kh',
+                'highSchools.name_kh as highSchool_name_kh',
+                'dob','percentile',
+                'math_grade.name_en as math_grade_name',
+                'phys_grade.name_en as phys_grade_name',
+                'chem_grade.name_en as chem_grade_name',
+                'total_grade.name_en as total_grade_name',
+            ]);
 
         $datatables =  app('datatables')->of($studentBac2sOldRecord)
             ->editColumn('dob', function($studentBac2){
@@ -162,76 +94,6 @@ class StudentBac2OldRecordController extends Controller
         if ($academic_year = $datatables->request->get('academic_year')) {
             $datatables->where('student_bac2s_old_record.bac_year', '=', $academic_year);
         }
-
-        return $datatables->make(true);
-    }
-
-    public function request_import(RequestImportStudentBac2Request $request){
-
-        return view('backend.configuration.studentBac2.import');
-
-    }
-
-    public function import(ImportStudentBac2Request $request){
-        $now = Carbon::now()->format('Y_m_d_H');
-
-        // try to move uploaded file to a temporary location
-        if($request->file('import')!= null){
-            $import = $now. '.' .$request->file('import')->getClientOriginalExtension();
-
-            $request->file('import')->move(
-                base_path() . '/public/assets/uploaded_file/temp/', $import
-            );
-
-            $storage_path = base_path() . '/public/assets/uploaded_file/temp/'.$import;
-
-            // and then read that data and store to database
-            //Excel::load($storage_path, function($reader) {
-            //    dd($reader->first());
-            //});
-
-
-            DB::beginTransaction();
-
-            try{
-                Excel::filter('chunk')->load($storage_path)->chunk(10000, function($results){
-                    //dd($results->first());
-                    // Loop through all rows
-                    $results->each(function($row) {
-
-                        $studentBac2 = $this->studentBac2Repository->create($row->toArray());
-                    });
-                });
-
-            } catch(Exception $e){
-                DB::rollback();
-            }
-            DB::commit();
-
-            return redirect(route('studentBac2sOldRecord.index'));
-        }
-    }
-
-    // Candiate From Moeys
-    public function get_candidate_from_moeys(){
-        return view('backend.configuration.candidatesFromMoeys.index');
-    }
-
-    public function candidates_from_moyes_data(\Illuminate\Http\Request $request){
-
-        $candidatesFromMoeys = DB::table('candidatesFromMoeys')
-            ->leftJoin('studentBac2sOldRecord','studentBac2sOldRecord.can_id','=','candidatesFromMoeys.can_id')
-            ->leftJoin('genders','studentBac2sOldRecord.gender_id','=','genders.id')
-            ->leftJoin('highSchools','studentBac2sOldRecord.highschool_id','=','highSchools.id')
-            ->leftJoin('gdeGrades','studentBac2sOldRecord.grade','=','gdeGrades.id')
-            ->leftJoin('origins','studentBac2sOldRecord.province_id','=','origins.id')
-            ->select(['candidatesFromMoeys.id','candidatesFromMoeys.bac_year','candidatesFromMoeys.can_id','origins.name_kh as origin','studentBac2sOldRecord.name_kh','studentBac2sOldRecord.status','studentBac2sOldRecord.highschool_id','genders.name_kh as gender_name_kh','highSchools.name_kh as highSchool_name_kh','dob','percentile','gdeGrades.name_en as gdeGrade_name_en']);
-
-        $datatables =  app('datatables')->of($candidatesFromMoeys)
-            ->editColumn('dob', function($studentBac2){
-                $date = Carbon::createFromFormat('Y-m-d h:i:s',$studentBac2->dob);
-                return $date->format('d/m/Y');
-            });
 
         return $datatables->make(true);
     }

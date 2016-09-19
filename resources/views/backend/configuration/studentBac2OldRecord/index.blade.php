@@ -37,6 +37,9 @@
                         <th>{{ trans('labels.backend.studentBac2s.fields.highschool_id') }}</th>
                         <th>{{ trans('labels.backend.studentBac2s.fields.percentile') }}</th>
                         <th>{{ trans('labels.backend.studentBac2s.fields.grade') }}</th>
+                        <th>{{ trans('labels.backend.studentBac2s.fields.bac_math_grade') }}</th>
+                        <th>{{ trans('labels.backend.studentBac2s.fields.bac_phys_grade') }}</th>
+                        <th>{{ trans('labels.backend.studentBac2s.fields.bac_chem_grade') }}</th>
                         <th>{{ trans('labels.backend.studentBac2s.fields.bac_year') }}</th>
                     </tr>
                     </thead>
@@ -67,7 +70,10 @@
                     { data: 'gender_name_kh', name: 'genders.name_kh'},
                     { data: 'highSchool_name_kh', name: 'highSchools.name_kh'},
                     { data: 'percentile', name: 'percentile',searchable:false},
-                    { data: 'gdeGrade_name_en', name: 'gdeGrades.name_en'},
+                    { data: 'total_grade_name', name: 'total_grade.name_en',searchable:false},
+                    { data: 'math_grade_name', name: 'math_grade.name_en',searchable:false},
+                    { data: 'phys_grade_name', name: 'phys_grade.name_en',searchable:false},
+                    { data: 'chem_grade_name', name: 'chem_grade.name_en',searchable:false},
                     { data: 'bac_year', name: 'student_bac2s_old_record.bac_year'}
                 ]
             });
