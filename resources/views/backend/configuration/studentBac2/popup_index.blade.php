@@ -13,7 +13,9 @@
     {!! Html::style('plugins/datatables/dataTables.bootstrap.css') !!}
     <style>
         .toolbar {
-            float: right;
+            float: left;
+            margin-left: 10px;
+            margin-bottom: 8px;
         }
 
         #studentBac2s-table_filter{
