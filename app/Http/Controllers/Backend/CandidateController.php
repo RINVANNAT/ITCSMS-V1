@@ -151,7 +151,18 @@ class CandidateController extends Controller
 
         $degrees = Degree::lists('name_kh','id');
         $genders = Gender::lists('name_kh','id');
-        $promotions = Promotion::orderBy('id','desc')->lists('name','id');
+
+        $dif = $exam->academic_year_id - 2015;
+        if($exam->type_id == 1){ // Engineer
+            $promotion_id = config('app.promotions.I.2015')+$dif;
+            $promotions = Promotion::where('id',$promotion_id)->orderBy('id','desc')->lists('name','id')->toArray();
+        } else if($exam->type_id == 2){
+            $promotion_id = config('app.promotions.T.2015')+$dif;
+            $promotions = Promotion::where('id',$promotion_id)->orderBy('id','desc')->lists('name','id')->toArray();
+        } else {
+            $promotions = Promotion::orderBy('id','desc')->lists('name','id')->toArray();
+        }
+
         $provinces = Origin::lists('name_kh','id');
         $gdeGrades = GdeGrade::lists('name_en','id');
         $departments = Department::where('is_specialist',true)->where('parent_id',11)->get();
