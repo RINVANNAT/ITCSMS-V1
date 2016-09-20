@@ -5,6 +5,11 @@
 @section('after-styles-end')
     {!! Html::style('plugins/datetimepicker/bootstrap-datetimepicker.min.css') !!}
     {!! Html::style('plugins/select2/select2.min.css') !!}
+    <style>
+        .department_choice{
+            text-align: center;
+        }
+    </style>
 @endsection
 
 @section('page-header')
@@ -44,11 +49,13 @@
     {!! JsValidator::formRequest('App\Http\Requests\Backend\Candidate\StoreCandidateRequest') !!}
 
     <script>
-
+        var entered_key = [];
+        var department_size = {{count($departments)}};
 
         function save_candidate(){
 
             var status = $( "#candidate-form" ).validate().form();
+
             if(status ==true){
                 var disabled = $("#candidate-form" ).find(':input:disabled').removeAttr('disabled');
                 var data = $("#candidate-form" ).serializeArray();
@@ -75,7 +82,6 @@
                             notify("error","Candidate Error",response.toString());
                         }
                      }
-
                  });
             } else {
 
@@ -120,6 +126,40 @@
             return repo.text || repo.name;
         }
 
+        function allowNumberOnlyAndNotDuplicate(e){
+            // Allow: backspace, delete, tab, escape, enter and .
+            if ($.inArray(e.keyCode, [46, 8, 9, 27, 13, 110, 190]) !== -1 ||
+                        // Allow: Ctrl+A
+                    (e.keyCode == 65 && e.ctrlKey === true) ||
+                        // Allow: Ctrl+C
+                    (e.keyCode == 67 && e.ctrlKey === true) ||
+                        // Allow: Ctrl+X
+                    (e.keyCode == 88 && e.ctrlKey === true) ||
+                        // Allow: home, end, left, right
+                    (e.keyCode >= 35 && e.keyCode <= 39)) {
+                // let it happen, don't do anything
+                return;
+            }
+            // Ensure that it is a number and stop the keypress
+            if ((e.shiftKey || (e.keyCode < 49 || e.keyCode > 57)) && (e.keyCode < 96 || e.keyCode > 105)) {
+                e.preventDefault();
+            } else {
+                // Ensure that the number is not redundant
+                if(e.keyCode >= 49 || e.keyCode <= 57){
+                    var code = e.keyCode + 48;
+
+                    if ($.inArray(code, entered_key) != -1)
+                    {
+                        // found, so it is not allowed
+                        e.preventDefault();
+                    } else {
+                        // not found, so it is allowed
+
+                    }
+                }
+            }
+
+        }
 
         $(document).ready(function(){
             var $search_url = "{{route('admin.configuration.highSchool.search')}}";
@@ -183,13 +223,29 @@
             });
 
             $(".department_choice").keydown(function (e) {
-                allowNumberOnly(e);
+                allowNumberOnlyAndNotDuplicate(e);
             });
             $(".department_choice").keyup(function (e) {
-                if ((e.shiftKey || (e.keyCode < 48 || e.keyCode > 57)) && (e.keyCode < 96 || e.keyCode > 105)) {
+                if ((e.shiftKey || (e.keyCode < 49 || e.keyCode > 57)) && (e.keyCode < 96 || e.keyCode > 105)) {
                     // Do nothing here
                 } else {
-                    $(this).closest('.choose_department_cell').next('.choose_department_cell').find('.department_choice').focus();
+                    // check 1 more time if the code is redundant
+                    var code = e.keyCode;
+                    if(e.keyCode >= 49 || e.keyCode <= 57){
+                        code = e.keyCode + 48;
+                    }
+                    if ($.inArray(code, entered_key) != -1)
+                    {
+
+                    } else {
+                        entered_key.push(code);
+                        $(this).closest('.choose_department_cell').next('.choose_department_cell').find('.department_choice').focus();
+                        $(".department_choice").each(function(index,element){
+                            if($(element).val()>department_size){
+                                $(element).css("background-color","red")
+                            }
+                        })
+                    }
                 }
 
             });

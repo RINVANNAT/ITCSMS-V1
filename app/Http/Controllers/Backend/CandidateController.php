@@ -69,6 +69,7 @@ class CandidateController extends Controller
     {
         $studentBac2_id = Input::get('studentBac2_id');
         $exam_id = Input::get('exam_id');
+        $exam = Exam::find($exam_id);
         $highschool = null;
 
         if($studentBac2_id==0){ // This allow to create candidate manually
@@ -79,18 +80,25 @@ class CandidateController extends Controller
             $highschool = HighSchool::where('id',$studentBac2->highschool_id)->lists('id', 'name_kh as name')->toArray();
         }
 
-        //$highschool->id = str_pad($highschool->id,12,"0",STR_PAD_LEFT);
-        //dd($highschool);
         $exam = Exam::where('id',$exam_id)->first();
+
+        $dif = $exam->academic_year_id - 2015;
+        if($exam->type_id == 1){ // Engineer
+            $promotion_id = config('app.promotions.I.2015')+$dif;
+            $promotions = Promotion::where('id',$promotion_id)->orderBy('id','desc')->lists('name','id')->toArray();
+        } else if($exam->type_id == 2){
+            $promotion_id = config('app.promotions.T.2015')+$dif;
+            $promotions = Promotion::where('id',$promotion_id)->orderBy('id','desc')->lists('name','id')->toArray();
+        } else {
+            $promotions = Promotion::orderBy('id','desc')->lists('name','id')->toArray();
+        }
 
         $degrees = Degree::lists('name_kh','id');
         $genders = Gender::lists('name_kh','id');
-        $promotions = Promotion::orderBy('id','desc')->lists('name','id');
 
-        //$highSchools = HighSchool::lists('name_kh','id');
         $provinces = Origin::lists('name_kh','id');
         $gdeGrades = GdeGrade::lists('name_en','id');
-        $departments = Department::where('is_specialist',true)->where('parent_id',11)->get();
+        $departments = Department::where('is_specialist',true)->where('parent_id',11)->orderBy('code','asc')->get();
         $academicYears = AcademicYear::orderBy('id','desc')->lists('id','id');
 
         return view('backend.candidate.create',compact('departments','degrees','genders','promotions','provinces','gdeGrades','academicYears','exam','studentBac2','highschool'));
