@@ -27,7 +27,7 @@ class StoreCandidateRequest extends Request
      */
     public function rules()
     {
-        return [
+        $rules =  [
             'name_kh' => 'required',
             'name_latin' => 'required',
             'pob' => 'required',
@@ -40,7 +40,14 @@ class StoreCandidateRequest extends Request
             'bac_year' => 'required',
             'promotion_id' => 'required',
             'exam_id' => 'required',
-            'register_id' => 'integer|required|unique_with:candidates,exam_id'
+            'register_id' => 'integer|required|unique_with:candidates,exam_id',
+
         ];
+        if($this->request->get('choice_department') != null) {
+            foreach ($this->request->get('choice_department') as $index => $val) {
+                $rules['choice_department.' . $index] = 'required';
+            }
+        }
+        return $rules;
     }
 }

@@ -72,6 +72,10 @@
                         } else {
                             notify("error","Candidate Error",response.toString());
                         }
+                     },
+                     error:function(response){
+                         console.log(response.toString());
+                         notify("error","Error: Some fields are missing!");
                      }
 
                  });

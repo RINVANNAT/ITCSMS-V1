@@ -197,9 +197,14 @@ class EloquentCandidateRepository implements CandidateRepositoryContract
         $candidate->fill($input);
 
         if ($candidate->save()) {
-            if(isset($input['departments'])){
-                $departmentIds = $input['departments'];
-                $candidate->departments()->sync($departmentIds);
+            if(isset($input['choice_department'])){
+                foreach($input['choice_department'] as $department_id => $choice_department){
+                    DB::table('candidate_department')
+                        ->where('candidate_id',$candidate->id)
+                        ->where('department_id',$department_id)
+                        ->update(['rank' => $choice_department]);
+                }
+
             }
             $result["status"] = true;
             $result["messages"] = "Your information is successfully saved";

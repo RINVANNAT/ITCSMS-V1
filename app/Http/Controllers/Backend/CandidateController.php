@@ -145,7 +145,8 @@ class CandidateController extends Controller
      */
     public function edit(EditCandidateRequest $request, $id)
     {
-        $candidate = $this->candidates->findOrThrowException($id);
+        $candidate = Candidate::where('id',$id)->with('departments')->first();
+
         $exam = Exam::where('id',$candidate->exam_id)->first();
         $studentBac2 = StudentBac2::find($candidate->studentBac2_id);
 
@@ -169,7 +170,7 @@ class CandidateController extends Controller
         $academicYears = AcademicYear::orderBy('name_latin','desc')->lists('name_latin','id');
         //$selected_high_school = HighSchool::where('id',$candidate->highschool_id)->select(['id', 'name_kh as name'])->first();
         $highschool = HighSchool::where('id',$studentBac2->highschool_id)->lists('id', 'name_kh as name')->toArray();
-        //dd($candidate);
+
         return view('backend.candidate.edit',compact('highschool','departments','exam','degrees','genders','promotions','provinces','gdeGrades','academicYears','candidate','studentBac2'));
     }
 

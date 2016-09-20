@@ -45,7 +45,7 @@ class Department extends Model
     }
 
     public function candidates(){
-        return $this->belongsToMany('App\Models\Candidate');
+        return $this->belongsToMany('App\Models\Candidate','candidate_department');
     }
 
     public function degrees(){

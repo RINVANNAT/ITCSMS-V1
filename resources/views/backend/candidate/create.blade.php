@@ -49,7 +49,7 @@
     {!! JsValidator::formRequest('App\Http\Requests\Backend\Candidate\StoreCandidateRequest') !!}
 
     <script>
-        var entered_key = [];
+        //var entered_key = [];
         var department_size = {{count($departments)}};
 
         function save_candidate(){
@@ -81,6 +81,9 @@
                         } else {
                             notify("error","Candidate Error",response.toString());
                         }
+                     },
+                     error:function(response){
+                         notify("error","Error: Some fields are missing!");
                      }
                  });
             } else {
@@ -126,7 +129,7 @@
             return repo.text || repo.name;
         }
 
-        function allowNumberOnlyAndNotDuplicate(e){
+        function allowNumberOnlyAndNotDuplicate(e,object){
             // Allow: backspace, delete, tab, escape, enter and .
             if ($.inArray(e.keyCode, [46, 8, 9, 27, 13, 110, 190]) !== -1 ||
                         // Allow: Ctrl+A
@@ -143,20 +146,6 @@
             // Ensure that it is a number and stop the keypress
             if ((e.shiftKey || (e.keyCode < 49 || e.keyCode > 57)) && (e.keyCode < 96 || e.keyCode > 105)) {
                 e.preventDefault();
-            } else {
-                // Ensure that the number is not redundant
-                if(e.keyCode >= 49 || e.keyCode <= 57){
-                    var code = e.keyCode + 48;
-
-                    if ($.inArray(code, entered_key) != -1)
-                    {
-                        // found, so it is not allowed
-                        e.preventDefault();
-                    } else {
-                        // not found, so it is allowed
-
-                    }
-                }
             }
 
         }
@@ -223,29 +212,36 @@
             });
 
             $(".department_choice").keydown(function (e) {
-                allowNumberOnlyAndNotDuplicate(e);
+                allowNumberOnlyAndNotDuplicate(e,$(this));
             });
             $(".department_choice").keyup(function (e) {
                 if ((e.shiftKey || (e.keyCode < 49 || e.keyCode > 57)) && (e.keyCode < 96 || e.keyCode > 105)) {
                     // Do nothing here
                 } else {
                     // check 1 more time if the code is redundant
-                    var code = e.keyCode;
-                    if(e.keyCode >= 49 || e.keyCode <= 57){
-                        code = e.keyCode + 48;
-                    }
-                    if ($.inArray(code, entered_key) != -1)
-                    {
+                    var check = 0;
+                    var value = $(this).val();
+                    $(".department_choice").each(function(index,element){
+                        if(value == $(element).val()){
+                            check = check + 1;
+                        }
+                    })
 
+                    if(check>1){
+                        $(this).val("");
+                        notify("error","Input Error!","Redundant choice department!");
                     } else {
-                        entered_key.push(code);
-                        $(this).closest('.choose_department_cell').next('.choose_department_cell').find('.department_choice').focus();
-                        $(".department_choice").each(function(index,element){
-                            if($(element).val()>department_size){
-                                $(element).css("background-color","red")
+                        $(".department_choice").each(function(index,element) {
+                            if ($(element).val() > department_size) {
+                                $(element).css("background-color", "red")
+                            } else {
+                                $(element).css("background-color", "white")
                             }
                         })
+                        $(this).closest('.choose_department_cell').next('.choose_department_cell').find('.department_choice').focus();
                     }
+
+
                 }
 
             });

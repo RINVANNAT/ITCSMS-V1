@@ -142,7 +142,7 @@ class Candidate extends Model
 
     public function departments(){
         //return $this->belongsToMany('App\Models\Department')->withPivot('rank')->where('is_success',true);
-        return $this->belongsToMany('App\Models\Department')->withPivot('rank');
+        return $this->belongsToMany('App\Models\Department','candidate_department')->withPivot('rank');
     }
 
 

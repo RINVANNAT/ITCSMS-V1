@@ -170,56 +170,38 @@
 </h3>
 <hr style="margin-top:0px;"/>
 
-<div class="form-group col-sm-6 required">
-    {!! Form::label('promotion',trans('labels.backend.candidates.fields.promotion_id'),array('class'=>'col-sm-4 control-label required')) !!}
-    <div class="col-sm-8">
-        {!! Form::select('promotion_id',$promotions, [key($promotions)=>$promotions[key($promotions)]], array('class'=>'form-control input','id'=>'candidate_promotion_id','placeholder'=>'Promotion', 'Required'=>'required')) !!}
-    </div>
-</div>
 @if($exam->type_id == 1)
 
 @elseif($exam->type_id == 2)
     <div class="row no-margin">
         <div class="form-group col-sm-12 required" id="choose_department">
             {!! Form::hidden('degree_id',2) !!}
-            <div class="row no-margin">
-                <div class="col-sm-6">
-                    <div class="col-sm-4">
-                        {!! Form::label('GCA_rank',trans('labels.backend.candidates.fields.preferred_department'),array('class'=>'control-label required','style'=>'padding-bottom:10px;')) !!}
-                    </div>
-                    <div class="col-sm-8">
-
-                    </div>
-                </div>
-                <div class="col-sm-6">
-
-                </div>
-
-            </div>
 
             <div class="col-sm-12">
                 <table id="choose_department_table">
                     <tr>
                         @foreach($departments as $department)
-                            <td class="choose_department_cell">{!! $department->name_kh !!}</td>
+                            <td class="choose_department_cell"><center><b>{!! $department->code !!}</b></center></td>
                         @endforeach
                     </tr>
                     <tr>
-                        @foreach($departments as $department)
-                            <td class="choose_department_cell"><b>{!! $department->code !!}</b></td>
-                        @endforeach
-                    </tr>
-                    <tr>
-                        @foreach($departments as $department)
-                            <td class="choose_department_cell">
-                                <div class="col-md-7 col-sm-7" style="height: 50px;display: table;">
-                                    <span style="display: table-cell;vertical-align: middle">{{trans('labels.backend.candidates.fields.priority_number')}}</span>
-                                </div>
-                                <div class="col-md-5 col-sm-5">
-                                    {!! Form::text('choice_department['.$department->id.']', null, array('class'=>'form-control department_choice input','id'=>$department->code.'_rank','style'=>'padding:0px;border:0;border-bottom: 2px dotted;',"maxlength"=>"1",'required'=>'required')) !!}
-                                </div>
-                            </td>
-                        @endforeach
+                        @if(isset($candidate) && $candidate != null)
+                            @foreach($candidate->departments as $department)
+                                <td class="choose_department_cell">
+                                    <div class="col-md-12 col-sm-12">
+                                        {!! Form::text('choice_department['.$department->id.']', $department->pivot->rank, array('class'=>'form-control department_choice input','id'=>$department->code.'_rank','style'=>'padding:0px;border:0;border-bottom: 2px dotted;',"maxlength"=>"1",'required'=>'required')) !!}
+                                    </div>
+                                </td>
+                            @endforeach
+                        @else
+                            @foreach($departments as $department)
+                                <td class="choose_department_cell">
+                                    <div class="col-md-12 col-sm-12">
+                                        {!! Form::text('choice_department['.$department->id.']', null, array('class'=>'form-control department_choice input','id'=>$department->code.'_rank','style'=>'padding:0px;border:0;border-bottom: 2px dotted;',"maxlength"=>"1",'required'=>'required')) !!}
+                                    </div>
+                                </td>
+                            @endforeach
+                        @endif
                     </tr>
                 </table>
 
@@ -227,3 +209,10 @@
         </div>
     </div>
 @endif
+
+<div class="form-group col-sm-6 required">
+    {!! Form::label('promotion',trans('labels.backend.candidates.fields.promotion_id'),array('class'=>'col-sm-4 control-label required')) !!}
+    <div class="col-sm-8">
+        {!! Form::select('promotion_id',$promotions, [key($promotions)=>$promotions[key($promotions)]], array('class'=>'form-control input','id'=>'candidate_promotion_id','placeholder'=>'Promotion', 'Required'=>'required')) !!}
+    </div>
+</div>

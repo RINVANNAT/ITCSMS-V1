@@ -27,7 +27,8 @@ class UpdateCandidateRequest extends Request
      */
     public function rules()
     {
-        return [
+
+        $rules =  [
             'name_kh' => 'required',
             'name_latin' => 'required',
             'pob' => 'required',
@@ -41,5 +42,14 @@ class UpdateCandidateRequest extends Request
             'exam_id' => 'required',
             'register_id' => 'integer|required',
         ];
+
+        if($this->request->get('choice_department') != null){
+            foreach($this->request->get('choice_department') as $index => $val)
+            {
+                $rules['choice_department.'.$index] = 'required';
+            }
+        }
+
+        return $rules;
     }
 }
