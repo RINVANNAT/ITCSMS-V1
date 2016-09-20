@@ -35,7 +35,7 @@ class UpdateCandidateRequest extends Request
             'dob' => 'required',
             'gender_id' => 'required',
             'register_from' => 'required',
-            'bac_percentile' => 'required',
+            'bac_percentile' => 'numeric|required',
             'bac_total_grade' => 'required',
             'bac_year' => 'required',
             'promotion_id' => 'required',
@@ -46,7 +46,7 @@ class UpdateCandidateRequest extends Request
         if($this->request->get('choice_department') != null){
             foreach($this->request->get('choice_department') as $index => $val)
             {
-                $rules['choice_department.'.$index] = 'required';
+                $rules['choice_department.'.$index] = 'integer|required';
             }
         }
 

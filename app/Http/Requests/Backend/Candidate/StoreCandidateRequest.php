@@ -35,7 +35,7 @@ class StoreCandidateRequest extends Request
             'gender_id' => 'required',
             'register_from' => 'required',
             'highschool_name' => 'required',
-            'bac_percentile' => 'required',
+            'bac_percentile' => 'numeric|required',
             'bac_total_grade' => 'required',
             'bac_year' => 'required',
             'promotion_id' => 'required',
@@ -45,7 +45,7 @@ class StoreCandidateRequest extends Request
         ];
         if($this->request->get('choice_department') != null) {
             foreach ($this->request->get('choice_department') as $index => $val) {
-                $rules['choice_department.' . $index] = 'required';
+                $rules['choice_department.' . $index] = 'integer|required';
             }
         }
         return $rules;
