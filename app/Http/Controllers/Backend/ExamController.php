@@ -1274,20 +1274,18 @@ class ExamController extends Controller
 
     public function generate_room(GenerateRoomExamRequest $request, $exam_id){ // In candidate section
 
-        $exam = $this->exams->findOrThrowException($exam_id);
-        $candidates = $exam->candidates()->where('active',true)->orderBy('register_id')->get();
-
-        foreach($candidates as $candidate)
-        {
-            $studentbac2 = StudentBac2::where('id',$candidate->studentBac2_id)->first();
-            if($studentbac2!=null){
-                $candidate->highschool_id = $studentbac2->highschool_id;
-                $candidate->save();
-            }
-
-        }
-
-        dd("success");
+//        $exam = $this->exams->findOrThrowException($exam_id);
+//        $candidates = $exam->candidates()->where('active',true)->orderBy('register_id')->get();
+//
+//        foreach($candidates as $candidate)
+//        {
+//            $studentbac2 = StudentBac2::where('id',$candidate->studentBac2_id)->first();
+//            if($studentbac2!=null){
+//                $candidate->highschool_id = $studentbac2->highschool_id;
+//                $candidate->save();
+//            }
+//
+//        }
 
         $exam = $this->exams->findOrThrowException($exam_id);
         $candidates = $exam->candidates()->where('active',true)->orderBy('register_id')->get()->toArray();

@@ -18,7 +18,7 @@
         @endauth
     @endif
 
-    {{--@if($exam->type_id == 1)--}}
+    @if($exam->type_id == 1)
 
         @permission('generate-room-exam-candidate')
         <button class="btn btn-default btn-sm pull-right" id="btn-candidate-generate-room"><i class="fa fa-map-signs"></i> {!! trans('buttons.exam.candidate.generate_room') !!}</button>
@@ -28,7 +28,7 @@
         <button  class="btn btn-primary btn-sm pull-right" id="btn_input_score_course" style="margin-right: 5px"><i class="fa fa-plus-circle" ></i> {!! trans('buttons.exam.course.input_score') !!} </button>
         @endauth
 
-    {{--@endif--}}
+    @endif
 
 
 </div>

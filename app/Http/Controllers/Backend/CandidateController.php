@@ -229,11 +229,12 @@ class CandidateController extends Controller
             ->leftJoin('genders','candidates.gender_id','=','genders.id')
             ->leftJoin('examRooms','candidates.room_id','=','examRooms.id')
             ->leftJoin('buildings','examRooms.building_id','=','buildings.id')
+            ->leftJoin('highSchools','candidates.highschool_id','=','highSchools.id')
             ->where('candidates.active',true)
             ->select([
                 'candidates.id',DB::raw("CONCAT(\"examRooms\".name,buildings.code) as room"),
                 'candidates.register_id','candidates.name_kh','candidates.name_latin',
-                'candidates.highschool_id',
+                'candidates.highschool_id','highSchools.name_kh as high_school',
                 'genders.name_kh as gender_name_kh','gdeGrades.name_en as bac_total_grade',
                 'origins.name_kh as province', 'dob','result','is_paid','is_register'
             ]);

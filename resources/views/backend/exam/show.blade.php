@@ -711,7 +711,7 @@
                     { data: 'gender_name_kh', name: 'genders.name_kh'},
                     { data: 'dob', name: 'candidates.dob'},
                     { data: 'province', name: 'origins.name_kh'},
-                    { data: 'highschool_id', name: 'highschool_id'},
+                    { data: 'high_school', name: 'highSchools.name_kh'},
                     { data: 'bac_total_grade', name: 'bac_total_grade'},
                     { data: 'room', name: 'candidates.room', searchable:false},
                     { data: 'result', name: 'candidates.result'},
