@@ -1505,16 +1505,28 @@ class ExamController extends Controller
     }
 
     public function getDUTCandidateResultLists ($examId) {
+        $candidateDUTs = [];
+//        $passedCandDUTs = $this->getSucceedCandidateDUTFromDB($examId, $is_success='Pass');
+//        $reservedCandDUTs = $this->getSucceedCandidateDUTFromDB($examId, $is_success='Reserve');
+//
+//        $failedCandDUTs = $this->getSucceedCandidateDUTFromDB($examId, $is_success=null);
+//
+//        $candidateDUTs = (object) array_merge((array) $passedCandDUTs, (array) $reservedCandDUTs, (array)$failedCandDUTs);
+
+        return  view('backend.exam.includes.examination_DUT_candidate_result', compact('examId'));
+    }
+
+    public function getDUTCandidateResultListTypes ($examId, Request $request) {
+
+        dd($request->type);
 
         $passedCandDUTs = $this->getSucceedCandidateDUTFromDB($examId, $is_success='Pass');
         $reservedCandDUTs = $this->getSucceedCandidateDUTFromDB($examId, $is_success='Reserve');
 
         $failedCandDUTs = $this->getSucceedCandidateDUTFromDB($examId, $is_success=null);
 
-        $candidateDUTs = $passedCandDUTs+$reservedCandDUTs;
 
 
-        return  view('backend.exam.includes.examination_DUT_candidate_result', compact('candidateDUTs', 'examId'));
     }
 
 
@@ -1602,7 +1614,7 @@ class ExamController extends Controller
                      ['candidates.exam_id', '=', $examId],
                  ])
                  ->select('candidates.register_id','candidates.dob as birth_date', 'candidates.register_from as home_town', 'genders.name_kh as gender', 'candidates.id as candidate_id', 'candidates.name_kh', 'candidates.name_latin', 'candidate_department.is_success', 'candidate_department.rank', 'departments.code as department_name', 'departments.id as department_id', 'candidates.bac_percentile')
-                 ->orderBy('candidates.bac_percentile', 'DESC')
+                 ->orderBy('register_id', 'ASC')
                  ->get();
 
              return $dUTCandidates;
@@ -1618,7 +1630,7 @@ class ExamController extends Controller
                      ['candidates.result', '=', 'Fail']
                  ])
                  ->select('candidates.register_id','candidates.dob as birth_date', 'candidates.register_from as home_town', 'genders.name_kh as gender', 'candidates.id as candidate_id', 'candidates.name_kh', 'candidates.name_latin', 'candidate_department.is_success', 'candidate_department.rank', 'departments.code as department_name', 'departments.id as department_id', 'candidates.bac_percentile')
-                 ->orderBy('candidates.bac_percentile', 'DESC')
+                 ->orderBy('register_id', 'ASC')
                  ->get();
 
              return $dUTCandidates;

@@ -77,6 +77,8 @@ Route::group([], function() {
 
     Route::get('exams/{id}/DUT-candidate-result-lists', 'ExamController@getDUTCandidateResultLists')->name('admin.exam.dut_candidate_result_lists');
 
+    Route::get('exams/{id}/DUT-candidate-result-list-type', 'ExamController@getDUTCandidateResultListTypes')->name('admin.exam.dut_candidate_result_list_type');
+
 
 
 });

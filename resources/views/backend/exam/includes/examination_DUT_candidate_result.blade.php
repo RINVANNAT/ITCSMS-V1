@@ -29,7 +29,13 @@
         <div class="box-header with-border">
             <h3 class="box-title">Candidates Result</h3>
             <div class="pull-right">
-                <button class="btn btn-primary" id="print_candidate_result"> Print </button>
+                {{--<button class="btn btn-primary" id="print_candidate_result"> Print </button>--}}
+                <select name="result_type" id="dut_result_type" class="enlarge-number">
+                    <option value="Pass"> Successfully Passed </option>
+                    <option value="Reserve">  Reserved </option>
+                    <option value="Pass_by_dept">  Passed By Department </option>
+                    <option value="reserve_by_dept">  Reserved By Department </option>
+                </select>
             </div>
         </div>
         <!-- /.box-header -->
@@ -39,41 +45,15 @@
                 <div class="col-md-12 text-center">
                     <h3> Result of DUT Selection </h3>
                 </div>
-                <div class="col-md-12">
-                    <table class="table">
-                        <thead>
-                        <tr>
-                            <th>Order</th>
-                            <th>Register ID</th>
-                            <th>Name Khmer</th>
-                            <th>Name Latin</th>
-                            <th>Sexe</th>
-                            <th>Birth Date</th>
-                            <th>Study Ressident</th>
-                            <th>Result</th>
-                            <th>Department </th>
-                        </tr>
-                        </thead>
-                        <tbody>
-                        <?php $i =0;?>
-                        @foreach($candidateDUTs as $result)
-                            <?php $i++;?>
-                            <tr>
-                                <td><?php echo str_pad($i, 4, '0', STR_PAD_LEFT);?></td>
-                                <td>{{$result->register_id}}</td>
-                                <td>{{$result->name_kh}}</td>
-                                <td>{{$result->name_latin}}</td>
-                                <td>{{$result->gender}}</td>
-                                <td> <?php $date = explode(' ', $result->birth_date); echo $date[0];?></td>
-                                <td>{{$result->home_town}}</td>
-                                <td>{{$result->is_success}}</td>
-                                <td>{{$result->department_name}}</td>
 
-                            </tr>
-                        @endforeach
-                        </tbody>
-                    </table>
+
+
+                <div class="col-md-12 candidate_DUT_result">
+
+
                 </div>
+
+
             </div>
 
         </div>
@@ -87,11 +67,27 @@
 
 @section('after-scripts-end')
     <script>
-        window.onload = function() {
-            $('.modal').style.display = "none";
-        };
 
-        var exam_id = JSON.parse('<?php echo $examId; ?>');
+        var baseUrl = "{!! route('admin.exam.dut_candidate_result_list_type', $examId) !!}";
+
+        $('document').ready(function() {
+
+            var selected_result_type = $('#dut_result_type :selected').val();
+            var baseData = {
+                type:   selected_result_type
+            };
+            ajaxRequest('GET', baseUrl, baseData);
+        });
+
+        $('#dut_result_type').on('change', function() {
+
+            var selected_result_type = $('#dut_result_type :selected').val();
+            var baseData = {
+                type:   selected_result_type
+            };
+            ajaxRequest('GET', baseUrl, baseData);
+        });
+
 
         function ajaxRequest(method, baseUrl, baseData){
 
@@ -101,21 +97,17 @@
                 data:baseData,
                 success: function(result) {
                     console.log(result);
-                    if(result.status) {
-                        window.close();
-                        var printUrl = "{!! route('print_candidate_result_lists') !!}";
-                        window_print_candidate_result = PopupCenterDual(printUrl+'?status='+'print_page'+'?exam_id='+exam_id,'print candidates result','1000','1200');
-                    }
+
+                    $('.candidate_DUT_result').html(result);
                 }
             });
         }
 
+
+
         $('#print_candidate_result').on('click', function() {
-
             var baseUrl  = "{!! route('print_candidate_result_lists') !!}";
-
             var baseData = {status: 'request_print_page'}
-
             ajaxRequest('GET', baseUrl, baseData);
         })
     </script>
