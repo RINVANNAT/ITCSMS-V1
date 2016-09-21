@@ -604,6 +604,19 @@ class ExamController extends Controller
         return view('backend.exam.print.correction_sheet',compact('rooms','courses'));
     }
 
+    public function download_candidate_list_dut(DownloadExaminationDocumentsRequest $request,$exam_id){
+        $exam = $this->exams->findOrThrowException($exam_id);
+        $candidates = $exam->candidates()
+            ->with('gender')
+            ->with('high_school')
+            ->with('origin')
+            ->orderBy('register_id')->get()->toArray();
+        $chunk_candidates = array_chunk($candidates,30);
+
+        //dd($candidates);
+        return view('backend.exam.print.candidate_list_dut',compact('chunk_candidates'));
+    }
+
     /*public function request_add_courses($exam_id){
         $exam = $this->exams->findOrThrowException($exam_id);
         if($exam->type_id == 1){  // This ID=1 is for entrance engineer

@@ -39,7 +39,7 @@
                 {!! Form::select('register_from', ['ITC'=>'ITC','Ministry'=>'Ministry'],$candidate->register_from, array('class'=>'form-control input','id'=>'candidate_register_from','required'=>'required')) !!}
             @else
                 @if($exam->type_id == 2)
-                    {!! Form::select('register_from', ['ITC'=>'ITC'],['ITC'=>'ITC'], array('class'=>'form-control input','id'=>'candidate_register_from','required'=>'required')) !!}
+                    {!! Form::select('register_from', ['ITC'=>'ITC'],['ITC'=>'ITC'], array('class'=>'form-control input','id'=>'candidate_register_from','disabled','required'=>'required')) !!}
                 @else
                     {!! Form::select('register_from', [""=>"",'ITC'=>'ITC','Ministry'=>'Ministry'],null, array('class'=>'form-control input','id'=>'candidate_register_from','required'=>'required')) !!}
                 @endif
