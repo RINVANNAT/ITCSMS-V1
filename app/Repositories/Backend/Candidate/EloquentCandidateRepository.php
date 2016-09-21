@@ -156,7 +156,7 @@ class EloquentCandidateRepository implements CandidateRepositoryContract
                 //$candidate->departments()->sync($departmentIds);
                 foreach($input['choice_department'] as $department_id => $choice_department){
                     DB::table('candidate_department')->insert([
-                        ['candidate_id' => $candidate->id, 'department_id' => $department_id, 'rank' => $choice_department, 'is_success' =>false]
+                        ['candidate_id' => $candidate->id, 'department_id' => $department_id, 'rank' => $choice_department]
                     ]);
                 }
 

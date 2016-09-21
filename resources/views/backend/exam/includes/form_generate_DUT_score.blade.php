@@ -23,77 +23,20 @@
         </div>
         <!-- /.box-header -->
         <div class="box-body">
-            {{--here what i need to write --}}
 
-            <table class="table text-center">
-                <thead>
-                <tr>
-                    <th>Name Department</th>
-                    <th> </th>
-                </tr>
-                </thead>
-                <tbody>
-
-                <form action="{{route('admin.exam.candidate_dut_generate_result',$examId)}}" class="table_number_candidate_pass">
-
-                <?php
-                //the php code is to display room data in two lines
-                if(fmod(count($departments), 2) != 0) {
-                for($i = 0; $i <=  (int)(count($departments)/2) ; $i++) {
-
-                ?>
-                <tr>
-                    <?php if($i < (int)(count($departments)/2) ) {
-                    ?>
-
-                    <td><?php echo $departments[2*$i]->name_abr;?></td>
-                    <td><input type="text" id="{{$departments[2*$i]->name_abr}}" class="form-group number_only number_candidate[{{$departments[2*$i]->name_abr}}]"></td>
-
-                    <td><?php echo $departments[2*$i+1]->name_abr;?></td>
-                    <td><input type="text" id="{{$departments[2*$i+1]->name_abr}}" class="form-group number_only number_candidate[{{$departments[2*$i+1]->name_abr}}]"></td>
-
-                    <?php
-
-                    } else if($i == (int)(count($departments)/2)  ) {?>
-
-                    <td><?php echo $departments[2*$i]->name_abr;?></td>
-                    <td><input type="text" id="{{$departments[2*$i]->name_abr}}" class="form-group number_only number_candidate[{{$departments[2*$i]->name_abr}}]"></td>
-
-                    <?php
-                    }
-                    ?>
-
-                </tr>
-
-                <?php
-
-                }
-                } else {
-                for($i = 0; $i < (int)(count($departments)/2) ; $i++) {
-                ?>
-                <tr>
-
-                    <td><?php echo $departments[2*$i]->name_abr;?></td>
-
-
-                    <td>{!! Form::text('number_candidate['.$departments[2*$i]->department_id.']', null, ['class' => 'form-control number_only']) !!}</td>
-
-                    <td><?php echo $departments[2*$i+1]->name_abr;?></td>
-
-
-                    <td>{!! Form::text('number_candidate['.$departments[2*$i+1]->department_id.']', null, ['class' => 'form-control number_only']) !!}</td>
-                </tr>
-
-                <?php
-                }
-                }
-                ?>
-
-                </form>
-                </tbody>
-            </table>
-
-
+            <form action="{{route('admin.exam.candidate_dut_generate_result',$examId)}}" class="table_number_candidate_pass">
+                @foreach($departments as $department)
+                    <div class="col-md-6 col-sm-6 form-group">
+                        {!! Form::label("department[".$department->department_id."][success]", $department->name_abr, ['class' => 'col-md-4 col-sm-4 control-label required']) !!}
+                        <div class="col-md-4 col-sm-4">
+                            {{ Form::number("department[".$department->department_id."][success]", 0, ['class' => 'form-control number_only']) }}
+                        </div>
+                        <div class="col-md-4 col-sm-4">
+                            {{ Form::number("department[".$department->department_id."][reserve]", 0, ['class' => 'form-control number_only']) }}
+                        </div>
+                    </div>
+                @endforeach
+            </form>
 
         </div>
     </div>
