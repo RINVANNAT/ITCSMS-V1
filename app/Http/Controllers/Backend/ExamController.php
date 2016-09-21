@@ -10,10 +10,12 @@ use App\Http\Requests\Backend\Exam\UpdateExamRequest;
 use App\Models\AcademicYear;
 use App\Models\Building;
 use App\Models\Candidate;
+use App\Models\Department;
 use App\Models\EntranceExamCourse;
 use App\Models\ExamRoom;
 use App\Models\ExamType;
 use App\Models\Room;
+use App\Models\StudentBac2;
 use App\Repositories\Backend\Exam\ExamRepositoryContract;
 use App\Repositories\Backend\TempEmployeeExam\TempEmployeeExamRepositoryContract;
 use Carbon\Carbon;
@@ -610,11 +612,19 @@ class ExamController extends Controller
             ->with('gender')
             ->with('high_school')
             ->with('origin')
-            ->orderBy('register_id')->get()->toArray();
+            ->with('departments')
+            ->with('bacTotal')
+            ->with('bacMath')
+            ->with('bacPhys')
+            ->with('bacChem')
+            ->orderBy('register_id')
+            ->get()->toArray();
         $chunk_candidates = array_chunk($candidates,30);
 
-        //dd($candidates);
-        return view('backend.exam.print.candidate_list_dut',compact('chunk_candidates'));
+        $departments = Department::where('is_specialist',true)->where('parent_id',11)->orderBy('code')->get();
+
+        //dd($chunk_candidates);
+        return view('backend.exam.print.candidate_list_dut',compact('chunk_candidates','departments'));
     }
 
     /*public function request_add_courses($exam_id){
@@ -1263,6 +1273,22 @@ class ExamController extends Controller
 
 
     public function generate_room(GenerateRoomExamRequest $request, $exam_id){ // In candidate section
+
+        $exam = $this->exams->findOrThrowException($exam_id);
+        $candidates = $exam->candidates()->where('active',true)->orderBy('register_id')->get();
+
+        foreach($candidates as $candidate)
+        {
+            $studentbac2 = StudentBac2::where('id',$candidate->studentBac2_id)->first();
+            if($studentbac2!=null){
+                $candidate->highschool_id = $studentbac2->highschool_id;
+                $candidate->save();
+            }
+
+        }
+
+        dd("success");
+
         $exam = $this->exams->findOrThrowException($exam_id);
         $candidates = $exam->candidates()->where('active',true)->orderBy('register_id')->get()->toArray();
         $rooms = $exam->rooms()->get()->toArray();

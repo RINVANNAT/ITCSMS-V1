@@ -15,6 +15,10 @@
             padding-bottom: 3px !important;
 
         }
+
+        table th {
+            background-color: grey;
+        }
     </style>
 @stop
 @section('content')
@@ -23,12 +27,16 @@
     $page_number = 1;
     $total_page = count($chunk_candidates);
     $index = 1;
+    function cmp($a, $b)
+    {
+        return strcmp($a["code"], $b["code"]);
+    }
     ?>
     @foreach($chunk_candidates as $chunk)
 
         <div class="page">
 
-            <table class="table" width="100%">
+            <table class="table table-striped table-bordered" width="100%">
                 <tr>
                     <th width="15px;">ល.រ</th>
                     <th>លេខបង្កាន់ដៃ</th>
@@ -44,13 +52,9 @@
                     <th>Math</th>
                     <th>Physic</th>
                     <th>Chimie</th>
-                    <th></th>
-                    <th></th>
-                    <th></th>
-                    <th></th>
-                    <th></th>
-                    <th></th>
-                    <th></th>
+                    @foreach($departments as $department)
+                        <th>{{$department->code}}</th>
+                    @endforeach
                 </tr>
                 @foreach($chunk as $candidate)
                     <tr>
@@ -60,19 +64,20 @@
                         <td class="left">{{$candidate['name_latin']}}</td>
                         <td>{{$candidate['gender']['code']}}</td>
                         <td class="left">{{\Carbon\Carbon::createFromFormat("Y-m-d h:i:s",$candidate['dob'])->formatLocalized("%d/%b/%Y")}}</td>
+                        <td class="left">{{$candidate['high_school']['name_kh']}}</td>
                         <td class="left">{{$candidate['origin']['name_kh']}}</td>
                         <td class="left">{{$candidate['bac_year']}}</td>
                         <td>{{$candidate['bac_percentile']}}</td>
-                        <td>{{$candidate['bac_math_grade']}}</td>
-                        <td>{{$candidate['bac_phys_grade']}}</td>
-                        <td>{{$candidate['bac_chem_grade']}}</td>
-                        <td></td>
-                        <td></td>
-                        <td></td>
-                        <td></td>
-                        <td></td>
-                        <td></td>
-                        <td></td>
+                        <td>{{$candidate['bac_total']['name_en']}}</td>
+                        <td>{{isset($candidate['bac_math'])?$candidate['bac_math']['name_en']:''}}</td>
+                        <td>{{isset($candidate['bac_phys'])?$candidate['bac_phys']['name_en']:''}}</td>
+                        <td>{{isset($candidate['bac_chem'])?$candidate['bac_chem']['name_en']:''}}</td>
+                        <?php
+                        usort($candidate['departments'], "cmp");
+                        ?>
+                        @foreach($candidate['departments'] as $department)
+                            <td>{{$department['pivot']['rank']}}</td>
+                        @endforeach
                         <?php $index++; ?>
                     </tr>
                 @endforeach

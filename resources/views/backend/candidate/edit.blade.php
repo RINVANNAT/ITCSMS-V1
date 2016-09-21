@@ -119,9 +119,8 @@
         }
 
         function formatRepoSelection (repo) {
-            console.log(repo);
             $('#candidate_highschool_name').val(repo.name);
-            $('#highschool_id').val(repo.id);
+            $('#highschool_id').val(repo.id+"");
 
             return repo.text || repo.name;
         }

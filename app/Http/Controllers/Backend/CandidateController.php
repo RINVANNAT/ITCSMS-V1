@@ -168,8 +168,13 @@ class CandidateController extends Controller
         $gdeGrades = GdeGrade::lists('name_en','id');
         $departments = Department::where('is_specialist',true)->where('parent_id',11)->get();
         $academicYears = AcademicYear::orderBy('name_latin','desc')->lists('name_latin','id');
-        //$selected_high_school = HighSchool::where('id',$candidate->highschool_id)->select(['id', 'name_kh as name'])->first();
-        $highschool = HighSchool::where('id',$studentBac2->highschool_id)->lists('id', 'name_kh as name')->toArray();
+
+        if($studentBac2!=null){
+            $highschool = HighSchool::where('id',$studentBac2->highschool_id)->lists('id', 'name_kh as name')->toArray();
+        } else {
+            $highschool = HighSchool::where('id',$candidate->highschool_id)->lists('id', 'name_kh as name')->toArray();
+        }
+
 
         return view('backend.candidate.edit',compact('highschool','departments','exam','degrees','genders','promotions','provinces','gdeGrades','academicYears','candidate','studentBac2'));
     }
@@ -227,7 +232,9 @@ class CandidateController extends Controller
             ->where('candidates.active',true)
             ->select([
                 'candidates.id',DB::raw("CONCAT(\"examRooms\".name,buildings.code) as room"),
-                'candidates.register_id','candidates.name_kh','candidates.name_latin','genders.name_kh as gender_name_kh','gdeGrades.name_en as bac_total_grade',
+                'candidates.register_id','candidates.name_kh','candidates.name_latin',
+                'candidates.highschool_id',
+                'genders.name_kh as gender_name_kh','gdeGrades.name_en as bac_total_grade',
                 'origins.name_kh as province', 'dob','result','is_paid','is_register'
             ]);
 

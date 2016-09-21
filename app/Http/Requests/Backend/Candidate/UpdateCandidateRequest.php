@@ -35,6 +35,7 @@ class UpdateCandidateRequest extends Request
             'dob' => 'required',
             'gender_id' => 'required',
             'register_from' => 'required',
+            'highschool_id' => 'required',
             'bac_percentile' => 'numeric|required',
             'bac_total_grade' => 'required',
             'bac_year' => 'required',

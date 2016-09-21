@@ -3,9 +3,9 @@
 {!! Form::hidden('studentBac2_id',$studentBac2==null?null:$studentBac2->id)!!}
 {!! Form::hidden('degree_id',1) !!}
 @if(isset($candidate) && $candidate != null)
-    <input type="text" name="highschool_id" style="visibility: hidden;position: absolute;" value="{{$candidate->highschool_id}}" id="highschdool_id" />
+    {!! Form::hidden('highschool_id',$candidate->highschool_id, array('id'=>'highschool_id'))!!}
 @else
-    <input type="text" name="highschool_id" style="visibility: hidden;position: absolute;" value="{!!isset($studentBac2) ?$studentBac2->highschool_id:null !!}" id="highschdool_id" />
+    {!! Form::hidden('highschool_id',isset($studentBac2) ?$studentBac2->highschool_id:null,array('id'=>'highschool_id'))!!}
 @endif
 <h3 style="font-size: 20px;"><i class="fa fa-user"></i> {{trans('labels.backend.candidates.header.personal_information')}}
 </h3>
