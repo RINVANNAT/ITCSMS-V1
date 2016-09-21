@@ -607,24 +607,90 @@ class ExamController extends Controller
     }
 
     public function download_candidate_list_dut(DownloadExaminationDocumentsRequest $request,$exam_id){
-        $exam = $this->exams->findOrThrowException($exam_id);
-        $candidates = $exam->candidates()
-            ->with('gender')
-            ->with('high_school')
-            ->with('origin')
-            ->with('departments')
-            ->with('bacTotal')
-            ->with('bacMath')
-            ->with('bacPhys')
-            ->with('bacChem')
+        $candidates = Candidate::where('exam_id',$exam_id)
+            ->leftJoin('genders','candidates.gender_id','=','genders.id')
+            ->leftJoin('origins','candidates.province_id','=','origins.id')
+            //->leftJoin('candidate_department','candidates.id','=','candidate_department.candidate_id')
+            ->leftJoin('highSchools','candidates.highschool_id','=','highSchools.id')
+            ->leftJoin('gdeGrades as bacTotal','candidates.bac_total_grade','=','bacTotal.id')
+            ->leftJoin('gdeGrades as mathGrade','candidates.bac_math_grade','=','mathGrade.id')
+            ->leftJoin('gdeGrades as physGrade','candidates.bac_phys_grade','=','candidates.id')
+            ->leftJoin('gdeGrades as chemGrade','candidates.bac_chem_grade','=','chemGrade.id')
             ->orderBy('register_id')
+            ->select([
+                'candidates.id',
+                'register_id',
+                'candidates.name_kh',
+                'candidates.name_latin',
+                'genders.name_kh as gender',
+                'candidates.dob',
+                'highSchools.name_kh as highschool',
+                'origins.name_kh as origin',
+                'candidates.bac_year',
+                'bacTotal.name_en as bac_total_grade',
+                'mathGrade.name_en as bac_math_grade',
+                'physGrade.name_en as bac_phys_grade',
+                'chemGrade.name_en as bac_chem_grade',
+                'candidates.bac_percentile',
+                //'candidate_department.department_id',
+                //'candidate_department.rank',
+            ])
             ->get()->toArray();
+        foreach($candidates as &$candidate){
+            $department_choices = DB::table('candidate_department')
+                ->join('departments','candidate_department.department_id','=','departments.id')
+                ->where('candidate_id',$candidate['id'])
+                ->select([
+                    'candidate_department.rank',
+                    'departments.code'
+                ])
+                ->orderBy('departments.code')
+                ->get();
+            $candidate["departments"] = $department_choices;
+        }
+
+        //dd($candidates);
         $chunk_candidates = array_chunk($candidates,30);
 
         $departments = Department::where('is_specialist',true)->where('parent_id',11)->orderBy('code')->get();
 
         //dd($chunk_candidates);
         return view('backend.exam.print.candidate_list_dut',compact('chunk_candidates','departments'));
+    }
+
+    public function download_candidate_list_ing(DownloadExaminationDocumentsRequest $request,$exam_id){
+//        $exam = $this->exams->findOrThrowException($exam_id);
+//        $candidates = $exam->candidates()
+//            ->with('gender')
+//            ->with('origin')
+//            ->with('bacTotal')
+//            ->orderBy('register_id')
+//            ->get()->toArray();
+
+        $candidates = Candidate::where('exam_id',$exam_id)
+                        ->leftJoin('genders','candidates.gender_id','=','genders.id')
+                        ->leftJoin('origins','candidates.province_id','=','origins.id')
+                        ->leftJoin('highSchools','candidates.highschool_id','=','highSchools.id')
+                        ->leftJoin('gdeGrades as bacTotal','candidates.bac_total_grade','=','bacTotal.id')
+                        ->orderBy('register_id')
+                        ->select([
+                            'register_id',
+                            'candidates.name_kh',
+                            'candidates.name_latin',
+                            'genders.name_kh as gender',
+                            'candidates.dob',
+                            'highSchools.name_kh as highschool',
+                            'origins.name_kh as origin',
+                            'candidates.bac_year',
+                            'bacTotal.name_en as bac_total_grade',
+                            'candidates.bac_percentile'
+                        ])
+                        ->get()->toArray();
+
+        $chunk_candidates = array_chunk($candidates,40);
+
+        //dd($chunk_candidates);
+        return view('backend.exam.print.candidate_list_ing',compact('chunk_candidates'));
     }
 
     /*public function request_add_courses($exam_id){
@@ -1274,18 +1340,23 @@ class ExamController extends Controller
 
     public function generate_room(GenerateRoomExamRequest $request, $exam_id){ // In candidate section
 
-//        $exam = $this->exams->findOrThrowException($exam_id);
-//        $candidates = $exam->candidates()->where('active',true)->orderBy('register_id')->get();
-//
-//        foreach($candidates as $candidate)
-//        {
-//            $studentbac2 = StudentBac2::where('id',$candidate->studentBac2_id)->first();
-//            if($studentbac2!=null){
-//                $candidate->highschool_id = $studentbac2->highschool_id;
-//                $candidate->save();
-//            }
-//
-//        }
+        $candidates = Candidate::orderBy('register_id')->get();
+
+        $yes = 0;
+        $no = 0;
+        foreach($candidates as $candidate)
+        {
+            $studentbac2 = StudentBac2::where('id',$candidate->studentBac2_id)->first();
+            if($studentbac2!=null){
+                Candidate::where('id', $candidate->id)
+                    ->update(['highschool_id' => $studentbac2->highschool_id.""]);
+                $yes++;
+            } else {
+                $no++;
+            }
+        }
+
+        dd("success:".$yes." yes -".$no." no");
 
         $exam = $this->exams->findOrThrowException($exam_id);
         $candidates = $exam->candidates()->where('active',true)->orderBy('register_id')->get()->toArray();

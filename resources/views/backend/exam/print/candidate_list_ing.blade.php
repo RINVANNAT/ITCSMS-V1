@@ -1,4 +1,4 @@
-@extends('backend.layouts.printing_landscape_a3')
+@extends('backend.layouts.printing_portrait_a3')
 @section('title')
     ITC-SMS | បញ្ជីបេក្ខជននិស្សិតវិស្វកម្ម
 @stop
@@ -27,7 +27,10 @@
     $page_number = 1;
     $total_page = count($chunk_candidates);
     $index = 1;
-
+    function cmp($a, $b)
+    {
+        return strcmp($a["code"], $b["code"]);
+    }
     ?>
     @foreach($chunk_candidates as $chunk)
 
@@ -46,12 +49,6 @@
                     <th>Bac Year</th>
                     <th>BacII Score</th>
                     <th>Grade BacII</th>
-                    <th>Math</th>
-                    <th>Physic</th>
-                    <th>Chimie</th>
-                    @foreach($departments as $department)
-                        <th>{{$department->code}}</th>
-                    @endforeach
                 </tr>
                 @foreach($chunk as $candidate)
                     <tr>
@@ -66,13 +63,6 @@
                         <td class="left">{{$candidate['bac_year']}}</td>
                         <td>{{$candidate['bac_percentile']}}</td>
                         <td>{{$candidate['bac_total_grade']}}</td>
-                        <td>{{isset($candidate['bac_math_grade'])?$candidate['bac_math_grade']:''}}</td>
-                        <td>{{isset($candidate['bac_phys_grade'])?$candidate['bac_phys_grade']:''}}</td>
-                        <td>{{isset($candidate['bac_chem_grade'])?$candidate['bac_chem_grade']:''}}</td>
-
-                        @foreach($candidate['departments'] as $department)
-                            <td>{{$department->rank}}</td>
-                        @endforeach
                         <?php $index++; ?>
                     </tr>
                 @endforeach

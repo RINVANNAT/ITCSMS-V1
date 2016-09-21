@@ -15,6 +15,12 @@
                             <div class="desc">Candidate DUT List</div>
                         </a>
                     </div>
+
+                    <div class="img">
+                        <a target="_blank" href="{{route('admin.exam.download_candidate_list_ing',$exam->id)}}">
+                            <div class="desc">Candidate Engineer List</div>
+                        </a>
+                    </div>
                 </div>
                 <div class="row">
                     <div class="img">
