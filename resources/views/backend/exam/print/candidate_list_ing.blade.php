@@ -46,8 +46,8 @@
                     <th>វិទ្យាល័យ</th>
                     <th>ប្រភព</th>
                     <th>Bac Year</th>
-                    <th>BacII Score</th>
-                    <th>Grade BacII</th>
+                    {{--<th>BacII Score</th>--}}
+                    <th>Bac</th>
                 </tr>
                 @foreach($chunk as $candidate)
                     <tr>
@@ -60,7 +60,7 @@
                         <td class="left">{{$candidate['highschool']}}</td>
                         <td class="left">{{$candidate['origin']}}</td>
                         <td class="left">{{$candidate['bac_year']}}</td>
-                        <td>{{$candidate['bac_percentile']}}</td>
+                        {{--<td>{{$candidate['bac_percentile']}}</td>--}}
                         <td>{{$candidate['bac_total_grade']}}</td>
                         <?php $index++; ?>
                     </tr>
