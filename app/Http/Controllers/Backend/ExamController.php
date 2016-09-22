@@ -687,7 +687,7 @@ class ExamController extends Controller
                         ])
                         ->get()->toArray();
 
-        $chunk_candidates = array_chunk($candidates,55);
+        $chunk_candidates = array_chunk($candidates,63);
 
         //dd($chunk_candidates);
         return view('backend.exam.print.candidate_list_ing',compact('chunk_candidates'));

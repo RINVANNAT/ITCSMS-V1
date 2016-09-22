@@ -67,8 +67,8 @@
             .page {
                 width: 297mm;
                 min-height: 420mm;
-                padding: 20mm;
-                margin: 10mm auto;
+                padding: 15mm;
+                margin: 5mm auto;
                 border: 1px #D3D3D3 solid;
                 border-radius: 5px;
                 background: white;
@@ -100,8 +100,8 @@
                     font: 12pt "Tahoma";
                 }
                 .page {
-                    padding: 10mm;
-                    margin: 10mm auto;
+                    padding: 5mm;
+                    margin: 5mm auto;
                     border: initial;
                     border-radius: initial;
                     width: 297mm;
