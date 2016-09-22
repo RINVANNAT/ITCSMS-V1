@@ -108,12 +108,12 @@
                     min-height: 297mm;
                     box-shadow: initial;
                     background: initial;
-                    page-break-after: always;
                     position: relative;
                 }
+
                 .footer{
                     position: absolute;
-                    bottom: 30px;
+                    bottom: 15px;
                     width: 100%;
                     padding-right:20mm;
                 }
