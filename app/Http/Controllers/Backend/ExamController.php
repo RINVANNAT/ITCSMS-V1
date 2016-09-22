@@ -318,9 +318,16 @@ class ExamController extends Controller
         $exam = $this->exams->findOrThrowException($id);
         $rooms = $_POST['rooms'];
 
-        $room_0 = ExamRoom::find($rooms[0]);
+        if(is_numeric($rooms[0])){
+            $room_0 = ExamRoom::find($rooms[0]);
+        } else {
+            $room_0 = ExamRoom::find($rooms[1]); // prevent get header too
+        }
+
         foreach($rooms as $room){
-            ExamRoom::destroy($room);
+            if(is_numeric($rooms)) {
+                ExamRoom::destroy($room);
+            }
         }
 
         $exam_room = new ExamRoom();
@@ -425,7 +432,12 @@ class ExamController extends Controller
         $exam = $this->exams->findOrThrowException($id);
 
         $room_ids = $_POST['exam_room'];
-        ExamRoom::destroy($room_ids);
+
+        foreach($room_ids as $room_id){
+            if(is_numeric($room_id)){
+                ExamRoom::destroy($room_id);
+            }
+        }
 
         $exam_rooms = $exam->rooms()->with(['building'])->get();
         return view('backend.exam.includes.exam_room_list',compact('exam_rooms'));
@@ -437,8 +449,11 @@ class ExamController extends Controller
 
         $room_ids = $_POST['rooms'];
 
+        //dd($_POST['rooms']);
         foreach($room_ids as $room_id){
-            DB::table("examRooms")->where('id',$room_id)->update(['nb_chair_exam'=>$_POST['nb_chair_exam']]);
+            if(is_numeric($room_id)){
+                DB::table("examRooms")->where('id',$room_id)->update(['nb_chair_exam'=>$_POST['nb_chair_exam']]);
+            }
         }
 
         $exam_rooms = $exam->rooms()->with(['building'])->get();

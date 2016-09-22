@@ -710,6 +710,7 @@
                     return $(this).val();
                 }).get();
 
+                console.log(selected_rooms);
                 $.each(selected_rooms, function (index, value){
                     data.push({name: 'rooms[]', value: value});
                 });
