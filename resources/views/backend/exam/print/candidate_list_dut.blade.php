@@ -27,6 +27,21 @@
     $total_page = count($chunk_candidates);
     $index = 1;
 
+    function truncate_number( $number, $precision = 2) {
+        // Zero causes issues, and no need to truncate
+        if ( 0 == (int)$number ) {
+            return $number;
+        }
+        // Are we negative?
+        $negative = $number / abs($number);
+        // Cast the number to a positive to solve rounding
+        $number = abs($number);
+        // Calculate precision number for dividing / multiplying
+        $precision = pow(10, $precision);
+        // Run the math, re-applying the negative value to ensure returns correctly negative / positive
+        return floor( $number * $precision ) / $precision * $negative;
+    }
+
     ?>
     @foreach($chunk_candidates as $chunk)
 
@@ -63,7 +78,7 @@
                         <td class="left">{{$candidate['highschool']}}</td>
                         <td class="left">{{$candidate['origin']}}</td>
                         <td class="left">{{$candidate['bac_year']}}</td>
-                        <td>{{bcdiv($candidate['bac_percentile'], 1, 3)}}</td>
+                        <td>{{truncate_number($candidate['bac_percentile'], 3)}}</td>
 {{--                        <td>{{$candidate['bac_percentile']}}</td>--}}
                         <td>{{$candidate['bac_total_grade']}}</td>
                         <td>{{isset($candidate['bac_math_grade'])?$candidate['bac_math_grade']:''}}</td>
