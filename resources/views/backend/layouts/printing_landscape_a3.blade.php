@@ -113,7 +113,7 @@
                 }
                 .footer{
                     position: absolute;
-                    bottom: 15px;
+                    bottom: 30px;
                     width: 100%;
                     padding-right:20mm;
                 }
