@@ -36,6 +36,7 @@ Route::group([], function() {
     Route::get('exams/{id}/download_candidate_list_by_register_id', 'ExamController@download_candidate_list_by_register_id')->name('admin.exam.download_candidate_list_by_register_id');
     Route::get('exams/{id}/download_candidate_list_dut', 'ExamController@download_candidate_list_dut')->name('admin.exam.download_candidate_list_dut');
     Route::get('exams/{id}/download_candidate_list_ing', 'ExamController@download_candidate_list_ing')->name('admin.exam.download_candidate_list_ing');
+    Route::get('exams/{id}/download_registration_statistic', 'ExamController@download_registration_statistic')->name('admin.exam.download_registration_statistic');
 
     Route::get('exams/{id}/check_missing_candidates', 'ExamController@check_missing_candidates')->name('admin.exam.check_missing_candidates');
     Route::get('exams/{id}/find_missing_candidates', 'ExamController@find_missing_candidates')->name('admin.exam.find_missing_candidates');

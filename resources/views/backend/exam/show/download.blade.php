@@ -24,6 +24,11 @@
                         </a>
                     </div>
                     @endif
+                    <div class="img">
+                        <a target="_blank" href="{{route('admin.exam.download_registration_statistic',$exam->id)}}">
+                            <div class="desc">Registration Statistic</div>
+                        </a>
+                    </div>
                 </div>
                 <div class="row">
                     @if($exam->type_id == 1)

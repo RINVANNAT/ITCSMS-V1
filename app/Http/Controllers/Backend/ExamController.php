@@ -693,6 +693,34 @@ class ExamController extends Controller
         return view('backend.exam.print.candidate_list_ing',compact('chunk_candidates'));
     }
 
+    public function download_registration_statistic(DownloadExaminationDocumentsRequest $request,$exam_id){
+
+        $dates = Candidate::where('exam_id',$exam_id)
+            ->get()
+            ->groupBy(function($date) {
+                $group = [
+                    Carbon::parse($date->created_at)->format('d-m-Y')
+                ];
+                return $group;
+            })
+            ->toArray();
+
+        $candidates = array();
+        foreach($dates as $key=>$date){
+            $candidates[$key][34] = array();
+            $candidates[$key][35] = array();
+            $candidates[$key][36] = array();
+            $candidates[$key][37] = array();
+            $candidates[$key][38] = array();
+            foreach($date as $candidate){
+                array_push($candidates[$key][$candidate['bac_total_grade']],$candidate);
+            }
+        }
+
+        //dd($candidates);
+        return view('backend.exam.print.registration_statistic',compact('candidates'));
+    }
+
     /*public function request_add_courses($exam_id){
         $exam = $this->exams->findOrThrowException($exam_id);
         if($exam->type_id == 1){  // This ID=1 is for entrance engineer
