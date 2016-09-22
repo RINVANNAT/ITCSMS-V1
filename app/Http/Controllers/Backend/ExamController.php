@@ -650,7 +650,7 @@ class ExamController extends Controller
         }
 
         //dd($candidates);
-        $chunk_candidates = array_chunk($candidates,21);
+        $chunk_candidates = array_chunk($candidates,25);
 
         $departments = Department::where('is_specialist',true)->where('parent_id',11)->orderBy('code')->get();
 
