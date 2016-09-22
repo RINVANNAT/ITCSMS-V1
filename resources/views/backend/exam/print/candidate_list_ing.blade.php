@@ -13,7 +13,6 @@
             text-align: center;
             padding-top: 3px !important;
             padding-bottom: 3px !important;
-            font-size: 11px;
         }
 
         table th {
