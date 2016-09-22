@@ -614,7 +614,7 @@ class ExamController extends Controller
             ->leftJoin('highSchools','candidates.highschool_id','=','highSchools.id')
             ->leftJoin('gdeGrades as bacTotal','candidates.bac_total_grade','=','bacTotal.id')
             ->leftJoin('gdeGrades as mathGrade','candidates.bac_math_grade','=','mathGrade.id')
-            ->leftJoin('gdeGrades as physGrade','candidates.bac_phys_grade','=','candidates.id')
+            ->leftJoin('gdeGrades as physGrade','candidates.bac_phys_grade','=','physGrade.id')
             ->leftJoin('gdeGrades as chemGrade','candidates.bac_chem_grade','=','chemGrade.id')
             ->orderBy('register_id')
             ->select([

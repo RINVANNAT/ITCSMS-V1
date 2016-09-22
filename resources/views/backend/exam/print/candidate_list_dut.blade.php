@@ -43,11 +43,11 @@
                     <th>វិទ្យាល័យ</th>
                     <th>ប្រភព</th>
                     <th>Bac Year</th>
-                    <th>BacII Score</th>
-                    <th>Grade BacII</th>
+                    <th>Score</th>
+                    <th>Bac</th>
                     <th>Math</th>
-                    <th>Physic</th>
-                    <th>Chimie</th>
+                    <th>Phys</th>
+                    <th>Chim</th>
                     @foreach($departments as $department)
                         <th>{{$department->code}}</th>
                     @endforeach
@@ -63,7 +63,8 @@
                         <td class="left">{{$candidate['highschool']}}</td>
                         <td class="left">{{$candidate['origin']}}</td>
                         <td class="left">{{$candidate['bac_year']}}</td>
-                        <td>{{$candidate['bac_percentile']}}</td>
+                        <td>{{bcdiv($candidate['bac_percentile'], 1, 3)}}</td>
+{{--                        <td>{{$candidate['bac_percentile']}}</td>--}}
                         <td>{{$candidate['bac_total_grade']}}</td>
                         <td>{{isset($candidate['bac_math_grade'])?$candidate['bac_math_grade']:''}}</td>
                         <td>{{isset($candidate['bac_phys_grade'])?$candidate['bac_phys_grade']:''}}</td>
