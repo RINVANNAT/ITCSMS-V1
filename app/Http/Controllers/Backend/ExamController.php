@@ -1641,15 +1641,70 @@ class ExamController extends Controller
 
     public function getDUTCandidateResultListTypes ($examId, Request $request) {
 
-        dd($request->type);
+//        dd($request->type);
+        $resultType = $request->type;
 
-        $passedCandDUTs = $this->getSucceedCandidateDUTFromDB($examId, $is_success='Pass');
-        $reservedCandDUTs = $this->getSucceedCandidateDUTFromDB($examId, $is_success='Reserve');
+        if($resultType == 'Pass') {
+            $title = 'Successfully Passed';
+            $allStudentByDept=[];
+            $candidateDUTs = $this->getSucceedCandidateDUTFromDB($examId, $is_success='Pass');
 
-        $failedCandDUTs = $this->getSucceedCandidateDUTFromDB($examId, $is_success=null);
+            return  view('backend.exam.includes.patial_result_candidate_dut', compact('allStudentByDept','candidateDUTs', 'examId', 'title'));
+
+        } else if($resultType == 'Reserve') {
+            $title = 'Reserve';
+            $allStudentByDept=[];
+            $candidateDUTs = $this->getSucceedCandidateDUTFromDB($examId, $is_success='Reserve');
+            return  view('backend.exam.includes.patial_result_candidate_dut', compact('allStudentByDept','candidateDUTs', 'examId', 'title'));
 
 
+        } else if($resultType == 'pass_by_dept') {
+            $candidateDUTs=[];
+            $allStudentByDept = $this->arrayStudentPassOrReserveByDept($examId, $is_success='Pass');
+                    return  view('backend.exam.includes.patial_result_candidate_dut', compact('allStudentByDept','candidateDUTs', 'examId'));
 
+        } else {
+            $candidateDUTs=[];
+            $allStudentByDept = $this->arrayStudentPassOrReserveByDept($examId, $is_success='Reserve');
+            return  view('backend.exam.includes.patial_result_candidate_dut', compact('allStudentByDept','candidateDUTs', 'examId'));
+
+        }
+//        $failedCandDUTs = $this->getSucceedCandidateDUTFromDB($examId, $is_success=null);
+    }
+
+    public function printCandidateDUTResult($examId, Request $request) {
+
+
+        $resultType = $request->status;
+
+        if($resultType == 'Pass') {
+            $title = 'បញ្ជីបេក្ខជនជាប់ស្ថាពរ';
+            $allStudentByDept=[];
+            $candidateDUTs = $this->getSucceedCandidateDUTFromDB($examId, $is_success='Pass');
+            $candidateDUTs = array_chunk($candidateDUTs, 30);
+            return  view('backend.exam.print.print_examination_DUT_candidate_result', compact('allStudentByDept', 'candidateDUTs', 'title'));
+
+        } else if($resultType == 'Reserve') {
+            $title = 'បញ្ជីបេក្ខជនជាប់បំរុង';
+            $allStudentByDept=[];
+            $candidateDUTs = $this->getSucceedCandidateDUTFromDB($examId, $is_success='Reserve');
+            $candidateDUTs = array_chunk($candidateDUTs, 30);
+            return  view('backend.exam.print.print_examination_DUT_candidate_result', compact('allStudentByDept', 'candidateDUTs', 'title'));
+
+
+        } else if($resultType == 'pass_by_dept') {
+            $title = 'បញ្ជីបេក្ខជនជាប់ស្ថាពរ';
+            $candidateDUTs=[];
+            $allStudentByDept = $this->arrayStudentPassOrReserveByDept($examId, $is_success='Pass');
+            return  view('backend.exam.print.print_examination_DUT_candidate_result', compact('allStudentByDept', 'candidateDUTs', 'title'));
+
+        } else {
+            $title = 'បញ្ជីបេក្ខជនជាប់បំរុង';
+            $candidateDUTs=[];
+            $allStudentByDept = $this->arrayStudentPassOrReserveByDept($examId, $is_success='Reserve');
+            return  view('backend.exam.print.print_examination_DUT_candidate_result', compact('allStudentByDept', 'candidateDUTs', 'title'));
+
+        }
     }
 
 
@@ -1761,22 +1816,40 @@ class ExamController extends Controller
 
     }
 
-    private function getReservedCandidateDUTFromDB($examId, $arrayPassedCands, $deptId) {
+    private function getPassOrReserveByDept($examId, $deptId, $is_success) {
 
 
         $dUTCandidates = DB::table('candidates')
             ->join('candidate_department', 'candidates.id', '=', 'candidate_department.candidate_id')
             ->join('departments', 'departments.id', '=', 'candidate_department.department_id')
+            ->join('genders', 'genders.id', '=', 'candidates.gender_id')
             ->where([
                 ['candidates.exam_id', '=', $examId],
+                ['candidate_department.is_success', '=', $is_success],
                 ['departments.id', '=', $deptId]
             ])
-            ->whereNotIn('candidates.id', $arrayPassedCands)
-            ->select('candidates.register_id', 'candidates.id as candidate_id', 'candidates.name_kh', 'candidates.name_latin', 'candidates.result', 'candidate_department.rank', 'departments.code as department_name', 'departments.id as department_id', 'candidates.bac_percentile')
-            ->orderBy('candidates.bac_percentile', 'DESC')
+            ->select('candidates.register_id','candidates.dob as birth_date', 'candidates.register_from as home_town', 'genders.name_kh as gender', 'candidates.id as candidate_id', 'candidates.name_kh', 'candidates.name_latin', 'candidate_department.is_success', 'candidate_department.rank', 'departments.code as department_name', 'departments.id as department_id', 'candidates.bac_percentile')
+            ->orderBy('register_id', 'ASC')
             ->get();
 
         return $dUTCandidates;
+    }
+
+    private function arrayStudentPassOrReserveByDept($examId, $is_success) {
+        $allStudentByDept = [];
+        $allDepts = $this->getAllDepartments();
+        if($allDepts) {
+            foreach($allDepts as $allDept) {
+
+                $studentPassedByDept = $this->getPassOrReserveByDept($examId, $allDept->department_id, $is_success);
+
+                if($studentPassedByDept) {
+                    $allStudentByDept[$allDept->name_abr] = $studentPassedByDept;
+                }
+            }
+
+            return $allStudentByDept;
+        }
     }
 
 
