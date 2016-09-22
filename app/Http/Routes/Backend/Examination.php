@@ -80,6 +80,8 @@ Route::group([], function() {
 
     Route::get('exams/{id}/DUT-candidate-result-list-type', 'ExamController@getDUTCandidateResultListTypes')->name('admin.exam.dut_candidate_result_list_type');
 
+    Route::get('exams/{id}/print-candidate-dut-result', 'ExamController@printCandidateDUTResult')->name('admin.exam.print_candidate_dut_result');
+
 
 
 });

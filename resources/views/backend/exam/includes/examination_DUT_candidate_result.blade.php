@@ -29,13 +29,14 @@
         <div class="box-header with-border">
             <h3 class="box-title">Candidates Result</h3>
             <div class="pull-right">
-                {{--<button class="btn btn-primary" id="print_candidate_result"> Print </button>--}}
+
                 <select name="result_type" id="dut_result_type" class="enlarge-number">
-                    <option value="Pass"> Successfully Passed </option>
+                    <option value="Pass"> Passed </option>
                     <option value="Reserve">  Reserved </option>
-                    <option value="Pass_by_dept">  Passed By Department </option>
+                    <option value="pass_by_dept">  Passed By Department </option>
                     <option value="reserve_by_dept">  Reserved By Department </option>
                 </select>
+                <button class="btn btn-primary btn-xs" id="print_candidate_dut_result"> Print </button>
             </div>
         </div>
         <!-- /.box-header -->
@@ -43,7 +44,21 @@
 
             <div class="container">
                 <div class="col-md-12 text-center">
-                    <h3> Result of DUT Selection </h3>
+                    <div class="col-md-2">
+
+                    </div>
+                    <div class="col-md-4">
+                        <h3> Lists Of Candidates: </h3>
+                    </div>
+                    <div class="col-md-4" >
+                        <h3> <div class="title text-info" style="margin-left: -100px"> </div></h3>
+                    </div>
+                    <div class="col-md-2">
+
+
+                    </div>
+
+
                 </div>
 
 
@@ -73,6 +88,8 @@
         $('document').ready(function() {
 
             var selected_result_type = $('#dut_result_type :selected').val();
+
+            $('.title').html($('#dut_result_type :selected').text());
             var baseData = {
                 type:   selected_result_type
             };
@@ -82,6 +99,7 @@
         $('#dut_result_type').on('change', function() {
 
             var selected_result_type = $('#dut_result_type :selected').val();
+            $('.title').html($('#dut_result_type :selected').text());
             var baseData = {
                 type:   selected_result_type
             };
@@ -103,12 +121,11 @@
             });
         }
 
+        $('#print_candidate_dut_result').on('click', function(){
+            var selected_result_type = $('#dut_result_type :selected').val();
+            var printUrl = "{!! route('admin.exam.print_candidate_dut_result', $examId) !!}";
+            window_print_candidate_result = PopupCenterDual(printUrl+'?status='+selected_result_type,'print candidates result','1000','1200');
+        });
 
-
-        $('#print_candidate_result').on('click', function() {
-            var baseUrl  = "{!! route('print_candidate_result_lists') !!}";
-            var baseData = {status: 'request_print_page'}
-            ajaxRequest('GET', baseUrl, baseData);
-        })
     </script>
 @stop
