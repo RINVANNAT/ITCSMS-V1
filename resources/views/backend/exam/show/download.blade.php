@@ -10,19 +10,23 @@
             <!-- /.box-header -->
             <div class="box-body">
                 <div class="row">
+                    @if($exam->type_id == 2)
                     <div class="img">
                         <a target="_blank" href="{{route('admin.exam.download_candidate_list_dut',$exam->id)}}">
                             <div class="desc">Candidate DUT List</div>
                         </a>
                     </div>
-
+                    @endif
+                    @if($exam->type_id == 1)
                     <div class="img">
                         <a target="_blank" href="{{route('admin.exam.download_candidate_list_ing',$exam->id)}}">
                             <div class="desc">Candidate Engineer List</div>
                         </a>
                     </div>
+                    @endif
                 </div>
                 <div class="row">
+                    @if($exam->type_id == 1)
                     <div class="img">
                         @permission('download-examination-document')
                         <a id="download_attendance_list" target="_blank" href="{{route('admin.exam.download_attendance_list',$exam->id)}}">
@@ -90,6 +94,7 @@
                         @endauth
                         <div class="desc">Candidate Result Sheet</div>
                     </div>
+                    @endif
                 </div>
 
 
