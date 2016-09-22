@@ -696,6 +696,7 @@ class ExamController extends Controller
     public function download_registration_statistic(DownloadExaminationDocumentsRequest $request,$exam_id){
 
         $dates = Candidate::where('exam_id',$exam_id)
+            ->orderBy('created_at')
             ->get()
             ->groupBy(function($date) {
                 $group = [
