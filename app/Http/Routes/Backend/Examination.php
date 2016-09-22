@@ -23,6 +23,7 @@ Route::group([], function() {
     Route::post('exams/{id}/split_room','ExamController@split_room')->name('admin.exam.split_room');
     Route::post('exams/{id}/add_room','ExamController@add_room')->name('admin.exam.add_room');
     Route::post('exams/{id}/delete_rooms','ExamController@delete_rooms')->name('admin.exam.delete_rooms');
+    Route::post('exams/{id}/edit_seats','ExamController@edit_seats')->name('admin.exam.edit_seats');
     Route::get('exams/{id}/view_room_secret_code', 'ExamController@view_room_secret_code')->name('admin.exam.view_room_secret_code');
     Route::post('exams/{id}/save_room_secret_code', 'ExamController@save_room_secret_code')->name('admin.exam.save_room_secret_code');
     Route::get('exams/{id}/export_room_secret_code', 'ExamController@export_room_secret_code')->name('admin.exam.export_room_secret_code');

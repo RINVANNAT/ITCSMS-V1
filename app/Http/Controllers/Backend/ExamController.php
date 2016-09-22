@@ -432,6 +432,20 @@ class ExamController extends Controller
 
     }
 
+    public function edit_seats(ModifyExamRoomRequest $request, $id){
+        $exam = $this->exams->findOrThrowException($id);
+
+        $room_ids = $_POST['rooms'];
+
+        foreach($room_ids as $room_id){
+            DB::table("examRooms")->where('id',$room_id)->update(['nb_chair_exam'=>$_POST['nb_chair_exam']]);
+        }
+
+        $exam_rooms = $exam->rooms()->with(['building'])->get();
+        return view('backend.exam.includes.exam_room_list',compact('exam_rooms'));
+
+    }
+
     public function count_seat_exam($id){
         $exam = $this->exams->findOrThrowException($id);
         $rooms = $exam->rooms()->get();
@@ -447,6 +461,7 @@ class ExamController extends Controller
 
     public function count_assigned_seat($id){
         $rooms = DB::table('candidates')
+            ->where('exam_id',$id)
             ->select(DB::raw('count(*) as room_count, room_id'))
             ->groupBy('room_id')
             ->get();

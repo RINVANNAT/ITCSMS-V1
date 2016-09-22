@@ -1,3 +1,4 @@
+@include('backend.exam.includes.exam_room_seat')
 @include('backend.exam.includes.exam_room_merge')
 @include('backend.exam.includes.exam_room_split')
 @include('backend.exam.includes.exam_room_modify')
@@ -21,6 +22,7 @@
                 <div class="btn-group pull-right room_editing" style="display: none;">
                     <button type="button" id="btn_room_add" class="btn btn-sm btn-warning" style="color: #fff; border-color: #3c8dbc;"><i class="fa fa-plus-square-o"></i> Add</button>
                     <button type="button" id="btn_room_merge" class="btn btn-sm btn-warning" style="color: #fff; border-color: #3c8dbc;" disabled><i class="fa fa-long-arrow-right"></i><i class="fa fa-long-arrow-left"></i> Merge</button>
+                    <button type="button" id="btn_seat_edit" class="btn btn-sm btn-warning" style="color: #fff; border-color: #3c8dbc;" disabled><i class="glyphicon glyphicon-pencil"></i> Edit</button>
                     <button type="button" id="btn_room_delete" class="btn btn-sm btn-warning" style="color: #fff; border-color: #3c8dbc;" disabled><i class="glyphicon glyphicon-trash"></i> Delete</button>
                 </div>
                 @endauth

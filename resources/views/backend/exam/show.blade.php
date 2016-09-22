@@ -220,6 +220,7 @@
         var add_room_url = '{{route('admin.exam.add_room',$exam->id)}}';
         var split_room_url = '{{route('admin.exam.split_room',$exam->id)}}';
         var delete_room_url = '{{route('admin.exam.delete_rooms',$exam->id)}}';
+        var edit_seat_url = '{{route('admin.exam.edit_seats',$exam->id)}}';
         var check_missing_candidates_url = '{{route('admin.exam.check_missing_candidates',$exam->id)}}';
         var find_missing_candidates_url = '{{route('admin.exam.find_missing_candidates',$exam->id)}}';
         var exam_id = {{$exam->id}};
@@ -309,9 +310,11 @@
             if(($('[name="exam_room[]"]:checked').length > 0)){
                 $('#btn_room_merge').prop('disabled',false);
                 $('#btn_room_delete').prop('disabled',false);
+                $('#btn_seat_edit').prop('disabled',false);
             }else{
                 $('#btn_room_merge').prop('disabled',true);
                 $('#btn_room_delete').prop('disabled',true);
+                $('#btn_seat_edit').prop('disabled',true);
             }
 
             $('#exam_room_list_table tbody').addClass('editing');
@@ -519,7 +522,7 @@
                     success: function(resultData) {
                         //$('#form_generate_room_wrapper').hide();
                         $('#selected_rooms').html(resultData);
-                        $('#modal_exam_room_add').modal('toggle');
+                        $('#modal_exam_room_modify').modal('toggle');
                         get_total_seat(); // Added new roo, so update total seat
                         enable_room_editing();
                     }
@@ -665,9 +668,11 @@
                 if(($('[name="exam_room[]"]:checked').length > 0)){
                     $('#btn_room_merge').prop('disabled',false);
                     $('#btn_room_delete').prop('disabled',false);
+                    $('#btn_seat_edit').prop('disabled',false);
                 }else{
                     $('#btn_room_merge').prop('disabled',true);
                     $('#btn_room_delete').prop('disabled',true);
+                    $('#btn_seat_edit').prop('disabled',true);
                 }
             });
 
@@ -689,6 +694,36 @@
                         //update_ui_room(); // Data changed, so we need to refresh UI
                         $('#selected_rooms').html(resultData);
                         get_total_seat(); // Delete ready, so update seat
+                        enable_room_editing();
+                    }
+                });
+            });
+
+            $("#btn_seat_edit").click(function(){
+
+                $('#modal_exam_room_seat').modal('toggle');
+            });
+
+            $("#btn_seat_edit_save").click(function () {
+                var data = $("#form_exam_room_seat").serializeArray();
+                var selected_rooms = $('#exam_room_list_table input:checkbox:checked').map(function () {
+                    return $(this).val();
+                }).get();
+
+                $.each(selected_rooms, function (index, value){
+                    data.push({name: 'rooms[]', value: value});
+                });
+
+                $.ajax({
+                    type: 'POST',
+                    url: edit_seat_url,
+                    data: data,
+                    dataType: "html",
+                    success: function(resultData) {
+                        //$('#form_generate_room_wrapper').hide();
+                        $('#selected_rooms').html(resultData);
+                        $('#modal_exam_room_seat').modal('toggle');
+                        get_total_seat(); // Merge ready, so update seat
                         enable_room_editing();
                     }
                 });
