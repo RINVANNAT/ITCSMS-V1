@@ -23,12 +23,12 @@
             <?php $i++;?>
             <tr>
                 <td><?php echo str_pad($i, 4, '0', STR_PAD_LEFT);?></td>
-                <td>{{$result->register_id}}</td>
+                <td><?php echo str_pad($result->register_id, 4, '0', STR_PAD_LEFT);?></td>
                 <td>{{$result->name_kh}}</td>
                 <td>{{$result->name_latin}}</td>
                 <td>{{$result->gender}}</td>
                 <td> <?php $date = explode(' ', $result->birth_date); echo $date[0];?></td>
-                <td>{{$result->home_town}}</td>
+                <td>{{$result->province_name}}</td>
                 <td>{{$result->is_success}}</td>
                 <td>{{$result->department_name}}</td>
 
@@ -79,8 +79,8 @@
                         <td>{{$result->name_latin}}</td>
                         <td>{{$result->gender}}</td>
                         <td> <?php $date = explode(' ', $result->birth_date); echo $date[0];?></td>
-                        <td>{{$result->home_town}}</td>
-                        <td>{{$result->is_success}}</td>
+                        <td>{{$result->province_name}}</td>
+                        <td >{{$result->is_success}}</td>
                         <td>{{$result->department_name}}</td>
 
                     </tr>

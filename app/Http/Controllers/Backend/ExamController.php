@@ -1706,7 +1706,7 @@ class ExamController extends Controller
         } else if($resultType == 'pass_by_dept') {
             $candidateDUTs=[];
             $allStudentByDept = $this->arrayStudentPassOrReserveByDept($examId, $is_success='Pass');
-                    return  view('backend.exam.includes.patial_result_candidate_dut', compact('allStudentByDept','candidateDUTs', 'examId'));
+            return  view('backend.exam.includes.patial_result_candidate_dut', compact('allStudentByDept','candidateDUTs', 'examId'));
 
         } else {
             $candidateDUTs=[];
@@ -1739,16 +1739,17 @@ class ExamController extends Controller
 
         } else if($resultType == 'pass_by_dept') {
             $title = 'បញ្ជីបេក្ខជនជាប់ស្ថាពរ';
+            $allDepts = $this->getAllDepartments();
             $candidateDUTs=[];
             $allStudentByDept = $this->arrayStudentPassOrReserveByDept($examId, $is_success='Pass');
-            return  view('backend.exam.print.print_examination_DUT_candidate_result', compact('allStudentByDept', 'candidateDUTs', 'title'));
+            return  view('backend.exam.print.print_examination_DUT_candidate_result', compact('allStudentByDept', 'candidateDUTs', 'title', 'allDepts'));
 
         } else {
             $title = 'បញ្ជីបេក្ខជនជាប់បំរុង';
             $candidateDUTs=[];
+            $allDepts = $this->getAllDepartments();
             $allStudentByDept = $this->arrayStudentPassOrReserveByDept($examId, $is_success='Reserve');
-            return  view('backend.exam.print.print_examination_DUT_candidate_result', compact('allStudentByDept', 'candidateDUTs', 'title'));
-
+            return  view('backend.exam.print.print_examination_DUT_candidate_result', compact('allStudentByDept', 'candidateDUTs', 'title','allDepts'));
         }
     }
 
@@ -1832,11 +1833,13 @@ class ExamController extends Controller
                  ->join('candidate_department', 'candidates.id', '=', 'candidate_department.candidate_id')
                  ->join('departments', 'departments.id', '=', 'candidate_department.department_id')
                  ->join('genders', 'genders.id', '=', 'candidates.gender_id')
+                 ->join('academicYears', 'academicYears.id', '=', 'candidates.academic_year_id')
+                 ->join('origins', 'origins.id', '=', 'candidates.province_id')
                  ->where([
                      ['candidate_department.is_success', '=', $is_success],
                      ['candidates.exam_id', '=', $examId],
                  ])
-                 ->select('candidates.register_id','candidates.dob as birth_date', 'candidates.register_from as home_town', 'genders.name_kh as gender', 'candidates.id as candidate_id', 'candidates.name_kh', 'candidates.name_latin', 'candidate_department.is_success', 'candidate_department.rank', 'departments.code as department_name', 'departments.id as department_id', 'candidates.bac_percentile')
+                 ->select('origins.name_kh as province_name', 'academicYears.name_kh as academic_year', 'candidates.register_id','candidates.dob as birth_date', 'candidates.register_from as home_town', 'genders.name_kh as gender', 'candidates.id as candidate_id', 'candidates.name_kh', 'candidates.name_latin', 'candidate_department.is_success', 'candidate_department.rank', 'departments.code as department_name', 'departments.id as department_id', 'candidates.bac_percentile')
                  ->orderBy('register_id', 'ASC')
                  ->get();
 
@@ -1848,11 +1851,15 @@ class ExamController extends Controller
                  ->join('candidate_department', 'candidates.id', '=', 'candidate_department.candidate_id')
                  ->join('departments', 'departments.id', '=', 'candidate_department.department_id')
                  ->join('genders', 'genders.id', '=', 'candidates.gender_id')
+                 ->join('academicYears', 'academicYears.id', '=', 'candidates.academic_year_id')
+                 ->join('origins', 'origins.id', '=', 'candidates.province_id')
                  ->where([
                      ['candidates.exam_id', '=', $examId],
-                     ['candidates.result', '=', 'Fail']
+                     ['candidates.result', '=', 'Fail'],
+                     ['origins.is_province', '=', true],
+                     ['origins.active', '=', true]
                  ])
-                 ->select('candidates.register_id','candidates.dob as birth_date', 'candidates.register_from as home_town', 'genders.name_kh as gender', 'candidates.id as candidate_id', 'candidates.name_kh', 'candidates.name_latin', 'candidate_department.is_success', 'candidate_department.rank', 'departments.code as department_name', 'departments.id as department_id', 'candidates.bac_percentile')
+                 ->select('origins.name_kh as province_name', 'academicYears.name_kh as academic_year', 'candidates.register_id','candidates.dob as birth_date', 'candidates.register_from as home_town', 'genders.name_kh as gender', 'candidates.id as candidate_id', 'candidates.name_kh', 'candidates.name_latin', 'candidate_department.is_success', 'candidate_department.rank', 'departments.code as department_name', 'departments.id as department_id', 'candidates.bac_percentile')
                  ->orderBy('register_id', 'ASC')
                  ->get();
 
@@ -1868,12 +1875,17 @@ class ExamController extends Controller
             ->join('candidate_department', 'candidates.id', '=', 'candidate_department.candidate_id')
             ->join('departments', 'departments.id', '=', 'candidate_department.department_id')
             ->join('genders', 'genders.id', '=', 'candidates.gender_id')
+            ->join('academicYears', 'academicYears.id', '=', 'candidates.academic_year_id')
+            ->join('origins', 'origins.id', '=', 'candidates.province_id')
             ->where([
                 ['candidates.exam_id', '=', $examId],
                 ['candidate_department.is_success', '=', $is_success],
-                ['departments.id', '=', $deptId]
+                ['departments.id', '=', $deptId],
+                ['origins.is_province', '=', true],
+                ['origins.active', '=', true]
+
             ])
-            ->select('candidates.register_id','candidates.dob as birth_date', 'candidates.register_from as home_town', 'genders.name_kh as gender', 'candidates.id as candidate_id', 'candidates.name_kh', 'candidates.name_latin', 'candidate_department.is_success', 'candidate_department.rank', 'departments.code as department_name', 'departments.id as department_id', 'candidates.bac_percentile')
+            ->select('origins.name_kh as province_name', 'academicYears.name_kh as academic_year', 'candidates.register_id','candidates.dob as birth_date', 'candidates.register_from as home_town', 'genders.name_kh as gender', 'candidates.id as candidate_id', 'candidates.name_kh', 'candidates.name_latin', 'candidate_department.is_success', 'candidate_department.rank', 'departments.code as department_name', 'departments.id as department_id', 'candidates.bac_percentile')
             ->orderBy('register_id', 'ASC')
             ->get();
 
