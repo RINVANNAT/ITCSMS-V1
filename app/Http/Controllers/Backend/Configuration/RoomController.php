@@ -145,16 +145,12 @@ class RoomController extends Controller
             ]);
 
         $datatables =  app('datatables')->of($rooms);
-
+        $index = 0;
 
         return $datatables
             ->editColumn('rooms.name', function($room){
                 return $room->room_name." ".$room->building_code;
             })
-            ->editColumn('nb_desk', '{!! $nb_desk !!}')
-            ->editColumn('nb_chair', '{!! $nb_chair !!}')
-            ->editColumn('nb_chair_exam', '{!! $nb_chair_exam !!}')
-            ->editColumn('size', '{!! $size !!}')
             ->editColumn('roomTypes.id', '{!! $room_type_name !!}')
             ->editColumn('buildings.id', '{!! $building_name !!}')
             ->editColumn('is_exam_room', function($room){
@@ -193,7 +189,7 @@ class RoomController extends Controller
             DB::beginTransaction();
 
             try{
-                Excel::filter('chunk')->load($storage_path)->chunk(100, function($results){
+                Excel::filter('chunk')->load($storage_path)->chunk(1000, function($results){
 
                     $results->each(function($row) {
                         $room = $this->rooms->create($row->toArray());

@@ -27,7 +27,8 @@ return [
         'show' => 'Show',
         'toggle_navigation' => 'Toggle Navigation',
         'id' => 'ID',
-        'last_updated' => 'Last Updated'
+        'last_updated' => 'Last Updated',
+        'number' => 'No.'
     ],
 
     'backend' => [
