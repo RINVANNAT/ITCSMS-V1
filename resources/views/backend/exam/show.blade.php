@@ -221,6 +221,9 @@
         var split_room_url = '{{route('admin.exam.split_room',$exam->id)}}';
         var delete_room_url = '{{route('admin.exam.delete_rooms',$exam->id)}}';
         var edit_seat_url = '{{route('admin.exam.edit_seats',$exam->id)}}';
+        var refresh_room_url = '{{route('admin.exam.refresh_room',$exam->id)}}';
+        var sort_room_capacity_url = '{{route('admin.exam.sort_room_capacity',$exam->id)}}';
+
         var check_missing_candidates_url = '{{route('admin.exam.check_missing_candidates',$exam->id)}}';
         var find_missing_candidates_url = '{{route('admin.exam.find_missing_candidates',$exam->id)}}';
         var exam_id = {{$exam->id}};
@@ -487,6 +490,30 @@
             // Close editing mode
             $("#btn_room_cancel").click(function () {
                 disable_room_editing();
+            });
+
+            $(document).on('click',"#refresh_room_list", function (e) {
+                e.preventDefault();
+                $.ajax({
+                    type: 'GET',
+                    url: refresh_room_url,
+                    dataType: "html",
+                    success: function(resultData) {
+                        $('#selected_rooms').html(resultData);
+                    }
+                });
+            });
+
+            $(document).on('click',"#sort_room_capacity", function (e) {
+                e.preventDefault();
+                $.ajax({
+                    type: 'GET',
+                    url: sort_room_capacity_url,
+                    dataType: "html",
+                    success: function(resultData) {
+                        $('#selected_rooms').html(resultData);
+                    }
+                });
             });
 
             /* ---------------- Add Section ---------------- */

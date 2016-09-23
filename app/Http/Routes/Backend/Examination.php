@@ -27,6 +27,8 @@ Route::group([], function() {
     Route::get('exams/{id}/view_room_secret_code', 'ExamController@view_room_secret_code')->name('admin.exam.view_room_secret_code');
     Route::post('exams/{id}/save_room_secret_code', 'ExamController@save_room_secret_code')->name('admin.exam.save_room_secret_code');
     Route::get('exams/{id}/export_room_secret_code', 'ExamController@export_room_secret_code')->name('admin.exam.export_room_secret_code');
+    Route::get('exams/{id}/refresh_room', 'ExamController@refresh_room')->name('admin.exam.refresh_room');
+    Route::get('exams/{id}/sort_room_capacity', 'ExamController@sort_room_capacity')->name('admin.exam.sort_room_capacity');
 
     Route::post('exams/{id}/get_courses', 'ExamController@get_courses')->name('admin.exam.get_courses');
 

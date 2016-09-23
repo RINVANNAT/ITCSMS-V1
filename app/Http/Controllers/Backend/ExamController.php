@@ -428,6 +428,20 @@ class ExamController extends Controller
 //
 //    }
 
+    public function refresh_room($id){
+        $exam = $this->exams->findOrThrowException($id);
+
+        $exam_rooms = $exam->rooms()->with(['building'])->get();
+        return view('backend.exam.includes.exam_room_list',compact('exam_rooms'));
+    }
+
+    public function sort_room_capacity($id){
+        $exam = $this->exams->findOrThrowException($id);
+
+        $exam_rooms = $exam->rooms()->with(['building'])->orderBy('nb_chair_exam')->get();
+        return view('backend.exam.includes.exam_room_list',compact('exam_rooms'));
+    }
+
     public function delete_rooms(ModifyExamRoomRequest $request, $id){
         $exam = $this->exams->findOrThrowException($id);
 

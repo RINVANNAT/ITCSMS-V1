@@ -4,8 +4,8 @@
         <tr>
             <th width="20px;" class="room_editing" style="display: none"><input type="checkbox" id="exam_room_header" disabled/></th>
             <th width="20px;">No.</th>
-            <th>Room Name</th>
-            <th>Capacity</th>
+            <th><a href="#" id="refresh_room_list">Room Name</a></th>
+            <th><a href="#" id="sort_room_capacity">Capacity</a></th>
             <th>Building</th>
             <th>Description</th>
             <th class="room_editing" style="display: none">Action</th>
