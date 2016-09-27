@@ -951,8 +951,12 @@
                     type: 'GET',
                     url: baseUrl,
                     success: function(result) {
+                        console.log(result.status);
                         if(result.status == false) {
+
                             $('#btn_result_score_candidate').show();
+                        } else {
+                            $('#btn_result_score_candidate').hide();
                         }
                     }
                 });

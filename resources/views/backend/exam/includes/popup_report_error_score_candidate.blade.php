@@ -209,6 +209,7 @@
             </div>
 
             <div class="pull-right">
+                <input type="button" id="submit_candidate_error_socre" class="btn btn-primary btn-xs" value="Submit" />
                 <input type="button" id="btn_candidate_error_socre" class="btn btn-danger btn-xs" value="Print Error" />
             </div>
             <div class="clearfix"></div>
@@ -220,6 +221,14 @@
    {{--here my script --}}
 
    <script>
+
+       @if(count($errorCandidateScores)==0)
+               window.close();
+       @endif
+
+       var store_array_correction = [];
+       var serializeData = [];
+       var tmp = null;
        $(document).ready(function () {
            $('.myloading').hide();
 
@@ -256,7 +265,35 @@
 
                if(corrector_name != '') {
                    if(status == 0) {
-                       ajaxRequest('POST', baseUrl+'?corrector_name='+corrector_name,baseData );
+//                       ajaxRequest('POST', baseUrl+'?corrector_name='+corrector_name,baseData );
+                       // check to store the inputted value without redandanc data
+                       if(store_array_correction.length > 0) {
+                           var check=0;
+                           $.each(store_array_correction, function(key, value) {
+
+                               for( var term=0; term<value.length; term++) {
+                                   if(value[term].name == 'candidate_id[]') {
+                                       if(value[term].value == data[term].value) {
+                                           check++;
+                                           serializeData[key] = baseData;
+                                       }
+                                   }
+                               }
+                           });
+
+                           if(check == 0) {
+                               store_array_correction.push(data);
+                               serializeData.push(baseData);
+                           }
+                       } else {
+                           store_array_correction.push(data);
+                           serializeData.push(baseData);
+                       }
+
+                       console.log(serializeData);
+                       notify("success","info", "done!");
+                       $('.new_correction').delay(1000).hide(0);
+
                    } else {
                        notify("error","info", "Required Score Value!!");
                    }
@@ -310,6 +347,24 @@
 
        $('#cancel_error_score_form').on('click', function() {
            window.close();
+       });
+
+       $('#submit_candidate_error_socre').on('click', function() {
+
+           var baseUrl = "{{route('admin.exam.add_new_correction_score',$exam_id)}}";
+           var corrector_name = $('#corrector_error_score').val();
+
+           if(store_array_correction.length > 0) {
+
+               var baseData = {
+                   data: store_array_correction,
+                   serializ_data: serializeData
+               }
+
+               console.log(store_array_correction.length);
+               ajaxRequest('POST', baseUrl+'?corrector_name='+corrector_name,baseData );
+           }
+
        });
 
        function calculateSum(obj) {

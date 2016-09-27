@@ -27,6 +27,8 @@
         $total_page = count($candidateDUTs);
         ?>
 
+        <?php $i =0; $female=0;?>
+
         @foreach($candidateDUTs as $candidatesResult)
             <?php $check =0;?>
             <div class="page">
@@ -51,7 +53,7 @@
                         <th>ដេប៉ាតឺម៉ង់</th>
 
                     </tr>
-                    <?php $i =0; $female=0;?>
+
                     @foreach($candidatesResult as $result)
                         <?php $i++;
                             if($result->gender == 'ស្រី') {
@@ -119,7 +121,7 @@
         @foreach($allDepts as $dept)
 
             <?php
-                $arrayCands = array_chunk($allStudentByDept[$dept->name_abr], 30);
+                $arrayCands = array_chunk($allStudentByDept[$dept->name_abr], 27);
             ?>
             @foreach($arrayCands as $candidatesResult)
                 <?php $check=0;?>

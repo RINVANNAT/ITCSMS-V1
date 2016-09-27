@@ -9,6 +9,7 @@ use App\Models\Exam;
 use App\Models\UserLog;
 use Carbon\Carbon;
 use DB;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Crypt;
 use Object;
 use phpDocumentor\Reflection\Types\Object_;
@@ -421,32 +422,43 @@ class EloquentExamRepository implements ExamRepositoryContract
         return $updateRecord;
     }
 
-    public function addNewCorrectionCandidateScore($examId, StoreEntranceExamScoreRequest $request, $correctorName) {
+    public function addNewCorrectionCandidateScore($examId,  $request, $correctorName) {
+        //StoreEntranceExamScoreRequest
 
-//        dd($request->score_c.'--'.$request->score_w.'--'.$request->score_na.'--'.$request->sequence.'--'.$request->course_id.'--'.$request->order.'--'.$request->candidate_id );
 
-        $checkSequenCandidateId = DB::table('candidateEntranceExamScores')
-                                    ->where([
-                                        ['candidate_id', '=', $request->candidate_id[0]],
-                                        ['sequence', '=', $request->sequence[0] ],
-                                        ['entrance_exam_course_id', '=', $request->course_id[0]]
+        $requestScore = $request->serializ_data;
+        $check =0;
 
-                                    ])->select('id')->get();
-        if($checkSequenCandidateId) {
-            return (['status' => false]);
-        } else {
+        for($index=0; $index < count($requestScore); $index++) {
+            parse_str($requestScore[$index], $outPut);// convertion of the serialized data to array json
 
-            if($request->score_c + $request->score_w + $request->score_na == 0 ) {
 
+            $checkSequenCandidateId = DB::table('candidateEntranceExamScores')
+                ->where([
+                    ['candidate_id', '=', $outPut['candidate_id'][0]],
+                    ['sequence', '=', $outPut['sequence'][0] ],
+                    ['entrance_exam_course_id', '=', $outPut['course_id'][0]]
+
+                ])->select('id')->get();
+            if($checkSequenCandidateId) {
                 return (['status' => false]);
             } else {
 
-                $res = $this->storeCandidateScore($request->course_id[0], $request->candidate_id[0], $request->score_c[0], $request->score_w[0], $request->score_na[0], $request->sequence[0], $request->order[0], $correctorName);
-                return $res;
+                $res = $this->storeCandidateScore($outPut['course_id'][0], $outPut['candidate_id'][0], $outPut['score_c'][0], $outPut['score_w'][0], $outPut['score_na'][0], $outPut['sequence'][0], $outPut['order'][0], $correctorName);
+                if($res) {
+                    $check++;
+                }
 
             }
-
         }
+
+        if($check == count($requestScore)) {
+            return (['status' => true]);
+        }
+
+
+//        dd($request->score_c.'--'.$request->score_w.'--'.$request->score_na.'--'.$request->sequence.'--'.$request->course_id.'--'.$request->order.'--'.$request->candidate_id );
+
     }
 
     public function reportErrorCandidateExamScores($examId, $courseId) {
@@ -545,6 +557,7 @@ class EloquentExamRepository implements ExamRepositoryContract
 
                 }
             }
+
 
             if($errorCandidateScores) {
 

@@ -32,6 +32,8 @@ use App\Http\Requests\Backend\Candidate\GenerateRoomExamRequest;
 use App\Http\Requests\Backend\Exam\DownloadExaminationDocumentsRequest;
 use Maatwebsite\Excel\Facades\Excel;
 
+//use App\Http\Requests\Backend\Exam\StoreEntranceExamScoreRequest;
+
 
 class ExamController extends Controller
 {
@@ -48,6 +50,7 @@ class ExamController extends Controller
     public function __construct(
         TempEmployeeExamRepositoryContract $empolyeeExams,
         ExamRepositoryContract $examRepo
+
     )
     {
         $this->employeeExams = $empolyeeExams;
@@ -987,7 +990,8 @@ class ExamController extends Controller
 
     }
 
-    public function addNewCorrectionScore($exam_id, Requests\Backend\Exam\StoreEntranceExamScoreRequest $request) {
+    public function addNewCorrectionScore($exam_id, Request $request) {
+        //Requests\Backend\Exam\StoreEntranceExamScoreRequest
 
         $correctorName  = $request->corrector_name;
 
@@ -1068,11 +1072,10 @@ class ExamController extends Controller
 
         $courseIds = $this->getAllExamCourses($examId);
         $checkScore = $this->checkEntranceExamScores($examId, $courseIds);
-
         if($checkScore[0]== count($courseIds)) {
-             return Response::json(['status'=> false]);
+             return Response::json(['status'=> false]);//there are no error of candidate score
         } else{
-            return Response::json(['status'=> true]);
+            return Response::json(['status'=> true]);// there are existing socre error of candidates
         }
 
     }
@@ -1368,7 +1371,6 @@ class ExamController extends Controller
                 if($room_Code[$j] == $roomCodes[$key]) {
                     $status_object1++;
                     $object1[$roomCodes[$key]][] = $orderInRoom[$j];
-
                 }
             }
 
@@ -1450,9 +1452,6 @@ class ExamController extends Controller
             $this->update_room_candidate($rooms,$current_room,$candidate);
         }
 
-        //dd($candidates);
-        // Update candidate
-
         foreach($candidates as $can){
             DB::table('candidates')
                 ->where('id', $can['id'])
@@ -1489,7 +1488,6 @@ class ExamController extends Controller
         } else {
             return Response::json(array('status'=>false)); // Nothing is missing
         }
-
     }
 
     public function find_missing_candidates($exam_id){
@@ -1512,31 +1510,12 @@ class ExamController extends Controller
     private function isAvalaibleDept($arrayNumberOfCandInEachDept, $deptId, $studentRate, $findsum) {
 
         $totalSelectionCands =0;
-        $numberStudent =0;
-        $selectedDepartment=[];
-        $check =0;
-
-
-
           if($findsum != null) { // calculation of the total selection of number of student
               foreach( $arrayNumberOfCandInEachDept as $key => $value) {
                   $totalSelectionCands = $totalSelectionCands + (int)$value;
               }
               return $totalSelectionCands;
           }
-
-//    if($findsum) {
-//        if($deptId == 2) {
-//            $val = (int)$arrayNumberOfCandInEachDept[$deptId];
-//            if($val > 0) {
-//                $val = $val -1;
-//                $arrayNumberOfCandInEachDept[$deptId] = $val;
-//            }
-//        }
-//
-//        return $arrayNumberOfCandInEachDept;
-//    }
-
 
     }
 
@@ -1662,8 +1641,6 @@ class ExamController extends Controller
                 }
             }
 
-
-//            dd($arrayCandidateInEachDept);
             //return view list of candidate who pass with selected department and student whow reserve with selected department options
 
             return Response::json(['status'=>true]);
@@ -1673,13 +1650,6 @@ class ExamController extends Controller
     }
 
     public function getDUTCandidateResultLists ($examId) {
-        $candidateDUTs = [];
-//        $passedCandDUTs = $this->getSucceedCandidateDUTFromDB($examId, $is_success='Pass');
-//        $reservedCandDUTs = $this->getSucceedCandidateDUTFromDB($examId, $is_success='Reserve');
-//
-//        $failedCandDUTs = $this->getSucceedCandidateDUTFromDB($examId, $is_success=null);
-//
-//        $candidateDUTs = (object) array_merge((array) $passedCandDUTs, (array) $reservedCandDUTs, (array)$failedCandDUTs);
 
         return  view('backend.exam.includes.examination_DUT_candidate_result', compact('examId'));
     }
@@ -1712,13 +1682,10 @@ class ExamController extends Controller
             $candidateDUTs=[];
             $allStudentByDept = $this->arrayStudentPassOrReserveByDept($examId, $is_success='Reserve');
             return  view('backend.exam.includes.patial_result_candidate_dut', compact('allStudentByDept','candidateDUTs', 'examId'));
-
         }
-//        $failedCandDUTs = $this->getSucceedCandidateDUTFromDB($examId, $is_success=null);
     }
 
     public function printCandidateDUTResult($examId, Request $request) {
-
 
         $resultType = $request->status;
 
@@ -1726,14 +1693,14 @@ class ExamController extends Controller
             $title = 'បញ្ជីបេក្ខជនជាប់ស្ថាពរ';
             $allStudentByDept=[];
             $candidateDUTs = $this->getSucceedCandidateDUTFromDB($examId, $is_success='Pass');
-            $candidateDUTs = array_chunk($candidateDUTs, 30);
+            $candidateDUTs = array_chunk($candidateDUTs, 27);
             return  view('backend.exam.print.print_examination_DUT_candidate_result', compact('allStudentByDept', 'candidateDUTs', 'title'));
 
         } else if($resultType == 'Reserve') {
             $title = 'បញ្ជីបេក្ខជនជាប់បំរុង';
             $allStudentByDept=[];
             $candidateDUTs = $this->getSucceedCandidateDUTFromDB($examId, $is_success='Reserve');
-            $candidateDUTs = array_chunk($candidateDUTs, 30);
+            $candidateDUTs = array_chunk($candidateDUTs, 27);
             return  view('backend.exam.print.print_examination_DUT_candidate_result', compact('allStudentByDept', 'candidateDUTs', 'title'));
 
 
@@ -1838,6 +1805,8 @@ class ExamController extends Controller
                  ->where([
                      ['candidate_department.is_success', '=', $is_success],
                      ['candidates.exam_id', '=', $examId],
+                     ['origins.is_province', '=', true],
+                     ['origins.active', '=', true]
                  ])
                  ->select('origins.name_kh as province_name', 'academicYears.name_kh as academic_year', 'candidates.register_id','candidates.dob as birth_date', 'candidates.register_from as home_town', 'genders.name_kh as gender', 'candidates.id as candidate_id', 'candidates.name_kh', 'candidates.name_latin', 'candidate_department.is_success', 'candidate_department.rank', 'departments.code as department_name', 'departments.id as department_id', 'candidates.bac_percentile')
                  ->orderBy('register_id', 'ASC')
