@@ -100,6 +100,16 @@
             text-align: center;
         }
 
+        .modal_loading {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.8);
+            z-index: 1;
+        }
+
     </style>
 @stop
 
@@ -194,6 +204,10 @@
                     </div>
                     @endauth
                 </div>
+            </div>
+
+            <div class="modal_loading" style="display: none; text-align: center">
+                <img src="{{url('img/exam/loader.gif')}}" alt="loading" style="margin-top: 400px; margin-left: 50px">
             </div>
 
         </div><!-- /.box-body -->
@@ -889,6 +903,8 @@
             /* ------------------------------------------------------------------------ Course Section ------------------------------------------------------------------ */
             @permission('view-entrance-exam-course')
 
+
+
             $('#btn-course-refresh').on('click',function(e){
                 course_datatable.draw();
             });
@@ -943,6 +959,8 @@
             $('#btn_result_score_candidate').hide();
 
             $('#btn_check_course_error').on('click', function() {
+
+                $('.modal_loading').show();
                 check_course_error = true;
                 course_datatable.draw();
                 var baseUrl ='{{route("admin.exam.ajax_check_candidate_score", $exam->id)}} ';
@@ -955,8 +973,10 @@
                         if(result.status == false) {
 
                             $('#btn_result_score_candidate').show();
+                            $('.modal_loading').delay(2000).hide(0);
                         } else {
                             $('#btn_result_score_candidate').hide();
+                            $('.modal_loading').delay(2000).hide(0);
                         }
                     }
                 });

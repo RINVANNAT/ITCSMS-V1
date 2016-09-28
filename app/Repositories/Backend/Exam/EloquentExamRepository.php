@@ -431,8 +431,6 @@ class EloquentExamRepository implements ExamRepositoryContract
 
         for($index=0; $index < count($requestScore); $index++) {
             parse_str($requestScore[$index], $outPut);// convertion of the serialized data to array json
-
-
             $checkSequenCandidateId = DB::table('candidateEntranceExamScores')
                 ->where([
                     ['candidate_id', '=', $outPut['candidate_id'][0]],

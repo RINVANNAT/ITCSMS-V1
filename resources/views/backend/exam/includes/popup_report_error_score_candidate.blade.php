@@ -34,15 +34,23 @@
             <div class="col-sm-12">
                 <div class="col-sm-6">
                     <h4> Error Inputed Score </h4>
-                </div>
 
-                <div class="col-sm-6 no-padding">
                     <div class="col-sm-3 no-padding" style="margin-top: 5px">
                         <label for="corrector_name"> Corrector Name : </label>
                     </div>
 
-                    <div class="col-sm-9 no-padding">
+                    <div class="col-sm-6 no-padding">
                         {!! Form::text('corrector', null, ['class' => 'form-control', 'placeholder'=>'name corrector', 'id'=> 'corrector_error_score', 'required']) !!}
+                    </div>
+                </div>
+
+                <div class="col-sm-6 no-padding">
+                    <div>
+
+                    </div>
+                    <div class="pull-right">
+                        <input type="button" id="submit_candidate_error_socre" class="btn btn-primary btn-xs" value="Submit" />
+                        <input type="button" id="btn_candidate_error_socre" class="btn btn-danger btn-xs" value="Print Error" />
                     </div>
                 </div>
             </div>
@@ -177,7 +185,7 @@
 
                                         <div class="col-sm-1 " style="margin-top: 5px" >
 
-                                            <button type="submit" class="btn btn-info btn-xs btn_save_new_correction"> <i class="fa fa-save"> </i> </button>
+                                            {{--<button type="submit" class="btn btn-info btn-xs btn_save_new_correction"> <i class="fa fa-save"> </i> </button>--}}
                                             <button type="button" onclick="cancelNewCorrection(this)" class="btn btn-danger btn-xs"><i class="fa fa-times"> </i> </button>
 
                                         </div>
@@ -194,10 +202,6 @@
                     </table>
                 </div>
 
-
-
-
-
             </div>
 
         </div>
@@ -209,8 +213,8 @@
             </div>
 
             <div class="pull-right">
-                <input type="button" id="submit_candidate_error_socre" class="btn btn-primary btn-xs" value="Submit" />
-                <input type="button" id="btn_candidate_error_socre" class="btn btn-danger btn-xs" value="Print Error" />
+                {{--<input type="button" id="submit_candidate_error_socre" class="btn btn-primary btn-xs" value="Submit" />--}}
+                {{--<input type="button" id="btn_candidate_error_socre" class="btn btn-danger btn-xs" value="Print Error" />--}}
             </div>
             <div class="clearfix"></div>
         </div><!-- /.box-body -->
@@ -237,6 +241,8 @@
                    return false;
                }
            });
+
+           //---------------------------------------------------------
 
            $(".new_correction_form").on('submit',function(e){
                e.preventDefault();
@@ -283,11 +289,9 @@
 
                            if(check == 0) {
                                store_array_correction.push(data);
-                               serializeData.push(baseData);
                            }
                        } else {
                            store_array_correction.push(data);
-                           serializeData.push(baseData);
                        }
 
                        console.log(serializeData);
@@ -304,6 +308,11 @@
 
            });
 
+           //---------------------------------------------
+
+
+
+
            $('.input_new_correction').on('keyup', function() {
                 calculateSum(this);
            });
@@ -317,7 +326,7 @@
        }
 
        function cancelNewCorrection(obj){
-           $(obj).closest('.new_correction').hide();
+           $(obj).closest('.new_correction').remove();
        }
 
        function addNewCorrection(obj){
@@ -335,7 +344,7 @@
 
                    console.log(result);
                    if(result.status){
-                       notify("success","info", "you done it");
+                       notify("success","info", "Your corretions have been saved!!");
                        location.reload();
                    } else{
                        notify("error","info", "there is an error");
@@ -354,17 +363,48 @@
            var baseUrl = "{{route('admin.exam.add_new_correction_score',$exam_id)}}";
            var corrector_name = $('#corrector_error_score').val();
 
-           if(store_array_correction.length > 0) {
+           var status = 0;
 
-               var baseData = {
-                   data: store_array_correction,
-                   serializ_data: serializeData
+           $('.new_correction').each(function() {
+               var each_form_score = $(this).children('form').serialize();
+               var data = $(this).children('form').serializeArray();
+               serializeData.push(each_form_score);
+               $.each(data, function(index,value) {
+                   if(value.name =='score_c[]') {
+                       if(value.value == '') {
+                           status++
+                       }
+                   }
+                   if(value.name =='score_w[]') {
+                       if(value.value == '') {
+                           status++
+                       }
+                   }
+                   if(value.name =='score_na[]') {
+                       if(value.value == '') {
+                           status++
+                       }
+                   }
+               });
+           });
+           if(corrector_name != '') {
+               if(status == 0) {
+                   if(serializeData.length > 0) {
+                       var baseData = {
+                           data: store_array_correction,
+                           serializ_data: serializeData
+                       };
+
+                       ajaxRequest('POST', baseUrl+'?corrector_name='+corrector_name,baseData );
+                   }
+
+               } else {
+                   notify("error","info", "Required Score Value!!");
                }
 
-               console.log(store_array_correction.length);
-               ajaxRequest('POST', baseUrl+'?corrector_name='+corrector_name,baseData );
+           } else {
+               notify("error","info", "Please Add The Corrector Name!!!");
            }
-
        });
 
        function calculateSum(obj) {
