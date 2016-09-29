@@ -54,7 +54,7 @@
                             <td>{{$index}}</td>
                             <td>{{str_pad($candidate->register_id, 4, '0', STR_PAD_LEFT)}}</td>
                             <td class="left">{{$candidate->name_kh}}</td>
-                            <td class="left">{{$candidate->name_latin}}</td>
+                            <td class="left">{{strtoupper($candidate->name_latin)}}</td>
                             <td>{{$candidate->gender->code}}</td>
                             <td class="left">{{$candidate->dob->formatLocalized("%d/%b/%Y")}}</td>
                             <td></td>
