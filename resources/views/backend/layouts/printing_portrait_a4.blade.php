@@ -127,7 +127,7 @@
     <body class="skin-{!! config('backend.theme') !!}" style="font-family: khmeros" onload="window.print()">
 
         @yield('content')
-
-        @yield('scripts')
     </body>
+    <script>window.jQuery || document.write('<script src="{{asset('js/vendor/jquery/jquery-2.1.4.min.js')}}"><\/script>')</script>
+    @yield('scripts')
 </html>
