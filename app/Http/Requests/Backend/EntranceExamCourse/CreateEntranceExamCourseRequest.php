@@ -17,7 +17,7 @@ class CreateEntranceExamCourseRequest extends Request
      */
     public function authorize()
     {
-        return access()->allow('create-entrance-exam-courses');
+        return access()->allow('create-entrance-exam-course');
     }
 
     /**
