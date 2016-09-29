@@ -19,14 +19,6 @@
             border-top: 1px solid black;
             border-collapse: collapse;
         }
-
-        td span, th span {
-            display: block;
-            white-space: nowrap;
-            width: 100px;
-            overflow: hidden;
-            font-size: 100%;
-        }
     </style>
 @stop
 @section('content')
@@ -40,24 +32,24 @@
 
             <table class="table" width="100%">
                 <tr>
-                    <th width="20px;"><span>ល.រ</span></th>
-                    <th><span>លេខបង្កាន់ដៃ</span></th>
-                    <th><span>ឈ្មោះ</span></th>
-                    <th><span>ឈ្មោះឡាតាំង</span></th>
-                    <th><span>ភេទ</span></th>
-                    <th><span>ថ្ងៃខែឆ្នាំកំណើត</span></th>
+                    <th width="1.2cm">ល.រ</th>
+                    <th width="1.5cm">លេខ បង្កាន់ដៃ</th>
+                    <th>ឈ្មោះ</th>
+                    <th>ឈ្មោះឡាតាំង</th>
+                    <th>ភេទ</th>
+                    <th width="2.5cm">ថ្ងៃខែឆ្នាំកំណើត</th>
                 </tr>
                 <?php
                 $index = 1;
                 ?>
                 @foreach($room->candidates()->with('gender')->orderBy('register_id')->get() as $candidate)
                     <tr>
-                        <td><span>{{$index}}</span></td>
-                        <td><span>{{str_pad($candidate->register_id, 4, '0', STR_PAD_LEFT)}}</span></td>
-                        <td class="left"><span>{{$candidate->name_kh}}</span></td>
-                        <td class="left"><span>{{$candidate->name_latin}}</span></td>
-                        <td><span>{{$candidate->gender->code}}</span></td>
-                        <td class="left"><span>{{$candidate->dob->formatLocalized("%d/%b/%Y")}}</span></td>
+                        <td>{{$index}}</td>
+                        <td>{{str_pad($candidate->register_id, 4, '0', STR_PAD_LEFT)}}</td>
+                        <td class="left">{{$candidate->name_kh}}</td>
+                        <td class="left">{{strtoupper($candidate->name_latin)}}</td>
+                        <td>{{$candidate->gender->code}}</td>
+                        <td class="left">{{$candidate->dob->formatLocalized("%d/%b/%Y")}}</td>
                         <?php $index++; ?>
                     </tr>
                 @endforeach
@@ -75,15 +67,6 @@
 
 @section('scripts')
     <script>
-        $(function() {
-            $('td span').each(function() {
-                var fontSize = 100;
-                while (this.scrollWidth > $(this).width() && fontSize > 0) {
-                    // adjust the font-size 5% at a time
-                    fontSize -= 5;
-                    $(this).css('font-size', fontSize + '%');
-                }
-            });
-        });
+
     </script>
 @stop
