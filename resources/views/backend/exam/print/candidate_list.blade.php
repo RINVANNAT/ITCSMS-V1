@@ -10,6 +10,8 @@
         }
 
         table th, table td {
+            padding-left: 0px !important;
+            padding-right: 0px !important;
             text-align: center;
             padding-top: 3px !important;
             padding-bottom: 3px !important;

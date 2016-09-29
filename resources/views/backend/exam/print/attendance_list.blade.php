@@ -19,7 +19,7 @@
             border-bottom: 1px solid black;
             border-top: 1px solid black;
             border-collapse: collapse;
-
+            font-size-adjust: 0.58;
         }
     </style>
 @stop
