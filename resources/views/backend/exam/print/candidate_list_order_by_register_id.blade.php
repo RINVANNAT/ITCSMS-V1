@@ -10,10 +10,14 @@
         }
 
         table th, table td {
+            padding-left: 0px !important;
+            padding-right: 0px !important;
             text-align: center;
             padding-top: 3px !important;
             padding-bottom: 3px !important;
-
+            border-bottom: 1px solid black;
+            border-top: 1px solid black;
+            border-collapse: collapse;
         }
     </style>
 @stop
@@ -31,13 +35,13 @@
 
             <table class="table" width="100%">
                 <tr>
-                    <th width="15px;">ល.រ</th>
-                    <th>លេខបង្កាន់ដៃ</th>
+                    <th width="1.2cm">ល.រ</th>
+                    <th width="1.5cm">លេខ បង្កាន់ដៃ</th>
                     <th>បន្ទប់</th>
                     <th>ឈ្មោះ</th>
                     <th>ឈ្មោះឡាតាំង</th>
                     <th>ភេទ</th>
-                    <th>ថ្ងៃខែឆ្នាំកំណើត</th>
+                    <th width="2.5cm">ថ្ងៃខែឆ្នាំកំណើត</th>
                 </tr>
                 @foreach($chunk as $candidate)
                     <tr>
