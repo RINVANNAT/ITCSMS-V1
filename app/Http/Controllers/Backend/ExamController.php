@@ -1521,6 +1521,8 @@ class ExamController extends Controller
 
     public function generateCandidateDUTResultTest($examId, Request $request) {
 
+
+
         $arrayCandidateInEachDept = $request->number_candidate;
         $test = [];
         $count =0;
@@ -1588,6 +1590,10 @@ class ExamController extends Controller
 
     public function generateCandidateDUTResult($examId, Request $request) {
 
+//        dd($request->department);
+
+        $DeptSelectedForStu =[];
+
         $arrayCandidateInEachDept = $request->department; // Array from form department
 
         //$totalCands = $this->isAvalaibleDept($arrayCandidateInEachDept, null, null, $findsum = 'true');
@@ -1602,6 +1608,7 @@ class ExamController extends Controller
 
                 //$statusRank =1;
                 $candidateDepts = $this->getCandidateDept($dUTCandidate->candidate_id); // List of all chosen department order by rank
+
                 $index = 1;
                 $reserve_ready = false;
                 foreach($candidateDepts as $candidateDept) {// loop candidate department option from the 1 choice to the end 1->8
@@ -1613,6 +1620,7 @@ class ExamController extends Controller
                     if($arrayCandidateInEachDept[$candidateDept->department_id]['success'] > 0){
                         // update candidate_department.status = true
 
+                        $DeptSelectedForStu[] =$candidateDept->department_id;
                         $arrayCandidateInEachDept[$candidateDept->department_id]['success'] --;
 
                         $update = $this-> updateCandiateDepartment($dUTCandidate->candidate_id, $candidateDept->department_id,$candidateDept->rank, $result='Pass');
@@ -1622,6 +1630,7 @@ class ExamController extends Controller
                             break;
                         }
                     } else if(!$reserve_ready) {
+
                         if($arrayCandidateInEachDept[$candidateDept->department_id]['reserve'] > 0){
                             $arrayCandidateInEachDept[$candidateDept->department_id]['reserve'] --;
                             // sdfsfasfdsdfafd
@@ -1675,12 +1684,17 @@ class ExamController extends Controller
 
         } else if($resultType == 'pass_by_dept') {
             $candidateDUTs=[];
-            $allStudentByDept = $this->arrayStudentPassOrReserveByDept($examId, $is_success='Pass');
+            $studentByDept = $this->arrayStudentPassOrReserveByDept($examId, $is_success='Pass');
+            $allStudentByDept = $studentByDept[1];
+
             return  view('backend.exam.includes.patial_result_candidate_dut', compact('allStudentByDept','candidateDUTs', 'examId'));
 
         } else {
             $candidateDUTs=[];
-            $allStudentByDept = $this->arrayStudentPassOrReserveByDept($examId, $is_success='Reserve');
+
+            $studentByDept = $this->arrayStudentPassOrReserveByDept($examId, $is_success='Reserve');
+            $allStudentByDept = $studentByDept[1];
+
             return  view('backend.exam.includes.patial_result_candidate_dut', compact('allStudentByDept','candidateDUTs', 'examId'));
         }
     }
@@ -1705,17 +1719,22 @@ class ExamController extends Controller
 
 
         } else if($resultType == 'pass_by_dept') {
+
             $title = 'បញ្ជីបេក្ខជនជាប់ស្ថាពរ';
-            $allDepts = $this->getAllDepartments();
+//            $allDepts = $this->getAllDepartments();
             $candidateDUTs=[];
-            $allStudentByDept = $this->arrayStudentPassOrReserveByDept($examId, $is_success='Pass');
+            $studentByDept = $this->arrayStudentPassOrReserveByDept($examId, $is_success='Pass');
+            $allDepts = $studentByDept[0];
+            $allStudentByDept = $studentByDept[1];
+
             return  view('backend.exam.print.print_examination_DUT_candidate_result', compact('allStudentByDept', 'candidateDUTs', 'title', 'allDepts'));
 
         } else {
             $title = 'បញ្ជីបេក្ខជនជាប់បំរុង';
             $candidateDUTs=[];
-            $allDepts = $this->getAllDepartments();
-            $allStudentByDept = $this->arrayStudentPassOrReserveByDept($examId, $is_success='Reserve');
+            $studentByDept = $this->arrayStudentPassOrReserveByDept($examId, $is_success='Reserve');
+            $allDepts = $studentByDept[0];
+            $allStudentByDept = $studentByDept[1];
             return  view('backend.exam.print.print_examination_DUT_candidate_result', compact('allStudentByDept', 'candidateDUTs', 'title','allDepts'));
         }
     }
@@ -1862,6 +1881,8 @@ class ExamController extends Controller
     }
 
     private function arrayStudentPassOrReserveByDept($examId, $is_success) {
+
+        $uniqueDept =[];
         $allStudentByDept = [];
         $allDepts = $this->getAllDepartments();
         if($allDepts) {
@@ -1870,14 +1891,13 @@ class ExamController extends Controller
                 $studentPassedByDept = $this->getPassOrReserveByDept($examId, $allDept->department_id, $is_success);
 
                 if($studentPassedByDept) {
+                    $uniqueDept[] = $allDept->name_abr;
                     $allStudentByDept[$allDept->name_abr] = $studentPassedByDept;
                 }
             }
 
-            return $allStudentByDept;
+            return array($uniqueDept, $allStudentByDept);
         }
     }
-
-
 
 }
