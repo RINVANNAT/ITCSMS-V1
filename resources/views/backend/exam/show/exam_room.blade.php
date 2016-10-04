@@ -14,7 +14,7 @@
                     <span id="count_assigned_seat"></span>
                 </h3>
                 @permission('generate-exam-room-secret-code')
-                <button class="btn btn-sm btn-default pull-right" id="btn-secret-code" style="margin-left: 5px;"><i class="fa fa-user-secret"></i> Anonymus Code</button>
+                <button class="btn btn-sm btn-default pull-right" id="btn-secret-code" style="margin-left: 5px;"><i class="fa fa-user-secret"></i> Anonymous Code</button>
                 @endauth
                 @permission('modify-exam-room')
                 <button class="btn btn-sm btn-info pull-right" id="btn_room_modify" style="margin-left: 5px;"><i class="fa fa-edit"></i> Modify</button>

@@ -2,6 +2,7 @@
 
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Model as Model;
+use Illuminate\Support\Facades\DB;
 
 class ExamRoom extends Model
 {
@@ -43,6 +44,10 @@ class ExamRoom extends Model
         return $this->hasMany('App\Models\Candidate','room_id');
     }
 
+    public function getCount_candidatesAttribute()
+    {
+        return $this->hasMany('App\Models\Candidate')->where('room_id',$this->id)->count();
+    }
 
     /**
      * The attributes that should be casted to native types.

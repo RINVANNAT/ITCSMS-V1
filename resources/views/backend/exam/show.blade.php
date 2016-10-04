@@ -576,12 +576,29 @@
                 var selected_rooms = $('#exam_room_list_table input:checkbox:checked').map(function () {
                     return $(this).data('roomname');
                 }).get();
+
+                var capacity = 0;
+
+                $('#exam_room_list_table input:checkbox:checked').each(function(item){
+                    capacity = capacity + $(this).data('capacity');
+                });
+
+                var building_ids = $('#exam_room_list_table input:checkbox:checked').map(function () {
+                    return $(this).data('building');
+                }).get();
+
+
                 var temporary_name = "";
                 $.each(selected_rooms, function(index, value){
                     temporary_name = value+temporary_name;
                 });
 
+                console.log(building_ids[0]);
+                $('#form_exam_room_merge')[0].reset();
+
                 $('#form_exam_room_merge input[name=name]').val(temporary_name);
+                $('#form_exam_room_merge input[name=nb_chair_exam]').val(capacity);
+                $('#merge_building_id').val(building_ids[0]);
 
                 $('#modal_exam_room_merge').modal('toggle');
             });

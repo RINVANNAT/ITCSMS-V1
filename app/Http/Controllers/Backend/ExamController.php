@@ -117,7 +117,8 @@ class ExamController extends Controller
         $academicYear = AcademicYear::where('id',$exam->academicYear->id)->lists('name_kh','id');
         $examType = ExamType::where('id',$type)->lists('name_kh','id')->toArray();
         $usable_room_exam = Room::where('is_exam_room',true)->count();
-        $exam_rooms = $exam->rooms()->with(['building'])->orderBy('building_id')->orderBy('name')->get();
+        $exam_rooms = $exam->rooms()->with(['building','candidates'])->orderBy('building_id')->orderBy('name')->get();
+        //dd($exam_rooms);
         $buildings = Building::lists('name','id');
 
         $roles = $this->employeeExams->getRoles();
@@ -312,7 +313,7 @@ class ExamController extends Controller
 
         $exam_room->save();
 
-        $exam_rooms = $exam->rooms()->with(['building'])->orderBy('building_id')->orderBy('name')->get();
+        $exam_rooms = $exam->rooms()->with(['building','candidates'])->orderBy('building_id')->orderBy('name')->get();
         return view('backend.exam.includes.exam_room_list',compact('exam_rooms'));
     }
 
@@ -327,8 +328,9 @@ class ExamController extends Controller
             $room_0 = ExamRoom::find($rooms[1]); // prevent get header too
         }
 
-        foreach($rooms as $room){
-            if(is_numeric($rooms)) {
+        //dd($rooms);
+        foreach($rooms as $key => $room){
+            if(is_numeric($room)) {
                 ExamRoom::destroy($room);
             }
         }
@@ -345,7 +347,7 @@ class ExamController extends Controller
 
         $exam_room->save();
 
-        $exam_rooms = $exam->rooms()->with(['building'])->orderBy('building_id')->orderBy('name')->get();
+        $exam_rooms = $exam->rooms()->with(['building','candidates'])->orderBy('building_id')->orderBy('name')->get();
         return view('backend.exam.includes.exam_room_list',compact('exam_rooms'));
     }
 
@@ -368,7 +370,7 @@ class ExamController extends Controller
             $exam_room->save();
         }
 
-        $exam_rooms = $exam->rooms()->with(['building'])->orderBy('building_id')->orderBy('name')->get();
+        $exam_rooms = $exam->rooms()->with(['building','candidates'])->orderBy('building_id')->orderBy('name')->get();
         return view('backend.exam.includes.exam_room_list',compact('exam_rooms'));
     }
 
@@ -407,41 +409,21 @@ class ExamController extends Controller
             $exam_room->save();
         }
 
-        $exam_rooms = $exam->rooms()->with(['building'])->get();
+        $exam_rooms = $exam->rooms()->with(['building','candidates'])->orderBy('building_id')->orderBy('name')->get();
         return view('backend.exam.includes.exam_room_list',compact('exam_rooms'));
     }
-
-//    public function save_rooms($id){
-//        $exam = $this->exams->findOrThrowException($id);
-//
-//        $room_ids = json_decode($_POST['room_ids']);
-//        $ids = [];
-//        foreach($room_ids as $room_id){
-//            $tmp = explode('_',$room_id);
-//            if($tmp[0] == "room"){  // Because ids that are pass alongs include buildings as well. We need to remove that.
-//                array_push($ids,$tmp[1]);
-//            }
-//        }
-//
-//        if($exam->rooms()->sync($ids,false)) {  // Add room ids without deleting old ids
-//            return Response::json(array("success"=>true));
-//        } else {
-//            return Response::json(array("success"=>false));
-//        }
-//
-//    }
 
     public function refresh_room($id){
         $exam = $this->exams->findOrThrowException($id);
 
-        $exam_rooms = $exam->rooms()->with(['building'])->get();
+        $exam_rooms = $exam->rooms()->with(['building','candidates'])->orderBy('building_id')->orderBy('name')->get();
         return view('backend.exam.includes.exam_room_list',compact('exam_rooms'));
     }
 
     public function sort_room_capacity($id){
         $exam = $this->exams->findOrThrowException($id);
 
-        $exam_rooms = $exam->rooms()->with(['building'])->orderBy('nb_chair_exam')->get();
+        $exam_rooms = $exam->rooms()->with(['building','candidates'])->orderBy('building_id')->orderBy('name')->get();
         return view('backend.exam.includes.exam_room_list',compact('exam_rooms'));
     }
 
@@ -456,7 +438,7 @@ class ExamController extends Controller
             }
         }
 
-        $exam_rooms = $exam->rooms()->with(['building'])->get();
+        $exam_rooms = $exam->rooms()->with(['building','candidates'])->orderBy('building_id')->orderBy('name')->get();
         return view('backend.exam.includes.exam_room_list',compact('exam_rooms'));
 
     }
@@ -473,7 +455,7 @@ class ExamController extends Controller
             }
         }
 
-        $exam_rooms = $exam->rooms()->with(['building'])->get();
+        $exam_rooms = $exam->rooms()->with(['building','candidates'])->orderBy('building_id')->orderBy('name')->get();
         return view('backend.exam.includes.exam_room_list',compact('exam_rooms'));
 
     }
@@ -1415,28 +1397,12 @@ class ExamController extends Controller
 
     public function generate_room(GenerateRoomExamRequest $request, $exam_id){ // In candidate section
 
-//        $candidates = Candidate::orderBy('register_id')->get();
-//
-//        $yes = 0;
-//        $no = 0;
-//        foreach($candidates as $candidate)
-//        {
-//            $studentbac2 = StudentBac2::where('id',$candidate->studentBac2_id)->first();
-//            if($studentbac2!=null){
-//                Candidate::where('id', $candidate->id)
-//                    ->update(['highschool_id' => $studentbac2->highschool_id.""]);
-//                $yes++;
-//            } else {
-//                $no++;
-//            }
-//        }
-//
-//        dd("success:".$yes." yes -".$no." no");
-
         $exam = $this->exams->findOrThrowException($exam_id);
         $candidates = $exam->candidates()->where('active',true)->orderBy('register_id')->get()->toArray();
         $rooms = $exam->rooms()->get()->toArray();
 
+        shuffle($rooms);
+        //dd($rooms);
         $available_seat = 0;
         foreach($rooms as &$room){
             $room['current_seat'] = 0;

@@ -5,7 +5,8 @@
             <th width="20px;" class="room_editing" style="display: none"><input type="checkbox" id="exam_room_header" disabled/></th>
             <th width="20px;">No.</th>
             <th><a href="#" id="refresh_room_list">Room Name</a></th>
-            <th><a href="#" id="sort_room_capacity">Capacity</a></th>
+            <th>Real Capacity</th>
+            <th><a href="#" id="sort_room_capacity">Max Capacity</a></th>
             <th>Building</th>
             <th>Description</th>
             <th class="room_editing" style="display: none">Action</th>
@@ -22,13 +23,13 @@
                 if(count($exam_rooms)>0){
                     $average_seat = $average_seat / count($exam_rooms);
                 }
-
         ?>
         @foreach($exam_rooms as $exam_room)
             <tr>
-                <td class="room_editing" style="display: none"><input type="checkbox" class="exam_room_checkbox" name="exam_room[]" data-roomname="{{$exam_room->name}}" value="{{$exam_room->id}}" disabled/></td>
+                <td class="room_editing" style="display: none"><input type="checkbox" class="exam_room_checkbox" name="exam_room[]" data-capacity="{{$exam_room->nb_chair_exam}}" data-building="{{$exam_room->building_id}}" data-roomname="{{$exam_room->name}}" value="{{$exam_room->id}}" disabled/></td>
                 <td>{{$index}}</td>
                 <td>{{$exam_room->building->code.$exam_room->name}}</td>
+                <td>{{count($exam_room->candidates)}}</td>
                 @if($exam_room->nb_chair_exam < $average_seat -5 )
                 <td class="badge bg-red">
                 @elseif($exam_room->nb_chair_exam > $average_seat +5)

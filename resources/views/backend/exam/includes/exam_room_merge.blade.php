@@ -28,7 +28,7 @@
                                     <label for="building" class="col-sm-3 control-label">Building</label>
 
                                     <div class="col-sm-5">
-                                        {!! Form::select('building_id',$buildings, null, ['class' => 'form-control']) !!}
+                                        {!! Form::select('building_id',$buildings, null, ['class' => 'form-control', 'id'=>'merge_building_id']) !!}
                                     </div>
                                 </div>
 
