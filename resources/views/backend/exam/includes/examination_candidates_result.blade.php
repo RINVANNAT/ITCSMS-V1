@@ -95,7 +95,7 @@
                     if(result.status) {
                         window.close();
                         var printUrl = "{!! route('print_candidate_result_lists') !!}";
-                        window_print_candidate_result = PopupCenterDual(printUrl+'?status='+'print_page'+'?exam_id='+exam_id,'print candidates result','1000','1200');
+                        window_print_candidate_result = PopupCenterDual(printUrl+'?status='+'print_page'+'&exam_id='+exam_id,'print candidates result','1000','1200');
                     }
                 }
             });
@@ -107,7 +107,7 @@
 
             var baseData = {status: 'request_print_page'}
 
-            ajaxRequest('GET', baseUrl, baseData);
+            ajaxRequest('GET', baseUrl+'?status='+'export_page'+'&exam_id='+exam_id, baseData);
         })
     </script>
 @stop

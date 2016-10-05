@@ -534,7 +534,6 @@ class ExamController extends Controller
             }
         }
 
-
         $alpha = array();
         $letter = 'A';
         while ($letter !== 'AAA') {
@@ -589,6 +588,148 @@ class ExamController extends Controller
 
             });
 
+        })->export('xls');
+    }
+
+    public function export_attendance_list(DownloadExaminationDocumentsRequest $request,$exam_id) {
+
+        $exam = $this->exams->findOrThrowException($exam_id);
+        $courses = $exam->entranceExamCourses()->get();
+        $rooms = $exam->rooms()->with('building')->get();
+        $candidateData=[];
+
+        if($courses) {
+            foreach($courses as $course) {
+                $arrayTmpCands = [];
+                if($rooms) {
+                    foreach($rooms as $room) {
+                        $candidates =  $room->candidates()->with('gender')->orderBy('register_id')->get();
+                        foreach($candidates as $candidate) {
+                            $element = array(
+                                'លេខបង្កាន់ដៃ'              => str_pad($candidate->register_id, 4, '0', STR_PAD_LEFT),
+                                'បន្ទប់'                    => $room->building->code."-".$room->name,
+                                'ឈ្មោះ ខ្មែរ'             => $candidate->name_kh,
+                                'ឈ្មោះ ឡាតាំង'            => $candidate->name_latin,
+                                'ភេទ'                      => $candidate->gender->code,
+                                'ថ្ងៃខែរឆ្នាំកំនើត'           => $candidate->dob->formatLocalized("%d/%b/%Y"),
+                                'ហត្ថលេខា'                => ''
+                            );
+//                            $element = array(
+//                                'Order'     =>  str_pad($candidate->register_id, 4, '0', STR_PAD_LEFT),
+//                                'Room'              => $room->building->code."-".$room->name,
+//                                'Name Khmer'        => $candidate->name_kh,
+//                                'Name Latin'        => $candidate->name_latin,
+//                                'Sexe'              => $candidate->gender->code,
+//                                'Birth Date'        => $candidate->dob->formatLocalized("%d/%b/%Y"),
+//                                'Signature'         => ''
+//                            );
+
+                            $arrayTmpCands[] = $element;
+                        }
+                    }
+                }
+                $candidateData[$course->name_en] = $arrayTmpCands;
+            }
+        }
+
+//        dd($candidateData);
+
+        $fields= ['លេខបង្កាន់ដៃ', 'បន្ទប់', 'ឈ្មោះ ខ្មែរ', 'ឈ្មោះ ឡាតាំង', 'ភេទ', 'ថ្ងៃខែរឆ្នាំកំនើត', 'ហត្ថលេខា'];
+
+//        $fields= ['Order', 'Room', 'Name Khmer', 'Name Latin', 'Sexe', 'Birth Date', 'Signature'];
+        $title = 'បញ្ជីវត្តមានបេក្ខជន';
+//        $title = 'Candidates';
+        $alpha = [];
+        $letter = 'A';
+        while ($letter !== 'AAA') {
+            $alpha[] = $letter++;
+        }
+        Excel::create('បញ្ជីវត្តមានបេក្ខជន', function($excel) use ($candidateData, $title,$alpha,$fields) {
+            foreach($candidateData as $key => $data) {
+                $excel->sheet($key, function($sheet) use($data,$title,$alpha,$fields) {
+                    $sheet->fromArray($data);
+                });
+            }
+        })->export('xls');
+
+    }
+
+    public function export_candidate_list($exam_id) {
+        $exam = $this->exams->findOrThrowException($exam_id);
+        $rooms = $exam->rooms()->with('building')->get();
+        $candidateByRoom =[];
+
+        if($rooms) {
+            foreach($rooms as $room) {
+                $candidates = $room->candidates()->with('gender')->orderBy('register_id')->get();
+                if($candidates) {
+                    foreach($candidates as $candidate) {
+                        $element = array(
+                            'លេខបង្កាន់ដៃ'              => str_pad($candidate->register_id, 4, '0', STR_PAD_LEFT),
+                            'ឈ្មោះ ខ្មែរ'             => $candidate->name_kh,
+                            'ឈ្មោះ ឡាតាំង'            => $candidate->name_latin,
+                            'ភេទ'                      => $candidate->gender->code,
+                            'ថ្ងៃខែរឆ្នាំកំនើត'           => $candidate->dob->formatLocalized("%d/%b/%Y")
+                        );
+                        $candidateByRoom[$room->building->code."-".$room->name][] = $element;
+
+                    }
+                }
+            }
+        }
+
+        $fields= ['លេខបង្កាន់ដៃ', 'ឈ្មោះ ខ្មែរ', 'ឈ្មោះ ឡាតាំង', 'ភេទ', 'ថ្ងៃខែរឆ្នាំកំនើត'];
+        $title = 'បញ្ជីបេក្ខជន';
+        $alpha = [];
+        $letter = 'A';
+        while ($letter !== 'AAA') {
+            $alpha[] = $letter++;
+        }
+        Excel::create('បញ្ជីបេក្ខជន', function($excel) use ($candidateByRoom, $title,$alpha,$fields) {
+            foreach($candidateByRoom as $key => $data) {
+                $excel->sheet($key, function($sheet) use($data,$title,$alpha,$fields) {
+                    $sheet->fromArray($data);
+                });
+            }
+        })->export('xls');
+    }
+
+    public function export_candidate_list_by_register_id ($exam_id) {
+
+        $exam = $this->exams->findOrThrowException($exam_id);
+        $candidates = $exam->candidates()->with('gender')->with('room')->with('room.building')->orderBy('register_id')->get();
+        $candidateByRoom=[];
+
+        if($candidates) {
+            foreach($candidates as $candidate) {
+
+                $candidateRooms = $candidate->room;
+                if($candidateRooms) {
+                    $element = array(
+                        'លេខបង្កាន់ដៃ'              => str_pad($candidate->register_id, 4, '0', STR_PAD_LEFT),
+                        'បន្ទប់'                    => $candidate->room->building->code."-".$candidate->room->name,
+                        'ឈ្មោះ ខ្មែរ'             => $candidate->name_kh,
+                        'ឈ្មោះ ឡាតាំង'            => $candidate->name_latin,
+                        'ភេទ'                      => $candidate->gender->code,
+                        'ថ្ងៃខែរឆ្នាំកំនើត'           => $candidate->dob->formatLocalized("%d/%b/%Y")
+                    );
+                    $candidateByRoom[] = $element;
+                }
+            }
+        }
+
+        $fields= ['លេខបង្កាន់ដៃ', 'បន្ទប់', 'ឈ្មោះ ខ្មែរ', 'ឈ្មោះ ឡាតាំង', 'ភេទ', 'ថ្ងៃខែរឆ្នាំកំនើត'];
+        $title = 'បញ្ជីបេក្ខជន';
+        $alpha = [];
+        $letter = 'A';
+        while ($letter !== 'AAA') {
+            $alpha[] = $letter++;
+        }
+        Excel::create('បញ្ជីបេក្ខជនតាមបន្ទប់ រៀបតាមលេខបង្កាន់ដៃ', function($excel) use ($candidateByRoom, $title,$alpha,$fields) {
+
+                $excel->sheet($title, function($sheet) use($candidateByRoom,$title,$alpha,$fields) {
+                    $sheet->fromArray($candidateByRoom);
+                });
         })->export('xls');
     }
 
@@ -1128,7 +1269,10 @@ class ExamController extends Controller
         $nonExamingCandidateIds = DB::table('candidates')
             ->select('candidates.id as candidate_id')
             ->whereNotIn('candidates.id', $candidateIds)
-            ->where('candidates.active', '=', true)
+            ->where([
+                ['candidates.active', '=', true],
+                ['candidates.exam_id', '=', $examId]
+            ])
             ->get();
 
         //this is to calculate each candidate score for all subjects == (total_math + total_physic....)
@@ -1222,44 +1366,52 @@ class ExamController extends Controller
     public function candidateResultLists(Request $request) {
 
         $examId = $request->exam_id;
-        $candidatesResults = $this->getCandidateResult();
+        $candidatesResults = $this->getCandidateResult($examId);
 
         return view('backend.exam.includes.examination_candidates_result', compact('candidatesResults', 'examId'));
     }
 
-    private function getCandidateResult() {
+    private function getCandidateResult($exam_id) {
 
         $studentPassed = DB::table('candidates')
+            ->join('genders', 'genders.id', '=', 'candidates.gender_id')
             ->where([
                 ['candidates.result', '=', 'Pass'],
-                ['candidates.active', '=', true]
+                ['candidates.active', '=', true],
+                ['candidates.exam_id', '=', $exam_id]
 
             ])
-            ->select('name_kh','name_latin', 'result','total_score', 'id')
+            ->select('candidates.name_kh','candidates.name_latin', 'candidates.result','candidates.total_score', 'candidates.id', 'genders.code as gender')
             ->get();
 
         $studentReserved = DB::table('candidates')
+            ->join('genders', 'genders.id', '=', 'candidates.gender_id')
             ->where([
                 ['candidates.result', '=', 'Reserve'],
-                ['candidates.active', '=', true]
+                ['candidates.active', '=', true],
+                ['candidates.exam_id', '=', $exam_id]
             ])
-            ->select('name_kh','name_latin', 'result','total_score', 'id')
+            ->select('candidates.name_kh','candidates.name_latin', 'candidates.result','candidates.total_score', 'candidates.id', 'genders.code as gender')
             ->get();
 
         $studentFail = DB::table('candidates')
+            ->join('genders', 'genders.id', '=', 'candidates.gender_id')
             ->where([
                 ['candidates.result', '=', 'Fail'],
-                ['candidates.active', '=', true]
+                ['candidates.active', '=', true],
+                ['candidates.exam_id', '=', $exam_id]
         ])
-            ->select('name_kh','name_latin', 'result','total_score', 'id')
+            ->select('candidates.name_kh','candidates.name_latin', 'candidates.result','candidates.total_score', 'candidates.id', 'genders.code as gender')
             ->get();
 
         $studentReject = DB::table('candidates')
+            ->join('genders', 'genders.id', '=', 'candidates.gender_id')
             ->where([
                 ['candidates.result', '=', 'Reject'],
-                ['candidates.active', '=', true]
+                ['candidates.active', '=', true],
+                ['candidates.exam_id', '=', $exam_id]
             ])
-            ->select('name_kh','name_latin', 'result','total_score', 'id')
+            ->select('candidates.name_kh','candidates.name_latin', 'candidates.result','candidates.total_score', 'candidates.id', 'genders.code as gender')
             ->get();
 
         usort($studentPassed, array($this, "sortCandidateRank"));
@@ -1285,7 +1437,7 @@ class ExamController extends Controller
 
         } else {
 
-            $candidatesResults = $this->getCandidateResult();
+            $candidatesResults = $this->getCandidateResult($request->exam_id);
 
             if($candidatesResults) {
                 $status = true;
@@ -1295,9 +1447,42 @@ class ExamController extends Controller
                 $status = false;
                 return view('backend.exam.print.examination_candidates_result', compact('status'));
             }
-
-
         }
+    }
+
+    public function export_candidate_result_list ($exam_id) {
+
+        $candidatesResults = $this->getCandidateResult($exam_id);
+        $candiateResult=[];
+
+        if($candidatesResults) {
+            foreach($candidatesResults as $candidate) {
+                $element = array(
+                    'ឈ្មោះ ខ្មែរ'             => $candidate->name_kh,
+                    'ឈ្មោះ ឡាតាំង'            => $candidate->name_latin,
+                    'ភេទ'                      => $candidate->gender,
+                    'លទ្ទផល'                  => $candidate->result,
+                    'ពិន្ទុសរុប'                  => $candidate->total_score
+                );
+                $candiateResult[] = $element;
+            }
+        }
+
+        $fields= ['លេខបង្កាន់ដៃ', 'ឈ្មោះ ខ្មែរ', 'ឈ្មោះ ឡាតាំង', 'ភេទ', 'ថ្ងៃខែរឆ្នាំកំនើត'];
+        $title = 'បញ្ជីលទ្ទផលរបស់បេក្ខជន';
+        $alpha = [];
+        $letter = 'A';
+        while ($letter !== 'AAA') {
+            $alpha[] = $letter++;
+        }
+        Excel::create('បញ្ជីលទ្ទផលបេក្ខជន', function($excel) use ($candiateResult, $title,$alpha,$fields) {
+
+                $excel->sheet($title, function($sheet) use($candiateResult,$title,$alpha,$fields) {
+                    $sheet->fromArray($candiateResult);
+                });
+
+        })->export('xls');
+
     }
 
     private function sortCandidateRank($a, $b)
