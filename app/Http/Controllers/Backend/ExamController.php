@@ -925,7 +925,7 @@ class ExamController extends Controller
     public function getAllRooms($exam_id, Request $request) {
 
         $rooms = [];
-        $roomFromDB = $this->getRoomsFromDB();
+        $roomFromDB = $this->getRoomsFromDB($exam_id);
         if($roomFromDB) {
             foreach ($roomFromDB as $room) {
                 $rooms[$room->room_id] = Crypt::decrypt($room->room_code);
@@ -936,14 +936,13 @@ class ExamController extends Controller
         }
     }
 
-    private function getRoomsFromDB() {
+    private function getRoomsFromDB($exam_id) {
 
         $roomFromDB = DB::table('examRooms')
             ->select('examRooms.roomcode as room_code', 'examRooms.id as room_id')
+            ->where('exam_id',$exam_id)
             ->WhereNotNull('examRooms.roomcode')
             ->get();
-
-//        dd($roomFromDB);
 
         return $roomFromDB;
 
@@ -1026,7 +1025,7 @@ class ExamController extends Controller
         $roomCode = $request->room_code;
         $number_correction = (int)$request->number_correction;
         $rooms = [];
-        $allRooms = $this->getRoomsFromDB();
+        $allRooms = $this->getRoomsFromDB($exam_id);
         $roomForSelection = [];
 
         if($allRooms) {

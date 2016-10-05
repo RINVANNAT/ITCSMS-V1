@@ -168,7 +168,7 @@
                entrance_course_name: $('#subject_id :selected').text()
            };
 
-           console.log(requestData);
+           //console.log(requestData);
            if(requestData.room_id) {
                if(numberCorrection !== null) {
                    console.log(numberCorrection);
