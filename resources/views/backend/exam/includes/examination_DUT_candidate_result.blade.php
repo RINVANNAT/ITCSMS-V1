@@ -62,7 +62,6 @@
                 </div>
 
 
-
                 <div class="col-md-12 candidate_DUT_result">
 
 

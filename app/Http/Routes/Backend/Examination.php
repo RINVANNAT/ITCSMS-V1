@@ -41,6 +41,16 @@ Route::group([], function() {
     Route::get('exams/{id}/download_candidate_list_ing', 'ExamController@download_candidate_list_ing')->name('admin.exam.download_candidate_list_ing');
     Route::get('exams/{id}/download_registration_statistic', 'ExamController@download_registration_statistic')->name('admin.exam.download_registration_statistic');
 
+    //------download document as excel format
+
+    Route::get('exams/{id}/export_attendance_list', 'ExamController@export_attendance_list')->name('admin.exam.export_attendance_list');
+    Route::get('exams/{id}/export_candidate_list', 'ExamController@export_candidate_list')->name('admin.exam.export_candidate_list');
+    Route::get('exams/{id}/export_candidate_list_by_register_id', 'ExamController@export_candidate_list_by_register_id')->name('admin.exam.export_candidate_list_by_register_id');
+
+    Route::get('exams/{id}/export_candidate_result_lists', 'ExamController@export_candidate_result_list')->name('admin.exam.export_candidate_result_lists');
+
+
+
     Route::get('exams/{id}/check_missing_candidates', 'ExamController@check_missing_candidates')->name('admin.exam.check_missing_candidates');
     Route::get('exams/{id}/find_missing_candidates', 'ExamController@find_missing_candidates')->name('admin.exam.find_missing_candidates');
 
