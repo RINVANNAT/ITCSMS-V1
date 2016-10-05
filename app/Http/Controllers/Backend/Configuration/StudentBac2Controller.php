@@ -220,11 +220,11 @@ class StudentBac2Controller extends Controller
     public function candidates_from_moyes_data(\Illuminate\Http\Request $request){
 
         $candidatesFromMoeys = DB::table('candidatesFromMoeys')
-            ->leftJoin('studentBac2s','studentBac2s.can_id','=','candidatesFromMoeys.can_id')
-            ->leftJoin('genders','studentBac2s.gender_id','=','genders.id')
+            ->join('studentBac2s','studentBac2s.can_id','=','candidatesFromMoeys.can_id')
+            ->join('genders','studentBac2s.gender_id','=','genders.id')
             ->leftJoin('highSchools','studentBac2s.highschool_id','=','highSchools.id')
-            ->leftJoin('gdeGrades','studentBac2s.grade','=','gdeGrades.id')
-            ->leftJoin('origins','studentBac2s.province_id','=','origins.id')
+            ->join('gdeGrades','studentBac2s.grade','=','gdeGrades.id')
+            ->join('origins','studentBac2s.province_id','=','origins.id')
             ->select(['candidatesFromMoeys.id','candidatesFromMoeys.bac_year','candidatesFromMoeys.can_id','origins.name_kh as origin','studentBac2s.name_kh','studentBac2s.status','studentBac2s.highschool_id','genders.name_kh as gender_name_kh','highSchools.name_kh as highSchool_name_kh','dob','percentile','gdeGrades.name_en as gdeGrade_name_en']);
 
         $datatables =  app('datatables')->of($candidatesFromMoeys)

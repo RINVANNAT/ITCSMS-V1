@@ -62,7 +62,7 @@
             </table>
             <div class="footer">
                 <hr/>
-                <span>Concours d'entree ITC 2016</span>
+                <span>Concours d'entrée ITC 2016</span>
                 <span class="pull-right">Page {{$page_number}} sur {{$total_page}}</span>
             </div>
         </div>
