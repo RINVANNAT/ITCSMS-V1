@@ -32,7 +32,7 @@ class Exam extends Model
         $this->attributes['date_end'] = $date->format('Y/m/d');
     }
 
-    protected $dates = ['date_start','date_end'];
+    protected $dates = ['date_start','date_end','success_registration_start','success_registration_stop','reserve_registration_start','reserve_registration_stop'];
 
     public function creator(){
         return $this->belongsTo('App\Models\Access\User','create_uid');

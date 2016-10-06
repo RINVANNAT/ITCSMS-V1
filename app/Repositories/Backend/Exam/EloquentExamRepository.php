@@ -90,16 +90,31 @@ class EloquentExamRepository implements ExamRepositoryContract
             throw new GeneralException(trans('exceptions.backend.general.already_exists'));
         }
 
+        // Examination start - end
         $date_start_end = explode(" - ",$input['date_start_end']);
-
         $date_start = $date_start_end[0];
         $date_end = $date_start_end[1];
+
+        // Success registration start - end
+        $success_registration_date_start_end = explode(" - ",$input['success_registration_date_start_end']);
+        $success_registration_date_start = Carbon::createFromFormat('d/m/Y',$success_registration_date_start_end[0])->format('Y-m-d');
+        $success_registration_date_end = Carbon::createFromFormat('d/m/Y',$success_registration_date_start_end[1])->format('Y-m-d');
+
+        // Reserve registration start - end
+        $reserve_registration_date_start_end = explode(" - ",$input['reserve_registration_date_start_end']);
+        $reserve_registration_date_start = Carbon::createFromFormat('d/m/Y',$reserve_registration_date_start_end[0])->format('Y-m-d');
+        $reserve_registration_date_end = Carbon::createFromFormat('d/m/Y',$reserve_registration_date_start_end[1])->format('Y-m-d');
 
         $exam = new Exam();
 
         $exam->name = $input['name'];
         $exam->date_start = $date_start;
         $exam->date_end = $date_end;
+        $exam->success_registration_start = $success_registration_date_start;
+        $exam->success_registration_stop = $success_registration_date_end;
+        $exam->reserve_registration_start = $reserve_registration_date_start;
+        $exam->reserve_registration_stop = $reserve_registration_date_end;
+
         $exam->active = true;
         $exam->description = $input['description'];
         $exam->academic_year_id = $input['academic_year_id'];
@@ -132,13 +147,26 @@ class EloquentExamRepository implements ExamRepositoryContract
         $old_record = json_encode($exam);
 
         $date_start_end = explode(" - ",$input['date_start_end']);
-
         $date_start = $date_start_end[0];
         $date_end = $date_start_end[1];
+
+        // Success registration start - end
+        $success_registration_date_start_end = explode(" - ",$input['success_registration_date_start_end']);
+        $success_registration_date_start = Carbon::createFromFormat('d/m/Y',$success_registration_date_start_end[0])->format('Y-m-d');
+        $success_registration_date_end = Carbon::createFromFormat('d/m/Y',$success_registration_date_start_end[1])->format('Y-m-d');
+
+        // Reserve registration start - end
+        $reserve_registration_date_start_end = explode(" - ",$input['reserve_registration_date_start_end']);
+        $reserve_registration_date_start = Carbon::createFromFormat('d/m/Y',$reserve_registration_date_start_end[0])->format('Y-m-d');
+        $reserve_registration_date_end = Carbon::createFromFormat('d/m/Y',$reserve_registration_date_start_end[1])->format('Y-m-d');
 
         $exam->name = $input['name'];
         $exam->date_start = $date_start;
         $exam->date_end = $date_end;
+        $exam->success_registration_start = $success_registration_date_start;
+        $exam->success_registration_stop = $success_registration_date_end;
+        $exam->reserve_registration_start = $reserve_registration_date_start;
+        $exam->reserve_registration_stop = $reserve_registration_date_end;
         $exam->active = isset($input['active'])?true:false;
         $exam->description = $input['description'];
         $exam->academic_year_id = $input['academic_year_id'];

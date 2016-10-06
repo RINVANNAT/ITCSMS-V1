@@ -50,7 +50,7 @@
     <script>
         $(function(){
             //$('#date_start').datetimepicker();
-            $('#date_start_end').daterangepicker({
+            $('.date-range').daterangepicker({
                 format: 'DD/MM/YYYY',
             });
         });

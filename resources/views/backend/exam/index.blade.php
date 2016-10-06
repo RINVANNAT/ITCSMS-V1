@@ -37,8 +37,9 @@
                     <thead>
                     <tr>
                         <th>{{ trans('labels.backend.exams.fields.name') }}</th>
-                        <th>{{ trans('labels.backend.exams.fields.date_start') }}</th>
-                        <th>{{ trans('labels.backend.exams.fields.date_end') }}</th>
+                        <th>{{ trans('labels.backend.exams.fields.date_start_end') }}</th>
+                        <th>{{ trans('labels.backend.exams.fields.success_registration_date_start_end') }}</th>
+                        <th>{{ trans('labels.backend.exams.fields.reserve_registration_date_start_end') }}</th>
                         <th>{{ trans('labels.backend.exams.fields.description') }}</th>
                         <th>{{ trans('labels.general.actions') }}</th>
                     </tr>
@@ -66,8 +67,9 @@
                 },
                 columns: [
                     { data: 'name', name: 'name'},
-                    { data: 'date_start', name: 'date_start'},
-                    { data: 'date_end', name: 'date_end'},
+                    { data: 'date_start_end', name: 'date_start_end', searchable:false},
+                    { data: 'success_registration_date_start_end', name: 'success_registration_date_start_end',searchable:false},
+                    { data: 'reserve_registration_date_start_end', name: 'reserve_registration_date_start_end',searchable:false},
                     { data: 'description', name: 'description'},
                     { data: 'action', name: 'action',orderable: false, searchable: false}
                 ]

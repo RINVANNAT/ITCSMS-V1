@@ -110,68 +110,69 @@
     {!! Html::script('plugins/datatables/dataTables.bootstrap.min.js') !!}
     {!! Html::script('plugins/handlebars.js') !!}
     <script>
+        function initTable(tableId, data) {
+            payment_table = $('#' + tableId).DataTable({
+                dom: 'i<"payment_info">t<"payment_export_print btn-group"><"payment_btn">',
+                processing: true,
+                serverSide: true,
+                ajax: data.details_url,
+                columns: [
+                    { data: 'number', name: 'number',searchable:false },
+                    { data: 'income', name: 'income' ,searchable:false},
+                    { data: 'outcome', name: 'outcome' ,searchable:false},
+                    { data: 'created_at', name: 'created_at',searchable:false },
+                    { data: 'action', name: 'action', orderable:false,searchable:false }
+                ]
+            })
+        }
+
+        var oTable = $('#candidates-table').DataTable({
+            dom: '<"toolbar">frtip',
+            processing: true,
+            serverSide: true,
+            pageLength: {!! config('app.records_per_page')!!},
+            deferLoading: 0,
+            ajax: {
+                url:"{!! route('admin.accounting.candidatePayment.data') !!}",
+                data:function(d){
+                    d.academic_year_id = $('#filter_academic_year').val();
+                    d.degree_id = $('#filter_degree').val();
+                    d.exam_id = $('#filter_exam').val();
+                    d.department_id = $('#filter_department').val();
+                    d.gender_id = $('#filter_gender').val();
+                }
+            },
+            columns: [
+                { data: 'name_kh', name: 'candidates.name_kh'},
+                { data: 'name_latin', name: 'candidates.name_en'},
+                { data: 'gender_name_kh', name: 'genders.name_kh'},
+                { data: 'dob', name: 'candidates.dob'},
+                { data: 'province', name: 'origins.name_kh'},
+                { data: 'class', name: 'class',searchable:false,orderable:false},
+                {
+                    "className":      'details-control',
+                    "orderable":      false,
+                    "searchable":       false,
+                    "data":           null,
+                    "defaultContent": ''
+                },
+            ]
+        });
+
         $(document).ready(function(){
             var template = Handlebars.compile($("#details-template").html());
             var current_id = null;
             var base_url = "{{url('/')}}";
             var payment_table = null;
 
-            function initTable(tableId, data) {
-                payment_table = $('#' + tableId).DataTable({
-                    dom: 'i<"payment_info">t<"payment_export_print btn-group"><"payment_btn">',
-                    processing: true,
-                    serverSide: true,
-                    ajax: data.details_url,
-                    columns: [
-                        { data: 'number', name: 'number',searchable:false },
-                        { data: 'income', name: 'income' ,searchable:false},
-                        { data: 'outcome', name: 'outcome' ,searchable:false},
-                        { data: 'created_at', name: 'created_at',searchable:false },
-                        { data: 'action', name: 'action', orderable:false,searchable:false }
-                    ]
-                })
-            }
-
-            var oTable = $('#candidates-table').DataTable({
-                dom: '<"toolbar">frtip',
-                processing: true,
-                serverSide: true,
-                pageLength: {!! config('app.records_per_page')!!},
-                ajax: {
-                    url:"{!! route('admin.accounting.candidatePayment.data') !!}",
-                    data:function(d){
-                        d.academic_year_id = $('#filter_academic_year').val();
-                        d.degree_id = $('#filter_degree').val();
-                        d.exam_id = $('#filter_exam').val();
-                        d.department_id = $('#filter_department').val();
-                        d.gender_id = $('#filter_gender').val();
-                    }
-                },
-                columns: [
-                    { data: 'name_kh', name: 'candidates.name_kh'},
-                    { data: 'name_latin', name: 'candidates.name_en'},
-                    { data: 'gender_name_kh', name: 'genders.name_kh'},
-                    { data: 'dob', name: 'candidates.dob'},
-                    { data: 'province', name: 'origins.name_kh'},
-                    { data: 'class', name: 'class',searchable:false,orderable:false},
-                    {
-                        "className":      'details-control',
-                        "orderable":      false,
-                        "searchable":       false,
-                        "data":           null,
-                        "defaultContent": ''
-                    },
-                ]
-            });
-
             $("div.toolbar").html(
                     ' {!! Form::select('academic_year',$academicYears,null, array('class'=>'form-control','id'=>'filter_academic_year')) !!} '+
-                    '{!! Form::select('exam',$exams,null, array('class'=>'form-control','id'=>'filter_exam','placeholder'=>'Exam')) !!} - '+
+                    '{!! Form::select('exam',$exams,null, array('class'=>'form-control','id'=>'filter_exam')) !!} - '+
                     '{!! Form::select('degree',$degrees,null, array('class'=>'form-control','id'=>'filter_degree','placeholder'=>'Degree')) !!} '+
                     '{!! Form::select('department',$departments,null, array('class'=>'form-control','id'=>'filter_department','placeholder'=>'Department')) !!} ' +
                     '{!! Form::select('gender',$genders,null, array('class'=>'form-control','id'=>'filter_gender','placeholder'=>'Gender')) !!} '
-
             );
+            oTable.draw();
 
             $('#filter_academic_year').on('change', function(e) {
                 oTable.draw();

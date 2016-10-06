@@ -513,6 +513,8 @@ return [
                 'date_start' => 'Date Start',
                 'date_end' => 'Date End',
                 'date_start_end' => "Date From/Till",
+                'success_registration_date_start_end' => "Success Registration",
+                'reserve_registration_date_start_end' => "Reserve Registration",
                 'active' => "Class",
                 'description' => "Description",
                 'type_id' => "Exam Type",

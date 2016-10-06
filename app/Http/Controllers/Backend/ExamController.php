@@ -177,17 +177,33 @@ class ExamController extends Controller
         $exams = DB::table('exams')
             ->where('type_id',$id)
             ->where('active',true)
-            ->select(['id','type_id','name','date_start','date_end','description']);
+            ->select([
+                'id','type_id','name','date_start','date_end',
+                'success_registration_start','success_registration_stop',
+                'reserve_registration_start','reserve_registration_stop',
+                'description'
+            ]);
 
         $datatables =  app('datatables')->of($exams);
 
 
         return $datatables
-            ->editColumn('date_start',function($exam){
-                return Carbon::createFromFormat('Y-m-d h:i:s',$exam->date_start)->toFormattedDateString();
+            ->addColumn('date_start_end',function($exam){
+                return Carbon::createFromFormat('Y-m-d h:i:s',$exam->date_start)->toFormattedDateString() ." - ". Carbon::createFromFormat('Y-m-d h:i:s',$exam->date_end)->toFormattedDateString();
             })
-            ->editColumn('date_end',function($exam){
-                return Carbon::createFromFormat('Y-m-d h:i:s',$exam->date_end)->toFormattedDateString();
+            ->addColumn('success_registration_date_start_end',function($exam){
+                if($exam->success_registration_start != null){
+                    return Carbon::createFromFormat('Y-m-d',$exam->success_registration_start)->toFormattedDateString() ." - ".Carbon::createFromFormat('Y-m-d',$exam->success_registration_stop)->toFormattedDateString();
+                } else {
+                    return "-";
+                }
+            })
+            ->addColumn('reserve_registration_date_start_end',function($exam){
+                if($exam->reserve_registration_start != null){
+                    return Carbon::createFromFormat('Y-m-d',$exam->reserve_registration_start)->toFormattedDateString() ." - ".Carbon::createFromFormat('Y-m-d',$exam->reserve_registration_stop)->toFormattedDateString();
+                } else {
+                    return "-";
+                }
             })
             ->addColumn('action', function ($exam) {
                 $action = "";
@@ -770,8 +786,15 @@ class ExamController extends Controller
     public function download_correction_sheet(DownloadExaminationDocumentsRequest $request,$exam_id){
         $exam = $this->exams->findOrThrowException($exam_id);
         $courses = $exam->entranceExamCourses()->get();
-        $rooms = $exam->rooms()->with('building')->with('candidates')->with('candidates.gender')->orderBy('building_id')->orderBy('name')->get();
+        $rooms = $exam->rooms()->with('candidates')->get()->toArray();
 
+        foreach($rooms as &$room){
+            $room['roomcode'] = Crypt::decrypt($room['roomcode']);
+        }
+
+        usort($rooms, function($a, $b) {
+            return $a['roomcode'] - $b['roomcode'];
+        });
 
         return view('backend.exam.print.correction_sheet',compact('rooms','courses'));
     }
