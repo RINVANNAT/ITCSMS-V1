@@ -229,9 +229,9 @@
                         if(result.status) {
 
                             notify("success","info", "your record have been save!");
-                            location.reload();
+//                            location.reload();
                         } else {
-                            notify("error","info", "Please Check Your Record Was Not Saved!");
+                            notify("error","info", "Duplicate Record!");
                         }
 
                     }

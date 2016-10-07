@@ -307,6 +307,7 @@ class EloquentExamRepository implements ExamRepositoryContract
 
     public function insertCandidateScore($exam_id, $requestDatas, $correctorName) {
 
+        $check =0;
         $numberCorrection = $requestDatas['sequence'];
         $roomcode = $requestDatas['roomcode'];
         $subjectId = $requestDatas['course_id'];
@@ -318,9 +319,16 @@ class EloquentExamRepository implements ExamRepositoryContract
         //dd($requestDatas);
         for($i = 0; $i < count($requestDatas['score_c']); $i++) {
             $insertResult = $this->storeCandidateScore($subjectId, $correctAns[$i], $wrongAns[$i], $noAns[$i], $numberCorrection, $i+1, $correctorName,$roomcode,$exam_id);
+            if($insertResult) {
+                $check++;
+            }
         }
 
-        return true;
+        if($check == count($requestDatas['score_c'])) {
+            return ['status'=>true];
+        } else {
+            return ['status'=>false];
+        }
     }
 
     /*private function checkEachCandidateScoreId ($requestDatas, $numberCorrection, $correctorName) {
