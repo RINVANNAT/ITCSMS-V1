@@ -229,7 +229,6 @@
                         if(result.status) {
 
                             notify("success","info", "your record have been save!");
-//                            location.reload();
                         } else {
                             notify("error","info", "Duplicate Record!");
                         }
