@@ -947,16 +947,31 @@ class ExamController extends Controller
 
     public function getAllRooms($exam_id, Request $request) {
 
+
+
+        $correction = $request->number_correction;
+        $entranceCourseId = $request->entrance_course_id;
+
+//        $rooms = $this->roomWithNotInputtedScoreCandidate($exam_id, $correction, $entranceCourseId);
+//
+
+//
+//        dd($test);
+
         $rooms = [];
         $roomFromDB = $this->getRoomsFromDB($exam_id);
         if($roomFromDB) {
             foreach ($roomFromDB as $room) {
                 $rooms[$room->room_id] = Crypt::decrypt($room->room_code);
             }
+
             asort($rooms);
+
             return view('backend.exam.includes.partial_selection_room_course', compact('rooms'))->render();
 
+//            dd($rooms);
         }
+
     }
 
     private function getRoomsFromDB($exam_id) {
@@ -972,66 +987,64 @@ class ExamController extends Controller
     }
 
 
-    public function requestRoomCourseSelection ($exam_id, Request $request) {
+    private  function roomWithNotInputtedScoreCandidate ($exam_id, $correction, $entranceCourseId) {
 
-        $correction = $request->number_correction;
-        $subjectId = $request->entrance_course_id;
         $rooms = [];
+        //get all examRooms -> get all candidate in each room -> get all the number correction of candidate from db then compare if the sequence = the requested correction then we dont get that room
 
-        if($correction != null) {
+        $roomCodes = DB::table('examRooms')
+            ->select('examRooms.roomcode as room_code', 'examRooms.id as room_id')
+            ->where('examRooms.exam_id', '=', $exam_id)
+            ->WhereNotNull('examRooms.roomcode')
+            ->orderBy('room_code', 'ASC')->get();
 
-            $roomCodes = DB::table('examRooms')
-                ->select('examRooms.roomcode as room_code', 'examRooms.id as room_id')
-                ->orderBy('room_code', 'ASC')->get();
+        if($roomCodes) {
 
-            if($roomCodes) {
+            foreach($roomCodes as $roomCode) {
 
-                foreach($roomCodes as $roomCode) {
+                $roomCode = Crypt::decrypt($roomCode->room_code);
+                $status =false;
 
-                    $check =0;
-                    $numberOfCandidateInEachRoom = DB::table('candidates')
-                        ->where([
-                            ['candidates.room_id', $roomCode->room_id],
-                            ['candidates.active', '=', true]
-                        ])
-                        ->select('candidates.id as candidate_id')
-                        ->get();
+                        $sequences = DB::table('secret_room_score')
+                            ->where([
+                                ['secret_room_score.roomcode', $roomCode],
+                                ['secret_room_score.course_id', $entranceCourseId],
+                                ['secret_room_score.sequence', $correction]
+                            ])
+                            ->select('secret_room_score.sequence as number_correction')
+                            ->get();
 
-                    if($numberOfCandidateInEachRoom) {
+                        if($sequences) {// to check here if at least one student has inputted the score
+                            foreach($sequences as $sequence) {
+                                if($sequence->number_correction == $correction) {
 
-                        foreach($numberOfCandidateInEachRoom as $eachCandidateRoom) {
-
-                            $sequences = DB::table('candidateEntranceExamScores')
-                                ->where([
-                                    ['candidateEntranceExamScores.candidate_id', $eachCandidateRoom->candidate_id],
-                                    ['candidateEntranceExamScores.entrance_exam_course_id', $subjectId]
-                                ])
-                                ->select('candidateEntranceExamScores.sequence as number_correction')
-                                ->get();
-
-                            if($sequences) {
-                                foreach($sequences as $sequence) {
-                                    if($sequence->number_correction == $correction) {
-                                        $check++;
-                                    }
+                                    $status= true;
+                                    break;
                                 }
                             }
                         }
-                        if($check !== count($numberOfCandidateInEachRoom)) {
 
+                        if($status == true) {
+                        } else {
                             $rooms[$roomCode->room_id]=Crypt::decrypt($roomCode->room_code);
+
                         }
                     }
-                }
 
-                asort($rooms);
 
-                return view('backend.exam.includes.partial_selection_room_course', compact('rooms'))->render();
-            } else {
+//                    if($check !== count($numberOfCandidateInEachRoom)) {
+//
+//                        $rooms[$roomCode->room_id]=Crypt::decrypt($roomCode->room_code);
+//                    }
+            asort($rooms);
 
-                return 'There are not Selected Room For Exam';
-            }
+//            return view('backend.exam.includes.partial_selection_room_course', compact('rooms'))->render();
+            return $rooms;
+        } else {
+
+            return 'There are not Selected Room For Exam';
         }
+
     }
 
     private function sortRoomCodes($a, $b)
@@ -1050,6 +1063,10 @@ class ExamController extends Controller
         $rooms = [];
         $allRooms = $this->getRoomsFromDB($exam_id);
         $roomForSelection = [];
+
+        $test = $this->roomWithNotInputtedScoreCandidate($exam_id, $number_correction, $subjectId);
+//
+//        dd($test);
 
         if($allRooms) {
 
@@ -1112,6 +1129,7 @@ class ExamController extends Controller
         } else {
             return Response::json(['status'=>false]);
         }
+
 
     }
 

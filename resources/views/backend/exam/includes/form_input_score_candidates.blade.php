@@ -132,6 +132,8 @@
                                 {!! Form::open(['route' => ['admin.exam.insert_exam_score_candidate',$exam_id], 'class' => 'form-horizontal table_score', 'role' => 'form', 'method' => 'post']) !!}
 
                                 {!! Form::hidden('sequence', $number_correction, ['class' => 'form-control ']) !!}
+                                {!! Form::hidden('roomcode', $roomCode, ['class' => 'form-control ']) !!}
+                                {!! Form::hidden('course_id', $subjectId, ['class' => 'form-control']) !!}
                                 @if($candidates)
                                     @foreach ($candidates as $candidate)
                                         <?php $i++; ?>
@@ -145,8 +147,6 @@
                                                 {!! Form::hidden('candidate_id[]', $candidate->candidate_id, ['class' => 'form-control']) !!}
 
                                                 {{--<input type="hidden" name="course_id" value="{{$subjectId}}">--}}
-
-                                                {!! Form::hidden('course_id[]', $subjectId, ['class' => 'form-control']) !!}
 
                                                 <?php echo $i;?>
                                             </td>
