@@ -10,6 +10,9 @@
 @endsection
 
 @section('after-styles-end')
+    {!! Html::script('plugins/es6-promise/es6-promise.min.js') !!}
+    {!! Html::script('plugins/sweetalert2/dist/sweetalert2.min.js') !!}
+    <link rel="stylesheet" href="{{url('plugins/sweetalert2/dist/sweetalert2.min.css')}}">
     {!! Html::style('plugins/jstree/themes/default/style.min.css') !!}
     {!! Html::style('plugins/datatables/dataTables.bootstrap.css') !!}
     <style>
@@ -815,34 +818,24 @@
 
             $('#candidates-table').on('click', '.btn-register[data-remote]', function (e) {
                 var url = $(this).data('remote');
+                var exam_type = $(this).data('exam');
                 e.preventDefault();
-                swal({
-                    title: "Confirm",
-                    text: "Register this candidate?",
-                    type: "info",
-                    showCancelButton: true,
-                    confirmButtonColor: "#DD6B55",
-                    confirmButtonText: "Yes, register it!",
-                    closeOnConfirm: true
-                }, function(confirmed) {
-                    if (confirmed) {
-                        $.ajaxSetup({
-                            headers: {
-                                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-                            }
-                        });
+                if(exam_type != 2) { // Engineer Exam
+                    swal({
+                        title: 'Error!',
+                        text: 'Do you want to continue',
+                        type: 'error',
+                        confirmButtonText: 'Cool'
+                    })
+                } else { // DUT Examß
+                    swal({
+                        title: 'Error!',
+                        text: 'Do you want to continue',
+                        type: 'error',
+                        confirmButtonText: 'Cool'
+                    })
+                }
 
-                        // confirm then
-                        $.ajax({
-                            url: url,
-                            type: 'GET',
-                            dataType: 'json',
-                            success:function(data) {
-                                candidate_datatable.draw();
-                            }
-                        });
-                    }
-                });
                 return false;
             });
             enableDeleteRecord($('#candidates-table'));

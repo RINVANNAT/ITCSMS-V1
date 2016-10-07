@@ -375,11 +375,11 @@ class EloquentExamRepository implements ExamRepositoryContract
 
        $CandidateScore =  DB::table('secret_room_score')
                             ->where([
-                                ['sequence', '=', $sequence],
-                                ['course_id', '=', $subjectId],
-                                ['roomcode', '=', $roomcode],
-                                ['order_in_room', '=', $orderInRoom],
-                                ['exam_id', '=',$exam_id]
+                                ['sequence', $sequence],
+                                ['course_id', $subjectId],
+                                ['roomcode', $roomcode],
+                                ['order_in_room', $orderInRoom],
+                                ['exam_id', $exam_id]
                             ])
                             ->first();
 
@@ -391,20 +391,25 @@ class EloquentExamRepository implements ExamRepositoryContract
     {
 
 
-        $insertedVal = DB::table('secret_room_score')->insertGetId([
-            'score_c' => (int)$correctAns,
-            'score_w' => (int)$wrongAns,
-            'score_na' => (int)$noAns,
-            'sequence' => (int)$numberCorrection,
-            'course_id' => (int)$subjectId,
-            'corrector_name' => $correctorName,
-            'order_in_room' => $orderInRoom,
-            'roomcode' => $roomcode,
-            'exam_id' => $exam_id
-        ]);
-        //UserLog
-        $this->getUserLog($insertedVal, $model = 'SecretRoomScore', $action = 'Create');
-        return $insertedVal;
+        if($this->getCandidateScore($roomcode,$subjectId,$numberCorrection,$orderInRoom,$exam_id)){
+            return false;
+        } else {
+            $insertedVal = DB::table('secret_room_score')->insertGetId([
+                'score_c' => (int)$correctAns,
+                'score_w' => (int)$wrongAns,
+                'score_na' => (int)$noAns,
+                'sequence' => (int)$numberCorrection,
+                'course_id' => (int)$subjectId,
+                'corrector_name' => $correctorName,
+                'order_in_room' => $orderInRoom,
+                'roomcode' => $roomcode,
+                'exam_id' => $exam_id
+            ]);
+            //UserLog
+            $this->getUserLog($insertedVal, $model = 'SecretRoomScore', $action = 'Create');
+            return $insertedVal;
+        }
+
     }
 
     public function getUserLog($data, $model, $action) {
