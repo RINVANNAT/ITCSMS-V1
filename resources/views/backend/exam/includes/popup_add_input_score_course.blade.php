@@ -172,7 +172,13 @@
            if(requestData.room_id) {
                if(numberCorrection !== null) {
                    console.log(numberCorrection);
-                   input_score_window = PopupCenterDual(input_score_url+"?room_id="+requestData.room_id+"&entrance_course_id="+requestData.entrance_course_id+"&number_correction="+ numberCorrection +"&course_name="+requestData.entrance_course_name + "&room_code=" + requestData.room_code + '&not_selected_rooms='+ not_selected_rooms,'request input form ','1250','960');
+                   input_score_window = PopupCenterDual(
+                           input_score_url+"?room_id="+requestData.room_id+
+                           "&entrance_course_id="+requestData.entrance_course_id+
+                           "&number_correction="+ numberCorrection +"&course_name="+
+                           requestData.entrance_course_name + "&room_code=" + requestData.room_code ,
+                           'request input form ','1250','960'
+                   );
                }
            }
 

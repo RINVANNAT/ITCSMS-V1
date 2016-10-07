@@ -970,7 +970,9 @@
 
             $('#btn_check_course_error').on('click', function() {
 
-                $('.modal_loading').show();
+                //$('.modal_loading').show();
+                toggleLoading(true);
+                var check_btn = $(this);
                 check_course_error = true;
                 course_datatable.draw();
                 var baseUrl ='{{route("admin.exam.ajax_check_candidate_score", $exam->id)}} ';
@@ -982,11 +984,13 @@
                         console.log(result.status);
                         if(result.status == false) {
 
-                            $('#btn_result_score_candidate').show();
-                            $('.modal_loading').delay(2000).hide(0);
-                        } else {
                             $('#btn_result_score_candidate').hide();
-                            $('.modal_loading').delay(2000).hide(0);
+                            check_btn.show();
+                            toggleLoading(false);
+                        } else {
+                            $('#btn_result_score_candidate').show();
+                            check_btn.hide();
+                            toggleLoading(false);
                         }
                     }
                 });

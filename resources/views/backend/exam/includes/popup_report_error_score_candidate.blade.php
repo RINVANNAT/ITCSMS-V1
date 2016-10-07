@@ -108,6 +108,8 @@
 
 
                         <?php $k=0; $length = []; $p=0; $arrayRoomCode = []; $arrayOrderInRoom = [];?>
+
+
                         @foreach($errorCandidateScores as $errorScoreProperties)
                             <?php $k++; $p=0;  ?>
 
@@ -119,31 +121,36 @@
                                         <?php  $p++;?>
 
                                             <div class="col-sm-2 enlarge-number">
-                                                <p > {{$errorScoreProperties->candidateProperties->room_code}} </p>
+                                                <p > {{explode( '_', $errorScoreProperties->candidateProperties )[0]}} </p>
                                             </div>
                                             <div class="col-sm-1 enlarge-number">
-                                                <p >{{$errorScore->candidate_number_in_room}}</p>
+                                                <p >{{explode( '_', $errorScoreProperties->candidateProperties )[1]}}</p>
                                             </div>
                                             <div class="col-sm-2">
-                                                <p class="score_c_<?php echo $k;?> enlarge-number" id="score_c_<?php echo $k.'_'.$p;?>">{{$errorScore->score_c}}</p>
+                                                <p class="score_c_<?php echo $k;?> enlarge-number" id="score_c_<?php echo $k.'_'.$p;?>">{{$errorScore['score_c']}}</p>
                                             </div>
                                             <div class="col-sm-2">
-                                                <p class="score_w_<?php echo $k;?> enlarge-number" id="score_w_<?php echo $k.'_'.$p;?>" >{{$errorScore->score_w}}</p>
+                                                <p class="score_w_<?php echo $k;?> enlarge-number" id="score_w_<?php echo $k.'_'.$p;?>" >{{$errorScore['score_w']}}</p>
                                             </div>
                                             <div class="col-sm-2">
-                                                <p class="score_na_<?php echo $k;?> enlarge-number" id="score_na_<?php echo $k.'_'.$p;?>" >{{$errorScore->score_na}}</p>
+                                                <p class="score_na_<?php echo $k;?> enlarge-number" id="score_na_<?php echo $k.'_'.$p;?>" >{{$errorScore['score_na']}}</p>
                                             </div>
                                             <div class="col-sm-1">
-                                                <p class="score_total_<?php echo $k;?> enlarge-number" id="score_total_<?php echo $k.'_'.$p;?>">{{$errorScore->score_c + $errorScore->score_w + $errorScore->score_na}}</p>
+                                                <p class="score_total_<?php echo $k;?> enlarge-number" id="score_total_<?php echo $k.'_'.$p;?>">{{$errorScore['score_c'] + $errorScore['score_w'] + $errorScore['score_na']}}</p>
                                             </div>
                                             <div class="col-sm-1">
-                                                <p class="socre_properties_<?php echo $k;?> enlarge-number" style="border: 2px solid orangered; text-align: center"> {{$errorScore->sequence}}</p>
+                                                <p class="socre_properties_<?php echo $k;?> enlarge-number" style="border: 2px solid orangered; text-align: center"> {{$errorScore['sequence']}}</p>
                                             </div>
 
                                     @endforeach
 
 
-                                        <?php array_push($length,$p);   $arrayRoomCode[] =  $errorScoreProperties->candidateProperties->room_code; $arrayOrderInRoom[] = $errorScore->candidate_number_in_room;?>
+
+                                        <?php
+                                            array_push($length,$p);
+                                            $arrayRoomCode[] =  explode( '_', $errorScoreProperties->candidateProperties )[0];
+                                            $arrayOrderInRoom[] = explode( '_', $errorScoreProperties->candidateProperties )[1];
+                                        ?>
 
                                         <div class="col-sm-1">
                                             <button class="btn-xs" onclick="addNewCorrection(this)"> Add </button>
@@ -152,14 +159,14 @@
                                 <div class="col-sm-12 new_correction" style="background-color: #F5EAEC;display: none;">
                                     <form class="new_correction_form">
                                         <div class="col-sm-2 enlarge-number">
-                                            <label for="order">{{$errorScoreProperties->candidateProperties->room_code}}</label>
-                                            {!! Form::hidden('candidate_id[]', $errorScoreProperties->candidateProperties->candidate_id, ['class' => 'form-control candidate_has_score_error_id']) !!}
+                                            <label for="order">{{explode( '_', $errorScoreProperties->candidateProperties )[0]}}</label>
+                                            {!! Form::hidden('candidate_id[]', 0, ['class' => 'form-control candidate_has_score_error_id']) !!}
 
                                         </div>
 
                                         <div class="col-sm-1 enlarge-number" >
-                                            <label for="roomCode">{{$errorScore->candidate_number_in_room}}</label>
-                                            {!! Form::hidden('order[]', $errorScore->candidate_number_in_room, ['class' => 'form-control candidate_order_in_room']) !!}
+                                            <label for="roomCode">{{explode( '_', $errorScoreProperties->candidateProperties )[1]}}</label>
+                                            {!! Form::hidden('order[]', explode( '_', $errorScoreProperties->candidateProperties )[1], ['class' => 'form-control candidate_order_in_room']) !!}
                                         </div>
                                         <div class="col-sm-2">
                                             {!! Form::text('score_c[]', 0, ['class' => 'form-control number_only enlarge-number score_c input_new_correction']) !!}
@@ -171,7 +178,7 @@
                                         </div>
                                         <div class="col-sm-2">
                                             {!! Form::text('score_na[]', 0, ['class' => 'form-control number_only enlarge-number score_na input_new_correction']) !!}
-                                            {!! Form::hidden('course_id[]', $errorScore->course_id, ['class' => 'form-control']) !!}
+                                            {!! Form::hidden('course_id[]', $courseId, ['class' => 'form-control']) !!}
                                         </div>
 
                                         <div class="col-sm-1">
@@ -179,8 +186,9 @@
                                         </div>
 
                                         <div class="col-sm-1 enlarge-number ">
-                                            <p style="border: 2px solid orangered; text-align: center" > {{$errorScore->sequence + 1}}</p>
-                                            {!! Form::hidden('sequence[]', $errorScore->sequence + 1, ['class' => 'form-control' ]) !!}
+                                            <p style="border: 2px solid orangered; text-align: center" > {{count($errorScoreProperties->scoreErrors) + 1}}</p>
+                                            {!! Form::hidden('sequence[]', count($errorScoreProperties->scoreErrors) + 1, ['class' => 'form-control' ]) !!}
+                                            {!! Form::hidden('roomcode[]', explode( '_', $errorScoreProperties->candidateProperties )[0], ['class' => 'form-control' ]) !!}
                                         </div>
 
                                         <div class="col-sm-1 " style="margin-top: 5px" >
@@ -231,7 +239,7 @@
        @endif
 
        var store_array_correction = [];
-       var serializeData = [];
+
        var tmp = null;
        $(document).ready(function () {
            $('.myloading').hide();
@@ -244,7 +252,7 @@
 
            //---------------------------------------------------------
 
-           $(".new_correction_form").on('submit',function(e){
+           /*$(".new_correction_form").on('submit',function(e){
                e.preventDefault();
                var data = $(this).serializeArray();
                var status = 0;
@@ -306,7 +314,7 @@
                    notify("error","info", "Please Add The Corrector Name!!!");
                }
 
-           });
+           });*/
 
            //---------------------------------------------
 
@@ -326,7 +334,10 @@
        }
 
        function cancelNewCorrection(obj){
-           $(obj).closest('.new_correction').remove();
+           $(obj).closest('.new_correction').find("input[name='score_c[]']").val(0);
+           $(obj).closest('.new_correction').find("input[name='score_w[]']").val(0);
+           $(obj).closest('.new_correction').find("input[name='score_na[]']").val(0);
+           $(obj).closest('.new_correction').hide();
        }
 
        function addNewCorrection(obj){
@@ -362,10 +373,11 @@
 
            var baseUrl = "{{route('admin.exam.add_new_correction_score',$exam_id)}}";
            var corrector_name = $('#corrector_error_score').val();
+           var serializeData = [];
 
            var status = 0;
 
-           $('.new_correction').each(function() {
+           $('.new_correction:visible').each(function() {
                var each_form_score = $(this).children('form').serialize();
                var data = $(this).children('form').serializeArray();
                serializeData.push(each_form_score);
@@ -387,6 +399,7 @@
                    }
                });
            });
+
            if(corrector_name != '') {
                if(status == 0) {
                    if(serializeData.length > 0) {
@@ -432,29 +445,16 @@
 
            $('#btn_candidate_error_socre').on('click', function() {
 
-           var course_id = JSON.parse('<?php echo json_encode($courseId)?>');
-           var course_name = JSON.parse('<?php echo json_encode($courseName)?>');
-           var baseUrl = '{!! route('admin.exam.print_candidate_error_socre', $exam_id) !!}';
+               var course_id = JSON.parse('<?php echo json_encode($courseId)?>');
+               var course_name = JSON.parse('<?php echo json_encode($courseName)?>');
+               var baseUrl = '{!! route('admin.exam.print_candidate_error_socre', $exam_id) !!}';
 
-           var array_candidate_ids = $(".candidate_has_score_error_id").map(function(){return $(this).val();}).get();
-           var array_room_code_id = JSON.parse('<?php echo json_encode($arrayRoomCode)?>');
-           var order = $(".candidate_order_in_room").map(function(){return $(this).val();}).get();
+               var array_candidate_ids = $(".candidate_has_score_error_id").map(function(){return $(this).val();}).get();
+               var array_room_code_id = JSON.parse('<?php echo json_encode($arrayRoomCode)?>');
+               var order = $(".candidate_order_in_room").map(function(){return $(this).val();}).get();
 
-//           window.location.href = baseUrl+'?course_id=' + course_id +'&candidate_array_ids='+array_candidate_ids+'&room_code_ids='+ array_room_code_id +'&order_in_room=' +order;
+               window_request_room = PopupCenterDual(baseUrl+'?course_id=' + course_id +'&room_code_ids='+ array_room_code_id +'&order_in_room=' +order + '&course_name=' + course_name,'Candidates Result List','1000','1200');
 
-           window_request_room = PopupCenterDual(baseUrl+'?course_id=' + course_id +'&room_code_ids='+ array_room_code_id +'&order_in_room=' +order + '&course_name=' + course_name,'Candidates Result List','1000','1200');
-
-
-//           for(var index =0; index< candidate_score_error.length; index++) {
-//
-//               var tmp = candidate_score_error[index].candidateProperties.room_code;
-//               for(var key= index+1; key< candidate_score_error.length; key++) {
-//                   if(tmp == candidate_score_error[key].candidateProperties.room_code) {
-//                       candidate_number_in_room.push(candidate_score_error[key].scoreErrors.canididate_number_in_room);
-//                       unique_room_code.push(tmp);
-//                   }
-//               }
-//           }
            })
        @endif
 

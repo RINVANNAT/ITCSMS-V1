@@ -141,7 +141,7 @@ class EntranceExamCourseController extends Controller
                 }
                 if($request->check_course_error == "true"){
                     if(Auth::user()->allow('report-error-on-inputted-score')){
-                        $errorCandidateScores = $this->exams->reportErrorCandidateExamScores($exam_id, $item->id);
+                        $errorCandidateScores = $this->exams->getErrorScore($exam_id, $item->id);
 
                         if(!empty($errorCandidateScores)){
                             $result = $result.' <button class="btn btn-xs btn-danger btn-report-error" data-remote="'. $item->id .'">Report Error</button>';

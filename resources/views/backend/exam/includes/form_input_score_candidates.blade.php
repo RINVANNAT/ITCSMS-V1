@@ -45,20 +45,23 @@
                            {{--here we need --}}
 
                            <div class="col-sm-12 text-center">
+                               @if($preRoom != null)
                                <div class="col-sm-3 text-info btn btn-primary no-padding enlarge-number" id="pre_room" room_id="{{$preRoom['room_id']}}"  style="margin-top: 7px">
                                    {{ $preRoom['room_code'] }}
                                </div>
+                               @endif
 
                                <div class="col-sm-4 text-info enlarge-number no-padding" id="selected_room" room_id="{{$roomId}}" style="margin-top: -10px">
                                  <strong> <h1> {{ $roomCode }}</h1></strong>
                                </div>
-
+                               @if($nextRoom != null)
                                <div class="col-sm-3 text-info btn btn-primary no-padding enlarge-number" id="next_room" room_id="{{$nextRoom['room_id']}}" style="margin-top: 7px">
                                    {{ $nextRoom['room_code'] }}
                                </div>
+                               @endif
 
                                <div class="col-sm-2 ">
-                                   {!! Form::select('room',$roomForSelection, null, array('class'=>'form-control enlarge-selection','id'=>'room_selection')) !!}
+                                   {!! Form::select('room',$availableRooms, null, array('class'=>'form-control enlarge-selection','id'=>'room_selection')) !!}
                                </div>
 
                            </div>
