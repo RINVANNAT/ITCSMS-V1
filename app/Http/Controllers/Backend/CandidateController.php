@@ -235,6 +235,7 @@ class CandidateController extends Controller
                 'candidates.id',DB::raw("CONCAT(buildings.code,\"examRooms\".name) as room"),
                 'candidates.register_id','candidates.name_kh','candidates.name_latin',
                 'candidates.highschool_id','highSchools.name_kh as high_school',
+                'candidates.exam_id',
                 'genders.name_kh as gender_name_kh','gdeGrades.name_en as bac_total_grade',
                 'origins.name_kh as province', 'dob','result','is_paid','is_register'
             ]);
@@ -294,7 +295,7 @@ class CandidateController extends Controller
                         $action = '<span style="color:green"><i class="fa fa-check"></i></span>';
                     } else if($candidate->is_paid){
                         if(Auth::user()->allow('register-exam-candidate')) {
-                            $action = ' <button class="btn btn-xs btn-register" data-remote="' . route('admin.candidate.register', $candidate->id) . '"><i class="fa fa-check-circle-o" data-toggle="tooltip" data-placement="top" title="' . trans('buttons.general.register') . '"></i></button>';
+                            $action = ' <button class="btn btn-xs btn-register" data-exam="'.$candidate->exam_id.'" data-remote="' . route('admin.candidate.register', $candidate->id) . '"><i class="fa fa-check-circle-o" data-toggle="tooltip" data-placement="top" title="' . trans('buttons.general.register') . '"></i></button>';
                         }
                     }
                 }

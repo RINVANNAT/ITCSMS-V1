@@ -987,7 +987,7 @@ class ExamController extends Controller
     }
 
 
-    private  function roomWithNotInputtedScoreCandidate ($exam_id, $correction, $entranceCourseId) {
+    /*private  function roomWithNotInputtedScoreCandidate ($exam_id, $correction, $entranceCourseId) {
 
         $rooms = [];
         //get all examRooms -> get all candidate in each room -> get all the number correction of candidate from db then compare if the sequence = the requested correction then we dont get that room
@@ -1045,7 +1045,7 @@ class ExamController extends Controller
             return 'There are not Selected Room For Exam';
         }
 
-    }
+    }*/
 
     private function sortRoomCodes($a, $b)
     {
@@ -1064,7 +1064,7 @@ class ExamController extends Controller
         $allRooms = $this->getRoomsFromDB($exam_id);
         $roomForSelection = [];
 
-        $test = $this->roomWithNotInputtedScoreCandidate($exam_id, $number_correction, $subjectId);
+//        $test = $this->roomWithNotInputtedScoreCandidate($exam_id, $number_correction, $subjectId);
 //
 //        dd($test);
 

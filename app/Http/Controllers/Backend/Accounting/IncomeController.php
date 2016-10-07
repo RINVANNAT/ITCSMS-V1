@@ -106,7 +106,7 @@ class IncomeController extends Controller
 
     public function candidate_payment_data()
     {
-        $now = Carbon::now()->format('m/d/Y');
+        $now = Carbon::now();
         $exam = Exam::where('id',Input::get('exam_id'))->first();
 
         $candidates = DB::table('candidates')
@@ -124,12 +124,12 @@ class IncomeController extends Controller
                 'academicYears.name_kh as academic_year_name_kh','candidates.grade_id', 'candidates.degree_id','degrees.name_kh as degree_name_kh',
                 'genders.name_kh as gender_name_kh','gdeGrades.name_en as bac_total_grade']);
 
-        if($now>=Carbon::createFromFormat('Y-m-d',$exam->success_registration_start) && $now<=Carbon::createFromFormat('Y-m-d',$exam->success_registration_stop)){
+        if($now>=$exam->success_registration_start && $now<=$exam->success_registration_stop){
             $candidates = $candidates->where('candidates.result',"Pass");
-            if($now>=Carbon::createFromFormat('Y-m-d',$exam->reserve_registration_start) && $now<=Carbon::createFromFormat('Y-m-d',$exam->reserve_registration_stop)){
+            if($now>=$exam->reserve_registration_start && $now<=$exam->reserve_registration_stop){
                 $candidates = $candidates->orWhere('candidates.result',"Reserve");
             }
-        } else if($now>=Carbon::createFromFormat('Y-m-d',$exam->reserve_registration_start) && $now<=Carbon::createFromFormat('Y-m-d',$exam->reserve_registration_stop)){
+        } else if($now>=$exam->reserve_registration_start && $now<=$exam->reserve_registration_stop){
             $candidates = $candidates->where('candidates.result',"Reserve");
         }
 
