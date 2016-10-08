@@ -1151,8 +1151,6 @@ class ExamController extends Controller
 
     private function checkEntranceExamScores($exam_id, $courseIds) {
 
-        var_dump($courseIds);
-        var_dump($exam_id);
         $check =0;
         $courses = [];
         if($courseIds) {
@@ -1182,10 +1180,11 @@ class ExamController extends Controller
 
         $courseIds = $this->getAllExamCourses($examId);
         $checkScore = $this->checkEntranceExamScores($examId, $courseIds);
+        dd($checkScore);
         if($checkScore[0]== count($courseIds)) {
              return Response::json(['status'=> true]);//there are no error of candidate score
         } else{
-            //return Response::json(['status'=> false]);// there are existing socre error of candidates
+            return Response::json(['status'=> false]);// there are existing socre error of candidates
         }
 
     }
