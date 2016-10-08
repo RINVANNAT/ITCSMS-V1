@@ -35,41 +35,23 @@
         <!-- /.box-header -->
         <div class="box-body">
 
-                <div class="container">
-                    <div class="col-md-12 text-center">
-                        <h3> Result of Standadize Testing Exam 2016-2017</h3>
-                    </div>
-                    <div class="col-md-12">
-                        <table class="table">
-                            <thead>
-                            <tr>
-                                <th>Order</th>
-                                <th>Name Khmer</th>
-                                <th>Name Latin</th>
-                                <th>Result</th>
-                                <th>Total Score</th>
-                            </tr>
-                            </thead>
-                            <tbody>
-                            <?php $i =0;?>
-                            @foreach($candidatesResults as $result)
-                                <?php $i++;?>
-                                <tr>
-                                    <td><?php echo $i;?></td>
-                                    <td>{{$result->name_kh}}</td>
-                                    <td>{{$result->name_latin}}</td>
-                                    <td>{{$result->result}}</td>
-                                    <td>{{$result->total_score}}</td>
-                                </tr>
-                            @endforeach
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-
-        </div>
-
-        <div class="modal">
+            <table class="table table-striped table-bordered table-hover dt-responsive nowrap" cellspacing="0" width="100%" id="candidates-table">
+                <thead>
+                <tr>
+                    <th>{{ trans('labels.backend.candidates.fields.register_id') }}</th>
+                    <th>{{ trans('labels.backend.candidates.fields.name_kh') }}</th>
+                    <th>{{ trans('labels.backend.candidates.fields.name_latin') }}</th>
+                    <th>{{ trans('labels.backend.candidates.fields.gender_id') }}</th>
+                    <th>{{ trans('labels.backend.candidates.fields.dob') }}</th>
+                    <th>{{ trans('labels.backend.candidates.fields.province_id') }}</th>
+                    <th>{{ trans('labels.backend.candidates.fields.highschool_id') }}</th>
+                    <th>{{ trans('labels.backend.candidates.fields.bac_total_grade') }}</th>
+                    <th>{{ trans('labels.backend.candidates.fields.room_id') }}</th>
+                    <th>{{ trans('labels.backend.candidates.fields.result') }}</th>
+                    <th>{{ trans('labels.general.actions') }}</th>
+                </tr>
+                </thead>
+            </table>
 
         </div>
 
@@ -78,6 +60,29 @@
 
 @section('after-scripts-end')
     <script>
+        candidate_datatable = $('#candidates-table').DataTable({
+            processing: true,
+            serverSide: true,
+            pageLength: {!! config('app.records_per_page')!!},
+            ajax: {
+                url: '{!! route('admin.candidate.data')."?exam_id=".$exam->id !!}',
+                method: 'POST'
+            },
+            columns: [
+                { data: 'register_id', name: 'candidates.register_id'},
+                { data: 'name_kh', name: 'candidates.name_kh'},
+                { data: 'name_latin', name: 'candidates.name_latin'},
+                { data: 'gender_name_kh', name: 'genders.name_kh'},
+                { data: 'dob', name: 'candidates.dob'},
+                { data: 'province', name: 'origins.name_kh'},
+                { data: 'high_school', name: 'highSchools.name_kh'},
+                { data: 'bac_total_grade', name: 'bac_total_grade'},
+                { data: 'room', name: 'candidates.room', searchable:false},
+                { data: 'result', name: 'candidates.result'},
+                { data: 'action', name: 'action',orderable: false, searchable: false}
+            ]
+        });
+
         window.onload = function() {
             $('.modal').style.display = "none";
         };

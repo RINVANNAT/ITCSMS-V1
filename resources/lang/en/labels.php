@@ -587,7 +587,8 @@ return [
                 'preferred_department' => "Prefered Departments",
                 'class' => 'Class',
                 'room_id' => 'Room',
-                'priority_number' => "Number"
+                'priority_number' => "Number",
+                'total_score' => 'Score'
             ]
         ],
         'reporting' => [

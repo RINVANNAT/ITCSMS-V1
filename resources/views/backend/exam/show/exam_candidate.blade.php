@@ -37,6 +37,7 @@
 <table class="table table-striped table-bordered table-hover dt-responsive nowrap" cellspacing="0" width="100%" id="candidates-table">
     <thead>
     <tr>
+        <th></th>
         <th>{{ trans('labels.backend.candidates.fields.register_id') }}</th>
         <th>{{ trans('labels.backend.candidates.fields.name_kh') }}</th>
         <th>{{ trans('labels.backend.candidates.fields.name_latin') }}</th>
@@ -47,6 +48,9 @@
         <th>{{ trans('labels.backend.candidates.fields.bac_total_grade') }}</th>
         <th>{{ trans('labels.backend.candidates.fields.room_id') }}</th>
         <th>{{ trans('labels.backend.candidates.fields.result') }}</th>
+        @permission('view-exam-candidate-score')
+        <th>{{ trans('labels.backend.candidates.fields.total_score') }}</th>
+        @endauth
         <th>{{ trans('labels.general.actions') }}</th>
     </tr>
     </thead>

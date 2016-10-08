@@ -223,6 +223,7 @@ class CandidateController extends Controller
      */
     public function data()
     {
+
         $candidates = DB::table('candidates')
             ->leftJoin('origins','candidates.province_id','=','origins.id')
             ->leftJoin('gdeGrades','candidates.bac_total_grade','=','gdeGrades.id')
@@ -235,7 +236,7 @@ class CandidateController extends Controller
                 'candidates.id',DB::raw("CONCAT(buildings.code,\"examRooms\".name) as room"),
                 'candidates.register_id','candidates.name_kh','candidates.name_latin',
                 'candidates.highschool_id','highSchools.name_kh as high_school',
-                'candidates.exam_id',
+                'candidates.exam_id', 'candidates.total_score',
                 'genders.name_kh as gender_name_kh','gdeGrades.name_en as bac_total_grade',
                 'origins.name_kh as province', 'dob','result','is_paid','is_register'
             ]);
@@ -249,11 +250,26 @@ class CandidateController extends Controller
         if($degree_id = Input::get('degree_id')){
             $candidates = $candidates->where('degree_id',$degree_id);
         }
+        if($origin_id = Input::get('origin_id')){
+            $candidates = $candidates->where('candidates.province_id',$origin_id);
+        }
+        if($room_id = Input::get('room_id')){
+            $candidates = $candidates->where('candidates.room_id',$room_id);
+        }
+        if($result = Input::get('result')){
+            $candidates = $candidates->where('candidates.result',$result);
+        }
 
         $datatables =  app('datatables')->of($candidates);
 
 
         return $datatables
+            ->addColumn('number',function($candidate){
+                return "";
+            })
+            ->editColumn('name_latin',function($candidate){
+                return strtoupper($candidate->name_latin);
+            })
             ->editColumn('register_id',function($candidate){
                 return str_pad($candidate->register_id, 4, '0', STR_PAD_LEFT);
             })
@@ -269,10 +285,12 @@ class CandidateController extends Controller
                     return '<span class="label label-warning">'.$candidate->result.'</span>';
                 } else if($candidate->result == "Pass"){
                     return '<span class="label label-success">'.$candidate->result.'</span>';
+                } else if($candidate->result == "Reserve"){
+                    return '<span class="label label-info">'.$candidate->result.'</span>';
                 } else if($candidate->result == "Fail"){
                     return '<span class="label label-danger">'.$candidate->result.'</span>';
                 } else { // Rejected
-                    return '<span class="label label-info">'.$candidate->result.'</span>';
+                    return '<span class="label label-danger">'.$candidate->result.'</span>';
                 }
             })
             ->editColumn('dob',function($candidate){

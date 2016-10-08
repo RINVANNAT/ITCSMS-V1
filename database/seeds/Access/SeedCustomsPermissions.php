@@ -590,6 +590,14 @@ class SeedCustomsPermissions extends Seeder
                             ]
 
                         ],
+                        [
+                            'name'          => 'view-exam-candidate-score',
+                            'display_name'  => "View candidate's score",
+                            'dependency'   => [
+                                'view-backend','view-exam-management','view-exam-candidate'
+                            ]
+
+                        ],
                     ]
                 ],
                 [

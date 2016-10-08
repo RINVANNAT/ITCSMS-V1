@@ -115,10 +115,23 @@
                         <div class="desc">Candidate Result Sheet</div>
                         <div class="desc">
                             <a id="download_candidate_result" target="_blank"  href="{{route('print_candidate_result_lists', '/status='.'request_print_page'.'&exam_id='.$exam->id)}}">
-                                <button  class="btn btn-primary btn-xs" id="print_att_list"> Print </button>
+                                <button  class="btn btn-primary btn-xs" id="print_candidate_list"> Print </button>
                             </a>
                             <a id="download_candidate_result" target="_blank"  href="{{route('admin.exam.export_candidate_result_lists', $exam->id)}}">
-                                <button class="btn btn-info btn-xs"id="export_att_list"> Excel </button>
+                                <button class="btn btn-info btn-xs"id="export_candidate_list"> Excel </button>
+                            </a>
+                        </div>
+
+                        @endauth
+
+                    </div>
+
+                    <div class="img">
+                        @permission('download-examination-document')
+                        <div class="desc">Result Candidate From Ministry</div>
+                        <div class="desc">
+                            <a id="download_candidate_result" target="_blank"  href="{{route('admin.exam.export_candidate_ministry_list', $exam->id)}}">
+                                <button class="btn btn-info btn-xs"id="export_candidate_ministry_list"> Excel </button>
                             </a>
                         </div>
 

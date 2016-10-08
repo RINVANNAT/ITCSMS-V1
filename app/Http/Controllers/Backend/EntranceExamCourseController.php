@@ -70,6 +70,10 @@ class EntranceExamCourseController extends Controller
 
     }
 
+    public function show(Request $request){
+        return view('backend.entranceExamCourse.show_score');
+    }
+
     /**
      * Show the form for editing the specified resource.
      *
@@ -138,6 +142,9 @@ class EntranceExamCourseController extends Controller
                 }
                 if(Auth::user()->allow('edit-entrance-exam-courses')){
                     $result = $result.' <button class="btn btn-xs btn-info btn_course_edit" data-remote="'.route('admin.entranceExamCourses.edit', $item->id) .'"><i class="fa fa-pencil" data-toggle="tooltip" data-placement="top" title="' . trans('buttons.general.crud.edit') . '"></i></button>';
+                }
+                if(Auth::user()->allow('view-entrance-exam-score')){
+                    $result = $result.' <button class="btn btn-xs btn-info btn_course_show" data-remote="'.route('admin.entranceExamCourses.show', $item->id) .'"><i class="fa fa-commenting-o" data-toggle="tooltip" data-placement="top" title="' . trans('buttons.general.crud.show') . '"></i></button>';
                 }
                 if($request->check_course_error == "true"){
                     if(Auth::user()->allow('report-error-on-inputted-score')){

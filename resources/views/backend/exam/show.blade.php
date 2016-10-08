@@ -113,6 +113,10 @@
             z-index: 1;
         }
 
+        .candidate_filter {
+            float: left;
+        }
+
     </style>
 @stop
 
@@ -457,11 +461,6 @@
             @endauth
 
 
-
-
-
-
-
             /* ------------------------------------------------  Room Exam Section -------------------------------------------*/
             @permission('view-exam-room')
 
@@ -796,12 +795,20 @@
             candidate_datatable = $('#candidates-table').DataTable({
                 processing: true,
                 serverSide: true,
+                dom: 'l<"candidate_filter">frtip',
                 pageLength: {!! config('app.records_per_page')!!},
                 ajax: {
                     url: '{!! route('admin.candidate.data')."?exam_id=".$exam->id !!}',
-                    method: 'POST'
+                    method: 'POST',
+                    data:function(d){
+                        d.exam_id = $('#candidate_filter_exams').val();
+                        d.origin_id = $('#candidate_filter_origins').val();
+                        d.room_id = $('#candidate_filter_room').val();
+                        d.result = $('#candidate_filter_result').val();
+                    }
                 },
                 columns: [
+                    { data: 'number', name: 'number', searchable:false,orderable:false},
                     { data: 'register_id', name: 'candidates.register_id'},
                     { data: 'name_kh', name: 'candidates.name_kh'},
                     { data: 'name_latin', name: 'candidates.name_latin'},
@@ -812,8 +819,46 @@
                     { data: 'bac_total_grade', name: 'bac_total_grade'},
                     { data: 'room', name: 'candidates.room', searchable:false},
                     { data: 'result', name: 'candidates.result'},
+                    @permission('view-exam-candidate-score')
+                    { data: 'total_score', name: 'candidates.total_score'},
+                    @endauth
                     { data: 'action', name: 'action',orderable: false, searchable: false}
                 ]
+            });
+
+            candidate_datatable.on( 'order.dt search.dt', function () {
+                var info = candidate_datatable.page.info();
+                console.log(info);
+                candidate_datatable.column(0, {search:'applied', order:'applied'}).nodes().each( function (cell, i) {
+                    cell.innerHTML = info.start+i+1;
+                } );
+            } ).draw();
+
+            $("div.candidate_filter").html(
+                    '{!! Form::select('exam_id',$exams,$exam->id, array('class'=>'form-control','id'=>'candidate_filter_exams','placeholder'=>'Exam')) !!} ' +
+                    '{!! Form::select('origin_id',$origins,null, array('class'=>'form-control','id'=>'candidate_filter_origins','placeholder'=>'Origin')) !!} ' +
+                    '{!! Form::select('room_id',$rooms,null, array('class'=>'form-control','id'=>'candidate_filter_room','placeholder'=>'Room')) !!} ' +
+                    '{!! Form::select('result',['Pass'=>'Pass','Reserve'=>'Reserve','Fail'=>'Fail','Reject'=>'Reject'],null, array('class'=>'form-control','id'=>'candidate_filter_result','placeholder'=>'Result')) !!} '
+            );
+
+            $('#candidate_filter_exams').on('change', function(e) {
+                candidate_datatable.draw();
+                e.preventDefault();
+            });
+
+            $('#candidate_filter_origins').on('change', function(e) {
+                candidate_datatable.draw();
+                e.preventDefault();
+            });
+
+            $('#candidate_filter_room').on('change', function(e) {
+                candidate_datatable.draw();
+                e.preventDefault();
+            });
+
+            $('#candidate_filter_result').on('change', function(e) {
+                candidate_datatable.draw();
+                e.preventDefault();
             });
 
             $('#candidates-table').on('click', '.btn-register[data-remote]', function (e) {
@@ -982,7 +1027,7 @@
                     url: baseUrl,
                     success: function(result) {
                         console.log(result.status);
-                        if(result.status == false) {
+                        if(result.status == true) {
 
                             $('#btn_result_score_candidate').hide();
                             check_btn.show();

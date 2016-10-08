@@ -127,8 +127,11 @@
                     if(result.status) {
 //
                         $('.modal').hide();
-                        var Url = '{!! route('candidate_result_lists') !!}';
-                        window_request_room = PopupCenterDual(Url+'?exam_id='+result.exam_id,'Candidates Result List','1000','1200');
+                        {{--var Url = '{!! route('candidate_result_lists') !!}';--}}
+//                        window_request_room = PopupCenterDual(Url+'?exam_id='+result.exam_id,'Candidates Result List','1000','1200');
+
+                        $('#btn_result_score_candidate').hide();
+                        notify('success', 'Result Success!');
                         window.close();
 
                     } else {
