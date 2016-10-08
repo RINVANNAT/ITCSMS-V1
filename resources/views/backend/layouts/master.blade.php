@@ -78,6 +78,7 @@
     {!! Html::script('plugins/toastr/toastr.min.js') !!}
     {!! Html::script('plugins/jquery.validate.min.js') !!}
 
+
     @yield('before-scripts-end')
     {!! HTML::script(elixir('js/backend.js')) !!}
     {!! HTML::script('js/custom.js') !!}
