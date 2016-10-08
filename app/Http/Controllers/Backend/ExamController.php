@@ -1093,7 +1093,7 @@ class ExamController extends Controller
         $totalQuestion = $totalQuestions->total_question;
         $courseName = $totalQuestions->name_kh;
 
-        return view('backend.exam.includes.popup_report_error_score_candidate', compact('exam_id', 'errorCandidateScores', 'totalQuestion', 'courseId', 'courseName'));
+        return view('backend.exam.includes.popup_report_error_score_candidate1', compact('exam_id', 'errorCandidateScores', 'totalQuestion', 'courseId', 'courseName'));
 
     }
 
