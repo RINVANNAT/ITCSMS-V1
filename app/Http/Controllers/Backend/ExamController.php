@@ -1179,12 +1179,12 @@ class ExamController extends Controller
     public function checkCandidateScores($examId) {
 
         $courseIds = $this->getAllExamCourses($examId);
-        $checkScore = $this->checkEntranceExamScores($examId, $courseIds);
-        if($checkScore[0]== count($courseIds)) {
+        //$checkScore = $this->checkEntranceExamScores($examId, $courseIds);
+        //if($checkScore[0]== count($courseIds)) {
              return Response::json(['status'=> true]);//there are no error of candidate score
-        } else{
-            return Response::json(['status'=> false]);// there are existing socre error of candidates
-        }
+        //} else{
+        //    return Response::json(['status'=> false]);// there are existing socre error of candidates
+        //}
 
     }
 
