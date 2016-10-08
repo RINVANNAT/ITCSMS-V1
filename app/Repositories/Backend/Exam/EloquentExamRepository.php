@@ -512,6 +512,17 @@ class EloquentExamRepository implements ExamRepositoryContract
 
         }
 
+        if($errorCandidateScores) {
+
+            $status = true;
+            $this->deleteStatusCandidateScores($examID, $courseId);
+            $this->insertStatusCandidateScores($examID, $courseId, $status);
+        } else {
+            $status = false;
+            $this->deleteStatusCandidateScores($examID, $courseId);
+            $this->insertStatusCandidateScores($examID, $courseId, $status);
+        }
+
         return $errorCandidateScores;
     }
 
