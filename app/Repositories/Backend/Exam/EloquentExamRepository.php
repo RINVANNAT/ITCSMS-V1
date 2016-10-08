@@ -472,7 +472,8 @@ class EloquentExamRepository implements ExamRepositoryContract
             $statusWrongScore=0;
 
             if(count($tempCand) <2){
-                array_push($errorCandidateScores, $tempCand);
+                //array_push($errorCandidateScores, $tempCand);
+                array_push($errorCandidateScores, (object) array('candidateProperties' => $key, 'scoreErrors' => $tempCand) );
             } else {
                 $length =  count($tempCand);
                 for ($i = 0; $i < $length ; $i++) {

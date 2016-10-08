@@ -109,8 +109,6 @@
 
                         <?php $k=0; $length = []; $p=0; $arrayRoomCode = []; $arrayOrderInRoom = [];?>
 
-                        {{dd($errorCandidateScores)}}
-
                         @foreach($errorCandidateScores as $errorScoreProperties)
                             <?php $k++; $p=0;  ?>
 
