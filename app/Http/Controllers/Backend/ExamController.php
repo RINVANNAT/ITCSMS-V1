@@ -1301,12 +1301,32 @@ class ExamController extends Controller
             $last_score = $final_result;
         }
 
+        // Mapping with secret room
         $final_results = DB::table('secret_room_result')
             ->where('exam_id',$examId)
-            ->orderBy('score','desc')
+            ->orderBy('order_in_room','asc')
             ->get();
 
-        dd($final_results);
+        $exam_rooms = ExamRoom::where('exam_id',$examId)
+            ->with('candidates')
+            ->orderBy('candidates.register_id')
+            ->get();
+        $array_rooms = [];
+        foreach($exam_rooms as $exam_room){
+            $array_rooms[Crypt::decrypt($exam_room->roomcode)] = $exam_room->id;
+        }
+        dd($exam_rooms);
+
+        // Update result to candidate
+        foreach($final_results as $final_result ){
+            DB::table('candidate')
+                ->where('room_id',$final_result->roomcode)
+                ->where('exam_id',$examId)
+                ->where('order_in_room',$final_result->order_in_room)
+                ->update(
+                    ['result'=>"Fail"]
+                );
+        }
         /*array:4 [
               "_token" => "OawDggVG8noZ0TdHYA6db8L8iZ6kwV2jwuXVhMlv"
               "course" => array:3 [
