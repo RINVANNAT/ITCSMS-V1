@@ -481,10 +481,19 @@ return [
                 'add_course' => 'Add new course for exam',
                 'edit_course' => 'Edit course for exam',
                 'choose_course' => 'Choose courses for exam',
+                'view_score' => 'View all score',
                 'fields' => [
                     "course_name" => "Course Name",
                     "total_question" => "Total Questions",
-                    "description" => "Description"
+                    "description" => "Description",
+                    "roomcode" => "Room Code",
+                    "order" => "Order",
+                    "correct" => "Correct",
+                    "wrong" => "Wrong",
+                    'na' => "No Answer",
+                    "sequence" => "Sequence",
+                    "corrector" => "Corrector",
+                    "register" => "Register User"
                 ]
             ],
             'exam_room' => [

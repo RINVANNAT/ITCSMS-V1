@@ -8,6 +8,7 @@ use App\Http\Requests\Backend\EntranceExamCourse\UpdateEntranceExamCourseRequest
 use App\Http\Requests\Backend\EntranceExamCourse\CreateEntranceExamCourseRequest;
 use App\Http\Requests\Backend\EntranceExamCourse\DeleteEntranceExamCourseRequest;
 use App\Models\Exam;
+use App\Models\SecretRoomScore;
 use App\Repositories\Backend\EntranceExamCourse\EntranceExamCourseRepositoryContract;
 use App\Repositories\Backend\Exam\ExamRepositoryContract;
 
@@ -70,8 +71,10 @@ class EntranceExamCourseController extends Controller
 
     }
 
-    public function show(Request $request){
-        return view('backend.entranceExamCourse.show_score');
+    public function show(Request $request, $course_id){
+
+        $entranceExamCourse = $this->entranceExamCourse->findOrThrowException($course_id);
+        return view('backend.entranceExamCourse.show_score',compact('entranceExamCourse'));
     }
 
     /**
@@ -137,14 +140,14 @@ class EntranceExamCourseController extends Controller
         return $datatables
             ->addColumn('action', function ($item) use ($exam_id,$request)  {
                 $result = '';
-                if(Auth::user()->allow('delete-entrance-exam-courses')){
+                if(Auth::user()->allow('delete-entrance-exam-course')){
                     $result = $result.' <button class="btn btn-xs btn-danger btn-delete" data-remote="'.route('admin.entranceExamCourses.destroy', $item->id) .'"><i class="fa fa-times" data-toggle="tooltip" data-placement="top" title="' . trans('buttons.general.crud.delete') . '"></i></button>';
                 }
-                if(Auth::user()->allow('edit-entrance-exam-courses')){
+                if(Auth::user()->allow('edit-entrance-exam-course')){
                     $result = $result.' <button class="btn btn-xs btn-info btn_course_edit" data-remote="'.route('admin.entranceExamCourses.edit', $item->id) .'"><i class="fa fa-pencil" data-toggle="tooltip" data-placement="top" title="' . trans('buttons.general.crud.edit') . '"></i></button>';
                 }
-                if(Auth::user()->allow('view-entrance-exam-score')){
-                    $result = $result.' <button class="btn btn-xs btn-info btn_course_show" data-remote="'.route('admin.entranceExamCourses.show', $item->id) .'"><i class="fa fa-commenting-o" data-toggle="tooltip" data-placement="top" title="' . trans('buttons.general.crud.show') . '"></i></button>';
+                if(Auth::user()->allow('view-entrance-exam-course-score')){
+                    $result = $result.' <button class="btn btn-xs btn-info btn_course_show" data-remote="'.route('admin.entranceExamCourses.show', $item->id) .'"><i class="fa fa-commenting-o" data-toggle="tooltip" data-placement="top" title="' . trans('buttons.general.view') . '"></i></button>';
                 }
                 if($request->check_course_error == "true"){
                     if(Auth::user()->allow('report-error-on-inputted-score')){
@@ -157,6 +160,29 @@ class EntranceExamCourseController extends Controller
                 }
                 return $result;
             })
+            ->make(true);
+    }
+
+    public function data_score(Request $request,$course_id)
+    {
+
+        $secret_scores = SecretRoomScore::where('course_id',$course_id)
+            ->leftJoin("users","users.id","=","secret_room_score.create_uid")
+            ->select(
+                "roomcode",
+                "score_c",
+                "score_w",
+                "score_na",
+                "order_in_room",
+                "corrector_name",
+                "sequence",
+                "users.name as register_user"
+            )
+            ->get();
+
+        $datatables =  app('datatables')->of($secret_scores);
+
+        return $datatables
             ->make(true);
     }
 

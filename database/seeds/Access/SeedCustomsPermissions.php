@@ -534,6 +534,13 @@ class SeedCustomsPermissions extends Seeder
                             'dependency'   => [
                                 'view-backend','view-exam-management', 'create-entrance-exam-score'
                             ]
+                        ],
+                        [
+                            'name'          => 'view-entrance-exam-course-score',
+                            'display_name'  => 'Get Inputted Score Error && Add New Correction',
+                            'dependency'   => [
+                                'view-backend','view-exam-management', 'create-entrance-exam-score'
+                            ]
                         ]
                     ]
                 ],

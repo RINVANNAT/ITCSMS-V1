@@ -255,6 +255,8 @@
         var window_bac2;
         var window_candidate;
         var window_missing_candidate;
+        var window_entrance_exam_course;
+        var window_report_error;
 
         var check_course_error = false;
         var iconUrl1 = "{{url('plugins/jstree/img/department.png')}}";
@@ -389,7 +391,6 @@
                     ajaxRequest('POST', inputBaseUrl,inputBaseData);
                 } else{
 
-                    console.log("Please Complete Record Before Submitting !!!!");
                     notify("error","info", "Please Complete Record Before Submitting !!!!");
                 }
             })
@@ -403,7 +404,7 @@
                     role_id:$('#role_change :selected').val()
                 };
                 if(baseData.staff_ids !== '[]') {
-                    console.log(baseData);
+
                     ajaxRequest('PUT',changeNodeUrl, baseData);
 
                     enable_modify_staff();
@@ -595,7 +596,6 @@
                     temporary_name = value+temporary_name;
                 });
 
-                console.log(building_ids[0]);
                 $('#form_exam_room_merge')[0].reset();
 
                 $('#form_exam_room_merge input[name=name]').val(temporary_name);
@@ -770,7 +770,6 @@
                     return $(this).val();
                 }).get();
 
-                console.log(selected_rooms);
                 $.each(selected_rooms, function (index, value){
                     data.push({name: 'rooms[]', value: value});
                 });
@@ -828,7 +827,6 @@
 
             candidate_datatable.on( 'order.dt search.dt', function () {
                 var info = candidate_datatable.page.info();
-                console.log(info);
                 candidate_datatable.column(0, {search:'applied', order:'applied'}).nodes().each( function (cell, i) {
                     cell.innerHTML = info.start+i+1;
                 } );
@@ -1011,6 +1009,12 @@
 
             });
 
+            $(document).on('click', '.btn_course_show', function (e) {
+                var course_url = $(this).data('remote');
+                window_entrance_exam_course = PopupCenterDual(course_url,'Entrance exam courses | Score ','1250','960');
+
+            });
+
             $('#btn_result_score_candidate').hide();
 
             $('#btn_check_course_error').on('click', function() {
@@ -1026,7 +1030,6 @@
                     type: 'GET',
                     url: baseUrl,
                     success: function(result) {
-                        console.log(result.status);
                         if(result.status == true) {
 
                             $('#btn_result_score_candidate').hide();
@@ -1073,6 +1076,15 @@
             if (window_missing_candidate && !window_missing_candidate.closed) {
                 window_missing_candidate.close();
             }
+
+            if(window_report_error && !window_report_error.closed){
+                window_report_error.close();
+            }
+
+            if(window_entrance_exam_course && !window_entrance_exam_course.closed){
+                window_entrance_exam_course.close();
+            }
+
         };
 
 

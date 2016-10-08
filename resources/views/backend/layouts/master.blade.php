@@ -9,8 +9,8 @@
         <title>@yield('title', app_name())</title>
 
         <!-- Meta -->
-        <meta name="description" content="@yield('meta_description', 'Default Description')">
-        <meta name="author" content="@yield('meta_author', 'Anthony Rappa')">
+        <meta name="description" content="@yield('meta_description', 'ITC School Management System')">
+        <meta name="author" content="@yield('meta_author', 'ITC SMIS')">
         @yield('meta')
 
         <!-- Styles -->
