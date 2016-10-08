@@ -1151,6 +1151,8 @@ class ExamController extends Controller
 
     private function checkEntranceExamScores($exam_id, $courseIds) {
 
+        var_dump($courseIds);
+        var_dump($exam_id);
         $check =0;
         $courses = [];
         if($courseIds) {
