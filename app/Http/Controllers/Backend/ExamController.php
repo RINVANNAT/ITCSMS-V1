@@ -130,7 +130,6 @@ class ExamController extends Controller
             ->select(
                 DB::raw('CONCAT(buildings.code,"examRooms".name) as room_name'),'examRooms.id'
             )
-            ->orderBy('room_name','ASC')
             ->lists('room_name', 'id');
 
         $roles = $this->employeeExams->getRoles();
