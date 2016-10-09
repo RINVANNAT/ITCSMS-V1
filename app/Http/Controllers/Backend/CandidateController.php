@@ -264,9 +264,6 @@ class CandidateController extends Controller
 
 
         return $datatables
-            ->addColumn('number',function($candidate){
-                return "";
-            })
             ->editColumn('name_latin',function($candidate){
                 return strtoupper($candidate->name_latin);
             })
