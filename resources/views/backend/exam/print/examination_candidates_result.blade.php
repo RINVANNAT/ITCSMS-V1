@@ -124,10 +124,7 @@
                                 ធ្វើនៅភ្នំពេញ ថ្ងៃទី ....... ខែ .................. ឆ្នាំ ២០
                             </div>
                             <div class="col-sm-12 no-padding text-center">
-                                ជ.នាយកវិទ្យាស្ថានបច្ចេកវិទ្យាកម្ពុជា
-                            </div>
-                            <div class="col-sm-12 no-padding text-center">
-                                <strong> នាយករង </strong>
+                                នាយកវិទ្យាស្ថានបច្ចេកវិទ្យាកម្ពុជា
                             </div>
                         </div>
                     </div>
@@ -160,10 +157,7 @@
                             ធ្វើនៅភ្នំពេញ ថ្ងៃទី ....... ខែ ............ ឆ្នាំ ២០
                         </div>
                         <div class="col-sm-12 no-padding text-center">
-                            ជ.នាយកវិទ្យាស្ថានបច្ចេកវិទ្យាកម្ពុជា
-                        </div>
-                        <div class="col-sm-12 no-padding text-center">
-                            <strong> នាយករង </strong>
+                            នាយកវិទ្យាស្ថានបច្ចេកវិទ្យាកម្ពុជា
                         </div>
                     </div>
                 </div>
