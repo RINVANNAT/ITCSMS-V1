@@ -1586,7 +1586,7 @@ class ExamController extends Controller
                 );
 
                 $index = 1;
-                dd($candidates);
+
                 foreach ($candidates as $candidate) {
 
                     if($candidate->result == "Reject"){
