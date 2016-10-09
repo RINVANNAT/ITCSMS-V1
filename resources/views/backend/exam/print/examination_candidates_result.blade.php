@@ -61,6 +61,7 @@
         ?>
         <?php $check =0;?>
         <?php $index =0; $female=0;?>
+        <?php $i =0;?>
         @foreach($candidatesResults as $candidatesResult)
 
 
@@ -83,7 +84,7 @@
                         <th width="2.5cm" class="center">ថ្ងៃខែឆ្នាំកំណើត</th>
                         <th width="2.5cm" class="center">ខេត្ត</th>
                     </tr>
-                    <?php $i =0;?>
+
                     @foreach($candidatesResult as $result)
                         <?php $i++;?>
 
