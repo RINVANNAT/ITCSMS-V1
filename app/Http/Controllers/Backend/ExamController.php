@@ -1588,11 +1588,10 @@ class ExamController extends Controller
                 $index = 1;
                 foreach ($candidates as $candidate) {
 
-                    $result = "";
                     if($candidate->result == "Reject"){
                         $result = "ធ្លាក់";
                     } else if($candidate->result == "Reserve"){
-                        $result = "បំរុង";
+                        $result = "ធ្លាក់";
                     } else if ($candidate->result == "Pass"){
                         $result= "ជាប់";
                     } else {
