@@ -1626,41 +1626,101 @@ class ExamController extends Controller
 
     public function export_candidate_result_list ($exam_id) {
 
-        $candidatesResults = $this->getCandidateResult($exam_id);
-        $candiateResult=[];
+        //$candiateResult = [];
 
-        if($candidatesResults) {
-            foreach($candidatesResults as $key => $candidates) {
-                foreach($candidates as $candidate) {
-                    $element = array(
-                        'ឈ្មោះ ខ្មែរ'             => $candidate->name_kh,
-                        'ឈ្មោះ ឡាតាំង'            => $candidate->name_latin,
-                        'ភេទ'                      => $candidate->gender,
-                        'លទ្ទផល'                  => $candidate->result,
-                        'ពិន្ទុសរុប'                  => $candidate->total_score
-                    );
-                    $candiateResult[$key][] = $element;
-                }
-            }
-        }
+        $candidate = DB::table('candidates')
+            ->leftJoin('studentBac2s', 'studentBac2s.id','=', 'candidates.studentBac2_id')
+            ->join('genders','studentBac2s.gender_id','=','genders.id')
+            ->join('highSchools','studentBac2s.highschool_id','=','highSchools.id')
+            ->join('origins','studentBac2s.province_id','=','origins.id')
+            ->join('examRooms','examRooms')
+            ->leftJoin('gdeGrades as math','studentBac2s.bac_math_grade','=','math.id')
+            ->leftJoin('gdeGrades as phys','studentBac2s.bac_phys_grade','=','phys.id')
+            ->leftJoin('gdeGrades as chem','studentBac2s.bac_chem_grade','=','chem.id')
+            ->select(
+                'candidates.register_id',
+                'studentBac2s.name_kh',
+                'candidates.name_latin',
+                'genders.code as gender',
+                'studentBac2s.dob',
+                'highSchools.name_kh as highschool',
+                'origins.name_kh as origin',
+                'studentBac2s.bac_year',
+                'math.name_en as math_grade',
+                'phys.name_en as phys_grade',
+                'chem.name_en as chem_grade'
+            )
+            ->orderBy('candidates.register_id')
+            ->get();
+
+        $reserve = DB::table('candidates')
+            ->leftJoin('studentBac2s', 'studentBac2s.id','=', 'candidates.studentBac2_id')
+            ->join('genders','studentBac2s.gender_id','=','genders.id')
+            ->join('highSchools','studentBac2s.highschool_id','=','highSchools.id')
+            ->join('origins','studentBac2s.province_id','=','origins.id')
+            ->leftJoin('gdeGrades as math','studentBac2s.bac_math_grade','=','math.id')
+            ->leftJoin('gdeGrades as phys','studentBac2s.bac_phys_grade','=','phys.id')
+            ->leftJoin('gdeGrades as chem','studentBac2s.bac_chem_grade','=','chem.id')
+            ->where('result','Reserve')
+            ->select(
+                'candidates.register_id',
+                'studentBac2s.name_kh',
+                'candidates.name_latin',
+                'genders.code as gender',
+                'studentBac2s.dob',
+                'highSchools.name_kh as highschool',
+                'origins.name_kh as origin',
+                'studentBac2s.bac_year',
+                'math.name_en as math_grade',
+                'phys.name_en as phys_grade',
+                'chem.name_en as chem_grade'
+            )
+            ->orderBy('candidates.register_id')
+            ->get();
 
 
-        $fields= ['លេខបង្កាន់ដៃ', 'ឈ្មោះ ខ្មែរ', 'ឈ្មោះ ឡាតាំង', 'ភេទ', 'ថ្ងៃខែរឆ្នាំកំនើត'];
+
+
+        $fields= ['ល.រ','លេខបង្កាន់ដៃ', 'ឈ្មោះ ខ្មែរ', 'ឈ្មោះ ឡាតាំង', 'ភេទ', 'ថ្ងៃខែរឆ្នាំកំនើត',"វិទ្យាល័យ","ខេត្តក្រុង","ឆ្នាំជាប់បាក់ឌុប","គណិតវិទ្យា","រូបវិទ្យា","គីមីវិទ្យា"];
         $title = 'បញ្ជីលទ្ទផលរបស់បេក្ខជន';
         $alpha = [];
         $letter = 'A';
         while ($letter !== 'AAA') {
             $alpha[] = $letter++;
         }
-        Excel::create('បញ្ជីលទ្ទផលបេក្ខជន', function($excel) use ($candiateResult, $title,$alpha,$fields) {
+        Excel::create('បញ្ជីលទ្ទផលបេក្ខជន', function($excel) use ($pass,$reserve, $title,$alpha,$fields) {
 
-            foreach($candiateResult as $key => $value) {
-                $excel->sheet($key, function($sheet) use($value,$title,$alpha,$fields) {
-                    $sheet->fromArray($value);
+            $datas = array(
+                "ជាប់ស្ថាពរ" => $pass, "ជាប់បំរុង"=>$reserve
+            );
+            foreach($datas as $key => $data){
+                $excel->sheet($key, function($sheet) use($data,$title,$alpha,$fields) {
+
+                    $index = 1;
+                    foreach ($data as $candidate) {
+
+                        $row = array(
+                            $index,
+                            $candidate->register_id,
+                            $candidate->name_kh,
+                            $candidate->name_latin,
+                            $candidate->gender,
+                            Carbon::createFromFormat('Y-m-d H:i:s',$candidate->dob)->format("d/m/Y"),
+                            $candidate->highschool,
+                            $candidate->origin,
+                            $candidate->bac_year,
+                            $candidate->math_grade,
+                            $candidate->phys_grade,
+                            $candidate->chem_grade
+                        );
+
+                        $sheet->appendRow(
+                            $row
+                        );
+                        $index++;
+                    }
                 });
             }
-
-
 
         })->export('xls');
 
