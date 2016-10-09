@@ -121,7 +121,7 @@
 
                         <div class="col-sm-5 no-padding pull-right" style="font-size: 10pt;">
                             <div class="col-sm-12 no-padding text-center">
-                                ធ្វើនៅភ្នំពេញ ថ្ងៃទី ....... ខែ .................. ឆ្នាំ ២០
+                                ធ្វើនៅភ្នំពេញ ថ្ងៃទី ០៩ ខែ តុលា ឆ្នាំ ២០១៦
                             </div>
                             <div class="col-sm-12 no-padding text-center">
                                 នាយកវិទ្យាស្ថានបច្ចេកវិទ្យាកម្ពុជា
@@ -154,7 +154,7 @@
 
                     <div class="col-sm-5 no-padding pull-right" style="font-size: 10pt;">
                         <div class="col-sm-12 no-padding text-center">
-                            ធ្វើនៅភ្នំពេញ ថ្ងៃទី ....... ខែ ............ ឆ្នាំ ២០
+                            ធ្វើនៅភ្នំពេញ ថ្ងៃទី ០៩ ខែ តុលា ឆ្នាំ ២០១៦
                         </div>
                         <div class="col-sm-12 no-padding text-center">
                             នាយកវិទ្យាស្ថានបច្ចេកវិទ្យាកម្ពុជា
