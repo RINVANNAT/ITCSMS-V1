@@ -53,7 +53,7 @@
         <?php
             $first_chunk = array_slice($candidatesResults,0,20);
             $remaining_chunk = array_slice($candidatesResults,21);
-            $candidatesResults = array_chunk($remaining_chunk, 23);
+            $candidatesResults = array_chunk($remaining_chunk, 22);
             array_unshift($candidatesResults,$first_chunk);
         ?>
         <?php   $page_number = 1;
@@ -108,7 +108,7 @@
 
                 @if($page_number == $total_page)
 
-                    <div class ="col-sm-12 no-padding" style="font-size: 10pt;margin-top: 20px; margin-left:-180px">
+                    <div class ="col-sm-12 no-padding" style="font-size: 10pt;margin-top: 20px;">
                         បញ្ឈប់បញ្ជីត្រឹម {{$index}} នាក់ ក្នុងនោះមានស្រី {{$female}} នាក់ ។
                     </div>
                     <div class="col-sm-12 no-padding">
