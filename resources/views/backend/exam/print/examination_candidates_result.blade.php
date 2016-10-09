@@ -50,9 +50,10 @@
 
 @if($status)
     @foreach($candidateRes as $key => $candidatesResults)
+
         <?php
             $first_chunk = array_slice($candidatesResults,0,20);
-            $remaining_chunk = array_slice($candidatesResults,21);
+            $remaining_chunk = array_slice($candidatesResults,20);
             $candidatesResults = array_chunk($remaining_chunk, 22);
             array_unshift($candidatesResults,$first_chunk);
         ?>
@@ -62,6 +63,7 @@
         <?php $check =0;?>
         <?php $index =0; $female=0;?>
         <?php $i =0;?>
+
         @foreach($candidatesResults as $candidatesResult)
 
 
