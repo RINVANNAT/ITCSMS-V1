@@ -1507,40 +1507,119 @@ class ExamController extends Controller
 
     public function export_candidate_ministry_list($exam_id) {
 
-        $candidateItcPassed = $this->getCandidateResult($exam_id);
-        $cands = $candidateItcPassed['ស្ថាពរ'];
-        usort($cands, array($this, "sortCandidateRank"));
 
-
-
-        dd($cands);
+        $cands = DB::table('candidates')
+            ->join('studentBac2s', 'studentBac2s.id', '=', 'candidates.studentBac2_id')
+            ->where('candidates.exam_id', $exam_id)
+            ->select(
+                'studentBac2s.can_id',
+                'candidates.result',
+                'candidates.total_score'
+            )
+            ->orderBy('candidates.total_score', 'DESC')
+            ->get();
 
         $candidateByRank=[];
         $index =1;
         foreach($cands as $cand) {
-
-            $candidateByRank[$cand->candidate_id] = $index;
+            $candidateByRank[$cand->can_id] = $index;
             $index++;
         }
 
 
-        dd($candidateByRank);
-
-
-        $candidates = DB::table('candidateFromMoeys')
-            ->join('studentBac2s', 'studentBac2s.can_id','=', 'candidateFromMoeys.can_id')
-            ->join('candidates', 'candidates.studentBac2_id', '=', 'studentBac2s.id')
+        $candidates = DB::table('candidatesFromMoeys')
+            ->join('studentBac2s', 'studentBac2s.can_id','=', 'candidatesFromMoeys.can_id')
+            ->join('genders','studentBac2s.gender_id','=','genders.id')
+            ->join('highSchools','studentBac2s.highschool_id','=','highSchools.id')
+            ->join('origins','studentBac2s.province_id','=','origins.id')
+            ->leftJoin('gdeGrades as math','studentBac2s.bac_math_grade','=','math.id')
+            ->leftJoin('gdeGrades as phys','studentBac2s.bac_phys_grade','=','phys.id')
+            ->leftJoin('gdeGrades as chem','studentBac2s.bac_chem_grade','=','chem.id')
             ->select(
-                'candidates.name_kh',
+                'candidatesFromMoeys.id',
+                'candidatesFromMoeys.can_id',
+                'studentBac2s.name_kh',
+                'highSchools.name_kh as highschool',
                 'genders.code as gender',
-                'candidates.dob',
-                'highSchools.name as school_name',
-                'origins.code as oringin',
-                'candidates.bac_year',
-                'candidates.result',
-                'candidates.register_id'
-                )
+                'studentBac2s.dob',
+                'origins.name_kh as origin',
+                'studentBac2s.bac_year',
+                'math.name_en as math_grade',
+                'phys.name_en as phys_grade',
+                'chem.name_en as chem_grade'
+            )
+            ->orderBy('candidatesFromMoeys.can_id')
             ->get();
+
+
+        foreach($candidates as &$candidate){
+            if(isset($candidateByRank[$candidate->can_id])){
+                $candidate->result = $candidateByRank[$candidate->can_id];
+            } else {
+                $candidate->result = "Reject";
+            }
+        }
+
+        Excel::create('Student Result To Send to DHE', function($excel) use ($candidates) {
+
+            // Set the title
+            $excel->setTitle('លទ្ធផលសំរាប់បញ្ជូនទៅគ្រឹះស្ថានឧត្តមសិក្សា');
+
+            // Chain the setters
+            $excel->setCreator('Institute of Technology of Cambodia')
+                ->setCompany('Institute of Technology of Cambodia');
+
+            $excel->sheet('បញ្ជីនិស្សិត្រ', function($sheet) use ($candidates) {
+
+                $header = array('ល.រ',"គោត្តនាមនិងនាម","ភេទ","ថ្ងៃខែឆ្នាំកំណើត","មកពីវិទ្យាល័យ","ឆ្នាំជាប់ទុតិយភូមិ","គណិតវិទ្យា","រូបវិទ្យា","គីមីវិទ្យា","ចំណាត់ថ្នាក់");
+                $sheet->setOrientation('portrait');
+                // Set top, right, bottom, left
+                $sheet->setPageMargin(array(
+                    0.25, 0.30, 0.25, 0.30
+                ));
+
+                // Set all margins
+                $sheet->setPageMargin(0.25);
+
+                $sheet->rows(
+                    array($header)
+                );
+
+                $index = 1;
+                foreach ($candidates as $candidate) {
+
+                    $result = "";
+                    if($candidate->result == "Reject"){
+                        $result = "ធ្លាក់";
+                    } else if($candidate->result == "Reserve"){
+                        $result = "បំរុង";
+                    } else if ($candidate->result == "Pass"){
+                        $result= "ជាប់";
+                    } else {
+                        $result = $candidate->result;
+                    }
+                    $row = array($index,$candidate->name_kh,$candidate->gender,
+                        Carbon::createFromFormat('Y-m-d H:i:s',$candidate->dob)->format("d/m/Y"),$candidate->highschool,$candidate->origin,$candidate->bac_year,
+                        $candidate->math_grade,$candidate->phys_grade,$candidate->chem_grade,
+                        $result
+                    );
+
+                    $sheet->appendRow(
+                        $row
+                    );
+                    $index++;
+                }
+
+                /*$sheet->mergeCells('A1:C1');
+                $sheet->cells('A1:C'.count($rooms)+1, function($cells) {
+                    $cells->setAlignment('center');
+                    $cells->setValignment('middle');
+                });
+                $sheet->setBorder('A2:C'.(2+count($rooms)), 'thin');*/
+
+            });
+
+        })->export('xls');
     }
 
     public function export_candidate_result_list ($exam_id) {
