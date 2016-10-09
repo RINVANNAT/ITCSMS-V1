@@ -1511,6 +1511,7 @@ class ExamController extends Controller
         $cands = DB::table('candidates')
             ->join('studentBac2s', 'studentBac2s.id', '=', 'candidates.studentBac2_id')
             ->where('candidates.exam_id', $exam_id)
+            ->where('result',"Pass")
             ->select(
                 'studentBac2s.can_id',
                 'candidates.result',
@@ -1571,7 +1572,7 @@ class ExamController extends Controller
 
             $excel->sheet('បញ្ជីនិស្សិត្រ', function($sheet) use ($candidates) {
 
-                $header = array('ល.រ',"គោត្តនាមនិងនាម","ភេទ","ថ្ងៃខែឆ្នាំកំណើត","មកពីវិទ្យាល័យ","ឆ្នាំជាប់ទុតិយភូមិ","គណិតវិទ្យា","រូបវិទ្យា","គីមីវិទ្យា","ចំណាត់ថ្នាក់");
+                $header = array('ល.រ',"គោត្តនាមនិងនាម","ភេទ","ថ្ងៃខែឆ្នាំកំណើត","មកពីវិទ្យាល័យ","ខេត្តក្រុង","ឆ្នាំជាប់ទុតិយភូមិ","គណិតវិទ្យា","រូបវិទ្យា","គីមីវិទ្យា","ចំណាត់ថ្នាក់");
                 $sheet->setOrientation('portrait');
                 // Set top, right, bottom, left
                 $sheet->setPageMargin(array(
@@ -1599,7 +1600,8 @@ class ExamController extends Controller
                         $result = $candidate->result;
                     }
                     $row = array($index,$candidate->name_kh,$candidate->gender,
-                        Carbon::createFromFormat('Y-m-d H:i:s',$candidate->dob)->format("d/m/Y"),$candidate->highschool,$candidate->origin,$candidate->bac_year,
+                        Carbon::createFromFormat('Y-m-d H:i:s',$candidate->dob)->format("d/m/Y"),$candidate->highschool,
+                        $candidate->origin,$candidate->bac_year,
                         $candidate->math_grade,$candidate->phys_grade,$candidate->chem_grade,
                         $result
                     );
