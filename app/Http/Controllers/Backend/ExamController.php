@@ -1626,101 +1626,131 @@ class ExamController extends Controller
 
     public function export_candidate_result_list ($exam_id) {
 
-        //$candiateResult = [];
-
-        $candidate = DB::table('candidates')
+        $candidates = DB::table('candidates')
             ->leftJoin('studentBac2s', 'studentBac2s.id','=', 'candidates.studentBac2_id')
-            ->join('genders','studentBac2s.gender_id','=','genders.id')
-            ->join('highSchools','studentBac2s.highschool_id','=','highSchools.id')
-            ->join('origins','studentBac2s.province_id','=','origins.id')
-            ->join('examRooms','examRooms')
+            ->leftJoin('genders','studentBac2s.gender_id','=','genders.id')
+            ->leftJoin('highSchools','studentBac2s.highschool_id','=','highSchools.id')
+            ->join('origins','candidates.province_id','=','origins.id')
+            ->join('examRooms','examRooms.id','=','candidates.room_id')
+            ->leftJoin('buildings','examRooms.building_id','=','buildings.id')
             ->leftJoin('gdeGrades as math','studentBac2s.bac_math_grade','=','math.id')
             ->leftJoin('gdeGrades as phys','studentBac2s.bac_phys_grade','=','phys.id')
             ->leftJoin('gdeGrades as chem','studentBac2s.bac_chem_grade','=','chem.id')
+            ->leftJoin('gdeGrades as grade','studentBac2s.grade','=','grade.id')
+            ->where('candidates.exam_id',$exam_id)
             ->select(
+                DB::raw('CONCAT(buildings.code,"examRooms".name) as room_name'),
                 'candidates.register_id',
-                'studentBac2s.name_kh',
+                'candidates.name_kh',
+                'studentBac2s.can_id',
+                'candidates.bac_percentile as percentile',
                 'candidates.name_latin',
                 'genders.code as gender',
-                'studentBac2s.dob',
+                'candidates.dob',
                 'highSchools.name_kh as highschool',
                 'origins.name_kh as origin',
-                'studentBac2s.bac_year',
+                'candidates.bac_year',
                 'math.name_en as math_grade',
                 'phys.name_en as phys_grade',
-                'chem.name_en as chem_grade'
+                'chem.name_en as chem_grade',
+                'grade.name_en as grade',
+                'candidates.result',
+                'candidates.total_score'
             )
-            ->orderBy('candidates.register_id')
+            ->orderBy('candidates.total_score', "DESC")
             ->get();
 
-        $reserve = DB::table('candidates')
-            ->leftJoin('studentBac2s', 'studentBac2s.id','=', 'candidates.studentBac2_id')
-            ->join('genders','studentBac2s.gender_id','=','genders.id')
-            ->join('highSchools','studentBac2s.highschool_id','=','highSchools.id')
-            ->join('origins','studentBac2s.province_id','=','origins.id')
-            ->leftJoin('gdeGrades as math','studentBac2s.bac_math_grade','=','math.id')
-            ->leftJoin('gdeGrades as phys','studentBac2s.bac_phys_grade','=','phys.id')
-            ->leftJoin('gdeGrades as chem','studentBac2s.bac_chem_grade','=','chem.id')
-            ->where('result','Reserve')
-            ->select(
-                'candidates.register_id',
-                'studentBac2s.name_kh',
-                'candidates.name_latin',
-                'genders.code as gender',
-                'studentBac2s.dob',
-                'highSchools.name_kh as highschool',
-                'origins.name_kh as origin',
-                'studentBac2s.bac_year',
-                'math.name_en as math_grade',
-                'phys.name_en as phys_grade',
-                'chem.name_en as chem_grade'
-            )
-            ->orderBy('candidates.register_id')
-            ->get();
+        //dd($candidates);
 
-
-
-
-        $fields= ['ល.រ','លេខបង្កាន់ដៃ', 'ឈ្មោះ ខ្មែរ', 'ឈ្មោះ ឡាតាំង', 'ភេទ', 'ថ្ងៃខែរឆ្នាំកំនើត',"វិទ្យាល័យ","ខេត្តក្រុង","ឆ្នាំជាប់បាក់ឌុប","គណិតវិទ្យា","រូបវិទ្យា","គីមីវិទ្យា"];
+        $fields= [
+            'ល.រ',
+            'បនទ្ប់',
+            'លេខបង្កាន់ដៃ',
+            'ឈ្មោះ ខ្មែរ',
+            'ឈ្មោះ ឡាតាំង',
+            'ភេទ',
+            'ថ្ងៃខែរឆ្នាំកំនើត',
+            "វិទ្យាល័យ",
+            "ខេត្តក្រុង",
+            "ឆ្នាំជាប់បាក់ឌុប",
+            "និទ្ទេសគណិតវិទ្យា",
+            "និទ្ទេសរូបវិទ្យា",
+            "និទ្ទេសគីមីវិទ្យា",
+            "និទ្ទេសសរុប",
+            "Percentile",
+            "can ID",
+            "ពិន្ទុ",
+            "លទ្ធផល",
+            "ចំណាត់ថ្នាក់"
+        ];
         $title = 'បញ្ជីលទ្ទផលរបស់បេក្ខជន';
         $alpha = [];
         $letter = 'A';
         while ($letter !== 'AAA') {
             $alpha[] = $letter++;
         }
-        Excel::create('បញ្ជីលទ្ទផលបេក្ខជន', function($excel) use ($pass,$reserve, $title,$alpha,$fields) {
+        Excel::create('បញ្ជីលទ្ទផលបេក្ខជន', function($excel) use ($candidates, $title,$alpha,$fields) {
 
-            $datas = array(
-                "ជាប់ស្ថាពរ" => $pass, "ជាប់បំរុង"=>$reserve
-            );
-            foreach($datas as $key => $data){
-                $excel->sheet($key, function($sheet) use($data,$title,$alpha,$fields) {
+            $excel->sheet("បញ្ជីលទ្ទផលបេក្ខជន", function($sheet) use($candidates,$title,$alpha,$fields) {
 
-                    $index = 1;
-                    foreach ($data as $candidate) {
+                $sheet->setOrientation('portrait');
+                // Set top, right, bottom, left
+                $sheet->setPageMargin(array(
+                    0.25, 0.30, 0.25, 0.30
+                ));
 
-                        $row = array(
-                            $index,
-                            $candidate->register_id,
-                            $candidate->name_kh,
-                            $candidate->name_latin,
-                            $candidate->gender,
-                            Carbon::createFromFormat('Y-m-d H:i:s',$candidate->dob)->format("d/m/Y"),
-                            $candidate->highschool,
-                            $candidate->origin,
-                            $candidate->bac_year,
-                            $candidate->math_grade,
-                            $candidate->phys_grade,
-                            $candidate->chem_grade
-                        );
+                // Set all margins
+                $sheet->setPageMargin(0.25);
 
-                        $sheet->appendRow(
-                            $row
-                        );
-                        $index++;
+                $sheet->rows(
+                    array($fields)
+                );
+
+                $index = 1;
+                $passIndex = 1;
+                $reserveIndex = 1;
+                foreach ($candidates as $candidate) {
+
+                    if($candidate->result == "Pass"){
+                        $result = "A".$passIndex;
+                        $passIndex++;
+                    } else if($candidate->result == "Reserve"){
+                        $result = "R".$reserveIndex;
+                        $reserveIndex++;
+                    } else if($candidate->result == "Reject"){
+                        $result = "AB";
+                    } else {
+                        $result = "";
                     }
-                });
-            }
+                    $row = array(
+                        $index,
+                        $candidate->room_name,
+                        $candidate->register_id,
+                        $candidate->name_kh,
+                        $candidate->name_latin,
+                        $candidate->gender,
+                        Carbon::createFromFormat('Y-m-d H:i:s',$candidate->dob)->format("d/m/Y"),
+                        $candidate->highschool,
+                        $candidate->origin,
+                        $candidate->bac_year,
+                        $candidate->math_grade,
+                        $candidate->phys_grade,
+                        $candidate->chem_grade,
+                        $candidate->grade,
+                        $candidate->percentile,
+                        $candidate->can_id,
+                        $candidate->total_score,
+                        $result,
+                        $index
+                    );
+
+                    $sheet->appendRow(
+                        $row
+                    );
+                    $index++;
+                }
+            });
+
 
         })->export('xls');
 
