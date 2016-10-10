@@ -1607,7 +1607,7 @@ class ExamController extends Controller
                 foreach ($candidates as $candidate) {
 
                     if($candidate->result == "Reject"){
-                        $result = "ធ្លាក់";
+                        $result = "អវត្តមាន";
                     } else if($candidate->result == "Reserve"){
                         $result = "ធ្លាក់";
                     } else if ($candidate->result == "Pass"){
