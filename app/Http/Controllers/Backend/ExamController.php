@@ -1523,6 +1523,7 @@ class ExamController extends Controller
 
     public function export_candidate_ministry_list($exam_id) {
 
+        $exam = Exam::where('id',$exam_id)->first();
 
         $cands = DB::table('candidates')
             ->join('studentBac2s', 'studentBac2s.id', '=', 'candidates.studentBac2_id')
@@ -1538,13 +1539,32 @@ class ExamController extends Controller
 
         $candidateByRank=[];
         $index =1;
+
+        $last = null;
+        $same_index = 0;
         foreach($cands as $cand) {
-            $candidateByRank[$cand->can_id] = $index;
-            $index++;
+            if($last!= null && ($cand->total_score == $last->total_score)){ // the last one and this one have the same score, so he must have the same range
+                $candidateByRank[$cand->can_id] = $index-1;
+                $same_index++;
+            } else {
+                if($same_index>0){
+                    $index = $index + $same_index;
+                    $same_index = 0;
+                }
+                $candidateByRank[$cand->can_id] = $index;
+                $index++;
+            }
+            $last = $cand;
         }
 
+        // Lists candidates who have register to ITC
+        $candsRegister = DB::table('candidatesFromMoeys')
+            ->join("studentBac2s","studentBac2s.can_id",'=',"candidatesFromMoeys.can_id")
+            ->join("candidates","candidates.studentBac2_id",'=',"studentBac2s.id")
+            ->where('candidatesFromMoeys.bac_year',$exam->academic_year_id - 1)
+            ->lists('candidatesFromMoeys.id');
 
-        $candidates = DB::table('candidatesFromMoeys')
+        $candidates_moeys = DB::table('candidatesFromMoeys')
             ->join('studentBac2s', 'studentBac2s.can_id','=', 'candidatesFromMoeys.can_id')
             ->join('genders','studentBac2s.gender_id','=','genders.id')
             ->join('highSchools','studentBac2s.highschool_id','=','highSchools.id')
@@ -1569,15 +1589,20 @@ class ExamController extends Controller
             ->get();
 
 
-        foreach($candidates as &$candidate){
+        foreach($candidates_moeys as &$candidate){
             if(isset($candidateByRank[$candidate->can_id])){
                 $candidate->result = $candidateByRank[$candidate->can_id];
             } else {
-                $candidate->result = "Reject";
+                if(in_array($candidate->id,$candsRegister)){ // This student registered to ITC, but fail
+                    $candidate->result = "Fail"; // This including Fail and absence during exam
+                } else {
+                    $candidate->result = "NA";
+                }
+
             }
         }
 
-        Excel::create('Student Result To Send to DHE', function($excel) use ($candidates) {
+        Excel::create('Student Result To Send to DHE', function($excel) use ($candidates_moeys) {
 
             // Set the title
             $excel->setTitle('លទ្ធផលសំរាប់បញ្ជូនទៅគ្រឹះស្ថានឧត្តមសិក្សា');
@@ -1586,7 +1611,7 @@ class ExamController extends Controller
             $excel->setCreator('Institute of Technology of Cambodia')
                 ->setCompany('Institute of Technology of Cambodia');
 
-            $excel->sheet('បញ្ជីនិស្សិត្រ', function($sheet) use ($candidates) {
+            $excel->sheet('បញ្ជីនិស្សិត្រ', function($sheet) use ($candidates_moeys) {
 
                 $header = array('ល.រ',"គោត្តនាមនិងនាម","ភេទ","ថ្ងៃខែឆ្នាំកំណើត","មកពីវិទ្យាល័យ","ខេត្តក្រុង","ឆ្នាំជាប់ទុតិយភូមិ","គណិតវិទ្យា","រូបវិទ្យា","គីមីវិទ្យា","ចំណាត់ថ្នាក់");
                 $sheet->setOrientation('portrait');
@@ -1604,14 +1629,14 @@ class ExamController extends Controller
 
                 $index = 1;
 
-                foreach ($candidates as $candidate) {
+                foreach ($candidates_moeys as $candidate) {
 
-                    if($candidate->result == "Reject"){
-                        $result = "អវត្តមាន";
-                    } else if($candidate->result == "Reserve"){
+                    if($candidate->result == "Fail"){
                         $result = "ធ្លាក់";
                     } else if ($candidate->result == "Pass"){
                         $result= "ជាប់";
+                    } else if ($candidate->result == "NA"){
+                        $result= "NA";
                     } else {
                         $result = $candidate->result;
                     }
@@ -1722,10 +1747,28 @@ class ExamController extends Controller
                     array($fields)
                 );
 
+                $last = null;
+                $same_index = 0;
                 $index = 1;
+                $order = 1;
                 $passIndex = 1;
                 $reserveIndex = 1;
+
                 foreach ($candidates as $candidate) {
+
+                    // This to find candidate's rank
+                    if($last!= null && ($candidate->total_score == $last->total_score)){ // the last one and this one have the same score, so he must have the same range
+                        $rank = $index-1;
+                        $same_index++;
+                    } else {
+                        if($same_index>0){
+                            $index = $index + $same_index;
+                            $same_index = 0;
+                        }
+                        $rank = $index;
+                        $index++;
+                    }
+                    $last = $candidate;
 
                     if($candidate->result == "Pass"){
                         $result = "A".$passIndex;
@@ -1739,7 +1782,7 @@ class ExamController extends Controller
                         $result = "";
                     }
                     $row = array(
-                        $index,
+                        $order,
                         $candidate->room_name,
                         $candidate->register_id,
                         $candidate->name_kh,
@@ -1757,13 +1800,13 @@ class ExamController extends Controller
                         $candidate->can_id,
                         $candidate->total_score,
                         $result,
-                        $index
+                        $rank
                     );
 
                     $sheet->appendRow(
                         $row
                     );
-                    $index++;
+                    $order++;
                 }
             });
 
