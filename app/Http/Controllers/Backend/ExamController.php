@@ -1218,6 +1218,8 @@ class ExamController extends Controller
         $passedCandidates = (int)$requestData['total_pass'];
         $reservedCandidates = (int)$requestData['total_reserve'];
 
+        //dd($reservedCandidates);
+
         // Clean all data in secret_room_result
         DB::table('secret_room_result')->delete();
 
@@ -1303,7 +1305,7 @@ class ExamController extends Controller
                         ['result'=>"Reject"]
                     );
             } else {
-                if($passedCandidates> -1){
+                if($passedCandidates> 0){
                     DB::table('secret_room_result')
                         ->where('roomcode',$final_result->roomcode)
                         ->where('exam_id',$examId)
@@ -1313,7 +1315,7 @@ class ExamController extends Controller
                         );
                     $passedCandidates--;
 
-                } else if($passedCandidates == -1){ // The first candidate out of passed range
+                } else if($passedCandidates == 0){ // The first candidate out of passed range
 
                     if($last_score!= null && $last_score->score == $final_result->score){
                         DB::table('secret_room_result')
@@ -1324,9 +1326,16 @@ class ExamController extends Controller
                                 ['result'=>"Pass"]
                             );
                     } else {
+                        DB::table('secret_room_result')
+                            ->where('roomcode',$final_result->roomcode)
+                            ->where('exam_id',$examId)
+                            ->where('order_in_room',$final_result->order_in_room)
+                            ->update(
+                                ['result'=>"Reserve"]
+                            );
                         $passedCandidates--;
                     }
-                } else if ($reservedCandidates > -1) {
+                } else if ($reservedCandidates > 0) {
                     DB::table('secret_room_result')
                         ->where('roomcode',$final_result->roomcode)
                         ->where('exam_id',$examId)
@@ -1336,7 +1345,7 @@ class ExamController extends Controller
                         );
                     $reservedCandidates--;
 
-                } else if ($reservedCandidates == -1) {
+                } else if ($reservedCandidates == 0) {
                     if($last_score!= null && $last_score->score == $final_result->score) {
                         DB::table('secret_room_result')
                             ->where('roomcode', $final_result->roomcode)
@@ -1346,6 +1355,13 @@ class ExamController extends Controller
                                 ['result' => "Reserve"]
                             );
                     } else {
+                        DB::table('secret_room_result')
+                            ->where('roomcode',$final_result->roomcode)
+                            ->where('exam_id',$examId)
+                            ->where('order_in_room',$final_result->order_in_room)
+                            ->update(
+                                ['result'=>"Fail"]
+                            );
                         $reservedCandidates--;
                     }
                 } else {
