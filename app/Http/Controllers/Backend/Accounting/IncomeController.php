@@ -109,6 +109,9 @@ class IncomeController extends Controller
         $now = Carbon::now();
         $exam = Exam::where('id',Input::get('exam_id'))->first();
 
+
+
+
         $candidates = DB::table('candidates')
             ->leftJoin('origins','candidates.province_id','=','origins.id')
             ->leftJoin('gdeGrades','candidates.bac_total_grade','=','gdeGrades.id')
@@ -118,20 +121,26 @@ class IncomeController extends Controller
             ->leftJoin('degrees', 'candidates.degree_id', '=', 'degrees.id')
             ->leftJoin('promotions', 'candidates.promotion_id', '=', 'promotions.id')
             ->leftJoin('academicYears', 'candidates.academic_year_id', '=', 'academicYears.id')
+            ->where([
+                ['candidates.result',"Pass"],
+                ['candidates.exam_id', $exam->id]
+            ])
+            ->orWhere('candidates.result',"Reserve")
             ->select([
                 'candidates.id','candidates.payslip_client_id','candidates.name_kh','candidates.name_latin','promotions.name as promotion_name',
                 'origins.name_kh as province', 'dob','result',DB::raw("CONCAT(degrees.code,grades.code,departments.code) as class"),
                 'academicYears.name_kh as academic_year_name_kh','candidates.grade_id', 'candidates.degree_id','degrees.name_kh as degree_name_kh',
+                'candidates.result',
                 'genders.name_kh as gender_name_kh','gdeGrades.name_en as bac_total_grade']);
 
-        if($now>=$exam->success_registration_start && $now<=$exam->success_registration_stop){
+        /*if($now>=$exam->success_registration_start && $now<=$exam->success_registration_stop){
             $candidates = $candidates->where('candidates.result',"Pass");
             if($now>=$exam->reserve_registration_start && $now<=$exam->reserve_registration_stop){
                 $candidates = $candidates->orWhere('candidates.result',"Reserve");
             }
         } else if($now>=$exam->reserve_registration_start && $now<=$exam->reserve_registration_stop){
             $candidates = $candidates->where('candidates.result',"Reserve");
-        }
+        }*/
 
         if($exam_id = Input::get('exam_id')){
             $candidates = $candidates->where('exam_id',$exam_id);
@@ -153,6 +162,15 @@ class IncomeController extends Controller
 
 
         return $datatables
+            ->editColumn('result',function($candidate){
+                $result = "";
+                if($candidate->result == "Pass"){
+                    $result = "<span class='label label-success'>".$candidate->result."</span>";
+                } else {
+                    $result = "<span class='label label-info'>".$candidate->result."</span>";
+                }
+                return $result;
+            })
             ->editColumn('dob',function($candidate){
                 $date = Carbon::createFromFormat('Y-m-d h:i:s',$candidate->dob);
                 return $date->format('d/m/Y');

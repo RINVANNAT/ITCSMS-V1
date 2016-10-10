@@ -316,7 +316,7 @@ class ExamController extends Controller
 //        return Response::json($data);
 //    }
 
-    public function add_room(ModifyExamRoomRequest$request, $id){
+    public function add_room(ModifyExamRoomRequest $request, $id){
 
         $exam = $this->exams->findOrThrowException($id);
 
@@ -2304,7 +2304,7 @@ class ExamController extends Controller
         return $dUTCandidates;
     }
 
-    private function arrayStudentPassOrReserveByDept($examId, $is_success) {
+    private  function arrayStudentPassOrReserveByDept($examId, $is_success) {
 
         $uniqueDept =[];
         $allStudentByDept = [];

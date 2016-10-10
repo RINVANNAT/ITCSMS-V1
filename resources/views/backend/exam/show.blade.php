@@ -859,28 +859,56 @@
                 e.preventDefault();
             });
 
-            $('#candidates-table').on('click', '.btn-register[data-remote]', function (e) {
-                var url = $(this).data('remote');
-                var exam_type = $(this).data('exam');
-                e.preventDefault();
-                if(exam_type != 2) { // Engineer Exam
-                    swal({
-                        title: 'Error!',
-                        text: 'Do you want to continue',
-                        type: 'error',
-                        confirmButtonText: 'Cool'
-                    })
-                } else { // DUT Examß
-                    swal({
-                        title: 'Error!',
-                        text: 'Do you want to continue',
-                        type: 'error',
-                        confirmButtonText: 'Cool'
-                    })
-                }
+          @if($exam->id == 1)
+              $('#candidates-table').on('click', '.btn-register[data-remote]', function (e) {
+                  var url = $(this).data('remote');
+                  e.preventDefault();
+                  swal({
+                      title: "Confirm",
+                      text: "Register this candidate?",
+                      type: "info",
+                      showCancelButton: true,
+                      confirmButtonColor: "#DD6B55",
+                      confirmButtonText: "Yes, register it!",
+                      closeOnConfirm: true
+                  }, function(confirmed) {
+                      if (confirmed) {
+                          $.ajaxSetup({
+                              headers: {
+                                  'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                              }
+                          });
 
-                return false;
-            });
+                          // confirm then
+                          $.ajax({
+                              url: url,
+                              type: 'GET',
+                              dataType: 'json',
+                              success:function(data) {
+                                  candidate_datatable.draw();
+                              }
+                          });
+                      }
+                  });
+                  return false;
+              });
+
+          @else
+
+              $('#candidates-table').on('click', '.btn-register[data-remote]', function (e) {
+
+                var url = $(this).data('remote');
+                var exam_id = $(this).data('exam')
+                window_request_room = PopupCenterDual(url+'?exam_id='+exam_id,'Course for exam','900','600');
+
+              });
+
+
+
+          @endif
+
+
+
             enableDeleteRecord($('#candidates-table'));
 
             $(document).on('click', '#btn_input_score_course', function (e) {

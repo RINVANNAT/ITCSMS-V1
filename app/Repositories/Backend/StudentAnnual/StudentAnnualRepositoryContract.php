@@ -51,4 +51,6 @@ interface StudentAnnualRepositoryContract
      * @return mixed
      */
     public function destroy($id);
+
+    public function registerStudentDUT($candidate, $department_id);
 }

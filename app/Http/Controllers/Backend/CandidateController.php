@@ -27,6 +27,7 @@ use Illuminate\Support\Facades\Input;
 use Illuminate\Support\Facades\Redirect;
 use Illuminate\Support\Facades\Response;
 use Yajra\Datatables\Datatables;
+use Symfony\Component\HttpFoundation\Request;
 
 class CandidateController extends Controller
 {
@@ -334,9 +335,51 @@ class CandidateController extends Controller
      * @return \Illuminate\Http\Response
      */
     public function register(RegisterCandidateRequest $request, $id){
-        $candidate = Candidate::where('id',$id)->first();
 
-        $this->studentRepo->register($candidate);
+        $examId = $request->exam_id;
+        $candidate_id = $id;
+
+        if($examId == 2) {
+
+            $candidateDepartments = DB::table('candidates')
+                    ->join('candidate_department', 'candidate_department.candidate_id', '=', 'candidates.id')
+                    ->join('departments', 'departments.id', '=', 'candidate_department.department_id')
+                    ->where([
+                        ['departments.is_specialist', '=', true],
+                        ['departments.parent_id', '=', 11],
+                        ['candidates.exam_id', '=', $examId],
+                        ['candidate_department.candidate_id', '=', $candidate_id]
+                    ])
+                    ->select(
+                        'candidate_department.is_success as result',
+                        'departments.code as dept_name',
+                        'departments.id as dept_id',
+                        'candidates.id as candidate_id'
+                    )
+                    ->get();
+
+//            dd($candidateDepartments);
+
+            return view('backend.exam.includes.popup_register_student_dut', compact('candidateDepartments', 'examId', 'candidate_id'));
+        } else {
+
+            $candidate = Candidate::where('id',$id)->first();
+
+            $this->studentRepo->register($candidate);
+
+            if($request->ajax()){
+                return json_encode(array('success'=>true));
+            }
+        }
+    }
+
+
+    public function registerStudentDUT($examId, Request $request) {
+
+        $dept_id = $request->department_id;
+        $candidate_id = $request->candidate_id;
+        $candidate = Candidate::where('id',$candidate_id)->first();
+        $this->studentRepo->registerStudentDUT($candidate, $dept_id);
 
         if($request->ajax()){
             return json_encode(array('success'=>true));

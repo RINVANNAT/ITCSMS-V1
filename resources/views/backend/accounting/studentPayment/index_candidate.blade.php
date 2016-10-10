@@ -94,6 +94,7 @@
                         <th>{{ trans('labels.backend.candidates.fields.dob') }}</th>
                         <th>{{ trans('labels.backend.candidates.fields.province_id') }}</th>
                         <th>{{ trans('labels.backend.candidates.fields.class') }}</th>
+                        <th>{{ trans('labels.backend.candidates.fields.result') }}</th>
                         <th>{{ trans('labels.general.actions') }}</th>
                     </tr>
                     </thead>
@@ -149,6 +150,7 @@
                 { data: 'dob', name: 'candidates.dob'},
                 { data: 'province', name: 'origins.name_kh'},
                 { data: 'class', name: 'class',searchable:false,orderable:false},
+                { data: 'result', name: 'candidates.result'},
                 {
                     "className":      'details-control',
                     "orderable":      false,
