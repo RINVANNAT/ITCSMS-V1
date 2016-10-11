@@ -13,7 +13,7 @@
 
     <div class="box box-success">
         <div class="box-header with-border">
-            <h1 class="box-title"> <span class="text_font"> Department Opption of Candidate DUT </span></h1>
+            <h1 class="box-title"> <span class="text_font"> Department Option of Candidate DUT </span></h1>
         </div>
         <!-- /.box-header -->
         <div class="box-body">
@@ -22,28 +22,35 @@
                 <table class="table">
                     <thead>
                     <tr>
-                        <th>Choice</th>
+                        <th width="10mm">Choice</th>
                         <th>Department</th>
                         <th>Result</th>
+                        <th> Count</th>
                     </tr>
                     </thead>
                     <tbody>
                         @foreach($candidateDepartments as $candidateDepartment)
                             <tr class="font_text">
                                 <td>
-                                    @if($candidateDepartment->result == 'Pass')
+                                        <input type="radio" name="department" value="{{$candidateDepartment->dept_id}}" class="text-success" >
+                                </td>
+                                <td>
+                                    {!! Form::label($candidateDepartment->dept_id, $candidateDepartment->dept_name, ['class' => 'col-md-4 col-sm-4 control-label']) !!}
+                                </td>
+                                <td>
 
-                                        <input type="radio" name="department" value="{{$candidateDepartment->dept_id}}" class="text-success" checked>
-
+                                    @if($candidateDepartment->result=='Pass')
+                                        {!! Form::label('', $candidateDepartment->result, ['class' => 'col-md-4 col-sm-4 control-label label label-success']) !!}
+                                    @elseif($candidateDepartment->result=='Reserve')
+                                        {!! Form::label('', $candidateDepartment->result, ['class' => 'col-md-4 col-sm-4 control-label label label-info']) !!}
                                     @else
-                                        <input type="radio" name="department" value="{{$candidateDepartment->dept_id}}" >
+                                        {!! Form::label('', null, ['class' => 'col-md-4 col-sm-4 control-label label label-info']) !!}
                                     @endif
+
                                 </td>
+
                                 <td>
-                                    {!! Form::label($candidateDepartment->dept_id, $candidateDepartment->dept_name, ['class' => 'col-md-4 col-sm-4 control-label required']) !!}
-                                </td>
-                                <td>
-                                    {!! Form::label('', $candidateDepartment->result=='Pass'?$candidateDepartment->result:null, ['class' => 'col-md-4 col-sm-4 control-label label label-success']) !!}
+                                    <label for="number" > {{$studentWithRegisteredStudetn[$candidateDepartment->dept_name]}}</label>
                                 </td>
 
                             </tr>
@@ -85,11 +92,11 @@
                 department_id: selected_department_id,
                 candidate_id: candidate_id
             };
-
             var url = "{{route('admin.candidate.register_student_dut',$examId)}}";
-
             ajaxRequest('PUT', url,baseData);
+
         });
+
 
         function ajaxRequest(method, baseUrl, baseData) {
             $.ajax({
@@ -101,7 +108,7 @@
                     console.log(resultData);
                     if(resultData.success) {
                         notify('success', 'Student Registered!!');
-//                        opener.refresh();
+                        opener.refresh_candidate_list();
                         setTimeout(function(){
                             window.close();
                         },2000);

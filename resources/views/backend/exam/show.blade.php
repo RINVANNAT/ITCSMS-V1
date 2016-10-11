@@ -257,6 +257,7 @@
         var window_missing_candidate;
         var window_entrance_exam_course;
         var window_report_error;
+        var window_choose_department_dut;
 
         var check_course_error = false;
         var iconUrl1 = "{{url('plugins/jstree/img/department.png')}}";
@@ -859,7 +860,7 @@
                 e.preventDefault();
             });
 
-          @if($exam->id == 1)
+          @if($exam->type_id == config("access.exam.entrance_engineer"))
               $('#candidates-table').on('click', '.btn-register[data-remote]', function (e) {
                   var url = $(this).data('remote');
                   e.preventDefault();
@@ -893,13 +894,13 @@
                   return false;
               });
 
-          @else
+          @elseif($exam->type_id == config("access.exam.entrance_dut"))
 
               $('#candidates-table').on('click', '.btn-register[data-remote]', function (e) {
 
                 var url = $(this).data('remote');
                 var exam_id = $(this).data('exam')
-                window_request_room = PopupCenterDual(url+'?exam_id='+exam_id,'Course for exam','900','600');
+                window_choose_department_dut = PopupCenterDual(url+'?exam_id='+exam_id,'Course for exam','450','580');
 
               });
 
@@ -1111,6 +1112,10 @@
 
             if(window_entrance_exam_course && !window_entrance_exam_course.closed){
                 window_entrance_exam_course.close();
+            }
+
+            if(window_choose_department_dut && !window_choose_department_dut.closed) {
+                window_choose_department_dut.close();
             }
 
         };

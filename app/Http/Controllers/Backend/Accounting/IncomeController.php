@@ -433,16 +433,25 @@ class IncomeController extends Controller
      */
     public function store(StoreIncomeRequest $request)
     {
-        $id = null;
+        $url = null;
         if(Input::get('type') == "Student" || Input::get('type') == "Candidate"){
-            $id = $this->incomes->create($request->all());
+            $url = $this->incomes->create($request->all());
+            if($request->ajax()){
+                return json_encode(array(
+                    "sucess"=>true,
+                    'payslip_client_id'=>$url,
+                    'candidate_id'=>$request->get('candidate_id'),
+                    'detail_url'=>$url
+                    )
+                );
+            }
         } else {
             $this->incomes->createSimpleIncome($request->all());
+            if($request->ajax()){
+                return json_encode(array("sucess"=>true,'payslip_client_id'=>$url));
+            }
         }
 
-        if($request->ajax()){
-            return json_encode(array("sucess"=>true,'payslip_client_id'=>$id));
-        }
         return redirect()->route('admin.accounting.incomes.index')->withFlashSuccess(trans('alerts.backend.generals.created'));
     }
 

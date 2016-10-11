@@ -31,7 +31,7 @@ interface StudentAnnualRepositoryContract
      */
     public function getAllStudentAnnuals($order_by = 'id', $sort = 'asc');
 
-    public function register($candidate);
+    public function register($candidate, $department_id);
 
     /**
      * @param  $input
@@ -52,5 +52,4 @@ interface StudentAnnualRepositoryContract
      */
     public function destroy($id);
 
-    public function registerStudentDUT($candidate, $department_id);
 }

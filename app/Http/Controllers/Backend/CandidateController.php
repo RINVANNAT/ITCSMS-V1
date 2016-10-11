@@ -337,9 +337,12 @@ class CandidateController extends Controller
     public function register(RegisterCandidateRequest $request, $id){
 
         $examId = $request->exam_id;
+        $exam = Exam::where('id',$examId)->first();
         $candidate_id = $id;
 
-        if($examId == 2) {
+        $studentWithRegisteredStudetn =[];
+
+        if($exam->type_id == config("access.exam.entrance_dut")) {
 
             $candidateDepartments = DB::table('candidates')
                     ->join('candidate_department', 'candidate_department.candidate_id', '=', 'candidates.id')
@@ -358,14 +361,34 @@ class CandidateController extends Controller
                     )
                     ->get();
 
-//            dd($candidateDepartments);
 
-            return view('backend.exam.includes.popup_register_student_dut', compact('candidateDepartments', 'examId', 'candidate_id'));
+            $getAllDepts = DB::table('departments')
+                ->where([
+                    ['departments.is_specialist', '=', true],
+                    ['departments.parent_id', '=', 11]
+                ])
+                ->select('departments.id as dept_id', 'departments.code as dept_name')
+                ->get();
+
+
+            foreach($getAllDepts as $Dept) {
+
+                $countRegisteredStudents = DB::table('studentAnnuals')
+                ->where([
+                    ['studentAnnuals.academic_year_id', '=', $exam->academic_year_id],
+                    ['studentAnnuals.department_id', '=', $Dept->dept_id],
+                    ['studentAnnuals.degree_id', '=', config('access.degrees.degree_associate')]
+                ])->count();
+                $studentWithRegisteredStudetn[$Dept->dept_name] = $countRegisteredStudents;
+            }
+
+            return view('backend.exam.includes.popup_register_student_dut', compact('candidateDepartments', 'examId', 'candidate_id', 'studentWithRegisteredStudetn'));
+
         } else {
 
             $candidate = Candidate::where('id',$id)->first();
 
-            $this->studentRepo->register($candidate);
+            $this->studentRepo->register($candidate, $department_id = config('access.departments.department_tc'));
 
             if($request->ajax()){
                 return json_encode(array('success'=>true));
@@ -377,9 +400,11 @@ class CandidateController extends Controller
     public function registerStudentDUT($examId, Request $request) {
 
         $dept_id = $request->department_id;
+
+
         $candidate_id = $request->candidate_id;
         $candidate = Candidate::where('id',$candidate_id)->first();
-        $this->studentRepo->registerStudentDUT($candidate, $dept_id);
+        $this->studentRepo->register($candidate, $dept_id);
 
         if($request->ajax()){
             return json_encode(array('success'=>true));

@@ -56,7 +56,7 @@ class EloquentStudentAnnualRepository implements StudentAnnualRepositoryContract
             ->get();
     }
 
-    public function registerStudentDUT($candidate, $department_id) {
+    public function register($candidate, $department_id){
 
         $student = new Student();
 
@@ -72,7 +72,10 @@ class EloquentStudentAnnualRepository implements StudentAnnualRepositoryContract
             $next_id = 1;
         }
 
-        $student->id_card = 'e'.$last_academic_year->id.str_pad($next_id, 4, '0', STR_PAD_LEFT);
+//        $student->id_card = 'e'.$last_academic_year->id.str_pad($next_id, 4, '0', STR_PAD_LEFT);
+
+
+        $student->id_card = $candidate->register_id;
         $student->photo = 'user.png';
 
         if($candidate->mcs_no != "" || $candidate->mcs_no != null){
@@ -127,109 +130,7 @@ class EloquentStudentAnnualRepository implements StudentAnnualRepositoryContract
             $studentAnnual->created_at = Carbon::now();
             $studentAnnual->create_uid = auth()->id();
             $studentAnnual->grade_id = $candidate->grade_id;
-
-            $studentAnnual->department_option_id = null;
-            if(isset($candidate->department_option_id)){
-                if($candidate->department_option_id != ""){
-                    $studentAnnual->department_option_id = $candidate->department_option_id;
-                }
-            }
-
-            $studentAnnual->history_id = null;
-            if(isset($candidate->history_id)){
-                if($candidate->history_id != ""){
-                    $studentAnnual->history_id = $candidate->history_id;
-                }
-            }
-
-            if ($studentAnnual->save()) {
-                DB::commit();
-                $candidate->is_register = true;
-                $candidate->save();
-                return true;
-            }
-            DB::rollback();
-            throw new GeneralException(trans('exceptions.backend.general.create_error'));
-        } else {
-            DB::rollback();
-            throw new GeneralException(trans('exceptions.backend.general.create_error'));
-        }
-
-    }
-
-
-
-    public function register($candidate){
-
-        $student = new Student();
-
-        $last_academic_year = AcademicYear::orderBy('id','desc')->first();
-        $last_student = StudentAnnual::leftJoin('students','studentAnnuals.student_id','=','students.id')
-            ->where('academic_year_id',$last_academic_year->id)
-            ->where('studentAnnuals.grade_id',1)
-            ->orderBy('students.id_card','desc')->first();
-
-        if($last_student != null) {
-            $next_id = (int)substr($last_student->id_card, 5)+1;
-        } else {
-            $next_id = 1;
-        }
-
-        $student->id_card = 'e'.$last_academic_year->id.str_pad($next_id, 4, '0', STR_PAD_LEFT);
-        $student->photo = 'user.png';
-
-        if($candidate->mcs_no != "" || $candidate->mcs_no != null){
-            $student->mcs_no = $candidate->mcs_no;
-        }
-        if($candidate->can_id != "" || $candidate->can_id != null){
-            $student->can_id = $candidate->can_id;
-        }
-
-        $student->name_latin = $candidate->name_latin;
-        $student->name_kh = $candidate->name_kh;
-        $student->dob = $candidate->dob->format('d/m/Y');
-        $student->radie = false;
-        $student->observation = null;
-        $student->phone = $candidate->phone;
-        $student->email = $candidate->email;
-        $student->admission_date = Carbon::now();
-        $student->address = $candidate->address;
-        $student->address_current = $candidate->address_current;
-        $student->parent_name = null;
-        $student->parent_occupation = null;
-        $student->parent_address = null;
-        $student->parent_phone = null;
-        $student->active = true;
-        $student->pob = $candidate->pob;
-        $student->gender_id = $candidate->gender_id;
-
-        $student->high_school_id = null;
-        if(isset($candidate->highschool_id)){
-            if($candidate->highschool_id != ""){
-                $student->high_school_id = $candidate->highschool_id;
-            }
-        }
-        $student->origin_id = $candidate->province_id;
-
-        $student->created_at = Carbon::now();
-        $student->create_uid = auth()->id();
-
-
-        DB::beginTransaction();
-        if($student->save()){
-            // If save successful, create student annual
-            $studentAnnual = new StudentAnnual();
-
-            $studentAnnual->student_id = $student->id;
-            $studentAnnual->academic_year_id = $last_academic_year->id;
-            $studentAnnual->group = null;
-            $studentAnnual->active = true;
-            $studentAnnual->promotion_id = $candidate->promotion_id;
-            $studentAnnual->department_id = 8; // Department TC
-            $studentAnnual->degree_id = $candidate->degree_id;
-            $studentAnnual->created_at = Carbon::now();
-            $studentAnnual->create_uid = auth()->id();
-            $studentAnnual->grade_id = $candidate->grade_id;
+            $studentAnnual->payslip_client_id = $candidate->payslip_client_id;
 
             $studentAnnual->department_option_id = null;
             if(isset($candidate->department_option_id)){

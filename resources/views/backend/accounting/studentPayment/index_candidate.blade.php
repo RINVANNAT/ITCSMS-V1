@@ -111,8 +111,11 @@
     {!! Html::script('plugins/datatables/dataTables.bootstrap.min.js') !!}
     {!! Html::script('plugins/handlebars.js') !!}
     <script>
+        var payment_tables = [];
         function initTable(tableId, data) {
-            payment_table = $('#' + tableId).DataTable({
+
+            console.log(data.details_url);
+            payment_tables[tableId] = $('#' + tableId).DataTable({
                 dom: 'i<"payment_info">t<"payment_export_print btn-group"><"payment_btn">',
                 processing: true,
                 serverSide: true,
@@ -125,6 +128,8 @@
                     { data: 'action', name: 'action', orderable:false,searchable:false }
                 ]
             })
+
+            console.log(payment_tables);
         }
 
         var oTable = $('#candidates-table').DataTable({
@@ -165,7 +170,7 @@
             var template = Handlebars.compile($("#details-template").html());
             var current_id = null;
             var base_url = "{{url('/')}}";
-            var payment_table = null;
+
 
             $("div.toolbar").html(
                     ' {!! Form::select('academic_year',$academicYears,null, array('class'=>'form-control','id'=>'filter_academic_year')) !!} '+
@@ -233,9 +238,11 @@
                         // do nothing for now
                     },
                     success:function(data) {
+                        console.log("Loaded ID: "+ "students-"+data.candidate_id);
                         $('#add_payment_modal').modal('toggle');
                         //$('#'+current_id).DataTable().ajax.reload();
-                        payment_table.draw();
+                        payment_tables["students-"+data.candidate_id].ajax.url(data.detail_url).load();
+                        //oTable.draw();
                     },
                     error:function(error){
                         alert(error);
@@ -262,7 +269,8 @@
                         '<button class="btn btn-default btn-sm export_all"><i class="fa fa-file-excel-o"></i></button>'
                     );
                     $("div.payment_btn").html(
-                            '<button class="btn btn-sm btn-primary btn_income_student">Income</button> &nbsp; <button class="btn btn-sm btn-success">Outcome</button>'
+                            '<button class="btn btn-sm btn-primary btn_income_student">Income</button> &nbsp;'
+                            {{--&nbsp; <button class="btn btn-sm btn-success">Outcome</button>--}}
                     );
                     $("div.payment_info").html(
                             '<span>To Pay: </span> 450$ / <span>Debt: </span> 450$'
