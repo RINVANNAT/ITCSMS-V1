@@ -70,39 +70,47 @@ class CandidateController extends Controller
     {
         $studentBac2_id = Input::get('studentBac2_id');
         $exam_id = Input::get('exam_id');
-        $exam = Exam::find($exam_id);
-        $highschool = null;
-
-        if($studentBac2_id==0){ // This allow to create candidate manually
-            $studentBac2 = null;
-            $highschool = null;
-        } else {
-            $studentBac2 = StudentBac2::find($studentBac2_id);
-            $highschool = HighSchool::where('id',$studentBac2->highschool_id)->lists('id', 'name_kh as name')->toArray();
-        }
-
         $exam = Exam::where('id',$exam_id)->first();
 
-        $dif = $exam->academic_year_id - 2015;
-        if($exam->type_id == 1){ // Engineer
-            $promotion_id = config('app.promotions.I.2015')+$dif;
-            $promotions = Promotion::where('id',$promotion_id)->orderBy('id','desc')->lists('name','id')->toArray();
-        } else if($exam->type_id == 2){
-            $promotion_id = config('app.promotions.T.2015')+$dif;
-            $promotions = Promotion::where('id',$promotion_id)->orderBy('id','desc')->lists('name','id')->toArray();
+        if($exam->accept_registration){
+            // This exam accept new candidate registration
+            $highschool = null;
+
+            if($studentBac2_id==0){ // This allow to create candidate manually
+                $studentBac2 = null;
+                $highschool = null;
+            } else {
+                $studentBac2 = StudentBac2::find($studentBac2_id);
+                $highschool = HighSchool::where('id',$studentBac2->highschool_id)->lists('id', 'name_kh as name')->toArray();
+            }
+
+
+
+            $dif = $exam->academic_year_id - 2015;
+            if($exam->type_id == 1){ // Engineer
+                $promotion_id = config('app.promotions.I.2015')+$dif;
+                $promotions = Promotion::where('id',$promotion_id)->orderBy('id','desc')->lists('name','id')->toArray();
+            } else if($exam->type_id == 2){
+                $promotion_id = config('app.promotions.T.2015')+$dif;
+                $promotions = Promotion::where('id',$promotion_id)->orderBy('id','desc')->lists('name','id')->toArray();
+            } else {
+                $promotions = Promotion::orderBy('id','desc')->lists('name','id')->toArray();
+            }
+
+            $degrees = Degree::lists('name_kh','id');
+            $genders = Gender::lists('name_kh','id');
+
+            $provinces = Origin::lists('name_kh','id');
+            $gdeGrades = GdeGrade::lists('name_en','id');
+            $departments = Department::where('is_specialist',true)->where('parent_id',11)->orderBy('code','asc')->get();
+            $academicYears = AcademicYear::orderBy('id','desc')->lists('id','id');
+
+            return view('backend.candidate.create',compact('departments','degrees','genders','promotions','provinces','gdeGrades','academicYears','exam','studentBac2','highschool'));
         } else {
-            $promotions = Promotion::orderBy('id','desc')->lists('name','id')->toArray();
+            // This exam no longer accept new candidate registration
+            return Response::json(array("message"=>"You can not add new candidate to this exam"),422);
         }
 
-        $degrees = Degree::lists('name_kh','id');
-        $genders = Gender::lists('name_kh','id');
-
-        $provinces = Origin::lists('name_kh','id');
-        $gdeGrades = GdeGrade::lists('name_en','id');
-        $departments = Department::where('is_specialist',true)->where('parent_id',11)->orderBy('code','asc')->get();
-        $academicYears = AcademicYear::orderBy('id','desc')->lists('id','id');
-
-        return view('backend.candidate.create',compact('departments','degrees','genders','promotions','provinces','gdeGrades','academicYears','exam','studentBac2','highschool'));
     }
 
     /**
@@ -113,16 +121,20 @@ class CandidateController extends Controller
      */
     public function store(StoreCandidateRequest $request)
     {
-        $result = $this->candidates->create($request->all());
+        $exam = Exam::where('id',$request->get('exam_id'))->first();
+        if($exam->result =="Pending") { // If this result is still pending, they can update their info
+            $result = $this->candidates->create($request->all());
 
-        if($request->ajax()){
             if($result['status']==true){
                 return Response::json($result);
             } else {
                 return Response::json($result,422);
             }
 
+        } else {
+            return Response::json(array("message"=>"You can modify information of this candidate"),422);
         }
+
     }
 
 
@@ -189,15 +201,19 @@ class CandidateController extends Controller
      */
     public function update(UpdateCandidateRequest $request, $id)
     {
-        $result = $this->candidates->update($id, $request->all());
-        if($request->ajax()){
+        $exam = Exam::where('id',$request->get('exam_id'))->first();
+        if($exam->result =="Pending"){ // If this result is still pending, they can update their info
+            $result = $this->candidates->update($id, $request->all());
+
             if($result['status']==true){
                 return Response::json($result);
             } else {
                 return Response::json($result,422);
             }
-
+        } else {
+            return Response::json(array("message"=>"You can modify information of this candidate"),422);
         }
+
     }
 
     /**
@@ -224,6 +240,7 @@ class CandidateController extends Controller
      */
     public function data()
     {
+        //$exam = Exam::where('id',Input::get('exam_id'))->first();
 
         $candidates = DB::table('candidates')
             ->leftJoin('origins','candidates.province_id','=','origins.id')

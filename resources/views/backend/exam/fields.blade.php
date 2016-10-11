@@ -1,6 +1,6 @@
 <div class="form-group">
     {!! Form::label('name', trans('labels.backend.exams.fields.name'), ['class' => 'col-lg-2 control-label required']) !!}
-    <div class="col-lg-3">
+    <div class="col-lg-4">
         {!! Form::text('name', null, ['class' => 'form-control', 'required']) !!}
     </div>
 </div><!--form control-->

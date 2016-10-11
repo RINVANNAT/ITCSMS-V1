@@ -6,8 +6,10 @@
 <div style="padding-bottom: 20px;">
     <!-- Check all button -->
     @permission('create-exam-candidate')
-    <button class="btn btn-primary btn-sm" id="btn_add_candidate"><i class="fa fa-plus-circle"></i> {!! trans('buttons.exam.candidate.add_from_bac2') !!}</button>
-    <button class="btn btn-info btn-sm" id="btn_add_candidate_manual"><i class="fa fa-plus-circle"></i> {!! trans('buttons.exam.candidate.add_manually') !!}</button>
+        @if($exam->accept_registration)
+        <button class="btn btn-primary btn-sm" id="btn_add_candidate"><i class="fa fa-plus-circle"></i> {!! trans('buttons.exam.candidate.add_from_bac2') !!}</button>
+        <button class="btn btn-info btn-sm" id="btn_add_candidate_manual"><i class="fa fa-plus-circle"></i> {!! trans('buttons.exam.candidate.add_manually') !!}</button>
+        @endif
     @endauth
     <!-- /.btn-group -->
     <button class="btn btn-default btn-sm" id="btn-candidate-refresh"><i class="fa fa-refresh"></i></button>
@@ -37,7 +39,7 @@
 <table class="table table-striped table-bordered table-hover dt-responsive nowrap" cellspacing="0" width="100%" id="candidates-table">
     <thead>
     <tr>
-        <th></th>
+        <th width="10mm"></th>
         <th>{{ trans('labels.backend.candidates.fields.register_id') }}</th>
         <th>{{ trans('labels.backend.candidates.fields.name_kh') }}</th>
         <th>{{ trans('labels.backend.candidates.fields.name_latin') }}</th>

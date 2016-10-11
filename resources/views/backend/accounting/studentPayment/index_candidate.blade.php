@@ -229,25 +229,30 @@
             });
 
             function submitIncome(){
-                $.ajax({
-                    type:'POST',
-                    dataType:'json',
-                    data:$('#payslip_income_form').serialize(),
-                    url:'{{route('admin.accounting.incomes.store')."?type=Candidate"}}',
-                    beforeSend:function(){
-                        // do nothing for now
-                    },
-                    success:function(data) {
-                        console.log("Loaded ID: "+ "students-"+data.candidate_id);
-                        $('#add_payment_modal').modal('toggle');
-                        //$('#'+current_id).DataTable().ajax.reload();
-                        payment_tables["students-"+data.candidate_id].ajax.url(data.detail_url).load();
-                        //oTable.draw();
-                    },
-                    error:function(error){
-                        alert(error);
-                    }
-                });
+                if($("#income").val() == ""){
+                    alert("ត្រូវការលេខរបស់វិក័យ្យប័ត្រ")
+                } else {
+                    $.ajax({
+                        type:'POST',
+                        dataType:'json',
+                        data:$('#payslip_income_form').serialize(),
+                        url:'{{route('admin.accounting.incomes.store')."?type=Candidate"}}',
+                        beforeSend:function(){
+                            // do nothing for now
+                        },
+                        success:function(data) {
+                            //console.log("Loaded ID: "+ "students-"+data.candidate_id);
+                            $('#add_payment_modal').modal('toggle');
+                            //$('#'+current_id).DataTable().ajax.reload();
+                            payment_tables["students-"+data.candidate_id].ajax.url(data.detail_url).load();
+                            //oTable.draw();
+                        },
+                        error:function(error){
+                            alert(error);
+                        }
+                    });
+                }
+
             }
 
             // Add event listener for opening and closing details
@@ -272,9 +277,9 @@
                             '<button class="btn btn-sm btn-primary btn_income_student">Income</button> &nbsp;'
                             {{--&nbsp; <button class="btn btn-sm btn-success">Outcome</button>--}}
                     );
-                    $("div.payment_info").html(
+                    /*$("div.payment_info").html(
                             '<span>To Pay: </span> 450$ / <span>Debt: </span> 450$'
-                    );
+                    );*/
                     $(".btn_income_student").click(function(){
                         preparePayment(row.data());
                         current_id = tableId;
