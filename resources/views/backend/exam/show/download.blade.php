@@ -31,8 +31,9 @@
                     </div>
                 </div>
 
+                @if($exam->type_id == 1)
                 <div class="row">
-                    @if($exam->type_id == 1)
+
                     <div class="img">
                         @permission('download-examination-document')
                             <div class="desc">Candidate Attendance List By Course</div>
@@ -110,6 +111,11 @@
 
                     </div>
 
+                </div>
+                <div class="box-header with-border">
+                    <h4 class="box-title">Examination Result</h4>
+                </div>
+                <div class="row">
                     <div class="img">
                         @permission('download-examination-document')
                         <div class="desc">Candidate Result Sheet</div>
@@ -131,16 +137,27 @@
                         <div class="desc">Result Candidate From Ministry</div>
                         <div class="desc">
                             <a id="download_candidate_result" target="_blank"  href="{{route('admin.exam.export_candidate_ministry_list', $exam->id)}}">
-                                <button class="btn btn-info btn-xs"id="export_candidate_ministry_list"> Excel </button>
+                                <button class="btn btn-info btn-xs" id="export_candidate_ministry_list"> Excel </button>
                             </a>
                         </div>
 
                         @endauth
 
                     </div>
-                    @endif
-                </div>
+                    <div class="img">
+                        @permission('download-examination-document')
+                        <div class="desc">Candidate's Result - Detail</div>
+                        <div class="desc">
+                            <a id="download_candidate_result_detail" target="_blank"  href="{{route('admin.exam.export_candidate_result_detail', $exam->id)}}">
+                                <button class="btn btn-info btn-xs" id="export_candidate_result_detail"> Excel </button>
+                            </a>
+                        </div>
 
+                        @endauth
+
+                    </div>
+                </div>
+                @endif
 
 
             </div>

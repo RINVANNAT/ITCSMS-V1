@@ -1667,6 +1667,112 @@ class ExamController extends Controller
 
     public function export_candidate_result_list ($exam_id) {
 
+        $candidates = $this->getCandidateResult($exam_id);
+
+        dd($candidates);
+        $fields= [
+            'ល.រ',
+            'លេខបង្កាន់ដៃ',
+            'បនទ្ប់ប្រលង',
+            'ឈ្មោះ ខ្មែរ',
+            'ឈ្មោះ ឡាតាំង',
+            'ភេទ',
+            'ថ្ងៃខែរឆ្នាំកំនើត',
+            "ខេត្តក្រុង"
+        ];
+        $title = 'បញ្ជីលទ្ទផលរបស់បេក្ខជន';
+        $alpha = [];
+        $letter = 'A';
+        while ($letter !== 'AAA') {
+            $alpha[] = $letter++;
+        }
+        Excel::create('បញ្ជីលទ្ទផលបេក្ខជន', function($excel) use ($candidates, $title,$alpha,$fields) {
+
+            $excel->sheet("បញ្ជីលទ្ទផលបេក្ខជន", function($sheet) use($candidates,$title,$alpha,$fields) {
+
+                $sheet->setOrientation('portrait');
+                // Set top, right, bottom, left
+                $sheet->setPageMargin(array(
+                    0.25, 0.30, 0.25, 0.30
+                ));
+
+                // Set all margins
+                $sheet->setPageMargin(0.25);
+
+                $sheet->rows(
+                    array($fields)
+                );
+
+                $last = null;
+                $same_index = 0;
+                $index = 1;
+                $order = 1;
+                $passIndex = 1;
+                $reserveIndex = 1;
+
+                foreach ($candidates as $candidate) {
+
+                    // This to find candidate's rank
+                    if($last!= null && ($candidate->total_score == $last->total_score)){ // the last one and this one have the same score, so he must have the same range
+                        $rank = $index-1;
+                        $same_index++;
+                    } else {
+                        if($same_index>0){
+                            $index = $index + $same_index;
+                            $same_index = 0;
+                        }
+                        $rank = $index;
+                        $index++;
+                    }
+                    $last = $candidate;
+
+                    if($candidate->result == "Pass"){
+                        $result = "A".$passIndex;
+                        $passIndex++;
+                    } else if($candidate->result == "Reserve"){
+                        $result = "R".$reserveIndex;
+                        $reserveIndex++;
+                    } else if($candidate->result == "Reject"){
+                        $result = "AB";
+                    } else {
+                        $result = "";
+                    }
+                    $row = array(
+                        $order,
+                        $candidate->room_name,
+                        $candidate->register_id,
+                        $candidate->name_kh,
+                        $candidate->name_latin,
+                        $candidate->gender,
+                        Carbon::createFromFormat('Y-m-d H:i:s',$candidate->dob)->format("d/m/Y"),
+                        $candidate->highschool,
+                        $candidate->origin,
+                        $candidate->bac_year,
+                        $candidate->math_grade,
+                        $candidate->phys_grade,
+                        $candidate->chem_grade,
+                        $candidate->grade,
+                        $candidate->percentile,
+                        $candidate->can_id,
+                        $candidate->total_score,
+                        $result,
+                        $rank
+                    );
+
+                    $sheet->appendRow(
+                        $row
+                    );
+                    $order++;
+                }
+            });
+
+
+        })->export('xls');
+
+    }
+
+    public function export_candidate_result_detail ($exam_id) {
+
         $candidates = DB::table('candidates')
             ->leftJoin('studentBac2s', 'studentBac2s.id','=', 'candidates.studentBac2_id')
             ->leftJoin('genders','studentBac2s.gender_id','=','genders.id')
@@ -1674,10 +1780,10 @@ class ExamController extends Controller
             ->join('origins','candidates.province_id','=','origins.id')
             ->join('examRooms','examRooms.id','=','candidates.room_id')
             ->leftJoin('buildings','examRooms.building_id','=','buildings.id')
-            ->leftJoin('gdeGrades as math','studentBac2s.bac_math_grade','=','math.id')
-            ->leftJoin('gdeGrades as phys','studentBac2s.bac_phys_grade','=','phys.id')
-            ->leftJoin('gdeGrades as chem','studentBac2s.bac_chem_grade','=','chem.id')
-            ->leftJoin('gdeGrades as grade','studentBac2s.grade','=','grade.id')
+            ->leftJoin('gdeGrades as math','candidates.bac_math_grade','=','math.id')
+            ->leftJoin('gdeGrades as phys','candidates.bac_phys_grade','=','phys.id')
+            ->leftJoin('gdeGrades as chem','candidates.bac_chem_grade','=','chem.id')
+            ->leftJoin('gdeGrades as grade','candidates.bac_total_grade','=','grade.id')
             ->where('candidates.exam_id',$exam_id)
             ->select(
                 DB::raw('CONCAT(buildings.code,"examRooms".name) as room_name'),
