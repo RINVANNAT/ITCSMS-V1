@@ -244,8 +244,8 @@
                             //console.log("Loaded ID: "+ "students-"+data.candidate_id);
                             $('#add_payment_modal').modal('toggle');
                             //$('#'+current_id).DataTable().ajax.reload();
-                            payment_tables["students-"+data.candidate_id].ajax.url(data.detail_url).load();
-                            //oTable.draw();
+                            //payment_tables["students-"+data.candidate_id].ajax.url(data.detail_url).load();
+                            oTable.draw();
                         },
                         error:function(error){
                             alert(error);
