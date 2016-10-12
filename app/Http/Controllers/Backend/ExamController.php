@@ -1773,6 +1773,74 @@ class ExamController extends Controller
 
     public function export_candidate_result_detail ($exam_id) {
 
+
+        $allCandidates = [];
+        $exam_rooms = ExamRoom::where('exam_id',$exam_id)
+            ->get();
+
+        foreach($exam_rooms as $exam_room){
+            $candidates = DB::table('candidates')
+                ->where('room_id',$exam_room->id)
+                ->where('candidates.exam_id',$exam_id)
+                ->orderBy('register_id','ASC')
+                ->get();
+
+            $CandidatesByRoom = [];
+            $allCourses = DB::table('entranceExamCourses')
+                ->where('entranceExamCourses.exam_id', '=', $exam_id)
+                ->select('id', 'name_kh', 'total_question')
+                ->orderBy('id')
+                ->get();
+
+            foreach($allCourses as $allCourse) {
+
+                $total_question = $allCourse->total_question;
+                $candidateResults = [];
+
+                $query = DB::select(
+                    "select roomcode, order_in_room,course_id,exam_id,score_c,score_w,score_na, count(*), (score_c+score_w+score_na) as total".
+                    " from secret_room_score".
+                    " where exam_id =".$exam_id.
+                    " and course_id =".$allCourse->id.
+                    "and roomcode=".Crypt::decrypt($exam_room->roomcode).
+                    " group by roomcode,order_in_room,course_id,exam_id,score_c,score_w,score_na".
+                    " HAVING count(*) > 1".
+                    " order by roomcode, order_in_room, course_id;"
+                );
+
+                foreach($query as $result){
+                    if($result->total == $total_question || $result->total == 0){ // This one is correct, just double check
+//                    $score = (($result->score_c * (int)$course['correct']) - ($result->score_w * (int)$course['wrong']))*(int)$course['coe'];
+                        $candidateResults[$result->order_in_room] = (['course_id'=>$result->course_id, 'score_c' => $result->score_c, 'score_w' => $result->score_w, 'score_na' => $result->score_na]);
+
+                    }
+                }
+                if($candidateResults) {
+
+                    $index =1;
+                    if($index <=count($candidates)) {
+
+                        foreach($candidates as $candidate) {
+                            if(isset($candidateResults[$index])){
+
+                                $element= array (
+                                    'score_c' => $candidateResults[$index]['score_c'],
+                                    'score_w' => $candidateResults[$index]['score_w'],
+                                    'score_na' => $candidateResults[$index]['score_na'],
+                                );
+                                $CandidatesByRoom[$candidate->register_id][$allCourse->name_kh] =  $element;
+                            }
+                            $index++;
+                        }
+                    }
+                }
+
+            }
+            $allCandidates = $allCandidates + $CandidatesByRoom;
+        }
+
+//        dd($allCandidates);
+
         $candidates = DB::table('candidates')
             ->leftJoin('studentBac2s', 'studentBac2s.id','=', 'candidates.studentBac2_id')
             ->leftJoin('genders','studentBac2s.gender_id','=','genders.id')
@@ -1807,7 +1875,6 @@ class ExamController extends Controller
             ->orderBy('candidates.total_score', "DESC")
             ->get();
 
-        //dd($candidates);
 
         $fields= [
             'ល.រ',
@@ -1828,7 +1895,17 @@ class ExamController extends Controller
             "can ID",
             "ពិន្ទុ",
             "លទ្ធផល",
-            "ចំណាត់ថ្នាក់"
+            "ចំណាត់ថ្នាក់",
+            "math_c",
+            "math_w",
+            "math_na",
+            "phy_chem_c",
+            "phy_chem_w",
+            "phy_chem_na",
+            "logic_c",
+            "logic_w",
+            "logic_na"
+
         ];
         $title = 'បញ្ជីលទ្ទផលរបស់បេក្ខជន';
         $alpha = [];
@@ -1836,9 +1913,9 @@ class ExamController extends Controller
         while ($letter !== 'AAA') {
             $alpha[] = $letter++;
         }
-        Excel::create('បញ្ជីលទ្ទផលបេក្ខជន', function($excel) use ($candidates, $title,$alpha,$fields) {
+        Excel::create('បញ្ជីលទ្ទផលបេក្ខជន', function($excel) use ($allCandidates, $allCourses, $candidates, $title,$alpha,$fields) {
 
-            $excel->sheet("បញ្ជីលទ្ទផលបេក្ខជន", function($sheet) use($candidates,$title,$alpha,$fields) {
+            $excel->sheet("បញ្ជីលទ្ទផលបេក្ខជន", function($sheet) use($allCandidates, $allCourses, $candidates,$title,$alpha,$fields) {
 
                 $sheet->setOrientation('portrait');
                 // Set top, right, bottom, left
@@ -1861,6 +1938,7 @@ class ExamController extends Controller
                 $reserveIndex = 1;
 
                 foreach ($candidates as $candidate) {
+                    $candScoreProperties = [];
 
                     // This to find candidate's rank
                     if($last!= null && ($candidate->total_score == $last->total_score)){ // the last one and this one have the same score, so he must have the same range
@@ -1908,6 +1986,16 @@ class ExamController extends Controller
                         $result,
                         $rank
                     );
+
+                    foreach($allCourses as $allCourse) {
+                        $elements =  array(
+                            $allCandidates[$candidate->register_id][$allCourse->name_kh]['score_c'],
+                            $allCandidates[$candidate->register_id][$allCourse->name_kh]['score_w'],
+                            $allCandidates[$candidate->register_id][$allCourse->name_kh]['score_na'],
+                        );
+
+                        $row = array_merge($row, $elements);
+                    }
 
                     $sheet->appendRow(
                         $row
