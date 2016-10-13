@@ -1773,7 +1773,6 @@ class ExamController extends Controller
 
     public function export_candidate_result_detail ($exam_id) {
 
-
         $allCandidates = [];
         $exam_rooms = ExamRoom::where('exam_id',$exam_id)
             ->get();
@@ -1841,6 +1840,14 @@ class ExamController extends Controller
 
 //        dd($allCandidates);
 
+
+        $exam = Exam::where('id',$exam_id)->first();
+        $candsRegister = DB::table('candidatesFromMoeys')
+            ->join("studentBac2s","studentBac2s.can_id",'=',"candidatesFromMoeys.can_id")
+            ->join("candidates","candidates.studentBac2_id",'=',"studentBac2s.id")
+            ->where('candidatesFromMoeys.bac_year',$exam->academic_year_id - 1)
+            ->lists('candidatesFromMoeys.can_id');
+
         $candidates = DB::table('candidates')
             ->leftJoin('studentBac2s', 'studentBac2s.id','=', 'candidates.studentBac2_id')
             ->leftJoin('genders','candidates.gender_id','=','genders.id')
@@ -1870,7 +1877,8 @@ class ExamController extends Controller
                 'chem.name_en as chem_grade',
                 'grade.name_en as grade',
                 'candidates.result',
-                'candidates.total_score'
+                'candidates.total_score',
+                'examRooms.roomcode'
             )
             ->orderBy('candidates.total_score', "DESC")
             ->get();
@@ -1879,6 +1887,7 @@ class ExamController extends Controller
         $fields= [
             'ល.រ',
             'បនទ្ប់',
+            'លេខបន្ទប់សំងាត់',
             'លេខបង្កាន់ដៃ',
             'ឈ្មោះ ខ្មែរ',
             'ឈ្មោះ ឡាតាំង',
@@ -1886,6 +1895,7 @@ class ExamController extends Controller
             'ថ្ងៃខែរឆ្នាំកំនើត',
             "វិទ្យាល័យ",
             "ខេត្តក្រុង",
+            "Register_from",
             "ឆ្នាំជាប់បាក់ឌុប",
             "និទ្ទេសគណិតវិទ្យា",
             "និទ្ទេសរូបវិទ្យា",
@@ -1913,9 +1923,9 @@ class ExamController extends Controller
         while ($letter !== 'AAA') {
             $alpha[] = $letter++;
         }
-        Excel::create('បញ្ជីលទ្ទផលបេក្ខជន', function($excel) use ($allCandidates, $allCourses, $candidates, $title,$alpha,$fields) {
+        Excel::create('បញ្ជីលទ្ទផលបេក្ខជន', function($excel) use ($candsRegister,$allCandidates, $allCourses, $candidates, $title,$alpha,$fields) {
 
-            $excel->sheet("បញ្ជីលទ្ទផលបេក្ខជន", function($sheet) use($allCandidates, $allCourses, $candidates,$title,$alpha,$fields) {
+            $excel->sheet("បញ្ជីលទ្ទផលបេក្ខជន", function($sheet) use($candsRegister, $allCandidates, $allCourses, $candidates,$title,$alpha,$fields) {
 
                 $sheet->setOrientation('portrait');
                 // Set top, right, bottom, left
@@ -1965,27 +1975,57 @@ class ExamController extends Controller
                     } else {
                         $result = "";
                     }
-                    $row = array(
-                        $order,
-                        $candidate->room_name,
-                        $candidate->register_id,
-                        $candidate->name_kh,
-                        $candidate->name_latin,
-                        $candidate->gender,
-                        Carbon::createFromFormat('Y-m-d H:i:s',$candidate->dob)->format("d/m/Y"),
-                        $candidate->highschool,
-                        $candidate->origin,
-                        $candidate->bac_year,
-                        $candidate->math_grade,
-                        $candidate->phys_grade,
-                        $candidate->chem_grade,
-                        $candidate->grade,
-                        $candidate->percentile,
-                        $candidate->can_id,
-                        $candidate->total_score,
-                        $result,
-                        $rank
-                    );
+
+                    if(in_array($candidate->can_id,$candsRegister)) {
+                        $row = array(
+                            $order,
+                            $candidate->room_name,
+                            crypt::decrypt($candidate->roomcode),
+                            $candidate->register_id,
+                            $candidate->name_kh,
+                            $candidate->name_latin,
+                            $candidate->gender,
+                            Carbon::createFromFormat('Y-m-d H:i:s',$candidate->dob)->format("d/m/Y"),
+                            $candidate->highschool,
+                            $candidate->origin,
+                            'Ministry',
+                            $candidate->bac_year,
+                            $candidate->math_grade,
+                            $candidate->phys_grade,
+                            $candidate->chem_grade,
+                            $candidate->grade,
+                            $candidate->percentile,
+                            $candidate->can_id,
+                            $candidate->total_score,
+                            $result,
+                            $rank
+                        );
+                    } else {
+                        $row = array(
+                            $order,
+                            $candidate->room_name,
+                            crypt::decrypt($candidate->roomcode),
+                            $candidate->register_id,
+                            $candidate->name_kh,
+                            $candidate->name_latin,
+                            $candidate->gender,
+                            Carbon::createFromFormat('Y-m-d H:i:s',$candidate->dob)->format("d/m/Y"),
+                            $candidate->highschool,
+                            $candidate->origin,
+                            'ITC',
+                            $candidate->bac_year,
+                            $candidate->math_grade,
+                            $candidate->phys_grade,
+                            $candidate->chem_grade,
+                            $candidate->grade,
+                            $candidate->percentile,
+                            $candidate->can_id,
+                            $candidate->total_score,
+                            $result,
+                            $rank
+                        );
+                    }
+
 
                     foreach($allCourses as $allCourse) {
                         $elements =  array(
