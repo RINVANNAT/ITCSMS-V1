@@ -861,8 +861,13 @@
             });
 
           @if($exam->type_id == config("access.exam.entrance_engineer"))
+
               $('#candidates-table').on('click', '.btn-register[data-remote]', function (e) {
                   var url = $(this).data('remote');
+                    var baseData = {
+                        exam_id:  $(this).data('exam')
+                    }
+
                   e.preventDefault();
                   swal({
                       title: "Confirm",
@@ -884,6 +889,7 @@
                           $.ajax({
                               url: url,
                               type: 'GET',
+                              data: baseData,
                               dataType: 'json',
                               success:function(data) {
                                   candidate_datatable.draw();

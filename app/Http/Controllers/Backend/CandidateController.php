@@ -357,7 +357,6 @@ class CandidateController extends Controller
         $examId = $request->exam_id;
         $exam = Exam::where('id',$examId)->first();
         $candidate_id = $id;
-
         $studentWithRegisteredStudetn =[];
 
         if($exam->type_id == config("access.exam.entrance_dut")) {
