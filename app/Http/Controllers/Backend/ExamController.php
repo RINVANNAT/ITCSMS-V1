@@ -1843,8 +1843,8 @@ class ExamController extends Controller
 
         $candidates = DB::table('candidates')
             ->leftJoin('studentBac2s', 'studentBac2s.id','=', 'candidates.studentBac2_id')
-            ->leftJoin('genders','studentBac2s.gender_id','=','genders.id')
-            ->leftJoin('highSchools','studentBac2s.highschool_id','=','highSchools.id')
+            ->leftJoin('genders','candidates.gender_id','=','genders.id')
+            ->leftJoin('highSchools','candidates.highschool_id','=','highSchools.id')
             ->join('origins','candidates.province_id','=','origins.id')
             ->join('examRooms','examRooms.id','=','candidates.room_id')
             ->leftJoin('buildings','examRooms.building_id','=','buildings.id')

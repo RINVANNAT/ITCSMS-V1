@@ -122,7 +122,7 @@ class CandidateController extends Controller
     public function store(StoreCandidateRequest $request)
     {
         $exam = Exam::where('id',$request->get('exam_id'))->first();
-        if($exam->result =="Pending") { // If this result is still pending, they can update their info
+        if($exam->accept_registration) { // If this exam doesn't allow new registration, we can't accept it
             $result = $this->candidates->create($request->all());
 
             if($result['status']==true){
@@ -160,6 +160,13 @@ class CandidateController extends Controller
     {
         $candidate = Candidate::where('id',$id)->with('departments')->first();
 
+        //dd($candidate->departments->toArray());
+        $candidate_departments = [];
+        foreach($candidate->departments as $candidate_department){
+            $candidate_departments[$candidate_department->id] = $candidate_department->pivot->rank;
+        }
+        //dd($candidate_departments);
+
         $exam = Exam::where('id',$candidate->exam_id)->first();
         $studentBac2 = StudentBac2::find($candidate->studentBac2_id);
 
@@ -179,7 +186,7 @@ class CandidateController extends Controller
 
         $provinces = Origin::lists('name_kh','id');
         $gdeGrades = GdeGrade::lists('name_en','id');
-        $departments = Department::where('is_specialist',true)->where('parent_id',11)->get();
+        $departments = Department::where('is_specialist',true)->where('parent_id',11)->orderBy('code','asc')->get();
         $academicYears = AcademicYear::orderBy('name_latin','desc')->lists('name_latin','id');
 
         if($studentBac2!=null){
@@ -189,7 +196,7 @@ class CandidateController extends Controller
         }
 
 
-        return view('backend.candidate.edit',compact('highschool','departments','exam','degrees','genders','promotions','provinces','gdeGrades','academicYears','candidate','studentBac2'));
+        return view('backend.candidate.edit',compact('highschool','departments','exam','degrees','genders','promotions','provinces','gdeGrades','academicYears','candidate','studentBac2','candidate_departments'));
     }
 
     /**
@@ -202,7 +209,8 @@ class CandidateController extends Controller
     public function update(UpdateCandidateRequest $request, $id)
     {
         $exam = Exam::where('id',$request->get('exam_id'))->first();
-        if($exam->result =="Pending"){ // If this result is still pending, they can update their info
+        $candidate = Candidate::where('id',$id)->first();
+        if($exam->accept_registration && $candidate->result != "Pending"){ // If this result is still pending, they can update their info
             $result = $this->candidates->update($id, $request->all());
 
             if($result['status']==true){
@@ -211,7 +219,7 @@ class CandidateController extends Controller
                 return Response::json($result,422);
             }
         } else {
-            return Response::json(array("message"=>"You can modify information of this candidate"),422);
+            return Response::json(array("message"=>"You cannot modify information of this candidate"),422);
         }
 
     }
