@@ -115,13 +115,14 @@
 
         </style>
 
-        @yield('after-styles-end')
 
     </head>
     <body class="skin-{!! config('backend.theme') !!}" style="font-family: khmeros" onload="window.print()">
 
         @yield('content')
     </body>
+    @yield('after-styles-end')
     <script>window.jQuery || document.write('<script src="{{asset('js/vendor/jquery/jquery-2.1.4.min.js')}}"><\/script>')</script>
+    {!! HTML::script('js/custom.js') !!}
     @yield('scripts')
 </html>

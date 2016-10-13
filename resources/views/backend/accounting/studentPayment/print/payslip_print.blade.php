@@ -39,7 +39,17 @@
 
 @section('scripts')
     <script>
-
+    var income = "{{$income->amount_dollar}}";
+    var curreny = "ដុល្លា";
+    if (income == ""){
+        income = "{{$income->amount_riel}}";
+        currency = "រៀល";
+    }
+    $(document).ready(function(e){
+        $('.amount_kh').html(convertMoney(income)+" "+curreny);
+        $('.department_name').html("ថ្នាក់មូលដ្ធាន")
+        $('.current_date').html(getKhmerCurrentDate());
+    });
     </script>
 @stop
 

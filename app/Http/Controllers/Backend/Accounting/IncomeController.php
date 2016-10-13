@@ -7,6 +7,7 @@ use App\Http\Requests\Backend\Accounting\Income\StoreIncomeRequest;
 use App\Http\Requests\Backend\Accounting\Income\UpdateIncomeRequest;
 use App\Models\AcademicYear;
 use App\Models\Account;
+use App\Models\Candidate;
 use App\Models\Degree;
 use App\Models\Department;
 use App\Models\DepartmentOption;
@@ -124,11 +125,22 @@ class IncomeController extends Controller
             })
             ->where('candidates.exam_id', $exam->id)
             ->select([
-                'candidates.id','candidates.payslip_client_id','candidates.name_kh','candidates.name_latin','promotions.name as promotion_name',
-                'origins.name_kh as province', 'dob','result',DB::raw("CONCAT(degrees.code,grades.code,departments.code) as class"),
-                'academicYears.name_kh as academic_year_name_kh','candidates.grade_id', 'candidates.degree_id','degrees.name_kh as degree_name_kh',
-                'candidates.result', "candidates.promotion_id",
-                'genders.name_kh as gender_name_kh','gdeGrades.name_en as bac_total_grade']);
+                'candidates.id',
+                'candidates.payslip_client_id',
+                'candidates.name_kh',
+                'candidates.name_latin',
+                'promotions.name as promotion_name',
+                'origins.name_kh as province', 'dob',
+                'result',DB::raw("CONCAT(degrees.code,grades.code,departments.code) as class"),
+                'academicYears.name_kh as academic_year_name_kh',
+                'candidates.grade_id',
+                'candidates.degree_id',
+                'degrees.name_kh as degree_name_kh',
+                'candidates.result',
+                "candidates.promotion_id",
+                'genders.name_kh as gender_name_kh',
+                'gdeGrades.name_en as bac_total_grade'
+            ]);
 
         /*if($now>=$exam->success_registration_start && $now<=$exam->success_registration_stop){
             $candidates = $candidates->where('candidates.result',"Pass");
@@ -349,6 +361,7 @@ class IncomeController extends Controller
 
     public function payslip_history(){
         $payslip_client_id = $_GET['payslip_client_id'];
+        $user_id = $_GET['user_id'];
         $type = $_GET['type'];
         $incomes = Income:: select([
             'id','amount_dollar','amount_riel','number','created_at',DB::raw("'income' as name"),'is_refund'
@@ -388,7 +401,7 @@ class IncomeController extends Controller
                     return "";
                 }
             })
-            ->addColumn('action', function ($payslip) use ($type) {
+            ->addColumn('action', function ($payslip) use ($type,$user_id) {
                 if($payslip->name == "income"){
                     $action = "";
                     if($type == "student"){
@@ -397,7 +410,7 @@ class IncomeController extends Controller
                             $action = $action.' <a href="#" class="btn-refund" data-remote="'.route('admin.accounting.income.refund', $payslip->id) .'"> <i class="fa fa-reply" data-toggle="tooltip" data-placement="top" title="' . "Refund" . '"></i></a>';
                         }
                     } else if($type == "candidate"){
-                        $action = '<a href="'.route('admin.accounting.income.print_candidate',$payslip->id).'" target="_blank"><i class="fa fa-print" data-toggle="tooltip" data-placement="top" title="" data-original-title="'.trans('buttons.general.print').'"></i> </a>';
+                        $action = '<a href="'.route('admin.accounting.income.print_candidate',$payslip->id).'?user_id='.$user_id.'" target="_blank"><i class="fa fa-print" data-toggle="tooltip" data-placement="top" title="" data-original-title="'.trans('buttons.general.print').'"></i> </a>';
                     }
 
                     return  $action;
@@ -593,6 +606,22 @@ class IncomeController extends Controller
     }
 
     public function print_income_candidate($id){ // For candidate only
+        $candidate_id = $_GET['user_id'];
+        //dd($candidate_id);
+
+        $candidate = Candidate::join('degrees','degrees.id','=','candidates.degree_id')
+            ->where('candidates.id',$candidate_id)
+            ->select([
+                'candidates.id',
+                'degrees.id as degree_id',
+                'candidates.promotion_id',
+                'degrees.name_kh as degree_name'
+            ])
+            ->first();
+        $fee = SchoolFeeRate::where('degree_id',$candidate->degree_id)
+            ->where('promotion_id',$candidate->promotion_id)
+            //->where('department_id',1) // This is kind of not right, because we consider fee of every department is the same
+            ->first();
         $income = Income::where('id',$id)->with([
             "payslipClient",
             "payslipClient.candidate.gender",
@@ -602,9 +631,14 @@ class IncomeController extends Controller
             "payslipClient.candidate.academic_year",
         ])->first();
 
-        $count = 0;
-        $debt = 0;
-        return view('backend.accounting.studentPayment.print.payslip_print',compact('income','count','debt'));
+        $paid = $income->amount_dollar;
+        if($paid == "") $paid = $income->amount_riel;
+
+        $count = 1;
+        $debt = $fee->to_pay - $paid;
+        $debt = $debt." ".$fee->to_pay_currency;
+        $to_pay = $fee->to_pay." ".$fee->to_pay_currency;
+        return view('backend.accounting.studentPayment.print.payslip_print',compact('income','count','debt','to_pay','candidate'));
     }
 
     public function print_income($id){ // For student only

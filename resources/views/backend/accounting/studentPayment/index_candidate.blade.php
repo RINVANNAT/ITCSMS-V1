@@ -127,7 +127,7 @@
                 dom: 'i<"payment_info">t',
                 processing: true,
                 serverSide: true,
-                ajax: payslip_history_url+"?payslip_client_id="+data.payslip_client_id+"&type=candidate",
+                ajax: payslip_history_url+"?payslip_client_id="+data.payslip_client_id+"&type=candidate&user_id="+data.id,
                 columns: [
                     { data: 'number', name: 'number',searchable:false },
                     { data: 'income', name: 'income' ,searchable:false},
@@ -256,7 +256,7 @@
                         success:function(data) {
                             //console.log("Loaded ID: "+ "students-"+data.candidate_id);
                             $('#add_payment_modal').modal('toggle');
-                            payment_tables["students-"+data.candidate_id].ajax.url(payslip_history_url+"?payslip_client_id="+data.payslip_client_id+"&type=candidate").load();
+                            payment_tables["students-"+data.candidate_id].ajax.url(payslip_history_url+"?payslip_client_id="+data.payslip_client_id+"&type=candidate&user_id="+data.candidate_id).load();
                             btn_income_last_click.hide();
                             //oTable.draw();
                         },

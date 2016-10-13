@@ -30,9 +30,9 @@
             <div class="col-md-6 col-xs-6"> អក្សរឡាតាំង
                 <strong>
                     @if(isset($income->payslipClient->student))
-                        {{$income->payslipClient->student->student->name_latin}}
+                        {{strtoupper($income->payslipClient->student->student->name_latin)}}
                     @else
-                        {{$income->payslipClient->candidate->name_latin}}
+                        {{strtoupper($income->payslipClient->candidate->name_latin)}}
                     @endif
                 </strong>
             </div>
@@ -43,9 +43,9 @@
             <div class="col-md-6 col-xs-6" align="right">ភេទ
                 <strong style="padding-right: 30px;">
                     @if(isset($income->payslipClient->student))
-                        {{$income->payslipClient->student->student->gender->name_kh}}
+                        {{strtoupper($income->payslipClient->student->student->gender->name_kh)}}
                     @else
-                        {{$income->payslipClient->candidate->gender->name_kh}}
+                        {{strtoupper($income->payslipClient->candidate->gender->name_kh)}}
                     @endif
                 </strong>
             </div>
@@ -66,22 +66,18 @@
     <tr style="font-family: metal">
         <td colspan="3">
             <span class="col-md-3 col-xs-3">ចំនួនទឺកប្រាក់</span>
-            <span class="col-md-3 col-xs-3">
+            <b class="col-md-3 col-xs-3">
                 @if($income->amount_riel == '' || $income->amount_riel == null)
                     {{$income->amount_dollar}} $
                 @else
                     {{$income->amount_riel}} ៛
                 @endif
 
-            </span>
+            </b>
             <span class="col-md-3 col-xs-3">ជាអក្សរ</span>
-            <span class="col-md-3 col-xs-3">
-                @if($income->amount_dollar_kh == '' || $income->amount_dollar_kh == null)
-                    {{$income->amount_dollar_kh}}
-                @else
-                    {{$income->amount_riel_kh}}
-                @endif
-            </span>
+            <b class="col-md-3 col-xs-3 amount_kh">
+
+            </b>
         </td>
     </tr>
     <tr style="font-family: metal">
@@ -96,7 +92,7 @@
         <td colspan="3">
             <div class="col-md-12 col-xs-12">
                 ជានិស្សិតដេប៉ាតឺម៉ង់
-                <strong>
+                <strong class="department_name">
                     @if(isset($income->payslipClient->student))
                         {{$income->payslipClient->student->department->name_kh}}
                     @else
@@ -105,7 +101,7 @@
                         @endif
                     @endif
 
-                </strong> ឆ្នាំទី
+                </strong>
                 <strong>
                     @if(isset($income->payslipClient->student))
                         {{$income->payslipClient->student->grade->name_kh}}
@@ -122,7 +118,7 @@
             <div class="col-md-12 col-xs-12">
                 ថ្នាក់រៀន
                 <strong>
-                    Ingenieur
+                    {{$candidate->degree_name}}
                 </strong> ជំនាន់/វគ្គ
                 <strong id="candidate_promotion">
                     @if(isset($income->payslipClient->student))
@@ -146,9 +142,9 @@
     </tr>
     <tr style="font-family: metal;">
         <td colspan="3" align="right">
-            <div class="col-md-6 col-xs-6"></div>
-            <div class="col-md-6 col-xs-6" align="center" style="padding-top: 15px">
-                រាជធានីភ្នំពេញ, <strong class="current_date">​២៥​ សីហា ២០១៥​ </strong><br/>
+            <div class="col-md-4 col-xs-4"></div>
+            <div class="col-md-8 col-xs-8" align="center" style="padding-top: 15px">
+                រាជធានីភ្នំពេញ, <strong class="current_date">​ </strong><br/>
                 អ្នកទទួលប្រាក់
             </div>
         </td>
@@ -157,7 +153,7 @@
         <td colspan="3" align="left">
             <div class="col-md-12 col-xs-12" style="padding-top: 10px">
                 <span style="text-decoration: underline">សំគាល់: </span>
-                និស្សិតដែលបង់ថ្លៃសិក្សារួចហើយមិនអាចដក់ប្រាក់វិញបានទេ ។
+                និស្សិតដែលបង់ថ្លៃសិក្សារួចហើយមិនអាចដកប្រាក់វិញបានទេ ។
             </div>
         </td>
     </tr>
