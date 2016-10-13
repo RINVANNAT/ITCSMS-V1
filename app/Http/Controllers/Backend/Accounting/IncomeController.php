@@ -109,9 +109,6 @@ class IncomeController extends Controller
         $now = Carbon::now();
         $exam = Exam::where('id',Input::get('exam_id'))->first();
 
-
-
-
         $candidates = DB::table('candidates')
             ->leftJoin('origins','candidates.province_id','=','origins.id')
             ->leftJoin('gdeGrades','candidates.bac_total_grade','=','gdeGrades.id')
@@ -130,7 +127,7 @@ class IncomeController extends Controller
                 'candidates.id','candidates.payslip_client_id','candidates.name_kh','candidates.name_latin','promotions.name as promotion_name',
                 'origins.name_kh as province', 'dob','result',DB::raw("CONCAT(degrees.code,grades.code,departments.code) as class"),
                 'academicYears.name_kh as academic_year_name_kh','candidates.grade_id', 'candidates.degree_id','degrees.name_kh as degree_name_kh',
-                'candidates.result',
+                'candidates.result', "candidates.promotion_id",
                 'genders.name_kh as gender_name_kh','gdeGrades.name_en as bac_total_grade']);
 
         /*if($now>=$exam->success_registration_start && $now<=$exam->success_registration_stop){
@@ -171,12 +168,24 @@ class IncomeController extends Controller
                 }
                 return $result;
             })
+            ->editColumn('name_latin',function($candidate){
+                return strtoupper($candidate->name_latin);
+            })
             ->editColumn('dob',function($candidate){
                 $date = Carbon::createFromFormat('Y-m-d h:i:s',$candidate->dob);
                 return $date->format('d/m/Y');
             })
-            ->addColumn('details_url', function($candidate) {
-                return route('admin.accounting.payslipHistory.data',$candidate->payslip_client_id==null?0:$candidate->payslip_client_id);
+            ->addColumn('payslip_client_id', function($candidate) {
+                return $candidate->payslip_client_id==null?0:$candidate->payslip_client_id;
+                //return route('admin.accounting.payslipHistory.data',$candidate->payslip_client_id==null?0:$candidate->payslip_client_id);
+            })
+            ->addColumn('to_pay', function($candidate) {
+                $fee = DB::table('schoolFeeRates')
+                    ->where('schoolFeeRates.promotion_id',$candidate->promotion_id)
+                    ->where('schoolFeeRates.degree_id',$candidate->degree_id)
+                    ->first();
+
+                return $fee->to_pay.$fee->to_pay_currency;
             })
             ->addColumn('count_income', 0)
             ->make(true);
@@ -338,7 +347,9 @@ class IncomeController extends Controller
         return view('backend.accounting.studentPayment.popup_payment',compact('scholarship_id','departments','degrees','grades','genders','options','academicYears','origins'));
     }
 
-    public function payslip_history($payslip_client_id){
+    public function payslip_history(){
+        $payslip_client_id = $_GET['payslip_client_id'];
+        $type = $_GET['type'];
         $incomes = Income:: select([
             'id','amount_dollar','amount_riel','number','created_at',DB::raw("'income' as name"),'is_refund'
         ])
@@ -377,12 +388,18 @@ class IncomeController extends Controller
                     return "";
                 }
             })
-            ->addColumn('action', function ($payslip) {
+            ->addColumn('action', function ($payslip) use ($type) {
                 if($payslip->name == "income"){
-                    $action = '<a href="'.route('admin.accounting.income.print',$payslip->id).'" target="_blank"><i class="fa fa-print" data-toggle="tooltip" data-placement="top" title="" data-original-title="'.trans('buttons.general.print').'"></i> </a>';
-                    if($payslip->is_refund != true){
-                        $action = $action.' <a href="#" class="btn-refund" data-remote="'.route('admin.accounting.income.refund', $payslip->id) .'"> <i class="fa fa-reply" data-toggle="tooltip" data-placement="top" title="' . "Refund" . '"></i></a>';
+                    $action = "";
+                    if($type == "student"){
+                        $action = '<a href="'.route('admin.accounting.income.print',$payslip->id).'" target="_blank"><i class="fa fa-print" data-toggle="tooltip" data-placement="top" title="" data-original-title="'.trans('buttons.general.print').'"></i> </a>';
+                        if($payslip->is_refund != true){
+                            $action = $action.' <a href="#" class="btn-refund" data-remote="'.route('admin.accounting.income.refund', $payslip->id) .'"> <i class="fa fa-reply" data-toggle="tooltip" data-placement="top" title="' . "Refund" . '"></i></a>';
+                        }
+                    } else if($type == "candidate"){
+                        $action = '<a href="'.route('admin.accounting.income.print_candidate',$payslip->id).'" target="_blank"><i class="fa fa-print" data-toggle="tooltip" data-placement="top" title="" data-original-title="'.trans('buttons.general.print').'"></i> </a>';
                     }
+
                     return  $action;
                 } else {
                     return  '<a href="'.route('admin.accounting.outcome.simple_print',$payslip->id).'" target="_blank"><i class="fa fa-print" data-toggle="tooltip" data-placement="top" title="" data-original-title="'.trans('buttons.general.print').'"></i> </a>';
@@ -433,15 +450,14 @@ class IncomeController extends Controller
      */
     public function store(StoreIncomeRequest $request)
     {
-        $url = null;
+        $payslip_client_id = null;
         if(Input::get('type') == "Student" || Input::get('type') == "Candidate"){
-            $url = $this->incomes->create($request->all());
+            $payslip_client_id = $this->incomes->create($request->all());
             if($request->ajax()){
                 return json_encode(array(
                     "sucess"=>true,
-                    'payslip_client_id'=>$url,
-                    'candidate_id'=>$request->get('candidate_id'),
-                    'detail_url'=>$url
+                    'payslip_client_id'=>$payslip_client_id,
+                    'candidate_id'=>$request->get('candidate_id')
                     )
                 );
             }
@@ -576,7 +592,22 @@ class IncomeController extends Controller
         return view('backend.accounting.studentPayment.print.payslip_print',compact('income','count','debt'));
     }
 
-    public function print_income($id){
+    public function print_income_candidate($id){ // For candidate only
+        $income = Income::where('id',$id)->with([
+            "payslipClient",
+            "payslipClient.candidate.gender",
+            "payslipClient.candidate.department",
+            "payslipClient.candidate.grade",
+            "payslipClient.candidate.promotion",
+            "payslipClient.candidate.academic_year",
+        ])->first();
+
+        $count = 0;
+        $debt = 0;
+        return view('backend.accounting.studentPayment.print.payslip_print',compact('income','count','debt'));
+    }
+
+    public function print_income($id){ // For student only
 
         $income = Income::where('id',$id)->with([
             "payslipClient",

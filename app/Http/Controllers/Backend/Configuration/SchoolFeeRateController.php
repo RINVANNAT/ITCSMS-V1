@@ -56,7 +56,7 @@ class SchoolFeeRateController extends Controller
     {
         $departments = Department::where('parent_id',11)->lists('name_kh','id');
         $grades = Grade::lists('name_kh','id');
-        $promotions = Promotion::orderBy('name','desc')->limit(16)->lists('name','id');
+        $promotions = Promotion::orderBy('id','DESC')->lists('name','id');
         $scholarships = Scholarship::where('active',true)->lists('code','id');
         $degrees = Degree::lists('name_kh','id');
         return view('backend.configuration.schoolFee.create', compact('departments','grades','promotions','scholarships','degrees'));
@@ -115,7 +115,7 @@ class SchoolFeeRateController extends Controller
 
         $departments = Department::where('parent_id',11)->lists('name_kh','id');
         $grades = Grade::lists('name_kh','id');
-        $promotions = Promotion::orderBy('name','desc')->limit(16)->lists('name','id');
+        $promotions = Promotion::orderBy('id','desc')->lists('name','id');
         $scholarships = Scholarship::where('active',true)->lists('code','id');
         $degrees = Degree::lists('name_kh','id');
 
@@ -166,7 +166,17 @@ class SchoolFeeRateController extends Controller
         }
 
         $schoolFees = $schoolFees
-                ->select(['schoolFeeRates.id','to_pay','to_pay_currency','degrees.name_kh as degree_name_kh','scholarships.code as scholarship_code','promotions.name as promotion_name','academic_year_id']);
+                ->select([
+                    'schoolFeeRates.id',
+                    'to_pay',
+                    'to_pay_currency',
+                    'degrees.name_kh as degree_name_kh',
+                    'scholarships.code as scholarship_code',
+                    'promotions.name as promotion_name',
+                    'academic_year_id'
+                ])
+                ->orderBy('degree_name_kh')
+                ->orderBy('promotion_name', 'DESC');
 
 
         $datatables =  app('datatables')->of($schoolFees);

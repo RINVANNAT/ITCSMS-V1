@@ -10,6 +10,7 @@ Route::group([
         Route::resource('incomes', 'IncomeController');
         Route::post('income-data', 'IncomeController@data')->name('admin.accounting.income.data');
         Route::get('income/{id}/print', 'IncomeController@print_income')->name('admin.accounting.income.print');
+        Route::get('income/{id}/print_income_candidate', 'IncomeController@print_income_candidate')->name('admin.accounting.income.print_candidate');
         Route::post('income/{id}/refund', 'IncomeController@refund')->name('admin.accounting.income.refund');
         Route::get('income/{id}/simple_print', 'IncomeController@print_simple_income')->name('admin.accounting.income.simple_print');
 
@@ -36,8 +37,7 @@ Route::group([
 
         Route::get('candidatePayments', 'IncomeController@candidate_payment')->name('admin.accounting.candidatePayment');
         Route::get('candidatePayment-data', 'IncomeController@candidate_payment_data')->name('admin.accounting.candidatePayment.data');
-
-        Route::get('payslipHistory/{payslip_client_id}', 'IncomeController@payslip_history')->name('admin.accounting.payslipHistory.data');
+        Route::get('payslipHistory', 'IncomeController@payslip_history')->name('admin.accounting.payslipHistory.data');
         Route::get('studentPayments/{studentId}/print', 'IncomeController@print_student_payment')->name('admin.accounting.studentPayment.print');
 
         Route::get('income/export', 'IncomeController@export')->name('admin.accounting.income.export');

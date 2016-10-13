@@ -122,13 +122,14 @@
             var current_id = null;
             var base_url = "{{url('/')}}";
             var payment_table = null;
+            var payslip_history_url = "{{route('admin.accounting.payslipHistory.data')}}";
 
             function initTable(tableId, data) {
                 payment_table = $('#' + tableId).DataTable({
                     dom: 'i<"#payment_info_'+data.id+'">t<"payment_export_print btn-group"><"payment_btn">',
                     processing: true,
                     serverSide: true,
-                    ajax: data.details_url,
+                    ajax: payslip_history_url+"?payslip_client_id="+data.payslip_client_id+"&type=student",
                     initComplete: function() {
                         $('#payment_info_'+data.id).addClass('payment_info');
                     },

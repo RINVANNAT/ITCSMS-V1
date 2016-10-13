@@ -33,11 +33,14 @@
             background: url('/img/details_close.png') no-repeat center center;
         }
         .bg-payment-detail {
-            background-image: url("/img/bg_contit.gif");
+            padding: 10px !important;
+            /*background-image: url("/img/bg_contit.gif");*/
+            background-color: #84D0EF;
         }
 
         table.bg-payment-detail{
-            background-image: url("/img/bg_contit.gif");
+            background-color: #84D0EF;
+            /*background-image: url("/img/bg_contit.gif");*/
             border: solid 1px black;
         }
 
@@ -95,6 +98,7 @@
                         <th>{{ trans('labels.backend.candidates.fields.province_id') }}</th>
                         <th>{{ trans('labels.backend.candidates.fields.class') }}</th>
                         <th>{{ trans('labels.backend.candidates.fields.result') }}</th>
+                        <th>To Pay</th>
                         <th>{{ trans('labels.general.actions') }}</th>
                     </tr>
                     </thead>
@@ -112,14 +116,18 @@
     {!! Html::script('plugins/handlebars.js') !!}
     <script>
         var payment_tables = [];
-        function initTable(tableId, data) {
+        var opening_tr = null;
+        var opening_row = null;
+        var payslip_history_url = "{{route('admin.accounting.payslipHistory.data')}}";
+        var btn_income_last_click = null;
 
-            console.log(data.details_url);
+        function initTable(tableId, data,tr) {
+
             payment_tables[tableId] = $('#' + tableId).DataTable({
-                dom: 'i<"payment_info">t<"payment_export_print btn-group"><"payment_btn">',
+                dom: 'i<"payment_info">t',
                 processing: true,
                 serverSide: true,
-                ajax: data.details_url,
+                ajax: payslip_history_url+"?payslip_client_id="+data.payslip_client_id+"&type=candidate",
                 columns: [
                     { data: 'number', name: 'number',searchable:false },
                     { data: 'income', name: 'income' ,searchable:false},
@@ -129,7 +137,11 @@
                 ]
             })
 
-            console.log(payment_tables);
+            var btn_income = tr.next('tr').find(".btn_income_candidate");
+            if(data.payslip_client_id != "0"){ // There are history payslip record in here
+                btn_income.hide(); // so hide the button income because candidate can only pay once
+            }
+
         }
 
         var oTable = $('#candidates-table').DataTable({
@@ -156,6 +168,7 @@
                 { data: 'province', name: 'origins.name_kh'},
                 { data: 'class', name: 'class',searchable:false,orderable:false},
                 { data: 'result', name: 'candidates.result'},
+                { data: 'to_pay', name: 'to_pay',searchable:false,orderable:false},
                 {
                     "className":      'details-control',
                     "orderable":      false,
@@ -229,8 +242,8 @@
             });
 
             function submitIncome(){
-                if($("#income").val() == ""){
-                    alert("ត្រូវការលេខរបស់វិក័យ្យប័ត្រ")
+                if($("#invoice_number").val() == ""){
+                    swal("មានបញ្ហា", "ត្រូវការលេខរបស់វិក័យបត្រ", "error");
                 } else {
                     $.ajax({
                         type:'POST',
@@ -243,9 +256,9 @@
                         success:function(data) {
                             //console.log("Loaded ID: "+ "students-"+data.candidate_id);
                             $('#add_payment_modal').modal('toggle');
-                            //$('#'+current_id).DataTable().ajax.reload();
-                            //payment_tables["students-"+data.candidate_id].ajax.url(data.detail_url).load();
-                            oTable.draw();
+                            payment_tables["students-"+data.candidate_id].ajax.url(payslip_history_url+"?payslip_client_id="+data.payslip_client_id+"&type=candidate").load();
+                            btn_income_last_click.hide();
+                            //oTable.draw();
                         },
                         error:function(error){
                             alert(error);
@@ -257,6 +270,7 @@
 
             // Add event listener for opening and closing details
             $('#candidates-table tbody').on('click', 'td.details-control', function () {
+
                 var tr = $(this).closest('tr');
                 var row = oTable.row(tr);
                 var tableId = 'students-' + row.data().id;
@@ -265,22 +279,25 @@
                     // This row is already open - close it
                     row.child.hide();
                     tr.removeClass('shown');
+                    opening_tr = null;
+                    opening_row = null;
                 } else {
+
+                    if(opening_tr != null){ // Some tr is openning, close it
+                        opening_row = oTable.row(opening_tr);
+                        opening_row.child.hide();
+                        opening_tr.removeClass('shown');
+                    }
+
+                    opening_tr = tr;
+                    opening_row = row;
+
                     // Open this row
                     row.child(template(row.data())).show();
-                    initTable(tableId, row.data());
-                    $("div.payment_export_print").html(
-                        '<button class="btn btn-default btn-sm print_all"><i class="fa fa-print"></i></button>'+
-                        '<button class="btn btn-default btn-sm export_all"><i class="fa fa-file-excel-o"></i></button>'
-                    );
-                    $("div.payment_btn").html(
-                            '<button class="btn btn-sm btn-primary btn_income_student">Income</button> &nbsp;'
-                            {{--&nbsp; <button class="btn btn-sm btn-success">Outcome</button>--}}
-                    );
-                    /*$("div.payment_info").html(
-                            '<span>To Pay: </span> 450$ / <span>Debt: </span> 450$'
-                    );*/
-                    $(".btn_income_student").click(function(){
+                    initTable(tableId, row.data(),tr);
+
+                    $(".btn_income_candidate").click(function(){
+                        btn_income_last_click = $(this);
                         preparePayment(row.data());
                         current_id = tableId;
                     });
@@ -298,7 +315,8 @@
 
             // This for payment part
             function preparePayment(data){
-                console.log(data);
+                //console.log(data);
+                $('#payslip_income_form')[0].reset();
 
                 var onlyBirthDate = data.dob;
                 var khmerBirthYear = convertKhmerNumber(onlyBirthDate.split('/')[2]);
@@ -331,6 +349,7 @@
 
     <script id="details-template" type="text/x-handlebars-template">
         <div class="label label-info">@{{name_kh}}'s Payments</div>
+        <button class="btn btn-sm btn-primary btn_income_candidate pull-right">Income</button>
         <table class="table details-table col-lg-8 bg-payment-detail dt-responsive nowrap" cellspacing="0" width="100%" id="students-@{{id}}">
             <thead>
             <tr>

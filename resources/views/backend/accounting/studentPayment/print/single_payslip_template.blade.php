@@ -1,4 +1,4 @@
-<table style="width:100%; height:120mm;border: 1px solid #000000;text-align: left;vertical-align: middle;" rules="none"
+<table style="width:100%; height:70mm;border: 1px solid #000000;text-align: left;vertical-align: middle;" rules="none"
        frame="box" class="table_modal_payment">
     <tr>
         <td align="left" width="20%">
@@ -15,9 +15,7 @@
             លេខ <b>{{str_pad($income->number, 4, "0", STR_PAD_LEFT)}}</b>
         </td>
     </tr>
-    <tr>
-        <td colspan="3"><div style="height: 1cm;"></div></td>
-    </tr>
+
     <tr style="font-family: metal">
         <td colspan="3">
             <div class="col-md-6 col-xs-6"> នាមត្រកូល និង នាមខ្លួន
@@ -157,7 +155,7 @@
     </tr>
     <tr style="font-family: kh-bokor">
         <td colspan="3" align="left">
-            <div class="col-md-12 col-xs-12" style="padding-top: 60px">
+            <div class="col-md-12 col-xs-12" style="padding-top: 10px">
                 <span style="text-decoration: underline">សំគាល់: </span>
                 និស្សិតដែលបង់ថ្លៃសិក្សារួចហើយមិនអាចដក់ប្រាក់វិញបានទេ ។
             </div>

@@ -175,6 +175,9 @@ class EloquentIncomeRepository implements IncomeRepositoryContract
      */
     public function create($input) // This is for student
     {
+        $candidate = Candidate::where("id",$input['candidate_id'])->first();
+        $input['payslip_client_id'] = $candidate->payslip_client_id; // Before we take payslip client id from front end, now we search it again to prevent bug
+
         $client_id = null;
 
         $income = new Income();
@@ -355,7 +358,7 @@ class EloquentIncomeRepository implements IncomeRepositoryContract
         if($query_ok){
             DB::commit();
 
-            return route('admin.accounting.payslipHistory.data',$client_id);
+            return $client_id;
         } else {
             DB::rollback();
             throw new GeneralException(trans('exceptions.backend.configuration.incomes.create_error'));

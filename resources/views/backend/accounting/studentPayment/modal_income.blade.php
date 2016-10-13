@@ -23,7 +23,7 @@
                                     <h3 style="font-family: bayon">បង្កាន់ដៃទទួលប្រាក់ </h3>
                                 </td>
                                 <td align="left" width="20%" valign="4bottom">
-                                    លេខ {!! Form::text('number', null, ['id'=>'number', 'style'=>'width:2cm;text-align:right;', 'required']) !!}
+                                    លេខ {!! Form::text('number', null, ['id'=>'invoice_number', 'style'=>'width:2cm;text-align:right;', 'required']) !!}
                                 </td>
                             </tr>
                             <tr style="font-family: metal">
