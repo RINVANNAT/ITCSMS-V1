@@ -122,7 +122,7 @@ class CandidateController extends Controller
     public function store(StoreCandidateRequest $request)
     {
         $exam = Exam::where('id',$request->get('exam_id'))->first();
-        if($exam->result =="Pending") { // If this result is still pending, they can update their info
+        if($exam->accept_registration) { // If this exam doesn't allow new registration, we can't accept it
             $result = $this->candidates->create($request->all());
 
             if($result['status']==true){
@@ -202,7 +202,8 @@ class CandidateController extends Controller
     public function update(UpdateCandidateRequest $request, $id)
     {
         $exam = Exam::where('id',$request->get('exam_id'))->first();
-        if($exam->result =="Pending"){ // If this result is still pending, they can update their info
+        $candidate = Candidate::where('id',$id)->first();
+        if($exam->accept_registration && $candidate->result != "Pending"){ // If this result is still pending, they can update their info
             $result = $this->candidates->update($id, $request->all());
 
             if($result['status']==true){
@@ -211,7 +212,7 @@ class CandidateController extends Controller
                 return Response::json($result,422);
             }
         } else {
-            return Response::json(array("message"=>"You can modify information of this candidate"),422);
+            return Response::json(array("message"=>"You cannot modify information of this candidate"),422);
         }
 
     }
