@@ -121,11 +121,11 @@ class IncomeController extends Controller
             ->leftJoin('degrees', 'candidates.degree_id', '=', 'degrees.id')
             ->leftJoin('promotions', 'candidates.promotion_id', '=', 'promotions.id')
             ->leftJoin('academicYears', 'candidates.academic_year_id', '=', 'academicYears.id')
-            ->where([
-                ['candidates.result',"Pass"],
-                ['candidates.exam_id', $exam->id]
-            ])
-            ->orWhere('candidates.result',"Reserve")
+            ->where(function ($query) {
+                $query->where('candidates.result',"Pass")
+                    ->orWhere('candidates.result',"Reserve");
+            })
+            ->where('candidates.exam_id', $exam->id)
             ->select([
                 'candidates.id','candidates.payslip_client_id','candidates.name_kh','candidates.name_latin','promotions.name as promotion_name',
                 'origins.name_kh as province', 'dob','result',DB::raw("CONCAT(degrees.code,grades.code,departments.code) as class"),
