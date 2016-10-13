@@ -1562,6 +1562,7 @@ class ExamController extends Controller
             ->join("studentBac2s","studentBac2s.can_id",'=',"candidatesFromMoeys.can_id")
             ->join("candidates","candidates.studentBac2_id",'=',"studentBac2s.id")
             ->where('candidatesFromMoeys.bac_year',$exam->academic_year_id - 1)
+            ->where('candidates.exam_id',$exam_id)
             ->lists('candidatesFromMoeys.id');
 
         $candidates_moeys = DB::table('candidatesFromMoeys')
@@ -1840,12 +1841,12 @@ class ExamController extends Controller
 
 //        dd($allCandidates);
 
-
         $exam = Exam::where('id',$exam_id)->first();
         $candsRegister = DB::table('candidatesFromMoeys')
             ->join("studentBac2s","studentBac2s.can_id",'=',"candidatesFromMoeys.can_id")
             ->join("candidates","candidates.studentBac2_id",'=',"studentBac2s.id")
             ->where('candidatesFromMoeys.bac_year',$exam->academic_year_id - 1)
+            ->where('candidates.exam_id',$exam_id)
             ->lists('candidatesFromMoeys.can_id');
 
         $candidates = DB::table('candidates')
@@ -1882,7 +1883,6 @@ class ExamController extends Controller
             )
             ->orderBy('candidates.total_score', "DESC")
             ->get();
-
 
         $fields= [
             'ល.រ',
@@ -2025,8 +2025,6 @@ class ExamController extends Controller
                             $rank
                         );
                     }
-
-
                     foreach($allCourses as $allCourse) {
                         $elements =  array(
                             $allCandidates[$candidate->register_id][$allCourse->name_kh]['score_c'],
@@ -2043,8 +2041,6 @@ class ExamController extends Controller
                     $order++;
                 }
             });
-
-
         })->export('xls');
 
     }
