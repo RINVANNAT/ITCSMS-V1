@@ -186,10 +186,10 @@
                     </tr>
                     <tr>
                         @if(isset($candidate) && $candidate != null)
-                            @foreach($candidate->departments as $department)
+                            @foreach($departments as $department)
                                 <td class="choose_department_cell">
                                     <div class="col-md-12 col-sm-12">
-                                        {!! Form::text('choice_department['.$department->id.']', $department->pivot->rank, array('class'=>'form-control department_choice input','id'=>$department->code.'_rank','style'=>'padding:0px;border:0;border-bottom: 2px dotted;',"maxlength"=>"1",'required'=>'required')) !!}
+                                        {!! Form::text('choice_department['.$department->id.']', $candidate_departments[$department->id], array('class'=>'form-control department_choice input','id'=>$department->code.'_rank','style'=>'padding:0px;border:0;border-bottom: 2px dotted;',"maxlength"=>"1",'required'=>'required')) !!}
                                     </div>
                                 </td>
                             @endforeach
