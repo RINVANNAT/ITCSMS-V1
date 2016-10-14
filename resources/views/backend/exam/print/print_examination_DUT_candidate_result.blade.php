@@ -64,8 +64,8 @@
                         <tr>
                             <td><?php echo str_pad($i, 4, '0', STR_PAD_LEFT);?></td>
                             <td><?php echo str_pad($result->register_id, 4, '0', STR_PAD_LEFT);?></td>
-                            <td >{{$result->name_kh}}</td>
-                            <td>{{$result->name_latin}}</td>
+                            <td class="left">{{$result->name_kh}}</td>
+                            <td class="left">{{strtoupper($result->name_latin)}}</td>
                             <td>{{$result->gender}}</td>
                             <td> <?php $date = explode(' ', $result->birth_date);  $time = strtotime($date[0]); $bDate = date('d/m/Y',$time); echo $bDate;?></td>
                             <td>{{$result->province_name}}</td>
@@ -98,10 +98,7 @@
                                     ធ្វើនៅភ្នំពេញ ថ្ងៃទី ....... ខែ ............ ឆ្នាំ ២០
                                 </div>
                                 <div class="col-sm-12 no-padding text-center">
-                                    ជ.នាយកវិទ្យាស្ថានបច្ចេកវិទ្យាកម្ពុជា
-                                </div>
-                                <div class="col-sm-12 no-padding text-center">
-                                    <strong> នាយករង </strong>
+                                    នាយកវិទ្យាស្ថានបច្ចេកវិទ្យាកម្ពុជា
                                 </div>
                             </div>
                         </div>
@@ -143,10 +140,7 @@
                             ធ្វើនៅភ្នំពេញ ថ្ងៃទី ....... ខែ ............ ឆ្នាំ ២០
                         </div>
                         <div class="col-sm-12 no-padding text-center">
-                            ជ.នាយកវិទ្យាស្ថានបច្ចេកវិទ្យាកម្ពុជា
-                        </div>
-                        <div class="col-sm-12 no-padding text-center">
-                            <strong> នាយករង </strong>
+                            នាយកវិទ្យាស្ថានបច្ចេកវិទ្យាកម្ពុជា
                         </div>
                     </div>
                 </div>

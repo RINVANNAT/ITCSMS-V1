@@ -812,6 +812,8 @@ class ExamController extends Controller
     }
 
     public function download_candidate_list_dut(DownloadExaminationDocumentsRequest $request,$exam_id){
+
+
         $candidates = Candidate::where('exam_id',$exam_id)
             ->leftJoin('genders','candidates.gender_id','=','genders.id')
             ->leftJoin('origins','candidates.province_id','=','origins.id')
@@ -861,6 +863,125 @@ class ExamController extends Controller
 
         //dd($chunk_candidates);
         return view('backend.exam.print.candidate_list_dut',compact('chunk_candidates','departments'));
+    }
+
+
+
+    public function export_candidate_dut_list (DownloadExaminationDocumentsRequest $request,$exam_id) {
+
+//        dd($exam_id);
+
+        $allDutCands = [];
+
+        $candidates = Candidate::where('exam_id',$exam_id)
+            ->leftJoin('genders','candidates.gender_id','=','genders.id')
+            ->leftJoin('origins','candidates.province_id','=','origins.id')
+            //->leftJoin('candidate_department','candidates.id','=','candidate_department.candidate_id')
+            ->leftJoin('highSchools','candidates.highschool_id','=','highSchools.id')
+            ->leftJoin('gdeGrades as bacTotal','candidates.bac_total_grade','=','bacTotal.id')
+            ->leftJoin('gdeGrades as mathGrade','candidates.bac_math_grade','=','mathGrade.id')
+            ->leftJoin('gdeGrades as physGrade','candidates.bac_phys_grade','=','physGrade.id')
+            ->leftJoin('gdeGrades as chemGrade','candidates.bac_chem_grade','=','chemGrade.id')
+            ->orderBy('register_id')
+            ->select([
+                'candidates.id',
+                'register_id',
+                'candidates.name_kh',
+                'candidates.name_latin',
+                'genders.name_kh as gender',
+                'candidates.dob',
+                'highSchools.name_kh as highschool',
+                'origins.name_kh as origin',
+                'candidates.bac_year',
+                'bacTotal.name_en as bac_total_grade',
+                'mathGrade.name_en as bac_math_grade',
+                'physGrade.name_en as bac_phys_grade',
+                'chemGrade.name_en as bac_chem_grade',
+                'candidates.bac_percentile',
+                //'candidate_department.department_id',
+                //'candidate_department.rank',
+            ])
+            ->get();
+
+
+        foreach($candidates as &$candidate){
+            $department_choices = DB::table('candidate_department')
+                ->join('departments','candidate_department.department_id','=','departments.id')
+                ->where('candidate_id',$candidate['id'])
+                ->select([
+                    'candidate_department.rank',
+                    'departments.code'
+                ])
+                ->orderBy('departments.code')
+                ->get();
+
+            $candidateOptions = [];
+            foreach($department_choices as $choice) {
+                $candidateOptions[$choice->code] = $choice->rank;
+            }
+            $element = array(
+                'លេខបង្កាន់ដៃ'              => str_pad($candidate->register_id, 4, '0', STR_PAD_LEFT),
+                'ឈ្មោះ ខ្មែរ'             => $candidate->name_kh,
+                'ឈ្មោះ ឡាតាំង'            => $candidate->name_latin,
+                'ភេទ'                      => $candidate->gender,
+                'ថ្ងៃខែរឆ្នាំកំនើត'           => $candidate->dob->formatLocalized("%d/%b/%Y"),
+                'វិទ្យាល័យ'                => $candidate->highschool,
+                'ប្រភព'                   => $candidate->origin,
+                'Bac Year'      => $candidate->bac_year,
+                'Score'         => $candidate->bac_percentile,
+                'Bac'           => $candidate->bac_total_grade,
+                'Math'          => $candidate->bac_math_grade,
+                'Phys'          => $candidate->bac_phys_grade,
+                'Chim'          => $candidate->bac_chem_grade,
+                'GCA'           => $candidateOptions['GCA'],
+                'GCI'           => $candidateOptions['GCI'],
+                'GEE'           => $candidateOptions['GEE'],
+                'GGG'           => $candidateOptions['GGG'],
+                'GIC'           => $candidateOptions['GIC'],
+                'GIM'           => $candidateOptions['GIM'],
+                'GRU'           => $candidateOptions['GRU'],
+            );
+
+            $allDutCands[] = $element;
+        }
+
+        $fields= [
+            'លេខបង្កាន់ដៃ',
+            'ឈ្មោះ ខ្មែរ',
+            'ឈ្មោះ ឡាតាំង',
+            'ភេទ',
+            'ថ្ងៃខែរឆ្នាំកំនើត',
+            'វិទ្យាល័យ',
+            'ប្រភព',
+            'Bac Year',
+            'Score',
+            'Bac',
+            'Math',
+            'Phys',
+            'Chim',
+            'GCA',
+            'GCI',
+            'GEE',
+            'GGG',
+            'GIC',
+            'GIM',
+            'GRU'
+
+        ];
+
+        $title = 'បញ្ជីបេក្ខជន DUT';
+        $alpha = [];
+        $letter = 'A';
+        while ($letter !== 'AAA') {
+            $alpha[] = $letter++;
+        }
+        Excel::create($title, function($excel) use ($allDutCands, $title,$alpha,$fields) {
+
+            $excel->sheet($title, function($sheet) use($allDutCands,$title,$alpha,$fields) {
+                $sheet->fromArray($allDutCands);
+            });
+        })->export('xls');
+
     }
 
     public function download_candidate_list_ing(DownloadExaminationDocumentsRequest $request,$exam_id){
@@ -923,8 +1044,48 @@ class ExamController extends Controller
             }
         }
 
-        //dd($candidates);
+//        dd($candidates);
         return view('backend.exam.print.registration_statistic',compact('candidates'));
+    }
+
+
+    public function download_dut_result_statistic ($exam_id) {
+
+//        dd($exam_id);
+
+//        $studentByDept = $this->arrayStudentPassOrReserveByDept($exam_id, $is_success='Pass');//candidates dut pass by department
+//        $allDepts = $studentByDept[0];
+//        $allStudentByDept = $studentByDept[1];
+
+
+        $candidateDuts = Candidate::where('exam_id',$exam_id)
+            ->join('genders', 'genders.id', '=', 'candidates.gender_id')
+            ->orderBy('bac_total_grade')
+            ->get()
+            ->groupBy(function($candidateDut) {
+                $group = [
+                    $candidateDut->bac_total_grade
+                ];
+                return $group;
+            })
+            ->toArray();
+
+
+        $candidates = array();
+        $total = 0;
+        foreach($candidateDuts as $key=>$candDUT){
+            $total = $total + count($candDUT);
+            $candidates[$key]['M'] = array();
+            $candidates[$key]['F'] = array();
+            foreach($candDUT as $candidate){
+                array_push($candidates[$key][$candidate['code']],$candidate);
+            }
+        }
+
+
+        return view('backend.exam.print.dut_result_statistic',compact('candidates', 'total'));
+
+
     }
 
     /*public function request_add_courses($exam_id){
