@@ -31,7 +31,7 @@
                     </div>
                 </div>
 
-                @if($exam->type_id == 1)
+                {{--@if($exam->type_id == 1)--}}
                 <div class="row">
 
                     <div class="img">
@@ -157,7 +157,7 @@
 
                     </div>
                 </div>
-                @endif
+                {{--@endif--}}
 
 
             </div>
