@@ -31,9 +31,10 @@ interface IncomeRepositoryContract
 
     /**
      * @param  $input
+     * @param $type
      * @return mixed
      */
-    public function create($input);
+    public function create($input, $type);
 
     public function createSimpleIncome($input);
 

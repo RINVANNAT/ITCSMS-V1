@@ -406,11 +406,12 @@ class IncomeController extends Controller
                     $action = "";
                     if($type == "student"){
                         $action = '<a href="'.route('admin.accounting.income.print',$payslip->id).'" target="_blank"><i class="fa fa-print" data-toggle="tooltip" data-placement="top" title="" data-original-title="'.trans('buttons.general.print').'"></i> </a>';
-                        if($payslip->is_refund != true){
-                            $action = $action.' <a href="#" class="btn-refund" data-remote="'.route('admin.accounting.income.refund', $payslip->id) .'"> <i class="fa fa-reply" data-toggle="tooltip" data-placement="top" title="' . "Refund" . '"></i></a>';
-                        }
                     } else if($type == "candidate"){
                         $action = '<a href="'.route('admin.accounting.income.print_candidate',$payslip->id).'?user_id='.$user_id.'" target="_blank"><i class="fa fa-print" data-toggle="tooltip" data-placement="top" title="" data-original-title="'.trans('buttons.general.print').'"></i> </a>';
+                    }
+
+                    if($payslip->is_refund != true){
+                        $action = $action.' <a href="#" class="btn-refund" data-remote="'.route('admin.accounting.income.refund', $payslip->id) .'"> <i class="fa fa-reply" data-toggle="tooltip" data-placement="top" title="' . "Refund" . '"></i></a>';
                     }
 
                     return  $action;
@@ -465,7 +466,7 @@ class IncomeController extends Controller
     {
         $payslip_client_id = null;
         if(Input::get('type') == "Student" || Input::get('type') == "Candidate"){
-            $payslip_client_id = $this->incomes->create($request->all());
+            $payslip_client_id = $this->incomes->create($request->all(),Input::get('type'));
             if($request->ajax()){
                 return json_encode(array(
                     "sucess"=>true,

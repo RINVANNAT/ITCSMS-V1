@@ -121,15 +121,17 @@
             var template = Handlebars.compile($("#details-template").html());
             var current_id = null;
             var base_url = "{{url('/')}}";
-            var payment_table = null;
             var payslip_history_url = "{{route('admin.accounting.payslipHistory.data')}}";
+            var payment_tables = [];
+            var opening_tr = null;
+            var opening_row = null;
 
             function initTable(tableId, data) {
-                payment_table = $('#' + tableId).DataTable({
+                payment_tables[tableId] = $('#' + tableId).DataTable({
                     dom: 'i<"#payment_info_'+data.id+'">t<"payment_export_print btn-group"><"payment_btn">',
                     processing: true,
                     serverSide: true,
-                    ajax: payslip_history_url+"?payslip_client_id="+data.payslip_client_id+"&type=student",
+                    ajax: payslip_history_url+"?payslip_client_id="+data.payslip_client_id+"&type=student&user_id="+data.id,
                     initComplete: function() {
                         $('#payment_info_'+data.id).addClass('payment_info');
                     },
@@ -291,9 +293,8 @@
                     },
                     success:function(data) {
                         $('#add_payment_modal').modal('toggle');
-                        //$('#'+current_id).DataTable().ajax.reload();
-                        //payment_table.draw();
-                        payment_table.ajax.url( data.payslip_client_id ).load();
+                        payment_tables["students-"+data.candidate_id].ajax.url(payslip_history_url+"?payslip_client_id="+data.payslip_client_id+"&type=candidate&user_id="+data.candidate_id).load();
+                        //payment_table.ajax.url( data.payslip_client_id ).load();
                     },
                     error:function(error){
                         alert(error);
@@ -331,7 +332,18 @@
                     // This row is already open - close it
                     row.child.hide();
                     tr.removeClass('shown');
+                    opening_tr = null;
+                    opening_row = null;
                 } else {
+                    if(opening_tr != null){ // Some tr is openning, close it
+                        opening_row = oTable.row(opening_tr);
+                        opening_row.child.hide();
+                        opening_tr.removeClass('shown');
+                    }
+
+                    opening_tr = tr;
+                    opening_row = row;
+
                     // Open this row
                     row.child(template(row.data())).show();
                     initTable(tableId, row.data());

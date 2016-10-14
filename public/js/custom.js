@@ -205,18 +205,18 @@ function convertMoney(number) {
         suffix2 = convertMoney(number % 1000);
         text = prefix2 + suffix2;
 
-    /*} else if (number < 10000) {
-        prefix2 = convertMoney((number - (number % 1000)) / 1000) + "ពាន់";
-        suffix2 = convertMoney(number % 1000);
-        text = prefix2 + suffix2;
-    } else if (number < 100000) {
-        prefix3 = convertMoney((number - (number % 10000)) / 10000) + "ម៉ឺន";
-        suffix3 = convertMoney(number % 10000);
-        text = prefix3 + suffix3;
-    } else if (number < 1000000) {
-        prefix4 = convertMoney((number - (number % 100000)) / 100000) + "សែន";
-        suffix4 = convertMoney(number % 100000);
-        text = prefix4 + suffix4;*/
+        /*} else if (number < 10000) {
+         prefix2 = convertMoney((number - (number % 1000)) / 1000) + "ពាន់";
+         suffix2 = convertMoney(number % 1000);
+         text = prefix2 + suffix2;
+         } else if (number < 100000) {
+         prefix3 = convertMoney((number - (number % 10000)) / 10000) + "ម៉ឺន";
+         suffix3 = convertMoney(number % 10000);
+         text = prefix3 + suffix3;
+         } else if (number < 1000000) {
+         prefix4 = convertMoney((number - (number % 100000)) / 100000) + "សែន";
+         suffix4 = convertMoney(number % 100000);
+         text = prefix4 + suffix4;*/
     } else {
         prefix5 = convertMoney((number - (number % 1000000)) / 1000000) + "លាន ";
         suffix5 = convertMoney(number % 1000000);
@@ -318,7 +318,7 @@ function convertKhmerMonth(number) {
 function convertKhmerGender(gender) {
     gender = gender.toLowerCase();
 
-    if (gender == 'male' || gender =='M' || gender == 'ប') {
+    if (gender == 'male' || gender =='m' || gender == 'ប') {
         return 'ប្រុស';
     } else {
         return 'ស្រី';
@@ -586,3 +586,6 @@ function getStaffs(allStaffs, selectedStaffs) {
     });
     return staffRoles;
 }
+
+
+
