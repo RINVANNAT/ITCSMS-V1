@@ -170,13 +170,21 @@ class EloquentIncomeRepository implements IncomeRepositoryContract
     }
     /**
      * @param  $input
+     * @param $type
+     *
      * @throws GeneralException
      * @return bool
      */
-    public function create($input) // This is for student
+    public function create($input,$type) // This is for student
     {
-        $candidate = Candidate::where("id",$input['candidate_id'])->first();
-        $input['payslip_client_id'] = $candidate->payslip_client_id; // Before we take payslip client id from front end, now we search it again to prevent bug
+        if($type == "candidate"){
+            $candidate = Candidate::where("id",$input['candidate_id'])->first();
+            $input['payslip_client_id'] = $candidate->payslip_client_id; // Before we take payslip client id from front end, now we search it again to prevent bug
+        } else {
+            $student = StudentAnnual::where("id",$input['student_annual_id'])->first();
+            $input['payslip_client_id'] = $student->payslip_client_id; // Before we take payslip client id from front end, now we search it again to prevent bug
+        }
+
 
         $client_id = null;
 
