@@ -28,7 +28,7 @@
 
         $first_chunk = array_slice($candidateDUTs,0,27);
         $remaining_chunk = array_slice($candidateDUTs,27);
-        $candidateDUTs = array_chunk($remaining_chunk, 30);
+        $candidateDUTs = array_chunk($remaining_chunk, 31);
         array_unshift($candidateDUTs,$first_chunk);
 
         $total_page = count($candidateDUTs);
