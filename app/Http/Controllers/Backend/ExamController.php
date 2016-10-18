@@ -893,7 +893,7 @@ class ExamController extends Controller
                 $candidateOptions[$choice->code] = $choice->rank;
                 if($choice->is_success == 'Pass') {
                     $pass = $choice->code;
-                } elseif ($choice->is_success= 'Reserve') {
+                } elseif ($choice->is_success == 'Reserve') {
                     $reserve = $choice->code;
                 }
             }
