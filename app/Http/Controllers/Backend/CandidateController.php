@@ -337,7 +337,7 @@ class CandidateController extends Controller
                 } else {
                     if($candidate->is_register){
                         $action = '<span style="color:green"><i class="fa fa-check"></i></span>';
-                    } else if($candidate->is_paid){
+                    } else {//if($candidate->is_paid){
                         if(Auth::user()->allow('register-exam-candidate')) {
                             $action = ' <button class="btn btn-xs btn-register" data-exam="'.$candidate->exam_id.'" data-remote="' . route('admin.candidate.register', $candidate->id) . '"><i class="fa fa-check-circle-o" data-toggle="tooltip" data-placement="top" title="' . trans('buttons.general.register') . '"></i></button>';
                         }
