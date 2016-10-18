@@ -15,7 +15,7 @@
     <button class="btn btn-default btn-sm" id="btn-candidate-refresh"><i class="fa fa-refresh"></i></button>
 
     @if($exam->type_id == 2)
-        @permission('create-entrance-exam-score')
+        @permission('get-candidate-result-score-dut')
         <button  class="btn btn-primary btn-sm pull-right" id="btn_generate_result" style="margin-right: 5px"><i class="fa fa-plus-circle" ></i> Generate Result </button>
         @endauth
     @endif

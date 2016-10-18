@@ -439,6 +439,20 @@ class SeedCustomsPermissions extends Seeder
                             ]
                         ],
                         [
+                            'name'         => 'download-dut-result-detail',
+                            'display_name' => "Download DUT Result Detail",
+                            'dependency'   => [
+                                'view-backend','view-exam-management'
+                            ]
+                        ],
+                        [
+                            'name'         => 'download-ing-result-detail',
+                            'display_name' => "Download Engineer Result Detail",
+                            'dependency'   => [
+                                'view-backend','view-exam-management'
+                            ]
+                        ],
+                        [
                             'name'         => 'download-examination-document',
                             'display_name' => "Download examination's documents",
                             'dependency'   => [
@@ -522,7 +536,15 @@ class SeedCustomsPermissions extends Seeder
                         ],
                         [
                             'name'          => 'get-candidate-result-score',
-                            'display_name'  => 'Generate Candidate Score',
+                            'display_name'  => 'Generate Candidate Score (Engineer)',
+                            'dependency'   => [
+                                'view-backend','view-exam-management'
+                            ]
+
+                        ],
+                        [
+                            'name'          => 'get-candidate-result-score-dut',
+                            'display_name'  => 'Generate Candidate Score (DUT)',
                             'dependency'   => [
                                 'view-backend','view-exam-management'
                             ]

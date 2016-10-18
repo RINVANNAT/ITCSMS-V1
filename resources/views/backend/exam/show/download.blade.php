@@ -207,8 +207,8 @@
 
                     </div>
                     <div class="img">
-                        @permission('download-examination-document')
-                        <div class="desc">Candidate's Result - Detail</div>
+                        @permission('download-ing-result-detail')
+                        <div class="desc">Candidate's Result (For Engineer) - Detail</div>
                         <div class="desc">
                             <a id="download_candidate_result_detail" target="_blank"  href="{{route('admin.exam.export_candidate_result_detail', $exam->id)}}">
                                 <button class="btn btn-info btn-xs" id="export_candidate_result_detail"> Excel </button>
