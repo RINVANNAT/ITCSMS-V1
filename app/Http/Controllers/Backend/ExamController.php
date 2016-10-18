@@ -2518,14 +2518,14 @@ class ExamController extends Controller
         $resultType = $request->status;
 
         if($resultType == 'Pass') {
-            $title = "បញ្ជីបេក្ខជនជាប់<strong>ស្ថាពរ</strong>";
+            $title = "បញ្ជីបេក្ខជន<span style='font-size: 150%'>ជាប់ស្ថាពរ</span>";
             $allStudentByDept=[];
             $candidateDUTs = $this->getSucceedCandidateDUTFromDB($examId, $is_success='Pass');
             $candidateDUTs = array_chunk($candidateDUTs, 27);
             return  view('backend.exam.print.print_examination_DUT_candidate_result', compact('allStudentByDept', 'candidateDUTs', 'title'));
 
         } else if($resultType == 'Reserve') {
-            $title = "បញ្ជីបេក្ខជន<strong>ជាប់បំរុង</strong>";
+            $title = "បញ្ជីបេក្ខជន<span style='font-size: 150%'>ជាប់បំរុង</span>";
             $allStudentByDept=[];
             $candidateDUTs = $this->getSucceedCandidateDUTFromDB($examId, $is_success='Reserve');
             $candidateDUTs = array_chunk($candidateDUTs, 27);
