@@ -23,11 +23,21 @@
 
 
     @if($candidateDUTs)
-        <?php   $page_number = 1;
+        <?php
+        $page_number = 1;
+
+        $first_chunk = array_slice($candidateDUTs,0,27);
+        $remaining_chunk = array_slice($candidateDUTs,27);
+        $candidateDUTs = array_chunk($remaining_chunk, 30);
+        array_unshift($candidatesResults,$first_chunk);
+
         $total_page = count($candidateDUTs);
         ?>
 
-        <?php $i =0; $female=0;?>
+        <?php
+        $i =0;
+        $female=0;
+        ?>
 
         @foreach($candidateDUTs as $candidatesResult)
             <?php $check =0;?>
