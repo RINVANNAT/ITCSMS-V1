@@ -867,11 +867,110 @@ class ExamController extends Controller
 
 
 
-    public function export_candidate_dut_list (DownloadExaminationDocumentsRequest $request,$exam_id) {
-
-//        dd($exam_id);
+    public function export_candidate_dut_detail (DownloadExaminationDocumentsRequest $request,$exam_id) {
 
         $allDutCands = [];
+
+        $candidates = $this->getCandidateFromDB($exam_id);
+
+        foreach($candidates as &$candidate){
+            $department_choices = DB::table('candidate_department')
+                ->join('departments','candidate_department.department_id','=','departments.id')
+                ->where('candidate_id',$candidate['id'])
+                ->select([
+                    'candidate_department.rank',
+                    'departments.code',
+                    'candidate_department.is_success'
+                ])
+                ->orderBy('departments.code')
+                ->get();
+//            dd($department_choices);
+
+            $candidateOptions = [];
+            $pass = '';
+            $reserve = '';
+            foreach($department_choices as $choice) {
+                $candidateOptions[$choice->code] = $choice->rank;
+                if($choice->is_success == 'Pass') {
+                    $pass = $choice->code;
+                } elseif ($choice->is_success= 'Reserve') {
+                    $reserve = $choice->code;
+                }
+            }
+
+//            dd($candidateOptions);
+            $element = array(
+                'លេខបង្កាន់ដៃ'              => str_pad($candidate->register_id, 4, '0', STR_PAD_LEFT),
+                'ឈ្មោះ ខ្មែរ'             => $candidate->name_kh,
+                'ឈ្មោះ ឡាតាំង'            => $candidate->name_latin,
+                'ភេទ'                      => $candidate->gender,
+                'ថ្ងៃខែរឆ្នាំកំនើត'           => $candidate->dob->formatLocalized("%d/%b/%Y"),
+                'វិទ្យាល័យ'                => $candidate->highschool,
+                'ប្រភព'                   => $candidate->origin,
+                'Bac Year'      => $candidate->bac_year,
+                'Score'         => $candidate->bac_percentile,
+                'Bac'           => $candidate->bac_total_grade,
+                'Math'          => $candidate->bac_math_grade,
+                'Phys'          => $candidate->bac_phys_grade,
+                'Chim'          => $candidate->bac_chem_grade,
+                'GCA'           => $candidateOptions['GCA'],
+                'GCI'           => $candidateOptions['GCI'],
+                'GEE'           => $candidateOptions['GEE'],
+                'GGG'           => $candidateOptions['GGG'],
+                'GIC'           => $candidateOptions['GIC'],
+                'GIM'           => $candidateOptions['GIM'],
+                'GRU'           => $candidateOptions['GRU'],
+                'Pass'          => $pass,
+                'Reserve'       => $reserve
+
+            );
+
+            $allDutCands[] = $element;
+        }
+
+        $fields= [
+            'លេខបង្កាន់ដៃ',
+            'ឈ្មោះ ខ្មែរ',
+            'ឈ្មោះ ឡាតាំង',
+            'ភេទ',
+            'ថ្ងៃខែរឆ្នាំកំនើត',
+            'វិទ្យាល័យ',
+            'ប្រភព',
+            'Bac Year',
+            'Score',
+            'Bac',
+            'Math',
+            'Phys',
+            'Chim',
+            'GCA',
+            'GCI',
+            'GEE',
+            'GGG',
+            'GIC',
+            'GIM',
+            'GRU',
+            'Pass',
+            'Reserve'
+
+        ];
+
+        $title = 'បញ្ជីបេក្ខជន DUT';
+        $alpha = [];
+        $letter = 'A';
+        while ($letter !== 'AAA') {
+            $alpha[] = $letter++;
+        }
+        Excel::create($title, function($excel) use ($allDutCands, $title,$alpha,$fields) {
+
+            $excel->sheet($title, function($sheet) use($allDutCands,$title,$alpha,$fields) {
+                $sheet->fromArray($allDutCands);
+            });
+        })->export('xls');
+
+    }
+
+
+    private function getCandidateFromDB($exam_id) {
 
         $candidates = Candidate::where('exam_id',$exam_id)
             ->leftJoin('genders','candidates.gender_id','=','genders.id')
@@ -903,6 +1002,18 @@ class ExamController extends Controller
             ])
             ->get();
 
+        return $candidates;
+    }
+
+
+
+    public function export_candidate_dut_list (DownloadExaminationDocumentsRequest $request,$exam_id) {
+
+//        dd($exam_id);
+
+        $allDutCands = [];
+
+        $candidates = $this->getCandidateFromDB($exam_id);
 
         foreach($candidates as &$candidate){
             $department_choices = DB::table('candidate_department')

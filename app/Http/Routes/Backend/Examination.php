@@ -51,6 +51,8 @@ Route::group([], function() {
 
      Route::get('exams/{id}/export_candidate_list_dut', 'ExamController@export_candidate_dut_list')->name('admin.exam.export_candidate_list_dut');
 
+    Route::get('exams/{id}/export_candidate_dut_detail', 'ExamController@export_candidate_dut_detail')->name('admin.exam.export_candidate_dut_detail');
+
     Route::get('exams/{id}/export_attendance_list', 'ExamController@export_attendance_list')->name('admin.exam.export_attendance_list');
     Route::get('exams/{id}/export_candidate_list', 'ExamController@export_candidate_list')->name('admin.exam.export_candidate_list');
     Route::get('exams/{id}/export_candidate_list_by_register_id', 'ExamController@export_candidate_list_by_register_id')->name('admin.exam.export_candidate_list_by_register_id');

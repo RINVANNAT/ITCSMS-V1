@@ -91,6 +91,18 @@
                         </div>
                         @endauth
                     </div>
+
+
+                    <div class="img">
+                        @permission('download-examination-document')
+                        <div class="desc">List of Candidates DUT Detail  </div>
+                        <div class="desc">
+                            <a id="download_student_list" target="_blank" href="{{route('admin.exam.export_candidate_dut_detail',$exam->id)}}">
+                                <button  class="btn btn-info btn-xs" id="candidate_dut_detail"> excel </button>
+                            </a>
+                        </div>
+                        @endauth
+                    </div>
                 </div>
 
                 @if($exam->type_id == 1)
