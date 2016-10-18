@@ -115,6 +115,7 @@
 
                 </tbody>
             </table>
+
             <div class="footer">
                 <hr/>
                 <span>Concours d'entree ITC 2016</span>

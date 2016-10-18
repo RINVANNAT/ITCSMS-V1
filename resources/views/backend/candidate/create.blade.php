@@ -56,9 +56,17 @@
 
             var status = $( "#candidate-form" ).validate().form();
 
+            //var pass_dept = $('#pass_dept :selected').val();
+            //var reserve_dept = $('#reserve_dept :selected').val();
+
+            var baseUrl = $("#candidate-form" ).attr('action');
+
+            //console.log(baseUrl+'?pass_dept='+pass_dept+'&reserve_dept='+reserve_dept);
+
             if(status ==true){
                 var disabled = $("#candidate-form" ).find(':input:disabled').removeAttr('disabled');
                 var data = $("#candidate-form" ).serializeArray();
+
                 $.each(data, function(key, data)
                 {
                     if (this.name == "highschool_id")
@@ -66,15 +74,14 @@
                 });
                 disabled.attr('disabled','disabled');
 
-
                  $.ajax({
                      type: 'POST',
-                     url: $("#candidate-form" ).attr('action'),
+                     url: baseUrl,
                      data: data,
                      success: function(response) {
                         if(typeof response.status !== 'undefined'){
                             if(response.status == true){
-                                return_back();
+                                //return_back();
                             } else {
                                 notify("error","Candidate Error",response.toString());
                             }

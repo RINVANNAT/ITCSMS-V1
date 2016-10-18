@@ -88,8 +88,8 @@ class EloquentCandidateRepository implements CandidateRepositoryContract
                         ['candidate_id' => $candidate->id, 'department_id' => $department_id, 'rank' => $choice_department]
                     ]);
                 }
-
             }
+            $result["candidate_id"] = $candidate->id;
             $result["status"] = true;
             $result["messages"] = "Your information is successfully saved";
 

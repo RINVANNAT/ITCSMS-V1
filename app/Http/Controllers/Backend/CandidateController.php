@@ -121,20 +121,79 @@ class CandidateController extends Controller
      */
     public function store(StoreCandidateRequest $request)
     {
-        $exam = Exam::where('id',$request->get('exam_id'))->first();
-        if($exam->accept_registration) { // If this exam doesn't allow new registration, we can't accept it
-            $result = $this->candidates->create($request->all());
 
-            if($result['status']==true){
-                return Response::json($result);
-            } else {
-                return Response::json($result,422);
+        $exam = Exam::where('id',$request->get('exam_id'))->first();
+        $data = $request->all();
+
+        if($exam->accept_registration) { // If this exam doesn't allow new registration, we can't accept it
+            if($request->pass_dept != null && $request->reserve_dept != null) {
+
+                $data['result'] = "Pass";
+                $result = $this->candidates->create($data);
+
+                if($result['status']==true){
+                    $this->updateCandidateDept($result['candidate_id'],$request->pass_dept,"Pass");
+                    $this->updateCandidateDept($result['candidate_id'],$request->reserve_dept,"Reserve");
+                    return Response::json($result);
+                } else {
+                    return Response::json($result,422);
+                }
+
+            } elseif($request->pass_dept != null && $request->reserve_dept == null) {
+
+                $data['result'] = "Pass";
+                $result = $this->candidates->create($data);
+
+                if($result['status']==true){
+                    $this->updateCandidateDept($result['candidate_id'],$request->pass_dept,"Pass");
+                    return Response::json($result);
+                } else {
+                    return Response::json($result,422);
+                }
+
+
+            } elseif($request->pass_dept == null && $request->reserve_dept != null) {
+
+                $data['result'] = "Reserve";
+                $result = $this->candidates->create($data);
+
+                if($result['status']==true){
+                    $this->updateCandidateDept($result['candidate_id'],$request->reserve_dept,"Reserve");
+                    return Response::json($result);
+                } else {
+                    return Response::json($result,422);
+                }
+
+            }
+            else {
+
+                $result = $this->candidates->create($request->all());
+
+                if($result['status']==true){
+                    return Response::json($result);
+                } else {
+                    return Response::json($result,422);
+                }
             }
 
+            dd($result);
         } else {
-            return Response::json(array("message"=>"You can modify information of this candidate"),422);
+            return Response::json(array("message"=>"You cannot register new candidate with this examination"),422);
         }
 
+    }
+
+    private function updateCandidateDept($candidate_id, $department_id, $result) {
+
+        $res = DB::table('candidate_department')
+            ->where([
+                ['candidate_id', '=', $candidate_id],
+                ['department_id', '=', $department_id]
+            ])
+            ->update(array(
+                'is_success' => $result
+            ));
+        return $res;
     }
 
 

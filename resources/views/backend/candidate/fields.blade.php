@@ -208,6 +208,32 @@
             </div>
         </div>
     </div>
+
+    <div class="form-group col-sm-6 ">
+        {!! Form::label('Pass','Pass',array('class'=>'col-sm-4 control-label required')) !!}
+        <div class="col-sm-8">
+            <select class="form-control input" name="pass_dept" id="pass_dept">
+                <option value="">Department Option</option>
+                @foreach($departments as $department)
+                    <option value="{{$department->id}}">{{$department->code}}</option>
+                @endforeach
+            </select>
+        </div>
+    </div>
+
+    <div class="form-group col-sm-6 ">
+        {!! Form::label('Reserve','Reserve',array('class'=>'col-sm-4 control-label required')) !!}
+        <div class="col-sm-8">
+
+            <select class="form-control input" name="reserve_dept" id="reserve_dept">
+                <option value="">Department Option</option>
+                @foreach($departments as $department)
+                    <option value="{{$department->id}}">{{$department->code}}</option>
+                @endforeach
+            </select>
+        </div>
+    </div>
+
 @endif
 
 <div class="form-group col-sm-6 required">
@@ -216,3 +242,4 @@
         {!! Form::select('promotion_id',$promotions, [key($promotions)=>$promotions[key($promotions)]], array('class'=>'form-control input','id'=>'candidate_promotion_id','placeholder'=>'Promotion', 'Required'=>'required')) !!}
     </div>
 </div>
+
