@@ -1160,13 +1160,11 @@ class ExamController extends Controller
     }
 
 
-    public function download_dut_result_statistic ($exam_id) {
+    public function download_dut_registration_statistic ($exam_id) {
 
 //        dd($exam_id);
 
-//        $studentByDept = $this->arrayStudentPassOrReserveByDept($exam_id, $is_success='Pass');//candidates dut pass by department
-//        $allDepts = $studentByDept[0];
-//        $allStudentByDept = $studentByDept[1];
+
 
 
         $candidateDuts = Candidate::where('exam_id',$exam_id)
@@ -1194,9 +1192,105 @@ class ExamController extends Controller
         }
 
 
-        return view('backend.exam.print.dut_result_statistic',compact('candidates', 'total'));
+        return view('backend.exam.print.dut_registration_statistic',compact('candidates', 'total'));
 
 
+    }
+
+    public function download_dut_result_statistic($exam_id) {
+
+
+
+        $studentByDept = $this->arrayStudentPassOrReserveByDept($exam_id, $is_success='Pass');//candidates dut pass by department
+
+        $allDepts = $this->getAllDepartments();
+
+        $allCandidateByDept = $studentByDept[1];
+        $candidates = array();
+        $arrayGrades = [];
+        $gradeA_M = 0;
+        $gradeA_F = 0;
+        $gradeB_M = 0;
+        $gradeB_F = 0;
+        $gradeC_M = 0;
+        $gradeC_F = 0;
+        $gradeD_M = 0;
+        $gradeD_F = 0;
+        $gradeE_M = 0;
+        $gradeE_F = 0;
+        $totalBydept = [];
+
+        foreach($allCandidateByDept as $key => $candidate ) {
+
+            usort($candidate, function($a, $b) {
+                return $a->total_grade - $b->total_grade;
+            });
+
+            foreach($candidate as $cand) {
+                $candidates[$key][$cand->total_grade][$cand->code_gender][] = $cand;
+                $arrayGrades[$cand->total_grade] = $cand->total_grade;
+
+                if($cand->total_grade == 34) {
+                    if($cand->code_gender == 'M') {
+                        $gradeA_M++;
+                    } else {
+                        $gradeA_F++;
+                    }
+                } elseif ($cand->total_grade == 35) {
+                    if($cand->code_gender == 'M') {
+                        $gradeB_M++;
+                    } else {
+                        $gradeB_F++;
+                    }
+
+                } elseif ($cand->total_grade == 36) {
+                    if($cand->code_gender == 'M') {
+                        $gradeC_M++;
+                    } else {
+                        $gradeC_F++;
+                    }
+
+                } elseif ($cand->total_grade == 37) {
+                    if($cand->code_gender == 'M') {
+                        $gradeD_M++;
+                    } else {
+
+                        $gradeD_F++;
+                    }
+
+                } else {
+                    if($cand->code_gender == 'M') {
+                        $gradeE_M++;
+                    } else {
+
+                        $gradeE_F++;
+                    }
+
+                }
+
+
+            }
+
+            $total_dept_grade = $gradeA_M + $gradeA_F + $gradeB_M + $gradeB_F + $gradeC_M + $gradeC_F + $gradeD_M + $gradeD_F + $gradeE_M + $gradeE_F;
+
+            $totalBydept[34]['M'] = $gradeA_M;
+            $totalBydept[35]['M'] = $gradeB_M;
+            $totalBydept[36]['M'] = $gradeC_M;
+            $totalBydept[37]['M'] = $gradeD_M;
+            $totalBydept[38]['M'] = $gradeE_M;
+
+            $totalBydept[34]['F'] = $gradeA_F;
+            $totalBydept[35]['F'] = $gradeB_F;
+            $totalBydept[36]['F'] = $gradeC_F;
+            $totalBydept[37]['F'] = $gradeD_F;
+            $totalBydept[38]['F'] = $gradeE_F;
+
+        }
+
+//        dd($totalBydept);
+
+
+        return view('backend.exam.print.dut_result_statistic',compact('candidates', 'allDepts', 'arrayGrades', 'totalBydept','total_dept_grade'));
     }
 
     /*public function request_add_courses($exam_id){
@@ -2709,6 +2803,7 @@ class ExamController extends Controller
                 ['is_specialist', '=', true],
                 ['parent_id', '=', 11]
             ])
+            ->orderBy('name_abr', 'ASC')
             ->get();
 
         return $dept;
@@ -2798,7 +2893,7 @@ class ExamController extends Controller
                 ['origins.active', '=', true]
 
             ])
-            ->select('origins.name_kh as province_name', 'academicYears.name_kh as academic_year', 'candidates.register_id','candidates.dob as birth_date', 'candidates.register_from as home_town', 'genders.name_kh as gender', 'candidates.id as candidate_id', 'candidates.name_kh', 'candidates.name_latin', 'candidate_department.is_success', 'candidate_department.rank', 'departments.code as department_name', 'departments.id as department_id', 'candidates.bac_percentile')
+            ->select('candidates.bac_total_grade as total_grade', 'origins.name_kh as province_name', 'academicYears.name_kh as academic_year', 'candidates.register_id','candidates.dob as birth_date', 'candidates.register_from as home_town', 'genders.name_kh as gender', 'genders.code as code_gender', 'candidates.id as candidate_id', 'candidates.name_kh', 'candidates.name_latin', 'candidate_department.is_success', 'candidate_department.rank', 'departments.code as department_name', 'departments.id as department_id', 'candidates.bac_percentile')
             ->orderBy('register_id', 'ASC')
             ->get();
 

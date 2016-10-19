@@ -41,11 +41,18 @@
                             <div class="desc">Registration Statistic</div>
                         </a>
                     </div>
+
                     <div class="img">
-                        <a target="_blank" href="{{route('admin.exam.download_dut_result_statistic',$exam->id)}}">
+                        <a target="_blank" href="{{route('admin.exam.download_dut_registration_statistic',$exam->id)}}">
                             <div class="desc">DUT Registration Statistic </div>
                         </a>
                     </div>
+
+                        <div class="img">
+                            <a target="_blank" href="{{route('admin.exam.download_dut_result_statistic',$exam->id)}}">
+                                <div class="desc">Candidates DUT Result Statistic </div>
+                            </a>
+                        </div>
 
                 </div>
 
