@@ -210,7 +210,7 @@
     </div>
 
     <div class="form-group col-sm-6 ">
-        {!! Form::label('Pass','Pass',array('class'=>'col-sm-4 control-label required')) !!}
+        {!! Form::label('Pass','Pass',array('class'=>'col-sm-4 control-label')) !!}
         <div class="col-sm-8">
             <select class="form-control input" name="pass_dept" id="pass_dept">
                 <option value="">Department Option</option>
@@ -222,7 +222,7 @@
     </div>
 
     <div class="form-group col-sm-6 ">
-        {!! Form::label('Reserve','Reserve',array('class'=>'col-sm-4 control-label required')) !!}
+        {!! Form::label('Reserve','Reserve',array('class'=>'col-sm-4 control-label')) !!}
         <div class="col-sm-8">
 
             <select class="form-control input" name="reserve_dept" id="reserve_dept">

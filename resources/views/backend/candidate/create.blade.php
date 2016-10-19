@@ -81,7 +81,7 @@
                      success: function(response) {
                         if(typeof response.status !== 'undefined'){
                             if(response.status == true){
-                                //return_back();
+                                return_back();
                             } else {
                                 notify("error","Candidate Error",response.toString());
                             }
