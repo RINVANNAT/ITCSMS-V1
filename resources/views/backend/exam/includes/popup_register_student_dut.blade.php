@@ -18,7 +18,7 @@
         <!-- /.box-header -->
         <div class="box-body">
 
-            <form action="{{route('admin.candidate.register_student_dut',$examId)}}" class="student_registration_dept">
+            <form action="{{$register_url}}" class="student_registration_dept">
                 <table class="table">
                     <thead>
                     <tr>
@@ -79,7 +79,7 @@
 
 @section('after-scripts-end')
     <script>
-
+        var register_url = {{$register_url}}
         $('#btn_cancel').on('click', function() {
             window.close();
         });
@@ -92,8 +92,8 @@
                 department_id: selected_department_id,
                 candidate_id: candidate_id
             };
-            var url = "{{route('admin.candidate.register_student_dut',$examId)}}";
-            ajaxRequest('PUT', url,baseData);
+            //var url = "{{route('admin.candidate.register',$examId)}}";
+            ajaxRequest('POST', register_url,baseData);
 
         });
 

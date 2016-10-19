@@ -398,7 +398,7 @@ class CandidateController extends Controller
                         $action = '<span style="color:green"><i class="fa fa-check"></i></span>';
                     } else {//if($candidate->is_paid){
                         if(Auth::user()->allow('register-exam-candidate')) {
-                            $action = ' <button class="btn btn-xs btn-register" data-exam="'.$candidate->exam_id.'" data-remote="' . route('admin.candidate.register', $candidate->id) . '"><i class="fa fa-check-circle-o" data-toggle="tooltip" data-placement="top" title="' . trans('buttons.general.register') . '"></i></button>';
+                            $action = ' <button class="btn btn-xs btn-register" data-exam="'.$candidate->exam_id.'" data-candidate="'.$candidate->id.'" data-remote="' . route('admin.candidate.register', $candidate->id) . '"><i class="fa fa-check-circle-o" data-toggle="tooltip" data-placement="top" title="' . trans('buttons.general.register') . '"></i></button>';
                         }
                     }
                 }
@@ -422,77 +422,65 @@ class CandidateController extends Controller
 
         $examId = $request->exam_id;
         $exam = Exam::where('id',$examId)->first();
-        $candidate_id = $id;
-        $studentWithRegisteredStudetn =[];
+        $candidate = Candidate::where('id',$id)->first();
+        $dept_id = config('access.departments.department_tc'); // By default, it is foundation department
 
         if($exam->type_id == config("access.exam.entrance_dut")) {
+            $dept_id = $request->department_id;
+        }
 
-            $candidateDepartments = DB::table('candidates')
-                    ->join('candidate_department', 'candidate_department.candidate_id', '=', 'candidates.id')
-                    ->join('departments', 'departments.id', '=', 'candidate_department.department_id')
-                    ->where([
-                        ['departments.is_specialist', '=', true],
-                        ['departments.parent_id', '=', 11],
-                        ['candidates.exam_id', '=', $examId],
-                        ['candidate_department.candidate_id', '=', $candidate_id]
-                    ])
-                    ->select(
-                        'candidate_department.is_success as result',
-                        'departments.code as dept_name',
-                        'departments.id as dept_id',
-                        'candidates.id as candidate_id'
-                    )
-                    ->get();
+        $this->studentRepo->register($candidate, $dept_id);
+        if($request->ajax()){
+            return json_encode(array('success'=>true));
+        }
+    }
 
 
-            $getAllDepts = DB::table('departments')
-                ->where([
-                    ['departments.is_specialist', '=', true],
-                    ['departments.parent_id', '=', 11]
-                ])
-                ->select('departments.id as dept_id', 'departments.code as dept_name')
-                ->get();
+    public function requestRegisterStudentDUT(RegisterCandidateRequest $request){
+        $examId = $request->exam_id;
+        $exam = Exam::where('id',$examId)->first();
+        $candidate_id = $request->candidate_id;
+        $register_url = route('admin.candidate.register',$candidate_id);
+
+        $candidateDepartments = DB::table('candidates')
+            ->join('candidate_department', 'candidate_department.candidate_id', '=', 'candidates.id')
+            ->join('departments', 'departments.id', '=', 'candidate_department.department_id')
+            ->where([
+                ['departments.is_specialist', '=', true],
+                ['departments.parent_id', '=', 11],
+                ['candidates.exam_id', '=', $examId],
+                ['candidate_department.candidate_id', '=', $candidate_id]
+            ])
+            ->select(
+                'candidate_department.is_success as result',
+                'departments.code as dept_name',
+                'departments.id as dept_id',
+                'candidates.id as candidate_id'
+            )
+            ->get();
 
 
-            foreach($getAllDepts as $Dept) {
+        $getAllDepts = DB::table('departments')
+            ->where([
+                ['departments.is_specialist', '=', true],
+                ['departments.parent_id', '=', 11]
+            ])
+            ->select('departments.id as dept_id', 'departments.code as dept_name')
+            ->get();
 
-                $countRegisteredStudents = DB::table('studentAnnuals')
+
+        foreach($getAllDepts as $Dept) {
+
+            $countRegisteredStudents = DB::table('studentAnnuals')
                 ->where([
                     ['studentAnnuals.academic_year_id', '=', $exam->academic_year_id],
                     ['studentAnnuals.department_id', '=', $Dept->dept_id],
                     ['studentAnnuals.degree_id', '=', config('access.degrees.degree_associate')]
                 ])->count();
-                $studentWithRegisteredStudetn[$Dept->dept_name] = $countRegisteredStudents;
-            }
-
-            return view('backend.exam.includes.popup_register_student_dut', compact('candidateDepartments', 'examId', 'candidate_id', 'studentWithRegisteredStudetn'));
-
-        } else {
-
-            $candidate = Candidate::where('id',$id)->first();
-
-            $this->studentRepo->register($candidate, $department_id = config('access.departments.department_tc'));
-
-            if($request->ajax()){
-                return json_encode(array('success'=>true));
-            }
-        }
-    }
-
-
-    public function registerStudentDUT($examId, Request $request) {
-
-        $dept_id = $request->department_id;
-
-
-        $candidate_id = $request->candidate_id;
-        $candidate = Candidate::where('id',$candidate_id)->first();
-        $this->studentRepo->register($candidate, $dept_id);
-
-        if($request->ajax()){
-            return json_encode(array('success'=>true));
+            $studentWithRegisteredStudetn[$Dept->dept_name] = $countRegisteredStudents;
         }
 
+        return view('backend.exam.includes.popup_register_student_dut', compact('candidateDepartments', 'examId', 'candidate_id', 'studentWithRegisteredStudetn','register_url'));
     }
 
 }

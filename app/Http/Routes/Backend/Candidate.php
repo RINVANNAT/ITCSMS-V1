@@ -8,6 +8,5 @@
         Route::post('candidate-import', 'CandidateController@import')->name('admin.candidate.import');
 
         Route::get('candidate/{id}/register', 'CandidateController@register')->name('admin.candidate.register');
-
-        Route::put('candidate/{id}/register_student_dut', 'CandidateController@registerStudentDUT')->name('admin.candidate.register_student_dut');//{id}= exam_id
+        Route::get('candidate/request_register_student_dut', 'CandidateController@requestRegisterStudentDUT')->name('admin.candidate.request_register_student_dut');//{id}= exam_id
     });

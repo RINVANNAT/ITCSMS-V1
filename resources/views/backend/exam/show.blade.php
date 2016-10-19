@@ -792,6 +792,7 @@
             @endauth
             /* ------------------------------------------------------------------------ Candidate Section ------------------------------------------------------------------ */
             @permission('view-exam-candidate')
+            var request_register_dut_url = "{{route('admin.candidate.request_register_student_dut')}}";
             candidate_datatable = $('#candidates-table').DataTable({
                 processing: true,
                 serverSide: true,
@@ -860,59 +861,57 @@
                 e.preventDefault();
             });
 
-          @if($exam->type_id == config("access.exam.entrance_engineer"))
+            @if($exam->type_id == config("access.exam.entrance_engineer"))
 
-              $('#candidates-table').on('click', '.btn-register[data-remote]', function (e) {
-                  var url = $(this).data('remote');
+                $('#candidates-table').on('click', '.btn-register[data-remote]', function (e) {
+                    var url = $(this).data('remote');
                     var baseData = {
                         exam_id:  $(this).data('exam')
                     }
 
-                  e.preventDefault();
-                  swal({
-                      title: "Confirm",
-                      text: "Register this candidate?",
-                      type: "info",
-                      showCancelButton: true,
-                      confirmButtonColor: "#DD6B55",
-                      confirmButtonText: "Yes, register it!",
-                      closeOnConfirm: true
-                  }, function(confirmed) {
-                      if (confirmed) {
-                          $.ajaxSetup({
-                              headers: {
-                                  'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-                              }
-                          });
+                    e.preventDefault();
+                    swal({
+                        title: "Confirm",
+                        text: "Register this candidate?",
+                        type: "info",
+                        showCancelButton: true,
+                        confirmButtonColor: "#DD6B55",
+                        confirmButtonText: "Yes, register it!",
+                        closeOnConfirm: true
+                    }, function(confirmed) {
+                        if (confirmed) {
+                            $.ajaxSetup({
+                                headers: {
+                                    'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                                }
+                            });
 
-                          // confirm then
-                          $.ajax({
-                              url: url,
-                              type: 'GET',
-                              data: baseData,
-                              dataType: 'json',
-                              success:function(data) {
-                                  candidate_datatable.draw();
-                              }
-                          });
-                      }
-                  });
-                  return false;
-              });
+                            // confirm then
+                            $.ajax({
+                                url: url,
+                                type: 'GET',
+                                data: baseData,
+                                dataType: 'json',
+                                success:function(data) {
+                                    candidate_datatable.draw();
+                                }
+                            });
+                        }
+                    });
+                    return false;
+                });
 
-          @elseif($exam->type_id == config("access.exam.entrance_dut"))
+            @elseif($exam->type_id == config("access.exam.entrance_dut"))
 
-              $('#candidates-table').on('click', '.btn-register[data-remote]', function (e) {
+                $('#candidates-table').on('click', '.btn-register[data-remote]', function (e) {
 
-                var url = $(this).data('remote');
-                var exam_id = $(this).data('exam')
-                window_choose_department_dut = PopupCenterDual(url+'?exam_id='+exam_id,'Course for exam','450','580');
+                    var exam_id = $(this).data('exam')
+                    var candidate_id = $(this).data('candidate')
+                    window_choose_department_dut = PopupCenterDual(request_register_dut_url+'?exam_id='+exam_id+'&candidate_id='+candidate_id,'Choose department to register','450','580');
 
-              });
+                });
 
-
-
-          @endif
+            @endif
 
 
 

@@ -1476,9 +1476,7 @@ class ExamController extends Controller
     }
 
     public function addNewCorrectionScore($exam_id, Request $request) {
-        //Requests\Backend\Exam\StoreEntranceExamScoreRequest
 
-        //dd($request->serializ_data);
         $correctorName  = $request->corrector_name;
 
         if($correctorName) {
@@ -1491,7 +1489,6 @@ class ExamController extends Controller
         } else {
             return Response::json(['status'=> false]);
         }
-
 
     }
 
