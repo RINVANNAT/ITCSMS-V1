@@ -234,8 +234,8 @@
 
                             @endforeach
 
-                            <td>{{$total_M}}</td>
-                            <td>{{$total_F}}</td>
+                            <td>{{ sprintf('%0.2f', ($total_M *100)/$totalByDept) }}</td>
+                            <td>{{ sprintf('%0.2f', ($total_F *100)/$totalByDept) }}</td>
 
                         @else
                             @foreach($arrayGrades as $key => $val)
@@ -261,10 +261,11 @@
 
                     <td >
 
-                        {{$total_dept_grade_M}}
+
+                        {{sprintf('%0.2f', ($total_dept_grade_M *100)/$total_dept_grade)}}
                     </td>
                     <td>
-                        {{$total_dept_grade_F}}
+                        {{sprintf('%0.2f', ($total_dept_grade_F *100)/$total_dept_grade)}}
                     </td>
                 </tr>
 
@@ -276,7 +277,7 @@
                     @endforeach
 
                     <td colspan="2" style="color: darkred">
-                        {{$total_dept_grade}}
+                        {{100.00}}
                     </td>
                 </tr>
 
