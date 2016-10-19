@@ -420,12 +420,12 @@ class CandidateController extends Controller
      */
     public function register(RegisterCandidateRequest $request, $id){
 
-        $examId = $request->exam_id;
-        $exam = Exam::where('id',$examId)->first();
+        //$examId = $request->exam_id;
+        //$exam = Exam::where('id',$examId)->first();
         $candidate = Candidate::where('id',$id)->first();
         $dept_id = config('access.departments.department_tc'); // By default, it is foundation department
 
-        if($exam->type_id == config("access.exam.entrance_dut")) {
+        if(isset($request->department_id) && $request->department_id != null) {
             $dept_id = $request->department_id;
         }
 
@@ -441,6 +441,8 @@ class CandidateController extends Controller
         $exam = Exam::where('id',$examId)->first();
         $candidate_id = $request->candidate_id;
         $register_url = route('admin.candidate.register',$candidate_id);
+
+        $candidate = Candidate::where('id',$candidate_id)->first();
 
         $candidateDepartments = DB::table('candidates')
             ->join('candidate_department', 'candidate_department.candidate_id', '=', 'candidates.id')
@@ -480,7 +482,7 @@ class CandidateController extends Controller
             $studentWithRegisteredStudetn[$Dept->dept_name] = $countRegisteredStudents;
         }
 
-        return view('backend.exam.includes.popup_register_student_dut', compact('candidateDepartments', 'examId', 'candidate_id', 'studentWithRegisteredStudetn','register_url'));
+        return view('backend.exam.includes.popup_register_student_dut', compact('candidateDepartments', 'examId', 'candidate_id', 'studentWithRegisteredStudetn','register_url','candidate'));
     }
 
 }

@@ -792,6 +792,7 @@
             @endauth
             /* ------------------------------------------------------------------------ Candidate Section ------------------------------------------------------------------ */
             @permission('view-exam-candidate')
+
             var request_register_dut_url = "{{route('admin.candidate.request_register_student_dut')}}";
             candidate_datatable = $('#candidates-table').DataTable({
                 processing: true,

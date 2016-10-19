@@ -1,6 +1,6 @@
 @extends ('backend.layouts.popup_master')
 
-@section ('title', trans('labels.backend.exams.title') . ' | ' . trans('labels.backend.exams.course.choose_course'))
+@section ('title', trans('labels.backend.exams.title') . ' | ' . 'Department Option of Candidate DUT')
 
 @section('content')
 
@@ -13,7 +13,7 @@
 
     <div class="box box-success">
         <div class="box-header with-border">
-            <h1 class="box-title"> <span class="text_font"> Department Option of Candidate DUT </span></h1>
+            <h1 class="box-title"> <span class="text_font"> Candidate Name: {{$candidate->name_kh}} </span></h1>
         </div>
         <!-- /.box-header -->
         <div class="box-body">
@@ -55,6 +55,16 @@
 
                             </tr>
                         @endforeach
+                            <tr class="font_text" style="background-color: grey">
+                                <td colspan="3"><strong>Total</strong></td>
+                                <td>
+                                    <?php $count = 0 ?>
+                                    @foreach($studentWithRegisteredStudetn as $element)
+                                        <?php $count = $count + $element ?>
+                                    @endforeach
+                                    <strong>{{$count}}</strong>
+                                </td>
+                            </tr>
                     </tbody>
                 </table>
             </form>
@@ -79,7 +89,7 @@
 
 @section('after-scripts-end')
     <script>
-        var register_url = {{$register_url}}
+        var register_url = "{{$register_url}}";
         $('#btn_cancel').on('click', function() {
             window.close();
         });
@@ -92,8 +102,29 @@
                 department_id: selected_department_id,
                 candidate_id: candidate_id
             };
-            //var url = "{{route('admin.candidate.register',$examId)}}";
-            ajaxRequest('POST', register_url,baseData);
+
+            $.ajaxSetup({
+                headers: {
+                    'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                }
+            });
+
+            // confirm then
+            $.ajax({
+                url: register_url,
+                type: 'GET',
+                data: baseData,
+                dataType: 'json',
+                success:function(data) {
+                    notify('success', 'Student Registered!!');
+                    opener.refresh_candidate_list();
+                    setTimeout(function(){
+                        window.close();
+                    },2000);
+                }
+            });
+
+            //ajaxRequest('POST', register_url,baseData);
 
         });
 
