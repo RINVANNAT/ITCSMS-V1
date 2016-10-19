@@ -385,7 +385,7 @@ class CandidateController extends Controller
             ->addColumn('action', function ($candidate) {
                 $action = "";
 
-                if($candidate->result == "Pending"){
+                //if($candidate->result == "Pending"){
                     $action = '';
                     if(Auth::user()->allow('edit-exam-candidate')){
                        $action = $action .'<a href="'.route('admin.candidates.edit',$candidate->id).'" class="btn_candidate_edit btn btn-xs btn-primary"><i class="fa fa-pencil" data-toggle="tooltip" data-placement="top" title="" data-original-title="'.trans('buttons.general.crud.edit').'"></i> </a>';
@@ -393,7 +393,7 @@ class CandidateController extends Controller
                     if(Auth::user()->allow('delete-exam-candidate')) {
                         $action = $action. ' <button class="btn btn-xs btn-danger btn-delete" data-remote="'.route('admin.candidates.destroy', $candidate->id) .'"><i class="fa fa-times" data-toggle="tooltip" data-placement="top" title="' . trans('buttons.general.crud.delete') . '"></i></button>';
                     }
-                } else {
+                //} else {
                     if($candidate->is_register){
                         $action = '<span style="color:green"><i class="fa fa-check"></i></span>';
                     } else {//if($candidate->is_paid){
@@ -401,7 +401,7 @@ class CandidateController extends Controller
                             $action = ' <button class="btn btn-xs btn-register" data-exam="'.$candidate->exam_id.'" data-remote="' . route('admin.candidate.register', $candidate->id) . '"><i class="fa fa-check-circle-o" data-toggle="tooltip" data-placement="top" title="' . trans('buttons.general.register') . '"></i></button>';
                         }
                     }
-                }
+                //}
                 return $action;
             })
             ->setRowClass(function ($candidate) {
