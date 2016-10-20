@@ -60,6 +60,11 @@ class EloquentStudentAnnualRepository implements StudentAnnualRepositoryContract
 
         $student = new Student();
 
+        $check_if_exit = Student::where('id_card',$candidate->register_id)->first();
+        if($check_if_exit!=null){
+            return false;
+        }
+
         $last_academic_year = AcademicYear::orderBy('id','desc')->first();
         $last_student = StudentAnnual::leftJoin('students','studentAnnuals.student_id','=','students.id')
             ->where('academic_year_id',$last_academic_year->id)
@@ -102,6 +107,7 @@ class EloquentStudentAnnualRepository implements StudentAnnualRepositoryContract
         $student->active = true;
         $student->pob = $candidate->pob;
         $student->gender_id = $candidate->gender_id;
+        $student->candidate_id = $candidate->id;
 
         $student->high_school_id = null;
         if(isset($candidate->highschool_id)){
