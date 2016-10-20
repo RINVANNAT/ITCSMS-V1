@@ -17,6 +17,8 @@ use App\Models\ExamRoom;
 use App\Models\ExamType;
 use App\Models\Origin;
 use App\Models\Room;
+use App\Models\Student;
+use App\Models\StudentAnnual;
 use App\Models\StudentBac2;
 use App\Repositories\Backend\Exam\ExamRepositoryContract;
 use App\Repositories\Backend\TempEmployeeExam\TempEmployeeExamRepositoryContract;
@@ -1291,6 +1293,148 @@ class ExamController extends Controller
 
 
         return view('backend.exam.print.dut_result_statistic',compact('candidates', 'allDepts', 'arrayGrades', 'totalBydept','total_dept_grade'));
+    }
+
+
+    public function download_student_dut_registration_statistic($exam_id) {
+
+
+        $exam = Exam::where('id', $exam_id)->first();
+
+        $students = DB::table('candidates')->where('exam_id',$exam_id)
+            ->Join('genders','candidates.gender_id','=','genders.id')
+            ->Join('origins','candidates.province_id','=','origins.id')
+            ->Join('highSchools','candidates.highschool_id','=','highSchools.id')
+            ->Join('gdeGrades as bacTotal','candidates.bac_total_grade','=','bacTotal.id')
+            ->Join('gdeGrades as mathGrade','candidates.bac_math_grade','=','mathGrade.id')
+            ->Join('gdeGrades as physGrade','candidates.bac_phys_grade','=','physGrade.id')
+            ->Join('gdeGrades as chemGrade','candidates.bac_chem_grade','=','chemGrade.id')
+            ->join('students', 'students.candidate_id', '=', 'candidates.id')
+            ->join('studentAnnuals', 'studentAnnuals.student_id', '=', 'students.id')
+            ->join('departments', 'departments.id','=', 'studentAnnuals.department_id')
+            ->orderBy('bac_total_grade', 'ASC')
+            ->where([
+                ['candidates.is_register', true],
+                ['studentAnnuals.academic_year_id', $exam->academic_year_id]
+            ])
+            ->select([
+                'candidates.id',
+                'register_id',
+                'candidates.name_kh',
+                'candidates.name_latin',
+                'genders.name_kh as gender',
+                'genders.code as code_gender',
+                'candidates.dob',
+                'highSchools.name_kh as highschool',
+                'origins.name_kh as origin',
+                'candidates.bac_year',
+                'bacTotal.name_en as bac_total_grade',
+                'mathGrade.name_en as bac_math_grade',
+                'physGrade.name_en as bac_phys_grade',
+                'chemGrade.name_en as bac_chem_grade',
+                'candidates.bac_percentile',
+                'candidates.is_register',
+                'studentAnnuals.department_id',
+                'departments.code as dept_name',
+                'studentAnnuals.id as student_annual_id',
+                'bacTotal.id as total_id'
+
+                //'candidate_department.rank',
+            ])
+            ->get();
+
+
+        $allDepts = $this->getAllDepartments();
+
+        $candidates = [];
+        $arrayGrades['A'] = 'A';
+        $arrayGrades['B'] = 'B';
+        $arrayGrades['C'] = 'C';
+        $arrayGrades['D'] = 'D';
+        $arrayGrades['E'] = 'E';
+        $gradeA_M = 0;
+        $gradeA_F = 0;
+        $gradeB_M = 0;
+        $gradeB_F = 0;
+        $gradeC_M = 0;
+        $gradeC_F = 0;
+        $gradeD_M = 0;
+        $gradeD_F = 0;
+        $gradeE_M = 0;
+        $gradeE_F = 0;
+        $totalBydept = [];
+
+        foreach($allDepts as $allDept ) {
+
+            if($students) {
+                foreach($students as $student) {
+
+                    if($student->department_id == $allDept->department_id) {
+                        $candidates[$allDept->name_abr][$student->bac_total_grade][$student->code_gender][] = $student;
+
+
+
+                        if($student->bac_total_grade == 'A') {
+                            if($student->code_gender == 'M') {
+                                $gradeA_M++;
+                            } else {
+                                $gradeA_F++;
+                            }
+                        } elseif ($student->bac_total_grade == 'B') {
+                            if($student->code_gender == 'M') {
+                                $gradeB_M++;
+                            } else {
+                                $gradeB_F++;
+                            }
+
+                        } elseif ($student->bac_total_grade == 'C') {
+                            if($student->code_gender == 'M') {
+                                $gradeC_M++;
+                            } else {
+                                $gradeC_F++;
+                            }
+
+                        } elseif ($student->bac_total_grade == 'D') {
+                            if($student->code_gender == 'M') {
+                                $gradeD_M++;
+                            } else {
+
+                                $gradeD_F++;
+                            }
+
+                        } else {
+                            if($student->code_gender == 'M') {
+                                $gradeE_M++;
+                            } else {
+
+                                $gradeE_F++;
+                            }
+
+                        }
+
+
+                        $totalBydept['A']['M'] = $gradeA_M;
+                        $totalBydept['B']['M'] = $gradeB_M;
+                        $totalBydept['C']['M'] = $gradeC_M;
+                        $totalBydept['D']['M'] = $gradeD_M;
+                        $totalBydept['E']['M'] = $gradeE_M;
+
+                        $totalBydept['A']['F'] = $gradeA_F;
+                        $totalBydept['B']['F'] = $gradeB_F;
+                        $totalBydept['C']['F'] = $gradeC_F;
+                        $totalBydept['D']['F'] = $gradeD_F;
+                        $totalBydept['E']['F'] = $gradeE_F;
+                    }
+                }
+            }
+        }
+
+//        dd($totalBydept);
+
+        return view('backend.exam.print.student_dut_registration_statistic',compact('candidates', 'allDepts', 'arrayGrades', 'totalBydept'));
+
+//        dd($exam->academic_year_id);
+
     }
 
     /*public function request_add_courses($exam_id){

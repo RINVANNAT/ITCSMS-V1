@@ -27,7 +27,7 @@
     $total_page = 1;
     ?>
         <div class="page">
-            <center><h2>Registration Statistic</h2></center>
+            <center><h2>Result Candidate DUT Statistic</h2></center>
 
             <table class="table table-bordered" width="100%">
                 <thead>
@@ -42,15 +42,15 @@
 
                 </tr>
                 <tr>
-                    <th>M</th>
+                    <th>TSG_A</th>
                     <th>F</th>
-                    <th>M</th>
+                    <th>TSG_B</th>
                     <th>F</th>
-                    <th>M</th>
+                    <th>TSG_C</th>
                     <th>F</th>
-                    <th>M</th>
+                    <th>TSG_D</th>
                     <th>F</th>
-                    <th>M</th>
+                    <th>TSG_E</th>
                     <th>F</th>
                     <th >M</th>
                     <th >F</th>
@@ -58,6 +58,7 @@
                 </thead>
                 <tbody>
 
+                 {{--loop order by the department code:name abreviation --}}
                 @foreach($allDepts as $dept)
 
                     <tr>
@@ -67,25 +68,30 @@
 
                         @if(isset($candidates[$dept->name_abr]))
 
-                            <?php $candidateDept = $candidates[$dept->name_abr]; $total_M = 0; $total_F=0;?>
-
+                            <?php $candidateDept = $candidates[$dept->name_abr]; $total_by_dept = 0; $total_F=0; ?>
+                            <!-- here loop from grade A to E from 34 to 38-->
                             @foreach($arrayGrades as $key => $value)
 
-                                @if(isset($candidateDept[$key]))
-                                    <?php $cand = $candidateDept[$key]?>
-                                    @if(isset($cand['M']))
-                                        <?php $total_M = $total_M +  count($cand['M']);?>
-                                        <td>{{count($cand['M'])}}</td>
+                                @if(isset($candidateDept[$key])) <!--check here if the key of grade is existe--!>
+
+                                    <?php $cand = $candidateDept[$key]; $total_each_grade = 0;?>
+                                    <!--this to find total student by each grade in each department-->
+                                    @foreach($cand as $val)
+                                        <?php $total_each_grade = $total_each_grade + count($val);?>
+                                    @endforeach
+
+                                    <?php $total_by_dept = $total_by_dept + $total_each_grade?>
+                                    <td> {{$total_each_grade}}</td>
+
+                                    @if(isset($cand['F']))
+
+                                        <?php $total_F = $total_F +  count($cand['F']);?>
+                                        <td>{{count($cand['F'])}}</td>
+
                                     @else
                                         <td>0</td>
                                     @endif
 
-                                    @if(isset($cand['F']))
-                                            <?php $total_F = $total_F +  count($cand['F']);?>
-                                        <td>{{count($cand['F'])}}</td>
-                                    @else
-                                        <td>0</td>
-                                    @endif
                                 @else
                                     <td>0</td>
                                     <td>0</td>
@@ -94,7 +100,7 @@
 
                             @endforeach
 
-                                <td>{{$total_M}}</td>
+                                <td>{{ $total_by_dept }}</td>
                                 <td>{{$total_F}}</td>
 
                         @else
@@ -113,9 +119,11 @@
 
                 <tr>
                     <td>Total</td>
+
                     <?php $total_dept_grade_F=0; $total_dept_grade_M = 0;?>
+
                     @foreach($totalBydept as $total)
-                        <td>{{$total['M']}}</td>
+                        <td>{{$total['M'] + $total['F']}}</td>
                         <td>{{$total['F']}}</td>
                         <?php
 
@@ -125,25 +133,15 @@
                         ?>
                     @endforeach
 
-                    <td >
+                    <td style="color: darkred">
 
-                        {{$total_dept_grade_M}}
+                        {{$total_dept_grade_M + $total_dept_grade_F}}
                     </td>
-                    <td>
+                    <td style="color: darkred">
                         {{$total_dept_grade_F}}
                     </td>
 
 
-                </tr>
-
-                <tr>
-                    <td> </td>
-                    @foreach($totalBydept as $total)
-                        <td colspan="2">{{$total['M'] + $total['F'] }}</td>
-                    @endforeach
-                    <td colspan="2" style="color: darkred">
-                        {{$total_dept_grade}}
-                    </td>
                 </tr>
 
                 </tbody>
@@ -166,17 +164,17 @@
 
                 </tr>
                 <tr>
-                    <th>M</th>
+                    <th>TS</th>
                     <th>F</th>
-                    <th>M</th>
+                    <th>TS</th>
                     <th>F</th>
-                    <th>M</th>
+                    <th>TS</th>
                     <th>F</th>
-                    <th>M</th>
+                    <th>TS</th>
                     <th>F</th>
-                    <th>M</th>
+                    <th>TS</th>
                     <th>F</th>
-                    <th >M</th>
+                    <th >TS_D</th>
                     <th >F</th>
                 </tr>
                 </thead>
@@ -191,38 +189,28 @@
 
                         @if(isset($candidates[$dept->name_abr]))
 
-                            <?php $candidateDept = $candidates[$dept->name_abr]; $total_M = 0; $total_F=0;?>
+                            <?php $candidateDept = $candidates[$dept->name_abr]; $total_by_dept = 0; $total_F=0;?>
 
-                            <?php
-                                foreach($candidateDept as $candDept) {
-                                    if(isset($candDept['M'])) {
-                                        $total_M = $total_M +  count($candDept['M']);
-                                    }
-                                    if(isset($candDept['F'])) {
-                                        $total_F = $total_F +  count($candDept['F']);
-                                    }
-                                }
-
-                                $totalByDept = $total_M + $total_F;
-                            ?>
 
                             @foreach($arrayGrades as $key => $value)
 
                                 @if(isset($candidateDept[$key]))
 
-                                    <?php $cand = $candidateDept[$key]?>
+                                    <?php $cand = $candidateDept[$key]; $total_each_grade = 0;?>
 
-                                    @if(isset($cand['M']))
+                                            @foreach($cand as $val)
+                                                <?php $total_each_grade = $total_each_grade + count($val);?>
+                                            @endforeach
 
-                                        <td>{{sprintf('%0.2f', (count($cand['M']) *100)/$totalByDept)}}</td>
+                                            <?php $total_by_dept = $total_by_dept + $total_each_grade;?>
+                                            <td> 100%</td>
 
-                                    @else
-                                        <td>0</td>
-                                    @endif
 
                                     @if(isset($cand['F']))
 
-                                        <td>{{ sprintf('%0.2f', (count($cand['F']) *100)/$totalByDept) }}</td>
+                            <?php $total_F = $total_F +  count($cand['F']);?>
+
+                                        <td>{{ sprintf('%0.1f', (count($cand['F']) *100)/$total_each_grade) }} %</td>
                                     @else
                                         <td>0</td>
                                     @endif
@@ -234,8 +222,8 @@
 
                             @endforeach
 
-                            <td>{{ sprintf('%0.2f', ($total_M *100)/$totalByDept) }}</td>
-                            <td>{{ sprintf('%0.2f', ($total_F *100)/$totalByDept) }}</td>
+                            <td>{{ $total_by_dept }}</td>
+                            <td>{{ sprintf('%0.2f', ($total_F *100)/$total_by_dept) }}</td>
 
                         @else
                             @foreach($arrayGrades as $key => $val)
@@ -253,32 +241,30 @@
 
                 <tr>
                     <td>Total</td>
+                    <?php $total_dept_grade_F=0; $total_dept_grade_M = 0;?>
+
                     @foreach($totalBydept as $total)
-                        <td>{{sprintf('%0.2f', ($total['M'] *100)/$total_dept_grade)}}</td>
-                        <td>{{sprintf('%0.2f', ($total['F'] *100)/$total_dept_grade)}}</td>
+
+                        <td>{{$total['M'] + $total['F']}}</td>
+
+                        <td>{{sprintf('%0.1f', ($total['F'] *100)/($total_by_dept))}}</td>
+
+                        <?php
+
+                        $total_dept_grade_F= $total_dept_grade_F + $total['F'];
+                        $total_dept_grade_M= $total_dept_grade_M + $total['M'];
+
+                        ?>
 
                     @endforeach
 
                     <td >
-
-
-                        {{sprintf('%0.2f', ($total_dept_grade_M *100)/$total_dept_grade)}}
+                        {{$total_dept_grade_M + $total_dept_grade_F}}
                     </td>
                     <td>
-                        {{sprintf('%0.2f', ($total_dept_grade_F *100)/$total_dept_grade)}}
+                        {{sprintf('%0.2f', ($total_dept_grade_F *100)/($total_dept_grade_M + $total_dept_grade_F))}}
                     </td>
-                </tr>
 
-                <tr>
-                    <td> </td>
-                    @foreach($totalBydept as $total)
-                        <td colspan="2">{{sprintf('%0.2f', (($total['M'] + $total['F']) *100)/$total_dept_grade)}}</td>
-
-                    @endforeach
-
-                    <td colspan="2" style="color: darkred">
-                        {{100.00}}
-                    </td>
                 </tr>
 
                 </tbody>

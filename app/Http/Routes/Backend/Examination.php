@@ -47,6 +47,10 @@ Route::group([], function() {
 
     Route::get('exams/{id}/download_dut_result_statistic', 'ExamController@download_dut_result_statistic')->name('admin.exam.download_dut_result_statistic');
 
+    Route::get('exams/{id}/download_student_dut_registration_statistic', 'ExamController@download_student_dut_registration_statistic')->name('admin.exam.download_student_dut_registration_statistic');
+
+
+
     //------download document as excel format
 
 

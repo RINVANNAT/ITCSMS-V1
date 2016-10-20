@@ -54,6 +54,12 @@
                             </a>
                         </div>
 
+                        <div class="img">
+                            <a target="_blank" href="{{route('admin.exam.download_student_dut_registration_statistic',$exam->id)}}">
+                                <div class="desc">Student DUT Registration Statistic </div>
+                            </a>
+                        </div>
+
                 </div>
 
                 <div class="row">

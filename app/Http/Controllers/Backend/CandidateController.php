@@ -461,7 +461,6 @@ class CandidateController extends Controller
             )
             ->get();
 
-
         $getAllDepts = DB::table('departments')
             ->where([
                 ['departments.is_specialist', '=', true],
