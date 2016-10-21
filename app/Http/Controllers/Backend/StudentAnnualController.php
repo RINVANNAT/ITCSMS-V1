@@ -1005,8 +1005,6 @@ class StudentAnnualController extends Controller
         //dd($studentAnnuals->toSql());
         $data = $studentAnnuals->get()->toArray();
 
-        dd($data);
-        //dd($data);
         foreach ($data as &$value){
             $date = Carbon::createFromFormat('Y-m-d H:i:s',$value['dob'])->formatLocalized("%d/%b/%Y");
             $value['dob'] = $date;
