@@ -910,22 +910,45 @@ class StudentAnnualController extends Controller
     public function export(){
 
         $studentAnnuals = StudentAnnual::select([
-            'studentAnnuals.id','students.id_card','students.name_kh','students.name_latin', 'students.dob as dob','genders.code as gender_id',
-            'origins.name_kh as origin_id', 'pob.name_kh as pob', 'studentAnnuals.group', 'studentAnnuals.promotion_id',
-            'studentAnnuals.academic_year_id', 'histories.name_kh as history_id', 'departmentOptions.code as department_option_id', 'students.radie', 'students.observation',
-            'students.mcs_no','students.can_id','highSchools.name_en as high_school_id', 'students.photo','students.phone','students.email', 'students.admission_date',
-            'students.address','students.address_current','students.parent_name','students.parent_occupation','students.parent_address','students.parent_phone',
+            'studentAnnuals.id',
+            'students.id_card',
+            'students.name_kh',
+            'students.name_latin',
+            'students.dob as dob',
+            'genders.code as gender_id',
+            'origins.name_kh as origin_id',
+            'pob.name_kh as pob',
+            'studentAnnuals.group',
+            'studentAnnuals.promotion_id',
+            'studentAnnuals.academic_year_id',
+            'histories.name_kh as history_id',
+            'departmentOptions.code as department_option_id',
+            'students.radie',
+            'students.observation',
+            'students.mcs_no',
+            'students.can_id',
+            'highSchools.name_en as high_school_id',
+            'students.photo',
+            'students.phone',
+            'students.email',
+            'students.admission_date',
+            'students.address',
+            'students.address_current',
+            'students.parent_name',
+            'students.parent_occupation',
+            'students.parent_address',
+            'students.parent_phone',
             DB::raw("CONCAT(degrees.code,grades.code,departments.code) as class"),
             'departmentOptions.code as option'
         ])
-            ->leftJoin('students','students.id','=','studentAnnuals.student_id')
-            ->leftJoin('genders', 'students.gender_id', '=', 'genders.id')
-            ->leftJoin('grades', 'studentAnnuals.grade_id', '=', 'grades.id')
+            ->join('students','students.id','=','studentAnnuals.student_id')
+            ->join('genders', 'students.gender_id', '=', 'genders.id')
+            ->join('grades', 'studentAnnuals.grade_id', '=', 'grades.id')
             ->leftJoin('departmentOptions', 'studentAnnuals.department_option_id', '=', 'departmentOptions.id')
-            ->leftJoin('departments', 'studentAnnuals.department_id', '=', 'departments.id')
-            ->leftJoin('degrees', 'studentAnnuals.degree_id', '=', 'degrees.id')
+            ->join('departments', 'studentAnnuals.department_id', '=', 'departments.id')
+            ->join('degrees', 'studentAnnuals.degree_id', '=', 'degrees.id')
             ->leftJoin('origins', 'students.origin_id', '=', 'origins.id')
-            ->leftJoin('origins as pob', 'students.pob', '=', 'origins.id')
+            ->leftJoin('origins as pob', 'students.pob', '=', 'pob.id')
             ->leftJoin('histories', 'studentAnnuals.history_id', '=', 'histories.id')
             ->leftJoin('highSchools', 'students.high_school_id', '=', 'highSchools.id')
         ;
@@ -937,48 +960,56 @@ class StudentAnnualController extends Controller
         } else {
             // additional search
             if ($degree = $_POST['filter_degree']) {
-                $studentAnnuals = $studentAnnuals->where('studentAnnuals.degree_id', '=', $degree);
+                $studentAnnuals = $studentAnnuals->where('studentAnnuals.degree_id', $degree);
 
                 $degree_obj = Degree::where('id',$degree)->first();
                 $title .= "ថ្នាក់".$degree_obj->name_kh;
             }
 
             if ($academic_year = $_POST['filter_academic_year']) {
-                $studentAnnuals = $studentAnnuals->where('studentAnnuals.academic_year_id', '=', $academic_year);
+                $studentAnnuals = $studentAnnuals->where('studentAnnuals.academic_year_id', $academic_year);
 
                 $academic_year_obj = AcademicYear::where('id',$academic_year)->first();
                 $title .= " ឆ្នាំសិក្សា ".$academic_year_obj->name_kh;
             }
 
             if ($grade = $_POST['filter_grade']) {
-                $studentAnnuals = $studentAnnuals->where('studentAnnuals.grade_id', '=', $grade);
+                $studentAnnuals = $studentAnnuals->where('studentAnnuals.grade_id', $grade);
 
                 $grade_obj = Grade::where('id',$grade)->first();
                 $title .= " ".$grade_obj->name_kh;
             }
             if ($department = $_POST['filter_department']) {
-                $studentAnnuals = $studentAnnuals->where('studentAnnuals.department_id', '=', $department);
+                $studentAnnuals = $studentAnnuals->where('studentAnnuals.department_id', $department);
 
                 $department_obj = Department::where('id',$department)->first();
                 $title .= " ដេប៉ាតឺម៉ង់ ".$department_obj->name_kh;
             }
             if ($gender = $_POST['filter_gender']) {
-                $studentAnnuals = $studentAnnuals->where('students.gender_id', '=', $gender);
+                $studentAnnuals = $studentAnnuals->where('students.gender_id', $gender);
 
                 $gender_obj = Gender::where('id',$gender)->first();
                 $title .= " ភេទ".$gender_obj->name_kh;
             }
             if ($option = $_POST['filter_option']) {
-                $studentAnnuals = $studentAnnuals->where('studentAnnuals.department_option_id', '=', $option);
+                $studentAnnuals = $studentAnnuals->where('studentAnnuals.department_option_id', $option);
 
                 $option_obj = DepartmentOption::where('id',$option)->first();
                 $title .= " ជំនាញ ".$option_obj->name_kh;
             }
             if ($origin = $_POST['filter_origin']) {
-                $studentAnnuals = $studentAnnuals->where('students.origin_id', '=', $origin);
+                $studentAnnuals = $studentAnnuals->where('students.origin_id', $origin);
             }
         }
+        //dd($studentAnnuals->toSql());
         $data = $studentAnnuals->get()->toArray();
+
+        //dd($data);
+        foreach ($data as &$value){
+            $date = Carbon::createFromFormat('Y-m-d H:i:s',$value['dob'])->formatLocalized("%d/%b/%Y");
+            $value['dob'] = $date;
+            $value['name_latin'] = strtoupper($value['name_latin']);
+        }
 
 
         $alpha = array();
@@ -1078,8 +1109,6 @@ class StudentAnnualController extends Controller
             array_push($fields,$_POST['parent_phone']);
         }
 
-        //dd($data);
-
         Excel::create('បញ្ជីនិស្សិត', function($excel) use ($data, $title,$alpha,$fields) {
 
             // Set the title
@@ -1125,6 +1154,8 @@ class StudentAnnualController extends Controller
                 $sheet->rows(
                     array($header)
                 );
+
+
                 foreach ($data as $item) {
 
                     $row = array();
@@ -1149,7 +1180,7 @@ class StudentAnnualController extends Controller
                 });
 
                 $sheet->cells('A5:'.$alpha[$number_column-1].(6+count($data)), function($cells) {
-                    $cells->setAlignment('center');
+                    $cells->setAlignment('left');
                     $cells->setValignment('middle');
                 });
 
