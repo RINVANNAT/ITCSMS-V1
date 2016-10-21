@@ -920,7 +920,7 @@ class StudentAnnualController extends Controller
             'pob.name_kh as pob',
             'studentAnnuals.group',
             'studentAnnuals.promotion_id',
-            'studentAnnuals.academic_year_id',
+            'academicYears.name_latin as academic_year_id',
             'histories.name_kh as history_id',
             'departmentOptions.code as department_option_id',
             'students.radie',
@@ -947,6 +947,7 @@ class StudentAnnualController extends Controller
             ->leftJoin('departmentOptions', 'studentAnnuals.department_option_id', '=', 'departmentOptions.id')
             ->join('departments', 'studentAnnuals.department_id', '=', 'departments.id')
             ->join('degrees', 'studentAnnuals.degree_id', '=', 'degrees.id')
+            ->join('academicYears','studentAnnuals.academic_year_id', '=','academicYears.id')
             ->leftJoin('origins', 'students.origin_id', '=', 'origins.id')
             ->leftJoin('origins as pob', 'students.pob', '=', 'pob.id')
             ->leftJoin('histories', 'studentAnnuals.history_id', '=', 'histories.id')
@@ -1004,6 +1005,7 @@ class StudentAnnualController extends Controller
         //dd($studentAnnuals->toSql());
         $data = $studentAnnuals->get()->toArray();
 
+        dd($data);
         //dd($data);
         foreach ($data as &$value){
             $date = Carbon::createFromFormat('Y-m-d H:i:s',$value['dob'])->formatLocalized("%d/%b/%Y");
