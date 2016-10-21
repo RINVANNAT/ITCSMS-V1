@@ -140,15 +140,10 @@
                     <td style="color: darkred">
                         {{$total_dept_grade_F}}
                     </td>
-
-
                 </tr>
 
                 </tbody>
             </table>
-
-
-
 
 
             <table class="table table-bordered" width="100%">
@@ -164,17 +159,17 @@
 
                 </tr>
                 <tr>
-                    <th>TS</th>
+                    <th>Total</th>
                     <th>F</th>
-                    <th>TS</th>
+                    <th>Total</th>
                     <th>F</th>
-                    <th>TS</th>
+                    <th>Total</th>
                     <th>F</th>
-                    <th>TS</th>
+                    <th>Total</th>
                     <th>F</th>
-                    <th>TS</th>
+                    <th>Total</th>
                     <th>F</th>
-                    <th >TS_D</th>
+                    <th >Total</th>
                     <th >F</th>
                 </tr>
                 </thead>
@@ -203,7 +198,7 @@
                                             @endforeach
 
                                             <?php $total_by_dept = $total_by_dept + $total_each_grade;?>
-                                            <td> 100%</td>
+                                            <td> {{$total_each_grade}}</td>
 
 
                                     @if(isset($cand['F']))
@@ -240,7 +235,7 @@
                 @endforeach
 
                 <tr>
-                    <td>Total</td>
+                    <td><strong>Total</strong></td>
                     <?php $total_dept_grade_F=0; $total_dept_grade_M = 0;?>
 
                     @foreach($totalBydept as $total)
