@@ -1,5 +1,15 @@
     <div class="pull-right" style="margin-bottom:10px">
         <div class="btn-group">
+            <button type="button" class="btn btn-warning btn-xs dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
+                Actions <span class="caret"></span>
+            </button>
+            <ul class="dropdown-menu" role="menu">
+                <li><a href="{{ route('admin.student.reporting',1) }}">{{ trans('menus.backend.student.generate_group') }}</a></li>
+                <li><a href="{{ route('admin.student.reporting',1) }}">{{ trans('menus.backend.student.generate_id_card') }}</a></li>
+                <li><a href="{{ route('admin.student.print_id_card') }}">{{ trans('menus.backend.student.print_id_card') }}</a></li>
+            </ul>
+        </div><!--btn group-->
+        <div class="btn-group">
           <button type="button" class="btn btn-primary btn-xs dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
               {{ trans('menus.backend.reporting.title') }} <span class="caret"></span>
           </button>

@@ -5,6 +5,11 @@
         Route::resource('studentAnnuals', 'StudentAnnualController');
         Route::post('student-data', 'StudentAnnualController@data')->name('admin.student.data');
 
+        /* -------------------- Actions -----------------------*/
+        Route::get('student-generate-group', 'StudentAnnualController@generate_group')->name('admin.student.generate_group');
+        Route::get('student-generate-id-card', 'StudentAnnualController@generate_id_card')->name('admin.student.generate_id_card');
+        Route::get('student-print-id-card', 'StudentAnnualController@print_id_card')->name('admin.student.print_id_card');
+
         /* -------------------- IMPORT -----------------------*/
         Route::get('student-request-import', 'StudentAnnualController@request_import')->name('admin.student.request_import');
         Route::post('student-import', 'StudentAnnualController@import')->name('admin.student.import');
@@ -17,7 +22,6 @@
 
         Route::post('student/export', 'StudentAnnualController@export')->name('admin.student.export');
         //Route::post('student/export-custom', 'StudentAnnualController@export_list_custom')->name('admin.student.export_custom');
-
 
 
         Route::get('student/{id}/reporting', 'StudentAnnualController@reporting')->name('admin.student.reporting');

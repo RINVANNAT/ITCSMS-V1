@@ -60,7 +60,12 @@ class EloquentStudentAnnualRepository implements StudentAnnualRepositoryContract
 
         $student = new Student();
 
-        $check_if_exit = Student::where('id_card',$candidate->register_id)->first();
+        //$check_if_exit = Student::where('id_card',$candidate->register_id)->first();
+        $check_if_exit = DB::table('students')->join('studentAnnuals','studentAnnuals.student_id','=','students.id')
+            ->where('students.id_card',$candidate->register_id)
+            ->where('studentAnnuals.department_id',$department_id)
+            ->first();
+
         if($check_if_exit!=null){
             return false;
         }

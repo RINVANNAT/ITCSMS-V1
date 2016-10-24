@@ -429,9 +429,9 @@ class CandidateController extends Controller
             $dept_id = $request->department_id;
         }
 
-        $this->studentRepo->register($candidate, $dept_id);
+        $result = $this->studentRepo->register($candidate, $dept_id);
         if($request->ajax()){
-            return json_encode(array('success'=>true));
+            return json_encode(array('success'=>$result));
         }
     }
 

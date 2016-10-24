@@ -1592,4 +1592,16 @@ class StudentAnnualController extends Controller
         }
     }
 
+    public function generate_group(){
+
+    }
+
+    public function generate_id_card(){
+
+    }
+
+    public function print_id_card(){
+        return view('backend.studentAnnual.print.id_card');
+    }
+
 }

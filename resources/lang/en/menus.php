@@ -94,6 +94,9 @@ return [
         ],
         'student' => [
             'title' => 'Student',
+            'generate_group' => 'Generate groups',
+            'generate_id_card' => 'Generate ID Cards',
+            'print_id_card' => 'Print ID Cards'
         ],
         'accounting' => [
             'title' => 'Accounting',
