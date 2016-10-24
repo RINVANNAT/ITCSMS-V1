@@ -177,7 +177,6 @@
                     custom_student_window.close();
                 }
             };
-
         });
     </script>
 @stop

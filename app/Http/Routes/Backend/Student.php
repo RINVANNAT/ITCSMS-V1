@@ -31,4 +31,9 @@
         Route::get('student/{id}/reporting/preview', 'StudentAnnualController@preview_report')->name('admin.student.reporting.preview');
 
         Route::get('student/popup_index', 'StudentAnnualController@popup_index')->name('admin.student.popup_index');
+
+
+
+
     });
+

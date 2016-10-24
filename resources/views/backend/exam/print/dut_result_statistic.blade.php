@@ -42,17 +42,17 @@
 
                 </tr>
                 <tr>
-                    <th>TSG_A</th>
+                    <th>Total</th>
                     <th>F</th>
-                    <th>TSG_B</th>
+                    <th>Total</th>
                     <th>F</th>
-                    <th>TSG_C</th>
+                    <th>Total</th>
                     <th>F</th>
-                    <th>TSG_D</th>
+                    <th>Total</th>
                     <th>F</th>
-                    <th>TSG_E</th>
+                    <th>Total</th>
                     <th>F</th>
-                    <th >M</th>
+                    <th >Total</th>
                     <th >F</th>
                 </tr>
                 </thead>

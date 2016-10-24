@@ -1157,17 +1157,128 @@ class ExamController extends Controller
             }
         }
 
-//        dd($candidates);
-        return view('backend.exam.print.registration_statistic',compact('candidates'));
+
+
+        ///------below is : result Candidate Engineer Statistic
+
+
+        $candidatePassOrReserves = DB::table('candidates')->where('exam_id',$exam_id)
+            ->leftJoin('genders','candidates.gender_id','=','genders.id')
+            ->leftJoin('origins','candidates.province_id','=','origins.id')
+            ->leftJoin('highSchools','candidates.highschool_id','=','highSchools.id')
+            ->leftJoin('gdeGrades as bacTotal','candidates.bac_total_grade','=','bacTotal.id')
+            ->leftJoin('gdeGrades as mathGrade','candidates.bac_math_grade','=','mathGrade.id')
+            ->leftJoin('gdeGrades as physGrade','candidates.bac_phys_grade','=','physGrade.id')
+            ->leftJoin('gdeGrades as chemGrade','candidates.bac_chem_grade','=','chemGrade.id')
+            ->orderBy('bac_total_grade')
+            ->where(function ($query) {
+                $query->where('candidates.result',"Pass")
+                    ->orWhere('candidates.result',"Reserve");
+            })
+            ->select([
+                'candidates.id',
+                'register_id',
+                'candidates.name_kh',
+                'candidates.name_latin',
+                'genders.name_kh as gender',
+                'genders.code as code_gender',
+                'candidates.dob',
+                'highSchools.name_kh as highschool',
+                'origins.name_kh as origin',
+                'candidates.bac_year',
+                'bacTotal.name_en as bac_total_grade',
+                'mathGrade.name_en as bac_math_grade',
+                'physGrade.name_en as bac_phys_grade',
+                'chemGrade.name_en as bac_chem_grade',
+                'candidates.bac_percentile',
+                'candidates.result as can_result'
+            ])
+            ->get();
+
+        $allCandidates = array();
+        $arrayGrades = [
+            'A',
+            'B',
+            'C',
+            'D',
+            'E',
+
+        ];
+
+        foreach($candidatePassOrReserves as $candidate ) {
+
+            $allCandidates[$candidate->can_result][$candidate->bac_total_grade][$candidate->code_gender][] = $candidate;
+
+        }
+
+
+        // below is : Student Engineer Registration
+
+
+        $exam = Exam::where('id', $exam_id)->first();
+
+        $allStudents = [];
+
+        $studentEngineers = DB::table('candidates')->where('exam_id',$exam_id)
+            ->Join('genders','candidates.gender_id','=','genders.id')
+            ->Join('origins','candidates.province_id','=','origins.id')
+            ->Join('highSchools','candidates.highschool_id','=','highSchools.id')
+            ->Join('gdeGrades as bacTotal','candidates.bac_total_grade','=','bacTotal.id')
+            ->Join('gdeGrades as mathGrade','candidates.bac_math_grade','=','mathGrade.id')
+            ->Join('gdeGrades as physGrade','candidates.bac_phys_grade','=','physGrade.id')
+            ->Join('gdeGrades as chemGrade','candidates.bac_chem_grade','=','chemGrade.id')
+            ->join('students', 'students.candidate_id', '=', 'candidates.id')
+            ->join('studentAnnuals', 'studentAnnuals.student_id', '=', 'students.id')
+            ->join('departments', 'departments.id','=', 'studentAnnuals.department_id')
+            ->orderBy('bac_total_grade', 'ASC')
+            ->where([
+                ['candidates.is_register', true],
+                ['studentAnnuals.academic_year_id', $exam->academic_year_id]
+            ])
+            ->select([
+                'candidates.id',
+                'register_id',
+                'candidates.name_kh',
+                'candidates.name_latin',
+                'genders.name_kh as gender',
+                'genders.code as code_gender',
+                'candidates.dob',
+                'highSchools.name_kh as highschool',
+                'origins.name_kh as origin',
+                'candidates.bac_year',
+                'bacTotal.name_en as bac_total_grade',
+                'mathGrade.name_en as bac_math_grade',
+                'physGrade.name_en as bac_phys_grade',
+                'chemGrade.name_en as bac_chem_grade',
+                'candidates.bac_percentile',
+                'candidates.is_register',
+                'studentAnnuals.department_id',
+                'departments.code as dept_name',
+                'studentAnnuals.id as student_annual_id',
+                'bacTotal.id as total_id'
+
+                //'candidate_department.rank',
+            ])
+            ->get();
+
+        foreach($studentEngineers as $student ) {
+
+            $allStudents['TC'][$student->bac_total_grade][$student->code_gender][] = $candidate;
+
+        }
+
+
+
+        return view('backend.exam.print.registration_statistic',compact('candidates', 'allCandidates', 'arrayGrades', 'allStudents'));
     }
+
+
+
 
 
     public function download_dut_registration_statistic ($exam_id) {
 
 //        dd($exam_id);
-
-
-
 
         $candidateDuts = Candidate::where('exam_id',$exam_id)
             ->join('genders', 'genders.id', '=', 'candidates.gender_id')

@@ -46,7 +46,7 @@
                 <th>F</th>
                 <th>Total</th>
                 <th>F</th>
-                <th>TSG_C</th>
+                <th>Total</th>
                 <th>F</th>
                 <th>Total</th>
                 <th>F</th>

@@ -28,95 +28,104 @@
 
                     </div>
 
-                    @endif
-                    @if($exam->type_id == 1)
-                    <div class="img">
-                        <a target="_blank" href="{{route('admin.exam.download_candidate_list_ing',$exam->id)}}">
-                            <div class="desc">Candidate Engineer List</div>
-                        </a>
-                    </div>
-                    @endif
-                    <div class="img">
-                        <a target="_blank" href="{{route('admin.exam.download_registration_statistic',$exam->id)}}">
-                            <div class="desc">Registration Statistic</div>
-                        </a>
-                    </div>
-
                     <div class="img">
                         <a target="_blank" href="{{route('admin.exam.download_dut_registration_statistic',$exam->id)}}">
                             <div class="desc">DUT Registration Statistic </div>
                         </a>
                     </div>
 
+                    <div class="img">
+                        <a target="_blank" href="{{route('admin.exam.download_dut_result_statistic',$exam->id)}}">
+                            <div class="desc">Candidates DUT Result Statistic </div>
+                        </a>
+                    </div>
+
+                    <div class="img">
+                        <a target="_blank" href="{{route('admin.exam.download_student_dut_registration_statistic',$exam->id)}}">
+                            <div class="desc">Student DUT Registration Statistic </div>
+                        </a>
+                    </div>
+
+                    @endif
+
+                    @if($exam->type_id == 1)
                         <div class="img">
-                            <a target="_blank" href="{{route('admin.exam.download_dut_result_statistic',$exam->id)}}">
-                                <div class="desc">Candidates DUT Result Statistic </div>
+                            <a target="_blank" href="{{route('admin.exam.download_candidate_list_ing',$exam->id)}}">
+                                <div class="desc">Candidate Engineer List</div>
                             </a>
                         </div>
 
                         <div class="img">
-                            <a target="_blank" href="{{route('admin.exam.download_student_dut_registration_statistic',$exam->id)}}">
-                                <div class="desc">Student DUT Registration Statistic </div>
+                            <a target="_blank" href="{{route('admin.exam.download_registration_statistic',$exam->id)}}">
+                                <div class="desc">Registration Statistic</div>
                             </a>
                         </div>
+                    @endif
 
                 </div>
+                @if($exam->type_id == 2)
+                    <div class="row">
 
-                <div class="row">
+                        <div class="img">
+                            @permission('download-examination-document')
+                            <div class="desc">Successfully Passed DUT</div>
+                            <div class="desc">
+                                <a id="download_student_list" target="_blank" href="{{route('admin.exam.print_candidate_dut_result',$exam->id).'?status='.'Pass'}}">
+                                    <button  class="btn btn-primary btn-xs" id="print_candidate_list"> Print </button>
+                                </a>
+                            </div>
+                            @endauth
+                        </div>
 
-                    <div class="img">
-                        @permission('download-examination-document')
-                        <div class="desc">Successfully Passed DUT</div>
-                        <div class="desc">
-                            <a id="download_student_list" target="_blank" href="{{route('admin.exam.print_candidate_dut_result',$exam->id).'?status='.'Pass'}}">
-                                <button  class="btn btn-primary btn-xs" id="print_candidate_list"> Print </button>
-                            </a>
+                        <div class="img">
+                            @permission('download-examination-document')
+                            <div class="desc"> DUT Passed by Department </div>
+                            <div class="desc">
+                                <a id="download_student_list" target="_blank" href="{{route('admin.exam.print_candidate_dut_result',$exam->id).'?status='.'pass_by_dept'}}">
+                                    <button  class="btn btn-primary btn-xs" id="print_candidate_list"> Print </button>
+                                </a>
+                            </div>
+                            @endauth
                         </div>
-                        @endauth
-                    </div>
-                    <div class="img">
-                        @permission('download-examination-document')
-                        <div class="desc"> DUT Passed by Department </div>
-                        <div class="desc">
-                            <a id="download_student_list" target="_blank" href="{{route('admin.exam.print_candidate_dut_result',$exam->id).'?status='.'pass_by_dept'}}">
-                                <button  class="btn btn-primary btn-xs" id="print_candidate_list"> Print </button>
-                            </a>
+
+                        <div class="img">
+                            @permission('download-examination-document')
+                            <div class="desc"> Candidate DUT Reserve </div>
+                            <div class="desc">
+                                <a id="download_student_list" target="_blank" href="{{route('admin.exam.print_candidate_dut_result',$exam->id).'?status='.'Reserve'}}">
+                                    <button  class="btn btn-primary btn-xs" id="print_candidate_list"> Print </button>
+                                </a>
+                            </div>
+                            @endauth
                         </div>
-                        @endauth
-                    </div>
-                    <div class="img">
-                        @permission('download-examination-document')
-                        <div class="desc"> Candidate DUT Reserve </div>
-                        <div class="desc">
-                            <a id="download_student_list" target="_blank" href="{{route('admin.exam.print_candidate_dut_result',$exam->id).'?status='.'Reserve'}}">
-                                <button  class="btn btn-primary btn-xs" id="print_candidate_list"> Print </button>
-                            </a>
+
+                        <div class="img">
+                            @permission('download-examination-document')
+                            <div class="desc">Reserve By Department </div>
+                            <div class="desc">
+                                <a id="download_student_list" target="_blank" href="{{route('admin.exam.print_candidate_dut_result',$exam->id).'?status='.'reserve_by_dept'}}">
+                                    <button  class="btn btn-primary btn-xs" id="print_candidate_list"> Print </button>
+                                </a>
+                            </div>
+                            @endauth
                         </div>
-                        @endauth
-                    </div>
-                    <div class="img">
-                        @permission('download-examination-document')
-                        <div class="desc">Reserve By Department </div>
-                        <div class="desc">
-                            <a id="download_student_list" target="_blank" href="{{route('admin.exam.print_candidate_dut_result',$exam->id).'?status='.'reserve_by_dept'}}">
-                                <button  class="btn btn-primary btn-xs" id="print_candidate_list"> Print </button>
-                            </a>
-                        </div>
-                        @endauth
-                    </div>
 
 
-                    <div class="img">
-                        @permission('download-examination-document')
-                        <div class="desc">List of Candidates DUT Detail  </div>
-                        <div class="desc">
-                            <a id="download_student_list" target="_blank" href="{{route('admin.exam.export_candidate_dut_detail',$exam->id)}}">
-                                <button  class="btn btn-info btn-xs" id="candidate_dut_detail"> excel </button>
-                            </a>
+                        <div class="img">
+                            @permission('download-examination-document')
+                            <div class="desc">List of Candidates DUT Detail  </div>
+                            <div class="desc">
+                                <a id="download_student_list" target="_blank" href="{{route('admin.exam.export_candidate_dut_detail',$exam->id)}}">
+                                    <button  class="btn btn-info btn-xs" id="candidate_dut_detail"> excel </button>
+                                </a>
+                            </div>
+                            @endauth
                         </div>
-                        @endauth
+
                     </div>
-                </div>
+
+                @endif
+
 
                 @if($exam->type_id == 1)
                 <div class="row">
