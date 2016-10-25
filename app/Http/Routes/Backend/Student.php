@@ -33,6 +33,11 @@
         Route::get('student/popup_index', 'StudentAnnualController@popup_index')->name('admin.student.popup_index');
 
 
+        /* ------------generate id card----------- */
+
+        Route::post('student/{id}/generate_student_id_card', 'StudentAnnualController@generate_id_card')->name('admin.student.generate_student_id_card');
+
+
 
 
     });

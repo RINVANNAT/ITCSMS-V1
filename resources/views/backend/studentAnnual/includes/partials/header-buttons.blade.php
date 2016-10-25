@@ -5,7 +5,7 @@
             </button>
             <ul class="dropdown-menu" role="menu">
                 <li><a href="{{ route('admin.student.reporting',1) }}">{{ trans('menus.backend.student.generate_group') }}</a></li>
-                <li><a href="{{ route('admin.student.reporting',1) }}">{{ trans('menus.backend.student.generate_id_card') }}</a></li>
+                <li><a href="#" id="generate_id_card">{{ trans('menus.backend.student.generate_id_card') }}</a></li>
                 <li><a href="{{ route('admin.student.print_id_card') }}">{{ trans('menus.backend.student.print_id_card') }}</a></li>
             </ul>
         </div><!--btn group-->

@@ -31,6 +31,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 use Maatwebsite\Excel\Facades\Excel;
 use Illuminate\Support\Facades\Input;
+use Illuminate\Support\Facades\Response;
 
 
 class StudentAnnualController extends Controller
@@ -1596,7 +1597,44 @@ class StudentAnnualController extends Controller
 
     }
 
-    public function generate_id_card(){
+    public function generate_id_card($exam_id){
+
+
+        $test = [];
+        $last_academic_year = AcademicYear::orderBy('id','desc')->first();
+        $studentAnnuals = StudentAnnual::leftJoin('students','studentAnnuals.student_id','=','students.id')
+            ->where([
+                ['academic_year_id',$last_academic_year->id],
+                ['studentAnnuals.grade_id',1],
+                ['studentAnnuals.degree_id', 1]
+
+            ])
+            ->orderBy('students.name_latin','ASC')->get();
+
+
+        if($studentAnnuals) {
+            $index =0;
+            $check =0;
+            foreach($studentAnnuals as $studentAnnual) {
+                $index++;
+                $idCard = 'e'.$last_academic_year->id.str_pad($index, 4, '0', STR_PAD_LEFT);
+
+                $update = DB::table('students')
+                    ->where('id', $studentAnnual->student_id)
+                    ->update(['id_card' => $idCard]);
+
+                if( $update ) {
+                    $check++;
+                }
+//                $test[] = 'e'.$last_academic_year->id.str_pad($index, 4, '0', STR_PAD_LEFT);
+            }
+        }
+
+        if($check == count($studentAnnuals)) {
+            return Response::json(array('success'=>true));
+        } else {
+            return Response::json(array('success'=>false));
+        }
 
     }
 

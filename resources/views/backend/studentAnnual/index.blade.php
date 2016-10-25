@@ -177,6 +177,26 @@
                     custom_student_window.close();
                 }
             };
+
+            $('#generate_id_card').on('click', function(e) {
+                e.preventDefault();
+                var baseUrl = " {{ route('admin.student.generate_student_id_card',1) }}";
+
+                $.ajax({
+                    type: 'POST',
+                    url: baseUrl,
+                    success: function(resultData) {
+                        console.log(resultData.success);
+                        if(resultData.success == true) {
+                            notify("success","info", "IDs Generated!!");
+                        }
+
+
+                    }
+                });
+
+
+            })
         });
     </script>
 @stop
