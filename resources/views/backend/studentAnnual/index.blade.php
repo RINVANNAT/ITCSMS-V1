@@ -182,13 +182,22 @@
                 e.preventDefault();
                 var baseUrl = " {{ route('admin.student.generate_student_id_card',1) }}";
 
+                var baseData = {
+                    degree_id: $('#filter_degree').val(),
+                };
+
                 $.ajax({
                     type: 'POST',
                     url: baseUrl,
+                    data: baseData,
+                    dataType:"json",
                     success: function(resultData) {
                         console.log(resultData.success);
                         if(resultData.success == true) {
-                            notify("success","info", "IDs Generated!!");
+                            notify("success","info", resultData.message);
+                            oTable.draw();
+                        } else {
+                            notify("error","info", resultData.message);
                         }
 
 
