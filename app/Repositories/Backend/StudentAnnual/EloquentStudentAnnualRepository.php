@@ -323,7 +323,7 @@ class EloquentStudentAnnualRepository implements StudentAnnualRepositoryContract
         $studentAnnual = $this->findOrThrowException($id);
 
         $input = $request->all();
-        $last_academic_year = AcademicYear::orderBy('id','desc')->first();
+        //$last_academic_year = AcademicYear::orderBy('id','desc')->first();
 
         // First create general information in table students first
         $student = Student::find($studentAnnual->student_id);
@@ -388,7 +388,7 @@ class EloquentStudentAnnualRepository implements StudentAnnualRepositoryContract
         if($student->save()){
 
             $studentAnnual->student_id = $student->id;
-            $studentAnnual->academic_year_id = $last_academic_year->id;
+            $studentAnnual->academic_year_id = $input['academic_year_id'];//$last_academic_year->id;
             $studentAnnual->group = $input['group'];
             $studentAnnual->active = isset($input['active'])?true:false;
             $studentAnnual->promotion_id = $input['promotion_id'];

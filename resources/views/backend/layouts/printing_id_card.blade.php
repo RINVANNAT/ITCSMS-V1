@@ -20,62 +20,62 @@
         {!! Html::style(elixir('css/backend.css')) !!}
 
         <style type="text/css" media="all">
-        * { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+            body {
+                width: 100%;
+                height: 100%;
+                margin: 0;
+                padding: 0;
+                background-color: #FAFAFA;
+                font: 12pt "Tahoma";
+            }
+            * {
+                box-sizing: border-box;
+                -moz-box-sizing: border-box;
+            }
+            .page {
+                width: 2.125in;
+                min-height: 3.375in;
+                padding: 0;
+                margin: 0 auto;
+                border: 1px #D3D3D3 solid;
+                border-radius: 5px;
+                background: white;
+                box-shadow: 0 0 5px rgba(0, 0, 0, 0.1);
+                position: relative;
+            }
 
-        @page {
-            margin: -.125in 0 0 -.125in;
-            size: 2in 3.5in;
-            marks: crop;
-        }
-
-        html, body {
-            margin: 0;
-            padding: 0;
-        }
-        ol, ol li {
-            list-style-type: none;
-            margin-left: 0;
-            padding-left: 0;
-        }
-        pre {
-            padding: .125in .29in .050in;
-            background: none;
-            border: none;
-            border-radius: 0;
-        }
-        .frosty {
-            margin: 0 -.390in;
-            background: rgba(255, 255, 255, .60);
-        }
-
-        .card {
-            position: relative;
-            width: 2.25in;
-            height: 3.75in;
-        }
-        .card-body {
-            position: absolute;
-            top: .125in;
-            left: .125in;
-            width: 2in;
-            height: 3.5in;
-            padding: 0 .250in;
-        }
-        .card-background {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 2.25in;
-            height: 3.75in;
-        }
-        .card-background img {
-            width: 100%;
-        }
-    </style>
-    <style type="text/css" media="screen">
-        .card-body {
-            border: 1pt solid gray;
-        }
+            @page {
+                size: 2.125in 3.375in;
+                margin: 0;
+            }
+            @media print {
+                html, body {
+                    width: 100%;
+                    height: 100%;
+                    margin: 0;
+                    padding: 0;
+                    background-color: #FAFAFA;
+                    font: 12pt "Tahoma";
+                }
+                .page {
+                    padding: 0mm;
+                    margin: 0mm auto;
+                    border: initial;
+                    border-radius: initial;
+                    width: 2.125in;
+                    min-height: 3.375in;
+                    box-shadow: initial;
+                    background: initial;
+                    page-break-after: always;
+                    position: relative;
+                }
+                .footer{
+                    position: absolute;
+                    bottom: 10px;
+                    width: 100%;
+                    padding-right:20mm;
+                }
+            }
     </style>
 
         @yield('after-styles-end')
