@@ -244,8 +244,6 @@ class ExamController extends Controller
         $course = $exam->courses();
 
         $datatables =  app('datatables')->of($course);
-
-
         return $datatables
             ->editColumn('name', '{!! $name !!}')
             ->editColumn('date_start', '{!! $date_start !!}')
@@ -2114,7 +2112,6 @@ class ExamController extends Controller
 
             $candidateRes = $this->getCandidateResult($request->exam_id);
 
-//            $candidatesResults = $candRes[0];
 
             if($candidateRes) {
                 $status = true;
