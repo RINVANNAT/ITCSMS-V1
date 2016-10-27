@@ -49,7 +49,9 @@
 
                     </div>
                     <div class="pull-right">
+
                         <input type="button" id="submit_candidate_error_socre" class="btn btn-primary btn-xs" value="Submit" />
+
                         <input type="button" id="btn_candidate_error_socre" class="btn btn-danger btn-xs" value="Print Error" />
                     </div>
                 </div>
@@ -108,7 +110,6 @@
 
 
                         <?php $k=0; $length = []; $p=0; $arrayRoomCode = []; $arrayOrderInRoom = [];?>
-
 
                         @foreach($errorCandidateScores as $errorScoreProperties)
                             <?php $k++; $p=0;  ?>
@@ -194,7 +195,9 @@
                                         <div class="col-sm-1 " style="margin-top: 5px" >
 
                                             {{--<button type="submit" class="btn btn-info btn-xs btn_save_new_correction"> <i class="fa fa-save"> </i> </button>--}}
+
                                             <button type="button" onclick="cancelNewCorrection(this)" class="btn btn-danger btn-xs"><i class="fa fa-times"> </i> </button>
+
 
                                         </div>
                                     </form>

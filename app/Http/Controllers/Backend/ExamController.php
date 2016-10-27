@@ -7,6 +7,11 @@ use App\Http\Requests\Backend\Exam\EditExamRequest;
 use App\Http\Requests\Backend\Exam\StoreExamRequest;
 use App\Http\Requests\Backend\Exam\ViewExamRequest;
 use App\Http\Requests\Backend\Exam\UpdateExamRequest;
+
+use App\Http\Requests\Backend\Exam\NewCorrectionExamScoreRequest;
+use App\Http\Requests\Backend\Exam\CalculateExamScoreRequest;
+use App\Http\Requests\Backend\Exam\GenerateExamScoreDUTRequest;
+
 use App\Models\AcademicYear;
 use App\Models\Building;
 use App\Models\Candidate;
@@ -358,7 +363,6 @@ class ExamController extends Controller
             $room_0 = ExamRoom::find($rooms[1]); // prevent get header too
         }
 
-        //dd($rooms);
         foreach($rooms as $key => $room){
             if(is_numeric($room)) {
                 ExamRoom::destroy($room);
@@ -383,7 +387,7 @@ class ExamController extends Controller
 
     public function split_room(ModifyExamRoomRequest$request, $id){
 
-        //dd($_POST);
+
         $exam = $this->exams->findOrThrowException($id);
         ExamRoom::destroy($_POST['split_room']);
 
@@ -478,7 +482,6 @@ class ExamController extends Controller
 
         $room_ids = $_POST['rooms'];
 
-        //dd($_POST['rooms']);
         foreach($room_ids as $room_id){
             if(is_numeric($room_id)){
                 DB::table("examRooms")->where('id',$room_id)->update(['nb_chair_exam'=>$_POST['nb_chair_exam']]);
@@ -540,7 +543,7 @@ class ExamController extends Controller
     public function save_room_secret_code(ViewSecretCodeRequest $request, $exam_id){
 
         $rooms = json_decode($_POST['room_ids']);
-        //dd($rooms);
+
         foreach($rooms as $room){
             DB::table('examRooms')
                 ->where('exam_id',$exam_id)
@@ -662,7 +665,6 @@ class ExamController extends Controller
             }
         }
 
-//        dd($candidateData);
 
         $fields= ['លេខបង្កាន់ដៃ', 'បន្ទប់', 'ឈ្មោះ ខ្មែរ', 'ឈ្មោះ ឡាតាំង', 'ភេទ', 'ថ្ងៃខែរឆ្នាំកំនើត', 'ហត្ថលេខា'];
 
@@ -858,12 +860,11 @@ class ExamController extends Controller
             $candidate["departments"] = $department_choices;
         }
 
-        //dd($candidates);
         $chunk_candidates = array_chunk($candidates,25);
 
         $departments = Department::where('is_specialist',true)->where('parent_id',11)->orderBy('code')->get();
 
-        //dd($chunk_candidates);
+
         return view('backend.exam.print.candidate_list_dut',compact('chunk_candidates','departments'));
     }
 
@@ -886,7 +887,6 @@ class ExamController extends Controller
                 ])
                 ->orderBy('departments.code')
                 ->get();
-//            dd($department_choices);
 
             $candidateOptions = [];
             $pass = '';
@@ -900,7 +900,6 @@ class ExamController extends Controller
                 }
             }
 
-//            dd($candidateOptions);
             $element = array(
                 'លេខបង្កាន់ដៃ'              => str_pad($candidate->register_id, 4, '0', STR_PAD_LEFT),
                 'ឈ្មោះ ខ្មែរ'             => $candidate->name_kh,
@@ -1011,7 +1010,6 @@ class ExamController extends Controller
 
     public function export_candidate_dut_list (DownloadExaminationDocumentsRequest $request,$exam_id) {
 
-//        dd($exam_id);
 
         $allDutCands = [];
 
@@ -1128,7 +1126,7 @@ class ExamController extends Controller
 
         $chunk_candidates = array_chunk($candidates,43);
 
-        //dd($chunk_candidates);
+
         return view('backend.exam.print.candidate_list_ing',compact('chunk_candidates'));
     }
 
@@ -1278,7 +1276,6 @@ class ExamController extends Controller
 
     public function download_dut_registration_statistic ($exam_id) {
 
-//        dd($exam_id);
 
         $candidateDuts = Candidate::where('exam_id',$exam_id)
             ->join('genders', 'genders.id', '=', 'candidates.gender_id')
@@ -1400,7 +1397,6 @@ class ExamController extends Controller
 
         }
 
-//        dd($totalBydept);
 
 
         return view('backend.exam.print.dut_result_statistic',compact('candidates', 'allDepts', 'arrayGrades', 'totalBydept','total_dept_grade'));
@@ -1540,11 +1536,9 @@ class ExamController extends Controller
             }
         }
 
-//        dd($totalBydept);
 
         return view('backend.exam.print.student_dut_registration_statistic',compact('candidates', 'allDepts', 'arrayGrades', 'totalBydept'));
 
-//        dd($exam->academic_year_id);
 
     }
 
@@ -1726,11 +1720,11 @@ class ExamController extends Controller
         $totalQuestion = $totalQuestions->total_question;
         $courseName = $totalQuestions->name_kh;
 
-        return view('backend.exam.includes.popup_report_error_score_candidate1', compact('exam_id', 'errorCandidateScores', 'totalQuestion', 'courseId', 'courseName'));
+        return view('backend.exam.includes.popup_report_error_score_candidate', compact('exam_id', 'errorCandidateScores', 'totalQuestion', 'courseId', 'courseName'));
 
     }
 
-    public function addNewCorrectionScore($exam_id, Request $request) {
+    public function addNewCorrectionScore($exam_id, NewCorrectionExamScoreRequest $request) {
 
         $correctorName  = $request->corrector_name;
 
@@ -1830,13 +1824,12 @@ class ExamController extends Controller
 
     }
 
-    public function calculateCandidateScores($examId, Request $request) {
+    public function calculateCandidateScores($examId, CalculateExamScoreRequest $request) {
 
         $requestData = $_POST;
         $passedCandidates = (int)$requestData['total_pass'];
         $reservedCandidates = (int)$requestData['total_reserve'];
 
-        //dd($reservedCandidates);
 
         // Clean all data in secret_room_result
         DB::table('secret_room_result')->delete();
@@ -1845,7 +1838,7 @@ class ExamController extends Controller
         DB::transaction(function () use($requestData, $examId) {
             foreach($requestData['course'] as $course){
                 $total_question = DB::table('entranceExamCourses')->where('id',$course['id'])->first()->total_question;
-                //dd($course);
+
                 $query = DB::select(
                     "select roomcode, order_in_room,course_id,exam_id,score_c,score_w,score_na, count(*), (score_c+score_w+score_na) as total".
                     " from secret_room_score".
@@ -2048,11 +2041,7 @@ class ExamController extends Controller
 
         $examId = $request->exam_id;
 
-//        dd($examId);
         $candidatesResults = $this->getCandidateResult($examId);
-
-
-        dd($candidatesResults);
 
         return view('backend.exam.includes.examination_candidates_result', compact('candidatesResults', 'examId'));
     }
@@ -2093,7 +2082,6 @@ class ExamController extends Controller
 
         $studentPassed = $this->candResFromDB($exam_id, $resultType='Pass');
 
-        //dd($studentPassed);
 
         $studentReserved = $this->candResFromDB($exam_id, $resultType='Reserve');
 
@@ -2288,7 +2276,6 @@ class ExamController extends Controller
 
         $candidates = $this->getCandidateResult($exam_id);
 
-        dd($candidates);
         $fields= [
             'ល.រ',
             'លេខបង្កាន់ដៃ',
@@ -2456,8 +2443,6 @@ class ExamController extends Controller
             }
             $allCandidates = $allCandidates + $CandidatesByRoom;
         }
-
-//        dd($allCandidates);
 
         $exam = Exam::where('id',$exam_id)->first();
         $candsRegister = DB::table('candidatesFromMoeys')
@@ -2708,7 +2693,6 @@ class ExamController extends Controller
         $rooms = $exam->rooms()->orderBy('building_id')->orderBy('name')->get()->toArray();
 
         shuffle($rooms);
-        //dd($rooms);
         $available_seat = 0;
         foreach($rooms as &$room){
             $room['current_seat'] = 0;
@@ -2849,7 +2833,6 @@ class ExamController extends Controller
             }
 
 
-//            dd($test);
             //return view list of candidate who pass with selected department and student whow reserve with selected department options
 
             return Response::json(['status'=>true]);
@@ -2859,9 +2842,7 @@ class ExamController extends Controller
 
     }
 
-    public function generateCandidateDUTResult($examId, Request $request) {
-
-//        dd($request->department);
+    public function generateCandidateDUTResult($examId, GenerateExamScoreDUTRequest $request) {
 
         $DeptSelectedForStu =[];
 
@@ -2936,7 +2917,7 @@ class ExamController extends Controller
 
     public function getDUTCandidateResultListTypes ($examId, Request $request) {
 
-//        dd($request->type);
+
         $resultType = $request->type;
 
         if($resultType == 'Pass') {
