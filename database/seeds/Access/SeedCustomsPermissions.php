@@ -232,6 +232,20 @@ class SeedCustomsPermissions extends Seeder
                             'dependency'   => [
                                 'view-backend','view-student-management'
                             ]
+                        ],
+                        [
+                            'name' => 'generate-student-group',
+                            'display_name' => 'Generate Student Group',
+                            'dependency' => [
+                                'view-backend','view-student-management'
+                            ]
+                        ],
+                        [
+                            'name' => 'generate-student-id-card',
+                            'display_name' => 'Generate Student ID Cards',
+                            'dependency' => [
+                                'view-backend','view-student-management'
+                            ]
                         ]
                     ]
                 ]

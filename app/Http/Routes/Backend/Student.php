@@ -37,6 +37,10 @@
 
         Route::post('student/{id}/generate_student_id_card', 'StudentAnnualController@generate_id_card')->name('admin.student.generate_student_id_card');
 
+        Route::get('student/{id}/form_generate_student_group', 'StudentAnnualController@formGenerateGroup')->name('admin.student.form_generate_student_group');
+
+        Route::post('student/{id}/generate_student_group', 'StudentAnnualController@generate_group')->name('admin.student.generate_student_group');
+
 
 
 

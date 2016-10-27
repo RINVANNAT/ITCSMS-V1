@@ -4,9 +4,13 @@
                 Actions <span class="caret"></span>
             </button>
             <ul class="dropdown-menu" role="menu">
-                <li><a href="{{ route('admin.student.reporting',1) }}">{{ trans('menus.backend.student.generate_group') }}</a></li>
+                @permission('generate-student-group')
+                <li><a href="#" id="generate_student_group">{{ trans('menus.backend.student.generate_group') }}</a></li>
+                @endauth
 
+                @permission('generate-student-id-card')
                 <li><a href="#" id="generate_id_card">{{ trans('menus.backend.student.generate_id_card') }}</a></li>
+                @endauth
 
                 <li><a href="{{ route('admin.student.print_id_card') }}">{{ trans('menus.backend.student.print_id_card') }}</a></li>
             </ul>
