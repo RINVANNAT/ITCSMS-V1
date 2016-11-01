@@ -1270,9 +1270,9 @@ class ExamController extends Controller
         if($request->type == "data_chart") {
 
             return view('backend.exam.includes.chart_datatable',compact('candidates', 'allCandidates', 'arrayGrades', 'allStudents'))->render();
-//            return "Test";
 
-        } else if ($request->type= "data_chart_candidate_registration") {
+
+        } elseif($request->type == "data_chart_candidate_registration") {
 
             $allCandidates = [];
 
@@ -1291,7 +1291,28 @@ class ExamController extends Controller
 
         }
         else {
-            return view('backend.exam.print.registration_statistic',compact('candidates', 'allCandidates', 'arrayGrades', 'allStudents'));
+
+            if( $request->download == 'student_registration') {
+                $allCandidates =[];//array of candidate result
+                $candidates =[];
+                return view('backend.exam.print.registration_statistic',compact('candidates', 'allCandidates', 'arrayGrades', 'allStudents'));
+
+            } elseif($request->download == 'candidate_engineer_result') {
+
+                $allStudents =[]; // array of student registration
+                $candidates =[]; // candidate registration
+                return view('backend.exam.print.registration_statistic',compact('candidates', 'allCandidates', 'arrayGrades', 'allStudents'));
+
+            } elseif ($request->download == 'candidate_engineer_registration') {
+
+                $allStudents =[]; // array of student registration
+                $allCandidates =[]; // candidate registration
+                return view('backend.exam.print.registration_statistic',compact('candidates', 'allCandidates', 'arrayGrades', 'allStudents'));
+
+            } else {
+                return view('backend.exam.print.registration_statistic',compact('candidates', 'allCandidates', 'arrayGrades', 'allStudents'));
+            }
+
         }
 
     }

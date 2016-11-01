@@ -1172,8 +1172,25 @@
                         chart: {
                             type: 'column'
                         },
-                        exporting: { enabled: false
+                        exporting: {
+                            buttons: {
+                                contextButton: {
+                                    menuItems: [{
+                                        text: 'Candidate Engineer Result',
+                                        onclick: function () {
+                                            var url = "{!! route('admin.exam.download_registration_statistic', $exam->id) !!}";
 
+                                            PopupCenterDual(url+'?download='+'candidate_engineer_result','download Registration Statistic','1200','900');
+                                        }
+                                    }, {
+                                        text: 'Export to PNG (large)',
+                                        onclick: function () {
+                                            this.exportChart();
+                                        },
+                                        separator: false
+                                    }]
+                                }
+                            }
                         },
 
                         credits: {
@@ -1211,7 +1228,26 @@
                         chart: {
                             type: 'column'
                         },
-                        exporting: { enabled: false
+                        exporting: {
+
+                            buttons: {
+                                contextButton: {
+                                    menuItems: [{
+                                        text: 'Student Registration Statistic',
+                                        onclick: function () {
+                                            var url = "{!! route('admin.exam.download_registration_statistic', $exam->id) !!}";
+
+                                            PopupCenterDual(url+'?download='+'student_registration','download Registration Statistic','1200','900');
+                                        }
+                                    }, {
+                                        text: 'Export to PNG (large)',
+                                        onclick: function () {
+                                            this.exportChart();
+                                        },
+                                        separator: false
+                                    }]
+                                }
+                            }
 
                         },
 
@@ -1259,8 +1295,25 @@
                         chart: {
                             type: 'line'
                         },
-                        exporting: { enabled: false
+                        exporting: {
+                            buttons: {
+                                contextButton: {
+                                    menuItems: [{
+                                        text: 'Download Candidate Registration',
+                                        onclick: function () {
+                                            var url = "{!! route('admin.exam.download_registration_statistic', $exam->id) !!}";
 
+                                            PopupCenterDual(url+'?download='+'candidate_engineer_registration','download Registration Statistic','1200','900');
+                                        }
+                                    }, {
+                                        text: 'Export to PNG (large)',
+                                        onclick: function () {
+                                            this.exportChart();
+                                        },
+                                        separator: false
+                                    }]
+                                }
+                            }
                         },
 
                         lang: {
