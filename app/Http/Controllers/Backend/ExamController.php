@@ -1220,9 +1220,9 @@ class ExamController extends Controller
             ->Join('origins','candidates.province_id','=','origins.id')
             ->Join('highSchools','candidates.highschool_id','=','highSchools.id')
             ->Join('gdeGrades as bacTotal','candidates.bac_total_grade','=','bacTotal.id')
-            ->Join('gdeGrades as mathGrade','candidates.bac_math_grade','=','mathGrade.id')
-            ->Join('gdeGrades as physGrade','candidates.bac_phys_grade','=','physGrade.id')
-            ->Join('gdeGrades as chemGrade','candidates.bac_chem_grade','=','chemGrade.id')
+            ->leftJoin('gdeGrades as mathGrade','candidates.bac_math_grade','=','mathGrade.id')
+            ->leftJoin('gdeGrades as physGrade','candidates.bac_phys_grade','=','physGrade.id')
+            ->leftJoin('gdeGrades as chemGrade','candidates.bac_chem_grade','=','chemGrade.id')
             ->join('students', 'students.candidate_id', '=', 'candidates.id')
             ->join('studentAnnuals', 'studentAnnuals.student_id', '=', 'students.id')
             ->join('departments', 'departments.id','=', 'studentAnnuals.department_id')
@@ -1263,13 +1263,38 @@ class ExamController extends Controller
 
         }
 
+        // candidates is the array of candidate who come for registration
+        // allCandidates is the array of candidtes who pass or reserve
+        // allStudents is the array of candidate who have register to study at ITC
 
+        if($request->type == "data_chart") {
 
-        return view('backend.exam.print.registration_statistic',compact('candidates', 'allCandidates', 'arrayGrades', 'allStudents'));
+            return view('backend.exam.includes.chart_datatable',compact('candidates', 'allCandidates', 'arrayGrades', 'allStudents'))->render();
+//            return "Test";
+
+        } else if ($request->type= "data_chart_candidate_registration") {
+
+            $allCandidates = [];
+
+            foreach($candidates as $key => $candidate) {
+
+                $dateInt = (double)strtotime($key) * 1000;
+
+                foreach($candidate as $grade => $value) {
+
+                    $allCandidates[$grade][] = [ $key, ((double)count($value))];
+
+                }
+            }
+
+            return Response::json($allCandidates);
+
+        }
+        else {
+            return view('backend.exam.print.registration_statistic',compact('candidates', 'allCandidates', 'arrayGrades', 'allStudents'));
+        }
+
     }
-
-
-
 
 
     public function download_dut_registration_statistic ($exam_id) {
@@ -1411,9 +1436,9 @@ class ExamController extends Controller
             ->Join('origins','candidates.province_id','=','origins.id')
             ->Join('highSchools','candidates.highschool_id','=','highSchools.id')
             ->Join('gdeGrades as bacTotal','candidates.bac_total_grade','=','bacTotal.id')
-            ->Join('gdeGrades as mathGrade','candidates.bac_math_grade','=','mathGrade.id')
-            ->Join('gdeGrades as physGrade','candidates.bac_phys_grade','=','physGrade.id')
-            ->Join('gdeGrades as chemGrade','candidates.bac_chem_grade','=','chemGrade.id')
+            ->leftJoin('gdeGrades as mathGrade','candidates.bac_math_grade','=','mathGrade.id')
+            ->leftJoin('gdeGrades as physGrade','candidates.bac_phys_grade','=','physGrade.id')
+            ->leftJoin('gdeGrades as chemGrade','candidates.bac_chem_grade','=','chemGrade.id')
             ->join('students', 'students.candidate_id', '=', 'candidates.id')
             ->join('studentAnnuals', 'studentAnnuals.student_id', '=', 'students.id')
             ->join('departments', 'departments.id','=', 'studentAnnuals.department_id')
@@ -1447,7 +1472,6 @@ class ExamController extends Controller
                 //'candidate_department.rank',
             ])
             ->get();
-
 
         $allDepts = $this->getAllDepartments();
 
@@ -1516,7 +1540,6 @@ class ExamController extends Controller
                             }
 
                         }
-
 
                         $totalBydept['A']['M'] = $gradeA_M;
                         $totalBydept['B']['M'] = $gradeB_M;

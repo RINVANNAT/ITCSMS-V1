@@ -12,6 +12,11 @@
 @section('after-styles-end')
     {!! Html::script('plugins/es6-promise/es6-promise.min.js') !!}
     {!! Html::script('plugins/sweetalert2/dist/sweetalert2.min.js') !!}
+    <script src="https://code.highcharts.com/highcharts.js"></script>
+    <script src="https://code.highcharts.com/modules/data.js"></script>
+    <script src="https://code.highcharts.com/modules/exporting.js"></script>
+
+
     <link rel="stylesheet" href="{{url('plugins/sweetalert2/dist/sweetalert2.min.css')}}">
     {!! Html::style('plugins/jstree/themes/default/style.min.css') !!}
     {!! Html::style('plugins/datatables/dataTables.bootstrap.css') !!}
@@ -177,11 +182,12 @@
                     @endauth
                 </ul>
 
-                <div class="tab-content">
-                    <div role="tabpanel" class="tab-pane active" id="general_info" style="padding-top:20px;">
-                        {!! Form::model($exam, ['#','class' => 'form-horizontal', 'role'=>'form', 'method' => 'patch', 'id'=> 'exam_show']) !!}
-                        @include ("backend.exam.fields")
-                        {!! Form::close() !!}
+                <div class="tab-content" style="height: 100%">
+                    <div role="tabpanel" class="tab-pane active" id="general_info" style="padding-top:20px; height: auto">
+                        {{--{!! Form::model($exam, ['#','class' => 'form-horizontal', 'role'=>'form', 'method' => 'patch', 'id'=> 'exam_show']) !!}--}}
+                        {{--@include ("backend.exam.fields")--}}
+                        {{--{!! Form::close() !!}--}}
+                        @include("backend.exam.show.exam_general_info")
                     </div>
                     @permission('view-exam-candidate')
                     <div role="tabpanel" class="tab-pane" id="candidate_info" style="padding-top:20px">
@@ -1125,6 +1131,236 @@
             }
 
         };
+
+//        blog statistic chart
+
+        $('#exam_blog').hide();
+
+        $('#btn_show_exam_info').on('click', function() {
+
+            $('#exam_blog').slideFadeToggle();
+
+        });
+
+        var requestData = {
+            type: 'data_chart'
+        };
+        $.ajax({
+            type: 'GET',
+            url: "{{route('admin.exam.download_registration_statistic',$exam->id)."?type=data_chart"}}",
+            success: function(resultData) {
+
+                console.log(resultData);
+                $('#table_data').append(resultData);
+
+                //this is a function to build the chart after requesting ajax
+
+                $(function () {
+
+                    Highcharts.setOptions({
+                        colors: ['#058DC7', '#50B432', '#ED561B', '#DDDF00', '#24CBE5', '#64E572', '#FF9655', '#FFF263', '#6AF9C4']
+                    });
+
+                    Highcharts.chart('candidate_engineer_result', {
+                        data: {
+                            table: 'datatable_candidate_resutl'
+                        },
+
+                        lang: {
+                            noData: "The result is not released yet"
+                        },
+                        chart: {
+                            type: 'column'
+                        },
+                        exporting: { enabled: false
+
+                        },
+
+                        credits: {
+                            enabled: false
+                        },
+
+                        title: {
+                            text: 'Candidates Result Engineer'
+                        },
+                        yAxis: {
+                            allowDecimals: false,
+                            title: {
+                                text: 'Number of Student'
+                            }
+                        },
+                        tooltip: {
+                            formatter: function () {
+                                return '<b>' + this.series.name + '</b><br/>' +
+                                        this.point.y + ' ' + this.point.name.toLowerCase();
+                            }
+                        }
+                    });
+                });
+
+
+                $(function () {
+                    Highcharts.chart('container', {
+                        data: {
+                            table: 'datatable'
+                        },
+
+                        lang: {
+                            noData: "There is no student engineer registration"
+                        },
+                        chart: {
+                            type: 'column'
+                        },
+                        exporting: { enabled: false
+
+                        },
+
+                        credits: {
+                            enabled: false
+                        },
+
+                        title: {
+                            text: 'Student Registration Engineer'
+                        },
+                        yAxis: {
+                            allowDecimals: false,
+                            title: {
+                                text: 'Number of Student'
+                            }
+                        },
+                        tooltip: {
+                            formatter: function () {
+                                return '<b>' + this.series.name + '</b><br/>' +
+                                        this.point.y + ' ' + this.point.name.toLowerCase();
+                            }
+                        }
+                    });
+                });
+
+            }
+
+        });
+
+        $.ajax({
+            type: 'GET',
+            dataType: "json",
+            url: "{{route('admin.exam.download_registration_statistic',$exam->id)."?type=data_chart_candidate_registration"}}",
+            success: function(resultData) {
+
+
+                var grade_A = resultData['34'],
+                    grade_B = resultData['35'],
+                    grade_C = resultData['36'],
+                    grade_D = resultData['37'],
+                    grade_E = resultData['38'];
+
+                $(function () {
+                    Highcharts.chart('candidate_registration', {
+                        chart: {
+                            type: 'line'
+                        },
+                        exporting: { enabled: false
+
+                        },
+
+                        lang: {
+                            noData: "There is no candidate registration"
+                        },
+
+                        credits: {
+                            enabled: false
+                        },
+
+                        title: {
+                            text: 'Candidate Engineer Registration'
+                        },
+                        xAxis: {
+                            tickInterval: 1,
+                            labels: {
+                                enabled: true,
+                                rotation: -45,
+                                formatter: function() {
+
+                                    return grade_A[this.value][0];
+                                }
+                            }
+                        },
+                        yAxis: {
+                            allowDecimals: false,
+                            tickInterval: 5,
+                            lineWidth: 5,
+                            lineColor: 'green',
+                            title: {
+                                text: '<strong>Number of Student</strong>'
+                            }
+                        },
+                        plotOptions: {
+                            series:{
+                                events: {
+                                    legendItemClick:  function(event) {
+                                    }
+                                }
+                            },
+                            line: {
+                                dataLabels: {
+                                    enabled: false
+                                },
+                                enableMouseTracking: true
+                            },
+                        },
+                        tooltip: {
+                            enabled:true,
+                            headerFormat: '{point.key}' ,
+                            pointFormat: ' | <span style="color:{series.color}">{series.name}</span>: <b>{point.y}</b>',
+                            shadow: false,
+                            valueDecimals: false
+                        },
+
+                        legend: {
+                            enabled: true,
+                            align: 'center',
+                            backgroundColor: '#FCFFC5',
+                            borderColor: 'black',
+                            borderWidth: 2,
+                            layout: 'horizontal',
+                            verticalAlign: 'bottom',
+                            y: 0,
+                            shadow: true
+                        },
+
+                        series: [{
+                            name: 'Grade A',
+                            data:grade_A,
+                            color: 'blue',
+                            showInLegend: true
+                        },{
+                            name: 'Grade B',
+                            data:grade_B,
+                            color: 'green',
+                            showInLegend: true
+                        },{
+                            name: 'Grade C',
+                            data:grade_C,
+                            color: 'red',
+                            showInLegend: true
+                        },{
+                            name: 'Grade D',
+                            data:grade_D,
+                            color: 'black',
+                            showInLegend: true
+                        },{
+                            name: 'Grade E',
+                            data:grade_E,
+                            color: '#CB15D7',
+                            showInLegend: true
+                        }]
+                    });
+                });
+
+            }
+
+        });
+
 
 
     </script>
