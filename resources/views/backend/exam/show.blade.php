@@ -1134,26 +1134,315 @@
 
 //        blog statistic chart
 
-        $('#exam_blog').hide();
 
-        $('#btn_show_exam_info').on('click', function() {
 
-            $('#exam_blog').slideFadeToggle();
+        @if($exam->type_id != 2)
 
-        });
+            $('#exam_blog').hide();
 
-        var requestData = {
-            type: 'data_chart'
-        };
-        $.ajax({
+            $('#btn_show_exam_info').on('click', function() {
+
+                $('#exam_blog').slideFadeToggle();
+
+            });
+
+            var requestData = {
+                type: 'data_chart'
+            };
+            $.ajax({
+                type: 'GET',
+                url: "{{route('admin.exam.download_registration_statistic',$exam->id)."?type=data_chart"}}",
+                success: function(resultData) {
+
+                    $('#table_data').append(resultData);
+
+                    //this is a function to build the chart after requesting ajax
+
+                    $(function () {
+
+                        Highcharts.setOptions({
+                            colors: ['#058DC7', '#50B432', '#ED561B', '#DDDF00', '#24CBE5', '#64E572', '#FF9655', '#FFF263', '#6AF9C4']
+                        });
+
+                        Highcharts.chart('candidate_engineer_result', {
+                            data: {
+                                table: 'datatable_candidate_resutl'
+                            },
+
+                            lang: {
+                                noData: "The result is not released yet"
+                            },
+                            chart: {
+                                type: 'column'
+                            },
+                            exporting: {
+                                buttons: {
+                                    contextButton: {
+                                        menuItems: [{
+                                            text: '<span class="fa fa-print" style="font-size: 12pt"> Candidate Engineer Result</span>',
+                                            onclick: function () {
+                                                var url = "{!! route('admin.exam.download_registration_statistic', $exam->id) !!}";
+
+                                                PopupCenterDual(url+'?download='+'candidate_engineer_result','download Registration Statistic','1200','900');
+                                            }
+                                        },  {
+                                            text: '<span class="fa fa-file-excel-o" style="font-size: 12pt"> Result Sheet</span>',
+                                            onclick: function () {
+                                                var url = "{{route('admin.exam.export_candidate_result_lists', $exam->id)}}";
+                                                window.open(url, '_blank');
+
+                                            }
+
+                                        }, {
+                                            text: '<span style="font-size: 12pt"> Export Figure</span>',
+                                            onclick: function () {
+                                                this.exportChart();
+                                            },
+                                            separator: false
+                                        }]
+                                    }
+                                }
+                            },
+
+                            credits: {
+                                enabled: false
+                            },
+
+                            title: {
+                                text: 'Candidates Result Engineer'
+                            },
+                            yAxis: {
+                                allowDecimals: false,
+                                title: {
+                                    text: 'Number of Student'
+                                }
+                            },
+                            tooltip: {
+                                formatter: function () {
+                                    return '<b>' + this.series.name + '</b><br/>' +
+                                            this.point.y + ' ' + this.point.name.toLowerCase();
+                                }
+                            }
+                        });
+                    });
+
+
+                    $(function () {
+                        Highcharts.chart('container', {
+                            data: {
+                                table: 'datatable'
+                            },
+
+                            lang: {
+                                noData: "There is no student engineer registration"
+                            },
+                            chart: {
+                                type: 'column'
+                            },
+                            exporting: {
+
+                                buttons: {
+                                    contextButton: {
+                                        menuItems: [{
+                                            text: '<span class="fa fa-print" style="font-size: 12pt"> Student Statistic</span>',
+                                            onclick: function () {
+                                                var url = "{!! route('admin.exam.download_registration_statistic', $exam->id) !!}";
+
+                                                PopupCenterDual(url+'?download='+'student_registration','download Registration Statistic','1200','900');
+                                            }
+                                        }, {
+                                            text: '<span class="fa fa-file-excel-o" style="font-size: 12pt"> Attendance List</span>',
+                                            onclick: function () {
+                                                var url = "{{route('admin.exam.export_attendance_list',$exam->id)}}";
+                                                window.open(url, '_blank');
+                                            }
+
+                                        }, {
+                                            text: '<span style="font-size: 12pt">Export Figure</span>',
+                                            onclick: function () {
+                                                this.exportChart();
+                                            },
+                                            separator: false
+                                        }]
+                                    }
+                                }
+
+                            },
+
+                            credits: {
+                                enabled: false
+                            },
+
+                            title: {
+                                text: 'Student Registration Engineer'
+                            },
+                            yAxis: {
+                                allowDecimals: false,
+                                title: {
+                                    text: 'Number of Student'
+                                }
+                            },
+                            tooltip: {
+                                formatter: function () {
+                                    return '<b>' + this.series.name + '</b><br/>' +
+                                            this.point.y + ' ' + this.point.name.toLowerCase();
+                                }
+                            }
+                        });
+                    });
+
+                }
+
+            });
+
+            $.ajax({
+                type: 'GET',
+                dataType: "json",
+                url: "{{route('admin.exam.download_registration_statistic',$exam->id)."?type=data_chart_candidate_registration"}}",
+                success: function(resultData) {
+
+
+                    var grade_A = resultData['34'],
+                            grade_B = resultData['35'],
+                            grade_C = resultData['36'],
+                            grade_D = resultData['37'],
+                            grade_E = resultData['38'];
+
+                    $(function () {
+                        Highcharts.chart('candidate_registration', {
+                            chart: {
+                                type: 'line'
+                            },
+                            exporting: {
+                                buttons: {
+                                    contextButton: {
+                                        menuItems: [{
+                                            text: '<span class="fa fa-print" style="font-size: 12pt"> Candidate Registration</span>',
+                                            onclick: function () {
+                                                var url = "{!! route('admin.exam.download_registration_statistic', $exam->id) !!}";
+
+                                                PopupCenterDual(url+'?download='+'candidate_engineer_registration','download Registration Statistic','1200','900');
+                                            }
+                                        }, {
+                                            text: '<span style="font-size: 12pt">Export Figure</span>',
+                                            onclick: function () {
+                                                this.exportChart();
+                                            },
+                                            separator: false
+                                        }]
+                                    }
+                                }
+                            },
+
+                            lang: {
+                                noData: "There is no candidate registration"
+                            },
+
+                            credits: {
+                                enabled: false
+                            },
+
+                            title: {
+                                text: 'Candidate Engineer Registration'
+                            },
+                            xAxis: {
+                                tickInterval: 1,
+                                labels: {
+                                    enabled: true,
+                                    rotation: -45,
+                                    formatter: function() {
+
+                                        return grade_A[this.value][0];
+                                    }
+                                }
+                            },
+                            yAxis: {
+                                allowDecimals: false,
+                                tickInterval: 5,
+                                lineWidth: 5,
+                                lineColor: 'green',
+                                title: {
+                                    text: '<strong>Number of Student</strong>'
+                                }
+                            },
+                            plotOptions: {
+                                series:{
+                                    events: {
+                                        legendItemClick:  function(event) {
+                                        }
+                                    }
+                                },
+                                line: {
+                                    dataLabels: {
+                                        enabled: false
+                                    },
+                                    enableMouseTracking: true
+                                },
+                            },
+                            tooltip: {
+                                enabled:true,
+                                headerFormat: '{point.key}' ,
+                                pointFormat: ' | <span style="color:{series.color}">{series.name}</span>: <b>{point.y}</b>',
+                                shadow: false,
+                                valueDecimals: false
+                            },
+
+                            legend: {
+                                enabled: true,
+                                align: 'center',
+                                backgroundColor: '#FCFFC5',
+                                borderColor: 'black',
+                                borderWidth: 2,
+                                layout: 'horizontal',
+                                verticalAlign: 'bottom',
+                                y: 0,
+                                shadow: true
+                            },
+
+                            series: [{
+                                name: 'Grade A',
+                                data:grade_A,
+                                color: 'blue',
+                                showInLegend: true
+                            },{
+                                name: 'Grade B',
+                                data:grade_B,
+                                color: 'green',
+                                showInLegend: true
+                            },{
+                                name: 'Grade C',
+                                data:grade_C,
+                                color: 'red',
+                                showInLegend: true
+                            },{
+                                name: 'Grade D',
+                                data:grade_D,
+                                color: 'black',
+                                showInLegend: true
+                            },{
+                                name: 'Grade E',
+                                data:grade_E,
+                                color: '#CB15D7',
+                                showInLegend: true
+                            }]
+                        });
+                    });
+
+                }
+
+            });
+        @endif
+
+
+        @if($exam->type_id == 2)
+
+            $.ajax({
             type: 'GET',
-            url: "{{route('admin.exam.download_registration_statistic',$exam->id)."?type=data_chart"}}",
+            url: "{{route('admin.exam.dut_registration_statistic',$exam->id).'?type=candidate_dut_registration'}}",
             success: function(resultData) {
 
-                console.log(resultData);
-                $('#table_data').append(resultData);
 
-                //this is a function to build the chart after requesting ajax
+                $('#table_dut_data').append(resultData);
 
                 $(function () {
 
@@ -1161,69 +1450,13 @@
                         colors: ['#058DC7', '#50B432', '#ED561B', '#DDDF00', '#24CBE5', '#64E572', '#FF9655', '#FFF263', '#6AF9C4']
                     });
 
-                    Highcharts.chart('candidate_engineer_result', {
+                    Highcharts.chart('candidate_dut_registration', {
                         data: {
-                            table: 'datatable_candidate_resutl'
+                            table: 'datatable_candidate_dut_registration'
                         },
 
                         lang: {
-                            noData: "The result is not released yet"
-                        },
-                        chart: {
-                            type: 'column'
-                        },
-                        exporting: {
-                            buttons: {
-                                contextButton: {
-                                    menuItems: [{
-                                        text: 'Candidate Engineer Result',
-                                        onclick: function () {
-                                            var url = "{!! route('admin.exam.download_registration_statistic', $exam->id) !!}";
-
-                                            PopupCenterDual(url+'?download='+'candidate_engineer_result','download Registration Statistic','1200','900');
-                                        }
-                                    }, {
-                                        text: 'Export to PNG (large)',
-                                        onclick: function () {
-                                            this.exportChart();
-                                        },
-                                        separator: false
-                                    }]
-                                }
-                            }
-                        },
-
-                        credits: {
-                            enabled: false
-                        },
-
-                        title: {
-                            text: 'Candidates Result Engineer'
-                        },
-                        yAxis: {
-                            allowDecimals: false,
-                            title: {
-                                text: 'Number of Student'
-                            }
-                        },
-                        tooltip: {
-                            formatter: function () {
-                                return '<b>' + this.series.name + '</b><br/>' +
-                                        this.point.y + ' ' + this.point.name.toLowerCase();
-                            }
-                        }
-                    });
-                });
-
-
-                $(function () {
-                    Highcharts.chart('container', {
-                        data: {
-                            table: 'datatable'
-                        },
-
-                        lang: {
-                            noData: "There is no student engineer registration"
+                            noData: "No DUT Candidate Registration"
                         },
                         chart: {
                             type: 'column'
@@ -1233,14 +1466,21 @@
                             buttons: {
                                 contextButton: {
                                     menuItems: [{
-                                        text: 'Student Registration Statistic',
+                                        text: '<span class="fa fa-print" style="font-size: 12pt"> DUT Statistic</span>',
                                         onclick: function () {
-                                            var url = "{!! route('admin.exam.download_registration_statistic', $exam->id) !!}";
+                                            var url = "{{route('admin.exam.download_dut_registration_statistic',$exam->id)}}";
 
                                             PopupCenterDual(url+'?download='+'student_registration','download Registration Statistic','1200','900');
                                         }
                                     }, {
-                                        text: 'Export to PNG (large)',
+                                        text:'<span class="fa fa-file-excel-o" style="font-size: 12pt"> DUT List</span>',
+                                        onclick: function() {
+                                            var url = "{{route('admin.exam.export_candidate_list_dut',$exam->id)}}";
+                                            window.open(url, '_blank');
+                                        }
+
+                                    },{
+                                        text: '<span style="font-size: 12pt"> Export Figure </span>',
                                         onclick: function () {
                                             this.exportChart();
                                         },
@@ -1256,7 +1496,7 @@
                         },
 
                         title: {
-                            text: 'Student Registration Engineer'
+                            text: 'Candidate DUT Registration Statistic'
                         },
                         yAxis: {
                             allowDecimals: false,
@@ -1267,46 +1507,56 @@
                         tooltip: {
                             formatter: function () {
                                 return '<b>' + this.series.name + '</b><br/>' +
-                                        this.point.y + ' ' + this.point.name.toLowerCase();
+                                        this.point.y ;
                             }
                         }
                     });
                 });
 
+
             }
 
         });
 
+
         $.ajax({
             type: 'GET',
-            dataType: "json",
-            url: "{{route('admin.exam.download_registration_statistic',$exam->id)."?type=data_chart_candidate_registration"}}",
+            url: "{{route('admin.exam.dut_registration_statistic',$exam->id).'?type=result_candidate_dut_statistic'}}",
             success: function(resultData) {
 
 
-                var grade_A = resultData['34'],
-                    grade_B = resultData['35'],
-                    grade_C = resultData['36'],
-                    grade_D = resultData['37'],
-                    grade_E = resultData['38'];
-
                 $(function () {
-                    Highcharts.chart('candidate_registration', {
+                    Highcharts.chart('result_candidate_dut', {
+
                         chart: {
-                            type: 'line'
+                            type: 'column'
                         },
+
+                        title: {
+                            text: 'Result Candidate DUT Statistic'
+                        },
+
                         exporting: {
+
                             buttons: {
                                 contextButton: {
                                     menuItems: [{
-                                        text: 'Download Candidate Registration',
+                                        text: '<span class="fa fa-print" style="font-size: 12pt"> DUT Result Statistic</span>',
                                         onclick: function () {
-                                            var url = "{!! route('admin.exam.download_registration_statistic', $exam->id) !!}";
+                                            var url = "{{route('admin.exam.download_dut_result_statistic',$exam->id)}}";
 
-                                            PopupCenterDual(url+'?download='+'candidate_engineer_registration','download Registration Statistic','1200','900');
+                                            PopupCenterDual(url,'download Result DUT Statistic','1200','900');
                                         }
                                     }, {
-                                        text: 'Export to PNG (large)',
+                                        text:'<span class="fa fa-file-excel-o" style="font-size: 12pt"> DUT Result List</span>',
+                                        onclick: function() {
+                                            var url = "{{route('admin.exam.export_candidate_dut_detail',$exam->id)}}";
+                                            window.open(url, '_blank');
+
+                                        }
+
+                                    },{
+                                        text: '<span style="font-size: 12pt"> Export Figure </span>',
                                         onclick: function () {
                                             this.exportChart();
                                         },
@@ -1314,107 +1564,232 @@
                                     }]
                                 }
                             }
-                        },
 
-                        lang: {
-                            noData: "There is no candidate registration"
                         },
 
                         credits: {
                             enabled: false
                         },
 
-                        title: {
-                            text: 'Candidate Engineer Registration'
-                        },
-                        xAxis: {
-                            tickInterval: 1,
-                            labels: {
-                                enabled: true,
-                                rotation: -45,
-                                formatter: function() {
 
-                                    return grade_A[this.value][0];
-                                }
-                            }
+                        xAxis: {
+                            categories: ['GCA', 'GCI', 'GEE', 'GGG', 'GIC', 'GIM', 'GRU']
                         },
                         yAxis: {
                             allowDecimals: false,
-                            tickInterval: 5,
-                            lineWidth: 5,
-                            lineColor: 'green',
+                            min: 0,
                             title: {
-                                text: '<strong>Number of Student</strong>'
+                                text: 'Number of Students'
+                            }
+                        },
+
+                        tooltip: {
+                            formatter: function () {
+                                return '<b>' + this.x + '</b><br/>' +
+                                        this.series.name + ': ' + this.y + '<br/>' +
+                                        'Total: ' + this.point.stackTotal;
                             }
                         },
                         plotOptions: {
-                            series:{
-                                events: {
-                                    legendItemClick:  function(event) {
-                                    }
-                                }
-                            },
-                            line: {
-                                dataLabels: {
-                                    enabled: false
-                                },
-                                enableMouseTracking: true
-                            },
-                        },
-                        tooltip: {
-                            enabled:true,
-                            headerFormat: '{point.key}' ,
-                            pointFormat: ' | <span style="color:{series.color}">{series.name}</span>: <b>{point.y}</b>',
-                            shadow: false,
-                            valueDecimals: false
-                        },
-
-                        legend: {
-                            enabled: true,
-                            align: 'center',
-                            backgroundColor: '#FCFFC5',
-                            borderColor: 'black',
-                            borderWidth: 2,
-                            layout: 'horizontal',
-                            verticalAlign: 'bottom',
-                            y: 0,
-                            shadow: true
+                            column: {
+                                stacking: 'normal'
+                            }
                         },
 
                         series: [{
-                            name: 'Grade A',
-                            data:grade_A,
-                            color: 'blue',
-                            showInLegend: true
+                            name: 'Grade:A(male)',
+                            data: resultData['CandidateMale']['34'],
+                            stack: 'male_1',
+                            color: '#088174'
+                        }, {
+                            name: 'Grade:B(male)',
+                            data: resultData['CandidateMale']['35'],
+                            stack: 'male_2',
+                            color: '#088174',
+                        }, {
+                            name: 'Grade:C(male)',
+                            data: resultData['CandidateMale']['36'],
+                            stack: 'male_3',
+                            color: '#088174',
+                        }, {
+                            name: 'Grade:D(male)',
+                            data: resultData['CandidateMale']['37'],
+                            stack: 'male_4',
+                            color: '#088174',
                         },{
-                            name: 'Grade B',
-                            data:grade_B,
-                            color: 'green',
-                            showInLegend: true
+                            name: 'Grade:E(male)',
+                            data: resultData['CandidateMale']['38'],
+                            stack: 'male_5',
+                            color: '#088174',
                         },{
-                            name: 'Grade C',
-                            data:grade_C,
-                            color: 'red',
-                            showInLegend: true
+                            name: 'Grade:A(female)',
+                            data: resultData['CandidateFemale']['34'],
+                            stack: 'male_1',
+                            color: '#FC7E93',
                         },{
-                            name: 'Grade D',
-                            data:grade_D,
-                            color: 'black',
-                            showInLegend: true
+                            name: 'Grade:B(female)',
+                            data: resultData['CandidateFemale']['35'],
+                            stack: 'male_2',
+                            color: '#FC7E93',
                         },{
-                            name: 'Grade E',
-                            data:grade_E,
-                            color: '#CB15D7',
-                            showInLegend: true
-                        }]
+                            name: 'Grade:C(female)',
+                            data: resultData['CandidateFemale']['36'],
+                            stack: 'male_3',
+                            color: '#FC7E93',
+                        },{
+                            name: 'Grade:D(female)',
+                            data: resultData['CandidateFemale']['37'],
+                            stack: 'male_4',
+                            color: '#FC7E93',
+                        },{
+                            name: 'Grade:E(female)',
+                            data: resultData['CandidateFemale']['38'],
+                            stack: 'male_5',
+                            color: '#FC7E93',
+                        }],
                     });
                 });
+
+
 
             }
 
         });
 
+        lastChart();
 
+        function lastChart() {
+            $.ajax({
+                type: 'GET',
+                url: "{{route('admin.exam.dut_registration_statistic',$exam->id).'?type=student_dut_registration'}}",
+                success: function(Data) {
+
+
+                    $(function () {
+                        Highcharts.chart('student_dut_registration', {
+
+                            chart: {
+                                type: 'column'
+                            },
+
+                            title: {
+                                text: 'Students DUT Registration Statistic'
+                            },
+
+                            exporting: {
+
+                                buttons: {
+                                    contextButton: {
+                                        menuItems: [{
+                                            text: '<span class="fa fa-print" style="font-size: 12pt"> Student DUT Statistic</span>',
+                                            onclick: function () {
+                                                var url = "{{route('admin.exam.download_student_dut_registration_statistic',$exam->id)}}";
+
+                                                PopupCenterDual(url,'download Student DUT Registration Statistic','1200','900');
+                                            }
+                                        }, {
+                                            text: '<span style="font-size: 12pt"> Export Figure </span>',
+                                            onclick: function () {
+                                                this.exportChart();
+                                            },
+                                            separator: false
+                                        }]
+                                    }
+                                }
+
+                            },
+
+                            credits: {
+                                enabled: false
+                            },
+
+
+                            xAxis: {
+                                categories: ['GCA', 'GCI', 'GEE', 'GGG', 'GIC', 'GIM', 'GRU']
+                            },
+                            yAxis: {
+                                allowDecimals: false,
+                                min: 0,
+                                title: {
+                                    text: 'Number of Students'
+                                }
+                            },
+
+                            tooltip: {
+                                formatter: function () {
+                                    return '<b>' + this.x + '</b><br/>' +
+                                            this.series.name + ': ' + this.y + '<br/>' +
+                                            'Total: ' + this.point.stackTotal;
+                                }
+                            },
+                            plotOptions: {
+                                column: {
+                                    stacking: 'normal'
+                                }
+                            },
+
+                            series: [{
+                                name: 'Grade:A(male)',
+                                data: Data['studentMale']['A'],
+                                stack: 'male_1',
+                                color: '#088174'
+                            }, {
+                                name: 'Grade:B(male)',
+                                data: Data['studentMale']['B'],
+                                stack: 'male_2',
+                                color: '#088174',
+                            }, {
+                                name: 'Grade:C(male)',
+                                data: Data['studentMale']['C'],
+                                stack: 'male_3',
+                                color: '#088174',
+                            }, {
+                                name: 'Grade:D(male)',
+                                data: Data['studentMale']['D'],
+                                stack: 'male_4',
+                                color: '#088174',
+                            },{
+                                name: 'Grade:E(male)',
+                                data: Data['studentMale']['E'],
+                                stack: 'male_5',
+                                color: '#088174',
+                            },{
+                                name: 'Grade:A(female)',
+                                data: Data['studentFemale']['A'],
+                                stack: 'male_1',
+                                color: '#FC7E93',
+                            },{
+                                name: 'Grade:B(female)',
+                                data: Data['studentFemale']['B'],
+                                stack: 'male_2',
+                                color: '#FC7E93',
+                            },{
+                                name: 'Grade:C(female)',
+                                data: Data['studentFemale']['C'],
+                                stack: 'male_3',
+                                color: '#FC7E93',
+                            },{
+                                name: 'Grade:D(female)',
+                                data: Data['studentFemale']['D'],
+                                stack: 'male_4',
+                                color: '#FC7E93',
+                            },{
+                                name: 'Grade:E(female)',
+                                data: Data['studentFemale']['E'],
+                                stack: 'male_5',
+                                color: '#FC7E93',
+                            }],
+                        });
+                    });
+
+                }
+
+            });
+        }
+
+
+
+        @endif
 
     </script>
 @stop

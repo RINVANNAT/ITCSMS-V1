@@ -120,4 +120,15 @@ Route::group([], function() {
 
 
 
+    //-----------------------statistic chart view
+
+
+
+    Route::get('exams/{id}/dut_registration_statistic', 'ExamController@requestEachChartData')->name('admin.exam.dut_registration_statistic');
+
+
+    Route::get('exams/{id}/export-data', 'ExamController@exportData')->name('admin.exam.export_data');// link to get data for teacher Seng
+
+
+
 });

@@ -1320,6 +1320,15 @@ class ExamController extends Controller
 
     public function download_dut_registration_statistic ($exam_id) {
 
+       $candidateDuts = $this->dutRegistration($exam_id);
+
+        $candidates = $candidateDuts[0];
+        $total = $candidateDuts[1];
+        return view('backend.exam.print.dut_registration_statistic',compact('candidates', 'total'));
+    }
+
+    private function dutRegistration($exam_id) {
+
 
         $candidateDuts = Candidate::where('exam_id',$exam_id)
             ->join('genders', 'genders.id', '=', 'candidates.gender_id')
@@ -1346,15 +1355,139 @@ class ExamController extends Controller
         }
 
 
-        return view('backend.exam.print.dut_registration_statistic',compact('candidates', 'total'));
-
+        return array($candidates, $total);
 
     }
 
-    public function download_dut_result_statistic($exam_id) {
+    public function requestEachChartData($examId, Request $request) {
+
+        $CandidateMale = [];
+        $CandidateFemale= [];
+
+        if($request->type == 'candidate_dut_registration') {
+
+            $dataReturn = $this->dutRegistration($examId);
+            $candidateDuts = $dataReturn[0];
+            $total = $dataReturn[1];
+            $status = 'candidate_dut_registration';
+
+            return view('backend.exam.includes.chart_datatable_candidate_dut', compact('candidateDuts', 'total', 'status'));
+
+        } elseif($request->type == 'result_candidate_dut_statistic') {
 
 
 
+            $arrayData = $this->dutResultStatistic($examId);
+            $candRes = $arrayData['arrayCands'];
+            $depts = $arrayData['allDepts'];
+            $grades = $arrayData['arrayGrades'];
+
+            foreach($grades as $key => $grade) {
+                $element_M =[];
+                $element_F = [];
+
+                foreach($depts as $dept) {
+
+                    if(isset($candRes[$dept->name_abr])) {
+                        $candByGrades = $candRes[$dept->name_abr];
+
+                        if(isset($candByGrades[$key])) {
+
+                            if(isset($candByGrades[$key]['M'])) {
+                                $element_M[] = count($candByGrades[$key]['M']);
+                            } else {
+                                $element_M[] = 0;
+                            }
+                            if(isset($candByGrades[$key]['F'])) {
+                                $element_F[] = count($candByGrades[$key]['F']);
+                            } else {
+                                $element_F[] = 0;
+                            }
+
+                        } else {
+                            $element_M[] = 0;
+                            $element_F[] = 0;
+
+                        }
+                    } else {
+                        $element_M[] = 0;
+                        $element_F[] = 0;
+                    }
+
+                }
+
+                $CandidateMale[$grade]= $element_M;
+                $CandidateFemale[$grade] = $element_F;
+
+            }
+
+            return Response::json(['CandidateMale' => $CandidateMale,'CandidateFemale' => $CandidateFemale]);
+
+        } elseif($request->type == 'student_dut_registration') {
+
+            $studentDUTMale = [];
+            $studentDUTFemale = [];
+
+
+            $students = $this->studentDUTRegistration($examId);
+            $allDepts = $this->getAllDepartments();
+            $grades = ['A', 'B', 'C', 'D', 'E'];
+            foreach($allDepts as $allDept ) {
+
+                if($students) {
+                    foreach($students as $student) {
+
+                        if($student->department_id == $allDept->department_id) {
+                            $candidates[$allDept->name_abr][$student->bac_total_grade][$student->code_gender][] = $student;
+
+                        }
+                    }
+                }
+            }
+
+            foreach($grades as $grade) {
+                $element_M =[];
+                $element_F = [];
+
+                foreach($allDepts as $dept) {
+
+                    if(isset($candidates[$dept->name_abr])) {
+                        $candByGrades = $candidates[$dept->name_abr];
+
+                        if(isset($candByGrades[$grade])) {
+
+                            if(isset($candByGrades[$grade]['M'])) {
+                                $element_M[] = count($candByGrades[$grade]['M']);
+                            } else {
+                                $element_M[] = 0;
+                            }
+                            if(isset($candByGrades[$grade]['F'])) {
+                                $element_F[] = count($candByGrades[$grade]['F']);
+                            } else {
+                                $element_F[] = 0;
+                            }
+
+                        } else {
+                            $element_M[] = 0;
+                            $element_F[] = 0;
+
+                        }
+                    } else {
+                        $element_M[] = 0;
+                        $element_F[] = 0;
+                    }
+                }
+                $studentDUTMale[$grade]= $element_M;
+                $studentDUTFemale[$grade] = $element_F;
+            }
+
+            return Response::json(['studentMale' => $studentDUTMale,'studentFemale' => $studentDUTFemale]);
+
+        }
+
+    }
+
+    private function dutResultStatistic ($exam_id) {
         $studentByDept = $this->arrayStudentPassOrReserveByDept($exam_id, $is_success='Pass');//candidates dut pass by department
 
         $allDepts = $this->getAllDepartments();
@@ -1441,13 +1574,30 @@ class ExamController extends Controller
 
         }
 
+        return array(
+            'arrayCands' => $candidates,
+            'allDepts'  => $allDepts,
+            'arrayGrades' => $arrayGrades,
+            'totalByDept'  => $totalBydept,
+            'totalGradeByDept' => $total_dept_grade
+        );
 
+    }
+
+    public function download_dut_result_statistic($exam_id) {
+
+        $arrayData = $this->dutResultStatistic($exam_id);
+        $candidates = $arrayData['arrayCands'];
+        $allDepts = $arrayData['allDepts'];
+        $arrayGrades = $arrayData['arrayGrades'];
+        $totalBydept = $arrayData['totalByDept'];
+        $total_dept_grade = $arrayData['totalGradeByDept'];
 
         return view('backend.exam.print.dut_result_statistic',compact('candidates', 'allDepts', 'arrayGrades', 'totalBydept','total_dept_grade'));
     }
 
 
-    public function download_student_dut_registration_statistic($exam_id) {
+    private function studentDUTRegistration($exam_id) {
 
 
         $exam = Exam::where('id', $exam_id)->first();
@@ -1494,6 +1644,16 @@ class ExamController extends Controller
             ])
             ->get();
 
+
+        return $students;
+
+
+    }
+
+
+    public function download_student_dut_registration_statistic($exam_id) {
+
+        $students = $this->studentDUTRegistration($exam_id);
         $allDepts = $this->getAllDepartments();
 
         $candidates = [];
@@ -3192,6 +3352,62 @@ class ExamController extends Controller
 
             return array($uniqueDept, $allStudentByDept);
         }
+    }
+
+
+
+    public function exportData($examId) {
+
+        dd('Test to export Data');
+//        dd($examId);
+
+
+        $exam = $this->exams->findOrThrowException($examId);
+
+//        $candidate = DB::table('candidates')
+//            ->where('exam_id', $examId)
+//            ->lists('id');
+
+//        $students = DB::table('students')
+//            ->join('studentAnnuals', 'studentAnnuals.student_id', '=', 'students.id')
+//            ->whereNotIn('academic_year_id', [2017])
+//            ->select('name_kh', 'name_latin')
+//            ->distinct('name_latin')
+//            ->orderBy('name_latin', 'ASC')
+//            ->get();
+
+        $studentBac2s = DB::table('studentBac2s')
+            ->select('name_kh', 'mother_name', 'father_name')
+            ->orderBy('name_kh', 'ASC')
+            ->get();
+
+        foreach($studentBac2s as $student) {
+
+            $el = array(
+                'Name_khmer' => $student->name_kh,
+                'Mother_name' => $student->mother_name,
+                'Father_name' => $student->father_name
+            );
+
+            $data[] = $el;
+
+        }
+//        $fields= ['លេខបង្កាន់ដៃ', 'បន្ទប់', 'ឈ្មោះ ខ្មែរ', 'ឈ្មោះ ឡាតាំង', 'ភេទ', 'ថ្ងៃខែរឆ្នាំកំនើត', 'ហត្ថលេខា'];
+
+        $fields= ['Name_Khmer', 'Mother_name', 'Father_name'];
+        $title = 'Student High School';
+        $alpha = [];
+        $letter = 'A';
+        while ($letter !== 'AAA') {
+            $alpha[] = $letter++;
+        }
+        Excel::create('Student High School Data', function($excel) use ($data, $title,$alpha,$fields) {
+
+                $excel->sheet($title, function($sheet) use($data,$title,$alpha,$fields) {
+                    $sheet->fromArray($data);
+                });
+
+        })->export('xls');
     }
 
 }
