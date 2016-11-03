@@ -1,16 +1,32 @@
 @if($exam->type_id == 1)
-
+    <style>
+        table, th, td {
+            border: 1px solid black;
+            font-size: 12pt;
+        }
+    </style>
     <div class="col-lg-12 col-md-12">
-        <div class="col-lg-4 col-md-4">
-            <div class="">
-                <span> <i class="fa fa-bar-chart " style="font-size: 16pt"> Statistic: <strong style="color: #00a7d0">Engineer Entrance Exam</strong> </i></span>
 
-                <h4>Academic Year: <strong style="color: #00a7d0"><?php $academic = explode(' ',$exam->name); echo $academic[2];?></strong></h4>
-                <h4>Date: <strong style="color: #00a7d0"> <?php $start = explode(' ', $exam->date_start); $end = explode(' ', $exam->date_end); echo $start[0].' - '. $end[0];?></strong></h4>
+        <table class="table " style="border: 2px solid black">
+            <tr>
+                <th class="text-center" colspan="2"> <span> <i class="fa fa-bar-chart " style="font-size: 16pt"> Statistic: <strong style="color: #00a7d0">Engineer Entrance Exam</strong> </i></span> </th>
 
-            </div>
 
-        </div>
+            </tr>
+            <tr>
+                <td> {!! Form::label('date_start_end', "Academic Year", ['class' => ' control-label ']) !!}</td>
+                <td>  <strong style="color: #00a7d0"><?php $academic = explode(' ',$exam->name); echo $academic[2];?></strong></td>
+
+
+
+            </tr>
+            <tr>
+                <td>{!! Form::label('date_start_end', trans('labels.backend.exams.fields.date_start_end'), ['class' => ' control-label ']) !!} </td>
+                <td> <strong style="color: #00a7d0"> <?php $start = explode(' ', $exam->date_start); $end = explode(' ', $exam->date_end); echo $start[0].' - '. $end[0];?></strong></td>
+
+
+            </tr>
+        </table>
 
     </div>
     <div id="chart_blog">
@@ -40,18 +56,34 @@
 @endif
 
 @if($exam->type_id == 2)
+    <style>
+        table, th, td {
+            border: 1px solid black;
+            font-size: 12pt;
+        }
+    </style>
 
     <div class="col-lg-12 col-md-12">
-        <div class="col-lg-4 col-md-4">
-            <div class="">
-                <span> <i class="fa fa-bar-chart " style="font-size: 16pt"> Statistic: <strong style="color: #00a7d0">Selection DUT Students</strong> </i></span>
+        <table class="table " style="border: 2px solid black">
+            <tr>
+                <th class="text-center" colspan="2"> <span> <i class="fa fa-bar-chart " style="font-size: 16pt"> Statistic: <strong style="color: #00a7d0">Candidate DUT Selection</strong> </i></span> </th>
 
-                <h4>Academic Year: <strong style="color: #00a7d0"><?php $academic = explode(' ',$exam->name); echo $academic[1];?></strong></h4>
-                <h4>Date: <strong style="color: #00a7d0"> <?php $start = explode(' ', $exam->date_start); $end = explode(' ', $exam->date_end); echo $start[0].' - '. $end[0];?></strong></h4>
 
-            </div>
+            </tr>
+            <tr>
+                <td> {!! Form::label('date_start_end', "Academic Year", ['class' => ' control-label ']) !!}</td>
+                <td>  <strong style="color: #00a7d0"><?php $academic = explode(' ',$exam->name); echo $academic[1];?></strong></td>
 
-        </div>
+
+
+            </tr>
+            <tr>
+                <td>{!! Form::label('date_start_end', trans('labels.backend.exams.fields.date_start_end'), ['class' => ' control-label ']) !!} </td>
+                <td> <strong style="color: #00a7d0"> <?php $start = explode(' ', $exam->date_start); $end = explode(' ', $exam->date_end); echo $start[0].' - '. $end[0];?></strong></td>
+
+
+            </tr>
+        </table>
 
     </div>
 
