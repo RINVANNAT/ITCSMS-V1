@@ -45,6 +45,8 @@
                 </div>
                 <!-- /.btn-group -->
                 <button class="btn btn-default btn-sm"><i class="fa fa-refresh"></i></button>
+
+                <button class="btn btn-primary btn-sm pull-right " id="course_assignment"><i class="fa fa-plus-circle"></i> {{trans('buttons.course.course_annual.course_assignment')}}</button>
             </div>
         </div><!-- /.box-header -->
 
@@ -127,5 +129,11 @@
                 e.preventDefault();
             });
         });
+
+
+        $('#course_assignment').on('click', function() {
+            var url = "{!! route('admin.course.course_assignment') !!}";
+            var course_assignment_window = PopupCenterDual(url,'course assignment','1200','900');
+        })
     </script>
 @stop

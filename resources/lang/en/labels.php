@@ -533,7 +533,103 @@ return [
                 'math_score_quote' =>  "Math Max Score",
                 'phys_chem_score_quote' => "Physique/Chemistry Max Score",
                 'logic_score_quote' => "Logic Max Score",
+            ],
+
+            //------vannat
+
+            'score' => [
+                'input_score'       => 'Input Score',
+                'request_score_form' => 'Request Input Score Form',
+                'select_subject'    => 'Select Subject:',
+                'correction_1'      => 'Correction 1',
+                'correction_2'      => 'Correction 2',
+                'Logic' => 'Logic',
+                'Mathematics'       => 'Mathematics',
+                'Physic/Chemistry'  => ' Physic/Chemistry',
+                'btn_ok'            => 'OK',
+                'btn_cancel'        => 'Cancel',
+                'select_room'       => 'Select Room Code :',
+
+                'form_score' => [
+                    'form_input_score' => 'Form Input Candidate Score',
+                    'room_code' => 'ROOM CODE',
+                    'scoring_sheet' => 'SCORING SHEET',
+                    'correction'    => 'CORRECTION',
+                    'corrector_name' => 'CORRECTOR NAME: ',
+                    'order' => 'Order',
+                    'correct' => 'Correct',
+                    'wrong' => 'Wrong',
+                    'no_answer' => 'No Answer'
+                ],
+                'message' => [
+                    'save_success' => 'your record have been save!',
+                    'save_duplicate'    => 'Duplicate Record!',
+                    'corrector_missing' => 'Please add the Corrector Name',
+                    'zero_value'        => 'You have inputted 0 Value!!!',
+
+                ]
+            ],
+
+            'result' => [
+              'generate_result' => 'Generate Result'
+            ],
+
+            'engineer' => [
+                'engineer_entrance_exam' => 'Engineer Entrance Exam',
+
+            ],
+            'dut' => [
+                'candidate_dut' => 'Candidate DUT Selection',
+            ],
+            'academic_year' => 'Academic Year',
+            'date_from' => 'Start Date',
+            'date_end' => 'End Date',
+            'chart' => [
+                'statistic' => 'Statistic',
+                'export_image' => 'Export Figure',
+                'department' => 'Department',
+                'engineer_statistic' => [
+                    'candidate_register' => 'Candidiate Engineer Registration',
+                    'no_data'   => 'There is no candidate registration yet',
+                    'yaxis'     => 'Number of Student',
+                    'btn_candidate_registration' => 'Candidate Registration',
+                    'btn_attendence_list' =>'Candidate Attendance List',
+                    'student_engineer' => 'Student Engineer Registration',
+                    'student_statistic' => 'Student Engineer Statistic',
+                    'no_student_registration'=> 'There is no student engineer registration',
+                    'result_candidate_engineer' => 'Candidate Engineer Result',
+                    'result_list'=> 'Result List',
+                    'result_statistic' => 'Candidate Result',
+                    'no_result' => 'The result is not yet released់',
+                    'total_pass' => 'Total Pass Students',
+                    'pass_female' => 'Total Pass Female Students',
+                    'total_reserve' => 'Total Reserve Students',
+                    'reserve_female' => 'Total Reserve Female Students',
+                    'grade' => 'Grade',
+                    'total_student' => 'Total Students',
+                    'total_female' => 'Total Female Students',
+                ],
+                'dut_statistic' => [
+                    'candidate_dut_register' => 'Candidate Dut Registration',
+                    'no_data'   => 'There is no candidate dut registration',
+                    'btn_dut_statistic' => 'Candidate Dut Statistic',
+                    'btn_register_list' =>'Candidate Dut List',
+
+                    'student_dut_registration_statistic' => 'Student DUT Registration',
+                    'student_dut_statistic' => 'Student Dut Statistic',
+                    'no_student_registration'=> 'There is no student dut registration',
+
+                    'result_candidate_dut' => 'Candidate DUT Result',
+                    'dut_result_list'=> 'Result List',
+                    'dut_result_statistic' => 'Dut Result Statistic',
+                    'no_result' => 'The result is not yet released',
+                    'male' => 'Male',
+                    'female' => 'Female'
+
+                ]
             ]
+
+            //------end vannat
         ],
         'candidates' => [
             'title' => 'Candidates',
@@ -859,6 +955,12 @@ return [
             'sub_create_title' => 'Create new payment',
             'sub_detail_title' => 'Detail of a payment',
         ],
+
+        'courseAnnual' => [
+            'title' => 'Courses Annually',
+            'lecturer' => 'Lecturers',
+            'course_assignment' => 'Course Assignment'
+        ]
     ],
 
     'frontend' => [

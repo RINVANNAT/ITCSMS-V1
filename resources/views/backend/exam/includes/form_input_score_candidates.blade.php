@@ -1,6 +1,6 @@
 @extends ('backend.layouts.popup_master')
 
-@section ('title', trans('labels.backend.exams.title') . ' | ' . 'Form Input Candidates Scores')
+@section ('title', trans('labels.backend.exams.title') . ' | ' . trans('labels.backend.exams.score.form_score.form_input_score'))
 
 @section('content')
 
@@ -26,7 +26,7 @@
             }
         </style>
         <div class="box-header with-border">
-            <h3 class="box-title "> <span class="enlarge-number">Input Score</span> </h3>
+            <h3 class="box-title "> <span class="enlarge-number">{{trans('labels.backend.exams.score.input_score')}}</span> </h3>
         </div>
 
 
@@ -37,7 +37,7 @@
                 <div class="col-sm-12 no-padding" style="margin-top: -15px">
                     <div class="col-sm-4">
                         <div class="col-sm-12 ">
-                            <h3> ROOM CODE  </h3>
+                            <h3> {{trans('labels.backend.exams.score.form_score.room_code')}}  </h3>
                         </div>
 
 
@@ -70,7 +70,7 @@
                     </div>
                     <div class="col-sm-4" style="text-align: center">
                         <div class="col-sm-12 ">
-                            <h3>SCORING SHEET</h3>
+                            <h3>{{trans('labels.backend.exams.score.form_score.scoring_sheet')}}</h3>
                         </div>
                         <div class="col-sm-12" style="margin-top: -5px">
                             {!! Form::hidden('subject_id', $subjectId, ['class' => 'form-control', 'id'=>'course_id']) !!}
@@ -79,7 +79,7 @@
                     </div>
                     <div class="col-sm-4">
                         <div class="col-sm-12" style="text-align: center">
-                            <h3>CORRECTION </h3>
+                            <h3> {{trans('labels.backend.exams.score.form_score.correction')}} </h3>
                         </div>
 
                         <div class="col-sm-12" style="margin-top: -10px; text-align: center; ">
@@ -99,11 +99,11 @@
 
                     </div>
                     <div class="col-sm-6 no-padding">
-                        <div class="col-sm-3 no-padding" style="margin-top: 5px">
-                            <label for="corrector_name"> Corrector Name : </label>
+                        <div class="col-sm-4 no-padding" style="margin-top: 5px">
+                            <label for="corrector_name"> {{trans('labels.backend.exams.score.form_score.corrector_name')}} </label>
                         </div>
 
-                        <div class="col-sm-9 no-padding">
+                        <div class="col-sm-8 no-padding">
                             {!! Form::text('corrector', null, ['class' => 'form-control', 'placeholder'=>'name corrector', 'id'=> 'corrector_name', 'required']) !!}
                         </div>
 
@@ -117,10 +117,10 @@
                     <table class="table">
                         <thead>
                         <tr>
-                            <th> Order </th>
-                            <th> Correct </th>
-                            <th> Wrong  </th>
-                            <th> No Answer </th>
+                            <th> {{trans('labels.backend.exams.score.form_score.order')}} </th>
+                            <th> {{trans('labels.backend.exams.score.form_score.correct')}} </th>
+                            <th> {{trans('labels.backend.exams.score.form_score.wrong')}}  </th>
+                            <th> {{trans('labels.backend.exams.score.form_score.no_answer')}} </th>
                             @if($candidates)
                                 <th> Total: {{$candidates[0]->total_question}} </th>
                             @endif
@@ -231,9 +231,9 @@
                     success: function(result) {
                         if(result.status) {
 
-                            notify("success","info", "your record have been save!");
+                            notify("success","info", "{{trans('labels.backend.exams.score.message.save_success')}}");
                         } else {
-                            notify("error","info", "Duplicate Record!");
+                            notify("error","info", "{{trans('labels.backend.exams.score.message.save_duplicate')}}");
                         }
 
                     }
@@ -261,15 +261,15 @@
 
                 if(corrector_name != '' ) {
 
-                    console.log(corrector_name);
                     if(status > 0) {
                         swal({
                             title: "Confirm",
-                            text: "You have inputted 0 Value!!!",
+                            text: "{{trans('labels.backend.exams.score.message.zero_value')}}",
                             type: "info",
                             showCancelButton: true,
+                            cancelButtonText: "{{ trans('labels.backend.exams.score.btn_cancel') }}",
                             confirmButtonColor: "#DD6B55",
-                            confirmButtonText: "Yes",
+                            confirmButtonText: "{{ trans('labels.backend.exams.score.btn_ok') }}",
                             closeOnConfirm: true
                         }, function(confirmed) {
                             if (confirmed) {
@@ -281,7 +281,7 @@
                     }
                 } else {
 
-                    notify("error","info", "Please Add The Corrector Name!!");
+                    notify("error","info", "{{trans('labels.backend.exams.score.message.corrector_missing')}}");
                 }
             });
 

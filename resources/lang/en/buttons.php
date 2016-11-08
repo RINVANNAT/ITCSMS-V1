@@ -58,6 +58,25 @@ return [
         'course' => [
             'generate_score' => "Generate Score",
             'input_score' => "Input Score"
+        ],
+
+        'result' => [
+
+            'dut' => [
+                'generate_result' => 'Generate Result'
+            ],
+            'engineer' => [
+
+            ]
+        ]
+    ],
+
+    'course' => [
+        'course_annual' =>[
+            'course_assignment' => 'Course Assignment'
+        ],
+        'course_program' => [
+
         ]
     ]
 ];

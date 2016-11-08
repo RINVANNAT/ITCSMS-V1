@@ -275,4 +275,281 @@ class CourseAnnualController extends Controller
         }
     }
 
+
+    private function getCourseAnnualFromDB ($teacherId) {
+
+            $courseAnnuals = DB::table('course_annuals')
+                ->leftJoin('courses','course_annuals.course_id', '=', 'courses.id')
+                ->leftJoin('employees','course_annuals.employee_id', '=', 'employees.id')
+                ->leftJoin('departments','course_annuals.department_id', '=', 'departments.id')
+                ->leftJoin('degrees','course_annuals.degree_id', '=', 'degrees.id')
+//            ->leftJoin('grades','course_annuals.grade_id', '=', 'grade.id')
+
+                ->orderBy("course_annuals.updated_at","desc")
+                ->select(
+                    ['course_annuals.id',
+                        'courses.name_en as course_name',
+                        'courses.id as course_id',
+                        'course_annuals.semester_id',
+                        'course_annuals.active',
+                        'course_annuals.academic_year_id',
+                        'employees.name_latin as employee_id',
+                        'departments.code as department_id',
+                        'degrees.code as degree_id',
+//                    'grades.code  as grade_id',
+                        'courses.grade_id',
+                        'course_annuals.course_id']
+                )
+                ->where('employees.id', $teacherId)
+                ->get();
+
+        return $courseAnnuals;
+    }
+
+    private function getNotSelectedCourseByDept($list, $deptId) {
+
+
+        $courseAnnuals = DB::table('courses')
+            ->leftJoin('departments','courses.department_id', '=', 'departments.id')
+            ->leftJoin('degrees','courses.degree_id', '=', 'degrees.id')
+            ->select([
+                    'courses.name_en as course_name',
+                    'courses.id as course_id',
+                    'departments.code as department_id',
+                    'degrees.code as degree_id',
+                    'courses.grade_id'
+                ])
+            ->where('departments.id', $deptId)
+            ->whereNotIn('courses.id', $list)
+            ->get();
+
+        return $courseAnnuals;
+
+    }
+
+    private function getSelectedCourses ($deptID) {
+
+        $courseAnnuals = DB::table('course_annuals')
+            ->leftJoin('courses','course_annuals.course_id', '=', 'courses.id')
+            ->leftJoin('employees','course_annuals.employee_id', '=', 'employees.id')
+            ->leftJoin('departments','course_annuals.department_id', '=', 'departments.id')
+            ->leftJoin('degrees','course_annuals.degree_id', '=', 'degrees.id')
+
+            ->orderBy("course_annuals.updated_at","desc")
+            ->select(
+                ['course_annuals.id',
+                    'courses.name_en as name',
+                    'course_annuals.semester_id',
+                    'course_annuals.active',
+                    'course_annuals.academic_year_id',
+                    'employees.name_latin as employee_id',
+                    'departments.code as department_id',
+                    'degrees.code as degree_id',
+//                    'grades.code  as grade_id',
+                    'courses.grade_id',
+                    'course_annuals.course_id']
+            )
+            ->where('departments.id', $deptID)
+            ->lists('courses.id');
+
+        return $courseAnnuals;
+
+    }
+
+    private function checkDepartmentID($userId) {
+
+        $deptIDbyUserID = DB::table('users')
+            ->join('employees', 'users.id', '=' , 'employees.user_id')
+            ->join('departments', 'departments.id', '=', 'employees.department_id')
+            ->where('users.id', $userId)
+            ->select('departments.id')->first();
+        if($deptIDbyUserID) {
+            return $deptIDbyUserID;
+        } else {
+            return [];
+        }
+    }
+
+    private function getAllteacherByDeptId ($deptID) {
+
+        $allTeachers = DB::table('employees')
+            ->join('departments', 'departments.id', '=', 'employees.department_id')
+            ->select('employees.name_kh as teacher_name', 'employees.id as teacher_id', 'departments.id as department_id')
+            ->where('departments.id', $deptID)
+            ->distinct('BINARY employees.name_kh')
+            ->get();
+
+        return $allTeachers;
+
+    }
+
+    public function getAllDepartments() {
+
+        $allDepartments= [];
+
+        $userId = auth()->user()->id;
+        $deptID = $this->checkDepartmentID($userId);
+
+        $depts = DB::table('departments')
+            ->select('departments.id as department_id', 'departments.name_en as department_name', 'departments.code as name_abr')
+            ->where([
+                ['departments.active', '=', true],
+                ['is_specialist', '=', true],
+                ['parent_id', '=', 11]
+            ])
+            ->orderBy('name_abr', 'ASC')
+            ->get('departments.department_id');
+
+
+        foreach($depts as $dept) {
+
+            if($deptID->id == $dept->department_id) {
+
+                $element = array(
+                    "id" => 'department_' . $dept->department_id,
+                    "text" => 'Department '.$dept->name_abr,
+                    "children" => true,
+                    "type" => "department",
+                    "state" => ["opened" => true, "selected" => true ]
+                );
+                array_push($allDepartments, $element);
+
+
+            } else {
+
+                $element = array(
+                    "id" => 'department_' . $dept->department_id,
+                    "text" => $dept->name_abr,
+                    "children" => true,
+                    "type" => "department"
+                );
+                array_push($allDepartments, $element);
+            }
+        }
+
+        return Response::json($allDepartments);
+    }
+
+    public function getAllTeacherByDepartmentId () {
+
+        $teachers = [];
+        $userId = auth()->user()->id;
+        $deptID = $this->checkDepartmentID($userId);
+        $department_id = explode('_', $_GET['id'])[1];
+
+
+        $allTeachers = $this->getAllteacherByDeptId($department_id);
+
+        foreach ($allTeachers as $teacher) {
+
+            if($deptID->id == $department_id) {
+
+                $element = array(
+                    "id" => 'teacher_' . $teacher->teacher_id,
+                    "text" => $teacher->teacher_name,
+                    "children" => true,
+                    "type" => "teacher",
+                    "state" => ["opened" => true, "selected" => true ]
+                );
+                array_push($teachers, $element);
+
+            } else {
+                $element = array(
+                    "id" => 'teacher_' . $teacher->teacher_id,
+                    "text" => $teacher->teacher_name,
+                    "children" => true,
+                    "type" => "teacher"
+                );
+                array_push($teachers, $element);
+            }
+
+
+        }
+
+        return Response::json($teachers);
+
+    }
+
+    public function getSeletedCourseByTeacherID() {
+
+        $courses = [];
+        $arayCourse =[];
+
+        $teacher_id = explode('_', $_GET['id'])[1];
+
+        $selectedCourses = $this->getCourseAnnualFromDB($teacher_id);
+
+        if($selectedCourses) {
+
+            foreach($selectedCourses as $course) {
+
+                $element = array(
+                    "id" => 'course_' . $course->course_id,
+                    "text" => $course->course_name. ' ('.$course->degree_id.$course->grade_id.')',
+                    "children" => false,
+                    "type" => "course"
+                );
+                array_push($courses, $element);
+
+            }
+
+            $res = array_map("unserialize", array_unique(array_map("serialize", $courses)));
+
+            foreach ($res as $a) {
+                array_push($arayCourse, $a);
+            }
+
+            return Response::json($arayCourse);
+        }
+
+    }
+
+
+    public function getAllCourseByDepartment () {
+
+        $deptId = explode('_', $_GET['id'])[1];
+        $arrayCourses = [];
+        $arayCourse = [];
+        $Ids = $this->getSelectedCourses($deptId);
+
+        $notSelectedCourses = $this->getNotSelectedCourseByDept($Ids, $deptId);
+
+        if($notSelectedCourses) {
+
+            foreach($notSelectedCourses as $course) {
+
+                $element = array(
+                    "id" => 'course_' . $course->course_id,
+                    "text" => $course->course_name. '('.$course->degree_id.'-'.$course->grade_id.')',
+                    "children" => false,
+                    "type" => "course"
+                );
+                array_push($arrayCourses, $element);
+
+            }
+
+        }
+
+        $res = array_map("unserialize", array_unique(array_map("serialize", $arrayCourses)));
+
+        foreach ($res as $a) {
+            array_push($arayCourse, $a);
+        }
+        return Response::json($arayCourse);
+
+    }
+
+    public function courseAssignment () {
+
+//        dd(auth()->user()->id);
+        return view('backend.course.courseAnnual.includes.popup_course_assignment');
+    }
+
+
+    public function removeCourse (Request $request) {
+
+        dd($request->all());
+
+    }
+
 }

@@ -8,14 +8,14 @@
         <thead>
         <tr>
             <th></th>
-            <th>Total</th>
-            <th>Female</th>
+            <th>{{ trans('labels.backend.exams.chart.engineer_statistic.total_student') }}</th>
+            <th>{{ trans('labels.backend.exams.chart.engineer_statistic.total_female') }}</th>
         </tr>
         </thead>
         <tbody>
         @foreach($arrayGrades as $key => $grade)
             <tr>
-                <th> Grade {{$key}}</th>
+                <th> {{ trans('labels.backend.exams.chart.engineer_statistic.grade') }} {{$key}}</th>
                 <td>{{ count($candidateDuts[$grade]['M']) + count($candidateDuts[$grade]['F'])}}</td>
                 <td>{{count($candidateDuts[$grade]['F'])}}</td>
             </tr>

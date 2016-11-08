@@ -9,12 +9,12 @@
 
         <table class="table " style="border: 2px solid black">
             <tr>
-                <th class="text-center" colspan="2"> <span> <i class="fa fa-bar-chart " style="font-size: 16pt"> Statistic: <strong style="color: #00a7d0">Engineer Entrance Exam</strong> </i></span> </th>
+                <th class="text-center" colspan="2"> <span> <i class="fa fa-bar-chart " style="font-size: 16pt"> Statistic: <strong style="color: #00a7d0">{{ trans('labels.backend.exams.engineer.engineer_entrance_exam') }}</strong> </i></span> </th>
 
 
             </tr>
             <tr>
-                <td> {!! Form::label('date_start_end', "Academic Year", ['class' => ' control-label ']) !!}</td>
+                <td> {!! Form::label('date_start_end',  trans('labels.backend.exams.academic_year'), ['class' => ' control-label ']) !!}</td>
                 <td>  <strong style="color: #00a7d0"><?php $academic = explode(' ',$exam->name); echo $academic[2];?></strong></td>
 
 
@@ -66,12 +66,12 @@
     <div class="col-lg-12 col-md-12">
         <table class="table " style="border: 2px solid black">
             <tr>
-                <th class="text-center" colspan="2"> <span> <i class="fa fa-bar-chart " style="font-size: 16pt"> Statistic: <strong style="color: #00a7d0">Candidate DUT Selection</strong> </i></span> </th>
+                <th class="text-center" colspan="2"> <span> <i class="fa fa-bar-chart " style="font-size: 16pt"> Statistic: <strong style="color: #00a7d0">{{ trans('labels.backend.exams.dut.candidate_dut') }}</strong> </i></span> </th>
 
 
             </tr>
             <tr>
-                <td> {!! Form::label('date_start_end', "Academic Year", ['class' => ' control-label ']) !!}</td>
+                <td> {!! Form::label('date_start_end', trans('labels.backend.exams.academic_year'), ['class' => ' control-label ']) !!}</td>
                 <td>  <strong style="color: #00a7d0"><?php $academic = explode(' ',$exam->name); echo $academic[1];?></strong></td>
 
 

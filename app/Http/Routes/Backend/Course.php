@@ -23,4 +23,16 @@ Route::group([
         Route::post('course-import-config', 'CourseController@import_config')->name('admin.course.course_program.import_config');
 
     });
+
+    Route::get('course-annual/course-assignment', 'CourseAnnualController@courseAssignment')->name('admin.course.course_assignment');
+
+    Route::get('course-annual/get-departments', 'CourseAnnualController@getAllDepartments')->name('admin.course.get_department');
+
+    Route::get('course-annual/get-teacher-by-department', 'CourseAnnualController@getAllTeacherByDepartmentId')->name('admin.course.get_teacher_by_department');
+
+    Route::get('course-annual/get-course-by-teacher', 'CourseAnnualController@getSeletedCourseByTeacherID')->name('admin.course.get_course_by_teacher');
+
+    Route::get('course-annual/get-course-by-department', 'CourseAnnualController@getAllCourseByDepartment')->name('admin.course.get_course_by_department');
+
+    Route::delete('course-annual/remove-course-from-teacher', 'CourseAnnualController@removeCourse')->name('admin.course.remove_course_from_teacher');
 });

@@ -1170,7 +1170,7 @@
                             },
 
                             lang: {
-                                noData: "The result is not released yet"
+                                noData: "{{ trans('labels.backend.exams.chart.engineer_statistic.no_result') }}"
                             },
                             chart: {
                                 type: 'column'
@@ -1179,14 +1179,14 @@
                                 buttons: {
                                     contextButton: {
                                         menuItems: [{
-                                            text: '<span class="fa fa-print" style="font-size: 12pt"> Candidate Engineer Result</span>',
+                                            text: '<span class="fa fa-print" style="font-size: 12pt"> {{ trans('labels.backend.exams.chart.engineer_statistic.result_statistic') }}</span>',
                                             onclick: function () {
                                                 var url = "{!! route('admin.exam.download_registration_statistic', $exam->id) !!}";
 
                                                 PopupCenterDual(url+'?download='+'candidate_engineer_result','download Registration Statistic','1200','900');
                                             }
                                         },  {
-                                            text: '<span class="fa fa-file-excel-o" style="font-size: 12pt"> Result Sheet</span>',
+                                            text: '<span class="fa fa-file-excel-o" style="font-size: 12pt"> {{ trans('labels.backend.exams.chart.engineer_statistic.result_list') }}</span>',
                                             onclick: function () {
                                                 var url = "{{route('admin.exam.export_candidate_result_lists', $exam->id)}}";
                                                 window.open(url, '_blank');
@@ -1194,7 +1194,7 @@
                                             }
 
                                         }, {
-                                            text: '<span style="font-size: 12pt"> Export Figure</span>',
+                                            text: '<span style="font-size: 12pt" class="fa fa-download"> {{ trans('labels.backend.exams.chart.export_image') }}</span>',
                                             onclick: function () {
                                                 this.exportChart();
                                             },
@@ -1209,18 +1209,23 @@
                             },
 
                             title: {
-                                text: 'Candidates Result Engineer'
+                                useHTML: true,
+                                x: 25,
+                                align: 'left',
+                                text: '<span style="color: #0a6aa1; font-size: 16pt" class="fa fa-bar-chart"> {{ trans('labels.backend.exams.chart.engineer_statistic.result_candidate_engineer') }} </span>'
                             },
                             yAxis: {
                                 allowDecimals: false,
                                 title: {
-                                    text: 'Number of Student'
+
+                                    useHTML:true,
+                                    text: '<strong style="font-size:10pt" >{{ trans('labels.backend.exams.chart.engineer_statistic.yaxis') }}</strong>'
                                 }
                             },
                             tooltip: {
                                 formatter: function () {
                                     return '<b>' + this.series.name + '</b><br/>' +
-                                            this.point.y + ' ' + this.point.name.toLowerCase();
+                                            this.point.name + ' = ' + this.point.y;
                                 }
                             }
                         });
@@ -1234,7 +1239,7 @@
                             },
 
                             lang: {
-                                noData: "There is no student engineer registration"
+                                noData: "{{ trans('labels.backend.exams.chart.engineer_statistic.no_student_registration') }}"
                             },
                             chart: {
                                 type: 'column'
@@ -1244,21 +1249,14 @@
                                 buttons: {
                                     contextButton: {
                                         menuItems: [{
-                                            text: '<span class="fa fa-print" style="font-size: 12pt"> Student Statistic</span>',
+                                            text: '<span class="fa fa-print" style="font-size: 12pt"> {{ trans('labels.backend.exams.chart.engineer_statistic.student_statistic') }} </span>',
                                             onclick: function () {
                                                 var url = "{!! route('admin.exam.download_registration_statistic', $exam->id) !!}";
 
                                                 PopupCenterDual(url+'?download='+'student_registration','download Registration Statistic','1200','900');
                                             }
                                         }, {
-                                            text: '<span class="fa fa-file-excel-o" style="font-size: 12pt"> Attendance List</span>',
-                                            onclick: function () {
-                                                var url = "{{route('admin.exam.export_attendance_list',$exam->id)}}";
-                                                window.open(url, '_blank');
-                                            }
-
-                                        }, {
-                                            text: '<span style="font-size: 12pt">Export Figure</span>',
+                                            text: '<span style="font-size: 12pt" class="fa fa-download"> {{ trans('labels.backend.exams.chart.export_image') }}</span>',
                                             onclick: function () {
                                                 this.exportChart();
                                             },
@@ -1274,18 +1272,21 @@
                             },
 
                             title: {
-                                text: 'Student Registration Engineer'
+                                useHTML: true,
+                                x: 25,
+                                align: 'left',
+                                text: '<span style="color: #0a6aa1; font-size: 16pt" class="fa fa-bar-chart"> {{ trans('labels.backend.exams.chart.engineer_statistic.student_engineer') }} </span>'
                             },
                             yAxis: {
                                 allowDecimals: false,
                                 title: {
-                                    text: 'Number of Student'
+                                    text: '<strong style="font-size:10pt" > {{ trans('labels.backend.exams.chart.engineer_statistic.yaxis') }}</strong>'
                                 }
                             },
                             tooltip: {
                                 formatter: function () {
                                     return '<b>' + this.series.name + '</b><br/>' +
-                                            this.point.y + ' ' + this.point.name.toLowerCase();
+                                            this.point.name + ' = ' + this.point.y;
                                 }
                             }
                         });
@@ -1317,14 +1318,21 @@
                                 buttons: {
                                     contextButton: {
                                         menuItems: [{
-                                            text: '<span class="fa fa-print" style="font-size: 12pt"> Candidate Registration</span>',
+                                            text: '<span class="fa fa-print" style="font-size: 12pt"> {{ trans('labels.backend.exams.chart.engineer_statistic.btn_candidate_registration') }}</span>',
                                             onclick: function () {
                                                 var url = "{!! route('admin.exam.download_registration_statistic', $exam->id) !!}";
 
                                                 PopupCenterDual(url+'?download='+'candidate_engineer_registration','download Registration Statistic','1200','900');
                                             }
                                         }, {
-                                            text: '<span style="font-size: 12pt">Export Figure</span>',
+                                            text: '<span class="fa fa-file-excel-o" style="font-size: 12pt"> {{ trans('labels.backend.exams.chart.engineer_statistic.btn_attendence_list') }}</span>',
+                                            onclick: function () {
+                                                var url = "{{route('admin.exam.export_attendance_list',$exam->id)}}";
+                                                window.open(url, '_blank');
+                                            }
+
+                                        },{
+                                            text: '<span style="font-size: 12pt" class="fa fa-download"> {{ trans('labels.backend.exams.chart.export_image') }} </span>',
                                             onclick: function () {
                                                 this.exportChart();
                                             },
@@ -1335,7 +1343,7 @@
                             },
 
                             lang: {
-                                noData: "There is no candidate registration"
+                                noData: "{{ trans('labels.backend.exams.chart.engineer_statistic.no_data') }}"
                             },
 
                             credits: {
@@ -1343,7 +1351,10 @@
                             },
 
                             title: {
-                                text: 'Candidate Engineer Registration'
+                                useHTML: true,
+                                x: 25,
+                                align: 'left',
+                                text: '<span style="color: #0a6aa1; font-size: 16pt" class="fa fa-line-chart"> {{ trans('labels.backend.exams.chart.engineer_statistic.candidate_register') }} </span>'
                             },
                             xAxis: {
                                 tickInterval: 1,
@@ -1362,7 +1373,8 @@
                                 lineWidth: 5,
                                 lineColor: 'green',
                                 title: {
-                                    text: '<strong>Number of Student</strong>'
+                                    useHTML: true,
+                                    text: '<strong style="font-size:10pt" >{{ trans('labels.backend.exams.chart.engineer_statistic.yaxis') }}</strong>'
                                 }
                             },
                             plotOptions: {
@@ -1400,27 +1412,27 @@
                             },
 
                             series: [{
-                                name: 'Grade A',
+                                name: '{{ trans('labels.backend.exams.chart.engineer_statistic.grade') }} A',
                                 data:grade_A,
                                 color: 'blue',
                                 showInLegend: true
                             },{
-                                name: 'Grade B',
+                                name: '{{ trans('labels.backend.exams.chart.engineer_statistic.grade') }} B',
                                 data:grade_B,
                                 color: 'green',
                                 showInLegend: true
                             },{
-                                name: 'Grade C',
+                                name: '{{ trans('labels.backend.exams.chart.engineer_statistic.grade') }} C',
                                 data:grade_C,
                                 color: 'red',
                                 showInLegend: true
                             },{
-                                name: 'Grade D',
+                                name: '{{ trans('labels.backend.exams.chart.engineer_statistic.grade') }} D',
                                 data:grade_D,
                                 color: 'black',
                                 showInLegend: true
                             },{
-                                name: 'Grade E',
+                                name: '{{ trans('labels.backend.exams.chart.engineer_statistic.grade') }} E',
                                 data:grade_E,
                                 color: '#CB15D7',
                                 showInLegend: true
@@ -1456,7 +1468,7 @@
                         },
 
                         lang: {
-                            noData: "No DUT Candidate Registration"
+                            noData: "{{ trans('labels.backend.exams.chart.dut_statistic.no_data') }}"
                         },
                         chart: {
                             type: 'column'
@@ -1466,21 +1478,21 @@
                             buttons: {
                                 contextButton: {
                                     menuItems: [{
-                                        text: '<span class="fa fa-print" style="font-size: 12pt"> DUT Statistic</span>',
+                                        text: '<span class="fa fa-print" style="font-size: 12pt"> {{ trans('labels.backend.exams.chart.dut_statistic.btn_dut_statistic') }}</span>',
                                         onclick: function () {
                                             var url = "{{route('admin.exam.download_dut_registration_statistic',$exam->id)}}";
 
                                             PopupCenterDual(url+'?download='+'student_registration','download Registration Statistic','1200','900');
                                         }
                                     }, {
-                                        text:'<span class="fa fa-file-excel-o" style="font-size: 12pt"> DUT List</span>',
+                                        text:'<span class="fa fa-file-excel-o" style="font-size: 12pt"> {{ trans('labels.backend.exams.chart.dut_statistic.btn_register_list') }} </span>',
                                         onclick: function() {
                                             var url = "{{route('admin.exam.export_candidate_list_dut',$exam->id)}}";
                                             window.open(url, '_blank');
                                         }
 
                                     },{
-                                        text: '<span style="font-size: 12pt"> Export Figure </span>',
+                                        text:  '<span style="font-size: 12pt" class="fa fa-download"> {{ trans('labels.backend.exams.chart.export_image') }} </span>',
                                         onclick: function () {
                                             this.exportChart();
                                         },
@@ -1496,18 +1508,21 @@
                         },
 
                         title: {
-                            text: 'Candidate DUT Registration Statistic'
+                            useHTML: true,
+                            x: 25,
+                            align: 'left',
+                            text: '<span style="color: #0a6aa1; font-size: 16pt" class="fa fa-bar-chart"> {{ trans('labels.backend.exams.chart.dut_statistic.candidate_dut_register') }} </span>'
                         },
                         yAxis: {
                             allowDecimals: false,
                             title: {
-                                text: 'Number of Student'
+                                text: '<strong style="font-size:10pt" >{{ trans('labels.backend.exams.chart.engineer_statistic.yaxis') }}</strong>'
                             }
                         },
                         tooltip: {
                             formatter: function () {
                                 return '<b>' + this.series.name + '</b><br/>' +
-                                        this.point.y ;
+                                        this.point.name + ' = ' + this.point.y;
                             }
                         }
                     });
@@ -1533,7 +1548,11 @@
                         },
 
                         title: {
-                            text: 'Result Candidate DUT Statistic'
+
+                            useHTML: true,
+                            x: 25,
+                            align: 'left',
+                            text: '<span style="color: #0a6aa1; font-size: 16pt" class="fa fa-bar-chart"> {{ trans('labels.backend.exams.chart.dut_statistic.result_candidate_dut') }} </span>'
                         },
 
                         exporting: {
@@ -1541,14 +1560,14 @@
                             buttons: {
                                 contextButton: {
                                     menuItems: [{
-                                        text: '<span class="fa fa-print" style="font-size: 12pt"> DUT Result Statistic</span>',
+                                        text: '<span class="fa fa-print" style="font-size: 12pt"> {{ trans('labels.backend.exams.chart.dut_statistic.dut_result_statistic') }}</span>',
                                         onclick: function () {
                                             var url = "{{route('admin.exam.download_dut_result_statistic',$exam->id)}}";
 
                                             PopupCenterDual(url,'download Result DUT Statistic','1200','900');
                                         }
                                     }, {
-                                        text:'<span class="fa fa-file-excel-o" style="font-size: 12pt"> DUT Result List</span>',
+                                        text:'<span class="fa fa-file-excel-o" style="font-size: 12pt"> {{ trans('labels.backend.exams.chart.dut_statistic.dut_result_list') }}</span>',
                                         onclick: function() {
                                             var url = "{{route('admin.exam.export_candidate_dut_detail',$exam->id)}}";
                                             window.open(url, '_blank');
@@ -1556,7 +1575,7 @@
                                         }
 
                                     },{
-                                        text: '<span style="font-size: 12pt"> Export Figure </span>',
+                                        text:  '<span style="font-size: 12pt" class="fa fa-download"> {{ trans('labels.backend.exams.chart.export_image') }} </span>',
                                         onclick: function () {
                                             this.exportChart();
                                         },
@@ -1573,13 +1592,21 @@
 
 
                         xAxis: {
-                            categories: ['GCA', 'GCI', 'GEE', 'GGG', 'GIC', 'GIM', 'GRU']
+                            categories: [
+                                '{{ trans('labels.backend.exams.chart.department') }}: GCA',
+                                '{{ trans('labels.backend.exams.chart.department') }}: GCI',
+                                '{{ trans('labels.backend.exams.chart.department') }}: GEE',
+                                '{{ trans('labels.backend.exams.chart.department') }}: GGG',
+                                '{{ trans('labels.backend.exams.chart.department') }}: GIC',
+                                '{{ trans('labels.backend.exams.chart.department') }}: GIM',
+                                '{{ trans('labels.backend.exams.chart.department') }}: GRU'
+                            ]
                         },
                         yAxis: {
                             allowDecimals: false,
                             min: 0,
                             title: {
-                                text: 'Number of Students'
+                                text: '<strong style="font-size:10pt" >{{ trans('labels.backend.exams.chart.engineer_statistic.yaxis') }}</strong>'
                             }
                         },
 
@@ -1587,7 +1614,7 @@
                             formatter: function () {
                                 return '<b>' + this.x + '</b><br/>' +
                                         this.series.name + ': ' + this.y + '<br/>' +
-                                        'Total: ' + this.point.stackTotal;
+                                        '{{ trans('labels.backend.exams.chart.engineer_statistic.total_student') }} : ' + this.point.stackTotal;
                             }
                         },
                         plotOptions: {
@@ -1597,52 +1624,52 @@
                         },
 
                         series: [{
-                            name: 'Grade:A(male)',
+                            name: '{{ trans('labels.backend.exams.chart.engineer_statistic.grade') }} :A ({{ trans('labels.backend.exams.chart.dut_statistic.male') }})',
                             data: resultData['CandidateMale']['34'],
                             stack: 'male_1',
                             color: '#088174'
                         }, {
-                            name: 'Grade:B(male)',
+                            name: '{{ trans('labels.backend.exams.chart.engineer_statistic.grade') }} :B ({{ trans('labels.backend.exams.chart.dut_statistic.male') }})',
                             data: resultData['CandidateMale']['35'],
                             stack: 'male_2',
                             color: '#088174',
                         }, {
-                            name: 'Grade:C(male)',
+                            name: '{{ trans('labels.backend.exams.chart.engineer_statistic.grade') }} :C ({{ trans('labels.backend.exams.chart.dut_statistic.male') }})',
                             data: resultData['CandidateMale']['36'],
                             stack: 'male_3',
                             color: '#088174',
                         }, {
-                            name: 'Grade:D(male)',
+                            name: '{{ trans('labels.backend.exams.chart.engineer_statistic.grade') }} :D ({{ trans('labels.backend.exams.chart.dut_statistic.male') }})',
                             data: resultData['CandidateMale']['37'],
                             stack: 'male_4',
                             color: '#088174',
                         },{
-                            name: 'Grade:E(male)',
+                            name: '{{ trans('labels.backend.exams.chart.engineer_statistic.grade') }} :E ({{ trans('labels.backend.exams.chart.dut_statistic.male') }})',
                             data: resultData['CandidateMale']['38'],
                             stack: 'male_5',
                             color: '#088174',
                         },{
-                            name: 'Grade:A(female)',
+                            name: '{{ trans('labels.backend.exams.chart.engineer_statistic.grade') }} :A ({{ trans('labels.backend.exams.chart.dut_statistic.female') }})',
                             data: resultData['CandidateFemale']['34'],
                             stack: 'male_1',
                             color: '#FC7E93',
                         },{
-                            name: 'Grade:B(female)',
+                            name: '{{ trans('labels.backend.exams.chart.engineer_statistic.grade') }} :B ({{ trans('labels.backend.exams.chart.dut_statistic.female') }})',
                             data: resultData['CandidateFemale']['35'],
                             stack: 'male_2',
                             color: '#FC7E93',
                         },{
-                            name: 'Grade:C(female)',
+                            name: '{{ trans('labels.backend.exams.chart.engineer_statistic.grade') }} :C ({{ trans('labels.backend.exams.chart.dut_statistic.female') }})',
                             data: resultData['CandidateFemale']['36'],
                             stack: 'male_3',
                             color: '#FC7E93',
                         },{
-                            name: 'Grade:D(female)',
+                            name: '{{ trans('labels.backend.exams.chart.engineer_statistic.grade') }} :D ({{ trans('labels.backend.exams.chart.dut_statistic.female') }})',
                             data: resultData['CandidateFemale']['37'],
                             stack: 'male_4',
                             color: '#FC7E93',
                         },{
-                            name: 'Grade:E(female)',
+                            name: '{{ trans('labels.backend.exams.chart.engineer_statistic.grade') }} :E ({{ trans('labels.backend.exams.chart.dut_statistic.female') }})',
                             data: resultData['CandidateFemale']['38'],
                             stack: 'male_5',
                             color: '#FC7E93',
@@ -1673,7 +1700,10 @@
                             },
 
                             title: {
-                                text: 'Students DUT Registration Statistic'
+                                useHTML: true,
+                                x: 25,
+                                align: 'left',
+                                text: '<span style="color: #0a6aa1; font-size: 16pt" class="fa fa-bar-chart"> {{ trans('labels.backend.exams.chart.dut_statistic.student_dut_registration_statistic') }} </span>'
                             },
 
                             exporting: {
@@ -1681,14 +1711,14 @@
                                 buttons: {
                                     contextButton: {
                                         menuItems: [{
-                                            text: '<span class="fa fa-print" style="font-size: 12pt"> Student DUT Statistic</span>',
+                                            text: '<span class="fa fa-print" style="font-size: 12pt"> {{ trans('labels.backend.exams.chart.dut_statistic.student_dut_statistic') }} </span>',
                                             onclick: function () {
                                                 var url = "{{route('admin.exam.download_student_dut_registration_statistic',$exam->id)}}";
 
                                                 PopupCenterDual(url,'download Student DUT Registration Statistic','1200','900');
                                             }
                                         }, {
-                                            text: '<span style="font-size: 12pt"> Export Figure </span>',
+                                            text:  '<span style="font-size: 12pt" class="fa fa-download"> {{ trans('labels.backend.exams.chart.export_image') }} </span>',
                                             onclick: function () {
                                                 this.exportChart();
                                             },
@@ -1705,13 +1735,21 @@
 
 
                             xAxis: {
-                                categories: ['GCA', 'GCI', 'GEE', 'GGG', 'GIC', 'GIM', 'GRU']
+                                categories: [
+                                    '{{ trans('labels.backend.exams.chart.department') }}: GCA',
+                                    '{{ trans('labels.backend.exams.chart.department') }}: GCI',
+                                    '{{ trans('labels.backend.exams.chart.department') }}: GEE',
+                                    '{{ trans('labels.backend.exams.chart.department') }}: GGG',
+                                    '{{ trans('labels.backend.exams.chart.department') }}: GIC',
+                                    '{{ trans('labels.backend.exams.chart.department') }}: GIM',
+                                    '{{ trans('labels.backend.exams.chart.department') }}: GRU'
+                                ]
                             },
                             yAxis: {
                                 allowDecimals: false,
                                 min: 0,
                                 title: {
-                                    text: 'Number of Students'
+                                    text: '<strong style="font-size:10pt" >{{ trans('labels.backend.exams.chart.engineer_statistic.yaxis') }}</strong>'
                                 }
                             },
 
@@ -1719,7 +1757,7 @@
                                 formatter: function () {
                                     return '<b>' + this.x + '</b><br/>' +
                                             this.series.name + ': ' + this.y + '<br/>' +
-                                            'Total: ' + this.point.stackTotal;
+                                            '{{ trans('labels.backend.exams.chart.engineer_statistic.total_student') }} : ' + this.point.stackTotal;
                                 }
                             },
                             plotOptions: {
@@ -1729,52 +1767,52 @@
                             },
 
                             series: [{
-                                name: 'Grade:A(male)',
+                                name:  '{{ trans('labels.backend.exams.chart.engineer_statistic.grade') }} :A ({{ trans('labels.backend.exams.chart.dut_statistic.male') }})',
                                 data: Data['studentMale']['A'],
                                 stack: 'male_1',
                                 color: '#088174'
                             }, {
-                                name: 'Grade:B(male)',
+                                name:  '{{ trans('labels.backend.exams.chart.engineer_statistic.grade') }} :B ({{ trans('labels.backend.exams.chart.dut_statistic.male') }})',
                                 data: Data['studentMale']['B'],
                                 stack: 'male_2',
                                 color: '#088174',
                             }, {
-                                name: 'Grade:C(male)',
+                                name:  '{{ trans('labels.backend.exams.chart.engineer_statistic.grade') }} :C ({{ trans('labels.backend.exams.chart.dut_statistic.male') }})',
                                 data: Data['studentMale']['C'],
                                 stack: 'male_3',
                                 color: '#088174',
                             }, {
-                                name: 'Grade:D(male)',
+                                name:  '{{ trans('labels.backend.exams.chart.engineer_statistic.grade') }} :D ({{ trans('labels.backend.exams.chart.dut_statistic.male') }})',
                                 data: Data['studentMale']['D'],
                                 stack: 'male_4',
                                 color: '#088174',
                             },{
-                                name: 'Grade:E(male)',
+                                name:  '{{ trans('labels.backend.exams.chart.engineer_statistic.grade') }} :E ({{ trans('labels.backend.exams.chart.dut_statistic.male') }})',
                                 data: Data['studentMale']['E'],
                                 stack: 'male_5',
                                 color: '#088174',
                             },{
-                                name: 'Grade:A(female)',
+                                name:  '{{ trans('labels.backend.exams.chart.engineer_statistic.grade') }} :A ({{ trans('labels.backend.exams.chart.dut_statistic.female') }})',
                                 data: Data['studentFemale']['A'],
                                 stack: 'male_1',
                                 color: '#FC7E93',
                             },{
-                                name: 'Grade:B(female)',
+                                name: '{{ trans('labels.backend.exams.chart.engineer_statistic.grade') }} :B ({{ trans('labels.backend.exams.chart.dut_statistic.female') }})',
                                 data: Data['studentFemale']['B'],
                                 stack: 'male_2',
                                 color: '#FC7E93',
                             },{
-                                name: 'Grade:C(female)',
+                                name: '{{ trans('labels.backend.exams.chart.engineer_statistic.grade') }} :C ({{ trans('labels.backend.exams.chart.dut_statistic.female') }})',
                                 data: Data['studentFemale']['C'],
                                 stack: 'male_3',
                                 color: '#FC7E93',
                             },{
-                                name: 'Grade:D(female)',
+                                name: '{{ trans('labels.backend.exams.chart.engineer_statistic.grade') }} :D ({{ trans('labels.backend.exams.chart.dut_statistic.female') }})',
                                 data: Data['studentFemale']['D'],
                                 stack: 'male_4',
                                 color: '#FC7E93',
                             },{
-                                name: 'Grade:E(female)',
+                                name: '{{ trans('labels.backend.exams.chart.engineer_statistic.grade') }} :E ({{ trans('labels.backend.exams.chart.dut_statistic.female') }})',
                                 data: Data['studentFemale']['E'],
                                 stack: 'male_5',
                                 color: '#FC7E93',

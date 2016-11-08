@@ -7,14 +7,14 @@
         <thead>
         <tr>
             <th></th>
-            <th>Total</th>
-            <th>Female</th>
+            <th>{{ trans('labels.backend.exams.chart.engineer_statistic.total_student') }}</th>
+            <th>{{ trans('labels.backend.exams.chart.engineer_statistic.total_female') }}</th>
         </tr>
         </thead>
         <tbody>
         @foreach($arrayGrades as $grade)
             <tr>
-                <th>{{$grade}}</th>
+                <th>{{ trans('labels.backend.exams.chart.engineer_statistic.grade') }} {{$grade}}</th>
                 <td>{{ count($students[$grade]['M']) + count($students[$grade]['F'])}}</td>
                 <td>{{count($students[$grade]['F'])}}</td>
             </tr>
@@ -33,16 +33,16 @@
         <thead>
         <tr>
             <th></th>
-            <th>Total_Pass</th>
-            <th>Pass_Female</th>
-            <th>Total_Reserve</th>
-            <th>Reserve_Female</th>
+            <th>{{ trans('labels.backend.exams.chart.engineer_statistic.total_pass') }}</th>
+            <th>{{ trans('labels.backend.exams.chart.engineer_statistic.pass_female') }}</th>
+            <th>{{ trans('labels.backend.exams.chart.engineer_statistic.total_reserve') }}</th>
+            <th>{{ trans('labels.backend.exams.chart.engineer_statistic.reserve_female') }}</th>
         </tr>
         </thead>
         <tbody>
         @foreach($arrayGrades as $grade)
             <tr>
-                <th>{{$grade}}</th>
+                <th>{{ trans('labels.backend.exams.chart.engineer_statistic.grade') }} {{$grade}}</th>
                 <td>{{ count($pass[$grade]['M']) + count($pass[$grade]['F'])}}</td>
                 <td>{{count($pass[$grade]['F'])}}</td>
 

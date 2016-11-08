@@ -1,6 +1,6 @@
 @extends ('backend.layouts.popup_master')
 
-@section ('title', trans('labels.backend.exams.title') . ' | ' . 'Request Input Score Form')
+@section ('title', trans('labels.backend.exams.title') . ' | ' . trans('labels.backend.exams.score.request_score_form'))
 
 @section('content')
     <style>
@@ -19,7 +19,7 @@
 
         <div class="box box-success">
             <div class="box-header with-border text_font">
-                <h1 class="box-title"> <span class="text_font">Request Input Score</span></h1>
+                <h1 class="box-title"> <span class="text_font">{{ trans('labels.backend.exams.score.input_score') }}</span></h1>
             </div>
             <!-- /.box-header -->
             <div class="box-body">
@@ -30,7 +30,7 @@
 
                     </div>
 
-                    <label class="col-sm-4  text_font"> Select Subject: </label>
+                    <label class="col-sm-4  text_font"> {{ trans('labels.backend.exams.score.select_subject') }} </label>
                     <div class="col-sm-2 no-padding text_font">
                         <select  name="subject" class="area" id="subject_id" style="float: left; margin-left: -115px;">
                             @foreach($courses as $course)
@@ -43,13 +43,13 @@
                 <form id="correctionForm">
                     <div class="col-sm-12 text_font correction_1" style="margin-top: 15px">
                         <input type="radio" name="correction" id="first_scoring_attemp" value="1">
-                        <label style="margin-left: 10px" > Correction 1  </label>
+                        <label style="margin-left: 10px" > {{ trans('labels.backend.exams.score.correction_1') }} </label>
 
                     </div>
 
                     <div class="col-sm-12 text_font correction_2">
                         <input type="radio" name="correction" id="second_scoring_attemp" value="2">
-                        <label  style="margin-left: 10px"> Correction 2  </label>
+                        <label  style="margin-left: 10px">{{ trans('labels.backend.exams.score.correction_2') }} </label>
 
                     </div>
                 </form>
@@ -70,11 +70,11 @@
     <div class="box box-success">
         <div class="box-body">
             <div class="pull-left">
-                <a href="#" id="btn_cancel_request_input" class="btn btn-default btn-xs">Cancel</a>
+                <a href="#" id="btn_cancel_request_input" class="btn btn-default btn-xs">{{ trans('labels.backend.exams.score.btn_cancel') }}</a>
             </div>
 
             <div class="pull-right">
-                <input type="button" id="btn_ok_request_input_score" class="btn btn-primary btn-xs" value="OK" />
+                <input type="button" id="btn_ok_request_input_score" class="btn btn-primary btn-xs" value="{{ trans('labels.backend.exams.score.btn_ok') }}" />
             </div>
             <div class="clearfix"></div>
         </div><!-- /.box-body -->
@@ -102,7 +102,7 @@
                success: function(result) {
 
                    $('.selection_room_course').html(result);
-                   getNotSelectedRooms();
+
                }
            });
        }
@@ -134,32 +134,8 @@
        });
 
 
-       function getNotSelectedRooms() {
-           var selected_room_id = $('#room_id_input_score :selected').val();
-           var room_ids = [];
-           var room_names = [];
-           var not_selected_rooms = [];
-           $("#room_id_input_score option").each(function()
-           {
-               var id =  $(this).val();
-               var name = $(this).text();
-               if(selected_room_id != id) {
-                   room_ids.push(id);
-                   room_names.push(name);
-               }
-           });
-
-
-           not_selected_rooms[0] =room_ids,
-           not_selected_rooms[1] = room_names;
-           return not_selected_rooms;
-
-       }
-
-
        $("#btn_ok_request_input_score").on("click",function(){
 
-           var not_selected_rooms = getNotSelectedRooms();
 
            var requestData = {
                room_id: $('#room_id_input_score :selected').val(),

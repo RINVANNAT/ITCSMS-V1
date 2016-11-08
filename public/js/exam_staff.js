@@ -93,7 +93,7 @@
 
     }
 
-    function initJsTree_StaffSelected( object, url_lv1, url_lv2, iconUrl2,iconUrl3 ) {
+    function initJsTree_StaffSelected( object, url_lv1, url_lv2, iconUrl2, iconUrl3 ) {
 
         object.jstree({
 
@@ -310,7 +310,7 @@
         //console.log($("#all_staff_role").jstree('get_selected'));
 
         var selected_arr = $("#all_staff_role").jstree('get_selected');
-        console.log(selected_arr);
+        //console.log(selected_arr);
         var only_staff = [];
         for (var i=0;i<selected_arr.length;i++){
             var element = selected_arr[i].split('_');

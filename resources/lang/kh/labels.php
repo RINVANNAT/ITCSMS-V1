@@ -120,6 +120,465 @@ return [
                 ],
             ],
         ],
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        'exams' => [
+            'title' => 'Examinations',
+            'sub_index_title' => 'All existing examinations',
+            'sub_edit_title' => 'Edit examination',
+            'sub_create_title' => 'Register new examination',
+            'sub_detail_title' => 'Detail of an examination',
+            'sub_import_title' => "Import examinations",
+            'secret_code' => [
+                'title' => 'Secret Code',
+                'print' => 'Print Secret Codes',
+                'export' => 'Export Secret Codes',
+                'generate_auto' => 'Auto Generate',
+                'generate_manual' => 'Manually Enter'
+            ],
+            'course' => [
+                'add_course' => 'Add new course for exam',
+                'edit_course' => 'Edit course for exam',
+                'choose_course' => 'Choose courses for exam',
+                'view_score' => 'View all score',
+                'fields' => [
+                    "course_name" => "Course Name",
+                    "total_question" => "Total Questions",
+                    "description" => "Description",
+                    "roomcode" => "Room Code",
+                    "order" => "Order",
+                    "correct" => "Correct",
+                    "wrong" => "Wrong",
+                    'na' => "No Answer",
+                    "sequence" => "Sequence",
+                    "corrector" => "Corrector",
+                    "register" => "Register User"
+                ]
+            ],
+            'exam_room' => [
+                'title' => [
+                    'merge' => 'Merge Room',
+                    'split' => 'Split Room',
+                    'add' => 'Add Room',
+                    'edit' => 'Edit Room'
+                ],
+                'field' => [
+                    'name' => 'Name',
+                    'capacity' => 'Capacity',
+                    'Building' => 'Building'
+                ]
+            ],
+            'show_tabs' => [
+                'general_info' => 'General Information',
+                'candidate_info' => 'Candidate Information',
+                'course_info' => 'Course Information',
+                'room_info' => 'Room Information',
+                'staff_info' => 'Staff Information',
+                'download' => 'Download'
+            ],
+            'fields'=>[
+                'name' => 'Exam Name',
+                'date_start' => 'Date Start',
+                'date_end' => 'Date End',
+                'date_start_end' => "Date From/Till",
+                'success_registration_date_start_end' => "Success Registration",
+                'reserve_registration_date_start_end' => "Reserve Registration",
+                'active' => "Class",
+                'description' => "Description",
+                'type_id' => "Exam Type",
+                'academic_year_id' => 'Academic Year',
+                'number_room_controller' => 'Number of controller/Room',
+                'number_floor_controller' => 'Number of controller/Floor',
+                'math_score_quote' =>  "Math Max Score",
+                'phys_chem_score_quote' => "Physique/Chemistry Max Score",
+                'logic_score_quote' => "Logic Max Score",
+            ],
+            'chart' => [
+                'export_image' => 'ទាញយករូបភាព',
+                'department' => 'ដេបា៉តឺម៉ង់',
+                'engineer_statistic' => [
+                    'candidate_register' => 'ការចុះឈ្មោះ បេក្ខជន វិស្វ័ករ',
+                    'no_data'   => 'មិនទាន់មាន ការចុះឈ្មោះ បេក្ខជនប្រលង',
+                    'yaxis'     => 'ចំនួនបេក្ខជន',
+                    'btn_candidate_registration' => 'ស្ថិតិ នៃការីចុះឈ្មោះ បេក្ខជន',
+                    'btn_attendence_list' =>'បញ្ជីវត្តមាន បេក្ខជន',
+                    'student_engineer' => 'ការចុះឈ្មោះនិសិត្សថ្នាក់វិស្វ័ករ',
+                    'student_statistic' => 'ស្ថិតិ នៃការចុះឈ្មោះ និសិត្សថ្នាក់វិស្វ័ករ',
+                    'no_student_registration'=> 'មិនទាន់មាន ការចុះឈ្មោះនិសិត្សថ្នាក់វិស្វ័ករ',
+                    'result_candidate_engineer' => 'លទ្ធផលសំរាប់បេក្ខជនវិស្វ័ករ',
+                    'result_list'=> 'បញ្ជីលទ្ធផល់',
+                    'result_statistic' => 'ស្ថិតិនៃលទ្ធផលបេក្ខជនវិស្វ័ករ',
+                    'no_result' => 'មិនទាន់មានការបិតផ្សាយលទ្ធផល់',
+                    'total_pass' => 'សិស្សជាប់សរុប',
+                    'pass_female' => 'សិស្សស្រីជាប់សរុប',
+                    'total_reserve' => 'សិស្សបំរុងសរុប',
+                    'reserve_female' => 'សិស្សស្រីបំរុងសរុប',
+                    'grade' => 'និទ្ទេស',
+                    'total_student' => 'ចំនួនសិស្សសរុប',
+                    'total_female' => 'ចំនួនសិស្សស្រីសរុប',
+                ],
+                'dut_statistic' => [
+                    'candidate_dut_register' => 'ការចុះឈ្មោះ បេក្ខជន ផ្នែកបរិញ្ញាប័ត្ររងវិស្វកម្ម',
+                    'no_data'   => 'មិនទាន់មាន ការចុះឈ្មោះ បេក្ខជនផ្នែកបរិញ្ញាប័ត្ររងវិស្វកម្ម',
+                    'btn_dut_statistic' => 'ស្ថិតិបេក្ខជន ផ្នែកបរិញ្ញាប័ត្ររងវិស្វកម្ម',
+                    'btn_register_list' =>'បញ្ជីចុះឈ្មោ៖ បេក្ខជន ផ្នែកបរិញ្ញាប័ត្ររងវិស្វកម្ម',
+
+                    'student_dut_registration_statistic' => 'ការចុះឈ្មោះនិសិត្សផ្នែកបរិញ្ញាប័ត្ររងវិស្វកម្ម',
+                    'student_dut_statistic' => 'ស្ថិតិ នៃការចុះឈ្មោះ និសិត្សផ្នែកបរិញ្ញាប័ត្ររងវិស្វកម្ម',
+                    'no_student_registration'=> 'មិនទាន់មាន ការចុះឈ្មោះនិសិត្សផ្នែកបរិញ្ញាប័ត្ររងវិស្វកម្មរ',
+
+                    'result_candidate_dut' => 'លទ្ធផលសំរាប់បេក្ខជនផ្នែកបរិញ្ញាប័ត្ររងវិស្វកម្មរ',
+                    'dut_result_list'=> 'បញ្ជីលទ្ធផល់',
+                    'dut_result_statistic' => 'ស្ថិតិនៃលទ្ធផលបេក្ខជនផ្នែកបរិញ្ញាប័ត្ររងវិស្វកម្ម',
+                    'no_result' => 'មិនទាន់មានការបិតផ្សាយលទ្ធផល់',
+                    'male' => 'ប្រុស',
+                    'female' => 'ស្រី'
+
+                ]
+            ]
+        ],
+
     ],
 
     'frontend' => [

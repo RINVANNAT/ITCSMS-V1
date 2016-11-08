@@ -16,7 +16,7 @@
 
     @if($exam->type_id == 2)
         @permission('get-candidate-result-score-dut')
-        <button  class="btn btn-primary btn-sm pull-right" id="btn_generate_result" style="margin-right: 5px"><i class="fa fa-plus-circle" ></i> Generate Result </button>
+        <button  class="btn btn-primary btn-sm pull-right" id="btn_generate_result" style="margin-right: 5px"><i class="fa fa-plus-circle" ></i> {{ trans('buttons.exam.result.dut.generate_result') }} </button>
         @endauth
     @endif
 
