@@ -334,22 +334,9 @@ class CourseAnnualController extends Controller
             ->leftJoin('employees','course_annuals.employee_id', '=', 'employees.id')
             ->leftJoin('departments','course_annuals.department_id', '=', 'departments.id')
             ->leftJoin('degrees','course_annuals.degree_id', '=', 'degrees.id')
-
-            ->orderBy("course_annuals.updated_at","desc")
-            ->select(
-                ['course_annuals.id',
-                    'courses.name_en as name',
-                    'course_annuals.semester_id',
-                    'course_annuals.active',
-                    'course_annuals.academic_year_id',
-                    'employees.name_latin as employee_id',
-                    'departments.code as department_id',
-                    'degrees.code as degree_id',
-//                    'grades.code  as grade_id',
-                    'courses.grade_id',
-                    'course_annuals.course_id']
-            )
             ->where('departments.id', $deptID)
+            ->where('course_annuals.employee_id', null)
+            ->distinct('courses.id')
             ->lists('courses.id');
 
         return $courseAnnuals;
@@ -410,7 +397,7 @@ class CourseAnnualController extends Controller
                     "text" => 'Department '.$dept->name_abr,
                     "children" => true,
                     "type" => "department",
-                    "state" => ["opened" => true, "selected" => true ]
+                    "state" => ["opened" => true, "selected" => false ]
                 );
                 array_push($allDepartments, $element);
 
@@ -437,7 +424,6 @@ class CourseAnnualController extends Controller
         $deptID = $this->checkDepartmentID($userId);
         $department_id = explode('_', $_GET['id'])[1];
 
-
         $allTeachers = $this->getAllteacherByDeptId($department_id);
 
         foreach ($allTeachers as $teacher) {
@@ -445,17 +431,17 @@ class CourseAnnualController extends Controller
             if($deptID->id == $department_id) {
 
                 $element = array(
-                    "id" => 'teacher_' . $teacher->teacher_id,
+                    "id" => 'department_'.$department_id.'_teacher_' . $teacher->teacher_id,
                     "text" => $teacher->teacher_name,
                     "children" => true,
                     "type" => "teacher",
-                    "state" => ["opened" => true, "selected" => true ]
+                    "state" => ["opened" => true, "selected" => false ]
                 );
                 array_push($teachers, $element);
 
             } else {
                 $element = array(
-                    "id" => 'teacher_' . $teacher->teacher_id,
+                    "id" => 'department_'.$department_id.'_teacher_' . $teacher->teacher_id,
                     "text" => $teacher->teacher_name,
                     "children" => true,
                     "type" => "teacher"
@@ -475,7 +461,9 @@ class CourseAnnualController extends Controller
         $courses = [];
         $arayCourse =[];
 
-        $teacher_id = explode('_', $_GET['id'])[1];
+        $parent_id = $_GET['id'];
+
+        $teacher_id = explode('_', $_GET['id'])[3];
 
         $selectedCourses = $this->getCourseAnnualFromDB($teacher_id);
 
@@ -484,7 +472,7 @@ class CourseAnnualController extends Controller
             foreach($selectedCourses as $course) {
 
                 $element = array(
-                    "id" => 'course_' . $course->course_id,
+                    "id" => $parent_id.'_courseannual_' . $course->id,
                     "text" => $course->course_name. ' ('.$course->degree_id.$course->grade_id.')',
                     "children" => false,
                     "type" => "course"
@@ -504,13 +492,14 @@ class CourseAnnualController extends Controller
 
     }
 
-
     public function getAllCourseByDepartment () {
 
         $deptId = explode('_', $_GET['id'])[1];
         $arrayCourses = [];
         $arayCourse = [];
         $Ids = $this->getSelectedCourses($deptId);
+
+
 
         $notSelectedCourses = $this->getNotSelectedCourseByDept($Ids, $deptId);
 
@@ -519,7 +508,7 @@ class CourseAnnualController extends Controller
             foreach($notSelectedCourses as $course) {
 
                 $element = array(
-                    "id" => 'course_' . $course->course_id,
+                    "id" => 'department_'.$deptId.'course_' . $course->course_id,
                     "text" => $course->course_name. '('.$course->degree_id.'-'.$course->grade_id.')',
                     "children" => false,
                     "type" => "course"
@@ -548,7 +537,51 @@ class CourseAnnualController extends Controller
 
     public function removeCourse (Request $request) {
 
-        dd($request->all());
+        $input = $request->course_selected;
+        $nodeID = json_decode($input);
+
+        if(count($nodeID) > 0) {
+            $check = 0;
+            $uncount =0;
+
+            foreach ($nodeID as $id) {
+                $explode = explode('_', $id);
+                if(count($explode) > 4) {
+                    $deparment_id = $explode[1];
+                    $teacher_id =  $explode[3];
+                    $course_annual_id = $explode[5];
+                    $update = $this->updateCourse($course_annual_id, $inputs = '');
+
+                    if($update) {
+                        $check++;
+                    }
+
+                } else {
+                    $uncount++;
+                }
+            }
+        }
+
+        if($check == (count($nodeID) - $uncount) ) {
+
+            return Response::json(['status' => true, 'message' => 'You Have Removed Selected Courses']);
+
+        }
+
+    }
+
+    private function updateCourse($courseAnnualId, $input) {
+
+        $courseAnnual = $this->courseAnnuals->findOrThrowException($courseAnnualId);
+        $courseAnnual->active = isset($input['active'])?true:false;
+        $courseAnnual->employee_id = isset($input['employee_id'])?$input['employee_id']:null;
+        $courseAnnual->write_uid = auth()->id();
+
+        if ($courseAnnual->save()) {
+            return true;
+        }
+
+         throw new GeneralException(trans('exceptions.backend.general.update_error'));
 
     }
 

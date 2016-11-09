@@ -124,7 +124,7 @@
                            } else {
 
                                var node_id = node.id.split('_');
-                               if(node_id[0] == 'teacher'){
+                               if(node_id[2] == 'teacher'){
                                    return url_lv3;
                                } else {
                                    return url_lv2;
@@ -219,19 +219,22 @@
                dataType: "json",
                success: function(resultData) {
 
-               $('#annual_course').jstree("refresh");
-               $('#annual_teacher').jstree("refresh");
+                if(resultData.status == true) {
+
+                  notify('success', 'info', resultData.message); 
+
+                  $('#annual_course').jstree("refresh");
+                  $('#annual_teacher').jstree("refresh");
+
+                }
+
+               
 
                }
            });
        }
 
-
        $('#btn_remove_course').on('click', function() {
-
-           var checked_ids = [];
-           $("#annual_teacher").jstree("get_checked",null,true);
-
 
            var baseData= {
                course_selected: JSON.stringify($('#annual_teacher').jstree("get_selected"))
@@ -240,11 +243,24 @@
 
            if( baseData.course_selected != '[]') {
                console.log( baseData);
-//               ajaxRequest('DELETE', baseUrl, baseData);
+
+                swal({
+                        title: "Confirm",
+                        text: "Remove Selected Courses",
+                        type: "info",
+                        showCancelButton: true,
+                        confirmButtonColor: "#DD6B55",
+                        confirmButtonText: "Yes",
+                        closeOnConfirm: true
+                    }, function(confirmed) {
+                        if (confirmed) {
+                             ajaxRequest('DELETE', baseUrl, baseData);
+                        }
+                    });
+             
            }
 
        })
-
 
 
    </script>

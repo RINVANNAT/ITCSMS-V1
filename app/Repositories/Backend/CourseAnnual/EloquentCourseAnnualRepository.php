@@ -89,6 +89,7 @@ class EloquentCourseAnnualRepository implements CourseAnnualRepositoryContract
     public function update($id, $input)
     {
         $courseAnnual = $this->findOrThrowException($id);
+
         $courseAnnual->course_id = $input['course_id'];
         $courseAnnual->semester_id = $input['semester_id'];
         $courseAnnual->active = isset($input['active'])?true:false;

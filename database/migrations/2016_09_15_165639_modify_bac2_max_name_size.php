@@ -12,7 +12,7 @@ class ModifyBac2MaxNameSize extends Migration
      */
     public function up()
     {
-        Schema::table("studentBac2s", function ($table) {
+        Schema::table('studentBac2s', function ($table) {
             $table->string('name_kh',255)->nullable()->change();
             $table->string('father_name',255)->nullable()->change();
             $table->string('mother_name',255)->nullable()->change();
