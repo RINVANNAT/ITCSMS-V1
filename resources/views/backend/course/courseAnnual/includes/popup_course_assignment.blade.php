@@ -226,10 +226,9 @@
                   $('#annual_course').jstree("refresh");
                   $('#annual_teacher').jstree("refresh");
 
+                } else {
+                    notify('error', 'info', resultData.message);
                 }
-
-               
-
                }
            });
        }
@@ -242,7 +241,6 @@
            var baseUrl = '{{route('admin.course.remove_course_from_teacher')}}';
 
            if( baseData.course_selected != '[]') {
-               console.log( baseData);
 
                 swal({
                         title: "Confirm",
@@ -260,7 +258,52 @@
              
            }
 
-       })
+       });
+
+
+       $('#btn_assign_course').on('click', function() {
+
+           var baseData= {
+               teacher_id: $('#annual_teacher').jstree("get_selected"),
+               course_id: $('#annual_course').jstree("get_selected")
+           };
+
+           console.log(baseData);
+
+           if(baseData.teacher_id.length > 0) {
+
+               if(baseData.course_id.length > 0) {
+
+                   var baseUrl = '{{route('admin.course.assign_course_teacher')}}';
+
+
+                   swal({
+                       title: "Confirm",
+                       text: "Assign Selected Courses!",
+                       type: "info",
+                       showCancelButton: true,
+                       confirmButtonColor: "#DD6B55",
+                       confirmButtonText: "Yes",
+                       closeOnConfirm: true
+                   }, function(confirmed) {
+                       if (confirmed) {
+
+                           ajaxRequest('POST', baseUrl, baseData);
+                       }
+                   });
+
+
+               } else {
+                   notify('error', 'info', 'Please Select Course!!');
+               }
+
+           } else {
+
+               notify('error', 'info', 'Please Select Teacher!!');
+           }
+
+
+       });
 
 
    </script>

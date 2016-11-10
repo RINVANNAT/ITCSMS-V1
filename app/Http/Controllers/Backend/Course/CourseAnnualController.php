@@ -306,21 +306,23 @@ class CourseAnnualController extends Controller
         return $courseAnnuals;
     }
 
-    private function getNotSelectedCourseByDept($list, $deptId) {
+    private function getNotSelectedCourseByDept($deptId) {
 
-
-        $courseAnnuals = DB::table('courses')
-            ->leftJoin('departments','courses.department_id', '=', 'departments.id')
-            ->leftJoin('degrees','courses.degree_id', '=', 'degrees.id')
+            $courseAnnuals = DB::table('course_annuals')
+                ->leftJoin('courses','course_annuals.course_id', '=', 'courses.id')
+                ->leftJoin('employees','course_annuals.employee_id', '=', 'employees.id')
+                ->leftJoin('departments','course_annuals.department_id', '=', 'departments.id')
+                ->leftJoin('degrees','course_annuals.degree_id', '=', 'degrees.id')
             ->select([
                     'courses.name_en as course_name',
                     'courses.id as course_id',
                     'departments.code as department_id',
                     'degrees.code as degree_id',
-                    'courses.grade_id'
+                    'courses.grade_id',
+                    'course_annuals.id as course_annual_id'
                 ])
             ->where('departments.id', $deptId)
-            ->whereNotIn('courses.id', $list)
+            ->where('course_annuals.employee_id', null)
             ->get();
 
         return $courseAnnuals;
@@ -335,7 +337,6 @@ class CourseAnnualController extends Controller
             ->leftJoin('departments','course_annuals.department_id', '=', 'departments.id')
             ->leftJoin('degrees','course_annuals.degree_id', '=', 'degrees.id')
             ->where('departments.id', $deptID)
-            ->where('course_annuals.employee_id', null)
             ->distinct('courses.id')
             ->lists('courses.id');
 
@@ -408,7 +409,9 @@ class CourseAnnualController extends Controller
                     "id" => 'department_' . $dept->department_id,
                     "text" => $dept->name_abr,
                     "children" => true,
-                    "type" => "department"
+                    "type" => "department",
+                    "state" => ["opened" => false, "selected" => false ]
+
                 );
                 array_push($allDepartments, $element);
             }
@@ -444,7 +447,8 @@ class CourseAnnualController extends Controller
                     "id" => 'department_'.$department_id.'_teacher_' . $teacher->teacher_id,
                     "text" => $teacher->teacher_name,
                     "children" => true,
-                    "type" => "teacher"
+                    "type" => "teacher",
+                    "state" => ["opened" => false, "selected" => false ]
                 );
                 array_push($teachers, $element);
             }
@@ -475,7 +479,8 @@ class CourseAnnualController extends Controller
                     "id" => $parent_id.'_courseannual_' . $course->id,
                     "text" => $course->course_name. ' ('.$course->degree_id.$course->grade_id.')',
                     "children" => false,
-                    "type" => "course"
+                    "type" => "course",
+                    "state" => ["opened" => false, "selected" => false ]
                 );
                 array_push($courses, $element);
 
@@ -496,22 +501,24 @@ class CourseAnnualController extends Controller
 
         $deptId = explode('_', $_GET['id'])[1];
         $arrayCourses = [];
-        $arayCourse = [];
-        $Ids = $this->getSelectedCourses($deptId);
+        $Course = [];
+//        $Ids = $this->getSelectedCourses($deptId);
 
+        $notSelectedCourses = $this->getNotSelectedCourseByDept($deptId);
 
-
-        $notSelectedCourses = $this->getNotSelectedCourseByDept($Ids, $deptId);
+//        dd($Ids);
 
         if($notSelectedCourses) {
 
             foreach($notSelectedCourses as $course) {
 
                 $element = array(
-                    "id" => 'department_'.$deptId.'course_' . $course->course_id,
-                    "text" => $course->course_name. '('.$course->degree_id.'-'.$course->grade_id.')',
+                    "id" => 'department_'.$deptId.'_'.'course_' . $course->course_annual_id,
+                    "text" => $course->course_name,
                     "children" => false,
-                    "type" => "course"
+                    'grade' => $course->grade_id,
+                    "type" => "course",
+                    "state" => ["opened" => false, "selected" => false ]
                 );
                 array_push($arrayCourses, $element);
 
@@ -522,9 +529,10 @@ class CourseAnnualController extends Controller
         $res = array_map("unserialize", array_unique(array_map("serialize", $arrayCourses)));
 
         foreach ($res as $a) {
-            array_push($arayCourse, $a);
+            array_push($Course, $a);
         }
-        return Response::json($arayCourse);
+
+        return Response::json($Course);
 
     }
 
@@ -572,7 +580,8 @@ class CourseAnnualController extends Controller
 
     private function updateCourse($courseAnnualId, $input) {
 
-        $courseAnnual = $this->courseAnnuals->findOrThrowException($courseAnnualId);
+
+        $courseAnnual = $this->courseAnnuals->findOrThrowException((int)$courseAnnualId);
         $courseAnnual->active = isset($input['active'])?true:false;
         $courseAnnual->employee_id = isset($input['employee_id'])?$input['employee_id']:null;
         $courseAnnual->write_uid = auth()->id();
@@ -584,5 +593,71 @@ class CourseAnnualController extends Controller
          throw new GeneralException(trans('exceptions.backend.general.update_error'));
 
     }
+
+    public function assignCourse(Request $request) {
+
+
+
+        $arrayCourseId = $request->course_id;
+        $arrayTeacherId = $request->teacher_id;
+        $check =0;
+        $uncount =0;
+        $index=0;
+
+        if(count($arrayTeacherId) > 0) {
+
+            if(count($arrayCourseId) >0 ) {
+
+                foreach($arrayTeacherId as $teacher) {
+
+                    $teacherId = explode('_', $teacher);
+
+                    if(count($teacherId) == 4) {
+                        $employee_id = $teacherId[3];
+
+                        foreach($arrayCourseId as $course) {
+
+                            $courseId = explode('_', $course);
+
+                            if(count($courseId) == 4) {
+
+                                $course_annual_id = $courseId[3];
+
+                                $input = [
+                                    'active' => true,
+                                    'employee_id' => $employee_id,
+                                ];
+                                $res = $this->updateCourse($course_annual_id, $input);
+
+                                if($res) {
+                                    $check++;
+                                }
+
+                            } else {
+                                $index++;
+                            }
+                        }
+
+                    } else {
+                        $uncount++;
+                    }
+                }
+                if($check == ( count($arrayCourseId) - $index ) * (count($arrayTeacherId)- $uncount) ) {
+
+                    return Response::json(['status' => true, 'message' => 'Course Added']);
+
+                } else {
+                    return Response::json(['status' => false, 'message' => 'Course Not Added!!']);
+                }
+
+            } else {
+                return Response::json(['status' => false, 'message' => 'Not Selected Course!!']);
+            }
+
+        } else {
+            return Response::json(['status' => false, 'message' => 'Not Seleted Teacher!']);
+        }
+    }
+
 
 }
