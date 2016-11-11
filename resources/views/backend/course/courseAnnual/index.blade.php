@@ -132,8 +132,12 @@
 
 
         $('#course_assignment').on('click', function() {
+            var academic_year_id = $('#filter_academic_year :selected').val();
+            var degree_id = $('#filter_degree :selected').val();
+            var grade_id  = $('#filter_grade :selected').val();
+            var department_id = $('#filter_department :selected').val();
             var url = "{!! route('admin.course.course_assignment') !!}";
-            var course_assignment_window = PopupCenterDual(url,'course assignment','1200','900');
+            var course_assignment_window = PopupCenterDual(url+'?department_id='+department_id+'&academic_year_id='+academic_year_id+'&degree_id='+degree_id+'&grade_id='+grade_id,'course assignment','1200','900');
         })
     </script>
 @stop

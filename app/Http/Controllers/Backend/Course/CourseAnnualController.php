@@ -276,7 +276,7 @@ class CourseAnnualController extends Controller
     }
 
 
-    private function getCourseAnnualFromDB ($teacherId) {
+    private function getCourseAnnualFromDB ($teacherId, $academicYearId) {
 
             $courseAnnuals = DB::table('course_annuals')
                 ->leftJoin('courses','course_annuals.course_id', '=', 'courses.id')
@@ -301,6 +301,7 @@ class CourseAnnualController extends Controller
                         'course_annuals.course_id']
                 )
                 ->where('employees.id', $teacherId)
+                ->where('course_annuals.academic_year_id', $academicYearId)
                 ->get();
 
         return $courseAnnuals;
@@ -371,12 +372,17 @@ class CourseAnnualController extends Controller
 
     }
 
-    public function getAllDepartments() {
+    public function getAllDepartments(Request $request) {
 
         $allDepartments= [];
 
-        $userId = auth()->user()->id;
-        $deptID = $this->checkDepartmentID($userId);
+        $deparmentId = $request->department_id;
+        $gradeId = $request->grade_id;
+        $degreeId = $request->degree_id;
+        $academicId = $request->academic_year_id;
+//
+//        $userId = auth()->user()->id;
+//        $deptID = $this->checkDepartmentID($userId);
 
         $depts = DB::table('departments')
             ->select('departments.id as department_id', 'departments.name_en as department_name', 'departments.code as name_abr')
@@ -388,10 +394,9 @@ class CourseAnnualController extends Controller
             ->orderBy('name_abr', 'ASC')
             ->get('departments.department_id');
 
-
         foreach($depts as $dept) {
 
-            if($deptID->id == $dept->department_id) {
+            if($deparmentId == $dept->department_id) {
 
                 $element = array(
                     "id" => 'department_' . $dept->department_id,
@@ -400,14 +405,21 @@ class CourseAnnualController extends Controller
                     "type" => "department",
                     "state" => ["opened" => true, "selected" => false ]
                 );
-                array_push($allDepartments, $element);
 
+                if($request->tree_side == 'teacher_annual') {
+
+                    array_push($allDepartments, $element);
+
+                } else if($request->tree_side == 'course_annual') {
+
+                    return Response::json(array($element));
+                }
 
             } else {
 
                 $element = array(
                     "id" => 'department_' . $dept->department_id,
-                    "text" => $dept->name_abr,
+                    "text" => 'Department'.$dept->name_abr,
                     "children" => true,
                     "type" => "department",
                     "state" => ["opened" => false, "selected" => false ]
@@ -423,53 +435,53 @@ class CourseAnnualController extends Controller
     public function getAllTeacherByDepartmentId () {
 
         $teachers = [];
-        $userId = auth()->user()->id;
-        $deptID = $this->checkDepartmentID($userId);
         $department_id = explode('_', $_GET['id'])[1];
 
         $allTeachers = $this->getAllteacherByDeptId($department_id);
 
-        foreach ($allTeachers as $teacher) {
+//        dd($allTeachers);
 
-            if($deptID->id == $department_id) {
+            foreach ($allTeachers as $teacher) {
 
-                $element = array(
-                    "id" => 'department_'.$department_id.'_teacher_' . $teacher->teacher_id,
-                    "text" => $teacher->teacher_name,
-                    "children" => true,
-                    "type" => "teacher",
-                    "state" => ["opened" => true, "selected" => false ]
-                );
-                array_push($teachers, $element);
+                if($teacher->department_id == $department_id) {
 
-            } else {
-                $element = array(
-                    "id" => 'department_'.$department_id.'_teacher_' . $teacher->teacher_id,
-                    "text" => $teacher->teacher_name,
-                    "children" => true,
-                    "type" => "teacher",
-                    "state" => ["opened" => false, "selected" => false ]
-                );
-                array_push($teachers, $element);
+                    $element = array(
+                        "id" => 'department_'.$department_id.'_teacher_' . $teacher->teacher_id,
+                        "text" => $teacher->teacher_name,
+                        "children" => true,
+                        "type" => "teacher",
+                        "state" => ["opened" => true, "selected" => false ]
+                    );
+                    array_push($teachers, $element);
+
+                } else {
+                    $element = array(
+                        "id" => 'department_'.$department_id.'_teacher_' . $teacher->teacher_id,
+                        "text" => $teacher->teacher_name,
+                        "children" => true,
+                        "type" => "teacher",
+                        "state" => ["opened" => false, "selected" => false ]
+                    );
+                    array_push($teachers, $element);
+                }
             }
-
-
-        }
 
         return Response::json($teachers);
 
     }
 
-    public function getSeletedCourseByTeacherID() {
+    public function getSeletedCourseByTeacherID(Request $request) {
 
         $courses = [];
         $arayCourse =[];
+
 
         $parent_id = $_GET['id'];
 
         $teacher_id = explode('_', $_GET['id'])[3];
 
-        $selectedCourses = $this->getCourseAnnualFromDB($teacher_id);
+        $selectedCourses = $this->getCourseAnnualFromDB($teacher_id, $request->academic_year_id);
+//        dd($selectedCourses);
 
         if($selectedCourses) {
 
@@ -510,6 +522,8 @@ class CourseAnnualController extends Controller
 
         if($notSelectedCourses) {
 
+//            dd($deptId);
+
             foreach($notSelectedCourses as $course) {
 
                 $element = array(
@@ -517,8 +531,7 @@ class CourseAnnualController extends Controller
                     "text" => $course->course_name,
                     "children" => false,
                     'grade' => $course->grade_id,
-                    "type" => "course",
-                    "state" => ["opened" => false, "selected" => false ]
+                    "type" => "course"
                 );
                 array_push($arrayCourses, $element);
 
@@ -532,14 +545,21 @@ class CourseAnnualController extends Controller
             array_push($Course, $a);
         }
 
+//        dd($Course);
+
         return Response::json($Course);
 
     }
 
-    public function courseAssignment () {
+    public function courseAssignment (Request $request) {
 
-//        dd(auth()->user()->id);
-        return view('backend.course.courseAnnual.includes.popup_course_assignment');
+
+        $academicYear = AcademicYear::where('id', $request->academic_year_id)->first();
+        $departmentId = $request->department_id;
+        $gradeId = $request->grade_id;
+        $degreeId = $request->degree_id;
+
+        return view('backend.course.courseAnnual.includes.popup_course_assignment', compact('academicYear', 'departmentId', 'gradeId', 'degreeId'));
     }
 
 
@@ -595,8 +615,6 @@ class CourseAnnualController extends Controller
     }
 
     public function assignCourse(Request $request) {
-
-
 
         $arrayCourseId = $request->course_id;
         $arrayTeacherId = $request->teacher_id;

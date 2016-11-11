@@ -27,6 +27,7 @@
         <div class="box box-success">
             <div class="box-header with-border text_font">
                 <strong class="box-title"> <span class="text_font">{{ trans('labels.backend.courseAnnual.course_assignment') }}</span></strong>
+                <strong class="box-title"> <span class="text_font">{{ $academicYear->name_latin }}</span></strong>
             </div>
             <!-- /.box-header -->
             <div class="box-body">
@@ -89,7 +90,6 @@
         <i class="fa fa-refresh fa-spin"></i>
     </div>
 @stop
-
 @section('after-scripts-end')
    {{--here where i need to write the js script --}}
    {!! Html::style('plugins/jstree/themes/default/style.min.css') !!}
@@ -101,11 +101,22 @@
        var iconUrl2 = "{{url('plugins/jstree/img/role.png')}}";
        var iconUrl3 = "{{url('plugins/jstree/img/employee.png')}}";
 
+       var department_id = '{{$departmentId}}';
+       var grade_id = '{{$gradeId}}';
+       var degree_id = '{{$degreeId}}';
+       var academic_year_id = '{{$academicYear->id}}';
+
+
+
+
+
        initJsTree_StaffSelected($('#annual_course'), '{{route('admin.course.get_department')}}', '{{route('admin.course.get_course_by_department')}}', iconUrl1, iconUrl3);
 
        initJsTree_StaffRole($('#annual_teacher'), '{{route('admin.course.get_department')}}', '{{route('admin.course.get_teacher_by_department')}}','{{route('admin.course.get_course_by_teacher')}}', iconUrl1, iconUrl2, iconUrl3 );
 
        function initJsTree_StaffRole( object, url_lv1, url_lv2, url_lv3, iconUrl1, iconUrl2, iconUrl3) {
+
+
 
            object.jstree({
                "core" : {
@@ -120,12 +131,12 @@
                        'url' : function (node) {
 
                            if(node.id == '#'){
-                               return url_lv1;
+                               return url_lv1+'?tree_side=teacher_annual'+'&department_id='+department_id+'&academic_year_id='+academic_year_id+'&grade_id='+grade_id+'&degree_id='+degree_id;
                            } else {
 
                                var node_id = node.id.split('_');
                                if(node_id[2] == 'teacher'){
-                                   return url_lv3;
+                                   return url_lv3+'?academic_year_id='+academic_year_id+'&grade_id='+grade_id+'&degree_id='+degree_id;
                                } else {
                                    return url_lv2;
                                }
@@ -177,7 +188,7 @@
                    },
                    "data":{
                        'url' : function (node) {
-                           return node.id === '#' ? url_lv1 : url_lv4;
+                           return node.id === '#' ? url_lv1+'?tree_side=course_annual'+'&department_id='+department_id+'&academic_year_id='+academic_year_id+'&grade_id='+grade_id+'&degree_id='+degree_id : url_lv4;
                        },
                        'data' : function (node) {
                            return { 'id' : node.id };
@@ -190,7 +201,7 @@
                "types" : {
                    "#" : { "max_depth" : 3, "valid_children" : ["department","course"] },
                    "deparment" : {
-                       "icon" : iconUrl1,
+                       "icon" : '<i class="fa fa-"></i>',
                        "valid_children" : ["course"]
                    },
                    "course" :{
@@ -275,7 +286,6 @@
                if(baseData.course_id.length > 0) {
 
                    var baseUrl = '{{route('admin.course.assign_course_teacher')}}';
-
 
                    swal({
                        title: "Confirm",
