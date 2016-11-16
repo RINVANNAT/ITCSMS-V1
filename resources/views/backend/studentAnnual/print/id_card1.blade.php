@@ -31,7 +31,7 @@
 @section('content')
     <div class="page">
         <div class="background">
-            <img width="100%" src="{{url('img/id_card/id_card_front.png')}}">
+            <img width="100%" src="{{url('img/id_card/id_card_front1.png')}}">
         </div>
         <div class="detail">
             {{--<span class="name_en">ENG RATANA</span>--}}
@@ -42,7 +42,7 @@
     </div>
     <div class="page">
         <div class="background">
-            <img width="100%" src="{{url('img/id_card/id_card_front.png')}}">
+            <img width="100%" src="{{url('img/id_card/id_card_front1.png')}}">
         </div>
         <div class="detail">
             {{--<span class="name_en">SOK PISETH</span>--}}

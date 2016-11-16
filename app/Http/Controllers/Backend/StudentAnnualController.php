@@ -1804,4 +1804,8 @@ class StudentAnnualController extends Controller
         return view('backend.studentAnnual.print.id_card');
     }
 
+    public function print_id_card1(){
+        return view('backend.studentAnnual.print.id_card1');
+    }
+
 }
