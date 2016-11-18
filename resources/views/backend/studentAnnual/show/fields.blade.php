@@ -24,7 +24,7 @@
                     <center>
                         <img style="width: 6cm;padding: 3px;border: 3px solid #d2d6de;"
                              class="profile-user-img img-responsive"
-                             src="{{$student->photo==""?url('img/profiles/avatar.png'):url('img/profiles/'.$student->photo)}}" alt="User profile picture"/>
+                             src="{{$student->photo==""?url('img/profiles/avatar.png'):url('img/profiles/'.$student->photo)}}" onerror="this.src='{{url('img/profiles/avatar.png')}}'" alt="User profile picture"/>
 
                     </center>
 

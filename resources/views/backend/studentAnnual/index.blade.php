@@ -57,12 +57,14 @@
         }
 
         $(document).ready(function(){
+            var current_filtering = null;
             var custom_student_window = null;
             var oTable = $('#students-table').DataTable({
                 dom: 'l<"toolbar">frtip',
                 processing: true,
                 serverSide: true,
                 pageLength: {!! config('app.records_per_page')!!},
+                deferLoading: 0,
                 ajax: {
                     url:"{!! route('admin.student.data') !!}",
                     method:'POST',
@@ -88,6 +90,11 @@
                     { data: 'action', name: 'action',orderable: false, searchable: false}
                 ]
             });
+
+            oTable.on( 'xhr', function () {
+                current_filtering = oTable.ajax.params();
+            } );
+
             $("div.toolbar").html(
                     '{!! Form::select('academic_year',$academicYears,null, array('class'=>'form-control','id'=>'filter_academic_year')) !!} '+
                     '{!! Form::select('degree',$degrees,null, array('class'=>'form-control','id'=>'filter_degree','placeholder'=>'Degree')) !!} '+
@@ -97,6 +104,8 @@
                     '{!! Form::select('option',$options,null, array('class'=>'form-control','id'=>'filter_option','placeholder'=>'Option')) !!} '+
                     '{!! Form::select('origin',$origins,null, array('class'=>'form-control','id'=>'filter_origin','placeholder'=>'Origin')) !!} '
             );
+
+            oTable.draw();
 
             $('#filter_academic_year').on('change', function(e) {
                 oTable.draw();
@@ -177,6 +186,23 @@
                     custom_student_window.close();
                 }
             };
+
+            $('#print_id_card').on('click',function(e){
+                e.preventDefault();
+                var url = "{{ route('admin.student.print_id_card') }}";
+
+                PopupCenterDual(
+                        url
+                        + '?academic_year='+current_filtering.academic_year
+                        + '&degree='+current_filtering.degree
+                        + '&grade='+current_filtering.grade
+                        + '&department='+current_filtering.department
+                        + '&gender='+current_filtering.gender
+                        + '&option='+current_filtering.option
+                        + '&origin='+current_filtering.origin
+                        + '&search='+current_filtering.search.value,
+                        'Print ID Card','750','800');
+            });
 
             $('#generate_id_card').on('click', function(e) {
                 e.preventDefault();

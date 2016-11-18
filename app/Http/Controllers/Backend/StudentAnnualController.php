@@ -5,6 +5,7 @@ use App\Http\Requests\Backend\Student\CreateStudentRequest;
 use App\Http\Requests\Backend\Student\DeleteStudentRequest;
 use App\Http\Requests\Backend\Student\EditStudentRequest;
 use App\Http\Requests\Backend\Student\ImportStudentRequest;
+use App\Http\Requests\Backend\Student\PrintStudentIDCardRequest;
 use App\Http\Requests\Backend\Student\RequestImportStudentRequest;
 use App\Http\Requests\Backend\Student\StoreStudentRequest;
 use App\Http\Requests\Backend\Student\UpdateStudentRequest;
@@ -914,6 +915,7 @@ class StudentAnnualController extends Controller
 
         $studentAnnuals = StudentAnnual::select([
             'studentAnnuals.id',
+            'students.id as student_id',
             'students.id_card',
             'students.name_kh',
             'students.name_latin',
@@ -1026,6 +1028,7 @@ class StudentAnnualController extends Controller
 
         if(isset($_POST['id'])){
             array_push($fields,$_POST['id']);
+            array_push($fields,"student_id");  // student_id is required as well
         }
         if(isset($_POST['id_card'])){
             array_push($fields,$_POST['id_card']);
@@ -1800,12 +1803,58 @@ class StudentAnnualController extends Controller
 
     }
 
-    public function print_id_card(){
-        return view('backend.studentAnnual.print.id_card');
-    }
+    public function print_id_card(PrintStudentIDCardRequest $request){
 
-    public function print_id_card1(){
-        return view('backend.studentAnnual.print.id_card1');
+        $studentAnnuals = StudentAnnual::select([
+            'students.id_card',
+            'students.name_kh',
+            'students.name_latin',
+            'departments.name_kh as department',
+            'students.photo'
+
+        ])
+            ->leftJoin('students','students.id','=','studentAnnuals.student_id')
+            ->leftJoin('genders', 'students.gender_id', '=', 'genders.id')
+            ->leftJoin('grades', 'studentAnnuals.grade_id', '=', 'grades.id')
+            ->leftJoin('departmentOptions', 'studentAnnuals.department_option_id', '=', 'departmentOptions.id')
+            ->leftJoin('departments', 'studentAnnuals.department_id', '=', 'departments.id')
+            ->leftJoin('degrees', 'studentAnnuals.degree_id', '=', 'degrees.id')
+            ->leftJoin('scholarship_student_annual','studentAnnuals.id','=','scholarship_student_annual.student_annual_id');
+
+        if ($academic_year = $request->get('academic_year')) {
+            $studentAnnuals = $studentAnnuals->where('studentAnnuals.academic_year_id', '=', $academic_year);
+        }
+        if ($degree = $request->get('degree')) {
+            $studentAnnuals = $studentAnnuals->where('studentAnnuals.degree_id', '=', $degree);
+        }
+        if ($grade = $request->get('grade')) {
+            $studentAnnuals = $studentAnnuals->where('studentAnnuals.grade_id', '=', $grade);
+        }
+        if ($department = $request->get('department')) {
+            $studentAnnuals = $studentAnnuals->where('studentAnnuals.department_id', '=', $department);
+        }
+        if ($gender = $request->get('gender')) {
+            $studentAnnuals = $studentAnnuals->where('students.gender_id', '=', $gender);
+        }
+        if ($option = $request->get('option')) {
+            $studentAnnuals = $studentAnnuals->where('studentAnnuals.department_option_id', '=', $option);
+        }
+        if ($origin = $request->get('origin')) {
+            $studentAnnuals = $studentAnnuals->where('students.origin_id', '=', $origin);
+        }
+        if ($search = $request->get('search')) {
+            $studentAnnuals = $studentAnnuals->where(function($q) use ($search){
+                $q->where('students.id_card', 'ilike', '%'.$search.'%')
+                  ->orWhere('students.name_kh','ilike', '%'.$search.'%')
+                  ->orWhere('students.name_latin','ilike', '%'.$search.'%');
+            });
+        }
+
+        $studentAnnuals_front = $studentAnnuals->orderBy('id_card','ASC')->get();
+        $studentAnnuals_back = $studentAnnuals->orderBy('id_card','DESC')->get();
+
+        //dd($studentAnnuals->toArray());
+        return view('backend.studentAnnual.print.id_card',compact('studentAnnuals_front','studentAnnuals_back'));
     }
 
 }

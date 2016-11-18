@@ -38,7 +38,7 @@ return [
     'degree_id'=>"Degree",
     'grade_id'=>"Grade",
     'academic_year_id'=>"Academic Year",
-    'student_id'=>"Student ID",
+    'student_id'=>"Student",
     'history_id'=>"History",
     'department_option_id'=>"Department Option/Geotechnique",
     'payslip_client_id'=>"Payslip Client",

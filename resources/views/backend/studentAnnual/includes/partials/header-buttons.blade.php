@@ -12,8 +12,7 @@
                 <li><a href="#" id="generate_id_card">{{ trans('menus.backend.student.generate_id_card') }}</a></li>
                 @endauth
 
-                <li><a href="{{ route('admin.student.print_id_card') }}">{{ trans('menus.backend.student.print_id_card') }}</a></li>
-                <li><a target="_blank" href="{{ route('admin.student.print_id_card1') }}">ID Card Sample2</a></li>
+                <li><a href="#" id="print_id_card">{{ trans('menus.backend.student.print_id_card') }}</a></li>
             </ul>
         </div><!--btn group-->
         <div class="btn-group">

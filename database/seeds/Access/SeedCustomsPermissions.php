@@ -246,6 +246,13 @@ class SeedCustomsPermissions extends Seeder
                             'dependency' => [
                                 'view-backend','view-student-management'
                             ]
+                        ],
+                        [
+                            'name' => 'print-students-id-card',
+                            'display_name' => 'Print Student ID Cards',
+                            'dependency' => [
+                                'view-backend','view-student-management'
+                            ]
                         ]
                     ]
                 ]
