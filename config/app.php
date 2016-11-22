@@ -218,7 +218,7 @@ return [
         Barryvdh\LaravelIdeHelper\IdeHelperServiceProvider::class,
         Proengsoft\JsValidation\JsValidationServiceProvider::class,
         Felixkiss\UniqueWithValidator\UniqueWithValidatorServiceProvider::class,
-        Milon\Barcode\BarcodeServiceProvider::class,
+        //Milon\Barcode\BarcodeServiceProvider::class,
 
 
     ],
@@ -283,8 +283,8 @@ return [
         'Form'      => Collective\Html\FormFacade::class,
         'Flash'     => Laracasts\Flash\Flash::class,
         'JsValidator' => Proengsoft\JsValidation\Facades\JsValidatorFacade::class,
-        'DNS1D' => Milon\Barcode\Facades\DNS1DFacade::class,
-        'DNS2D' => Milon\Barcode\Facades\DNS2DFacade::class,
+        //'DNS1D' => Milon\Barcode\Facades\DNS1DFacade::class,
+        //'DNS2D' => Milon\Barcode\Facades\DNS2DFacade::class,
     ],
 
 ];
