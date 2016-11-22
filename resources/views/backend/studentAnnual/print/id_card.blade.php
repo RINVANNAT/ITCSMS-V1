@@ -13,7 +13,7 @@
             height: 3.375in;
         }
 
-        .detail{
+        .detail {
             position: absolute;
             width: 100%;
             height: 100%;
@@ -29,6 +29,7 @@
             font-size: 10px;
             position: absolute;
         }
+
         .avatar {
             position: absolute;
             top:1.2in;
@@ -187,7 +188,7 @@
         </div>
         <div class="detail">
             <span class="address_title">
-                អាសយដ្ធាន ៖
+                អាសយដ្ថាន ៖
             </span>
             <span class="address">
                 ប្រអប់សំបុត្រលេខ៨៦​ មហាវិថីសហព័ន្ធរុស្សី <br/>
