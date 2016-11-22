@@ -99,42 +99,7 @@
     {!! Html::script('plugins/datatables/dataTables.bootstrap.min.js') !!}
     <script>
         $(function() {
-            $('#schoolFees-table').DataTable({
-                processing: true,
-                serverSide: true,
-                pageLength: {!! config('app.records_per_page')!!},
-                ajax: {
-                    url: '{!! route('admin.configuration.schoolFee.data',"false") !!}', // parameter 0 represent scholarship id, which mean all scholarships
-                    method: 'POST'
-                },
-                columns: [
-                    { data: 'degree_name_kh', name: 'degrees.name_kh', orderable:false},
-                    { data: 'promotion_name', name: 'promotions.name', orderable:false},
-                    { data: 'to_pay', name: 'to_pay', orderable:false, searchable:false},
-                    { data: 'departments', name: 'departments', orderable:false, searchable:false},
-                    { data: 'grades', name: 'grades', orderable:false, searchable:false},
-                    { data: 'action', name: 'action',orderable: false, searchable: false}
-                ]
-            });
-            $('#scholarshipFees-table').DataTable({
-                processing: true,
-                serverSide: true,
-                pageLength: {!! config('app.records_per_page')!!},
-                ajax: {
-                    url: '{!! route('admin.configuration.schoolFee.data',"true") !!}',
-                    method: 'POST'
-                },
-                columns: [
-                    { data: 'degree_name_kh', name: 'degrees.name_kh', orderable:false},
-                    { data: 'scholarship_code', name: 'scholarships.code', orderable:false},
-                    { data: 'promotion_name', name: 'promotions.name', orderable:false},
-                    { data: 'to_pay', name: 'to_pay', orderable:false, searchable:false},
-                    { data: 'departments', name: 'departments', orderable:false, searchable:false},
-                    { data: 'grades', name: 'grades', orderable:false, searchable:false},
-                    { data: 'action', name: 'action',orderable: false, searchable: false}
-                ]
-            });
-            enableDeleteRecord($('#schoolFees-table'));
+
         });
     </script>
 @stop
