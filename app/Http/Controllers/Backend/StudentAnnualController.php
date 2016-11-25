@@ -916,6 +916,7 @@ class StudentAnnualController extends Controller
         $studentAnnuals = StudentAnnual::select([
             'studentAnnuals.id',
             'students.id as student_id',
+            'studentAnnuals.payslip_client_id',
             'students.id_card',
             'students.name_kh',
             'students.name_latin',
@@ -1029,6 +1030,7 @@ class StudentAnnualController extends Controller
         if(isset($_POST['id'])){
             array_push($fields,$_POST['id']);
             array_push($fields,"student_id");  // student_id is required as well
+            array_push($fields,"payslip_client_id");
         }
         if(isset($_POST['id_card'])){
             array_push($fields,$_POST['id_card']);

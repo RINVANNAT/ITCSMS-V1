@@ -18,7 +18,7 @@
                                 <td align="middle">
                                     <h3 style="font-family: khmerosmoulpali">វិទ្យាស្ថានបច្ចេកវិទ្យាកម្ពុជា</h3>
                                     <h4>Institut de Technologie du Cambobodge</h4>
-                                    <h5 style="font-family: tactieng;font-size: 60px;">3</h5>
+                                    <h5 style="font-family: tactieng; font-size: 30px">3</h5>
 
                                     <h3 style="font-family: bayon">បង្កាន់ដៃទទួលប្រាក់ </h3>
                                 </td>

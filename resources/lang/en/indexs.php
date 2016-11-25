@@ -41,7 +41,7 @@ return [
     'student_id'=>"Student ID",
     'history_id'=>"History",
     'department_option_id'=>"Department Option/Geotechnique",
-    'payslip_client_id'=>"Payslip Client",
+    'payslip_client_id'=>"Payslip",
     'is_paid'=>"Is Paid",
     'is_suspend'=>"Is Suspend",
     'to_pay'=>"To Pay",

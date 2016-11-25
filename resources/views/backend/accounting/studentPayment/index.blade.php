@@ -293,8 +293,9 @@
                     },
                     success:function(data) {
                         $('#add_payment_modal').modal('toggle');
-                        payment_tables["students-"+data.candidate_id].ajax.url(payslip_history_url+"?payslip_client_id="+data.payslip_client_id+"&type=candidate&user_id="+data.candidate_id).load();
+                        //payment_tables["students-"+data.candidate_id].ajax.url(payslip_history_url+"?payslip_client_id="+data.payslip_client_id+"&type=candidate&user_id="+data.candidate_id).load();
                         //payment_table.ajax.url( data.payslip_client_id ).load();
+                        oTable.draw();
                     },
                     error:function(error){
                         alert(error);
@@ -382,7 +383,7 @@
 
             // This for payment part
             function preparePayment(data){
-                console.log(data);
+                //console.log(data);
 
                 var onlyBirthDate = data.dob;
                 var khmerBirthYear = convertKhmerNumber(onlyBirthDate.split('/')[2]);

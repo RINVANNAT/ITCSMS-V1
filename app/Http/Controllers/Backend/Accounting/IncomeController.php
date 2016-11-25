@@ -360,7 +360,12 @@ class IncomeController extends Controller
     }
 
     public function payslip_history(){
+
         $payslip_client_id = $_GET['payslip_client_id'];
+        //dd($payslip_client_id);
+        if($payslip_client_id == null || $payslip_client_id == "" || $payslip_client_id == "null"){
+            $payslip_client_id = -1; // to return nothing
+        }
         $user_id = $_GET['user_id'];
         $type = $_GET['type'];
         $incomes = Income:: select([
