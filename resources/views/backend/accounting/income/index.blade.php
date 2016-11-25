@@ -73,6 +73,12 @@
                     </tr>
                     </tfoot>
                 </table>
+
+
+
+                <div id="graph_income" style="height: 400px; min-width: 310px">
+
+                </div>
             </div>
 
             <div class="clearfix"></div>
@@ -85,6 +91,8 @@
     {!! Html::script('plugins/datatables/dataTables.bootstrap.min.js') !!}
     {!! Html::script('plugins/moment/moment.min.js') !!}
     {!! Html::script('plugins/daterangepicker/daterangepicker.js') !!}
+    <script src="https://code.highcharts.com/stock/highstock.js"></script>
+    <script src="https://code.highcharts.com/stock/modules/exporting.js"></script>
     <script>
         $(function() {
 
@@ -183,6 +191,45 @@
                 PopupCenterDual(url,'Export student data','1200','960');
             });
         });
+
+        incomeChart();
+
+        function incomeChart() {
+
+            var baseData = {
+                acount:         $('#filter_account').val(),
+                income_type:    $('#filter_incomeType').val(),
+                date_range:     $('#filter_date_range').val()
+            }
+
+
+            $.ajax({
+                type: 'GET',
+                url: "{{route('admin.accounting.income_graph_data')}}",
+                data: baseData,
+                success: function(graphData) {
+
+                    console.log(graphData);
+
+                    $('#graph_income').highcharts('StockChart', {
+
+                        rangeSelector: {
+                            selected: 1
+                        },
+
+                        title: {
+                            text: 'Income Data'
+                        },
+
+                        series: [{
+                            name: 'Income',
+                            data: graphData,
+                        }]
+                    });
+                }
+
+            });
+        }
     </script>
 @stop
 

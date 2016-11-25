@@ -18,6 +18,14 @@
             text-indent: 10px;
         }
 
+        .testing {
+
+        }
+        .form-edit {
+            width: 70px;
+            height: 20px;
+        }
+
     </style>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/2.1.4/jquery.min.js"></script>
@@ -69,13 +77,12 @@
                 </div>
 
 
-
             </div>
         </div>
 
     <div class="box box-success">
         <div class="box-body">
-            <div class="pull-left">
+            <div class="pull-left me" tp="vannat">
                 <a href="#" id="btn_cancel_request_input" class="btn btn-default btn-xs">{{ trans('labels.backend.exams.score.btn_cancel') }}</a>
             </div>
 
@@ -110,13 +117,16 @@
 
 
 
-       initJsTree_StaffSelected($('#annual_course'), '{{route('admin.course.get_department')}}', '{{route('admin.course.get_course_by_department')}}', iconUrl1, iconUrl3);
-
-       initJsTree_StaffRole($('#annual_teacher'), '{{route('admin.course.get_department')}}', '{{route('admin.course.get_teacher_by_department')}}','{{route('admin.course.get_course_by_teacher')}}', iconUrl1, iconUrl2, iconUrl3 );
-
-       function initJsTree_StaffRole( object, url_lv1, url_lv2, url_lv3, iconUrl1, iconUrl2, iconUrl3) {
 
 
+       initree_course($('#annual_course'), '{{route('admin.course.get_department')}}', '{{route('admin.course.get_course_by_department')}}', iconUrl1, iconUrl3);
+
+
+       initree_teacher($('#annual_teacher'), '{{route('admin.course.get_department')}}', '{{route('admin.course.get_teacher_by_department')}}','{{route('admin.course.get_course_by_teacher')}}', iconUrl1, iconUrl2, iconUrl3 );
+
+       var id_teacher= [];
+
+       function initree_teacher( object, url_lv1, url_lv2, url_lv3, iconUrl1, iconUrl2, iconUrl3) {
 
            object.jstree({
                "core" : {
@@ -138,7 +148,7 @@
                                if(node_id[2] == 'teacher'){
                                    return url_lv3+'?academic_year_id='+academic_year_id+'&grade_id='+grade_id+'&degree_id='+degree_id;
                                } else {
-                                   return url_lv2;
+                                   return url_lv2+'?academic_year_id='+academic_year_id+'&grade_id='+grade_id+'&degree_id='+degree_id;
                                }
                            }
                            //return node.id === '#' ? url_lv1 : url_lv2;
@@ -150,31 +160,62 @@
                },
 
                "checkbox" : {
-                   "keep_selected_style" : false
+//                   "keep_selected_style" : false,
+                   three_state : false, // to avoid that fact that checking a node also check others
+                   tie_selection : true
+
                },
                "types" : {
                    "#" : { "max_depth" : 3, "valid_children" : ["department","teacher", "course"] },
                    "department" : {
                        "icon" : iconUrl1,
-                       "valid_children" : ["teacher"]
+                       "valid_children" : ["teacher"],
+
                    },
                    "teacher" :{
+                       "multiple" : false,
                        "icon" : iconUrl2,
-                       "valid_children" : ["course"]
+                       "valid_children" : ["course"],
+                       "HTML" : true
                    },
                    "course" :{
                        "icon" : iconUrl3,
-                       "valid_children" : []
+                       "valid_children" : [],
+                       "multiple" : true
+
                    }
                },
                "plugins" : [
-                   "wholerow",'checkbox', "contextmenu", "search", "state","types", "html_data"
+                   'checkbox', "contextmenu", "search", "state","types","sort"
                ]
+           }).bind('select_node.jstree', function (e, data) {
+
+               var explode = data.node.id.split('_');
+
+               if (explode.length == 4) {
+                   $('#annual_teacher').jstree(true).settings.core.multiple = false;
+                   $('#annual_teacher').jstree(true).redraw(true);
+                   timeTdTdCourseTeacherAnnual(data.node.id);
+
+               } else {
+
+                   $('#annual_teacher').jstree(true).settings.core.multiple = true;
+                   $('#annual_teacher').jstree(true).redraw(true);
+
+               }
+
+
+           }).bind('deselect_node.jstree', function(e, data) {
+               var explode = data.node.id.split('_');
+               if(explode.length == 4) {
+
+                   $('.li_time_teaching').remove();
+               }
            });
 
        }
 
-       function initJsTree_StaffSelected( object, url_lv1, url_lv4, iconUrl1, iconUrl3 ) {
+       function initree_course( object, url_lv1, url_lv4, iconUrl1, iconUrl3 ) {
 
            object.jstree({
 
@@ -188,11 +229,19 @@
                    },
                    "data":{
                        'url' : function (node) {
-                           return node.id === '#' ? url_lv1+'?tree_side=course_annual'+'&department_id='+department_id+'&academic_year_id='+academic_year_id+'&grade_id='+grade_id+'&degree_id='+degree_id : url_lv4;
+
+                           return node.id === '#' ? url_lv1+'?tree_side=course_annual'+'&department_id='+department_id+'&academic_year_id='+academic_year_id+'&grade_id='+grade_id+'&degree_id='+degree_id : url_lv4+'?academic_year_id='+academic_year_id+'&grade_id='+grade_id+'&degree_id='+degree_id;
+
+
                        },
                        'data' : function (node) {
-                           return { 'id' : node.id };
-                       }
+//                           alert(object.jstree("is_loaded"));
+
+                           return {
+                               'id' : node.id,
+                               'class' : node.class
+                           };
+                       },
                    }
                },
                "checkbox" : {
@@ -201,7 +250,7 @@
                "types" : {
                    "#" : { "max_depth" : 3, "valid_children" : ["department","course"] },
                    "deparment" : {
-                       "icon" : '<i class="fa fa-"></i>',
+                       "icon" : iconUrl1,
                        "valid_children" : ["course"]
                    },
                    "course" :{
@@ -210,16 +259,65 @@
                    }
                },
                "plugins" : [
-                   "wholerow",'checkbox', "contextmenu", "search", "state","types"
+                   'checkbox', "contextmenu", "search", "state","types", "sort"
                ]
+           }).on('open_node.jstree', function (e, data) {
+               var folderId = data.node.original.id;
+               var moduleId = data.node.original.moduleId;
+               console.log(folderId);
+               initdiv(data.node);
            });
+       }
+
+
+       function initdiv(object) {
+           $(".testing").each(function() {
+               var tp = ($(this).attr('tp'));
+               var td = ($(this).attr('td'));
+               var course = ($(this).attr('course'));
+               var total = parseInt(tp) + parseInt(td) + parseInt(course);
+               var li_id = $(this).attr('id');
+               var text = $(this).attr('course_name');
+               alert(text)
+
+
+               $(this).append('<div class="col-sm-2 pull-right">'+
+                                   '<button type="button" class="btn btn-warning btn-xs dropdown-toggle" data-toggle="dropdown" aria-expanded="false"> Actions <span class="caret"></span></button>'+
+                                   '<ul class="dropdown-menu" role="menu">'+
+                                    '<li>' + ' <a href="{{route('admin.course.form_edit_course_annual')}}" class="edit_course" li_id = '+li_id+'> <i class="fa fa-edit"> Edit </i></a> '+ '</li>'+
+                                    '<li>' + ' <a href="{{route('admin.course.add_course_annual')}}" class="add_course" li_id = '+li_id+'> <i class="fa fa-plus"> Add </i></a>'+ '</li>'+
+                                    '<li>' + ' <a href="{{route('admin.course.delete_course_annual')}}" class="delete_course" li_id = '+li_id+'> <i class="fa fa-trash"> Delete </i></a> '+ '</li>'+
+                                   '</ul>'+
+                               '<div>');
+
+               $(this).append('<br/>'+'<label   class="label label-xs label-default time btn_tp" style="margin-left: 40px"> TP ='+tp+'</label>');
+
+               $(this).append('<label  class="label label-xs label-default time btn_td"> TD ='+td+'</label>');
+
+               $(this).append('<label class="label label-xs label-default time btn_course"> Course ='+course+'</label>');
+
+               $(this).append('<label class="label label-xs label-default time"> Total ='+total+'</label>');
+
+           });
+       }
+
+       function timeTdTdCourseTeacherAnnual(id) {
+
+           var tp = ( $("#"+id).attr('time_tp'));
+           var td = ( $("#"+id).attr('time_td'));
+           var course = ( $("#"+id).attr('time_course'));
+
+            $("#"+id).append('<li class="li_time_teaching">'+
+                            '<label class="label label-xs label-info time" style="margin-left: 40px"> TP ='+tp+'</label>' +
+                            '<label class="label label-xs label-info time"> TD ='+td+'</label>'+
+                            '<label class="label label-xs label-info time"> Course ='+course+'</label>'
+                        +'</li>');
 
        }
+
        $('#btn_cancel_request_input').on('click', function() {
            window.close();
        });
-
-
 
        function ajaxRequest(method, baseUrl, baseData){
 
@@ -236,6 +334,8 @@
 
                   $('#annual_course').jstree("refresh");
                   $('#annual_teacher').jstree("refresh");
+
+
 
                 } else {
                     notify('error', 'info', resultData.message);
@@ -266,11 +366,9 @@
                              ajaxRequest('DELETE', baseUrl, baseData);
                         }
                     });
-             
            }
 
        });
-
 
        $('#btn_assign_course').on('click', function() {
 
@@ -278,8 +376,6 @@
                teacher_id: $('#annual_teacher').jstree("get_selected"),
                course_id: $('#annual_course').jstree("get_selected")
            };
-
-           console.log(baseData);
 
            if(baseData.teacher_id.length > 0) {
 
@@ -302,7 +398,6 @@
                        }
                    });
 
-
                } else {
                    notify('error', 'info', 'Please Select Course!!');
                }
@@ -311,9 +406,36 @@
 
                notify('error', 'info', 'Please Select Teacher!!');
            }
+       });
 
+
+       $(document).on('click','.edit_course',function(e){
+           e.preventDefault();
+          var id =  $(this).attr('li_id');
+           var url = $(this).attr('href');
+
+           edit_course_window = PopupCenterDual(url+'?dept_course_id='+id,'Update Candidate','600','400');
+
+
+       }).on('click','.add_course',function(e){
+           e.preventDefault();
+           var id =  $(this).attr('li_id');
+           var url = $(this).attr('href');
+
+           edit_course_window = PopupCenterDual(url+'?dept_course_id='+id,'Update Candidate','600','400');
+
+       }).on('click','.delete_course',function(e){
+           e.preventDefault();
+           var id =  $(this).attr('li_id');
+           var url = $(this).attr('href');
+
+           edit_course_window = PopupCenterDual(url+'?dept_course_id='+id,'Update Candidate','600','400');
 
        });
+
+
+
+
 
 
    </script>

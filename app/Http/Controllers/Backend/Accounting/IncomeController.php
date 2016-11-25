@@ -28,6 +28,8 @@ use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Input;
 use Maatwebsite\Excel\Facades\Excel;
+use Illuminate\Support\Facades\Response;
+use Illuminate\Http\Request;
 
 class IncomeController extends Controller
 {
@@ -542,8 +544,8 @@ class IncomeController extends Controller
         return redirect()->route('admin.accounting.academicYears.index')->withFlashSuccess(trans('alerts.backend.generals.deleted'));
     }
 
-    public function data()
-    {
+    private function getIncomeFromDB() {
+
         $incomes = DB::table('incomes')
             ->leftJoin('accounts','incomes.account_id','=','accounts.id')
             ->leftJoin('incomeTypes','incomes.income_type_id','=','incomeTypes.id')
@@ -553,10 +555,61 @@ class IncomeController extends Controller
             ->leftJoin('students','studentAnnuals.student_id','=','students.id')
             ->select([
                 'incomes.id','incomes.number','incomes.amount_dollar','incomes.amount_riel','incomes.payslip_client_id','accounts.name as account_name',
-                'incomeTypes.name as income_type_name', 'incomes.description',
+                'incomeTypes.name as income_type_name', 'incomes.description','incomes.pay_date as date',
                 DB::raw("CONCAT(customers.name,employees.name_kh,students.name_kh) as name")
             ]);
+        return $incomes;
+    }
 
+    private function getIncomeByCurrency () {
+
+    }
+
+    public function incomeGraphData(Request $request) {
+
+
+        $graphData = [];
+
+//        dd($request->all());
+        $incomeData = $this->getIncomeFromDB();
+        $incomeData = $incomeData->where('incomes.amount_riel', '=',null);
+        // additional search
+        if ($account = $request->account) {
+            $incomeData = $incomeData->where('incomes.account_id', '=',$account);
+
+        }
+        if ($income_type = $request->income_type) {
+            $incomeData = $incomeData->where('incomes.income_type_id', '=', $income_type);
+        }
+        if ($date_range = $request->date_range) {
+            $date = explode(' - ',$date_range);
+
+            $start_date = Carbon::createFromFormat('d/m/Y',$date[0])->startOfDay()->format('Y-m-d')." 00:00:00";
+            $end_date = Carbon::createFromFormat('d/m/Y',$date[1])->endOfDay()->format('Y-m-d h:i:s');
+
+            $incomeData = $incomeData->where('incomes.pay_date', '<=', $end_date)->where('incomes.pay_date', '>=', $start_date);
+        }
+        $incomeData = $incomeData->get();
+
+
+        foreach($incomeData as $data) {
+            $dateInt = (double)strtotime($data->date) * 1000;
+
+            $graphData[] = array($dateInt, (int)($data->amount_dollar));
+        }
+
+
+//        dd(Response::json($graphData));
+
+
+        return Response::json($graphData);
+    }
+
+
+
+    public function data()
+    {
+        $incomes = $this->getIncomeFromDB();
         $datatables =  app('datatables')->of($incomes)
             ->filterColumn('name', 'whereRaw', "CONCAT(customers.name,employees.name_kh,students.name_kh) like ? ", ["%$1%"])
             ->editColumn('number','{{str_pad($number, 5, "0", STR_PAD_LEFT)}}')

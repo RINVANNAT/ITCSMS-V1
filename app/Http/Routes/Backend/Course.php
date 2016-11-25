@@ -37,4 +37,14 @@ Route::group([
     Route::delete('course-annual/remove-course-from-teacher', 'CourseAnnualController@removeCourse')->name('admin.course.remove_course_from_teacher');
 
     Route::post('course-annual/assign-course-teacher', 'CourseAnnualController@assignCourse')->name('admin.course.assign_course_teacher');
+
+
+    Route::get('course-annual/edit_course_annual', 'CourseAnnualController@formEditCourseAnnual')->name('admin.course.form_edit_course_annual');
+    Route::put('course-annual/edit_course_annual/{id}', 'CourseAnnualController@editCourseAnnual')->name('admin.course.edit_course_annual');
+
+
+
+    Route::get('course-annual/add_course_annual', 'CourseAnnualController@douplicateCourseAnnual')->name('admin.course.add_course_annual');
+
+    Route::get('course-annual/delete_course_annual', 'CourseAnnualController@deleteCourseAnnual')->name('admin.course.delete_course_annual');
 });

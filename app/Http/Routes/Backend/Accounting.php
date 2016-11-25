@@ -18,6 +18,9 @@ Route::group([
         Route::post('income-import', 'IncomeController@import')->name('admin.accounting.income.import');
         Route::get('income-import-done', 'IncomeController@import_done')->name('admin.accounting.income.import_done');
 
+
+        Route::get('income-chart-data/graph', 'IncomeController@incomeGraphData')->name('admin.accounting.income_graph_data');
+
     });
 
     Route::group([], function() {
@@ -48,6 +51,9 @@ Route::group([
         Route::get('customer-data', 'CustomerController@data')->name('admin.accounting.customer.data');
         Route::get('customer/popup_create', 'CustomerController@popup_create')->name('admin.accounting.customer.popup_create');
         Route::post('customer/popup_store', 'CustomerController@popup_store')->name('admin.accounting.customer.popup_store');
+
+
+
     });
 
 });

@@ -276,57 +276,291 @@ class CourseAnnualController extends Controller
     }
 
 
-    private function getCourseAnnualFromDB ($teacherId, $academicYearId) {
+    private function getCourseAnnualFromDB ($teacherId, $academicYearId, $grade_id, $degree_id) {
 
-            $courseAnnuals = DB::table('course_annuals')
-                ->leftJoin('courses','course_annuals.course_id', '=', 'courses.id')
-                ->leftJoin('employees','course_annuals.employee_id', '=', 'employees.id')
-                ->leftJoin('departments','course_annuals.department_id', '=', 'departments.id')
-                ->leftJoin('degrees','course_annuals.degree_id', '=', 'degrees.id')
+        if($degree_id) {
+
+            if($grade_id) {
+
+                $courseAnnuals = DB::table('course_annuals')
+                    ->leftJoin('courses','course_annuals.course_id', '=', 'courses.id')
+                    ->leftJoin('employees','course_annuals.employee_id', '=', 'employees.id')
+                    ->leftJoin('departments','course_annuals.department_id', '=', 'departments.id')
+                    ->leftJoin('degrees','course_annuals.degree_id', '=', 'degrees.id')
 //            ->leftJoin('grades','course_annuals.grade_id', '=', 'grade.id')
 
-                ->orderBy("course_annuals.updated_at","desc")
-                ->select(
-                    ['course_annuals.id',
-                        'courses.name_en as course_name',
-                        'courses.id as course_id',
-                        'course_annuals.semester_id',
-                        'course_annuals.active',
-                        'course_annuals.academic_year_id',
-                        'employees.name_latin as employee_id',
-                        'departments.code as department_id',
-                        'degrees.code as degree_id',
+                    ->orderBy("course_annuals.updated_at","desc")
+                    ->select(
+                        ['course_annuals.id',
+                            'courses.name_en as course_name',
+                            'courses.id as course_id',
+                            'course_annuals.semester_id',
+                            'course_annuals.active',
+                            'course_annuals.academic_year_id',
+                            'employees.name_latin as employee_id',
+                            'departments.code as department_id',
+                            'degrees.code as degree_id',
 //                    'grades.code  as grade_id',
-                        'courses.grade_id',
-                        'course_annuals.course_id']
-                )
-                ->where('employees.id', $teacherId)
-                ->where('course_annuals.academic_year_id', $academicYearId)
-                ->get();
+                            'courses.grade_id',
+                            'course_annuals.course_id',
+                            'course_annuals.time_tp',
+                            'course_annuals.time_td',
+                            'course_annuals.time_course',
 
-        return $courseAnnuals;
+                        ]
+                    )
+                    ->where([
+                        ['employees.id', $teacherId],
+                        ['course_annuals.academic_year_id', $academicYearId],
+                        ['course_annuals.grade_id', $grade_id],
+                        ['course_annuals.degree_id', $degree_id]
+                    ])
+                    ->get();
+
+                return $courseAnnuals;
+
+            } else {
+                $courseAnnuals = DB::table('course_annuals')
+                    ->leftJoin('courses','course_annuals.course_id', '=', 'courses.id')
+                    ->leftJoin('employees','course_annuals.employee_id', '=', 'employees.id')
+                    ->leftJoin('departments','course_annuals.department_id', '=', 'departments.id')
+                    ->leftJoin('degrees','course_annuals.degree_id', '=', 'degrees.id')
+//            ->leftJoin('grades','course_annuals.grade_id', '=', 'grade.id')
+
+                    ->orderBy("course_annuals.updated_at","desc")
+                    ->select(
+                        ['course_annuals.id',
+                            'courses.name_en as course_name',
+                            'courses.id as course_id',
+                            'course_annuals.semester_id',
+                            'course_annuals.active',
+                            'course_annuals.academic_year_id',
+                            'employees.name_latin as employee_id',
+                            'departments.code as department_id',
+                            'degrees.code as degree_id',
+//                    'grades.code  as grade_id',
+                            'courses.grade_id',
+                            'course_annuals.course_id',
+                            'course_annuals.time_tp',
+                            'course_annuals.time_td',
+                            'course_annuals.time_course'
+                        ]
+                    )
+                    ->where([
+                        ['employees.id', $teacherId],
+                        ['course_annuals.academic_year_id', $academicYearId],
+                        ['course_annuals.degree_id', $degree_id]
+                    ])
+                    ->get();
+                return $courseAnnuals;
+            }
+
+        } else {
+            if($grade_id) {
+                $courseAnnuals = DB::table('course_annuals')
+                    ->leftJoin('courses','course_annuals.course_id', '=', 'courses.id')
+                    ->leftJoin('employees','course_annuals.employee_id', '=', 'employees.id')
+                    ->leftJoin('departments','course_annuals.department_id', '=', 'departments.id')
+                    ->leftJoin('degrees','course_annuals.degree_id', '=', 'degrees.id')
+//            ->leftJoin('grades','course_annuals.grade_id', '=', 'grade.id')
+
+                    ->orderBy("course_annuals.updated_at","desc")
+                    ->select(
+                        ['course_annuals.id',
+                            'courses.name_en as course_name',
+                            'courses.id as course_id',
+                            'course_annuals.semester_id',
+                            'course_annuals.active',
+                            'course_annuals.academic_year_id',
+                            'employees.name_latin as employee_id',
+                            'departments.code as department_id',
+                            'degrees.code as degree_id',
+//                    'grades.code  as grade_id',
+                            'courses.grade_id',
+                            'course_annuals.course_id',
+                            'course_annuals.time_tp',
+                            'course_annuals.time_td',
+                            'course_annuals.time_course'
+                        ]
+                    )
+                    ->where([
+                        ['employees.id', $teacherId],
+                        ['course_annuals.academic_year_id', $academicYearId],
+                        ['course_annuals.grade_id', $grade_id]
+                    ])
+                    ->get();
+
+
+                return $courseAnnuals;
+
+            } else {
+
+                $courseAnnuals = DB::table('course_annuals')
+                    ->leftJoin('courses','course_annuals.course_id', '=', 'courses.id')
+                    ->leftJoin('employees','course_annuals.employee_id', '=', 'employees.id')
+                    ->leftJoin('departments','course_annuals.department_id', '=', 'departments.id')
+                    ->leftJoin('degrees','course_annuals.degree_id', '=', 'degrees.id')
+//            ->leftJoin('grades','course_annuals.grade_id', '=', 'grade.id')
+
+                    ->orderBy("course_annuals.updated_at","desc")
+                    ->select(
+                        ['course_annuals.id',
+                            'courses.name_en as course_name',
+                            'courses.id as course_id',
+                            'course_annuals.semester_id',
+                            'course_annuals.active',
+                            'course_annuals.academic_year_id',
+                            'employees.name_latin as employee_id',
+                            'departments.code as department_id',
+                            'degrees.code as degree_id',
+//                    'grades.code  as grade_id',
+                            'courses.grade_id',
+                            'course_annuals.course_id',
+                            'course_annuals.time_tp',
+                            'course_annuals.time_td',
+                            'course_annuals.time_course'
+                        ]
+                    )
+                    ->where([
+                        ['employees.id', $teacherId],
+                        ['course_annuals.academic_year_id', $academicYearId]
+                    ])
+                    ->get();
+
+            }
+
+            return $courseAnnuals;
+        }
+
     }
 
-    private function getNotSelectedCourseByDept($deptId) {
+    private function getNotSelectedCourseByDept($deptId, $academicYearId, $grade_id, $degree_id) {
 
-            $courseAnnuals = DB::table('course_annuals')
-                ->leftJoin('courses','course_annuals.course_id', '=', 'courses.id')
-                ->leftJoin('employees','course_annuals.employee_id', '=', 'employees.id')
-                ->leftJoin('departments','course_annuals.department_id', '=', 'departments.id')
-                ->leftJoin('degrees','course_annuals.degree_id', '=', 'degrees.id')
-            ->select([
-                    'courses.name_en as course_name',
-                    'courses.id as course_id',
-                    'departments.code as department_id',
-                    'degrees.code as degree_id',
-                    'courses.grade_id',
-                    'course_annuals.id as course_annual_id'
-                ])
-            ->where('departments.id', $deptId)
-            ->where('course_annuals.employee_id', null)
-            ->get();
+        if($degree_id) {
 
-        return $courseAnnuals;
+            if($grade_id) {
+
+                $courseAnnuals = DB::table('course_annuals')
+                    ->leftJoin('courses','course_annuals.course_id', '=', 'courses.id')
+                    ->leftJoin('employees','course_annuals.employee_id', '=', 'employees.id')
+                    ->leftJoin('departments','course_annuals.department_id', '=', 'departments.id')
+                    ->leftJoin('degrees','course_annuals.degree_id', '=', 'degrees.id')
+                    ->select([
+                        'course_annuals.name_en as course_name',
+                        'courses.id as course_id',
+                        'departments.code as department_id',
+                        'degrees.code as degree_id',
+                        'courses.grade_id',
+                        'course_annuals.id as course_annual_id',
+                        'course_annuals.time_tp',
+                        'course_annuals.time_td',
+                        'course_annuals.time_course'
+
+                    ])
+                    ->where([
+                        ['departments.id', $deptId],
+                        ['course_annuals.employee_id', null],
+                        ['course_annuals.academic_year_id', $academicYearId],
+                        ['course_annuals.grade_id', $grade_id],
+                        ['course_annuals.degree_id', $degree_id]
+
+                    ])
+                    ->get();
+
+                return $courseAnnuals;
+
+            } else {
+
+                $courseAnnuals = DB::table('course_annuals')
+                    ->leftJoin('courses','course_annuals.course_id', '=', 'courses.id')
+                    ->leftJoin('employees','course_annuals.employee_id', '=', 'employees.id')
+                    ->leftJoin('departments','course_annuals.department_id', '=', 'departments.id')
+                    ->leftJoin('degrees','course_annuals.degree_id', '=', 'degrees.id')
+                    ->select([
+                        'course_annuals.name_en as course_name',
+                        'courses.id as course_id',
+                        'departments.code as department_id',
+                        'degrees.code as degree_id',
+                        'courses.grade_id',
+                        'course_annuals.id as course_annual_id',
+                        'course_annuals.time_tp',
+                        'course_annuals.time_td',
+                        'course_annuals.time_course'
+                    ])
+                    ->where([
+                        ['departments.id', $deptId],
+                        ['course_annuals.employee_id', null],
+                        ['course_annuals.academic_year_id', $academicYearId],
+                        ['course_annuals.degree_id', $degree_id]
+
+                    ])
+                    ->get();
+
+                return $courseAnnuals;
+
+            }
+
+        } else {
+
+            if($grade_id) {
+
+                $courseAnnuals = DB::table('course_annuals')
+                    ->leftJoin('courses','course_annuals.course_id', '=', 'courses.id')
+                    ->leftJoin('employees','course_annuals.employee_id', '=', 'employees.id')
+                    ->leftJoin('departments','course_annuals.department_id', '=', 'departments.id')
+                    ->leftJoin('degrees','course_annuals.degree_id', '=', 'degrees.id')
+                    ->select([
+                        'course_annuals.name_en as course_name',
+                        'courses.id as course_id',
+                        'departments.code as department_id',
+                        'degrees.code as degree_id',
+                        'courses.grade_id',
+                        'course_annuals.id as course_annual_id',
+                        'course_annuals.time_tp',
+                        'course_annuals.time_td',
+                        'course_annuals.time_course'
+                    ])
+                    ->where([
+                        ['departments.id', $deptId],
+                        ['course_annuals.employee_id', null],
+                        ['course_annuals.academic_year_id', $academicYearId],
+                        ['course_annuals.grade_id', $grade_id]
+
+                    ])
+                    ->get();
+
+                return $courseAnnuals;
+
+            } else {
+
+                $courseAnnuals = DB::table('course_annuals')
+                    ->leftJoin('courses','course_annuals.course_id', '=', 'courses.id')
+                    ->leftJoin('employees','course_annuals.employee_id', '=', 'employees.id')
+                    ->leftJoin('departments','course_annuals.department_id', '=', 'departments.id')
+                    ->leftJoin('degrees','course_annuals.degree_id', '=', 'degrees.id')
+                    ->select([
+                        'course_annuals.name_en as course_name',
+                        'courses.id as course_id',
+                        'departments.code as department_id',
+                        'degrees.code as degree_id',
+                        'courses.grade_id',
+                        'course_annuals.id as course_annual_id',
+                        'course_annuals.time_tp',
+                        'course_annuals.time_td',
+                        'course_annuals.time_course'
+                    ])
+                    ->where([
+                        ['departments.id', $deptId],
+                        ['course_annuals.employee_id', null],
+                        ['course_annuals.academic_year_id', $academicYearId]
+                    ])
+                    ->get();
+
+                return $courseAnnuals;
+
+
+            }
+        }
 
     }
 
@@ -432,25 +666,63 @@ class CourseAnnualController extends Controller
         return Response::json($allDepartments);
     }
 
-    public function getAllTeacherByDepartmentId () {
+    public function getAllTeacherByDepartmentId (Request $request) {
 
         $teachers = [];
+        $totalCourseInSemester = [];
         $department_id = explode('_', $_GET['id'])[1];
+        $academic_year_id = $request->academic_year_id;
+        $grade_id = $request->grade_id;
+        $degree_id = $request->degree_id;
 
         $allTeachers = $this->getAllteacherByDeptId($department_id);
 
-//        dd($allTeachers);
-
             foreach ($allTeachers as $teacher) {
+
+                $selectedCourses = $this->getCourseAnnualFromDB($teacher->teacher_id, $academic_year_id, $grade_id, $degree_id );
+
+//                dd($selectedCourses);
+                $totalCoursePerSemester=[];
+                $timeTpS1 =0;
+                $timeTpS2 =0;
+                $timeTdS1 =0;
+                $timeTdS2 =0;
+                $timeCourseS1 =0;
+                $timeCourseS2 =0;
+
+                if($selectedCourses) {
+                    foreach($selectedCourses as $course) {
+                        $totalCoursePerSemester[$course->semester_id]=$course->time_tp + $course->time_td + $course->time_course;
+                        if($course->semester_id == 1) {
+
+                            $timeTpS1 = $timeTpS1 +  $course->time_tp;
+                            $timeTdS1 =$timeTdS1 + $course->time_td;
+                            $timeCourseS1 = $timeCourseS1 + $course->time_course;
+
+                        } else {
+                            $timeTpS2 = $timeTpS2 +  $course->time_tp;
+                            $timeTdS2 =$timeTdS2 + $course->time_td;
+                            $timeCourseS2 = $timeCourseS2 + $course->time_course;
+                        }
+
+                    }
+                }
 
                 if($teacher->department_id == $department_id) {
 
                     $element = array(
-                        "id" => 'department_'.$department_id.'_teacher_' . $teacher->teacher_id,
-                        "text" => $teacher->teacher_name,
-                        "children" => true,
-                        "type" => "teacher",
-                        "state" => ["opened" => true, "selected" => false ]
+                        "id"        => 'department_'.$department_id.'_teacher_' . $teacher->teacher_id,
+                        "text"      => $teacher->teacher_name.' (S1 = '.(isset($totalCoursePerSemester[1]) ? $totalCoursePerSemester[1] : 0). ' | S2 = '.(isset($totalCoursePerSemester[2]) ? $totalCoursePerSemester[2] : 0).')',
+                        "children"  => true,
+                        "type"      => "teacher",
+                        "state"     => ["opened" => true, "selected" => false ],
+                        "li_attr"   => [
+                            'class'         => 'teacher',
+                            'time_tp'       => ' (S1 = '.$timeTpS1. ' | S2 = '.$timeTpS2.')',
+                            'time_td'       => ' (S1 = '.$timeTdS1. ' | S2 = '.$timeTdS2.')',
+                            'time_course'  => ' (S1 = '.$timeCourseS1. ' | S2 = '.$timeCourseS2.')'
+                        ],
+
                     );
                     array_push($teachers, $element);
 
@@ -460,12 +732,21 @@ class CourseAnnualController extends Controller
                         "text" => $teacher->teacher_name,
                         "children" => true,
                         "type" => "teacher",
-                        "state" => ["opened" => false, "selected" => false ]
+                        "state" => ["opened" => false, "selected" => false ],
+                        "li_attr" => [
+                            'class' => 'teacher',
+                            'time_tp'       => ' (S1 = '.$timeTpS1. ' | S2 = '.$timeTpS2.')',
+                            'time_td'       => ' (S1 = '.$timeTdS1. ' | S2 = '.$timeTdS2.')',
+                            'time_course'  => ' (S1 = '.$timeCourseS1. ' | S2 = '.$timeCourseS2.')'
+                        ],
+
                     );
                     array_push($teachers, $element);
                 }
             }
 
+
+//        dd($teachers);
         return Response::json($teachers);
 
     }
@@ -475,12 +756,18 @@ class CourseAnnualController extends Controller
         $courses = [];
         $arayCourse =[];
 
+        $academic_year_id = $request->academic_year_id;
+        $grade_id = $request->grade_id;
+        $degree_id = $request->degree_id;
+
 
         $parent_id = $_GET['id'];
 
         $teacher_id = explode('_', $_GET['id'])[3];
 
-        $selectedCourses = $this->getCourseAnnualFromDB($teacher_id, $request->academic_year_id);
+//        dd($request->all());
+
+        $selectedCourses = $this->getCourseAnnualFromDB($teacher_id, $academic_year_id, $grade_id, $degree_id );
 //        dd($selectedCourses);
 
         if($selectedCourses) {
@@ -492,7 +779,10 @@ class CourseAnnualController extends Controller
                     "text" => $course->course_name. ' ('.$course->degree_id.$course->grade_id.')',
                     "children" => false,
                     "type" => "course",
-                    "state" => ["opened" => false, "selected" => false ]
+                    "state" => ["opened" => false, "selected" => false ],
+                    "li_attr" => [
+                        'class' => 'teacher_course',
+                    ],
                 );
                 array_push($courses, $element);
 
@@ -509,14 +799,19 @@ class CourseAnnualController extends Controller
 
     }
 
-    public function getAllCourseByDepartment () {
+    public function getAllCourseByDepartment (Request $request) {
 
         $deptId = explode('_', $_GET['id'])[1];
         $arrayCourses = [];
         $Course = [];
+        $academic_year_id = $request->academic_year_id;
+        $grade_id = $request->grade_id;
+        $degree_id = $request->degree_id;
+
+
 //        $Ids = $this->getSelectedCourses($deptId);
 
-        $notSelectedCourses = $this->getNotSelectedCourseByDept($deptId);
+        $notSelectedCourses = $this->getNotSelectedCourseByDept($deptId, $academic_year_id, $grade_id, $degree_id);
 
 //        dd($Ids);
 
@@ -526,13 +821,24 @@ class CourseAnnualController extends Controller
 
             foreach($notSelectedCourses as $course) {
 
+
                 $element = array(
                     "id" => 'department_'.$deptId.'_'.'course_' . $course->course_annual_id,
                     "text" => $course->course_name,
-                    "children" => false,
+                    "li_attr" => [
+                        'class' => 'testing',
+                        'tp'    => $course->time_tp,
+                        'td'    => $course->time_td,
+                        'course' => $course->time_course,
+                        'course_name' => $course->course_name
+                    ],
+
                     'grade' => $course->grade_id,
-                    "type" => "course"
+                    "type" => "course",
+                    "state" => ["opened" => false, "selected" => false ]
+
                 );
+
                 array_push($arrayCourses, $element);
 
             }
@@ -675,6 +981,44 @@ class CourseAnnualController extends Controller
         } else {
             return Response::json(['status' => false, 'message' => 'Not Seleted Teacher!']);
         }
+    }
+
+
+    public function formEditCourseAnnual(Request $request) {
+
+        $explode = explode('_', $request->dept_course_id);
+        $courseAnnualId = $explode[3];
+        $course = $this->getCourseAnnualById($courseAnnualId);
+
+        if($course) {
+
+            return view('backend.course.courseAnnual.includes.popup_edit_course_annual', compact('course'));
+        }
+
+    }
+
+    public function editCourseAnnual($courseId) {
+
+    }
+
+    public function douplicateCourseAnnual(Request $request) {
+
+        dd($request->all());
+
+    }
+
+    public function deleteCourseAnnual(Request $request) {
+
+
+        dd($request->all());
+    }
+
+    private function getCourseAnnualById ($courseAnnualId) {
+
+        $course = CourseAnnual::where('id', $courseAnnualId)->first();
+
+        return $course;
+
     }
 
 
