@@ -19,7 +19,8 @@ Route::group([
         Route::get('income-import-done', 'IncomeController@import_done')->name('admin.accounting.income.import_done');
 
 
-        Route::get('income-chart-data/graph', 'IncomeController@incomeGraphData')->name('admin.accounting.income_graph_data');
+        Route::get('income-chart-data/graph-dollar-currency', 'IncomeController@incomeGraphData')->name('admin.accounting.income_graph_data');
+        Route::get('income-chart-data/graph-riel-currency', 'IncomeController@incomeGraphInRielCurrency')->name('admin.accounting.income_graph_reil_currency');
 
     });
 

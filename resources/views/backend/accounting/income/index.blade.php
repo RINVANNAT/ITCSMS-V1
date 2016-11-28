@@ -76,9 +76,15 @@
 
 
 
-                <div id="graph_income" style="height: 400px; min-width: 310px">
+                <div id="graph_income_dollar_currency" style="height: 400px; min-width: 310px">
 
                 </div>
+
+                <div id="graph_income_riel_currency" style="height: 400px; min-width: 310px">
+
+                </div>
+
+
             </div>
 
             <div class="clearfix"></div>
@@ -165,14 +171,20 @@
 
             $('#filter_account').on('change', function(e) {
                 oTable.draw();
+                incomeChartInRielCurrency();
+                incomeChart();
                 e.preventDefault();
             });
             $('#filter_incomeType').on('change', function(e) {
                 oTable.draw();
+                incomeChartInRielCurrency();
+                incomeChart();
                 e.preventDefault();
             });
             $('#filter_date_range').on('change', function(e) {
                 oTable.draw();
+                incomeChartInRielCurrency();
+                incomeChart();
                 e.preventDefault();
             });
 
@@ -192,6 +204,7 @@
             });
         });
 
+        incomeChartInRielCurrency();
         incomeChart();
 
         function incomeChart() {
@@ -211,10 +224,22 @@
 
                     console.log(graphData);
 
-                    $('#graph_income').highcharts('StockChart', {
+                    $('#graph_income_dollar_currency').highcharts('StockChart', {
 
                         rangeSelector: {
                             selected: 1
+                        },
+                        credits: {
+                            enabled: false
+                        },
+
+                        yAxis: {
+                            tickInterval: 10,
+                            lineWidth: 5,
+                            opposite: false,
+                            title: {
+                                text: 'Revenue'
+                            }
                         },
 
                         title: {
@@ -224,6 +249,56 @@
                         series: [{
                             name: 'Income',
                             data: graphData,
+                        }]
+                    });
+                }
+
+            });
+        }
+
+        function incomeChartInRielCurrency() {
+
+            var baseData = {
+                acount:         $('#filter_account').val(),
+                income_type:    $('#filter_incomeType').val(),
+                date_range:     $('#filter_date_range').val()
+            }
+
+
+            $.ajax({
+                type: 'GET',
+                url: "{{route('admin.accounting.income_graph_reil_currency')}}",
+                data: baseData,
+                success: function(chartData) {
+
+                    console.log(chartData);
+
+                    $('#graph_income_riel_currency').highcharts('StockChart', {
+
+                        rangeSelector: {
+                            selected: 1
+                        },
+                        credits: {
+                            enabled: false
+                        },
+
+                        yAxis: {
+                            tickInterval: 10,
+                            lineWidth: 5,
+                            opposite: false,
+                            title: {
+                                text: 'Amount in Riel'
+                            }
+                        },
+
+                        title: {
+                            text: 'Income Riel'
+                        },
+
+                        series: [{
+                            name: 'Income Riel',
+                            data: chartData,
+                            color: 'green'
                         }]
                     });
                 }
