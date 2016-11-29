@@ -587,7 +587,6 @@ class IncomeController extends Controller
         }
         $incomeData = $incomeData->get();
 
-
         foreach($incomeData as $data) {
             $dateInt = (double)strtotime($data->date) * 1000;
 

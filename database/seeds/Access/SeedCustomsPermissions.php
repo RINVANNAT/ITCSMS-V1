@@ -765,6 +765,13 @@ class SeedCustomsPermissions extends Seeder
                             'dependency'   => [
                                 'view-backend','view-course-management','view-courseAnnual-management'
                             ]
+                        ],
+                        [
+                            'name'         => 'course-annual-assignment',
+                            'display_name' => 'Assign Course Annual for Each Teacher',
+                            'dependency'   => [
+                                'view-backend','view-course-management','view-courseAnnual-management'
+                            ]
                         ]
                     ]
                 ],

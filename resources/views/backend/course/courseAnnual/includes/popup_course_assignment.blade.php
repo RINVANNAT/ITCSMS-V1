@@ -82,13 +82,6 @@
 
     <div class="box box-success">
         <div class="box-body">
-            <div class="pull-left me" tp="vannat">
-                <a href="#" id="btn_cancel_request_input" class="btn btn-default btn-xs">{{ trans('labels.backend.exams.score.btn_cancel') }}</a>
-            </div>
-
-            <div class="pull-right">
-                <input type="button" id="btn_ok_request_input_score" class="btn btn-primary btn-xs" value="{{ trans('labels.backend.exams.score.btn_ok') }}" />
-            </div>
             <div class="clearfix"></div>
         </div><!-- /.box-body -->
     </div><!--box-->
@@ -105,17 +98,13 @@
 
 
        var iconUrl1 = "{{url('plugins/jstree/img/department.png')}}";
-       var iconUrl2 = "{{url('plugins/jstree/img/role.png')}}";
-       var iconUrl3 = "{{url('plugins/jstree/img/employee.png')}}";
+       var iconUrl2 = "{{url('plugins/jstree/img/teacher.png')}}";
+       var iconUrl3 = "{{url('plugins/jstree/img/course_pic.png')}}";
 
        var department_id = '{{$departmentId}}';
        var grade_id = '{{$gradeId}}';
        var degree_id = '{{$degreeId}}';
        var academic_year_id = '{{$academicYear->id}}';
-
-
-
-
 
 
 
@@ -249,7 +238,7 @@
                },
                "types" : {
                    "#" : { "max_depth" : 3, "valid_children" : ["department","course"] },
-                   "deparment" : {
+                   "department" : {
                        "icon" : iconUrl1,
                        "valid_children" : ["course"]
                    },
@@ -271,14 +260,15 @@
 
 
        function initdiv(object) {
-           $(".testing").each(function() {
+           $(".department_course").each(function() {
                var tp = ($(this).attr('tp'));
                var td = ($(this).attr('td'));
                var course = ($(this).attr('course'));
                var total = parseInt(tp) + parseInt(td) + parseInt(course);
                var li_id = $(this).attr('id');
                var text = $(this).attr('course_name');
-               alert(text)
+
+//               $(this).children('a').find('i').addClass('fa fa-book');
 
 
                $(this).append('<div class="col-sm-2 pull-right">'+
@@ -414,7 +404,7 @@
           var id =  $(this).attr('li_id');
            var url = $(this).attr('href');
 
-           edit_course_window = PopupCenterDual(url+'?dept_course_id='+id,'Update Candidate','600','400');
+           edit_course_window = PopupCenterDual(url+'?dept_course_id='+id,'Update Candidate','500','600');
 
 
        }).on('click','.add_course',function(e){
@@ -422,21 +412,77 @@
            var id =  $(this).attr('li_id');
            var url = $(this).attr('href');
 
-           edit_course_window = PopupCenterDual(url+'?dept_course_id='+id,'Update Candidate','600','400');
+           var baseData = {
+               dept_course_id : id
+           }
+
+           swal({
+               title: "Confirm",
+               text: "You want to duplicate course!!",
+               type: "info",
+               showCancelButton: true,
+               confirmButtonColor: "#DD6B55",
+               confirmButtonText: "Yes",
+               closeOnConfirm: true
+           }, function(confirmed) {
+               if (confirmed) {
+                   $.ajax({
+                       type: 'POST',
+                       url: url,
+                       data: baseData,
+                       dataType: "json",
+                       success: function(resultData) {
+                           if(resultData.status == true) {
+                               notify('success', 'info', resultData.message);
+                               $('#annual_course').jstree("refresh");
+
+                           } else {
+                               notify('error', 'info', resultData.message);
+                           }
+                       }
+                   });
+               }
+           });
 
        }).on('click','.delete_course',function(e){
            e.preventDefault();
            var id =  $(this).attr('li_id');
            var url = $(this).attr('href');
+           var baseData = {
+               dept_course_id : id
+           }
 
-           edit_course_window = PopupCenterDual(url+'?dept_course_id='+id,'Update Candidate','600','400');
+
+           swal({
+               title: "Confirm",
+               text: "You want to delete this course!!",
+               type: "info",
+               showCancelButton: true,
+               confirmButtonColor: "#DD6B55",
+               confirmButtonText: "Yes",
+               closeOnConfirm: true
+           }, function(confirmed) {
+               if (confirmed) {
+                   $.ajax({
+                       type: 'DELETE',
+                       url: url,
+                       data: baseData,
+                       dataType: "json",
+                       success: function(resultData) {
+                           if(resultData.status == true) {
+                               notify('success', 'info', resultData.message);
+                               $('#annual_course').jstree("refresh");
+
+                           } else {
+                               notify('error', 'info', resultData.message);
+                           }
+                       }
+                   });
+               }
+           });
+
 
        });
-
-
-
-
-
 
    </script>
 @stop

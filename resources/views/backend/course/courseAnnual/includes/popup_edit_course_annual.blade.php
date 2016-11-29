@@ -1,6 +1,6 @@
 @extends ('backend.layouts.popup_master')
 
-@section ('title', trans('labels.backend.exams.title') . ' | ' . 'Generate Candidates Result')
+@section ('title', 'Course Annual' . ' | ' . 'Edit Course Annual')
 
 @section('content')
 
@@ -12,6 +12,14 @@
             }
             .enlarge-number{
                 font-size: 22px;
+            }
+
+            .enlarge-selection{
+                font-size: 14px;
+                border-radius: 0;
+                background: transparent;
+                width: 150px;
+                text-indent: 10px;
             }
 
 
@@ -26,26 +34,75 @@
             }
         </style>
         <div class="box-header with-border">
-            <h3 class="box-title">Get Result Score</h3>
+            <h3 class="box-title">Course Annual Edition</h3>
         </div>
         <!-- /.box-header -->
-        <div class="box-body">
+        <div class="box-body panel">
 
-            {!! Form::open(['route' => ['admin.course.edit_course_annual',$course->id], 'class' => 'form-horizontal calculation_score', 'role' => 'form', 'method' => 'post']) !!}
-                <div class="row">
-                    <div class="col-md-12 no-padding">
-                        <div class="col-md-3">
-                            <label for="name_kh" class="label label-default enlarge-number"> Name Khmer </label>
-                            {!! Form::text("name_kh", $course->name_kh, ['class' => 'enlarge-number form-control']) !!}
-                        </div>
+            {!! Form::open(['route' => ['admin.course.edit_course_annual',$course->id], 'class' => 'form-horizontal form_edit_course_annual', 'role' => 'form', 'method' => 'put']) !!}
 
-                        <div class="col-md-3">
+                <table class="table table-hover" id="dev-table">
+                    <thead>
+                    <tr style="background-color: #0a6aa1; color: #00ee00">
+                        <th>Order</th>
+                        <th>Name</th>
+                        <th>Updating</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr>
+                        <td width="1cm">1</td>
+                        <td width="20cm"> Khmer</td>
+                        <td><input type="text" name="name_kh" class="form-control inputs_val" value="{{$course->name_kh}}"></td>
 
-                        </div>
-                    </div>
-                </div>
+                    </tr>
+                    <tr>
+                        <td>2</td>
+                        <td> English</td>
+                        <td><input type="text" name="name_en" class="form-control inputs_val" value="{{$course->name_en}}"></td>
+                    </tr>
+                    <tr>
+                        <td>3</td>
+                        <td> France</td>
+                        <td><input type="text" name="name_fr" class="form-control inputs_val" value="{{$course->name_fr}}"></td>
+                    </tr>
+                    <tr>
+                        <td>4</td>
+                        <td>Time Course</td>
+                        <td><input type="text" name="time_course" class="form-control number_only inputs_val" value="{{$course->time_course}}"></td>
+                    </tr>
+                    <tr>
+                        <td>5</td>
+                        <td>Time TD</td>
+                        <td><input type="text" name="time_td" class="form-control number_only inputs_val" value="{{$course->time_td}}"></td>
+                    </tr>
+                    <tr>
+                        <td>6</td>
+                        <td>Time TP</td>
+                        <td><input type="text" name="time_tp" class="form-control number_only inputs_val" value="{{$course->time_tp}}"></td>
+                    </tr>
 
+                    <tr>
+                        <td>7</td>
+                        <td> Semester </td>
 
+                        <td>
+                            <select name="semester_id" id="select_semester_id" class="enlarge-selection">
+                                @foreach($allSemesters as $semester)
+                                    @if($course->semester_id == $semester->id)
+                                        <option value="{{$semester->id}}" selected>{{$semester->name_en}}</option>
+                                    @else
+                                        <option value="{{$semester->id}}">{{$semester->name_en}}</option>
+
+                                    @endif
+
+                                @endforeach
+
+                            </select>
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
 
             {!! Form::close() !!}
 
@@ -60,7 +117,7 @@
             </div>
 
             <div class="pull-right">
-                <input type="button" id="btn_get_factor_ok" class="btn btn-danger btn-xs" value="OK" />
+                <input type="button" id="btn_update_course" class="btn btn-danger btn-xs" value="OK" />
             </div>
             <div class="clearfix"></div>
         </div><!-- /.box-body -->
@@ -82,15 +139,14 @@
                 success: function(result) {
                     console.log(result);
 
-                    if(result.status) {
-
-                        $('#btn_result_score_candidate').hide();
-                        notify('success', 'Result Success!');
-                        window.close();
-
+                    if(result.status== true) {
+                        notify('success', 'info', result.message);
+                        window.opener.location.reload();
+                        window.setTimeout(function(){
+                          window.close();
+                        }, 3000);
                     } else {
-                        $('.modal').hide();
-                        notify("error","info", "There are not enough candidates!!!");
+                        notify('error', 'info', result.message);
                     }
 
                 }
@@ -98,14 +154,44 @@
         }
 
 
-        $('#btn_get_factor_ok').on('click', function(e) {
+        $('#btn_update_course').on('click', function(e) {
             e.preventDefault();
+            var data = $('form.form_edit_course_annual').serialize();
+
+            swal({
+                title: "Confirm",
+                text: "Save Edition??",
+                type: "info",
+                showCancelButton: true,
+                confirmButtonColor: "#DD6B55",
+                confirmButtonText: "Yes,Save it",
+                closeOnConfirm: true
+            }, function(confirmed) {
+                if (confirmed) {
+                    ajaxRequest('PUT', $('form.form_edit_course_annual').attr('action'), data);
+                }
+            });
 
         })
 
         $('#cancel_edit').on('click', function() {
             window.close();
         })
+
+
+        $(".number_only").keypress(function (e) {
+            if (e.which != 8 && e.which != 0 && (e.which < 48 || e.which > 57)) {
+                return false;
+            }
+        });
+
+
+        $('.inputs_val').keydown(function (e) {
+            if (e.which === 13) {
+                var index = $('.inputs_val').index(this) + 1;
+                $('.inputs_val').eq(index).focus().select();
+            }
+        });
 
 
     </script>

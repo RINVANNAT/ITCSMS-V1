@@ -46,7 +46,11 @@
                 <!-- /.btn-group -->
                 <button class="btn btn-default btn-sm"><i class="fa fa-refresh"></i></button>
 
-                <button class="btn btn-primary btn-sm pull-right " id="course_assignment"><i class="fa fa-plus-circle"></i> {{trans('buttons.course.course_annual.course_assignment')}}</button>
+                @permission('course-annual-assignment')
+                    <button class="btn btn-primary btn-sm pull-right " id="course_assignment"><i class="fa fa-plus-circle"></i> {{trans('buttons.course.course_annual.course_assignment')}}</button>
+                @endauth
+
+
             </div>
         </div><!-- /.box-header -->
 

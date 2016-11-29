@@ -238,12 +238,12 @@
                             lineWidth: 5,
                             opposite: false,
                             title: {
-                                text: 'Revenue'
+                                text: 'Amount in USD'
                             }
                         },
 
                         title: {
-                            text: 'Income Data'
+                            text: 'Income USD Currency'
                         },
 
                         series: [{
@@ -292,7 +292,7 @@
                         },
 
                         title: {
-                            text: 'Income Riel'
+                            text: 'Income Riel Currency'
                         },
 
                         series: [{

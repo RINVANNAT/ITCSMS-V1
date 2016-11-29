@@ -40,6 +40,8 @@ interface CourseAnnualRepositoryContract
      */
     public function update($id, $input);
 
+    public function updateCourseAnnualAssignment($courseAnnualID, $input);
+
     /**
      * @param  $id
      * @param  $input
