@@ -1,9 +1,33 @@
-<div class="form-group">
-    {!! Form::label('course', trans('labels.backend.courseAnnuals.fields.course'), ['class' => 'col-lg-2 control-label required']) !!}
-    <div class="col-lg-7">
-        {{ Form::select('course_id', $courses, null, ['class' => 'form-control']) }}
+@if(isset($courseAnnual))
+
+    <div class="form-group">
+        {!! Form::label('course', trans('labels.backend.courseAnnuals.fields.course'), ['class' => 'col-lg-2 control-label required']) !!}
+        <div class="col-lg-7">
+            <select name="course_id" id="course_id" class="form-control">
+                @foreach($courses as $course)
+                    @if($course->id == $courseAnnual->course_id)
+                        <option selected value="{{$course->id}}" time_course="{{$course->time_course}}" time_tp="{{$course->time_tp}}" time_td="{{$course->time_td}}" name_kh="{{$course->name_kh}}" name_en="{{$course->name_en}}" name_fr="{{$course->name_fr}}">{{$course->name_kh}}</option>
+                    @else
+                        <option value="{{$course->id}}" time_course="{{$course->time_course}}" time_tp="{{$course->time_tp}}" time_td="{{$course->time_td}}" name_kh="{{$course->name_kh}}" name_en="{{$course->name_en}}" name_fr="{{$course->name_fr}}">{{$course->name_kh}}</option>
+                    @endif
+                @endforeach
+            </select>
+        </div>
     </div>
-</div>
+
+@else
+    <div class="form-group">
+        {!! Form::label('course', trans('labels.backend.courseAnnuals.fields.course'), ['class' => 'col-lg-2 control-label required']) !!}
+        <div class="col-lg-7">
+            <select name="course_id" id="course_id" class="form-control">
+                @foreach($courses as $course)
+                    <option value="{{$course->id}}" time_course="{{$course->time_course}}" time_tp="{{$course->time_tp}}" time_td="{{$course->time_td}}" name_kh="{{$course->name_kh}}" name_en="{{$course->name_en}}" name_fr="{{$course->name_fr}}">{{$course->name_kh}}</option>
+                @endforeach
+            </select>
+        </div>
+    </div>
+@endif
+
 <div class="form-group">
     {!! Form::label('course', trans('labels.backend.courseAnnuals.fields.employee'), ['class' => 'col-lg-2 control-label required']) !!}
     <div class="col-lg-7">
@@ -68,4 +92,50 @@
         {{ Form::text('score_percentage_column_3',  null, ['class' => 'form-control']) }}
     </div>
 </div>
+
+
+
+{{--add new row--}}
+
+<div class="form-group">
+    {!! Form::label('time_course', "Time Course", ['class' => 'col-lg-2 control-label required']) !!}
+    <div class="col-lg-2">
+        {{ Form::text('time_course',  null, ['class' => 'form-control', 'id'=>'time_course']) }}
+    </div>
+
+    {!! Form::label('name_kh', "Name Khmer", ['class' => 'col-lg-2 control-label']) !!}
+
+    <div class="col-lg-3">
+        {{ Form::text('name_kh',  null, ['class' => 'form-control', 'id'=>'name_kh']) }}
+    </div>
+</div>
+
+
+<div class="form-group">
+    {!! Form::label('time_td', "Time TD", ['class' => 'col-lg-2 control-label required']) !!}
+    <div class="col-lg-2">
+        {{ Form::text('time_td',  null, ['class' => 'form-control', 'id'=> 'time_td']) }}
+    </div>
+
+    {!! Form::label('name_en', "Name English", ['class' => 'col-lg-2 control-label']) !!}
+
+    <div class="col-lg-3">
+        {{ Form::text('name_en',  null, ['class' => 'form-control', 'id'=> 'name_en']) }}
+    </div>
+</div>
+
+<div class="form-group">
+    {!! Form::label('time_tp', "Time TP", ['class' => 'col-lg-2 control-label required']) !!}
+    <div class="col-lg-2">
+        {{ Form::text('time_tp',  null, ['class' => 'form-control', 'id'=>'time_tp']) }}
+    </div>
+
+    {!! Form::label('name_fr', "Name France", ['class' => 'col-lg-2 control-label']) !!}
+
+    <div class="col-lg-3">
+        {{ Form::text('name_fr',  null, ['class' => 'form-control' , 'id'=> 'name_fr']) }}
+    </div>
+</div>
+
+
 

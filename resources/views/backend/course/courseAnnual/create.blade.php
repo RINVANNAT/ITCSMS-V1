@@ -44,4 +44,5 @@
 @section('after-scripts-end')
     {!! Html::script('js/backend/plugin/jstree/jstree.min.js') !!}
     {!! Html::script('js/backend/access/roles/script.js') !!}
+    {!! Html::script('js/backend/course/courseAnnual/course_annual.js') !!}
 @stop

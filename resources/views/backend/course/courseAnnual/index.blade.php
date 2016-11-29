@@ -50,6 +50,10 @@
                     <button class="btn btn-primary btn-sm pull-right " id="course_assignment"><i class="fa fa-plus-circle"></i> {{trans('buttons.course.course_annual.course_assignment')}}</button>
                 @endauth
 
+                @permission('generat-course-annual')
+                <button class="btn btn-primary btn-sm pull-right " id="generate_course_annual" style="margin-right: 5px"><i class="fa fa-plus-circle"></i> Generate Course Annual</button>
+                @endauth
+
 
             </div>
         </div><!-- /.box-header -->
@@ -145,6 +149,45 @@
             var degree_name = $('#filter_degree :selected').text();
             var url = "{!! route('admin.course.course_assignment') !!}";
             var course_assignment_window = PopupCenterDual(url+'?department_id='+department_id+'&academic_year_id='+academic_year_id+'&degree_id='+degree_id+'&grade_id='+grade_id,'course assignment','1400','900');
+        });
+
+        $('#generate_course_annual').on('click', function() {
+
+            var url = "{!! route('admin.course.generate_course_annual') !!}";
+            var baseData = {
+                academic_year_id: $('#filter_academic_year :selected').val(),
+                degree_id : $('#filter_degree :selected').val(),
+                grade_id: $('#filter_grade :selected').val(),
+                department_id:$('#filter_department :selected').val()
+            };
+
+            swal({
+                title: "Confirm",
+                text: "Do you really want to generate courses??",
+                type: "info",
+                showCancelButton: true,
+                confirmButtonColor: "#DD6B55",
+                confirmButtonText: "Yes",
+                closeOnConfirm: true
+            }, function(confirmed) {
+                if (confirmed) {
+                    $.ajax({
+                        type: 'POST',
+                        url: url,
+                        data: baseData,
+                        dataType: "json",
+                        success: function(resultData) {
+                            if(resultData.status == true) {
+                                notify('success', 'info', resultData.message);
+                                oTable.draw();
+
+                            } else {
+                                notify('error', 'info', resultData.message);
+                            }
+                        }
+                    });
+                }
+            });
         })
     </script>
 @stop

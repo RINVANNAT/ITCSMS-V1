@@ -36,3 +36,8 @@
         </div><!--box-->
     {!! Form::close() !!}
 @stop
+
+
+@section('after-scripts-end')
+    {!! Html::script('js/backend/course/courseAnnual/course_annual.js') !!}
+@stop

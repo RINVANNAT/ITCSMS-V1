@@ -104,29 +104,7 @@ class EloquentCourseAnnualRepository implements CourseAnnualRepositoryContract
         $courseAnnual->semester_id = $input['semester_id'];
         $courseAnnual->active = isset($input['active'])?true:false;
         $courseAnnual->employee_id = isset($input['employee_id'])?$input['employee_id']:null;
-
-        $courseAnnual->updated_at = Carbon::now();
-        $courseAnnual->score_percentage_column_1 = isset($input['score_percentage_column_1'])?$input['score_percentage_column_1']:10;
-        $courseAnnual->score_percentage_column_2 = isset($input['score_percentage_column_2'])?$input['score_percentage_column_2']:30;
-        $courseAnnual->score_percentage_column_3 = isset($input['score_percentage_column_3'])?$input['score_percentage_column_3']:60;
-
-        $courseAnnual->write_uid = auth()->id();
-
-        if ($courseAnnual->save()) {
-            return true;
-        }
-
-        throw new GeneralException(trans('exceptions.backend.general.update_error'));
-    }
-
-    public function updateCourseAnnualAssignment($courseAnnualID, $input){
-
-        $courseAnnual = $this->findOrThrowException($courseAnnualID);
-
-        $courseAnnual->course_id = $input['course_id'];
-        $courseAnnual->semester_id = $input['semester_id'];
-        $courseAnnual->active = isset($input['active'])?true:false;
-        $courseAnnual->employee_id = isset($input['employee_id'])?$input['employee_id']:null;
+        $courseAnnual->department_id = $input['department_id'];
 
         $courseAnnual->time_course = isset($input['time_course'])?$input['time_course']:0;
         $courseAnnual->time_td = isset($input['time_td'])?$input['time_td']:0;
@@ -148,9 +126,7 @@ class EloquentCourseAnnualRepository implements CourseAnnualRepositoryContract
         }
 
         throw new GeneralException(trans('exceptions.backend.general.update_error'));
-
     }
-
 
     public function update_score_per($id, $input)
     {

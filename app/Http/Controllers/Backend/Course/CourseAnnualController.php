@@ -86,7 +86,9 @@ class CourseAnnualController extends Controller
         $academicYears = AcademicYear::orderBy('id', 'desc')->lists('name_latin','id')->toArray();
         $degrees = Degree::lists('name_kh','id')->toArray();
         $grades = Grade::lists('name_kh','id')->toArray();
-        $courses = Course::orderBy('updated_at', 'desc')->lists('name_kh','id')->toArray();
+//        $courses = Course::orderBy('updated_at', 'desc')->lists('name_kh','id')->toArray();
+        $courses = Course::orderBy('updated_at', 'desc')->get();
+
         $semesters = Semester::lists("name_kh", "id");
         $employees = Employee::orderBy('updated_at', 'desc')->lists("name_kh","id");
         return view('backend.course.courseAnnual.create',compact('departments','academicYears','degrees','grades','courses',"semesters","employees"));
@@ -101,6 +103,7 @@ class CourseAnnualController extends Controller
 
     public function store(StoreCourseAnnualRequest $request)
     {
+
         $data = $request->all();
         $this->courseAnnuals->create($data);
         
@@ -133,7 +136,10 @@ class CourseAnnualController extends Controller
         $academicYears = AcademicYear::lists('name_latin','id')->toArray();
         $degrees = Degree::lists('name_kh','id')->toArray();
         $grades = Grade::lists('name_kh','id')->toArray();
-        $courses = Course::lists('name_kh','id')->toArray();
+//        $courses = Course::lists('name_kh','id')->toArray();
+
+        $courses = Course::orderBy('updated_at', 'desc')->get();
+
         $semesters = Semester::lists("name_kh", "id");
         $employees = Employee::lists("name_kh","id");
         return view('backend.course.courseAnnual.edit',compact('courseAnnual','departments','academicYears','degrees','grades','courses','employees','semesters'));
@@ -148,6 +154,7 @@ class CourseAnnualController extends Controller
      */
     public function update(UpdateCourseAnnualRequest $request, $id)
     {
+
         $this->courseAnnuals->update($id, $request->all());
         return redirect()->route('admin.course.course_annual.index')->withFlashSuccess(trans('alerts.backend.generals.updated'));
     }
@@ -769,7 +776,7 @@ class CourseAnnualController extends Controller
             'active'        => true
         ];
 
-        $update =  $this->courseAnnuals->updateCourseAnnualAssignment($courseId, $inputs);
+        $update =  $this->courseAnnuals->update($courseId, $inputs);
         if($update) {
             return Response::json(['status'=>true, 'message'=>'update course successfully!']);
         } else {
@@ -822,7 +829,6 @@ class CourseAnnualController extends Controller
             return Response::json(['status'=>true, 'message'=>'Error Deleted!']);
         }
 
-
     }
 
     private function getCourseAnnualById ($courseAnnualId) {
@@ -830,6 +836,96 @@ class CourseAnnualController extends Controller
         $course = CourseAnnual::where('id', $courseAnnualId)->first();
 
         return $course;
+
+    }
+
+
+    public function generateCourseAnnual(Request $request) {
+
+
+        $courseAnnual= DB::table('course_annuals')->where('academic_year_id', $request->academic_year_id-1);
+        $departmentId = $request->department_id;
+        $degreeId = $request->degree_id;
+        $gradeId = $request->grade_id;
+        $check =0;
+        $countIsGenerated =0;
+
+        if($departmentId) {
+            $courseAnnual = $courseAnnual->where('course_annuals.department_id', '=', $departmentId);
+        }
+        if($degreeId) {
+            $courseAnnual = $courseAnnual->where('course_annuals.degree_id', '=', $degreeId);
+        }
+        if($gradeId) {
+            $courseAnnual = $courseAnnual->where('course_annuals.grade_id', '=', $gradeId);
+        }
+        $courseAnnual = $courseAnnual->get();
+
+        foreach($courseAnnual as $course) {
+            $input = [
+                'time_course'   => $course->time_course,
+                'time_td'       => $course->time_td,
+                'time_tp'       => $course->time_tp,
+                'name_kh'       => $course->name_kh,
+                'name_en'       => $course->name_en,
+                'name_fr'       => $course->name_fr,
+                'course_id'     => $course->course_id,
+                'semester_id'   => $course->semester_id,
+                'active'        => true,
+                'academic_year_id'      => $request->academic_year_id,
+                'department_id'         => $course->department_id,
+                'degree_id'             => $course->degree_id,
+                'grade_id'              => $course->grade_id,
+                'employee_id'           => $course->employee_id,
+            ];
+
+            // check for preventing a sencond time of generating Course Annual
+
+            $isGenerated = $this->isCourseAnnualGenerated($course->course_id,$course->semester_id,$request->academic_year_id,$course->department_id, $course->degree_id,$course->grade_id, $course->employee_id);
+
+            if($isGenerated) {
+
+                return Response::json(['status'=> false, 'message'=>'Duplicated Generating!!']);
+
+            } else {
+                $store = $this->courseAnnuals->create($input);
+
+                if($store) {
+                    $check++;
+                }
+            }
+        }
+
+        if($check == count($courseAnnual)) {
+            return Response::json(['status'=> true, 'message'=>'Course Annual Generated!!']);
+
+        } else {
+            return Response::json(['status'=> true, 'message'=>'Course Annual Not Generated!!']);
+        }
+
+
+    }
+
+
+    private function isCourseAnnualGenerated($courseId, $semesterId, $academicYearId, $departmentId, $degreeId, $gradeId, $employeeId) {
+
+        $select = DB::table('course_annuals')
+            ->where([
+                ['course_id', '=', $courseId],
+                ['semester_id', '=', $semesterId],
+                ['academic_year_id', '=', $academicYearId],
+                ['department_id', '=', $departmentId],
+                ['degree_id', '=', $degreeId],
+                ['grade_id', '=', $gradeId],
+                ['employee_id', '=', $employeeId]
+            ])
+            ->get();
+
+        if($select) {
+            return true;
+        } else {
+            return false;
+        }
 
     }
 

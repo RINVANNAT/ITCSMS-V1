@@ -45,4 +45,7 @@ Route::group([
     Route::post('course-annual/add_course_annual', 'CourseAnnualController@douplicateCourseAnnual')->name('admin.course.add_course_annual');
 
     Route::delete('course-annual/delete_course_annual', 'CourseAnnualController@deleteCourseAnnual')->name('admin.course.delete_course_annual');
+
+
+    Route::get('course-annual/generate-course-annual', 'CourseAnnualController@generateCourseAnnual')->name('admin.course.generate_course_annual');
 });
