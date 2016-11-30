@@ -1158,6 +1158,11 @@
 
                     //this is a function to build the chart after requesting ajax
 
+
+
+                    //-----start build a chart of Result Candidate Engineer----//
+                    //----- we use the data from table that we create from ajax request : datatable_cadidate_result is the id table we created
+
                     $(function () {
 
                         Highcharts.setOptions({
@@ -1232,6 +1237,14 @@
                     });
 
 
+                    //----end of Result Candiate Engineer Chart------//
+
+
+
+                    //-------Start build Student Engineer Statistic: the number of candidate that register to study in ITC---//
+
+                    //------ this chart also use the data from the table we created from ajax---//
+
                     $(function () {
                         Highcharts.chart('container', {
                             data: {
@@ -1292,9 +1305,23 @@
                         });
                     });
 
+
+                    //------end of student engineer registration chart----//
+
                 }
 
             });
+
+
+        //-----end of first ajax request---//
+
+
+
+
+        //------------start new ajax request --------------//
+        //--------here we use this ajax to get the data for showing in a line chart----///
+
+
 
             $.ajax({
                 type: 'GET',
@@ -1308,6 +1335,11 @@
                             grade_C = resultData['36'],
                             grade_D = resultData['37'],
                             grade_E = resultData['38'];
+
+
+                    //---------start create a line chart from callback function of ajax -----//
+                    //--------data format: [ ['date', value], ['date', value],....,[] ]-----//
+                    //------- Candidate Engineer Regstration Statistic Chart: to register for the entrance exam------//
 
                     $(function () {
                         Highcharts.chart('candidate_registration', {
@@ -1440,21 +1472,41 @@
                         });
                     });
 
+
+                    //------end of chart Candidate Engineer Registration-------//
+
                 }
 
             });
+
+
+
+        //--------end of ajax request for line chart ------//
         @endif
+
+        //-------this is end of Candidate Engineer------------//
+
+
+        //------start create charts for Dut student and candidate------//
 
 
         @if($exam->type_id == 2)
 
+
+            //--------start ajax for reqesting the table of data--------//
             $.ajax({
             type: 'GET',
             url: "{{route('admin.exam.dut_registration_statistic',$exam->id).'?type=candidate_dut_registration'}}",
             success: function(resultData) {
 
 
-                $('#table_dut_data').append(resultData);
+                $('#table_dut_data').append(resultData);// we have created div then after ajax request we append the table into that div
+
+
+
+
+                //-----start create Candidate DUT Registration chart----------//
+                //---- use the table data----//
 
                 $(function () {
 
@@ -1529,9 +1581,17 @@
                 });
 
 
+                //-------end of candidate dut registration statistic chart-----//
+
             }
 
         });
+
+
+
+
+        //-------new ajax start-----//
+        //------the data is different from the previous chart ------//
 
 
         $.ajax({
@@ -1539,6 +1599,8 @@
             url: "{{route('admin.exam.dut_registration_statistic',$exam->id).'?type=result_candidate_dut_statistic'}}",
             success: function(resultData) {
 
+
+                //-----start create Result Candidate Dut Chart----//
 
                 $(function () {
                     Highcharts.chart('result_candidate_dut', {
@@ -1677,21 +1739,30 @@
                     });
                 });
 
+                //------end of result candidate dut chart ----//
+
 
 
             }
 
         });
 
-        lastChart();
+        lastChart();//---init the last chart ---//
+
+
+
+        //----start function of the last chart ----//
 
         function lastChart() {
+
+            //----start ajax----//
             $.ajax({
                 type: 'GET',
                 url: "{{route('admin.exam.dut_registration_statistic',$exam->id).'?type=student_dut_registration'}}",
                 success: function(Data) {
 
 
+                    //----- start create Student Dut Registration Chart----//
                     $(function () {
                         Highcharts.chart('student_dut_registration', {
 
@@ -1819,6 +1890,9 @@
                             }],
                         });
                     });
+
+
+                    //---- end of student dut registration chart ------//
 
                 }
 

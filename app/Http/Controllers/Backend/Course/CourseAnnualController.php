@@ -7,6 +7,9 @@ use App\Http\Requests\Backend\Course\CourseAnnual\EditCourseAnnualRequest;
 use App\Http\Requests\Backend\Course\CourseAnnual\StoreCourseAnnualRequest;
 use App\Http\Requests\Backend\Course\CourseAnnual\UpdateCourseAnnualRequest;
 use App\Http\Requests\Backend\Course\CourseAnnual\CourseAnnualAssignmentRequest;
+use App\Http\Requests\Backend\Course\CourseAnnual\GenerateCourseAnnualRequest;
+
+
 use App\Models\AcademicYear;
 use App\Models\Course;
 use App\Models\Degree;
@@ -840,7 +843,7 @@ class CourseAnnualController extends Controller
     }
 
 
-    public function generateCourseAnnual(Request $request) {
+    public function generateCourseAnnual(GenerateCourseAnnualRequest $request) {
 
 
         $courseAnnual= DB::table('course_annuals')->where('academic_year_id', $request->academic_year_id-1);

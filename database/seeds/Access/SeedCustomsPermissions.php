@@ -772,6 +772,13 @@ class SeedCustomsPermissions extends Seeder
                             'dependency'   => [
                                 'view-backend','view-course-management','view-courseAnnual-management'
                             ]
+                        ],
+                        [
+                            'name'         => 'generate-course-annual',
+                            'display_name' => 'Generate Course Annual From The Previous Course AnnualProgram',
+                            'dependency'   => [
+                                'view-backend','view-course-management','view-courseAnnual-management'
+                            ]
                         ]
                     ]
                 ],

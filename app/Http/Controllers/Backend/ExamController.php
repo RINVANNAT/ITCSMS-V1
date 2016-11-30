@@ -1274,6 +1274,8 @@ class ExamController extends Controller
 
         } elseif($request->type == "data_chart_candidate_registration") {
 
+            //this is the chart_data for candidate registration
+
             $allCandidates = [];
 
             foreach($candidates as $key => $candidate) {

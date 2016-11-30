@@ -50,8 +50,8 @@
                     <button class="btn btn-primary btn-sm pull-right " id="course_assignment"><i class="fa fa-plus-circle"></i> {{trans('buttons.course.course_annual.course_assignment')}}</button>
                 @endauth
 
-                @permission('generat-course-annual')
-                <button class="btn btn-primary btn-sm pull-right " id="generate_course_annual" style="margin-right: 5px"><i class="fa fa-plus-circle"></i> Generate Course Annual</button>
+                @permission('generate-course-annual')
+                <button class="btn btn-primary btn-sm pull-right " id="generate_course_annual" style="margin-right: 5px"><i class="fa fa-plus-circle"></i> Generate From Old Course Annual</button>
                 @endauth
 
 
@@ -172,7 +172,7 @@
             }, function(confirmed) {
                 if (confirmed) {
                     $.ajax({
-                        type: 'POST',
+                        type: 'GET',
                         url: url,
                         data: baseData,
                         dataType: "json",
