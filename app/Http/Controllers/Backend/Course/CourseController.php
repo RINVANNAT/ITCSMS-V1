@@ -180,21 +180,35 @@ class CourseController extends Controller
     {
 
         $coursePrograms = DB::table('courses')
-            ->select(['id', 'name_kh', 'name_en', 'name_fr', 'code', 'time_tp', 'time_td', 'time_course'])
-            ->orderBy('updated_at','desc');
+            ->join('semesters', 'semesters.id', '=', 'courses.semester_id')
+            ->select([
+                'courses.id as course_id',
+                'courses.name_kh',
+                'courses.name_en',
+                'courses.name_fr',
+                'courses.code',
+                'courses.time_tp',
+                'courses.time_td',
+                'courses.time_course',
+                'courses.credit',
+                'semesters.name_en as semester'
+            ])
+            ->orderBy('courses.updated_at','desc');
 
         $datatables = app('datatables')->of($coursePrograms);
 
 
          $datatables
             ->editColumn('name_kh', '{!! $name_kh !!}')
-            ->editColumn('name_en', '{!! $name_en !!}')
-            ->editColumn('name_fr', '{!! $name_fr !!}')
+            ->editColumn('semester', '{!! $semester !!}')
+            ->editColumn('time_course', '{!! $time_course !!}')
+            ->editColumn('time_td', '{!! $time_td !!}')
+            ->editColumn('time_tp', '{!! $time_tp !!}')
             ->editColumn('code', '{!! $code !!}')
-            ->editColumn('duration', '{!! $time_course."/".$time_tp."/".$time_td !!}')
+            ->editColumn('credit', '{!! $credit !!}')
             ->addColumn('action', function ($courseProgram) {
-                return '<a href="' . route('admin.course.course_program.edit', $courseProgram->id) . '" class="btn btn-xs btn-primary"><i class="fa fa-pencil" data-toggle="tooltip" data-placement="top" title="" data-original-title="' . trans('buttons.general.crud.edit') . '"></i> </a>' .
-                ' <button class="btn btn-xs btn-danger btn-delete" data-remote="' . route('admin.course.course_program.destroy', $courseProgram->id) . '"><i class="fa fa-times" data-toggle="tooltip" data-placement="top" title="' . trans('buttons.general.crud.delete') . '"></i></button>';
+                return '<a href="' . route('admin.course.course_program.edit', $courseProgram->course_id) . '" class="btn btn-xs btn-primary"><i class="fa fa-pencil" data-toggle="tooltip" data-placement="top" title="" data-original-title="' . trans('buttons.general.crud.edit') . '"></i> </a>' .
+                ' <button class="btn btn-xs btn-danger btn-delete" data-remote="' . route('admin.course.course_program.destroy', $courseProgram->course_id) . '"><i class="fa fa-times" data-toggle="tooltip" data-placement="top" title="' . trans('buttons.general.crud.delete') . '"></i></button>';
             });
 
 

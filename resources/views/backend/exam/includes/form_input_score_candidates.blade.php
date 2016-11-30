@@ -243,6 +243,8 @@
             $("#btn_save_candidate_score").click(function() {
 
                 var data = $( "form.table_score" ).serializeArray();
+
+                console.log(data);
                 var baseData = $( "form.table_score" ).serialize();
                 var corrector_name = $('#corrector_name').val();
                 var check =0;
