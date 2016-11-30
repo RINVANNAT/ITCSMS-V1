@@ -40,7 +40,7 @@
             width: 1.2in;
             height: 1.55in;
             display: block;
-            border: 1px solid white;
+            /*border: 1px solid white;*/
             overflow: hidden;
             margin-left: auto;
             margin-right: auto;
@@ -51,7 +51,7 @@
         .name_kh {
             position: absolute;
             font-family: "khmersantepheap";
-            top:2.8in;
+            top:2.85in;
             font-weight: bold;
             font-size:19px;
             text-align: center;
@@ -63,7 +63,8 @@
             text-align: center;
             font-weight: bold;
             font-size: 15px;
-            top:3.05in;
+            line-height: 14px;
+            top:3.1in;
             width: 100%;
         }
 
@@ -135,8 +136,8 @@
                 width: 100%;
                 /*font-weight: bold;*/
                 text-align: center;
-                top:0.78in;
-                font-size: 12px !important;
+                top:0.79in;
+                font-size: 10.5px !important;
                 color: #ffffff !important;
                 position: absolute;
             }
@@ -147,8 +148,8 @@
                 width: 100%;
                 text-align: center;
                 /*font-weight: bold;*/
-                top:0.78in;
-                font-size: 12px !important;
+                top:0.79in;
+                font-size: 10.5px !important;
                 color:#fff !important;
                 -webkit-print-color-adjust: exact;
                 position: absolute;
@@ -160,6 +161,7 @@
 @stop
 @section('content')
     @foreach($studentAnnuals_front as $front)
+
     <div class="page">
         <div class="background">
             <img width="100%" src="{{url('img/id_card/front_id_card.png')}}">
@@ -167,7 +169,10 @@
         <div class="detail">
             {{--<span class="name_en">ENG RATANA</span>--}}
             {{--<span class="name_kh">អេង រតនា</span>--}}
-            <span class="department">ដេប៉ាតឺម៉ង់{{$front->department}}</span>
+            <span class="department" >
+                ដេប៉ាតឺម៉ង់
+                {{$front->department}}
+            </span>
             <span class="id_card">អត្តលេខនិស្សិត/ID : <strong>{{$front->id_card}}</strong></span>
             <div class="avatar">
                 <div class="crop">
@@ -176,7 +181,11 @@
             </div>
 
             <span class="name_kh">{{$front->name_kh}}</span>
-            <span class="name_latin">{{strtoupper($front->name_latin)}}</span>
+            @if(strlen($front->name_latin) < 25)
+                <span class="name_latin">{{strtoupper($front->name_latin)}}</span>
+            @else
+                <span class="name_latin" style="font-size: 13px !important;">{{strtoupper($front->name_latin)}}</span>
+            @endif
         </div>
 
     </div>

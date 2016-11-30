@@ -1816,6 +1816,7 @@ class StudentAnnualController extends Controller
             'students.name_latin',
             'departments.name_kh as department',
             'students.photo',
+            'studentAnnuals.department_id',
             'studentAnnuals.degree_id',
             'studentAnnuals.grade_id',
             'studentAnnuals.academic_year_id'
@@ -1864,6 +1865,7 @@ class StudentAnnualController extends Controller
         $studentAnnuals_front = $studentAnnuals->orderBy('id_card','ASC')->get();
         $studentAnnuals_back = array_reverse($studentAnnuals_front->toArray());
 
+        //dd($studentAnnuals_front);
         //dd($studentAnnuals_back);
         return view('backend.studentAnnual.print.id_card',compact('studentAnnuals_front','studentAnnuals_back'));
     }
