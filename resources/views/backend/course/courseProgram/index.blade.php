@@ -54,10 +54,12 @@
                     <thead>
                     <tr>
                         <th>{{ trans('labels.backend.coursePrograms.fields.name_kh') }}</th>
-                        <th>{{ trans('labels.backend.coursePrograms.fields.name_en') }}</th>
-                        <th>{{ trans('labels.backend.coursePrograms.fields.name_fr') }}</th>
+                        <th>Semester</th>
+                        <th>Course Hour</th>
+                        <th>TD Hour</th>
+                        <th>TP Hour</th>
                         <th>{{ trans('labels.backend.coursePrograms.fields.code') }}</th>
-                        <th>{{ trans('labels.backend.coursePrograms.fields.duration') }}</th>
+                        <th>Credit</th>
                         <th>{{ trans('labels.general.actions') }}</th>
                     </tr>
                     </thead>
@@ -93,10 +95,12 @@
                 },
                 columns: [
                     { data: 'name_kh', name: 'name_kh'},
-                    { data: 'name_en', name: 'name_en'},
-                    { data: 'name_fr', name: 'name_fr'},
+                    { data: 'semester', name: 'semester'},
+                    { data: 'time_course', name: 'time_course'},
+                    { data: 'time_td', name: 'time_td'},
+                    { data: 'time_tp', name: 'time_tp'},
                     { data: 'code', name: 'code'},
-                    { data: 'duration', name: 'duration'},
+                    { data: 'credit', name: 'credit'},
                     { data: 'action', name: 'action',orderable: false, searchable: false}
                 ]
             });

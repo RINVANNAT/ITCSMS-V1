@@ -1891,6 +1891,7 @@ class ExamController extends Controller
     public function insertScoreForEachCandiate($exam_id, Requests\Backend\Exam\StoreEntranceExamScoreRequest $request) {
 
         $requestDatas = $_POST;
+
         $correctorName = $request->corrector_name;
 
         if($correctorName) {
