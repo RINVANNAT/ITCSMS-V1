@@ -81,7 +81,8 @@
         @yield('after-styles-end')
 
     </head>
-    <body class="skin-{!! config('backend.theme') !!}" style="font-family: khmeros" onload="window.print()">
+    {{--<body class="skin-{!! config('backend.theme') !!}" style="font-family: khmeros" onload="window.print()">--}}
+    <body class="skin-{!! config('backend.theme') !!}" style="font-family: khmeros" >
 
         @yield('content')
 

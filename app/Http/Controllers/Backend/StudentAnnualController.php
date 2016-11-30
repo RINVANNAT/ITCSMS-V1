@@ -206,7 +206,7 @@ class StudentAnnualController extends Controller
         $scholarship_id = Input::get('scholarship_id');
 
         $studentAnnuals = StudentAnnual::select([
-                'studentAnnuals.id','students.id_card','students.name_kh','students.dob as dob','students.name_latin', 'genders.code as gender', 'departmentOptions.code as option',
+                'studentAnnuals.id','studentAnnuals.group','students.id_card','students.name_kh','students.dob as dob','students.name_latin', 'genders.code as gender', 'departmentOptions.code as option',
                 DB::raw("CONCAT(degrees.code,grades.code,departments.code) as class")
             ])
             ->leftJoin('students','students.id','=','studentAnnuals.student_id')
@@ -276,6 +276,9 @@ class StudentAnnualController extends Controller
         }
         if ($origin = $datatables->request->get('origin')) {
             $datatables->where('students.origin_id', '=', $origin);
+        }
+        if ($group = $datatables->request->get('group')) {
+            $datatables->where('studentAnnuals.group', '=', $group);
         }
         if ($scholarship = $datatables->request->get('scholarship')) {
             $datatables->where('scholarship_student_annual.scholarship_id', '=', $scholarship);
@@ -1812,7 +1815,10 @@ class StudentAnnualController extends Controller
             'students.name_kh',
             'students.name_latin',
             'departments.name_kh as department',
-            'students.photo'
+            'students.photo',
+            'studentAnnuals.degree_id',
+            'studentAnnuals.grade_id',
+            'studentAnnuals.academic_year_id'
 
         ])
             ->leftJoin('students','students.id','=','studentAnnuals.student_id')
@@ -1844,6 +1850,9 @@ class StudentAnnualController extends Controller
         if ($origin = $request->get('origin')) {
             $studentAnnuals = $studentAnnuals->where('students.origin_id', '=', $origin);
         }
+        if ($group = $request->get('group')) {
+            $studentAnnuals = $studentAnnuals->where('studentAnnuals.group', '=', $group);
+        }
         if ($search = $request->get('search')) {
             $studentAnnuals = $studentAnnuals->where(function($q) use ($search){
                 $q->where('students.id_card', 'ilike', '%'.$search.'%')
@@ -1853,9 +1862,9 @@ class StudentAnnualController extends Controller
         }
 
         $studentAnnuals_front = $studentAnnuals->orderBy('id_card','ASC')->get();
-        $studentAnnuals_back = $studentAnnuals->orderBy('id_card','DESC')->get();
+        $studentAnnuals_back = array_reverse($studentAnnuals_front->toArray());
 
-        //dd($studentAnnuals->toArray());
+        //dd($studentAnnuals_back);
         return view('backend.studentAnnual.print.id_card',compact('studentAnnuals_front','studentAnnuals_back'));
     }
 

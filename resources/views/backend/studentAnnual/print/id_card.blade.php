@@ -59,7 +59,7 @@
         }
         .name_latin {
             position: absolute;
-            font-family: "Verdana";
+            font-family: "Calibri";
             text-align: center;
             font-weight: bold;
             font-size: 15px;
@@ -168,7 +168,7 @@
             {{--<span class="name_en">ENG RATANA</span>--}}
             {{--<span class="name_kh">អេង រតនា</span>--}}
             <span class="department">ដេប៉ាតឺម៉ង់{{$front->department}}</span>
-            <span class="id_card">អត្តលេខនិស្សិត/ID : {{$front->id_card}}</span>
+            <span class="id_card">អត្តលេខនិស្សិត/ID : <strong>{{$front->id_card}}</strong></span>
             <div class="avatar">
                 <div class="crop">
                     <img src="{{$front->photo !=""?url('img/profiles/'.$front->photo):url('img/profiles/avatar.png')}}" onerror="this.src='{{url('img/profiles/avatar.png')}}'">
@@ -188,24 +188,37 @@
         </div>
         <div class="detail">
             <span class="address_title">
-                អាសយដ្ថាន ៖
+                អាសយដ្ឋាន ៖
             </span>
             <span class="address">
-                ប្រអប់សំបុត្រលេខ៨៦​ មហាវិថីសហព័ន្ធរុស្សី <br/>
+                ប្រអប់សំបុត្រលេខ៨៦​ មហាវិថីសហព័ន្ធរុស្សុី<br/>
                 រាជធានីភ្នំពេញ ប្រទេសកម្ពុជា <br/>
-                ទូរស័ព្ទ: (៨៥៥) ២៣ ៨៨០ ៣៧០/៩៨២ ៤០៤ <br/>
+                ទូរស័ព្ទ: (៨៥៥) ២៣ ៨៨០ ៣៧០/៨៨២ ៤០៤ <br/>
                 ទូរសារ: (៨៥៥) ២៣ ៨៨០ ៣៦៩ <br/>
                 សារអេឡិចត្រូនិច: info@itc.edu.kh <br/>
                 គេហទំព័រ: www.itc.edu.kh
 
             </span>
-            <span class="expired_date">ថ្ងៃផុតកំណត់/Expiry date: 31 July {{date('Y', strtotime('+1 year'))}}</span>
+            <?php
+                $date = null;
+                $count = 0;
+                if($back['degree_id'] == 1){
+                    if($back['grade_id'] < 3){
+                        $count = 2 - $back['grade_id'];
+                    } else {
+                        $count = 5 - $back['grade_id'];
+                    }
+                } else if ($back['degree_id'] == 2){
+                    $count = 2 - $back['grade_id'];
+                }
+            ?>
+            <span class="expired_date">ថ្ងៃផុតកំណត់/Expiry date: 30 September {{$back['academic_year_id'] + $count}}</span>
             <div class="barcode">
-                <img src="data:image/png;base64,{{\Milon\Barcode\Facades\DNS1DFacade::getBarcodePNG(substr($back->id_card, 1), 'C39')}}" alt="barcode" />
+                <img src="data:image/png;base64,{{\Milon\Barcode\Facades\DNS1DFacade::getBarcodePNG(substr($back['id_card'], 1), 'C39')}}" alt="barcode" />
             </div>
-            <span class="barcode_value">{{$back->id_card}}</span>
+            <span class="barcode_value">{{$back['id_card']}}</span>
             <span class="message">
-                ប្រសិនបើរើសបាន សូមជួយយកមកប្រគល់អោយ <br/>
+                ប្រសិនបើរើសបាន សូមជួយយកមកប្រគល់ឱ្យ <br/>
                 ការិយាល័យសិក្សា នៃវិទ្យាស្ថានបច្ចេកវិទ្យាកម្ពុជា
             </span>
         </div>

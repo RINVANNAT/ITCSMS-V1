@@ -16,6 +16,10 @@
         .toolbar {
             float: left;
         }
+
+        #filter_group {
+            width: 2cm;
+        }
     </style>
 @stop
 
@@ -77,6 +81,7 @@
                         d.gender = $('#filter_gender').val();
                         d.option = $('#filter_option').val();
                         d.origin = $('#filter_origin').val();
+                        d.group = $('#filter_group').val();
                     }
                 },
                 columns: [
@@ -87,6 +92,7 @@
                     { data: 'gender', name: 'gender',searchable:false},
                     { data: 'class' , name: 'class',searchable:false},
                     { data: 'option' , name: 'option',searchable:false},
+                    { data: 'group' , name: 'group',searchable:false},
                     { data: 'action', name: 'action',orderable: false, searchable: false}
                 ]
             });
@@ -102,7 +108,8 @@
                     '{!! Form::select('department',$departments,null, array('class'=>'form-control','id'=>'filter_department','placeholder'=>'Department')) !!} ' +
                     '{!! Form::select('gender',$genders,null, array('class'=>'form-control','id'=>'filter_gender','placeholder'=>'Gender')) !!} '+
                     '{!! Form::select('option',$options,null, array('class'=>'form-control','id'=>'filter_option','placeholder'=>'Option')) !!} '+
-                    '{!! Form::select('origin',$origins,null, array('class'=>'form-control','id'=>'filter_origin','placeholder'=>'Origin')) !!} '
+                    '{!! Form::select('origin',$origins,null, array('class'=>'form-control','id'=>'filter_origin','placeholder'=>'Origin')) !!} '+
+                    '{!! Form::text('group',null, array('class'=>'form-control','id'=>'filter_group','placeholder'=>'Group')) !!} '
             );
 
             oTable.draw();
@@ -136,6 +143,12 @@
                 oTable.draw();
                 e.preventDefault();
             });
+            $('#filter_group').on('input', function(e) {
+                oTable.draw();
+                e.preventDefault();
+
+                //alert($('#filter_group').val());
+            });
 
             enableDeleteRecord($('#students-table'));
             viewPopUpStudent($('#students-table'));
@@ -161,7 +174,8 @@
                         '&department=' + $('#filter_department').val()+
                         '&gender='+$('#filter_gender').val()+
                         '&option='+$('#filter_option').val()+
-                        '&origin='+$('#filter_origin').val();
+                        '&origin='+$('#filter_origin').val()+
+                        '&group='+$('#filter_group').val();
 
                 PopupCenterDual(url,'Select fields to export','1200','960');
             });
@@ -200,6 +214,7 @@
                         + '&gender='+current_filtering.gender
                         + '&option='+current_filtering.option
                         + '&origin='+current_filtering.origin
+                        + '&group='+current_filtering.group
                         + '&search='+current_filtering.search.value,
                         'Print ID Card','750','800');
             });

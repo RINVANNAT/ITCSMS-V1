@@ -8,6 +8,7 @@
         <th>{{ trans('labels.backend.students.fields.gender_id') }}</th>
         <th>{{ trans('labels.backend.students.fields.class') }}</th>
         <th>{{ trans('labels.backend.students.fields.department_option_id') }}</th>
+        <th>{{ trans('labels.backend.students.fields.group') }}</th>
         <th>{{ trans('labels.general.actions') }}</th>
     </tr>
     </thead>

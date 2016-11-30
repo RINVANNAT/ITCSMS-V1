@@ -764,13 +764,19 @@ class IncomeController extends Controller
             $topay = $total_topay." ".$currency;
 
         } else {
-            $scholarship_ids = DB::table('scholarship_student_annual')->where('student_annual_id', $income->payslipClient->student->id)->lists('scholarship_id');
+            // Check if this student has any scholarship
+            $scholarship_ids = DB::table('scholarship_student_annual')
+                ->where('student_annual_id', $income->payslipClient->student->id)
+                ->lists('scholarship_id');
+
+
             $school_fee = SchoolFeeRate::leftJoin('department_school_fee_rate', 'schoolFeeRates.id', '=', 'department_school_fee_rate.school_fee_rate_id')
                 ->leftJoin('grade_school_fee_rate', 'schoolFeeRates.id', '=', 'grade_school_fee_rate.school_fee_rate_id')
                 ->where('promotion_id', $income->payslipClient->student->promotion_id)
                 ->where('degree_id', $income->payslipClient->student->degree_id)
                 ->where('grade_school_fee_rate.grade_id', $income->payslipClient->student->grade_id)
                 ->where('department_school_fee_rate.department_id', $income->payslipClient->student->department_id);
+
             if (sizeof($scholarship_ids) > 0) { //This student have scholarship, so his payment might be changed
                 $scolarship_fee = clone $school_fee;
                 $scolarship_fee = $scolarship_fee

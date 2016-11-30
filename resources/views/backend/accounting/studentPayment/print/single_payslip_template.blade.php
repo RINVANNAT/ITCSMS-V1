@@ -118,7 +118,11 @@
             <div class="col-md-12 col-xs-12">
                 ថ្នាក់រៀន
                 <strong>
-                    {{$candidate->degree_name}}
+                    @if(isset($income->payslipClient->student))
+                        {{$income->payslipClient->student->degree->name_kh}}
+                    @else
+                        {{$income->payslipClient->candidate->degree->name_kh}}
+                    @endif
                 </strong> ជំនាន់/វគ្គ
                 <strong id="candidate_promotion">
                     @if(isset($income->payslipClient->student))
