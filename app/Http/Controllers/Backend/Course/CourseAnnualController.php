@@ -227,7 +227,8 @@ class CourseAnnualController extends Controller
             ->editColumn('employee_id', '{!! $employee_id !!}')
             ->addColumn('action', function ($courseAnnual) {
                 return  '<a href="'.route('admin.course.course_annual.edit',$courseAnnual->id).'" class="btn btn-xs btn-primary"><i class="fa fa-pencil" data-toggle="tooltip" data-placement="top" title="" data-original-title="'.trans('buttons.general.crud.edit').'"></i> </a>'.
-                ' <button class="btn btn-xs btn-danger btn-delete" data-remote="'.route('admin.course.course_annual.destroy', $courseAnnual->id) .'"><i class="fa fa-times" data-toggle="tooltip" data-placement="top" title="' . trans('buttons.general.crud.delete') . '"></i></button>';
+                ' <button class="btn btn-xs btn-danger btn-delete" data-remote="'.route('admin.course.course_annual.destroy', $courseAnnual->id) .'"><i class="fa fa-times" data-toggle="tooltip" data-placement="top" title="' . trans('buttons.general.crud.delete') . '"></i></button>'.
+                '<a href="'.route('admin.course.form_input_score_course_annual',$courseAnnual->id).'" class="btn btn-xs btn-info input_score_course"><i class="fa fa-plus" data-toggle="tooltip" data-placement="top" title="" data-original-title="'.'input score'.'"></i> Input Score </a>';
             });
         if ($academic_year = $datatables->request->get('academic_year')) {
             $datatables->where('course_annuals.academic_year_id', '=', $academic_year);
@@ -843,7 +844,7 @@ class CourseAnnualController extends Controller
     }
 
 
-    public function generateCourseAnnual(GenerateCourseAnnualRequest $request) {
+    public function generateCourseAnnual(Request $request) {
 
 
         $courseAnnual= DB::table('course_annuals')->where('academic_year_id', $request->academic_year_id-1);
@@ -929,6 +930,65 @@ class CourseAnnualController extends Controller
         } else {
             return false;
         }
+
+    }
+
+
+
+
+    public function getFormScoreByCourse($courseAnnualID) {
+
+
+        $arrayData = [];
+
+        $courseAnnual = $this->getCourseAnnualById($courseAnnualID);
+
+        $studentByCourse = $this->getStudentByDeptIdGradeIdDegreeId(
+                                                                $courseAnnual->department_id,
+                                                                $courseAnnual->degree_id,
+                                                                $courseAnnual->grade_id,
+                                                                $courseAnnual->academic_year_id
+        );
+
+
+        foreach($studentByCourse as $student) {
+             $element = array(
+                 'student_id' => $student->id_card,
+                 'student_name' => $student->name_latin,
+                 'student_gender' => $student->code
+             );
+
+            $arrayData[] = $element;
+
+        }
+
+        $studentData = json_encode($arrayData);
+//        dd($studentData);
+        return view('backend.course.courseAnnual.includes.form_input_score_course_annual', compact('studentData'));
+    }
+
+    private function getStudentByDeptIdGradeIdDegreeId($deptId, $degreeId, $gradeId, $academicYearID) {
+
+        $studentAnnual = DB::table('studentAnnuals')
+            ->join('students', 'students.id', '=', 'studentAnnuals.student_id')
+            ->join('genders', 'genders.id', '=', 'students.gender_id')
+            ->where([
+                ['studentAnnuals.department_id', $deptId],
+                ['studentAnnuals.degree_id', $degreeId],
+                ['studentAnnuals.grade_id', $gradeId],
+                ['studentAnnuals.academic_year_id', $academicYearID]
+            ])
+            ->select(
+                'students.name_latin',
+                'students.name_kh',
+                'students.id_card',
+                'genders.code'
+            )
+            ->orderBy('students.id_card', 'ASC')
+            ->get();
+
+
+        return $studentAnnual;
 
     }
 

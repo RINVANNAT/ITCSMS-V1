@@ -46,6 +46,11 @@ Route::group([
 
     Route::delete('course-annual/delete_course_annual', 'CourseAnnualController@deleteCourseAnnual')->name('admin.course.delete_course_annual');
 
-
     Route::get('course-annual/generate-course-annual', 'CourseAnnualController@generateCourseAnnual')->name('admin.course.generate_course_annual');
+
+
+    Route::get('course-annual/{id}/form-input-score-course-annual', 'CourseAnnualController@getFormScoreByCourse')->name('admin.course.form_input_score_course_annual');
+
+
+
 });

@@ -70,7 +70,7 @@
     {!! Html::script('plugins/datatables/dataTables.bootstrap.min.js') !!}
     <script>
         $(function() {
-            var oTable = $('#courseAnnuals-table').DataTable({
+                var oTable = $('#courseAnnuals-table').DataTable({
                 dom: 'l<"toolbar">frtip',
                 processing: true,
                 serverSide: true,
@@ -188,6 +188,20 @@
                     });
                 }
             });
+        });
+
+
+
+
+
+        $(document).on('click', '.input_score_course', function(e) {
+            e.preventDefault();
+            var  baseUrl = $('.input_score_course').attr('href');
+            PopupCenterDual(baseUrl, 'Input Score Course Annual', '800', '800');
+
         })
+
+
+
     </script>
 @stop
