@@ -8,7 +8,9 @@
         /* -------------------- Actions -----------------------*/
         Route::get('student-generate-group', 'StudentAnnualController@generate_group')->name('admin.student.generate_group');
         Route::get('student-generate-id-card', 'StudentAnnualController@generate_id_card')->name('admin.student.generate_id_card');
+        Route::get('student-request-print-id-card', 'StudentAnnualController@request_print_id_card')->name('admin.student.request_print_id_card');
         Route::get('student-print-id-card', 'StudentAnnualController@print_id_card')->name('admin.student.print_id_card');
+        Route::get('student-print-inform-success', 'StudentAnnualController@print_inform_success')->name('admin.student.print_inform_success');
 
         /* -------------------- IMPORT -----------------------*/
         Route::get('student-request-import', 'StudentAnnualController@request_import')->name('admin.student.request_import');

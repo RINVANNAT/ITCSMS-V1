@@ -80,6 +80,7 @@
             display: block;
             margin-left: auto;
             margin-right: auto;
+            image-orientation: from-image;
         }
 
         .barcode_value {
@@ -160,79 +161,83 @@
     </style>
 @stop
 @section('content')
-    @foreach($studentAnnuals_front as $front)
 
-    <div class="page">
-        <div class="background">
-            <img width="100%" src="{{url('img/id_card/front_id_card.png')}}">
-        </div>
-        <div class="detail">
-            {{--<span class="name_en">ENG RATANA</span>--}}
-            {{--<span class="name_kh">អេង រតនា</span>--}}
-            <span class="department" >
-                ដេប៉ាតឺម៉ង់
-                {{$front->department}}
-            </span>
-            <span class="id_card">អត្តលេខនិស្សិត/ID : <strong>{{$front->id_card}}</strong></span>
-            <div class="avatar">
-                <div class="crop">
-                    <img src="{{$front->photo !=""?url('img/profiles/'.$front->photo):url('img/profiles/avatar.png')}}" onerror="this.src='{{url('img/profiles/avatar.png')}}'">
+    @if($type == "front")
+        @foreach($studentAnnuals as $front)
+
+        <div class="page">
+            <div class="background">
+                <img width="100%" src="{{url('img/id_card/front_id_card.png')}}">
+            </div>
+            <div class="detail">
+                {{--<span class="name_en">ENG RATANA</span>--}}
+                {{--<span class="name_kh">អេង រតនា</span>--}}
+                <span class="department" >
+                    ដេប៉ាតឺម៉ង់
+                    {{$front->department}}
+                </span>
+                <span class="id_card">អត្តលេខនិស្សិត/ID : <strong>{{$front->id_card}}</strong></span>
+                <div class="avatar">
+                    <div class="crop">
+                        <img src="{{$front->photo !=""?url('img/profiles/'.$front->photo):url('img/profiles/avatar.png')}}" onerror="this.src='{{url('img/profiles/avatar.png')}}'">
+                    </div>
                 </div>
+
+                <span class="name_kh">{{$front->name_kh}}</span>
+                @if(strlen($front->name_latin) < 25)
+                    <span class="name_latin">{{strtoupper($front->name_latin)}}</span>
+                @else
+                    <span class="name_latin" style="font-size: 13px !important;">{{strtoupper($front->name_latin)}}</span>
+                @endif
             </div>
 
-            <span class="name_kh">{{$front->name_kh}}</span>
-            @if(strlen($front->name_latin) < 25)
-                <span class="name_latin">{{strtoupper($front->name_latin)}}</span>
-            @else
-                <span class="name_latin" style="font-size: 13px !important;">{{strtoupper($front->name_latin)}}</span>
-            @endif
         </div>
+        @endforeach
+    @elseif($type=="back")
+        @foreach($studentAnnuals as $back)
+        <div class="page">
+            <div class="background">
+                <img width="100%" src="{{url('img/id_card/back_id_card.png')}}">
+            </div>
+            <div class="detail">
+                <span class="address_title">
+                    អាសយដ្ឋាន ៖
+                </span>
+                <span class="address">
+                    ប្រអប់សំបុត្រលេខ៨៦​ មហាវិថីសហព័ន្ធរុស្សុី<br/>
+                    រាជធានីភ្នំពេញ ប្រទេសកម្ពុជា <br/>
+                    ទូរស័ព្ទ: (៨៥៥) ២៣ ៨៨០ ៣៧០/៨៨២ ៤០៤ <br/>
+                    ទូរសារ: (៨៥៥) ២៣ ៨៨០ ៣៦៩ <br/>
+                    សារអេឡិចត្រូនិច: info@itc.edu.kh <br/>
+                    គេហទំព័រ: www.itc.edu.kh
 
-    </div>
-    @endforeach
-    @foreach($studentAnnuals_back as $back)
-    <div class="page">
-        <div class="background">
-            <img width="100%" src="{{url('img/id_card/back_id_card.png')}}">
-        </div>
-        <div class="detail">
-            <span class="address_title">
-                អាសយដ្ឋាន ៖
-            </span>
-            <span class="address">
-                ប្រអប់សំបុត្រលេខ៨៦​ មហាវិថីសហព័ន្ធរុស្សុី<br/>
-                រាជធានីភ្នំពេញ ប្រទេសកម្ពុជា <br/>
-                ទូរស័ព្ទ: (៨៥៥) ២៣ ៨៨០ ៣៧០/៨៨២ ៤០៤ <br/>
-                ទូរសារ: (៨៥៥) ២៣ ៨៨០ ៣៦៩ <br/>
-                សារអេឡិចត្រូនិច: info@itc.edu.kh <br/>
-                គេហទំព័រ: www.itc.edu.kh
-
-            </span>
-            <?php
-                $date = null;
-                $count = 0;
-                if($back['degree_id'] == 1){
-                    if($back['grade_id'] < 3){
+                </span>
+                <?php
+                    $date = null;
+                    $count = 0;
+                    if($back['degree_id'] == 1){
+                        if($back['grade_id'] < 3){
+                            $count = 2 - $back['grade_id'];
+                        } else {
+                            $count = 5 - $back['grade_id'];
+                        }
+                    } else if ($back['degree_id'] == 2){
                         $count = 2 - $back['grade_id'];
-                    } else {
-                        $count = 5 - $back['grade_id'];
                     }
-                } else if ($back['degree_id'] == 2){
-                    $count = 2 - $back['grade_id'];
-                }
-            ?>
-            <span class="expired_date">ថ្ងៃផុតកំណត់/Expiry date: 30 September {{$back['academic_year_id'] + $count}}</span>
-            <div class="barcode">
-                <img src="data:image/png;base64,{{\Milon\Barcode\Facades\DNS1DFacade::getBarcodePNG(substr($back['id_card'], 1), 'C39')}}" alt="barcode" />
+                ?>
+                <span class="expired_date">ថ្ងៃផុតកំណត់/Expiry date: 30 September {{$back['academic_year_id'] + $count}}</span>
+                <div class="barcode">
+                    <img src="data:image/png;base64,{{\Milon\Barcode\Facades\DNS1DFacade::getBarcodePNG(substr($back['id_card'], 1), 'C39')}}" alt="barcode" />
+                </div>
+                <span class="barcode_value">{{$back['id_card']}}</span>
+                <span class="message">
+                    ប្រសិនបើរើសបាន សូមជួយយកមកប្រគល់ឱ្យ <br/>
+                    ការិយាល័យសិក្សា នៃវិទ្យាស្ថានបច្ចេកវិទ្យាកម្ពុជា
+                </span>
             </div>
-            <span class="barcode_value">{{$back['id_card']}}</span>
-            <span class="message">
-                ប្រសិនបើរើសបាន សូមជួយយកមកប្រគល់ឱ្យ <br/>
-                ការិយាល័យសិក្សា នៃវិទ្យាស្ថានបច្ចេកវិទ្យាកម្ពុជា
-            </span>
         </div>
-    </div>
-    @endforeach
+        @endforeach
+    @endif
 
 @endsection
 

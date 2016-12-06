@@ -394,6 +394,7 @@ return [
             'sub_create_title' => 'Register new student',
             'sub_detail_title' => 'Detail of student',
             'sub_import_title' => "Import students",
+            'sub_print_title' => "Print ID Card",
             'basic_info' => 'Basic Information',
             'more_info' => 'More Information',
             'fields'=>[

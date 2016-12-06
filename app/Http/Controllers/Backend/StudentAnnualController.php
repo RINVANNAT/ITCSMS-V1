@@ -220,6 +220,9 @@ class StudentAnnualController extends Controller
 
 
         $datatables = app('datatables')->of($studentAnnuals)
+            ->editColumn('name_latin',function($studentAnnual){
+                return strtoupper($studentAnnual->name_latin);
+            })
             ->editColumn('dob', function ($studentAnnual){
                 $date = Carbon::createFromFormat("Y-m-d h:i:s",$studentAnnual->dob);
                 return $date->toFormattedDateString();
@@ -1808,7 +1811,8 @@ class StudentAnnualController extends Controller
 
     }
 
-    public function print_id_card(PrintStudentIDCardRequest $request){
+
+    public function request_print_id_card(PrintStudentIDCardRequest $request){
 
         $studentAnnuals = StudentAnnual::select([
             'students.id_card',
@@ -1819,7 +1823,8 @@ class StudentAnnualController extends Controller
             'studentAnnuals.department_id',
             'studentAnnuals.degree_id',
             'studentAnnuals.grade_id',
-            'studentAnnuals.academic_year_id'
+            'studentAnnuals.academic_year_id',
+            'studentAnnuals.id'
 
         ])
             ->leftJoin('students','students.id','=','studentAnnuals.student_id')
@@ -1863,11 +1868,61 @@ class StudentAnnualController extends Controller
         }
 
         $studentAnnuals_front = $studentAnnuals->orderBy('id_card','ASC')->get();
-        $studentAnnuals_back = array_reverse($studentAnnuals_front->toArray());
+        //$studentAnnuals_back = array_reverse($studentAnnuals_front->toArray());
 
-        //dd($studentAnnuals_front);
-        //dd($studentAnnuals_back);
-        return view('backend.studentAnnual.print.id_card',compact('studentAnnuals_front','studentAnnuals_back'));
+        return view('backend.studentAnnual.print.request_print_id_card',compact('studentAnnuals_front'));
+    }
+
+    public function print_id_card(PrintStudentIDCardRequest $request){
+
+        $ids = json_decode($request->get('ids'));
+        $orderby = $request->get('orderby');
+        $type = $request->get('type');
+
+        $studentAnnuals = StudentAnnual::select([
+            'students.id_card',
+            'students.name_kh',
+            'students.name_latin',
+            'departments.name_kh as department',
+            'students.photo',
+            'studentAnnuals.department_id',
+            'studentAnnuals.degree_id',
+            'studentAnnuals.grade_id',
+            'studentAnnuals.academic_year_id',
+            'studentAnnuals.id'
+
+        ])
+            ->leftJoin('students','students.id','=','studentAnnuals.student_id')
+            ->leftJoin('genders', 'students.gender_id', '=', 'genders.id')
+            ->leftJoin('grades', 'studentAnnuals.grade_id', '=', 'grades.id')
+            ->leftJoin('departmentOptions', 'studentAnnuals.department_option_id', '=', 'departmentOptions.id')
+            ->leftJoin('departments', 'studentAnnuals.department_id', '=', 'departments.id')
+            ->leftJoin('degrees', 'studentAnnuals.degree_id', '=', 'degrees.id')
+            ->leftJoin('scholarship_student_annual','studentAnnuals.id','=','scholarship_student_annual.student_annual_id')
+            ->whereIn('studentAnnuals.id',$ids)
+            ->orderBy('id_card',$orderby)
+            ->get();
+
+        return view('backend.studentAnnual.print.id_card',compact('studentAnnuals','type'));
+    }
+
+    public function print_inform_success(PrintStudentIDCardRequest $request){
+        $ids = json_decode($request->get('ids'));
+        
+        DB::beginTransaction();
+        try {
+            foreach($ids as $id){
+                $studentAnnual = StudentAnnual::find($id);
+                $studentAnnual->count_print_card = $studentAnnual->count_print_card+ 1;
+                $studentAnnual->save();
+            }
+        } catch(Exception $e){
+            DB::rollback();
+            return Response::json(array('success'=>false,'message'=>"Something is wrong. Cannot update number of printing card!"));
+        }
+        DB::commit();
+
+        return Response::json(array('success'=>true,'message'=>"Number of card printing is updated!"));
     }
 
 }

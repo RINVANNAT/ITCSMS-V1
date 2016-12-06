@@ -23,7 +23,7 @@ return [
 	| The application name for use within the UI of the application
 	*/
     'name' => 'ITC | SMIS',
-
+    'smis_server' => 'http://192.168.51.88',
     'records_per_page' => 25,
     'promotions' => [
         'T' => [

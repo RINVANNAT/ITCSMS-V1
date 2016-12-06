@@ -203,7 +203,7 @@
 
             $('#print_id_card').on('click',function(e){
                 e.preventDefault();
-                var url = "{{ route('admin.student.print_id_card') }}";
+                var url = "{{ route('admin.student.request_print_id_card') }}";
 
                 PopupCenterDual(
                         url
@@ -216,7 +216,7 @@
                         + '&origin='+current_filtering.origin
                         + '&group='+current_filtering.group
                         + '&search='+current_filtering.search.value,
-                        'Print ID Card','750','800');
+                        'Print ID Card','900','800');
             });
 
             $('#generate_id_card').on('click', function(e) {
