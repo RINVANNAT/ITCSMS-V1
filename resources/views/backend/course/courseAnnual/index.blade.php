@@ -195,9 +195,10 @@
 
 
         $(document).on('click', '.input_score_course', function(e) {
-            e.preventDefault();
+//            e.preventDefault();
             var  baseUrl = $('.input_score_course').attr('href');
-            PopupCenterDual(baseUrl, 'Input Score Course Annual', '800', '800');
+
+//            PopupCenterDual(baseUrl, 'Input Score Course Annual', '800', '800');
 
         })
 

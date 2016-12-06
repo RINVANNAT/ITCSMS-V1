@@ -52,5 +52,8 @@ Route::group([
     Route::get('course-annual/{id}/form-input-score-course-annual', 'CourseAnnualController@getFormScoreByCourse')->name('admin.course.form_input_score_course_annual');
 
 
+    Route::post('course-annual/save-score-course-annual', 'CourseAnnualController@getsaveScoreByCourse')->name('admin.course.save_score_course_annual');
+
+
 
 });

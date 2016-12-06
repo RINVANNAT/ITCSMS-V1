@@ -228,7 +228,7 @@ class CourseAnnualController extends Controller
             ->addColumn('action', function ($courseAnnual) {
                 return  '<a href="'.route('admin.course.course_annual.edit',$courseAnnual->id).'" class="btn btn-xs btn-primary"><i class="fa fa-pencil" data-toggle="tooltip" data-placement="top" title="" data-original-title="'.trans('buttons.general.crud.edit').'"></i> </a>'.
                 ' <button class="btn btn-xs btn-danger btn-delete" data-remote="'.route('admin.course.course_annual.destroy', $courseAnnual->id) .'"><i class="fa fa-times" data-toggle="tooltip" data-placement="top" title="' . trans('buttons.general.crud.delete') . '"></i></button>'.
-                '<a href="'.route('admin.course.form_input_score_course_annual',$courseAnnual->id).'" class="btn btn-xs btn-info input_score_course"><i class="fa fa-plus" data-toggle="tooltip" data-placement="top" title="" data-original-title="'.'input score'.'"></i> Input Score </a>';
+                ' <a href="'.route('admin.course.form_input_score_course_annual',$courseAnnual->id).'" class="btn btn-xs btn-info input_score_course"><i class="fa fa-plus" data-toggle="tooltip" data-placement="top" title="" data-original-title="'.'input score'.'"></i> Input Score </a>';
             });
         if ($academic_year = $datatables->request->get('academic_year')) {
             $datatables->where('course_annuals.academic_year_id', '=', $academic_year);
@@ -934,8 +934,6 @@ class CourseAnnualController extends Controller
     }
 
 
-
-
     public function getFormScoreByCourse($courseAnnualID) {
 
 
@@ -953,9 +951,15 @@ class CourseAnnualController extends Controller
 
         foreach($studentByCourse as $student) {
              $element = array(
+                 'student_annual_id'=>$student->student_annual_id,
                  'student_id' => $student->id_card,
                  'student_name' => $student->name_latin,
-                 'student_gender' => $student->code
+                 'student_gender' => $student->code,
+                 'department_id'    => $courseAnnual->department_id,
+                 'degree_id'        => $courseAnnual->degree_id,
+                 'grade_id'         => $courseAnnual->grade_id,
+                 'academic_year_id' => $courseAnnual->academic_year_id,
+                 'semester_id'      => $courseAnnual->semester_id
              );
 
             $arrayData[] = $element;
@@ -966,6 +970,22 @@ class CourseAnnualController extends Controller
 //        dd($studentData);
         return view('backend.course.courseAnnual.includes.form_input_score_course_annual', compact('studentData'));
     }
+
+
+    public function getsaveScoreByCourse(Request $request) {
+
+        dd($request->all());
+    }
+
+
+
+
+
+
+
+
+
+
 
     private function getStudentByDeptIdGradeIdDegreeId($deptId, $degreeId, $gradeId, $academicYearID) {
 
@@ -979,6 +999,7 @@ class CourseAnnualController extends Controller
                 ['studentAnnuals.academic_year_id', $academicYearID]
             ])
             ->select(
+                'studentAnnuals.id as student_annual_id',
                 'students.name_latin',
                 'students.name_kh',
                 'students.id_card',
