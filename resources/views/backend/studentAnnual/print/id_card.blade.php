@@ -179,7 +179,7 @@
                 <span class="id_card">អត្តលេខនិស្សិត/ID : <strong>{{$front->id_card}}</strong></span>
                 <div class="avatar">
                     <div class="crop">
-                        <img src="{{$front->photo !=""?url('img/profiles/'.$front->photo):url('img/profiles/avatar.png')}}" onerror="this.src='{{url('img/profiles/avatar.png')}}'">
+                        <img src="{{config('app.smis_server')}}/img/profiles/{{$student->photo}}">
                     </div>
                 </div>
 
