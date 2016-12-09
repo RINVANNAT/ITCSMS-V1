@@ -88,7 +88,7 @@
                     { data: 'id_card', name: 'students.id_card'},
                     { data: 'name_kh', name: 'students.name_kh'},
                     { data: 'name_latin', name: 'students.name_latin'},
-                    { data: 'dob', name: 'dob'},
+                    { data: 'dob', name: 'dob',searchable:false},
                     { data: 'gender', name: 'gender',searchable:false},
                     { data: 'class' , name: 'class',searchable:false},
                     { data: 'option' , name: 'option',searchable:false},
