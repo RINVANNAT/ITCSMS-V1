@@ -53,6 +53,16 @@ Route::group([
 
 
     Route::post('course-annual/save-score-course-annual', 'CourseAnnualController@getsaveScoreByCourse')->name('admin.course.save_score_course_annual');
+    Route::get('course-annual/get-data-course-annual-score', 'CourseAnnualController@getCourseAnnualScoreByAjax')->name('admin.course.get_data_course_annual_score');
+
+    Route::post('course-annual/add-new-column-courseannual', 'CourseAnnualController@insertPercentageNameNPercentage')->name('admin.course.add_new_column_courseannual');
+
+
+    Route::post('course-annual/save-number-absence', 'CourseAnnualController@storeNumberAbsence')->name('admin.course.save_number_absence');
+
+
+
+
 
 
 

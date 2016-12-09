@@ -9,10 +9,8 @@ class Score extends Model
     
 
 	public $fillable = [
-	    "score10",
-		"score30",
-		"score60",
-		"reexam",
+	    "score",
+		"score_absence",
 		"department_id",
         "degree_id",
         "grade_id",
@@ -43,11 +41,11 @@ class Score extends Model
     protected $casts = [
         
     ];
-
-	public static $rules = [
-	    "score10" => "int",
-		"score30" => "int",
-		"score60" => "int"
-	];
+//
+//	public static $rules = [
+//	    "score" => "int",
+//		"score" => "int",
+//		"score60" => "int"
+//	];
 
 }

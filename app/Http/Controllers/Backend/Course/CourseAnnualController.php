@@ -16,7 +16,12 @@ use App\Models\Degree;
 use App\Models\Department;
 use App\Models\Employee;
 use App\Models\Grade;
+use App\Models\Score;
 use App\Repositories\Backend\CourseAnnual\CourseAnnualRepositoryContract;
+use App\Repositories\Backend\CourseAnnualScore\CourseAnnualScoreRepositoryContract;
+use App\Repositories\Backend\Percentage\PercentageRepositoryContract;
+use App\Repositories\Backend\Absence\AbsenceRepositoryContract;
+
 use Illuminate\Support\Facades\DB;
 use App\Http\Requests\Backend\Course\CourseAnnual\ImportCourseAnnualRequest;
 use Carbon\Carbon;
@@ -36,15 +41,24 @@ class CourseAnnualController extends Controller
      * @var CourseAnnualRepositoryContract
      */
     protected $courseAnnuals;
+    protected $courseAnnualScores;
+    protected $percentages;
+    protected $absences;
 
     /**
      * @param CourseAnnualRepositoryContract $courseAnnualRepo
      */
     public function __construct(
-        CourseAnnualRepositoryContract $courseAnnualRepo
+        CourseAnnualRepositoryContract $courseAnnualRepo,
+        CourseAnnualScoreRepositoryContract $courseAnnualScoreRepo,
+        PercentageRepositoryContract $percentageRepo,
+        AbsenceRepositoryContract $absenceRepo
     )
     {
         $this->courseAnnuals = $courseAnnualRepo;
+        $this->courseAnnualScores = $courseAnnualScoreRepo;
+        $this->percentages = $percentageRepo;
+        $this->absences = $absenceRepo;
     }
 
     /**
@@ -934,41 +948,114 @@ class CourseAnnualController extends Controller
     }
 
 
+
     public function getFormScoreByCourse($courseAnnualID) {
 
+        return view('backend.course.courseAnnual.includes.form_input_score_course_annual', compact('courseAnnualID'));
+    }
+
+    public function getCourseAnnualScoreByAjax(Request $request) {
+
+        //-----this is a default columns and columnHeader
+        return $this->handsonTableData($request->course_annual_id);
+    }
+
+    private function handsonTableData($courseAnnualId) {
 
         $arrayData = [];
+        $columnHeader = array('Student ID', 'Student Name', 'Gender', 'Num Absence', 'Absence-10%');
+        $columns=  array(
 
-        $courseAnnual = $this->getCourseAnnualById($courseAnnualID);
-
-        $studentByCourse = $this->getStudentByDeptIdGradeIdDegreeId(
-                                                                $courseAnnual->department_id,
-                                                                $courseAnnual->degree_id,
-                                                                $courseAnnual->grade_id,
-                                                                $courseAnnual->academic_year_id
+            ['data' => 'student_id_card'],
+            ['data' => 'student_name'],
+            ['data' => 'student_gender'],
+            ['data' => 'num_absence', 'type' => 'numeric'],
+            ['data' => 'absence', 'type' => 'numeric']
         );
 
+        $courseAnnual = $this->getCourseAnnualById($courseAnnualId);
+        $columnName = $this->getPropertiesFromScoreTable($courseAnnual);
+        $columnName = $columnName->select('percentages.name', 'percentages.id as percentage_id')->groupBy('percentages.id')->orderBy('percentages.id')->get();
 
-        foreach($studentByCourse as $student) {
-             $element = array(
-                 'student_annual_id'=>$student->student_annual_id,
-                 'student_id' => $student->id_card,
-                 'student_name' => $student->name_latin,
-                 'student_gender' => $student->code,
-                 'department_id'    => $courseAnnual->department_id,
-                 'degree_id'        => $courseAnnual->degree_id,
-                 'grade_id'         => $courseAnnual->grade_id,
-                 'academic_year_id' => $courseAnnual->academic_year_id,
-                 'semester_id'      => $courseAnnual->semester_id
-             );
+        $studentByCourse = $this->getStudentByDeptIdGradeIdDegreeId(
+            $courseAnnual->department_id,
+            $courseAnnual->degree_id,
+            $courseAnnual->grade_id,
+            $courseAnnual->academic_year_id
+        );
 
-            $arrayData[] = $element;
+        if($columnName) {
 
+            foreach($columnName as $column) {
+                $columnHeader = array_merge($columnHeader, array($column->name));
+                $columns = array_merge($columns, array(['data'=>$column->name]));
+            }
+            $columns = array_merge($columns, array(['data' => 'average', 'type' => 'numeric', 'readOnly' => true]));
+            $columnHeader = array_merge($columnHeader, array('Average'));
+
+        } else {
+
+            $columns = array_merge($columns, array(['data' => 'average', 'type' => 'numeric', 'readOnly' => true]));
+            $columnHeader = array_merge($columnHeader, array('Average'));
         }
 
-        $studentData = json_encode($arrayData);
-//        dd($studentData);
-        return view('backend.course.courseAnnual.includes.form_input_score_course_annual', compact('studentData'));
+
+
+
+        //----------------find student score if they have inserted
+
+        foreach($studentByCourse as $student) {
+
+            $mergeStudentscore=[];
+
+            $studentScore = $this->getPropertiesFromScoreTable($courseAnnual);//join three table scores, percentages, and score_percentage
+
+            $studentScore = $studentScore->where('student_annual_id', $student->student_annual_id)
+                ->select('scores.score', 'scores.score_absence', 'percentages.name', 'percentages.percent', 'percentages.id as percentage_id', 'scores.id as score_id')
+                ->get();
+
+//            dd($studentScore);
+
+            $scoreAbsence = $this->getAbsenceFromDB($courseAnnual->id, $student->student_annual_id);
+
+            if($studentScore) {
+
+                foreach($studentScore as $score) {
+
+                    $scoreData[$score->name] = $score->score;
+                    $scoreData['percentage_id'.'_'.$score->name] =  $score->percentage_id;
+
+                }
+
+            } else{
+                $scoreData=[];
+            }
+            $element = array(
+                'student_annual_id'=>$student->student_annual_id,
+                'student_id_card' => $student->id_card,
+                'student_name' => $student->name_latin,
+                'student_gender' => $student->code,
+                'absence'          => isset($scoreAbsence) ? 10-$scoreAbsence->num_absence:10,
+                'num_absence'      => isset($scoreAbsence) ? $scoreAbsence->num_absence:0,
+
+                'department_id'    => $courseAnnual->department_id,
+                'degree_id'        => $courseAnnual->degree_id,
+                'grade_id'         => $courseAnnual->grade_id,
+                'academic_year_id' => $courseAnnual->academic_year_id,
+                'semester_id'      => $courseAnnual->semester_id,
+                'employee_id'      => $courseAnnual->employee_id,
+            );
+
+            $mergerData = array_merge($element,$scoreData);
+
+            $arrayData[] = $mergerData;
+        }
+
+        return Response::json([
+            'data' => $arrayData,
+            'columnHeader' => $columnHeader,
+            'columns'      =>$columns
+        ]);
     }
 
 
@@ -978,14 +1065,35 @@ class CourseAnnualController extends Controller
     }
 
 
+    private function getPropertiesFromScoreTable($objectCourseAnnual) {
 
+        $tableScore = DB::table('scores')
+            ->join('percentage_scores', 'percentage_scores.score_id', '=', 'scores.id')
+            ->join('percentages', 'percentages.id', '=', 'percentage_scores.percentage_id')
+            ->where([
+                ['scores.course_annual_id', $objectCourseAnnual->id],
+                ['scores.degree_id', $objectCourseAnnual->degree_id],
+                ['scores.grade_id', $objectCourseAnnual->grade_id],
+                ['scores.semester_id', $objectCourseAnnual->semester_id],
+                ['scores.department_id', $objectCourseAnnual->department_id],
+                ['scores.academic_year_id', $objectCourseAnnual->academic_year_id]
+            ]);
 
+        return $tableScore;
 
+    }
 
+    private function getAbsenceFromDB($courseAnnualID, $studentAnnualID) {
 
+        $absence = DB::table('absences')
+            ->where([
+                ['course_annual_id', $courseAnnualID],
+                ['student_annual_id', $studentAnnualID]
+            ])
+            ->first();
 
-
-
+        return $absence;
+    }
 
     private function getStudentByDeptIdGradeIdDegreeId($deptId, $degreeId, $gradeId, $academicYearID) {
 
@@ -1012,6 +1120,109 @@ class CourseAnnualController extends Controller
         return $studentAnnual;
 
     }
+
+
+    public function insertPercentageNameNPercentage(Request $request) {
+
+    //this is to add new column name of the exam score ...and we have to initial the value 0 to the student for this type of exam
+
+
+        $check =0;
+        $courseAnnual = $this->getCourseAnnualById($request->course_annual_id);
+
+        $percentageInput = [
+            'name'              =>   $request->percentage_name,
+            'percent'           => $request->percentage,
+            'percentage_type'   => $request->percentage_type
+        ];
+
+        $savePercentageId = $this->percentages->create($percentageInput);// return the percentage id
+
+        $studentByCourse = $this->getStudentByDeptIdGradeIdDegreeId(
+            $courseAnnual->department_id,
+            $courseAnnual->degree_id,
+            $courseAnnual->grade_id,
+            $courseAnnual->academic_year_id
+        );
+
+        if($studentByCourse) {
+            foreach( $studentByCourse as $studentScore) {
+                $input = [
+                    'course_annual_id'  =>  $request->course_annual_id,
+                    'student_annual_id' =>  $studentScore->student_annual_id,
+                    'department_id'     =>  $courseAnnual->department_id,
+                    'degree_id'         =>  $courseAnnual->degree_id,
+                    'grade_id'          =>  $courseAnnual->grade_id,
+                    'academic_year_id'  =>  $courseAnnual->academic_year_id,
+                    'semester_id'       =>  $courseAnnual->semester_id,
+                    'socre_absence'     =>  0
+
+                ];
+
+                $saveScoreId = $this->courseAnnualScores->create($input);// return the socreId
+                $savePercentageScore = $this->courseAnnualScores->createPercentageScore($saveScoreId->id, $savePercentageId->id);
+
+                if($savePercentageScore) {
+
+                    $check++;
+                }
+            }
+        }
+        if($check == count($studentByCourse)) {
+
+            $reDrawTable = $this->handsonTableData($request->course_annual_id);
+            return $reDrawTable;
+        }
+
+    }
+
+
+    public function storeNumberAbsence(Request $request) {
+
+
+        $baseData = $request->baseData;
+
+        dd($baseData);
+        $checkStore = 0;
+        $checkUpdate=0;
+
+
+        if(count($baseData) > 0) {
+            foreach($baseData as $data) {
+
+                $absence = $this->absences->findIfExist($data['course_annual_id'], $data['student_annual_id']);
+
+//                dd($absence);
+
+                if($absence) {
+                    //update absence
+
+                    $update = $this->absences->update($absence->id, $data);
+
+                    if($update) {
+                        $checkUpdate++;
+                    }
+
+
+                } else {
+                    // store absence
+
+                    $store = $this->absences->create($data);
+                    if($store) {
+                        $checkStore++;
+
+                    }
+                }
+            }
+        }
+
+        if($checkStore+$checkUpdate == count($baseData)) {
+            $reDrawTable = $this->handsonTableData($data['course_annual_id']);
+            return $reDrawTable;
+        }
+
+    }
+
 
 
 }
