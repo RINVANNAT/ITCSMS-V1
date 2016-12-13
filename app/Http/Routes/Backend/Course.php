@@ -52,7 +52,7 @@ Route::group([
     Route::get('course-annual/{id}/form-input-score-course-annual', 'CourseAnnualController@getFormScoreByCourse')->name('admin.course.form_input_score_course_annual');
 
 
-    Route::post('course-annual/save-score-course-annual', 'CourseAnnualController@getsaveScoreByCourse')->name('admin.course.save_score_course_annual');
+    Route::post('course-annual/save-score-course-annual', 'CourseAnnualController@saveScoreByCourseAnnual')->name('admin.course.save_score_course_annual');
     Route::get('course-annual/get-data-course-annual-score', 'CourseAnnualController@getCourseAnnualScoreByAjax')->name('admin.course.get_data_course_annual_score');
 
     Route::post('course-annual/add-new-column-courseannual', 'CourseAnnualController@insertPercentageNameNPercentage')->name('admin.course.add_new_column_courseannual');

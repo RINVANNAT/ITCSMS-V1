@@ -966,11 +966,11 @@ class CourseAnnualController extends Controller
         $columnHeader = array('Student ID', 'Student Name', 'Gender', 'Num Absence', 'Absence-10%');
         $columns=  array(
 
-            ['data' => 'student_id_card'],
-            ['data' => 'student_name'],
-            ['data' => 'student_gender'],
+            ['data' => 'student_id_card', 'readOnly'=>true],
+            ['data' => 'student_name', 'readOnly'=>true],
+            ['data' => 'student_gender', 'readOnly'=>true],
             ['data' => 'num_absence', 'type' => 'numeric'],
-            ['data' => 'absence', 'type' => 'numeric']
+            ['data' => 'absence', 'type' => 'numeric', 'readOnly'=>true]
         );
 
         $courseAnnual = $this->getCourseAnnualById($courseAnnualId);
@@ -1024,6 +1024,7 @@ class CourseAnnualController extends Controller
 
                     $scoreData[$score->name] = $score->score;
                     $scoreData['percentage_id'.'_'.$score->name] =  $score->percentage_id;
+                    $scoreData['score_id'.'_'.$score->name]=$score->score_id;
 
                 }
 
@@ -1048,8 +1049,12 @@ class CourseAnnualController extends Controller
 
             $mergerData = array_merge($element,$scoreData);
 
+
             $arrayData[] = $mergerData;
         }
+
+
+
 
         return Response::json([
             'data' => $arrayData,
@@ -1058,10 +1063,26 @@ class CourseAnnualController extends Controller
         ]);
     }
 
+    public function saveScoreByCourseAnnual(Request $request) {
 
-    public function getsaveScoreByCourse(Request $request) {
+        $inputs = $request->data;
+        $checkUpdate = 0;
 
-        dd($request->all());
+        if($inputs) {
+            foreach($inputs as $input) {
+
+                $updateScore = $this->courseAnnualScores->update($input['score_id'], $input);
+
+                if($updateScore) {
+                    $checkUpdate++;
+                }
+            }
+        }
+
+        if($checkUpdate == count($inputs)) {
+
+            return Response::json(['status'=>true, 'message' => 'Score Saved!!']);
+        }
     }
 
 
@@ -1181,8 +1202,6 @@ class CourseAnnualController extends Controller
 
 
         $baseData = $request->baseData;
-
-        dd($baseData);
         $checkStore = 0;
         $checkUpdate=0;
 
@@ -1202,7 +1221,6 @@ class CourseAnnualController extends Controller
                     if($update) {
                         $checkUpdate++;
                     }
-
 
                 } else {
                     // store absence

@@ -18,8 +18,8 @@ class Percentage extends Model
     ];
 
 
-    public function score()
+    public function scores()
     {
-        return $this->belongsToMany('Score', 'percentage_scores');
+        return $this->belongsToMany('App\Models\Score');
     }
 }

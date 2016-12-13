@@ -32,6 +32,11 @@ class Score extends Model
 		return $this->belongsTo('App\Models\Grade');
 	}
 
+	public function percentageScore()
+	{
+		return $this->belongsToMany('App\Models\Percentage', 'percentage_scores', 'percentage_id', 'score_id');
+	}
+
 
 	/**
      * The attributes that should be casted to native types.
