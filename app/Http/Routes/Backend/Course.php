@@ -61,6 +61,9 @@ Route::group([
     Route::post('course-annual/save-number-absence', 'CourseAnnualController@storeNumberAbsence')->name('admin.course.save_number_absence');
 
 
+    Route::delete('course-annual/delete-score', 'CourseAnnualController@deleteScoreFromScorePercentage')->name('admin.course.delete-score');
+
+
 
 
 

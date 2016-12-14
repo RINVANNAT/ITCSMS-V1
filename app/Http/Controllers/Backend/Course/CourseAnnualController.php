@@ -17,6 +17,7 @@ use App\Models\Department;
 use App\Models\Employee;
 use App\Models\Grade;
 use App\Models\Score;
+use App\Models\Percentage;
 use App\Repositories\Backend\CourseAnnual\CourseAnnualRepositoryContract;
 use App\Repositories\Backend\CourseAnnualScore\CourseAnnualScoreRepositoryContract;
 use App\Repositories\Backend\Percentage\PercentageRepositoryContract;
@@ -924,7 +925,6 @@ class CourseAnnualController extends Controller
 
     }
 
-
     private function isCourseAnnualGenerated($courseId, $semesterId, $academicYearId, $departmentId, $degreeId, $gradeId, $employeeId) {
 
         $select = DB::table('course_annuals')
@@ -946,8 +946,6 @@ class CourseAnnualController extends Controller
         }
 
     }
-
-
 
     public function getFormScoreByCourse($courseAnnualID) {
 
@@ -999,9 +997,6 @@ class CourseAnnualController extends Controller
             $columnHeader = array_merge($columnHeader, array('Average'));
         }
 
-
-
-
         //----------------find student score if they have inserted
 
         foreach($studentByCourse as $student) {
@@ -1052,9 +1047,6 @@ class CourseAnnualController extends Controller
 
             $arrayData[] = $mergerData;
         }
-
-
-
 
         return Response::json([
             'data' => $arrayData,
@@ -1236,6 +1228,38 @@ class CourseAnnualController extends Controller
 
         if($checkStore+$checkUpdate == count($baseData)) {
             $reDrawTable = $this->handsonTableData($data['course_annual_id']);
+            return $reDrawTable;
+        }
+
+    }
+
+
+    public function deleteScoreFromScorePercentage(Request $request) {
+
+
+
+        $checkDeleteScore =0;
+        $percentageScore = Percentage::join('percentage_scores', 'percentage_scores.percentage_id', '=', 'percentages.id')
+            ->join('scores', 'scores.id', '=', 'percentage_scores.score_id')
+            ->where('percentages.id', $request->percentage_id)
+            ->lists('scores.id');
+        $deletePercentage = $this->percentages->destroy($request->percentage_id);
+
+        foreach($percentageScore as $score) {
+            $deleteScore = $this->courseAnnualScores->destroy($score);
+            DB::table('percentage_scores')->where([
+                ['percentage_id', '=', $request->percentage_id],
+                ['score_id', '=', $score]
+            ])->delete();
+
+            if($deleteScore) {
+                $checkDeleteScore++;
+            }
+        }
+
+        if($checkDeleteScore == count($percentageScore)) {
+
+            $reDrawTable = $this->handsonTableData($request->course_annual_id);
             return $reDrawTable;
         }
 

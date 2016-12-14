@@ -5,7 +5,7 @@ function jPopup(config) {
 	
 	var defaults = {
 		title: "",
-		content: "",
+		content: '',
 		buttons: [],
 		popupClass: classBase+" "+popup_color,
 		wrapperClass: classBase+"_wrapper",
@@ -351,11 +351,11 @@ function jPopup(config) {
 				return false;
 			}
 		});
-		var closed = false;
-		popupButtons.on("click", "button", function(e) {
 
-			//-----------custom on the popup wrapper
+		$('#add_col_ok').on('click', function(e) {
+
 			e.preventDefault();
+
 			var colHeader = $('#name_exam').val();
 			var percentage = $('#percentage').val();
 
@@ -375,6 +375,21 @@ function jPopup(config) {
 				notify('error', 'info', 'Please Input Column Name!!');
 			}
 
+		});
+
+		$('#delte_col_ok').on('click', function() {
+			var check = true ;
+			if(check == true){
+				return false
+			}
+		});
+
+
+		var closed = false;
+		popupButtons.on("click", "button", function(e) {
+
+			//-----------custom on the popup wrapper
+			e.preventDefault();
 
 		});
 		popupClose.on("click", function(e) {

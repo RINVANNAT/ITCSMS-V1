@@ -319,14 +319,15 @@
         <div class="box-header with-border">
             <h3 class="box-title">Complete Score Mathematic Course</h3>
             <div class="btn-group pull-right">
+
+                <button class="btn btn-primary btn-xs" id="save_editted_score" style="margin-right:5px">Save Changes!</button>
                 <button type="button" class="btn btn-warning btn-xs dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
                     Actions <span class="caret"></span>
                 </button>
                 <ul class="dropdown-menu" role="menu">
-                    <li class=""> <a href="#"  id="save_editted_score" value="Save Changes!">Save Change!! </a></li>
-                    <li class="drop-menu"> <a href="#"  id="add_column"> <i class="fa fa-plus"> Add column</i></a></li>
-                    <li class="drop-menu"> <a href="#"  id="delete_column"> <i class="fa fa-plus"> Delete column</i></a></li>
-                    <li class="drop-menu"> <a href="{!! route('admin.course.course_annual.index') !!}">{{ trans('buttons.general.cancel') }}</a> </li>
+
+                    <li class="drop-menu"> <a href="#"  id="add_column"> <i class="fa fa-plus"> Add Score</i></a></li>
+                    <li class="drop-menu"> <a href="#"  id="get_result"> <i class="fa fa-circle-o-notch"> Generate Score</i></a></li>
 
 
                 </ul>
@@ -355,9 +356,11 @@
 
 
 
+
     {{--myscript--}}
 
     <script>
+
 
         function ajaxRequest (method, baseUrl, baseData) {
             $.ajax({
@@ -379,19 +382,40 @@
         }
 
         var hotInstance;
+        var celldata = [];
         var cellChanges = [];
         var cellScoreChanges=[];
+        var sentrow, sentcol;
 
+
+        var colorRenderer = function (instance, td, row, col, prop, value, cellProperties) {
+            Handsontable.renderers.TextRenderer.apply(this, arguments);
+            td.style.backgroundColor = 'red';
+
+        };
+
+
+        // this is the property of the handson table
         var setting = {
             rowHeaders: true,
             manualColumnMove: true,
             filters: true,
-            contextMenu: false,
             autoWrapRow: true,
             minSpareRows: true,
             height:1500,
             width:1800,
+            filters: true,
+            dropdownMenu: ['filter_by_condition', 'filter_action_bar'],
             className: "htLeft",
+            cell: celldata,
+            cells: function (row, col, prop) {
+                if (row === sentrow) {
+                    this.renderer = colorRenderer;
+                }
+                if (col === sentcol) {
+                    this.renderer = colorRenderer;
+                }
+            },
             afterChange: function (changes, source) {
 
                 if(changes){
@@ -483,6 +507,8 @@
 
         };
 
+
+
         $('#add_column').on('click', function(e) {
 
             var pop = new jPopup({
@@ -508,23 +534,20 @@
                                 '<option value="subplementary_exam"> Subplementary Exam</option>'+
                             '</select>'+
                         '</div>'+
-                '</div>',
+                '</div>'+
+                '<button id="add_col_ok" class="btn btn-xs btn-primary pull-right"> OK </button>',
                 closeButton:true,
                 buttons:[{
-                    text: '',
-                    value: 'author',
-                    "class": "author"
-                }, {
-                    text: '<button class="btn btn-danger"> OK </button>',
-                    value: 'ok',
-                    "class": "ok_event"
+//                    text: '<button class="btn btn-danger"> OK </button>',
+//                    value: 'ok',
+//                    "class": "ok_event"
                 }]
             });
 
-            pop.open(function(r) {
+            pop.open(function(r) {// call this function to open dialog
                 switch(r) {
-                    case 'ok':
-                        alert(pop.popupTitle);
+                    case 'ok':// vaule of btn
+                       //do nothing
                         break;
                 }
 
@@ -589,6 +612,123 @@
                     setting.colHeaders = resultData.columnHeader;
                     setting.columns = resultData.columns;
                     hotInstance = new Handsontable(jQuery("#score_table")[0], setting);
+
+
+                    hotInstance.updateSettings({
+                        contextMenu: {
+                            callback: function (key, options) {
+                                if (key === 'cellcolor') {
+                                    setTimeout(function () {
+                                        //timeout is used to make sure the menu collapsed before alert is shown
+                                        var row = hotInstance.getSelected()[0];
+                                        var col = hotInstance.getSelected()[1];
+
+                                        var item = {};
+                                        item.row = row;
+                                        item.col = col;
+                                        item.renderer = colorRenderer
+                                        celldata.push(item)
+
+                                        hotInstance.updateSettings({cell: celldata});
+                                        hotInstance.render();
+
+                                    }, 100);
+                                }
+                                if (key === 'rowcolor') {
+                                    setTimeout(function () {
+                                        //timeout is used to make sure the menu collapsed before alert is shown
+                                        var row = hotInstance.getSelected()[0];
+                                        sentrow = row;
+                                        hotInstance.render();
+
+                                    }, 100);
+                                }
+                                if (key === 'colcolor') {
+                                    setTimeout(function () {
+                                        //timeout is used to make sure the menu collapsed before alert is shown
+                                        var col = hotInstance.getSelected()[1];
+                                        sentcol = col;
+                                        hotInstance.render();
+
+                                    }, 100);
+                                }
+
+                                if (key === 'deletecol') {
+                                    console.log( hotInstance.getSelected());
+
+                                    if(hotInstance.getSelected()) {
+
+                                        var colIndex = hotInstance.getSelected()[1]; //console.log(hotInstance.getSelected()[1]);// return index of column header count from 0 index
+
+                                        // check not allow to delete on the specific columns
+                                       if(((colIndex != 0) && (colIndex != 1)) && ((colIndex != 2) && (colIndex != 3)) && ((colIndex != 4) && (colIndex != setting.colHeaders.length-1))) {
+
+                                           var colNmae = setting.colHeaders[colIndex];
+                                           var percentageId = setting.data[0]['percentage_id_'+colNmae];
+                                           var courseAnnualId = setting.data[0]['course_annual_id'];
+                                           var baseUrl = '{{route('admin.course.delete-score')}}';
+                                           var baseData = {
+                                               percentage_id: percentageId,
+                                               percentage_name: colNmae,
+                                               course_annual_id: '{{$courseAnnualID}}'
+                                           };
+
+                                           swal({
+                                               title: "Confirm",
+                                               text: "Delete Score??",
+                                               type: "info",
+                                               showCancelButton: true,
+                                               confirmButtonColor: "#DD6B55",
+                                               confirmButtonText: "Yes",
+                                               closeOnConfirm: true
+                                           }, function(confirmed) {
+                                               if (confirmed) {
+
+                                                   $.ajax({
+                                                       type: 'DELETE',
+                                                       url: baseUrl,
+                                                       data: baseData,
+                                                       dataType: "json",
+                                                       success: function(resultData) {
+
+                                                           notify('success', 'info', 'Score Deleted!!');
+                                                           setting.data = resultData.data;
+                                                           setting.colHeaders = resultData.columnHeader;
+                                                           setting.columns = resultData.columns;
+
+                                                           hotInstance = new Handsontable(jQuery("#score_table")[0], setting);
+
+                                                       }
+                                                   });
+
+                                               }
+                                           });
+                                       } else {
+                                           notify('error', 'info', 'This Column is not Deletable');
+                                       }
+
+                                    } else {
+                                        notify('error', 'info', 'Column Score Not Selected!!')
+                                    }
+
+                                }
+                            },
+                            items: {
+//                                "cellcolor": {
+//                                    name: 'Cell color'
+//                                },
+//                                "rowcolor": {
+//                                    name: 'Row color'
+//                                },
+//                                "colcolor": {
+//                                    name: 'Column color'
+//                                },
+                                "deletecol": {
+                                    name: '<span><i class="fa fa-trash"> Delete Column</i></span>'
+                                },
+                            }
+                        }
+                    })
                 }
             });
 
@@ -598,13 +738,14 @@
         $('#save_editted_score').on('click', function() {
 
             var url = '{{route('admin.course.save_number_absence')}}';
+
             swal({
                 title: "Confirm",
-                text: "You want to add column?",
+                text: "Save Changes?",
                 type: "info",
                 showCancelButton: true,
                 confirmButtonColor: "#DD6B55",
-                confirmButtonText: "Yes, add id!!",
+                confirmButtonText: "Yes",
                 closeOnConfirm: true
             }, function(confirmed) {
                 if (confirmed) {
