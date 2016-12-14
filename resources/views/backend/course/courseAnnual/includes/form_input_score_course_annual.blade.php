@@ -400,6 +400,7 @@
             rowHeaders: true,
             manualColumnMove: true,
             filters: true,
+            contextMenu: false,
             autoWrapRow: true,
             minSpareRows: true,
             height:1500,

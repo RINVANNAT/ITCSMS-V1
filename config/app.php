@@ -218,7 +218,7 @@ return [
         Barryvdh\LaravelIdeHelper\IdeHelperServiceProvider::class,
         Proengsoft\JsValidation\JsValidationServiceProvider::class,
         Felixkiss\UniqueWithValidator\UniqueWithValidatorServiceProvider::class,
-        Milon\Barcode\BarcodeServiceProvider::class,
+
 
 
     ],

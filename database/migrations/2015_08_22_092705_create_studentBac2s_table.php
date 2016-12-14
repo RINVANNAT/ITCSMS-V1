@@ -13,7 +13,7 @@ class CreateStudentBac2sTable extends Migration
 	 */
 	public function up()
 	{
-		Schema::create('studentBac2s', function(Blueprint $table)
+		Schema::create("studentBac2s", function(Blueprint $table)
 		{
 			$table->increments('id');
             $table->string('can_id',25);
@@ -100,11 +100,11 @@ class CreateStudentBac2sTable extends Migration
 	/**
 	 * Reverse the migrations.
 	 *
-	 * @return void
+	 * @return void"
 	 */
 	public function down()
 	{
-		Schema::drop('studentBac2s');
+		Schema::drop("studentBac2s");
 	}
 
 }

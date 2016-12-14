@@ -1,12 +1,11 @@
-<?php
+<?php namespace App\Repositories;
 
-namespace App\Repositories;
-
-use App\Models\academicYear;
+use App\Models\AcademicYear;
 use InfyOm\Generator\Common\BaseRepository;
 
-class academicYearRepository extends BaseRepository
+class AcademicYearRepository extends BaseRepository
 {
+//    heloo
     /**
      * @var array
      */
@@ -19,6 +18,6 @@ class academicYearRepository extends BaseRepository
      **/
     public function model()
     {
-        return academicYear::class;
+        return \App\Models\AcademicYear::class;
     }
 }
