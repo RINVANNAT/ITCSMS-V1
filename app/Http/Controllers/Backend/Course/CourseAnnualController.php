@@ -23,6 +23,8 @@ use App\Repositories\Backend\CourseAnnualScore\CourseAnnualScoreRepositoryContra
 use App\Repositories\Backend\Percentage\PercentageRepositoryContract;
 use App\Repositories\Backend\Absence\AbsenceRepositoryContract;
 
+use App\Repositories\Backend\Average\AverageRepositoryContract;
+
 use Illuminate\Support\Facades\DB;
 use App\Http\Requests\Backend\Course\CourseAnnual\ImportCourseAnnualRequest;
 use Carbon\Carbon;
@@ -45,6 +47,7 @@ class CourseAnnualController extends Controller
     protected $courseAnnualScores;
     protected $percentages;
     protected $absences;
+    protected $averages;
 
     /**
      * @param CourseAnnualRepositoryContract $courseAnnualRepo
@@ -53,13 +56,15 @@ class CourseAnnualController extends Controller
         CourseAnnualRepositoryContract $courseAnnualRepo,
         CourseAnnualScoreRepositoryContract $courseAnnualScoreRepo,
         PercentageRepositoryContract $percentageRepo,
-        AbsenceRepositoryContract $absenceRepo
+        AbsenceRepositoryContract $absenceRepo,
+        AverageRepositoryContract $averageRepo
     )
     {
         $this->courseAnnuals = $courseAnnualRepo;
         $this->courseAnnualScores = $courseAnnualScoreRepo;
         $this->percentages = $percentageRepo;
         $this->absences = $absenceRepo;
+        $this->averages = $averageRepo;
     }
 
     /**
@@ -988,12 +993,12 @@ class CourseAnnualController extends Controller
                 $columnHeader = array_merge($columnHeader, array($column->name));
                 $columns = array_merge($columns, array(['data'=>$column->name]));
             }
-            $columns = array_merge($columns, array(['data' => 'average', 'type' => 'numeric', 'readOnly' => true]));
+            $columns = array_merge($columns, array(['data' => 'average', 'readOnly' => true]));
             $columnHeader = array_merge($columnHeader, array('Average'));
 
         } else {
 
-            $columns = array_merge($columns, array(['data' => 'average', 'type' => 'numeric', 'readOnly' => true]));
+            $columns = array_merge($columns, array(['data' => 'average', 'readOnly' => true]));
             $columnHeader = array_merge($columnHeader, array('Average'));
         }
 
@@ -1009,9 +1014,12 @@ class CourseAnnualController extends Controller
                 ->select('scores.score', 'scores.score_absence', 'percentages.name', 'percentages.percent', 'percentages.id as percentage_id', 'scores.id as score_id')
                 ->get();
 
-//            dd($studentScore);
 
+            // get number of absence from database
             $scoreAbsence = $this->getAbsenceFromDB($courseAnnual->id, $student->student_annual_id);
+            //get total score of one course from DB
+
+            $totalScore = $this->averages->findAverageByCourseIdAndStudentId($courseAnnual->id, $student->student_annual_id);
 
             if($studentScore) {
 
@@ -1033,6 +1041,7 @@ class CourseAnnualController extends Controller
                 'student_gender' => $student->code,
                 'absence'          => isset($scoreAbsence) ? 10-$scoreAbsence->num_absence:10,
                 'num_absence'      => isset($scoreAbsence) ? $scoreAbsence->num_absence:0,
+                'average'          => isset($totalScore) ? (float)$totalScore->average: null,
 
                 'department_id'    => $courseAnnual->department_id,
                 'degree_id'        => $courseAnnual->degree_id,
@@ -1048,11 +1057,15 @@ class CourseAnnualController extends Controller
             $arrayData[] = $mergerData;
         }
 
+
+//        dd($arrayData);
         return Response::json([
             'data' => $arrayData,
             'columnHeader' => $columnHeader,
             'columns'      =>$columns
         ]);
+
+
     }
 
     public function saveScoreByCourseAnnual(Request $request) {
@@ -1074,6 +1087,8 @@ class CourseAnnualController extends Controller
         if($checkUpdate == count($inputs)) {
 
             return Response::json(['status'=>true, 'message' => 'Score Saved!!']);
+        } else{
+            return Response::json(['status'=>false, 'message' => 'Score NOt Saved!!']);
         }
     }
 
@@ -1236,13 +1251,12 @@ class CourseAnnualController extends Controller
 
     public function deleteScoreFromScorePercentage(Request $request) {
 
-
-
         $checkDeleteScore =0;
         $percentageScore = Percentage::join('percentage_scores', 'percentage_scores.percentage_id', '=', 'percentages.id')
             ->join('scores', 'scores.id', '=', 'percentage_scores.score_id')
             ->where('percentages.id', $request->percentage_id)
             ->lists('scores.id');
+
         $deletePercentage = $this->percentages->destroy($request->percentage_id);
 
         foreach($percentageScore as $score) {
@@ -1263,6 +1277,95 @@ class CourseAnnualController extends Controller
             return $reDrawTable;
         }
 
+    }
+
+
+    public function calculateAverageByCourseAnnual($courseAnnualId, Request $request) {
+
+        $colHeaders = $request->colHeader;
+        $dataArray  = $request->data;
+
+//        dd($dataArray);
+        $studentScores = [];
+        $check =0;
+        $count = 0;
+        foreach($dataArray as $data){
+
+            $count++;
+
+            if($count < count($dataArray)) {
+                $totalScore = 0;// this is the total score by only one course
+                $scoreId = [];
+
+                for($index=0; $index< count($colHeaders); $index++) {
+
+
+
+                    if($index > 4  && $index < (count($colHeaders)-1)) { // we know the exact column header of the score so this we need only the score which every teacher created
+
+                        $scoreHeader = explode('-', $colHeaders[$index]);
+                        $percentage = (int)$scoreHeader[count($scoreHeader)-1];// convert string X% to integer X
+                        $score = $data[$colHeaders[$index]];
+                        $percentage_id = $data['percentage_id_'.$colHeaders[$index]];
+                        $totalScore = $totalScore + (($score*$percentage)/100);
+
+                        $scoreId[] = $data['score_id_'.$colHeaders[$index]];
+                    }
+
+                }
+
+                // store average score in table average and relation table average_score
+                $input = [
+                    'course_annual_id' => $courseAnnualId,
+                    'student_annual_id'=> $data['student_annual_id'],
+                    'average'   => $totalScore
+                ];
+
+
+
+                $totalScore = $this->averages->findAverageByCourseIdAndStudentId($courseAnnualId, (int)$data['student_annual_id']);
+
+                if($totalScore) {
+                    //update calcuation total score
+                    $UpdateAverage = $this->averages->update($totalScore->id, $input);
+
+                    if($UpdateAverage) {
+                        $check++;
+                    }
+                } else {
+
+                    // insert new calculation score
+                    $storeAverage = $this->averages->create($input);
+                    if($storeAverage) {
+                        // this is to store the relation table
+                        $checkRelation =0;
+                        foreach($scoreId as $score_id) {
+                            $storeRelationTable = $this->averages->storeTableRelation($storeAverage->id, $score_id);
+
+                            if($storeRelationTable) {
+                                $checkRelation++;
+                            }
+                        }
+
+                        if($checkRelation == count($scoreId) ) {
+                            $check++;
+                        }
+                    }
+                }
+
+                $studentScores[$data['student_annual_id']][] = $totalScore;
+            }
+        }
+
+        if($check == count($dataArray)-1) {
+
+            $reDrawTable = $this->handsonTableData($courseAnnualId);
+            return $reDrawTable;
+        } else {
+            return 'check is not enouht';
+        }
+
+//        dd($studentScores);
     }
 
 

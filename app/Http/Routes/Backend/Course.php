@@ -63,6 +63,8 @@ Route::group([
 
     Route::delete('course-annual/delete-score', 'CourseAnnualController@deleteScoreFromScorePercentage')->name('admin.course.delete-score');
 
+    Route::post('course-annual/{id}/get-average-score', 'CourseAnnualController@calculateAverageByCourseAnnual')->name('admin.course.get_average_score');
+
 
 
 

@@ -264,6 +264,11 @@ class AccessServiceProvider extends ServiceProvider
             \App\Repositories\Backend\Absence\AbsenceRepositoryContract::class,
             \App\Repositories\Backend\Absence\EloquentAbsenceRepository::class
         );
+
+        $this->app->bind(
+            \App\Repositories\Backend\Average\AverageRepositoryContract::class,
+            \App\Repositories\Backend\Average\EloquentAverageRepository::class
+        );
         /*---------------------------------------
             binding For Module score
         ----------------------------------------*/

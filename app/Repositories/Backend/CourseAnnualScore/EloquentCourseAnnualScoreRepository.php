@@ -69,16 +69,24 @@ class EloquentCourseAnnualScoreRepository implements CourseAnnualScoreRepository
     public function update($id, $input)
     {
 
+        //---we need to update the score and score_absence only
+
         $courseAnnualScore = $this->findOrThrowException($id);
 
-        $courseAnnualScore->course_annual_id = $input['course_annual_id'];
-        $courseAnnualScore->student_annual_id = $input['student_annual_id'];
-        $courseAnnualScore->academic_year_id = $input['academic_year_id'];
-        $courseAnnualScore->semester_id = $input['semester_id'];
-        $courseAnnualScore->grade_id = $input['grade_id'];
-        $courseAnnualScore->degree_id = $input['degree_id'];
-        $courseAnnualScore->department_id = $input['department_id'];
-        $courseAnnualScore->score = isset($input['score'])?$input['score']:0;
+//        $courseAnnualScore->course_annual_id = $input['course_annual_id'];
+//        $courseAnnualScore->student_annual_id = $input['student_annual_id'];
+//        $courseAnnualScore->academic_year_id = $input['academic_year_id'];
+//        $courseAnnualScore->semester_id = $input['semester_id'];
+//        $courseAnnualScore->grade_id = $input['grade_id'];
+//        $courseAnnualScore->degree_id = $input['degree_id'];
+//        $courseAnnualScore->department_id = $input['department_id'];
+
+
+        if($input['score'] == null) {
+            $courseAnnualScore->score = 0;
+        } else {
+            $courseAnnualScore->score = isset($input['score'])?$input['score']:0;
+        }
         $courseAnnualScore->score_absence = isset($input['score_absence'])?$input['score_absence']:0;
         $courseAnnualScore->updated_at = Carbon::now();
         $courseAnnualScore->write_uid = auth()->id();

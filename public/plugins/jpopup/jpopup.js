@@ -352,6 +352,32 @@ function jPopup(config) {
 			}
 		});
 
+
+		$('#add_col_ok').on('click', function(e) {
+
+			e.preventDefault();
+			var colHeader = $('#name_exam').val();
+			var percentage = $('#percentage').val();
+			if(colHeader) {
+				if(percentage) {
+
+					if(cellChanges.length > 0 || cellScoreChanges.length > 0) {
+						notify('error', 'info', 'You have not save your changes!');
+					} else {
+						addColumns(colHeader, percentage);
+						close();
+						closed = true;
+					}
+
+				} else {
+					notify('error', 'info', 'Please Input Percentage!!');
+				}
+
+			} else {
+				notify('error', 'info', 'Please Input Column Name!!');
+			}
+
+		});
 		popupClose.on("click", function(e) {
 			e.preventDefault();
 			close();

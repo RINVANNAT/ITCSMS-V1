@@ -327,7 +327,7 @@
                 <ul class="dropdown-menu" role="menu">
 
                     <li class="drop-menu"> <a href="#"  id="add_column"> <i class="fa fa-plus"> Add Score</i></a></li>
-                    <li class="drop-menu"> <a href="#"  id="get_result"> <i class="fa fa-circle-o-notch"> Generate Score</i></a></li>
+                    <li class="drop-menu"> <a href="#"  id="get_average"> <i class="fa fa-circle-o-notch"> Generate Average</i></a></li>
 
 
                 </ul>
@@ -372,6 +372,7 @@
                     if(resultData.status == true) {
 
                         cellScoreChanges=[];
+                        cellIndex = [{}];
                         notify('success', 'info', resultData.message);
 
                     } else {
@@ -386,11 +387,44 @@
         var cellChanges = [];
         var cellScoreChanges=[];
         var sentrow, sentcol;
+        var cellIndex=[];
 
 
-        var colorRenderer = function (instance, td, row, col, prop, value, cellProperties) {
+        var colorRenderer = function ( instance, td, row, col, prop, value, cellProperties) {
+
+
             Handsontable.renderers.TextRenderer.apply(this, arguments);
-            td.style.backgroundColor = 'red';
+
+
+
+            if(cellIndex.length >0) {
+//                console.log(cellIndex);
+                for(var i =0; i< cellIndex.length; i++) {
+                    if(cellIndex[i]['row'] == row) {
+
+                        if( setting.columns[col]['data'] == cellIndex[i]['col']) {
+
+                            if(value > 100) {
+                                td.style.backgroundColor = 'red';
+                            } else {
+                                td.style.backgroundColor = '#FEFFB0';
+                            }
+
+                        }
+                    }
+                }
+            } else {
+                td.style.backgroundColor = '';
+            }
+
+            if(col == setting.colHeaders.length-1) {
+                if(value != null) {
+                    if(value < 50) {
+                        td.style.backgroundColor = '#FF8D74';
+                    }
+                }
+
+            }
 
         };
 
@@ -410,6 +444,8 @@
             className: "htLeft",
             cell: celldata,
             cells: function (row, col, prop) {
+
+                this.renderer = colorRenderer;
                 if (row === sentrow) {
                     this.renderer = colorRenderer;
                 }
@@ -450,20 +486,21 @@
                                 }
                             } else {
 
+
                                 var percentage_id = 'percentage_id_'+columnIndex;
                                 var score_id = 'score_id_'+columnIndex;
                                 var baseData = {
                                     score_id: rowData[score_id],
                                     score: newValue,
-                                    percentage: parseInt(pourcent[pourcent.length-1]),
-                                    student_annual_id: rowData.student_annual_id,
-                                    department_id:      rowData.department_id,
-                                    degree_id:          rowData.degree_id,
-                                    grade_id:           rowData.grade_id,
-                                    academic_year_id :  rowData.academic_year_id,
-                                    semester_id:        rowData.semester_id,
-                                    course_annual_id: '{{$courseAnnualID}}',
-                                    percentage_id:      rowData[percentage_id],
+//                                    percentage: parseInt(pourcent[pourcent.length-1]),
+//                                    student_annual_id: rowData.student_annual_id,
+//                                    department_id:      rowData.department_id,
+//                                    degree_id:          rowData.degree_id,
+//                                    grade_id:           rowData.grade_id,
+//                                    academic_year_id :  rowData.academic_year_id,
+//                                    semester_id:        rowData.semester_id,
+                                    {{--course_annual_id: '{{$courseAnnualID}}',--}}
+//                                    percentage_id:      rowData[percentage_id],
                                     score_absence:      rowData.absence
                                 }
                             }
@@ -503,6 +540,16 @@
                         }
                     });
                 }
+
+            },
+
+            beforeChange: function (changes, source) {
+                var lastChange = changes[0];
+
+                var rowIndex = lastChange[0];
+                var columnIndex = lastChange[1];
+
+                cellIndex.push({ row: rowIndex,col: columnIndex });
 
             }
 
@@ -555,47 +602,47 @@
             });
         });
 
-
         function addColumns(colHeader, percentage) {
 
-            var headerLength = setting.colHeaders.length;
+                var headerLength = setting.colHeaders.length;
 //            var averageData = setting.columns[headerLength-1].data;
-            var averageDataType = setting.columns[headerLength-1].type;
-            var averageHeader = setting.colHeaders[headerLength-1];
-            var baseData = {
-                percentage_name: colHeader+'-'+percentage+'%',
-                percentage:percentage,
-                percentage_type: $('#score_type :selected').val(),
-                course_annual_id: '{{$courseAnnualID}}'
-            };
+                var averageDataType = setting.columns[headerLength-1].type;
+                var averageHeader = setting.colHeaders[headerLength-1];
+                var baseData = {
+                    percentage_name: colHeader+'-'+percentage+'%',
+                    percentage:percentage,
+                    percentage_type: $('#score_type :selected').val(),
+                    course_annual_id: '{{$courseAnnualID}}'
+                };
 
-            var BaseUrl = '{{route('admin.course.add_new_column_courseannual')}}'
+                var BaseUrl = '{{route('admin.course.add_new_column_courseannual')}}'
 
-            swal({
-                title: "Confirm",
-                text: "You want to add column?",
-                type: "info",
-                showCancelButton: true,
-                confirmButtonColor: "#DD6B55",
-                confirmButtonText: "Yes, add id!!",
-                closeOnConfirm: true
-            }, function(confirmed) {
-                if (confirmed) {
-                    $.ajax({
-                        type: 'POST',
-                        url: BaseUrl,
-                        data: baseData,
-                        dataType: "json",
-                        success: function(resultData) {
-                            setting.data = resultData.data;
-                            setting.colHeaders = resultData.columnHeader;
-                            setting.columns = resultData.columns;
-                            hotInstance = new Handsontable(jQuery("#score_table")[0], setting);
-                            $('#popup').hide();
-                        }
-                    });
-                }
-            });
+                swal({
+                    title: "Confirm",
+                    text: "You want to add column?",
+                    type: "info",
+                    showCancelButton: true,
+                    confirmButtonColor: "#DD6B55",
+                    confirmButtonText: "Yes, add id!!",
+                    closeOnConfirm: true
+                }, function(confirmed) {
+                    if (confirmed) {
+                        $.ajax({
+                            type: 'POST',
+                            url: BaseUrl,
+                            data: baseData,
+                            dataType: "json",
+                            success: function(resultData) {
+                                setting.data = resultData.data;
+                                setting.colHeaders = resultData.columnHeader;
+                                setting.columns = resultData.columns;
+                                hotInstance = new Handsontable(jQuery("#score_table")[0], setting);
+                                $('#popup').hide();
+                            }
+                        });
+                    }
+                });
+
         }
 
         $('document').ready(function() {
@@ -740,41 +787,47 @@
 
             var url = '{{route('admin.course.save_number_absence')}}';
 
-            swal({
-                title: "Confirm",
-                text: "Save Changes?",
-                type: "info",
-                showCancelButton: true,
-                confirmButtonColor: "#DD6B55",
-                confirmButtonText: "Yes",
-                closeOnConfirm: true
-            }, function(confirmed) {
-                if (confirmed) {
+            if(cellChanges.length > 0 || cellScoreChanges.length > 0) {
+                swal({
+                    title: "Confirm",
+                    text: "Save Changes?",
+                    type: "info",
+                    showCancelButton: true,
+                    confirmButtonColor: "#DD6B55",
+                    confirmButtonText: "Yes",
+                    closeOnConfirm: true
+                }, function(confirmed) {
+                    if (confirmed) {
 
-                    if(cellScoreChanges.length > 0) {
+                        if(cellScoreChanges.length > 0) {
 
-                        var baseUrl = '{{route('admin.course.save_score_course_annual')}}';
-                        ajaxRequest('POST', baseUrl, baseData={data:cellScoreChanges});
+                            var baseUrl = '{{route('admin.course.save_score_course_annual')}}';
+                            ajaxRequest('POST', baseUrl, baseData={data:cellScoreChanges});
+                        }
+
+                        if(cellChanges.length > 0) {
+                            $.ajax({
+                                type: 'POST',
+                                url: url,
+                                data: {baseData:cellChanges},
+                                dataType: "json",
+                                success: function(resultData) {
+                                    setting.data = resultData.data;
+                                    setting.colHeaders = resultData.columnHeader;
+                                    setting.columns = resultData.columns;
+                                    hotInstance = new Handsontable(jQuery("#score_table")[0], setting);
+                                    cellChanges=[];
+                                    cellIndex = [{}];
+                                }
+                            });
+                        }
+
                     }
+                });
 
-                    if(cellChanges.length > 0) {
-                        $.ajax({
-                            type: 'POST',
-                            url: url,
-                            data: {baseData:cellChanges},
-                            dataType: "json",
-                            success: function(resultData) {
-                                setting.data = resultData.data;
-                                setting.colHeaders = resultData.columnHeader;
-                                setting.columns = resultData.columns;
-                                hotInstance = new Handsontable(jQuery("#score_table")[0], setting);
-                                cellChanges=[];
-                            }
-                        });
-                    }
-
-                }
-            });
+            } else {
+                notify('error', 'There are no changes!!', 'Info');
+            }
         })
 
 
@@ -787,6 +840,55 @@
                 return 'You have not yet save your changes!!';
             }
         };
+
+
+
+        $('#get_average').on('click', function() {
+
+
+            if(cellChanges.length > 0 || cellScoreChanges.length > 0) {
+                notify('error', 'info', 'Please Save Your Changes Before Getting Average!!!')
+            } else {
+
+                console.log(setting.data);
+
+
+                var Baseurl = '{{route('admin.course.get_average_score', $courseAnnualID)}}';
+
+                swal({
+                    title: "Confirm",
+                    text: "Calculate Score?",
+                    type: "info",
+                    showCancelButton: true,
+                    confirmButtonColor: "#DD6B55",
+                    confirmButtonText: "Yes",
+                    closeOnConfirm: true
+                }, function(confirmed) {
+                    if (confirmed) {
+
+                        $.ajax({
+                            type: 'POST',
+                            url: Baseurl,
+                            data: {data: setting.data, colHeader:setting.colHeaders},
+                            dataType: "json",
+                            success: function(resultData) {
+
+                                notify('success', 'info', 'Score Calculated!!');
+                                setting.data = resultData.data;
+                                setting.colHeaders = resultData.columnHeader;
+                                setting.columns = resultData.columns;
+                                hotInstance = new Handsontable(jQuery("#score_table")[0], setting);
+                                cellIndex=[];
+
+//                                alert('Redraw Table');
+                            }
+                        });
+
+
+                    }
+                });
+            }
+        })
 
     </script>
 @stop
