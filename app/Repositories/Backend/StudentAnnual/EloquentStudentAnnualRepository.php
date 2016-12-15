@@ -218,8 +218,16 @@ class EloquentStudentAnnualRepository implements StudentAnnualRepositoryContract
             $request->file('photo')->move(
                 base_path() . '/public/img/profiles/', $imageName
             );
+            // After transferring to this server, move it immediately to smis server
+            $ch = curl_init();
+            curl_setopt($ch, CURLOPT_POST, true);
+            curl_setopt($ch, CURLOPT_POSTFIELDS, array('file' => base_path() . '/public/img/profiles/', $imageName));
+            curl_setopt($ch, CURLOPT_URL, config('app.smis_server').'/upload_photo');
+            curl_exec($ch);
+            curl_close($ch);
+
         } else {
-            $student->photo = 'user.png';
+            $student->photo = $student->id_card.'.jpg'; // Default for student photo file name is its id card
         }
 
         if($input['mcs_no'] != "" || $input['mcs_no'] != null){
@@ -336,8 +344,15 @@ class EloquentStudentAnnualRepository implements StudentAnnualRepositoryContract
             $request->file('photo')->move(
                 base_path() . '/public/img/profiles/', $imageName
             );
+
+            // After transferring to this server, move it immediately to smis server
+            $connection = ftp_connect(config('app.smis_ftp_server'));
+            $login = ftp_login($connection, "thavorac", "hope1986");
+            if (!$connection || !$login) { die('Connection attempt failed!'); }
+            ftp_put($connection, "/test/".$imageName, base_path() . '/public/img/profiles/'.$imageName, FTP_BINARY);
+            ftp_close($connection);
         } else {
-            $student->photo = 'user.png';
+            $student->photo = $student->id_card.'.jpg';
         }
 
         if($input['mcs_no'] != "" || $input['mcs_no'] != null){
@@ -417,7 +432,9 @@ class EloquentStudentAnnualRepository implements StudentAnnualRepositoryContract
                     $studentAnnual->scholarships()->sync($input['scholarship_ids']);
                 }
                 DB::commit();
+
                 return true;
+
             }
             DB::rollback();
             throw new GeneralException(trans('exceptions.backend.general.update_error'));

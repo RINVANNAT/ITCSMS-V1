@@ -15,7 +15,7 @@
 @endsection
 
 @section('content')
-    {!! Form::model($studentAnnual, ['route' => ['admin.studentAnnuals.update', $studentAnnual->id],'class' => 'form-horizontal', 'role'=>'form', 'method' => 'patch','files' => true]) !!}
+    {!! Form::model($studentAnnual, ['route' => ['admin.studentAnnuals.update', $studentAnnual->id],'class' => 'form-horizontal','id'=>"student_form", 'role'=>'form', 'method' => 'patch','files' => true]) !!}
 
         <div class="box box-success">
             <div class="box-header with-border">
@@ -47,11 +47,14 @@
     {!! Html::script('plugins/daterangepicker/daterangepicker.js') !!}
     {!! HTML::script('plugins/select2/select2.full.min.js') !!}
     <script>
+        var upload_photo_url = "{{config('app.smis_server')."/upload_photo"}}";
         $(function(){
             $(".select2").select2();
             $('#date_start_end').daterangepicker({
                 format: 'DD/MM/YYYY',
             });
         });
+
+
     </script>
 @stop

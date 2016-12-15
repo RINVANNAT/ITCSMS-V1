@@ -189,6 +189,9 @@
         <div class="box-header with-border">
             <h3 class="box-title">Printing Student ID Card</h3>
             <div class="pull-right">
+                <input id="card_a4" type="checkbox" />
+                <label style="margin-right: 20px;">A4 Paper</label>
+
                 <input id="orderby" type="checkbox" checked />
                 <label style="margin-right: 20px;">ASC</label>
 
@@ -200,7 +203,7 @@
                     Inform Success
                 </button>
                 <button type="button" class="btn btn-default btn-sm checkbox-toggle">
-                    <i class="fa fa-square-o"></i>
+                    <i class="fa fa-check-square-o"></i>
                 </button>
             </div>
         </div><!-- /.box-header -->
@@ -217,9 +220,9 @@
                                     {{--<span class="name_en">ENG RATANA</span>--}}
                                     {{--<span class="name_kh">អេង រតនា</span>--}}
                                     <span class="department" >
-                                        ដេប៉ាតឺម៉ង់ {{$front->department}}
+                                        អត្តលេខនិស្សិត/ID : <strong>{{$front->id_card}}</strong>
                                     </span>
-                                    <span class="id_card">អត្តលេខនិស្សិត/ID : <strong>{{$front->id_card}}</strong></span>
+                                    {{--<span class="id_card">អត្តលេខនិស្សិត/ID : <strong>{{$front->id_card}}</strong></span>--}}
                                     <div class="avatar">
                                         <div class="crop">
                                             <img src="{{config('app.smis_server')}}/img/profiles/{{$front->photo}}">
@@ -238,7 +241,7 @@
                         </div>
 
                         <div class="col-sm-1" style="margin-bottom: 15px;">
-                            <input type="checkbox" class="checkbox" data-id="{{$front->id}}">
+                            <input type="checkbox" checked class="checkbox" data-id="{{$front->id}}">
                         </div>
 
 
@@ -265,12 +268,12 @@
             var clicks = $(this).data('clicks');
             if (clicks) {
                 //Uncheck all checkboxes
-                $(".id_card_table input[type='checkbox']").iCheck("uncheck");
-                $(".fa", this).removeClass("fa-check-square-o").addClass('fa-square-o');
-            } else {
-                //Check all checkboxes
                 $(".id_card_table input[type='checkbox']").iCheck("check");
                 $(".fa", this).removeClass("fa-square-o").addClass('fa-check-square-o');
+            } else {
+                //Check all checkboxes
+                $(".id_card_table input[type='checkbox']").iCheck("uncheck");
+                $(".fa", this).removeClass("fa-check-square-o").addClass('fa-square-o');
             }
             $(this).data("clicks", !clicks);
         });
@@ -287,12 +290,17 @@
             if($("#orderby").is(":checked")){
                 orderby = "ASC";
             }
+
+            var card_type = "PVC"; // Plastic card
+            if($("#card_a4").is(":checked")){
+                card_type = "A4";
+            }
             var url = "{{ route('admin.student.print_id_card') }}";
 
             PopupCenterDual(
                     url
-                    + '?ids='+JSON.stringify(selected_ids)+"&orderby="+orderby+"&type="+type,
-                    'Printing','450','800');
+                    + '?ids='+JSON.stringify(selected_ids)+"&orderby="+orderby+"&type="+type+"&card="+card_type,
+                    'Printing','600','800');
 
         });
 

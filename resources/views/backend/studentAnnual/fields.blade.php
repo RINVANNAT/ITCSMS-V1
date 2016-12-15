@@ -22,13 +22,13 @@
                     <center>
                         <img style="width: 4cm;padding: 3px;border: 3px solid #d2d6de;"
                              class="profile-user-img img-responsive"
-                             src="{{(isset($studentAnnual) && !empty($studentAnnual->student->photo))?url('img/profiles/'.$studentAnnual->student->photo):url('img/profiles/avatar.png')}}" alt="User profile picture"> </img>
+                             src="{{(isset($studentAnnual) && !empty($studentAnnual->student->photo))?config('app.smis_server')."/img/profiles/".$studentAnnual->student->photo:url('img/profiles/avatar.png')}}" alt="User profile picture">
+                             {{--src="{{(isset($studentAnnual) && !empty($studentAnnual->student->photo))?url('img/profiles/'.$studentAnnual->student->photo):url('img/profiles/avatar.png')}}" alt="User profile picture"> --}}
+                        </img>
                         <div style="width: 5cm;">
                             {!! Form::file('photo', null,['id'=>'photo']) !!}
                         </div>
-
                     </center>
-
                 </div>
                 <div class="col-lg-9">
                     {!! Form::label('id_card',trans('labels.backend.students.fields.id_card'),['class' => 'col-lg-2 control-label']) !!}
