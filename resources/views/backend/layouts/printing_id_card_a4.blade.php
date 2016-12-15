@@ -33,8 +33,8 @@
             -moz-box-sizing: border-box;
         }
         .page {
-            width: 2.125in;
-            min-height: 3.375in;
+            width: 8.27in;
+            min-height: 11.69in;
             padding: 0;
             margin: 0 auto;
             border: 1px #D3D3D3 solid;
@@ -45,7 +45,7 @@
         }
 
         @page {
-            size: 2.125in 3.375in;
+            size: 8.27in 11.69in;
             margin: 0;
         }
         @media print {
@@ -62,8 +62,8 @@
                 margin: 0mm auto;
                 border: initial;
                 border-radius: initial;
-                width: 2.125in;
-                min-height: 3.375in;
+                width: 8.27in;
+                min-height: 11.69in;
                 box-shadow: initial;
                 background: initial;
                 page-break-after: always;

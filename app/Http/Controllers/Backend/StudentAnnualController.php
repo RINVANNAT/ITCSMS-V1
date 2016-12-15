@@ -180,6 +180,7 @@ class StudentAnnualController extends Controller
     public function update(UpdateStudentRequest $request, $id)
     {
         $this->students->update($id, $request);
+        //dd("done");
         return redirect()->route('admin.studentAnnuals.index')->withFlashSuccess(trans('alerts.backend.generals.updated'));
     }
 
@@ -1878,6 +1879,7 @@ class StudentAnnualController extends Controller
         $ids = json_decode($request->get('ids'));
         $orderby = $request->get('orderby');
         $type = $request->get('type');
+        $card = $request->get('card');
 
         $studentAnnuals = StudentAnnual::select([
             'students.id_card',
@@ -1903,7 +1905,11 @@ class StudentAnnualController extends Controller
             ->orderBy('id_card',$orderby)
             ->get();
 
-        return view('backend.studentAnnual.print.id_card',compact('studentAnnuals','type'));
+        if($card == "PVC"){
+            return view('backend.studentAnnual.print.id_card',compact('studentAnnuals','type'));
+        } else { // A4 Card
+            return view('backend.studentAnnual.print.id_card_a4',compact('studentAnnuals','type'));
+        }
     }
 
     public function print_inform_success(PrintStudentIDCardRequest $request){

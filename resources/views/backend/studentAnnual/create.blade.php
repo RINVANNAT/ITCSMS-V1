@@ -15,7 +15,7 @@
 @endsection
 
 @section('content')
-    {!! Form::open(['route' => 'admin.studentAnnuals.store', 'class' => 'form-horizontal', 'role' => 'form', 'files' => true]) !!}
+    {!! Form::open(['route' => 'admin.studentAnnuals.store','id'=>'student_form', 'class' => 'form-horizontal', 'role' => 'form', 'files' => true]) !!}
 
         <div class="box box-success">
             <div class="box-header with-border">
@@ -48,6 +48,7 @@
     {!! HTML::script('plugins/select2/select2.full.min.js') !!}
     <script>
         $(function(){
+            var upload_photo_url = "{{config('app.smis_server')."/upload_photo"}}";
             $(".select2").select2();
             $('#date_start_end').daterangepicker({
                 format: 'DD/MM/YYYY',
@@ -64,6 +65,20 @@
                 //console.log($(this).mozFullPath);
 
                 $('.profile-user-img').attr('src',URL.createObjectURL(event.target.files[0]));
+            });
+
+            $('#student_form').on('submit',function(){
+                $.ajax({
+                    url : upload_photo_url,
+                    type : 'POST',
+                    data : $('#student_form').serialize,
+                    processData: false,  // tell jQuery not to process the data
+                    contentType: false,  // tell jQuery not to set contentType
+                    success : function(data) {
+                        console.log(data);
+                        alert(data);
+                    }
+                });
             });
         });
     </script>

@@ -1,4 +1,4 @@
-@extends('backend.layouts.printing_id_card')
+@extends('backend.layouts.printing_id_card_a4')
 @section('title')
     ITC-SMS | អត្តសញ្ញាណបណ្ណនិស្សិត
 @stop
@@ -15,8 +15,8 @@
 
         .detail {
             position: absolute;
-            width: 100%;
-            height: 100%;
+            width: 2.125in;
+            height: 3.375in;
             z-index: 9999;
         }
 
@@ -163,33 +163,50 @@
 @section('content')
 
     @if($type == "front")
-        @foreach($studentAnnuals as $front)
+        <?php
+                $pages = array_chunk($studentAnnuals,9);
+        ?>
+        @foreach($pages as $page)
 
         <div class="page">
-            <div class="background">
-                <img width="100%" src="{{url('img/id_card/front_id_card.png')}}">
-            </div>
-            <div class="detail">
-                {{--<span class="name_en">ENG RATANA</span>--}}
-                {{--<span class="name_kh">អេង រតនា</span>--}}
-                <span class="department" >
-                    អត្តលេខនិស្សិត/ID : <strong>{{$front->id_card}}</strong>
-                </span>
-                {{--<span class="id_card">អត្តលេខនិស្សិត/ID : <strong>{{$front->id_card}}</strong></span>--}}
-                <div class="avatar">
-                    <div class="crop">
-                        <img src="{{config('app.smis_server')}}/img/profiles/{{$front->photo}}">
+            <div class="row">
+                @foreach($page as $front)
+                    <div class="col-sm-3" style="margin-bottom: 15px;">
+                        <div class="page">
+                            <div class="background">
+                                <img width="100%" src="{{url('img/id_card/front_id_card.png')}}">
+                            </div>
+                            <div class="detail">
+                                {{--<span class="name_en">ENG RATANA</span>--}}
+                                {{--<span class="name_kh">អេង រតនា</span>--}}
+                                <span class="department" >
+                                        ដេប៉ាតឺម៉ង់ {{$front->department}}
+                                    </span>
+                                <span class="id_card">អត្តលេខនិស្សិត/ID : <strong>{{$front->id_card}}</strong></span>
+                                <div class="avatar">
+                                    <div class="crop">
+                                        <img src="{{config('app.smis_server')}}/img/profiles/{{$front->photo}}">
+                                    </div>
+                                </div>
+
+                                <span class="name_kh">{{$front->name_kh}}</span>
+                                @if(strlen($front->name_latin) < 25)
+                                    <span class="name_latin">{{strtoupper($front->name_latin)}}</span>
+                                @else
+                                    <span class="name_latin" style="font-size: 13px !important;">{{strtoupper($front->name_latin)}}</span>
+                                @endif
+                            </div>
+
+                        </div>
                     </div>
-                </div>
 
-                <span class="name_kh">{{$front->name_kh}}</span>
-                @if(strlen($front->name_latin) < 25)
-                    <span class="name_latin">{{strtoupper($front->name_latin)}}</span>
-                @else
-                    <span class="name_latin" style="font-size: 13px !important;">{{strtoupper($front->name_latin)}}</span>
-                @endif
+                    <div class="col-sm-1" style="margin-bottom: 15px;">
+                        <input type="checkbox" class="checkbox" data-id="{{$front->id}}">
+                    </div>
+
+
+                @endforeach
             </div>
-
         </div>
         @endforeach
     @elseif($type=="back")
