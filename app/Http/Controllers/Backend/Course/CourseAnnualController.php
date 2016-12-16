@@ -786,7 +786,10 @@ class CourseAnnualController extends Controller
 
     public function editCourseAnnual($courseId, CourseAnnualAssignmentRequest $request) {
 
+
         $preCourse = $this->getCourseAnnualById($courseId);
+//        dd($preCourse);
+
         $inputs = [
             'time_course'   => $request->time_course,
             'time_td'       => $request->time_td,
@@ -797,6 +800,7 @@ class CourseAnnualController extends Controller
             'semester_id'   => $request->semester_id,
             'employee_id'   => $preCourse->employee_id,
             'course_id'     => $preCourse->course_id,
+            'department_id' => $preCourse->department_id,
             'active'        => true
         ];
 
@@ -1070,21 +1074,28 @@ class CourseAnnualController extends Controller
 
     public function saveScoreByCourseAnnual(Request $request) {
 
+//        dd($request->data);
+
         $inputs = $request->data;
         $checkUpdate = 0;
+        $checkNotUpdated = 0;
 
         if($inputs) {
             foreach($inputs as $input) {
 
-                $updateScore = $this->courseAnnualScores->update($input['score_id'], $input);
+                if($input['score_id'] != null) {
+                    $updateScore = $this->courseAnnualScores->update($input['score_id'], $input);
 
-                if($updateScore) {
-                    $checkUpdate++;
+                    if($updateScore) {
+                        $checkUpdate++;
+                    }
+                } else {
+                    $checkNotUpdated++;
                 }
             }
         }
 
-        if($checkUpdate == count($inputs)) {
+        if($checkUpdate == count($inputs) - $checkNotUpdated) {
 
             return Response::json(['status'=>true, 'message' => 'Score Saved!!']);
         } else{

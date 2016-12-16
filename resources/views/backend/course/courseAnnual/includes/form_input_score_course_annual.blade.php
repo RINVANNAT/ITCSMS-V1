@@ -361,7 +361,6 @@
 
     <script>
 
-
         function ajaxRequest (method, baseUrl, baseData) {
             $.ajax({
                 type: method,
@@ -382,20 +381,17 @@
             });
         }
 
-        var hotInstance;
-        var celldata = [];
-        var cellChanges = [];
-        var cellScoreChanges=[];
-        var sentrow, sentcol;
-        var cellIndex=[];
+        var hotInstance;// declaration of handsontable object
+        var celldata = []; // each cell data to render in a table
+        var cellChanges = [];// the properties of changes when user edit on column number-absence
+        var cellScoreChanges=[]; // when make changes on every score columns
+        var sentrow, sentcol; // not use
+        var cellIndex=[]; // to get each col and row and check value with colorRenderer
 
 
         var colorRenderer = function ( instance, td, row, col, prop, value, cellProperties) {
 
-
             Handsontable.renderers.TextRenderer.apply(this, arguments);
-
-
 
             if(cellIndex.length >0) {
 //                console.log(cellIndex);
@@ -404,7 +400,7 @@
 
                         if( setting.columns[col]['data'] == cellIndex[i]['col']) {
 
-                            if(value > 100) {
+                            if(value > 100) { // the score should be lower or equal 100
                                 td.style.backgroundColor = 'red';
                             } else {
                                 td.style.backgroundColor = '#FEFFB0';
@@ -417,9 +413,11 @@
                 td.style.backgroundColor = '';
             }
 
+
+            //-----when the average is less than 50
             if(col == setting.colHeaders.length-1) {
                 if(value != null) {
-                    if(value < 50) {
+                    if(value < 30) {
                         td.style.backgroundColor = '#FF8D74';
                     }
                 }
@@ -429,7 +427,7 @@
         };
 
 
-        // this is the property of the handson table
+        // this is the property of the handson table / or configuration
         var setting = {
             rowHeaders: true,
             manualColumnMove: true,
@@ -485,8 +483,6 @@
                                     course_annual_id: '{{$courseAnnualID}}'
                                 }
                             } else {
-
-
                                 var percentage_id = 'percentage_id_'+columnIndex;
                                 var score_id = 'score_id_'+columnIndex;
                                 var baseData = {
@@ -743,7 +739,6 @@
                                                            setting.data = resultData.data;
                                                            setting.colHeaders = resultData.columnHeader;
                                                            setting.columns = resultData.columns;
-
                                                            hotInstance = new Handsontable(jQuery("#score_table")[0], setting);
 
                                                        }
@@ -803,6 +798,7 @@
 
                             var baseUrl = '{{route('admin.course.save_score_course_annual')}}';
                             ajaxRequest('POST', baseUrl, baseData={data:cellScoreChanges});
+                            cellIndex = [];
                         }
 
                         if(cellChanges.length > 0) {
@@ -817,9 +813,11 @@
                                     setting.columns = resultData.columns;
                                     hotInstance = new Handsontable(jQuery("#score_table")[0], setting);
                                     cellChanges=[];
-                                    cellIndex = [{}];
+                                    cellIndex = [];
                                 }
                             });
+
+                            cellIndex = [];
                         }
 
                     }
