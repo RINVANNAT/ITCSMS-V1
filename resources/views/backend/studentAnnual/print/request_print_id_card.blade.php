@@ -300,7 +300,7 @@
             PopupCenterDual(
                     url
                     + '?ids='+JSON.stringify(selected_ids)+"&orderby="+orderby+"&type="+type+"&card="+card_type,
-                    'Printing','600','800');
+                    'Printing','1200','800');
 
         });
 

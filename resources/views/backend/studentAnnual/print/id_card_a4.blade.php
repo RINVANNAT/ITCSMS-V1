@@ -7,8 +7,6 @@
     <style>
         .background {
             position: absolute;
-            top:0;
-            left:0;
             width: 2.125in;
             height: 3.375in;
         }
@@ -156,6 +154,14 @@
                 position: absolute;
             }
         }
+        .page1 {
+            width: 2.125in;
+            height: 3.375in;
+            margin-left:auto;
+            margin-right:auto;
+            display:block;
+        }
+
 
 
     </style>
@@ -164,94 +170,136 @@
 
     @if($type == "front")
         <?php
-                $pages = array_chunk($studentAnnuals,9);
+                $pages = array_chunk($studentAnnuals->toArray(),9);
         ?>
         @foreach($pages as $page)
+            <?php
+                if(count($page) >= 3) {
 
-        <div class="page">
-            <div class="row">
-                @foreach($page as $front)
-                    <div class="col-sm-3" style="margin-bottom: 15px;">
-                        <div class="page">
-                            <div class="background">
-                                <img width="100%" src="{{url('img/id_card/front_id_card.png')}}">
-                            </div>
-                            <div class="detail">
-                                {{--<span class="name_en">ENG RATANA</span>--}}
-                                {{--<span class="name_kh">អេង រតនា</span>--}}
-                                <span class="department" >
+                    $rows = array_chunk($page, 3);
+                } else {
+                    $rows = $page;
+                }
+            ?>
+            <div class="page">
+
+                @foreach($rows as $row)
+                    <div class="row" style="margin:0px; padding-top: 10mm !important;">
+                        @foreach($row as $front)
+                            <?php $front = (object)$front; ?>
+                            <div class="col-sm-4 col-xs-4" style="padding:0px;">
+
+                                <div class="page1">
+                                    <div class="background">
+                                        <img width="100%" src="{{url('img/id_card/front_id_card.png')}}">
+                                    </div>
+                                    <div class="detail">
+                                        {{--<span class="name_en">ENG RATANA</span>--}}
+                                        {{--<span class="name_kh">អេង រតនា</span>--}}
+                                        <span class="department" >
                                         ដេប៉ាតឺម៉ង់ {{$front->department}}
-                                    </span>
-                                <span class="id_card">អត្តលេខនិស្សិត/ID : <strong>{{$front->id_card}}</strong></span>
-                                <div class="avatar">
-                                    <div class="crop">
-                                        <img src="{{config('app.smis_server')}}/img/profiles/{{$front->photo}}">
+                                        </span>
+                                        <span class="id_card">អត្តលេខនិស្សិត/ID : <strong>{{$front->id_card}}</strong></span>
+                                        <div class="avatar">
+                                            <div class="crop">
+                                                <img src="{{config('app.smis_server')}}/img/profiles/{{$front->photo}}">
+                                            </div>
+                                        </div>
+
+                                        <span class="name_kh">{{$front->name_kh}}</span>
+                                        @if(strlen($front->name_latin) < 25)
+                                            <span class="name_latin">{{strtoupper($front->name_latin)}}</span>
+                                        @else
+                                            <span class="name_latin" style="font-size: 13px !important;">{{strtoupper($front->name_latin)}}</span>
+                                        @endif
+                                    </div>
+
+                                </div>
+                            </div>
+                        @endforeach
+                    </div><!---this end of row: has three images ---->
+                @endforeach
+            </div><!---end of one page: has nine images---->
+        @endforeach
+
+    @elseif($type=="back")
+        <?php
+            $pages = array_chunk($studentAnnuals->toArray(), 9);
+        ?>
+
+        @foreach($pages as $page)
+
+            <?php
+                if(count($page) >= 3) {
+
+                    $rows = array_chunk($page, 3);
+                } else {
+                    $rows = $page;
+                }
+            ?>
+            <div class="page">
+
+                @foreach($rows as $row)
+
+                    <div class="row" style="margin:0px; padding-top: 10mm !important;">
+                        <?php $row = array_reverse($row); //dd($row);?>
+                        @foreach($row as $back)
+
+                            <div class="col-sm-4 col-xs-4" style="padding:0px;">
+                                <div class="page1">
+
+                                    <div class="background">
+                                        <img width="100%" src="{{url('img/id_card/back_id_card.png')}}">
+                                    </div>
+                                    <div class="detail">
+                                <span class="address_title">
+                                    អាសយដ្ឋាន ៖
+                                </span>
+                                <span class="address">
+                                    ប្រអប់សំបុត្រលេខ៨៦​ មហាវិថីសហព័ន្ធរុស្សុី<br/>
+                                    រាជធានីភ្នំពេញ ប្រទេសកម្ពុជា <br/>
+                                    ទូរស័ព្ទ: (៨៥៥) ២៣ ៨៨០ ៣៧០/៨៨២ ៤០៤ <br/>
+                                    ទូរសារ: (៨៥៥) ២៣ ៨៨០ ៣៦៩ <br/>
+                                    សារអេឡិចត្រូនិច: info@itc.edu.kh <br/>
+                                    គេហទំព័រ: www.itc.edu.kh
+
+                                </span>
+                                        <?php
+                                        $date = null;
+                                        $count = 0;
+                                        if($back['degree_id'] == 1){
+                                            if($back['grade_id'] < 3){
+                                                $count = 2 - $back['grade_id'];
+                                            } else {
+                                                $count = 5 - $back['grade_id'];
+                                            }
+                                        } else if ($back['degree_id'] == 2){
+                                            $count = 2 - $back['grade_id'];
+                                        }
+                                        ?>
+                                        <span class="expired_date">ថ្ងៃផុតកំណត់/Expiry date: 30 September {{$back['academic_year_id'] + $count}}</span>
+                                        <div class="barcode">
+                                            <img src="data:image/png;base64,{{\Milon\Barcode\Facades\DNS1DFacade::getBarcodePNG(substr($back['id_card'], 1), 'C39')}}" alt="barcode" />
+                                        </div>
+                                        <span class="barcode_value">{{$back['id_card']}}</span>
+                                <span class="message">
+                                    ប្រសិនបើរើសបាន សូមជួយយកមកប្រគល់ឱ្យ <br/>
+                                    ការិយាល័យសិក្សា នៃវិទ្យាស្ថានបច្ចេកវិទ្យាកម្ពុជា
+                                </span>
                                     </div>
                                 </div>
 
-                                <span class="name_kh">{{$front->name_kh}}</span>
-                                @if(strlen($front->name_latin) < 25)
-                                    <span class="name_latin">{{strtoupper($front->name_latin)}}</span>
-                                @else
-                                    <span class="name_latin" style="font-size: 13px !important;">{{strtoupper($front->name_latin)}}</span>
-                                @endif
                             </div>
 
-                        </div>
-                    </div>
+                        @endforeach
 
-                    <div class="col-sm-1" style="margin-bottom: 15px;">
-                        <input type="checkbox" class="checkbox" data-id="{{$front->id}}">
                     </div>
-
 
                 @endforeach
-            </div>
-        </div>
-        @endforeach
-    @elseif($type=="back")
-        @foreach($studentAnnuals as $back)
-        <div class="page">
-            <div class="background">
-                <img width="100%" src="{{url('img/id_card/back_id_card.png')}}">
-            </div>
-            <div class="detail">
-                <span class="address_title">
-                    អាសយដ្ឋាន ៖
-                </span>
-                <span class="address">
-                    ប្រអប់សំបុត្រលេខ៨៦​ មហាវិថីសហព័ន្ធរុស្សុី<br/>
-                    រាជធានីភ្នំពេញ ប្រទេសកម្ពុជា <br/>
-                    ទូរស័ព្ទ: (៨៥៥) ២៣ ៨៨០ ៣៧០/៨៨២ ៤០៤ <br/>
-                    ទូរសារ: (៨៥៥) ២៣ ៨៨០ ៣៦៩ <br/>
-                    សារអេឡិចត្រូនិច: info@itc.edu.kh <br/>
-                    គេហទំព័រ: www.itc.edu.kh
 
-                </span>
-                <?php
-                    $date = null;
-                    $count = 0;
-                    if($back['degree_id'] == 1){
-                        if($back['grade_id'] < 3){
-                            $count = 2 - $back['grade_id'];
-                        } else {
-                            $count = 5 - $back['grade_id'];
-                        }
-                    } else if ($back['degree_id'] == 2){
-                        $count = 2 - $back['grade_id'];
-                    }
-                ?>
-                <span class="expired_date">ថ្ងៃផុតកំណត់/Expiry date: 30 September {{$back['academic_year_id'] + $count}}</span>
-                <div class="barcode">
-                    <img src="data:image/png;base64,{{\Milon\Barcode\Facades\DNS1DFacade::getBarcodePNG(substr($back['id_card'], 1), 'C39')}}" alt="barcode" />
-                </div>
-                <span class="barcode_value">{{$back['id_card']}}</span>
-                <span class="message">
-                    ប្រសិនបើរើសបាន សូមជួយយកមកប្រគល់ឱ្យ <br/>
-                    ការិយាល័យសិក្សា នៃវិទ្យាស្ថានបច្ចេកវិទ្យាកម្ពុជា
-                </span>
+
             </div>
-        </div>
+
         @endforeach
     @endif
 
