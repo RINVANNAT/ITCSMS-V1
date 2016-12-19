@@ -132,6 +132,10 @@ return [
                 'not_found' => 'That student BacII does not exist.',
                 'already_exists' => 'That student BacII already exists. You can not add the same student BacII.',
             ],
+            'create_error' => 'There was a problem creating this configuration. Please try again.',
+            'delete_error' => 'There was a problem deleting this configuration. Please try again.',
+            'not_found' => 'That configuration does not exist.',
+            'already_exists' => 'That configuration already exists. You can not add the same configuration.'
         ],
         'exams'=>[
             'has_candidate' => 'You cannot delete this examination. There are associated candidates!'

@@ -102,4 +102,9 @@ Route::group([
         Route::resource('redoubles', 'RedoubleController');
         Route::post('redouble-data', 'RedoubleController@data')->name('admin.configuration.redouble.data');
     });
+
+    Route::group([], function() {
+        Route::resource('configurations', 'ConfigurationController');
+        Route::post('configuration-data', 'ConfigurationController@data')->name('admin.configuration.configuration.data');
+    });
 });

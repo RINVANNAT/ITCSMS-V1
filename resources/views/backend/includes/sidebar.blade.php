@@ -236,6 +236,11 @@
                         <a href="{!! url('admin/configuration/redoubles') !!}">{{ trans('menus.backend.configuration.redoubles') }}</a>
                     </li>
                     @endauth
+                    @permission('view-admin-configuration-management')
+                    <li class="{{ Active::pattern('admin/configuration/configuration*') }}">
+                        <a href="{!! url('admin/configuration/configurations') !!}">{{ trans('menus.backend.configuration.main') }}</a>
+                    </li>
+                    @endauth
                 </ul>
             </li>
             @endauth

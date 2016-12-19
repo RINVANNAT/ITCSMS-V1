@@ -961,7 +961,19 @@ return [
             'title' => 'Courses Annually',
             'lecturer' => 'Lecturers',
             'course_assignment' => 'Course Assignment'
-        ]
+        ],
+        'configurations' => [
+            'title' => 'Configurations',
+            'sub_index_title' => 'All available configurations',
+            'sub_create_title' => 'Create configurations',
+            'sub_edit_title' => 'Edit configurations',
+            'sub_detail_title' => 'Detail of configurations',
+            'fields'=>[
+                'key' => 'Key',
+                'value' => 'Value',
+                'description' => "Description"
+            ]
+        ],
     ],
 
     'frontend' => [
@@ -1022,7 +1034,6 @@ return [
                 'name' => 'Name',
                 'update_information' => 'Update Information',
             ],
-        ],
-
+        ]
     ],
 ];

@@ -347,10 +347,11 @@ class EloquentStudentAnnualRepository implements StudentAnnualRepositoryContract
 
             // After transferring to this server, move it immediately to smis server
             $connection = ftp_connect(config('app.smis_ftp_server'));
-            $login = ftp_login($connection, "thavorac", "hope1986");
+            $login = ftp_login($connection, "vagrant", "hope1986");
             if (!$connection || !$login) { die('Connection attempt failed!'); }
-            ftp_put($connection, "/test/".$imageName, base_path() . '/public/img/profiles/'.$imageName, FTP_BINARY);
+            ftp_put($connection, "/Code/smis/public/img/profiles/".$imageName, base_path() . '/public/img/profiles/'.$imageName, FTP_BINARY);
             ftp_close($connection);
+
         } else {
             $student->photo = $student->id_card.'.jpg';
         }
