@@ -423,12 +423,11 @@
 
         };
 
-       console.log($('.box').width());
-
 
         // this is the property of the handson table / or configuration
 
-        var menu_width = $( window ).width() - $('.box').width();
+
+        var table_size;
         var setting = {
             rowHeaders: true,
             manualColumnMove: true,
@@ -437,7 +436,7 @@
             minSpareRows: true,
             stretchH: 'last',
             height:800,
-            width:$( document ).width() - menu_width ,
+            width: table_size,
             filters: true,
             dropdownMenu: ['filter_by_condition', 'filter_action_bar'],
             className: "htLeft",
