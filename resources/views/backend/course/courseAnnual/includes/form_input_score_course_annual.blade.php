@@ -423,17 +423,21 @@
 
         };
 
+       console.log($('.box').width());
+
 
         // this is the property of the handson table / or configuration
+
+        var menu_width = $( window ).width() - $('.box').width();
         var setting = {
             rowHeaders: true,
             manualColumnMove: true,
             filters: true,
-//            contextMenu: true,
             autoWrapRow: true,
             minSpareRows: true,
+            stretchH: 'last',
             height:800,
-            width:700,
+            width:$( document ).width() - menu_width ,
             filters: true,
             dropdownMenu: ['filter_by_condition', 'filter_action_bar'],
             className: "htLeft",
@@ -547,8 +551,6 @@
             }
 
         };
-
-
 
         $('#add_column').on('click', function(e) {
 
@@ -753,32 +755,52 @@
                                     }
 
                                 }
-
-                                if(key == 'freeze') {
+                                if(key == 'freeze_column') {
 
                                     if(hotInstance.getSelected()) {
 
-                                        var colIndex = hotInstance.getSelected()[1];
-                                        setting.fixedColumnsLeft = colIndex+1;
-                                        setting.manualColumnFreeze = true;
-                                        hotInstance = new Handsontable(jQuery("#score_table")[0], setting);
+                                        let selectedColumn = hotInstance.getSelected()[1];
+
+                                        if(setting.fixedColumnsLeft) {
+
+                                            if (selectedColumn > setting.fixedColumnsLeft - 1) {
+
+                                                freezeColumn(selectedColumn);
+                                            } else {
+                                                unfreezeColumn(selectedColumn);
+                                            }
+
+                                        } else {
+
+                                            freezeColumn(selectedColumn);
+                                        }
+
                                     }
-
-
-
 
                                 }
 
-                                if(key == 'un_freeze') {
+                                function freezeColumn(column) {
+                                    setting.fixedColumnsLeft = column+1;
+                                    setting.manualColumnFreeze = true;
+                                    hotInstance = new Handsontable(jQuery("#score_table")[0], setting);
+                                }
 
-                                    if(hotInstance.getSelected()) {
-                                        var colIndex = hotInstance.getSelected()[1];
-                                        setting.manualColumnFreeze = false;
-                                        delete setting.fixedColumnsLeft;
-                                        console.log(setting);
-                                        hotInstance = new Handsontable(jQuery("#score_table")[0], setting);
+                                function unfreezeColumn(column) {
 
+                                    console.log(column);
+
+                                    if (column > setting.fixedColumnsLeft - 1) {
+                                        return; // not fixed
                                     }
+                                    removeFixedColumn(column+1);
+                                    hotInstance = new Handsontable(jQuery("#score_table")[0], setting);
+                                }
+
+                                function removeFixedColumn(column) {
+                                    hotInstance.updateSettings({
+                                        fixedColumnsLeft: column - 1
+                                    });
+                                    setting.fixedColumnsLeft--;
                                 }
                             },
                             items: {
@@ -788,15 +810,25 @@
 //                                "rowcolor": {
 //                                    name: 'Row color'
 //                                },
-                                "freeze": {
-                                   name: '<span><i class="fa fa-fire"> Freeze This Column </i></span>'
-                                },
-                                "un_freeze": {
-                                    name: '<span><i class="fa fa-leaf"> Unfreeze This Column </i></span>'
-                                },
                                 "deletecol": {
                                     name: '<span><i class="fa fa-trash"> Delete Column</i></span>'
                                 },
+
+                                "freeze_column": {
+                                    name: function() {
+                                        let selectedColumn = hotInstance.getSelected()[1];
+                                        if(setting.fixedColumnsLeft) {
+                                            if (selectedColumn > setting.fixedColumnsLeft - 1) {
+                                                return '<span><i class="fa fa-fire"> Freeze This Column </i></span>';
+                                            } else {
+                                                return '<span><i class="fa fa-leaf"> Unfreeze This Column </i></span>';
+                                            }
+                                        } else {
+                                            return '<span><i class="fa fa-fire"> Freeze This Column </i></span>';
+                                        }
+
+                                    }
+                                }
                             }
                         }
                     })
