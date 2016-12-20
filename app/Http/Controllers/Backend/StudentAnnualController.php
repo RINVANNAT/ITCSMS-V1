@@ -1871,10 +1871,11 @@ class StudentAnnualController extends Controller
             });
         }
 
+        $smis_server = Configuration::where("key","smis_server")->first();
         $studentAnnuals_front = $studentAnnuals->orderBy('id_card','ASC')->get();
         //$studentAnnuals_back = array_reverse($studentAnnuals_front->toArray());
 
-        return view('backend.studentAnnual.print.request_print_id_card',compact('studentAnnuals_front'));
+        return view('backend.studentAnnual.print.request_print_id_card',compact('smis_server','studentAnnuals_front'));
     }
 
     public function print_id_card(PrintStudentIDCardRequest $request){
@@ -1883,6 +1884,7 @@ class StudentAnnualController extends Controller
         $orderby = $request->get('orderby');
         $type = $request->get('type');
         $card = $request->get('card');
+        $smis_server = Configuration::where("key","smis_server")->first();
 
         $studentAnnuals = StudentAnnual::select([
             'students.id_card',
@@ -1909,9 +1911,9 @@ class StudentAnnualController extends Controller
             ->get();
 
         if($card == "PVC"){
-            return view('backend.studentAnnual.print.id_card',compact('studentAnnuals','type'));
+            return view('backend.studentAnnual.print.id_card',compact('smis_server','studentAnnuals','type'));
         } else { // A4 Card
-            return view('backend.studentAnnual.print.id_card_a4',compact('studentAnnuals','type'));
+            return view('backend.studentAnnual.print.id_card_a4',compact('smis_server','studentAnnuals','type'));
         }
     }
 

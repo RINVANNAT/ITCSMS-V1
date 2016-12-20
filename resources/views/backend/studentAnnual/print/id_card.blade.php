@@ -178,7 +178,7 @@
                 {{--<span class="id_card">អត្តលេខនិស្សិត/ID : <strong>{{$front->id_card}}</strong></span>--}}
                 <div class="avatar">
                     <div class="crop">
-                        <img src="{{config('app.smis_server')}}/img/profiles/{{$front->photo}}">
+                        <img src="{{$smis_server->value}}/img/profiles/{{$front->photo}}">
                     </div>
                 </div>
 
