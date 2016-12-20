@@ -25,44 +25,51 @@
         </div>
     @endif
 
-    <div class="box box-success">
-        <div class="box-header with-border">
-            <div class="mailbox-controls">
-                <!-- Check all button -->
-                <a href="{!! route('admin.course.course_annual.create') !!}">
-                    <button class="btn btn-primary btn-sm"><i class="fa fa-plus-circle"></i> Add
-                    </button>
-                </a>
-                <a href="{!! route('admin.course.course_annual.request_import') !!}">
-                    <button class="btn btn-primary btn-sm"><i class="fa fa-plus-circle"></i> Import
-                    </button>
-                </a>
+    <div class="content_body">
+        <div class="box box-success">
+            <div class="box-header with-border">
+                <div class="mailbox-controls">
+                    <!-- Check all button -->
+                    <a href="{!! route('admin.course.course_annual.create') !!}">
+                        <button class="btn btn-primary btn-sm"><i class="fa fa-plus-circle"></i> Add
+                        </button>
+                    </a>
+                    <a href="{!! route('admin.course.course_annual.request_import') !!}">
+                        <button class="btn btn-primary btn-sm"><i class="fa fa-plus-circle"></i> Import
+                        </button>
+                    </a>
 
-                <div class="btn-group">
-                    <button class="btn btn-default btn-sm"><i class="fa fa-trash-o"></i></button>
-                    <button class="btn btn-default btn-sm"><i class="fa fa-reply"></i></button>
-                    <button class="btn btn-default btn-sm"><i class="fa fa-share"></i></button>
-                </div>
-                <!-- /.btn-group -->
-                <button class="btn btn-default btn-sm"><i class="fa fa-refresh"></i></button>
+                    <div class="btn-group">
+                        <button class="btn btn-default btn-sm"><i class="fa fa-trash-o"></i></button>
+                        <button class="btn btn-default btn-sm"><i class="fa fa-reply"></i></button>
+                        <button class="btn btn-default btn-sm"><i class="fa fa-share"></i></button>
+                    </div>
+                    <!-- /.btn-group -->
+                    <button class="btn btn-default btn-sm"><i class="fa fa-refresh"></i></button>
 
-                @permission('course-annual-assignment')
+                    @permission('course-annual-assignment')
                     <button class="btn btn-primary btn-sm pull-right " id="course_assignment"><i class="fa fa-plus-circle"></i> {{trans('buttons.course.course_annual.course_assignment')}}</button>
-                @endauth
+                    @endauth
 
-                @permission('generate-course-annual')
-                <button class="btn btn-primary btn-sm pull-right " id="generate_course_annual" style="margin-right: 5px"><i class="fa fa-plus-circle"></i> Generate From Old Course Annual</button>
-                @endauth
+                    @permission('generate-course-annual')
+                    <button class="btn btn-primary btn-sm pull-right " id="generate_course_annual" style="margin-right: 5px"><i class="fa fa-plus-circle"></i> Generate From Old Course Annual</button>
+                    @endauth
+
+                    @permission('evaluation-score')
+                    <button class="btn btn-primary btn-sm pull-right " id="evaluation_score" style="margin-right: 5px"><i class="fa fa-plus-circle"></i> Evaluation </button>
+                    @endauth
 
 
-            </div>
-        </div><!-- /.box-header -->
+                </div>
+            </div><!-- /.box-header -->
 
-        <div class="box-body">
-            @include("backend.course.courseAnnual.includes.index_table")
-            <div class="clearfix"></div>
-        </div><!-- /.box-body -->
-    </div><!--box-->
+            <div class="box-body">
+                @include("backend.course.courseAnnual.includes.index_table")
+                <div class="clearfix"></div>
+            </div><!-- /.box-body -->
+        </div><!--box-->
+
+    </div>
 @stop
 
 @section('after-scripts-end')
@@ -194,11 +201,54 @@
 
 
 
-        $(document).on('click', '.input_score_course', function(e) {
-//            e.preventDefault();
-            var  baseUrl = $('.input_score_course').attr('href');
+        $(document).on('click', '#evaluation_score', function(e) {
 
-//            PopupCenterDual(baseUrl, 'Input Score Course Annual', '800', '800');
+            var  baseUrl = '{{route('admin.course.get_form_evaluation_score')}}';
+            var baseData = {
+                academic_year_id: $('#filter_academic_year :selected').val(),
+                degree_id : $('#filter_degree :selected').val(),
+                grade_id: $('#filter_grade :selected').val(),
+                department_id:$('#filter_department :selected').val()
+            };
+
+            if(baseData.academic_year_id != null) {
+                if(baseData.degree_id) {
+                    if(baseData.grade_id) {
+                        if(baseData.department_id) {
+
+//                            $.ajax({
+//                                type: 'GET',
+//                                url: baseUrl,
+//                                data: baseData,
+//                                dataType: "json",
+//                                success: function(resultData) {
+//                                    $('.content_body').html(resultData);
+//                                }
+//                            });
+
+
+                            window.location.replace(baseUrl+'?academic_year_id='+baseData.academic_year_id+
+                                            '&degree_id='+baseData.degree_id+
+                                            '&grade_id='+baseData.grade_id+
+                                            '&department_id='+baseData.department_id
+                            );
+
+                        } else {
+                            notify('error', 'Department Not Selected!!', 'info');
+                        }
+
+                    } else {
+                        notify('error', 'Grade Not Selected!!', 'info');
+                    }
+
+                } else {
+                    notify('error', 'Degree Not Selected!!', 'info');
+                }
+            }
+
+
+            console.log(baseData);
+
 
         })
 

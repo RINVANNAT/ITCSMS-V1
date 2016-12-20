@@ -24,6 +24,9 @@ Route::group([
 
     });
 
+
+//    --------course annual assignment ---------------
+
     Route::get('course-annual/course-assignment', 'CourseAnnualController@courseAssignment')->name('admin.course.course_assignment');
 
     Route::get('course-annual/get-departments', 'CourseAnnualController@getAllDepartments')->name('admin.course.get_department');
@@ -49,21 +52,21 @@ Route::group([
     Route::get('course-annual/generate-course-annual', 'CourseAnnualController@generateCourseAnnual')->name('admin.course.generate_course_annual');
 
 
+
+//    ------input score by each course annual ----------------
+
     Route::get('course-annual/{id}/form-input-score-course-annual', 'CourseAnnualController@getFormScoreByCourse')->name('admin.course.form_input_score_course_annual');
-
-
     Route::post('course-annual/save-score-course-annual', 'CourseAnnualController@saveScoreByCourseAnnual')->name('admin.course.save_score_course_annual');
     Route::get('course-annual/get-data-course-annual-score', 'CourseAnnualController@getCourseAnnualScoreByAjax')->name('admin.course.get_data_course_annual_score');
-
     Route::post('course-annual/add-new-column-courseannual', 'CourseAnnualController@insertPercentageNameNPercentage')->name('admin.course.add_new_column_courseannual');
-
-
     Route::post('course-annual/save-number-absence', 'CourseAnnualController@storeNumberAbsence')->name('admin.course.save_number_absence');
-
-
     Route::delete('course-annual/delete-score', 'CourseAnnualController@deleteScoreFromScorePercentage')->name('admin.course.delete-score');
-
     Route::post('course-annual/{id}/get-average-score', 'CourseAnnualController@calculateAverageByCourseAnnual')->name('admin.course.get_average_score');
+
+//    --------------evaluation score for course annually -------
+
+    Route::get('course-annual/get-form-evaluation-score', 'CourseAnnualController@formScoreEvaluation')->name('admin.course.get_form_evaluation_score');
+
 
 
 

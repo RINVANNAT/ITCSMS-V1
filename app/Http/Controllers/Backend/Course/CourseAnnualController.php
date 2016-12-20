@@ -351,7 +351,8 @@ class CourseAnnualController extends Controller
 
     }
 
-    private function getNotSelectedCourseByDept($deptId, $academicYearId, $grade_id, $degree_id) {
+
+    private function getCourseAnnually() {
 
         $courseAnnuals = DB::table('course_annuals')
             ->leftJoin('employees','course_annuals.employee_id', '=', 'employees.id')
@@ -359,6 +360,7 @@ class CourseAnnualController extends Controller
             ->leftJoin('degrees','course_annuals.degree_id', '=', 'degrees.id')
             ->select([
                 'course_annuals.name_en as course_name',
+                'course_annuals.id as course_annual_id',
                 'course_annuals.course_id as course_id',
                 'departments.code as department_id',
                 'degrees.code as degree_id',
@@ -368,14 +370,24 @@ class CourseAnnualController extends Controller
                 'course_annuals.time_td',
                 'course_annuals.time_course',
                 'course_annuals.semester_id'
-            ])
-            ->where([
-                ['departments.id', $deptId],
-                ['course_annuals.employee_id', null],
-                ['course_annuals.academic_year_id', $academicYearId],
-
             ]);
 
+        return $courseAnnuals;
+    }
+
+    private function getNotSelectedCourseByDept($deptId, $academicYearId, $grade_id, $degree_id) {
+
+
+        $courseAnnuals = $this->getCourseAnnually();
+
+        $courseAnnuals = $courseAnnuals->where('course_annuals.employee_id', '=', null);// this to get not assigned courses
+
+        if($deptId) {
+            $courseAnnuals = $courseAnnuals->where('departments.id', '=',$deptId);
+        }
+        if($academicYearId) {
+            $courseAnnuals = $courseAnnuals->where('course_annuals.academic_year_id', '=',$academicYearId);
+        }
         if($degree_id) {
             $courseAnnuals = $courseAnnuals->where('course_annuals.degree_id', '=',$degree_id);
         }
@@ -384,8 +396,6 @@ class CourseAnnualController extends Controller
         }
         $courseAnnuals = $courseAnnuals->get();
         return $courseAnnuals;
-
-
 
     }
 
@@ -870,7 +880,6 @@ class CourseAnnualController extends Controller
 
     public function generateCourseAnnual(Request $request) {
 
-
         $courseAnnual= DB::table('course_annuals')->where('academic_year_id', $request->academic_year_id-1);
         $departmentId = $request->department_id;
         $degreeId = $request->degree_id;
@@ -1160,11 +1169,9 @@ class CourseAnnualController extends Controller
 
     }
 
-
     public function insertPercentageNameNPercentage(Request $request) {
 
     //this is to add new column name of the exam score ...and we have to initial the value 0 to the student for this type of exam
-
 
         $check =0;
         $courseAnnual = $this->getCourseAnnualById($request->course_annual_id);
@@ -1215,50 +1222,57 @@ class CourseAnnualController extends Controller
 
     }
 
-
     public function storeNumberAbsence(Request $request) {
 
 
         $baseData = $request->baseData;
+
+//        dd($baseData);
         $checkStore = 0;
         $checkUpdate=0;
+        $checkNOTUpdatOrStore = 0;
 
 
         if(count($baseData) > 0) {
             foreach($baseData as $data) {
 
-                $absence = $this->absences->findIfExist($data['course_annual_id'], $data['student_annual_id']);
+                if($data['student_annual_id'] != null) {
+
+                    $absence = $this->absences->findIfExist($data['course_annual_id'], $data['student_annual_id']);
 
 //                dd($absence);
 
-                if($absence) {
-                    //update absence
+                    if($absence) {
+                        //update absence
 
-                    $update = $this->absences->update($absence->id, $data);
+                        $update = $this->absences->update($absence->id, $data);
 
-                    if($update) {
-                        $checkUpdate++;
+                        if($update) {
+                            $checkUpdate++;
+                        }
+
+                    } else {
+                        // store absence
+
+                        $store = $this->absences->create($data);
+                        if($store) {
+                            $checkStore++;
+
+                        }
                     }
 
                 } else {
-                    // store absence
-
-                    $store = $this->absences->create($data);
-                    if($store) {
-                        $checkStore++;
-
-                    }
+                    $checkNOTUpdatOrStore++;
                 }
             }
         }
 
-        if($checkStore+$checkUpdate == count($baseData)) {
+        if($checkStore+$checkUpdate == count($baseData)- $checkNOTUpdatOrStore) {
             $reDrawTable = $this->handsonTableData($data['course_annual_id']);
             return $reDrawTable;
         }
 
     }
-
 
     public function deleteScoreFromScorePercentage(Request $request) {
 
@@ -1377,6 +1391,42 @@ class CourseAnnualController extends Controller
         }
 
 //        dd($studentScores);
+    }
+
+
+//    --------------course annual score evaluation ---------------
+
+
+    public function formScoreEvaluation(Request $request) {
+        $deptId = $request->department_id;
+        $degreeId = $request->degree_id;
+        $gradeId = $request->grade_id;
+        $academicYearID = $request->academic_year_id;
+        $courseAnnuals = $this->getCourseAnnually();
+
+        if($deptId) {
+            $courseAnnuals = $courseAnnuals->where('departments.id', '=',$deptId);
+        }
+        if($academicYearID) {
+            $courseAnnuals = $courseAnnuals->where('course_annuals.academic_year_id', '=',$academicYearID);
+        }
+        if($degreeId) {
+            $courseAnnuals = $courseAnnuals->where('course_annuals.degree_id', '=',$degreeId);
+        }
+        if($gradeId) {
+            $courseAnnuals = $courseAnnuals->where('course_annuals.grade_id', '=',$gradeId);
+        }
+
+        $courseAnnuals = $courseAnnuals->get();
+
+        dd($courseAnnuals);
+
+        $students = $this->getStudentByDeptIdGradeIdDegreeId($deptId, $degreeId, $gradeId, $academicYearID);
+
+
+        return view('backend.course.courseAnnual.includes.form_evaluation_score_courses_annual', compact('students'));
+
+//        dd($students);
     }
 
 

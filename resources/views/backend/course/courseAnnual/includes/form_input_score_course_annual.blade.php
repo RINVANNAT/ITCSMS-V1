@@ -308,6 +308,7 @@
             margin-top: 0;
         }
 
+
     </style>
 
 @endsection
@@ -349,13 +350,9 @@
 
 @section('after-scripts-end')
 
-    {!! Html::style('plugins/handsontable/handsontable.full.css') !!}
-    {!! Html::style('plugins/handsontable/handsontable.full.min.css') !!}
-    {!! Html::script('plugins/handsontable/handsontable.full.js') !!}
+    {!! Html::style('plugins/handsontable-test/handsontable.full.min.css') !!}
+    {!! Html::script('plugins/handsontable-test/handsontable.full.min.js') !!}
     {!! Html::script('plugins/jpopup/jpopup.js') !!}
-
-
-
 
     {{--myscript--}}
 
@@ -432,11 +429,11 @@
             rowHeaders: true,
             manualColumnMove: true,
             filters: true,
-            contextMenu: false,
+//            contextMenu: true,
             autoWrapRow: true,
             minSpareRows: true,
-            height:1500,
-            width:1800,
+            height:800,
+            width:700,
             filters: true,
             dropdownMenu: ['filter_by_condition', 'filter_action_bar'],
             className: "htLeft",
@@ -755,6 +752,33 @@
                                     }
 
                                 }
+
+                                if(key == 'freeze') {
+
+                                    if(hotInstance.getSelected()) {
+
+                                        var colIndex = hotInstance.getSelected()[1];
+                                        setting.fixedColumnsLeft = colIndex+1;
+                                        setting.manualColumnFreeze = true;
+                                        hotInstance = new Handsontable(jQuery("#score_table")[0], setting);
+                                    }
+
+
+
+
+                                }
+
+                                if(key == 'un_freeze') {
+
+                                    if(hotInstance.getSelected()) {
+                                        var colIndex = hotInstance.getSelected()[1];
+                                        setting.manualColumnFreeze = false;
+                                        delete setting.fixedColumnsLeft;
+                                        console.log(setting);
+                                        hotInstance = new Handsontable(jQuery("#score_table")[0], setting);
+
+                                    }
+                                }
                             },
                             items: {
 //                                "cellcolor": {
@@ -763,9 +787,12 @@
 //                                "rowcolor": {
 //                                    name: 'Row color'
 //                                },
-//                                "colcolor": {
-//                                    name: 'Column color'
-//                                },
+                                "freeze": {
+                                   name: '<span><i class="fa fa-fire"> Freeze This Column </i></span>'
+                                },
+                                "un_freeze": {
+                                    name: '<span><i class="fa fa-leaf"> Unfreeze This Column </i></span>'
+                                },
                                 "deletecol": {
                                     name: '<span><i class="fa fa-trash"> Delete Column</i></span>'
                                 },
