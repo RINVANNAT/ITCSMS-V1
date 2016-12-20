@@ -168,7 +168,8 @@ class StudentAnnualController extends Controller
         $histories = History::lists('name_en','id');
         $redoubles = Redouble::lists('name_en','id');
         $department_options = DepartmentOption::lists('code','id');
-        return view('backend.studentAnnual.edit',compact('studentAnnual','departments','promotions','degrees','grades','genders','histories','scholarships','highSchools','origins','academic_years','redoubles','department_options'));
+        $smis_server = Configuration::where("key","smis_server")->first();
+        return view('backend.studentAnnual.edit',compact('smis_server','studentAnnual','departments','promotions','degrees','grades','genders','histories','scholarships','highSchools','origins','academic_years','redoubles','department_options'));
 
     }
 
