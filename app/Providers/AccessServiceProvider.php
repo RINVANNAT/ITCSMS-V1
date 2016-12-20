@@ -269,6 +269,11 @@ class AccessServiceProvider extends ServiceProvider
             \App\Repositories\Backend\Average\AverageRepositoryContract::class,
             \App\Repositories\Backend\Average\EloquentAverageRepository::class
         );
+
+        $this->app->bind(
+            \App\Repositories\Backend\Configuration\ConfigurationRepositoryContract::class,
+            \App\Repositories\Backend\Configuration\EloquentConfigurationRepository::class
+        );
         /*---------------------------------------
             binding For Module score
         ----------------------------------------*/

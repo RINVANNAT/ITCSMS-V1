@@ -12,6 +12,7 @@ use App\Http\Requests\Backend\Student\UpdateStudentRequest;
 use App\Http\Requests\Backend\Student\GenerateStudentGroupRequest;
 use App\Http\Requests\Backend\Student\GenerateStudentIDCardRequest;
 use App\Models\AcademicYear;
+use App\Models\Configuration;
 use App\Models\Degree;
 use App\Models\Department;
 use App\Models\DepartmentOption;
@@ -131,6 +132,7 @@ class StudentAnnualController extends Controller
      */
     public function show($id)
     {
+        $smis_server = Configuration::where("key","smis_server")->first();
         $studentAnnual = $this->students->findOrThrowException($id);
 
         $student = Student::with(['studentAnnuals','studentAnnuals.scholarships','gender','origin','studentAnnuals.department',
@@ -138,7 +140,7 @@ class StudentAnnualController extends Controller
             ->find($studentAnnual->student_id);
 
         //dd($student);
-        return view('backend.studentAnnual.popup_show',compact('student'));
+        return view('backend.studentAnnual.popup_show',compact('student','smis_server'));
     }
 
     /**

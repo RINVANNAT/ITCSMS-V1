@@ -11,6 +11,7 @@ use App\Models\Student;
 use App\Models\StudentAnnual;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
+use Psy\Configuration;
 
 /**
  * Class EloquentStudentAnnualRepository
@@ -330,6 +331,11 @@ class EloquentStudentAnnualRepository implements StudentAnnualRepositoryContract
     {
         $studentAnnual = $this->findOrThrowException($id);
 
+        $smis_ftp_server = \App\Models\Configuration::where('key',"smis_ftp_server")->first();
+        $smis_ftp_server_user = \App\Models\Configuration::where('key',"smis_ftp_server_user")->first();
+        $smis_ftp_server_pwd = \App\Models\Configuration::where('key',"smis_ftp_server_pwd")->first();
+        $smis_ftp_server_path = \App\Models\Configuration::where('key',"smis_ftp_server_path")->first();
+
         $input = $request->all();
         //$last_academic_year = AcademicYear::orderBy('id','desc')->first();
 
@@ -346,10 +352,11 @@ class EloquentStudentAnnualRepository implements StudentAnnualRepositoryContract
             );
 
             // After transferring to this server, move it immediately to smis server
-            $connection = ftp_connect(config('app.smis_ftp_server'));
-            $login = ftp_login($connection, "vagrant", "hope1986");
+            $connection = ftp_connect($smis_ftp_server->value);
+            $login = ftp_login($connection, $smis_ftp_server_user->value, $smis_ftp_server_pwd->value);
             if (!$connection || !$login) { die('Connection attempt failed!'); }
-            ftp_put($connection, "/Code/smis/public/img/profiles/".$imageName, base_path() . '/public/img/profiles/'.$imageName, FTP_BINARY);
+            //ftp_put($connection, "/Code/smis/public/img/profiles/".$imageName, base_path() . '/public/img/profiles/'.$imageName, FTP_BINARY);
+            ftp_put($connection, $smis_ftp_server_path->value.$imageName, base_path() . '/public/img/profiles/'.$imageName, FTP_BINARY);
             ftp_close($connection);
 
         } else {

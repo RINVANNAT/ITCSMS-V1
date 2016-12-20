@@ -21,12 +21,12 @@ class ConfigurationController extends Controller
     /**
      * @param ConfigurationRepositoryContract $configurationRepo
      */
-//    public function __construct(
-//        ConfigurationRepositoryContract $configurationRepo
-//    )
-//    {
-//        $this->configurations = $configurationRepo;
-//    }
+    public function __construct(
+        ConfigurationRepositoryContract $configurationRepo
+    )
+    {
+        $this->configurations = $configurationRepo;
+    }
 
     /**
      * Display a listing of the resource.
@@ -73,7 +73,7 @@ class ConfigurationController extends Controller
         $configuration->create_uid = auth()->id();
 
         if ($configuration->save()) {
-            return redirect()->route('admin.configurations.index')->withFlashSuccess(trans('alerts.backend.general.created'));
+            return redirect()->route('admin.configuration.configurations.index')->withFlashSuccess(trans('alerts.backend.general.created'));
         }
 
         throw new GeneralException(trans('exceptions.backend.configuration.create_error'));
@@ -100,7 +100,7 @@ class ConfigurationController extends Controller
     {
         $configuration = $this->configurations->findOrThrowException($id);
 
-        return view('backend.configuration.configuration.edit',compact('configuration'));
+        return view('backend.configuration.edit',compact('configuration'));
     }
 
     /**
@@ -113,7 +113,7 @@ class ConfigurationController extends Controller
     public function update(UpdateConfigurationRequest $request, $id)
     {
         $this->configurations->update($id, $request->all());
-        return redirect()->route('admin.configuration.index')->withFlashSuccess(trans('alerts.backend.generals.updated'));
+        return redirect()->route('admin.configuration.configurations.index')->withFlashSuccess(trans('alerts.backend.generals.updated'));
     }
 
     /**
@@ -125,7 +125,7 @@ class ConfigurationController extends Controller
     public function destroy($id)
     {
         $this->configurations->destroy($id);
-        return redirect()->route('admin.configuration.index')->withFlashSuccess(trans('alerts.backend.generals.deleted'));
+        return redirect()->route('admin.configuration.configurations.index')->withFlashSuccess(trans('alerts.backend.generals.deleted'));
     }
 
     public function data()

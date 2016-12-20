@@ -22,7 +22,7 @@
                     <center>
                         <img style="width: 4cm;padding: 3px;border: 3px solid #d2d6de;"
                              class="profile-user-img img-responsive"
-                             src="{{(isset($studentAnnual) && !empty($studentAnnual->student->photo))?config('app.smis_server')."/img/profiles/".$studentAnnual->student->photo:url('img/profiles/avatar.png')}}" alt="User profile picture">
+                             src="{{(isset($studentAnnual) && !empty($studentAnnual->student->photo))?$smis_server->value."/img/profiles/".$studentAnnual->student->photo:url('img/profiles/avatar.png')}}" alt="User profile picture">
                              {{--src="{{(isset($studentAnnual) && !empty($studentAnnual->student->photo))?url('img/profiles/'.$studentAnnual->student->photo):url('img/profiles/avatar.png')}}" alt="User profile picture"> --}}
                         </img>
                         <div style="width: 5cm;">
