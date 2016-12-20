@@ -724,6 +724,7 @@
                                                closeOnConfirm: true
                                            }, function(confirmed) {
                                                if (confirmed) {
+                                                   console.log(confirmed);
 
                                                    $.ajax({
                                                        type: 'DELETE',
