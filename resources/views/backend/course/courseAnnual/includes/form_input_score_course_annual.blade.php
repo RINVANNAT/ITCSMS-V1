@@ -427,6 +427,11 @@
         // this is the property of the handson table / or configuration
 
 
+        $(window).on('load resize', function(){
+
+            table_size = $('.box-body').width();
+        });
+
         var table_size;
         var setting = {
             rowHeaders: true,
