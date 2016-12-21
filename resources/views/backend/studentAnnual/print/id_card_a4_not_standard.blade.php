@@ -195,7 +195,7 @@
             <div class="page">
 
                 @foreach($rows as $row)
-                    <div class="row" style="margin:0px; padding-top: 2mm !important;">
+                    <div class="row" style="margin:0px; padding-left: 10mm !important;padding-top: 2mm !important;">
                         @foreach($row as $front)
                             <?php $front = (object)$front; ?>
 
@@ -248,7 +248,7 @@
 
                 @foreach($rows as $row)
 
-                    <div class="row" style="margin:0px; padding-top: 2mm !important;">
+                    <div class="row" style="margin:0px; padding-top: 2mm !important; padding-right: 12mm !important;">
                         <?php $row = array_reverse($row); //dd($row);?>
                         @foreach($row as $back)
 
