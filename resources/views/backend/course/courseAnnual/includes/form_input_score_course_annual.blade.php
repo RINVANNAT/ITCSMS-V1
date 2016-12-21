@@ -358,24 +358,33 @@
 
     <script>
 
+
+
         function ajaxRequest (method, baseUrl, baseData) {
-            $.ajax({
+            var result=null;
+            var ajax = $.ajax(result,{
                 type: method,
                 url: baseUrl,
                 data: baseData,
                 dataType: "json",
-                success: function(resultData) {
+                done: function(resultData) {
+                    result = resultData;
                     if(resultData.status == true) {
 
+
+
                         cellScoreChanges=[];
-                        cellIndex = [{}];
-                        notify('success', 'info', resultData.message);
+                        cellIndex = [];
+//                        notify('success', 'info', resultData.message);
 
                     } else {
-                        notify('error', 'info', resultData.message);
+                        return resultData;
+//                        notify('error', 'info', resultData.message);
                     }
                 }
+
             });
+
         }
 
         var hotInstance;// declaration of handsontable object
@@ -384,8 +393,12 @@
         var cellScoreChanges=[]; // when make changes on every score columns
         var sentrow, sentcol; // not use
         var cellIndex=[]; // to get each col and row and check value with colorRenderer
-
-
+        var colDataArray = []; // column score data key=>value use to pass data to server
+        function declareColumnHeaderDataEmpty() {
+            for(var i = 5; i < setting.colHeaders.length -1 ; i++) {
+                colDataArray[setting.colHeaders[i]] = [];
+            }
+        }
         var colorRenderer = function ( instance, td, row, col, prop, value, cellProperties) {
 
             Handsontable.renderers.TextRenderer.apply(this, arguments);
@@ -493,24 +506,12 @@
                                 var baseData = {
                                     score_id: rowData[score_id],
                                     score: newValue,
-//                                    percentage: parseInt(pourcent[pourcent.length-1]),
-//                                    student_annual_id: rowData.student_annual_id,
-//                                    department_id:      rowData.department_id,
-//                                    degree_id:          rowData.degree_id,
-//                                    grade_id:           rowData.grade_id,
-//                                    academic_year_id :  rowData.academic_year_id,
-//                                    semester_id:        rowData.semester_id,
-                                    {{--course_annual_id: '{{$courseAnnualID}}',--}}
-//                                    percentage_id:      rowData[percentage_id],
                                     score_absence:      rowData.absence
                                 }
-                            }
-                            if(oldValue != newValue){
-                                cellScoreChanges.push(baseData);
-                            }
+                                colDataArray[columnIndex].push(baseData) // cell changes data by each column score use to pass data to server
+                                cellScoreChanges.push(baseData); // use this cell score change to test if user has made any changes
 
-                            console.log(baseData);
-//                            ajaxRequest('POST', url, baseData);
+                            }
                         }
 
                         if(columnIndex == 'num_absence') {
@@ -636,6 +637,7 @@
                                 setting.colHeaders = resultData.columnHeader;
                                 setting.columns = resultData.columns;
                                 hotInstance = new Handsontable(jQuery("#score_table")[0], setting);
+                                declareColumnHeaderDataEmpty();
                                 $('#popup').hide();
                             }
                         });
@@ -658,6 +660,9 @@
                     setting.data = resultData.data;
                     setting.colHeaders = resultData.columnHeader;
                     setting.columns = resultData.columns;
+                    // loop for declaring array key of columns score with empty value ---> then we will push the cell score change for updating score value--> this idea is to reduce the amount of parametter that pass to the server
+                    declareColumnHeaderDataEmpty();
+
                     hotInstance = new Handsontable(jQuery("#score_table")[0], setting);
 
 
@@ -858,14 +863,54 @@
                 }, function(confirmed) {
                     if (confirmed) {
 
-                        if(cellScoreChanges.length > 0) {
+                        if(cellScoreChanges.length > 0) {// save each score
 
-                            var baseUrl = '{{route('admin.course.save_score_course_annual')}}';
-                            ajaxRequest('POST', baseUrl, baseData={data:cellScoreChanges});
+                            //recursive function fo send the request by the column data array
+                            function sendRequest (index, message) {
+
+                                var baseUrl = '{{route('admin.course.save_score_course_annual')}}';
+
+                                if(index < setting.colHeaders.length -1) {
+
+                                    if(colDataArray[setting.colHeaders[index]].length > 0 ) {
+                                        $.ajax({
+                                            type: 'POST',
+                                            url: baseUrl,
+                                            data: {data:colDataArray[setting.colHeaders[index]]},
+                                            dataType: "json",
+                                            success: function(data) {
+                                                console.log(data);
+                                                if(data.status) {
+                                                    console.log(data);
+                                                    cellScoreChanges=[];
+                                                    cellIndex = [];
+                                                    index++;
+                                                    message= data.message;
+                                                    sendRequest(index);
+                                                } else {
+                                                    notify('error', data.message, 'Alert');
+                                                }
+                                            }
+                                        })
+                                    } else {
+                                        index++;
+                                        sendRequest(index, message);
+                                    }
+                                } else {
+                                    notify('success', 'Score Saved!', 'Info');
+                                    cellScoreChanges=[];
+                                    cellIndex = [];
+                                }
+                            }
+                            var index = 5;
+                            var message = null;
+                            sendRequest(index, message);
+                            cellScoreChanges=[];
                             cellIndex = [];
+
                         }
 
-                        if(cellChanges.length > 0) {
+                        if(cellChanges.length > 0) { // save each number absence
                             $.ajax({
                                 type: 'POST',
                                 url: url,
@@ -907,49 +952,53 @@
 
         $('#get_average').on('click', function() {
 
+           var check = false;
 
-            if(cellChanges.length > 0 || cellScoreChanges.length > 0) {
-                notify('error', 'info', 'Please Save Your Changes Before Getting Average!!!')
-            } else {
+            if(check) {
+                if(cellChanges.length > 0 || cellScoreChanges.length > 0) {
+                    notify('error', 'info', 'Please Save Your Changes Before Getting Average!!!')
+                } else {
 
-                console.log(setting.data);
 
+                    var Baseurl = '{{route('admin.course.get_average_score', $courseAnnualID)}}';
 
-                var Baseurl = '{{route('admin.course.get_average_score', $courseAnnualID)}}';
+                    swal({
+                        title: "Confirm",
+                        text: "Calculate Score?",
+                        type: "info",
+                        showCancelButton: true,
+                        confirmButtonColor: "#DD6B55",
+                        confirmButtonText: "Yes",
+                        closeOnConfirm: true
+                    }, function(confirmed) {
+                        if (confirmed) {
 
-                swal({
-                    title: "Confirm",
-                    text: "Calculate Score?",
-                    type: "info",
-                    showCancelButton: true,
-                    confirmButtonColor: "#DD6B55",
-                    confirmButtonText: "Yes",
-                    closeOnConfirm: true
-                }, function(confirmed) {
-                    if (confirmed) {
+                            $.ajax({
+                                type: 'POST',
+                                url: Baseurl,
+                                data: {data: setting.data, colHeader:setting.colHeaders},
+                                dataType: "json",
+                                success: function(resultData) {
 
-                        $.ajax({
-                            type: 'POST',
-                            url: Baseurl,
-                            data: {data: setting.data, colHeader:setting.colHeaders},
-                            dataType: "json",
-                            success: function(resultData) {
-
-                                notify('success', 'info', 'Score Calculated!!');
-                                setting.data = resultData.data;
-                                setting.colHeaders = resultData.columnHeader;
-                                setting.columns = resultData.columns;
-                                hotInstance = new Handsontable(jQuery("#score_table")[0], setting);
-                                cellIndex=[];
+                                    notify('success', 'info', 'Score Calculated!!');
+                                    setting.data = resultData.data;
+                                    setting.colHeaders = resultData.columnHeader;
+                                    setting.columns = resultData.columns;
+                                    hotInstance = new Handsontable(jQuery("#score_table")[0], setting);
+                                    cellIndex=[];
 
 //                                alert('Redraw Table');
-                            }
-                        });
+                                }
+                            });
 
 
-                    }
-                });
+                        }
+                    });
+                }
             }
+
+
+
         })
 
     </script>

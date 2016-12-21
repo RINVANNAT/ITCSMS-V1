@@ -1032,12 +1032,16 @@ class CourseAnnualController extends Controller
             $scoreAbsence = $this->getAbsenceFromDB($courseAnnual->id, $student->student_annual_id);
             //get total score of one course from DB
 
-            $totalScore = $this->averages->findAverageByCourseIdAndStudentId($courseAnnual->id, $student->student_annual_id);
-
+//            $totalScore = $this->averages->findAverageByCourseIdAndStudentId($courseAnnual->id, $student->student_annual_id);
+            $totalScore = 0;
             if($studentScore) {
+
+//                dd($studentScore);
+
 
                 foreach($studentScore as $score) {
 
+                    $totalScore = $totalScore + (($score->score * $score->percent)/100);
                     $scoreData[$score->name] = $score->score;
                     $scoreData['percentage_id'.'_'.$score->name] =  $score->percentage_id;
                     $scoreData['score_id'.'_'.$score->name]=$score->score_id;
@@ -1054,7 +1058,8 @@ class CourseAnnualController extends Controller
                 'student_gender' => $student->code,
                 'absence'          => isset($scoreAbsence) ? 10-$scoreAbsence->num_absence:10,
                 'num_absence'      => isset($scoreAbsence) ? $scoreAbsence->num_absence:0,
-                'average'          => isset($totalScore) ? (float)$totalScore->average: null,
+//                'average'          => isset($totalScore) ? (float)$totalScore->average: null,
+                'average'          => $totalScore,
 
                 'department_id'    => $courseAnnual->department_id,
                 'degree_id'        => $courseAnnual->degree_id,
@@ -1088,12 +1093,16 @@ class CourseAnnualController extends Controller
         $inputs = $request->data;
         $checkUpdate = 0;
         $checkNotUpdated = 0;
+        $score = $this->courseAnnualScores->findOrThrowException($inputs[0]['score_id']);
+
+//        dd($score->course_annual_id);
 
         if($inputs) {
             foreach($inputs as $input) {
 
                 if($input['score_id'] != null) {
                     $updateScore = $this->courseAnnualScores->update($input['score_id'], $input);
+//                    $updateScore =[];
 
                     if($updateScore) {
                         $checkUpdate++;
@@ -1106,9 +1115,16 @@ class CourseAnnualController extends Controller
 
         if($checkUpdate == count($inputs) - $checkNotUpdated) {
 
-            return Response::json(['status'=>true, 'message' => 'Score Saved!!']);
-        } else{
+            $reDrawTable = $this->handsonTableData($score->course_annual_id);
+//            return $reDrawTable;
+
             return Response::json(['status'=>false, 'message' => 'Score NOt Saved!!']);
+
+//            return array('data'=> $reDrawTable, 'responseText' =>Response::json(['status'=>true, 'message' => 'Score Saved!!']));
+        } else{
+
+            return Response::json(['status'=>false, 'message' => 'Score NOt Saved!!']);
+//            return array('handsontableData'=> [], 'responseText' =>Response::json(['status'=>true, 'message' => 'Score Saved!!']));
         }
     }
 
@@ -1310,7 +1326,7 @@ class CourseAnnualController extends Controller
         $colHeaders = $request->colHeader;
         $dataArray  = $request->data;
 
-//        dd($dataArray);
+        dd($dataArray);
         $studentScores = [];
         $check =0;
         $count = 0;
@@ -1323,8 +1339,6 @@ class CourseAnnualController extends Controller
                 $scoreId = [];
 
                 for($index=0; $index< count($colHeaders); $index++) {
-
-
 
                     if($index > 4  && $index < (count($colHeaders)-1)) { // we know the exact column header of the score so this we need only the score which every teacher created
 
@@ -1398,6 +1412,7 @@ class CourseAnnualController extends Controller
 
 
     public function formScoreEvaluation(Request $request) {
+
         $deptId = $request->department_id;
         $degreeId = $request->degree_id;
         $gradeId = $request->grade_id;
