@@ -1913,7 +1913,7 @@ class StudentAnnualController extends Controller
         if($card == "PVC"){
             return view('backend.studentAnnual.print.id_card',compact('smis_server','studentAnnuals','type'));
         } else { // A4 Card
-            return view('backend.studentAnnual.print.id_card_a4',compact('smis_server','studentAnnuals','type'));
+            return view('backend.studentAnnual.print.id_card_a4_not_standard',compact('smis_server','studentAnnuals','type'));
         }
     }
 
