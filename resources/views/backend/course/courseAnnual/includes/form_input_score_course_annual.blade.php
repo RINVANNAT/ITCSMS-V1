@@ -394,11 +394,30 @@
         var sentrow, sentcol; // not use
         var cellIndex=[]; // to get each col and row and check value with colorRenderer
         var colDataArray = []; // column score data key=>value use to pass data to server
+
+        // this function is to declare global empty array and we use the empty arrays to store the data when user make change of each cell score value to pass to the sever
         function declareColumnHeaderDataEmpty() {
+            // create empty array by the columns score which user created
+            // because we want to store data cell changes by column and send them to the server by one column ...not all columns at once
             for(var i = 5; i < setting.colHeaders.length -1 ; i++) {
                 colDataArray[setting.colHeaders[i]] = [];
             }
         }
+        // use this function to update the table when success of ajax request
+        function updateSettingHandsontable(resultData) {
+            setting.data = resultData.data;
+            setting.colHeaders = resultData.columnHeader;
+            setting.columns = resultData.columns;
+            hotInstance.updateSettings({
+                data: resultData['data'],
+                colHeaders:resultData['columnHeader'],
+                columns:resultData['columns']
+            });
+        }
+
+
+        // this global variable is to tie each cell of the value the has over the limitted we will render them with specific color...this function will call by cell function
+
         var colorRenderer = function ( instance, td, row, col, prop, value, cellProperties) {
 
             Handsontable.renderers.TextRenderer.apply(this, arguments);
@@ -429,11 +448,8 @@
                         td.style.backgroundColor = '#FF8D74';
                     }
                 }
-
             }
-
         };
-
         // this is the property of the handson table / or configuration
         var table_size;
         $(window).on('load resize', function(){
@@ -503,7 +519,6 @@
                                 }
                                 colDataArray[columnIndex].push(baseData) // cell changes data by each column score use to pass data to server
                                 cellScoreChanges.push(baseData); // use this cell score change to test if user has made any changes
-
                             }
                         }
 
@@ -535,7 +550,6 @@
                         }
                     });
                 }
-
             },
 
             beforeChange: function (changes, source) {
@@ -547,7 +561,6 @@
                 cellIndex.push({ row: rowIndex,col: columnIndex });
 
             }
-
         };
 
         $('#add_column').on('click', function(e) {
@@ -626,17 +639,13 @@
                             data: baseData,
                             dataType: "json",
                             success: function(resultData) {
-                                setting.data = resultData.data;
-                                setting.colHeaders = resultData.columnHeader;
-                                setting.columns = resultData.columns;
-                                hotInstance = new Handsontable(jQuery("#score_table")[0], setting);
+                                updateSettingHandsontable(resultData);
                                 declareColumnHeaderDataEmpty();
                                 $('#popup').hide();
                             }
                         });
                     }
                 });
-
         }
 
         $('document').ready(function() {
@@ -736,13 +745,8 @@
                                                        data: baseData,
                                                        dataType: "json",
                                                        success: function(resultData) {
-
                                                            notify('success', 'info', 'Score Deleted!!');
-                                                           setting.data = resultData.data;
-                                                           setting.colHeaders = resultData.columnHeader;
-                                                           setting.columns = resultData.columns;
-                                                           hotInstance = new Handsontable(jQuery("#score_table")[0], setting);
-
+                                                           updateSettingHandsontable(resultData);
                                                        }
                                                    });
 
@@ -784,7 +788,10 @@
                                 function freezeColumn(column) {
                                     setting.fixedColumnsLeft = column+1;
                                     setting.manualColumnFreeze = true;
-                                    hotInstance = new Handsontable(jQuery("#score_table")[0], setting);
+                                    hotInstance.updateSettings({
+                                        fixedColumnsLeft: column + 1,
+                                        manualColumnFreeze: true
+                                    });
                                 }
 
                                 function unfreezeColumn(column) {
@@ -795,7 +802,6 @@
                                         return; // not fixed
                                     }
                                     removeFixedColumn(column+1);
-                                    hotInstance = new Handsontable(jQuery("#score_table")[0], setting);
                                 }
 
                                 function removeFixedColumn(column) {
@@ -839,7 +845,6 @@
 
         });
 
-
         $('#save_editted_score').on('click', function() {
 
             var url = '{{route('admin.course.save_number_absence')}}';
@@ -871,17 +876,13 @@
                                             url: baseUrl,
                                             data: {data:colDataArray[setting.colHeaders[index]]},
                                             dataType: "json",
-                                            success: function(data) {
-                                                console.log(data);
-                                                if(data.status) {
-                                                    console.log(data);
-                                                    cellScoreChanges=[];
-                                                    cellIndex = [];
+                                            success: function(resultData) {
+                                                if(resultData.status) {
                                                     index++;
-                                                    message= data.message;
+                                                    updateSettingHandsontable(resultData.handsontableData);
                                                     sendRequest(index);
                                                 } else {
-                                                    notify('error', data.message, 'Alert');
+                                                    notify('error', resultData.message, 'Alert');
                                                 }
                                             }
                                         })
@@ -891,8 +892,6 @@
                                     }
                                 } else {
                                     notify('success', 'Score Saved!', 'Info');
-                                    cellScoreChanges=[];
-                                    cellIndex = [];
                                 }
                             }
                             var index = 5;
@@ -930,7 +929,6 @@
             }
         })
 
-
         window.onbeforeunload = function(e){
 
             if(cellChanges.length > 0) {
@@ -940,8 +938,6 @@
                 return 'You have not yet save your changes!!';
             }
         };
-
-
 
         $('#get_average').on('click', function() {
 
