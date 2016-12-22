@@ -1034,23 +1034,35 @@ class CourseAnnualController extends Controller
 
 //            $totalScore = $this->averages->findAverageByCourseIdAndStudentId($courseAnnual->id, $student->student_annual_id);
             $totalScore = 0;
+            $scoreIds = []; // there are many score type for one subject and one student :example TP, Midterm, Final-exam
             if($studentScore) {
 
 //                dd($studentScore);
-
-
                 foreach($studentScore as $score) {
 
                     $totalScore = $totalScore + (($score->score * $score->percent)/100);
                     $scoreData[$score->name] = $score->score;
                     $scoreData['percentage_id'.'_'.$score->name] =  $score->percentage_id;
                     $scoreData['score_id'.'_'.$score->name]=$score->score_id;
+                    $scoreIds[] = $score->score_id;
 
                 }
 
             } else{
                 $scoreData=[];
             }
+
+            /*------store average(a total score of one courseannual in table averages)-----------*/
+
+            $input = [
+                'course_annual_id' => $courseAnnualId,
+                'student_annual_id' => $student->student_annual_id,
+                'average'   => $totalScore
+            ];
+            $storeTotalScore = $this->storeTotalScoreEachCourseAnnual($input, $scoreIds); // private function to store of update total score
+
+            /*------------end of insert of update total score -------------*/
+
             $element = array(
                 'student_annual_id'=>$student->student_annual_id,
                 'student_id_card' => $student->id_card,
@@ -1069,6 +1081,7 @@ class CourseAnnualController extends Controller
                 'employee_id'      => $courseAnnual->employee_id,
             );
 
+
             $mergerData = array_merge($element,$scoreData);
 
 
@@ -1077,7 +1090,7 @@ class CourseAnnualController extends Controller
 
 
 //        dd($arrayData);
-        return Response::json([
+        return json_encode([
             'data' => $arrayData,
             'columnHeader' => $columnHeader,
             'columns'      =>$columns
@@ -1116,15 +1129,12 @@ class CourseAnnualController extends Controller
         if($checkUpdate == count($inputs) - $checkNotUpdated) {
 
             $reDrawTable = $this->handsonTableData($score->course_annual_id);
-//            return $reDrawTable;
+            $reDrawTable =  json_decode($reDrawTable, true);
 
-            return Response::json(['status'=>true, 'message' => 'Score Saved!!']);
-
-//            return array('data'=> $reDrawTable, 'responseText' =>Response::json(['status'=>true, 'message' => 'Score Saved!!']));
+            return Response::json(['handsontableData' => $reDrawTable,'status'=>true, 'message' => 'Score Saved!!']);
         } else{
 
-            return Response::json(['status'=>false, 'message' => 'Score NOt Saved!!']);
-//            return array('handsontableData'=> [], 'responseText' =>Response::json(['status'=>true, 'message' => 'Score Saved!!']));
+            return Response::json(['handsontableData' => [],'status'=>false, 'message' => 'Score NOt Saved!!']);
         }
     }
 
@@ -1392,7 +1402,7 @@ class CourseAnnualController extends Controller
                     }
                 }
 
-                $studentScores[$data['student_annual_id']][] = $totalScore;
+                $studentScores[$data['student_annual_id']][] = $totalScore;// if we wan to get array of total scores in one subject
             }
         }
 
@@ -1406,6 +1416,52 @@ class CourseAnnualController extends Controller
 
 //        dd($studentScores);
     }
+
+
+    private function storeTotalScoreEachCourseAnnual($input,$scoreIds) {
+
+
+        $totalScore = $this->averages->findAverageByCourseIdAndStudentId($input['course_annual_id'], (int)$input['student_annual_id']);// check if total score existe
+        $check=false;
+        if($totalScore) {
+            //update calcuation total score
+            $UpdateAverage = $this->averages->update($totalScore->id, $input);
+            if($UpdateAverage) {
+                $check = true;
+            }
+
+        } else {
+            // insert new calculation score
+            $storeAverage = $this->averages->create($input); // store total score then return collection-with ID
+
+            if($storeAverage) {
+                // this is to store the relation table
+                $checkRelation =0;
+                foreach($scoreIds as $score_id) {
+                    $storeRelationTable = $this->averages->storeTableRelation($storeAverage->id, $score_id);
+                    if($storeRelationTable) {
+                        $checkRelation++;
+                    }
+                }
+
+                if($checkRelation == count($scoreIds) ) {
+                    $check =true;
+                }
+            }
+        }
+
+        if($check == true) {
+            return true;
+        } else {
+            return false;
+        }
+
+    }
+
+
+
+
+
 
 
 //    --------------course annual score evaluation ---------------
