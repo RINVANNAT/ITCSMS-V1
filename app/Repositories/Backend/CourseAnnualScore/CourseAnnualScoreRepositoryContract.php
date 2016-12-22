@@ -39,4 +39,7 @@ interface CourseAnnualScoreRepositoryContract
      * @return mixed
      */
     public function destroy($id);
+
+
+    public function findScoreId($courseAnnualId, $studentAnnualId);
 }

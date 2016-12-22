@@ -466,17 +466,22 @@
             width: table_size,
             filters: true,
             dropdownMenu: ['filter_by_condition', 'filter_action_bar'],
+//            hiddenColumns: {
+//                columns: [0],
+//                indicators: true
+//            },
             className: "htLeft",
             cell: celldata,
             cells: function (row, col, prop) {
 
-                this.renderer = colorRenderer;
+
                 if (row === sentrow) {
                     this.renderer = colorRenderer;
                 }
                 if (col === sentcol) {
                     this.renderer = colorRenderer;
                 }
+                this.renderer = colorRenderer;
             },
             afterChange: function (changes, source) {
 
@@ -488,42 +493,31 @@
                         var columnIndex = change[1];
                         var oldValue = change[2];
                         var newValue = change[3];
-                        var cellChange = {
-                            'rowIndex': rowIndex,
-                            'columnIndex': columnIndex
-                        };
-
+                        var tableData = setting.data;
                         if(columnIndex != 'num_absence') {
-                            var rowData = setting.data[rowIndex];
-                            {{--var url = '{{route('admin.course.save_score_course_annual')}}';--}}
-                            var pourcent = columnIndex.split('-');
-                            if(columnIndex == 'absence') {
-                                var baseData = {
-                                    score: newValue,
-                                    percentage: 10,
-                                    student_annual_id:  rowData.student_annual_id,
-                                    department_id:      rowData.department_id,
-                                    degree_id:          rowData.degree_id,
-                                    grade_id:           rowData.grade_id,
-                                    academic_year_id :  rowData.academic_year_id,
-                                    semester_id:        rowData.semester_id,
-                                    course_annual_id: '{{$courseAnnualID}}'
-                                }
-                            } else {
-                                var percentage_id = 'percentage_id_'+columnIndex;
-                                var score_id = 'score_id_'+columnIndex;
-                                var baseData = {
-                                    score_id: rowData[score_id],
-                                    score: newValue,
-                                    score_absence:      rowData.absence
-                                }
-                                colDataArray[columnIndex].push(baseData) // cell changes data by each column score use to pass data to server
-                                cellScoreChanges.push(baseData); // use this cell score change to test if user has made any changes
+
+                            var rowData = hotInstance.getData();
+                            var element={};
+                            var score_id = 'score_id'+'_'+columnIndex;
+                            for(var keyIndex=0; keyIndex< tableData.length; keyIndex++) {
+                                $.each(tableData[keyIndex],function(i, value){
+//                                    console.log(index+'--->'+value);
+                                    if(rowData[rowIndex][0] == value) {
+                                        element = {
+                                            score_id: tableData[keyIndex][score_id],
+                                            score: newValue,
+                                            score_absence: tableData[keyIndex]['absence'],
+                                            course_annual_id: '{{$courseAnnualID}}'
+                                        };
+                                    }
+                                });
+
                             }
+                            colDataArray[columnIndex].push(element) // cell changes data by each column score use to pass data to server
+                            cellScoreChanges.push(element); // use this cell score change to test if user has made any changes
                         }
 
                         if(columnIndex == 'num_absence') {
-
                             var arrayAbsence=[];
                             var rowData = setting.data[rowIndex];
 
@@ -537,11 +531,6 @@
                                 semester_id:        rowData.semester_id,
                                 course_annual_id: '{{$courseAnnualID}}'
                             }
-
-                            var cellChange = {
-                                'rowIndex': rowIndex,
-                                'columnIndex': columnIndex
-                            };
 
                             if(oldValue != newValue){
                                 cellChanges.push(baseData);
@@ -671,37 +660,12 @@
                     hotInstance.updateSettings({
                         contextMenu: {
                             callback: function (key, options) {
-                                if (key === 'cellcolor') {
-                                    setTimeout(function () {
-                                        //timeout is used to make sure the menu collapsed before alert is shown
-                                        var row = hotInstance.getSelected()[0];
-                                        var col = hotInstance.getSelected()[1];
 
-                                        var item = {};
-                                        item.row = row;
-                                        item.col = col;
-                                        item.renderer = colorRenderer
-                                        celldata.push(item)
-
-                                        hotInstance.updateSettings({cell: celldata});
-                                        hotInstance.render();
-
-                                    }, 100);
-                                }
                                 if (key === 'rowcolor') {
                                     setTimeout(function () {
                                         //timeout is used to make sure the menu collapsed before alert is shown
                                         var row = hotInstance.getSelected()[0];
                                         sentrow = row;
-                                        hotInstance.render();
-
-                                    }, 100);
-                                }
-                                if (key === 'colcolor') {
-                                    setTimeout(function () {
-                                        //timeout is used to make sure the menu collapsed before alert is shown
-                                        var col = hotInstance.getSelected()[1];
-                                        sentcol = col;
                                         hotInstance.render();
 
                                     }, 100);
@@ -812,12 +776,9 @@
                                 }
                             },
                             items: {
-//                                "cellcolor": {
-//                                    name: 'Cell color'
-//                                },
-//                                "rowcolor": {
-//                                    name: 'Row color'
-//                                },
+                                "rowcolor": {
+                                    name: 'Row color'
+                                },
                                 "deletecol": {
                                     name: '<span><i class="fa fa-trash"> Delete Column</i></span>'
                                 },

@@ -979,9 +979,9 @@ class CourseAnnualController extends Controller
     private function handsonTableData($courseAnnualId) {
 
         $arrayData = [];
-        $columnHeader = array('Student ID', 'Student Name', 'Gender', 'Num Absence', 'Absence-10%');
+        $columnHeader = array(/*'Student_annual_id',*/'Student ID', 'Student Name', 'Gender', 'Num Absence', 'Absence-10%');
         $columns=  array(
-
+//            ['data' => 'student_annual_id', 'readOnly'=>true],
             ['data' => 'student_id_card', 'readOnly'=>true],
             ['data' => 'student_name', 'readOnly'=>true],
             ['data' => 'student_gender', 'readOnly'=>true],
@@ -1064,7 +1064,7 @@ class CourseAnnualController extends Controller
             /*------------end of insert of update total score -------------*/
 
             $element = array(
-                'student_annual_id'=>$student->student_annual_id,
+//                'student_annual_id'=>$student->student_annual_id,
                 'student_id_card' => $student->id_card,
                 'student_name' => $student->name_latin,
                 'student_gender' => $student->code,
@@ -1101,25 +1101,20 @@ class CourseAnnualController extends Controller
 
     public function saveScoreByCourseAnnual(Request $request) {
 
-//        dd($request->data);
-
         $inputs = $request->data;
         $checkUpdate = 0;
         $checkNotUpdated = 0;
-        $score = $this->courseAnnualScores->findOrThrowException($inputs[0]['score_id']);
-
-//        dd($score->course_annual_id);
 
         if($inputs) {
             foreach($inputs as $input) {
 
                 if($input['score_id'] != null) {
                     $updateScore = $this->courseAnnualScores->update($input['score_id'], $input);
-//                    $updateScore =[];
 
                     if($updateScore) {
                         $checkUpdate++;
                     }
+
                 } else {
                     $checkNotUpdated++;
                 }
@@ -1128,7 +1123,7 @@ class CourseAnnualController extends Controller
 
         if($checkUpdate == count($inputs) - $checkNotUpdated) {
 
-            $reDrawTable = $this->handsonTableData($score->course_annual_id);
+            $reDrawTable = $this->handsonTableData($inputs[0]['course_annual_id']);
             $reDrawTable =  json_decode($reDrawTable, true);
 
             return Response::json(['handsontableData' => $reDrawTable,'status'=>true, 'message' => 'Score Saved!!']);
@@ -1458,12 +1453,6 @@ class CourseAnnualController extends Controller
 
     }
 
-
-
-
-
-
-
 //    --------------course annual score evaluation ---------------
 
 
@@ -1487,17 +1476,33 @@ class CourseAnnualController extends Controller
         if($gradeId) {
             $courseAnnuals = $courseAnnuals->where('course_annuals.grade_id', '=',$gradeId);
         }
-
+        $courseAnnuals = $courseAnnuals->where('course_annuals.semester_id', '=',1);
         $courseAnnuals = $courseAnnuals->get();
-
-        dd($courseAnnuals);
-
         $students = $this->getStudentByDeptIdGradeIdDegreeId($deptId, $degreeId, $gradeId, $academicYearID);
+
+        dd($students);
+
+
+
+
+
+
+
 
 
         return view('backend.course.courseAnnual.includes.form_evaluation_score_courses_annual', compact('students'));
 
 //        dd($students);
+    }
+
+
+    private function handsontableDataInEachSemester() {
+
+
+
+
+
+
     }
 
 

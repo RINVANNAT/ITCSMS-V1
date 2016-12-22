@@ -100,6 +100,18 @@ class EloquentCourseAnnualScoreRepository implements CourseAnnualScoreRepository
     }
 
 
+
+    public function findScoreId($courseAnnualId, $studentAnnualId) {
+
+        $score = Score::where([
+            ['course_annual_id', $courseAnnualId],
+            ['student_annual_id', $studentAnnualId]
+        ])->get();
+
+        return $score;
+    }
+
+
     public function createPercentageScore($scoreId, $percentageId) {
 
         $save = DB::table('percentage_scores')->insert([
