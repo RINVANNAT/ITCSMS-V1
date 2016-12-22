@@ -158,7 +158,7 @@
             width: 2.146in;
             height: 3.390in;
             margin-left:auto;
-            border:1px solid black;
+            border:1px solid darkgrey;
             margin-right:auto;
             float:left;
             margin-right: 2mm;
@@ -168,7 +168,7 @@
             width: 2.146in;
             height: 3.390in;
             margin-left:auto;
-            border:1px solid black;
+            border:none;
             margin-right:auto;
             float:right;
             margin-right: 2mm;
@@ -249,8 +249,8 @@
                 @foreach($rows as $row)
 
                     <div class="row" style="margin:0px; padding-top: 2mm !important; padding-right: 11mm !important;">
-                        <?php $row = array_reverse($row); //dd($row);?>
-                        @foreach($row as $back)
+                        <?php $row1 = array_reverse($row); //dd($row);?>
+                        @foreach($row1 as $back)
 
                             {{--<div class="col-sm-4 col-xs-4" style="padding:0px;">--}}
                                 <div class="page2">

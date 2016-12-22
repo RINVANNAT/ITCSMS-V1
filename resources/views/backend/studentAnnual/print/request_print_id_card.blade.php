@@ -189,6 +189,7 @@
         <div class="box-header with-border">
             <h3 class="box-title">Printing Student ID Card</h3>
             <div class="pull-right">
+
                 <input id="card_a4" type="checkbox" />
                 <label style="margin-right: 20px;">A4 Paper</label>
 
@@ -198,6 +199,7 @@
                 <div class="btn-group">
                     <button type="button" class="btn btn-default btn-sm btn-print" data-value="front"><i class="fa fa-print"></i> FRONT</button>
                     <button type="button" class="btn btn-default btn-sm btn-print" data-value="back"><i class="fa fa-print"></i> BACK</button>
+                    <button type="button" class="btn btn-default btn-sm btn-print" data-value="duplex"><i class="fa fa-print"></i> DUPLEX</button>
                 </div>
                 <button type="button" class="btn btn-warning btn-sm btn-inform-success">
                     Inform Success
