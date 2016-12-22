@@ -422,8 +422,6 @@
             } else {
                 td.style.backgroundColor = '';
             }
-
-
             //-----when the average is less than 50
             if(col == setting.colHeaders.length-1) {
                 if(value != null) {
@@ -436,16 +434,11 @@
 
         };
 
-
         // this is the property of the handson table / or configuration
-
-
+        var table_size;
         $(window).on('load resize', function(){
-
             table_size = $('.box-body').width();
         });
-
-        var table_size;
         var setting = {
             rowHeaders: true,
             manualColumnMove: true,

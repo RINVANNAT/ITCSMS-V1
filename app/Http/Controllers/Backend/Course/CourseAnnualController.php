@@ -1118,7 +1118,7 @@ class CourseAnnualController extends Controller
             $reDrawTable = $this->handsonTableData($score->course_annual_id);
 //            return $reDrawTable;
 
-            return Response::json(['status'=>false, 'message' => 'Score NOt Saved!!']);
+            return Response::json(['status'=>true, 'message' => 'Score Saved!!']);
 
 //            return array('data'=> $reDrawTable, 'responseText' =>Response::json(['status'=>true, 'message' => 'Score Saved!!']));
         } else{
