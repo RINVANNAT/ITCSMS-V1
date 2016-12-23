@@ -355,6 +355,7 @@ class CourseAnnualController extends Controller
     private function getCourseAnnually() {
 
         $courseAnnuals = DB::table('course_annuals')
+            ->join('courses', 'courses.id', '=', 'course_annuals.course_id')
             ->leftJoin('employees','course_annuals.employee_id', '=', 'employees.id')
             ->leftJoin('departments','course_annuals.department_id', '=', 'departments.id')
             ->leftJoin('degrees','course_annuals.degree_id', '=', 'degrees.id')
@@ -369,7 +370,8 @@ class CourseAnnualController extends Controller
                 'course_annuals.time_tp',
                 'course_annuals.time_td',
                 'course_annuals.time_course',
-                'course_annuals.semester_id'
+                'course_annuals.semester_id',
+                'courses.code as code'
             ]);
 
         return $courseAnnuals;
@@ -1456,12 +1458,26 @@ class CourseAnnualController extends Controller
 //    --------------course annual score evaluation ---------------
 
 
-    public function formScoreEvaluation(Request $request) {
+    public function formScoreAllCourseAnnual(Request $request) {
 
         $deptId = $request->department_id;
         $degreeId = $request->degree_id;
         $gradeId = $request->grade_id;
         $academicYearID = $request->academic_year_id;
+
+        return view('backend.course.courseAnnual.includes.form_all_score_courses_annual', compact('deptId', 'degreeId', 'gradeId', 'academicYearID'));
+
+    }
+
+
+    public function allHandsontableData(Request $request) {
+
+        $deptId = $request->dept_id;
+        $degreeId = $request->degree_id;
+        $gradeId = $request->grade_id;
+        $academicYearID = $request->academic_year_id;
+        $semesterId = $request->semester_id;
+
         $courseAnnuals = $this->getCourseAnnually();
 
         if($deptId) {
@@ -1476,32 +1492,91 @@ class CourseAnnualController extends Controller
         if($gradeId) {
             $courseAnnuals = $courseAnnuals->where('course_annuals.grade_id', '=',$gradeId);
         }
+        if($semesterId) {
+            $courseAnnuals = $courseAnnuals->where('course_annuals.semester_id', '=',$semesterId);
+        }
         $courseAnnuals = $courseAnnuals->where('course_annuals.semester_id', '=',1);
         $courseAnnuals = $courseAnnuals->get();
+
+//        dd($courseAnnuals);
         $students = $this->getStudentByDeptIdGradeIdDegreeId($deptId, $degreeId, $gradeId, $academicYearID);
 
-        dd($students);
+        $nestedHeaders =  [
+            ['Student ID', 'Student Name', 'Sexe',
+                ['label'=> 'Absents', 'colspan'=> 3]
+            ],
+            ['', '', '',
+                ['label'=> 'Total', 'colspan'=>1],
+                ['label'=> 'S_1', 'colspan' => 1],
+                ['label'=> 'S_2', 'colspan'=>1]
+            ]
+        ];
+
+        $colWidths=  [100, 180, 50, 50, 50, 50];
+
+        $arrayData = [];
+        if($courseAnnuals) {
+
+            foreach($courseAnnuals as $courseAnnual) {
+                $nestedHeaders[0] = array_merge($nestedHeaders[0], [['label'=>$courseAnnual->course_name, 'colspan'=>2]]);
+                $nestedHeaders[1] = array_merge($nestedHeaders[1], [['label'=>'Abs', 'colspan'=>1], ['label'=> '2.5', 'colspan'=>1]]);
+                $colWidths[] = 75;
+                $colWidths[] = 75;
+            }
+
+            $nestedHeaders[0] = array_merge($nestedHeaders[0], ['Moyenne']);
+            $nestedHeaders[1] = array_merge($nestedHeaders[1], ['']);
+            $colWidths[] = 75;
+        }
+
+//        dd($colWidths);
+
+//        dd($nestedHeaders);
+
+        if($students) {
+
+            foreach($students as $student) {
+
+                $element = array(
+                    'student_id_card' => $student->id_card,
+                    'student_name' => $student->name_latin,
+                    'student_gender' => $student->code,
+                    'total' => 0,
+                    'S_1' => 0,
+                    'S_2' => 0
+                );
+
+                if($courseAnnuals) {
+
+                    $courseScoreElement=[];
+
+                    foreach($courseAnnuals as $courseAnnual) {
+                        $element = $element + ['Abs'.'_'.$courseAnnual->course_name => 0, 'Credit'.'_'.$courseAnnual->course_name => 0];
+
+                    }
+
+                    $element = $element +['Moyenne'=>0];
+                }
+
+//                dd($element);
+//                $element = array_merge($element, $courseScoreElement);
+
+//                dd($element);
+
+                $arrayData[] = $element;
+            }
+        }
+
+//        dd($arrayData);
 
 
-
-
-
-
-
-
-
-        return view('backend.course.courseAnnual.includes.form_evaluation_score_courses_annual', compact('students'));
-
-//        dd($students);
-    }
-
-
-    private function handsontableDataInEachSemester() {
-
-
-
-
-
+        return json_encode([
+            'data' => $arrayData,
+//            'columnHeader' => $columnHeader,
+            'nestedHeaders' => $nestedHeaders,
+//            'columns'      =>$columns
+            'colWidths' => $colWidths
+        ]);
 
     }
 

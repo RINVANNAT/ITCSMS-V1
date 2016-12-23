@@ -322,7 +322,7 @@
 
         <div class="box-body">
 
-            <div id="score_table" class="handsontable htColumnHeaders">
+            <div id="all_score_course_annual_table" class="handsontable htColumnHeaders">
 
             </div>
         </div>
@@ -335,9 +335,8 @@
 
 @section('after-scripts-end')
 
-    {!! Html::style('plugins/handsontable/handsontable.full.css') !!}
-    {!! Html::style('plugins/handsontable/handsontable.full.min.css') !!}
-    {!! Html::script('plugins/handsontable/handsontable.full.js') !!}
+    {!! Html::style('plugins/handsontable-test/handsontable.full.min.css') !!}
+    {!! Html::script('plugins/handsontable-test/handsontable.full.min.js') !!}
     {!! Html::script('plugins/jpopup/jpopup.js') !!}
     {{--myscript--}}
 
@@ -360,9 +359,60 @@
             });
         }
 
+        var table_size;
+        $(window).on('load resize', function(){
+            table_size = $('.box-body').width();
+        });
 
-        // this is the property of the handson table / or configuration
 
+
+        var setting = {
+            rowHeaders: true,
+            manualColumnResize: true,
+            manualRowResize: true,
+            manualColumnMove: true,
+            filters: true,
+            autoWrapRow: true,
+            minSpareRows: true,
+            stretchH: 'last',
+            height:800,
+            width: table_size,
+//            filters: true,
+            startRows: 4,
+//            dropdownMenu: ['filter_by_condition', 'filter_action_bar'],
+            className: "htLeft"
+        };
+
+        $('document').ready(function() {
+
+            var BaseUrl = '{{route('admin.course.get_all_handsontable_data')}}';
+            var BaseData = {
+
+                dept_id: '{{$deptId}}',
+                degree_id: '{{$degreeId}}',
+                grade_id: '{{$gradeId}}',
+                academic_year_id: '{{$academicYearID}}'
+            }
+
+            //--------------- when document ready call ajax
+            $.ajax({
+                type: 'GET',
+                url: BaseUrl,
+                data:BaseData ,
+                dataType: "json",
+                success: function(resultData) {
+                    console.log(resultData);
+                    setting.data = resultData.data;
+//                    setting.colHeaders = resultData.columnHeader;
+//                    setting.columns = resultData.columns;
+                    setting.nestedHeaders = resultData.nestedHeaders;
+                    setting.colWidths = resultData.colWidths;
+                    hotInstance = new Handsontable(jQuery("#all_score_course_annual_table")[0], setting);
+
+                }
+            });
+
+        });
 
     </script>
 @stop
