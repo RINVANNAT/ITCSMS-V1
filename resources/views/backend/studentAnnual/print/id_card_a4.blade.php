@@ -160,7 +160,7 @@
             margin-left:auto;
             margin-right:auto;
             display:block;
-            border:1px dashed #F6EEEC;
+            border:1px dashed black;
         }
         .page2 {
             width: 2.145in;
