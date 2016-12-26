@@ -1,9 +1,9 @@
 <div class="page2">
 
-    <div class="background">
+    <div class="background1">
         <img width="100%" src="{{url('img/id_card/back_id_card.png')}}">
     </div>
-    <div class="detail">
+    <div class="detail1">
                                 <span class="address_title">
                                     អាសយដ្ឋាន ៖
                                 </span>

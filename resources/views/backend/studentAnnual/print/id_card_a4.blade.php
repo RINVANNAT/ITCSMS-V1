@@ -18,6 +18,19 @@
             z-index: 9999;
         }
 
+        .background1 {
+            position: absolute;
+            width: 2.225in;
+            height: 3.475in;
+        }
+
+        .detail1 {
+            position: absolute;
+            width: 2.225in;
+            height: 3.475in;
+            z-index: 9999;
+        }
+
         .id_card {
             font-family: "khmersantepheap";
             width: 100%;
@@ -73,7 +86,7 @@
 
         }
         .barcode img {
-            width: 1.8in;
+            width: 1.6in;
             height: 0.8cm;
             display: block;
             margin-left: auto;
@@ -167,7 +180,6 @@
             height: 3.395in;
             margin-left:auto;
             margin-right:auto;
-            border:1px solid darkgrey;
             display:block;
         }
 
@@ -183,7 +195,7 @@
             <div class="page">
 
                 @foreach($rows as $row)
-                    <div class="row" style="margin:0px; padding-left: 2mm !important; padding-top: 10mm !important;">
+                    <div class="row" style="margin:0px; padding-left: 1.5mm !important; padding-top: 10mm !important;">
                         @foreach($row as $front)
                             <?php $front = (object)$front; ?>
 
@@ -201,10 +213,10 @@
             <?php $rows = array_chunk($page, 3);?>
             <div class="page">
                 @foreach($rows as $row)
-                    <div class="row" style="margin:0px; padding-left: 1mm !important; padding-top: 10mm !important;">
+                    <div class="row" style="margin:0px; padding-top: 10mm !important;">
                         <?php $row = array_reverse($row); //dd($row);?>
                         @foreach($row as $back)
-                            <div class="col-sm-4 col-xs-4" style="padding:0px;">
+                            <div class="col-sm-4 col-xs-4" style="padding:0px; float: right!important;">
                                 @include("backend.studentAnnual.print.id_card_back_single")
                             </div>
                         @endforeach
