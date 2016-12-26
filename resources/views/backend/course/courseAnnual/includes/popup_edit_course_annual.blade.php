@@ -103,9 +103,7 @@
                     </tr>
                     </tbody>
                 </table>
-
             {!! Form::close() !!}
-
         </div>
 
     </div>

@@ -365,21 +365,17 @@
         });
 
 
-
+        var hotInstance;
         var setting = {
             rowHeaders: true,
-            manualColumnResize: true,
-            manualRowResize: true,
             manualColumnMove: true,
             filters: true,
             autoWrapRow: true,
             minSpareRows: true,
-            stretchH: 'last',
             height:800,
             width: table_size,
-//            filters: true,
-            startRows: 4,
-//            dropdownMenu: ['filter_by_condition', 'filter_action_bar'],
+            filters: true,
+            dropdownMenu: ['filter_by_condition', 'filter_action_bar'],
             className: "htLeft"
         };
 
@@ -401,13 +397,91 @@
                 data:BaseData ,
                 dataType: "json",
                 success: function(resultData) {
-                    console.log(resultData);
+
+                    console.log(resultData.nestedHeaders);
                     setting.data = resultData.data;
 //                    setting.colHeaders = resultData.columnHeader;
 //                    setting.columns = resultData.columns;
                     setting.nestedHeaders = resultData.nestedHeaders;
                     setting.colWidths = resultData.colWidths;
-                    hotInstance = new Handsontable(jQuery("#all_score_course_annual_table")[0], setting);
+                    hotInstance = new Handsontable(jQuery("#all_score_course_annual_table")[0], setting)
+
+                    hotInstance.updateSettings({
+                        contextMenu: {
+                            callback: function (key, options) {
+
+                                if(key == 'freeze_column') {
+
+                                    if(hotInstance.getSelected()) {
+
+                                        var selectedColumn = hotInstance.getSelected()[1];
+
+                                        if(setting.fixedColumnsLeft) {
+
+                                            if (selectedColumn > setting.fixedColumnsLeft - 1) {
+
+                                                freezeColumn(selectedColumn);
+                                            } else {
+                                                unfreezeColumn(selectedColumn);
+                                            }
+
+                                        } else {
+
+                                            freezeColumn(selectedColumn);
+                                        }
+
+                                    }
+
+                                }
+
+                                function freezeColumn(column) {
+//                                    setting.fixedColumnsLeft = column+1;
+//                                    setting.manualColumnFreeze = true;
+                                    setting.rowHeaders = true,
+
+                                    hotInstance.updateSettings({
+                                        fixedColumnsLeft: column + 1,
+                                        manualColumnFreeze: true,
+                                    });
+                                }
+
+                                function unfreezeColumn(column) {
+
+                                    console.log(column);
+
+                                    if (column > setting.fixedColumnsLeft - 1) {
+                                        return; // not fixed
+                                    }
+                                    removeFixedColumn(column+1);
+                                }
+
+                                function removeFixedColumn(column) {
+                                    hotInstance.updateSettings({
+                                        fixedColumnsLeft: column - 1
+                                    });
+                                    setting.fixedColumnsLeft--;
+                                }
+                            },
+                            items: {
+
+                                "freeze_column": {
+                                    name: function() {
+                                        var selectedColumn = hotInstance.getSelected()[1];
+                                        if(setting.fixedColumnsLeft) {
+                                            if (selectedColumn > setting.fixedColumnsLeft - 1) {
+                                                return '<span><i class="fa fa-fire"> Freeze This Column </i></span>';
+                                            } else {
+                                                return '<span><i class="fa fa-leaf"> Unfreeze This Column </i></span>';
+                                            }
+                                        } else {
+                                            return '<span><i class="fa fa-fire"> Freeze This Column </i></span>';
+                                        }
+
+                                    }
+                                }
+                            }
+                        }
+                    })
 
                 }
             });

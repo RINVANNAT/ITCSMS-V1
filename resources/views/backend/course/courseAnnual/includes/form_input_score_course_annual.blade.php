@@ -456,6 +456,7 @@
             table_size = $('.box-body').width();
         });
         var setting = {
+            colHeaders:false,
             rowHeaders: true,
             manualColumnMove: true,
             filters: true,

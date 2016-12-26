@@ -1512,7 +1512,7 @@ class CourseAnnualController extends Controller
             ]
         ];
 
-        $colWidths=  [100, 180, 50, 50, 50, 50];
+        $colWidths=  [100, 180, 50, 75, 75, 75];
 
         $arrayData = [];
         if($courseAnnuals) {
@@ -1524,9 +1524,30 @@ class CourseAnnualController extends Controller
                 $colWidths[] = 75;
             }
 
+            $nestedHeaders[0] = array_merge($nestedHeaders[0], ['S1_Moyenne']);
             $nestedHeaders[0] = array_merge($nestedHeaders[0], ['Moyenne']);
-            $nestedHeaders[1] = array_merge($nestedHeaders[1], ['']);
-            $colWidths[] = 75;
+            $nestedHeaders[0] = array_merge($nestedHeaders[0], ['Classement']);
+            $nestedHeaders[0] = array_merge($nestedHeaders[0], ['Redouble']);
+            $nestedHeaders[0] = array_merge($nestedHeaders[0], ['Observation']);
+            $nestedHeaders[0] = array_merge($nestedHeaders[0], ['Rattrapage']);
+            $nestedHeaders[0] = array_merge($nestedHeaders[0], ['Passage']);
+
+            $nestedHeaders[1] = array_merge($nestedHeaders[1], [' ']);
+            $nestedHeaders[1] = array_merge($nestedHeaders[1], [' ']);
+            $nestedHeaders[1] = array_merge($nestedHeaders[1], [' ']);
+            $nestedHeaders[1] = array_merge($nestedHeaders[1], [' ']);
+            $nestedHeaders[1] = array_merge($nestedHeaders[1], [' ']);
+            $nestedHeaders[1] = array_merge($nestedHeaders[1], [' ']);
+            $nestedHeaders[1] = array_merge($nestedHeaders[1], [' ']);
+            $colWidths[] = 150;
+            $colWidths[] = 100;
+            $colWidths[] = 100;
+            $colWidths[] = 100;
+            $colWidths[] = 100;
+            $colWidths[] = 100;
+            $colWidths[] = 100;
+            $colWidths[] = 100;
+            $colWidths[] = 100;
         }
 
 //        dd($colWidths);
@@ -1555,7 +1576,15 @@ class CourseAnnualController extends Controller
 
                     }
 
+                    $element = $element +['S1_Moyenne'=> ''];
                     $element = $element +['Moyenne'=>0];
+                    $element = $element +['Classement'=>0];
+                    $element = $element +['Redouble'=>' '];
+                    $element = $element +['Observation'=> ' '];
+                    $element = $element +['Rattrapage'=>' '];
+                    $element = $element +['Passage'=>' '];
+                    $element = $element +[' '=>' '];
+
                 }
 
 //                dd($element);
