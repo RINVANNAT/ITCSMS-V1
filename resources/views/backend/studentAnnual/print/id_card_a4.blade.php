@@ -73,7 +73,7 @@
 
         }
         .barcode img {
-            width: 1.9in;
+            width: 1.8in;
             height: 0.8cm;
             display: block;
             margin-left: auto;
