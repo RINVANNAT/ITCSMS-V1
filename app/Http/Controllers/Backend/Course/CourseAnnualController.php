@@ -371,7 +371,8 @@ class CourseAnnualController extends Controller
                 'course_annuals.time_td',
                 'course_annuals.time_course',
                 'course_annuals.semester_id',
-                'courses.code as code'
+                'courses.code as code',
+                'courses.credit as course_credit'
             ]);
 
         return $courseAnnuals;
@@ -1476,9 +1477,18 @@ class CourseAnnualController extends Controller
         $degreeId = $request->degree_id;
         $gradeId = $request->grade_id;
         $academicYearID = $request->academic_year_id;
-        $semesterId = $request->semester_id;
+
 
         $courseAnnuals = $this->getCourseAnnually();
+        $semesters = Semester::get();
+
+//        dd($semesters);
+//        $courseAnnualBySemester=[];
+//        foreach($semesters as $semester) {
+//            $courseAnnualBySemester[$semester->id] = $courseAnnuals->where('course_annuals.semester_id', '=',$semester->id)->get();
+//        }
+//        dd($courseAnnualBySemester);
+//        dd($courseAnnuals->get());
 
         if($deptId) {
             $courseAnnuals = $courseAnnuals->where('departments.id', '=',$deptId);
@@ -1492,39 +1502,37 @@ class CourseAnnualController extends Controller
         if($gradeId) {
             $courseAnnuals = $courseAnnuals->where('course_annuals.grade_id', '=',$gradeId);
         }
-        if($semesterId) {
-            $courseAnnuals = $courseAnnuals->where('course_annuals.semester_id', '=',$semesterId);
-        }
-        $courseAnnuals = $courseAnnuals->where('course_annuals.semester_id', '=',1);
-        $courseAnnuals = $courseAnnuals->get();
+//        $courseAnnuals = $courseAnnuals->where('course_annuals.semester_id', '=',1);
+        $courseAnnuals = $courseAnnuals->orderBy('semester_id')->get();
 
-//        dd($courseAnnuals);
+
         $students = $this->getStudentByDeptIdGradeIdDegreeId($deptId, $degreeId, $gradeId, $academicYearID);
 
         $nestedHeaders =  [
-            ['Student ID', 'Student Name', 'Sexe',
+            ['', 'Student ID', 'Student Name', 'Sexe',
                 ['label'=> 'Absents', 'colspan'=> 3]
             ],
-            ['', '', '',
+            ['Order','', '', '',
                 ['label'=> 'Total', 'colspan'=>1],
                 ['label'=> 'S_1', 'colspan' => 1],
                 ['label'=> 'S_2', 'colspan'=>1]
             ]
         ];
 
-        $colWidths=  [100, 180, 50, 75, 75, 75];
+        $colWidths=  [100, 100, 180, 50, 75, 75, 75];
 
         $arrayData = [];
         if($courseAnnuals) {
 
             foreach($courseAnnuals as $courseAnnual) {
-                $nestedHeaders[0] = array_merge($nestedHeaders[0], [['label'=>$courseAnnual->course_name, 'colspan'=>2]]);
-                $nestedHeaders[1] = array_merge($nestedHeaders[1], [['label'=>'Abs', 'colspan'=>1], ['label'=> '2.5', 'colspan'=>1]]);
-                $colWidths[] = 75;
-                $colWidths[] = 75;
+                $nestedHeaders[0] = array_merge($nestedHeaders[0], [['label'=>'S'.$courseAnnual->semester_id.'_'.$courseAnnual->course_name, 'colspan'=>2]]);
+                $nestedHeaders[1] = array_merge($nestedHeaders[1], [['label'=>'Abs', 'colspan'=>1], ['label'=> $courseAnnual->course_credit, 'colspan'=>1]]);
+                $colWidths[] = 100;
+                $colWidths[] = 100;
             }
 
             $nestedHeaders[0] = array_merge($nestedHeaders[0], ['S1_Moyenne']);
+            $nestedHeaders[0] = array_merge($nestedHeaders[0], ['S2_Moyenne']);
             $nestedHeaders[0] = array_merge($nestedHeaders[0], ['Moyenne']);
             $nestedHeaders[0] = array_merge($nestedHeaders[0], ['Classement']);
             $nestedHeaders[0] = array_merge($nestedHeaders[0], ['Redouble']);
@@ -1539,6 +1547,7 @@ class CourseAnnualController extends Controller
             $nestedHeaders[1] = array_merge($nestedHeaders[1], [' ']);
             $nestedHeaders[1] = array_merge($nestedHeaders[1], [' ']);
             $nestedHeaders[1] = array_merge($nestedHeaders[1], [' ']);
+            $colWidths[] = 150;
             $colWidths[] = 150;
             $colWidths[] = 100;
             $colWidths[] = 100;
@@ -1556,27 +1565,33 @@ class CourseAnnualController extends Controller
 
         if($students) {
 
+            $index =0;
+
             foreach($students as $student) {
+                $index++;
 
                 $element = array(
+                    'number' =>$index,
                     'student_id_card' => $student->id_card,
                     'student_name' => $student->name_latin,
-                    'student_gender' => $student->code,
-                    'total' => 0,
-                    'S_1' => 0,
-                    'S_2' => 0
+                    'student_gender' => $student->code
+
                 );
 
                 if($courseAnnuals) {
 
                     $courseScoreElement=[];
 
-                    foreach($courseAnnuals as $courseAnnual) {
-                        $element = $element + ['Abs'.'_'.$courseAnnual->course_name => 0, 'Credit'.'_'.$courseAnnual->course_name => 0];
+//                    dd($courseAnnuals);
 
+                    foreach($courseAnnuals as $courseAnnual) {
+
+                        $element = $element + [ 'total' => 2, 'S_1' => 1, 'S_2' => 0];
+                        $element = $element + ['Abs'.'_'.$courseAnnual->course_name => 0, 'Credit'.'_'.$courseAnnual->course_name => 0];
                     }
 
-                    $element = $element +['S1_Moyenne'=> ''];
+                    $element = $element +['S1_Moyenne'=> 'S1'];
+                    $element = $element +['S2_Moyenne'=> 's2'];
                     $element = $element +['Moyenne'=>0];
                     $element = $element +['Classement'=>0];
                     $element = $element +['Redouble'=>' '];
@@ -1586,11 +1601,6 @@ class CourseAnnualController extends Controller
                     $element = $element +[' '=>' '];
 
                 }
-
-//                dd($element);
-//                $element = array_merge($element, $courseScoreElement);
-
-//                dd($element);
 
                 $arrayData[] = $element;
             }

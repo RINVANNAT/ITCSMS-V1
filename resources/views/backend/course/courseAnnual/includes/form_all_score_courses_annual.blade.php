@@ -322,7 +322,7 @@
 
         <div class="box-body">
 
-            <div id="all_score_course_annual_table" class="handsontable htColumnHeaders">
+            <div id="all_score_course_annual_table" class="table table-striped handsontable htColumnHeaders">
 
             </div>
         </div>
@@ -359,6 +359,76 @@
             });
         }
 
+
+
+        function getSelectedColor() {
+            return 'yellow';
+        }
+
+        var TableStyles = function(hot) {
+            var self = this;
+            var _cellStyles = [];
+            var _createStyle = function(row, col, color) {
+                var _color = color;
+
+                var style = {
+                    row: row,
+                    col: col,
+                    renderer:   function (instance, td, row, col, prop, value, cellProperties) {
+                        Handsontable.renderers.TextRenderer.apply(this, arguments);
+                        td.style.backgroundColor = _color;
+                    },
+                    color: function(c) { _color = c; }
+                };
+
+                return style;
+            };
+
+            self.getStyles = function() {
+                return _cellStyles;
+            };
+
+            self.setCellStyle = function(row, col, color, updateTable) {
+                var _color = color;
+
+                if (_cellStyles.length == 0) {
+                    _cellStyles.push(_createStyle(row, col, color));
+                } else {
+                    var found = _cellStyles.some(function(cell) {
+                        if (cell.row == row && cell.col == col) {
+                            cell.color(color);
+                            return true;
+                        }
+                    });
+
+                    if (!found) {
+                        _cellStyles.push(_createStyle(row, col, color));
+                    }
+                }
+
+                if (updateTable!=false) {
+                    hotInstance.updateSettings({cell: self.getStyles()});
+                    hotInstance.render();
+                };
+            };
+
+            self.setRowStyle = function(row, color) {
+                for (var col=0; col<hotInstance.countCols(); col++)
+                    self.setCellStyle(row, col, color, false);
+
+                hotInstance.updateSettings({cell: self.getStyles()});
+                hotInstance.render();
+            };
+
+            self.setColStyle = function(col, color) {
+                for (var row=0; row<hotInstance.countCols(); row++)
+                    self.setCellStyle(row, col, color, false);
+
+                hotInstance.updateSettings({cell: self.getStyles()});
+                hotInstance.render();
+            };
+        };
+
         var table_size;
         $(window).on('load resize', function(){
             table_size = $('.box-body').width();
@@ -367,17 +437,20 @@
 
         var hotInstance;
         var setting = {
-            rowHeaders: true,
+            rowHeaders: false,
             manualColumnMove: true,
             filters: true,
             autoWrapRow: true,
             minSpareRows: true,
-            height:800,
+            fixedColumnsLeft: 3,
+            height:700,
+            columnSorting: true,
             width: table_size,
             filters: true,
-            dropdownMenu: ['filter_by_condition', 'filter_action_bar'],
-            className: "htLeft"
+            dropdownMenu: ['filter_by_condition', 'filter_action_bar', 'sort'],
+            className: "htLeft",
         };
+
 
         $('document').ready(function() {
 
@@ -406,78 +479,38 @@
                     setting.colWidths = resultData.colWidths;
                     hotInstance = new Handsontable(jQuery("#all_score_course_annual_table")[0], setting)
 
+                    var styles = new TableStyles(hotInstance);
+
                     hotInstance.updateSettings({
                         contextMenu: {
                             callback: function (key, options) {
+                                if (key === 'cellcolor') {
+                                    setTimeout(function () {
+                                        var sel = hotInstance.getSelected();
 
-                                if(key == 'freeze_column') {
-
-                                    if(hotInstance.getSelected()) {
-
-                                        var selectedColumn = hotInstance.getSelected()[1];
-
-                                        if(setting.fixedColumnsLeft) {
-
-                                            if (selectedColumn > setting.fixedColumnsLeft - 1) {
-
-                                                freezeColumn(selectedColumn);
-                                            } else {
-                                                unfreezeColumn(selectedColumn);
-                                            }
-
-                                        } else {
-
-                                            freezeColumn(selectedColumn);
-                                        }
-
-                                    }
-
+                                        styles.setCellStyle(sel[0], sel[1], getSelectedColor());
+                                    }, 100);
                                 }
+                                if (key === 'rowcolor') {
+                                    setTimeout(function () {
+                                        //timeout is used to make sure the menu collapsed before alert is shown
+                                        var sel = hotInstance.getSelected();
 
-                                function freezeColumn(column) {
-//                                    setting.fixedColumnsLeft = column+1;
-//                                    setting.manualColumnFreeze = true;
-                                    setting.rowHeaders = true,
-
-                                    hotInstance.updateSettings({
-                                        fixedColumnsLeft: column + 1,
-                                        manualColumnFreeze: true,
-                                    });
+                                        styles.setRowStyle(sel[0], getSelectedColor());
+                                    }, 100);
                                 }
+                                if (key === 'colcolor') {
+                                    setTimeout(function () {
+                                        //timeout is used to make sure the menu collapsed before alert is shown
+                                        var sel = hotInstance.getSelected();
 
-                                function unfreezeColumn(column) {
-
-                                    console.log(column);
-
-                                    if (column > setting.fixedColumnsLeft - 1) {
-                                        return; // not fixed
-                                    }
-                                    removeFixedColumn(column+1);
-                                }
-
-                                function removeFixedColumn(column) {
-                                    hotInstance.updateSettings({
-                                        fixedColumnsLeft: column - 1
-                                    });
-                                    setting.fixedColumnsLeft--;
+                                        styles.setColStyle(sel[1], getSelectedColor());
+                                    }, 100);
                                 }
                             },
                             items: {
-
-                                "freeze_column": {
-                                    name: function() {
-                                        var selectedColumn = hotInstance.getSelected()[1];
-                                        if(setting.fixedColumnsLeft) {
-                                            if (selectedColumn > setting.fixedColumnsLeft - 1) {
-                                                return '<span><i class="fa fa-fire"> Freeze This Column </i></span>';
-                                            } else {
-                                                return '<span><i class="fa fa-leaf"> Unfreeze This Column </i></span>';
-                                            }
-                                        } else {
-                                            return '<span><i class="fa fa-fire"> Freeze This Column </i></span>';
-                                        }
-
-                                    }
+                                "rowcolor": {
+                                    name: 'Row color'
                                 }
                             }
                         }
