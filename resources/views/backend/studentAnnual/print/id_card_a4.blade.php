@@ -20,14 +20,14 @@
 
         .background1 {
             position: absolute;
-            width: 2.225in;
-            height: 3.475in;
+            width: 2.275in;
+            height: 3.525in;
         }
 
         .detail1 {
             position: absolute;
-            width: 2.225in;
-            height: 3.475in;
+            width: 2.275in;
+            height: 3.525in;
             z-index: 9999;
         }
 
@@ -100,7 +100,7 @@
             text-align: right;
             position: absolute;
             top:2.84in;
-            right: 0.14in;
+            right: 0.2in;
         }
 
         .expired_date {
@@ -188,15 +188,16 @@
 @stop
 @section('content')
 
-    <?php $pages = array_chunk($studentAnnuals->toArray(),9); ?>
     @if($type == "front")
+        <?php $pages = array_chunk($studentAnnuals->toArray(),9); ?>
         @foreach($pages as $page)
-            <?php $rows = array_chunk($page, 3); ?>
+            <?php $rows1 = array_chunk($page, 3); ?>
             <div class="page">
 
-                @foreach($rows as $row)
-                    <div class="row" style="margin:0px; padding-left: 1.5mm !important; padding-top: 10mm !important;">
-                        @foreach($row as $front)
+                @foreach($rows1 as $row1)
+                    <div class="row" style="margin:0px; padding-left: 2mm !important; padding-top: 10mm !important;">
+
+                        @foreach($row1 as $front)
                             <?php $front = (object)$front; ?>
 
                             <div class="col-sm-4 col-xs-4" style="padding:0px;">
@@ -209,13 +210,13 @@
         @endforeach
 
     @elseif($type=="back")
+        <?php $pages = array_chunk($studentAnnuals->toArray(),9); ?>
         @foreach($pages as $page)
-            <?php $rows = array_chunk($page, 3);?>
+            <?php $rows2 = array_chunk($page, 3);?>
             <div class="page">
-                @foreach($rows as $row)
+                @foreach($rows2 as $row2)
                     <div class="row" style="margin:0px; padding-top: 10mm !important;">
-                        <?php $row = array_reverse($row); //dd($row);?>
-                        @foreach($row as $back)
+                        @foreach($row2 as $back)
                             <div class="col-sm-4 col-xs-4" style="padding:0px; float: right!important;">
                                 @include("backend.studentAnnual.print.id_card_back_single")
                             </div>
