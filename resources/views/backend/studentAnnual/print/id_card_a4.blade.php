@@ -182,7 +182,7 @@
             <div class="page">
 
                 @foreach($rows as $row)
-                    <div class="row" style="margin:0px; padding-top: 10mm !important;">
+                    <div class="row" style="margin:0px; padding-left: 2mm !important; padding-top: 10mm !important;">
                         @foreach($row as $front)
                             <?php $front = (object)$front; ?>
 
