@@ -160,13 +160,14 @@
             margin-left:auto;
             margin-right:auto;
             display:block;
-            border:1px dashed black;
+
         }
         .page2 {
             width: 2.145in;
             height: 3.395in;
             margin-left:auto;
             margin-right:auto;
+            border:1px solid darkgrey;
             display:block;
         }
 
@@ -200,7 +201,7 @@
             <?php $rows = array_chunk($page, 3);?>
             <div class="page">
                 @foreach($rows as $row)
-                    <div class="row" style="margin:0px; padding-top: 10mm !important;">
+                    <div class="row" style="margin:0px; padding-left: 1mm !important; padding-top: 10mm !important;">
                         <?php $row = array_reverse($row); //dd($row);?>
                         @foreach($row as $back)
                             <div class="col-sm-4 col-xs-4" style="padding:0px;">
