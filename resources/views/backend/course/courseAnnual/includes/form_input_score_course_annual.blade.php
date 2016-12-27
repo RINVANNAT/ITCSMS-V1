@@ -9,6 +9,7 @@
     </h1>
 
     <style>
+
         .popupdiv{
             height:200px;
             width: 600px;
@@ -318,7 +319,7 @@
     <div class="box box-success">
 
         <div class="box-header with-border">
-            <h3 class="box-title">Complete Score Mathematic Course</h3>
+            <h3 class="box-title">Subject: <span class="label label-success">{{$courseAnnual->name_en}}</span></h3>
             <div class="btn-group pull-right">
 
                 <button class="btn btn-primary btn-xs" id="save_editted_score" style="margin-right:5px">Save Changes!</button>
@@ -520,21 +521,29 @@
 
                         if(columnIndex == 'num_absence') {
                             var arrayAbsence=[];
-                            var rowData = setting.data[rowIndex];
+                            var rowData = hotInstance.getData();
 
-                            var baseData = {
-                                num_absence: newValue,
-                                student_annual_id: rowData.student_annual_id,
-                                department_id:      rowData.department_id,
-                                degree_id:          rowData.degree_id,
-                                grade_id:           rowData.grade_id,
-                                academic_year_id :  rowData.academic_year_id,
-                                semester_id:        rowData.semester_id,
-                                course_annual_id: '{{$courseAnnualID}}'
+                            for(var keyIndex=0; keyIndex< tableData.length; keyIndex++) {
+                                $.each(tableData[keyIndex],function(i, value){
+//                                    console.log(index+'--->'+value);
+                                    if(rowData[rowIndex][0] == value) {//rowData[rowIndex][0] with the row data we get rowDat by Key rowIndex then we will get the student_id_card
+                                        element = {
+                                            num_absence: newValue,
+                                            student_annual_id: tableData[keyIndex]['student_annual_id'],
+//                                            department_id: tableData[keyIndex]['department_id'],
+//                                            degree_id: tableData[keyIndex]['degree_id'],
+//                                            grade_id:           tableData[keyIndex]['grade_id'],
+//                                            academic_year_id :  tableData[keyIndex]['academic_year_id'],
+//                                            semester_id:        tableData[keyIndex]['semester_id'],
+                                            course_annual_id: '{{$courseAnnualID}}'
+                                        };
+                                    }
+                                });
+
                             }
 
                             if(oldValue != newValue){
-                                cellChanges.push(baseData);
+                                cellChanges.push(element);
                             }
 
                         }
@@ -544,7 +553,6 @@
 
             beforeChange: function (changes, source) {
                 var lastChange = changes[0];
-
                 var rowIndex = lastChange[0];
                 var columnIndex = lastChange[1];
 
@@ -865,16 +873,23 @@
                         }
 
                         if(cellChanges.length > 0) { // save each number absence
+
+                            var url = '{{route('admin.course.save_number_absence')}}';
+
+                            console.log(cellChanges);
+                            console.log(cellScoreChanges);
                             $.ajax({
                                 type: 'POST',
                                 url: url,
                                 data: {baseData:cellChanges},
                                 dataType: "json",
                                 success: function(resultData) {
-                                    setting.data = resultData.data;
-                                    setting.colHeaders = resultData.columnHeader;
-                                    setting.columns = resultData.columns;
-                                    hotInstance = new Handsontable(jQuery("#score_table")[0], setting);
+
+                                    updateSettingHandsontable(resultData);
+//                                    setting.data = resultData.data;
+//                                    setting.colHeaders = resultData.columnHeader;
+//                                    setting.columns = resultData.columns;
+//                                    hotInstance = new Handsontable(jQuery("#score_table")[0], setting);
                                     cellChanges=[];
                                     cellIndex = [];
                                 }

@@ -9,6 +9,25 @@
     </h1>
 
     <style>
+
+        /*.ht_master tr > td:nth-of-type(odd) {*/
+            /*background-color: #f00;*/
+        /*}*/
+
+        /*!* Every even column *!*/
+        /*.ht_master tr > td:nth-of-type(even) {*/
+            /*background-color: #919291;*/
+        /*}*/
+
+        /* Every odd row */
+        .ht_master tr:nth-of-type(odd) > td {
+            background-color: #AFBDB6;
+        }
+
+        /* Every even row */
+        .ht_master tr:nth-of-type(even) > td {
+            background-color: #F7F8FF;
+        }
         .popupdiv{
             height:200px;
             width: 600px;
@@ -442,13 +461,25 @@
             filters: true,
             autoWrapRow: true,
             minSpareRows: true,
-            fixedColumnsLeft: 3,
+            fixedColumnsLeft: 4,
             height:700,
             columnSorting: true,
             width: table_size,
             filters: true,
             dropdownMenu: ['filter_by_condition', 'filter_action_bar', 'sort'],
             className: "htLeft",
+            columnSummary: [
+                {
+                    destinationRow: 54,
+                    destinationColumn: 8,
+                    type: 'min'
+                },
+                {
+                    destinationRow: 55,
+                    destinationColumn: 8,
+                    type: 'max'
+                }
+            ]
         };
 
 
