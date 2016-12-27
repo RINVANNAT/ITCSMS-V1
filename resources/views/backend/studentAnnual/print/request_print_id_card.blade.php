@@ -178,12 +178,12 @@
 @section('content')
 
     <div class="box box-success">
-        @if(sizeof($studentAnnuals_front) > 50)
+        @if(sizeof($studentAnnuals_front) > 100)
         <div class="alert alert-danger alert-dismissible">
             <button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>
             <h4><i class="icon fa fa-ban"></i> Error!</h4>
-            You are printing more than 50 students, this will cause memory over used and many more errors might be occurred. <br/>
-            Please filter more to get less than 50 students.
+            You are printing more than 100 students, this will cause memory over used and many more errors might be occurred. <br/>
+            Please filter more to get less than 100 students.
         </div>
         @else
         <div class="box-header with-border">
