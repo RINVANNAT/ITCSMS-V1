@@ -1517,16 +1517,17 @@ class CourseAnnualController extends Controller
             $courseAnnuals = $courseAnnuals->where('course_annuals.semester_id', '=',$semesterId);
         }
 
-
-
         $students = $this->getStudentByDeptIdGradeIdDegreeId($deptId, $degreeId, $gradeId, $academicYearID);
         $courseAnnuals = $courseAnnuals->orderBy('semester_id')->get();
 
-//        dd($courseAnnuals);
         $arrayData = [];
         $arraySemester = [];
 
         $colWidths=  [100, 100, 180, 50, 75, 75, 75];
+
+        $allProperties = $this->getCourseAnnualWithScore($courseAnnuals);
+        $averages = $allProperties['averages'];
+        $absences = $allProperties['absences'];
 
         if($semesterId) {
             $nestedHeaders =  [
@@ -1558,8 +1559,6 @@ class CourseAnnualController extends Controller
         }
 
         if($courseAnnuals) {
-
-
             $creditInEachSemester =  [];
             foreach($courseAnnuals as $courseAnnual) {
 
@@ -1568,9 +1567,7 @@ class CourseAnnualController extends Controller
                 $nestedHeaders[1] = array_merge($nestedHeaders[1], [['label'=>'Abs', 'colspan'=>1], ['label'=> $courseAnnual->course_credit, 'colspan'=>1]]);
                 $colWidths[] = 150;
                 $colWidths[] = 150;
-
             }
-
 //            dd(array_sum($creditInEachSemester[1]));
             $finalCredit=0;
             if($semesterId) {
@@ -1638,13 +1635,18 @@ class CourseAnnualController extends Controller
                             $count++;
                             $totalCredit = $totalCredit +$courseAnnual->course_credit;
 
-                            $scoreBycourse = $this->getScoreEachCourse($courseAnnual->course_annual_id, $student->student_annual_id);
-                            $numAbs = $this->getAbsenceFromDB($courseAnnual->course_annual_id, $student->student_annual_id);
+//                            $scoreBycourse = $this->getScoreEachCourse($courseAnnual->course_annual_id, $student->student_annual_id);
+                            $scoreBycourse = isset($averages[$courseAnnual->course_annual_id][$student->student_annual_id])?$averages[$courseAnnual->course_annual_id][$student->student_annual_id]->average:0;
+//                            $numAbs = $this->getAbsenceFromDB($courseAnnual->course_annual_id, $student->student_annual_id);
+                            $numAbs = isset($absences[$courseAnnual->course_annual_id][$student->student_annual_id])?$absences[$courseAnnual->course_annual_id][$student->student_annual_id]->num_absence:0;
 
-                            $moyenne = $moyenne + ((($scoreBycourse)?$scoreBycourse->average:0) * $courseAnnual->course_credit);
+                            $moyenne = $moyenne + ($scoreBycourse * $courseAnnual->course_credit);
 
-                            $totalAbs = $totalAbs + (($numAbs)?$numAbs->num_absence:0);
-                            $element = $element + ['Abs'.'_'.$courseAnnual->course_name.'_'.$count =>  ($numAbs)?$numAbs->num_absence:0, 'Credit'.'_'.$courseAnnual->course_name.'_'.$count => ($scoreBycourse)?$scoreBycourse->average:0];
+//                            $totalAbs = $totalAbs + (($numAbs)?$numAbs->num_absence:0);
+
+                            $totalAbs = $totalAbs + $numAbs;
+
+                            $element = $element + ['Abs'.'_'.$courseAnnual->course_name.'_'.$count =>  $numAbs, 'Credit'.'_'.$courseAnnual->course_name.'_'.$count => $scoreBycourse];
                         }
                         $element = $element +['S'.$semesterId.'_Moyenne'=> number_format((float)($moyenne/$totalCredit), 2, '.', '')];
                     }
@@ -1663,8 +1665,6 @@ class CourseAnnualController extends Controller
                             $element = $element +['S_'.$semester->id => 0];
                         }
 
-//                        dd($element);
-
                         // here we have to add all the semesters value  .... before every course
                         $totalAbseneces = 0;
                         $finalMoyennes =0;
@@ -1682,12 +1682,14 @@ class CourseAnnualController extends Controller
                                     if($semester->id == $courseAnnual->semester_id) {
 
                                         $creditBySemester = $creditBySemester + $courseAnnual->course_credit;
-                                        $scoreBycourse = $this->getScoreEachCourse($courseAnnual->course_annual_id, $student->student_annual_id);
-                                        $numAbs = $this->getAbsenceFromDB($courseAnnual->course_annual_id, $student->student_annual_id);
-                                        $absBySemester = $absBySemester + (($numAbs)?$numAbs->num_absence:0);
-                                        $moyenne = $moyenne + ((($scoreBycourse)?$scoreBycourse->average:0) * $courseAnnual->course_credit);
+//                                        $scoreBycourse = $this->getScoreEachCourse($courseAnnual->course_annual_id, $student->student_annual_id);
+                                        $scoreBycourse = isset($averages[$courseAnnual->course_annual_id][$student->student_annual_id])?$averages[$courseAnnual->course_annual_id][$student->student_annual_id]->average:0;
+//                                        $numAbs = $this->getAbsenceFromDB($courseAnnual->course_annual_id, $student->student_annual_id);
+                                        $numAbs = isset($absences[$courseAnnual->course_annual_id][$student->student_annual_id])?$absences[$courseAnnual->course_annual_id][$student->student_annual_id]->num_absence:0;
+                                        $absBySemester = $absBySemester + $numAbs;
+                                        $moyenne = $moyenne + ($scoreBycourse * $courseAnnual->course_credit);
 
-                                        $element = $element + ['Abs'.'_'.$courseAnnual->course_name.'_'.$count => (($numAbs)?$numAbs->num_absence:0), 'Credit'.'_'.$courseAnnual->course_name.'_'.$count => (($scoreBycourse)?$scoreBycourse->average:0)];
+                                        $element = $element + ['Abs'.'_'.$courseAnnual->course_name.'_'.$count => $numAbs, 'Credit'.'_'.$courseAnnual->course_name.'_'.$count => $scoreBycourse];
                                     }
 
                                 }
@@ -1717,62 +1719,6 @@ class CourseAnnualController extends Controller
                 $element = $element +['Passage'=>' '];
                 $element = $element +[' '=>' '];
 
-//                if($courseAnnuals) {
-//
-//                    $count =0;
-//                    $total = 0;
-//                    $absS1 =0;
-//                    $absS2 =0;
-//                    $moyenneS1=0; $countCourseS1=0;
-//                    $moyenneS2 =0;$counrCourseS2=0;
-//                    $totalCreditS1=0; $totalCreditS2=0;
-//
-//
-//                    foreach($courseAnnuals as $courseAnnual) {
-//                        $count++;
-//                        $scoreBycourse = $this->getScoreEachCourse($courseAnnual->course_annual_id, $student->student_annual_id);
-//                        $numAbs = $this->getAbsenceFromDB($courseAnnual->course_annual_id, $student->student_annual_id);
-//                        if($numAbs) {
-//                            $total = $total + $numAbs->num_absence;
-//                            if($courseAnnual->semester_id == $semesters[0]) {// semester1
-//                                if($scoreBycourse) {
-//                                    $countCourseS1++;
-//                                }
-//                                $totalCreditS1 = $totalCreditS1 +  $courseAnnual->course_credit;
-//                                $moyenneS1 = $moyenneS1 + ((($scoreBycourse)?$scoreBycourse->average:0) * $courseAnnual->course_credit);
-//                                $absS1 = $absS1 + $numAbs->num_absence;
-//
-//                            }  else if ($courseAnnual->semester_id == $semesters[1]) {//semester2
-//                                if($scoreBycourse) {
-//                                    $counrCourseS2++;
-//                                }
-//                                $totalCreditS2 = $totalCreditS2 +  $courseAnnual->course_credit;
-//                                $absS2 = $absS2 + $numAbs->num_absence;
-//                                $moyenneS2 = $moyenneS2 + ((($scoreBycourse)?$scoreBycourse->average:0) * $courseAnnual->course_credit);
-//                            }
-//                            $element = $element + ['Abs'.'_'.$courseAnnual->course_name.'_'.$count => $numAbs->num_absence, 'Credit'.'_'.$courseAnnual->course_name.'_'.$count => ($scoreBycourse)?$scoreBycourse->average:0];
-//                        } else {
-//                            $element = $element + ['Abs'.'_'.$courseAnnual->course_name.'_'.$count => 0, 'Credit'.'_'.$courseAnnual->course_name.'_'.$count => ($scoreBycourse)?$scoreBycourse->average:0];
-//                        }
-//                    }
-//
-//                    $element['total']= $total;
-//                    $element['S_1']= $absS1;
-//                    $element['S_2']= $absS2;
-//                    $element = $element +['S1_Moyenne'=> number_format((float)($moyenneS1/$totalCreditS1), 2, '.', '')];
-//                    $element = $element +['S2_Moyenne'=> number_format((float)($moyenneS2/$totalCreditS2), 2, '.', '')];
-//                    $element = $element +['Moyenne'=>(number_format((float)($moyenneS1/$totalCreditS1), 2, '.', '') + number_format((float)($moyenneS2/$totalCreditS2), 2, '.', ''))/2];
-//                    $element = $element +['Classement'=>0];
-//                    $element = $element +['Redouble'=>' '];
-//                    $element = $element +['Observation'=> ' '];
-//                    $element = $element +['Rattrapage'=>' '];
-//                    $element = $element +['Passage'=>' '];
-//                    $element = $element +[' '=>' '];
-//
-//                }
-
-//                dd($element);
-
                 $arrayData[] = $element;
             }
         }
@@ -1796,6 +1742,35 @@ class CourseAnnualController extends Controller
         ])->first();
 
         return $score;
+
+    }
+
+    private function getCourseAnnualWithScore($courseAnnually) {// ---$courseAnnually---collections of all courses by dept, grade, semester ...
+
+        $arrayAverageObject=[];
+        $arrayAbsenceObject=[];
+
+        foreach($courseAnnually as $courseAnnual) {
+            $averageProperties = DB::table('averages')->where('course_annual_id', $courseAnnual->course_annual_id)->get();
+
+            if($averageProperties) {
+                foreach($averageProperties as $property) {
+                    $arrayAverageObject[$courseAnnual->course_annual_id][$property->student_annual_id] = $property;
+                }
+            }
+
+            $absenceProperties = DB::table('absences')->where('course_annual_id', $courseAnnual->course_annual_id)->get();
+
+            if($absenceProperties) {
+                foreach($absenceProperties as $absenceProperty) {
+                    $arrayAbsenceObject[$courseAnnual->course_annual_id][$absenceProperty->student_annual_id] = $absenceProperty;
+                }
+            }
+        }
+
+        return ['averages'=>$arrayAverageObject,'absences'=>$arrayAbsenceObject] ;
+
+
 
     }
 }

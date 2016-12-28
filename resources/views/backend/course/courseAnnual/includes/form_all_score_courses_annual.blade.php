@@ -480,7 +480,7 @@
             manualColumnMove: true,
             filters: true,
             autoWrapRow: true,
-            minSpareRows: true,
+            minSpareRows: false,
             fixedColumnsLeft: 4,
             height:1400,
             columnSorting: true,
