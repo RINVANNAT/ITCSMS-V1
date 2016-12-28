@@ -20,18 +20,23 @@
         /*}*/
 
         /* Every odd row */
-        .ht_master tr:nth-of-type(odd) > td {
-            background-color: #AFBDB6;
-        }
+        /*.ht_master tr:nth-of-type(odd) > td {*/
+            /*background-color: #F7F8FF;*/
+        /*}*/
 
         /* Every even row */
         .ht_master tr:nth-of-type(even) > td {
             background-color: #F7F8FF;
         }
+
+
+        .ht_master tr:nth-of-type(50) > td {
+            background-color: #F7F8FF;
+        }
         .popupdiv{
             height:200px;
             width: 600px;
-            background-color: #AED6F1;
+            background-color: red;
             opacity: 60;
 
         }
@@ -327,6 +332,9 @@
             margin-top: 0;
         }
 
+        .margin-left2 {
+            margin-left: 5px;
+        }
     </style>
 
 @endsection
@@ -336,7 +344,12 @@
     <div class="box box-success">
 
         <div class="box-header with-border">
-            <h3 class="box-title">Evaluation on Student Departmen :Dept_id: -- :Grade_id:</h3>
+            <div class="row-fluid box-title">
+                <label for="year" class="label label-success"> Total Score For Academic Year: {{$academicYear->name_latin}}</label>
+                <span class="label label-success arrowed-right arrowed-in margin-left2"> Department: {{$department->name_en}}</span>
+                <span class="label label-success arrowed-right arrowed-in margin-left2">Student: {{$degree->name_en}}</span>
+                <span class="label label-success arrowed-right arrowed-in margin-left2"> Student:{{$grade->name_en}}</span>
+            </div>
         </div><!-- /.box-header -->
 
         <div class="box-body">
@@ -378,13 +391,11 @@
             });
         }
 
-
-
         function getSelectedColor() {
             return 'yellow';
         }
 
-        var TableStyles = function(hot) {
+        var TableStyles = function(hotInstance) {
             var self = this;
             var _cellStyles = [];
             var _createStyle = function(row, col, color) {
@@ -448,6 +459,15 @@
             };
         };
 
+
+//        var colorRenderer = function ( instance, td, row, col, prop, value, cellProperties) {
+//
+//            Handsontable.renderers.TextRenderer.apply(this, arguments);
+//
+//            td.style.backgroundColor = '#FEFFB0';
+//
+//        };
+
         var table_size;
         $(window).on('load resize', function(){
             table_size = $('.box-body').width();
@@ -462,24 +482,13 @@
             autoWrapRow: true,
             minSpareRows: true,
             fixedColumnsLeft: 4,
-            height:700,
+            height:1400,
             columnSorting: true,
             width: table_size,
             filters: true,
             dropdownMenu: ['filter_by_condition', 'filter_action_bar', 'sort'],
             className: "htLeft",
-            columnSummary: [
-                {
-                    destinationRow: 54,
-                    destinationColumn: 8,
-                    type: 'min'
-                },
-                {
-                    destinationRow: 55,
-                    destinationColumn: 8,
-                    type: 'max'
-                }
-            ]
+
         };
 
 
@@ -488,10 +497,11 @@
             var BaseUrl = '{{route('admin.course.get_all_handsontable_data')}}';
             var BaseData = {
 
-                dept_id: '{{$deptId}}',
-                degree_id: '{{$degreeId}}',
-                grade_id: '{{$gradeId}}',
-                academic_year_id: '{{$academicYearID}}'
+                dept_id: '{{$department->id}}',
+                degree_id: '{{$degree->id}}',
+                grade_id: '{{$grade->id}}',
+                academic_year_id: '{{$academicYear->id}}',
+                semester_id:'{{$semesterId}}'
             }
 
             //--------------- when document ready call ajax
@@ -511,6 +521,8 @@
                     hotInstance = new Handsontable(jQuery("#all_score_course_annual_table")[0], setting)
 
                     var styles = new TableStyles(hotInstance);
+
+//                    setting.columnSummary = [{destinationRow: 54,destinationColumn: 8,type: 'min' },{destinationRow: 55,destinationColumn: 8,type: 'max'}];
 
                     hotInstance.updateSettings({
                         contextMenu: {

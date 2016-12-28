@@ -657,6 +657,7 @@
                 data: {course_annual_id: '{{$courseAnnualID}}' },
                 dataType: "json",
                 success: function(resultData) {
+
                     setting.data = resultData.data;
                     setting.colHeaders = resultData.columnHeader;
                     setting.columns = resultData.columns;

@@ -92,7 +92,7 @@
                         d.degree = $('#filter_degree').val();
                         d.grade = $('#filter_grade').val();
                         d.department = $('#filter_department').val();
-
+                        d.semester = $('#filter_semester').val();
                         d.lecturer = $('#filter_lecturer').val();
                     }
                 },
@@ -113,6 +113,7 @@
 
             $("div.toolbar").html(
                     '{!! Form::select('academic_year',$academicYears,null, array('class'=>'form-control','id'=>'filter_academic_year')) !!} ' +
+                    '{!! Form::select('semester',$semesters,null, array('class'=>'form-control','id'=>'filter_semester','placeholder'=>'Semester')) !!} '+
                     '{!! Form::select('degree',$degrees,null, array('class'=>'form-control','id'=>'filter_degree','placeholder'=>'Degree')) !!} '+
                     '{!! Form::select('grade',$grades,null, array('class'=>'form-control','id'=>'filter_grade','placeholder'=>'Year')) !!} '+
                     '{!! Form::select('department',$departments,null, array('class'=>'form-control','id'=>'filter_department','placeholder'=>'Department')) !!} '+
@@ -140,6 +141,11 @@
                 e.preventDefault();
             });
             $('#filter_lecturer').on('change', function(e) {
+                oTable.draw();
+                e.preventDefault();
+            });
+
+            $('#filter_semester').on('change', function(e) {
                 oTable.draw();
                 e.preventDefault();
             });
@@ -208,7 +214,8 @@
                 academic_year_id: $('#filter_academic_year :selected').val(),
                 degree_id : $('#filter_degree :selected').val(),
                 grade_id: $('#filter_grade :selected').val(),
-                department_id:$('#filter_department :selected').val()
+                department_id:$('#filter_department :selected').val(),
+                semester_id:$('#filter_semester :selected').val()
             };
 
             if(baseData.academic_year_id != null) {
@@ -230,7 +237,8 @@
                             window.location.replace(baseUrl+'?academic_year_id='+baseData.academic_year_id+
                                             '&degree_id='+baseData.degree_id+
                                             '&grade_id='+baseData.grade_id+
-                                            '&department_id='+baseData.department_id
+                                            '&department_id='+baseData.department_id+
+                                            '&semester_id='+baseData.semester_id
                             );
 
                         } else {
