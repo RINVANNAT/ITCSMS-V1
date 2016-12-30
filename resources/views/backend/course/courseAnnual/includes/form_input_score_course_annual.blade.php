@@ -463,7 +463,7 @@
             manualColumnMove: true,
             filters: true,
             autoWrapRow: true,
-            minSpareRows: true,
+            minSpareRows: false,
             stretchH: 'last',
             height:800,
             width: table_size,

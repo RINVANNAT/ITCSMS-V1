@@ -340,12 +340,17 @@
 @endsection
 
 @section('content')
-
     <div class="box box-success">
 
         <div class="box-header with-border">
             <div class="row-fluid box-title">
                 <label for="year" class="label label-success"> Academic Year: {{$academicYear->name_latin}} /{{$department->name_en}} /Student: {{$degree->name_en}}/ {{$grade->name_en}}</label>
+                <select  name="sort" id="sort_table">
+                    <option value="">Sort Table</option>
+                    <option value="student_name">Sort By Name</option>
+                    <option value="student_id">Sort By ID</option>
+                    <option value="student_name">Sort By Rank</option>
+                </select>
 
             </div>
         </div><!-- /.box-header -->
@@ -358,10 +363,7 @@
         </div>
 
     </div><!--box-->
-
-
 @stop
-
 
 @section('after-scripts-end')
 
@@ -457,8 +459,34 @@
             };
         };
 
+        var colorRenderer = function ( instance, td, row, col, prop, value, cellProperties) {
 
+            Handsontable.renderers.TextRenderer.apply(this, arguments);
 
+            if(jQuery.isNumeric(value) ) {
+                if(value < 5) {
+                    if(prop != 'number' ) {
+                        if(prop != 'Classement') {
+                            var check = prop.split('_');
+                            if(check[0] != 'Abs') {
+
+                                if(prop != 'total') {
+                                    var colSemester = prop.split('_');
+                                    if(colSemester[0] != 'S' ) {
+                                        td.style.backgroundColor = '#FF8D74';
+                                    }
+                                }
+                            } else {
+                                td.style.backgroundColor= '#E6E6E8'
+                            }
+
+                        }
+                    }
+
+                }
+            }
+
+        };
 
         var table_size;
         $(window).on('load resize', function(){
@@ -467,7 +495,6 @@
 
         var numberOfStudents = '{{isset($students)?count($students):0}}';
 
-        console.log(numberOfStudents*40);
         var hotInstance;
         var setting = {
             readOnly:true,
@@ -477,15 +504,15 @@
             autoWrapRow: true,
             minSpareRows: false,
             fixedColumnsLeft: 4,
-            height:(numberOfStudents)*49,
-            columnSorting: true,
+            height:700,
             width: table_size,
             filters: true,
             dropdownMenu: ['filter_by_condition', 'filter_action_bar', 'sort'],
             className: "htLeft",
             cells: function (row, col, prop) {
-                var cellProperties = {};
+                this.renderer = colorRenderer;
 
+                var cellProperties = {};
                 if ( prop  === 'Redouble') {
                     cellProperties.readOnly = false;
                 } else if ( prop  === 'Observation') {
@@ -520,7 +547,7 @@
                 dataType: "json",
                 success: function(resultData) {
 
-                    console.log(resultData.nestedHeaders);
+
                     setting.data = resultData.data;
 //                    setting.colHeaders = resultData.columnHeader;
 //                    setting.columns = resultData.columns;

@@ -1641,7 +1641,7 @@ class CourseAnnualController extends Controller
             foreach($students as $student) {
                 $index++;
                 $element = array(
-                    'number' =>$index,
+                    'number' => ' '.$index,
                     'student_id_card' => $student->id_card,
                     'student_name' => $student->name_latin,
                     'student_gender' => $student->code,
