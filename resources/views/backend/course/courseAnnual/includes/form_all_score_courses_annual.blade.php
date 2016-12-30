@@ -345,10 +345,8 @@
 
         <div class="box-header with-border">
             <div class="row-fluid box-title">
-                <label for="year" class="label label-success"> Total Score For Academic Year: {{$academicYear->name_latin}}</label>
-                <span class="label label-success arrowed-right arrowed-in margin-left2"> Department: {{$department->name_en}}</span>
-                <span class="label label-success arrowed-right arrowed-in margin-left2">Student: {{$degree->name_en}}</span>
-                <span class="label label-success arrowed-right arrowed-in margin-left2"> Student:{{$grade->name_en}}</span>
+                <label for="year" class="label label-success"> Academic Year: {{$academicYear->name_latin}} /{{$department->name_en}} /Student: {{$degree->name_en}}/ {{$grade->name_en}}</label>
+
             </div>
         </div><!-- /.box-header -->
 
@@ -460,37 +458,47 @@
         };
 
 
-//        var colorRenderer = function ( instance, td, row, col, prop, value, cellProperties) {
-//
-//            Handsontable.renderers.TextRenderer.apply(this, arguments);
-//
-//            td.style.backgroundColor = '#FEFFB0';
-//
-//        };
+
 
         var table_size;
         $(window).on('load resize', function(){
             table_size = $('.box-body').width();
         });
 
+        var numberOfStudents = '{{isset($students)?count($students):0}}';
 
+        console.log(numberOfStudents*40);
         var hotInstance;
         var setting = {
+            readOnly:true,
             rowHeaders: false,
             manualColumnMove: true,
             filters: true,
             autoWrapRow: true,
             minSpareRows: false,
             fixedColumnsLeft: 4,
-            height:1400,
+            height:(numberOfStudents)*49,
             columnSorting: true,
             width: table_size,
             filters: true,
             dropdownMenu: ['filter_by_condition', 'filter_action_bar', 'sort'],
             className: "htLeft",
+            cells: function (row, col, prop) {
+                var cellProperties = {};
+
+                if ( prop  === 'Redouble') {
+                    cellProperties.readOnly = false;
+                } else if ( prop  === 'Observation') {
+                    cellProperties.readOnly = false;
+                } else if ( prop  === 'Rattrapage') {
+                    cellProperties.readOnly = false;
+                } else if ( prop  === 'Passage') {
+                    cellProperties.readOnly = false;
+                }
+                return cellProperties;
+            }
 
         };
-
 
         $('document').ready(function() {
 

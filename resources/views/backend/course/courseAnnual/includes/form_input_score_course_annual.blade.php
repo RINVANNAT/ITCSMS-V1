@@ -451,6 +451,7 @@
                 }
             }
         };
+
         // this is the property of the handson table / or configuration
         var table_size;
         $(window).on('load resize', function(){
