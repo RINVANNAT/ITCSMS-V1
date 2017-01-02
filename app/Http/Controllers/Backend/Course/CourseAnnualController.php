@@ -93,9 +93,9 @@ class CourseAnnualController extends Controller
         $academicYears = AcademicYear::orderBy("id","desc")->lists('name_latin','id')->toArray();
         $degrees = Degree::lists('name_en','id')->toArray();
         $grades = Grade::lists('name_en','id')->toArray();
-        $courses = Course::orderBy("updated_at","desc")->lists('name_en','id')->toArray();
         $semesters = Semester::orderBy('id')->lists('name_en', 'id')->toArray();
 
+        $courses = Course::orderBy("updated_at","desc")->lists('name_en','id')->toArray();
         $employees = Employee::lists("name_latin","id")->toArray();
         return view('backend.course.courseAnnual.index',compact('departments','academicYears','degrees','grades','courses','employees', 'semesters'));
     }
@@ -1012,6 +1012,8 @@ class CourseAnnualController extends Controller
             $courseAnnual->academic_year_id
         );
 
+//        $this->studentScoreCourseAnnually($courseAnnual);
+
         if($columnName) {
 
             foreach($columnName as $column) {
@@ -1162,6 +1164,35 @@ class CourseAnnualController extends Controller
 
         return $tableScore;
 
+    }
+
+    private function studentScoreCourseAnnually($courseAnnual) {
+
+
+        $scores = DB::table('scores')
+            ->join('percentage_scores', 'percentage_scores.score_id', '=', 'scores.id')
+            ->join('percentages', 'percentages.id', '=', 'percentage_scores.percentage_id')
+            ->where([
+                ['scores.course_annual_id', $courseAnnual->id],
+                ['scores.degree_id', $courseAnnual->degree_id],
+                ['scores.grade_id', $courseAnnual->grade_id],
+                ['scores.semester_id', $courseAnnual->semester_id],
+                ['scores.department_id', $courseAnnual->department_id],
+                ['scores.academic_year_id', $courseAnnual->academic_year_id]
+            ])
+            ->groupBy(function($score) {
+                $group = [
+                    'sdfsdf'
+                ];
+                return $group;
+            })
+            ->select(
+                'scores.course_annual_id',
+                'scores.score', 'scores.score_absence', 'percentages.name', 'percentages.percent', 'percentages.id as percentage_id', 'scores.id as score_id')
+            ->get();
+
+
+        dd($scores);
     }
 
     private function getAbsenceFromDB($courseAnnualID, $studentAnnualID) {
@@ -1505,12 +1536,32 @@ class CourseAnnualController extends Controller
         $degree = Degree::where('id', $degreeId)->first();
         $grade = Grade::where('id', $gradeId)->first();
         $academicYear = AcademicYear::where('id', $academicYearID)->first();
-        $semesters = Semester::get();
+//        $semesters = Semester::get();
+
+        $departments = Department::orderBy("code")
+            ->where("code","!=","Study Office")
+            ->where("code","!=","Academic")
+            ->where("code","!=","Finance")
+            ->get();
+
+        $departmentTmps = array();
+        foreach ($departments as $value){
+            $departmentTmps[$value->id] = $value['code'];
+        }
+        $departments = $departmentTmps;
+
+        $academicYears = AcademicYear::orderBy("id","desc")->lists('name_latin','id')->toArray();
+        $degrees = Degree::lists('name_en','id')->toArray();
+        $grades = Grade::lists('name_en','id')->toArray();
+        $semesters = Semester::orderBy('id')->lists('name_en', 'id')->toArray();
 
 //        dd($semesters);
 
 
-        return view('backend.course.courseAnnual.includes.form_all_score_courses_annual', compact('department', 'degree', 'grade', 'academicYear', 'semesters', 'semesterId', 'courseAnnuals', 'students'));
+        return view('backend.course.courseAnnual.includes.form_all_score_courses_annual', compact('department',
+            'degree', 'grade', 'academicYear', 'semesters', 'semesterId', 'courseAnnuals', 'students',
+            'departments', 'academicYears', 'degrees', 'grades'
+            ));
 
     }
 
@@ -1547,7 +1598,7 @@ class CourseAnnualController extends Controller
         $arrayData = [];
         $arraySemester = [];
 
-        $colWidths=  [100, 100, 180, 50, 75, 75, 75];
+        $colWidths=  [50, 80, 180, 50, 60, 55, 55];
 
         $allProperties = $this->getCourseAnnualWithScore($courseAnnuals);
         $averages = $allProperties['averages'];
@@ -1559,7 +1610,7 @@ class CourseAnnualController extends Controller
                 ['', 'Student ID', 'Student Name', 'Sexe',
                     ['label'=> 'Absents', 'colspan'=> 2]
                 ],
-                ['Order','', '', '',
+                ['#','', '', '',
                     ['label'=> 'Total', 'colspan'=>1],
                 ]
             ];
@@ -1570,7 +1621,7 @@ class CourseAnnualController extends Controller
                 ['', 'Student ID', 'Student Name', 'Sexe',
                     ['label'=> 'Absents', 'colspan'=> 3]
                 ],
-                ['Order','', '', '',
+                ['#','', '', '',
                     ['label'=> 'Total', 'colspan'=>1],
                 ]
             ];
@@ -1588,7 +1639,7 @@ class CourseAnnualController extends Controller
                 $creditInEachSemester[$courseAnnual->semester_id][] = $courseAnnual->course_credit;
                 $nestedHeaders[0] = array_merge($nestedHeaders[0], [['label'=>'S'.$courseAnnual->semester_id.'_'.$courseAnnual->course_name, 'colspan'=>2]]);
                 $nestedHeaders[1] = array_merge($nestedHeaders[1], [['label'=>'Abs', 'colspan'=>1], ['label'=> $courseAnnual->course_credit, 'colspan'=>1]]);
-                $colWidths[] = 150;
+                $colWidths[] = 55;
                 $colWidths[] = 150;
             }
 //            dd(array_sum($creditInEachSemester[1]));
@@ -1740,10 +1791,8 @@ class CourseAnnualController extends Controller
                     $element['total']= $totalAbseneces;
                     $element = $element +['Moyenne'=>number_format((float)($finalMoyennes/$allCredit), 2, '.', '')];
                     $allMoyenneYearly[] = number_format((float)($finalMoyennes/$allCredit), 2, '.', '');// array of total average for each student
-                    $ranks[] = number_format((float)($finalMoyennes/$allCredit), 2, '.', '');
+                    $ranks[$student->id_card] = number_format((float)($finalMoyennes/$allCredit), 2, '.', '');
                 }
-
-
 
                 $element = $element +['Classement'=>0];
                 $element = $element +['Redouble'=>' '];
@@ -1755,18 +1804,25 @@ class CourseAnnualController extends Controller
                 $arrayData[] = $element;
             }
         }
+
+//        dd($ranks);
         asort($ranks);
         $ranks = array_reverse($ranks);
+//        dd($ranks);
         $finalData=[];
-        for($index=0; $index< count($ranks); $index++) {
+        $index =0;
+        foreach($ranks as $key => $rank) {
             foreach($arrayData as $data) {
-                if($data['Moyenne'] == $ranks[$index]) {
+                if($data['student_id_card'] == $key ) {
                     $data['Classement'] = $index+1;
                     $data['number'] = $index+1;
                     $finalData[] = $data;
+                    $index++;
                 }
             }
         }
+
+//        dd($finalData);
         $arrayData = $finalData;
 //        dd($arrayData);
 
@@ -1900,7 +1956,11 @@ class CourseAnnualController extends Controller
 
         return ['averages'=>$arrayAverageObject,'absences'=>$arrayAbsenceObject, 'arrayCourseScore'=>$arrayScoreOneCourseWithAllStudents] ;
 
+    }
 
 
+    public function ajaxFilterScoreCourseAnnual(Request $request) {
+
+        dd($request->all());
     }
 }

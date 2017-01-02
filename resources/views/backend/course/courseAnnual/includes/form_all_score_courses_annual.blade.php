@@ -3,12 +3,13 @@
 @section ('title', trans('labels.backend.courseAnnuals.title') . ' | ' . trans('labels.backend.courseAnnuals.sub_edit_title'))
 
 @section('page-header')
-    <h1>
-        {{ trans('labels.backend.courseAnnuals.title') }}
-        <small>{{ trans('labels.backend.courseAnnuals.sub_edit_title') }}</small>
-    </h1>
+
 
     <style>
+
+        .handsontable td.area {
+            background-color: black;
+        }
 
         /*.ht_master tr > td:nth-of-type(odd) {*/
             /*background-color: #f00;*/
@@ -24,15 +25,15 @@
             /*background-color: #F7F8FF;*/
         /*}*/
 
-        /* Every even row */
-        .ht_master tr:nth-of-type(even) > td {
-            background-color: #F7F8FF;
-        }
+         /*Every even row */
+        /*.ht_master tr:nth-of-type(even) > td {*/
+            /*background-color: #F7F8FF;*/
+        /*}*/
 
 
-        .ht_master tr:nth-of-type(50) > td {
-            background-color: #F7F8FF;
-        }
+        /*.ht_master tr:nth-of-type(50) > td {*/
+            /*background-color: #F7F8FF;*/
+        /*}*/
         .popupdiv{
             height:200px;
             width: 600px;
@@ -48,310 +49,97 @@
         .pop_margin{
             margin-right: 30px;
         }
-        .popup_wrapper .popup {
-            background: #08B65F;
-            width: 400px;
-            border-radius: 3px;
-            border: 0;
-            box-shadow: 0 5px 20px rgba(0,0,0,1);
-            outline: 1px solid #ddd;
-            outline: 1px solid rgba(0,0,0,.03);
-            font-family: "Roboto", sans-serif;
-
-        }
-        .popup_wrapper .popup .popup_title {
-            color:#FFF;
-            font-weight:bold;
-            line-height: 45px;
-            padding: 0 20px;
-            margin-bottom: 10px;
-            min-height: 20px;
-        }
-        .popup_wrapper .popup .popup_title h1,
-        .popup_wrapper .popup .popup_title h2,
-        .popup_wrapper .popup .popup_title h3,
-        .popup_wrapper .popup .popup_title h4,
-        .popup_wrapper .popup .popup_title h5,
-        .popup_wrapper .popup .popup_title h6 {
-            margin: 0;
-        }
-        .popup_wrapper .popup .popup_title h1 {
-            font-size: 22px;
-        }
-        .popup_wrapper .popup .popup_title h2 {
-            font-size: 18px;
-        }
-        .popup_wrapper .popup .popup_title h3 {
-            font-size: 16px;
-        }
-        .popup_wrapper .popup .popup_title h4 {
-            font-size: 14px;
-        }
-        .popup_wrapper .popup .popup_title h5 {
-            font-size: 12px;
-        }
-        .popup_wrapper .popup .popup_title h6 {
-            font-size: 12px;
-        }
-        .popup_wrapper .popup_close {
-            position: absolute;
-            top: 5px;
-            right: 6px;
-            width: 20px;
-            height: 20px;
-            border-radius: 3px;
-            cursor: pointer;
-            font-family: "Roboto", sans-serif;
-            font-size: 10px;
-            text-align: center;
-            line-height: 17px;
-            color:#FFF;
-        }
-        .popup_wrapper .popup_close svg {
-            position: absolute;
-            top: 0;
-            left: 0;
-            fill: #FFF;
-            border-radius: 3px;
-            color:#FFF;
-        }
-        .popup_wrapper .popup_content {
-            color:#FFF;
-            padding: 0 20px;
-        }
-        .popup_wrapper .popup p {
-            font-size: 16px;
-            color: #FFF;
-        }
-        .popup_wrapper .popup p + p {
-            margin: 16px 0 0 0;
-        }
-        .popup_wrapper .popup input,
-        .popup_wrapper .popup textarea {
-
-            outline: 0;
-            font-size:15px;
-
-            padding:5px;
-            line-height: 20px;
-            padding: 8px 8px;
-            color: #000;
-            box-shadow: none;
-        }
-        .popup_wrapper .popup input:focus,
-        .popup_wrapper .popup textarea:focus {
-
-        }
-        .popup_wrapper .popup p + textarea,
-        .popup_wrapper .popup p + input,
-        .popup_wrapper .popup input + textarea,
-        .popup_wrapper .popup textarea + input {
-            margin: 16px 0 0 0;
-        }
-        .popup_wrapper .popup .popup_buttons {
-            float: left;
-            width: 100%;
-            box-sizing: border-box;
-            padding: 0 10px 0 0;
-            min-height: 10px;
-        }
-        b.author{
-            font-family: "Roboto", sans-serif;
-            font-size: 14px;
-            font-weight: 700;
-            color: #FFF;
-            line-height: 20px;
-            padding: 0 10px;
-            margin: 20px 10px 20px 0;
-            border: 0;
-            border-radius: 3px;
-            background: none;
-            outline: 0;
-        }
-        b.author{
-            font-weight: normal;
-        }
-        .popup_wrapper .popup .popup_buttons button {
-            font-family: "Roboto", sans-serif;
-            font-size: 14px;
-            color: #FFF;
-            line-height: 20px;
-            padding: 0 10px;
-            margin: 20px 10px 20px 0;
-            border: 0;
-            border-radius: 3px;
-            background: none;
-            float: right;
-            cursor: pointer;
-            outline: 0;
-            text-decoration: underline;
-        }
-        .popup_wrapper .popup .popup_close:hover,
-        .popup_wrapper .popup .popup_close:hover svg,
-        .popup_wrapper .popup .popup_buttons button:hover {
-
-        }
-        .popup_wrapper .popup .popup_close:active,
-        .popup_wrapper .popup .popup_close:active svg,
-        .popup_wrapper .popup .popup_buttons button:active {
-            text-decoration: underline;
-        }
-        .popup_wrapper .popup .popup_buttons button.ok {
-            text-decoration: underline;
-        }
-        .popup_wrapper .popup .popup_buttons button.no {
-            text-decoration: underline;
-        }
-        /* stretchTop & stretchBottom */
-        .popup_wrapper[data-position="stretchTop"] .popup,
-        .popup_wrapper[data-position="stretchBottom"] .popup {
-            border-radius: 0;
-        }
-        /* stretchLeft & stretchRight */
-        .popup_wrapper[data-position="stretchLeft"] .popup,
-        .popup_wrapper[data-position="stretchRight"] .popup {
-            border-radius: 0;
-        }
-        .popup_wrapper[data-position="stretchLeft"] .popup  .popup_title,
-        .popup_wrapper[data-position="stretchRight"] .popup .popup_title {
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-        }
-        .popup_wrapper[data-position="stretchLeft"] .popup  .popup_buttons,
-        .popup_wrapper[data-position="stretchRight"] .popup .popup_buttons {
-            position: absolute;
-            bottom: 0;
-            left: 0;
-            right: 0;
-        }
-        .popup_wrapper[data-position="stretchLeft"] .popup .popup_content,
-        .popup_wrapper[data-position="stretchRight"] .popup .popup_content {
-            position: absolute;
-            top: 74px;
-            left: 0;
-            right: 0;
-            bottom: 76px;
-            overflow: auto;
-        }
-        /* Overflow */
-        .popup_wrapper.popup_overflow_y,
-        .popup_wrapper.popup_overflow_y .popup {
-            height: 100% !important;
-            top: 0 !important;
-        }
-        .popup_wrapper.popup_overflow_x:not([data-position="stretchTop"]):not([data-position="stretchBottom"]),
-        .popup_wrapper.popup_overflow_x:not([data-position="stretchTop"]):not([data-position="stretchBottom"]) .popup {
-            width: 100% !important;
-            height: 100% !important;
-            top: 0 !important;
-            left: 0 !important;
-            border: 0;
-            border-radius: 0;
-        }
-        .popup_wrapper.popup_overflow_y .popup .popup_title,
-        .popup_wrapper.popup_overflow_x:not([data-position="stretchTop"]):not([data-position="stretchBottom"]) .popup .popup_title {
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-        }
-        .popup_wrapper.popup_overflow_x:not([data-position="stretchTop"]):not([data-position="stretchBottom"]) .popup .popup_title {
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            cursor: inherit !important;
-        }
-        .popup_wrapper.popup_overflow_y .popup .popup_buttons,
-        .popup_wrapper.popup_overflow_x:not([data-position="stretchTop"]):not([data-position="stretchBottom"]) .popup .popup_buttons {
-            position: absolute;
-            bottom: 0;
-            left: 0;
-            right: 0;
-        }
-        .popup_wrapper.popup_overflow_y .popup .popup_content,
-        .popup_wrapper.popup_overflow_x:not([data-position="stretchTop"]):not([data-position="stretchBottom"]) .popup .popup_content {
-            position: absolute;
-
-            top: 74px;
-            left: 0;
-            right: 0;
-            bottom: 76px;
-            overflow: auto;
-        }
-        /* ScrollTop */
-        .popup_wrapper .popup .popup_title:after,
-        .popup_wrapper .popup .popup_buttons:before,
-        .popup_wrapper .popup .popup_title:after,
-        .popup_wrapper .popup .popup_buttons:before {
-            content: "";
-            position: absolute;
-            left: 0;
-            right: 0;
-            height: 10px;
-            pointer-events: none;
-            opacity: .1;
-            transition: margin-top .3s,
-            margin-bottom .3s,
-            height .3s;
-        }
-        .popup_wrapper .popup .popup_title:after,
-        .popup_wrapper .popup .popup_title:after {
-            margin-bottom: -20px;
-            bottom: 0;
-            background: -webkit-linear-gradient(rgba(0,0,0,1) 0%, rgba(0,0,0,0) 100%);
-            background: -moz-linear-gradient(rgba(0,0,0,1) 0%, rgba(0,0,0,0) 100%);
-            background: -o-linear-gradient(rgba(0,0,0,1) 0%, rgba(0,0,0,0) 100%);
-            background: linear-gradient(rgba(0,0,0,1) 0%, rgba(0,0,0,0) 100%);
-            z-index: 1;
-        }
-        .popup_wrapper .popup .popup_buttons:before,
-        .popup_wrapper .popup .popup_buttons:before {
-            margin-top: -10px;
-            top: 0;
-            background: -webkit-linear-gradient(rgba(0,0,0,0) 0%, rgba(0,0,0,1) 100%);
-            background: -moz-linear-gradient(rgba(0,0,0,0) 0%, rgba(0,0,0,1) 100%);
-            background: -o-linear-gradient(rgba(0,0,0,0) 0%, rgba(0,0,0,1) 100%);
-            background: linear-gradient(rgba(0,0,0,0) 0%, rgba(0,0,0,1) 100%);
-        }
-        .popup_wrapper.popup_scroll_top .popup .popup_title:after,
-        .popup_wrapper.popup_scroll_bottom .popup .popup_buttons:before,
-        .popup_wrapper.popup_scroll_top .popup .popup_title:after,
-        .popup_wrapper.popup_scroll_bottom .popup .popup_buttons:before {
-            height: 0;
-            opacity: 0;
-        }
-        .popup_wrapper.popup_scroll_top .popup .popup_title:after,
-        .popup_wrapper.popup_scroll_top .popup .popup_title:after {
-            margin-bottom: -10px;
-        }
-        .popup_wrapper.popup_scroll_bottom .popup .popup_buttons:before,
-        .popup_wrapper.popup_scroll_bottom .popup .popup_buttons:before {
-            margin-top: 0;
-        }
 
         .margin-left2 {
             margin-left: 5px;
         }
+        .selection {
+            width: 110px;
+            font-size: 12pt;
+            height: 23px;
+            margin-left: 5px;
+
+
+        }
+        .label {
+            font-size: 12pt;
+            height: 20px;
+            align-content: center;
+        }
     </style>
 
 @endsection
-
 @section('content')
     <div class="box box-success">
 
         <div class="box-header with-border">
-            <div class="row-fluid box-title">
-                <label for="year" class="label label-success"> Academic Year: {{$academicYear->name_latin}} /{{$department->name_en}} /Student: {{$degree->name_en}}/ {{$grade->name_en}}</label>
-                <select  name="sort" id="sort_table">
-                    <option value="">Sort Table</option>
-                    <option value="student_name">Sort By Name</option>
-                    <option value="student_id">Sort By ID</option>
-                    <option value="student_name">Sort By Rank</option>
-                </select>
+            <div class="col-md-12 no-padding col-lg-12 col-sm-12">
+                   <label for="year" class=" label label-success col-md-6 no-padding col-lg-6 col-sm-6"> Academic Year: {{$academicYear->name_latin}} /{{$department->name_en}} /Student: {{$degree->name_en}}/ {{$grade->name_en}}</label>
 
+                <div class="pull-right">
+                    <select  name="academic_year" id="filter_academic_year" class="selection col-md-1 col-lg-1 col-sm-1">
+                        @foreach($academicYears as $key=>$year)
+                            @if($key == $academicYear->id)
+                                <option value="{{$key}}" selected> {{$year}}</option>
+                            @else
+                                <option value="{{$key}}"> {{$year}}</option>
+                            @endif
+                        @endforeach
+                    </select>
+
+                    <select  name="semester" id="filter_semester" class="selection col-md-1 col-lg-1 col-sm-1">
+                        <option value="">Semester</option>
+                        @foreach($semesters as $key=>$semester)
+                            @if($key == $semesterId)
+                                <option value="{{$key}}" selected> {{$semester}}</option>
+                            @else
+                                <option value="{{$key}}"> {{$semester}}</option>
+                            @endif
+                        @endforeach
+                    </select>
+
+                    <select  name="degree" id="filter_degree" class="selection col-md-1 col-lg-1 col-sm-1">
+                        <option value="">Degree</option>
+                        @foreach($degrees as $key=>$degreeName)
+                            @if($key == $degree->id)
+                                <option value="{{$key}}" selected> {{$degreeName}}</option>
+                            @else
+                                <option value="{{$key}}"> {{$degreeName}}</option>
+                            @endif
+                        @endforeach
+                    </select>
+
+
+                    <select  name="grade" id="filter_grade" class="selection col-md-1 col-lg-1 col-sm-1">
+                        <option value="">Grade</option>
+                        @foreach($grades as $key=>$gradeName)
+                            @if($key == $grade->id)
+                                <option value="{{$key}}" selected> {{$gradeName}}</option>
+                            @else
+                                <option value="{{$key}}"> {{$gradeName}}</option>
+                            @endif
+                        @endforeach
+                    </select>
+                    @permission('someone-not-simple-user')
+
+                    <select  name="department" id="filter_dept" class="selection col-md-1 col-lg-1 col-sm-1">
+                        <option value="">Department</option>
+                        @foreach($departments as $key=>$departmentName)
+                            @if($key == $department->id)
+                                <option value="{{$key}}" selected> {{$departmentName}}</option>
+                            @else
+                                <option value="{{$key}}"> {{$departmentName}}</option>
+                            @endif
+                        @endforeach
+                    </select>
+                    @endauth
+                    <select  name="sort" id="sort_table" class="selection col-md-1 col-lg-1 col-sm-1">
+                        <option value="">Sort Table</option>
+                        <option value="name">By Name</option>
+                        <option value="id_card">By ID</option>
+                        <option value="rank">By Rank</option>
+                    </select>
+                </div>
             </div>
         </div><!-- /.box-header -->
 
@@ -390,75 +178,6 @@
                 }
             });
         }
-
-        function getSelectedColor() {
-            return 'yellow';
-        }
-
-        var TableStyles = function(hotInstance) {
-            var self = this;
-            var _cellStyles = [];
-            var _createStyle = function(row, col, color) {
-                var _color = color;
-
-                var style = {
-                    row: row,
-                    col: col,
-                    renderer:   function (instance, td, row, col, prop, value, cellProperties) {
-                        Handsontable.renderers.TextRenderer.apply(this, arguments);
-                        td.style.backgroundColor = _color;
-                    },
-                    color: function(c) { _color = c; }
-                };
-
-                return style;
-            };
-
-            self.getStyles = function() {
-                return _cellStyles;
-            };
-
-            self.setCellStyle = function(row, col, color, updateTable) {
-                var _color = color;
-
-                if (_cellStyles.length == 0) {
-                    _cellStyles.push(_createStyle(row, col, color));
-                } else {
-                    var found = _cellStyles.some(function(cell) {
-                        if (cell.row == row && cell.col == col) {
-                            cell.color(color);
-                            return true;
-                        }
-                    });
-
-                    if (!found) {
-                        _cellStyles.push(_createStyle(row, col, color));
-                    }
-                }
-
-                if (updateTable!=false) {
-                    hotInstance.updateSettings({cell: self.getStyles()});
-                    hotInstance.render();
-                };
-            };
-
-            self.setRowStyle = function(row, color) {
-                for (var col=0; col<hotInstance.countCols(); col++)
-                    self.setCellStyle(row, col, color, false);
-
-                hotInstance.updateSettings({cell: self.getStyles()});
-                hotInstance.render();
-            };
-
-            self.setColStyle = function(col, color) {
-                for (var row=0; row<hotInstance.countCols(); row++)
-                    self.setCellStyle(row, col, color, false);
-
-                hotInstance.updateSettings({cell: self.getStyles()});
-                hotInstance.render();
-            };
-        };
-
         var colorRenderer = function ( instance, td, row, col, prop, value, cellProperties) {
 
             Handsontable.renderers.TextRenderer.apply(this, arguments);
@@ -476,13 +195,16 @@
                                         td.style.backgroundColor = '#FF8D74';
                                     }
                                 }
-                            } else {
-                                td.style.backgroundColor= '#E6E6E8'
                             }
 
                         }
                     }
 
+                }
+                var check = prop.split('_');
+
+                if(check[0] == 'Abs') {
+                    td.style.backgroundColor= '#E6E6E8'
                 }
             }
 
@@ -498,12 +220,13 @@
         var hotInstance;
         var setting = {
             readOnly:true,
-            rowHeaders: false,
-            manualColumnMove: true,
+            manualColumnMove: false,
             filters: true,
-            autoWrapRow: true,
+            autoWrapRow: false,
+            manualColumnResize: true,
+            manualRowResize: true,
             minSpareRows: false,
-            fixedColumnsLeft: 4,
+            fixedColumnsLeft: 3,
             height:700,
             width: table_size,
             filters: true,
@@ -555,49 +278,43 @@
                     setting.colWidths = resultData.colWidths;
                     hotInstance = new Handsontable(jQuery("#all_score_course_annual_table")[0], setting)
 
-                    var styles = new TableStyles(hotInstance);
-
-//                    setting.columnSummary = [{destinationRow: 54,destinationColumn: 8,type: 'min' },{destinationRow: 55,destinationColumn: 8,type: 'max'}];
-
-                    hotInstance.updateSettings({
-                        contextMenu: {
-                            callback: function (key, options) {
-                                if (key === 'cellcolor') {
-                                    setTimeout(function () {
-                                        var sel = hotInstance.getSelected();
-
-                                        styles.setCellStyle(sel[0], sel[1], getSelectedColor());
-                                    }, 100);
-                                }
-                                if (key === 'rowcolor') {
-                                    setTimeout(function () {
-                                        //timeout is used to make sure the menu collapsed before alert is shown
-                                        var sel = hotInstance.getSelected();
-
-                                        styles.setRowStyle(sel[0], getSelectedColor());
-                                    }, 100);
-                                }
-                                if (key === 'colcolor') {
-                                    setTimeout(function () {
-                                        //timeout is used to make sure the menu collapsed before alert is shown
-                                        var sel = hotInstance.getSelected();
-
-                                        styles.setColStyle(sel[1], getSelectedColor());
-                                    }, 100);
-                                }
-                            },
-                            items: {
-                                "rowcolor": {
-                                    name: 'Row color'
-                                }
-                            }
-                        }
-                    })
 
                 }
             });
 
         });
+
+        $('#sort_table').on('change', function(){
+
+            var sortType = $('#sort_table :selected').val();
+
+            var BaseData = {
+                sort_type: sortType,
+                dept_id: $('#filter_dept :selected').val(),
+                degree_id: $('#filter_degree :selected').val(),
+                grade_id: $('#filter_grade :selected').val(),
+                academic_year_id: $('#filter_academic_year :selected').val(),
+                semester_id:$('#filter_semester :selected').val()
+            }
+
+
+            $.ajax({
+                type: 'GET',
+                url: '{{route('admin.course.filter_course_annual_scores')}}',
+                data: BaseData,
+                dataType: "json",
+                success: function(resultData) {
+
+                    alert('here we go');
+                }
+            });
+        })
+
+
+        if($(".sidebar-toggle").toggle($(".sidebar").is(':visible'))) {
+        } else {
+            alert('false');
+        }
 
     </script>
 @stop

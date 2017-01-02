@@ -67,6 +67,7 @@ Route::group([
 
     Route::get('course-annual/get-form-all-course-annual-score', 'CourseAnnualController@formScoreAllCourseAnnual')->name('admin.course.get_form_evaluation_score');
     Route::get('course-annual/get-all-data-course-annual-score', 'CourseAnnualController@allHandsontableData')->name('admin.course.get_all_handsontable_data');
+    Route::get('course-annual/filter-course-annual-scores', 'CourseAnnualController@ajaxFilterScoreCourseAnnual')->name('admin.course.filter_course_annual_scores');
 
 
 
