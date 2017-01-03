@@ -54,17 +54,16 @@
             margin-left: 5px;
         }
         .selection {
-            width: 110px;
-            font-size: 12pt;
+            width: 80px;
+            font-size: 10pt;
             height: 23px;
             margin-left: 5px;
 
 
         }
-        .label {
-            font-size: 12pt;
-            height: 20px;
-            align-content: center;
+        .h4 {
+            text-align: left;
+            margin-top: -3px !important;
         }
     </style>
 
@@ -74,7 +73,7 @@
 
         <div class="box-header with-border">
             <div class="col-md-12 no-padding col-lg-12 col-sm-12">
-                   <label for="year" class=" label label-success col-md-6 no-padding col-lg-6 col-sm-6"> Academic Year: {{$academicYear->name_latin}} /{{$department->name_en}} /Student: {{$degree->name_en}}/ {{$grade->name_en}}</label>
+                   <h4 for="year" class=" h4 col-md-4 no-padding col-lg-4 col-sm-4">{{$academicYear->name_latin}} /{{$department->code}} /{{$degree->name_en}}/ {{$grade->name_en}}</h4>
 
                 <div class="pull-right">
                     <select  name="academic_year" id="filter_academic_year" class="selection col-md-1 col-lg-1 col-sm-1">
@@ -134,9 +133,9 @@
                     </select>
                     @endauth
                     <select  name="sort" id="sort_table" class="selection col-md-1 col-lg-1 col-sm-1">
-                        <option value="">Sort Table</option>
-                        <option value="name">By Name</option>
-                        <option value="id_card">By ID</option>
+                        <option value="">Sort</option>
+                        <option value="name">Name</option>
+                        <option value="id_card">ID</option>
                         <option value="rank">By Rank</option>
                     </select>
                 </div>
