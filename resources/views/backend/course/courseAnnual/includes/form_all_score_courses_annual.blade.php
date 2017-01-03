@@ -59,7 +59,16 @@
             height: 23px;
             margin-left: 5px;
 
-
+        }
+        #filter_academic_year {
+            font-size: 10pt;
+            height: 23px;
+            margin-left: 5px;
+        }
+        #filter_semester{
+            font-size: 10pt;
+            height: 23px;
+            margin-left: 5px;
         }
         .h4 {
             text-align: left;
@@ -76,7 +85,7 @@
                    <h4 for="year" class=" h4 col-md-4 no-padding col-lg-4 col-sm-4">{{$academicYear->name_latin}} /{{$department->code}} /{{$degree->name_en}}/ {{$grade->name_en}}</h4>
 
                 <div class="pull-right">
-                    <select  name="academic_year" id="filter_academic_year" class="selection col-md-1 col-lg-1 col-sm-1">
+                    <select  name="academic_year" id="filter_academic_year" style="width: 100px;" class=" col-md-1 col-lg-1 col-sm-1">
                         @foreach($academicYears as $key=>$year)
                             @if($key == $academicYear->id)
                                 <option value="{{$key}}" selected> {{$year}}</option>
@@ -86,7 +95,7 @@
                         @endforeach
                     </select>
 
-                    <select  name="semester" id="filter_semester" class="selection col-md-1 col-lg-1 col-sm-1">
+                    <select  name="semester" id="filter_semester" style="width: 90px;" class=" col-md-1 col-lg-1 col-sm-1">
                         <option value="">Semester</option>
                         @foreach($semesters as $key=>$semester)
                             @if($key == $semesterId)
@@ -276,17 +285,34 @@
                     setting.nestedHeaders = resultData.nestedHeaders;
                     setting.colWidths = resultData.colWidths;
                     hotInstance = new Handsontable(jQuery("#all_score_course_annual_table")[0], setting)
-
-
                 }
             });
 
         });
 
         $('#sort_table').on('change', function(){
+            filter_table();
+        });
+        $('#filter_academic_year').on('change', function() {
+            filter_table();
+        })
+        $('#filter_grade').on('change', function(){
+            filter_table();
+        });
+        $('#filter_semester').on('change', function() {
+            filter_table();
+        })
+        $('#filter_degree').on('change', function(){
+            filter_table();
+        });
+        $('#filter_dept').on('change', function() {
+            filter_table();
+        })
+
+
+        function filter_table () {
 
             var sortType = $('#sort_table :selected').val();
-
             var BaseData = {
                 sort_type: sortType,
                 dept_id: $('#filter_dept :selected').val(),
@@ -295,19 +321,28 @@
                 academic_year_id: $('#filter_academic_year :selected').val(),
                 semester_id:$('#filter_semester :selected').val()
             }
-
-
             $.ajax({
                 type: 'GET',
                 url: '{{route('admin.course.filter_course_annual_scores')}}',
                 data: BaseData,
                 dataType: "json",
                 success: function(resultData) {
-
-                    alert('here we go');
+                    updateSettingHandsontable(resultData);
                 }
             });
-        })
+        }
+
+        function updateSettingHandsontable(resultData) {
+            setting.data = resultData.data;
+            setting.nestedHeaders = resultData.nestedHeaders;
+            setting.colWidths = resultData.colWidths;
+//            hotInstance = new Handsontable(jQuery("#all_score_course_annual_table")[0], setting)
+            hotInstance.updateSettings({
+                data: resultData['data'],
+                nestedHeaders:resultData['nestedHeaders'],
+                colWidths:resultData['colWidths']
+            });
+        }
 
 
         if($(".sidebar-toggle").toggle($(".sidebar").is(':visible'))) {
