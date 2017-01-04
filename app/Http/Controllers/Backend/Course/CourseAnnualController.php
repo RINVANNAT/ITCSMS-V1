@@ -1741,7 +1741,9 @@ class CourseAnnualController extends Controller
                     $element = $element +['Moyenne'=>number_format((float)($moyenne/(($totalCredit > 0)?$totalCredit:1)), 2, '.', '')];
                     $allMoyenneYearly[] = number_format((float)($moyenne/(($totalCredit > 0)?$totalCredit:1)), 2, '.', '');// array of total average for each student
 
-                    $ranks[] = number_format((float)($moyenne/(($totalCredit > 0)?$totalCredit:1)), 2, '.', '');
+//                    $ranks[] = number_format((float)($moyenne/(($totalCredit > 0)?$totalCredit:1)), 2, '.', '');
+
+                    $ranks[$student->id_card] = number_format((float)($moyenne/(($totalCredit >0)?$totalCredit:1)), 2, '.', '');
 
 
                 } else {
@@ -1832,7 +1834,11 @@ class CourseAnnualController extends Controller
                     }
                 }
             }
+
+
             $arrayData = $finalData;
+
+//            dd($finalData);
         }
 
         //-----here is used to add more about average max and min value ----

@@ -141,12 +141,6 @@
                         @endforeach
                     </select>
                     @endauth
-                    <select  name="sort" id="sort_table" class="selection col-md-1 col-lg-1 col-sm-1">
-                        <option value="">Sort</option>
-                        <option value="name">Name</option>
-                        <option value="id_card">ID</option>
-                        <option value="rank">By Rank</option>
-                    </select>
                 </div>
             </div>
         </div><!-- /.box-header -->
@@ -238,7 +232,7 @@
             height:700,
             width: table_size,
             filters: true,
-            dropdownMenu: ['filter_by_condition', 'filter_action_bar', 'sort'],
+            dropdownMenu: ['filter_by_condition', 'filter_action_bar'],
             className: "htLeft",
             cells: function (row, col, prop) {
                 this.renderer = colorRenderer;
@@ -277,22 +271,141 @@
                 data:BaseData ,
                 dataType: "json",
                 success: function(resultData) {
-
-
                     setting.data = resultData.data;
-//                    setting.colHeaders = resultData.columnHeader;
-//                    setting.columns = resultData.columns;
                     setting.nestedHeaders = resultData.nestedHeaders;
                     setting.colWidths = resultData.colWidths;
-                    hotInstance = new Handsontable(jQuery("#all_score_course_annual_table")[0], setting)
+                    hotInstance = new Handsontable(jQuery("#all_score_course_annual_table")[0], setting);
+
+
+                    hotInstance.updateSettings({
+                        contextMenu: {
+                            callback: function (key, options) {
+
+                                if (key === 'sort') {
+                                    setTimeout(function () {
+                                        //timeout is used to make sure the menu collapsed before alert is shown
+
+                                        var row = hotInstance.getSelected()[0];
+                                        var col = hotInstance.getSelected()[1];
+                                        var data = hotInstance.getData();
+                                        var settingData = setting.data;
+                                        var arrayData = [];
+                                        var averageMaxMin = [];
+                                        for(var key = 0; key < data.length; key++) {
+                                            if(data[key][col] != null) {
+                                                arrayData.push({student_id_card: data[key][1], score: data[key][col]});
+                                            } else {
+                                                break;
+                                            }
+                                        }
+                                        if(col > 3 && col < (hotInstance.countCols() - 5)) {
+
+                                            arrayData.sort(SortByScore);
+                                            var sortedData = [];
+                                            for(var rank=0; rank < arrayData.length; rank++) {
+                                                $.each(settingData, function(key, val) {
+
+                                                    if(val.student_id_card == arrayData[rank].student_id_card) {
+//                                                    console.log(val.student_id_card +'=='+ arrayData[rank].student_id_card);
+                                                        val.number = rank+1;
+                                                        sortedData.push(val)
+                                                    }
+                                                })
+                                            }
+                                            for(var index= arrayData.length; index < settingData.length; index++) {
+                                                averageMaxMin.push(settingData[index])
+                                            }
+                                            var finalData = sortedData.concat(averageMaxMin);
+                                            setting.data = finalData;
+                                            hotInstance.updateSettings({
+                                                data: finalData
+                                            });
+
+                                        }
+
+                                        if(col == 1) {
+
+                                            var dataToSort = settingData.slice(0,arrayData.length);
+                                            averageMaxMin = settingData.slice(arrayData.length);
+                                            dataToSort.sort(SortId);
+                                            var index =0;
+                                            $.each(dataToSort, function(key, val) {
+                                                val.number = index+1;
+                                                index++;
+                                            })
+
+                                            var finalData = dataToSort.concat(averageMaxMin);
+                                            setting.data = finalData;
+                                            hotInstance.updateSettings({
+                                                data: finalData
+                                            });
+                                        }
+
+                                        if(col == 2) {
+
+                                            var dataToSort = settingData.slice(0,arrayData.length);
+                                            averageMaxMin = settingData.slice(arrayData.length);
+                                            dataToSort.sort(SortName);
+                                            var index =0;
+                                            $.each(dataToSort, function(key, val) {
+                                                val.number = index+1;
+                                                index++;
+                                            })
+
+                                            var finalData = dataToSort.concat(averageMaxMin);
+                                            setting.data = finalData;
+                                            hotInstance.updateSettings({
+                                                data: finalData
+                                            });
+                                        }
+
+
+                                    }, 100);
+                                }
+
+                                function SortByScore(a, b){
+                                    var aScore = a.score;
+                                    var bScore = b.score;
+                                    return bScore - aScore ;
+                                }
+                                function SortId(a, b) {
+                                    var aId = a.student_id_card.toLowerCase();
+                                    var bId = b.student_id_card.toLowerCase();
+                                    return ((aId < bId) ? -1 : ((aId > bId ) ? 1 : 0));
+                                }
+
+                                function SortName(a, b) {
+                                    var aName = a.student_name.toLowerCase();
+                                    var bName = b.student_name.toLowerCase();
+                                    return ((aName < bName) ? -1 : ((aName > bName ) ? 1 : 0));
+                                }
+
+                            },
+                            items: {
+                                "sort": {
+                                    name: function() {
+                                        let selectedColumn = hotInstance.getSelected()[1];
+                                        if (selectedColumn == 3 || selectedColumn == 0) {
+                                           return '';
+                                        } else {
+                                            if(selectedColumn < hotInstance.countCols() -5) {
+                                                return '<span><i class="fa fa-leaf"> Sort Column </i></span>';
+                                            } else {
+                                                return '';
+                                            }
+
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    })
+
                 }
             });
 
         });
 
-        $('#sort_table').on('change', function(){
-            filter_table();
-        });
         $('#filter_academic_year').on('change', function() {
             filter_table();
         })
@@ -309,12 +422,9 @@
             filter_table();
         })
 
-
         function filter_table () {
 
-            var sortType = $('#sort_table :selected').val();
             var BaseData = {
-                sort_type: sortType,
                 dept_id: $('#filter_dept :selected').val(),
                 degree_id: $('#filter_degree :selected').val(),
                 grade_id: $('#filter_grade :selected').val(),
