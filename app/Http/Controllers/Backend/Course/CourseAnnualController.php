@@ -991,7 +991,7 @@ class CourseAnnualController extends Controller
     private function handsonTableData($courseAnnualId) {
 
         $arrayData = [];
-        $columnHeader = array(/*'Student_annual_id',*/'Student ID', 'Student Name', 'Gender', 'Num Absence', 'Absence-10%');
+        $columnHeader = array(/*'Student_annual_id',*/'Student ID', 'Student Name', 'M/F', 'Abs', 'Abs'. "<br/>".'10%');
         $columns=  array(
 //            ['data' => 'student_annual_id', 'readOnly'=>true],
             ['data' => 'student_id_card', 'readOnly'=>true],
@@ -1000,6 +1000,7 @@ class CourseAnnualController extends Controller
             ['data' => 'num_absence', 'type' => 'numeric'],
             ['data' => 'absence', 'type' => 'numeric', 'readOnly'=>true]
         );
+        $colWidths = [80,180,55, 55, 55];
 
         $courseAnnual = $this->getCourseAnnualById($courseAnnualId);
         $columnName = $this->getPropertiesFromScoreTable($courseAnnual);
@@ -1011,22 +1012,31 @@ class CourseAnnualController extends Controller
             $courseAnnual->grade_id,
             $courseAnnual->academic_year_id
         );
-
-//        $this->studentScoreCourseAnnually($courseAnnual);
+        $allScoreByCourseAnnual = $this->studentScoreCourseAnnually($courseAnnual);
+        $allNumberAbsences = $this->getAbsenceFromDB();
 
         if($columnName) {
 
             foreach($columnName as $column) {
+                $splits = explode('-', $column->name);
+                $name='';
+                foreach($splits as $split) {
+                    $name = $name.$split.'<br/>';
+                }
+//                dd($name);
                 $columnHeader = array_merge($columnHeader, array($column->name));
                 $columns = array_merge($columns, array(['data'=>$column->name]));
+                $colWidths[] = 70;
             }
             $columns = array_merge($columns, array(['data' => 'average', 'readOnly' => true]));
             $columnHeader = array_merge($columnHeader, array('Average'));
+            $colWidths[] = 70;
 
         } else {
 
             $columns = array_merge($columns, array(['data' => 'average', 'readOnly' => true]));
             $columnHeader = array_merge($columnHeader, array('Average'));
+            $colWidths[] = 70;
         }
 
         //----------------find student score if they have inserted
@@ -1034,19 +1044,19 @@ class CourseAnnualController extends Controller
         foreach($studentByCourse as $student) {
 
             $mergeStudentscore=[];
+//            $studentScore = $this->getPropertiesFromScoreTable($courseAnnual);//join three table scores, percentages, and score_percentage
+//            $studentScore = $studentScore->where('student_annual_id', $student->student_annual_id)
+//                ->select('scores.score', 'scores.score_absence', 'percentages.name', 'percentages.percent', 'percentages.id as percentage_id', 'scores.id as score_id')
+//                ->get();
 
-            $studentScore = $this->getPropertiesFromScoreTable($courseAnnual);//join three table scores, percentages, and score_percentage
-
-            $studentScore = $studentScore->where('student_annual_id', $student->student_annual_id)
-                ->select('scores.score', 'scores.score_absence', 'percentages.name', 'percentages.percent', 'percentages.id as percentage_id', 'scores.id as score_id')
-                ->get();
-
+            $studentScore = $allScoreByCourseAnnual[$courseAnnual->id][$student->student_annual_id];
+            $scoreAbsence = $allNumberAbsences[$courseAnnual->id][$student->student_annual_id];
 
             // get number of absence from database
-            $scoreAbsence = $this->getAbsenceFromDB($courseAnnual->id, $student->student_annual_id);
+//            $scoreAbsence = $this->getAbsenceFromDB($courseAnnual->id, $student->student_annual_id);
             //get total score of one course from DB
-
 //            $totalScore = $this->averages->findAverageByCourseIdAndStudentId($courseAnnual->id, $student->student_annual_id);
+
             $totalScore = 0;
             $scoreIds = []; // there are many score type for one subject and one student :example TP, Midterm, Final-exam
             if($studentScore) {
@@ -1105,6 +1115,7 @@ class CourseAnnualController extends Controller
 
 //        dd($arrayData);
         return json_encode([
+            'colWidths' => $colWidths,
             'data' => $arrayData,
             'columnHeader' => $columnHeader,
             'columns'      =>$columns
@@ -1169,6 +1180,12 @@ class CourseAnnualController extends Controller
     private function studentScoreCourseAnnually($courseAnnual) {
 
 
+//
+//        $scores = DB::table('scores')->where('scores.course_annual_id', $courseAnnual->id)->select('student_annual_id', 'score', 'scores.id as score_id')->groupBy('scores.student_annual_id')->get();
+//        dd($scores);
+
+        $arrayData = [];
+
         $scores = DB::table('scores')
             ->join('percentage_scores', 'percentage_scores.score_id', '=', 'scores.id')
             ->join('percentages', 'percentages.id', '=', 'percentage_scores.percentage_id')
@@ -1180,31 +1197,43 @@ class CourseAnnualController extends Controller
                 ['scores.department_id', $courseAnnual->department_id],
                 ['scores.academic_year_id', $courseAnnual->academic_year_id]
             ])
-            ->groupBy(function($score) {
-                $group = [
-                    'sdfsdf'
-                ];
-                return $group;
-            })
             ->select(
-                'scores.course_annual_id',
+                'scores.course_annual_id','scores.student_annual_id',
                 'scores.score', 'scores.score_absence', 'percentages.name', 'percentages.percent', 'percentages.id as percentage_id', 'scores.id as score_id')
+//            ->distinct('scores.student_annual_id')
+//            ->groupBy(DB::raw('count(*) as student_annual_id, student_annual_id'))
             ->get();
 
+        foreach($scores as $score) {
+            $arrayData[$courseAnnual->id][$score->student_annual_id][] = $score;
+        }
+//        dd($scores);
 
-        dd($scores);
+        return ($arrayData);
     }
 
-    private function getAbsenceFromDB($courseAnnualID, $studentAnnualID) {
+    private function getAbsenceFromDB() {
 
-        $absence = DB::table('absences')
-            ->where([
-                ['course_annual_id', $courseAnnualID],
-                ['student_annual_id', $studentAnnualID]
-            ])
-            ->first();
+        $arrayData=[];
 
-        return $absence;
+        $absences = DB::table('absences')->get();
+        if($absences) {
+            foreach($absences as $absence) {
+                $arrayData[$absence->course_annual_id][$absence->student_annual_id] = $absence;
+            }
+        }
+        return $arrayData;
+
+
+//        dd($arrayData);
+//        $absence = DB::table('absences')
+//            ->where([
+//                ['course_annual_id', $courseAnnualID],
+//                ['student_annual_id', $studentAnnualID]
+//            ])
+//            ->first();
+//
+//        return $absence;
     }
 
     private function getStudentByDeptIdGradeIdDegreeId($deptId, $degreeId, $gradeId, $academicYearID) {

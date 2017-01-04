@@ -3,10 +3,6 @@
 @section ('title', trans('labels.backend.courseAnnuals.title') . ' | ' . trans('labels.backend.courseAnnuals.sub_edit_title'))
 
 @section('page-header')
-    <h1>
-        {{ trans('labels.backend.courseAnnuals.title') }}
-        <small>{{ trans('labels.backend.courseAnnuals.sub_edit_title') }}</small>
-    </h1>
 
     <style>
 
@@ -458,7 +454,7 @@
             table_size = $('.box-body').width();
         });
         var setting = {
-            colHeaders:false,
+            AutoColumnSize:true,
             rowHeaders: true,
             manualColumnMove: true,
             filters: true,
@@ -662,6 +658,7 @@
                     setting.data = resultData.data;
                     setting.colHeaders = resultData.columnHeader;
                     setting.columns = resultData.columns;
+//                    setting.colWidths = resultData.colWidths;
                     // loop for declaring array key of columns score with empty value ---> then we will push the cell score change for updating score value--> this idea is to reduce the amount of parametter that pass to the server
                     declareColumnHeaderDataEmpty();
 
@@ -701,6 +698,8 @@
                                                percentage_name: colNmae,
                                                course_annual_id: '{{$courseAnnualID}}'
                                            };
+
+//                                           console.log(setting.colHeaders);
 
                                            swal({
                                                title: "Confirm",
@@ -787,9 +786,7 @@
                                 }
                             },
                             items: {
-                                "rowcolor": {
-                                    name: 'Row color'
-                                },
+
                                 "deletecol": {
                                     name: '<span><i class="fa fa-trash"> Delete Column</i></span>'
                                 },
