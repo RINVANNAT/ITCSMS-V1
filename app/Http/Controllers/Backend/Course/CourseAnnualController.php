@@ -1671,7 +1671,7 @@ class CourseAnnualController extends Controller
                 $nestedHeaders[0] = array_merge($nestedHeaders[0], [['label'=>'S'.$courseAnnual->semester_id.'_'.$courseAnnual->course_name, 'colspan'=>2]]);
                 $nestedHeaders[1] = array_merge($nestedHeaders[1], [['label'=>'Abs', 'colspan'=>1], ['label'=> $courseAnnual->course_credit, 'colspan'=>1]]);
                 $colWidths[] = 55;
-                $colWidths[] = 150;
+                $colWidths[] = 50;
             }
         }
 
@@ -1690,7 +1690,7 @@ class CourseAnnualController extends Controller
         }
 
         $nestedHeaders[0] = array_merge($nestedHeaders[0], ['Moyenne']);
-        $nestedHeaders[0] = array_merge($nestedHeaders[0], ['Classement']);
+        $nestedHeaders[0] = array_merge($nestedHeaders[0], ['Rank']);
         $nestedHeaders[0] = array_merge($nestedHeaders[0], ['Redouble']);
         $nestedHeaders[0] = array_merge($nestedHeaders[0], ['Observation']);
         $nestedHeaders[0] = array_merge($nestedHeaders[0], ['Rattrapage']);
@@ -1701,11 +1701,11 @@ class CourseAnnualController extends Controller
         $nestedHeaders[1] = array_merge($nestedHeaders[1], [' ']);
         $nestedHeaders[1] = array_merge($nestedHeaders[1], [' ']);
         $nestedHeaders[1] = array_merge($nestedHeaders[1], [' ']);
-        $colWidths[] = 150;
-        $colWidths[] = 150;
         $colWidths[] = 100;
         $colWidths[] = 100;
         $colWidths[] = 100;
+        $colWidths[] = 70;
+        $colWidths[] = 70;
         $colWidths[] = 100;
         $colWidths[] = 100;
         $colWidths[] = 100;
@@ -1837,7 +1837,7 @@ class CourseAnnualController extends Controller
                     $ranks[$student->id_card] = number_format((float)($finalMoyennes/(($allCredit >0)?$allCredit:1)), 2, '.', '');
                 }
 
-                $element = $element +['Classement'=>0];
+                $element = $element +['Rank'=>0];
                 $element = $element +['Redouble'=>' '];
                 $element = $element +['Observation'=> ' '];
                 $element = $element +['Rattrapage'=>' '];
@@ -1856,7 +1856,7 @@ class CourseAnnualController extends Controller
             foreach($ranks as $key => $rank) {
                 foreach($arrayData as $data) {
                     if($data['student_id_card'] == $key ) {
-                        $data['Classement'] = $index+1;
+                        $data['Rank'] = $index+1;
                         $data['number'] = $index+1;
                         $finalData[] = $data;
                         $index++;

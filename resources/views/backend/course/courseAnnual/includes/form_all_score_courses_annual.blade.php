@@ -74,6 +74,14 @@
             text-align: left;
             margin-top: -3px !important;
         }
+        thead tr:first-child {
+            height: 150px !important;
+            vertical-align: middle !important;
+        }
+
+        .handsontable th {
+            white-space: normal !important;
+        }
     </style>
 
 @endsection
@@ -187,7 +195,7 @@
             if(jQuery.isNumeric(value) ) {
                 if(value < 5) {
                     if(prop != 'number' ) {
-                        if(prop != 'Classement') {
+                        if(prop != 'Rank') {
                             var check = prop.split('_');
                             if(check[0] != 'Abs') {
 
