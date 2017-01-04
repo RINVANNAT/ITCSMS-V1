@@ -82,6 +82,10 @@
         .handsontable th {
             white-space: normal !important;
         }
+
+        .handsontable td {
+            color: #000 !important;
+        }
     </style>
 
 @endsection
@@ -202,7 +206,7 @@
                                 if(prop != 'total') {
                                     var colSemester = prop.split('_');
                                     if(colSemester[0] != 'S' ) {
-                                        td.style.backgroundColor = '#FF8D74';
+                                        td.style.backgroundColor = '#cc3300';
                                     }
                                 }
                             }
@@ -233,8 +237,8 @@
             manualColumnMove: false,
             filters: true,
             autoWrapRow: false,
-            manualColumnResize: true,
-            manualRowResize: true,
+            manualColumnResize: false,
+            manualRowResize: false,
             minSpareRows: false,
             fixedColumnsLeft: 3,
             height:700,

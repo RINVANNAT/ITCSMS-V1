@@ -1049,8 +1049,8 @@ class CourseAnnualController extends Controller
 //                ->select('scores.score', 'scores.score_absence', 'percentages.name', 'percentages.percent', 'percentages.id as percentage_id', 'scores.id as score_id')
 //                ->get();
 
-            $studentScore = $allScoreByCourseAnnual[$courseAnnual->id][$student->student_annual_id];
-            $scoreAbsence = $allNumberAbsences[$courseAnnual->id][$student->student_annual_id];
+            $studentScore = isset($allScoreByCourseAnnual[$courseAnnual->id][$student->student_annual_id])?$allScoreByCourseAnnual[$courseAnnual->id][$student->student_annual_id]:[];
+            $scoreAbsence = isset($allNumberAbsences[$courseAnnual->id][$student->student_annual_id])?$allNumberAbsences[$courseAnnual->id][$student->student_annual_id]:null;
 
             // get number of absence from database
 //            $scoreAbsence = $this->getAbsenceFromDB($courseAnnual->id, $student->student_annual_id);
