@@ -88,74 +88,75 @@
         }
     </style>
 
+
+    <div class="box-header with-border" style="margin-bottom: -25px !important;">
+        <div class="col-md-12 no-padding col-lg-12 col-sm-12">
+            <h4 for="year" class=" h4 col-md-4 no-padding col-lg-4 col-sm-4">{{$academicYear->name_latin}} /{{$department->code}} /{{$degree->name_en}}/ {{$grade->name_en}}</h4>
+
+            <div class="pull-right">
+                <select  name="academic_year" id="filter_academic_year" style="width: 100px;" class=" col-md-1 col-lg-1 col-sm-1">
+                    @foreach($academicYears as $key=>$year)
+                        @if($key == $academicYear->id)
+                            <option value="{{$key}}" selected> {{$year}}</option>
+                        @else
+                            <option value="{{$key}}"> {{$year}}</option>
+                        @endif
+                    @endforeach
+                </select>
+
+                <select  name="semester" id="filter_semester" style="width: 90px;" class=" col-md-1 col-lg-1 col-sm-1">
+                    <option value="">Semester</option>
+                    @foreach($semesters as $key=>$semester)
+                        @if($key == $semesterId)
+                            <option value="{{$key}}" selected> {{$semester}}</option>
+                        @else
+                            <option value="{{$key}}"> {{$semester}}</option>
+                        @endif
+                    @endforeach
+                </select>
+
+                <select  name="degree" id="filter_degree" class="selection col-md-1 col-lg-1 col-sm-1">
+                    <option value="">Degree</option>
+                    @foreach($degrees as $key=>$degreeName)
+                        @if($key == $degree->id)
+                            <option value="{{$key}}" selected> {{$degreeName}}</option>
+                        @else
+                            <option value="{{$key}}"> {{$degreeName}}</option>
+                        @endif
+                    @endforeach
+                </select>
+
+
+                <select  name="grade" id="filter_grade" class="selection col-md-1 col-lg-1 col-sm-1">
+                    <option value="">Grade</option>
+                    @foreach($grades as $key=>$gradeName)
+                        @if($key == $grade->id)
+                            <option value="{{$key}}" selected> {{$gradeName}}</option>
+                        @else
+                            <option value="{{$key}}"> {{$gradeName}}</option>
+                        @endif
+                    @endforeach
+                </select>
+                @permission('someone-not-simple-user')
+
+                <select  name="department" id="filter_dept" class="selection col-md-1 col-lg-1 col-sm-1">
+                    <option value="">Department</option>
+                    @foreach($departments as $key=>$departmentName)
+                        @if($key == $department->id)
+                            <option value="{{$key}}" selected> {{$departmentName}}</option>
+                        @else
+                            <option value="{{$key}}"> {{$departmentName}}</option>
+                        @endif
+                    @endforeach
+                </select>
+                @endauth
+            </div>
+        </div>
+    </div><!-- /.box-header -->
+
 @endsection
 @section('content')
     <div class="box box-success">
-
-        <div class="box-header with-border">
-            <div class="col-md-12 no-padding col-lg-12 col-sm-12">
-                   <h4 for="year" class=" h4 col-md-4 no-padding col-lg-4 col-sm-4">{{$academicYear->name_latin}} /{{$department->code}} /{{$degree->name_en}}/ {{$grade->name_en}}</h4>
-
-                <div class="pull-right">
-                    <select  name="academic_year" id="filter_academic_year" style="width: 100px;" class=" col-md-1 col-lg-1 col-sm-1">
-                        @foreach($academicYears as $key=>$year)
-                            @if($key == $academicYear->id)
-                                <option value="{{$key}}" selected> {{$year}}</option>
-                            @else
-                                <option value="{{$key}}"> {{$year}}</option>
-                            @endif
-                        @endforeach
-                    </select>
-
-                    <select  name="semester" id="filter_semester" style="width: 90px;" class=" col-md-1 col-lg-1 col-sm-1">
-                        <option value="">Semester</option>
-                        @foreach($semesters as $key=>$semester)
-                            @if($key == $semesterId)
-                                <option value="{{$key}}" selected> {{$semester}}</option>
-                            @else
-                                <option value="{{$key}}"> {{$semester}}</option>
-                            @endif
-                        @endforeach
-                    </select>
-
-                    <select  name="degree" id="filter_degree" class="selection col-md-1 col-lg-1 col-sm-1">
-                        <option value="">Degree</option>
-                        @foreach($degrees as $key=>$degreeName)
-                            @if($key == $degree->id)
-                                <option value="{{$key}}" selected> {{$degreeName}}</option>
-                            @else
-                                <option value="{{$key}}"> {{$degreeName}}</option>
-                            @endif
-                        @endforeach
-                    </select>
-
-
-                    <select  name="grade" id="filter_grade" class="selection col-md-1 col-lg-1 col-sm-1">
-                        <option value="">Grade</option>
-                        @foreach($grades as $key=>$gradeName)
-                            @if($key == $grade->id)
-                                <option value="{{$key}}" selected> {{$gradeName}}</option>
-                            @else
-                                <option value="{{$key}}"> {{$gradeName}}</option>
-                            @endif
-                        @endforeach
-                    </select>
-                    @permission('someone-not-simple-user')
-
-                    <select  name="department" id="filter_dept" class="selection col-md-1 col-lg-1 col-sm-1">
-                        <option value="">Department</option>
-                        @foreach($departments as $key=>$departmentName)
-                            @if($key == $department->id)
-                                <option value="{{$key}}" selected> {{$departmentName}}</option>
-                            @else
-                                <option value="{{$key}}"> {{$departmentName}}</option>
-                            @endif
-                        @endforeach
-                    </select>
-                    @endauth
-                </div>
-            </div>
-        </div><!-- /.box-header -->
 
         <div class="box-body">
 
@@ -224,10 +225,14 @@
 
         };
 
-        var table_size;
+
         $(window).on('load resize', function(){
-            table_size = $('.box-body').width();
+            var table_width = $('.box-body').width(),
+            table_height = $('.wrapper').height() - $('.main-header').height() - $('.main-footer').height();
+            setting.width = table_width;
+            setting.height = table_height;
         });
+
 
         var numberOfStudents = '{{isset($students)?count($students):0}}';
 
@@ -241,8 +246,6 @@
             manualRowResize: false,
             minSpareRows: false,
             fixedColumnsLeft: 3,
-            height:700,
-            width: table_size,
             filters: true,
             dropdownMenu: ['filter_by_condition', 'filter_action_bar'],
             className: "htLeft",
