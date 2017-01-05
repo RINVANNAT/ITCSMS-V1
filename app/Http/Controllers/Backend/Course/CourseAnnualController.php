@@ -1830,7 +1830,7 @@ class CourseAnnualController extends Controller
                                 $allMoyenneScoreOfStudentBySemester[$semester->id][] = number_format((float)($moyenne/(($creditBySemester > 0)?$creditBySemester:1)), 2, '.', '');// push all moyenne of all student by semester id
                                 $element['S_'.$semester->id]= $absBySemester;
                                 $totalAbseneces = $totalAbseneces + $absBySemester;
-                                $semesterMoyenne[$semester->id]= number_format((float)($moyenne/($creditBySemester > 0)?$creditBySemester:1), 2, '.', '');
+                                $semesterMoyenne[$semester->id]= number_format((float)($moyenne/(($creditBySemester > 0)?$creditBySemester:1)), 2, '.', '');
                                 $finalMoyennes = $finalMoyennes + ($moyenne);
                             }
 
