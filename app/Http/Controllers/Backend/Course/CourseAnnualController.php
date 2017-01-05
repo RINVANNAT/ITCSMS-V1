@@ -1617,7 +1617,7 @@ class CourseAnnualController extends Controller
         $ranks=[];
         $finalCredit=0;
 
-        dd($request->all());
+//        dd($request->all());
 
         $courseAnnuals = $this->getCourseAnnually();
 
@@ -1754,7 +1754,7 @@ class CourseAnnualController extends Controller
                     $element = $element +['S_'.$semesterId => 0];
 
                     if($courseAnnuals) {
-                        dd($courseAnnuals);
+//                        dd($courseAnnuals);
                         foreach($courseAnnuals as $courseAnnual) {
                             $count++;
                             $totalCredit = $totalCredit +$courseAnnual->course_credit;
@@ -1794,7 +1794,7 @@ class CourseAnnualController extends Controller
 
                     // if the user did not select the semester .....so that mean we need to score for all semesters
 
-                    dd($courseAnnuals);
+//                    dd($courseAnnuals);
                     $semesters = Semester::orderBy('id')->get();
                     if($semesters) {
 
