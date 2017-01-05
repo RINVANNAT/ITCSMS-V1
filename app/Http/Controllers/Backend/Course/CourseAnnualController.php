@@ -1965,7 +1965,7 @@ class CourseAnnualController extends Controller
         $arrayData[] = $maxArray;
         $arrayData[] = $minArray;
 
-        dd($arrayData);
+//        dd($arrayData);
 
         return json_encode([
             'data' => $arrayData,
