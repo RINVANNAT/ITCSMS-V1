@@ -465,6 +465,8 @@
         }
 
         function updateSettingHandsontable(resultData) {
+
+            console.log(resultData)
             setting.data = resultData.data;
             setting.nestedHeaders = resultData.nestedHeaders;
             setting.colWidths = resultData.colWidths;
