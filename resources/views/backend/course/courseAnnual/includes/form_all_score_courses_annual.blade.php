@@ -141,7 +141,6 @@
                         @endif
                     @endforeach
                 </select>
-                @permission('someone-not-simple-user')
 
                 <select  name="department" id="filter_dept" class="selection col-md-1 col-lg-1 col-sm-1">
                     <option value="">Department</option>
@@ -153,7 +152,6 @@
                         @endif
                     @endforeach
                 </select>
-                @endauth
             </div>
         </div>
     </div><!-- /.box-header -->
