@@ -779,6 +779,20 @@ class SeedCustomsPermissions extends Seeder
                             'dependency'   => [
                                 'view-backend','view-course-management','view-courseAnnual-management'
                             ]
+                        ],
+                        [
+                            'name'         => 'view-all-score-course-annul',
+                            'display_name' => 'View all scores of course annual',
+                            'dependency'   => [
+                                'view-backend','view-course-management','view-courseAnnual-management'
+                            ]
+                        ],
+                        [
+                            'name'         => 'input-score-course-annual',
+                            'display_name' => 'Input each score course annual',
+                            'dependency'   => [
+                                'view-backend','view-course-management','view-courseAnnual-management'
+                            ]
                         ]
                     ]
                 ],

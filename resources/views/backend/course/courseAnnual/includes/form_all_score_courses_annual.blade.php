@@ -74,8 +74,12 @@
             text-align: left;
             margin-top: -3px !important;
         }
-        thead tr:first-child {
-            height: 150px !important;
+        .handsontable thead tr:first-child {
+            height: 120px !important;
+            vertical-align: middle !important;
+        }
+        .handsontable thead tr:nth-child(2) {
+            height: 50px !important;
             vertical-align: middle !important;
         }
 
@@ -229,13 +233,14 @@
         $(window).on('load resize', function(){
             var table_width = $('.box-body').width(),
             table_height = $('.wrapper').height() - $('.main-header').height() - $('.main-footer').height();
-            setting.width = table_width;
-            setting.height = table_height;
+//            setting.width = table_width;
+//            setting.height = 700;
         });
 
 
         var numberOfStudents = '{{isset($students)?count($students):0}}';
 
+        var table_width;
         var hotInstance;
         var setting = {
             readOnly:true,
@@ -246,6 +251,8 @@
             manualRowResize: false,
             minSpareRows: false,
             fixedColumnsLeft: 3,
+            width: table_width,
+            height: 700,
             filters: true,
             dropdownMenu: ['filter_by_condition', 'filter_action_bar'],
             className: "htLeft",
@@ -471,6 +478,8 @@
 
 
         if($(".sidebar-toggle").toggle($(".sidebar").is(':visible'))) {
+
+
         } else {
             alert('false');
         }

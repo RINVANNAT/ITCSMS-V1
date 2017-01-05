@@ -36,6 +36,7 @@ use App\Models\CourseAnnual;
 use App\Models\Semester;
 use Response;
 use InfyOm\Generator\Utils\ResponseUtil;
+use Illuminate\Support\Facades\Auth;
 
 
 
@@ -85,10 +86,11 @@ class CourseAnnualController extends Controller
 
         $departmentTmps = array();
         foreach ($departments as $value){
-            array_push($departmentTmps,$value['code']." - ".$value["name_en"]);
+
+            $departmentTmps[$value->id] = $value['code']." - ".$value["name_en"];
+//            array_push($departmentTmps,$value['code']." - ".$value["name_en"]);
         }
         $departments = $departmentTmps;
-
 
         $academicYears = AcademicYear::orderBy("id","desc")->lists('name_latin','id')->toArray();
         $degrees = Degree::lists('name_en','id')->toArray();
@@ -249,9 +251,17 @@ class CourseAnnualController extends Controller
             ->editColumn('grade_id', '{!! $grade_id !!}')
             ->editColumn('employee_id', '{!! $employee_id !!}')
             ->addColumn('action', function ($courseAnnual) {
-                return  '<a href="'.route('admin.course.course_annual.edit',$courseAnnual->id).'" class="btn btn-xs btn-primary"><i class="fa fa-pencil" data-toggle="tooltip" data-placement="top" title="" data-original-title="'.trans('buttons.general.crud.edit').'"></i> </a>'.
-                ' <button class="btn btn-xs btn-danger btn-delete" data-remote="'.route('admin.course.course_annual.destroy', $courseAnnual->id) .'"><i class="fa fa-times" data-toggle="tooltip" data-placement="top" title="' . trans('buttons.general.crud.delete') . '"></i></button>'.
-                ' <a href="'.route('admin.course.form_input_score_course_annual',$courseAnnual->id).'" class="btn btn-xs btn-info input_score_course"><i class="fa fa-plus" data-toggle="tooltip" data-placement="top" title="" data-original-title="'.'input score'.'"></i> Input Score </a>';
+                if(Auth::user()->allow('input-score-course-annual')) {
+                    return  '<a href="'.route('admin.course.course_annual.edit',$courseAnnual->id).'" class="btn btn-xs btn-primary"><i class="fa fa-pencil" data-toggle="tooltip" data-placement="top" title="" data-original-title="'.trans('buttons.general.crud.edit').'"></i> </a>'.
+                    ' <button class="btn btn-xs btn-danger btn-delete" data-remote="'.route('admin.course.course_annual.destroy', $courseAnnual->id) .'"><i class="fa fa-times" data-toggle="tooltip" data-placement="top" title="' . trans('buttons.general.crud.delete') . '"></i></button>'.
+                    ' <a href="'.route('admin.course.form_input_score_course_annual',$courseAnnual->id).'" class="btn btn-xs btn-info input_score_course"><i class="fa fa-plus" data-toggle="tooltip" data-placement="top" title="" data-original-title="'.'input score'.'"></i> Score </a>';
+                } else {
+
+                    return  '<a href="'.route('admin.course.course_annual.edit',$courseAnnual->id).'" class="btn btn-xs btn-primary"><i class="fa fa-pencil" data-toggle="tooltip" data-placement="top" title="" data-original-title="'.trans('buttons.general.crud.edit').'"></i> </a>'.
+                    ' <button class="btn btn-xs btn-danger btn-delete" data-remote="'.route('admin.course.course_annual.destroy', $courseAnnual->id) .'"><i class="fa fa-times" data-toggle="tooltip" data-placement="top" title="' . trans('buttons.general.crud.delete') . '"></i></button>';
+
+                }
+
             });
         if ($academic_year = $datatables->request->get('academic_year')) {
             $datatables->where('course_annuals.academic_year_id', '=', $academic_year);
@@ -1950,7 +1960,7 @@ class CourseAnnualController extends Controller
         $arrayData[] = $maxArray;
         $arrayData[] = $minArray;
 
-//        dd($nestedHeaders);
+//        dd($arrayData);
 
         return json_encode([
             'data' => $arrayData,

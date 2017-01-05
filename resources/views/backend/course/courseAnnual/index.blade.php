@@ -55,7 +55,7 @@
                     <button class="btn btn-primary btn-sm pull-right " id="generate_course_annual" style="margin-right: 5px"><i class="fa fa-plus-circle"></i> Generate From Old Course Annual</button>
                     @endauth
 
-                    @permission('evaluation-score')
+                    @permission('view-all-score-course-annul')
                     <button class="btn btn-primary btn-sm pull-right " id="evaluation_score" style="margin-right: 5px"><i class="fa fa-plus-circle"></i> Evaluation </button>
                     @endauth
 
