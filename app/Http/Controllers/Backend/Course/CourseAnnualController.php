@@ -1859,23 +1859,23 @@ class CourseAnnualController extends Controller
 
 
 //            dd($ranks);
-            asort($ranks);
-            $ranks = array_reverse($ranks);
-            $finalData=[];
-            $index =0;
-            foreach($ranks as $key => $rank) {
-                foreach($arrayData as $data) {
-                    if($data['student_id_card'] == $key ) {
-                        $data['Rank'] = $index+1;
-                        $data['number'] = $index+1;
-                        $finalData[] = $data;
-                        $index++;
-                    }
-                }
-            }
+//            asort($ranks);
+//            $ranks = array_reverse($ranks);
+//            $finalData=[];
+//            $index =0;
+//            foreach($ranks as $key => $rank) {
+//                foreach($arrayData as $data) {
+//                    if($data['student_id_card'] == $key ) {
+//                        $data['Rank'] = $index+1;
+//                        $data['number'] = $index+1;
+//                        $finalData[] = $data;
+//                        $index++;
+//                    }
+//                }
+//            }
 
 
-            $arrayData = $finalData;
+//            $arrayData = $finalData;
 
 //            dd($finalData);
         }
