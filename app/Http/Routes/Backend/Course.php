@@ -51,6 +51,8 @@ Route::group([
 
     Route::get('course-annual/generate-course-annual', 'CourseAnnualController@generateCourseAnnual')->name('admin.course.generate_course_annual');
 
+    Route::get('course-annual/get-student-group-filtering', 'CourseAnnualController@filteringStudentGroup')->name('course_annual.get_group_filtering');
+
 
 
 //    ------input score by each course annual ----------------
@@ -62,6 +64,8 @@ Route::group([
     Route::post('course-annual/save-number-absence', 'CourseAnnualController@storeNumberAbsence')->name('admin.course.save_number_absence');
     Route::delete('course-annual/delete-score', 'CourseAnnualController@deleteScoreFromScorePercentage')->name('admin.course.delete-score');
     Route::post('course-annual/{id}/get-average-score', 'CourseAnnualController@calculateAverageByCourseAnnual')->name('admin.course.get_average_score');
+
+    Route::post('course_annual/ajax-switch-course-annaul', 'CourseAnnualController@switchCourseAnnual')->name('course_annual.ajax_switch_course_annual');
 
 //    --------------evaluation score for course annually -------
 

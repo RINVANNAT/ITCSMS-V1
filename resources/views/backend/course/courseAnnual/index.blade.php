@@ -94,6 +94,7 @@
                         d.department = $('#filter_department').val();
                         d.semester = $('#filter_semester').val();
                         d.lecturer = $('#filter_lecturer').val();
+                        d.student_group = $('#filter_student_group').val();
                     }
                 },
 
@@ -111,7 +112,10 @@
 
             enableDeleteRecord($('#courseAnnuals-table'));
 
-            $("div.toolbar").html(
+{{--            {{ Form::select('client_id', $client, Input::old('client_id')) }}--}}
+
+
+             $("div.toolbar").html(
                     '{!! Form::select('academic_year',$academicYears,null, array('class'=>'form-control','id'=>'filter_academic_year')) !!} ' +
                     '{!! Form::select('semester',$semesters,null, array('class'=>'form-control','id'=>'filter_semester','placeholder'=>'Semester')) !!} '+
                     '{!! Form::select('degree',$degrees,null, array('class'=>'form-control','id'=>'filter_degree','placeholder'=>'Degree')) !!} '+
@@ -124,20 +128,25 @@
 //                e.preventDefault();
 //            });
             $('#filter_academic_year').on('change', function(e) {
+
                 oTable.draw();
+                appendFilterGroupSeclection();
                 e.preventDefault();
             });
 
             $('#filter_degree').on('change', function(e) {
                 oTable.draw();
+                appendFilterGroupSeclection();
                 e.preventDefault();
             });
             $('#filter_grade').on('change', function(e) {
                 oTable.draw();
+                appendFilterGroupSeclection();
                 e.preventDefault();
             });
             $('#filter_department').on('change', function(e) {
                 oTable.draw();
+                appendFilterGroupSeclection();
                 e.preventDefault();
             });
             $('#filter_lecturer').on('change', function(e) {
@@ -149,7 +158,46 @@
                 oTable.draw();
                 e.preventDefault();
             });
+
+            $('#filter_student_group').on('change', function(e) {
+                oTable.draw();
+                e.preventDefault();
+            });
         });
+
+        function appendFilterGroupSeclection() {
+
+            var academic_year_id = $('#filter_academic_year :selected').val();
+            var degree_id = $('#filter_degree :selected').val();
+            var grade_id  = $('#filter_grade :selected').val();
+            var department_id = $('#filter_department :selected').val();
+            var baseData = {
+                academic_year_id: academic_year_id,
+                degree_id: degree_id,
+                grade_id:grade_id,
+                department_id:department_id
+            };
+
+            $.ajax({
+                type: 'GET',
+                url: '{{route('course_annual.get_group_filtering')}}',
+                data: baseData,
+                dataType: "html",
+                success: function(resultData) {
+
+//                    console.log(resultData);
+                    if($('#filter_student_group').is(':visible')) {
+                        $('#filter_student_group').html(resultData);
+                    } else {
+                        $('div.toolbar').append(resultData);
+                    }
+
+                }
+            });
+
+
+
+        }
 
 
         $('#course_assignment').on('click', function() {
@@ -259,6 +307,21 @@
 
 
         })
+
+
+        $('#courseAnnuals-table').on('click', '.input_score_course', function(e) {
+            e.preventDefault();
+//            alert($(this).attr('href'));
+            var url = $(this).attr('href');
+            var baseData = {student_group: $(document).find('#filter_student_group').val()};
+//            console.log(baseData.student_group);
+            window.location.replace(url+'?student_group='+baseData.student_group);
+
+        })
+
+//        $(document).on('change', '#filter_student_group', function() {
+//            alert($(this).val())
+//        })
 
 
 

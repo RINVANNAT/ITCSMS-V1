@@ -1610,7 +1610,7 @@ class StudentAnnualController extends Controller
         }
     }
 
-    public function generate_group(GenerateGroupAndIdCardStudentRequest $request, $id){
+    public function generate_group(GenerateStudentGroupRequest $request, $id){
 
 
         $studentListByGroup = [];

@@ -101,6 +101,16 @@
                             </select>
                         </td>
                     </tr>
+
+
+                    <tr>
+                        <td>8</td>
+                        <td> Group </td>
+
+                        <td>
+                            {!! Form::select('group',$allGroups,$course->group, array('class'=>'form-control','id'=>'group')) !!}
+                        </td>
+                    </tr>
                     </tbody>
                 </table>
             {!! Form::close() !!}

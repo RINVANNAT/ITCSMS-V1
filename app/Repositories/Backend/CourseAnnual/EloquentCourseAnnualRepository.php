@@ -115,6 +115,7 @@ class EloquentCourseAnnualRepository implements CourseAnnualRepositoryContract
         $courseAnnual->name_kh = isset($input['name_kh'])?$input['name_kh']:null;
         $courseAnnual->name_en = isset($input['name_en'])?$input['name_en']:null;
         $courseAnnual->name_fr = isset($input['name_fr'])?$input['name_fr']:null;
+        $courseAnnual->group = isset($input['group'])?$input['group']:$courseAnnual->group;
 
         $courseAnnual->updated_at = Carbon::now();
         $courseAnnual->score_percentage_column_1 = isset($input['score_percentage_column_1'])?$input['score_percentage_column_1']:10;

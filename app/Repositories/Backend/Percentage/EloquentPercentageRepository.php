@@ -106,9 +106,12 @@ class EloquentPercentageRepository implements PercentageRepositoryContract
     {
 
         $model = $this->findOrThrowException($id);
-
-        if ($model->delete()) {
-            return true;
+        if($model) {
+            if ($model->delete()) {
+                return true;
+            }
+        } else {
+            return false;
         }
 
         throw new GeneralException(trans('exceptions.backend.general.delete_error'));

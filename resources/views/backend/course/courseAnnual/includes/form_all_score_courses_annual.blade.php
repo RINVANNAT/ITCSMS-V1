@@ -152,6 +152,7 @@
                         @endif
                     @endforeach
                 </select>
+
             </div>
         </div>
     </div><!-- /.box-header -->
@@ -161,7 +162,6 @@
     <div class="box box-success">
 
         <div class="box-body">
-
             <div id="all_score_course_annual_table" class="table table-striped handsontable htColumnHeaders">
 
             </div>
@@ -229,11 +229,10 @@
 
 
         $(window).on('load resize', function(){
-            var table_width = $('.box-body').width(),
-            table_height = $('.wrapper').height() - $('.main-header').height() - $('.main-footer').height();
-//            setting.width = table_width;
-//            setting.height = 700;
+
+//
         });
+
 
 
         var numberOfStudents = '{{isset($students)?count($students):0}}';
@@ -424,6 +423,25 @@
                 }
             });
 
+
+            $(window).resize(function() {
+                var table_width = $('.box-body').width();
+                setting.width = table_width;
+                hotInstance.updateSettings({
+                    width: table_width
+                });
+            });
+
+
+            $('.sidebar-toggle').on('click', function() {
+
+                var table_width = $('.box-body').width();
+                setting.width = table_width;
+                hotInstance.updateSettings({
+                    width: table_width
+                });
+
+            })
         });
 
         $('#filter_academic_year').on('change', function() {
@@ -477,12 +495,10 @@
         }
 
 
-        if($(".sidebar-toggle").toggle($(".sidebar").is(':visible'))) {
 
 
-        } else {
-            alert('false');
-        }
+
+
 
     </script>
 @stop

@@ -310,7 +310,23 @@
             color: #000 !important;
         }
 
+        .selection {
+            width: 120px;
+            font-size: 13pt;
+            height: 23px;
+            margin-bottom: 5px;
 
+        }
+        #filter_academic_year {
+            font-size: 10pt;
+            height: 23px;
+            margin-left: 5px;
+        }
+        #filter_semester{
+            font-size: 10pt;
+            height: 23px;
+            margin-left: 5px;
+        }
     </style>
 
 @endsection
@@ -320,10 +336,25 @@
     <div class="box box-success">
 
         <div class="box-header with-border">
-            <h3 class="box-title">Subject: <span class="label label-success">{{$courseAnnual->name_en}}</span></h3>
-            <div class="btn-group pull-right">
+            <div class="pull-left">
+                <select  name="available_course" id="available_course" class=" form-control col-md-2 col-lg-2 col-sm-2">
+                    <option value="">Other Course</option>
+                    @foreach($availableCourses as $course)
+                        @if($course->id == $courseAnnual->id)
 
-                <button class="btn btn-primary btn-xs" id="save_editted_score" style="margin-right:5px">Save Changes!</button>
+                            <option value="{{$course->id}}" selected> {{$course->name_en.'/ Group:_'.$course->group.' /'.$course->department->code.'/'.$course->grade->name_en}}</option>
+                        @else
+                            <option value="{{$course->id}}"> {{$course->name_en.'/ Group:_'.$course->group.' /'.$course->department->code.'/'.$course->grade->name_en}}</option>
+                        @endif
+                    @endforeach
+                </select>
+
+            </div>
+
+{{--            <label for="description" class="label label-success">{{$courseAnnual->academic_year->name_latin}} </label>--}}
+            <button class="btn btn-primary btn-xs pull-right" id="save_editted_score" style="margin-left:5px">Save Changes!</button>
+            <div class="btn-group pull-right btn_action_group">
+
                 <button type="button" class="btn btn-warning btn-xs dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
                     Actions <span class="caret"></span>
                 </button>
@@ -410,6 +441,12 @@
             setting.data = resultData.data;
             setting.colHeaders = resultData.columnHeader;
             setting.columns = resultData.columns;
+
+            if(!resultData.should_add_score) {
+                $('.btn_action_group').hide();
+            } else {
+                $('.btn_action_group').show();
+            }
             hotInstance.updateSettings({
                 data: resultData['data'],
                 colHeaders:resultData['columnHeader'],
@@ -425,13 +462,14 @@
             Handsontable.renderers.TextRenderer.apply(this, arguments);
 
             if(cellIndex.length >0) {
-//                console.log(cellIndex);
                 for(var i =0; i< cellIndex.length; i++) {
                     if(cellIndex[i]['row'] == row) {
 
                         if( setting.columns[col]['data'] == cellIndex[i]['col']) {
+                            var explode = prop.split('-');
+                            var percentage = parseInt(explode[explode.length-1]);
 
-                            if(value > 100) { // the score should be lower or equal 100
+                            if(value > percentage) { // the score should be lower or equal 100
                                 td.style.backgroundColor = 'red';
                             } else {
                                 td.style.backgroundColor = '#FEFFB0';
@@ -465,7 +503,7 @@
             filters: true,
             autoWrapRow: true,
             minSpareRows: false,
-            stretchH: 'last',
+            stretchH: 'all',
             height:800,
             width: table_size,
             filters: true,
@@ -500,19 +538,33 @@
                         var tableData = setting.data;
                         if(columnIndex != 'num_absence') {
 
+                            var explode = columnIndex.split('-');
+                            var percentage = parseInt(explode[explode.length-1]);
                             var rowData = hotInstance.getData();
                             var element={};
                             var score_id = 'score_id'+'_'+columnIndex;
                             for(var keyIndex=0; keyIndex< tableData.length; keyIndex++) {
                                 $.each(tableData[keyIndex],function(i, value){
-//                                    console.log(index+'--->'+value);
                                     if(rowData[rowIndex][0] == value) {
-                                        element = {
-                                            score_id: tableData[keyIndex][score_id],
-                                            score: newValue,
-                                            score_absence: tableData[keyIndex]['absence'],
-                                            course_annual_id: '{{$courseAnnualID}}'
-                                        };
+
+                                        if(newValue <= percentage) {
+                                            element = {
+                                                score_id: tableData[keyIndex][score_id],
+                                                score: newValue,
+                                                score_absence: tableData[keyIndex]['absence'],
+                                                course_annual_id: $('select[name=available_course] :selected').val()
+                                            };
+                                        } else {
+                                            notify('error', 'Danger', 'Score must be less than or equal to '+percentage )
+
+                                            element = {
+                                                score_id: tableData[keyIndex][score_id],
+                                                score: 0,
+                                                score_absence: tableData[keyIndex]['absence'],
+                                                course_annual_id: $('select[name=available_course] :selected').val()
+                                            };
+                                        }
+
                                     }
                                 });
 
@@ -524,20 +576,13 @@
                         if(columnIndex == 'num_absence') {
                             var arrayAbsence=[];
                             var rowData = hotInstance.getData();
-
                             for(var keyIndex=0; keyIndex< tableData.length; keyIndex++) {
                                 $.each(tableData[keyIndex],function(i, value){
-//                                    console.log(index+'--->'+value);
                                     if(rowData[rowIndex][0] == value) {//rowData[rowIndex][0] with the row data we get rowDat by Key rowIndex then we will get the student_id_card
                                         element = {
                                             num_absence: newValue,
                                             student_annual_id: tableData[keyIndex]['student_annual_id'],
-//                                            department_id: tableData[keyIndex]['department_id'],
-//                                            degree_id: tableData[keyIndex]['degree_id'],
-//                                            grade_id:           tableData[keyIndex]['grade_id'],
-//                                            academic_year_id :  tableData[keyIndex]['academic_year_id'],
-//                                            semester_id:        tableData[keyIndex]['semester_id'],
-                                            course_annual_id: '{{$courseAnnualID}}'
+                                            course_annual_id: $('select[name=available_course] :selected').val()
                                         };
                                     }
                                 });
@@ -575,9 +620,9 @@
                         '</div>'+
 
                         '<div class="form-group col-sm-12 no-padding">' +
-                            '<label for="column_name" class="col-sm-2 control-label pop_margin no-padding">Column Name</label>'+
+                            '<label for="column_name" class="col-sm-2 control-label pop_margin no-padding">Score Name</label>'+
                             '<div class="col-sm-7 no-padding">'+
-                                '<input type="text" class="form-control" id="name_exam" name="name_exam" required>'+
+                                '<input type="text" class="form-control" id="name_exam" name="name_exam" required value="Midterm">'+
                             '</div>'+
                         '</div class="form-group col-sm-12 no-padding">'+
                 '<div class="form-group col-sm-12 no-padding">' +
@@ -618,10 +663,10 @@
                     percentage_name: colHeader+'-'+percentage+'%',
                     percentage:percentage,
                     percentage_type: $('#score_type :selected').val(),
-                    course_annual_id: '{{$courseAnnualID}}'
+                    course_annual_id:$('select[name=available_course] :selected').val()
                 };
 
-                var BaseUrl = '{{route('admin.course.add_new_column_courseannual')}}'
+                var addScoreBaseUrl = '{{route('admin.course.add_new_column_courseannual')}}'
 
                 swal({
                     title: "Confirm",
@@ -635,13 +680,14 @@
                     if (confirmed) {
                         $.ajax({
                             type: 'POST',
-                            url: BaseUrl,
+                            url: addScoreBaseUrl,
                             data: baseData,
                             dataType: "json",
                             success: function(resultData) {
                                 updateSettingHandsontable(resultData);
                                 declareColumnHeaderDataEmpty();
                                 $('#popup').hide();
+
                             }
                         });
                     }
@@ -650,42 +696,32 @@
 
         $('document').ready(function() {
 
-            var BaseUrl = '{{route('admin.course.get_data_course_annual_score')}}';
+            var getDataBaseUrl = '{{route('admin.course.get_data_course_annual_score')}}';
 
             //--------------- when document ready call ajax
             $.ajax({
                 type: 'GET',
-                url: BaseUrl,
-                data: {course_annual_id: '{{$courseAnnualID}}' },
+                url: getDataBaseUrl,
+                data: {course_annual_id: '{{$courseAnnualID}}', student_group:'{{$studentGroup}}' },
                 dataType: "json",
                 success: function(resultData) {
 
                     setting.data = resultData.data;
                     setting.colHeaders = resultData.columnHeader;
                     setting.columns = resultData.columns;
+                    if(!resultData.should_add_score) {
+                        $('.btn_action_group').hide();
+                    }
 //                    setting.colWidths = resultData.colWidths;
                     // loop for declaring array key of columns score with empty value ---> then we will push the cell score change for updating score value--> this idea is to reduce the amount of parametter that pass to the server
                     declareColumnHeaderDataEmpty();
 
                     hotInstance = new Handsontable(jQuery("#score_table")[0], setting);
-
-
                     hotInstance.updateSettings({
                         contextMenu: {
                             callback: function (key, options) {
 
-                                if (key === 'rowcolor') {
-                                    setTimeout(function () {
-                                        //timeout is used to make sure the menu collapsed before alert is shown
-                                        var row = hotInstance.getSelected()[0];
-                                        sentrow = row;
-                                        hotInstance.render();
-
-                                    }, 100);
-                                }
-
                                 if (key === 'deletecol') {
-                                    console.log( hotInstance.getSelected());
 
                                     if(hotInstance.getSelected()) {
 
@@ -697,14 +733,13 @@
                                            var colNmae = setting.colHeaders[colIndex];
                                            var percentageId = setting.data[0]['percentage_id_'+colNmae];
                                            var courseAnnualId = setting.data[0]['course_annual_id'];
-                                           var baseUrl = '{{route('admin.course.delete-score')}}';
+                                           var deleteUrl = '{{route('admin.course.delete-score')}}';
                                            var baseData = {
                                                percentage_id: percentageId,
                                                percentage_name: colNmae,
-                                               course_annual_id: '{{$courseAnnualID}}'
+                                               course_annual_id: $('select[name=available_course] :selected').val()
                                            };
 
-//                                           console.log(setting.colHeaders);
 
                                            swal({
                                                title: "Confirm",
@@ -716,11 +751,10 @@
                                                closeOnConfirm: true
                                            }, function(confirmed) {
                                                if (confirmed) {
-                                                   console.log(confirmed);
 
                                                    $.ajax({
                                                        type: 'DELETE',
-                                                       url: baseUrl,
+                                                       url: deleteUrl,
                                                        data: baseData,
                                                        dataType: "json",
                                                        success: function(resultData) {
@@ -775,7 +809,6 @@
 
                                 function unfreezeColumn(column) {
 
-                                    console.log(column);
 
                                     if (column > setting.fixedColumnsLeft - 1) {
                                         return; // not fixed
@@ -840,14 +873,14 @@
                             //recursive function fo send the request by the column data array
                             function sendRequest (index, message) {
 
-                                var baseUrl = '{{route('admin.course.save_score_course_annual')}}';
+                                var saveBaseUrl = '{{route('admin.course.save_score_course_annual')}}';
 
                                 if(index < setting.colHeaders.length -1) {
 
                                     if(colDataArray[setting.colHeaders[index]].length > 0 ) {
                                         $.ajax({
                                             type: 'POST',
-                                            url: baseUrl,
+                                            url: saveBaseUrl,
                                             data: {data:colDataArray[setting.colHeaders[index]]},
                                             dataType: "json",
                                             success: function(resultData) {
@@ -879,9 +912,6 @@
                         if(cellChanges.length > 0) { // save each number absence
 
                             var url = '{{route('admin.course.save_number_absence')}}';
-
-                            console.log(cellChanges);
-                            console.log(cellScoreChanges);
                             $.ajax({
                                 type: 'POST',
                                 url: url,
@@ -930,7 +960,7 @@
                 } else {
 
 
-                    var Baseurl = '{{route('admin.course.get_average_score', $courseAnnualID)}}';
+                    var getAverageBaseurl = '{{route('admin.course.get_average_score', $courseAnnualID)}}';
 
                     swal({
                         title: "Confirm",
@@ -945,7 +975,7 @@
 
                             $.ajax({
                                 type: 'POST',
-                                url: Baseurl,
+                                url: getAverageBaseurl,
                                 data: {data: setting.data, colHeader:setting.colHeaders},
                                 dataType: "json",
                                 success: function(resultData) {
@@ -960,16 +990,37 @@
 //                                alert('Redraw Table');
                                 }
                             });
-
-
                         }
                     });
                 }
             }
+        });
+        $('select[name=available_course]').on('change', function() {
+
+            $.ajax({
+                type: 'POST',
+                url: '{{route('course_annual.ajax_switch_course_annual')}}',
+                data: {course_annual_id:$(this).val()},
+                dataType: "json",
+                success: function(resultData) {
+
+                    updateSettingHandsontable(resultData);
+                    declareColumnHeaderDataEmpty()
+                }
+            });
+        });
 
 
-
+        $('.sidebar-toggle').on('click', function() {
+            alert('hello');
         })
+
+
+        $(window).resize(function() {
+            //update stuff
+        });
+
+
 
     </script>
 @stop

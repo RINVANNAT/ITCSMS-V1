@@ -17,9 +17,11 @@ class CreateEmployeesTable extends Migration
 		{
 			$table->increments('id');
 			$table->string('name_kh')->nullable()->index();
+			$table->integer('id_card')->nullable();
 			$table->string('name_latin');
             $table->string('email');
             $table->string('phone');
+			$table->string('status')->nullable();
 			$table->timestamp('birthdate')->nullable();
 			$table->string('address')->nullable();
 			$table->boolean('active')->default(true);
