@@ -781,7 +781,7 @@ class SeedCustomsPermissions extends Seeder
                             ]
                         ],
                         [
-                            'name'         => 'view-all-score-course-annul',
+                            'name'         => 'view-all-score-course-annul', // View all score/course in a department
                             'display_name' => 'View all scores of course annual',
                             'dependency'   => [
                                 'view-backend','view-course-management','view-courseAnnual-management'
@@ -790,6 +790,13 @@ class SeedCustomsPermissions extends Seeder
                         [
                             'name'         => 'input-score-course-annual',
                             'display_name' => 'Input each score course annual',
+                            'dependency'   => [
+                                'view-backend','view-course-management','view-courseAnnual-management'
+                            ]
+                        ],
+                        [
+                            'name'         => 'view-all-score-in-all-department', // View all score/course in all departments
+                            'display_name' => 'View all score in all department',
                             'dependency'   => [
                                 'view-backend','view-course-management','view-courseAnnual-management'
                             ]

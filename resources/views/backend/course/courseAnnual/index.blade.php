@@ -20,7 +20,6 @@
     @if (Session::has('flash_notification.message'))
         <div class="alert alert-{{ Session::get('flash_notification.level') }}">
             <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
-
             {{ Session::get('flash_notification.message') }}
         </div>
     @endif
@@ -82,7 +81,7 @@
                 processing: true,
                 serverSide: true,
                 pageLength: {!! config('app.records_per_page')!!},
-
+                deferLoading : true,
                 ajax: {
                     url:"{!! route('admin.course.course_annual.data') !!}",
                     type:"POST",
@@ -121,7 +120,7 @@
                     '{!! Form::select('degree',$degrees,null, array('class'=>'form-control','id'=>'filter_degree','placeholder'=>'Degree')) !!} '+
                     '{!! Form::select('grade',$grades,null, array('class'=>'form-control','id'=>'filter_grade','placeholder'=>'Year')) !!} '+
                     '{!! Form::select('department',$departments,null, array('class'=>'form-control','id'=>'filter_department','placeholder'=>'Department')) !!} '+
-                    '{!! Form::select('lecturer',$employees,null, array('class'=>'form-control','id'=>'filter_lecturer','placeholder'=>'Lecturer')) !!} '
+                    '{!! Form::select('lecturer',[],null, array('class'=>'form-control','id'=>'filter_lecturer','placeholder'=>'Lecturer')) !!} '
             );
 //            $('#filter_academic_year, #filter_degree, #filter_grade, #filter_department').on('change', function(e) {
 //                oTable.draw();

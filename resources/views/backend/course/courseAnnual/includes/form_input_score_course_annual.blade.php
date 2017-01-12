@@ -638,7 +638,7 @@
                     var boxHeaderHeight = $('.box-header').height();
                     var height = $(document).height();
 
-                    var tab_height = height - (mainHeaderHeight + mainFooterHeight + boxHeaderHeight + 120);
+                    var tab_height = height - (mainHeaderHeight + mainFooterHeight + boxHeaderHeight + 70);
 
                     alert(tab_height);
 

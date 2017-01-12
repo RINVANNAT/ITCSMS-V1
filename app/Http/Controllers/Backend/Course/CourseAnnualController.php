@@ -79,40 +79,23 @@ class CourseAnnualController extends Controller
     public function index()
     {
 
-        $employee = Employee::where('user_id', Auth::user()->id)->first();
-        $departments = Department::orderBy("code")
-            ->where("code","!=","Study Office")
-            ->where("code","!=","Academic")
-            ->where("code","!=","Finance");
 
-        if(($employee->department_id != 9) && ($employee->department_id != 10) && (($employee->department_id != 11) && ($employee->department_id != 12))) {
 
-            $departments = $departments ->where('id', $employee->department_id )->get();
-
+        if(auth()->user()->allow("view-all-score-in-all-department")){
+            // Get all department in case user have previlege to view all department
+            $departments = Department::where("parent_id",config('access.departments.department_academic'))->orderBy("code")->lists("code","id");
         } else {
-            $departments = $departments->get();
+            $employee = Employee::where('user_id', Auth::user()->id)->first();
+            $departments = $employee->department()->lists("code","id");
         }
 
-        $departmentTmps = array();
-        foreach ($departments as $value){
-
-            $departmentTmps[$value->id] = $value['code']." - ".$value["name_en"];
-//            array_push($departmentTmps,$value['code']." - ".$value["name_en"]);
-        }
-        $departments = $departmentTmps;
-
-        $academicYears = AcademicYear::orderBy("id","desc")->lists('name_latin','id')->toArray();
-        $degrees = Degree::lists('name_en','id')->toArray();
-        $grades = Grade::lists('name_en','id')->toArray();
-        $semesters = Semester::orderBy('id')->lists('name_en', 'id')->toArray();
+        $academicYears = AcademicYear::orderBy("id","desc")->lists('name_latin','id');
+        $degrees = Degree::lists('name_en','id');
+        $grades = Grade::lists('name_en','id');
+        $semesters = Semester::orderBy('id')->lists('name_en', 'id');
         $studentGroup = StudentAnnual::select('group')->groupBy('group')->orderBy('group')->lists('group');
 
-//        dd($studentGroup);
-
-        $courses = Course::orderBy("updated_at","desc")->lists('name_en','id')->toArray();
-        $employees = Employee::lists("name_latin","id")->toArray();
-
-        return view('backend.course.courseAnnual.index',compact('departments','academicYears','degrees','grades','courses','employees', 'semesters', 'studentGroup'));
+        return view('backend.course.courseAnnual.index',compact('departments','academicYears','degrees','grades', 'semesters', 'studentGroup'));
     }
 
     public function filteringStudentGroup(Request $request) {
@@ -269,6 +252,7 @@ class CourseAnnualController extends Controller
 
     public function data(Request $request)
     {
+        $employee =Employee::where('user_id', Auth::user()->id)->first();
         $courseAnnuals = DB::table('course_annuals')
             ->leftJoin('courses','course_annuals.course_id', '=', 'courses.id')
             ->leftJoin('employees','course_annuals.employee_id', '=', 'employees.id')
@@ -326,27 +310,29 @@ class CourseAnnualController extends Controller
         if ($grade = $datatables->request->get('grade')) {
             $datatables->where('course_annuals.grade_id', '=', $grade);
         }
-        if ($department = $datatables->request->get('department')) {
-            $datatables->where('course_annuals.department_id', '=', $department);
-        }
-
-        if ($lecturer = $datatables->request->get('lecturer')) {
-            $datatables->where('course_annuals.employee_id', '=', $lecturer);
-        }
 
         if ($semester = $datatables->request->get('semester')) {
             $datatables->where('course_annuals.semester_id', '=', $semester);
         }
 
-        $employee =Employee::where('user_id', Auth::user()->id)->first();
-
-        if(($employee->department_id != 9) && ($employee->department_id != 10) && (($employee->department_id != 11) && ($employee->department_id != 12))) {
-
-            $datatables = $datatables ->where('course_annuals.employee_id', $employee->id )->get();
-
+        if(auth()->user()->allow("view-all-score-in-all-department")){ // user has permission to view all course/score in all department
+            if ($department = $datatables->request->get('department')) {
+                $datatables->where('course_annuals.department_id', '=', $department);
+            }
         } else {
-            $datatables = $datatables->get();
+            $datatables = $datatables ->where('course_annuals.department_id', $employee->department()->id );
         }
+
+        if(auth()->user()->allow("view-all-score-course-annul")){
+            if ($lecturer = $datatables->request->get('lecturer')) {
+                $datatables->where('course_annuals.employee_id', '=', $lecturer);
+            }
+        } else {
+            $datatables = $datatables ->where('course_annuals.employee_id', $employee->id );
+        }
+
+        $datatables = $datatables->get();
+
 
 
         return $datatables->make(true);
