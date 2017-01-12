@@ -206,6 +206,8 @@ class CourseAnnualController extends Controller
     public function edit(EditCourseAnnualRequest $request, $id)
     {
         $courseAnnual = $this->courseAnnuals->findOrThrowException($id);
+
+//        dd($courseAnnual);
         $departments = Department::lists('name_kh','id')->toArray();
 
         $academicYears = AcademicYear::lists('name_latin','id')->toArray();
@@ -214,6 +216,8 @@ class CourseAnnualController extends Controller
 //        $courses = Course::lists('name_kh','id')->toArray();
 
         $courses = Course::orderBy('updated_at', 'desc')->get();
+
+//        dd($courses);
 
         $semesters = Semester::lists("name_kh", "id");
         $employees = Employee::lists("name_kh","id");
@@ -1131,7 +1135,8 @@ class CourseAnnualController extends Controller
             ['data' => 'student_name', 'readOnly'=>true],
             ['data' => 'student_gender', 'readOnly'=>true],
             ['data' => 'num_absence', 'type' => 'numeric'],
-            ['data' => 'absence', 'type' => 'numeric', 'readOnly'=>true]
+            ['data' => 'absence', 'type' => 'numeric', 'readOnly'=>true],
+
         );
         $colWidths = [80,180,55, 55, 55];
 
@@ -1159,23 +1164,18 @@ class CourseAnnualController extends Controller
         if($columnName) {
 
             foreach($columnName as $column) {
-                $splits = explode('-', $column->name);
-                $name='';
-                foreach($splits as $split) {
-                    $name = $name.$split.'<br/>';
-                }
                 $columnHeader = array_merge($columnHeader, array($column->name));
                 $columns = array_merge($columns, array(['data'=>$column->name]));
                 $colWidths[] = 70;
             }
-            $columns = array_merge($columns, array(['data' => 'average', 'readOnly' => true]));
-            $columnHeader = array_merge($columnHeader, array('Average'));
+            $columns = array_merge($columns, array(['data' => 'average', 'readOnly' => true], ['data' => 'observe']));
+            $columnHeader = array_merge($columnHeader, array('Average', 'Observatoion'));
             $colWidths[] = 70;
 
         } else {
 
-            $columns = array_merge($columns, array(['data' => 'average', 'readOnly' => true]));
-            $columnHeader = array_merge($columnHeader, array('Average'));
+            $columns = array_merge($columns, array(['data' => 'average', 'readOnly' => true], ['data' => 'observe']));
+            $columnHeader = array_merge($columnHeader, array('Average', 'Observatoion'));
             $colWidths[] = 70;
         }
 
@@ -1205,7 +1205,9 @@ class CourseAnnualController extends Controller
             $totalScore = 0;
             $checkPercent=0;
             $scoreIds = []; // there are many score type for one subject and one student :example TP, Midterm, Final-exam
+//            dd($studentScore);
             if($studentScore) {
+
 //                dd($studentScore);
                 foreach($studentScore as $score) {
                     $checkPercent = $checkPercent +$score->percent;
@@ -1220,10 +1222,13 @@ class CourseAnnualController extends Controller
             } else{
                 $scoreData=[];
             }
+
+//            dd($totalScore);
             $totalCourseHours = ($courseAnnual->time_course + $courseAnnual->time_tp + $courseAnnual->time_td);
-//            dd($totalCourseHours);
-            $scoreAbsenceByCourse =  number_format((float)((($totalCourseHours/2)-$scoreAbsence->num_absence)*10)/($totalCourseHours/2), 2, '.', '');
-            $totalScore = $totalScore + $scoreAbsenceByCourse;
+//            dd($courseAnnual);
+            $scoreAbsenceByCourse =  number_format((float)((($totalCourseHours/2)-(isset($scoreAbsence)?$scoreAbsence->num_absence:0))*10)/((($totalCourseHours != 0)?$totalCourseHours/2:1)), 2, '.', '');
+            $totalScore = $totalScore + (($scoreAbsenceByCourse > 0)?$scoreAbsenceByCourse:0);
+
 
 
             //----check if every student has the score equal or upper then 90 then we set status to true..then we will not allow teacher to add any score
@@ -1248,10 +1253,11 @@ class CourseAnnualController extends Controller
                 'student_id_card' => $student->id_card,
                 'student_name' => $student->name_latin,
                 'student_gender' => $student->code,
-                'absence'          => $scoreAbsenceByCourse,
+                'absence'          => ($scoreAbsenceByCourse > 0)?$scoreAbsenceByCourse:10,
                 'num_absence'      => isset($scoreAbsence) ? $scoreAbsence->num_absence:0,
 //                'average'          => isset($totalScore) ? (float)$totalScore->average: null,
                 'average'          => $totalScore,
+                'observe'   => null,
 
                 'department_id'    => $courseAnnual->department_id,
                 'degree_id'        => $courseAnnual->degree_id,

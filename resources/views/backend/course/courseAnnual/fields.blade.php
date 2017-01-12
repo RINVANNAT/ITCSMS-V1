@@ -6,6 +6,7 @@
             <select name="course_id" id="course_id" class="form-control">
                 @foreach($courses as $course)
                     @if($course->id == $courseAnnual->course_id)
+<!--                        --><?php //dd($course);?>
                         <option selected value="{{$course->id}}" time_course="{{$course->time_course}}" time_tp="{{$course->time_tp}}" time_td="{{$course->time_td}}" name_kh="{{$course->name_kh}}" name_en="{{$course->name_en}}" name_fr="{{$course->name_fr}}">{{$course->name_kh}}</option>
                     @else
                         <option value="{{$course->id}}" time_course="{{$course->time_course}}" time_tp="{{$course->time_tp}}" time_td="{{$course->time_td}}" name_kh="{{$course->name_kh}}" name_en="{{$course->name_en}}" name_fr="{{$course->name_fr}}">{{$course->name_kh}}</option>
