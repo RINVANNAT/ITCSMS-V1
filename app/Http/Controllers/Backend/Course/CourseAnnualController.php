@@ -1168,14 +1168,14 @@ class CourseAnnualController extends Controller
                 $columns = array_merge($columns, array(['data'=>$column->name]));
                 $colWidths[] = 70;
             }
-            $columns = array_merge($columns, array(['data' => 'average', 'readOnly' => true], ['data' => 'observe']));
-            $columnHeader = array_merge($columnHeader, array('Average', 'Observatoion'));
+            $columns = array_merge($columns, array(['data' => 'average', 'readOnly' => true]));
+            $columnHeader = array_merge($columnHeader, array('Average'/*, 'Observatoion'*/));
             $colWidths[] = 70;
 
         } else {
 
-            $columns = array_merge($columns, array(['data' => 'average', 'readOnly' => true], ['data' => 'observe']));
-            $columnHeader = array_merge($columnHeader, array('Average', 'Observatoion'));
+            $columns = array_merge($columns, array(['data' => 'average', 'readOnly' => true]));
+            $columnHeader = array_merge($columnHeader, array('Average' /*,'Observatoion'*/));
             $colWidths[] = 70;
         }
 
@@ -1257,7 +1257,7 @@ class CourseAnnualController extends Controller
                 'num_absence'      => isset($scoreAbsence) ? $scoreAbsence->num_absence:0,
 //                'average'          => isset($totalScore) ? (float)$totalScore->average: null,
                 'average'          => $totalScore,
-                'observe'   => null,
+
 
                 'department_id'    => $courseAnnual->department_id,
                 'degree_id'        => $courseAnnual->degree_id,

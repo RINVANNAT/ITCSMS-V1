@@ -329,6 +329,11 @@
         }
     </style>
 
+
+@endsection
+
+@section('after-style-end')
+    <link rel="stylesheet" href="node_modules/jquery-offcanvas/dist/jquery.offcanvas.min.css">
 @endsection
 
 @section('content')
@@ -386,6 +391,7 @@
     {!! Html::style('plugins/handsontable-test/handsontable.full.min.css') !!}
     {!! Html::script('plugins/handsontable-test/handsontable.full.min.js') !!}
     {!! Html::script('plugins/jpopup/jpopup.js') !!}
+
 
     {{--myscript--}}
 
@@ -492,10 +498,9 @@
         };
 
         // this is the property of the handson table / or configuration
-        var table_size;
-        $(window).on('load resize', function(){
-            table_size = $('.box-body').width();
-        });
+
+
+
         var setting = {
             AutoColumnSize:true,
             rowHeaders: true,
@@ -504,8 +509,6 @@
             autoWrapRow: true,
             minSpareRows: false,
             stretchH: 'all',
-            height:800,
-            width: table_size,
             filters: true,
             dropdownMenu: ['filter_by_condition', 'filter_action_bar'],
 //            hiddenColumns: {
@@ -608,93 +611,7 @@
             }
         };
 
-        $('#add_column').on('click', function(e) {
-
-            var pop = new jPopup({
-               title: 'Add New Column',
-                content: '<div class="form-group col-sm-12 no-padding">' +
-                            '<label for="percentage" class="col-sm-2 control-label pop_margin no-padding "> Percentage</label>'+
-                            '<div class="col-sm-7 no-padding">'+
-                            '<input type="text" id="percentage" class="form-control number_only" required>'+
-                            '</div>'+
-                        '</div>'+
-
-                        '<div class="form-group col-sm-12 no-padding">' +
-                            '<label for="column_name" class="col-sm-2 control-label pop_margin no-padding">Score Name</label>'+
-                            '<div class="col-sm-7 no-padding">'+
-                                '<input type="text" class="form-control" id="name_exam" name="name_exam" required value="Midterm">'+
-                            '</div>'+
-                        '</div class="form-group col-sm-12 no-padding">'+
-                '<div class="form-group col-sm-12 no-padding">' +
-                        '<label for="score_type" class="col-sm-3 no-padding"> Score Type</label>'+
-                        '<div class="col-sm-7 no-padding">' +
-                            '<select name="score_type" class="form-control" id="score_type">'+
-                                '<option value="normal">Normal</option>'+
-                                '<option value="subplementary_exam"> Subplementary Exam</option>'+
-                            '</select>'+
-                        '</div>'+
-                '</div>'+
-                '<button id="add_col_ok" class="btn btn-xs btn-primary pull-right"> OK </button>',
-                closeButton:true,
-                buttons:[{
-//                    text: '<button class="btn btn-danger"> OK </button>',
-//                    value: 'ok',
-//                    "class": "ok_event"
-                }]
-            });
-
-            pop.open(function(r) {// call this function to open dialog
-                switch(r) {
-                    case 'ok':// vaule of btn
-                       //do nothing
-                        break;
-                }
-
-            });
-        });
-
-        function addColumns(colHeader, percentage) {
-
-                var headerLength = setting.colHeaders.length;
-//            var averageData = setting.columns[headerLength-1].data;
-                var averageDataType = setting.columns[headerLength-1].type;
-                var averageHeader = setting.colHeaders[headerLength-1];
-                var baseData = {
-                    percentage_name: colHeader+'-'+percentage+'%',
-                    percentage:percentage,
-                    percentage_type: $('#score_type :selected').val(),
-                    course_annual_id:$('select[name=available_course] :selected').val()
-                };
-
-                var addScoreBaseUrl = '{{route('admin.course.add_new_column_courseannual')}}'
-
-                swal({
-                    title: "Confirm",
-                    text: "You want to add column?",
-                    type: "info",
-                    showCancelButton: true,
-                    confirmButtonColor: "#DD6B55",
-                    confirmButtonText: "Yes, add id!!",
-                    closeOnConfirm: true
-                }, function(confirmed) {
-                    if (confirmed) {
-                        $.ajax({
-                            type: 'POST',
-                            url: addScoreBaseUrl,
-                            data: baseData,
-                            dataType: "json",
-                            success: function(resultData) {
-                                updateSettingHandsontable(resultData);
-                                declareColumnHeaderDataEmpty();
-                                $('#popup').hide();
-
-                            }
-                        });
-                    }
-                });
-        }
-
-        $('document').ready(function() {
+        $(document).ready(function() {
 
             var getDataBaseUrl = '{{route('admin.course.get_data_course_annual_score')}}';
 
@@ -715,8 +632,29 @@
 //                    setting.colWidths = resultData.colWidths;
                     // loop for declaring array key of columns score with empty value ---> then we will push the cell score change for updating score value--> this idea is to reduce the amount of parametter that pass to the server
                     declareColumnHeaderDataEmpty();
+                    var table_size = $('.box-body').width();
+                    var mainHeaderHeight = $('.main-header').height();
+                    var mainFooterHeight = $('.main-footer').height();
+                    var boxHeaderHeight = $('.box-header').height();
+                    var height = $(document).height();
+
+                    var tab_height = height - (mainHeaderHeight + mainFooterHeight + boxHeaderHeight + 120);
+
+                    alert(tab_height);
+
+                    setting.height=tab_height;
+                    setting.width=table_size;
 
                     hotInstance = new Handsontable(jQuery("#score_table")[0], setting);
+
+                    $(window).on('resize', function(){
+                        var table_size = $('.box-body').width();
+                        setting.width=table_size;
+                        hotInstance.updateSettings({
+                            width:table_size
+                        });
+                    })
+
                     hotInstance.updateSettings({
                         contextMenu: {
                             callback: function (key, options) {
@@ -847,10 +785,133 @@
                             }
                         }
                     })
+
+
+
+
+//                    $('.sidebar-toggle').on('click', function() {
+//                        var table_size = $('.box-body').width();
+////                        alert(table_size);
+//                        var height = 500;
+//                        setting.height=height;
+//                        setting.width=table_size;
+////
+//                        hotInstance.updateSettings({
+//                            width:table_size,
+//                            height: height
+//                        });
+//                    })
+
+
+//                    $('.sidebar-toggle').on('shown.bs.collapse', function() {
+//                        alert("shown");
+//                    }).on('show.bs.collapse', function() {
+//                        console.log("show");
+//                    });
+
+
+
+
+
+
                 }
             });
 
+
+
+
+
+
+
         });
+
+
+        $('#add_column').on('click', function(e) {
+
+            var pop = new jPopup({
+                title: 'Add New Column',
+                content: '<div class="form-group col-sm-12 no-padding">' +
+                '<label for="percentage" class="col-sm-2 control-label pop_margin no-padding "> Percentage</label>'+
+                '<div class="col-sm-7 no-padding">'+
+                '<input type="text" id="percentage" class="form-control number_only" required>'+
+                '</div>'+
+                '</div>'+
+
+                '<div class="form-group col-sm-12 no-padding">' +
+                '<label for="column_name" class="col-sm-2 control-label pop_margin no-padding">Score Name</label>'+
+                '<div class="col-sm-7 no-padding">'+
+                '<input type="text" class="form-control" id="name_exam" name="name_exam" required value="Midterm">'+
+                '</div>'+
+                '</div class="form-group col-sm-12 no-padding">'+
+                '<div class="form-group col-sm-12 no-padding">' +
+                '<label for="score_type" class="col-sm-3 no-padding"> Score Type</label>'+
+                '<div class="col-sm-7 no-padding">' +
+                '<select name="score_type" class="form-control" id="score_type">'+
+                '<option value="normal">Normal</option>'+
+                '<option value="subplementary_exam"> Subplementary Exam</option>'+
+                '</select>'+
+                '</div>'+
+                '</div>'+
+                '<button id="add_col_ok" class="btn btn-xs btn-primary pull-right"> OK </button>',
+                closeButton:true,
+                buttons:[{
+//                    text: '<button class="btn btn-danger"> OK </button>',
+//                    value: 'ok',
+//                    "class": "ok_event"
+                }]
+            });
+
+            pop.open(function(r) {// call this function to open dialog
+                switch(r) {
+                    case 'ok':// vaule of btn
+                        //do nothing
+                        break;
+                }
+
+            });
+        });
+
+        function addColumns(colHeader, percentage) {
+
+            var headerLength = setting.colHeaders.length;
+//            var averageData = setting.columns[headerLength-1].data;
+            var averageDataType = setting.columns[headerLength-1].type;
+            var averageHeader = setting.colHeaders[headerLength-1];
+            var baseData = {
+                percentage_name: colHeader+'-'+percentage+'%',
+                percentage:percentage,
+                percentage_type: $('#score_type :selected').val(),
+                course_annual_id:$('select[name=available_course] :selected').val()
+            };
+
+            var addScoreBaseUrl = '{{route('admin.course.add_new_column_courseannual')}}'
+
+            swal({
+                title: "Confirm",
+                text: "You want to add column?",
+                type: "info",
+                showCancelButton: true,
+                confirmButtonColor: "#DD6B55",
+                confirmButtonText: "Yes, add id!!",
+                closeOnConfirm: true
+            }, function(confirmed) {
+                if (confirmed) {
+                    $.ajax({
+                        type: 'POST',
+                        url: addScoreBaseUrl,
+                        data: baseData,
+                        dataType: "json",
+                        success: function(resultData) {
+                            updateSettingHandsontable(resultData);
+                            declareColumnHeaderDataEmpty();
+                            $('#popup').hide();
+
+                        }
+                    });
+                }
+            });
+        }
+
 
         $('#save_editted_score').on('click', function() {
 
@@ -1011,14 +1072,30 @@
         });
 
 
-        $('.sidebar-toggle').on('click', function() {
-            alert('hello');
-        })
 
 
-        $(window).resize(function() {
-            //update stuff
+
+//        function returnWidth() {
+//            var j= $('box-boddy').width();
+//
+//            return j;
+//        }
+//
+//
+//        $(".sidebar-toggle").on('click', function(e) {
+//            e.preventDefault();
+//
+//            console.log(returnWidth());
+//            $("#sidebar").toggleClass("toggled");
+//        });
+
+
+        $('#sidebar').on('shown.bs.collapse', function() {
+            console.log("shown");
+        }).on('show.bs.collapse', function() {
+            console.log("show");
         });
+
 
 
 
