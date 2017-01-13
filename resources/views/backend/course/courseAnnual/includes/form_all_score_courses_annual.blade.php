@@ -271,7 +271,7 @@
 
         };
 
-        $('document').ready(function() {
+        $(document).ready(function() {
 
             var BaseUrl = '{{route('admin.course.get_all_handsontable_data')}}';
             var BaseData = {
@@ -293,9 +293,21 @@
                     setting.data = resultData.data;
                     setting.nestedHeaders = resultData.nestedHeaders;
                     setting.colWidths = resultData.colWidths;
+
+                    var table_size = $('.box-body').width();
+                    var mainHeaderHeight = $('.main-header').height();
+                    var mainFooterHeight = $('.main-footer').height();
+                    var boxHeaderHeight = $('.box-header').height();
+                    var height = $(document).height();
+
+                    var tab_height = height - (mainHeaderHeight + mainFooterHeight + boxHeaderHeight + 60);
+
+                    alert(tab_height);
+
+                    setting.height=tab_height;
+                    setting.width=table_size;
+
                     hotInstance = new Handsontable(jQuery("#all_score_course_annual_table")[0], setting);
-
-
                     hotInstance.updateSettings({
                         contextMenu: {
                             callback: function (key, options) {

@@ -1212,7 +1212,7 @@ class CourseAnnualController extends Controller
 //            dd($totalScore);
             $totalCourseHours = ($courseAnnual->time_course + $courseAnnual->time_tp + $courseAnnual->time_td);
 //            dd($courseAnnual);
-            $scoreAbsenceByCourse =  number_format((float)((($totalCourseHours/2)-(isset($scoreAbsence)?$scoreAbsence->num_absence:0))*10)/((($totalCourseHours != 0)?$totalCourseHours/2:1)), 2, '.', '');
+            $scoreAbsenceByCourse =  number_format((float)((($totalCourseHours)-(isset($scoreAbsence)?$scoreAbsence->num_absence:0))*10)/((($totalCourseHours != 0)?$totalCourseHours:1)), 2, '.', '');
             $totalScore = $totalScore + (($scoreAbsenceByCourse > 0)?$scoreAbsenceByCourse:0);
 
 

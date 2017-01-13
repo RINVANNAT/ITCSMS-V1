@@ -557,9 +557,10 @@
                                                 score_absence: tableData[keyIndex]['absence'],
                                                 course_annual_id: $('select[name=available_course] :selected').val()
                                             };
-                                        } else {
-                                            notify('error', 'Danger', 'Score must be less than or equal to '+percentage )
 
+                                        } else {
+
+                                            notify('error', 'Danger', 'Score must be less than or equal to '+percentage )
                                             element = {
                                                 score_id: tableData[keyIndex][score_id],
                                                 score: 0,
@@ -572,8 +573,27 @@
                                 });
 
                             }
+
+
                             colDataArray[columnIndex].push(element) // cell changes data by each column score use to pass data to server
                             cellScoreChanges.push(element); // use this cell score change to test if user has made any changes
+
+                            var check_val = colDataArray[columnIndex];
+                            var explode = columnIndex.split('-');
+
+
+
+                            for(var kIndex = 0; kIndex < check_val.length; kIndex++) {
+
+//                                console.log(check_val[kIndex]['score']+'---'+parseInt(explode[explode.length-1]));
+                                if(check_val[kIndex]['score'] > parseInt(explode[explode.length-1])){
+                                    $('#save_editted_score').hide();
+                                    break;
+                                } else {
+                                    $('#save_editted_score').show();
+                                }
+
+                            }
                         }
 
                         if(columnIndex == 'num_absence') {
@@ -911,7 +931,6 @@
                 }
             });
         }
-
 
         $('#save_editted_score').on('click', function() {
 
