@@ -69,6 +69,10 @@ class Course extends Model
 	public function grade(){
 		return $this->belongsTo('App\Models\Grade');
 	}
+
+	public function courseAnnual() {
+		return $this->hasMany('App\Models\CourseAnnual');
+	}
 	
 
 }

@@ -419,8 +419,7 @@ class CourseAnnualController extends Controller
 
     private function getCourseAnnually() {
 
-        $courseAnnuals = DB::table('course_annuals')
-            ->join('courses', 'courses.id', '=', 'course_annuals.course_id')
+        $courseAnnuals = CourseAnnual::join('courses', 'courses.id', '=', 'course_annuals.course_id')
             ->leftJoin('employees','course_annuals.employee_id', '=', 'employees.id')
             ->leftJoin('departments','course_annuals.department_id', '=', 'departments.id')
             ->leftJoin('degrees','course_annuals.degree_id', '=', 'degrees.id')
@@ -1052,26 +1051,17 @@ class CourseAnnualController extends Controller
 
     public function getFormScoreByCourse(Request $request, $courseAnnualID) {
 
-//        dd($request->all());
         $studentGroup = $request->student_group;
-
         $courseAnnual = $this->getCourseAnnualById($courseAnnualID);
-
-//        dd($courseAnnual->academic_year->name_latin);
         $groups = $this->getStudentGroupFromDB();
         $groups = $groups->where('studentAnnuals.department_id', '=',$courseAnnual->department_id);
         $groups = $groups->where('studentAnnuals.academic_year_id', '=',$courseAnnual->academic_year_id);
         $groups = $groups->where('studentAnnuals.degree_id', '=',$courseAnnual->degree_id)->lists('group');
-//        dd($groups);
-//        ($studentGroup != "undefined")?($groups = $groups->where('studentAnnuals.group', '=',$studentGroup)->lists('group')): ($groups = $groups->lists('group'));
         $departments = Department::orderBy("code")
             ->where("code","!=","Study Office")
             ->where("code","!=","Academic")
             ->where("code","!=","Finance")
             ->get();
-
-//        dd($groups);
-
         $departmentTmps = array();
         foreach ($departments as $value){
             $departmentTmps[$value->id] = $value['code'];
@@ -1090,10 +1080,10 @@ class CourseAnnualController extends Controller
                 ['semester_id', $courseAnnual->semester_id]
             ]);
 
+        //--------need to change from here---check permission should do right here
+
         if(($employee->department_id != 9) && ($employee->department_id != 10) && (($employee->department_id != 11) && ($employee->department_id != 12))) {
-
             $availableCourses = $availableCourses->where('employee_id', $employee->id)->orderBy('id')->get();
-
         } else {
 
             $availableCourses = $availableCourses->orderBy('id')->get();
@@ -1122,12 +1112,9 @@ class CourseAnnualController extends Controller
             ['data' => 'student_gender', 'readOnly'=>true],
             ['data' => 'num_absence', 'type' => 'numeric'],
             ['data' => 'absence', 'type' => 'numeric', 'readOnly'=>true],
-
         );
         $colWidths = [80,180,55, 55, 55];
-
         $courseAnnual = $this->getCourseAnnualById($courseAnnualId);
-
         $columnName = $this->getPropertiesFromScoreTable($courseAnnual);
         $columnName = $columnName->select('percentages.name', 'percentages.id as percentage_id')->groupBy('percentages.id')->orderBy('percentages.id')->get();
 
@@ -1154,14 +1141,14 @@ class CourseAnnualController extends Controller
                 $columns = array_merge($columns, array(['data'=>$column->name]));
                 $colWidths[] = 70;
             }
-            $columns = array_merge($columns, array(['data' => 'average', 'readOnly' => true]));
-            $columnHeader = array_merge($columnHeader, array('Average'/*, 'Observatoion'*/));
+            $columns = array_merge($columns, array(['data' => 'average', 'readOnly' => true], ['data'=> 'notation']));
+            $columnHeader = array_merge($columnHeader, array('Average', 'Notation'));
             $colWidths[] = 70;
 
         } else {
 
-            $columns = array_merge($columns, array(['data' => 'average', 'readOnly' => true]));
-            $columnHeader = array_merge($columnHeader, array('Average' /*,'Observatoion'*/));
+            $columns = array_merge($columns, array(['data' => 'average', 'readOnly' => true], ['data'=> 'notation']));
+            $columnHeader = array_merge($columnHeader, array('Average' ,'Notation'));
             $colWidths[] = 70;
         }
 
@@ -1169,71 +1156,44 @@ class CourseAnnualController extends Controller
 
         $checkScoreReachHundredPercent=0;
         foreach($studentByCourse as $student) {
-
-            $mergeStudentscore=[];
-//            $studentScore = $this->getPropertiesFromScoreTable($courseAnnual);//join three table scores, percentages, and score_percentage
-//            $studentScore = $studentScore->where('student_annual_id', $student->student_annual_id)
-//                ->select('scores.score', 'scores.score_absence', 'percentages.name', 'percentages.percent', 'percentages.id as percentage_id', 'scores.id as score_id')
-//                ->get();
-
             $studentScore = isset($allScoreByCourseAnnual[$courseAnnual->id][$student->student_annual_id])?$allScoreByCourseAnnual[$courseAnnual->id][$student->student_annual_id]:[];
-
-//            dd($studentScore);
-            $scoreAbsence = isset($allNumberAbsences[$courseAnnual->id][$student->student_annual_id])?$allNumberAbsences[$courseAnnual->id][$student->student_annual_id]:null;
-
-//            dd($scoreAbsence);
-
-            // get number of absence from database
-//            $scoreAbsence = $this->getAbsenceFromDB($courseAnnual->id, $student->student_annual_id);
-            //get total score of one course from DB
-//            $totalScore = $this->averages->findAverageByCourseIdAndStudentId($courseAnnual->id, $student->student_annual_id);
+            $scoreAbsence = isset($allNumberAbsences[$courseAnnual->id][$student->student_annual_id])?$allNumberAbsences[$courseAnnual->id][$student->student_annual_id]:null;// get number of absence from database
 
             $totalScore = 0;
             $checkPercent=0;
             $scoreIds = []; // there are many score type for one subject and one student :example TP, Midterm, Final-exam
-//            dd($studentScore);
             if($studentScore) {
-
-//                dd($studentScore);
                 foreach($studentScore as $score) {
-                    $checkPercent = $checkPercent +$score->percent;
-                    $totalScore = $totalScore + ($score->score);
+                    $checkPercent = $checkPercent +$score->percent; // we check the percentage if it is equal or bigger than 90 then we should now allow teacher to create more score
+                    $totalScore = $totalScore + ($score->score);// calculate score for stuent annual
                     $scoreData[$score->name] = $score->score;
                     $scoreData['percentage_id'.'_'.$score->name] =  $score->percentage_id;
                     $scoreData['score_id'.'_'.$score->name]=$score->score_id;
                     $scoreIds[] = $score->score_id;
-
                 }
-
             } else{
                 $scoreData=[];
             }
-
-//            dd($totalScore);
+            //--calculate score absence to sum with the real score
             $totalCourseHours = ($courseAnnual->time_course + $courseAnnual->time_tp + $courseAnnual->time_td);
-//            dd($courseAnnual);
             $scoreAbsenceByCourse =  number_format((float)((($totalCourseHours)-(isset($scoreAbsence)?$scoreAbsence->num_absence:0))*10)/((($totalCourseHours != 0)?$totalCourseHours:1)), 2, '.', '');
             $totalScore = $totalScore + (($scoreAbsenceByCourse > 0)?$scoreAbsenceByCourse:0);
 
-
-
             //----check if every student has the score equal or upper then 90 then we set status to true..then we will not allow teacher to add any score
-
             if($checkPercent >= 90 ) {
                 $checkScoreReachHundredPercent++;
             }
 
             /*------store average(a total score of one courseannual in table averages)-----------*/
-
             $input = [
                 'course_annual_id' => $courseAnnualId,
                 'student_annual_id' => $student->student_annual_id,
                 'average'   => $totalScore
             ];
             $storeTotalScore = $this->storeTotalScoreEachCourseAnnual($input, $scoreIds); // private function to store of update total score
-
             /*------------end of insert of update total score -------------*/
 
+            // ------create element data array for handsontable
             $element = array(
                 'student_annual_id'=>$student->student_annual_id,
                 'student_id_card' => $student->id_card,
@@ -1243,8 +1203,7 @@ class CourseAnnualController extends Controller
                 'num_absence'      => isset($scoreAbsence) ? $scoreAbsence->num_absence:0,
 //                'average'          => isset($totalScore) ? (float)$totalScore->average: null,
                 'average'          => $totalScore,
-
-
+                'notatioin'        => '',
                 'department_id'    => $courseAnnual->department_id,
                 'degree_id'        => $courseAnnual->degree_id,
                 'grade_id'         => $courseAnnual->grade_id,
@@ -1252,14 +1211,9 @@ class CourseAnnualController extends Controller
                 'semester_id'      => $courseAnnual->semester_id,
                 'employee_id'      => $courseAnnual->employee_id,
             );
-
-
             $mergerData = array_merge($element,$scoreData);
-
-
             $arrayData[] = $mergerData;
         }
-
         if($checkScoreReachHundredPercent == count($studentByCourse)) {
             return json_encode([
                 'colWidths' => $colWidths,
@@ -1277,8 +1231,6 @@ class CourseAnnualController extends Controller
                 'should_add_score' => true
             ]);
         }
-
-
     }
 
     public function saveScoreByCourseAnnual(Request $request) {
@@ -1333,15 +1285,9 @@ class CourseAnnualController extends Controller
             ]);
 
         return $tableScore;
-
     }
 
     private function studentScoreCourseAnnually($courseAnnual) {
-
-
-//
-//        $scores = DB::table('scores')->where('scores.course_annual_id', $courseAnnual->id)->select('student_annual_id', 'score', 'scores.id as score_id')->groupBy('scores.student_annual_id')->get();
-//        dd($scores);
 
         $arrayData = [];
         $scores = DB::table('scores')
@@ -1358,15 +1304,11 @@ class CourseAnnualController extends Controller
             ->select(
                 'scores.course_annual_id','scores.student_annual_id',
                 'scores.score', 'scores.score_absence', 'percentages.name', 'percentages.percent', 'percentages.id as percentage_id', 'scores.id as score_id')
-//            ->distinct('scores.student_annual_id')
-//            ->groupBy(DB::raw('count(*) as student_annual_id, student_annual_id'))
             ->get();
 
         foreach($scores as $score) {
             $arrayData[$courseAnnual->id][$score->student_annual_id][] = $score;
         }
-//        dd($scores);
-
         return ($arrayData);
     }
 
@@ -1382,16 +1324,6 @@ class CourseAnnualController extends Controller
         }
         return $arrayData;
 
-
-//        dd($arrayData);
-//        $absence = DB::table('absences')
-//            ->where([
-//                ['course_annual_id', $courseAnnualID],
-//                ['student_annual_id', $studentAnnualID]
-//            ])
-//            ->first();
-//
-//        return $absence;
     }
 
     private function getStudentByDeptIdGradeIdDegreeId($deptId, $degreeId, $gradeId, $academicYearID) {
@@ -1415,18 +1347,13 @@ class CourseAnnualController extends Controller
                 'studentAnnuals.academic_year_id'
             )
             ->orderBy('students.id_card', 'ASC');
-
-
         return $studentAnnual;
-
     }
 
     public function insertPercentageNameNPercentage(Request $request) {
 
     //this is to add new column name of the exam score ...and we have to initial the value 0 to the student for this type of exam
 
-
-//        dd($request->percentage);
         $check =0;
         $courseAnnual = $this->getCourseAnnualById($request->course_annual_id);
         $percentageInput = [
@@ -1455,9 +1382,6 @@ class CourseAnnualController extends Controller
             $studentByCourse =$studentByCourse->get();
         }
 
-
-
-
         foreach($percentageInput as $input) {
 
             $savePercentageId = $this->percentages->create($input);// return the percentage id
@@ -1484,8 +1408,6 @@ class CourseAnnualController extends Controller
                     }
                 }
             }
-
-
         }
 
         if($check == (count($studentByCourse) * count($percentageInput))) {
@@ -1498,62 +1420,42 @@ class CourseAnnualController extends Controller
 
     public function storeNumberAbsence(Request $request) {
 
-
         $baseData = $request->baseData;
-//        dd($baseData);
-
-//        dd($baseData);
         $checkStore = 0;
         $checkUpdate=0;
         $checkNOTUpdatOrStore = 0;
-
-
         if(count($baseData) > 0) {
             foreach($baseData as $data) {
 
                 if($data['student_annual_id'] != null) {
 
                     $absence = $this->absences->findIfExist($data['course_annual_id'], $data['student_annual_id']);
-
-//                dd($absence);
-
                     if($absence) {
                         //update absence
-
                         $update = $this->absences->update($absence->id, $data);
-
                         if($update) {
                             $checkUpdate++;
                         }
-
                     } else {
                         // store absence
-
                         $store = $this->absences->create($data);
                         if($store) {
                             $checkStore++;
-
                         }
                     }
-
                 } else {
                     $checkNOTUpdatOrStore++;
                 }
             }
         }
-
         if($checkStore+$checkUpdate == count($baseData)- $checkNOTUpdatOrStore) {
             $reDrawTable = $this->handsonTableData($data['course_annual_id']);
             return $reDrawTable;
         }
-
     }
 
     public function deleteScoreFromScorePercentage(Request $request) {
 
-
-        $checkDeleteScore =0;
-        $unceck=0;
         $scores =Score::join('percentage_scores', 'percentage_scores.score_id', '=', 'scores.id')
             ->join('percentages', 'percentages.id', '=', 'percentage_scores.percentage_id')
             ->where('course_annual_id', $request->course_annual_id)
@@ -1573,9 +1475,6 @@ class CourseAnnualController extends Controller
             $reDrawTable = $this->handsonTableData($request->course_annual_id);
             return $reDrawTable;
         }
-
-
-
     }
 
 
@@ -1668,7 +1567,6 @@ class CourseAnnualController extends Controller
 
     private function storeTotalScoreEachCourseAnnual($input,$scoreIds) {
 
-
         $totalScore = $this->averages->findAverageByCourseIdAndStudentId($input['course_annual_id'], (int)$input['student_annual_id']);// check if total score existe
         $check=false;
         if($totalScore) {
@@ -1681,7 +1579,6 @@ class CourseAnnualController extends Controller
         } else {
             // insert new calculation score
             $storeAverage = $this->averages->create($input); // store total score then return collection-with ID
-
             if($storeAverage) {
                 // this is to store the relation table
                 $checkRelation =0;
@@ -1697,16 +1594,14 @@ class CourseAnnualController extends Controller
                 }
             }
         }
-
         if($check == true) {
             return true;
         } else {
             return false;
         }
-
     }
 
-//    --------------course annual score evaluation ---------------
+//    --------------all course annual score  ---------------
 
 
     public function formScoreAllCourseAnnual(Request $request) {
@@ -1716,7 +1611,6 @@ class CourseAnnualController extends Controller
         $gradeId = $request->grade_id;
         $academicYearID = $request->academic_year_id;
         $semesterId = $request->semester_id;
-
 
         $courseAnnuals = $this->getCourseAnnually();
 
@@ -1735,17 +1629,12 @@ class CourseAnnualController extends Controller
         if($semesterId) {
             $courseAnnuals = $courseAnnuals->where('course_annuals.semester_id', '=',$semesterId);
         }
-
         $courseAnnuals = $courseAnnuals->orderBy('semester_id')->get();
-
-
 
         $department = Department::where('id', $deptId)->first();
         $degree = Degree::where('id', $degreeId)->first();
         $grade = Grade::where('id', $gradeId)->first();
         $academicYear = AcademicYear::where('id', $academicYearID)->first();
-//        $semesters = Semester::get();
-
         $departments = Department::orderBy("code")
             ->where("code","!=","Study Office")
             ->where("code","!=","Academic")
@@ -1762,9 +1651,6 @@ class CourseAnnualController extends Controller
         $degrees = Degree::lists('name_en','id')->toArray();
         $grades = Grade::lists('name_en','id')->toArray();
         $semesters = Semester::orderBy('id')->lists('name_en', 'id')->toArray();
-
-//        dd($semesters);
-
 
         return view('backend.course.courseAnnual.includes.form_all_score_courses_annual', compact('department',
             'degree', 'grade', 'academicYear', 'semesters', 'semesterId', 'courseAnnuals',
@@ -1786,8 +1672,6 @@ class CourseAnnualController extends Controller
         $ranks=[];
         $finalCredit=0;
 
-//        dd($request->all());
-
         $courseAnnuals = $this->getCourseAnnually();
 
         if($deptId) {
@@ -1806,9 +1690,12 @@ class CourseAnnualController extends Controller
             $courseAnnuals = $courseAnnuals->where('course_annuals.semester_id', '=',$semesterId);
         }
 
+//        dd($courseAnnuals->select('course_annuals.course_id', DB::raw('count(*) as course_id'))->groupBy('course_id')->get());
+
         $students = $this->getStudentByDeptIdGradeIdDegreeId($deptId, $degreeId, $gradeId, $academicYearID);
         $students = $students->get();
         $courseAnnuals = $courseAnnuals->orderBy('semester_id')->get();
+//        dd($courseAnnuals);
 
         $allProperties = $this->getCourseAnnualWithScore($courseAnnuals);
         $averages = $allProperties['averages'];
@@ -1845,17 +1732,33 @@ class CourseAnnualController extends Controller
             }
         }
 
+
+
         $creditInEachSemester =  [];
+        $courseAnnualByCourseId =[];
         if($courseAnnuals) {
 
             foreach($courseAnnuals as $courseAnnual) {
+
                 $creditInEachSemester[$courseAnnual->semester_id][] = $courseAnnual->course_credit;
                 $nestedHeaders[0] = array_merge($nestedHeaders[0], [['label'=>'S'.$courseAnnual->semester_id.'_'.$courseAnnual->course_name, 'colspan'=>2]]);
                 $nestedHeaders[1] = array_merge($nestedHeaders[1], [['label'=>'Abs', 'colspan'=>1], ['label'=> $courseAnnual->course_credit, 'colspan'=>1]]);
                 $colWidths[] = 55;
                 $colWidths[] = 50;
+                $courseAnnualByCourseId[$courseAnnual->course->name_fr] = $courseAnnual;
             }
+
+//            foreach( $courseAnnualByCourseId as $key => $course) {
+////                dd($course);
+//                $creditInEachSemester[$course->semester_id][] = $course->course_credit;
+//                $nestedHeaders[0] = array_merge($nestedHeaders[0], [['label'=>'S'.$course->semester_id.'_'.$course->course_name, 'colspan'=>2]]);
+//                $nestedHeaders[1] = array_merge($nestedHeaders[1], [['label'=>'Abs', 'colspan'=>1], ['label'=> $course->course_credit, 'colspan'=>1]]);
+//                $colWidths[] = 55;
+//                $colWidths[] = 50;
+//            }
         }
+
+
 
         if($semesterId) {
             $nestedHeaders[0] = array_merge($nestedHeaders[0], ['S'.$semesterId.'_Moyenne']);
@@ -1894,6 +1797,7 @@ class CourseAnnualController extends Controller
         $colWidths[] = 100;
         $colWidths[] = 100;
 
+//        dd($nestedHeaders);
 
 
         $index =0;
@@ -1915,9 +1819,6 @@ class CourseAnnualController extends Controller
                     'total' => 0,
                 );
                 if($semesterId) {
-
-
-
                     $count=0;
                     $totalCredit=0;// for only each one semester
                     $totalAbs = 0;
@@ -2191,9 +2092,12 @@ class CourseAnnualController extends Controller
 
     public function switchCourseAnnual(Request $request) {
 
-//        dd($request->all());
-
        return  $this->handsonTableData($request->course_annual_id);
+    }
+
+    public function saveEachCellNotationCourseAnnual (Request $request) {
+
+        dd($request->all());
     }
 
 

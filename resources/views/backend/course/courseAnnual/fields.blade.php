@@ -7,9 +7,9 @@
                 @foreach($courses as $course)
                     @if($course->id == $courseAnnual->course_id)
 <!--                        --><?php //dd($course);?>
-                        <option selected value="{{$course->id}}" time_course="{{$course->time_course}}" time_tp="{{$course->time_tp}}" time_td="{{$course->time_td}}" name_kh="{{$course->name_kh}}" name_en="{{$course->name_en}}" name_fr="{{$course->name_fr}}">{{$course->name_kh}}</option>
+                        <option selected value="{{$course->id}}" time_course="{{$courseAnnual->time_course}}" time_tp="{{$courseAnnual->time_tp}}" time_td="{{$courseAnnual->time_td}}" name_kh="{{$courseAnnual->name_kh}}" name_en="{{$courseAnnual->name_en}}" name_fr="{{$courseAnnual->name_fr}}">{{$courseAnnual->name_kh}}</option>
                     @else
-                        <option value="{{$course->id}}" time_course="{{$course->time_course}}" time_tp="{{$course->time_tp}}" time_td="{{$course->time_td}}" name_kh="{{$course->name_kh}}" name_en="{{$course->name_en}}" name_fr="{{$course->name_fr}}">{{$course->name_kh}}</option>
+                        <option value="{{$course->id}}" time_course="{{$courseAnnual->time_course}}" time_tp="{{$courseAnnual->time_tp}}" time_td="{{$courseAnnual->time_td}}" name_kh="{{$courseAnnual->name_kh}}" name_en="{{$courseAnnual->name_en}}" name_fr="{{$courseAnnual->name_fr}}">{{$courseAnnual->name_kh}}</option>
                     @endif
                 @endforeach
             </select>

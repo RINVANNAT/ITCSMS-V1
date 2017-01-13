@@ -475,8 +475,10 @@
                             var explode = prop.split('-');
                             var percentage = parseInt(explode[explode.length-1]);
 
-                            if(value > percentage) { // the score should be lower or equal 100
-                                td.style.backgroundColor = 'red';
+                            if(value > percentage) { // the score should be lower or equal the percentage
+                                if(prop != 'notation') {
+                                    td.style.backgroundColor = 'red';
+                                }
                             } else {
                                 td.style.backgroundColor = '#FEFFB0';
                             }
@@ -487,8 +489,10 @@
             } else {
                 td.style.backgroundColor = '';
             }
-            //-----when the average is less than 50
-            if(col == setting.colHeaders.length-1) {
+            //-----when the average is less than 30
+
+            console.log(prop);
+            if(prop == 'average') {
                 if(value != null) {
                     if(value < 30) {
                         td.style.backgroundColor = '#cc3300';
@@ -539,8 +543,7 @@
                         var oldValue = change[2];
                         var newValue = change[3];
                         var tableData = setting.data;
-                        if(columnIndex != 'num_absence') {
-
+                        if(columnIndex != 'num_absence' && columnIndex != 'notation') {
                             var explode = columnIndex.split('-');
                             var percentage = parseInt(explode[explode.length-1]);
                             var rowData = hotInstance.getData();
@@ -581,8 +584,6 @@
                             var check_val = colDataArray[columnIndex];
                             var explode = columnIndex.split('-');
 
-
-
                             for(var kIndex = 0; kIndex < check_val.length; kIndex++) {
 
 //                                console.log(check_val[kIndex]['score']+'---'+parseInt(explode[explode.length-1]));
@@ -594,6 +595,35 @@
                                 }
 
                             }
+                        }
+
+                        if(columnIndex == 'notation') {
+                            console.log(tableData)
+                            var rowData = hotInstance.getData();
+                            var route = '{{route('course_annual.save_each_cell_notation')}}';
+                            var baseData ={};
+
+                            for(var k=0; k< tableData.length; k++) {
+                                $.each(tableData[k],function(i, value){
+                                    if(rowData[rowIndex][0] == value) {
+                                         baseData = {
+                                            course_annual_id: $('select[name=available_course] :selected').val(),
+                                            student_annual_id: tableData[k]['student_annual_id'],
+                                            description: newValue
+                                        };
+                                    }
+                                });
+                            }
+                            $.ajax({
+                                type: 'POST',
+                                url: route,
+                                data: baseData,
+                                dataType: "json",
+                                success: function(resultData) {
+
+                                }
+                            });
+
                         }
 
                         if(columnIndex == 'num_absence') {
