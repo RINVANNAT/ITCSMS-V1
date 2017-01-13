@@ -84,9 +84,17 @@ class CourseAnnualController extends Controller
         if(auth()->user()->allow("view-all-score-in-all-department")){
             // Get all department in case user have previlege to view all department
             $departments = Department::where("parent_id",config('access.departments.department_academic'))->orderBy("code")->lists("code","id");
+            $department_id = null;
+            $lecturers = Employee::lists("name_kh","id");
         } else {
             $employee = Employee::where('user_id', Auth::user()->id)->first();
             $departments = $employee->department()->lists("code","id");
+            $department_id = $employee->department()->id;
+            if(auth()->user()->allow("view-all-score-course-annual")){ // This is chef department, he can see all courses in his department
+                $lecturers = Employee::where('department_id',$department_id)->lists("name_kh","id");
+            } else {
+                $lecturers = null;
+            }
         }
 
         $academicYears = AcademicYear::orderBy("id","desc")->lists('name_latin','id');
@@ -95,7 +103,7 @@ class CourseAnnualController extends Controller
         $semesters = Semester::orderBy('id')->lists('name_en', 'id');
         $studentGroup = StudentAnnual::select('group')->groupBy('group')->orderBy('group')->lists('group');
 
-        return view('backend.course.courseAnnual.index',compact('departments','academicYears','degrees','grades', 'semesters', 'studentGroup'));
+        return view('backend.course.courseAnnual.index',compact('departments','academicYears','degrees','grades', 'semesters', 'studentGroup','department_id','lecturers'));
     }
 
     public function filteringStudentGroup(Request $request) {
@@ -240,7 +248,7 @@ class CourseAnnualController extends Controller
     /**
      * Remove the specified resource from storage.
      *
-     * @param DeleteCourseProgramRequest $request
+     * @param DeleteCourseAnnualRequest $request
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
@@ -278,13 +286,6 @@ class CourseAnnualController extends Controller
 
         $datatables =  app('datatables')->of($courseAnnuals);
         $datatables
-            ->editColumn('name', '{!! $name !!}')
-            ->editColumn('semester_id', '{!! $semester_id !!}')
-            ->editColumn('academic_year_id', '{!! $academic_year_id !!}')
-            ->editColumn('department_id', '{!! $department_id !!}')
-            ->editColumn('degree_id', '{!! $degree_id !!}')
-            ->editColumn('grade_id', '{!! $grade_id !!}')
-            ->editColumn('employee_id', '{!! $employee_id !!}')
             ->addColumn('action', function ($courseAnnual) {
                 if(Auth::user()->allow('input-score-course-annual')) {
                     return  '<a href="'.route('admin.course.course_annual.edit',$courseAnnual->id).'" class="btn btn-xs btn-primary"><i class="fa fa-pencil" data-toggle="tooltip" data-placement="top" title="" data-original-title="'.trans('buttons.general.crud.edit').'"></i> </a>'.
@@ -323,7 +324,7 @@ class CourseAnnualController extends Controller
             $datatables = $datatables ->where('course_annuals.department_id', $employee->department()->id );
         }
 
-        if(auth()->user()->allow("view-all-score-course-annul")){
+        if(auth()->user()->allow("view-all-score-course-annul")){   // This one is might be chef department, he can view all course/score for all teacher
             if ($lecturer = $datatables->request->get('lecturer')) {
                 $datatables->where('course_annuals.employee_id', '=', $lecturer);
             }
@@ -332,8 +333,6 @@ class CourseAnnualController extends Controller
         }
 
         $datatables = $datatables->get();
-
-
 
         return $datatables->make(true);
     }

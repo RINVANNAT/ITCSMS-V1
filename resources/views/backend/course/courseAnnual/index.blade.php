@@ -54,7 +54,7 @@
                     <button class="btn btn-primary btn-sm pull-right " id="generate_course_annual" style="margin-right: 5px"><i class="fa fa-plus-circle"></i> Generate From Old Course Annual</button>
                     @endauth
 
-                    @permission('view-all-score-course-annul')
+                    @permission('view-all-score-course-annual')
                     <button class="btn btn-primary btn-sm pull-right " id="evaluation_score" style="margin-right: 5px"><i class="fa fa-plus-circle"></i> Evaluation </button>
                     @endauth
 
@@ -116,11 +116,13 @@
 
              $("div.toolbar").html(
                     '{!! Form::select('academic_year',$academicYears,null, array('class'=>'form-control','id'=>'filter_academic_year')) !!} ' +
+                    '{!! Form::select('department',$departments,$department_id, array('class'=>'form-control','id'=>'filter_department','placeholder'=>'Department')) !!} '+
                     '{!! Form::select('semester',$semesters,null, array('class'=>'form-control','id'=>'filter_semester','placeholder'=>'Semester')) !!} '+
                     '{!! Form::select('degree',$degrees,null, array('class'=>'form-control','id'=>'filter_degree','placeholder'=>'Degree')) !!} '+
                     '{!! Form::select('grade',$grades,null, array('class'=>'form-control','id'=>'filter_grade','placeholder'=>'Year')) !!} '+
-                    '{!! Form::select('department',$departments,null, array('class'=>'form-control','id'=>'filter_department','placeholder'=>'Department')) !!} '+
-                    '{!! Form::select('lecturer',[],null, array('class'=>'form-control','id'=>'filter_lecturer','placeholder'=>'Lecturer')) !!} '
+                    @if($lecturers != null)
+                    '{!! Form::select('lecturer',$lecturers,null, array('class'=>'form-control','id'=>'filter_lecturer','placeholder'=>'Lecturer')) !!} '
+                    @endif
             );
 //            $('#filter_academic_year, #filter_degree, #filter_grade, #filter_department').on('change', function(e) {
 //                oTable.draw();
@@ -148,10 +150,12 @@
                 appendFilterGroupSeclection();
                 e.preventDefault();
             });
+            @if($lecturers != null)
             $('#filter_lecturer').on('change', function(e) {
                 oTable.draw();
                 e.preventDefault();
             });
+            @endif
 
             $('#filter_semester').on('change', function(e) {
                 oTable.draw();
