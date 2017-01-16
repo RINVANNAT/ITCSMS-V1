@@ -89,7 +89,7 @@ class CourseAnnualController extends Controller
         } else {
             $employee = Employee::where('user_id', Auth::user()->id)->first();
             $departments = $employee->department()->lists("code","id");
-            $department_id = $employee->department()->id;
+            $department_id = $employee->department->id;
             if(auth()->user()->allow("view-all-score-course-annual")){ // This is chef department, he can see all courses in his department
                 $lecturers = Employee::where('department_id',$department_id)->lists("name_kh","id");
             } else {
@@ -321,10 +321,10 @@ class CourseAnnualController extends Controller
                 $datatables->where('course_annuals.department_id', '=', $department);
             }
         } else {
-            $datatables = $datatables ->where('course_annuals.department_id', $employee->department()->id );
+            $datatables = $datatables ->where('course_annuals.department_id', $employee->department->id );
         }
 
-        if(auth()->user()->allow("view-all-score-course-annul")){   // This one is might be chef department, he can view all course/score for all teacher
+        if(auth()->user()->allow("view-all-score-course-annual")){   // This one is might be chef department, he can view all course/score for all teacher
             if ($lecturer = $datatables->request->get('lecturer')) {
                 $datatables->where('course_annuals.employee_id', '=', $lecturer);
             }
@@ -1141,7 +1141,7 @@ class CourseAnnualController extends Controller
                 $colWidths[] = 70;
             }
             $columns = array_merge($columns, array(['data' => 'average', 'readOnly' => true], ['data'=> 'notation']));
-            $columnHeader = array_merge($columnHeader, array('Average', 'Notation'));
+            $columnHeader = array_merge($columnHeader, array('Total', 'Notation'));
             $colWidths[] = 70;
 
         } else {
@@ -1165,7 +1165,7 @@ class CourseAnnualController extends Controller
                 foreach($studentScore as $score) {
                     $checkPercent = $checkPercent +$score->percent; // we check the percentage if it is equal or bigger than 90 then we should now allow teacher to create more score
                     $totalScore = $totalScore + ($score->score);// calculate score for stuent annual
-                    $scoreData[$score->name] = $score->score;
+                    $scoreData[$score->name] = (($score->score > 0)?$score->score: null);
                     $scoreData['percentage_id'.'_'.$score->name] =  $score->percentage_id;
                     $scoreData['score_id'.'_'.$score->name]=$score->score_id;
                     $scoreIds[] = $score->score_id;
@@ -1177,6 +1177,7 @@ class CourseAnnualController extends Controller
             $totalCourseHours = ($courseAnnual->time_course + $courseAnnual->time_tp + $courseAnnual->time_td);
             $scoreAbsenceByCourse =  number_format((float)((($totalCourseHours)-(isset($scoreAbsence)?$scoreAbsence->num_absence:0))*10)/((($totalCourseHours != 0)?$totalCourseHours:1)), 2, '.', '');
             $totalScore = $totalScore + (($scoreAbsenceByCourse > 0)?$scoreAbsenceByCourse:0);
+
 
             //----check if every student has the score equal or upper then 90 then we set status to true..then we will not allow teacher to add any score
             if($checkPercent >= 90 ) {
@@ -1424,32 +1425,48 @@ class CourseAnnualController extends Controller
         $checkUpdate=0;
         $checkNOTUpdatOrStore = 0;
         if(count($baseData) > 0) {
+
+            $status =0;
             foreach($baseData as $data) {
-
-                if($data['student_annual_id'] != null) {
-
-                    $absence = $this->absences->findIfExist($data['course_annual_id'], $data['student_annual_id']);
-                    if($absence) {
-                        //update absence
-                        $update = $this->absences->update($absence->id, $data);
-                        if($update) {
-                            $checkUpdate++;
-                        }
-                    } else {
-                        // store absence
-                        $store = $this->absences->create($data);
-                        if($store) {
-                            $checkStore++;
-                        }
-                    }
-                } else {
-                    $checkNOTUpdatOrStore++;
+                if(is_numeric($data['num_absence']) && $data['num_absence'] != null) {
+                    $status++;
                 }
             }
+
+            if($status == count($baseData)) {
+                foreach($baseData as $data) {
+
+                    if($data['student_annual_id'] != null) {
+
+                        $absence = $this->absences->findIfExist($data['course_annual_id'], $data['student_annual_id']);
+                        if($absence) {
+                            //update absence
+                            $update = $this->absences->update($absence->id, $data);
+                            if($update) {
+                                $checkUpdate++;
+                            }
+                        } else {
+                            // store absence
+                            $store = $this->absences->create($data);
+                            if($store) {
+                                $checkStore++;
+                            }
+                        }
+                    } else {
+                        $checkNOTUpdatOrStore++;
+                    }
+                }
+            } else {
+                $reDrawTable = $this->handsonTableData($data['course_annual_id']);
+                $reDrawTable = json_decode($reDrawTable);
+                return Response::json(['status' => false, 'message' => 'There are null or String Value in cell!', 'handsonData'=> $reDrawTable]);
+            }
+
         }
         if($checkStore+$checkUpdate == count($baseData)- $checkNOTUpdatOrStore) {
             $reDrawTable = $this->handsonTableData($data['course_annual_id']);
-            return $reDrawTable;
+            $reDrawTable = json_decode($reDrawTable);
+            return Response::json(['status' => true, 'message' => 'Stored!', 'handsonData'=> $reDrawTable]);
         }
     }
 

@@ -426,6 +426,7 @@
 
         }
 
+        var status=false;// to check user if he/she input string in each cell
         var hotInstance;// declaration of handsontable object
         var celldata = []; // each cell data to render in a table
         var cellChanges = [];// the properties of changes when user edit on column number-absence
@@ -460,10 +461,20 @@
             });
         }
 
+        function numberOnly(object) {
+
+            object.keypress(function (e) {
+                if (e.which != 8 && e.which != 0 && (e.which < 48 || e.which > 57)) {
+                    return false;
+                }
+            });
+        }
+
 
         // this global variable is to tie each cell of the value the has over the limitted we will render them with specific color...this function will call by cell function
 
         var colorRenderer = function ( instance, td, row, col, prop, value, cellProperties) {
+
 
             Handsontable.renderers.TextRenderer.apply(this, arguments);
 
@@ -474,15 +485,16 @@
                         if( setting.columns[col]['data'] == cellIndex[i]['col']) {
                             var explode = prop.split('-');
                             var percentage = parseInt(explode[explode.length-1]);
-
                             if(value > percentage) { // the score should be lower or equal the percentage
                                 if(prop != 'notation') {
                                     td.style.backgroundColor = 'red';
+//                                    cellIndex=[];
                                 }
                             } else {
+//                                console.log(cellIndex);
                                 td.style.backgroundColor = '#FEFFB0';
+//                                cellIndex=[];
                             }
-
                         }
                     }
                 }
@@ -491,7 +503,7 @@
             }
             //-----when the average is less than 30
 
-            console.log(prop);
+//            console.log(prop);
             if(prop == 'average') {
                 if(value != null) {
                     if(value < 30) {
@@ -499,11 +511,19 @@
                     }
                 }
             }
+            if(prop == 'num_absence') {
+//                numberOnly($('.number_only'))
+                if($.isNumeric(value) && value >= 0) {
+                    if(value > parseInt('{{$courseAnnual->time_course + $courseAnnual->time_td + $courseAnnual->time_tp}}')) {
+                        td.style.backgroundColor = 'red';
+                    }
+                }  else {
+                    td.style.backgroundColor = 'red';
+                }
+            }
         };
 
         // this is the property of the handson table / or configuration
-
-
 
         var setting = {
             AutoColumnSize:true,
@@ -515,23 +535,14 @@
             stretchH: 'all',
             filters: true,
             dropdownMenu: ['filter_by_condition', 'filter_action_bar'],
-//            hiddenColumns: {
-//                columns: [0],
-//                indicators: true
-//            },
-            className: "htLeft",
+            className: "htLeft number_only",
             cell: celldata,
             cells: function (row, col, prop) {
 
-
-                if (row === sentrow) {
-                    this.renderer = colorRenderer;
-                }
-                if (col === sentcol) {
-                    this.renderer = colorRenderer;
-                }
                 this.renderer = colorRenderer;
             },
+
+
             afterChange: function (changes, source) {
 
                 if(changes){
@@ -544,6 +555,10 @@
                         var newValue = change[3];
                         var tableData = setting.data;
                         if(columnIndex != 'num_absence' && columnIndex != 'notation') {
+
+                            console.log(hotInstance);
+                            console.log(hotInstance.eventListeners[0].event);
+
                             var explode = columnIndex.split('-');
                             var percentage = parseInt(explode[explode.length-1]);
                             var rowData = hotInstance.getData();
@@ -577,7 +592,6 @@
 
                             }
 
-
                             colDataArray[columnIndex].push(element) // cell changes data by each column score use to pass data to server
                             cellScoreChanges.push(element); // use this cell score change to test if user has made any changes
 
@@ -598,7 +612,9 @@
                         }
 
                         if(columnIndex == 'notation') {
-                            console.log(tableData)
+
+
+//                            console.log(tableData)
                             var rowData = hotInstance.getData();
                             var route = '{{route('course_annual.save_each_cell_notation')}}';
                             var baseData ={};
@@ -623,35 +639,43 @@
 
                                 }
                             });
-
                         }
 
                         if(columnIndex == 'num_absence') {
-                            var arrayAbsence=[];
-                            var rowData = hotInstance.getData();
-                            for(var keyIndex=0; keyIndex< tableData.length; keyIndex++) {
-                                $.each(tableData[keyIndex],function(i, value){
-                                    if(rowData[rowIndex][0] == value) {//rowData[rowIndex][0] with the row data we get rowDat by Key rowIndex then we will get the student_id_card
-                                        element = {
-                                            num_absence: newValue,
-                                            student_annual_id: tableData[keyIndex]['student_annual_id'],
-                                            course_annual_id: $('select[name=available_course] :selected').val()
-                                        };
+//                            console.log(hotInstance.getDataObject())
+                            console.log(hotInstance.getData())
+                            {{--console.log(parseInt('{{$courseAnnual->time_course + $courseAnnual->time_td + $courseAnnual->time_tp}}'));--}}
+                            var colData = findDataAtCol('Abs');
+                            if($.isNumeric(newValue)) {
+                                if(newValue <= parseInt('{{$courseAnnual->time_course + $courseAnnual->time_td + $courseAnnual->time_tp}}')) {
+
+                                    var rowData = hotInstance.getData();
+                                    for(var keyIndex=0; keyIndex< tableData.length; keyIndex++) {
+                                        $.each(tableData[keyIndex],function(i, value){
+                                            if(rowData[rowIndex][0] == value) {//rowData[rowIndex][0] with the row data we get rowDat by Key rowIndex then we will get the student_id_card
+                                                element = {
+                                                    num_absence: newValue,
+                                                    student_annual_id: tableData[keyIndex]['student_annual_id'],
+                                                    course_annual_id: $('select[name=available_course] :selected').val()
+                                                };
+                                            }
+                                        });
                                     }
-                                });
-
+                                    if(oldValue != newValue){
+                                        cellChanges.push(element);
+                                    }
+                                }
                             }
-
-                            if(oldValue != newValue){
-                                cellChanges.push(element);
-                            }
-
+                            var count = 0;
+                            var numAbs = 0;
+                            checkIfStringValExist(colData, count, numAbs);
                         }
                     });
                 }
             },
 
             beforeChange: function (changes, source) {
+
                 var lastChange = changes[0];
                 var rowIndex = lastChange[0];
                 var columnIndex = lastChange[1];
@@ -660,6 +684,69 @@
 
             }
         };
+
+        function checkIfStringValExist(colData, count, numAbs) {
+            for(var check =0; check < colData.length; check++) {
+                if($.isNumeric(colData[check])) {
+                    count++;
+                    if((colData[check] <= parseInt('{{$courseAnnual->time_course + $courseAnnual->time_td + $courseAnnual->time_tp}}')) && (colData[check] >=0)) {
+                        numAbs++;
+                    }
+                }
+            }
+            if(count == colData.length) {
+
+                if(numAbs == colData.length) {
+                    $('#save_editted_score').show();
+                    status = true;
+
+                } else {
+                    status = false;
+                    {{--swal({--}}
+                        {{--title: "Attention",--}}
+                        {{--text: "Value must be!" +"0 < Val <"+ parseInt('{{$courseAnnual->time_course + $courseAnnual->time_td + $courseAnnual->time_tp}}'),--}}
+                        {{--type: "warning",--}}
+                        {{--confirmButtonColor: "red",--}}
+                        {{--confirmButtonText: "Close",--}}
+                        {{--closeOnConfirm: true--}}
+                    {{--}, function(confirmed) {--}}
+                        {{--if (confirmed) {--}}
+                            {{--$('#save_editted_score').hide();--}}
+                        {{--}--}}
+                    {{--});--}}
+                }
+            } else {
+
+                status = false;
+
+//                swal({
+//                    title: "Attention",
+//                    text: " Column input with string value!",
+//                    type: "warning",
+//                    confirmButtonColor: "red",
+//                    confirmButtonText: "Close",
+//                    closeOnConfirm: true
+//                }, function(confirmed) {
+//                    if (confirmed) {
+//                        $('#save_editted_score').hide();
+//                    }
+//                });
+
+            }
+
+        }
+
+        function findDataAtCol(colIndex) {
+
+            var col= 0;
+            var header = setting.colHeaders;
+            for( var ja = 0; ja < header.length; ja++ ) {
+                if(setting.colHeaders[ja] == colIndex) {
+                    col = ja;
+                }
+            }
+            return hotInstance.getDataAtCol(col);
+        }
 
         $(document).ready(function() {
 
@@ -690,7 +777,7 @@
 
                     var tab_height = height - (mainHeaderHeight + mainFooterHeight + boxHeaderHeight + 70);
 
-                    alert(tab_height);
+//                    alert(tab_height);
 
                     setting.height=tab_height;
                     setting.width=table_size;
@@ -748,6 +835,9 @@
                                                        success: function(resultData) {
                                                            notify('success', 'info', 'Score Deleted!!');
                                                            updateSettingHandsontable(resultData);
+                                                       },
+                                                       error:function(e) {
+                                                           notify('error', 'Delete Error!', 'Attention');
                                                        }
                                                    });
 
@@ -766,7 +856,7 @@
 
                                     if(hotInstance.getSelected()) {
 
-                                        let selectedColumn = hotInstance.getSelected()[1];
+                                        var selectedColumn = hotInstance.getSelected()[1];
 
                                         if(setting.fixedColumnsLeft) {
 
@@ -819,7 +909,7 @@
 
                                 "freeze_column": {
                                     name: function() {
-                                        let selectedColumn = hotInstance.getSelected()[1];
+                                        var selectedColumn = hotInstance.getSelected()[1];
                                         if(setting.fixedColumnsLeft) {
                                             if (selectedColumn > setting.fixedColumnsLeft - 1) {
                                                 return '<span><i class="fa fa-fire"> Freeze This Column </i></span>';
@@ -964,91 +1054,114 @@
 
         $('#save_editted_score').on('click', function() {
 
-            var url = '{{route('admin.course.save_number_absence')}}';
 
-            if(cellChanges.length > 0 || cellScoreChanges.length > 0) {
+            if(status == true) {
+                alert(status)
+                var url = '{{route('admin.course.save_number_absence')}}';
+
+                if(cellChanges.length > 0 || cellScoreChanges.length > 0) {
+
+                    swal({
+                        title: "Confirm",
+                        text: "Save Changes?",
+                        type: "info",
+                        showCancelButton: true,
+                        confirmButtonColor: "#DD6B55",
+                        confirmButtonText: "Yes",
+                        closeOnConfirm: true
+                    }, function(confirmed) {
+                        if (confirmed) {
+
+                            if(cellScoreChanges.length > 0) {// save each score
+
+                                //recursive function fo send the request by the column data array
+                                function sendRequest (index, message) {
+
+                                    var saveBaseUrl = '{{route('admin.course.save_score_course_annual')}}';
+
+                                    if(index < setting.colHeaders.length -1) {
+
+                                        if(colDataArray[setting.colHeaders[index]].length > 0 ) {
+                                            $.ajax({
+                                                type: 'POST',
+                                                url: saveBaseUrl,
+                                                data: {data:colDataArray[setting.colHeaders[index]]},
+                                                dataType: "json",
+                                                success: function(resultData) {
+                                                    if(resultData.status) {
+                                                        index++;
+                                                        updateSettingHandsontable(resultData.handsontableData);
+                                                        sendRequest(index);
+                                                    } else {
+                                                        notify('error', resultData.message, 'Alert');
+                                                    }
+                                                }
+                                            })
+                                        } else {
+                                            index++;
+                                            sendRequest(index, message);
+                                        }
+                                    } else {
+                                        notify('success', 'Score Saved!', 'Info');
+                                    }
+                                }
+                                var index = 5;
+                                var message = null;
+                                sendRequest(index, message);
+                                cellScoreChanges=[];
+                                cellIndex = [];
+
+                            }
+
+                            if(cellChanges.length > 0) { // save each number absence
+
+                                var url = '{{route('admin.course.save_number_absence')}}';
+                                $.ajax({
+                                    type: 'POST',
+                                    url: url,
+                                    data: {baseData:cellChanges},
+                                    dataType: "json",
+                                    success: function(resultData) {
+
+                                        if(resultData.status) {
+                                            notify('success', resultData.message, 'Info')
+
+                                            updateSettingHandsontable(resultData.handsonData);
+
+                                        } else {
+                                            notify('error', resultData.message, 'Attention')
+                                            updateSettingHandsontable(resultData.handsonData);
+                                        }
+
+                                        cellChanges=[];
+                                        cellIndex = [];
+                                    }
+                                });
+
+                                cellIndex = [];
+                            }
+                        }
+                    });
+
+                } else {
+                    notify('error', 'There are no changes!!', 'Info');
+                }
+            } else {
+
                 swal({
-                    title: "Confirm",
-                    text: "Save Changes?",
-                    type: "info",
-                    showCancelButton: true,
-                    confirmButtonColor: "#DD6B55",
-                    confirmButtonText: "Yes",
+                    title: "Attention",
+                    text: "Value in cell must be: 0< X <= "+parseInt('{{$courseAnnual->time_course + $courseAnnual->time_td + $courseAnnual->time_tp}}')+ ' and No String Allowed!' ,
+                    type: "warning",
+                    confirmButtonColor: "red",
+                    confirmButtonText: "Close",
                     closeOnConfirm: true
                 }, function(confirmed) {
                     if (confirmed) {
 
-                        if(cellScoreChanges.length > 0) {// save each score
-
-                            //recursive function fo send the request by the column data array
-                            function sendRequest (index, message) {
-
-                                var saveBaseUrl = '{{route('admin.course.save_score_course_annual')}}';
-
-                                if(index < setting.colHeaders.length -1) {
-
-                                    if(colDataArray[setting.colHeaders[index]].length > 0 ) {
-                                        $.ajax({
-                                            type: 'POST',
-                                            url: saveBaseUrl,
-                                            data: {data:colDataArray[setting.colHeaders[index]]},
-                                            dataType: "json",
-                                            success: function(resultData) {
-                                                if(resultData.status) {
-                                                    index++;
-                                                    updateSettingHandsontable(resultData.handsontableData);
-                                                    sendRequest(index);
-                                                } else {
-                                                    notify('error', resultData.message, 'Alert');
-                                                }
-                                            }
-                                        })
-                                    } else {
-                                        index++;
-                                        sendRequest(index, message);
-                                    }
-                                } else {
-                                    notify('success', 'Score Saved!', 'Info');
-                                }
-                            }
-                            var index = 5;
-                            var message = null;
-                            sendRequest(index, message);
-                            cellScoreChanges=[];
-                            cellIndex = [];
-
-                        }
-
-                        if(cellChanges.length > 0) { // save each number absence
-
-                            var url = '{{route('admin.course.save_number_absence')}}';
-                            $.ajax({
-                                type: 'POST',
-                                url: url,
-                                data: {baseData:cellChanges},
-                                dataType: "json",
-                                success: function(resultData) {
-
-                                    updateSettingHandsontable(resultData);
-//                                    setting.data = resultData.data;
-//                                    setting.colHeaders = resultData.columnHeader;
-//                                    setting.columns = resultData.columns;
-//                                    hotInstance = new Handsontable(jQuery("#score_table")[0], setting);
-                                    cellChanges=[];
-                                    cellIndex = [];
-                                }
-                            });
-
-                            cellIndex = [];
-                        }
-
                     }
                 });
-
-            } else {
-                notify('error', 'There are no changes!!', 'Info');
             }
-        })
+        });
 
         window.onbeforeunload = function(e){
 

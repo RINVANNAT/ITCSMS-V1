@@ -242,14 +242,10 @@
         var setting = {
             readOnly:true,
             manualColumnMove: false,
-            filters: true,
-            autoWrapRow: false,
             manualColumnResize: false,
             manualRowResize: false,
             minSpareRows: false,
             fixedColumnsLeft: 3,
-            width: table_width,
-            height: 700,
             filters: true,
             dropdownMenu: ['filter_by_condition', 'filter_action_bar'],
             className: "htLeft",
@@ -294,7 +290,7 @@
                     setting.nestedHeaders = resultData.nestedHeaders;
                     setting.colWidths = resultData.colWidths;
 
-                    var table_size = $('.box-body').width();
+                    var table_size = $('.box-body').width() + 30;
                     var mainHeaderHeight = $('.main-header').height();
                     var mainFooterHeight = $('.main-footer').height();
                     var boxHeaderHeight = $('.box-header').height();
@@ -302,10 +298,9 @@
 
                     var tab_height = height - (mainHeaderHeight + mainFooterHeight + boxHeaderHeight + 60);
 
-                    alert(tab_height);
+//                    alert(tab_height);
 
                     setting.height=tab_height;
-                    setting.width=table_size;
 
                     hotInstance = new Handsontable(jQuery("#all_score_course_annual_table")[0], setting);
                     hotInstance.updateSettings({
@@ -415,7 +410,7 @@
                             items: {
                                 "sort": {
                                     name: function() {
-                                        let selectedColumn = hotInstance.getSelected()[1];
+                                        var selectedColumn = hotInstance.getSelected()[1];
                                         if (selectedColumn == 3 || selectedColumn == 0) {
                                            return '';
                                         } else {
@@ -437,7 +432,9 @@
 
 
             $(window).resize(function() {
+
                 var table_width = $('.box-body').width();
+//                alert(table_width);
                 setting.width = table_width;
                 hotInstance.updateSettings({
                     width: table_width
@@ -447,11 +444,11 @@
 
             $('.sidebar-toggle').on('click', function() {
 
-                var table_width = $('.box-body').width();
-                setting.width = table_width;
-                hotInstance.updateSettings({
-                    width: table_width
-                });
+//                var table_width = $('.box-body').width();
+//                setting.width = table_width;
+//                hotInstance.updateSettings({
+//                    width: table_width
+//                });
 
             })
         });
