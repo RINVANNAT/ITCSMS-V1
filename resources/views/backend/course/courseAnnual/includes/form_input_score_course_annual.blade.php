@@ -426,6 +426,8 @@
 
         }
 
+        var objectStatus={};
+
         var status=false;// to check user if he/she input string in each cell
         var hotInstance;// declaration of handsontable object
         var celldata = []; // each cell data to render in a table
@@ -479,21 +481,29 @@
             Handsontable.renderers.TextRenderer.apply(this, arguments);
 
             if(cellIndex.length >0) {
+
                 for(var i =0; i< cellIndex.length; i++) {
                     if(cellIndex[i]['row'] == row) {
 
                         if( setting.columns[col]['data'] == cellIndex[i]['col']) {
+
                             var explode = prop.split('-');
                             var percentage = parseInt(explode[explode.length-1]);
-                            if(value > percentage) { // the score should be lower or equal the percentage
-                                if(prop != 'notation') {
-                                    td.style.backgroundColor = 'red';
+                            if($.isNumeric(value)) {
+
+                                if( (value > percentage) || (value < 0)) { // the score should be lower or equal the percentage
+
+                                    if((prop != 'notation')) {
+                                        td.style.backgroundColor = 'red';
 //                                    cellIndex=[];
+                                    }
+                                } else {
+//                                console.log(cellIndex);
+                                    td.style.backgroundColor = '#FEFFB0';
+//                                cellIndex=[];
                                 }
                             } else {
-//                                console.log(cellIndex);
-                                td.style.backgroundColor = '#FEFFB0';
-//                                cellIndex=[];
+                                td.style.backgroundColor = 'red';
                             }
                         }
                     }
@@ -554,61 +564,56 @@
                         var oldValue = change[2];
                         var newValue = change[3];
                         var tableData = setting.data;
+
                         if(columnIndex != 'num_absence' && columnIndex != 'notation') {
 
-                            console.log(hotInstance);
-                            console.log(hotInstance.eventListeners[0].event);
-
+                            var colData = findDataAtCol(columnIndex);
                             var explode = columnIndex.split('-');
                             var percentage = parseInt(explode[explode.length-1]);
-                            var rowData = hotInstance.getData();
-                            var element={};
-                            var score_id = 'score_id'+'_'+columnIndex;
-                            for(var keyIndex=0; keyIndex< tableData.length; keyIndex++) {
-                                $.each(tableData[keyIndex],function(i, value){
-                                    if(rowData[rowIndex][0] == value) {
 
-                                        if(newValue <= percentage) {
-                                            element = {
-                                                score_id: tableData[keyIndex][score_id],
-                                                score: newValue,
-                                                score_absence: tableData[keyIndex]['absence'],
-                                                course_annual_id: $('select[name=available_course] :selected').val()
-                                            };
+                            if($.isNumeric(newValue) && (newValue >= 0)) {
+                                if(newValue <= percentage) {
 
-                                        } else {
+                                    var rowData = hotInstance.getData();
+                                    var element={};
+                                    var score_id = 'score_id'+'_'+columnIndex;
+                                    for(var keyIndex=0; keyIndex< tableData.length; keyIndex++) {
+                                        $.each(tableData[keyIndex],function(i, value){
+                                            if(rowData[rowIndex][0] == value) {
 
-                                            notify('error', 'Danger', 'Score must be less than or equal to '+percentage )
-                                            element = {
-                                                score_id: tableData[keyIndex][score_id],
-                                                score: 0,
-                                                score_absence: tableData[keyIndex]['absence'],
-                                                course_annual_id: $('select[name=available_course] :selected').val()
-                                            };
-                                        }
+                                                if(newValue <= percentage) {
+                                                    element = {
+                                                        score_id: tableData[keyIndex][score_id],
+                                                        score: newValue,
+                                                        score_absence: tableData[keyIndex]['absence'],
+                                                        course_annual_id: $('select[name=available_course] :selected').val()
+                                                    };
+
+                                                } else {
+
+                                                    notify('error', 'Danger', 'Score must be less than or equal to '+percentage )
+                                                    element = {
+                                                        score_id: tableData[keyIndex][score_id],
+                                                        score: 0,
+                                                        score_absence: tableData[keyIndex]['absence'],
+                                                        course_annual_id: $('select[name=available_course] :selected').val()
+                                                    };
+                                                }
+
+                                            }
+                                        });
 
                                     }
-                                });
 
-                            }
-
-                            colDataArray[columnIndex].push(element) // cell changes data by each column score use to pass data to server
-                            cellScoreChanges.push(element); // use this cell score change to test if user has made any changes
-
-                            var check_val = colDataArray[columnIndex];
-                            var explode = columnIndex.split('-');
-
-                            for(var kIndex = 0; kIndex < check_val.length; kIndex++) {
-
-//                                console.log(check_val[kIndex]['score']+'---'+parseInt(explode[explode.length-1]));
-                                if(check_val[kIndex]['score'] > parseInt(explode[explode.length-1])){
-                                    $('#save_editted_score').hide();
-                                    break;
-                                } else {
-                                    $('#save_editted_score').show();
+                                    colDataArray[columnIndex].push(element) // cell changes data by each column score use to pass data to server
+                                    cellScoreChanges.push(element); // use this cell score change to test if user has made any changes
                                 }
 
                             }
+
+                            var count = 0;
+                            var numAbs = 0;
+                            checkIfStringValExist(colData, columnIndex, count, numAbs, percentage);
                         }
 
                         if(columnIndex == 'notation') {
@@ -642,8 +647,6 @@
                         }
 
                         if(columnIndex == 'num_absence') {
-//                            console.log(hotInstance.getDataObject())
-                            console.log(hotInstance.getData())
                             {{--console.log(parseInt('{{$courseAnnual->time_course + $courseAnnual->time_td + $courseAnnual->time_tp}}'));--}}
                             var colData = findDataAtCol('Abs');
                             if($.isNumeric(newValue)) {
@@ -668,7 +671,7 @@
                             }
                             var count = 0;
                             var numAbs = 0;
-                            checkIfStringValExist(colData, count, numAbs);
+                            checkIfStringValExist(colData,'Absence', count, numAbs, parseInt('{{$courseAnnual->time_course + $courseAnnual->time_td + $courseAnnual->time_tp}}'));
                         }
                     });
                 }
@@ -685,55 +688,38 @@
             }
         };
 
-        function checkIfStringValExist(colData, count, numAbs) {
+        function checkIfStringValExist(colData, colName, count, numAbs, valToCompare) {
+            var arrayNull=[];
             for(var check =0; check < colData.length; check++) {
-                if($.isNumeric(colData[check])) {
+
+                if($.isNumeric(colData[check]) && (parseInt(colData[check]) >= 0)) {
+
                     count++;
-                    if((colData[check] <= parseInt('{{$courseAnnual->time_course + $courseAnnual->time_td + $courseAnnual->time_tp}}')) && (colData[check] >=0)) {
+                    if((colData[check] <= valToCompare) ) {
+
                         numAbs++;
                     }
                 }
+                if(colData[check] == null) {
+                    arrayNull.push(colData[check])
+                }
             }
-            if(count == colData.length) {
+//            console.log();
+//            console.log((parseInt(count) + arrayNull.length) +'=='+ colData.length);
+            if((parseInt(count) + arrayNull.length) == colData.length) {
 
-                if(numAbs == colData.length) {
-                    $('#save_editted_score').show();
-                    status = true;
-
+                if((parseInt(numAbs) + arrayNull.length) == colData.length) {
+                    objectStatus.status = true;
                 } else {
-                    status = false;
-                    {{--swal({--}}
-                        {{--title: "Attention",--}}
-                        {{--text: "Value must be!" +"0 < Val <"+ parseInt('{{$courseAnnual->time_course + $courseAnnual->time_td + $courseAnnual->time_tp}}'),--}}
-                        {{--type: "warning",--}}
-                        {{--confirmButtonColor: "red",--}}
-                        {{--confirmButtonText: "Close",--}}
-                        {{--closeOnConfirm: true--}}
-                    {{--}, function(confirmed) {--}}
-                        {{--if (confirmed) {--}}
-                            {{--$('#save_editted_score').hide();--}}
-                        {{--}--}}
-                    {{--});--}}
+                    objectStatus.status = false;
+                    objectStatus.val_to_compare = valToCompare;
+                    objectStatus.colName = colName;
                 }
             } else {
-
-                status = false;
-
-//                swal({
-//                    title: "Attention",
-//                    text: " Column input with string value!",
-//                    type: "warning",
-//                    confirmButtonColor: "red",
-//                    confirmButtonText: "Close",
-//                    closeOnConfirm: true
-//                }, function(confirmed) {
-//                    if (confirmed) {
-//                        $('#save_editted_score').hide();
-//                    }
-//                });
-
+                objectStatus.status = false;
+                objectStatus.val_to_compare = valToCompare;
+                objectStatus.colName = colName;
             }
-
         }
 
         function findDataAtCol(colIndex) {
@@ -1054,11 +1040,8 @@
 
         $('#save_editted_score').on('click', function() {
 
-
-            if(status == true) {
-                alert(status)
+            if(objectStatus.status == true) {
                 var url = '{{route('admin.course.save_number_absence')}}';
-
                 if(cellChanges.length > 0 || cellScoreChanges.length > 0) {
 
                     swal({
@@ -1150,7 +1133,7 @@
 
                 swal({
                     title: "Attention",
-                    text: "Value in cell must be: 0< X <= "+parseInt('{{$courseAnnual->time_course + $courseAnnual->time_td + $courseAnnual->time_tp}}')+ ' and No String Allowed!' ,
+                    text: objectStatus.colName+" value must be: 0 <= X <= "+ objectStatus.val_to_compare + ' No String Allowed!' ,
                     type: "warning",
                     confirmButtonColor: "red",
                     confirmButtonText: "Close",
