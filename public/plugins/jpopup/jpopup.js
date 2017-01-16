@@ -353,6 +353,7 @@ function jPopup(config) {
 		});
 
 
+		var close = false;
 		$('#add_col_ok').on('click', function(e) {
 
 			e.preventDefault();
@@ -365,8 +366,7 @@ function jPopup(config) {
 						notify('error', 'info', 'You have not save your changes!');
 					} else {
 						addColumns(colHeader, percentage);
-						close();
-						closed = true;
+
 					}
 
 				} else {
@@ -437,7 +437,7 @@ function jPopup(config) {
 		return r.progress(f);
 	};
 	this.close = function() {
-		alert('t');
+
 		close();
 		return this;
 	};

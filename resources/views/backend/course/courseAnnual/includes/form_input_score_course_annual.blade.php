@@ -952,9 +952,10 @@
         });
 
 
+        var pop;
         $('#add_column').on('click', function(e) {
 
-            var pop = new jPopup({
+             pop = new jPopup({
                 title: 'Add New Column',
                 content: '<div class="form-group col-sm-12 no-padding">' +
                 '<label for="percentage" class="col-sm-2 control-label pop_margin no-padding "> Percentage</label>'+
@@ -999,43 +1000,60 @@
 
         function addColumns(colHeader, percentage) {
 
-            var headerLength = setting.colHeaders.length;
+            if(percentage > 0 && percentage < 90) {
+                var headerLength = setting.colHeaders.length;
 //            var averageData = setting.columns[headerLength-1].data;
-            var averageDataType = setting.columns[headerLength-1].type;
-            var averageHeader = setting.colHeaders[headerLength-1];
-            var baseData = {
-                percentage_name: colHeader+'-'+percentage+'%',
-                percentage:percentage,
-                percentage_type: $('#score_type :selected').val(),
-                course_annual_id:$('select[name=available_course] :selected').val()
-            };
+                var averageDataType = setting.columns[headerLength-1].type;
+                var averageHeader = setting.colHeaders[headerLength-1];
+                var baseData = {
+                    percentage_name: colHeader+'-'+percentage+'%',
+                    percentage:percentage,
+                    percentage_type: $('#score_type :selected').val(),
+                    course_annual_id:$('select[name=available_course] :selected').val()
+                };
 
-            var addScoreBaseUrl = '{{route('admin.course.add_new_column_courseannual')}}'
+                var addScoreBaseUrl = '{{route('admin.course.add_new_column_courseannual')}}'
 
-            swal({
-                title: "Confirm",
-                text: "You want to add column?",
-                type: "info",
-                showCancelButton: true,
-                confirmButtonColor: "#DD6B55",
-                confirmButtonText: "Yes, add id!!",
-                closeOnConfirm: true
-            }, function(confirmed) {
-                if (confirmed) {
-                    $.ajax({
-                        type: 'POST',
-                        url: addScoreBaseUrl,
-                        data: baseData,
-                        dataType: "json",
-                        success: function(resultData) {
-                            updateSettingHandsontable(resultData);
-                            declareColumnHeaderDataEmpty();
-                            $('#popup').hide();
+                swal({
+                    title: "Confirm",
+                    text: "You want to add column?",
+                    type: "info",
+                    showCancelButton: true,
+                    confirmButtonColor: "#DD6B55",
+                    confirmButtonText: "Yes, add id!!",
+                    closeOnConfirm: true
+                }, function(confirmed) {
+                    if (confirmed) {
+                        $.ajax({
+                            type: 'POST',
+                            url: addScoreBaseUrl,
+                            data: baseData,
+                            dataType: "json",
+                            success: function(resultData) {
+                                updateSettingHandsontable(resultData);
+                                declareColumnHeaderDataEmpty();
+                                $('#popup').hide();
+                            }
+                        });
+                        pop.close();
+                    }
+                });
+            } else {
 
-                        }
-                    });
-                }
-            });
+                swal({
+                    title: "Attention",
+                    text: "0 < value < 90",
+                    type: "warning",
+                    confirmButtonColor: "red",
+                    confirmButtonText: "Close",
+                    closeOnConfirm: true
+                }, function(confirmed) {
+                    if (confirmed) {
+
+                    }
+                });
+
+            }
         }
 
         $('#save_editted_score').on('click', function() {
