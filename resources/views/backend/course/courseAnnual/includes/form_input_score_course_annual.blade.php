@@ -327,6 +327,20 @@
             height: 23px;
             margin-left: 5px;
         }
+        .current_row td{
+
+        gradient(to bottom,rgba(181,209,255,0.34) 0,rgba(181,209,255,0.34) 100%);
+            background-image: linear-gradient(rgba(181, 209, 255, 1) 0px, rgba(181, 209, 255, 0.341176) 100%);
+            background-position-x: initial;
+            background-position-y: initial;
+            background-size: initial;
+            background-repeat-x: initial;
+            background-repeat-y: initial;
+            background-attachment: initial;
+            background-origin: initial;
+            background-clip: initial;
+            background-color: #fff !important;
+        }
     </style>
 
 
@@ -355,7 +369,6 @@
                 </select>
 
             </div>
-
 {{--            <label for="description" class="label label-success">{{$courseAnnual->academic_year->name_latin}} </label>--}}
             <button class="btn btn-primary btn-xs pull-right" id="save_editted_score" style="margin-left:5px">Save Changes!</button>
             <div class="btn-group pull-right btn_action_group">
@@ -367,8 +380,6 @@
 
                     <li class="drop-menu"> <a href="#"  id="add_column"> <i class="fa fa-plus"> Add Score</i></a></li>
                     <li class="drop-menu"> <a href="#"  id="get_average"> <i class="fa fa-circle-o-notch"> Generate Average</i></a></li>
-
-
                 </ul>
             </div><!--btn group-->
         </div><!-- /.box-header -->
@@ -381,8 +392,6 @@
         </div>
 
     </div><!--box-->
-
-
 @stop
 
 
@@ -397,8 +406,14 @@
 
     <script>
 
+        function setSelectedRow() {
 
-
+            var current_rows = $(document).find(".current_row");
+            if(current_rows != null){
+                current_rows.removeClass("current_row");
+            }
+            $(".current").closest("tr").addClass("current_row");
+        }
         function ajaxRequest (method, baseUrl, baseData) {
             var result=null;
             var ajax = $.ajax(result,{
@@ -409,11 +424,7 @@
                 done: function(resultData) {
                     result = resultData;
                     if(resultData.status == true) {
-
-
-
                         cellScoreChanges=[];
-                        cellIndex = [];
 //                        notify('success', 'info', resultData.message);
 
                     } else {
@@ -427,7 +438,6 @@
         }
 
         var objectStatus={};
-
         var status=false;// to check user if he/she input string in each cell
         var hotInstance;// declaration of handsontable object
         var celldata = []; // each cell data to render in a table
@@ -436,6 +446,7 @@
         var sentrow, sentcol; // not use
         var cellIndex=[]; // to get each col and row and check value with colorRenderer
         var colDataArray = []; // column score data key=>value use to pass data to server
+        var rowColor=0;
 
         // this function is to declare global empty array and we use the empty arrays to store the data when user make change of each cell score value to pass to the sever
         function declareColumnHeaderDataEmpty() {
@@ -463,72 +474,56 @@
             });
         }
 
-        function numberOnly(object) {
-
-            object.keypress(function (e) {
-                if (e.which != 8 && e.which != 0 && (e.which < 48 || e.which > 57)) {
-                    return false;
-                }
-            });
-        }
-
-
         // this global variable is to tie each cell of the value the has over the limitted we will render them with specific color...this function will call by cell function
 
         var colorRenderer = function ( instance, td, row, col, prop, value, cellProperties) {
 
-
             Handsontable.renderers.TextRenderer.apply(this, arguments);
 
-            if(cellIndex.length >0) {
+            if( ((prop != 'student_id_card')&& (prop != 'student_name')) && ((prop != 'student_gender')&& (prop != 'absence')) && (((prop != 'average')&& (prop != 'notation'))) ) {
 
-                for(var i =0; i< cellIndex.length; i++) {
-                    if(cellIndex[i]['row'] == row) {
+                var explode = prop.split('-');
+                var percentage = parseInt(explode[explode.length-1]);
+                if($.isNumeric(value)) {
 
-                        if( setting.columns[col]['data'] == cellIndex[i]['col']) {
+                    if( (value > percentage) || (value < 0)) { // the score should be lower or equal the percentage
 
-                            var explode = prop.split('-');
-                            var percentage = parseInt(explode[explode.length-1]);
-                            if($.isNumeric(value)) {
-
-                                if( (value > percentage) || (value < 0)) { // the score should be lower or equal the percentage
-
-                                    if((prop != 'notation')) {
-                                        td.style.backgroundColor = 'red';
-//                                    cellIndex=[];
-                                    }
-                                } else {
-//                                console.log(cellIndex);
-                                    td.style.backgroundColor = '#FEFFB0';
-//                                cellIndex=[];
-                                }
-                            } else {
-                                td.style.backgroundColor = 'red';
-                            }
+                        if((prop != 'notation')) {
+                            td.style.backgroundColor = '#cc3300';
                         }
+                    } else {
+//                        td.style.backgroundColor = '#FEFFB0';
+                    }
+                } else {
+                    if(value == '') {
+                        td.style.backgroundColor = ''
+
+                    } else if (value == null) {
+                        td.style.backgroundColor = ''
+                    } else {
+                        td.style.backgroundColor = '#cc3300';
                     }
                 }
             } else {
                 td.style.backgroundColor = '';
             }
             //-----when the average is less than 30
-
-//            console.log(prop);
             if(prop == 'average') {
-                if(value != null) {
+
+                if($.isNumeric(value)) {
                     if(value < 30) {
                         td.style.backgroundColor = '#cc3300';
                     }
                 }
             }
             if(prop == 'num_absence') {
-//                numberOnly($('.number_only'))
+
                 if($.isNumeric(value) && value >= 0) {
                     if(value > parseInt('{{$courseAnnual->time_course + $courseAnnual->time_td + $courseAnnual->time_tp}}')) {
-                        td.style.backgroundColor = 'red';
+                        td.style.backgroundColor = '#cc3300';
                     }
                 }  else {
-                    td.style.backgroundColor = 'red';
+//                    td.style.backgroundColor = '#cc3300';
                 }
             }
         };
@@ -542,17 +537,59 @@
             filters: true,
             autoWrapRow: true,
             minSpareRows: false,
-            stretchH: 'all',
+            stretchH: 'last',
             filters: true,
             dropdownMenu: ['filter_by_condition', 'filter_action_bar'],
             className: "htLeft number_only",
-            cell: celldata,
             cells: function (row, col, prop) {
 
-                this.renderer = colorRenderer;
+                if( ((prop != 'student_id_card')&& (prop != 'student_name')) && ((prop != 'student_gender')&& (prop != 'absence')) && (((prop != 'average')&& (prop != 'notation'))) ) {
+                    this.renderer = colorRenderer;
+                }
+                if(prop == 'average') {
+                    this.renderer = colorRenderer;
+                }
             },
 
+            beforeOnCellMouseDown: function (event,coord, TD) {
+                return false;
+            },
+            afterOnCellMouseDown: function (event,coord, TD) {
+                return false;
+            },
+            afterCellMetaReset: function() {
+                return  false;
+            },
+            afterRowMove: function() {
+                return false;
+            },
+            afterGetCellMeta: function () {
+                return false;
+            },
+            afterSelectionEnd: function() {
+                setSelectedRow();
+            },
 
+            afterMomentumScroll: function() {
+
+                return false;
+            },
+            beforeTouchScroll: function() {
+
+                return false;
+            },
+            afterScrollHorizontally: function() {
+
+                return false;
+            },
+            afterScrollVertically: function() {
+
+                return false;
+            },
+
+            afterColumnResize: function() {
+              return false;
+            },
             afterChange: function (changes, source) {
 
                 if(changes){
@@ -564,7 +601,6 @@
                         var oldValue = change[2];
                         var newValue = change[3];
                         var tableData = setting.data;
-
                         if(columnIndex != 'num_absence' && columnIndex != 'notation') {
 
                             var colData = findDataAtCol(columnIndex);
@@ -572,7 +608,8 @@
                             var percentage = parseInt(explode[explode.length-1]);
 
                             if($.isNumeric(newValue) && (newValue >= 0)) {
-                                if(newValue <= percentage) {
+
+                                if((newValue <= percentage) && (newValue != '')) {
 
                                     var rowData = hotInstance.getData();
                                     var element={};
@@ -604,11 +641,9 @@
                                         });
 
                                     }
-
                                     colDataArray[columnIndex].push(element) // cell changes data by each column score use to pass data to server
                                     cellScoreChanges.push(element); // use this cell score change to test if user has made any changes
                                 }
-
                             }
 
                             var count = 0;
@@ -617,9 +652,6 @@
                         }
 
                         if(columnIndex == 'notation') {
-
-
-//                            console.log(tableData)
                             var rowData = hotInstance.getData();
                             var route = '{{route('course_annual.save_each_cell_notation')}}';
                             var baseData ={};
@@ -644,6 +676,8 @@
 
                                 }
                             });
+                        } else {
+                            cellIndex.push(newValue)
                         }
 
                         if(columnIndex == 'num_absence') {
@@ -676,37 +710,24 @@
                     });
                 }
             },
-
-            beforeChange: function (changes, source) {
-
-                var lastChange = changes[0];
-                var rowIndex = lastChange[0];
-                var columnIndex = lastChange[1];
-
-                cellIndex.push({ row: rowIndex,col: columnIndex });
-
-            }
         };
 
         function checkIfStringValExist(colData, colName, count, numAbs, valToCompare) {
             var arrayNull=[];
             for(var check =0; check < colData.length; check++) {
-
                 if($.isNumeric(colData[check]) && (parseInt(colData[check]) >= 0)) {
-
                     count++;
                     if((colData[check] <= valToCompare) ) {
-
                         numAbs++;
                     }
-                }
-                if(colData[check] == null) {
+                } else if((colData[check] == null) || (colData[check] == '')) {// to check if he/she deose not input any value or input only empty string
                     arrayNull.push(colData[check])
                 }
             }
-//            console.log();
-//            console.log((parseInt(count) + arrayNull.length) +'=='+ colData.length);
+
             if((parseInt(count) + arrayNull.length) == colData.length) {
+
+//                console.log((parseInt(numAbs) + arrayNull.length) +'=='+ colData.length);
 
                 if((parseInt(numAbs) + arrayNull.length) == colData.length) {
                     objectStatus.status = true;
@@ -763,8 +784,6 @@
 
                     var tab_height = height - (mainHeaderHeight + mainFooterHeight + boxHeaderHeight + 70);
 
-//                    alert(tab_height);
-
                     setting.height=tab_height;
                     setting.width=table_size;
 
@@ -789,7 +808,7 @@
                                         var colIndex = hotInstance.getSelected()[1]; //console.log(hotInstance.getSelected()[1]);// return index of column header count from 0 index
 
                                         // check not allow to delete on the specific columns
-                                       if(((colIndex != 0) && (colIndex != 1)) && ((colIndex != 2) && (colIndex != 3)) && ((colIndex != 4) && (colIndex != setting.colHeaders.length-1))) {
+                                       if(((colIndex != 0) && (colIndex != 1)) && ((colIndex != 2) && (colIndex != 3)) && ((colIndex != 4) && (colIndex != setting.colHeaders.length-1)) && (colIndex != setting.colHeaders.length-2)) {
 
                                            var colNmae = setting.colHeaders[colIndex];
                                            var percentageId = setting.data[0]['percentage_id_'+colNmae];
@@ -911,46 +930,9 @@
                             }
                         }
                     })
-
-
-
-
-//                    $('.sidebar-toggle').on('click', function() {
-//                        var table_size = $('.box-body').width();
-////                        alert(table_size);
-//                        var height = 500;
-//                        setting.height=height;
-//                        setting.width=table_size;
-////
-//                        hotInstance.updateSettings({
-//                            width:table_size,
-//                            height: height
-//                        });
-//                    })
-
-
-//                    $('.sidebar-toggle').on('shown.bs.collapse', function() {
-//                        alert("shown");
-//                    }).on('show.bs.collapse', function() {
-//                        console.log("show");
-//                    });
-
-
-
-
-
-
                 }
             });
-
-
-
-
-
-
-
         });
-
 
         var pop;
         $('#add_column').on('click', function(e) {
@@ -967,7 +949,7 @@
                 '<div class="form-group col-sm-12 no-padding">' +
                 '<label for="column_name" class="col-sm-2 control-label pop_margin no-padding">Score Name</label>'+
                 '<div class="col-sm-7 no-padding">'+
-                '<input type="text" class="form-control" id="name_exam" name="name_exam" required value="Midterm">'+
+                '<input type="text" class="form-control" id="name_exam" name="name_exam" required value="Midterm" readonly="readonly">'+
                 '</div>'+
                 '</div class="form-group col-sm-12 no-padding">'+
                 '<div class="form-group col-sm-12 no-padding">' +
@@ -1058,109 +1040,106 @@
 
         $('#save_editted_score').on('click', function() {
 
-            if(objectStatus.status == true) {
-                var url = '{{route('admin.course.save_number_absence')}}';
-                if(cellChanges.length > 0 || cellScoreChanges.length > 0) {
+            var url = '{{route('admin.course.save_number_absence')}}';
+
+            if(cellIndex.length > 0) {
+
+                if(objectStatus.status == true) {
+
+                    if(cellChanges.length > 0 || cellScoreChanges.length >0) {
+                        swal({
+                            title: "Confirm",
+                            text: "Save Changes?",
+                            type: "info",
+                            showCancelButton: true,
+                            confirmButtonColor: "#DD6B55",
+                            confirmButtonText: "Yes",
+                            closeOnConfirm: true
+                        }, function(confirmed) {
+                            if (confirmed) {
+
+                                if(cellScoreChanges.length > 0) {// save each score
+
+                                    //recursive function fo send the request by the column data array
+                                    function sendRequest (index, message) {
+
+                                        var saveBaseUrl = '{{route('admin.course.save_score_course_annual')}}';
+
+                                        if(index < setting.colHeaders.length -1) {
+
+                                            if(colDataArray[setting.colHeaders[index]].length > 0 ) {
+                                                $.ajax({
+                                                    type: 'POST',
+                                                    url: saveBaseUrl,
+                                                    data: {data:colDataArray[setting.colHeaders[index]]},
+                                                    dataType: "json",
+                                                    success: function(resultData) {
+                                                        if(resultData.status) {
+                                                            index++;
+                                                            updateSettingHandsontable(resultData.handsontableData);
+                                                            sendRequest(index);
+                                                        } else {
+                                                            notify('error', resultData.message, 'Alert');
+                                                        }
+                                                    }
+                                                })
+                                            } else {
+                                                index++;
+                                                sendRequest(index, message);
+                                            }
+                                        } else {
+                                            notify('success', 'Score Saved!', 'Info');
+                                        }
+                                    }
+                                    var index = 5;
+                                    var message = null;
+                                    sendRequest(index, message);
+                                    cellScoreChanges=[];
+                                }
+
+                                if(cellChanges.length > 0) { // save each number absence
+
+                                    var url = '{{route('admin.course.save_number_absence')}}';
+                                    $.ajax({
+                                        type: 'POST',
+                                        url: url,
+                                        data: {baseData:cellChanges},
+                                        dataType: "json",
+                                        success: function(resultData) {
+
+                                            if(resultData.status) {
+                                                notify('success', resultData.message, 'Info')
+
+                                                updateSettingHandsontable(resultData.handsonData);
+
+                                            } else {
+                                                notify('error', resultData.message, 'Attention')
+                                                updateSettingHandsontable(resultData.handsonData);
+                                            }
+                                            cellChanges=[];
+                                        }
+                                    });
+                                }
+                            }
+                        });
+                    } else {
+                        notify('error', 'There are no changes!!', 'Info');
+                    }
+                } else {
 
                     swal({
-                        title: "Confirm",
-                        text: "Save Changes?",
-                        type: "info",
-                        showCancelButton: true,
-                        confirmButtonColor: "#DD6B55",
-                        confirmButtonText: "Yes",
+                        title: "Attention",
+                        text: objectStatus.colName+" value must be: 0 <= X <= "+ objectStatus.val_to_compare + ', No String Allowed!' ,
+                        type: "warning",
+                        confirmButtonColor: "red",
+                        confirmButtonText: "Close",
                         closeOnConfirm: true
                     }, function(confirmed) {
                         if (confirmed) {
 
-                            if(cellScoreChanges.length > 0) {// save each score
-
-                                //recursive function fo send the request by the column data array
-                                function sendRequest (index, message) {
-
-                                    var saveBaseUrl = '{{route('admin.course.save_score_course_annual')}}';
-
-                                    if(index < setting.colHeaders.length -1) {
-
-                                        if(colDataArray[setting.colHeaders[index]].length > 0 ) {
-                                            $.ajax({
-                                                type: 'POST',
-                                                url: saveBaseUrl,
-                                                data: {data:colDataArray[setting.colHeaders[index]]},
-                                                dataType: "json",
-                                                success: function(resultData) {
-                                                    if(resultData.status) {
-                                                        index++;
-                                                        updateSettingHandsontable(resultData.handsontableData);
-                                                        sendRequest(index);
-                                                    } else {
-                                                        notify('error', resultData.message, 'Alert');
-                                                    }
-                                                }
-                                            })
-                                        } else {
-                                            index++;
-                                            sendRequest(index, message);
-                                        }
-                                    } else {
-                                        notify('success', 'Score Saved!', 'Info');
-                                    }
-                                }
-                                var index = 5;
-                                var message = null;
-                                sendRequest(index, message);
-                                cellScoreChanges=[];
-                                cellIndex = [];
-
-                            }
-
-                            if(cellChanges.length > 0) { // save each number absence
-
-                                var url = '{{route('admin.course.save_number_absence')}}';
-                                $.ajax({
-                                    type: 'POST',
-                                    url: url,
-                                    data: {baseData:cellChanges},
-                                    dataType: "json",
-                                    success: function(resultData) {
-
-                                        if(resultData.status) {
-                                            notify('success', resultData.message, 'Info')
-
-                                            updateSettingHandsontable(resultData.handsonData);
-
-                                        } else {
-                                            notify('error', resultData.message, 'Attention')
-                                            updateSettingHandsontable(resultData.handsonData);
-                                        }
-
-                                        cellChanges=[];
-                                        cellIndex = [];
-                                    }
-                                });
-
-                                cellIndex = [];
-                            }
                         }
                     });
-
-                } else {
-                    notify('error', 'There are no changes!!', 'Info');
                 }
-            } else {
-
-                swal({
-                    title: "Attention",
-                    text: objectStatus.colName+" value must be: 0 <= X <= "+ objectStatus.val_to_compare + ' No String Allowed!' ,
-                    type: "warning",
-                    confirmButtonColor: "red",
-                    confirmButtonText: "Close",
-                    closeOnConfirm: true
-                }, function(confirmed) {
-                    if (confirmed) {
-
-                    }
-                });
             }
         });
 
@@ -1175,9 +1154,7 @@
         };
 
         $('#get_average').on('click', function() {
-
            var check = false;
-
             if(check) {
                 if(cellChanges.length > 0 || cellScoreChanges.length > 0) {
                     notify('error', 'info', 'Please Save Your Changes Before Getting Average!!!')
@@ -1203,15 +1180,11 @@
                                 data: {data: setting.data, colHeader:setting.colHeaders},
                                 dataType: "json",
                                 success: function(resultData) {
-
                                     notify('success', 'info', 'Score Calculated!!');
                                     setting.data = resultData.data;
                                     setting.colHeaders = resultData.columnHeader;
                                     setting.columns = resultData.columns;
                                     hotInstance = new Handsontable(jQuery("#score_table")[0], setting);
-                                    cellIndex=[];
-
-//                                alert('Redraw Table');
                                 }
                             });
                         }
@@ -1233,34 +1206,6 @@
                 }
             });
         });
-
-
-
-
-
-//        function returnWidth() {
-//            var j= $('box-boddy').width();
-//
-//            return j;
-//        }
-//
-//
-//        $(".sidebar-toggle").on('click', function(e) {
-//            e.preventDefault();
-//
-//            console.log(returnWidth());
-//            $("#sidebar").toggleClass("toggled");
-//        });
-
-
-        $('#sidebar').on('shown.bs.collapse', function() {
-            console.log("shown");
-        }).on('show.bs.collapse', function() {
-            console.log("show");
-        });
-
-
-
 
     </script>
 @stop

@@ -1165,7 +1165,7 @@ class CourseAnnualController extends Controller
                 foreach($studentScore as $score) {
                     $checkPercent = $checkPercent +$score->percent; // we check the percentage if it is equal or bigger than 90 then we should now allow teacher to create more score
                     $totalScore = $totalScore + ($score->score);// calculate score for stuent annual
-                    $scoreData[$score->name] = (($score->score > 0)?$score->score: null);
+                    $scoreData[$score->name] = (($score->score != null)?$score->score: null);
                     $scoreData['percentage_id'.'_'.$score->name] =  $score->percentage_id;
                     $scoreData['score_id'.'_'.$score->name]=$score->score_id;
                     $scoreIds[] = $score->score_id;
@@ -1193,6 +1193,7 @@ class CourseAnnualController extends Controller
             $storeTotalScore = $this->storeTotalScoreEachCourseAnnual($input, $scoreIds); // private function to store of update total score
             /*------------end of insert of update total score -------------*/
 
+//            dd($storeTotalScore->description);
             // ------create element data array for handsontable
             $element = array(
                 'student_annual_id'=>$student->student_annual_id,
@@ -1200,10 +1201,10 @@ class CourseAnnualController extends Controller
                 'student_name' => $student->name_latin,
                 'student_gender' => $student->code,
                 'absence'          => ($scoreAbsenceByCourse > 0)?$scoreAbsenceByCourse:10,
-                'num_absence'      => isset($scoreAbsence) ? $scoreAbsence->num_absence:0,
+                'num_absence'      => isset($scoreAbsence) ? $scoreAbsence->num_absence:null,
 //                'average'          => isset($totalScore) ? (float)$totalScore->average: null,
                 'average'          => $totalScore,
-                'notatioin'        => '',
+                'notation'        => $storeTotalScore->description,
                 'department_id'    => $courseAnnual->department_id,
                 'degree_id'        => $courseAnnual->degree_id,
                 'grade_id'         => $courseAnnual->grade_id,
@@ -1356,18 +1357,23 @@ class CourseAnnualController extends Controller
 
         $check =0;
         $courseAnnual = $this->getCourseAnnualById($request->course_annual_id);
-        $percentageInput = [
-            [
-                'name'              =>   $request->percentage_name,
-                'percent'           => $request->percentage,
-                'percentage_type'   => $request->percentage_type
-            ],
-            [
-                'name'              =>   'Final-'.(90-$request->percentage).'%',
-                'percent'           => 90 - $request->percentage,
-                'percentage_type'   => $request->percentage_type
-            ]
-        ];
+        if($request->percentage <= 90) {
+            $percentageInput = [
+                [
+                    'name'              =>   $request->percentage_name,
+                    'percent'           => $request->percentage,
+                    'percentage_type'   => $request->percentage_type
+                ],
+                [
+                    'name'              =>   'Final-'.(90-$request->percentage).'%',
+                    'percent'           => 90 - $request->percentage,
+                    'percentage_type'   => $request->percentage_type
+                ]
+            ];
+
+        } else {
+            return Response::json(['status' => false, 'message'=> 'Score percentage must not over than 90']);
+        }
 
         $studentByCourse = $this->getStudentByDeptIdGradeIdDegreeId(
             $courseAnnual->department_id,
@@ -1395,7 +1401,7 @@ class CourseAnnualController extends Controller
                         'grade_id'          =>  $courseAnnual->grade_id,
                         'academic_year_id'  =>  $courseAnnual->academic_year_id,
                         'semester_id'       =>  $courseAnnual->semester_id,
-                        'socre_absence'     =>  0
+                        'socre_absence'     =>  null
 
                     ];
 
@@ -1589,7 +1595,7 @@ class CourseAnnualController extends Controller
             //update calcuation total score
             $UpdateAverage = $this->averages->update($totalScore->id, $input);
             if($UpdateAverage) {
-                $check = true;
+                return $UpdateAverage;
             }
 
         } else {
@@ -1606,15 +1612,15 @@ class CourseAnnualController extends Controller
                 }
 
                 if($checkRelation == count($scoreIds) ) {
-                    $check =true;
+                   return $storeAverage;
                 }
             }
         }
-        if($check == true) {
-            return true;
-        } else {
-            return false;
-        }
+//        if($check == true) {
+//            return $storeAverage;
+//        } else {
+//            return [];
+//        }
     }
 
 //    --------------all course annual score  ---------------
@@ -2113,7 +2119,25 @@ class CourseAnnualController extends Controller
 
     public function saveEachCellNotationCourseAnnual (Request $request) {
 
-        dd($request->all());
+        $input = [
+            'course_annual_id' => $request->course_annual_id,
+            'student_annual_id' => $request->student_annual_id,
+            'description' => $request->description
+        ];
+        $find = $this->averages->findAverageByCourseIdAndStudentId($input['course_annual_id'], $input['student_annual_id']);
+        if($find) {
+            $update = $this->averages->update($find->id, $input);
+
+            if($update) {
+                return Response::json(['status'=>true]);
+            }
+
+        } else {
+            $storeDescription = $this->averages->create($input);
+            if($storeDescription) {
+                return Response::json(['status'=>true]);
+            }
+        }
     }
 
 

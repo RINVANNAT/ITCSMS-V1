@@ -44,8 +44,8 @@ class EloquentCourseAnnualScoreRepository implements CourseAnnualScoreRepository
         $courseAnnualScore->grade_id = $input['grade_id'];
         $courseAnnualScore->degree_id = $input['degree_id'];
         $courseAnnualScore->department_id = $input['department_id'];
-        $courseAnnualScore->score = isset($input['score'])?$input['score']:0;
-        $courseAnnualScore->score_absence = isset($input['score_absence'])?$input['score_absence']:0;
+        $courseAnnualScore->score = isset($input['score'])?$input['score']:null;
+        $courseAnnualScore->score_absence = isset($input['score_absence'])?$input['score_absence']:null;
         $courseAnnualScore->created_at = Carbon::now();
         $courseAnnualScore->create_uid = auth()->id();
         if ($courseAnnualScore->save()) {
