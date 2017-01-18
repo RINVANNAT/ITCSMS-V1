@@ -69,6 +69,8 @@ Route::group([
 
     Route::post('course_annual/ajax-save-each-cell-notation', 'CourseAnnualController@saveEachCellNotationCourseAnnual')->name('course_annual.save_each_cell_notation');
 
+    Route::post('course_annual/export-course-score-annual', 'CourseAnnualController@exportCourseScore')->name('course_annual.export_course_score_annual');
+
 //    --------------evaluation score for course annually -------
 
     Route::get('course-annual/get-form-all-course-annual-score', 'CourseAnnualController@formScoreAllCourseAnnual')->name('admin.course.get_form_evaluation_score');

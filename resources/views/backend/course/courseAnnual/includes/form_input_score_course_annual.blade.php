@@ -330,7 +330,7 @@
         .current_row td{
 
         gradient(to bottom,rgba(181,209,255,0.34) 0,rgba(181,209,255,0.34) 100%);
-            background-image: linear-gradient(rgba(181, 209, 255, 1) 0px, rgba(181, 209, 255, 0.341176) 100%);
+            background-image: linear-gradient(rgba(181, 209, 255, 0.5) 0px, rgba(181, 209, 255, 0.341176) 100%);
             background-position-x: initial;
             background-position-y: initial;
             background-size: initial;
@@ -371,6 +371,7 @@
             </div>
 {{--            <label for="description" class="label label-success">{{$courseAnnual->academic_year->name_latin}} </label>--}}
             <button class="btn btn-primary btn-xs pull-right" id="save_editted_score" style="margin-left:5px">Save Changes!</button>
+            <button class="btn btn-primary btn-xs pull-right" id="export_score" style="margin-left:5px">Export Score</button>
             <div class="btn-group pull-right btn_action_group">
 
                 <button type="button" class="btn btn-warning btn-xs dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
@@ -766,6 +767,8 @@
                 data: {course_annual_id: '{{$courseAnnualID}}', student_group:'{{$studentGroup}}' },
                 dataType: "json",
                 success: function(resultData) {
+
+                    console.log(resultData);
 
                     setting.data = resultData.data;
                     setting.colHeaders = resultData.columnHeader;
@@ -1192,6 +1195,7 @@
                 }
             }
         });
+
         $('select[name=available_course]').on('change', function() {
 
             $.ajax({
@@ -1205,6 +1209,41 @@
                     declareColumnHeaderDataEmpty()
                 }
             });
+        });
+
+        $('#export_score').on('click', function(e) {
+
+            var colHeaders = setting.colHeaders
+
+            if(colHeaders.length > 7) {// we exactly knew the fixed column header so we just check if the couse has added the score column
+
+                $.ajax({
+                    type: 'POST',
+                    url: '{{route('course_annual.export_course_score_annual')}}',
+                    data: {course_annual_id:$('select[name=available_course] :selected').val(), col_header: colHeaders},
+                    dataType: "json",
+                    success: function(resultData) {
+
+                    }
+                });
+
+            } else {
+
+                swal({
+                    title: "Attention",
+                    text: 'Please Add Score Before Export!' ,
+                    type: "warning",
+                    confirmButtonColor: "red",
+                    confirmButtonText: "Close",
+                    closeOnConfirm: true
+                }, function(confirmed) {
+                    if (confirmed) {
+
+                    }
+                });
+
+            }
+
         });
 
     </script>

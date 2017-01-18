@@ -1100,10 +1100,10 @@ class CourseAnnualController extends Controller
         return $this->handsonTableData($request->course_annual_id);
     }
 
-    private function handsonTableData($courseAnnualId) {
 
-        $arrayData = [];
-        $columnHeader = array(/*'Student_annual_id',*/'Student ID', 'Student Name', 'M/F', 'Abs', 'Abs'. "<br/>".'10%');
+    private function handsonTableHeaders($columnName) {
+
+        $columnHeader = array(/*'Student_annual_id',*/'Student ID', 'Student Name', 'M/F', 'Abs', 'Abs-10%');
         $columns=  array(
 //            ['data' => 'student_annual_id', 'readOnly'=>true],
             ['data' => 'student_id_card', 'readOnly'=>true],
@@ -1113,26 +1113,6 @@ class CourseAnnualController extends Controller
             ['data' => 'absence', 'type' => 'numeric', 'readOnly'=>true],
         );
         $colWidths = [80,180,55, 55, 55];
-        $courseAnnual = $this->getCourseAnnualById($courseAnnualId);
-        $columnName = $this->getPropertiesFromScoreTable($courseAnnual);
-        $columnName = $columnName->select('percentages.name', 'percentages.id as percentage_id')->groupBy('percentages.id')->orderBy('percentages.id')->get();
-
-        $studentByCourse = $this->getStudentByDeptIdGradeIdDegreeId(
-            $courseAnnual->department_id,
-            $courseAnnual->degree_id,
-            $courseAnnual->grade_id,
-            $courseAnnual->academic_year_id
-        );
-
-        if($courseAnnual->group) {
-            $studentByCourse = $studentByCourse->where('studentAnnuals.group', $courseAnnual->group)->get();
-        } else {
-            $studentByCourse = $studentByCourse->get();
-        }
-
-        $allScoreByCourseAnnual = $this->studentScoreCourseAnnually($courseAnnual);
-        $allNumberAbsences = $this->getAbsenceFromDB();
-
         if($columnName) {
 
             foreach($columnName as $column) {
@@ -1140,7 +1120,7 @@ class CourseAnnualController extends Controller
                 $columns = array_merge($columns, array(['data'=>$column->name]));
                 $colWidths[] = 70;
             }
-            $columns = array_merge($columns, array(['data' => 'average', 'readOnly' => true], ['data'=> 'notation']));
+            $columns = array_merge($columns, array(['data' => 'average', 'readOnly' => true, 'type'=> 'numeric'], ['data'=> 'notation']));
             $columnHeader = array_merge($columnHeader, array('Total', 'Notation'));
             $colWidths[] = 70;
 
@@ -1151,6 +1131,33 @@ class CourseAnnualController extends Controller
             $colWidths[] = 70;
         }
 
+        return [
+            'colHeader' => $columnHeader,
+            'column'  => $columns,
+            'colWidth' => $colWidths
+        ];
+
+    }
+
+    private function handsonTableData($courseAnnualId) {
+
+        $arrayData = [];
+        $courseAnnual = $this->getCourseAnnualById($courseAnnualId);
+        $columnName = $this->getPropertiesFromScoreTable($courseAnnual);
+        $columnName = $columnName->select('percentages.name', 'percentages.id as percentage_id')->groupBy('percentages.id')->orderBy('percentages.id')->get();
+        $headers = $this->handsonTableHeaders($columnName);
+        $columnHeader = $headers['colHeader'];
+        $columns = $headers['column'];
+        $colWidths = $headers['colWidth'];
+        $studentByCourse = $this->getStudentByDeptIdGradeIdDegreeId( $courseAnnual->department_id, $courseAnnual->degree_id, $courseAnnual->grade_id, $courseAnnual->academic_year_id);
+        $allScoreByCourseAnnual = $this->studentScoreCourseAnnually($courseAnnual);
+        $allNumberAbsences = $this->getAbsenceFromDB();
+
+        if($courseAnnual->group) {
+            $studentByCourse = $studentByCourse->where('studentAnnuals.group', $courseAnnual->group)->get();
+        } else {
+            $studentByCourse = $studentByCourse->get();
+        }
         //----------------find student score if they have inserted
 
         $checkScoreReachHundredPercent=0;
@@ -1176,7 +1183,7 @@ class CourseAnnualController extends Controller
             //--calculate score absence to sum with the real score
             $totalCourseHours = ($courseAnnual->time_course + $courseAnnual->time_tp + $courseAnnual->time_td);
             $scoreAbsenceByCourse =  number_format((float)((($totalCourseHours)-(isset($scoreAbsence)?$scoreAbsence->num_absence:0))*10)/((($totalCourseHours != 0)?$totalCourseHours:1)), 2, '.', '');
-            $totalScore = $totalScore + (($scoreAbsenceByCourse > 0)?$scoreAbsenceByCourse:0);
+            $totalScore = $totalScore + (($scoreAbsenceByCourse >= 0)?$scoreAbsenceByCourse:0);
 
 
             //----check if every student has the score equal or upper then 90 then we set status to true..then we will not allow teacher to add any score
@@ -1195,12 +1202,13 @@ class CourseAnnualController extends Controller
 
 //            dd($storeTotalScore->description);
             // ------create element data array for handsontable
+//            dd($scoreAbsenceByCourse);
             $element = array(
                 'student_annual_id'=>$student->student_annual_id,
                 'student_id_card' => $student->id_card,
                 'student_name' => $student->name_latin,
                 'student_gender' => $student->code,
-                'absence'          => ($scoreAbsenceByCourse > 0)?$scoreAbsenceByCourse:10,
+                'absence'          => (($scoreAbsenceByCourse >= 0)?$scoreAbsenceByCourse:10),
                 'num_absence'      => isset($scoreAbsence) ? $scoreAbsence->num_absence:null,
 //                'average'          => isset($totalScore) ? (float)$totalScore->average: null,
                 'average'          => $totalScore,
@@ -1215,6 +1223,7 @@ class CourseAnnualController extends Controller
             $mergerData = array_merge($element,$scoreData);
             $arrayData[] = $mergerData;
         }
+
         if($checkScoreReachHundredPercent == count($studentByCourse)) {
             return json_encode([
                 'colWidths' => $colWidths,
@@ -2138,6 +2147,134 @@ class CourseAnnualController extends Controller
                 return Response::json(['status'=>true]);
             }
         }
+    }
+
+
+    private function studentEachPercentScore($courseAnnualId, $studentAnnualId) {
+
+    }
+
+
+    public function exportCourseScore(Request $request) {
+
+        $colHeaders = $request->col_header;
+        $courseAnnual = $this->courseAnnuals->findOrThrowException($request->course_annual_id);
+        $allScoreByCourseAnnual = $this->studentScoreCourseAnnually($courseAnnual);
+
+//        dd($request->col_header);
+        $allNumberAbsences = $this->getAbsenceFromDB();
+        $students = $this->getStudentByDeptIdGradeIdDegreeId($courseAnnual->department_id, $courseAnnual->degree_id, $courseAnnual->grade_id,$courseAnnual->academic_year_id);
+        if($courseAnnual->group) {
+            $students = $students->where('studentAnnuals.group', $courseAnnual->group)->get();
+        } else {
+            $students= $students->get();
+        }
+
+        foreach($students as $student ) {
+
+
+            $studentScores = isset($allScoreByCourseAnnual[$courseAnnual->id][$student->student_annual_id])?$allScoreByCourseAnnual[$courseAnnual->id][$student->student_annual_id]:[];
+            $scoreAbsence = isset($allNumberAbsences[$courseAnnual->id][$student->student_annual_id])?$allNumberAbsences[$courseAnnual->id][$student->student_annual_id]:null;// get number of absence from database
+
+
+            $totalScore = 0;
+            if($studentScores) {
+                foreach($studentScores as $score) {
+                    $totalScore = $totalScore + ($score->score);// calculate score for stuent annual
+                    $scoreData[$score->name] = (($score->score != null)?$score->score: null);
+                }
+            } else{
+                $scoreData=[];
+            }
+
+            //--calculate score absence to sum with the real score
+            $totalCourseHours = ($courseAnnual->time_course + $courseAnnual->time_tp + $courseAnnual->time_td);
+            $scoreAbsenceByCourse =  number_format((float)((($totalCourseHours)-(isset($scoreAbsence)?$scoreAbsence->num_absence:0))*10)/((($totalCourseHours != 0)?$totalCourseHours:1)), 2, '.', '');
+            $totalScore = $totalScore + (($scoreAbsenceByCourse >= 0)?$scoreAbsenceByCourse:0);
+
+                    $element =[
+                        "Student ID" => $student->id_card,
+                        "Student Name" => $student->name_latin,
+                        "M/F"           => $student->code,
+                        "Abs"           => ($scoreAbsence)?$scoreAbsence->num_absence:0,
+                        "Abs-10%"       => $scoreAbsenceByCourse,
+                    ];
+            $element = $element + $scoreData+ ["Total" =>$totalScore, "Notation" =>'',];
+        }
+
+
+        dd($element);
+
+
+
+
+
+
+        $exam = $this->exams->findOrThrowException(1);
+        $courses = $exam->entranceExamCourses()->get();
+        $rooms = $exam->rooms()->with('building')->orderBy('building_id')->orderBy('name')->get();
+        $candidateData=[];
+
+        if($courses) {
+            foreach($courses as $course) {
+                $arrayTmpCands = [];
+                if($rooms) {
+                    foreach($rooms as $room) {
+                        $candidates =  $room->candidates()->with('gender')->orderBy('register_id')->get();
+                        foreach($candidates as $candidate) {
+                            $element = array(
+                                'លេខបង្កាន់ដៃ'              => str_pad($candidate->register_id, 4, '0', STR_PAD_LEFT),
+                                'បន្ទប់'                    => $room->building->code."-".$room->name,
+                                'ឈ្មោះ ខ្មែរ'             => $candidate->name_kh,
+                                'ឈ្មោះ ឡាតាំង'            => $candidate->name_latin,
+                                'ភេទ'                      => $candidate->gender->code,
+                                'ថ្ងៃខែរឆ្នាំកំនើត'           => $candidate->dob->formatLocalized("%d/%b/%Y"),
+                                'ហត្ថលេខា'                => ''
+                            );
+//                            $element = array(
+//                                'Order'     =>  str_pad($candidate->register_id, 4, '0', STR_PAD_LEFT),
+//                                'Room'              => $room->building->code."-".$room->name,
+//                                'Name Khmer'        => $candidate->name_kh,
+//                                'Name Latin'        => $candidate->name_latin,
+//                                'Sexe'              => $candidate->gender->code,
+//                                'Birth Date'        => $candidate->dob->formatLocalized("%d/%b/%Y"),
+//                                'Signature'         => ''
+//                            );
+
+                            $arrayTmpCands[] = $element;
+                        }
+                    }
+                }
+                $candidateData[$course->name_en] = $arrayTmpCands;
+            }
+        }
+
+
+        $fields= ['លេខបង្កាន់ដៃ', 'បន្ទប់', 'ឈ្មោះ ខ្មែរ', 'ឈ្មោះ ឡាតាំង', 'ភេទ', 'ថ្ងៃខែរឆ្នាំកំនើត', 'ហត្ថលេខា'];
+
+//        $fields= ['Order', 'Room', 'Name Khmer', 'Name Latin', 'Sexe', 'Birth Date', 'Signature'];
+        $title = 'បញ្ជីវត្តមានបេក្ខជន';
+//        $title = 'Candidates';
+        $alpha = [];
+        $letter = 'A';
+        while ($letter !== 'AAA') {
+            $alpha[] = $letter++;
+        }
+        Excel::create('បញ្ជីវត្តមានបេក្ខជន', function($excel) use ($candidateData, $title,$alpha,$fields) {
+            foreach($candidateData as $key => $data) {
+                $excel->sheet($key, function($sheet) use($data,$title,$alpha,$fields) {
+                    $sheet->fromArray($data);
+                });
+            }
+        })->export('xls');
+
+
+
+
+
+
+
+
     }
 
 
