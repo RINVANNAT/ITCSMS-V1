@@ -1059,10 +1059,15 @@ class CourseAnnualController extends Controller
             ['semester_id', $courseAnnual->semester_id]
         ]);
 
-        if(auth()->user()->allow("input-score-course-annual")){ // only teacher in every department who have this permission
-            $availableCourses = $availableCourses->where('employee_id', $employee->id)->orderBy('id')->get();
-        } else {
+        if(auth()->user()->allow("view-all-score-in-all-department") || auth()->user()->allow('view-all-score-course-annual')) {
+
             $availableCourses = $availableCourses->orderBy('id')->get();
+        } else {
+            if(auth()->user()->allow("input-score-course-annual")){ // only teacher in every department who have this permission
+                $availableCourses = $availableCourses->where('employee_id', $employee->id)->orderBy('id')->get();
+            } else {
+                $availableCourses = $availableCourses->orderBy('id')->get();
+            }
         }
 
         return [
@@ -2143,6 +2148,7 @@ class CourseAnnualController extends Controller
         $studentListScore=[];
         $colHeaders =explode(',',  $request->col_headers);
         $courseAnnual = $this->courseAnnuals->findOrThrowException($request->course_annual_id);
+
         $allScoreByCourseAnnual = $this->studentScoreCourseAnnually($courseAnnual);
         $allNumberAbsences = $this->getAbsenceFromDB();
         $students = $this->getStudentByDeptIdGradeIdDegreeId($courseAnnual->department_id, $courseAnnual->degree_id, $courseAnnual->grade_id,$courseAnnual->academic_year_id);
