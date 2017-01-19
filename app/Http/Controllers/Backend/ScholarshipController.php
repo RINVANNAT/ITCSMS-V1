@@ -147,6 +147,9 @@ class ScholarshipController extends Controller
 
 
         return $datatables
+            ->editColumn('name_kh', function($scholarship){
+                return $scholarship->name_kh."<br/>".$scholarship->name_en."<br/>".$scholarship->name_fr;
+            })
             ->addColumn('action', function ($scholarship) {
                 return  '<a href="'.route('admin.scholarships.edit',$scholarship->id).'" class="btn btn-xs btn-primary"><i class="fa fa-pencil" data-toggle="tooltip" data-placement="top" title="" data-original-title="'.trans('buttons.general.crud.edit').'"></i> </a>'.
                 ' <button class="btn btn-xs btn-danger btn-delete" data-remote="'.route('admin.scholarships.destroy', $scholarship->id) .'"><i class="fa fa-times" data-toggle="tooltip" data-placement="top" title="' . trans('buttons.general.crud.delete') . '"></i></button>'.

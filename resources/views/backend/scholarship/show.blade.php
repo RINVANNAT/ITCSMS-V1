@@ -58,7 +58,10 @@
                 serverSide: true,
                 pageLength: {!! config('app.records_per_page')!!},
                 ajax: {
-                    url:"{!! route('admin.configuration.schoolFee.data',["true",$scholarship->id]) !!}",
+                    data: {
+                      scholarship_id:  "{{$scholarship->id}}"
+                    },
+                    url:"{!! route('admin.configuration.schoolFee.data',["true"]) !!}",
                     method:"post"
                 },
                 columns: [
@@ -67,6 +70,7 @@
                     { data: 'to_pay', name: 'to_pay', orderable:false, searchable:false},
                 ]
             });
+
             var oTable = $('#scholarship_holder_table').DataTable({
                 dom: 'l<"toolbar">frtip',
                 processing: true,

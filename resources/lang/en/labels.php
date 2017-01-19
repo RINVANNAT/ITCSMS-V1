@@ -880,6 +880,7 @@ return [
             'school_fee_and_award' => 'School Fee and Award',
             'scholarship_holder' => 'Scholarship Holder',
             'fields' => [
+                'name' => "Name",
                 'name_kh' => "Name Khmer",
                 'name_en' => 'Name English',
                 'name_fr' => 'Name French',

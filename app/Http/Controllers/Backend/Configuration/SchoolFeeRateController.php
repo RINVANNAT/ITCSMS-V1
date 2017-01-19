@@ -16,6 +16,7 @@ use App\Models\Scholarship;
 use App\Repositories\Backend\SchoolFee\SchoolFeeRepositoryContract;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Request;
 use Maatwebsite\Excel\Facades\Excel;
 
 class SchoolFeeRateController extends Controller
@@ -159,7 +160,7 @@ class SchoolFeeRateController extends Controller
             ->leftJoin('scholarships', 'schoolFeeRates.scholarship_id', '=', 'scholarships.id');
         if($with_scholarships == "true") {
             $schoolFees = $schoolFees
-                ->whereNotNull('scholarship_id');
+                ->where('scholarship_id',$_POST["scholarship_id"]);
         } else {
             $schoolFees = $schoolFees
                 ->whereNull('scholarship_id');

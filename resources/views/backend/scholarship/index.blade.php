@@ -46,9 +46,7 @@
                 <table class="table table-striped table-bordered table-hover dt-responsive nowrap" cellspacing="0" width="100%" id="scholarships-table">
                     <thead>
                     <tr>
-                        <th>{{ trans('labels.backend.scholarships.fields.name_kh') }}</th>
-                        <th>{{ trans('labels.backend.scholarships.fields.name_en') }}</th>
-                        <th>{{ trans('labels.backend.scholarships.fields.name_fr') }}</th>
+                        <th>{{ trans('labels.backend.scholarships.fields.name') }}</th>
                         <th>{{ trans('labels.backend.scholarships.fields.code') }}</th>
                         <th>{{ trans('labels.backend.scholarships.fields.founder') }}</th>
                         <th>{{ trans('labels.general.actions') }}</th>
@@ -74,8 +72,6 @@
                 ajax: '{!! route('admin.scholarship.data') !!}',
                 columns: [
                     { data: 'name_kh', name: 'name_kh'},
-                    { data: 'name_en', name: 'name_en'},
-                    { data: 'name_fr', name: 'name_fr'},
                     { data: 'code', name: 'code'},
                     { data: 'founder', name: 'founder'},
                     { data: 'action', name: 'action',orderable: false, searchable: false}
