@@ -83,11 +83,11 @@ class EloquentCourseAnnualScoreRepository implements CourseAnnualScoreRepository
 
 
         if($input['score'] == null) {
-            $courseAnnualScore->score = 0;
+            $courseAnnualScore->score = null;
         } else {
-            $courseAnnualScore->score = isset($input['score'])?$input['score']:0;
+            $courseAnnualScore->score = isset($input['score'])?$input['score']:null;
         }
-        $courseAnnualScore->score_absence = isset($input['score_absence'])?$input['score_absence']:0;
+        $courseAnnualScore->score_absence = isset($input['score_absence'])?$input['score_absence']:$courseAnnualScore->score_absence;
         $courseAnnualScore->updated_at = Carbon::now();
         $courseAnnualScore->write_uid = auth()->id();
 

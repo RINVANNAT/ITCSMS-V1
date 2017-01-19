@@ -1048,47 +1048,36 @@ class CourseAnnualController extends Controller
 
     }
 
-    public function getFormScoreByCourse(Request $request, $courseAnnualID) {
+    private function dataSendToView($courseAnnualId) {
 
-        $studentGroup = $request->student_group;
-        $courseAnnual = $this->getCourseAnnualById($courseAnnualID);
-        $groups = $this->getStudentGroupFromDB();
-        $groups = $groups->where('studentAnnuals.department_id', '=',$courseAnnual->department_id);
-        $groups = $groups->where('studentAnnuals.academic_year_id', '=',$courseAnnual->academic_year_id);
-        $groups = $groups->where('studentAnnuals.degree_id', '=',$courseAnnual->degree_id)->lists('group');
-        $departments = Department::orderBy("code")
-            ->where("code","!=","Study Office")
-            ->where("code","!=","Academic")
-            ->where("code","!=","Finance")
-            ->get();
-        $departmentTmps = array();
-        foreach ($departments as $value){
-            $departmentTmps[$value->id] = $value['code'];
-        }
-        $departments = $departmentTmps;
-        $academicYears = AcademicYear::orderBy("id","desc")->lists('name_latin','id')->toArray();
-        $degrees = Degree::lists('name_en','id')->toArray();
-        $grades = Grade::lists('name_en','id')->toArray();
-        $semesters = Semester::orderBy('id')->lists('name_en', 'id')->toArray();
-
+        $courseAnnual = $this->getCourseAnnualById($courseAnnualId);
         $employee = Employee::where('user_id', Auth::user()->id)->first();
 
         $availableCourses = CourseAnnual::where([
-                ['department_id', $courseAnnual->department_id],
-                ['academic_year_id', $courseAnnual->academic_year_id],
-                ['semester_id', $courseAnnual->semester_id]
-            ]);
+            ['department_id', $courseAnnual->department_id],
+            ['academic_year_id', $courseAnnual->academic_year_id],
+            ['semester_id', $courseAnnual->semester_id]
+        ]);
 
-        //--------need to change from here---check permission should do right here
-
-        if(($employee->department_id != 9) && ($employee->department_id != 10) && (($employee->department_id != 11) && ($employee->department_id != 12))) {
+        if(auth()->user()->allow("input-score-course-annual")){ // only teacher in every department who have this permission
             $availableCourses = $availableCourses->where('employee_id', $employee->id)->orderBy('id')->get();
         } else {
-
             $availableCourses = $availableCourses->orderBy('id')->get();
         }
 
-        return view('backend.course.courseAnnual.includes.form_input_score_course_annual', compact('courseAnnualID', 'courseAnnual', 'groups', 'departments', 'academicYears', 'degrees', 'grades', 'semesters', 'studentGroup', 'availableCourses'));
+        return [
+            'course_annual' => $courseAnnual,
+            'available_course'  =>$availableCourses
+        ];
+    }
+
+    public function getFormScoreByCourse(Request $request, $courseAnnualId) {
+
+        $properties = $this->dataSendToView($courseAnnualId);
+        $courseAnnual = $properties['course_annual'];
+        $availableCourses = $properties['available_course'];
+
+        return view('backend.course.courseAnnual.includes.form_input_score_course_annual', compact('courseAnnualId', 'courseAnnual', 'availableCourses'));
     }
 
     public function getCourseAnnualScoreByAjax(Request $request) {
@@ -2149,19 +2138,12 @@ class CourseAnnualController extends Controller
         }
     }
 
-
-    private function studentEachPercentScore($courseAnnualId, $studentAnnualId) {
-
-    }
-
-
     public function exportCourseScore(Request $request) {
 
-        $colHeaders = $request->col_header;
+        $studentListScore=[];
+        $colHeaders =explode(',',  $request->col_headers);
         $courseAnnual = $this->courseAnnuals->findOrThrowException($request->course_annual_id);
         $allScoreByCourseAnnual = $this->studentScoreCourseAnnually($courseAnnual);
-
-//        dd($request->col_header);
         $allNumberAbsences = $this->getAbsenceFromDB();
         $students = $this->getStudentByDeptIdGradeIdDegreeId($courseAnnual->department_id, $courseAnnual->degree_id, $courseAnnual->grade_id,$courseAnnual->academic_year_id);
         if($courseAnnual->group) {
@@ -2172,11 +2154,8 @@ class CourseAnnualController extends Controller
 
         foreach($students as $student ) {
 
-
             $studentScores = isset($allScoreByCourseAnnual[$courseAnnual->id][$student->student_annual_id])?$allScoreByCourseAnnual[$courseAnnual->id][$student->student_annual_id]:[];
             $scoreAbsence = isset($allNumberAbsences[$courseAnnual->id][$student->student_annual_id])?$allNumberAbsences[$courseAnnual->id][$student->student_annual_id]:null;// get number of absence from database
-
-
             $totalScore = 0;
             if($studentScores) {
                 foreach($studentScores as $score) {
@@ -2200,82 +2179,152 @@ class CourseAnnualController extends Controller
                         "Abs-10%"       => $scoreAbsenceByCourse,
                     ];
             $element = $element + $scoreData+ ["Total" =>$totalScore, "Notation" =>'',];
+            $studentListScore[] = $element;
         }
 
-
-        dd($element);
-
-
-
-
-
-
-        $exam = $this->exams->findOrThrowException(1);
-        $courses = $exam->entranceExamCourses()->get();
-        $rooms = $exam->rooms()->with('building')->orderBy('building_id')->orderBy('name')->get();
-        $candidateData=[];
-
-        if($courses) {
-            foreach($courses as $course) {
-                $arrayTmpCands = [];
-                if($rooms) {
-                    foreach($rooms as $room) {
-                        $candidates =  $room->candidates()->with('gender')->orderBy('register_id')->get();
-                        foreach($candidates as $candidate) {
-                            $element = array(
-                                'លេខបង្កាន់ដៃ'              => str_pad($candidate->register_id, 4, '0', STR_PAD_LEFT),
-                                'បន្ទប់'                    => $room->building->code."-".$room->name,
-                                'ឈ្មោះ ខ្មែរ'             => $candidate->name_kh,
-                                'ឈ្មោះ ឡាតាំង'            => $candidate->name_latin,
-                                'ភេទ'                      => $candidate->gender->code,
-                                'ថ្ងៃខែរឆ្នាំកំនើត'           => $candidate->dob->formatLocalized("%d/%b/%Y"),
-                                'ហត្ថលេខា'                => ''
-                            );
-//                            $element = array(
-//                                'Order'     =>  str_pad($candidate->register_id, 4, '0', STR_PAD_LEFT),
-//                                'Room'              => $room->building->code."-".$room->name,
-//                                'Name Khmer'        => $candidate->name_kh,
-//                                'Name Latin'        => $candidate->name_latin,
-//                                'Sexe'              => $candidate->gender->code,
-//                                'Birth Date'        => $candidate->dob->formatLocalized("%d/%b/%Y"),
-//                                'Signature'         => ''
-//                            );
-
-                            $arrayTmpCands[] = $element;
-                        }
-                    }
-                }
-                $candidateData[$course->name_en] = $arrayTmpCands;
-            }
-        }
-
-
-        $fields= ['លេខបង្កាន់ដៃ', 'បន្ទប់', 'ឈ្មោះ ខ្មែរ', 'ឈ្មោះ ឡាតាំង', 'ភេទ', 'ថ្ងៃខែរឆ្នាំកំនើត', 'ហត្ថលេខា'];
-
-//        $fields= ['Order', 'Room', 'Name Khmer', 'Name Latin', 'Sexe', 'Birth Date', 'Signature'];
-        $title = 'បញ្ជីវត្តមានបេក្ខជន';
-//        $title = 'Candidates';
+        $title = 'Student Score Lists';
         $alpha = [];
         $letter = 'A';
         while ($letter !== 'AAA') {
             $alpha[] = $letter++;
         }
-        Excel::create('បញ្ជីវត្តមានបេក្ខជន', function($excel) use ($candidateData, $title,$alpha,$fields) {
-            foreach($candidateData as $key => $data) {
-                $excel->sheet($key, function($sheet) use($data,$title,$alpha,$fields) {
-                    $sheet->fromArray($data);
-                });
-            }
-        })->export('xls');
 
-
-
-
-
-
-
+        Excel::create($title, function($excel) use ($studentListScore, $title,$alpha,$colHeaders) {
+            $excel->sheet($title, function($sheet) use($studentListScore,$title,$alpha,$colHeaders) {
+                $sheet->fromArray($studentListScore);
+            });
+        })->download('xls');
 
     }
+
+    public function formImportScore(Request $request) {
+//        dd($request->all());
+        $courseAnnual = $this->courseAnnuals->findOrThrowException($request->course_annual_id);
+        return view('backend.course.courseAnnual.includes.popup_import_score_file', compact('courseAnnual'));
+    }
+
+    public function importScore($courseAnnualId, Request $request) {
+        $now = Carbon::now()->format('Y_m_d_H');
+
+
+
+        if($request->file('import')!= null){
+            $import = $now. '.' .$request->file('import')->getClientOriginalExtension();
+
+            $request->file('import')->move(
+                base_path() . '/public/assets/uploaded_file/course_annuals/', "course_annual_".$import
+            );
+            $storage_path = base_path() . '/public/assets/uploaded_file/course_annuals/course_annual_'.$import;
+            $students = $this->getStudentByNameAndIdCard($courseAnnualId);
+            $check=0;
+            DB::beginTransaction();
+            try{
+                Excel::filter('chunk')->load($storage_path)->chunk(100, function($results)use ($students, $courseAnnualId, $check){
+
+
+
+                    $results->each(function($row) use($students, $courseAnnualId, $check)  {
+
+                        $row = $row->toArray();
+                        $scoreIds = $this->getScoreId($courseAnnualId);
+                        $studentScoreIds = $scoreIds[$students[$row['student_id']][$row['student_name']]->student_annual_id];
+                        $percentage = $this->getPercentage();
+                        foreach($studentScoreIds as $scoreId) {
+                            if(isset($row[strtolower($percentage[$scoreId])])) {
+                                $explode = explode('_',strtolower($percentage[$scoreId]));
+                                $percent = $explode[count($explode)-1];
+                                if(  $row[strtolower($percentage[$scoreId])] <= (int)$percent) {
+
+                                    $input = [
+                                        'score'=> $row[strtolower($percentage[$scoreId])]
+                                    ];
+                                    $score = $this->courseAnnualScores->update($scoreId, $input);
+                                    if($score) {
+                                        $check++;
+                                    }
+
+                                }
+                            }
+                        }
+
+                    });
+
+                });
+
+            } catch(Exception $e){
+                DB::rollback();
+            }
+            DB::commit();
+            $status = true;
+            $dataSendToview = $this->dataSendToView($courseAnnualId);
+            $courseAnnual = $dataSendToview['course_annual'];
+            $availableCourses = $dataSendToview['available_course'];
+            if($check == count($students)) {
+                return view('backend.course.courseAnnual.includes.form_input_score_course_annual', compact('courseAnnualId', 'courseAnnual', 'availableCourses'));
+            } else {
+                return redirect()->back()->with(['warning'=>'The inputted score was over the determined percentage!']);
+            }
+
+        } else {
+            $status = false;
+//            return view('backend.exam.includes.after_import_success', compact('status'));
+        }
+    }
+
+
+    private function getStudentByNameAndIdCard($courseAnnualId) {
+
+        $arrayStudent = [];
+        $courseAnnual = $this->courseAnnuals->findOrThrowException($courseAnnualId);
+        $students = $this->getStudentByDeptIdGradeIdDegreeId($courseAnnual->department_id, $courseAnnual->degree_id, $courseAnnual->grade_id, $courseAnnual->academic_year_id);
+        if($courseAnnual->group) {
+            $students = $students->where('studentAnnuals.group', $courseAnnual->group)->get();
+        } else {
+            $students = $students->get();
+        }
+
+        foreach($students as $student) {
+            $arrayStudent[$student->id_card][$student->name_latin]=$student;
+        }
+
+        return $arrayStudent;
+    }
+
+    private function getScoreId($courseAnnualId) {
+
+        $arrayScores = [];
+
+        $scores = DB::table('scores')
+            ->where([
+                ['scores.course_annual_id', $courseAnnualId],
+            ])->get();
+
+        foreach($scores as $score) {
+            $arrayScores[$score->student_annual_id][] = $score->id;
+        }
+
+        return $arrayScores;
+    }
+
+    private function getPercentage() {
+
+        $arrayPercentage=[];
+        $percentages = DB::table('percentages')
+            ->join('percentage_scores','percentage_scores.percentage_id','=', 'percentages.id')
+            ->join('scores', 'scores.id','=', 'percentage_scores.score_id')
+            ->select('scores.id as score_id', 'percentages.percent', 'percentages.name')
+            ->get();
+
+        foreach($percentages as $percentage) {
+            $trim =trim($percentage->name, '%');
+            $strReplace = str_replace("-","_",$trim);
+            $arrayPercentage[$percentage->score_id] = $strReplace;
+        }
+
+        return ($arrayPercentage);
+
+    }
+
 
 
 

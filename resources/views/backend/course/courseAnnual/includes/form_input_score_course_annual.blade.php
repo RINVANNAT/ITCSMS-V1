@@ -353,7 +353,6 @@
 @section('content')
 
     <div class="box box-success">
-
         <div class="box-header with-border">
             <div class="pull-left">
                 <select  name="available_course" id="available_course" class=" form-control col-md-2 col-lg-2 col-sm-2">
@@ -371,7 +370,8 @@
             </div>
 {{--            <label for="description" class="label label-success">{{$courseAnnual->academic_year->name_latin}} </label>--}}
             <button class="btn btn-primary btn-xs pull-right" id="save_editted_score" style="margin-left:5px">Save Changes!</button>
-            <button class="btn btn-primary btn-xs pull-right" id="export_score" style="margin-left:5px">Export Score</button>
+            <a class="btn btn-primary btn-xs pull-right" id="export_score" href="{{route('course_annual.export_course_score_annual')}}" target="_blank" style="margin-left:5px">Export Score</a>
+            <a href="{{route('course_annual.form_import_score')}}" target="_self" class="btn btn-info btn-xs pull-right" id="import_score" style="margin-left: 5px"> Import Score</a>
             <div class="btn-group pull-right btn_action_group">
 
                 <button type="button" class="btn btn-warning btn-xs dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
@@ -764,7 +764,7 @@
             $.ajax({
                 type: 'GET',
                 url: getDataBaseUrl,
-                data: {course_annual_id: '{{$courseAnnualID}}', student_group:'{{$studentGroup}}' },
+                data: {course_annual_id: '{{$courseAnnualId}}' },
                 dataType: "json",
                 success: function(resultData) {
 
@@ -1164,7 +1164,7 @@
                 } else {
 
 
-                    var getAverageBaseurl = '{{route('admin.course.get_average_score', $courseAnnualID)}}';
+                    var getAverageBaseurl = '{{route('admin.course.get_average_score', $courseAnnualId)}}';
 
                     swal({
                         title: "Confirm",
@@ -1213,19 +1213,11 @@
 
         $('#export_score').on('click', function(e) {
 
+            e.preventDefault();
             var colHeaders = setting.colHeaders
-
             if(colHeaders.length > 7) {// we exactly knew the fixed column header so we just check if the couse has added the score column
-
-                $.ajax({
-                    type: 'POST',
-                    url: '{{route('course_annual.export_course_score_annual')}}',
-                    data: {course_annual_id:$('select[name=available_course] :selected').val(), col_header: colHeaders},
-                    dataType: "json",
-                    success: function(resultData) {
-
-                    }
-                });
+                var url = $(this).attr('href');
+                window.open(url+'?course_annual_id='+ $('select[name=available_course] :selected').val()+'&col_headers='+colHeaders)
 
             } else {
 
@@ -1243,6 +1235,34 @@
                 });
 
             }
+
+        });
+
+
+        $('#import_score').on('click', function(e) {
+            e.preventDefault();
+            var url = $(this).attr('href');
+            var colHeaders = setting.colHeaders
+            if(colHeaders.length > 7) {// we exactly knew the fixed column header so we just check if the couse has added the score column
+                window.open(url+'?course_annual_id='+$('select[name=available_course] :selected').val(), '_self');
+
+            } else {
+                swal({
+                    title: "Attention",
+                    text: 'Please Add Score Before Import!' ,
+                    type: "warning",
+                    confirmButtonColor: "red",
+                    confirmButtonText: "Close",
+                    closeOnConfirm: true
+                }, function(confirmed) {
+                    if (confirmed) {
+
+                    }
+                });
+
+            }
+
+
 
         });
 
