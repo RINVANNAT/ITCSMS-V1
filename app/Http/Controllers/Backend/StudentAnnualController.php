@@ -220,8 +220,9 @@ class StudentAnnualController extends Controller
             ->leftJoin('departments', 'studentAnnuals.department_id', '=', 'departments.id')
             ->leftJoin('degrees', 'studentAnnuals.degree_id', '=', 'degrees.id');
 
-
-
+        if ($scholarship = $request->get('scholarship')) {
+            $studentAnnuals = $studentAnnuals->leftJoin('scholarship_student_annual', 'studentAnnuals.id', '=', 'scholarship_student_annual.student_annual_id');
+        }
 
         $datatables = app('datatables')->of($studentAnnuals)
             ->editColumn('name_latin',function($studentAnnual){
@@ -287,9 +288,9 @@ class StudentAnnualController extends Controller
         if ($group = $datatables->request->get('group')) {
             $datatables->where('studentAnnuals.group', '=', $group);
         }
-//        if ($scholarship = $datatables->request->get('scholarship')) {
-//            $datatables->where('scholarship_student_annual.scholarship_id', '=', $scholarship);
-//        }
+        if ($scholarship = $datatables->request->get('scholarship')) {
+            $datatables->where('scholarship_student_annual.scholarship_id', '=', $scholarship);
+        }
 
 
         return $datatables->make(true);
