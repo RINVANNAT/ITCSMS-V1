@@ -49,22 +49,35 @@
         <div class="box-header with-border">
             <div class="row">
                 <div class="col-lg-9 form-horizontal vcenter">
-                    <div class="form-group">
-                        {!! Form::label('name', trans('labels.backend.reporting.academic_year_id'), ['class' => 'col-lg-2 control-label']) !!}
-                        <div class="col-lg-4">
-                            {!! Form::select('academic_year_id', $academicYears,null, ['class' => 'form-control','id' => 'input_academic_year']) !!}
+                    <form id="reporting-form">
+                        <div class="form-group">
+                            {!! Form::label('name', trans('labels.backend.reporting.academic_year_id'), ['class' => 'col-lg-2 control-label']) !!}
+                            <div class="col-lg-4">
+                                {!! Form::select('academic_year_id', $academicYears,null, ['class' => 'form-control','id' => 'input_academic_year']) !!}
+                            </div>
+                            {!! Form::label('name', trans('labels.backend.reporting.degree_id'), ['class' => 'col-lg-2 control-label']) !!}
+                            <div class="col-lg-4">
+                                {!! Form::select('degree_id', $degrees,null, ['class' => 'form-control', 'id'=>'input_degree']) !!}
+                            </div>
                         </div>
-                        {!! Form::label('name', trans('labels.backend.reporting.degree_id'), ['class' => 'col-lg-2 control-label']) !!}
-                        <div class="col-lg-4">
-                            {!! Form::select('degree_id', $degrees,null, ['class' => 'form-control', 'id'=>'input_degree']) !!}
+                        <div class="form-group">
+                            {!! Form::label('name', trans('labels.backend.reporting.is_foreigner'), ['class' => 'col-lg-2 control-label']) !!}
+                            <div class="col-lg-4">
+                                {!! Form::checkbox('only_foreigner', 'TRUE',false,['id'=>'only_foreigner']) !!}
+                            </div>
                         </div>
-                    </div><!--form control-->
-                    <div class="form-group">
-                        {!! Form::label('name', trans('labels.backend.reporting.is_foreigner'), ['class' => 'col-lg-2 control-label']) !!}
-                        <div class="col-lg-4">
-                            {!! Form::checkbox('is_foreigner', 'TRUE',false,['id'=>'is_foreigner']) !!}
+                        <div class="form-group">
+                            {!! Form::label('scholarships', trans('labels.backend.reporting.scholarships'), ['class' => 'col-lg-2 control-label']) !!}
+                            <div class="col-lg-10" style="padding: 0px">
+                                @foreach($scholarships as $scholarship)
+                                    <div class="col-md-4">
+                                        <label><input type="checkbox" name="scholarships[]" value="{{$scholarship->id}}"> {{$scholarship->code}}</label>
+                                    </div>
+                                @endforeach
+                            </div>
                         </div>
-                    </div><!--form control-->
+                    </form>
+
                 </div>
                 <div class="col-lg-2 vcenter">
                     <a class="btn btn-app" id="search_btn">
@@ -79,7 +92,9 @@
         <div class="box-body">
 
             <div id="data">
-
+                <div class="form-group col-sm-12 box-body with-border text-muted well well-sm no-shadow" style="padding: 20px;">
+                    Please select the fields above to apply filter and then click search.
+                </div>
             </div>
             <div class="clearfix"></div>
             <iframe name="print_frame" width="0" height="0" frameborder="0" src="about:blank"></iframe>
@@ -108,9 +123,10 @@
         /* ----------------------Page functions---------------------*/
         function preview(link){
             $.ajax({
-                url: link+"?academic_year_id="+$('#input_academic_year').val()+"&degree_id="+$('#input_degree').val()+"&only_foreigner="+$('#is_foreigner').is(':checked'),
-                type: 'GET',
+                url: link,
+                type: 'POST',
                 dataType: 'text',
+                data:$("#reporting-form").serialize(),
                 success: function(data) {
                     $('#data').html(data);
                 },
@@ -134,7 +150,7 @@
                 }
             });
             // Start load data when page loaded
-            preview(preview_url);
+            //preview(preview_url);
             $("#search_btn").click(function (e) {
                 e.preventDefault();
                 preview(preview_url);

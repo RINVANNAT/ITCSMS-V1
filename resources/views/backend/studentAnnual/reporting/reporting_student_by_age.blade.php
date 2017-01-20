@@ -11,6 +11,7 @@
 @endsection
 
 @section('after-styles-end')
+    {!! Html::style('plugins/datetimepicker/bootstrap-datetimepicker.min.css') !!}
     <style>
         .vcenter {
             display: inline-block;
@@ -49,16 +50,35 @@
         <div class="box-header with-border">
             <div class="row">
                 <div class="col-lg-9 form-horizontal vcenter">
-                    <div class="form-group">
-                        {!! Form::label('name', trans('labels.backend.reporting.academic_year_id'), ['class' => 'col-lg-2 control-label']) !!}
-                        <div class="col-lg-4">
-                            {!! Form::select('academic_year_id', $academicYears,null, ['class' => 'form-control','id' => 'input_academic_year']) !!}
+                    <form id="reporting-form">
+                        <div class="form-group">
+                            {!! Form::label('name', trans('labels.backend.reporting.academic_year_id'), ['class' => 'col-lg-2 control-label']) !!}
+                            <div class="col-lg-4">
+                                {!! Form::select('academic_year_id', $academicYears,null, ['class' => 'form-control','id' => 'input_academic_year']) !!}
+                            </div>
+                            {!! Form::label('name', trans('labels.backend.reporting.degree_id'), ['class' => 'col-lg-2 control-label']) !!}
+                            <div class="col-lg-4">
+                                {!! Form::select('degree_id', $degrees,null, ['class' => 'form-control', 'id'=>'input_degree']) !!}
+                            </div>
                         </div>
-                        {!! Form::label('name', trans('labels.backend.reporting.degree_id'), ['class' => 'col-lg-2 control-label']) !!}
-                        <div class="col-lg-4">
-                            {!! Form::select('degree_id', $degrees,null, ['class' => 'form-control', 'id'=>'input_degree']) !!}
+                        <div class="form-group">
+                            {!! Form::label('date', trans('labels.backend.reporting.date'), ['class' => 'col-lg-2 control-label']) !!}
+                            <div class="col-lg-4">
+                                {!! Form::text('date' ,null, ['class' => 'form-control', 'id'=>'date']) !!}
+                            </div>
                         </div>
-                    </div><!--form control-->
+                        <div class="form-group">
+                            {!! Form::label('scholarships', trans('labels.backend.reporting.scholarships'), ['class' => 'col-lg-2 control-label']) !!}
+                            <div class="col-lg-10" style="padding: 0px">
+                                @foreach($scholarships as $scholarship)
+                                    <div class="col-md-4">
+                                        <label><input type="checkbox" name="scholarships[]" value="{{$scholarship->id}}"> {{$scholarship->code}}</label>
+                                    </div>
+                                @endforeach
+                            </div>
+                        </div>
+                    </form>
+
                 </div>
                 <div class="col-lg-2 vcenter">
                     <a class="btn btn-app" id="search_btn">
@@ -68,17 +88,19 @@
             </div>
 
 
-        </div><!-- /.box-header -->
+        </div>
 
         <div class="box-body">
 
             <div id="data">
-
+                <div class="form-group col-sm-12 box-body with-border text-muted well well-sm no-shadow" style="padding: 20px;">
+                    Please select the fields above to apply filter and then click search.
+                </div>
             </div>
             <div class="clearfix"></div>
             <iframe name="print_frame" width="0" height="0" frameborder="0" src="about:blank"></iframe>
-        </div><!-- /.box-body -->
-    </div><!--box-->
+        </div>
+    </div>
 
     <div class="box box-success">
         <div class="box-body">
@@ -88,11 +110,13 @@
                 <button class="btn btn-success btn-xs" id="print_btn"> <i class="fa fa-print"></i> {{ trans('buttons.general.print') }} </button>
             </div>
             <div class="clearfix"></div>
-        </div><!-- /.box-body -->
-    </div><!--box-->
+        </div>
+    </div>
 @stop
 
 @section('after-scripts-end')
+    {!! Html::script('plugins/moment/moment.min.js') !!}
+    {!! Html::script('plugins/datetimepicker/bootstrap-datetimepicker.min.js') !!}
     <script>
         var report_data_url = "{!! url('admin/student/'.$id.'/reporting-data') !!}";
         var export_data_url = "{!! url('admin/student/'.$id.'/reporting/export') !!}";
@@ -101,50 +125,12 @@
 
         /* ----------------------Page functions---------------------*/
 
-        /*function loadData() {
-            $.ajax({
-                url: report_data_url,
-                type: 'POST',
-                dataType: 'json',
-                data: $("#report_search").serialize(),
-                success: function(data) {
-                    var rows="";
-                    $.each(data, function(key,age) {
-                        var row = "<tr align='center' class='insertBorder record'><td>"+age.name+"</td>";
-
-                        var scholarship_total = 0;
-                        var scholarship_total_female = 0;
-                        var pay_total = 0;
-                        var pay_total_female = 0;
-                        $.each(age.data, function(x,y){
-                            row +=  "<td>"+ y.st +"</td>"+"<td>"+ y.sf +"</td>"+"<td>"+ y.pt +"</td>"+"<td>"+ y.pf +"</td>";
-                            scholarship_total = scholarship_total + y.st;
-                            scholarship_total_female = scholarship_total_female + y.sf;
-                            pay_total = pay_total + y.pt;
-                            pay_total_female = pay_total_female + y.pf;
-                        });
-                        row += "<td>"+ scholarship_total +"</td>"+"<td>"+ scholarship_total_female +"</td>"+"<td>"+ pay_total +"</td>"+"<td>"+ pay_total_female +"</td>";
-                        row = row+"</tr>"
-
-                        rows = rows+ row;
-
-                    });
-                    $('.record').remove();
-                    $('#row_header').after(rows);
-
-
-                },
-                error: function() {
-                    alert('Something is wrong');
-                }
-            });
-        }*/
-
         function preview(link){
             $.ajax({
-                url: link+"?academic_year_id="+$('#input_academic_year').val()+"&degree_id="+$('#input_degree').val(),
-                type: 'GET',
+                url: link,
+                type: 'POST',
                 dataType: 'text',
+                data:$("#reporting-form").serialize(),
                 success: function(data) {
                     $('#data').html(data);
                 },
@@ -161,6 +147,10 @@
 
         /* --------------------When page ready, start some action---------------------- */
         $(document).ready(function() {
+            $('#date').datetimepicker({
+                defaultDate: new Date(),
+                format : "DD/MM/YYYY"
+            });
 
             $.ajaxSetup({
                 headers: {
@@ -168,7 +158,7 @@
                 }
             });
             // Start load data when page loaded
-            preview(preview_url);
+            //preview(preview_url);
             $("#search_btn").click(function (e) {
                 e.preventDefault();
                 preview(preview_url);
