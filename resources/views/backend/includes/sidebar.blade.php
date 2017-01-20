@@ -87,19 +87,21 @@
                     <li class="{{ Active::pattern('admin/course/course_annual*') }}">
                         <a href="{!! url('admin/course/course_annual') !!}">{{ trans('menus.backend.course.course_annuals') }}</a>
                     </li>
+                    @permission('view-all-score-course-annual')
                     <li class="{{ Active::pattern('admin/course/course_program*') }}">
                         <a href="{!! url('admin/course/course_program') !!}">{{ trans('menus.backend.course.course_programs') }}</a>
                     </li>
+                    @endauth
 
-                    <li class="{{ Active::pattern('admin/score/absences/input*') }}">
-                        <a href="{!! route('absences.input') !!}">{{ trans('menus.backend.absences.input') }}</a>
-                    </li>
-                    <li class="{{ Active::pattern('admin/score/input*') }}">
-                        <a href="{{ route('score.input')}}">{{ trans('menus.backend.score.input') }}</a>
-                    </li>
-                    <li class="{{ Active::pattern('admin/score/ranking*') }}">
-                        <a href="{{ route('score.ranking')}}">{{ trans('menus.backend.score.ranking') }}</a>
-                    </li>
+                    {{--<li class="{{ Active::pattern('admin/score/absences/input*') }}">--}}
+                        {{--<a href="{!! route('absences.input') !!}">{{ trans('menus.backend.absences.input') }}</a>--}}
+                    {{--</li>--}}
+                    {{--<li class="{{ Active::pattern('admin/score/input*') }}">--}}
+                        {{--<a href="{{ route('score.input')}}">{{ trans('menus.backend.score.input') }}</a>--}}
+                    {{--</li>--}}
+                    {{--<li class="{{ Active::pattern('admin/score/ranking*') }}">--}}
+                        {{--<a href="{{ route('score.ranking')}}">{{ trans('menus.backend.score.ranking') }}</a>--}}
+                    {{--</li>--}}
 
                     {{--ranking--}}
 

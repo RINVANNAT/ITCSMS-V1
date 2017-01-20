@@ -15,11 +15,7 @@
 
         {!! Form::open(['route' => ['course_annual.import_file', $courseAnnual->id],'id' => 'import_course_annual_score', 'role'=>'form','files' => true])!!}
         <div class="box box-success">
-            @if(session('warning'))
-                <div class="alert alert-danger message">
-                    {{session('warning')}}
-                </div>
-            @endif
+
             <div class="box-header with-border">
                 <h3 class="box-title">{{ trans('labels.backend.rooms.sub_import_title') }}</h3>
             </div><!-- /.box-header -->
@@ -83,6 +79,40 @@
                 }, 3000)
             }
         })
+
+        @if(session('warning'))
+
+            swal({
+            title: "Attention",
+            text: " File Not Imported :Cell value must be bigger then 0, less than the header percentage and no string allowed!",
+            type: "warning",
+            confirmButtonColor: "red",
+            confirmButtonText: "Close",
+            closeOnConfirm: true
+        }, function(confirmed) {
+            if (confirmed) {
+
+            }
+        });
+        @endif
+
+        @if(session('status'))
+            swal({
+            title: "Attention",
+            text: "{{session('status')}}",
+            type: "warning",
+            confirmButtonColor: "red",
+            confirmButtonText: "Close",
+            closeOnConfirm: true
+        }, function(confirmed) {
+            if (confirmed) {
+
+            }
+        });
+        @endif
+
+
+
 
     </script>
 @stop

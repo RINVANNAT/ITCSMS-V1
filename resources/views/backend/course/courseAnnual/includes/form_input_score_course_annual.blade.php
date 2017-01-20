@@ -976,7 +976,7 @@
             pop.open(function(r) {// call this function to open dialog
                 switch(r) {
                     case 'ok':// vaule of btn
-                        //do nothing
+                        pop.close();
                         break;
                 }
 
@@ -1261,10 +1261,30 @@
                 });
 
             }
-
-
-
         });
+
+
+        @if(isset($arrayMissedStudent))
+                var str = ' ';
+                @foreach($arrayMissedStudent as $student)
+                        str = str + '{{$student['student_id']}}'+ ' ';
+                @endforeach
+
+                 swal({
+                    title: "Attention",
+                    text: 'Your file has imported but the student with this Id: '+ str +' cannot find in the system' ,
+                    type: "warning",
+                    confirmButtonColor: "red",
+                    confirmButtonText: "Close",
+                    closeOnConfirm: true
+                }, function(confirmed) {
+                    if (confirmed) {
+
+                    }
+                });
+        @endif
+
+
 
     </script>
 @stop
