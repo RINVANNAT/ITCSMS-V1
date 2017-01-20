@@ -218,8 +218,8 @@ class StudentAnnualController extends Controller
             ->leftJoin('grades', 'studentAnnuals.grade_id', '=', 'grades.id')
             ->leftJoin('departmentOptions', 'studentAnnuals.department_option_id', '=', 'departmentOptions.id')
             ->leftJoin('departments', 'studentAnnuals.department_id', '=', 'departments.id')
-            ->leftJoin('degrees', 'studentAnnuals.degree_id', '=', 'degrees.id')
-            ->leftJoin('scholarship_student_annual','studentAnnuals.id','=','scholarship_student_annual.student_annual_id');
+            ->leftJoin('degrees', 'studentAnnuals.degree_id', '=', 'degrees.id');
+
 
 
 
@@ -287,9 +287,9 @@ class StudentAnnualController extends Controller
         if ($group = $datatables->request->get('group')) {
             $datatables->where('studentAnnuals.group', '=', $group);
         }
-        if ($scholarship = $datatables->request->get('scholarship')) {
-            $datatables->where('scholarship_student_annual.scholarship_id', '=', $scholarship);
-        }
+//        if ($scholarship = $datatables->request->get('scholarship')) {
+//            $datatables->where('scholarship_student_annual.scholarship_id', '=', $scholarship);
+//        }
 
 
         return $datatables->make(true);
@@ -594,37 +594,41 @@ class StudentAnnualController extends Controller
 
                     $total = DB::table('studentAnnuals')
                         ->leftJoin('students','studentAnnuals.student_id','=','students.id')
+                        ->leftJoin('redouble_student','students.id','=','redouble_student.student_id')
                         ->where('studentAnnuals.degree_id','=',$degree)
                         ->where('studentAnnuals.grade_id','=',$grade)
                         ->where('studentAnnuals.academic_year_id','=',$academic_year_id)
                         ->where('studentAnnuals.department_id','=',$department['id'])
                         ->where('studentAnnuals.department_option_id','=',$option['id'])
-                        ->where('students.redouble_id','=',$degree==2?$grade+5:$grade)->count();
+                        ->where('redouble_student.redouble_id','=',$degree==2?$grade+5:$grade)->count();
 
                     $total_female = DB::table('studentAnnuals')
                         ->leftJoin('students','studentAnnuals.student_id','=','students.id')
+                        ->leftJoin('redouble_student','students.id','=','redouble_student.student_id')
                         ->where('studentAnnuals.degree_id','=',$degree)
                         ->where('studentAnnuals.grade_id','=',$grade)
                         ->where('studentAnnuals.academic_year_id','=',$academic_year_id)
                         ->where('studentAnnuals.department_id','=',$department['id'])
                         ->where('studentAnnuals.department_option_id','=',$option['id'])
                         ->where('students.gender_id','=',2)
-                        ->where('students.redouble_id','=',$degree==2?$grade+5:$grade)->count(); // 2 is female
+                        ->where('redouble_student.redouble_id','=',$degree==2?$grade+5:$grade)->count(); // 2 is female
 
                     $scholarship_total =  DB::table('studentAnnuals')
                         ->leftJoin('scholarship_student_annual','studentAnnuals.id','=','scholarship_student_annual.student_annual_id')
                         ->leftJoin('students','studentAnnuals.student_id','=','students.id')
+                        ->leftJoin('redouble_student','students.id','=','redouble_student.student_id')
                         ->where('studentAnnuals.degree_id','=',$degree)
                         ->where('studentAnnuals.grade_id','=',$grade)
                         ->where('studentAnnuals.academic_year_id','=',$academic_year_id)
                         ->whereIn('scholarship_student_annual.scholarship_id',$scholarships)
                         ->where('studentAnnuals.department_id','=',$department['id'])
                         ->where('studentAnnuals.department_option_id','=',$option['id'])
-                        ->where('students.redouble_id','=',$degree==2?$grade+5:$grade)->count();
+                        ->where('redouble_student.redouble_id','=',$degree==2?$grade+5:$grade)->count();
 
                     $scholarship_female =  DB::table('studentAnnuals')
                         ->leftJoin('scholarship_student_annual','studentAnnuals.id','=','scholarship_student_annual.student_annual_id')
                         ->leftJoin('students','studentAnnuals.student_id','=','students.id')
+                        ->leftJoin('redouble_student','students.id','=','redouble_student.student_id')
                         ->where('studentAnnuals.degree_id','=',$degree)
                         ->where('studentAnnuals.grade_id','=',$grade)
                         ->where('studentAnnuals.academic_year_id','=',$academic_year_id)
@@ -632,7 +636,7 @@ class StudentAnnualController extends Controller
                         ->where('studentAnnuals.department_id','=',$department['id'])
                         ->where('studentAnnuals.department_option_id','=',$option['id'])
                         ->where('students.gender_id','=',2)
-                        ->where('students.redouble_id','=',$degree==2?$grade+5:$grade)->count(); // 2 is female
+                        ->where('redouble_student.redouble_id','=',$degree==2?$grade+5:$grade)->count(); // 2 is female
 
                     $array = array(
                         'st' => $scholarship_total,

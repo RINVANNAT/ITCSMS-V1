@@ -30,38 +30,71 @@
                     </center>
 
                 </div>
-                <div class="col-lg-9">
-                    <span class="show_label col-sm-2">{{trans('labels.backend.students.fields.id_card')}}</span>
-                    <span class="show_value col-sm-10">{{$student->id_card}} &nbsp;</span>
+                <div class="col-lg-6">
+                    <div class="row no-margin">
+                        <span class="show_label col-sm-4">{{trans('labels.backend.students.fields.id_card')}}</span>
+                        <span class="show_value col-sm-8">{{$student->id_card}} &nbsp;</span>
+                    </div>
+                    <div class="row no-margin">
+                        <span class="show_label col-sm-4">{{trans('labels.backend.students.fields.name_kh')}}</span>
+                        <span class="show_value col-sm-8">{{$student->name_kh}} &nbsp;</span>
+                    </div>
+                    <div class="row no-margin">
+                        <span class="show_label col-sm-4">{{trans('labels.backend.students.fields.name_latin')}}</span>
+                        <span class="show_value col-sm-8">{{$student->name_latin}} &nbsp;</span>
+                    </div>
+                    <div class="row no-margin">
+                        <span class="show_label col-sm-4">{{trans('labels.backend.students.fields.gender_id')}}</span>
+                        <span class="show_value col-sm-8">{{$student->gender->name_kh}} &nbsp;</span>
+                    </div>
+                    <div class="row no-margin">
+                        <span class="show_label col-sm-4">{{trans('labels.backend.students.fields.dob')}}</span>
+                        <span class="show_value col-sm-8">
+                            <?php
+                                $dob = \Carbon\Carbon::createFromFormat('Y-m-d h:i:s', $student->dob);
+                            ?>
+                            {{$dob->format('d/m/Y')}} &nbsp;
+                        </span>
+                    </div>
+                    <div class="row no-margin">
+                        <span class="show_label col-sm-4">{{trans('labels.backend.students.fields.pob')}}</span>
+                        <span class="show_value col-sm-8">{{$student->pob}} &nbsp;</span>
+                    </div>
 
-                    <span class="show_label col-sm-2">{{trans('labels.backend.students.fields.name_kh')}}</span>
-                    <span class="show_value col-sm-10">{{$student->name_kh}} &nbsp;</span>
-
-                    <span class="show_label col-sm-2">{{trans('labels.backend.students.fields.name_latin')}}</span>
-                    <span class="show_value col-sm-10">{{$student->name_latin}} &nbsp;</span>
-
-                    <span class="show_label col-sm-2">{{trans('labels.backend.students.fields.gender_id')}}</span>
-                    <span class="show_value col-sm-10">{{$student->gender->name_kh}} &nbsp;</span>
-
-                    <span class="show_label col-sm-2">{{trans('labels.backend.students.fields.dob')}}</span>
-                    <span class="show_value col-sm-10">
-                        <?php
-                            $dob = \Carbon\Carbon::createFromFormat('Y-m-d h:i:s', $student->dob);
-                        ?>
-                        {{$dob->format('d/m/Y')}} &nbsp;
-                    </span>
-
-                    <span class="show_label col-sm-2">{{trans('labels.backend.students.fields.pob')}}</span>
-                    <span class="show_value col-sm-10">{{$student->pob}} &nbsp;</span>
-
-                    <span class="show_label col-sm-2">{{trans('labels.backend.students.fields.radie')}}</span>
-                    <span class="show_value col-sm-10">{{$student->radie}} &nbsp;</span>
-
-                    <span class="show_label col-sm-2">{{trans('labels.backend.students.fields.observation')}}</span>
-                    <span class="show_value col-sm-10">{{$student->observation}} &nbsp;</span>
-
+                    <div class="row no-margin">
+                        <span class="show_label col-sm-4">{{trans('labels.backend.students.fields.radie')}}</span>
+                        <span class="show_value col-sm-8">{{$student->radie}} &nbsp;</span>
+                    </div>
+                    <div class="row no-margin">
+                        <span class="show_label col-sm-4">{{trans('labels.backend.students.fields.observation')}}</span>
+                        <span class="show_value col-sm-8">{{$student->observation}} &nbsp;</span>
+                    </div>
                 </div>
-
+                <div class="col-lg-3">
+                    <table class="table table-striped">
+                        <thead>
+                        <tr>
+                            <th colspan="4">{{trans('labels.backend.students.fields.redouble_id')}}</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        @if(empty($student->redoubles->toArray()))
+                            <tr>
+                                <td colspan="2" style="text-align: center">
+                                    <h4>Empty</h4>
+                                </td>
+                            </tr>
+                        @else
+                            @foreach($student->redoubles as $redouble)
+                                <tr style="color:#15c">
+                                    <td>{{$a}}</td>
+                                    <td>{{$redouble->name_en}}</td>
+                                </tr>
+                            @endforeach
+                        @endif
+                        </tbody>
+                    </table>
+                </div>
 
 
             </div><!--form control-->
@@ -132,13 +165,17 @@
                 </div>
             </div>
         </div>
-        @foreach($student->studentAnnuals as $studentAnnual)
+
+        <?php
+            $studentAnnuals = $student->studentAnnuals->sortByDesc('academic_year_id');
+        ?>
+
+        @foreach($studentAnnuals as $key => $studentAnnual)
         <div role="tabpanel" class="tab-pane" id="academic_{{$studentAnnual->academic_year->id}}" style="padding-top:20px">
             <div class="col-sm-6">
                 <div class="row no-margin no-padding">
                     <span class="show_label col-sm-4">{{trans('labels.backend.students.fields.academic_year_id')}}</span>
                     <span class="show_value col-sm-8">{{$studentAnnual->academic_year->name_kh}} &nbsp;</span>
-
                 </div>
                 <div class="row no-margin no-padding">
                     <span class="show_label col-sm-4">{{trans('labels.backend.students.fields.promotion_id')}}</span>
@@ -174,6 +211,7 @@
                 </div>
 
             </div>
+            <?php $a = 0; ?>
             <div class="col-sm-6">
                 <table class="table table-striped">
                     <thead>
@@ -182,41 +220,28 @@
                     </tr>
                     </thead>
                     <tbody>
-                    <tr style="color:#15c">
-                        <td>1</td>
-                        <td>Boursier M</td>
-                        <td>Ministry of Education Youth and Sport</td>
-                        <td>Full tuition fee</td>
-                    </tr>
-                    <tr style="color:#15c">
-                        <td>2</td>
-                        <td>Akaraka</td>
-                        <td>Akaraka foundation</td>
-                        <td>Full tuition fee and montly payment</td>
-                    </tr>
-                    </tbody>
-                </table>
-
-                <table class="table table-striped">
-                    <thead>
-                    <tr>
-                        <th colspan="4">{{trans('labels.backend.students.fields.redouble_id')}}</th>
-                    </tr>
-                    </thead>
-                    <tbody>
-                    <tr style="color:#15c">
-                        <td>1</td>
-                        <td>Redouble I1</td>
-                    </tr>
-                    <tr style="color:#15c">
-                        <td>2</td>
-                        <td>Redouble I2</td>
-                    </tr>
+                    @if(empty($studentAnnual->scholarships->toArray()))
+                        <tr>
+                            <td colspan="4" style="text-align: center">
+                                <h4>Empty</h4>
+                            </td>
+                        </tr>
+                    @else
+                        @foreach($studentAnnual->scholarships as $scholarship)
+                        <tr style="color:#15c">
+                            <td>{{$a}}</td>
+                            <td>{{$scholarship->code}}</td>
+                            <td>{{$scholarship->founder}}</td>
+                            <td>{{$scholarship->duration}}</td>
+                        </tr>
+                        @endforeach
+                    @endif
                     </tbody>
                 </table>
             </div>
 
         </div>
+        <?php $a++; ?>
         @endforeach
     </div>
 </div>

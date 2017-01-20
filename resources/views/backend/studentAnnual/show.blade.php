@@ -18,12 +18,12 @@
         <div class="box box-success">
             <div class="box-header with-border">
                 <h3 class="box-title">{{ trans('labels.backend.students.sub_create_title') }}</h3>
-            </div><!-- /.box-header -->
+            </div>
 
             <div class="box-body">
                 @include('backend.studentAnnual.show.fields')
-            </div><!-- /.box-body -->
-        </div><!--box-->
+            </div>
+        </div>
 
         <div class="box box-success">
             <div class="box-body">
@@ -35,8 +35,8 @@
                     <input type="submit" class="btn btn-success btn-xs" value="{{ trans('buttons.general.crud.create') }}" />
                 </div>
                 <div class="clearfix"></div>
-            </div><!-- /.box-body -->
-        </div><!--box-->
+            </div>
+        </div>
     {!! Form::close() !!}
 @stop
 

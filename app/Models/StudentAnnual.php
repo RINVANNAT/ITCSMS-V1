@@ -145,7 +145,7 @@ class StudentAnnual extends Model
     }
 
     public function scholarships(){
-        return $this->belongsToMany('App\Models\Scholarship');
+        return $this->belongsToMany('App\Models\Scholarship',"scholarship_student_annual");
     }
 
     public function creator(){

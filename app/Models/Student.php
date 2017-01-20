@@ -81,7 +81,7 @@ class Student extends Model
 		return $this->hasMany('App\Models\StudentEvalStatu');
 	}
     public function redoubles(){
-        return $this->belongsToMany('App\Models\Redouble');
+        return $this->belongsToMany('App\Models\Redouble',"redouble_student");
     }
 
     /**
