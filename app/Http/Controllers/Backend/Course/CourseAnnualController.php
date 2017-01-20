@@ -2210,48 +2210,81 @@ class CourseAnnualController extends Controller
     }
 
     public function importScore($courseAnnualId, Request $request) {
-        $now = Carbon::now()->format('Y_m_d_H');
-
+        //$now = Carbon::now()->format('Y_m_d_H');
 
 
         if($request->file('import')!= null){
-            $import = $now. '.' .$request->file('import')->getClientOriginalExtension();
+            $import = "score". '.' .$request->file('import')->getClientOriginalExtension();
 
             $request->file('import')->move(
-                base_path() . '/public/assets/uploaded_file/course_annuals/', "course_annual_".$import
+                base_path() . '/public/assets/uploaded_file/course_annuals/', $import
             );
-            $storage_path = base_path() . '/public/assets/uploaded_file/course_annuals/course_annual_'.$import;
+            $storage_path = base_path() . '/public/assets/uploaded_file/course_annuals/'.$import;
+
             $students = $this->getStudentByNameAndIdCard($courseAnnualId);
             $check=0;
+            $unCheck = 0;
             DB::beginTransaction();
             try{
-                Excel::filter('chunk')->load($storage_path)->chunk(100, function($results)use ($students, $courseAnnualId, $check){
 
+                    Excel::filter('chunk')->load($storage_path)->chunk(150, function($results)use ($students, $courseAnnualId, $check, $unCheck){
 
+//                        dd($results);
 
-                    $results->each(function($row) use($students, $courseAnnualId, $check)  {
-
+                    $status=true;
+                        $arrayMissedStudent =[];
+                    $results->each(function($row) use($students, $courseAnnualId, $check, $status, $unCheck)  {
                         $row = $row->toArray();
                         $scoreIds = $this->getScoreId($courseAnnualId);
-                        $studentScoreIds = $scoreIds[$students[$row['student_id']][$row['student_name']]->student_annual_id];
-                        $percentage = $this->getPercentage();
-                        foreach($studentScoreIds as $scoreId) {
-                            if(isset($row[strtolower($percentage[$scoreId])])) {
-                                $explode = explode('_',strtolower($percentage[$scoreId]));
-                                $percent = $explode[count($explode)-1];
-                                if(  $row[strtolower($percentage[$scoreId])] <= (int)$percent) {
+                        if(isset($students[$row['student_id']])) {
+                            $studentScoreIds = $scoreIds[$students[$row['student_id']]->student_annual_id];
+                        } else {
+                            $studentScoreIds=[];
+                        }
 
-                                    $input = [
-                                        'score'=> $row[strtolower($percentage[$scoreId])]
-                                    ];
-                                    $score = $this->courseAnnualScores->update($scoreId, $input);
-                                    if($score) {
-                                        $check++;
+//                        dd($studentScoreIds);
+
+                        if(count($studentScoreIds) > 0) {
+                            $percentage = $this->getPercentage();
+                            if($status) {
+                                foreach($studentScoreIds as $scoreId) {
+
+                                    if(isset($row[strtolower($percentage[$scoreId])]) || ($row[strtolower($percentage[$scoreId])] == null)) {
+
+                                        $explode = explode('_',strtolower($percentage[$scoreId]));
+                                        $percent = $explode[count($explode)-1];
+                                        if(  (int)$row[strtolower($percentage[$scoreId])] <= (int)$percent || ($row[strtolower($percentage[$scoreId])] == null) ) {
+
+                                            $input = [
+                                                'score'=> $row[strtolower($percentage[$scoreId])]
+                                            ];
+                                            $score = $this->courseAnnualScores->update($scoreId, $input);
+                                            if($score) {
+                                                $check++;
+                                            }
+
+                                        } else {
+
+                                            DB::rollback();
+                                            break;
+                                        }
+                                    } else {
+
+                                        dd($row);
+                                        dd($row[strtolower($percentage[$scoreId])]);
+                                        dd('whery herer');
                                     }
-
                                 }
                             }
+
+                        } else {
+
+                            $arrayMissedStudent[] = $row;
+
+//                            dd('student does not exist');
+                            //-----need to do something
                         }
+
 
                     });
 
@@ -2265,10 +2298,10 @@ class CourseAnnualController extends Controller
             $dataSendToview = $this->dataSendToView($courseAnnualId);
             $courseAnnual = $dataSendToview['course_annual'];
             $availableCourses = $dataSendToview['available_course'];
-            if($check == count($students)) {
-                return view('backend.course.courseAnnual.includes.form_input_score_course_annual', compact('courseAnnualId', 'courseAnnual', 'availableCourses'));
+            if($check + $unCheck == count($students)) {
+//                return view('backend.course.courseAnnual.includes.form_input_score_course_annual', compact('courseAnnualId', 'courseAnnual', 'availableCourses'));
             } else {
-                return redirect()->back()->with(['warning'=>'The inputted score was over the determined percentage!']);
+//                return redirect()->back()->with(['warning'=>'The inputted score was over the determined percentage!']);
             }
 
         } else {
@@ -2290,7 +2323,7 @@ class CourseAnnualController extends Controller
         }
 
         foreach($students as $student) {
-            $arrayStudent[$student->id_card][$student->name_latin]=$student;
+            $arrayStudent[$student->id_card]=$student;
         }
 
         return $arrayStudent;
