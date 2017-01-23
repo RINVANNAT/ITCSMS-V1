@@ -1284,6 +1284,9 @@
                 });
         @endif
 
+        @if(isset($status))
+            notify('success', '{{$status}}', 'Info')
+        @endif
 
 
     </script>

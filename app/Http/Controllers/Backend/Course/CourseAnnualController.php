@@ -2234,7 +2234,7 @@ class CourseAnnualController extends Controller
                 Excel::filter('chunk')->load($storage_path)->chunk(150, function($results) use ($students, $courseAnnualId, $courseAnnual, $absences){
 
                     $firstrow = $results->first()->toArray();
-                    if (isset($firstrow['student_id']) && isset($firstrow['student_name'])) {
+                    if (isset($firstrow['student_id']) && isset($firstrow['student_name']) && isset($firstrow['abs']) && (count($firstrow)>7)) {
                         $results->each(function($row) use($students, $courseAnnualId, $courseAnnual, $absences)  {
                             $row = $row->toArray();
                             $scoreIds = $this->getScoreId($courseAnnualId);
@@ -2282,8 +2282,6 @@ class CourseAnnualController extends Controller
                                     }
                                 }
                                 if(isset($row['abs'])) { // ---absence column
-
-
 
                                     if( ( ($row['abs'] <= ($courseAnnual->time_course + $courseAnnual->time_td + $courseAnnual->time_tp)) && ((float)$row['abs'] > 0)) && ( is_numeric($row['abs']) ) ) {
 
@@ -2341,7 +2339,7 @@ class CourseAnnualController extends Controller
                 });
 
                 if(CourseAnnualController::$isError) {
-                    return redirect()->back()->with(['status'=>'There is empty data in the first row of file!!']);
+                    return redirect()->back()->with(['status'=>'Problem with no data in the first row, or your file misses some fields. To make file corrected please export the template!!']);
                 }
                 if(CourseAnnualController::$isNotAceptedScore) {
                     return redirect()->back()->with(['warning'=>'The inputted score was over the determined percentage!']);
@@ -2378,7 +2376,8 @@ class CourseAnnualController extends Controller
 //                dd((CourseAnnualController::$ifScoreImported/CourseAnnualController::$countStudentScoreType) .'=='. count($students).'& '.(CourseAnnualController::$ifAbsenceUpdated + CourseAnnualController::$ifAbsenceCreated) .'=='. count($students));
 
                 if( ((CourseAnnualController::$ifScoreImported/CourseAnnualController::$countStudentScoreType) == count($students)) && ( (CourseAnnualController::$ifAbsenceUpdated + CourseAnnualController::$ifAbsenceCreated) == count($students) ) ) {
-                    return view('backend.course.courseAnnual.includes.form_input_score_course_annual', compact('courseAnnualId', 'courseAnnual', 'availableCourses'));
+                    $status = 'File Imported!';
+                    return view('backend.course.courseAnnual.includes.form_input_score_course_annual', compact('courseAnnualId', 'courseAnnual', 'availableCourses', 'status'));
                 } else {
                     return redirect()->back()->with(['status'=> 'Something went wrong']);
                 }
