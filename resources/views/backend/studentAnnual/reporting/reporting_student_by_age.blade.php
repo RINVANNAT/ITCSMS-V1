@@ -118,7 +118,7 @@
     {!! Html::script('plugins/moment/moment.min.js') !!}
     {!! Html::script('plugins/datetimepicker/bootstrap-datetimepicker.min.js') !!}
     <script>
-        var report_data_url = "{!! url('admin/student/'.$id.'/reporting-data') !!}";
+        //var report_data_url = "{!! url('admin/student/'.$id.'/reporting-data') !!}";
         var export_data_url = "{!! url('admin/student/'.$id.'/reporting/export') !!}";
         var print_url = "{!! url('admin/student/'.$id.'/reporting/print') !!}";
         var preview_url = "{!! url('admin/student/'.$id.'/reporting/preview') !!}";
@@ -127,10 +127,9 @@
 
         function preview(link){
             $.ajax({
-                url: link,
-                type: 'POST',
+                url: link +"?data="+JSON.stringify($("#reporting-form").serializeArray()),
+                type: 'GET',
                 dataType: 'text',
-                data:$("#reporting-form").serialize(),
                 success: function(data) {
                     $('#data').html(data);
                 },
@@ -141,9 +140,8 @@
         }
         function submitForm(link){
 
-            window.location = link+"?academic_year_id="+$('#input_academic_year').val()+"&degree_id="+$('#input_degree').val();
+            window.location = link +"?data="+JSON.stringify($("#reporting-form").serializeArray());
         }
-
 
         /* --------------------When page ready, start some action---------------------- */
         $(document).ready(function() {

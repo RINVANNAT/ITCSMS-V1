@@ -123,10 +123,9 @@
         /* ----------------------Page functions---------------------*/
         function preview(link){
             $.ajax({
-                url: link,
-                type: 'POST',
+                url: link +"?data="+JSON.stringify($("#reporting-form").serializeArray()),
+                type: 'GET',
                 dataType: 'text',
-                data:$("#reporting-form").serialize(),
                 success: function(data) {
                     $('#data').html(data);
                 },

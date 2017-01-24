@@ -481,7 +481,7 @@ class StudentAnnualController extends Controller
             $t_pt = 0;
             $t_pf = 0;
             foreach($grades as $grade){
-                $minDate = Carbon::createFromFormat("d/m/Y",$date)->subYears($age['max']);
+                $minDate = Carbon::createFromFormat("d/m/Y",$date)->subYears($age['max'])->subDay();
                 $maxDate = Carbon::createFromFormat("d/m/Y",$date)->subYears($age['min'])->subDay()->endOfDay();
 
                 $total = DB::table('studentAnnuals')
@@ -502,17 +502,18 @@ class StudentAnnualController extends Controller
 
                                 ;
                 $scholarship_total =  DB::table('studentAnnuals')
-                    ->leftJoin('scholarship_student_annual','studentAnnuals.id','=','scholarship_student_annual.student_annual_id')
-                    ->leftJoin('students','studentAnnuals.student_id','=','students.id')
+                    ->join('scholarship_student_annual','studentAnnuals.id','=','scholarship_student_annual.student_annual_id')
+                    ->join('students','studentAnnuals.student_id','=','students.id')
                     ->where('studentAnnuals.degree_id','=',$degree)
                     ->where('studentAnnuals.grade_id','=',$grade)
                     ->where('studentAnnuals.academic_year_id','=',$academic_year_id)
                     ->whereIn('scholarship_student_annual.scholarship_id',$scholarships)
-                    ->whereBetween('students.dob',[$minDate,$maxDate])->count();
+                    ->whereBetween('students.dob',[$minDate,$maxDate])
+                    ->count();
 
                 $scholarship_female =  DB::table('studentAnnuals')
-                    ->leftJoin('scholarship_student_annual','studentAnnuals.id','=','scholarship_student_annual.student_annual_id')
-                    ->leftJoin('students','studentAnnuals.student_id','=','students.id')
+                    ->join('scholarship_student_annual','studentAnnuals.id','=','scholarship_student_annual.student_annual_id')
+                    ->join('students','studentAnnuals.student_id','=','students.id')
                     ->where('studentAnnuals.degree_id','=',$degree)
                     ->where('studentAnnuals.grade_id','=',$grade)
                     ->where('studentAnnuals.academic_year_id','=',$academic_year_id)
@@ -839,18 +840,31 @@ class StudentAnnualController extends Controller
 
     public function prepare_print_and_preview($id, $is_preview){
 
+        $data = json_decode($_GET['data']);
+        $params = [
+            'scholarships' => []
+        ];
+
+        foreach($data as $key => $param){
+            if($param->name != "scholarships[]") {
+                $params[$param->name] = $param->value;
+            } else {
+                array_push($params['scholarships'],$param->value);
+            }
+        }
+
         switch ($id) {
             case 1:
-                if(isset($_POST['scholarships'])){
-                    $scholarships = $_POST['scholarships'];
+                if(isset($params['scholarships'])){
+                    $scholarships = $params['scholarships'];
                 } else {
                     $scholarships = [];
                 }
 
-                $data = $this->get_student_list_by_age($_POST['academic_year_id'],$_POST['degree_id'],$_POST['date'],$scholarships);
-                $degree_name = Degree::find($_POST['degree_id'])->name_kh;
-                $academic_year_name = AcademicYear::find($_POST['academic_year_id'])->name_kh;
-                $date = $_POST['date'];
+                $data = $this->get_student_list_by_age($params['academic_year_id'],$params['degree_id'],$params['date'],$scholarships);
+                $degree_name = Degree::find($params['degree_id'])->name_kh;
+                $academic_year_name = AcademicYear::find($params['academic_year_id'])->name_kh;
+                $date = $params['date'];
 
                 if($is_preview){
                     return view('backend.studentAnnual.reporting.template_report_student_by_age',compact('id','data','degree_name','academic_year_name','date'));
@@ -860,15 +874,15 @@ class StudentAnnualController extends Controller
 
                 break;
             case 2:
-                if(isset($_POST['scholarships'])){
-                    $scholarships = $_POST['scholarships'];
+                if(isset($params['scholarships'])){
+                    $scholarships = $params['scholarships'];
                 } else {
                     $scholarships = [];
                 }
 
-                $data = $this->get_student_redouble($_POST['academic_year_id'],$_POST['degree_id'],$scholarships);
-                $degree_name = Degree::find($_POST['degree_id'])->name_kh;
-                $academic_year_name = AcademicYear::find($_POST['academic_year_id'])->name_kh;
+                $data = $this->get_student_redouble($params['academic_year_id'],$params['degree_id'],$scholarships);
+                $degree_name = Degree::find($params['degree_id'])->name_kh;
+                $academic_year_name = AcademicYear::find($params['academic_year_id'])->name_kh;
 
                 if($is_preview){
                     return view('backend.studentAnnual.reporting.template_report_student_redouble',compact('id','data','degree_name','academic_year_name'));
@@ -878,20 +892,20 @@ class StudentAnnualController extends Controller
                 break;
             case 3:
 
-                if(isset($_POST['only_foreigner'])){
+                if(isset($params['only_foreigner'])){
                     $only_foreigner = "true";
                 } else {
                     $only_foreigner = "false";
                 }
 
-                if(isset($_POST['scholarships'])){
-                    $scholarships = $_POST['scholarships'];
+                if(isset($params['scholarships'])){
+                    $scholarships = $params['scholarships'];
                 } else {
                     $scholarships = [];
                 }
-                $data = $this->get_student_by_group($_POST['academic_year_id'],$_POST['degree_id'],$only_foreigner,$scholarships);
-                $degree_name = Degree::find($_POST['degree_id'])->name_kh;
-                $academic_year_name = AcademicYear::find($_POST['academic_year_id'])->name_kh;
+                $data = $this->get_student_by_group($params['academic_year_id'],$params['degree_id'],$only_foreigner,$scholarships);
+                $degree_name = Degree::find($params['degree_id'])->name_kh;
+                $academic_year_name = AcademicYear::find($params['academic_year_id'])->name_kh;
 
                 if($is_preview) {
                     return view('backend.studentAnnual.reporting.template_report_student_studying', compact('id', 'data', 'degree_name', 'academic_year_name','only_foreigner'));
@@ -1238,17 +1252,31 @@ class StudentAnnualController extends Controller
     }
 
     public function report($id){  // Export student report
+        $data = json_decode($_GET['data']);
+        $params = [
+            'scholarships' => []
+        ];
+
+        foreach($data as $key => $param){
+            if($param->name != "scholarships[]") {
+                $params[$param->name] = $param->value;
+            } else {
+                array_push($params['scholarships'],$param->value);
+            }
+        }
+
+        if(isset($params['scholarships'])){
+            $scholarships = $params['scholarships'];
+        } else {
+            $scholarships = [];
+        }
+
         switch ($id) {
             case 1:
-                if(isset($_POST['scholarships'])){
-                    $scholarships = $_POST['scholarships'];
-                } else {
-                    $scholarships = [];
-                }
 
-                $data = $this->get_student_list_by_age($_POST['academic_year_id'],$_POST['degree_id'],$_POST['date'],$scholarships);
-                $degree_name = Degree::find($_POST['degree_id'])->name_kh;
-                $academic_year_name = AcademicYear::find($_POST['academic_year_id'])->name_kh;
+                $data = $this->get_student_list_by_age($params['academic_year_id'],$params['degree_id'],$params['date'],$scholarships);
+                $degree_name = Degree::find($params['degree_id'])->name_kh;
+                $academic_year_name = AcademicYear::find($params['academic_year_id'])->name_kh;
                 Excel::create('ស្ថិតិនិស្សិត តាមអាយុ', function($excel) use ($data,$degree_name,$academic_year_name) {
 
                     // Set the title
@@ -1362,10 +1390,10 @@ class StudentAnnualController extends Controller
                 })->export('xls');
                 break;
             case 2:
-                $data = $this->get_student_redouble($_GET['academic_year_id'],$_GET['degree_id']);
+                $data = $this->get_student_redouble($params['academic_year_id'],$params['degree_id'],$scholarships);
 
-                $degree_name = Degree::find($_GET['degree_id'])->name_kh;
-                $academic_year_name = AcademicYear::find($_GET['academic_year_id'])->name_kh;
+                $degree_name = Degree::find($params['degree_id'])->name_kh;
+                $academic_year_name = AcademicYear::find($params['academic_year_id'])->name_kh;
                 Excel::create('ស្ថិតិនិស្សិតត្រួតថ្នាក់ តាមដេប៉ាតឺម៉ង់និងជំនាញ ថ្នាក់'.$degree_name, function($excel) use ($data,$degree_name,$academic_year_name) {
 
                     // Set the title
@@ -1501,10 +1529,22 @@ class StudentAnnualController extends Controller
                 })->export('xls');
                 break;
             case 3:
-                $data = $this->get_student_by_group($_GET['academic_year_id'],$_GET['degree_id'],$_GET['only_foreigner']);
+                if(isset($params['only_foreigner'])){
+                    $only_foreigner = "true";
+                } else {
+                    $only_foreigner = "false";
+                }
 
-                $degree_name = Degree::find($_GET['degree_id'])->name_kh;
-                $academic_year_name = AcademicYear::find($_GET['academic_year_id'])->name_kh;
+                if(isset($params['scholarships'])){
+                    $scholarships = $params['scholarships'];
+                } else {
+                    $scholarships = [];
+                }
+
+                $data = $this->get_student_by_group($params['academic_year_id'],$params['degree_id'],$only_foreigner,$scholarships);
+
+                $degree_name = Degree::find($params['degree_id'])->name_kh;
+                $academic_year_name = AcademicYear::find($params['academic_year_id'])->name_kh;
                 Excel::create('ស្ថិតិនិស្សិត តាមដេប៉ាតឺម៉ង់និងជំនាញថ្នាក់'.$degree_name, function($excel) use ($data,$degree_name,$academic_year_name) {
 
                     // Set the title
