@@ -109,13 +109,11 @@ class CourseAnnualController extends Controller
     public function getDeptOption(Request $request) {
         $dept = Department::find($request->department_id);
 
-        if($dept->department_option_id) {
+        if($dept->department_options) {
             $deptOptions = $dept->department_options->lists('name_en', 'id');
         } else {
             $deptOptions = [];
         }
-
-        dd($deptOptions);
 
         return view('backend.course.courseAnnual.includes.dept_option_selection', compact('deptOptions'));
     }
