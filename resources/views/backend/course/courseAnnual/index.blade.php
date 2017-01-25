@@ -176,7 +176,7 @@
                 e.preventDefault();
             });
 
-            $('#filter_dept_option').on('change', function(e) {
+            $(document).on('change', '#filter_dept_option', function() {
                 oTable.draw();
                 e.preventDefault();
             });
@@ -208,9 +208,7 @@
 
         }
 
-//        $(document).on('change', '#filter_dept_option', function() {
-//           alert($(this).val());
-//        });
+
 
         function appendFilterGroupSeclection() {
 
