@@ -115,6 +115,8 @@ class CourseAnnualController extends Controller
             $deptOptions = [];
         }
 
+        dd($deptOptions);
+
         return view('backend.course.courseAnnual.includes.dept_option_selection', compact('deptOptions'));
     }
 
