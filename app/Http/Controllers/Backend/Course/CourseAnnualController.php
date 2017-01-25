@@ -106,6 +106,18 @@ class CourseAnnualController extends Controller
         return view('backend.course.courseAnnual.index',compact('departments','academicYears','degrees','grades', 'semesters', 'studentGroup','department_id','lecturers'));
     }
 
+    public function getDeptOption(Request $request) {
+        $dept = Department::find($request->department_id);
+
+        if($dept->department_option_id) {
+            $deptOptions = $dept->department_options->lists('name_en', 'id');
+        } else {
+            $deptOptions = [];
+        }
+
+        return view('backend.course.courseAnnual.includes.dept_option_selection', compact('deptOptions'));
+    }
+
     public function filteringStudentGroup(Request $request) {
 
         $groups = $this->getStudentGroupFromDB();
@@ -322,6 +334,10 @@ class CourseAnnualController extends Controller
 
         if ($semester = $datatables->request->get('semester')) {
             $datatables->where('course_annuals.semester_id', '=', $semester);
+        }
+
+        if($deptOption = $datatables->request->get('dept_option')) {
+            $datatables->where('course_annuals.department_option_id', '=', $deptOption);
         }
 
         if(auth()->user()->allow("view-all-score-in-all-department")){ // user has permission to view all course/score in all department

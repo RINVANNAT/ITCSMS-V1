@@ -68,16 +68,22 @@ Route::group([
     Route::post('course_annual/ajax-switch-course-annaul', 'CourseAnnualController@switchCourseAnnual')->name('course_annual.ajax_switch_course_annual');
 
     Route::post('course_annual/ajax-save-each-cell-notation', 'CourseAnnualController@saveEachCellNotationCourseAnnual')->name('course_annual.save_each_cell_notation');
-
     Route::get('/export-course-score-annual', 'CourseAnnualController@exportCourseScore')->name('course_annual.export_course_score_annual');
     Route::get('/course-annual-import-score', 'CourseAnnualController@formImportScore')->name('course_annual.form_import_score');
     Route::post('/course-annual/{id}/import-score', 'CourseAnnualController@importScore')->name('course_annual.import_file');
+
+
+    Route::get('/course-annual/dept-option', 'CourseAnnualController@getDeptOption')->name('course_annual.dept_option');
 
 //    --------------evaluation score for course annually -------
 
     Route::get('course-annual/get-form-all-course-annual-score', 'CourseAnnualController@formScoreAllCourseAnnual')->name('admin.course.get_form_evaluation_score');
     Route::get('course-annual/get-all-data-course-annual-score', 'CourseAnnualController@allHandsontableData')->name('admin.course.get_all_handsontable_data');
     Route::get('course-annual/filter-course-annual-scores', 'CourseAnnualController@allHandsontableData')->name('admin.course.filter_course_annual_scores');
+
+
+
+
 
 
 

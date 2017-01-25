@@ -14,6 +14,9 @@
         .toolbar {
             float: left;
         }
+        #filter_dept_option {
+            margin-left: 5px;
+        }
     </style>
 @stop
 @section('content')
@@ -105,6 +108,7 @@
                         d.semester = $('#filter_semester').val();
                         d.lecturer = $('#filter_lecturer').val();
                         d.student_group = $('#filter_student_group').val();
+                        d.dept_option = $('#filter_dept_option').val();
                     }
                 },
 
@@ -152,6 +156,7 @@
             $('#filter_department').on('change', function(e) {
                 oTable.draw();
                 appendFilterGroupSeclection();
+                hasDeptOption();
                 e.preventDefault();
             });
             @if($lecturers != null)
@@ -170,7 +175,42 @@
                 oTable.draw();
                 e.preventDefault();
             });
+
+            $('#filter_dept_option').on('change', function(e) {
+                oTable.draw();
+                e.preventDefault();
+            });
         });
+
+
+
+
+        function hasDeptOption() {
+            var dept_option_url = '{{route('course_annual.dept_option')}}';
+            var department_id = $('#filter_department :selected').val();
+
+            $.ajax({
+                type: 'GET',
+                url: dept_option_url,
+                data: {department_id: department_id},
+                dataType: "html",
+                success: function(resultData) {
+
+//                    console.log(resultData);
+                    if($('#filter_dept_option').is(':visible')) {
+                        $('#filter_dept_option').html(resultData);
+                    } else {
+                        $("div.toolbar > select#filter_department").after(resultData);
+                    }
+
+                }
+            });
+
+        }
+
+//        $(document).on('change', '#filter_dept_option', function() {
+//           alert($(this).val());
+//        });
 
         function appendFilterGroupSeclection() {
 
