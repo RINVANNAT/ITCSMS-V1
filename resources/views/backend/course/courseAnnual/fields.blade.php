@@ -6,10 +6,9 @@
             <select name="course_id" id="course_id" class="form-control">
                 @foreach($courses as $course)
                     @if($course->id == $courseAnnual->course_id)
-<!--                        --><?php //dd($course);?>
-                        <option selected value="{{$course->id}}" time_course="{{$courseAnnual->time_course}}" time_tp="{{$courseAnnual->time_tp}}" time_td="{{$courseAnnual->time_td}}" name_kh="{{$courseAnnual->name_kh}}" name_en="{{$courseAnnual->name_en}}" name_fr="{{$courseAnnual->name_fr}}">{{$courseAnnual->name_kh}}</option>
+                        <option selected value="{{$courseAnnual->course_id}}" time_course="{{$courseAnnual->time_course}}" time_tp="{{$courseAnnual->time_tp}}" time_td="{{$courseAnnual->time_td}}" name_kh="{{$courseAnnual->name_kh}}" name_en="{{$courseAnnual->name_en}}" name_fr="{{$courseAnnual->name_fr}}">{{$courseAnnual->name_en}}</option>
                     @else
-                        <option value="{{$course->id}}" time_course="{{$courseAnnual->time_course}}" time_tp="{{$courseAnnual->time_tp}}" time_td="{{$courseAnnual->time_td}}" name_kh="{{$courseAnnual->name_kh}}" name_en="{{$courseAnnual->name_en}}" name_fr="{{$courseAnnual->name_fr}}">{{$courseAnnual->name_kh}}</option>
+                        <option value="{{$course->id}}" time_course="{{$course->time_course}}" time_tp="{{$course->time_tp}}" time_td="{{$course->time_td}}" name_kh="{{$course->name_kh}}" name_en="{{$course->name_en}}" name_fr="{{$course->name_fr}}">{{$course->name_en}}</option>
                     @endif
                 @endforeach
             </select>
@@ -22,7 +21,7 @@
         <div class="col-lg-7">
             <select name="course_id" id="course_id" class="form-control">
                 @foreach($courses as $course)
-                    <option value="{{$course->id}}" time_course="{{$course->time_course}}" time_tp="{{$course->time_tp}}" time_td="{{$course->time_td}}" name_kh="{{$course->name_kh}}" name_en="{{$course->name_en}}" name_fr="{{$course->name_fr}}">{{$course->name_kh}}</option>
+                    <option value="{{$course->id}}" time_course="{{$course->time_course}}" time_tp="{{$course->time_tp}}" time_td="{{$course->time_td}}" name_kh="{{$course->name_kh}}" name_en="{{$course->name_en}}" name_fr="{{$course->name_fr}}">{{$course->name_en}}</option>
                 @endforeach
             </select>
         </div>
@@ -73,26 +72,35 @@
     </div>
 </div>
 
-<div class="form-group">
-    {!! Form::label('', "Absence score percentage", ['class' => 'col-lg-2 control-label required']) !!}
-    <div class="col-lg-7">
-        {{ Form::text('score_percentage_column_1',  null, ['class' => 'form-control']) }}
+@if(($deptOptions != null) && (count($deptOptions) > 0))
+    <div class="form-group">
+        {!! Form::label('department_option','Division', ['class' => 'col-lg-2 control-label required']) !!}
+        <div class="col-lg-7">
+            {{ Form::select('department_option_id', $deptOptions, null, ['class' => 'form-control','required'=>'required']) }}
+        </div>
     </div>
-</div>
+@endif
 
-<div class="form-group">
-    {!! Form::label('departments', "TP score percentage", ['class' => 'col-lg-2 control-label required']) !!}
-    <div class="col-lg-7">
-        {{ Form::text('score_percentage_column_2',  null, ['class' => 'form-control']) }}
-    </div>
-</div>
+{{--<div class="form-group">--}}
+    {{--{!! Form::label('', "Absence score percentage", ['class' => 'col-lg-2 control-label required']) !!}--}}
+    {{--<div class="col-lg-7">--}}
+        {{--{{ Form::text('score_percentage_column_1',  null, ['class' => 'form-control']) }}--}}
+    {{--</div>--}}
+{{--</div>--}}
 
-<div class="form-group">
-    {!! Form::label('departments', "Final score percentage", ['class' => 'col-lg-2 control-label required']) !!}
-    <div class="col-lg-7">
-        {{ Form::text('score_percentage_column_3',  null, ['class' => 'form-control']) }}
-    </div>
-</div>
+{{--<div class="form-group">--}}
+    {{--{!! Form::label('departments', "TP score percentage", ['class' => 'col-lg-2 control-label required']) !!}--}}
+    {{--<div class="col-lg-7">--}}
+        {{--{{ Form::text('score_percentage_column_2',  null, ['class' => 'form-control']) }}--}}
+    {{--</div>--}}
+{{--</div>--}}
+
+{{--<div class="form-group">--}}
+    {{--{!! Form::label('departments', "Final score percentage", ['class' => 'col-lg-2 control-label required']) !!}--}}
+    {{--<div class="col-lg-7">--}}
+        {{--{{ Form::text('score_percentage_column_3',  null, ['class' => 'form-control']) }}--}}
+    {{--</div>--}}
+{{--</div>--}}
 
 
 

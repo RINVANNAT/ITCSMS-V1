@@ -169,16 +169,32 @@ class CourseAnnualController extends Controller
      */
     public function create(CreateCourseAnnualRequest $request)
     {
-        $departments = Department::lists('name_en','id')->toArray();
+
+
+        if(auth()->user()->allow("view-all-score-in-all-department")){
+            $courses = Course::orderBy('updated_at', 'desc')->get();
+            // Get all department in case user have previlege to view all department
+            $departments = Department::where("parent_id",config('access.departments.department_academic'))->orderBy("code")->lists("code","id");
+            $department_id = null;
+            $deptOptions = null;
+            $employees = Employee::orderBy('updated_at', 'desc')->lists("name_kh","id");
+        } else {
+            $employee = Employee::where('user_id', Auth::user()->id)->first();
+            $departments = $employee->department()->lists("code","id");
+            $department_id = $employee->department->id;
+            $deptOptions = $this->deptHasOption($department_id);
+            $courses = Course::where('courses.department_id', $department_id)->orderBy('updated_at', 'desc')->get();
+            if(auth()->user()->allow("view-all-score-course-annual")){ // This is chef department, he can see all courses in his department
+                $employees = Employee::where('employees.department_id', $department_id)->orderBy('updated_at', 'desc')->lists("name_kh","id");
+            } else {
+                $employees = null;
+            }
+        }
         $academicYears = AcademicYear::orderBy('id', 'desc')->lists('name_latin','id')->toArray();
         $degrees = Degree::lists('name_kh','id')->toArray();
         $grades = Grade::lists('name_kh','id')->toArray();
-//        $courses = Course::orderBy('updated_at', 'desc')->lists('name_kh','id')->toArray();
-        $courses = Course::orderBy('updated_at', 'desc')->get();
-
         $semesters = Semester::lists("name_kh", "id");
-        $employees = Employee::orderBy('updated_at', 'desc')->lists("name_kh","id");
-        return view('backend.course.courseAnnual.create',compact('departments','academicYears','degrees','grades','courses',"semesters","employees"));
+        return view('backend.course.courseAnnual.create',compact('departments','academicYears','degrees','grades','courses',"semesters","employees", 'deptOptions'));
     }
 
     /**
@@ -217,23 +233,35 @@ class CourseAnnualController extends Controller
      */
     public function edit(EditCourseAnnualRequest $request, $id)
     {
+
         $courseAnnual = $this->courseAnnuals->findOrThrowException($id);
 
-//        dd($courseAnnual);
-        $departments = Department::lists('name_kh','id')->toArray();
+        if(auth()->user()->allow("view-all-score-in-all-department")){
 
+            // Get all department in case user have previlege to view all department
+            $departments = Department::where("parent_id",config('access.departments.department_academic'))->orderBy("code")->lists("code","id");
+            $department_id = null;
+            $courses = Course::orderBy('updated_at', 'desc')->get();
+            $employees = Employee::orderBy('name_latin')->lists("name_kh","id");
+            $deptOptions = null;
+
+        } else {
+            $employee = Employee::where('user_id', Auth::user()->id)->first();
+            $departments = $employee->department()->lists("code","id");
+            $department_id = $employee->department->id;
+            $deptOptions = $this->deptHasOption($department_id);
+            $courses = Course::where('department_id', $department_id)->orderBy('updated_at', 'desc')->get();
+            if(auth()->user()->allow("view-all-score-course-annual")){ // This is chef department, he can see all courses in his department
+                $employees = Employee::where('department_id',$department_id)->lists("name_kh","id");
+            } else {
+                $employees = null;
+            }
+        }
         $academicYears = AcademicYear::lists('name_latin','id')->toArray();
         $degrees = Degree::lists('name_kh','id')->toArray();
         $grades = Grade::lists('name_kh','id')->toArray();
-//        $courses = Course::lists('name_kh','id')->toArray();
-
-        $courses = Course::orderBy('updated_at', 'desc')->get();
-
-//        dd($courses);
-
         $semesters = Semester::lists("name_kh", "id");
-        $employees = Employee::lists("name_kh","id");
-        return view('backend.course.courseAnnual.edit',compact('courseAnnual','departments','academicYears','degrees','grades','courses','employees','semesters'));
+        return view('backend.course.courseAnnual.edit',compact('courseAnnual','departments','academicYears','degrees','grades','courses','employees','semesters', 'deptOptions'));
     }
 
     /**
@@ -245,7 +273,6 @@ class CourseAnnualController extends Controller
      */
     public function update(UpdateCourseAnnualRequest $request, $id)
     {
-
         $this->courseAnnuals->update($id, $request->all());
         return redirect()->route('admin.course.course_annual.index')->withFlashSuccess(trans('alerts.backend.generals.updated'));
     }
@@ -300,7 +327,7 @@ class CourseAnnualController extends Controller
                     'departments.code as department_id',
                     'degrees.code as degree_id',
 //                    'grades.code  as grade_id',
-                    'courses.grade_id',
+                    'course_annuals.grade_id',
                     'course_annuals.course_id']
             );
 

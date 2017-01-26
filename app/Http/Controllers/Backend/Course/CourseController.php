@@ -25,6 +25,7 @@ use App\Models\Grade;
 use App\Models\Semester;
 use Flash;
 use App\Utils\ArrayUtils;
+use Illuminate\Support\Facades\Auth;
 
 use Illuminate\Foundation\Validation\ValidatesRequests;
 
@@ -61,31 +62,42 @@ class CourseController extends Controller
 //        $departments = Department::lists("name_en", "id");
 //        $semesters = Semester::lists("name_en", "id");
 
-        $departments = Department::orderBy("code")
-            ->where("code","!=","Study Office")
-            ->where("code","!=","Academic")
-            ->where("code","!=","Finance")
-            ->get();
+        if(auth()->user()->allow("view-all-score-in-all-department")){
 
-        $departmentTmps = array();
-        foreach ($departments as $value){
-            array_push($departmentTmps,$value['code']." - ".$value["name_en"]);
+            // Get all department in case user have previlege to view all department
+            $departments = Department::where("parent_id",config('access.departments.department_academic'))->orderBy("code")->lists("code","id");
+            $department_id = null;
+            $deptOptions = null;
+
+        } else {
+            $employee = Employee::where('user_id', Auth::user()->id)->first();
+            $departments = $employee->department()->lists("code","id");
+            $department_id = $employee->department->id;
+            $deptOptions = $this->deptHasOption($department_id);
         }
-        $departments = $departmentTmps;
-
-
 
         $academicYears = AcademicYear::orderBy("id","desc")->lists('name_latin','id')->toArray();
         $degrees = Degree::lists('name_en','id')->toArray();
-
-        
         $grades = Grade::lists('name_en','id')->toArray();
 
         return view('backend.course.courseProgram.index'
-            , compact("degrees", "grades", "departments", "semesters", "academicYears"));
+            , compact("degrees", "grades", "departments", "semesters", "academicYears", 'deptOptions'));
         // create dev branch test!
         // test merge
 
+    }
+
+
+    private function deptHasOption($deptId) {
+        $dept = Department::find($deptId);
+
+        if($dept->department_options) {
+            $deptOptions = $dept->department_options->lists('name_en', 'id');
+        } else {
+            $deptOptions = [];
+        }
+
+        return $deptOptions;
     }
 
 
@@ -220,6 +232,9 @@ class CourseController extends Controller
         }
         if ($department = $datatables->request->get('department')) {
             $datatables->where('courses.department_id', '=', $department);
+        }
+        if ($deptOptionId = $datatables->request->get('department_option')) {
+            $datatables->where('courses.department_option_id', '=', $deptOptionId);
         }
         
         return $datatables->make(true);

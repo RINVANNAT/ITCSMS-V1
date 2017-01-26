@@ -80,6 +80,7 @@
                 processing: true,
                 serverSide: true,
                 dom: 'l<"toolbar">frtip',
+                deferLoading: true,
                 pageLength: {!! config('app.records_per_page')!!},
 
                 ajax: {
@@ -90,6 +91,7 @@
                         d.degree = $('#filter_degree').val();
                         d.grade = $('#filter_grade').val();
                         d.department = $('#filter_department').val();
+                        d.department_option = $('#filter_department_option').val();
 
                     }
                 },
@@ -110,7 +112,8 @@
             $("div.toolbar").html(
                     '{!! Form::select('degree',$degrees,null, array('class'=>'form-control','id'=>'filter_degree','placeholder'=>'Degree')) !!} '+
                     '{!! Form::select('grade',$grades,null, array('class'=>'form-control','id'=>'filter_grade','placeholder'=>'Year')) !!} '+
-                    '{!! Form::select('department',$departments,null, array('class'=>'form-control','id'=>'filter_department','placeholder'=>'Department')) !!} '
+                    '{!! Form::select('department',$departments,null, array('class'=>'form-control','id'=>'filter_department','placeholder'=>'Department')) !!} '+
+                    '{!! Form::select('department_option',$deptOptions,null, array('class'=>'form-control','id'=>'filter_department_option','placeholder'=>'Division')) !!} '
             );
 
 
@@ -124,6 +127,10 @@
                 e.preventDefault();
             });
             $('#filter_department').on('change', function(e) {
+                oTable.draw();
+                e.preventDefault();
+            });
+            $('#filter_department_option').on('change', function(e) {
                 oTable.draw();
                 e.preventDefault();
             });

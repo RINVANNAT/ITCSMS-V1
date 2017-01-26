@@ -219,10 +219,17 @@
 
         function appendFilterGroupSeclection() {
 
-            var academic_year_id = $('#filter_academic_year :selected').val();
-            var degree_id = $('#filter_degree :selected').val();
-            var grade_id  = $('#filter_grade :selected').val();
-            var department_id = $('#filter_department :selected').val();
+            var academic_year_id,degree_id,grade_id, department_id ;
+
+            academic_year_id = $('#filter_academic_year :selected').val();
+            degree_id = $('#filter_degree :selected').val();
+            grade_id  = $('#filter_grade :selected').val();
+
+            @if($department_id != null)
+                department_id = '{{$department_id}}';
+            @else
+                department_id = $('#filter_department :selected').val();
+            @endif
             var baseData = {
                 academic_year_id: academic_year_id,
                 degree_id: degree_id,
@@ -248,7 +255,6 @@
             });
 
         }
-
 
         $('#course_assignment').on('click', function() {
             var academic_year_id = $('#filter_academic_year :selected').val();
@@ -305,7 +311,6 @@
 
             var  baseUrl = '{{route('admin.course.get_form_evaluation_score')}}';
             @if($department_id != null)
-                    alert('eree');
                 var baseData = {
                             academic_year_id: $('#filter_academic_year :selected').val(),
                             degree_id : $('#filter_degree :selected').val(),
@@ -315,7 +320,6 @@
                             dept_option_id: $('#filter_dept_option :selected').val()
                         };
             @else
-                    alert('this');
                 var baseData = {
                             academic_year_id: $('#filter_academic_year :selected').val(),
                             degree_id : $('#filter_degree :selected').val(),
