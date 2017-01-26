@@ -58,7 +58,7 @@
                     @endauth
 
                     @permission('view-all-score-course-annual')
-                    <button class="btn btn-primary btn-sm pull-right " id="evaluation_score" style="margin-right: 5px"><i class="fa fa-plus-circle"></i> Evaluation </button>
+                    <button class="btn btn-primary btn-sm pull-right " id="all_score_course_annual" style="margin-right: 5px"><i class="fa fa-plus-circle"></i> All Score Course </button>
                     @endauth
 
 
@@ -80,8 +80,15 @@
     <script>
         $(function() {
                 var toolbar_html =
-                        '{!! Form::select('academic_year',$academicYears,null, array('class'=>'form-control','id'=>'filter_academic_year')) !!} ' +
-                        '{!! Form::select('department',$departments,$department_id, array('class'=>'form-control','id'=>'filter_department','placeholder'=>'Department')) !!} '+
+                        '{!! Form::select('academic_year',$academicYears,null, array('class'=>'form-control','id'=>'filter_academic_year')) !!}' +
+                        @if($department_id != null)
+                                ''+
+                                @if(isset($deptOptions))
+                                        '{!! Form::select('dept_option',$deptOptions,null, array('class'=>'form-control','id'=>'filter_dept_option','placeholder'=>'Division')) !!} '+
+                                @endif
+                        @else
+                                ' {!! Form::select('department',$departments,$department_id, array('class'=>'form-control','id'=>'filter_department','placeholder'=>'Department')) !!} '+
+                        @endif
                         '{!! Form::select('semester',$semesters,null, array('class'=>'form-control','id'=>'filter_semester','placeholder'=>'Semester')) !!} '+
                         '{!! Form::select('degree',$degrees,null, array('class'=>'form-control','id'=>'filter_degree','placeholder'=>'Degree')) !!} '+
                         '{!! Form::select('grade',$grades,null, array('class'=>'form-control','id'=>'filter_grade','placeholder'=>'Year')) !!} '+
@@ -294,21 +301,28 @@
             });
         });
 
-
-
-
-
-        $(document).on('click', '#evaluation_score', function(e) {
+        $(document).on('click', '#all_score_course_annual', function(e) {
 
             var  baseUrl = '{{route('admin.course.get_form_evaluation_score')}}';
-            var baseData = {
-                academic_year_id: $('#filter_academic_year :selected').val(),
-                degree_id : $('#filter_degree :selected').val(),
-                grade_id: $('#filter_grade :selected').val(),
-                department_id:$('#filter_department :selected').val(),
-                semester_id:$('#filter_semester :selected').val()
-            };
-
+            @if($department_id != null)
+                var baseData = {
+                            academic_year_id: $('#filter_academic_year :selected').val(),
+                            degree_id : $('#filter_degree :selected').val(),
+                            grade_id: $('#filter_grade :selected').val(),
+                            department_id:'{{$department_id}}',
+                            semester_id:$('#filter_semester :selected').val(),
+                            dept_option_id: $('#filter_dept_option :selected').val()
+                        };
+            @else
+                var baseData = {
+                            academic_year_id: $('#filter_academic_year :selected').val(),
+                            degree_id : $('#filter_degree :selected').val(),
+                            grade_id: $('#filter_grade :selected').val(),
+                            department_id:$('#filter_department :selected').val(),
+                            semester_id:$('#filter_semester :selected').val(),
+                            dept_option_id: $('#filter_dept_option :selected').val()
+                        };
+            @endif
             if(baseData.academic_year_id != null) {
                 if(baseData.degree_id) {
                     if(baseData.grade_id) {
@@ -345,8 +359,6 @@
                 }
             }
 
-
-            console.log(baseData);
 
 
         })

@@ -86,10 +86,12 @@ class CourseAnnualController extends Controller
             $departments = Department::where("parent_id",config('access.departments.department_academic'))->orderBy("code")->lists("code","id");
             $department_id = null;
             $lecturers = Employee::lists("name_kh","id");
+            $deptOptions = null;
         } else {
             $employee = Employee::where('user_id', Auth::user()->id)->first();
             $departments = $employee->department()->lists("code","id");
             $department_id = $employee->department->id;
+            $deptOptions = $this->deptHasOption($department_id);
             if(auth()->user()->allow("view-all-score-course-annual")){ // This is chef department, he can see all courses in his department
                 $lecturers = Employee::where('department_id',$department_id)->lists("name_kh","id");
             } else {
@@ -103,17 +105,24 @@ class CourseAnnualController extends Controller
         $semesters = Semester::orderBy('id')->lists('name_en', 'id');
         $studentGroup = StudentAnnual::select('group')->groupBy('group')->orderBy('group')->lists('group');
 
-        return view('backend.course.courseAnnual.index',compact('departments','academicYears','degrees','grades', 'semesters', 'studentGroup','department_id','lecturers'));
+        return view('backend.course.courseAnnual.index',compact('departments','academicYears','degrees','grades', 'semesters', 'studentGroup','department_id','lecturers', 'deptOptions'));
     }
 
-    public function getDeptOption(Request $request) {
-        $dept = Department::find($request->department_id);
+    private function deptHasOption($deptId) {
+        $dept = Department::find($deptId);
 
         if($dept->department_options) {
             $deptOptions = $dept->department_options->lists('name_en', 'id');
         } else {
             $deptOptions = [];
         }
+
+        return $deptOptions;
+    }
+
+    public function getDeptOption(Request $request) {
+
+        $deptOptions = $this->deptHasOption($request->department_id);
 
         return view('backend.course.courseAnnual.includes.dept_option_selection', compact('deptOptions'));
     }
@@ -1661,6 +1670,8 @@ class CourseAnnualController extends Controller
         $academicYearID = $request->academic_year_id;
         $semesterId = $request->semester_id;
 
+
+        dd($request->all());
         $courseAnnuals = $this->getCourseAnnually();
 
         if($deptId) {
@@ -1680,21 +1691,22 @@ class CourseAnnualController extends Controller
         }
         $courseAnnuals = $courseAnnuals->orderBy('semester_id')->get();
 
+        if(auth()->user()->allow("view-all-score-in-all-department")){
+            // Get all department in case user have previlege to view all department
+            $departments = Department::where("parent_id",config('access.departments.department_academic'))->orderBy("code")->lists("code","id");
+            $department_id = null;
+            $deptOptions = null;
+        } else {
+            $employee = Employee::where('user_id', Auth::user()->id)->first();
+            $departments = $employee->department()->lists("code","id");
+            $department_id = $employee->department->id;
+            $deptOptions = $this->deptHasOption($department_id);
+        }
+
         $department = Department::where('id', $deptId)->first();
         $degree = Degree::where('id', $degreeId)->first();
         $grade = Grade::where('id', $gradeId)->first();
         $academicYear = AcademicYear::where('id', $academicYearID)->first();
-        $departments = Department::orderBy("code")
-            ->where("code","!=","Study Office")
-            ->where("code","!=","Academic")
-            ->where("code","!=","Finance")
-            ->get();
-
-        $departmentTmps = array();
-        foreach ($departments as $value){
-            $departmentTmps[$value->id] = $value['code'];
-        }
-        $departments = $departmentTmps;
 
         $academicYears = AcademicYear::orderBy("id","desc")->lists('name_latin','id')->toArray();
         $degrees = Degree::lists('name_en','id')->toArray();
@@ -1703,8 +1715,13 @@ class CourseAnnualController extends Controller
 
         return view('backend.course.courseAnnual.includes.form_all_score_courses_annual', compact('department',
             'degree', 'grade', 'academicYear', 'semesters', 'semesterId', 'courseAnnuals',
-            'departments', 'academicYears', 'degrees', 'grades'
+            'departments', 'academicYears', 'degrees', 'grades', 'deptOptions'
             ));
+
+    }
+
+
+    private function getCourseProgram($deptId, $degreeId, $gradeId, $semesterId) {
 
     }
 
@@ -1743,8 +1760,8 @@ class CourseAnnualController extends Controller
 
         $students = $this->getStudentByDeptIdGradeIdDegreeId($deptId, $degreeId, $gradeId, $academicYearID);
         $students = $students->get();
-        $courseAnnuals = $courseAnnuals->orderBy('semester_id')->get();
-//        dd($courseAnnuals);
+        $courseAnnuals = $courseAnnuals->orderBy('semester_id')->get();// note restricted order by semester this is very important to make dynamic table course of each year [if change there would have bugs]
+        dd($courseAnnuals->groupBy('course_id')->toArray());
 
         $allProperties = $this->getCourseAnnualWithScore($courseAnnuals);
         $averages = $allProperties['averages'];

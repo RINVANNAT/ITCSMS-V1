@@ -90,6 +90,21 @@
         .handsontable td {
             color: #000 !important;
         }
+
+        .current_row td{
+
+        gradient(to bottom,rgba(181,209,255,0.34) 0,rgba(181,209,255,0.34) 100%);
+            background-image: linear-gradient(rgba(181, 209, 255, 0.5) 0px, rgba(181, 209, 255, 0.341176) 100%);
+            background-position-x: initial;
+            background-position-y: initial;
+            background-size: initial;
+            background-repeat-x: initial;
+            background-repeat-y: initial;
+            background-attachment: initial;
+            background-origin: initial;
+            background-clip: initial;
+            background-color: #fff !important;
+        }
     </style>
 
 
@@ -142,16 +157,26 @@
                     @endforeach
                 </select>
 
-                <select  name="department" id="filter_dept" class="selection col-md-1 col-lg-1 col-sm-1">
-                    <option value="">Department</option>
-                    @foreach($departments as $key=>$departmentName)
-                        @if($key == $department->id)
-                            <option value="{{$key}}" selected> {{$departmentName}}</option>
-                        @else
-                            <option value="{{$key}}"> {{$departmentName}}</option>
-                        @endif
-                    @endforeach
-                </select>
+                @if($deptOptions != null)
+                    <select  name="dept_option" id="filter_dept_option" class="selection col-md-1 col-lg-1 col-sm-1">
+                        <option value="">Division</option>
+                        @foreach($deptOptions as $option)
+                            <option value="{{$option->id}}"> {{$option->name_en}}</option>
+                        @endforeach
+                    </select>
+
+                @else
+                    <select  name="department" id="filter_dept" class="selection col-md-1 col-lg-1 col-sm-1">
+                        <option value="">Department</option>
+                        @foreach($departments as $key=>$departmentName)
+                            @if($key == $department->id)
+                                <option value="{{$key}}" selected> {{$departmentName}}</option>
+                            @else
+                                <option value="{{$key}}"> {{$departmentName}}</option>
+                            @endif
+                        @endforeach
+                    </select>
+                @endif
 
             </div>
         </div>
@@ -178,6 +203,16 @@
     {{--myscript--}}
 
     <script>
+
+
+        function setSelectedRow() {
+
+            var current_rows = $(document).find(".current_row");
+            if(current_rows != null){
+                current_rows.removeClass("current_row");
+            }
+            $(".current").closest("tr").addClass("current_row");
+        }
 
         function ajaxRequest (method, baseUrl, baseData) {
             $.ajax({
@@ -263,7 +298,46 @@
                     cellProperties.readOnly = false;
                 }
                 return cellProperties;
-            }
+            },
+            beforeOnCellMouseDown: function (event,coord, TD) {
+                return false;
+            },
+            afterOnCellMouseDown: function (event,coord, TD) {
+                return false;
+            },
+            afterCellMetaReset: function() {
+                return  false;
+            },
+            afterRowMove: function() {
+                return false;
+            },
+            afterGetCellMeta: function () {
+                return false;
+            },
+            afterSelectionEnd: function() {
+                setSelectedRow();
+            },
+
+            afterMomentumScroll: function() {
+
+                return false;
+            },
+            beforeTouchScroll: function() {
+
+                return false;
+            },
+            afterScrollHorizontally: function() {
+
+                return false;
+            },
+            afterScrollVertically: function() {
+
+                return false;
+            },
+
+            afterColumnResize: function() {
+                return false;
+            },
 
         };
 
@@ -502,11 +576,6 @@
                 colWidths:resultData['colWidths']
             });
         }
-
-
-
-
-
 
 
     </script>
