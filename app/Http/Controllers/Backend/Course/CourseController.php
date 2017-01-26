@@ -67,7 +67,7 @@ class CourseController extends Controller
             // Get all department in case user have previlege to view all department
             $departments = Department::where("parent_id",config('access.departments.department_academic'))->orderBy("code")->lists("code","id");
             $department_id = null;
-            $deptOptions = null;
+            $deptOptions = [];
 
         } else {
             $employee = Employee::where('user_id', Auth::user()->id)->first();
