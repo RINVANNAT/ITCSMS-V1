@@ -347,7 +347,7 @@
                 grade_id: '{{$grade->id}}',
                 academic_year_id: '{{$academicYear->id}}',
                 semester_id:'{{$semesterId}}',
-                dept_option_id: '{{$departmentOptionId}}'
+                dept_option_id: '{{$deptOptionId}}'
             }
 
             //--------------- when document ready call ajax
