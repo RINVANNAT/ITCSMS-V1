@@ -305,6 +305,7 @@
 
             var  baseUrl = '{{route('admin.course.get_form_evaluation_score')}}';
             @if($department_id != null)
+                    alert('eree');
                 var baseData = {
                             academic_year_id: $('#filter_academic_year :selected').val(),
                             degree_id : $('#filter_degree :selected').val(),
@@ -314,6 +315,7 @@
                             dept_option_id: $('#filter_dept_option :selected').val()
                         };
             @else
+                    alert('this');
                 var baseData = {
                             academic_year_id: $('#filter_academic_year :selected').val(),
                             degree_id : $('#filter_degree :selected').val(),
@@ -328,22 +330,12 @@
                     if(baseData.grade_id) {
                         if(baseData.department_id) {
 
-//                            $.ajax({
-//                                type: 'GET',
-//                                url: baseUrl,
-//                                data: baseData,
-//                                dataType: "json",
-//                                success: function(resultData) {
-//                                    $('.content_body').html(resultData);
-//                                }
-//                            });
-
-
                             window.location.replace(baseUrl+'?academic_year_id='+baseData.academic_year_id+
                                             '&degree_id='+baseData.degree_id+
                                             '&grade_id='+baseData.grade_id+
                                             '&department_id='+baseData.department_id+
-                                            '&semester_id='+baseData.semester_id
+                                            '&semester_id='+baseData.semester_id+
+                                            '&dept_option_id='+baseData.dept_option_id
                             );
 
                         } else {

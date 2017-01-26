@@ -161,7 +161,12 @@
                     <select  name="dept_option" id="filter_dept_option" class="selection col-md-1 col-lg-1 col-sm-1">
                         <option value="">Division</option>
                         @foreach($deptOptions as $option)
-                            <option value="{{$option->id}}"> {{$option->name_en}}</option>
+                            @if($option->id == $deptOptionId)
+                                <option value="{{$option->id}}" selected> {{$option->name_en}}</option>
+                            @else
+                                <option value="{{$option->id}}"> {{$option->name_en}}</option>
+                            @endif
+
                         @endforeach
                     </select>
 
@@ -262,14 +267,6 @@
 
         };
 
-
-        $(window).on('load resize', function(){
-
-//
-        });
-
-
-
         var numberOfStudents = '{{isset($students)?count($students):0}}';
 
         var table_width;
@@ -345,12 +342,12 @@
 
             var BaseUrl = '{{route('admin.course.get_all_handsontable_data')}}';
             var BaseData = {
-
                 dept_id: '{{$department->id}}',
                 degree_id: '{{$degree->id}}',
                 grade_id: '{{$grade->id}}',
                 academic_year_id: '{{$academicYear->id}}',
-                semester_id:'{{$semesterId}}'
+                semester_id:'{{$semesterId}}',
+                dept_option_id: '{{$departmentOptionId}}'
             }
 
             //--------------- when document ready call ajax
@@ -550,7 +547,8 @@
                 degree_id: $('#filter_degree :selected').val(),
                 grade_id: $('#filter_grade :selected').val(),
                 academic_year_id: $('#filter_academic_year :selected').val(),
-                semester_id:$('#filter_semester :selected').val()
+                semester_id:$('#filter_semester :selected').val(),
+                dept_option_id: $('#filter_dept_option :selected').val()
             }
             $.ajax({
                 type: 'GET',

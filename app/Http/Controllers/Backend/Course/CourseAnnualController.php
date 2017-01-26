@@ -1669,9 +1669,8 @@ class CourseAnnualController extends Controller
         $gradeId = $request->grade_id;
         $academicYearID = $request->academic_year_id;
         $semesterId = $request->semester_id;
+        $deptOptionId = $request->dept_option_id;
 
-
-        dd($request->all());
         $courseAnnuals = $this->getCourseAnnually();
 
         if($deptId) {
@@ -1688,6 +1687,12 @@ class CourseAnnualController extends Controller
         }
         if($semesterId) {
             $courseAnnuals = $courseAnnuals->where('course_annuals.semester_id', '=',$semesterId);
+        }
+        if($deptOptionId) {
+//            dd($courseAnnuals->get());
+            $courseAnnuals = $courseAnnuals->where('course_annuals.department_option_id', '=',$deptOptionId);
+        } else {
+            $deptOptionId= null;
         }
         $courseAnnuals = $courseAnnuals->orderBy('semester_id')->get();
 
@@ -1715,7 +1720,7 @@ class CourseAnnualController extends Controller
 
         return view('backend.course.courseAnnual.includes.form_all_score_courses_annual', compact('department',
             'degree', 'grade', 'academicYear', 'semesters', 'semesterId', 'courseAnnuals',
-            'departments', 'academicYears', 'degrees', 'grades', 'deptOptions'
+            'departments', 'academicYears', 'degrees', 'grades', 'deptOptions', 'deptOptionId'
             ));
 
     }
@@ -1733,6 +1738,7 @@ class CourseAnnualController extends Controller
         $gradeId = $request->grade_id;
         $academicYearID = $request->academic_year_id;
         $semesterId = $request->semester_id;
+        $deptOptionId = $request->dept_option_id;
         $arrayData = [];
         $arraySemester = [];
         $ranks=[];
@@ -1754,6 +1760,10 @@ class CourseAnnualController extends Controller
         }
         if($semesterId) {
             $courseAnnuals = $courseAnnuals->where('course_annuals.semester_id', '=',$semesterId);
+        }
+        if($deptOptionId) {
+//            dd($deptOptionId);
+            $courseAnnuals = $courseAnnuals->where('course_annuals.department_option_id', '=',$deptOptionId);
         }
 
 //        dd($courseAnnuals->select('course_annuals.course_id', DB::raw('count(*) as course_id'))->groupBy('course_id')->get());
