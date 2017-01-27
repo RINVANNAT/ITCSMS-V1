@@ -12,6 +12,11 @@
 
 @section('after-styles-end')
     {!! Html::style('plugins/datatables/dataTables.bootstrap.css') !!}
+    <style>
+        #filter_dept_option {
+            margin-left: 5px;
+        }
+    </style>
 @stop
 
 @section('content')
@@ -76,6 +81,21 @@
     {!! Html::script('plugins/datatables/dataTables.bootstrap.min.js') !!}
     <script>
         $(function() {
+
+            var toolbar_html =
+                    @if($department_id != null)
+                            ''+
+                        @if(isset($deptOptions))
+                                '{!! Form::select('dept_option',$deptOptions,null, array('class'=>'form-control','id'=>'filter_dept_option','placeholder'=>'Division')) !!} '+
+                        @endif
+                    @else
+                            ' {!! Form::select('department',$departments,$department_id, array('class'=>'form-control','id'=>'filter_department','placeholder'=>'Department')) !!} '+
+                    @endif
+                        '{!! Form::select('semester',$semesters,null, array('class'=>'form-control','id'=>'filter_semester','placeholder'=>'Semester')) !!} '+
+                        '{!! Form::select('degree',$degrees,null, array('class'=>'form-control','id'=>'filter_degree','placeholder'=>'Degree')) !!} '+
+                        '{!! Form::select('grade',$grades,null, array('class'=>'form-control','id'=>'filter_grade','placeholder'=>'Year')) !!} '
+
+
             var oTable = $('#coursePrograms-table').DataTable({
                 processing: true,
                 serverSide: true,
@@ -91,7 +111,8 @@
                         d.degree = $('#filter_degree').val();
                         d.grade = $('#filter_grade').val();
                         d.department = $('#filter_department').val();
-                        d.department_option = $('#filter_department_option').val();
+                        d.department_option = $('#filter_dept_option').val();
+                        d.semester = $('#filter_semester').val();
 
                     }
                 },
@@ -109,12 +130,7 @@
 
             enableDeleteRecord($('#coursePrograms-table'));
 
-            $("div.toolbar").html(
-                    '{!! Form::select('degree',$degrees,null, array('class'=>'form-control','id'=>'filter_degree','placeholder'=>'Degree')) !!} '+
-                    '{!! Form::select('grade',$grades,null, array('class'=>'form-control','id'=>'filter_grade','placeholder'=>'Year')) !!} '+
-                    '{!! Form::select('department',$departments,null, array('class'=>'form-control','id'=>'filter_department','placeholder'=>'Department')) !!} '+
-                    '{!! Form::select('department_option',$deptOptions,null, array('class'=>'form-control','id'=>'filter_department_option','placeholder'=>'Division')) !!} '
-            );
+            $("div.toolbar").html(toolbar_html);
 
 
 
@@ -128,13 +144,45 @@
             });
             $('#filter_department').on('change', function(e) {
                 oTable.draw();
+                hasDeptOption();
                 e.preventDefault();
             });
-            $('#filter_department_option').on('change', function(e) {
+
+            $(document).on('change', '#filter_dept_option', function() {
+                oTable.draw();
+                e.preventDefault();
+            })
+
+            $('#filter_semester').on('change', function(e) {
                 oTable.draw();
                 e.preventDefault();
             });
         });
+
+
+
+        function hasDeptOption() {
+            var dept_option_url = '{{route('course_program.dept_option')}}';
+            var department_id = $('#filter_department :selected').val();
+
+            $.ajax({
+                type: 'GET',
+                url: dept_option_url,
+                data: {department_id: department_id},
+                dataType: "html",
+                success: function(resultData) {
+
+//                    console.log(resultData);
+                    if($('#filter_dept_option').is(':visible')) {
+                        $('#filter_dept_option').html(resultData);
+                    } else {
+                        $("div.toolbar > select#filter_department").after(resultData);
+                    }
+
+                }
+            });
+
+        }
     </script>
 @stop
 

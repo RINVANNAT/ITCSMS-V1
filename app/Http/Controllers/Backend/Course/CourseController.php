@@ -60,7 +60,7 @@ class CourseController extends Controller
 //        $degrees = Degree::lists("name_en", "id");
 //        $grades = Grade::lists("name_en", "id");
 //        $departments = Department::lists("name_en", "id");
-//        $semesters = Semester::lists("name_en", "id");
+        $semesters = Semester::lists("name_en", "id");
 
         if(auth()->user()->allow("view-all-score-in-all-department")){
 
@@ -80,15 +80,24 @@ class CourseController extends Controller
         $degrees = Degree::lists('name_en','id')->toArray();
         $grades = Grade::lists('name_en','id')->toArray();
 
-        return view('backend.course.courseProgram.index'
-            , compact("degrees", "grades", "departments", "semesters", "academicYears", 'deptOptions'));
-        // create dev branch test!
-        // test merge
+        return view('backend.course.courseProgram.index', compact(
+            "degrees", "grades", "departments",
+            "semesters", "academicYears", 'deptOptions',
+            'department_id', 'semesters'
+        ));
 
+    }
+
+    public function getDeptOption(Request $request) {
+
+        $deptOptions = $this->deptHasOption($request->department_id);
+
+        return view('backend.course.courseAnnual.includes.dept_option_selection', compact('deptOptions'));
     }
 
 
     private function deptHasOption($deptId) {
+
         $dept = Department::find($deptId);
 
         if($dept->department_options) {
@@ -230,11 +239,22 @@ class CourseController extends Controller
         if ($grade = $datatables->request->get('grade')) {
             $datatables->where('courses.grade_id', '=', $grade);
         }
-        if ($department = $datatables->request->get('department')) {
-            $datatables->where('courses.department_id', '=', $department);
-        }
+//        if ($department = $datatables->request->get('department')) {
+//            $datatables->where('courses.department_id', '=', $department);
+//        }
         if ($deptOptionId = $datatables->request->get('department_option')) {
             $datatables->where('courses.department_option_id', '=', $deptOptionId);
+        }
+        if ($semester = $datatables->request->get('semester')) {
+            $datatables->where('courses.semester_id', '=', $semester);
+        }
+        if(auth()->user()->allow("view-all-score-in-all-department")){ // user has permission to view all course/score in all department
+            if ($department = $datatables->request->get('department')) {
+                $datatables->where('courses.department_id', '=', $department);
+            }
+        } else {
+            $employee =Employee::where('user_id', Auth::user()->id)->first();
+            $datatables = $datatables ->where('courses.department_id', $employee->department->id );
         }
         
         return $datatables->make(true);

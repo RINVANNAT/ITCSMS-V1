@@ -22,6 +22,8 @@ Route::group([
         Route::get('course-request-import-config', 'CourseController@request_import_config')->name('admin.course.course_program.request_import_config');
         Route::post('course-import-config', 'CourseController@import_config')->name('admin.course.course_program.import_config');
 
+        Route::get('/course-program/dept-has-option', 'CourseController@getDeptOption')->name('course_program.dept_option');
+
     });
 
 
