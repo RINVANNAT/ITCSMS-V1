@@ -2299,6 +2299,8 @@ class CourseAnnualController extends Controller
     public static $isFileHasColumnScoreType = [];
     public static $isCellValueNull = false;
     public static $errorNumberAbsence = false;
+    public static $isStringAllowed = false;
+    public static $headerPercentage =0;
 
 
     public function importScore($courseAnnualId, Request $request) {
@@ -2314,14 +2316,15 @@ class CourseAnnualController extends Controller
             $storage_path = base_path() . '/public/assets/uploaded_file/course_annuals/'.$import;
             $students = $this->getStudentByNameAndIdCard($courseAnnualId);
             $absences = $this->getStudentAbsence($courseAnnualId);
+            $notations = $this->getStudentNotation($courseAnnualId);
 
             DB::beginTransaction();
             try{
-                Excel::filter('chunk')->load($storage_path)->chunk(150, function($results) use ($students, $courseAnnualId, $courseAnnual, $absences){
+                Excel::filter('chunk')->load($storage_path)->chunk(150, function($results) use ($students, $courseAnnualId, $courseAnnual, $absences, $notations){
 
                     $firstrow = $results->first()->toArray();
-                    if (isset($firstrow['student_id']) && isset($firstrow['student_name']) && isset($firstrow['abs']) && (count($firstrow)>7)) {
-                        $results->each(function($row) use($students, $courseAnnualId, $courseAnnual, $absences)  {
+                    if (isset($firstrow['student_id']) && isset($firstrow['student_name']) && array_key_exists("abs",$firstrow) && (count($firstrow)>7)) {
+                        $results->each(function($row) use($students, $courseAnnualId, $courseAnnual, $absences, $notations)  {
                             $row = $row->toArray();
                             $scoreIds = $this->getScoreId($courseAnnualId);
                             if(isset($students[$row['student_id']])) {
@@ -2334,43 +2337,40 @@ class CourseAnnualController extends Controller
                                 $percentage = $this->getPercentage();
 
                                 foreach($studentScoreIds as $scoreId) {
-                                    if(isset($row[strtolower($percentage[$scoreId])])) {
 
-                                        $explode = explode('_',strtolower($percentage[$scoreId]));
-                                        $percent = $explode[count($explode)-1];
-                                        if(  (((float)$row[strtolower($percentage[$scoreId])] <= (float)$percent) && ((float)$row[strtolower($percentage[$scoreId])] > 0)) && (is_numeric($row[strtolower($percentage[$scoreId])])) ) {
+                                    if(array_key_exists(strtolower($percentage[$scoreId]), $row)) { // check the array key of score name
+                                        if( ($row[strtolower($percentage[$scoreId])] == null) || is_numeric($row[strtolower($percentage[$scoreId])]) ) {
 
-                                            $input = [
-                                                'score'=> $row[strtolower($percentage[$scoreId])]
-                                            ];
-                                            $score = $this->courseAnnualScores->update($scoreId, $input);
+                                            $explode = explode('_',strtolower($percentage[$scoreId]));
+                                            $percent = $explode[count($explode)-1];
+                                            if(  (((float)$row[strtolower($percentage[$scoreId])] <= (float)$percent) && ((float)$row[strtolower($percentage[$scoreId])] >= 0)) ) {
+                                                $input = [
+                                                    'score'=> $row[strtolower($percentage[$scoreId])]
+                                                ];
+                                                $score = $this->courseAnnualScores->update($scoreId, $input);
 
-                                            if($score) {
-                                                CourseAnnualController::$ifScoreImported++;
+                                                if($score) {
+                                                    CourseAnnualController::$ifScoreImported++;
+                                                }
+                                            } else {
+                                                CourseAnnualController::$isNotAceptedScore = true;
+                                                CourseAnnualController::$headerPercentage = $percent;
+                                                DB::rollback();
+                                                break;
                                             }
+
                                         } else {
-                                            CourseAnnualController::$isNotAceptedScore = true;
-                                            DB::rollback();
-                                            break;
+                                            // score value is exactly the string so we must not accept it
+                                            CourseAnnualController::$isStringAllowed = true;
                                         }
                                     } else {
-
-                                        if(($row[strtolower($percentage[$scoreId])] == null)) {
-
-
-                                            CourseAnnualController::$isCellValueNull = true;
-                                            DB::rollback();
-                                            break;
-
-                                        } else {
-                                            CourseAnnualController::$isFileHasColumnScoreType[$percentage[$scoreId]]= $percentage[$scoreId];
-                                        }
+                                        CourseAnnualController::$isFileHasColumnScoreType[$percentage[$scoreId]]= $percentage[$scoreId];
                                     }
                                 }
-                                if(isset($row['abs'])) { // ---absence column
 
-                                    if( ( ($row['abs'] <= ($courseAnnual->time_course + $courseAnnual->time_td + $courseAnnual->time_tp)) && ((float)$row['abs'] > 0)) && ( is_numeric($row['abs']) ) ) {
+                                if(is_numeric($row['abs']) || ($row['abs'] == null)) { // ---absence column
 
+                                    if( ( (float)($row['abs'] <= ($courseAnnual->time_course + $courseAnnual->time_td + $courseAnnual->time_tp)) && ((float)$row['abs'] >= 0)) ) {
 
                                         if(isset($absences[$students[$row['student_id']]->student_annual_id])) {
 
@@ -2401,17 +2401,44 @@ class CourseAnnualController extends Controller
                                         }
                                     } else {
 
+                                        // the absence value is not in the conditioin
                                         CourseAnnualController::$errorNumberAbsence = true;
                                         DB::rollback();
                                     }
 
                                 } else {
+                                    // the absence value is exactly string
+                                    CourseAnnualController::$errorNumberAbsence = true;
+                                    DB::rollback();
+                                }
 
-                                    if($row['abs'] == null) {
-                                        CourseAnnualController::$isCellValueNull = true;
-                                        DB::rollback();
+                                //----------store notation-------------
+
+
+                                if(isset($row['notation'])) { // ---notation column
+
+                                    if(isset($notations[$students[$row['student_id']]->student_annual_id])) {
+
+                                        $notation = $notations[$students[$row['student_id']]->student_annual_id];
+
+                                        if($notation) {
+                                            //----update student absence
+                                            $input = [
+                                                'course_annual_id' => $notation->course_annual_id,
+                                                'student_annual_id' => $notation->student_annual_id,
+                                                'description' => $row['notation']
+                                            ];
+
+                                            $update = $this->averages->update($notation->id, $input);
+                                        }
                                     } else {
-                                        CourseAnnualController::$isFileHasColumnScoreType['abs']= 'Abs';
+                                        //----create student absence
+                                        $input = [
+                                            'course_annual_id' => $courseAnnualId,
+                                            'student_annual_id' => $students[$row['student_id']]->student_annual_id,
+                                            'description'       => $row['notation']
+                                        ];
+                                        $store = $this->averages->create($input);
                                     }
                                 }
                             } else {
@@ -2428,7 +2455,10 @@ class CourseAnnualController extends Controller
                     return redirect()->back()->with(['status'=>'Problem with no data in the first row, or your file misses some fields. To make file corrected please export the template!!']);
                 }
                 if(CourseAnnualController::$isNotAceptedScore) {
-                    return redirect()->back()->with(['warning'=>'The inputted score was over the determined percentage!']);
+                    return redirect()->back()->with(['warning' => 'Score must be between 0 and '.CourseAnnualController::$headerPercentage]);
+                }
+                if(CourseAnnualController::$isStringAllowed) {
+                    return redirect()->back()->with(['status' => 'No string allowed!']);
                 }
                 if(count(CourseAnnualController::$isFileHasColumnScoreType) > 0) {
                     $string = ' ';
@@ -2437,9 +2467,9 @@ class CourseAnnualController extends Controller
                     }
                     return redirect()->back()->with(['status'=> 'Your file does not have this field score: '.$string.' Please export template as sample!']);
                 }
-                if(CourseAnnualController::$isCellValueNull) {
-                    return redirect()->back()->with(['status'=> 'Cell Value Null is not allow. Please Add as 0']);
-                }
+//                if(CourseAnnualController::$isCellValueNull) {
+//                    return redirect()->back()->with(['status'=> 'Cell Value Null is not allow. Please Add as 0']);
+//                }
                 if( CourseAnnualController::$errorNumberAbsence ) {
                     $string = 'The absence value must be between 0 and '.($courseAnnual->time_course + $courseAnnual->time_td + $courseAnnual->time_tp). ', and No string allowed!';
                     return redirect()->back()->with(['status'=> htmlspecialchars($string)]);
@@ -2456,14 +2486,17 @@ class CourseAnnualController extends Controller
             if(count(CourseAnnualController::$arrayMissedStudent) > 0) {
                 $message ='Some student are missing!';
                 $arrayMissedStudent = CourseAnnualController::$arrayMissedStudent;
-                return view('backend.course.courseAnnual.includes.form_input_score_course_annual', compact('courseAnnualId', 'courseAnnual', 'availableCourses', 'message', 'arrayMissedStudent'));
+//                return view('backend.course.courseAnnual.includes.form_input_score_course_annual', compact('courseAnnualId', 'courseAnnual', 'availableCourses', 'message', 'arrayMissedStudent'));
+                return redirect(route('admin.course.form_input_score_course_annual', $courseAnnualId))->with(['status_student' => $arrayMissedStudent]);
             } else {
 
 //                dd((CourseAnnualController::$ifScoreImported/CourseAnnualController::$countStudentScoreType) .'=='. count($students).'& '.(CourseAnnualController::$ifAbsenceUpdated + CourseAnnualController::$ifAbsenceCreated) .'=='. count($students));
 
                 if( ((CourseAnnualController::$ifScoreImported/CourseAnnualController::$countStudentScoreType) == count($students)) && ( (CourseAnnualController::$ifAbsenceUpdated + CourseAnnualController::$ifAbsenceCreated) == count($students) ) ) {
                     $status = 'File Imported!';
-                    return view('backend.course.courseAnnual.includes.form_input_score_course_annual', compact('courseAnnualId', 'courseAnnual', 'availableCourses', 'status'));
+//                    return view('backend.course.courseAnnual.includes.form_input_score_course_annual', compact('courseAnnualId', 'courseAnnual', 'availableCourses', 'status'));
+
+                    return redirect(route('admin.course.form_input_score_course_annual', $courseAnnualId))->with(['status' => 'File Imported']);
                 } else {
                     return redirect()->back()->with(['status'=> 'Something went wrong']);
                 }
@@ -2536,6 +2569,21 @@ class CourseAnnualController extends Controller
         foreach($absences as $absence) {
             $arrayAbsence[$absence->student_annual_id] = $absence;
         }
+        return $arrayAbsence;
+    }
+
+    private function getStudentNotation($courseAnnualId) {
+        $arrayNotation =[];
+        $notations = DB::table('averages')
+            ->where('course_annual_id', $courseAnnualId)
+            ->get();
+
+        foreach($notations as $notation) {
+            $arrayNotation[$notation->student_annual_id] = $notation;
+        }
+
+        return $arrayNotation;
+
     }
 
 

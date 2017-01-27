@@ -379,8 +379,10 @@ function jPopup(config) {
 
 		});
 		popupClose.on("click", function(e) {
-			e.preventDefault();
-			close();
+
+			//alert('erere');
+			//e.preventDefault();
+			pop.close();
 		});
 		popupContent.on("scroll", function() {
 			scrollTop();

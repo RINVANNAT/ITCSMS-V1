@@ -64,7 +64,7 @@ class EloquentAverageRepository implements AverageRepositoryContract
         $average->student_annual_id = $input['student_annual_id'];
         $average->total_average_id = isset($input['total_average_id'])? $input['total_average_id']:null;
         $average->description = isset($input['description'])?$input['description']:null;
-        $average->average = $input['average'];
+        $average->average = isset($input['average'])?$input['average']:null;
         $average->created_at = Carbon::now();
         $average->create_uid = auth()->id();
 
@@ -89,8 +89,8 @@ class EloquentAverageRepository implements AverageRepositoryContract
         $average = $this->findOrThrowException($id);
 
 
-        $average->course_annual_id = $input['course_annual_id'];
-        $average->student_annual_id = $input['student_annual_id'];
+        $average->course_annual_id = isset($input['course_annual_id'])?$input['course_annual_id']:$average->course_annual_id;
+        $average->student_annual_id = isset($input['student_annual_id'])?$input['student_annual_id']:$average->student_annual_id;
         $average->total_average_id = isset($input['total_average_id'])? $input['total_average_id']:null;
         $average->average = isset($input['average'])? $input['average']:0;
         $average->description = isset($input['description'])?$input['description']:$average->description;

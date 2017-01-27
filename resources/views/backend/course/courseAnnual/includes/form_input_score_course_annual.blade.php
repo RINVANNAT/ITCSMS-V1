@@ -360,7 +360,7 @@
                     @foreach($availableCourses as $course)
                         @if($course->id == $courseAnnual->id)
 
-                            <option value="{{$course->id}}" selected> {{$course->name_en.'/ Group:_'.$course->group.' /'.$course->department->code.'/'.$course->grade->name_en}}</option>
+                            <option value="{{$course->id}}" selected> {{$course->name_en.' /'.$course->department->code.'/'.$course->grade->name_en}}</option>
                         @else
                             <option value="{{$course->id}}"> {{$course->name_en.'/ Group:_'.$course->group.' /'.$course->department->code.'/'.$course->grade->name_en}}</option>
                         @endif
@@ -768,7 +768,6 @@
                 dataType: "json",
                 success: function(resultData) {
 
-                    console.log(resultData);
 
                     setting.data = resultData.data;
                     setting.colHeaders = resultData.columnHeader;
@@ -976,7 +975,7 @@
             pop.open(function(r) {// call this function to open dialog
                 switch(r) {
                     case 'ok':// vaule of btn
-                        pop.close();
+
                         break;
                 }
 
@@ -1264,9 +1263,9 @@
         });
 
 
-        @if(isset($arrayMissedStudent))
+        @if(session('status_student'))
                 var str = ' ';
-                @foreach($arrayMissedStudent as $student)
+                @foreach(session('status_student') as $student)
                         str = str + '{{$student['student_id']}}'+ ' ';
                 @endforeach
 
@@ -1284,8 +1283,8 @@
                 });
         @endif
 
-        @if(isset($status))
-            notify('success', '{{$status}}', 'Info')
+         @if(session('status'))
+            notify('success', '{{session('status')}}', 'Info')
         @endif
 
 

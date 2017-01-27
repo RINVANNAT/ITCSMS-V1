@@ -62,8 +62,9 @@
 
     {{--myscript--}}
     <script>
-        $('#cancel_import').on('click', function() {
-            window.history.back();
+        $('#cancel_import').on('click', function(e) {
+            e.preventDefault();
+            window.open('{{route('admin.course.form_input_score_course_annual', $courseAnnual->id)}}', '_self');
         });
 
         $(function(){
@@ -84,7 +85,7 @@
 
             swal({
             title: "Attention",
-            text: " File Not Imported :Cell value must be bigger then 0, less than the header percentage and no string allowed!",
+            text: " File Not Imported :Cell value must be bigger or equal 0, less than the header percentage and no string allowed!",
             type: "warning",
             confirmButtonColor: "red",
             confirmButtonText: "Close",
