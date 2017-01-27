@@ -2219,6 +2219,10 @@ class CourseAnnualController extends Controller
         $allScoreByCourseAnnual = $this->studentScoreCourseAnnually($courseAnnual);
         $allNumberAbsences = $this->getAbsenceFromDB();
         $students = $this->getStudentByDeptIdGradeIdDegreeId($courseAnnual->department_id, $courseAnnual->degree_id, $courseAnnual->grade_id,$courseAnnual->academic_year_id);
+        dd($students);
+        if($courseAnnual->department_option_id) {
+            $students = $students->where('studentAnnuals.department_option_id', $courseAnnual->department_option_id);
+        }
         if($courseAnnual->group) {
             $students = $students->where('studentAnnuals.group', $courseAnnual->group)->get();
         } else {
@@ -2255,7 +2259,7 @@ class CourseAnnualController extends Controller
             $studentListScore[] = $element;
         }
 
-        $title = 'Student Score Lists';
+        $title = 'Student_Score_'.$courseAnnual->name_en;
         $alpha = [];
         $letter = 'A';
         while ($letter !== 'AAA') {
