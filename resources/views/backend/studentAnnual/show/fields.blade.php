@@ -78,6 +78,7 @@
                         </tr>
                         </thead>
                         <tbody>
+
                         @if(empty($student->redoubles->toArray()))
                             <tr>
                                 <td colspan="2" style="text-align: center">
@@ -85,11 +86,13 @@
                                 </td>
                             </tr>
                         @else
+                            <?php $a = 1 ?>
                             @foreach($student->redoubles as $redouble)
                                 <tr style="color:#15c">
                                     <td>{{$a}}</td>
                                     <td>{{$redouble->name_en}}</td>
                                 </tr>
+                                <?php $a++ ?>
                             @endforeach
                         @endif
                         </tbody>
