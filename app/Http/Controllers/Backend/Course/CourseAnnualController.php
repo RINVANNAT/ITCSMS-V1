@@ -1207,11 +1207,15 @@ class CourseAnnualController extends Controller
         $allScoreByCourseAnnual = $this->studentScoreCourseAnnually($courseAnnual);
         $allNumberAbsences = $this->getAbsenceFromDB();
 
+        if($courseAnnual->department_option_id) {
+            $studentByCourse = $studentByCourse->where('studentAnnuals.department_option_id', $courseAnnual->department_option_id);
+        }
         if($courseAnnual->group) {
             $studentByCourse = $studentByCourse->where('studentAnnuals.group', $courseAnnual->group)->get();
         } else {
             $studentByCourse = $studentByCourse->get();
         }
+
         //----------------find student score if they have inserted
 
         $checkScoreReachHundredPercent=0;
