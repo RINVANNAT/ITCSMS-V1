@@ -2260,7 +2260,14 @@ class CourseAnnualController extends Controller
             $studentListScore[] = $element;
         }
 
-        $title = 'Student_Score_'.$courseAnnual->name_en;
+
+        $courseName = explode(" ", $courseAnnual->name_en);
+        $acronym = "";
+
+        foreach ($courseName as $char) {
+            $acronym .= $char[0];
+        }
+        $title = 'Student_Score_'.$acronym;
         $alpha = [];
         $letter = 'A';
         while ($letter !== 'AAA') {
