@@ -2219,7 +2219,8 @@ class CourseAnnualController extends Controller
         $allScoreByCourseAnnual = $this->studentScoreCourseAnnually($courseAnnual);
         $allNumberAbsences = $this->getAbsenceFromDB();
         $students = $this->getStudentByDeptIdGradeIdDegreeId($courseAnnual->department_id, $courseAnnual->degree_id, $courseAnnual->grade_id,$courseAnnual->academic_year_id);
-        dd($students);
+
+
         if($courseAnnual->department_option_id) {
             $students = $students->where('studentAnnuals.department_option_id', $courseAnnual->department_option_id);
         }
