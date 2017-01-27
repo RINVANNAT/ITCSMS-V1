@@ -541,7 +541,7 @@
             stretchH: 'last',
             filters: true,
             dropdownMenu: ['filter_by_condition', 'filter_action_bar'],
-            className: "htLeft number_only",
+            className: "htLeft",
             cells: function (row, col, prop) {
 
                 if( ((prop != 'student_id_card')&& (prop != 'student_name')) && ((prop != 'student_gender')&& (prop != 'absence')) && (((prop != 'average')&& (prop != 'notation'))) ) {
@@ -608,9 +608,9 @@
                             var explode = columnIndex.split('-');
                             var percentage = parseInt(explode[explode.length-1]);
 
-                            if($.isNumeric(newValue) && (newValue >= 0)) {
 
-                                if((newValue <= percentage) && (newValue != '')) {
+                            if($.isNumeric(newValue) || (newValue == '') ) {
+                                if((newValue <= percentage) ||  (newValue >= 0) || (newValue == '')) {
 
                                     var rowData = hotInstance.getData();
                                     var element={};
@@ -684,7 +684,7 @@
                         if(columnIndex == 'num_absence') {
                             {{--console.log(parseInt('{{$courseAnnual->time_course + $courseAnnual->time_td + $courseAnnual->time_tp}}'));--}}
                             var colData = findDataAtCol('Abs');
-                            if($.isNumeric(newValue)) {
+                            if($.isNumeric(newValue) || (newValue == '')) {
                                 if(newValue <= parseInt('{{$courseAnnual->time_course + $courseAnnual->time_td + $courseAnnual->time_tp}}')) {
 
                                     var rowData = hotInstance.getData();

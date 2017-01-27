@@ -74,7 +74,7 @@ class EloquentAbsenceRepository implements AbsenceRepositoryContract
 
         $absence->course_annual_id = $input['course_annual_id'];
         $absence->student_annual_id = $input['student_annual_id'];
-        $absence->num_absence = isset($input['num_absence'])?$input['num_absence']:null;
+        $absence->num_absence = ($input['num_absence'] == '')?null:$input['num_absence'] ;
         $absence->created_at = Carbon::now();
         $absence->create_uid = auth()->id();
 
@@ -97,7 +97,7 @@ class EloquentAbsenceRepository implements AbsenceRepositoryContract
 
         $absence->course_annual_id = isset($input['course_annual_id'])?$input['course_annual_id']:$absence->course_annual_id;
         $absence->student_annual_id = isset($input['student_annual_id'])?$input['student_annual_id']:$absence->student_annual_id;
-        $absence->num_absence = ($input['num_absence'] != null)? $input['num_absence']:$absence->num_absence;
+        $absence->num_absence = ($input['num_absence'] != null)? ($input['num_absence'] == '')?null:$input['num_absence']:null;
         $absence->updated_at = Carbon::now();
         $absence->write_uid = auth()->id();
 

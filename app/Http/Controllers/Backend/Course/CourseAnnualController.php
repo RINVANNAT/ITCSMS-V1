@@ -1501,10 +1501,11 @@ class CourseAnnualController extends Controller
 
             $status =0;
             foreach($baseData as $data) {
-                if(is_numeric($data['num_absence']) && $data['num_absence'] != null) {
+                if(is_numeric($data['num_absence']) || $data['num_absence'] == null) {
                     $status++;
                 }
             }
+
 
             if($status == count($baseData)) {
                 foreach($baseData as $data) {
