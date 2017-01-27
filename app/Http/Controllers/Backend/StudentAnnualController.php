@@ -1975,7 +1975,6 @@ class StudentAnnualController extends Controller
             ->leftJoin('departmentOptions', 'studentAnnuals.department_option_id', '=', 'departmentOptions.id')
             ->leftJoin('departments', 'studentAnnuals.department_id', '=', 'departments.id')
             ->leftJoin('degrees', 'studentAnnuals.degree_id', '=', 'degrees.id')
-            ->leftJoin('scholarship_student_annual','studentAnnuals.id','=','scholarship_student_annual.student_annual_id')
             ->whereIn('studentAnnuals.id',$ids)
             ->orderBy('id_card',$orderby)
             ->get();
