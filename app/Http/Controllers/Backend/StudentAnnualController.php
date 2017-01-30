@@ -205,8 +205,6 @@ class StudentAnnualController extends Controller
 
     public function data(Request $request)
     {
-
-
         $scholarship_id = Input::get('scholarship_id');
 
         $studentAnnuals = StudentAnnual::select([
@@ -1909,8 +1907,7 @@ class StudentAnnualController extends Controller
             ->leftJoin('grades', 'studentAnnuals.grade_id', '=', 'grades.id')
             ->leftJoin('departmentOptions', 'studentAnnuals.department_option_id', '=', 'departmentOptions.id')
             ->leftJoin('departments', 'studentAnnuals.department_id', '=', 'departments.id')
-            ->leftJoin('degrees', 'studentAnnuals.degree_id', '=', 'degrees.id')
-            ->leftJoin('scholarship_student_annual','studentAnnuals.id','=','scholarship_student_annual.student_annual_id');
+            ->leftJoin('degrees', 'studentAnnuals.degree_id', '=', 'degrees.id');
 
         if ($academic_year = $request->get('academic_year')) {
             $studentAnnuals = $studentAnnuals->where('studentAnnuals.academic_year_id', '=', $academic_year);
@@ -1978,7 +1975,6 @@ class StudentAnnualController extends Controller
             ->leftJoin('departmentOptions', 'studentAnnuals.department_option_id', '=', 'departmentOptions.id')
             ->leftJoin('departments', 'studentAnnuals.department_id', '=', 'departments.id')
             ->leftJoin('degrees', 'studentAnnuals.degree_id', '=', 'degrees.id')
-            ->leftJoin('scholarship_student_annual','studentAnnuals.id','=','scholarship_student_annual.student_annual_id')
             ->whereIn('studentAnnuals.id',$ids)
             ->orderBy('id_card',$orderby)
             ->get();

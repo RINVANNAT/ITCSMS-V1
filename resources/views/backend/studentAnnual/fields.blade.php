@@ -188,7 +188,24 @@
             </div>
             {!! Form::label('name', trans('labels.backend.students.fields.redouble_id'), ['class' => 'col-lg-2 control-label']) !!}
             <div class="col-lg-10" style="padding-bottom: 10px;">
-                {!! Form::select('redouble_id',$redoubles,null, array('class'=>'form-control','placeholder'=>'')) !!}
+                <?php
+                    $redouble_history = [];
+                    foreach($studentAnnual->student->redoubles as $r){
+                        $redouble_history[$r->id] = $r->name_en;
+                    }
+                ?>
+
+                @foreach($redoubles as $key => $redouble)
+                    <div class="col-md-4">
+                        @if(isset($redouble_history['$key']))
+                            <label><input type="checkbox" name="redoubles[]" value="{{$key}}" checked> {{$redouble}}</label>
+                        @else
+                            <label><input type="checkbox" name="redoubles[]" value="{{$key}}"> {{$redouble}}</label>
+                        @endif
+                    </div>
+                @endforeach
+
+                {{--{!! Form::select('redouble_id',$redoubles,null, array('class'=>'form-control','placeholder'=>'')) !!}--}}
             </div>
             {!! Form::label('name', trans('labels.backend.students.fields.scholarship_id'), ['class' => 'col-lg-2 control-label']) !!}
             <div class="col-lg-10" style="padding-bottom: 10px;">
