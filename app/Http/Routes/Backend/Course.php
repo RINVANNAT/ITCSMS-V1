@@ -74,6 +74,12 @@ Route::group([
     Route::get('/course-annual-import-score', 'CourseAnnualController@formImportScore')->name('course_annual.form_import_score');
     Route::post('/course-annual/{id}/import-score', 'CourseAnnualController@importScore')->name('course_annual.import_file');
 
+    Route::get('/course-annual/get-other-dept', 'CourseAnnualController@getDepts')->name('course_annual.get_other_dept');
+
+    Route::get('/course-annual/get-other-lecturer', 'CourseAnnualController@getOtherLecturer')->name('course_annual.get_other_lecturer');
+
+
+
 
     Route::get('/course-annual/dept-option', 'CourseAnnualController@getDeptOption')->name('course_annual.dept_option');
 

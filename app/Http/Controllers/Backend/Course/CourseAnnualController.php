@@ -197,6 +197,35 @@ class CourseAnnualController extends Controller
         return view('backend.course.courseAnnual.create',compact('departments','academicYears','degrees','grades','courses',"semesters","employees", 'deptOptions'));
     }
 
+    public function getDepts() {
+
+        if(auth()->user()->allow("view-all-score-in-all-department")){
+            $departments = Department::where("parent_id",config('access.departments.department_academic'))->orderBy("code")->lists("code","id");
+        } else {
+            $employee = Employee::where('user_id', Auth::user()->id)->first();
+            $departments = Department::where("parent_id",config('access.departments.department_academic'))
+                ->whereNotIn('id', [$employee->department->id])
+                ->orderBy("code")->lists("code","id");
+        }
+        return view('backend.course.courseAnnual.includes.other_dept_selection', compact('departments'));
+    }
+
+    public function getOtherLecturer(Request $request) {
+
+        $employee = Employee::where('user_id', Auth::user()->id)->first();
+        $currentTeachersInHisDept = $this->getAllteacherByDeptId($employee->department->id);
+        if($request->department_id) {
+            $teacherByDept = $this->getAllteacherByDeptId($request->department_id);
+        } else {
+            $teacherByDept = [];
+        }
+
+        $totalTeachers = array_merge($currentTeachersInHisDept, $teacherByDept);
+
+//        dd($totalTeachers);
+        return view('backend.course.courseAnnual.includes.mix_teacher_selection', compact('totalTeachers'));
+    }
+
     /**
      * Store a newly created resource in storage.
      *
@@ -319,7 +348,7 @@ class CourseAnnualController extends Controller
             ->orderBy("course_annuals.updated_at","desc")
             ->select(
                 ['course_annuals.id',
-                    'courses.name_en as name',
+                    'course_annuals.name_en as name',
                     'course_annuals.semester_id',
                     'course_annuals.active',
                     'course_annuals.academic_year_id',
@@ -330,7 +359,6 @@ class CourseAnnualController extends Controller
                     'course_annuals.grade_id',
                     'course_annuals.course_id']
             );
-
 
         $datatables =  app('datatables')->of($courseAnnuals);
         $datatables
@@ -530,8 +558,9 @@ class CourseAnnualController extends Controller
 
         $allTeachers = DB::table('employees')
             ->join('departments', 'departments.id', '=', 'employees.department_id')
-            ->select('employees.name_latin as teacher_name', 'employees.id as teacher_id', 'departments.id as department_id')
+            ->select('employees.name_kh as teacher_name', 'employees.id as teacher_id', 'departments.id as department_id')
             ->where('departments.id', $deptID)
+            ->orderBy('teacher_name')
             ->distinct('BINARY employees.name_latin')
             ->get();
 

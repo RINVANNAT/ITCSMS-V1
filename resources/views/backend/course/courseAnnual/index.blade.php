@@ -189,9 +189,6 @@
             });
         });
 
-
-
-
         function hasDeptOption() {
             var dept_option_url = '{{route('course_annual.dept_option')}}';
             var department_id = $('#filter_department :selected').val();

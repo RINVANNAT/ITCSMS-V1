@@ -1,0 +1,1 @@
+{{ Form::select('other_department_id', $departments, null, ['class' => 'form-control', 'placeholder' => 'Departments']) }}

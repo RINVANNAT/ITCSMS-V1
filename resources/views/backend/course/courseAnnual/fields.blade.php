@@ -31,8 +31,16 @@
 <div class="form-group">
     {!! Form::label('course', trans('labels.backend.courseAnnuals.fields.employee'), ['class' => 'col-lg-2 control-label required']) !!}
     <div class="col-lg-7">
-        {{ Form::select('employee_id', $employees, null, ['class' => 'form-control']) }}
+        {{ Form::select('employee_id', $employees, null, ['class' => 'form-control', 'id'=>'lecturer_lists']) }}
     </div>
+
+    @permission('view-all-score-course-annual')
+        <button class="btn btn-sm btn-info pull-left label-control" id="other_dept">Others</button>
+        <div class="col-lg-2 other_department">
+
+        </div>
+    @endauth
+
 </div>
 
 <div class="form-group">
