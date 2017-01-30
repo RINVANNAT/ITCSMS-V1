@@ -49,9 +49,8 @@
 
                                <span class="text_font"><i class="fa fa-book" aria-hidden="true"> {{ trans('labels.backend.courseAnnual.title') }} </i> </span>
 
-                               @permission('course-assignment')
                                <button class="btn btn-xs btn-primary pull-right" style="margin-top: 5px; margin-bottom: 5px; margin-right: -8px" id="btn_assign_course">Assign Course</button>
-                               @endauth
+
                               <div id="annual_course">
 
                               </div>
@@ -61,9 +60,9 @@
                         <div class="col-sm-6 no-padding">
                             <div class="col-sm-12 " style="border: 2px solid green">
                                 <span class="text_font"> <i class="fa fa-user" aria-hidden="true"> {{ trans('labels.backend.courseAnnual.lecturer') }} </i></span>
-                                @permission('course-assignment')
+
                                 <button class="btn btn-xs btn-danger pull-right" style="margin-top: 5px; margin-bottom: 5px; margin-right: -8px" id="btn_remove_course">Remove Course</button>
-                                @endauth
+
                                 <div id="annual_teacher">
 
                                 </div>
@@ -104,7 +103,14 @@
        var department_id = '{{$departmentId}}';
        var grade_id = '{{$gradeId}}';
        var degree_id = '{{$degreeId}}';
+       var semester_id = '{{$semesterId}}';
        var academic_year_id = '{{$academicYear->id}}';
+
+       @if($deptOption != null)
+            var department_option_id = '{{$deptOption}}';
+       @else
+            var department_option_id = null;
+       @endif
 
 
 
@@ -219,7 +225,7 @@
                    "data":{
                        'url' : function (node) {
 
-                           return node.id === '#' ? url_lv1+'?tree_side=course_annual'+'&department_id='+department_id+'&academic_year_id='+academic_year_id+'&grade_id='+grade_id+'&degree_id='+degree_id : url_lv4+'?academic_year_id='+academic_year_id+'&grade_id='+grade_id+'&degree_id='+degree_id;
+                           return node.id === '#' ? url_lv1+'?tree_side=course_annual'+'&department_id='+department_id+'&academic_year_id='+academic_year_id+'&grade_id='+grade_id+'&degree_id='+degree_id+'&department_option_id='+department_option_id + '&semester_id='+semester_id: url_lv4+'?academic_year_id='+academic_year_id+'&grade_id='+grade_id+'&degree_id='+degree_id+'&department_option_id='+department_option_id+ '&semester_id='+semester_id;
 
 
                        },

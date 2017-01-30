@@ -178,10 +178,10 @@
                 e.preventDefault();
             });
 
-            $('#filter_student_group').on('change', function(e) {
+            $(document).on('change', '#filter_student_group', function() {
                 oTable.draw();
                 e.preventDefault();
-            });
+            })
 
             $(document).on('change', '#filter_dept_option', function() {
                 oTable.draw();
@@ -257,12 +257,20 @@
             var academic_year_id = $('#filter_academic_year :selected').val();
             var degree_id = $('#filter_degree :selected').val();
             var grade_id  = $('#filter_grade :selected').val();
-            var department_id = $('#filter_department :selected').val();
+            var department_option_id = $('#filter_dept_option :selected').val();
+            var semester_id = $('#filter_semester :selected').val();
+
+
+            @if($department_id !=null)
+                var department_id = '{{$department_id}}';
+            @else
+                var department_id = $('#filter_department :selected').val();
+            @endif
             var department_name = $('#filter_department :selected').text();
             var grade_name = $('#filter_grade :selected').text();
             var degree_name = $('#filter_degree :selected').text();
             var url = "{!! route('admin.course.course_assignment') !!}";
-            var course_assignment_window = PopupCenterDual(url+'?department_id='+department_id+'&academic_year_id='+academic_year_id+'&degree_id='+degree_id+'&grade_id='+grade_id,'course assignment','1400','900');
+            var course_assignment_window = PopupCenterDual(url+'?department_id='+department_id+'&academic_year_id='+academic_year_id+'&degree_id='+degree_id+'&grade_id='+grade_id+'&department_option_id='+department_option_id + '&semester_id='+semester_id,'course assignment','1400','900');
         });
 
         $('#generate_course_annual').on('click', function() {
