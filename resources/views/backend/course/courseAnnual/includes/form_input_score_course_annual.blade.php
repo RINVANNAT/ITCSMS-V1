@@ -699,9 +699,10 @@
                                             }
                                         });
                                     }
-                                    if(oldValue != newValue){
-                                        cellChanges.push(element);
-                                    }
+                                    cellChanges.push(element);
+//                                    if(oldValue != newValue){
+//
+//                                    }
                                 }
                             }
                             var count = 0;
