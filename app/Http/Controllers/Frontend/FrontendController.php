@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Frontend;
 
 use App\Http\Controllers\Controller;
+use Illuminate\Support\Facades\Redirect;
 
 /**
  * Class FrontendController
@@ -15,11 +16,8 @@ class FrontendController extends Controller
      */
     public function index()
     {
-        javascript()->put([
-            'test' => 'it works!',
-        ]);
-
-        return view('frontend.index');
+        return redirect()
+            ->route('admin.dashboard');
     }
 
     /**

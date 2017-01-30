@@ -52,6 +52,7 @@
 
         <!-- Content Wrapper. Contains page content -->
         <div class="content-wrapper">
+            @yield('message')
             <!-- Content Header (Page header) -->
             <section class="content-header">
                 @yield('page-header')
