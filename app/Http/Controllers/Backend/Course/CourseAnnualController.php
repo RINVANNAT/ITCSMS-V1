@@ -2491,7 +2491,7 @@ class CourseAnnualController extends Controller
                 return redirect(route('admin.course.form_input_score_course_annual', $courseAnnualId))->with(['status_student' => $arrayMissedStudent]);
             } else {
 
-                dd((CourseAnnualController::$ifScoreImported/CourseAnnualController::$countStudentScoreType) .'=='. count($students).'& '.(CourseAnnualController::$ifAbsenceUpdated + CourseAnnualController::$ifAbsenceCreated) .'=='. count($students));
+//                dd((CourseAnnualController::$ifScoreImported/CourseAnnualController::$countStudentScoreType) .'=='. count($students).'& '.(CourseAnnualController::$ifAbsenceUpdated + CourseAnnualController::$ifAbsenceCreated) .'=='. count($students));
 
                 if( ((CourseAnnualController::$ifScoreImported/CourseAnnualController::$countStudentScoreType) == count($students)) && ( (CourseAnnualController::$ifAbsenceUpdated + CourseAnnualController::$ifAbsenceCreated) == count($students) ) ) {
                     $status = 'File Imported!';
@@ -2512,11 +2512,15 @@ class CourseAnnualController extends Controller
         $arrayStudent = [];
         $courseAnnual = $this->courseAnnuals->findOrThrowException($courseAnnualId);
         $students = $this->getStudentByDeptIdGradeIdDegreeId($courseAnnual->department_id, $courseAnnual->degree_id, $courseAnnual->grade_id, $courseAnnual->academic_year_id);
+        if($courseAnnual->department_option_id) {
+            $students = $students->where('studentAnnuals.department_option_id', $courseAnnual->department_option_id);
+        }
         if($courseAnnual->group) {
             $students = $students->where('studentAnnuals.group', $courseAnnual->group)->get();
         } else {
             $students = $students->get();
         }
+
 
         foreach($students as $student) {
             $arrayStudent[$student->id_card]=$student;
