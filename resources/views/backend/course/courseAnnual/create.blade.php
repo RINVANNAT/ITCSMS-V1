@@ -25,7 +25,8 @@
                 @include('backend.course.courseAnnual.fields')
 
                 <div class="form-group">
-                    <div class="col-lg-3 col-lg-offset-2">
+                    {!! Form::label('student_group', "Student Group", ['class' => 'col-lg-2 control-label required']) !!}
+                    <div class="col-lg-2">
                         <div id="jstree_group">
 
                         </div>

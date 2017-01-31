@@ -237,6 +237,7 @@ class CourseAnnualController extends Controller
     public function store(StoreCourseAnnualRequest $request)
     {
 
+        dd($request->all());
         $data = $request->all();
         $this->courseAnnuals->create($data);
         
@@ -899,7 +900,7 @@ class CourseAnnualController extends Controller
                 if($group->group != null) {
                     $element = [
                         'id' => 'department_'.$deptId.'_'.$group->group,
-                        'text' => (($degreeId == 1)?'I':'T').'_'.$gradeId.$group->group,
+                        'text' => (($degreeId == 1)?'I ':'T ').$gradeId.'_'.$group->group,
                         'li_attr' => [
                             'class' => 'student_group'
                         ],
