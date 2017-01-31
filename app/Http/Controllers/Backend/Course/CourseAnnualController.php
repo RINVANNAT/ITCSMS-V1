@@ -914,6 +914,7 @@ class CourseAnnualController extends Controller
 
                 if($group->group != null) {
                     dd($group);
+
                     $element = [
                         'id' => 'department_'.$deptId.'_'.$group->group,
                         'text' => (($degreeId == 1)?'I':'T ').$gradeId.'_'.$group->group,
