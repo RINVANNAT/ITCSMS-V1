@@ -888,8 +888,8 @@ class CourseAnnualController extends Controller
         $groups = $groups->get();
 
         usort($groups, function($a, $b) {
-//            return $a->group - $b->group;
-            return strcmp($a->group, $b->group);
+            return $a->group - $b->group;
+//            return strcmp($a->group, $b->group);
         });
 
         dd($groups);
