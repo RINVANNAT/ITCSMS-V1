@@ -237,8 +237,25 @@ class CourseAnnualController extends Controller
     public function store(StoreCourseAnnualRequest $request)
     {
 
-        dd(json_decode($request->group_selected));
+
+        $groups = json_decode($request->group_selected);
+
+        if(count($groups)>0) {
+            foreach($groups as $group) {
+                $split = explode('_', $group);
+                if(count($split)>2) {
+
+                    dd($split);
+
+                    $input = [
+                        'group' => ''
+                    ];
+
+                }
+            }
+        }
         $data = $request->all();
+
         $this->courseAnnuals->create($data);
         
         return redirect()->route('admin.course.course_annual.index')->withFlashSuccess(trans('alerts.backend.general.created'));
@@ -912,6 +929,8 @@ class CourseAnnualController extends Controller
             }
 
         }
+
+        dd($arrayGroup);
         return Response::json($arrayGroup);
     }
 
