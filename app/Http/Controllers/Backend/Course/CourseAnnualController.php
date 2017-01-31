@@ -890,9 +890,7 @@ class CourseAnnualController extends Controller
 
         usort($groups, function($a, $b) {
             return $a->group - $b->group;
-//            return strcmp($a->group, $b->group);
         });
-
 
         if(count($groups) > 0) {
             foreach($groups as $group) {
@@ -900,7 +898,7 @@ class CourseAnnualController extends Controller
                 if($group->group != null) {
                     $element = [
                         'id' => 'department_'.$deptId.'_'.$group->group,
-                        'text' => (($degreeId == 1)?'I ':'T ').$gradeId.'_'.$group->group,
+                        'text' => (($degreeId == 1)?'I':'T ').$gradeId.'_'.$group->group,
                         'li_attr' => [
                             'class' => 'student_group'
                         ],

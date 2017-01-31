@@ -14,7 +14,7 @@
 @stop
 
 @section('content')
-    {!! Form::open(['route' => 'admin.course.course_annual.store', 'class' => 'form-horizontal', 'role' => 'form', 'method' => 'post', 'id' => 'create-role']) !!}
+    {!! Form::open(['route' => 'admin.course.course_annual.store', 'class' => 'form-horizontal create_course_annual', 'role' => 'form', 'method' => 'post', 'id' => 'create-role']) !!}
 
         <div class="box box-success">
             <div class="box-header with-border">
@@ -25,7 +25,7 @@
                 @include('backend.course.courseAnnual.fields')
 
                 <div class="form-group">
-                    {!! Form::label('student_group', "Student Group", ['class' => 'col-lg-2 control-label required']) !!}
+                    {!! Form::label('student_group', "Student Group", ['class' => 'col-lg-2 control-label required label_student_group']) !!}
                     <div class="col-lg-2">
                         <div id="jstree_group">
 
@@ -46,8 +46,8 @@
                 </div>
 
                 <div class="pull-right">
-                    <input type="submit" class="btn btn-success btn-xs" value="{{ trans('buttons.general.crud.create') }}" />
-                    <button class="btn btn-xs btn-success" id="btn_generate_group">Generate Group</button>
+                    <input type="submit" id="submit_form" class="btn btn-success btn-xs" value="{{ trans('buttons.general.crud.create') }}" />
+                    <button class="btn btn-xs btn-success" id="btn_generate_group">Get Group</button>
                 </div>
                 <div class="clearfix"></div>
             </div><!-- /.box-body -->
@@ -70,6 +70,28 @@
 
 
         $(document).ready(function() {
+            $('.label_student_group').hide();
+            $('#jstree_group').hide();
+
+
+            $('form.create_course_annual').on('submit', function(e) {
+                e.preventDefault();
+                var form_url = $(this).attr('action');
+                var baseData = {
+                    group_selected: ($('#jstree_group').is(':visible'))?JSON.stringify($('#jstree_group').jstree("get_selected")):''
+                };
+
+                $.ajax({
+                    type: 'POST',
+                    url: form_url+'?'+$('form.create_course_annual').serialize(),
+                    data: baseData,
+                    dataType: 'JSON',
+                    success: function(resultData) {
+                        console.log(resultData);
+
+                    }
+                });
+            })
 
             $('#other_dept').on('click', function(e) {
                 e.preventDefault();
@@ -105,9 +127,10 @@
                 });
             })
 
-
             $('#btn_generate_group').on('click', function (e) {
                 e.preventDefault();
+                $('#jstree_group').show();
+                $('.label_student_group').show();
 
                 var url_lv1 = '', url_lv2 = '';
                 var iconUrl1 = "{{url('plugins/jstree/img/department.png')}}";
@@ -120,6 +143,7 @@
                     grade_id: $('select[name=grade_id]').val(),
                     department_option_id: ($('select[name=department_option_id]').is(':visible'))?$('select[name=department_option_id]').val():''
                 };
+
 //                console.log(baseData);
                 initree_group($('#jstree_group'), '{{route('admin.course.get_department')}}', '{{route('course_annual.student_group')}}', iconUrl1, iconUrl2, baseData);
             });
