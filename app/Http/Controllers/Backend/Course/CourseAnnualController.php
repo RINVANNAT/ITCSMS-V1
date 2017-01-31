@@ -894,7 +894,7 @@ class CourseAnnualController extends Controller
                 if($group->group != null) {
                     $element = [
                         'id' => 'department_'.$deptId.'_'.$group->group,
-                        'text' => $group,
+                        'text' => $group->group,
                         'li_attr' => [
                             'class' => 'student_group'
                         ],
@@ -908,7 +908,6 @@ class CourseAnnualController extends Controller
             }
 
         }
-        dd($arrayGroup);
         return Response::json($arrayGroup);
     }
 
