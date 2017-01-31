@@ -69,17 +69,23 @@
                     <tr>
                         <td>4</td>
                         <td>Time Course</td>
-                        <td><input type="text" name="time_course" class="form-control number_only inputs_val" value="{{$course->time_course}}"></td>
+                        <td>
+                            {!! Form::text('time_course', ($course->time_course != null)?$course->time_course:0, ['class' => 'form-control number_only inputs_val','required'=>'required']) !!}
+                        </td>
                     </tr>
                     <tr>
                         <td>5</td>
                         <td>Time TD</td>
-                        <td><input type="text" name="time_td" class="form-control number_only inputs_val" value="{{$course->time_td}}"></td>
+                        <td>
+                            {!! Form::text('time_td', ($course->time_td != null)?$course->time_td:0, ['class' => 'form-control number_only inputs_val','required'=>'required']) !!}
+                        </td>
                     </tr>
                     <tr>
                         <td>6</td>
                         <td>Time TP</td>
-                        <td><input type="text" name="time_tp" class="form-control number_only inputs_val" value="{{$course->time_tp}}"></td>
+                        <td>
+                            {!! Form::text('time_tp', ($course->time_tp != null)?$course->time_tp:0, ['class' => 'form-control number_only inputs_val','required'=>'required']) !!}
+                        </td>
                     </tr>
 
                     <tr>
@@ -108,7 +114,7 @@
                         <td> Group </td>
 
                         <td>
-                            {!! Form::select('group',$allGroups,$course->group, array('class'=>'form-control','id'=>'group')) !!}
+                            {!! Form::select('group',$allGroups,$course->group, array('class'=>'form-control','id'=>'group', 'placeholder' => 'Group')) !!}
                         </td>
                     </tr>
                     </tbody>

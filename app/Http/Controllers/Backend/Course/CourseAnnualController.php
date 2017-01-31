@@ -38,6 +38,7 @@ use App\Models\Semester;
 use Response;
 use InfyOm\Generator\Utils\ResponseUtil;
 use Illuminate\Support\Facades\Auth;
+use App\Models\Enum\SemesterEnum;
 
 
 
@@ -554,12 +555,13 @@ class CourseAnnualController extends Controller
         return $arrayCourses;
     }
 
-    private function getNotSelectedCourseByDept($deptId, $academicYearId, $grade_id, $degree_id, $dept_option_id) {
+    private function getNotSelectedCourseByDept($deptId, $academicYearId, $grade_id, $degree_id, $dept_option_id, $semester_id) {
 
         $courseAnnuals = $this->getCourseAnnually();
 
         $courseAnnuals = $courseAnnuals->where('course_annuals.employee_id', '=', null);// this to get not assigned courses
 
+//        dd($courseAnnuals->get());
         if($deptId) {
             $courseAnnuals = $courseAnnuals->where('departments.id', '=',$deptId);
         }
@@ -579,6 +581,9 @@ class CourseAnnualController extends Controller
         if($dept_option_id != 'null') {
             $courseAnnuals = $courseAnnuals->where('course_annuals.department_option_id', '=',$dept_option_id);
         }
+        if($semester_id) {
+            $courseAnnuals = $courseAnnuals->where('course_annuals.semester_id', '=',$semester_id);
+        }
         $courseAnnuals = $courseAnnuals->get();
 
 
@@ -589,11 +594,10 @@ class CourseAnnualController extends Controller
     private function getAllteacherByDeptId ($deptID) {
 
         $allTeachers = DB::table('employees')
-            ->join('departments', 'departments.id', '=', 'employees.department_id')
-            ->select('employees.name_kh as teacher_name', 'employees.id as teacher_id', 'departments.id as department_id')
-            ->where('departments.id', $deptID)
+            ->select('employees.name_kh as teacher_name', 'employees.id as teacher_id', 'employees.department_id as department_id')
+            ->where('employees.department_id', $deptID)
             ->orderBy('teacher_name')
-            ->distinct('BINARY employees.name_latin')
+            ->distinct('BINARY employees.name_kh')
             ->get();
 
         return $allTeachers;
@@ -665,11 +669,12 @@ class CourseAnnualController extends Controller
         $academic_year_id = $request->academic_year_id;
         $grade_id = $request->grade_id;
         $degree_id = $request->degree_id;
+        $semesters = Semester::get();
 
         $allTeachers = $this->getAllteacherByDeptId($department_id);
+        $courseByTeacher = $this->courseAnnualFromDB($academic_year_id, $grade_id, $degree_id);
 
             foreach ($allTeachers as $teacher) {
-                $courseByTeacher = $this->courseAnnualFromDB($academic_year_id, $grade_id, $degree_id);
                 $selectedCourses = isset($courseByTeacher[$teacher->teacher_id])?$courseByTeacher[$teacher->teacher_id]:null;
 
                 $totalCoursePerSemester=[];
@@ -679,13 +684,13 @@ class CourseAnnualController extends Controller
                 $timeTdS2 =0;
                 $timeCourseS1 =0;
                 $timeCourseS2 =0;
+
                 if($selectedCourses !=null) {
                     foreach($selectedCourses as $course) {
 
-                        $totalCoursePerSemester[$course->semester_id]=$course->time_tp + $course->time_td + $course->time_course;
+                        $totalCoursePerSemester[$course->semester_id][]=$course->time_tp + $course->time_td + $course->time_course;
 
-                        if($course->semester_id == 1) {
-
+                        if($course->semester_id == SemesterEnum::SEMESTER_ONE) {
 
                             $timeTpS1 = $timeTpS1 +  $course->time_tp;
                             $timeTdS1 =$timeTdS1 + $course->time_td;
@@ -698,13 +703,31 @@ class CourseAnnualController extends Controller
                         }
 
                     }
+//                    dd($totalCoursePerSemester);
                 }
 
+
+
                 if($teacher->department_id == $department_id) {
+                    $t_HourS1 = 0;
+                    $t_HourS2 = 0;
+
+
+                    if(isset($totalCoursePerSemester[SemesterEnum::SEMESTER_ONE])) {
+                        foreach($totalCoursePerSemester[SemesterEnum::SEMESTER_ONE] as $S1_total) {
+                            $t_HourS1 = $t_HourS1 + $S1_total;
+                        }
+                    }
+                    if(isset($totalCoursePerSemester[SemesterEnum::SEMESTER_TWO])) {
+                        foreach($totalCoursePerSemester[SemesterEnum::SEMESTER_TWO] as $S2_toal) {
+                            $t_HourS2 = $t_HourS2 + $S2_toal;
+                        }
+                    }
+
 
                     $element = array(
                         "id"        => 'department_'.$department_id.'_teacher_' . $teacher->teacher_id,
-                        "text"      => $teacher->teacher_name.' (S1 = '.(isset($totalCoursePerSemester[1]) ? $totalCoursePerSemester[1] : 0). ' | S2 = '.(isset($totalCoursePerSemester[2]) ? $totalCoursePerSemester[2] : 0).')',
+                        "text"      => $teacher->teacher_name.' (S1 = '.$t_HourS1. ' | S2 = '.$t_HourS2.')',
                         "children"  => true,
                         "type"      => "teacher",
                         "state"     => ["opened" => true, "selected" => false ],
@@ -721,7 +744,7 @@ class CourseAnnualController extends Controller
                 } else {
                     $element = array(
                         "id" => 'department_'.$department_id.'_teacher_' . $teacher->teacher_id,
-                        "text" =>  $teacher->teacher_name.' (S1 = '.(isset($totalCoursePerSemester[1]) ? $totalCoursePerSemester[1] : 0). ' | S2 = '.(isset($totalCoursePerSemester[2]) ? $totalCoursePerSemester[2] : 0).')',
+                        "text" =>  $teacher->teacher_name.' (S1 = '.$t_HourS1. ' | S2 = '.$t_HourS2.')',
                         "children" => true,
                         "type" => "teacher",
                         "state" => ["opened" => false, "selected" => false ],
@@ -784,6 +807,7 @@ class CourseAnnualController extends Controller
     }
 
     public function getAllCourseByDepartment (Request $request) {
+
         //CourseAnnualAssignmentRequest
 
         $deptId = explode('_', $_GET['id'])[1];
@@ -793,8 +817,12 @@ class CourseAnnualController extends Controller
         $grade_id = $request->grade_id;
         $degree_id = $request->degree_id;
         $dept_option_id = $request->department_option_id;
+        $semester_id = $request->semester_id;
 
-        $notSelectedCourses = $this->getNotSelectedCourseByDept($deptId, $academic_year_id, $grade_id, $degree_id, $dept_option_id);
+//        dd($request->all());
+
+        $notSelectedCourses = $this->getNotSelectedCourseByDept($deptId, $academic_year_id, $grade_id, $degree_id, $dept_option_id, $semester_id);
+
 
         if($notSelectedCourses) {
 
@@ -860,7 +888,7 @@ class CourseAnnualController extends Controller
 
             foreach ($nodeID as $id) {
                 $explode = explode('_', $id);
-                if(count($explode) > 4) {
+                if(count($explode) > 4) {// the node id here will return the above node so we want to delete only the depest node (course) then the id of each course length must greater than 4
 //                    $deparment_id = $explode[1];
 //                    $teacher_id =  $explode[3];
                     $course_annual_id = $explode[5];
@@ -1199,6 +1227,7 @@ class CourseAnnualController extends Controller
     }
 
     public function getFormScoreByCourse(Request $request, $courseAnnualId) {
+
 
         $properties = $this->dataSendToView($courseAnnualId);
         $courseAnnual = $properties['course_annual'];

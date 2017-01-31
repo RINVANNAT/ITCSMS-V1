@@ -259,7 +259,7 @@
            }).on('open_node.jstree', function (e, data) {
                var folderId = data.node.original.id;
                var moduleId = data.node.original.moduleId;
-               console.log(folderId);
+
                initdiv(data.node);
            });
        }
@@ -329,7 +329,10 @@
                   notify('success', 'info', resultData.message); 
 
                   $('#annual_course').jstree("refresh");
-                  $('#annual_teacher').jstree("refresh");
+//                  $('#annual_teacher').jstree("refresh");
+
+                    $('#annual_teacher').jstree(true).redraw(true)
+//                    $('#annual_teacher').jstree(true).settings.core.data = new_data;
 
 
 
