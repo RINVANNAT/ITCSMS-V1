@@ -237,7 +237,7 @@ class CourseAnnualController extends Controller
     public function store(StoreCourseAnnualRequest $request)
     {
 
-        dd($request->all());
+        dd(json_decode($request->group_selected));
         $data = $request->all();
         $this->courseAnnuals->create($data);
         
