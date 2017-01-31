@@ -862,6 +862,49 @@ class CourseAnnualController extends Controller
 
     }
 
+    public function studentGroupByDept(Request $request) {
+
+        $arrayGroup = [];
+        $nodeId = explode('_', $_GET['id']);
+        $deptId = $nodeId[count($nodeId)-1];
+        $groups = $this->getStudentGroupFromDB();
+        $groups = $groups->where('studentAnnuals.department_id', '=',$deptId);
+        if($academicYearId = $request->academic_year_id) {
+            $groups = $groups->where('studentAnnuals.academic_year_id', '=',$academicYearId);
+        }
+//        if($semesterId = $request->semester_id) {
+//            $groups = $groups->where('studentAnnuals.semester_id', '=',$semesterId);
+//        }
+        if($gradeId = $request->grade_id) {
+            $groups = $groups->where('studentAnnuals.grade_id', '=',$gradeId);
+        }
+        if($degreeId = $request->degree_id) {
+            $groups = $groups->where('studentAnnuals.degree_id', '=',$degreeId);
+        }
+        if($deptOptionId = $request->department_option_id) {
+            $groups = $groups->where('studentAnnuals.degree_id', '=',$degreeId);
+        }
+        $groups = $groups->get();
+        if(count($groups) > 0) {
+            foreach($groups as $group) {
+                $element = [
+                    'id' => 'department_'.$deptId.'_'.$group,
+                    'text' => $group,
+                    'li_attr' => [
+                        'class' => 'student_group'
+                    ],
+                    "type" => "group",
+                    "state" => ["opened" => false, "selected" => false ]
+
+                ];
+
+                $arrayGroup[] = $element;
+            }
+
+        }
+        return Response::json($arrayGroup);
+    }
+
     public function courseAssignment (CourseAnnualAssignmentRequest $request) {
 
         $academicYear = AcademicYear::where('id', $request->academic_year_id)->first();
@@ -1006,7 +1049,8 @@ class CourseAnnualController extends Controller
         $course = $this->getCourseAnnualById($courseAnnualId);
         $allSemesters = Semester::get();
         $allGroups = StudentAnnual::where([
-            ['department_id', $deptId]
+            ['department_id', $deptId],
+            ['academic_year_id', $course->academic_year_id]
         ])
             ->groupBy('group')->orderBy('group', 'ASC')->lists('group', 'group');
 
@@ -1023,7 +1067,6 @@ class CourseAnnualController extends Controller
 //        dd($request->all());
 
         $preCourse = $this->getCourseAnnualById($courseId);
-//        dd($preCourse);
 
         $inputs = [
             'time_course'   => $request->time_course,

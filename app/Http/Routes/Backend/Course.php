@@ -45,6 +45,9 @@ Route::group([
 
 
     Route::get('course-annual/edit_course_annual', 'CourseAnnualController@formEditCourseAnnual')->name('admin.course.form_edit_course_annual');
+
+    Route::get('course-annual/get-student-group', 'CourseAnnualController@studentGroupByDept')->name('course_annual.student_group');
+
     Route::put('course-annual/{id}/edit_course_annual', 'CourseAnnualController@editCourseAnnual')->name('admin.course.edit_course_annual');
 
     Route::post('course-annual/add_course_annual', 'CourseAnnualController@douplicateCourseAnnual')->name('admin.course.add_course_annual');

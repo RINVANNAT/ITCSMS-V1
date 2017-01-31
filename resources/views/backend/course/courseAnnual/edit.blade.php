@@ -40,4 +40,43 @@
 
 @section('after-scripts-end')
     {!! Html::script('js/backend/course/courseAnnual/course_annual.js') !!}
+
+    <script>
+        $(document).ready(function() {
+
+            $('#other_dept').on('click', function(e) {
+                e.preventDefault();
+                $.ajax({
+                    type: 'GET',
+                    url: '{{route('course_annual.get_other_dept')}}',
+                    data: {department_id: 'request'},
+                    dataType: "html",
+                    success: function(resultData) {
+                        if($('select[name=other_department_id]').is(':visible')) {
+
+                            $(this).html(resultData);
+                        } else {
+                            $('.other_department').append(resultData);
+                        }
+
+                    }
+                });
+            })
+
+
+            $(document).on('change', 'select[name=other_department_id]', function() {
+                var route = '{{route('course_annual.get_other_lecturer')}}';
+
+                $.ajax({
+                    type: 'GET',
+                    url: route,
+                    data: {department_id: $(this).val()},
+                    dataType: "html",
+                    success: function(resultData) {
+                        $('#lecturer_lists').html(resultData);
+                    }
+                });
+            })
+        })
+    </script>
 @stop
