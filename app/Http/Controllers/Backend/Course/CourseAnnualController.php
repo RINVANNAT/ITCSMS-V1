@@ -908,6 +908,7 @@ class CourseAnnualController extends Controller
             }
 
         }
+        dd($arrayGroup);
         return Response::json($arrayGroup);
     }
 
