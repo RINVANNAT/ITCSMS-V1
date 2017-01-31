@@ -869,7 +869,7 @@ class CourseAnnualController extends Controller
         $deptId = $nodeId[count($nodeId)-1];
         $groups = $this->getStudentGroupFromDB();
         $groups = $groups->where('studentAnnuals.department_id', '=',$deptId);
-        dd($groups->get());
+
         if($academicYearId = $request->academic_year_id) {
             $groups = $groups->where('studentAnnuals.academic_year_id', '=',$academicYearId);
         }
