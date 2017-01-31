@@ -869,6 +869,7 @@ class CourseAnnualController extends Controller
         $deptId = $nodeId[count($nodeId)-1];
         $groups = $this->getStudentGroupFromDB();
         $groups = $groups->where('studentAnnuals.department_id', '=',$deptId);
+        dd($groups->get());
         if($academicYearId = $request->academic_year_id) {
             $groups = $groups->where('studentAnnuals.academic_year_id', '=',$academicYearId);
         }
@@ -885,20 +886,25 @@ class CourseAnnualController extends Controller
             $groups = $groups->where('studentAnnuals.degree_id', '=',$degreeId);
         }
         $groups = $groups->get();
+
+
         if(count($groups) > 0) {
             foreach($groups as $group) {
-                $element = [
-                    'id' => 'department_'.$deptId.'_'.$group,
-                    'text' => $group,
-                    'li_attr' => [
-                        'class' => 'student_group'
-                    ],
-                    "type" => "group",
-                    "state" => ["opened" => false, "selected" => false ]
 
-                ];
+                if($group->group != null) {
+                    $element = [
+                        'id' => 'department_'.$deptId.'_'.$group->group,
+                        'text' => $group,
+                        'li_attr' => [
+                            'class' => 'student_group'
+                        ],
+                        "type" => "group",
+                        "state" => ["opened" => false, "selected" => false ]
 
-                $arrayGroup[] = $element;
+                    ];
+
+                    $arrayGroup[] = $element;
+                }
             }
 
         }
