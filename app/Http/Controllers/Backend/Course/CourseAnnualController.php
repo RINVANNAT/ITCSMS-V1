@@ -911,9 +911,10 @@ class CourseAnnualController extends Controller
 
         if(count($groups) > 0) {
             foreach($groups as $group) {
-
+                echo($group);
+                dd($groups);
                 if($group->group != null) {
-                    dd($group);
+
 
                     $element = [
                         'id' => 'department_'.$deptId.'_'.$group->group,
