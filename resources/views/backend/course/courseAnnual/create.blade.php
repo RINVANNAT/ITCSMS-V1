@@ -25,7 +25,7 @@
                 @include('backend.course.courseAnnual.fields')
 
                 <div class="form-group">
-                    <div class="col-lg-10">
+                    <div class="col-lg-3 col-lg-offset-2">
                         <div id="jstree_group">
 
                         </div>

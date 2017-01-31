@@ -887,6 +887,13 @@ class CourseAnnualController extends Controller
         }
         $groups = $groups->get();
 
+        usort($groups, function($a, $b) {
+//            return $a->group - $b->group;
+            return strcmp($a->group, $b->group);
+        });
+
+        dd($groups);
+
 
         if(count($groups) > 0) {
             foreach($groups as $group) {
@@ -908,6 +915,9 @@ class CourseAnnualController extends Controller
             }
 
         }
+
+
+        dd($arrayGroup);
         return Response::json($arrayGroup);
     }
 
