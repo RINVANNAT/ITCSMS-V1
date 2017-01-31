@@ -238,22 +238,22 @@ class CourseAnnualController extends Controller
     {
 
 
-        $groups = json_decode($request->group_selected);
+//        $groups = json_decode($request->group_selected);
 
-        if(count($groups)>0) {
-            foreach($groups as $group) {
-                $split = explode('_', $group);
-                if(count($split)>2) {
-
-                    dd($split);
-
-                    $input = [
-                        'group' => ''
-                    ];
-
-                }
-            }
-        }
+//        if(count($groups)>0) {
+//            foreach($groups as $group) {
+//                $split = explode('_', $group);
+//                if(count($split)>2) {
+//
+//                    dd($split);
+//
+//                    $input = [
+//                        'group' => ''
+//                    ];
+//
+//                }
+//            }
+//        }
         $data = $request->all();
 
         $this->courseAnnuals->create($data);
@@ -515,8 +515,8 @@ class CourseAnnualController extends Controller
                 'course_annuals.name_en as course_name',
                 'course_annuals.id as course_annual_id',
                 'course_annuals.course_id as course_id',
-                'departments.code as department_id',
-                'degrees.code as degree_id',
+                'departments.id as department_id',
+                'degrees.id as degree_id',
                 'course_annuals.grade_id',
                 'course_annuals.id as course_annual_id',
                 'course_annuals.time_tp',
@@ -528,6 +528,7 @@ class CourseAnnualController extends Controller
                 'course_annuals.group',
                  'employees.id as employee_id',
                 'course_annuals.active',
+                'course_annuals.academic_year_id'
             ]);
 
         return $courseAnnuals;
@@ -1940,35 +1941,51 @@ class CourseAnnualController extends Controller
 
 //        dd($request->all());
 
+        $coursePrograms = $coursePrograms = DB::table('courses');
+
         $courseAnnuals = $this->getCourseAnnually();
 
         if($deptId) {
+            $coursePrograms = $coursePrograms->where('department_id', $deptId);
             $courseAnnuals = $courseAnnuals->where('departments.id', '=',$deptId);
         }
         if($academicYearID) {
             $courseAnnuals = $courseAnnuals->where('course_annuals.academic_year_id', '=',$academicYearID);
         }
         if($degreeId) {
+            $coursePrograms = $coursePrograms->where('degree_id', $degreeId);
             $courseAnnuals = $courseAnnuals->where('course_annuals.degree_id', '=',$degreeId);
         }
         if($gradeId) {
+            $coursePrograms = $coursePrograms->where('grade_id', $gradeId);
             $courseAnnuals = $courseAnnuals->where('course_annuals.grade_id', '=',$gradeId);
         }
         if($semesterId) {
+            $coursePrograms = $coursePrograms->where('semester_id', $semesterId);
             $courseAnnuals = $courseAnnuals->where('course_annuals.semester_id', '=',$semesterId);
         }
         if($deptOptionId) {
 //            dd($deptOptionId);
+            $coursePrograms = $coursePrograms->where('department_option_id', $deptOptionId);
             $courseAnnuals = $courseAnnuals->where('course_annuals.department_option_id', '=',$deptOptionId);
         }
 
+
+
 //        dd($courseAnnuals->select('course_annuals.course_id', DB::raw('count(*) as course_id'))->groupBy('course_id')->get());
 
+        $coursePrograms = $coursePrograms->get();
         $students = $this->getStudentByDeptIdGradeIdDegreeId($deptId, $degreeId, $gradeId, $academicYearID);
         $students = $students->get();
         $courseAnnuals = $courseAnnuals->orderBy('semester_id')->get();// note restricted order by semester this is very important to make dynamic table course of each year [if change there would have bugs]
 
-
+        $arrayCourseAnnual =[];
+        if(count($courseAnnuals) >0) {
+            foreach($courseAnnuals as $courseAnnual) {
+                $arrayCourseAnnual[$courseAnnual->course_id][]= $courseAnnual;
+            }
+        }
+//        dd($arrayCourseAnnual);
         $allProperties = $this->getCourseAnnualWithScore($courseAnnuals);
         $averages = $allProperties['averages'];
         $absences = $allProperties['absences'];
@@ -2004,20 +2021,21 @@ class CourseAnnualController extends Controller
             }
         }
 
-
-
         $creditInEachSemester =  [];
         $courseAnnualByCourseId =[];
-        if($courseAnnuals) {
+        $arrayCoursePrograms =[];
+        if($coursePrograms) {
 
-            foreach($courseAnnuals as $courseAnnual) {
+            foreach($coursePrograms as $courseProgram) {
 
-                $creditInEachSemester[$courseAnnual->semester_id][] = $courseAnnual->course_credit;
-                $nestedHeaders[0] = array_merge($nestedHeaders[0], [['label'=>'S'.$courseAnnual->semester_id.'_'.$courseAnnual->course_name, 'colspan'=>2]]);
-                $nestedHeaders[1] = array_merge($nestedHeaders[1], [['label'=>'Abs', 'colspan'=>1], ['label'=> $courseAnnual->course_credit, 'colspan'=>1]]);
+                $creditInEachSemester[$courseProgram->semester_id][] = $courseProgram->credit;
+                $nestedHeaders[0] = array_merge($nestedHeaders[0], [['label'=>'S'.$courseProgram->semester_id.'_'.$courseProgram->name_en, 'colspan'=>2]]);
+                $nestedHeaders[1] = array_merge($nestedHeaders[1], [['label'=>'Abs', 'colspan'=>1], ['label'=> $courseProgram->credit, 'colspan'=>1]]);
                 $colWidths[] = 55;
                 $colWidths[] = 50;
-                $courseAnnualByCourseId[$courseAnnual->course->name_fr] = $courseAnnual;
+                $arrayCoursePrograms[$courseProgram->id] =$courseProgram;
+
+//                $courseAnnualByCourseId[$courseProgram->name_fr] = $courseProgram;
             }
 
 //            foreach( $courseAnnualByCourseId as $key => $course) {
@@ -2029,8 +2047,6 @@ class CourseAnnualController extends Controller
 //                $colWidths[] = 50;
 //            }
         }
-
-
 
         if($semesterId) {
             $nestedHeaders[0] = array_merge($nestedHeaders[0], ['S'.$semesterId.'_Moyenne']);
@@ -2069,13 +2085,13 @@ class CourseAnnualController extends Controller
         $colWidths[] = 100;
         $colWidths[] = 100;
 
-//        dd($nestedHeaders);
-
         $index =0;
         $allCredit = 0;// the same as total credit
         $finalMoyennes =0;
         $allMoyenneScoreOfStudentBySemester=[];
         $allMoyenneYearly=[];
+
+
 
         if($students) {
 
@@ -2095,20 +2111,20 @@ class CourseAnnualController extends Controller
                     $totalAbs = 0;
                     $element = $element +['S_'.$semesterId => 0];
 
+
                     if($courseAnnuals) {
-//                        dd($courseAnnuals);
+
                         foreach($courseAnnuals as $courseAnnual) {
+
                             $count++;
+
                             $totalCredit = $totalCredit +$courseAnnual->course_credit;
 
-//                            $scoreBycourse = $this->getScoreEachCourse($courseAnnual->course_annual_id, $student->student_annual_id);
                             $scoreBycourse = isset($averages[$courseAnnual->course_annual_id][$student->student_annual_id])?$averages[$courseAnnual->course_annual_id][$student->student_annual_id]->average:0;
-//                            $numAbs = $this->getAbsenceFromDB($courseAnnual->course_annual_id, $student->student_annual_id);
+
                             $numAbs = isset($absences[$courseAnnual->course_annual_id][$student->student_annual_id])?$absences[$courseAnnual->course_annual_id][$student->student_annual_id]->num_absence:0;
 
                             $moyenne = $moyenne + ($scoreBycourse * $courseAnnual->course_credit);
-
-//                            $totalAbs = $totalAbs + (($numAbs)?$numAbs->num_absence:0);
 
                             $totalAbs = $totalAbs + $numAbs;
 
@@ -2133,9 +2149,9 @@ class CourseAnnualController extends Controller
 
                 } else {
 
-                    // if the user did not select the semester .....so that mean we need to score for all semesters
 
-//                    dd($courseAnnuals);
+
+                    // if the user did not select the semester .....so that mean we need to score for all semesters
                     $semesters = Semester::orderBy('id')->get();
                     if($semesters) {
 
@@ -2148,21 +2164,92 @@ class CourseAnnualController extends Controller
 
                         foreach($semesters as $semester) {
 
-                            if($courseAnnuals) {
+
+                            if(count($coursePrograms) > 0) {
+                                foreach($coursePrograms as $courseProgram) {
+
+                                    if(isset($arrayCourseAnnual[$courseProgram->id])) {
+                                        $annualCourses  = $arrayCourseAnnual[$courseProgram->id];
+                                        if(count($annualCourses) > 1) {
+
+                                            // there are many course annuals which are a division of the course program, so we need to compare each student. if the student are not the same so that mean they in diffrent group. and if they are the same student to learn the course that mean they only different course type
+                                            $areTheSameStudents = $this->areCommonStudents($annualCourses);
+
+                                            $count=0;
+                                            $creditBySemester = 0;
+                                            $absBySemester = 0;
+
+                                            $studentAnnualFromDB = $this->studentAnnualFromDB();
+                                            $arrayStudentByCourseAnnual=[];
+
+                                            foreach($annualCourses as $course) {
+                                                if($length = count($arrayStudentByCourseAnnual) > 0) {
+                                                    $studentAnnualByCourse = $studentAnnualFromDB[$course->department_id][$course->degree_id][$course->grade_id][$course->academic_year_id][$course->group];
+
+                                                    for($index=0; $index < $length; $index++) {
+                                                        $containsSearch = count(array_intersect($arrayStudentByCourseAnnual[$index], $studentAnnualByCourse));
+                                                        if($containsSearch == $length) {
+
+                                                            dd('lsjdfljsdlf');
+
+                                                        } else {
+
+                                                        }
+                                                    }
+                                                    $arrayStudentByCourseAnnual[] = $studentAnnualByCourse;
+
+                                                } else {
+                                                    $arrayStudentByCourseAnnual[] = $studentAnnualFromDB[$course->department_id][$course->degree_id][$course->grade_id][$course->academic_year_id][$course->group];
+                                                }
+
+                                            }
+
+
+
+                                        } else {
+                                            // course annual and course program are the same
+
+
+                                        }
+
+
+                                    }
+
+                                }
+                            }
+
+
+                            if(count($courseAnnuals) > 0) {
                                 $count=0;
                                 $creditBySemester = 0;
                                 $absBySemester = 0;
-
                                 foreach($courseAnnuals as $courseAnnual) {
                                     $count++;
+
+//                                    if(isset($arrayCoursePrograms[$courseAnnual->course_id])) {
+//                                        if(count($arrayCoursePrograms[$courseAnnual->course_id]) > 0 ) {
+//
+//                                            $courseProgram = $arrayCoursePrograms[$courseAnnual->course_id];
+////                                            $this->areCommonStudents($courseProgram, $courseAnnual);
+//
+//
+//                                        } else {
+//
+//                                        }
+//                                    }
+
                                     if($semester->id == $courseAnnual->semester_id) {
+
                                         $allCredit = $allCredit+ $courseAnnual->course_credit;
+
                                         $creditBySemester = $creditBySemester + $courseAnnual->course_credit;
-//                                        $scoreBycourse = $this->getScoreEachCourse($courseAnnual->course_annual_id, $student->student_annual_id);
+
                                         $scoreBycourse = isset($averages[$courseAnnual->course_annual_id][$student->student_annual_id])?$averages[$courseAnnual->course_annual_id][$student->student_annual_id]->average:0;
-//                                        $numAbs = $this->getAbsenceFromDB($courseAnnual->course_annual_id, $student->student_annual_id);
+
                                         $numAbs = isset($absences[$courseAnnual->course_annual_id][$student->student_annual_id])?$absences[$courseAnnual->course_annual_id][$student->student_annual_id]->num_absence:0;
+
                                         $absBySemester = $absBySemester + $numAbs;
+
                                         $moyenne = $moyenne + ($scoreBycourse * $courseAnnual->course_credit);
 
                                         $element = $element + ['Abs'.'_'.$courseAnnual->course_name.'_'.$count => $numAbs, 'Credit'.'_'.$courseAnnual->course_name.'_'.$count => $scoreBycourse];
@@ -2170,7 +2257,6 @@ class CourseAnnualController extends Controller
                                 }
 
                                 // --- here we add value to column moyenne by semester and assign value for each absence of the semester
-
 
                                 $allMoyenneScoreOfStudentBySemester[$semester->id][] = number_format((float)($moyenne/(($creditBySemester > 0)?$creditBySemester:1)), 2, '.', '');// push all moyenne of all student by semester id
                                 $element['S_'.$semester->id]= $absBySemester;
@@ -2312,6 +2398,37 @@ class CourseAnnualController extends Controller
             'colWidths' => $colWidths
         ]);
 
+    }
+
+    private function areCommonStudents($arrayCourseAnnual) {
+
+        $students = $this->studentAnnualFromDB();
+        $arrayStudentByCourseAnnual=[];
+        foreach($arrayCourseAnnual as $course) {
+
+            $arrayStudentByCourseAnnual[$course->course_annual_id] = $students[$course->department_id][$course->degree_id][$course->grade_id][$course->academic_year_id][$course->group];
+
+        }
+
+
+        dd($arrayStudentByCourseAnnual);
+
+//        $containsSearch = count(array_intersect($studentBycourseAnnual, $studentBycoursePrograms));// this function will return the amount of element in first array that are searched in the second array
+
+
+    }
+
+
+    private function studentAnnualFromDB() {
+
+        $arrayStudentAnnual=[];
+        $students = DB::table('studentAnnuals')->get();
+
+        foreach($students as $student) {
+            $arrayStudentAnnual[$student->department_id][$student->degree_id][$student->grade_id][$student->academic_year_id][$student->group][]= $student->id;
+        }
+
+        return ($arrayStudentAnnual);
     }
 
     private function getCourseAnnualWithScore($courseAnnually) {// ---$courseAnnually---collections of all courses by dept, grade, semester ...
