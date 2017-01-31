@@ -911,7 +911,7 @@ class CourseAnnualController extends Controller
 
         if(count($groups) > 0) {
             foreach($groups as $group) {
-                echo($group);
+                echo($group->group);
                 dd($groups);
                 if($group->group != null) {
 
