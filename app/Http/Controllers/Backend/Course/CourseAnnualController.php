@@ -892,8 +892,6 @@ class CourseAnnualController extends Controller
 //            return strcmp($a->group, $b->group);
         });
 
-        dd($groups);
-
 
         if(count($groups) > 0) {
             foreach($groups as $group) {
@@ -901,7 +899,7 @@ class CourseAnnualController extends Controller
                 if($group->group != null) {
                     $element = [
                         'id' => 'department_'.$deptId.'_'.$group->group,
-                        'text' => $group->group,
+                        'text' => (($degreeId == 1)?'I':'T').'_'.$gradeId.$group->group,
                         'li_attr' => [
                             'class' => 'student_group'
                         ],
@@ -915,9 +913,6 @@ class CourseAnnualController extends Controller
             }
 
         }
-
-
-        dd($arrayGroup);
         return Response::json($arrayGroup);
     }
 
