@@ -542,14 +542,28 @@
 
         function filter_table () {
 
-            var BaseData = {
-                dept_id: $('#filter_dept :selected').val(),
-                degree_id: $('#filter_degree :selected').val(),
-                grade_id: $('#filter_grade :selected').val(),
-                academic_year_id: $('#filter_academic_year :selected').val(),
-                semester_id:$('#filter_semester :selected').val(),
-                dept_option_id: $('#filter_dept_option :selected').val()
-            }
+
+
+            @if($department_id != null)
+
+                var BaseData = {
+                        dept_id: '{{$department_id}}',
+                        degree_id: $('#filter_degree :selected').val(),
+                        grade_id: $('#filter_grade :selected').val(),
+                        academic_year_id: $('#filter_academic_year :selected').val(),
+                        semester_id:$('#filter_semester :selected').val(),
+                        dept_option_id: $('#filter_dept_option :selected').val()
+                }
+            @else
+                var BaseData = {
+                    dept_id: $('#filter_dept :selected').val(),
+                    degree_id: $('#filter_degree :selected').val(),
+                    grade_id: $('#filter_grade :selected').val(),
+                    academic_year_id: $('#filter_academic_year :selected').val(),
+                    semester_id:$('#filter_semester :selected').val(),
+                    dept_option_id: $('#filter_dept_option :selected').val()
+                }
+            @endif
             $.ajax({
                 type: 'GET',
                 url: '{{route('admin.course.filter_course_annual_scores')}}',

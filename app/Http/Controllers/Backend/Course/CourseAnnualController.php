@@ -1916,18 +1916,14 @@ class CourseAnnualController extends Controller
         $grades = Grade::lists('name_en','id')->toArray();
         $semesters = Semester::orderBy('id')->lists('name_en', 'id')->toArray();
 
+
+
         return view('backend.course.courseAnnual.includes.form_all_score_courses_annual', compact('department',
             'degree', 'grade', 'academicYear', 'semesters', 'semesterId', 'courseAnnuals',
-            'departments', 'academicYears', 'degrees', 'grades', 'deptOptions', 'deptOptionId'
+            'departments', 'academicYears', 'degrees', 'grades', 'deptOptions', 'deptOptionId', 'department_id'
             ));
 
     }
-
-
-    private function getCourseProgram($deptId, $degreeId, $gradeId, $semesterId) {
-
-    }
-
 
     public function allHandsontableData(Request $request) {
 
@@ -1941,6 +1937,8 @@ class CourseAnnualController extends Controller
         $arraySemester = [];
         $ranks=[];
         $finalCredit=0;
+
+//        dd($request->all());
 
         $courseAnnuals = $this->getCourseAnnually();
 
@@ -1969,7 +1967,7 @@ class CourseAnnualController extends Controller
         $students = $this->getStudentByDeptIdGradeIdDegreeId($deptId, $degreeId, $gradeId, $academicYearID);
         $students = $students->get();
         $courseAnnuals = $courseAnnuals->orderBy('semester_id')->get();// note restricted order by semester this is very important to make dynamic table course of each year [if change there would have bugs]
-        dd($courseAnnuals->groupBy('course_id')->toArray());
+
 
         $allProperties = $this->getCourseAnnualWithScore($courseAnnuals);
         $averages = $allProperties['averages'];
@@ -2073,7 +2071,6 @@ class CourseAnnualController extends Controller
 
 //        dd($nestedHeaders);
 
-
         $index =0;
         $allCredit = 0;// the same as total credit
         $finalMoyennes =0;
@@ -2117,13 +2114,12 @@ class CourseAnnualController extends Controller
 
                             $element = $element + ['Abs'.'_'.$courseAnnual->course_name.'_'.$count =>  $numAbs, 'Credit'.'_'.$courseAnnual->course_name.'_'.$count => $scoreBycourse];
                         }
-                        $element = $element +['S'.$semesterId.'_Moyenne'=> number_format((float)($moyenne/$totalCredit), 2, '.', '')];
+                        $element = $element +['S'.$semesterId.'_Moyenne'=> number_format((float)($moyenne/(($totalCredit > 0)?$totalCredit:1)), 2, '.', '')];
 
-                        $allMoyenneScoreOfStudentBySemester[$semesterId][] = number_format((float)($moyenne/$totalCredit), 2, '.', '');// to get all moyenne of all student then to find max min and average
+                        $allMoyenneScoreOfStudentBySemester[$semesterId][] = number_format((float)($moyenne/(($totalCredit > 0)?$totalCredit:1)), 2, '.', '');// to get all moyenne of all student then to find max min and average
 
 
                     }
-
 
                     $element['total']= $totalAbs; // assign value for the total absence
                     $element['S_'.$semesterId]= $totalAbs;// assigne value to the s_1
@@ -2149,7 +2145,6 @@ class CourseAnnualController extends Controller
                         // here we have to add all the semesters value  .... before every course
                         $totalAbseneces = 0;
                         $finalMoyennes =0;
-
 
                         foreach($semesters as $semester) {
 
@@ -2203,7 +2198,6 @@ class CourseAnnualController extends Controller
                 $element = $element +['Rattrapage'=>' '];
                 $element = $element +['Passage'=>' '];
                 $element = $element +[' '=>' '];
-
                 $arrayData[] = $element;
             }
 
@@ -2322,31 +2316,36 @@ class CourseAnnualController extends Controller
 
     private function getCourseAnnualWithScore($courseAnnually) {// ---$courseAnnually---collections of all courses by dept, grade, semester ...
 
-        $arrayAverageObject=[];
-        $arrayAbsenceObject=[];
-        $arrayScoreOneCourseWithAllStudents = [];
-
-        foreach($courseAnnually as $courseAnnual) {
-            $averageProperties = DB::table('averages')->where('course_annual_id', $courseAnnual->course_annual_id)->orderBy('student_annual_id')->get();
-
-            if($averageProperties) {
-                foreach($averageProperties as $property) {
-                    $arrayAverageObject[$courseAnnual->course_annual_id][$property->student_annual_id] = $property;
-                    $arrayScoreOneCourseWithAllStudents[$courseAnnual->course_annual_id][] = $property->average;
-                }
-            }
-            $absenceProperties = DB::table('absences')->where('course_annual_id', $courseAnnual->course_annual_id)->get();
-
-            if($absenceProperties) {
-                foreach($absenceProperties as $absenceProperty) {
-                    $arrayAbsenceObject[$courseAnnual->course_annual_id][$absenceProperty->student_annual_id] = $absenceProperty;
-                }
-            }
+        $averageProps = $this->averagePropertiesFromDB();;
+        $averageScore =  $averageProps['average_score'];
+        $averageObject = $averageProps['average_object'];
+        $absences = $this->absencePropFromDB();
+        return ['averages'=>$averageObject,'absences'=>$absences, 'arrayCourseScore'=>$averageScore] ;
+    }
+    private function averagePropertiesFromDB() {
+        $arrayAverage = [];
+        $arrayScores=[];
+        $averageProperties = DB::table('averages')
+            ->select('average', 'course_annual_id', 'student_annual_id', 'description')
+            ->orderBy('student_annual_id')->get();
+        foreach($averageProperties as $average) {
+            $arrayAverage[$average->course_annual_id][$average->student_annual_id]= $average;
+            $arrayScores[$average->course_annual_id][] = $average->average;
         }
-//        dd($arrayScoreOneCourseWithAllStudents);
+        return [
+            'average_score' => $arrayScores,
+            'average_object'=> $arrayAverage
+        ];
+    }
+    private function absencePropFromDB() {
 
-        return ['averages'=>$arrayAverageObject,'absences'=>$arrayAbsenceObject, 'arrayCourseScore'=>$arrayScoreOneCourseWithAllStudents] ;
+        $arrayAbsence=[];
+        $absenceProperties = DB::table('absences')->get();
+        foreach($absenceProperties as $absence) {
+            $arrayAbsence[$absence->course_annual_id][$absence->student_annual_id]= $absence;
+        }
 
+        return $arrayAbsence;
     }
 
     public function switchCourseAnnual(Request $request) {
