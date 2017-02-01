@@ -85,7 +85,7 @@
 <div class="form-group">
     {!! Form::label('credit', 'Credit', ['class' => 'col-lg-2 control-label required']) !!}
     <div class="col-lg-7">
-        {{ Form::text('credit',  null, ['class' => 'form-control' , 'id'=> 'credit', 'required' => 'required']) }}
+        {{ Form::text('credit',  null, ['class' => 'form-control' , 'id'=> 'credit', 'required' => true]) }}
     </div>
 </div>
 

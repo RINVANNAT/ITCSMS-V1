@@ -75,6 +75,12 @@
 
 
             $('form.create_course_annual').on('submit', function(e) {
+
+                var x = document.form[".create_course_annual"]["credit"].value;
+                if (x == "") {
+                    notify('error', "Credit must be filled out");
+                    return false;
+                }
 //                e.preventDefault();
 //                var form_url = $(this).attr('action');
 //                var baseData = {

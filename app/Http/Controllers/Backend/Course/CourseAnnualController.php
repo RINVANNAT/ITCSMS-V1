@@ -1104,6 +1104,8 @@ class CourseAnnualController extends Controller
 
     public function douplicateCourseAnnual(CourseAnnualAssignmentRequest $request) {
 
+//        dd($request->all());
+
         $explode = explode('_',$request->dept_course_id);
         $courseAnnualId = $explode[3];
         $courseAnnual = $this->getCourseAnnualById($courseAnnualId);
@@ -1120,7 +1122,8 @@ class CourseAnnualController extends Controller
             'academic_year_id'      => $courseAnnual->academic_year_id,
             'department_id'         => $courseAnnual->department_id,
             'degree_id'             => $courseAnnual->degree_id,
-            'grade_id'              => $courseAnnual->grade_id
+            'grade_id'              => $courseAnnual->grade_id,
+            'credit'                => $courseAnnual->credit
 
         ];
 
