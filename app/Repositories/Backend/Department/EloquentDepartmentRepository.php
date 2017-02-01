@@ -71,8 +71,14 @@ class EloquentDepartmentRepository implements DepartmentRepositoryContract
         $department->name_kh = $input['name_kh'];
         $department->code = $input['code'];
         $department->description = $input['description'];
-        $department->parent_id = intval($input['parent_id']);
-        $department->school_id = intval($input['school_id']);
+
+        $parent_id = intval($input['parent_id']);
+        $school_id = intval($input['school_id']);
+        if($parent_id ==0)$parent_id = null;
+        if($school_id ==0)$school_id = null;
+
+        $department->parent_id = $parent_id;
+        $department->school_id = $school_id;
         $department->created_at = Carbon::now();
         $department->create_uid = auth()->id();
 
