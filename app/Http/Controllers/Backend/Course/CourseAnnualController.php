@@ -275,7 +275,7 @@ class CourseAnnualController extends Controller
     /**
      * Show the form for editing the specified resource.
      *
-     * @param EditCourseProgramRequest $request
+     * @param EditCourseAnnualRequest $request
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
@@ -315,7 +315,7 @@ class CourseAnnualController extends Controller
     /**
      * Update the specified resource in storage.
      *
-     * @param  UpdateCourseProgramRequest  $request
+     * @param  UpdateCourseAnnualRequest  $request
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
@@ -328,7 +328,7 @@ class CourseAnnualController extends Controller
     /**
      * Update the specified resource in storage.
      *
-     * @param  update_score_per  $request
+     * @param  Request  $request
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
