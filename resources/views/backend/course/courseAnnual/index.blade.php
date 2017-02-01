@@ -121,11 +121,11 @@
                 },
 
                 columns: [
-                    { data: 'name', name: 'name_en'},
-                    { data: 'semester_id', name: 'semester_id'},
-                    { data: 'academic_year_id', name: 'academic_year_id'},
+                    { data: 'name', name: 'course_annuals.name_en'},
+                    { data: 'semester_id', name: 'course_annuals.semester_id'},
+                    { data: 'academic_year_id', name: 'course_annuals.academic_year_id'},
                     { data: 'class', name: 'class',searchable:false},
-                    { data: 'employee_id', name: 'employee_id'},
+                    { data: 'employee_id', name: 'employee_id',searchable:false},
                     { data: 'action', name: 'action',orderable: false, searchable: false}
                 ]
             });

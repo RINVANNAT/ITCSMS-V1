@@ -120,7 +120,7 @@
                     }
                 },
                 columns: [
-                    { data: 'name_kh', name: 'name_kh'},
+                    { data: 'name_kh', name: 'name_en'},
                     { data: 'code', name: 'code'},
                     { data: 'class', name: 'class', searchable:false},
                     { data: 'semester', name: 'semesters.id'},
