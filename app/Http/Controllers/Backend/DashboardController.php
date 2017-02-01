@@ -8,6 +8,7 @@ use App\Models\Course;
 use App\Models\CourseAnnual;
 use App\Models\Employee;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 
 /**
  * Class DashboardController
