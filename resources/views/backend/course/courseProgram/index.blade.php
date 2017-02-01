@@ -38,18 +38,17 @@
                     <button class="btn btn-primary btn-sm"><i class="fa fa-plus-circle"></i> Add
                     </button>
                 </a>
-                <a href="{!! route('admin.course.course_program.request_import') !!}">
-                    <button class="btn btn-primary btn-sm"><i class="fa fa-plus-circle"></i> Import
-                    </button>
-                </a>
+                {{--<a href="{!! route('admin.course.course_program.request_import') !!}">--}}
+                    {{--<button class="btn btn-primary btn-sm"><i class="fa fa-plus-circle"></i> Import--}}
+                    {{--</button>--}}
+                {{--</a>--}}
 
-                <div class="btn-group">
-                    <button class="btn btn-default btn-sm"><i class="fa fa-trash-o"></i></button>
-                    <button class="btn btn-default btn-sm"><i class="fa fa-reply"></i></button>
-                    <button class="btn btn-default btn-sm"><i class="fa fa-share"></i></button>
-                </div>
-                <!-- /.btn-group -->
-                <button class="btn btn-default btn-sm"><i class="fa fa-refresh"></i></button>
+                {{--<div class="btn-group">--}}
+                    {{--<button class="btn btn-default btn-sm"><i class="fa fa-trash-o"></i></button>--}}
+                    {{--<button class="btn btn-default btn-sm"><i class="fa fa-reply"></i></button>--}}
+                    {{--<button class="btn btn-default btn-sm"><i class="fa fa-share"></i></button>--}}
+                {{--</div>--}}
+                {{--<button class="btn btn-default btn-sm"><i class="fa fa-refresh"></i></button>--}}
 
             </div>
 
@@ -123,7 +122,7 @@
                 columns: [
                     { data: 'name_kh', name: 'name_kh'},
                     { data: 'code', name: 'code'},
-                    { data: 'class', name: 'class'},
+                    { data: 'class', name: 'class', searchable:false},
                     { data: 'semester', name: 'semester'},
                     { data: 'time_course', name: 'time_course'},
                     { data: 'time_td', name: 'time_td'},

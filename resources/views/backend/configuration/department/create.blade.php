@@ -4,7 +4,7 @@
 
 @section('page-header')
     <h1>
-        {{ trans('labels.backend.departments.index_title') }}
+        {{ trans('labels.backend.departments.title') }}
         <small>{{ trans('labels.backend.departments.sub_create_title') }}</small>
     </h1>
 @endsection

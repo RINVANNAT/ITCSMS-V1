@@ -35,7 +35,6 @@
 
             <div class="pull-right">
                 <input type="submit" class="btn btn-success btn-xs" value="{{ trans('buttons.general.crud.create') }}" />
-                <input type="submit" class="btn btn-success btn-xs" value="{{ trans('buttons.general.crud.') }}" />
             </div>
             <div class="clearfix"></div>
         </div><!-- /.box-body -->
