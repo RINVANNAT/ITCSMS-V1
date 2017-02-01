@@ -123,7 +123,7 @@
                     { data: 'name_kh', name: 'name_kh'},
                     { data: 'code', name: 'code'},
                     { data: 'class', name: 'class', searchable:false},
-                    { data: 'semester', name: 'semester'},
+                    { data: 'semester', name: 'semester.id'},
                     { data: 'time_course', name: 'time_course'},
                     { data: 'time_td', name: 'time_td'},
                     { data: 'time_tp', name: 'time_tp'},
