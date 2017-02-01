@@ -121,7 +121,7 @@
                 },
 
                 columns: [
-                    { data: 'name', name: 'name'},
+                    { data: 'name', name: 'name_en'},
                     { data: 'semester_id', name: 'semester_id'},
                     { data: 'academic_year_id', name: 'academic_year_id'},
                     { data: 'class', name: 'class',searchable:false},
