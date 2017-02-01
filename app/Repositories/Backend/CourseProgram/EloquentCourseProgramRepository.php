@@ -90,6 +90,9 @@ class EloquentCourseProgramRepository implements CourseProgramRepositoryContract
         if ( array_key_exists("semester_id",$input)){
             $courseProgram->semester_id = $input["semester_id"];
         }
+        if ( array_key_exists("grade_id",$input)){
+            $courseProgram->grade_id = $input["grade_id"];
+        }
 
         $courseProgram->create_uid = auth()->id();
         $courseProgram->updated_at = Carbon::now();
@@ -146,6 +149,9 @@ class EloquentCourseProgramRepository implements CourseProgramRepositoryContract
         }
         if ( array_key_exists("semester_id",$input)){
             $courseProgram->semester_id = $input["semester_id"];
+        }
+        if ( array_key_exists("grade_id",$input)){
+            $courseProgram->grade_id = $input["grade_id"];
         }
 
         $courseProgram->updated_at = Carbon::now();

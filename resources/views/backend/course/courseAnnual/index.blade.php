@@ -324,7 +324,8 @@
                             grade_id: $('#filter_grade :selected').val(),
                             department_id:'{{$department_id}}',
                             semester_id:$('#filter_semester :selected').val(),
-                            dept_option_id: $('#filter_dept_option :selected').val()
+                            dept_option_id: $('#filter_dept_option :selected').val(),
+                            group_name: $('#filter_student_group :selected').val()
                         };
             @else
                 var baseData = {
@@ -333,7 +334,8 @@
                             grade_id: $('#filter_grade :selected').val(),
                             department_id:$('#filter_department :selected').val(),
                             semester_id:$('#filter_semester :selected').val(),
-                            dept_option_id: $('#filter_dept_option :selected').val()
+                            dept_option_id: $('#filter_dept_option :selected').val(),
+                            group_name: $('#filter_student_group :selected').val()
                         };
             @endif
             if(baseData.academic_year_id != null) {
@@ -346,7 +348,8 @@
                                             '&grade_id='+baseData.grade_id+
                                             '&department_id='+baseData.department_id+
                                             '&semester_id='+baseData.semester_id+
-                                            '&dept_option_id='+baseData.dept_option_id
+                                            '&dept_option_id='+baseData.dept_option_id+
+                                            '&group_name='+baseData.group_name
                             );
 
                         } else {

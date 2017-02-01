@@ -47,7 +47,7 @@
 
                 <div class="pull-right">
                     <input type="submit" id="submit_form" class="btn btn-success btn-xs" value="{{ trans('buttons.general.crud.create') }}" />
-                    <button class="btn btn-xs btn-success" id="btn_generate_group">Get Group</button>
+                    {{--<button class="btn btn-xs btn-success" id="btn_generate_group">Get Group</button>--}}
                 </div>
                 <div class="clearfix"></div>
             </div><!-- /.box-body -->
@@ -75,22 +75,22 @@
 
 
             $('form.create_course_annual').on('submit', function(e) {
-                e.preventDefault();
-                var form_url = $(this).attr('action');
-                var baseData = {
-                    group_selected: ($('#jstree_group').is(':visible'))?JSON.stringify($('#jstree_group').jstree("get_selected")):''
-                };
-
-                $.ajax({
-                    type: 'POST',
-                    url: form_url+'?'+$('form.create_course_annual').serialize(),
-                    data: baseData,
-                    dataType: 'JSON',
-                    success: function(resultData) {
-                        console.log(resultData);
-
-                    }
-                });
+//                e.preventDefault();
+//                var form_url = $(this).attr('action');
+//                var baseData = {
+//                    group_selected: ($('#jstree_group').is(':visible'))?JSON.stringify($('#jstree_group').jstree("get_selected")):''
+//                };
+//
+//                $.ajax({
+//                    type: 'POST',
+//                    url: form_url+'?'+$('form.create_course_annual').serialize(),
+//                    data: baseData,
+//                    dataType: 'JSON',
+//                    success: function(resultData) {
+//                        console.log(resultData);
+//
+//                    }
+//                });
             })
 
             $('#other_dept').on('click', function(e) {
@@ -129,8 +129,8 @@
 
             $('#btn_generate_group').on('click', function (e) {
                 e.preventDefault();
-                $('#jstree_group').show();
-                $('.label_student_group').show();
+//                $('#jstree_group').show();
+//                $('.label_student_group').show();
 
                 var url_lv1 = '', url_lv2 = '';
                 var iconUrl1 = "{{url('plugins/jstree/img/department.png')}}";

@@ -80,6 +80,7 @@ class CourseController extends Controller
         $degrees = Degree::lists('name_en','id')->toArray();
         $grades = Grade::lists('name_en','id')->toArray();
 
+
         return view('backend.course.courseProgram.index', compact(
             "degrees", "grades", "departments",
             "semesters", "academicYears", 'deptOptions',

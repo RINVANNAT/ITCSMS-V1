@@ -198,8 +198,6 @@
                    $('#annual_teacher').jstree(true).redraw(true);
 
                }
-
-
            }).bind('deselect_node.jstree', function(e, data) {
                var explode = data.node.id.split('_');
                if(explode.length == 4) {
@@ -329,9 +327,9 @@
                   notify('success', 'info', resultData.message); 
 
                   $('#annual_course').jstree("refresh");
-//                  $('#annual_teacher').jstree("refresh");
+                  $('#annual_teacher').jstree("refresh");
 
-                    $('#annual_teacher').jstree(true).redraw(true)
+//                    $('#annual_teacher').jstree(true).redraw(true)
 //                    $('#annual_teacher').jstree(true).settings.core.data = new_data;
 
 

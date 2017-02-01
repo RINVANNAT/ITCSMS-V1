@@ -80,6 +80,13 @@
     </div>
 </div>
 
+<div class="form-group">
+    {!! Form::label('credit', 'Credit', ['class' => 'col-lg-2 control-label required']) !!}
+    <div class="col-lg-7">
+        {{ Form::text('credit',  null, ['class' => 'form-control' , 'id'=> 'credit']) }}
+    </div>
+</div>
+
 @if(($deptOptions != null) && (count($deptOptions) > 0))
     <div class="form-group">
         {!! Form::label('department_option','Division', ['class' => 'col-lg-2 control-label required']) !!}

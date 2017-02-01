@@ -90,6 +90,14 @@
 
                     <tr>
                         <td>7</td>
+                        <td>Credit</td>
+                        <td>
+                            {!! Form::text('course_annual_credit', null, ['class' => 'form-control inputs_val','required'=>'required']) !!}
+                        </td>
+                    </tr>
+
+                    <tr>
+                        <td>7</td>
                         <td> Semester </td>
 
                         <td>
