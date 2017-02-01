@@ -65,14 +65,14 @@ class EloquentDepartmentRepository implements DepartmentRepositoryContract
         $count = Department::count();
 
         $department = new Department();
-        $department->id = $count+1;
+        $department->id = intval($count+1);
         $department->name_en = $input['name_en'];
         $department->name_fr = $input['name_fr'];
         $department->name_kh = $input['name_kh'];
         $department->code = $input['code'];
         $department->description = $input['description'];
-        $department->parent_id = $input['parent_id'];
-        $department->school_id = $input['school_id'];
+        $department->parent_id = intval($input['parent_id']);
+        $department->school_id = intval($input['school_id']);
         $department->created_at = Carbon::now();
         $department->create_uid = auth()->id();
 
