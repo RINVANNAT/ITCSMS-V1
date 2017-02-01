@@ -186,6 +186,9 @@
                 oTable.draw();
                 e.preventDefault();
             });
+
+            oTable.draw();
+
         });
 
         function hasDeptOption() {
