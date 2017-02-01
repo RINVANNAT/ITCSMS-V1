@@ -2,7 +2,10 @@
 <header class="main-header">
 
     <!-- Logo -->
-    <a href="{!! route('frontend.index') !!}" class="logo">{!! app_name() !!}</a>
+    <a href="{!! route('frontend.index') !!}" class="logo">
+        <span class="logo-mini">SMIS</span>
+        <span class="logo-lg">{!! app_name() !!}</span>
+    </a>
 
     <!-- Header Navbar -->
     <nav class="navbar navbar-static-top" role="navigation">

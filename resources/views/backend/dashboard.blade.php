@@ -1,7 +1,16 @@
 @extends('backend.layouts.master')
 
-@section('message')
+@section('after-styles-end')
+    <style>
+        .timeline-inverse>li>.timeline-item {
+            background: #f0f0f0 !important;
+            border: 1px solid #ddd !important;
+            -webkit-box-shadow: none;
+            box-shadow: none !important;
+        }
 
+
+    </style>
 @stop
 
 @section('page-header')
@@ -17,18 +26,16 @@
             <h3 class="box-title">{{ trans('strings.backend.dashboard.welcome') }} {!! access()->user()->name !!}!</h3>
             <div class="box-tools pull-right">
                 {{--<button class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i></button>--}}
-                <li class="dropdown">
-                    <a class="dropdown-toggle" data-toggle="dropdown" href="#" aria-expanded="false">
-                        Dropdown <span class="caret"></span>
-                    </a>
-                    <ul class="dropdown-menu">
-                        <li role="presentation"><a role="menuitem" tabindex="-1" href="#">Action</a></li>
-                        <li role="presentation"><a role="menuitem" tabindex="-1" href="#">Another action</a></li>
-                        <li role="presentation"><a role="menuitem" tabindex="-1" href="#">Something else here</a></li>
-                        <li role="presentation" class="divider"></li>
-                        <li role="presentation"><a role="menuitem" tabindex="-1" href="#">Separated link</a></li>
-                    </ul>
-                </li>
+                {{--<div class="btn-group">--}}
+                    {{--<button type="button" class="btn btn-primary btn-xs dropdown-toggle" data-toggle="dropdown" aria-expanded="false">--}}
+                        {{--Export data <span class="caret"></span>--}}
+                    {{--</button>--}}
+                    {{--<ul class="dropdown-menu" role="menu">--}}
+                        {{--<li><a href="#" id="export_student_list">Export current student list</a></li>--}}
+                        {{--<li><a href="#" id="export_student_list_custom">Export custom student list</a></li>--}}
+
+                    {{--</ul>--}}
+                {{--</div>--}}
             </div>
         </div>
         <div class="box-body">
@@ -45,88 +52,108 @@
                 </p>
             </div>
 
+            <?php
+                $teacher = false;
+                foreach($user->roles as $role){
+                    if($role->name == "Teacher"){
+                        $teacher = true;
+                        break;
+                    }
+                }
+            ?>
+
             <div class="row">
                 <div class="col-md-12">
                     <ul class="timeline timeline-inverse">
-                        
+
+                        @if($teacher)
+                            @include('backend.dashboard.teacher')
+                        @endif
+
                         <li>
-                            <i class="fa fa-envelope bg-blue"></i>
+                            <i class="fa fa-user bg-purple"></i>
 
                             <div class="timeline-item">
-                                <span class="time"><i class="fa fa-clock-o"></i> 12:05</span>
+                                {{--<span class="time"><i class="fa fa-clock-o"></i> 2 days ago</span>--}}
 
-                                <h3 class="timeline-header"><a href="#">Support Team</a> sent you an email</h3>
+                                <h3 class="timeline-header"><a href="#">User information</a> view/update your information</h3>
 
                                 <div class="timeline-body">
-                                    Etsy doostang zoodles disqus groupon greplin oooj voxy zoodles,
-                                    weebly ning heekya handango imeem plugg dopplr jibjab, movity
-                                    jajah plickers sifteo edmodo ifttt zimbra. Babblely odeo kaboodle
-                                    quora plaxo ideeli hulu weebly balihoo...
-                                </div>
-                                <div class="timeline-footer">
-                                    <a class="btn btn-primary btn-xs">Read more</a>
-                                    <a class="btn btn-danger btn-xs">Delete</a>
-                                </div>
-                            </div>
-                        </li>
-                        <!-- END timeline item -->
-                        <!-- timeline item -->
-                        <li>
-                            <i class="fa fa-user bg-aqua"></i>
+                                    <div class="panel panel-default">
+                                        <div class="panel-body">
+                                            <div role="tabpanel">
 
-                            <div class="timeline-item">
-                                <span class="time"><i class="fa fa-clock-o"></i> 5 mins ago</span>
+                                                <!-- Nav tabs -->
+                                                <ul class="nav nav-tabs" role="tablist">
+                                                    <li role="presentation" class="active">
+                                                        <a href="#profile" aria-controls="profile" role="tab" data-toggle="tab">{{ trans('navs.frontend.user.my_information') }}</a>
+                                                    </li>
+                                                </ul>
 
-                                <h3 class="timeline-header no-border"><a href="#">Sarah Young</a> accepted your friend request
-                                </h3>
-                            </div>
-                        </li>
-                        <!-- END timeline item -->
-                        <!-- timeline item -->
-                        <li>
-                            <i class="fa fa-comments bg-yellow"></i>
+                                                <div class="tab-content">
 
-                            <div class="timeline-item">
-                                <span class="time"><i class="fa fa-clock-o"></i> 27 mins ago</span>
+                                                    <div role="tabpanel" class="tab-pane active" id="profile">
+                                                        <table class="table table-striped table-hover table-bordered dashboard-table">
+                                                            <tr>
+                                                                <th>{{ trans('labels.frontend.user.profile.avatar') }}</th>
+                                                                <td><img src="{!! $user->picture !!}" class="user-profile-image" /></td>
+                                                            </tr>
+                                                            <tr>
+                                                                <th>{{ trans('labels.frontend.user.profile.name') }}</th>
+                                                                <td>{!! $user->name !!}</td>
+                                                            </tr>
+                                                            <tr>
+                                                                <th>{{ trans('labels.frontend.user.profile.email') }}</th>
+                                                                <td>{!! $user->email !!}</td>
+                                                            </tr>
+                                                            <tr>
+                                                                <th>{{ trans('labels.frontend.user.profile.created_at') }}</th>
+                                                                <td>{!! $user->created_at !!} ({!! $user->created_at->diffForHumans() !!})</td>
+                                                            </tr>
+                                                            <tr>
+                                                                <th>{{ trans('labels.frontend.user.profile.last_updated') }}</th>
+                                                                <td>{!! $user->updated_at !!} ({!! $user->updated_at->diffForHumans() !!})</td>
+                                                            </tr>
+                                                            <tr>
+                                                                <th>{{ trans('labels.general.actions') }}</th>
+                                                                <td>
+                                                                    <a href="{!! route('frontend.user.profile.edit') !!}" class="btn btn-primary btn-xs">{{ trans('labels.frontend.user.profile.edit_information') }}</a>
 
-                                <h3 class="timeline-header"><a href="#">Jay White</a> commented on your post</h3>
+                                                                    @if ($user->canChangePassword())
+                                                                        <a href="{!! route('auth.password.change') !!}" class="btn btn-warning btn-xs">{{ trans('navs.frontend.user.change_password') }}</a>
+                                                                    @endif
+                                                                </td>
+                                                            </tr>
+                                                        </table>
+                                                    </div><!--tab panel profile-->
 
-                                <div class="timeline-body">
-                                    Take me to your leader!
-                                    Switzerland is small and neutral!
-                                    We are more like Germany, ambitious and misunderstood!
-                                </div>
-                                <div class="timeline-footer">
-                                    <a class="btn btn-warning btn-flat btn-xs">View comment</a>
-                                </div>
-                            </div>
-                        </li>
-                        <!-- END timeline item -->
-                        <!-- timeline time label -->
-                        <li class="time-label">
-                        <span class="bg-green">
-                          3 Jan. 2014
-                        </span>
-                        </li>
-                        <!-- /.timeline-label -->
-                        <!-- timeline item -->
-                        <li>
-                            <i class="fa fa-camera bg-purple"></i>
+                                                </div><!--tab content-->
 
-                            <div class="timeline-item">
-                                <span class="time"><i class="fa fa-clock-o"></i> 2 days ago</span>
+                                            </div><!--tab panel-->
 
-                                <h3 class="timeline-header"><a href="#">Mina Lee</a> uploaded new photos</h3>
+                                        </div><!--panel body-->
 
-                                <div class="timeline-body">
-                                    <img src="http://placehold.it/150x100" alt="..." class="margin">
-                                    <img src="http://placehold.it/150x100" alt="..." class="margin">
-                                    <img src="http://placehold.it/150x100" alt="..." class="margin">
-                                    <img src="http://placehold.it/150x100" alt="..." class="margin">
+                                    </div><!-- panel -->
                                 </div>
                             </div>
                         </li>
-                        <!-- END timeline item -->
+
+                        {{--<li>--}}
+                        {{--<i class="fa fa-camera bg-purple"></i>--}}
+
+                        {{--<div class="timeline-item">--}}
+                        {{--<span class="time"><i class="fa fa-clock-o"></i> 2 days ago</span>--}}
+
+                        {{--<h3 class="timeline-header"><a href="#">Mina Lee</a> uploaded new photos</h3>--}}
+
+                        {{--<div class="timeline-body">--}}
+                        {{--<img src="http://placehold.it/150x100" alt="..." class="margin">--}}
+                        {{--<img src="http://placehold.it/150x100" alt="..." class="margin">--}}
+                        {{--<img src="http://placehold.it/150x100" alt="..." class="margin">--}}
+                        {{--<img src="http://placehold.it/150x100" alt="..." class="margin">--}}
+                        {{--</div>--}}
+                        {{--</div>--}}
+                        {{--</li>--}}
                         <li>
                             <i class="fa fa-clock-o bg-gray"></i>
                         </li>
@@ -134,8 +161,6 @@
                 </div>
             </div>
 
-
-            <!-- /.row -->
         </div><!-- /.box-body -->
     </div><!--box box-success-->
 @endsection

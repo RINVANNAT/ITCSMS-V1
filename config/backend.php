@@ -20,6 +20,6 @@ return [
      * yellow
      * yellow-light
      */
-    'theme' => 'blue-light',
-    'layout' => 'fixed',
+    'theme' => 'blue',
+    'layout' => 'sidebar-collapse sidebar-mini',
 ];

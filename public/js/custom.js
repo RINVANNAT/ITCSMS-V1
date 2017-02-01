@@ -1,3 +1,41 @@
+function get_filter_box(){
+    var html = '<div class="o_cp_searchview" style="display: block;">'+
+                    '<div class="o_searchview">'+
+                        '<span class="o_searchview_more fa fa-search-minus" title="Advanced Search..."></span>'+
+                        '<ul class="dropdown-menu o_searchview_autocomplete" role="menu" style="display: none;">'+
+                            '<li class="o-selection-focus"><a href="#">Search <em>Product</em> for: <strong>dd</strong></a></li>'+
+                            '<li><a class="o-expand" href="#"></a><a href="#">Search <em>Internal Category</em> for: <strong>dd</strong></a></li>'+
+                            '<li><a class="o-expand" href="#"></a><a href="#">Search <em>Location</em> for: <strong>dd</strong></a></li>'+
+                            '<li><a class="o-expand" href="#"></a><a href="#">Search <em>Warehouse</em> for: <strong>dd</strong></a></li>'+
+                        '</ul>'+
+                        '<div id="filter_items">' +
+                            '<div class="o_searchview_facet" tabindex="0">'+
+                            '<span class="fa fa-filter o_searchview_facet_label"></span>'+
+
+                            '<div class="o_facet_values">'+
+                            '<span>Products</span>'+
+                            '<span class="o_facet_values_sep"> or </span>'+
+                            '<span>Services</span>'+
+                            '</div>'+
+                            '<div class="fa fa-sm fa-remove o_facet_remove"></div>'+
+                            '</div>'+
+                        '</div>'+
+                        '<input class="o_searchview_input" placeholder="Search..." type="text"></div>'+
+                '</div>'+
+                '<div class="slide_container">'+
+                    'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vivamus et urna erat, sed ullamcorper enim. Maecenas eu venenatis metus. Mauris tortor eros, condimentum vel faucibus ac, commodo fermentum magna. Fusce posuere interdum arcu, eget ornare eros tempus et. Maecenas convallis faucibus sem sed commodo. Donec leo nisi, consequat sed luctus eu, pellentesque eu nibh. Vivamus sed quam a tortor lobortis iaculis. Phasellus et odio sed tortor interdum accumsan. Duis tempor condimentum rhoncus. Maecenas lacinia, nulla ac adipiscing mollis, augue felis luctus lectus, quis ultrices nisl odio a diam. Nam massa sapien, consequat nec mollis eget, sodales ac velit. Maecenas vehicula, ante eu rutrum elementum, lorem urna luctus libero, at pulvinar leo turpis et quam.'+
+                '</div>'+
+
+        '';
+    return html;
+}
+function get_filter_form(data){
+    if(data.academic_years != undefined){
+
+    }
+
+}
+
 function notify(type, message, title){
     toastr.options = {
         "closeButton": true,

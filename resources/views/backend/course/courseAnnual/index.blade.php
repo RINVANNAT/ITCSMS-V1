@@ -123,9 +123,7 @@
                     { data: 'name', name: 'name'},
                     { data: 'semester_id', name: 'semester_id'},
                     { data: 'academic_year_id', name: 'academic_year_id'},
-                    { data: 'department_id', name: 'department_id'},
-                    { data: 'degree_id', name: 'degree_id'},
-                    { data: 'grade_id', name: 'grade_id'},
+                    { data: 'class', name: 'class',searchable:false},
                     { data: 'employee_id', name: 'employee_id'},
                     { data: 'action', name: 'action',orderable: false, searchable: false}
                 ]

@@ -88,7 +88,7 @@ class EloquentEmployeeRepository implements EmployeeRepositoryContract
         $employee->create_uid = auth()->id();
 
         if ($employee->save()) {
-            $employee->roles()->sync($input['assignees_roles']);
+            $employee->positions()->sync($input['assignees_roles']);
             return true;
         }
 
@@ -122,7 +122,7 @@ class EloquentEmployeeRepository implements EmployeeRepositoryContract
         $employee->write_uid = auth()->id();
 
         if ($employee->save()) {
-            $employee->roles()->sync($input['assignees_roles']);
+            $employee->positions()->sync($input['assignees_roles']);
             return true;
         }
 

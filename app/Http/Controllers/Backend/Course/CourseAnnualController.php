@@ -364,9 +364,8 @@ class CourseAnnualController extends Controller
             ->leftJoin('employees','course_annuals.employee_id', '=', 'employees.id')
             ->leftJoin('departments','course_annuals.department_id', '=', 'departments.id')
             ->leftJoin('degrees','course_annuals.degree_id', '=', 'degrees.id')
-//            ->leftJoin('grades','course_annuals.grade_id', '=', 'grade.id')
+            ->leftJoin('grades','course_annuals.grade_id', '=', 'grades.id')
 
-            ->orderBy("course_annuals.updated_at","desc")
             ->select([
                 'course_annuals.id',
                 'course_annuals.name_en as name',
@@ -377,31 +376,14 @@ class CourseAnnualController extends Controller
                 'departments.code as department_id',
                 'degrees.code as degree_id',
                 'course_annuals.grade_id',
-                'course_annuals.course_id'
-            ]);
+                'course_annuals.course_id',
+                DB::raw("CONCAT(degrees.code,grades.code,departments.code) as class")
+            ])
+            ->orderBy("course_annuals.degree_id","ASC")
+            ->orderBy("course_annuals.department_id","ASC")
+            ->orderBy("course_annuals.grade_id","ASC")
+            ->orderBy("course_annuals.semester_id","ASC");
 
-
-//        $courseAnnuals = CourseAnnual::join('courses', 'courses.id', '=', 'course_annuals.course_id')
-//            ->leftJoin('employees','course_annuals.employee_id', '=', 'employees.id')
-//            ->leftJoin('departments','course_annuals.department_id', '=', 'departments.id')
-//            ->leftJoin('degrees','course_annuals.degree_id', '=', 'degrees.id')
-//            ->select([
-//                'course_annuals.name_en as course_name',
-//                'course_annuals.id as course_annual_id',
-//                'course_annuals.course_id as course_id',
-//                'departments.code as department_id',
-//                'degrees.code as degree_id',
-//                'course_annuals.grade_id',
-//                'course_annuals.id as course_annual_id',
-//                'course_annuals.time_tp',
-//                'course_annuals.time_td',
-//                'course_annuals.time_course',
-//                'course_annuals.semester_id',
-//                'courses.code as code',
-//                'courses.credit as course_credit',
-//                'course_annuals.group'
-//            ]);
-//
 
         $datatables =  app('datatables')->of($courseAnnuals);
         $datatables

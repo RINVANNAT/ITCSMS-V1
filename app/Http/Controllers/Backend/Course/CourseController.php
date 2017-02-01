@@ -202,6 +202,9 @@ class CourseController extends Controller
 
         $coursePrograms = DB::table('courses')
             ->join('semesters', 'semesters.id', '=', 'courses.semester_id')
+            ->leftJoin('grades', 'courses.grade_id', '=', 'grades.id')
+            ->leftJoin('departments', 'courses.department_id', '=', 'departments.id')
+            ->leftJoin('degrees', 'courses.degree_id', '=', 'degrees.id')
             ->select([
                 'courses.id as course_id',
                 'courses.name_kh',
@@ -212,26 +215,14 @@ class CourseController extends Controller
                 'courses.time_td',
                 'courses.time_course',
                 'courses.credit',
-                'semesters.name_en as semester'
+                'semesters.name_en as semester',
+                DB::raw("CONCAT(degrees.code,grades.code,departments.code) as class")
             ])
-            ->orderBy('courses.updated_at','desc');
+            ->orderBy('courses.department_id','ASC')
+            ->orderBy('courses.degree_id','ASC')
+            ->orderBy('courses.grade_id','ASC');
 
         $datatables = app('datatables')->of($coursePrograms);
-
-
-         $datatables
-            ->editColumn('name_kh', '{!! $name_kh !!}')
-            ->editColumn('semester', '{!! $semester !!}')
-            ->editColumn('time_course', '{!! $time_course !!}')
-            ->editColumn('time_td', '{!! $time_td !!}')
-            ->editColumn('time_tp', '{!! $time_tp !!}')
-            ->editColumn('code', '{!! $code !!}')
-            ->editColumn('credit', '{!! $credit !!}')
-            ->addColumn('action', function ($courseProgram) {
-                return '<a href="' . route('admin.course.course_program.edit', $courseProgram->course_id) . '" class="btn btn-xs btn-primary"><i class="fa fa-pencil" data-toggle="tooltip" data-placement="top" title="" data-original-title="' . trans('buttons.general.crud.edit') . '"></i> </a>' .
-                ' <button class="btn btn-xs btn-danger btn-delete" data-remote="' . route('admin.course.course_program.destroy', $courseProgram->course_id) . '"><i class="fa fa-times" data-toggle="tooltip" data-placement="top" title="' . trans('buttons.general.crud.delete') . '"></i></button>';
-            });
-
 
         if ($degree = $datatables->request->get('degree')) {
             $datatables->where('courses.degree_id', '=', $degree);
@@ -239,9 +230,9 @@ class CourseController extends Controller
         if ($grade = $datatables->request->get('grade')) {
             $datatables->where('courses.grade_id', '=', $grade);
         }
-//        if ($department = $datatables->request->get('department')) {
-//            $datatables->where('courses.department_id', '=', $department);
-//        }
+        if ($department = $datatables->request->get('department')) {
+            $datatables->where('courses.department_id', '=', $department);
+        }
         if ($deptOptionId = $datatables->request->get('department_option')) {
             $datatables->where('courses.department_option_id', '=', $deptOptionId);
         }
@@ -256,6 +247,15 @@ class CourseController extends Controller
             $employee =Employee::where('user_id', Auth::user()->id)->first();
             $datatables = $datatables ->where('courses.department_id', $employee->department->id );
         }
+
+        $datatables
+            ->editColumn('name_kh' , function($courseProgram) {
+                return '<b>'.$courseProgram->name_kh.'</b><br/>'.$courseProgram->name_en.'<br/>'.$courseProgram->name_fr;
+            })
+            ->addColumn('action', function ($courseProgram) {
+                return '<a href="' . route('admin.course.course_program.edit', $courseProgram->course_id) . '" class="btn btn-xs btn-primary"><i class="fa fa-pencil" data-toggle="tooltip" data-placement="top" title="" data-original-title="' . trans('buttons.general.crud.edit') . '"></i> </a>' .
+                ' <button class="btn btn-xs btn-danger btn-delete" data-remote="' . route('admin.course.course_program.destroy', $courseProgram->course_id) . '"><i class="fa fa-times" data-toggle="tooltip" data-placement="top" title="' . trans('buttons.general.crud.delete') . '"></i></button>';
+            });
         
         return $datatables->make(true);
     }

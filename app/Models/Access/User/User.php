@@ -2,6 +2,7 @@
 
 namespace App\Models\Access\User;
 
+use App\Models\Access\Role\Role;
 use App\Models\Access\User\Traits\UserAccess;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Foundation\Auth\User as Authenticatable;
@@ -39,4 +40,5 @@ class User extends Authenticatable
     public function employees(){
         return $this->hasMany('App\Models\Employee','user_id');
     }
+
 }

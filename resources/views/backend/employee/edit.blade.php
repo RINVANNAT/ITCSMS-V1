@@ -36,3 +36,15 @@
         </div><!--box-->
     {!! Form::close() !!}
 @stop
+@section('after-scripts-end')
+    {!! Html::script('plugins/moment/moment.min.js') !!}
+    {!! Html::script('plugins/datetimepicker/bootstrap-datetimepicker.min.js') !!}
+
+    <script>
+        $(function(){
+            $('#birthdate').datetimepicker({
+                format: 'DD/MM/YYYY'
+            });
+        });
+    </script>
+@stop

@@ -10,6 +10,7 @@ use App\Models\Access\User\User;
 use App\Models\Department;
 use App\Models\Employee;
 use App\Models\Gender;
+use App\Models\Position;
 use App\Repositories\Backend\Employee\EmployeeRepositoryContract;
 use App\Repositories\Backend\Role\RoleRepositoryContract;
 use Illuminate\Support\Facades\DB;
@@ -59,8 +60,8 @@ class EmployeeController extends Controller
         $departments = Department::lists('name_kh','id')->toArray();
         $users = User::lists('name','id')->toArray();
         $genders = Gender::lists('name_en','id')->toArray();
-        $roles = $this->roles->getAllRoles('sort', 'asc', true);
-        return view('backend.employee.create',compact('departments','users','genders','roles'));
+        $positions = Position::get();
+        return view('backend.employee.create',compact('departments','users','genders','positions'));
     }
 
     /**
@@ -101,16 +102,9 @@ class EmployeeController extends Controller
         $departments = Department::lists('name_kh','id')->toArray();
         $users = User::lists('name','id')->toArray();
         $genders = Gender::lists('name_en','id')->toArray();
-        $roles = $this->roles->getAllRoles('sort', 'asc', true);
+        $positions = Position::get();
 
-//        dd($employee);
-
-        
-        //$selected_role_ids = $employee->roles()->lists('role_id')->toArray();
-        //dd($selected_role_ids);
-        
-
-        return view('backend.employee.edit',compact('employee','departments','users','genders','roles'));
+        return view('backend.employee.edit',compact('employee','departments','users','genders','positions'));
     }
 
     /**
@@ -145,26 +139,47 @@ class EmployeeController extends Controller
     public function data()
     {
 
-        $employees = Employee::with('roles')->select(['id','name_kh','name_latin','email','phone','department_id']);
+        $employees = Employee::leftJoin('departments','employees.department_id','=','departments.id')
+            ->with('positions')
+            ->select([
+                'employees.id',
+                'employees.name_kh',
+                'employees.name_latin',
+                'employees.email',
+                'employees.phone',
+                'employees.birthdate',
+                'departments.name_en as department'
+            ])
+            ->orderBy('department_id','DESC');
 
-        //$employees = Employee::select(array('employees.id', 'employees.name_kh','employees.name_latin','employees.email','employees.phone','employees.department_id',DB::raw("'roles'")));
         $datatables =  app('datatables')->of($employees);
 
 
         return $datatables
-            ->editColumn('name_kh', '{!! str_limit($name_kh, 60) !!}')
-            ->editColumn('name_latin', '{!! str_limit($name_latin, 60) !!}')
-            ->editColumn('email', '{!! $email !!}')
-            ->editColumn('phone', '{!! $phone !!}')
-            ->editColumn('roles', function ($employee){
-                $role_view = "";
-                foreach($employee->roles()->lists('name') as $role){
-                    $role_view .= "<span>".$role."</span><br/>";
-                }
 
+            ->editColumn('positions', function ($employee){
+                $role_view = "";
+                foreach($employee->positions as $position){
+                    $role_view .= "<span>".$position->title."</span><br/>";
+                }
                 return $role_view;
             })
-            ->editColumn('department_id', '{!! $department_id !!}')
+            ->addColumn('contact', function ($employee) {
+                $phone = $employee->phone;
+                $email = $employee->email;
+                $address = $employee->address;
+
+                if ($phone != '' && $phone != null){
+                    $phone = $phone."<br/>";
+                }
+                if ($email != '' && $email != null){
+                    $email = $email."<br/>";
+                }
+                if ($address != '' && $address != null){
+                    $address = $address."<br/>";
+                }
+                return $phone.$email.$address;
+            })
             ->addColumn('action', function ($employee) {
                 return  '<a href="'.route('admin.employees.edit',$employee->id).'" class="btn btn-xs btn-primary"><i class="fa fa-pencil" data-toggle="tooltip" data-placement="top" title="" data-original-title="'.trans('buttons.general.crud.edit').'"></i> </a>'.
                 ' <button class="btn btn-xs btn-danger btn-delete" data-remote="'.route('admin.employees.destroy', $employee->id) .'"><i class="fa fa-times" data-toggle="tooltip" data-placement="top" title="' . trans('buttons.general.crud.delete') . '"></i></button>';

@@ -30,8 +30,8 @@ class StoreEmployeeRequest extends Request
         return [
             'name_kh' => 'required',
             'name_latin' => 'required',
-            'email' => 'required',
-            'phone' => 'required',
+            //'email' => 'required',
+            //'phone' => 'required',
             'department_id' => 'required',
         ];
     }

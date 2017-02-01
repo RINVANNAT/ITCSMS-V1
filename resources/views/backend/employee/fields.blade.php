@@ -66,20 +66,25 @@
 
 <div class="form-group">
     <label class="col-lg-2 control-label">{{ trans('validation.attributes.backend.access.users.associated_roles') }}</label>
-    <div class="col-lg-3">
-        @if (count($roles) > 0)
-            @foreach($roles as $role)
+    <div class="col-lg-10">
+        <div class="row">
+        @if (count($positions) > 0)
+            @foreach($positions as $position)
+                <div class="col-md-4">
                 @if(isset($employee))
-                    <input type="checkbox" value="{{$role->id}}" name="assignees_roles[]" id="role-{{$role->id}}" {{in_array($role->id,$employee->roles()->lists('role_id')->toArray())?'checked="checked"':""}} />
+                    <input type="checkbox" value="{{$position->id}}" name="assignees_roles[]" id="role-{{$position->id}}"
+                            {{in_array($position->id,$employee->positions()->lists('position_id')->toArray())?'checked="checked"':""}} />
                 @else
-                    <input type="checkbox" value="{{$role->id}}" name="assignees_roles[]" id="role-{{$role->id}}" />
+                    <input type="checkbox" value="{{$position->id}}" name="assignees_roles[]" id="role-{{$position->id}}" />
                 @endif
 
-                <label for="role-{{$role->id}}">{!! $role->name !!}</label>
-                <br/>
+                <label for="role-{{$position->id}}">{!! $position->title !!}</label>
+                </div>
             @endforeach
         @else
             {{ trans('labels.backend.access.users.no_roles') }}
         @endif
+        </div>
+
     </div>
-</div><!--form control-->
+</div>

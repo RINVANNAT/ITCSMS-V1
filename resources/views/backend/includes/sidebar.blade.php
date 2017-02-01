@@ -32,32 +32,48 @@
 
             <!-- Optionally, you can add icons to the links -->
             <li class="{{ Active::pattern('admin/dashboard') }}">
-                <a href="{!! route('admin.dashboard') !!}"><span>{{ trans('menus.backend.sidebar.dashboard') }}</span></a>
+                <a href="{!! route('admin.dashboard') !!}">
+                    <i class="fa fa-dashboard"></i>
+                    <span>{{ trans('menus.backend.sidebar.dashboard') }}</span>
+                </a>
             </li>
 
             @permission('view-student-management')
             <li class="{{ Active::pattern('admin/student*') }}">
-                <a href="{!!url('admin/studentAnnuals')!!}"><span>{{ trans('menus.backend.student.title') }}</span></a>
+                <a href="{!!url('admin/studentAnnuals')!!}">
+                    <i class="fa fa-user"></i>
+                    <span>{{ trans('menus.backend.student.title') }}</span>
+                </a>
             </li>
             @endauth
             @permission('view-employee-management')
             <li class="{{ Active::pattern('admin/employees') }}">
-                <a href="{!!url('admin/employees')!!}"><span>{{ trans('menus.backend.employee.title') }}</span></a>
+                <a href="{!!url('admin/employees')!!}">
+                    <i class="fa fa-suitcase"></i>
+                    <span>{{ trans('menus.backend.employee.title') }}</span>
+                </a>
             </li>
             @endauth
             @permission('view-scholarship-management')
             <li class="{{ Active::pattern('admin/scholarships*') }}">
-                <a href="{!!url('admin/scholarships')!!}"><span>{{ trans('menus.backend.scholarship.title') }}</span></a>
+                <a href="{!!url('admin/scholarships')!!}">
+                    <i class="fa fa-mortar-board"></i>
+                    <span>{{ trans('menus.backend.scholarship.title') }}</span>
+                </a>
             </li>
             @endauth
             @permission('view-access-management')
-                <li class="{{ Active::pattern('admin/access/*') }}">
-                    <a href="{!!url('admin/access/users')!!}"><span>{{ trans('menus.backend.access.title') }}</span></a>
-                </li>
+            <li class="{{ Active::pattern('admin/access/*') }}">
+                <a href="{!!url('admin/access/users')!!}">
+                    <i class="fa fa-user-plus"></i>
+                    <span>{{ trans('menus.backend.access.title') }}</span>
+                </a>
+            </li>
             @endauth
             @permission('view-exam-management')
             <li class="{{ Active::pattern('admin/exams*') }} treeview">
                 <a href="#">
+                    <i class="fa fa-list-alt"></i>
                     <span>{{ trans('menus.backend.exam.title') }}</span>
                     <i class="fa fa-angle-left pull-right"></i>
                 </a>
@@ -79,6 +95,7 @@
             @permission('view-course-management')
             <li class="{{ Active::pattern('admin/course*') }} treeview">
                 <a href="#">
+                    <i class="fa fa-book"></i>
                     <span>{{ trans('menus.backend.course.title') }}</span>
                     <i class="fa fa-angle-left pull-right"></i>
                 </a>
@@ -111,6 +128,7 @@
             @permission('view-accounting-management')
             <li class="{{ Active::pattern('admin/accounting*') }} treeview">
                 <a href="#">
+                    <i class="fa fa-money"></i>
                     <span>{{ trans('menus.backend.accounting.title') }}</span>
                     <i class="fa fa-angle-left pull-right"></i>
                 </a>
@@ -137,6 +155,7 @@
 
             <li class="{{ Active::pattern('admin/configuration*') }} treeview">
                 <a href="#">
+                    <i class="fa fa-gears"></i>
                     <span>{{ trans('menus.backend.configuration.main') }}</span>
                     <i class="fa fa-angle-left pull-right"></i>
                 </a>
@@ -250,6 +269,7 @@
             @permission('view-log-viewer-management')
             <li class="{{ Active::pattern('admin/log-viewer*') }} treeview">
                 <a href="#">
+                    <i class="fa fa-tasks"></i>
                     <span>{{ trans('menus.backend.log-viewer.main') }}</span>
                     <i class="fa fa-angle-left pull-right"></i>
                 </a>
@@ -265,7 +285,10 @@
             @endauth
 
             <li class="{{ Active::pattern('admin/reporting*') }}">
-                <a href="{!!url('admin/reporting')!!}"><span>{{ trans('menus.backend.error.reporting') }}</span></a>
+                <a href="{!!url('admin/reporting')!!}">
+                    <i class="fa fa-exclamation-triangle"></i>
+                    <span>{{ trans('menus.backend.error.reporting') }}</span>
+                </a>
             </li>
 
         </ul><!-- /.sidebar-menu -->

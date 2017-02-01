@@ -26,13 +26,19 @@ class Employee extends Model
 
     public function setBirthdateAttribute($value)
     {
+        if($value == null){
+            return true;
+        }
         $date = Carbon::createFromFormat('d/m/Y', $value);
         $this->attributes['birthdate'] = $date->format('Y/m/d');
     }
 
     public function getBirthdateAttribute(){
-        $date = Carbon::createFromFormat('Y-m-d h:i:s', $this->attributes['birthdate']);
+        if($this->attributes['birthdate'] == null) {
+            return null;
+        }
 
+        $date = Carbon::createFromFormat('Y-m-d h:i:s', $this->attributes['birthdate']);
         return $date->format('m/d/Y');
     }
 
@@ -59,8 +65,9 @@ class Employee extends Model
     {
         return $this->belongsToMany(config('access.role'));
     }
+
     public function positions() {
-        return $this->belongsToMany('App\Models\Position');
+        return $this->belongsToMany('App\Models\Position','employee_position');
     }
 
     /**

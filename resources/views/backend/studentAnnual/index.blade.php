@@ -12,14 +12,27 @@
 
 @section('after-styles-end')
     {!! Html::style('plugins/datatables/dataTables.bootstrap.css') !!}
+    {!! Html::style('plugins/webui-popover/jquery.webui-popover.css') !!}
+    {!! Html::style('css/odoo1.css') !!}
     <style>
         .toolbar {
             float: left;
+            width: 50%;
         }
 
         #filter_group {
             width: 2cm;
         }
+
+        .slide_container {
+            width: 50%;
+            margin-right: 15px;
+            position: absolute;
+            background-color: white;
+            border: 1px solid black;
+            z-index: 999;
+        }
+
     </style>
 @stop
 
@@ -55,7 +68,9 @@
 @section('after-scripts-end')
     {!! Html::script('plugins/datatables/jquery.dataTables.min.js') !!}
     {!! Html::script('plugins/datatables/dataTables.bootstrap.min.js') !!}
+    {!! Html::script('plugins/webui-popover/jquery.webui-popover.js') !!}
     <script>
+        var filter_box = '';
         function hideCustomExport(){
             $('.btn-export').hide();
         }
@@ -63,6 +78,8 @@
         $(document).ready(function(){
             var current_filtering = null;
             var custom_student_window = null;
+
+
             var oTable = $('#students-table').DataTable({
                 dom: 'l<"toolbar">frtip',
                 processing: true,
@@ -111,6 +128,20 @@
                     '{!! Form::select('origin',$origins,null, array('class'=>'form-control','id'=>'filter_origin','placeholder'=>'Origin')) !!} '+
                     '{!! Form::text('group',null, array('class'=>'form-control','id'=>'filter_group','placeholder'=>'Group')) !!} '
             );
+//            $("div.toolbar").html(
+//                    get_filter_box()
+//            );
+//
+//            $('.o_searchview_more').on("click", function() {
+//                if ($('.slide_container').is(':hidden')) {
+//                    $('.slide_container').slideDown(300);
+//                } else {
+//                    $('.slide_container').slideUp(300);
+//                    //layer.remove();
+//                }
+//            });
+
+
 
             oTable.draw();
 

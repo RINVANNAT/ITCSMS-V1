@@ -16,6 +16,9 @@
         #filter_dept_option {
             margin-left: 5px;
         }
+        .toolbar {
+            float: left;
+        }
     </style>
 @stop
 
@@ -59,13 +62,14 @@
                     <thead>
                     <tr>
                         <th>{{ trans('labels.backend.coursePrograms.fields.name_kh') }}</th>
-                        <th>Semester</th>
-                        <th>Course Hour</th>
-                        <th>TD Hour</th>
-                        <th>TP Hour</th>
                         <th>{{ trans('labels.backend.coursePrograms.fields.code') }}</th>
-                        <th>Credit</th>
-                        <th>{{ trans('labels.general.actions') }}</th>
+                        <th>Class</th>
+                        <th>{{ trans('labels.backend.coursePrograms.fields.semester') }}</th>
+                        <th width="20px;">{{ trans('labels.backend.coursePrograms.fields.time_course') }}</th>
+                        <th width="20px;">{{ trans('labels.backend.coursePrograms.fields.time_td') }}</th>
+                        <th width="20px;">{{ trans('labels.backend.coursePrograms.fields.time_tp') }}</th>
+                        <th>{{ trans('labels.backend.coursePrograms.fields.credit') }}</th>
+                        <th  width="50px;">{{ trans('labels.general.actions') }}</th>
                     </tr>
                     </thead>
                 </table>
@@ -100,7 +104,7 @@
                 processing: true,
                 serverSide: true,
                 dom: 'l<"toolbar">frtip',
-                deferLoading: true,
+                //deferLoading: true,
                 pageLength: {!! config('app.records_per_page')!!},
 
                 ajax: {
@@ -118,11 +122,12 @@
                 },
                 columns: [
                     { data: 'name_kh', name: 'name_kh'},
+                    { data: 'code', name: 'code'},
+                    { data: 'class', name: 'class'},
                     { data: 'semester', name: 'semester'},
                     { data: 'time_course', name: 'time_course'},
                     { data: 'time_td', name: 'time_td'},
                     { data: 'time_tp', name: 'time_tp'},
-                    { data: 'code', name: 'code'},
                     { data: 'credit', name: 'credit'},
                     { data: 'action', name: 'action',orderable: false, searchable: false}
                 ]

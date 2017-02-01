@@ -48,9 +48,9 @@
                     <tr>
                         <th>{{ trans('labels.backend.employees.fields.name_kh') }}</th>
                         <th>{{ trans('labels.backend.employees.fields.name_latin') }}</th>
-                        <th>{{ trans('labels.backend.employees.fields.email') }}</th>
-                        <th>{{ trans('labels.backend.employees.fields.phone') }}</th>
                         <th>{{ trans('labels.backend.employees.fields.department_id') }}</th>
+                        <th>{{ trans('labels.backend.employees.fields.birthdate') }}</th>
+                        <th>{{ trans('labels.backend.employees.fields.contact') }}</th>
                         <th>{{ trans('labels.backend.employees.fields.role_id') }}</th>
                         <th>{{ trans('labels.general.actions') }}</th>
                     </tr>
@@ -76,10 +76,10 @@
                 columns: [
                     { data: 'name_kh', name: 'name_kh'},
                     { data: 'name_latin', name: 'name_latin'},
-                    { data: 'email', name: 'email'},
-                    { data: 'phone', name: 'phone'},
-                    { data: 'department_id', name: 'department_id'},
-                    { data: 'roles', name: 'roles', orderable:false,searchable:false},
+                    { data: 'department', name: 'department_id',searchable:false},
+                    { data: 'birthdate', name: 'birthdate',orderable:false},
+                    { data: 'contact', name: 'address',orderable:false},
+                    { data: 'positions', name: 'positions', orderable:false,searchable:false},
                     { data: 'action', name: 'action',orderable: false, searchable: false}
                 ]
             });

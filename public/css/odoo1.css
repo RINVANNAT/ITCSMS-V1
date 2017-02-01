@@ -1,0 +1,259 @@
+.o_cp_searchview {
+    width: 100%;
+    min-height: 30px;
+    font-family: Roboto;
+    font-size: 13px;
+}
+
+.btn.o_enable_searchview {
+    width: 10%;
+    margin-left: 2%;
+    padding: 0px;
+}
+
+.o_searchview {
+    display: -ms-flexbox;
+    display: -moz-box;
+    display: -webkit-box;
+    display: -webkit-flex;
+    display: flex;
+    -ms-flex-flow: row wrap;
+    -moz-flex-flow: row wrap;
+    -webkit-flex-flow: row wrap;
+    flex-flow: row wrap;
+    -webkit-align-items: flex-end;
+    align-items: flex-end;
+    position: relative;
+    padding: 0 20px 1px 0;
+}
+
+.o_searchview .o_searchview_facet {
+    -ms-flex: 0 0 auto;
+    -moz-flex: 0 0 auto;
+    -webkit-box-flex: 0;
+    -webkit-flex: 0 0 auto;
+    flex: 0 0 auto;
+    max-width: 100%;
+    display: -ms-flexbox;
+    display: -moz-box;
+    display: -webkit-box;
+    display: -webkit-flex;
+    display: flex;
+    position: relative;
+    margin: 1px 3px 0 0;
+}
+
+.o_searchview .o_searchview_facet .o_searchview_facet_label {
+    -ms-flex: 0 0 auto;
+    -moz-flex: 0 0 auto;
+    -webkit-box-flex: 0;
+    -webkit-flex: 0 0 auto;
+    flex: 0 0 auto;
+    display: inline-block;
+    max-width: 100%;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    vertical-align: top;
+    padding: 0 3px;
+    color: white;
+    display: -ms-flexbox;
+    display: -moz-box;
+    display: -webkit-box;
+    display: -webkit-flex;
+    display: flex;
+    -webkit-align-items: center;
+    align-items: center;
+}
+
+.o_searchview .o_searchview_facet .o_facet_values {
+    padding: 0 18px 0 5px;
+}
+
+.o_searchview .o_searchview_facet .o_facet_values .o_facet_values_sep {
+    font-style: italic;
+}
+
+.o_searchview .o_searchview_facet .o_facet_remove {
+    -ms-flex: 0 0 auto;
+    -moz-flex: 0 0 auto;
+    -webkit-box-flex: 0;
+    -webkit-flex: 0 0 auto;
+    flex: 0 0 auto;
+    display: -ms-flexbox;
+    display: -moz-box;
+    display: -webkit-box;
+    display: -webkit-flex;
+    display: flex;
+    -moz-justify-content: center;
+    -webkit-justify-content: center;
+    justify-content: center;
+    -webkit-align-items: center;
+    align-items: center;
+    position: absolute;
+    top: 0;
+    left: auto;
+    bottom: 0;
+    right: 0;
+    width: 18px;
+    cursor: pointer;
+}
+
+.o_searchview .o_searchview_input {
+    width: 100px;
+    -ms-flex: 1 0 auto;
+    -moz-flex: 1 0 auto;
+    -webkit-box-flex: 1;
+    -webkit-flex: 1 0 auto;
+    flex: 1 0 auto;
+}
+
+.o_searchview .o_searchview_more {
+    font-size: 16px;
+    cursor: pointer;
+}
+
+.o_searchview .o_searchview_autocomplete {
+    position: absolute;
+    top: 100%;
+    left: auto;
+    bottom: auto;
+    right: auto;
+    width: 100%;
+}
+
+.o_searchview .o_searchview_autocomplete li {
+    padding-left: 25px;
+    position: relative;
+}
+
+.o_searchview .o_searchview_autocomplete li.o-indent {
+    padding-left: 50px;
+}
+
+.o_searchview .o_searchview_autocomplete li a {
+    display: inline-block;
+    padding-left: 0px;
+    padding-right: 0px;
+}
+
+.o_searchview .o_searchview_autocomplete li a:hover {
+    background-color: inherit;
+}
+
+.o_searchview .o_searchview_autocomplete li a.o-expand, .o_searchview .o_searchview_autocomplete li a.o-expanded {
+    position: absolute;
+    top: auto;
+    left: 6px;
+    bottom: auto;
+    right: auto;
+    padding: 3px;
+}
+
+.o_searchview .o_searchview_autocomplete li a.o-expand:before {
+    content: "";
+    display: inline-block;
+    width: 0;
+    height: 0;
+    vertical-align: middle;
+    border-bottom: 4px solid transparent;
+    border-left: 4px solid;
+    border-right: 0;
+    border-top: 4px solid transparent;
+    -moz-transform: scale(0.9999);
+}
+
+.o_searchview .o_searchview_autocomplete li a.o-expanded:before {
+    content: "";
+    display: inline-block;
+    width: 0;
+    height: 0;
+    vertical-align: middle;
+    border-bottom: 0;
+    border-left: 4px solid transparent;
+    border-right: 4px solid transparent;
+    border-top: 4px solid;
+    -moz-transform: scale(0.9999);
+}
+.o_search_options .o_filters_menu .o_searchview_extended_prop_op {
+    margin: 3px 0px;
+}
+
+.o_search_options .o_filters_menu .o_searchview_extended_prop_value .datepickerbutton {
+    position: absolute;
+    top: 3px;
+    left: auto;
+    bottom: auto;
+    right: -20px;
+    cursor: pointer;
+}
+
+.o_search_options .o_filters_menu .o_searchview_extended_delete_prop {
+    position: absolute;
+    top: 3px;
+    left: auto;
+    bottom: auto;
+    right: -18px;
+    cursor: pointer;
+}
+
+.o_search_options .o_favorites_menu .o-searchview-custom-private .o-remove-filter, .o_search_options .o_favorites_menu .o-searchview-custom-public .o-remove-filter {
+    position: absolute;
+    top: 50%;
+    left: auto;
+    bottom: auto;
+    right: 12px;
+    margin-top: -6px;
+    cursor: pointer;
+}
+
+.o_search_options .o_favorites_menu .o-searchview-custom-public a:after {
+    font-family: FontAwesome;
+    content: "\f0c0";
+    margin-left: 5px;
+    font-weight: normal;
+}
+
+.o_searchview {
+    border-bottom: 1px solid #8f8f8f;
+}
+
+.o_searchview .o_searchview_facet {
+    border: 1px solid #8f8f8f;
+    background: #e2e2e0;
+    color: #8f8f8f;
+}
+
+@media (max-width: 767px) {
+    .o_searchview .o_searchview_facet {
+        -ms-flex-flow: row wrap;
+        -moz-flex-flow: row wrap;
+        -webkit-flex-flow: row wrap;
+        flex-flow: row wrap;
+    }
+}
+
+.o_searchview .o_searchview_facet .o_searchview_facet_label {
+    background-color: #875A7B;
+}
+
+.o_searchview .o_searchview_facet .o_facet_remove:hover {
+    color: #5c5c5c;
+}
+
+.o_searchview .o_searchview_input {
+    border: none;
+    outline: none;
+}
+
+.o_searchview .o_searchview_more {
+    position: absolute;
+    top: 4px;
+    left: auto;
+    bottom: auto;
+    right: 0;
+}
+
+.o_searchview .o_searchview_autocomplete li.o-selection-focus {
+    background-color: #eef0f0;
+}
