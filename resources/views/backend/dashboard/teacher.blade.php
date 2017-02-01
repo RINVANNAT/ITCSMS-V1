@@ -16,7 +16,7 @@
                     <th style="width: 40px"></th>
                 </tr>
                 <tr>
-                    @if($courses == null || empty($course))
+                    @if($courses == null || empty($courses))
                         <td colspan="4">Empty</td>
                     @else
                         <?php $index = 1; ?>

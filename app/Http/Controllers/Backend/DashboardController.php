@@ -23,11 +23,10 @@ class DashboardController extends Controller
     public function index()
     {
         $employee = Employee::where('user_id', Auth::user()->id)->first();
-        dump($employee);
         $courses = null;
+
         if($employee != null){
             $last_year = AcademicYear::orderBy('id','DESC')->first();
-            dump($last_year);
             $courses = CourseAnnual::leftJoin('departments','course_annuals.department_id', '=', 'departments.id')
                 ->leftJoin('degrees','course_annuals.degree_id', '=', 'degrees.id')
                 ->leftJoin('grades','course_annuals.grade_id', '=', 'grades.id')
@@ -40,7 +39,6 @@ class DashboardController extends Controller
                 ])
                 ->get()
                 ->toArray();
-            dump($courses);
         }
 
         return view('backend.dashboard',compact('courses'))->withUser(access()->user());
