@@ -39,7 +39,7 @@
             </table>
         </div>
         <div class="timeline-footer">
-            <a class="btn btn-primary btn-xs">See more</a>
+            <a class="btn btn-primary btn-xs" href="{!! url('admin/course/course_annual') !!}">See more</a>
         </div>
     </div>
 </li>
