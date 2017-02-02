@@ -81,6 +81,19 @@
         {{ Form::select('department_id', $departments, null, ['class' => 'form-control','required'=>'required']) }}
     </div>
 </div>
+<div class="form-group dept_option_block">
+
+
+</div>
+
+@if(($deptOptions != null) && (count($deptOptions) > 0))
+    <div class="form-group">
+        {!! Form::label('dept_option','Division', ['class' => 'col-lg-2 control-label required']) !!}
+        <div class="col-lg-7">
+            {{ Form::select('dept_option', $deptOptions, isset($courseAnnual)?$courseAnnual->department_option_id:null, ['class' => 'form-control','required'=>'required']) }}
+        </div>
+    </div>
+@endif
 
 <div class="form-group">
     {!! Form::label('credit', 'Credit', ['class' => 'col-lg-2 control-label required']) !!}
@@ -89,14 +102,7 @@
     </div>
 </div>
 
-@if(($deptOptions != null) && (count($deptOptions) > 0))
-    <div class="form-group">
-        {!! Form::label('department_option','Division', ['class' => 'col-lg-2 control-label required']) !!}
-        <div class="col-lg-7">
-            {{ Form::select('department_option_id', $deptOptions, null, ['class' => 'form-control','required'=>'required']) }}
-        </div>
-    </div>
-@endif
+
 
 {{--<div class="form-group">--}}
     {{--{!! Form::label('', "Absence score percentage", ['class' => 'col-lg-2 control-label required']) !!}--}}

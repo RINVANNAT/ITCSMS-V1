@@ -252,8 +252,9 @@ class CourseAnnualController extends Controller
 //                }
 //            }
 //        }
-        $data = $request->all();
 
+
+        $data = $request->all();
         $this->courseAnnuals->create($data);
         
         return redirect()->route('admin.course.course_annual.index')->withFlashSuccess(trans('alerts.backend.general.created'));
