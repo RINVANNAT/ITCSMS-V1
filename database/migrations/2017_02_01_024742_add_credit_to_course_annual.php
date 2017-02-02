@@ -13,7 +13,7 @@ class AddCreditToCourseAnnual extends Migration
     public function up()
     {
         Schema::table('course_annuals', function (Blueprint $table) {
-//            $table->double('credit');
+            $table->double('credit');
         });
     }
 
