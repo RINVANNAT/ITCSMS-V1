@@ -10,7 +10,7 @@
 @endsection
 
 @section('content')
-    {!! Form::model($courseAnnual, ['route' => ['admin.course.course_annual.update', $courseAnnual->id],'class' => 'form-horizontal', 'role'=>'form', 'method' => 'patch']) !!}
+    {!! Form::model($courseAnnual, ['route' => ['admin.course.course_annual.update', $courseAnnual->id],'class' => 'form-horizontal edit_course_annual', 'role'=>'form', 'method' => 'patch']) !!}
 
         <div class="box box-success">
             <div class="box-header with-border">
@@ -76,6 +76,45 @@
                         $('#lecturer_lists').html(resultData);
                     }
                 });
+            })
+
+
+
+
+
+            $('form.edit_course_annual').on('submit', function(e) {
+
+                var credit = $('input#credit').val();
+
+                if(credit != '') {
+                    if($.isNumeric(credit)) {
+                        return true;
+                    } else {
+
+                        notify('error', 'Not a numeric!')
+                        e.preventDefault();
+
+                    }
+                } else {
+                    notify('error', 'Field credit is required!')
+                    e.preventDefault();
+                }
+//                e.preventDefault();
+//                var form_url = $(this).attr('action');
+//                var baseData = {
+//                    group_selected: ($('#jstree_group').is(':visible'))?JSON.stringify($('#jstree_group').jstree("get_selected")):''
+//                };
+//
+//                $.ajax({
+//                    type: 'POST',
+//                    url: form_url+'?'+$('form.create_course_annual').serialize(),
+//                    data: baseData,
+//                    dataType: 'JSON',
+//                    success: function(resultData) {
+//                        console.log(resultData);
+//
+//                    }
+//                });
             })
         })
     </script>
