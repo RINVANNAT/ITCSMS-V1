@@ -25,6 +25,13 @@
             width: 70px;
             height: 20px;
         }
+        .spacing {
+            margin-left: 5px;
+        }
+        .current_copy{
+            color: #00dd00;
+
+        }
 
     </style>
 
@@ -36,10 +43,82 @@
             <div class="box-header with-border text_font">
                 <strong class="box-title"> <span class="text_font">{{ trans('labels.backend.courseAnnual.course_assignment') }}</span></strong>
                 <strong class="box-title"> <span class="text_font">{{ $academicYear->name_latin }}</span></strong>
+
             </div>
             <!-- /.box-header -->
             <div class="box-body">
                 {{--here what i need to write --}}
+                <div class="row">
+                    <div class="col-sm-12 selection" style="margin-left: 15px; margin-bottom: 5px">
+
+                        <select  name="academic_year" id="filter_academic_year" style="width: 100px;" class=" col-md-1 col-lg-1 col-sm-1">
+                            @foreach($academicYears as $key=>$year)
+                                @if($key == $academicYear->id)
+                                    <option value="{{$key}}" selected> {{$year}}</option>
+                                @else
+                                    <option value="{{$key}}"> {{$year}}</option>
+                                @endif
+                            @endforeach
+                        </select>
+
+                        <select  name="semester" id="filter_semester" style="width: 90px; " class="spacing col-md-1 col-lg-1 col-sm-1">
+                            <option value="">Semester</option>
+                            @foreach($semesters as $key=>$semester)
+                                @if($key == $semesterId)
+                                    <option value="{{$key}}" selected> {{$semester}}</option>
+                                @else
+                                    <option value="{{$key}}"> {{$semester}}</option>
+                                @endif
+                            @endforeach
+                        </select>
+
+
+                        <select  name="degree" id="filter_degree" class="spacing col-md-1 col-lg-1 col-sm-1">
+                            <option value="">Degree</option>
+                            @foreach($degrees as $key=>$degreeName)
+                                @if($key == $degreeId)
+                                    <option value="{{$key}}" selected> {{$degreeName}}</option>
+                                @else
+                                    <option value="{{$key}}"> {{$degreeName}}</option>
+                                @endif
+                            @endforeach
+                        </select>
+
+
+                        <select  name="grade" id="filter_grade" class="spacing col-md-1 col-lg-1 col-sm-1">
+                            <option value="">Grade</option>
+                            @foreach($grades as $key=>$gradeName)
+                                @if($key == $gradeId)
+                                    <option value="{{$key}}" selected> {{$gradeName}}</option>
+                                @else
+                                    <option value="{{$key}}"> {{$gradeName}}</option>
+                                @endif
+                            @endforeach
+                        </select>
+                        @permission('view-all-score-in-all-department')
+
+                            <select  name="department" id="filter_dept" class="spacing col-md-1 col-lg-1 col-sm-1">
+                                <option value="">Department</option>
+                                @foreach($departments as $key=>$departmentName)
+                                    @if($key == $departmentId)
+                                        <option value="{{$key}}" selected> {{$departmentName}}</option>
+                                    @else
+                                        <option value="{{$key}}"> {{$departmentName}}</option>
+                                    @endif
+                                @endforeach
+                            </select>
+
+                        @endauth
+
+
+                        @if($departmentOptions != null)
+                            {!! Form::select('deptOption',$departmentOptions,$deptOption, array('class'=>'spacing col-md-1 col-lg-1 col-sm-1','id'=>'filter_dept_option','placeholder'=>'Division')) !!}
+
+                        @else
+
+                        @endif
+                    </div>
+                </div>
 
                 <div class="row">
                     <div class="col-sm-12">
@@ -112,14 +191,94 @@
             var department_option_id = null;
        @endif
 
-
-
        initree_course($('#annual_course'), '{{route('admin.course.get_department')}}', '{{route('admin.course.get_course_by_department')}}', iconUrl1, iconUrl3);
-
 
        initree_teacher($('#annual_teacher'), '{{route('admin.course.get_department')}}', '{{route('admin.course.get_teacher_by_department')}}','{{route('admin.course.get_course_by_teacher')}}', iconUrl1, iconUrl2, iconUrl3 );
 
        var id_teacher= [];
+
+
+       function getVal() {
+
+           @if($user_department_id !=null)
+                   department_id = '{{$user_department_id}}'
+           @else
+                   department_id = $('#filter_dept :selected').val()
+           @endif
+
+            grade_id = $('#filter_grade :selected').val();
+            degree_id = $('#filter_degree :selected').val();
+            semester_id = $('#filter_semester :selected').val();
+            academic_year_id = $('#filter_academic_year :selected').val();
+//           department_option_id = ($('#filter_dept_option').is(':visible'))?$('#filter_dept_option :selected').val():null
+
+           if($('#filter_dept_option option').length >1) {
+               $('#filter_dept_option option').each(function() {
+                   if($(this).is(':selected')) {
+                       department_option_id = $(this).val();
+                   } else {
+                       department_option_id = null;
+                   }
+               })
+           }  else {
+               department_option_id = null;
+           }
+
+
+
+       }
+
+
+       $('#filter_academic_year').on('change', function() {
+           getVal();
+           $('#annual_course').jstree("refresh");
+       })
+       $('#filter_grade').on('change', function() {
+           getVal();
+           $('#annual_course').jstree("refresh");
+       })
+       $('#filter_degree').on('change', function() {
+           getVal();
+           $('#annual_course').jstree("refresh");
+       })
+       $('#filter_semester').on('change', function() {
+           getVal();
+           $('#annual_course').jstree("refresh");
+       })
+       $('#filter_dept').on('change', function() {
+           getVal();
+           hasDeptOption();
+           $('#annual_course').jstree("refresh");
+           $('#annual_teacher').jstree("refresh");
+       })
+
+       $(document).on('change', '#filter_dept_option', function() {
+           getVal();
+           $('#annual_course').jstree("refresh");
+
+       })
+
+       function hasDeptOption() {
+           var dept_option_url = '{{route('course_annual.dept_option')}}';
+           var department_id = $('#filter_dept :selected').val();
+
+           $.ajax({
+               type: 'GET',
+               url: dept_option_url,
+               data: {department_id: department_id},
+               dataType: "html",
+               success: function(resultData) {
+
+                   if($('#filter_dept_option').is(':visible')) {
+                       $('#filter_dept_option').html(resultData);
+                   }else {
+                       $("div.selection > select#filter_dept").after(resultData);
+                   }
+
+               }
+           });
+
+       }
 
        function initree_teacher( object, url_lv1, url_lv2, url_lv3, iconUrl1, iconUrl2, iconUrl3) {
 
@@ -487,9 +646,11 @@
                    });
                }
            });
-
-
        });
+
+       function refresh_course_tree() {
+           $('#annual_course').jstree("refresh");
+       }
 
    </script>
 @stop

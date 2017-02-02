@@ -33,7 +33,7 @@
 <div class="form-group">
     {!! Form::label('course', trans('labels.backend.courseAnnuals.fields.employee'), ['class' => 'col-lg-2 control-label required']) !!}
     <div class="col-lg-7">
-        {{ Form::select('employee_id', $employees, null, ['class' => 'form-control', 'id'=>'lecturer_lists', 'placeholder' => 'Lecturer']) }}
+        {{ Form::select('employee_id', $employees, null, ['class' => 'form-control', 'id'=>'lecturer_lists', 'placeholder' => 'Lecturer', 'required'=> 'required']) }}
     </div>
 
     @permission('view-all-score-course-annual')
@@ -85,7 +85,7 @@
 <div class="form-group">
     {!! Form::label('credit', 'Credit', ['class' => 'col-lg-2 control-label required']) !!}
     <div class="col-lg-7">
-        {{ Form::number('credit',  null, ['class' => 'form-control' , 'id'=> 'credit', 'required' => true]) }}
+        {{ Form::text('credit',  null, ['class' => 'form-control' , 'id'=> 'credit', 'required' => 'required']) }}
     </div>
 </div>
 
@@ -126,13 +126,13 @@
 <div class="form-group">
     {!! Form::label('time_course', "Time Course", ['class' => 'col-lg-2 control-label required']) !!}
     <div class="col-lg-2">
-        {{ Form::text('time_course',  null, ['class' => 'form-control', 'id'=>'time_course']) }}
+        {{ Form::text('time_course',  null, ['class' => 'form-control', 'id'=>'time_course', 'required' => 'required']) }}
     </div>
 
     {!! Form::label('name_kh', "Name Khmer", ['class' => 'col-lg-2 control-label']) !!}
 
     <div class="col-lg-3">
-        {{ Form::text('name_kh',  null, ['class' => 'form-control', 'id'=>'name_kh']) }}
+        {{ Form::text('name_kh',  null, ['class' => 'form-control', 'id'=>'name_kh', 'required' => 'required']) }}
     </div>
 </div>
 
@@ -140,7 +140,7 @@
 <div class="form-group">
     {!! Form::label('time_td', "Time TD", ['class' => 'col-lg-2 control-label required']) !!}
     <div class="col-lg-2">
-        {{ Form::text('time_td',  null, ['class' => 'form-control', 'id'=> 'time_td']) }}
+        {{ Form::text('time_td',  null, ['class' => 'form-control', 'id'=> 'time_td', 'required' => 'required']) }}
     </div>
 
     {!! Form::label('name_en', "Name English", ['class' => 'col-lg-2 control-label']) !!}

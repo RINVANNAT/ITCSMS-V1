@@ -780,7 +780,7 @@ class CourseAnnualController extends Controller
 
                 $element = array(
                     "id" => $parent_id.'_courseannual_' . $course->course_annual_id,
-                    "text" => $course->course_name.': Group '.$course->group. ' ('.$course->degree_id.$course->grade_id.')',
+                    "text" => $course->course_name.(isset($course->group)?':Group '.$course->group:'').' ('.$course->degree->code.$course->grade->code.')',
                     "children" => false,
                     "type" => "course",
                     "state" => ["opened" => false, "selected" => false ],
@@ -827,11 +827,14 @@ class CourseAnnualController extends Controller
 
                 $totalCoursePerSemester = $course->time_tp + $course->time_td + $course->time_course;
 
+                $splitName = explode('_', $course->course_name);
+                $copy = $splitName[count($splitName)-1];
+
                 $element = array(
                     "id" => 'department_'.$deptId.'_'.'course_' . $course->course_annual_id,
                     "text" => $course->course_name.': Group '.$course->group.' (S_'.$course->semester_id.' = '.$totalCoursePerSemester.')',
                     "li_attr" => [
-                        'class' => 'department_course',
+                        'class' => 'department_course '.(($copy == '(copy)')?'current_copy':''),
                         'tp'    => $course->time_tp,
                         'td'    => $course->time_td,
                         'course' => $course->time_course,
@@ -920,16 +923,40 @@ class CourseAnnualController extends Controller
 
     public function courseAssignment (CourseAnnualAssignmentRequest $request) {
 
+
         $academicYear = AcademicYear::where('id', $request->academic_year_id)->first();
         $departmentId = $request->department_id;
         $gradeId = $request->grade_id;
         $degreeId = $request->degree_id;
         $deptOption = $request->department_option_id;
         $semesterId = $request->semester_id;
+        $departmentOptions = $this->deptHasOption($departmentId);
+
+        if(auth()->user()->allow("view-all-score-in-all-department")){
+            // Get all department in case user have previlege to view all department
+            $departments = Department::where("parent_id",config('access.departments.department_academic'))->orderBy("code")->lists("code","id");
+            $user_department_id = null;
+
+        } else {
+            $employee = Employee::where('user_id', Auth::user()->id)->first();
+            $departments = $employee->department()->lists("code", "id");
+            $user_department_id = $employee->department->id;
+
+
+        }
+        $academicYears = AcademicYear::lists('name_latin','id')->toArray();
+        $degrees = Degree::lists('name_en','id')->toArray();
+        $grades = Grade::lists('name_en','id')->toArray();
+        $semesters = Semester::lists("name_en", "id");
+
         if($deptOption == '') {
             $deptOption = null;
         }
-        return view('backend.course.courseAnnual.includes.popup_course_assignment', compact('academicYear', 'departmentId', 'gradeId', 'degreeId', 'deptOption', 'semesterId'));
+
+//        dd($departmentOptions);
+        return view('backend.course.courseAnnual.includes.popup_course_assignment', compact(
+            'academicYear', 'departmentId', 'gradeId','academicYears', 'degrees', 'grades', 'semesters','departmentOptions','departments','user_department_id',
+            'degreeId', 'deptOption', 'semesterId'));
     }
 
 
@@ -1063,7 +1090,9 @@ class CourseAnnualController extends Controller
         $allSemesters = Semester::get();
         $allGroups = StudentAnnual::where([
             ['department_id', $deptId],
-            ['academic_year_id', $course->academic_year_id]
+            ['academic_year_id', $course->academic_year_id],
+            ['grade_id', $course->grade_id],
+            ['degree_id', $course->degree_id]
         ])
             ->groupBy('group')->orderBy('group', 'ASC')->lists('group', 'group');
 

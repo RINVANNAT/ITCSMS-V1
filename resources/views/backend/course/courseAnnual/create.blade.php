@@ -74,12 +74,23 @@
             $('#jstree_group').hide();
 
 
+
             $('form.create_course_annual').on('submit', function(e) {
 
-                var x = document.form[".create_course_annual"]["credit"].value;
-                if (x == "") {
-                    notify('error', "Credit must be filled out");
-                    return false;
+                var credit = $('input#credit').val();
+
+                if(credit != '') {
+                    if($.isNumeric(credit)) {
+                        return true;
+                    } else {
+
+                        notify('error', 'Not a numeric!')
+                        e.preventDefault();
+
+                    }
+                } else {
+                    notify('error', 'Field credit is required!')
+                    e.preventDefault();
                 }
 //                e.preventDefault();
 //                var form_url = $(this).attr('action');

@@ -92,7 +92,7 @@
                         <td>7</td>
                         <td>Credit</td>
                         <td>
-                            {!! Form::text('course_annual_credit', null, ['class' => 'form-control inputs_val','required'=>'required']) !!}
+                            {!! Form::text('course_annual_credit', null, ['class' => 'form-control inputs_val','required'=> true]) !!}
                         </td>
                     </tr>
 
@@ -163,10 +163,13 @@
 
                     if(result.status== true) {
                         notify('success', 'info', result.message);
-                        window.opener.location.reload();
+                        window.opener.refresh_course_tree();
+
+//                        window.parent.$("#annual_course");
+
                         window.setTimeout(function(){
                           window.close();
-                        }, 3000);
+                        }, 2000);
                     } else {
                         notify('error', 'info', result.message);
                     }
@@ -180,19 +183,26 @@
             e.preventDefault();
             var data = $('form.form_edit_course_annual').serialize();
 
-            swal({
-                title: "Confirm",
-                text: "Save Edition??",
-                type: "info",
-                showCancelButton: true,
-                confirmButtonColor: "#DD6B55",
-                confirmButtonText: "Yes,Save it",
-                closeOnConfirm: true
-            }, function(confirmed) {
-                if (confirmed) {
-                    ajaxRequest('PUT', $('form.form_edit_course_annual').attr('action'), data);
-                }
-            });
+            var credit = $('input[name=course_annual_credit]').val();
+
+            if($.isNumeric(credit)) {
+                swal({
+                    title: "Confirm",
+                    text: "Save Edition??",
+                    type: "info",
+                    showCancelButton: true,
+                    confirmButtonColor: "#DD6B55",
+                    confirmButtonText: "Yes,Save it",
+                    closeOnConfirm: true
+                }, function(confirmed) {
+                    if (confirmed) {
+                        ajaxRequest('PUT', $('form.form_edit_course_annual').attr('action'), data);
+                    }
+                });
+
+            } else {
+                notify('error', 'Field Credit is not a valid value')
+            }
 
         })
 
