@@ -113,6 +113,7 @@ class CourseAnnualController extends Controller
     }
 
     private function deptHasOption($deptId) {
+
         $dept = Department::find($deptId);
 
         if($dept->department_options) {
@@ -124,11 +125,27 @@ class CourseAnnualController extends Controller
         return $deptOptions;
     }
 
+    private function courseAnnualByDeptId ($deptId) {
+
+        $coursePrograms = DB::table('courses')->where('department_id', $deptId)->lists('name_en', 'id');
+//        $courseAnnuals = $courseAnnuals->where('course_annual_classes.department_id', $deptId)->lists('course_name', 'course_annual_id');
+
+        return $coursePrograms;
+
+    }
+
     public function getDeptOption(Request $request) {
 
         $deptOptions = $this->deptHasOption($request->department_id);
+//        $coursePrograms = $this->courseAnnualByDeptId($request->department_id);
 
         return view('backend.course.courseAnnual.includes.dept_option_selection', compact('deptOptions'));
+
+//        return [
+//            'course' => view('backend.course.courseAnnual.includes.course_by_dept_selection', 'coursePrograms'),
+//            'dept_option'  => view('backend.course.courseAnnual.includes.dept_option_selection', compact('deptOptions'))
+//        ];
+
     }
 
     public function filteringStudentGroup(Request $request) {
@@ -339,9 +356,35 @@ class CourseAnnualController extends Controller
      */
     public function update(UpdateCourseAnnualRequest $request, $id)
     {
-        $this->courseAnnuals->update($id, $request->all());
-        return redirect()->route('admin.course.course_annual.index')->withFlashSuccess(trans('alerts.backend.generals.updated'));
+
+
+        $check = 0;
+        $input = $request->all();
+        $updateCourseAannual = $this->courseAnnuals->update($id, $input);
+        if($updateCourseAannual) {
+
+//            dd($updateCourseAannual->courseAnnualClass);
+
+            if($updateCourseAannual->courseAnnualClass) {
+
+                $courseAnnualClassess = $updateCourseAannual->courseAnnualClass;
+                foreach($courseAnnualClassess as $annualClass) {
+                    $updateCourseAnnualClass = $this->courseAnnualClasses->update($annualClass->id, $input);
+                    if($updateCourseAnnualClass) {
+                        $check++;
+                    }
+                }
+
+                if($check == count($courseAnnualClassess)) {
+                    return redirect()->route('admin.course.course_annual.index')->withFlashSuccess(trans('alerts.backend.generals.updated'));
+                }
+            }
+        }
+
+        return redirect()->back()->withFlashError('Not Updated');
+
     }
+
 
     /**
      * Update the specified resource in storage.

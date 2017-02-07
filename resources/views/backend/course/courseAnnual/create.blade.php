@@ -227,9 +227,9 @@
                     data: {department_id: $(this).val()},
                     dataType: "html",
                     success: function(resultData) {
-                        if($('select[name=dept_option]').is(':visible')) {
+                        if($('select[name=department_option_id]').is(':visible')) {
 
-                            $('select[name=dept_option]').html(resultData);
+                            $('select[name=department_option_id]').html(resultData);
                         } else {
                             $('.dept_option_block').show();
                             $('.dept_option_block').append('<label class="col-lg-2 control-label required" style="margin-top: 5px"> Department Option </label>');
@@ -240,6 +240,8 @@
 
 
             })
+
+
         })
     </script>
 @stop

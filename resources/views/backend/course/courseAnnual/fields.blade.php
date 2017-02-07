@@ -7,9 +7,9 @@
                 <option value="" disabled selected>Course</option>
                 @foreach($courses as $course)
                     @if($course->id == $courseAnnual->course_id)
-                        <option selected value="{{$courseAnnual->course_id}}" time_course="{{$courseAnnual->time_course}}" time_tp="{{$courseAnnual->time_tp}}" time_td="{{$courseAnnual->time_td}}" name_kh="{{$courseAnnual->name_kh}}" name_en="{{$courseAnnual->name_en}}" name_fr="{{$courseAnnual->name_fr}}">{{$courseAnnual->name_en}}</option>
+                        <option selected value="{{$courseAnnual->course_id}}" time_course="{{$courseAnnual->time_course}}" time_tp="{{$courseAnnual->time_tp}}" time_td="{{$courseAnnual->time_td}}" name_kh="{{$courseAnnual->name_kh}}" name_en="{{$courseAnnual->name_en}}" name_fr="{{$courseAnnual->name_fr}}" credit="{{$courseAnnual->credit}}">{{$courseAnnual->name_en}}</option>
                     @else
-                        <option value="{{$course->id}}" time_course="{{$course->time_course}}" time_tp="{{$course->time_tp}}" time_td="{{$course->time_td}}" name_kh="{{$course->name_kh}}" name_en="{{$course->name_en}}" name_fr="{{$course->name_fr}}">{{$course->name_en}}</option>
+                        <option value="{{$course->id}}" time_course="{{$course->time_course}}" time_tp="{{$course->time_tp}}" time_td="{{$course->time_td}}" name_kh="{{$course->name_kh}}" name_en="{{$course->name_en}}" name_fr="{{$course->name_fr}}" credit="{{$course->credit}}" dept="{{$course->department_id}}" grade="{{$course->grade_id}}" degree="{{$course->degree_id}}" dept_option="{{$course->department_option_id}}" semester="{{$course->semester_id}}">{{$course->name_en}}</option>
                     @endif
                 @endforeach
             </select>
@@ -90,7 +90,7 @@
     <div class="form-group">
         {!! Form::label('dept_option','Division', ['class' => 'col-lg-2 control-label required']) !!}
         <div class="col-lg-7">
-            {{ Form::select('dept_option', $deptOptions, isset($courseAnnual->courseAnnualClass[0])?$courseAnnual->courseAnnualClass[0]->department_option_id:null, ['class' => 'form-control','required'=>'required']) }}
+            {{ Form::select('department_option_id', $deptOptions, isset($courseAnnual->courseAnnualClass[0])?$courseAnnual->courseAnnualClass[0]->department_option_id:null, ['class' => 'form-control','required'=>'required']) }}
         </div>
     </div>
 @endif
