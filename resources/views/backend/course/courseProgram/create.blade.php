@@ -62,8 +62,6 @@
                         hourcourse:0,
                         hourtp:0,
                         hourtd:0,
-
-
                     },
                     computed: {
                         // a computed getter
@@ -75,10 +73,57 @@
                         }
                     }
                 });
-
-
-
             });
+
+
+
+            if($('select[name=department_id] :selected').val()) {
+
+                var department_id = $('select[name=department_id] :selected').val();
+                var route = '{{route('course_program.dept_option')}}'
+
+                $.ajax({
+                    type: 'GET',
+                    url: route,
+                    data: {department_id: department_id},
+                    dataType: "html",
+                    success: function(resultData) {
+                        if($('select[name=department_option_id]').is(':visible')) {
+
+                            $('select[name=department_option_id]').html(resultData);
+                        } else {
+                            $('.dept_option_block').show();
+                            $('.dept_option_block').append('<label class="col-lg-2 control-label required" style="margin-top: 5px"> Department Option </label>');
+                            $(".dept_option_block").append('<div class="col-lg-7">'+resultData +'</div>');
+                        }
+                    }
+                });
+            }
+
+            $('select[name=department_id]').on('change', function() {
+                var department_id = $('select[name=department_id] :selected').val();
+                var route = '{{route('course_program.dept_option')}}'
+
+                $.ajax({
+                    type: 'GET',
+                    url: route,
+                    data: {department_id: department_id},
+                    dataType: "html",
+                    success: function(resultData) {
+                        if($('select[name=department_option_id]').is(':visible')) {
+
+                            $('select[name=department_option_id]').html(resultData);
+                        } else {
+                            $('.dept_option_block').show();
+                            $('.dept_option_block').append('<label class="col-lg-2 control-label required" style="margin-top: 5px"> Department Option </label>');
+                            $(".dept_option_block").append('<div class="col-lg-7">'+resultData +'</div>');
+                        }
+                    }
+                });
+            });
+
+
+
         });
     </script>
 @stop

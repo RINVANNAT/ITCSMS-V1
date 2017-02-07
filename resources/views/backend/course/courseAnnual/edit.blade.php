@@ -140,9 +140,29 @@
                         }
                     }
                 });
-
-
             })
+
+            if($('select[name=department_id] :selected').val()) {
+
+                var request_url = '{{route('course_annual.dept_option')}}';
+
+                $.ajax({
+                    type: 'GET',
+                    url: request_url,
+                    data: {department_id: $('select[name=department_id] :selected').val()},
+                    dataType: "html",
+                    success: function(resultData) {
+                        if($('select[name=department_option_id]').is(':visible')) {
+
+                            $('select[name=department_option_id]').html(resultData);
+                        } else {
+                            $('.dept_option_block').show();
+                            $('.dept_option_block').append('<label class="col-lg-2 control-label required" style="margin-top: 5px"> Department Option </label>');
+                            $(".dept_option_block").append('<div class="col-lg-7">'+resultData +'</div>');
+                        }
+                    }
+                });
+            }
         })
     </script>
 @stop

@@ -87,6 +87,9 @@ class EloquentCourseProgramRepository implements CourseProgramRepositoryContract
         if ( array_key_exists("department_id",$input)){
             $courseProgram->department_id = $input["department_id"];
         }
+        if ( array_key_exists("departement_option_id",$input)){
+            $courseProgram->departement_option_id = $input["departement_option_id"];
+        }
         if ( array_key_exists("semester_id",$input)){
             $courseProgram->semester_id = $input["semester_id"];
         }
@@ -146,6 +149,10 @@ class EloquentCourseProgramRepository implements CourseProgramRepositoryContract
         }
         if ( array_key_exists("department_id",$input)){
             $courseProgram->department_id = $input["department_id"];
+        }
+
+        if ( array_key_exists("department_option_id",$input)){
+            $courseProgram->department_option_id = $input["department_option_id"];
         }
         if ( array_key_exists("semester_id",$input)){
             $courseProgram->semester_id = $input["semester_id"];

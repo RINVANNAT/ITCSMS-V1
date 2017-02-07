@@ -119,9 +119,16 @@ class CourseController extends Controller
      */
     public function create(CreateCourseProgramRequest $request)
     {
+
+        if(auth()->user()->allow("view-all-score-in-all-department")){
+            $departments = Department::where("parent_id",config('access.departments.department_academic'))->orderBy("code")->lists("code","id");
+        } else {
+            $employee = Employee::where('user_id', Auth::user()->id)->first();
+            $departments = $employee->department()->lists("code","id");
+        }
+
         $degrees = Degree::lists("name_en", "id");
         $grades = Grade::lists("name_en", "id");
-        $departments = Department::lists("name_en", "id");
         $semesters = Semester::lists("name_en", "id");
         return view('backend.course.courseProgram.create', compact("degrees", "grades", "departments", "semesters"));
     }
@@ -134,6 +141,8 @@ class CourseController extends Controller
      */
     public function store(StoreCourseProgramRequest $request)
     {
+
+//        dd($request->all());
         $this->validate($request, Course::$rules);
         $this->coursePrograms->create($request->all());
         return redirect()->route('admin.course.course_program.index')->withFlashSuccess(trans('alerts.backend.roles.created'));

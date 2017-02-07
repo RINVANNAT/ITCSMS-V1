@@ -82,6 +82,10 @@
         {{ Form::select('department_id', $departments, null, ['class' => 'form-control','required'=>'required']) }}
     </div>
 </div>
+<div class="form-group dept_option_block">
+
+
+</div>
 
 
 <div class="form-group">
