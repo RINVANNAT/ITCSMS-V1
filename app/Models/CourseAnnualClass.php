@@ -37,6 +37,10 @@ class CourseAnnualClass extends Model
         return $this->belongsTo('App\Models\Grade');
     }
 
+    public function courseAnnual(){
+        return $this->belongsTo('App\Models\CourseAnnual');
+    }
+
     /**
      * The attributes that should be casted to native types.
      *

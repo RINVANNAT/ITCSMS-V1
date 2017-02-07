@@ -9,17 +9,11 @@ class CourseAnnual extends Model
     
 
 	public $fillable = [
-		"department_id",
-		"degree_id",
-		"grade_id",
 		"academic_year_id",
 		"employee_id",
 		"course_id",
 		"semester_id",
         "create_uid",
-		"score_percentage_column_1",
-		"score_percentage_column_2",
-		"score_percentage_column_3",
         "write_uid"
 	];
 
@@ -30,24 +24,17 @@ class CourseAnnual extends Model
         return $this->belongsTo('App\Models\Access\User','write_uid');
     }
 
-
-	public function department(){
-		return $this->belongsTo('App\Models\Department');
-	}
-	public function degree(){
-		return $this->belongsTo('App\Models\Degree');
-	}
-
-	public function grade(){
-		return $this->belongsTo('App\Models\Grade');
-	}
-
 	public function academic_year(){
 		return $this->belongsTo('App\Models\AcademicYear');
 	}
 	public function course(){
 		return $this->belongsTo('App\Models\Course');
 	}
+
+    public function courseAnnualClass(){
+        return $this->hasMany('App\Models\CourseAnnualClass');
+    }
+
 	public function exams(){
 		return $this->belongsToMany('App\Models\Exam');
 	}
@@ -80,9 +67,6 @@ class CourseAnnual extends Model
     ];
 
 	public static $rules = [
-		"department_id" => "Required",
-		"degree_id" => "Required|numeric",
-		"grade_id" => "Required|numeric",
 		"academic_year_id" => "Required|numeric",
 		"employee_id"=>"Required|numeric",
 		"course_id"=>"Required|numeric",

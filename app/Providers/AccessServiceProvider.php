@@ -274,6 +274,12 @@ class AccessServiceProvider extends ServiceProvider
             \App\Repositories\Backend\Configuration\ConfigurationRepositoryContract::class,
             \App\Repositories\Backend\Configuration\EloquentConfigurationRepository::class
         );
+
+
+        $this->app->bind(
+            \App\Repositories\Backend\CourseAnnualClass\CourseAnnualClassRepositoryContract::class,
+            \App\Repositories\Backend\CourseAnnualClass\EloquentCourseAnnualClassRepository::class
+        );
         /*---------------------------------------
             binding For Module score
         ----------------------------------------*/

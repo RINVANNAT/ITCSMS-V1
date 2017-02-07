@@ -1,3 +1,4 @@
+
 @extends ('backend.layouts.master')
 
 @section ('title', trans('labels.backend.courseAnnuals.title') . ' | ' . trans('labels.backend.courseAnnuals.sub_edit_title'))
@@ -358,11 +359,11 @@
                 <select  name="available_course" id="available_course" class=" form-control col-md-2 col-lg-2 col-sm-2">
                     <option value="">Other Course</option>
                     @foreach($availableCourses as $course)
-                        @if($course->id == $courseAnnual->id)
+                        @if($course->course_annual_id == $courseAnnual->id)
 
-                            <option value="{{$course->id}}" selected> {{$course->name_en.' /'.$course->department->code.'/'.$course->grade->name_en}}</option>
+                            <option value="{{$course->course_annual_id}}" selected> {{$course->name_en.' /'.$course->department_code.'/'.$course->grade_name}}</option>
                         @else
-                            <option value="{{$course->id}}"> {{$course->name_en.'/ Group:_'.$course->group.' /'.$course->department->code.'/'.$course->grade->name_en}}</option>
+                            <option value="{{$course->course_annual_id}}"> {{$course->name_en.'/ Group:_'.$course->group.' /'.$course->department_code.'/'.$course->grade_name}}</option>
                         @endif
                     @endforeach
                 </select>
