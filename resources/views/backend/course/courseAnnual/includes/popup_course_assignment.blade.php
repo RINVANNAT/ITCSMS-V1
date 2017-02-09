@@ -61,7 +61,7 @@
                             @endforeach
                         </select>
 
-                        <select  name="semester" id="filter_semester" style="width: 90px; " class="spacing col-md-1 col-lg-1 col-sm-1">
+                        <select  name="semester" id="filter_semester" style="width: 100px; " class="spacing col-md-1 col-lg-1 col-sm-1">
                             <option value="">Semester</option>
                             @foreach($semesters as $key=>$semester)
                                 @if($key == $semesterId)
@@ -231,18 +231,22 @@
 
        $('#filter_academic_year').on('change', function() {
            getVal();
+           $('#annual_teacher').jstree("refresh");
            $('#annual_course').jstree("refresh");
        })
        $('#filter_grade').on('change', function() {
            getVal();
+           $('#annual_teacher').jstree("refresh");
            $('#annual_course').jstree("refresh");
        })
        $('#filter_degree').on('change', function() {
            getVal();
+           $('#annual_teacher').jstree("refresh");
            $('#annual_course').jstree("refresh");
        })
        $('#filter_semester').on('change', function() {
            getVal();
+//           $('#annual_teacher').jstree("refresh");
            $('#annual_course').jstree("refresh");
        })
        $('#filter_dept').on('change', function() {
@@ -254,6 +258,7 @@
 
        $(document).on('change', '#filter_dept_option', function() {
            getVal();
+           $('#annual_teacher').jstree("refresh");
            $('#annual_course').jstree("refresh");
 
        })
@@ -649,6 +654,7 @@
        });
 
        function refresh_course_tree() {
+           getVal();
            $('#annual_course').jstree("refresh");
        }
 

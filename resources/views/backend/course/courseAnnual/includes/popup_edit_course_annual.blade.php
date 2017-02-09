@@ -32,6 +32,13 @@
                 background: rgba(0,0,0,0.8);
                 z-index: 1;
             }
+            .checkbox_style{
+
+                border-color: #00dd00;
+                background-color: #00dd00;
+
+
+            }
         </style>
         <div class="box-header with-border">
             <h3 class="box-title">Course Annual Edition</h3>
@@ -92,12 +99,12 @@
                         <td>7</td>
                         <td>Credit</td>
                         <td>
-                            {!! Form::text('course_annual_credit', null, ['class' => 'form-control inputs_val','required'=> true]) !!}
+                            {!! Form::text('course_annual_credit', ($course->credit != null)?$course->credit:0, ['class' => 'form-control inputs_val','required'=> true]) !!}
                         </td>
                     </tr>
 
                     <tr>
-                        <td>7</td>
+                        <td>8</td>
                         <td> Semester </td>
 
                         <td>
@@ -116,13 +123,35 @@
                         </td>
                     </tr>
 
-
                     <tr>
-                        <td>8</td>
-                        <td> Group </td>
+                        <td>9</td>
+                        <td><input type="checkbox" class="all_box"> All Group </td>
 
                         <td>
-                            {!! Form::select('group',$allGroups,$course->group, array('class'=>'form-control','id'=>'group', 'placeholder' => 'Group')) !!}
+                            @foreach($allGroups as $group)
+                                 <?php $index =0;?>
+
+                                @if($group != null)
+
+                                    <?php $status =true;?>
+                                         @foreach($courseAnnualClasses as $class)
+                                             @if($group == $class->group)
+                                                <?php $status =false;?>
+                                                 <label for="group"> <input type="checkbox" class="each-check-box" value="{{$class->group}}" checked> {{$class->group}}</label>
+                                             @endif
+                                         @endforeach
+                                         @if($status == true)
+                                            <label for="group"> <input type="checkbox" class="each-check-box" value="{{$group}}"> {{$group}}</label>
+                                         @endif
+
+
+                                @endif
+
+
+                            @endforeach
+
+
+                            {{--{!! Form::select('group',$allGroups,$course->group, array('class'=>'form-control','id'=>'group', 'placeholder' => 'Group')) !!}--}}
                         </td>
                     </tr>
                     </tbody>
@@ -180,10 +209,23 @@
 
 
         $('#btn_update_course').on('click', function(e) {
+
             e.preventDefault();
             var data = $('form.form_edit_course_annual').serialize();
-
             var credit = $('input[name=course_annual_credit]').val();
+
+            var url = $('form.form_edit_course_annual').attr('action');
+            var checked_group =[];
+
+
+            $('.each-check-box').each(function (e) {
+                if(this.checked) {
+                    checked_group.push($(this).val())
+                }
+            })
+            var baseData = {
+                group:checked_group
+            }
 
             if($.isNumeric(credit)) {
                 swal({
@@ -196,7 +238,7 @@
                     closeOnConfirm: true
                 }, function(confirmed) {
                     if (confirmed) {
-                        ajaxRequest('PUT', $('form.form_edit_course_annual').attr('action'), data);
+                        ajaxRequest('PUT', url+'?'+data, baseData);
                     }
                 });
 
@@ -224,6 +266,24 @@
                 $('.inputs_val').eq(index).focus().select();
             }
         });
+
+        $(".all_box").change(function() {
+            if(this.checked) {
+                $('.each-check-box').prop('checked', true);
+            } else {
+                $('.each-check-box').prop('checked', false);
+            }
+        });
+
+//        $('.each-check-box').each(function() {
+//
+//            $(this).change(function() {
+//                if(this.checked) {
+//                    $('.all_box').addClass('checkbox_style');
+//                }
+//
+//            });
+//        })
 
 
     </script>

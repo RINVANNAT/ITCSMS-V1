@@ -79,9 +79,6 @@
             })
 
 
-
-
-
             $('form.edit_course_annual').on('submit', function(e) {
 
                 var credit = $('input#credit').val();

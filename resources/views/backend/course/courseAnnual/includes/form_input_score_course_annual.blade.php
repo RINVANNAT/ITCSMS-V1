@@ -358,12 +358,12 @@
             <div class="pull-left">
                 <select  name="available_course" id="available_course" class=" form-control col-md-2 col-lg-2 col-sm-2">
                     <option value="">Other Course</option>
-                    @foreach($availableCourses as $course)
-                        @if($course->course_annual_id == $courseAnnual->id)
+                    @foreach($availableCourses as $course_annual_id => $course)
+                        @if($course_annual_id == $courseAnnual->id)
 
-                            <option value="{{$course->course_annual_id}}" selected> {{$course->name_en.' /'.$course->department_code.'/'.$course->grade_name}}</option>
+                            <option value="{{$course_annual_id}}" selected> {{$courseAnnual->name_en.' /'.$course[0]->department_code.'/'.$course[0]->grade_id}}</option>
                         @else
-                            <option value="{{$course->course_annual_id}}"> {{$course->name_en.'/ Group:_'.$course->group.' /'.$course->department_code.'/'.$course->grade_name}}</option>
+                            <option value="{{$courseAnnual}}"> {{$course[0]->name_en. '/'.$course[0]->department_code.'/'.$course[0]->grade_id}}</option>
                         @endif
                     @endforeach
                 </select>
