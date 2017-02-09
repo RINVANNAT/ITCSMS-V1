@@ -363,7 +363,7 @@
 
                             <option value="{{$course_annual_id}}" selected> {{$courseAnnual->name_en.' /'.$course[0]->department_code.'/'.$course[0]->grade_id}}</option>
                         @else
-                            <option value="{{$courseAnnual}}"> {{$course[0]->name_en. '/'.$course[0]->department_code.'/'.$course[0]->grade_id}}</option>
+                            <option value="{{$course_annual_id}}"> {{$course[0]->name_en. '/'.$course[0]->department_code.'/'.$course[0]->grade_id}}</option>
                         @endif
                     @endforeach
                 </select>
@@ -618,6 +618,7 @@
                                     var score_id = 'score_id'+'_'+columnIndex;
                                     for(var keyIndex=0; keyIndex< tableData.length; keyIndex++) {
                                         $.each(tableData[keyIndex],function(i, value){
+
                                             if(rowData[rowIndex][0] == value) {
 
                                                 if(newValue <= percentage) {
@@ -643,6 +644,8 @@
                                         });
 
                                     }
+
+
                                     colDataArray[columnIndex].push(element) // cell changes data by each column score use to pass data to server
                                     cellScoreChanges.push(element); // use this cell score change to test if user has made any changes
                                 }
