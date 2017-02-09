@@ -808,6 +808,8 @@ return [
                 'grade' => 'Grade',
                 'class' => 'Class',
                 'employee' => 'Lecturer',
+                'department_option_id' => 'Option',
+                'group' => 'Group',
                 'credit'=>"Credit",
                 'code'=>"Code"
             ]
@@ -867,6 +869,7 @@ return [
                 'degree'=>"Degree",
                 'grade'=>"Grade",
                 'department'=>"Department",
+                'department_option' => "Option",
                 'semester'=>"Semester"
             ]
         ],

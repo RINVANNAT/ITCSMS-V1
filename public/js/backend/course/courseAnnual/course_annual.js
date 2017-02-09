@@ -1,3 +1,38 @@
+function load_group(){
+    var department_id = $("#department_id").val();
+    var academic_year_id = $("#academic_year_id").val();
+    var degree_id = $("#degree_id").val();
+    var grade_id = $("#grade_id").val();
+    var department_option_id = $("#department_option_id").val();
+
+    // Load group only department, academic year, degree and grade are filled.
+    if(department_id != "" && department_id != null  && academic_year_id != "" && degree_id != "" && grade_id != ""){
+        $.ajax({
+            url : get_group_url,
+            type: 'GET',
+            data: {
+                department_id:$("#department_id").val(),
+                academic_year_id:$("#academic_year_id").val(),
+                degree_id:$("#degree_id").val(),
+                grade_id:$("#grade_id").val(),
+                department_option_id:$("#department_option_id").val()
+            },
+            success : function(data){
+                if(data != null){
+                    var option_text = "";
+                    $.each(data, function(key, value){
+                        option_text = option_text +
+                            '<div class="col-md-1">'+
+                            '<label><input type="checkbox" name="groups[]" value="'+value+'"> '+value+'</label>'+
+                            '</div>';
+                    })
+                    $("#group_panel").html(option_text);
+                }
+            }
+        })
+    }
+}
+
 function setTimeCourseTpTd() {
 
     var course = $('#course_id :selected').attr('time_course'),
@@ -59,7 +94,8 @@ function setSelectedField() {
     })
 
     $('#credit').val(credit);
-
+    console.log("fsdfsf");
+    load_group();
 }
 
 $('#course_id').on('change', function() {

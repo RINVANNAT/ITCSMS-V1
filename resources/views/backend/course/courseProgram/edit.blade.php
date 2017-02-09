@@ -15,12 +15,12 @@
         <div class="box box-success">
             <div class="box-header with-border">
                 <h3 class="box-title">{{ trans('labels.backend.coursePrograms.sub_edit_title') }}</h3>
-            </div><!-- /.box-header -->
+            </div>
 
             <div class="box-body">
                 @include ("backend.course.courseProgram.fields")
-            </div><!-- /.box-body -->
-        </div><!--box-->
+            </div>
+        </div>
 
         <div class="box box-success">
             <div class="box-body">
@@ -32,8 +32,8 @@
                     <input type="submit" class="btn btn-info btn-xs" value="{{ trans('buttons.general.crud.update') }}" />
                 </div>
                 <div class="clearfix"></div>
-            </div><!-- /.box-body -->
-        </div><!--box-->
+            </div>
+        </div>
     {!! Form::close() !!}
 @stop
 
@@ -41,35 +41,19 @@
 @section('after-scripts-end')
     {!! Html::script('plugins/moment/moment.min.js') !!}
     {!! Html::script('plugins/datetimepicker/bootstrap-datetimepicker.min.js') !!}
-    <script src="{{url('assets/js/vue/vue.min.js')}}">
-    </script>
 
 
     <script>
         $(function(){
 
-            $(document).ready(function () {
-//                $("#creditlabel").
-//                #("#credithidhen")
-                new Vue({
-                    el: '#credittemplate',
-                    data: {
-                        hourcourse:0,
-                        hourtp:0,
-                        hourtd:0,
-                    },
-                    computed: {
-                        // a computed getter
-                        credit: function () {
-                            // `this` points to the vm instance
-
-//                            C/16 + (TD+TP)/ 32
-                            return parseInt((parseInt(this.hourcourse)/16) + ((parseInt(this.hourtp) + parseInt(this.hourtd))/32));
-                        }
-                    }
-                });
-
-
+            if($('select[name=department_id] :selected').val()) {
+                var department_id = $('select[name=department_id] :selected').val();
+                $(".department_"+department_id).show();
+            }
+            $('select[name=department_id]').on('change', function() {
+                $(".department_option").hide();
+                var department_id = $('select[name=department_id] :selected').val();
+                $(".department_"+department_id).show();
 
             });
         });

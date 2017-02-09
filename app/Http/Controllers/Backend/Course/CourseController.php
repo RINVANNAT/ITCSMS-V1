@@ -7,6 +7,7 @@ use App\Http\Requests\Backend\Course\CourseProgram\EditCourseProgramRequest;
 use App\Http\Requests\Backend\Course\CourseProgram\StoreCourseProgramRequest;
 use App\Http\Requests\Backend\Course\CourseProgram\UpdateCourseProgramRequest;
 use App\Models\AcademicYear;
+use App\Models\DepartmentOption;
 use App\Models\Employee;
 use App\Repositories\Backend\CourseProgram\CourseProgramRepositoryContract;
 use App\Utils\StringUtils;
@@ -122,15 +123,17 @@ class CourseController extends Controller
 
         if(auth()->user()->allow("view-all-score-in-all-department")){
             $departments = Department::where("parent_id",config('access.departments.department_academic'))->orderBy("code")->lists("code","id");
+            $options = DepartmentOption::get();
         } else {
             $employee = Employee::where('user_id', Auth::user()->id)->first();
             $departments = $employee->department()->lists("code","id");
+            $options = DepartmentOption::where('department_id',$employee->department_id)->get();
         }
 
         $degrees = Degree::lists("name_en", "id");
         $grades = Grade::lists("name_en", "id");
         $semesters = Semester::lists("name_en", "id");
-        return view('backend.course.courseProgram.create', compact("degrees", "grades", "departments", "semesters"));
+        return view('backend.course.courseProgram.create', compact("degrees", "grades", "departments", "semesters","options"));
     }
 
     /**
@@ -141,23 +144,11 @@ class CourseController extends Controller
      */
     public function store(StoreCourseProgramRequest $request)
     {
-
-//        dd($request->all());
-        $this->validate($request, Course::$rules);
+        //$this->validate($request, Course::$rules);
         $this->coursePrograms->create($request->all());
-        return redirect()->route('admin.course.course_program.index')->withFlashSuccess(trans('alerts.backend.roles.created'));
+        return redirect()->route('admin.course.course_program.index')->withFlashSuccess(trans('alerts.backend.generals.created'));
     }
 
-    /**
-     * Display the specified resource.
-     *
-     * @param  int $id
-     * @return \Illuminate\Http\Response
-     */
-    public function show($id)
-    {
-        //
-    }
 
     /**
      * Show the form for editing the specified resource.
@@ -169,12 +160,20 @@ class CourseController extends Controller
     public function edit(EditCourseProgramRequest $request, $id)
     {
         $courseProgram = $this->coursePrograms->findOrThrowException($id);
+        if(auth()->user()->allow("view-all-score-in-all-department")){
+            $departments = Department::where("parent_id",config('access.departments.department_academic'))->orderBy("code")->lists("code","id");
+            $options = DepartmentOption::get();
+        } else {
+            $employee = Employee::where('user_id', Auth::user()->id)->first();
+            $departments = $employee->department()->lists("code","id");
+            $options = DepartmentOption::where('department_id',$employee->department_id)->get();
+        }
+
         $degrees = Degree::lists("name_en", "id");
         $grades = Grade::lists("name_en", "id");
-        $departments = Department::lists("name_en", "id");
         $semesters = Semester::lists("name_en", "id");
 
-        return view('backend.course.courseProgram.edit', compact('courseProgram','degrees','grades','departments','semesters'));
+        return view('backend.course.courseProgram.edit', compact('courseProgram','degrees','grades','departments','semesters','options'));
     }
 
     /**

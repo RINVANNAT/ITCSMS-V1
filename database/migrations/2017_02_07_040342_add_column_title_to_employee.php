@@ -3,7 +3,7 @@
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
 
-class AddColumnStatusIdCardToEmployees extends Migration
+class AddColumnTitleToEmployee extends Migration
 {
     /**
      * Run the migrations.
@@ -13,12 +13,11 @@ class AddColumnStatusIdCardToEmployees extends Migration
     public function up()
     {
         Schema::table('employees', function (Blueprint $table) {
-            $table->integer('id_card')->nullable();
-            $table->string('status')->nullable();
-            $table->string('salary_rate',100)->nullable();
-            $table->string('service')->nullable();
-            $table->string('state_position')->nullable();
-            $table->string('observation')->nullable();
+            $table->integer('title_id')->unsigned()->index()->nullable();
+            $table->foreign('title_id')
+                ->references('id')
+                ->on('titles')
+                ->onDelete('CASCADE');
         });
     }
 
@@ -30,7 +29,7 @@ class AddColumnStatusIdCardToEmployees extends Migration
     public function down()
     {
         Schema::table('employees', function (Blueprint $table) {
-            //
+            $table->dropColumn('title_id');
         });
     }
 }

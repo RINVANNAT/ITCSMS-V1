@@ -10,7 +10,7 @@
 @endsection
 
 @section('after-styles-end')
-    {!! Html::style('css/backend/plugin/jstree/themes/default/style.min.css') !!}
+    {!! Html::style('plugins/select2/select2.min.css') !!}
 @stop
 
 @section('content')
@@ -19,25 +19,12 @@
         <div class="box box-success">
             <div class="box-header with-border">
                 <h3 class="box-title">{{ trans('labels.backend.courseAnnuals.sub_create_title') }}</h3>
-            </div><!-- /.box-header -->
+            </div>
 
             <div class="box-body">
                 @include('backend.course.courseAnnual.fields')
-
-                <div class="form-group">
-                    {!! Form::label('student_group', "Student Group", ['class' => 'col-lg-2 control-label required label_student_group']) !!}
-                    <div class="col-lg-2">
-                        <div id="jstree_group">
-
-                        </div>
-
-                    </div>
-                </div>
-
-
-
-            </div><!-- /.box-body -->
-        </div><!--box-->
+            </div>
+        </div>
 
         <div class="box box-success">
             <div class="box-body">
@@ -50,197 +37,90 @@
                     {{--<button class="btn btn-xs btn-success" id="btn_generate_group">Get Group</button>--}}
                 </div>
                 <div class="clearfix"></div>
-            </div><!-- /.box-body -->
-        </div><!--box-->
+            </div>
+        </div>
     {!! Form::close() !!}
 @stop
 
 @section('after-scripts-end')
-    {{--{!! Html::script('js/backend/plugin/jstree/jstree.min.js') !!}--}}
-
-    {!! Html::style('plugins/jstree/themes/default/style.min.css') !!}
-    {!! Html::script('plugins/jstree/jstree.min.js') !!}
-
-    {!! Html::script('js/backend/access/roles/script.js') !!}
+    {{--{!! Html::script('js/backend/access/roles/script.js') !!}--}}
     {!! Html::script('js/backend/course/courseAnnual/course_annual.js') !!}
-
-
+    {!! HTML::script('plugins/select2/select2.full.min.js') !!}
 
     <script>
-
+        var $search_url = "{{route('admin.employee.search')}}";
+        var base_url = '{{url('img/profiles/')}}';
+        var get_group_url = "{{route('course_annual.get_group_filtering')}}";
 
         $(document).ready(function() {
-            $('.label_student_group').hide();
-            $('#jstree_group').hide();
 
-
-
-            $('form.create_course_annual').on('submit', function(e) {
-
-                var credit = $('input#credit').val();
-
-                if(credit != '') {
-                    if($.isNumeric(credit)) {
-                        return true;
-                    } else {
-
-                        notify('error', 'Not a numeric!')
-                        e.preventDefault();
-
-                    }
-                } else {
-                    notify('error', 'Field credit is required!')
-                    e.preventDefault();
-                }
-//                e.preventDefault();
-//                var form_url = $(this).attr('action');
-//                var baseData = {
-//                    group_selected: ($('#jstree_group').is(':visible'))?JSON.stringify($('#jstree_group').jstree("get_selected")):''
-//                };
-//
-//                $.ajax({
-//                    type: 'POST',
-//                    url: form_url+'?'+$('form.create_course_annual').serialize(),
-//                    data: baseData,
-//                    dataType: 'JSON',
-//                    success: function(resultData) {
-//                        console.log(resultData);
-//
-//                    }
-//                });
-            })
-
-            $('#other_dept').on('click', function(e) {
-                e.preventDefault();
-                $.ajax({
-                    type: 'GET',
-                    url: '{{route('course_annual.get_other_dept')}}',
-                    data: {department_id: 'request'},
-                    dataType: "html",
-                    success: function(resultData) {
-                        if($('select[name=other_department_id]').is(':visible')) {
-
-                            $(this).html(resultData);
-                        } else {
-                            $('.other_department').append(resultData);
-                        }
-
-                    }
-                });
-            })
-
-
-            $(document).on('change', 'select[name=other_department_id]', function() {
-                var route = '{{route('course_annual.get_other_lecturer')}}';
-
-                $.ajax({
-                    type: 'GET',
-                    url: route,
-                    data: {department_id: $(this).val()},
-                    dataType: "html",
-                    success: function(resultData) {
-                        $('#lecturer_lists').html(resultData);
-                    }
-                });
-            })
-
-            $('#btn_generate_group').on('click', function (e) {
-                e.preventDefault();
-//                $('#jstree_group').show();
-//                $('.label_student_group').show();
-
-                var url_lv1 = '', url_lv2 = '';
-                var iconUrl1 = "{{url('plugins/jstree/img/department.png')}}";
-                var iconUrl2 = "{{url('plugins/jstree/img/course_pic.png')}}";
-                var baseData = {
-                    department_id: $('select[name=department_id]').val(),
-                    academic_year_id: $('select[name=academic_year_id]').val(),
-                    semester_id: $('select[name=semester_id]').val(),
-                    degree_id: $('select[name=degree_id]').val(),
-                    grade_id: $('select[name=grade_id]').val(),
-                    department_option_id: ($('select[name=department_option_id]').is(':visible'))?$('select[name=department_option_id]').val():''
-                };
-
-//                console.log(baseData);
-                initree_group($('#jstree_group'), '{{route('admin.course.get_department')}}', '{{route('course_annual.student_group')}}', iconUrl1, iconUrl2, baseData);
+            // Search course program
+            $("#course_id").select2({
+                placeholder: "Select a course program",
+                allowClear: true
             });
 
-
-            function initree_group( object, url_lv1, url_lv2, iconUrl1, iconUrl2 , baseData) {
-
-                object.jstree({
-
-                    "core" : {
-                        "animation":0,
-                        "check_callback" : true,
-                        'force_text' : true,
-                        "themes" : {
-                            "variant" : "large",
-                            "stripes" : true
-                        },
-                        "data":{
-                            'url' : function (node) {
-
-                                return node.id === '#' ? url_lv1+'?tree_side=course_annual'+'&department_id='+baseData.department_id+'&academic_year_id='+baseData.academic_year_id+'&grade_id='+baseData.grade_id+'&degree_id='+baseData.degree_id+'&department_option_id='+baseData.department_option_id + '&semester_id='+baseData.semester_id: url_lv2+'?academic_year_id='+baseData.academic_year_id+'&grade_id='+baseData.grade_id+'&degree_id='+baseData.degree_id+'&department_option_id='+baseData.department_option_id+ '&semester_id='+baseData.semester_id;
-                            },
-                            'data' : function (node) {
-
-                                return {
-                                    'id' : node.id,
-                                    'class' : node.class
-                                };
-                            },
-                        }
-                    },
-                    "checkbox" : {
-                        "keep_selected_style" : false
-                    },
-                    "types" : {
-                        "#" : { "max_depth" : 3, "valid_children" : ["department","course"] },
-                        "department" : {
-                            "icon" : iconUrl1,
-                            "valid_children" : ["course"]
-                        },
-                        "course" :{
-                            "icon" : iconUrl2,
-                            "valid_children" : []
-                        }
-                    },
-                    "plugins" : [
-                        'checkbox', "contextmenu", "search", "state","types", "sort"
-                    ]
-                }).on('open_node.jstree', function (e, data) {
-//                        var folderId = data.node.original.id;
-//                        var moduleId = data.node.original.moduleId;
-                });
-            }
-
-            $('.dept_option_block').hide();
-
-            $('select[name=department_id]').on('change', function (e) {
-
-                var request_url = '{{route('course_annual.dept_option')}}';
-
-                $.ajax({
-                    type: 'GET',
-                    url: request_url,
-                    data: {department_id: $(this).val()},
-                    dataType: "html",
-                    success: function(resultData) {
-                        if($('select[name=department_option_id]').is(':visible')) {
-
-                            $('select[name=department_option_id]').html(resultData);
-                        } else {
-                            $('.dept_option_block').show();
-                            $('.dept_option_block').append('<label class="col-lg-2 control-label required" style="margin-top: 5px"> Department Option </label>');
-                            $(".dept_option_block").append('<div class="col-lg-7">'+resultData +'</div>');
-                        }
+            // Search lecturer
+            var employee_search_box = $(".select_employee").select2({
+                placeholder: 'Enter name ...',
+                allowClear: true,
+                tags: true,
+                createTag: function (params) {
+                    return {
+                        id: params.term,
+                        name: params.term,
+                        group: 'customer',
+                        newOption: true
                     }
-                });
+                },
+                ajax: {
+                    url: $search_url,
+                    dataType: 'json',
+                    delay: 250,
+                    data: function (params) {
+                        return {
+                            term: params.term || '', // search term
+                            page: params.page || 1
+                        };
+                    },
+                    cache: true
+                },
+                escapeMarkup: function (markup) {
+                    return markup;
+                }, // let our custom formatter work
+                minimumInputLength: 3,
+                templateResult: formatRepoEmployee, // omitted for brevity, see the source of this page
+                templateSelection: formatRepoSelectionEmployee, // omitted for brevity, see the source of this page
+            });
 
+            // On department change, change option
+            if($('select[name=department_id] :selected').val()) {
+                var department_id = $('select[name=department_id] :selected').val();
+                $(".department_"+department_id).show();
+            }
+            $('select[name=department_id]').on('change', function() {
+                $(".department_option").hide();
+                var department_id = $('select[name=department_id] :selected').val();
+                $(".department_"+department_id).show();
 
-            })
+            });
 
+            // On degree, grade, department, option is changed, change group
+            $("#academic_year_id").on('change', function (){
+                load_group();
+            });
+            $("#degree_id").on('change', function (){
+                load_group();
+            });
+            $("#grade_id").on('change', function (){
+                load_group();
+            });
+            $("#department_id").on('change', function (){
+                load_group();
+            });
+            $("#department_option_id").on('change', function (){
+                load_group();
+            });
 
         })
     </script>

@@ -56,54 +56,10 @@ class EloquentCourseProgramRepository implements CourseProgramRepositoryContract
     public function create($input)
     {
 
-        $courseProgram = new Course();
-        if ( array_key_exists("name_kh",$input)){
-            $courseProgram->name_kh = $input["name_kh"];
-        }
-        if ( array_key_exists("name_en",$input)){
-            $courseProgram->name_en = $input["name_en"];
-        }
-        if ( array_key_exists("name_fr",$input)){
-            $courseProgram->name_fr = $input["name_fr"];
-        }
-        if ( array_key_exists("time_course",$input)){
-            $courseProgram->time_course = $input["time_course"];
-        }
-        if ( array_key_exists("time_tp",$input)){
-            $courseProgram->time_tp = $input["time_tp"];
-        }
-        if ( array_key_exists("time_td",$input)){
-            $courseProgram->time_td = $input["time_td"];
-        }
-        if ( array_key_exists("code",$input)){
-            $courseProgram->code = $input["code"];
-        }
-        if ( array_key_exists("credit",$input)){
-            $courseProgram->credit = $input["credit"];
-        }
-        if ( array_key_exists("degree_id",$input)){
-            $courseProgram->degree_id = $input["degree_id"];
-        }
-        if ( array_key_exists("department_id",$input)){
-            $courseProgram->department_id = $input["department_id"];
-        }
-        if ( array_key_exists("departement_option_id",$input)){
-            $courseProgram->departement_option_id = $input["departement_option_id"];
-        }
-        if ( array_key_exists("semester_id",$input)){
-            $courseProgram->semester_id = $input["semester_id"];
-        }
-        if ( array_key_exists("grade_id",$input)){
-            $courseProgram->grade_id = $input["grade_id"];
-        }
+        $input['create_uid'] = auth()->id();
+        $input['created_at'] = Carbon::now();
 
-        $courseProgram->create_uid = auth()->id();
-        $courseProgram->updated_at = Carbon::now();
-        $courseProgram->write_uid = auth()->id();
-
-
-
-        if ($courseProgram->save()) {
+        if (Course::create($input)) {
             return true;
         }
         throw new GeneralException(trans('exceptions.backend.general.create_error'));
@@ -119,55 +75,11 @@ class EloquentCourseProgramRepository implements CourseProgramRepositoryContract
     {
         $courseProgram = $this->findOrThrowException($id);
 
-
-        if ( array_key_exists("name_kh",$input)){
-            $courseProgram->name_kh = $input["name_kh"];
-        }
-        if ( array_key_exists("name_en",$input)){
-            $courseProgram->name_en = $input["name_en"];
-        }
-        if ( array_key_exists("name_fr",$input)){
-            $courseProgram->name_fr = $input["name_fr"];
-        }
-        if ( array_key_exists("time_course",$input)){
-            $courseProgram->time_course = $input["time_course"];
-        }
-        if ( array_key_exists("time_tp",$input)){
-            $courseProgram->time_tp = $input["time_tp"];
-        }
-        if ( array_key_exists("time_td",$input)){
-            $courseProgram->time_td = $input["time_td"];
-        }
-        if ( array_key_exists("code",$input)){
-            $courseProgram->code = $input["code"];
-        }
-        if ( array_key_exists("credit",$input)){
-            $courseProgram->credit = $input["credit"];
-        }
-        if ( array_key_exists("degree_id",$input)){
-            $courseProgram->degree_id = $input["degree_id"];
-        }
-        if ( array_key_exists("department_id",$input)){
-            $courseProgram->department_id = $input["department_id"];
-        }
-
-        if ( array_key_exists("department_option_id",$input)){
-            $courseProgram->department_option_id = $input["department_option_id"];
-        }
-        if ( array_key_exists("semester_id",$input)){
-            $courseProgram->semester_id = $input["semester_id"];
-        }
-        if ( array_key_exists("grade_id",$input)){
-            $courseProgram->grade_id = $input["grade_id"];
-        }
-
-        $courseProgram->updated_at = Carbon::now();
-        $courseProgram->write_uid = auth()->id();
+        $input['updated_at'] = Carbon::now();
+        $input['write_uid'] = auth()->id();
 
 
-
-
-        if ($courseProgram->save()) {
+        if ($courseProgram->update($input)) {
             return true;
         }
 

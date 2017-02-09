@@ -16,6 +16,7 @@ use App\Models\Average;
 use App\Models\Course;
 use App\Models\Degree;
 use App\Models\Department;
+use App\Models\DepartmentOption;
 use App\Models\Employee;
 use App\Models\Grade;
 use App\Models\Score;
@@ -164,9 +165,16 @@ class CourseAnnualController extends Controller
         if($grade_id = $request->grade_id) {
             $groups = $groups->where('studentAnnuals.grade_id', '=',$grade_id);
         }
+        if($option_id = $request->department_option_id) {
+            $groups = $groups->where('studentAnnuals.department_option_id', '=',$option_id);
+        }
         $groups = $groups->lists('group');
 
-        return view('backend.course.courseAnnual.includes.student_group_selection', compact('groups'))->render();
+        if($request->ajax()){
+            return Response::json($groups);
+        } else {
+            return view('backend.course.courseAnnual.includes.student_group_selection', compact('groups'))->render();
+        }
 
     }
 
@@ -188,32 +196,83 @@ class CourseAnnualController extends Controller
      */
     public function create(CreateCourseAnnualRequest $request)
     {
-
-
         if(auth()->user()->allow("view-all-score-in-all-department")){
             $courses = Course::orderBy('updated_at', 'desc')->get();
             // Get all department in case user have previlege to view all department
             $departments = Department::where("parent_id",config('access.departments.department_academic'))->orderBy("code")->lists("code","id");
             $department_id = null;
-            $deptOptions = null;
-            $employees = Employee::orderBy('updated_at', 'desc')->lists("name_kh","id");
+            $options = DepartmentOption::get();
+            $raw_courses = Course::join('degrees','degrees.id','=','courses.degree_id')
+                ->join('departments','departments.id','=','courses.department_id')
+                ->leftJoin('departmentOptions','departmentOptions.id','=','courses.department_option_id')
+                ->select([
+                    'courses.id',
+                    'courses.name_en',
+                    'courses.name_fr',
+                    'courses.name_kh',
+                    'courses.time_course',
+                    'courses.time_tp',
+                    'courses.time_td',
+                    'courses.credit',
+                    'courses.department_id',
+                    'courses.degree_id',
+                    'courses.grade_id',
+                    'courses.department_option_id',
+                    'courses.semester_id',
+                    'degrees.code as degree_code',
+                    'departments.code as department_code',
+                    'departmentOptions.code as option'
+                ])
+                ->orderBy('courses.degree_id', 'asc')
+                ->orderBy('courses.grade_id', 'asc')
+                ->orderBy('courses.semester_id', 'asc')
+                ->get();
         } else {
             $employee = Employee::where('user_id', Auth::user()->id)->first();
             $departments = $employee->department()->lists("code","id");
             $department_id = $employee->department->id;
-            $deptOptions = $this->deptHasOption($department_id);
-            $courses = Course::where('courses.department_id', $department_id)->orderBy('updated_at', 'desc')->get();
-            if(auth()->user()->allow("view-all-score-course-annual")){ // This is chef department, he can see all courses in his department
-                $employees = Employee::where('employees.department_id', $department_id)->orderBy('updated_at', 'desc')->lists("name_kh","id");
-            } else {
-                $employees = null;
-            }
+            $options = DepartmentOption::where('department_id',$employee->department_id)->get();
+            $raw_courses = Course::where('courses.department_id', $department_id)
+                                ->join('degrees','degrees.id','=','courses.degree_id')
+                                ->join('departments','departments.id','=','courses.department_id')
+                                ->leftJoin('departmentOptions','departmentOptions.id','=','courses.department_option_id')
+                                ->select([
+                                    'courses.id',
+                                    'courses.name_en',
+                                    'courses.name_fr',
+                                    'courses.name_kh',
+                                    'courses.time_course',
+                                    'courses.time_tp',
+                                    'courses.time_td',
+                                    'courses.credit',
+                                    'courses.department_id',
+                                    'courses.degree_id',
+                                    'courses.grade_id',
+                                    'courses.department_option_id',
+                                    'courses.semester_id',
+                                    'degrees.code as degree_code',
+                                    'departments.code as department_code',
+                                    'departmentOptions.code as option'
+                                ])
+                                ->orderBy('courses.degree_id', 'asc')
+                                ->orderBy('courses.grade_id', 'asc')
+                                ->orderBy('courses.semester_id', 'asc')
+                                ->get();
         }
+        $courses = [];
+
+        foreach($raw_courses as $raw_course){
+            if(!isset($courses[$raw_course->department_code])){
+                $courses[$raw_course->department_code] = array();
+            }
+            array_push($courses[$raw_course->department_code],$raw_course);
+        }
+
         $academicYears = AcademicYear::orderBy('id', 'desc')->lists('name_latin','id')->toArray();
         $degrees = Degree::lists('name_kh','id')->toArray();
         $grades = Grade::lists('name_kh','id')->toArray();
         $semesters = Semester::lists("name_kh", "id");
-        return view('backend.course.courseAnnual.create',compact('departments','academicYears','degrees','grades','courses',"semesters","employees", 'deptOptions'));
+        return view('backend.course.courseAnnual.create',compact('departments','academicYears','degrees','grades','courses',"semesters", 'options'));
     }
 
     public function getDepts() {
@@ -248,41 +307,23 @@ class CourseAnnualController extends Controller
     /**
      * Store a newly created resource in storage.
      *
-     * @param  StoreCourseProgramRequest $request
+     * @param  StoreCourseAnnualRequest $request
      * @return \Illuminate\Http\Response
      */
 
     public function store(StoreCourseAnnualRequest $request)
     {
-
-
-//        $groups = json_decode($request->group_selected);
-
-//        if(count($groups)>0) {
-//            foreach($groups as $group) {
-//                $split = explode('_', $group);
-//                if(count($split)>2) {
-//
-//                    dd($split);
-//
-//                    $input = [
-//                        'group' => ''
-//                    ];
-//
-//                }
-//            }
-//        }
-
         $data = $request->all();
+
+        //dd($data);
 
         $storeCourseAnnual = $this->courseAnnuals->create($data);
         if($storeCourseAnnual) {
             $data = $data + ['course_annual_id' => $storeCourseAnnual->id];
-//            dd($data);
             $storeCourseAnnualClass = $this->courseAnnualClasses->create($data);
 
             if($storeCourseAnnualClass) {
-                return redirect()->route('admin.course.course_annual.index')->withFlashSuccess(trans('alerts.backend.general.created'));
+                return redirect()->route('admin.course.course_annual.index')->withFlashSuccess(trans('alerts.backend.generals.created'));
             }
         }
 
@@ -313,38 +354,94 @@ class CourseAnnualController extends Controller
     {
 
         $courseAnnual = $this->courseAnnuals->findOrThrowException($id);
+        //dd($courseAnnual->courseAnnualClass);
+
+        $groups = $this->getStudentGroupFromDB()
+                       ->where('studentAnnuals.department_id', '=',$courseAnnual->department_id)
+                       ->where('studentAnnuals.academic_year_id', '=',$courseAnnual->academic_year_id)
+                       ->where('studentAnnuals.degree_id', '=',$courseAnnual->degree_id)
+                       ->where('studentAnnuals.grade_id', '=',$courseAnnual->grade_id)
+                       ->where('studentAnnuals.department_option_id', '=',$courseAnnual->department_option_id)
+                       ->lists('group');
 
         if(auth()->user()->allow("view-all-score-in-all-department")){
-
+            $courses = Course::orderBy('updated_at', 'desc')->get();
             // Get all department in case user have previlege to view all department
             $departments = Department::where("parent_id",config('access.departments.department_academic'))->orderBy("code")->lists("code","id");
             $department_id = null;
-            $courses = Course::orderBy('updated_at', 'desc')->get();
-            $employees = Employee::orderBy('name_latin')->lists("name_kh","id");
-            $deptOptions = null;
-
+            $options = DepartmentOption::get();
+            $raw_courses = Course::join('degrees','degrees.id','=','courses.degree_id')
+                ->join('departments','departments.id','=','courses.department_id')
+                ->leftJoin('departmentOptions','departmentOptions.id','=','courses.department_option_id')
+                ->select([
+                    'courses.id',
+                    'courses.name_en',
+                    'courses.name_fr',
+                    'courses.name_kh',
+                    'courses.time_course',
+                    'courses.time_tp',
+                    'courses.time_td',
+                    'courses.credit',
+                    'courses.department_id',
+                    'courses.degree_id',
+                    'courses.grade_id',
+                    'courses.department_option_id',
+                    'courses.semester_id',
+                    'degrees.code as degree_code',
+                    'departments.code as department_code',
+                    'departmentOptions.code as option'
+                ])
+                ->orderBy('courses.degree_id', 'asc')
+                ->orderBy('courses.grade_id', 'asc')
+                ->orderBy('courses.semester_id', 'asc')
+                ->get();
         } else {
             $employee = Employee::where('user_id', Auth::user()->id)->first();
             $departments = $employee->department()->lists("code","id");
             $department_id = $employee->department->id;
-            $deptOptions = $this->deptHasOption($department_id);
-            $courses = Course::where('department_id', $department_id)->orderBy('updated_at', 'desc')->get();
-            if(auth()->user()->allow("view-all-score-course-annual")){ // This is chef department, he can see all courses in his department
-                $employees = Employee::where('department_id',$department_id)->lists("name_kh","id");
-            } else {
-                $employees = null;
-            }
+            $options = DepartmentOption::where('department_id',$employee->department_id)->get();
+            $raw_courses = Course::where('courses.department_id', $department_id)
+                ->join('degrees','degrees.id','=','courses.degree_id')
+                ->join('departments','departments.id','=','courses.department_id')
+                ->leftJoin('departmentOptions','departmentOptions.id','=','courses.department_option_id')
+                ->select([
+                    'courses.id',
+                    'courses.name_en',
+                    'courses.name_fr',
+                    'courses.name_kh',
+                    'courses.time_course',
+                    'courses.time_tp',
+                    'courses.time_td',
+                    'courses.credit',
+                    'courses.department_id',
+                    'courses.degree_id',
+                    'courses.grade_id',
+                    'courses.department_option_id',
+                    'courses.semester_id',
+                    'degrees.code as degree_code',
+                    'departments.code as department_code',
+                    'departmentOptions.code as option'
+                ])
+                ->orderBy('courses.degree_id', 'asc')
+                ->orderBy('courses.grade_id', 'asc')
+                ->orderBy('courses.semester_id', 'asc')
+                ->get();
         }
-        $academicYears = AcademicYear::lists('name_latin','id')->toArray();
+        $courses = [];
+
+        foreach($raw_courses as $raw_course){
+            if(!isset($courses[$raw_course->department_code])){
+                $courses[$raw_course->department_code] = array();
+            }
+            array_push($courses[$raw_course->department_code],$raw_course);
+        }
+
+        $academicYears = AcademicYear::orderBy('id', 'desc')->lists('name_latin','id')->toArray();
         $degrees = Degree::lists('name_kh','id')->toArray();
         $grades = Grade::lists('name_kh','id')->toArray();
         $semesters = Semester::lists("name_kh", "id");
 
-
-//        dd($courseAnnual->courseAnnualClass);
-//
-//        dd(isset($courseAnnual->courseAnnualClass[0])?$courseAnnual->courseAnnualClass[0]->department_id:0);
-        return view('backend.course.courseAnnual.edit',compact('courseAnnual','departments','academicYears','degrees','grades','courses','employees','semesters', 'deptOptions'));
+        return view('backend.course.courseAnnual.edit',compact('courseAnnual','departments','academicYears','degrees','grades','courses', 'options','semesters', 'groups'));
     }
 
     /**
@@ -421,35 +518,53 @@ class CourseAnnualController extends Controller
         $employee =Employee::where('user_id', Auth::user()->id)->first();
 
         $courseAnnuals = DB::table('course_annuals')
-            ->leftJoin('course_annual_classes', 'course_annual_classes.course_annual_id', '=', 'course_annuals.id')
             ->leftJoin('courses','course_annuals.course_id', '=', 'courses.id')
             ->leftJoin('employees','course_annuals.employee_id', '=', 'employees.id')
-
-            ->leftJoin('departments','course_annual_classes.department_id', '=', 'departments.id')
-            ->leftJoin('degrees','course_annual_classes.degree_id', '=', 'degrees.id')
-            ->leftJoin('grades','course_annual_classes.grade_id', '=', 'grades.id')
-            ->leftJoin('departmentOptions', 'departmentOptions.department_id', '=', 'departments.id')
-
+            ->leftJoin('academicYears','course_annuals.academic_year_id', '=', 'academicYears.id')
+            ->leftJoin('departments','course_annuals.department_id', '=', 'departments.id')
+            ->leftJoin('degrees','course_annuals.degree_id', '=', 'degrees.id')
+            ->leftJoin('grades','course_annuals.grade_id', '=', 'grades.id')
+            ->leftJoin('departmentOptions', 'course_annuals.department_option_id', '=', 'departmentOptions.id')
             ->select([
+                'courses.name_kh as course',
                 'course_annuals.id',
                 'course_annuals.name_en as name',
                 'course_annuals.semester_id',
                 'course_annuals.active',
                 'course_annuals.academic_year_id',
                 'employees.name_latin as employee_id',
-                'departments.code as department_id',
-                'degrees.code as degree_id',
-                'grades.id as grade_id',
+                'academicYears.name_latin as academic_year',
                 'course_annuals.course_id',
-                DB::raw("CONCAT(degrees.code,grades.code,departments.code, ' (',course_annual_classes.group, ')' ) as class")
+                DB::raw("CONCAT(degrees.code,grades.code,departments.code) as class")
             ])
-            ->orderBy("degrees.id","ASC")
-            ->orderBy("departments.id","ASC")
-            ->orderBy("grades.id","ASC")
+            ->orderBy("courses.degree_id","ASC")
+            ->orderBy("courses.department_id","ASC")
+            ->orderBy("courses.grade_id","ASC")
             ->orderBy("course_annuals.semester_id","ASC");
 
         $datatables =  app('datatables')->of($courseAnnuals);
+
         $datatables
+            ->editColumn('class', function ($courseAnnual) {
+                $course_annual_classes = DB::table('course_annual_classes')
+
+                    ->select('group')
+                    ->where('course_annual_classes.course_annual_id',$courseAnnual->id)
+                    ->get();
+
+                $data = "";
+
+                foreach($course_annual_classes as $obj){
+                    $data = $obj->group.'.'.$data;
+                }
+
+                if($data != ".") {
+                    return $courseAnnual->class.'-'.$data;
+                } else {
+                    return $courseAnnual->class;
+                }
+
+            })
             ->addColumn('action', function ($courseAnnual) {
 
             if(Auth::user()->allow('input-score-course-annual')) {
@@ -472,10 +587,10 @@ class CourseAnnualController extends Controller
             $datatables->where('course_annuals.academic_year_id', '=', $last_academic_year_id);
         }
         if ($degree = $datatables->request->get('degree')) {
-            $datatables->where('degrees.id', '=', $degree);
+            $datatables->where('courses.degree_id', '=', $degree);
         }
         if ($grade = $datatables->request->get('grade')) {
-            $datatables->where('grades.id', '=', $grade);
+            $datatables->where('courses.grade_id', '=', $grade);
         }
 
         if ($semester = $datatables->request->get('semester')) {
@@ -483,7 +598,7 @@ class CourseAnnualController extends Controller
         }
 
         if($deptOption = $datatables->request->get('dept_option')) {
-            $datatables->where('departmentOptions.id', '=', $deptOption);
+            $datatables->where('courses.department_option_id', '=', $deptOption);
         }
         if($group = $datatables->request->get('student_group')) {
             $datatables->where('course_annual_classes.group', '=', $group);
@@ -491,10 +606,10 @@ class CourseAnnualController extends Controller
 
         if(auth()->user()->allow("view-all-score-in-all-department")){ // user has permission to view all course/score in all department
             if ($department = $datatables->request->get('department')) {
-                $datatables->where('departments.id', '=', $department);
+                $datatables->where('courses.department_id', '=', $department);
             }
         } else {
-            $datatables = $datatables ->where('departments.id', $employee->department->id );
+            $datatables = $datatables ->where('courses.department_id', $employee->department->id );
         }
 
         if(auth()->user()->allow("view-all-score-course-annual")){   // This one is might be chef department, he can view all course/score for all teacher

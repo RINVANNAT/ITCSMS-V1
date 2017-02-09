@@ -1,3 +1,41 @@
+function formatRepoEmployee (repo) {
+
+    if (repo.loading) {
+        return repo.text;
+    }
+    if (repo.newOption) {
+        return '<a href="#" class=""><em>Select employee below</em></a>';
+    } else {
+        var photo = "avatar.png";
+        var gender = "NA";
+        if(repo.photo != "" && repo.photo != null){
+            photo = repo.photo;
+        }
+        if(repo.gender != null) {
+            gender = repo.gender;
+        }
+        var markup = "<div class='select2-result-repository clearfix'>" +
+            "<div class='select2-result-repository__avatar'><img src='"+base_url+"/"+photo+"' /></div>" +
+            "<div class='select2-result-repository__meta'>" +
+            "<div class='select2-result-repository__title'>" + repo.id_card+" | "+repo.text + "</div>"+
+            "<div class='select2-result-repository__description'>" + repo.name_latin + "</div>"+
+            "<div class='select2-result-repository__statistics'>" +
+            "<div class='select2-result-repository__forks'><i class='fa fa-bank'></i> " + repo.department + "</div>" +
+            "<div class='select2-result-repository__stargazers'><i class='fa fa-venus-mars'></i> " + gender + "</div>" +
+            "</div>" +
+            "</div>"+
+            "</div>";
+        return markup;
+
+    }
+}
+
+function formatRepoSelectionEmployee (data, container) {
+
+    $('#lecturer_lists').val(data.id);
+    return data.text || data.name_e;
+}
+
 function get_filter_box(){
     var html = '<div class="o_cp_searchview" style="display: block;">'+
                     '<div class="o_searchview">'+

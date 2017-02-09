@@ -8,6 +8,9 @@
         <small>{{ trans('labels.backend.courseAnnuals.sub_edit_title') }}</small>
     </h1>
 @endsection
+@section('after-styles-end')
+    {!! Html::style('plugins/select2/select2.min.css') !!}
+@stop
 
 @section('content')
     {!! Form::model($courseAnnual, ['route' => ['admin.course.course_annual.update', $courseAnnual->id],'class' => 'form-horizontal edit_course_annual', 'role'=>'form', 'method' => 'patch']) !!}
@@ -40,126 +43,81 @@
 
 @section('after-scripts-end')
     {!! Html::script('js/backend/course/courseAnnual/course_annual.js') !!}
+    {!! HTML::script('plugins/select2/select2.full.min.js') !!}
 
     <script>
+        var $search_url = "{{route('admin.employee.search')}}";
+        var base_url = '{{url('img/profiles/')}}';
+        var get_group_url = "{{route('course_annual.get_group_filtering')}}";
+
         $(document).ready(function() {
+            // Search course program
+            $("#course_id").select2({
+                placeholder: "Select a course program",
+                allowClear: true
+            });
 
-            $('#other_dept').on('click', function(e) {
-                e.preventDefault();
-                $.ajax({
-                    type: 'GET',
-                    url: '{{route('course_annual.get_other_dept')}}',
-                    data: {department_id: 'request'},
-                    dataType: "html",
-                    success: function(resultData) {
-                        if($('select[name=other_department_id]').is(':visible')) {
-
-                            $(this).html(resultData);
-                        } else {
-                            $('.other_department').append(resultData);
-                        }
-
+            // Search lecturer
+            var employee_search_box = $(".select_employee").select2({
+                placeholder: 'Enter name ...',
+                allowClear: true,
+                tags: true,
+                createTag: function (params) {
+                    return {
+                        id: params.term,
+                        name: params.term,
+                        group: 'customer',
+                        newOption: true
                     }
-                });
-            })
+                },
+                ajax: {
+                    url: $search_url,
+                    dataType: 'json',
+                    delay: 250,
+                    data: function (params) {
+                        return {
+                            term: params.term || '', // search term
+                            page: params.page || 1
+                        };
+                    },
+                    cache: true
+                },
+                escapeMarkup: function (markup) {
+                    return markup;
+                }, // let our custom formatter work
+                minimumInputLength: 3,
+                templateResult: formatRepoEmployee, // omitted for brevity, see the source of this page
+                templateSelection: formatRepoSelectionEmployee, // omitted for brevity, see the source of this page
+            });
 
-
-            $(document).on('change', 'select[name=other_department_id]', function() {
-                var route = '{{route('course_annual.get_other_lecturer')}}';
-
-                $.ajax({
-                    type: 'GET',
-                    url: route,
-                    data: {department_id: $(this).val()},
-                    dataType: "html",
-                    success: function(resultData) {
-                        $('#lecturer_lists').html(resultData);
-                    }
-                });
-            })
-
-
-            $('form.edit_course_annual').on('submit', function(e) {
-
-                var credit = $('input#credit').val();
-
-                if(credit != '') {
-                    if($.isNumeric(credit)) {
-                        return true;
-                    } else {
-
-                        notify('error', 'Not a numeric!')
-                        e.preventDefault();
-
-                    }
-                } else {
-                    notify('error', 'Field credit is required!')
-                    e.preventDefault();
-                }
-//                e.preventDefault();
-//                var form_url = $(this).attr('action');
-//                var baseData = {
-//                    group_selected: ($('#jstree_group').is(':visible'))?JSON.stringify($('#jstree_group').jstree("get_selected")):''
-//                };
-//
-//                $.ajax({
-//                    type: 'POST',
-//                    url: form_url+'?'+$('form.create_course_annual').serialize(),
-//                    data: baseData,
-//                    dataType: 'JSON',
-//                    success: function(resultData) {
-//                        console.log(resultData);
-//
-//                    }
-//                });
-            })
-            
-
-            $('.dept_option_block').hide();
-
-            $('select[name=department_id]').on('change', function (e) {
-
-                var request_url = '{{route('course_annual.dept_option')}}';
-
-                $.ajax({
-                    type: 'GET',
-                    url: request_url,
-                    data: {department_id: $(this).val()},
-                    dataType: "html",
-                    success: function(resultData) {
-                        if($('select[name=department_option_id]').is(':visible')) {
-
-                            $('select[name=department_option_id]').html(resultData);
-                        } else {
-                            $('.dept_option_block').show();
-                            $('.dept_option_block').append('<label class="col-lg-2 control-label required" style="margin-top: 5px"> Department Option </label>');
-                            $(".dept_option_block").append('<div class="col-lg-7">'+resultData +'</div>');
-                        }
-                    }
-                });
-            })
-
+            // On department change, change option
             if($('select[name=department_id] :selected').val()) {
-
-                var request_url = '{{route('course_annual.dept_option')}}';
-
-                $.ajax({
-                    type: 'GET',
-                    url: request_url,
-                    data: {department_id: $('select[name=department_id] :selected').val()},
-                    dataType: "html",
-                    success: function(resultData) {
-                        if($('select[name=department_option_id]').is(':visible')) {
-
-                            $('select[name=department_option_id]').html(resultData);
-                        } else {
-                            $('.dept_option_block').show();
-                            $('.dept_option_block').append('<label class="col-lg-2 control-label required" style="margin-top: 5px"> Department Option </label>');
-                            $(".dept_option_block").append('<div class="col-lg-7">'+resultData +'</div>');
-                        }
-                    }
-                });
+                var department_id = $('select[name=department_id] :selected').val();
+                $(".department_"+department_id).show();
             }
+            $('select[name=department_id]').on('change', function() {
+                $(".department_option").hide();
+                var department_id = $('select[name=department_id] :selected').val();
+                $(".department_"+department_id).show();
+
+            });
+
+            // On degree, grade, department, option is changed, change group
+            $("#academic_year_id").on('change', function (){
+                load_group();
+            });
+            $("#degree_id").on('change', function (){
+                load_group();
+            });
+            $("#grade_id").on('change', function (){
+                load_group();
+            });
+            $("#department_id").on('change', function (){
+                load_group();
+            });
+            $("#department_option_id").on('change', function (){
+                load_group();
+            });
         })
     </script>
 @stop

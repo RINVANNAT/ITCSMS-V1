@@ -13,11 +13,13 @@ use App\Models\Gender;
 use App\Models\Position;
 use App\Repositories\Backend\Employee\EmployeeRepositoryContract;
 use App\Repositories\Backend\Role\RoleRepositoryContract;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Carbon\Carbon;
 use Maatwebsite\Excel\Facades\Excel;
 use Flash;
 use App\Utils\ArrayUtils;
+use Illuminate\Support\Facades\Input;
 
 class EmployeeController extends Controller
 {
@@ -286,6 +288,49 @@ class EmployeeController extends Controller
             return redirect()->route('admin.employees.index');
         }else{
             Flash::error("Please select import file");
+        }
+    }
+
+    public function search(Request $request){
+        if($request->ajax()) {
+
+            $page = Input::get('page');
+            $resultCount = 25;
+            $offset = ($page - 1) * $resultCount;
+            $employees = Employee::where('employees.name_latin', 'ilike', "%".Input::get("term") . "%")
+                ->orWhere('employees.name_kh', 'ilike', "%".Input::get("term") . "%")
+                ->select([
+                    'employees.id as id',
+                    'employees.id_card',
+                    'employees.name_kh as text',
+                    'employees.name_latin',
+                    'genders.code as gender',
+                    'departments.code as department'
+                ])
+                ->leftJoin('departments','departments.id','=','employees.department_id')
+                ->leftJoin('genders','genders.id','=','employees.gender_id');
+            //Filter employee by office
+//            if($this->users->office_id != 0 || $this->users->office_id != null){
+//                $employees->whereIn('office_id', $this->users->office_id);
+//            }
+
+            $client = $employees
+                ->orderBy('name_latin')
+                ->skip($offset)
+                ->take($resultCount)
+                ->get();
+
+            $count = Count($employees->get());
+            $endCount = $offset + $resultCount;
+            $morePages = $count > $endCount;
+
+            $results = array(
+                'results' => $client,
+                'pagination' => array(
+                    "more" => $morePages
+                )
+            );
+            return response()->json($results);
         }
     }
 }

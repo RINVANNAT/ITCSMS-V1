@@ -14,7 +14,11 @@ class CourseAnnual extends Model
 		"course_id",
 		"semester_id",
         "create_uid",
-        "write_uid"
+        "write_uid",
+        "degree_id",
+        "grade_id",
+        "department_id",
+        "department_option_id"
 	];
 
     public function creator(){
