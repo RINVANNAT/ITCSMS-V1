@@ -229,7 +229,8 @@ class CourseController extends Controller
             ])
             ->orderBy('courses.department_id','ASC')
             ->orderBy('courses.degree_id','ASC')
-            ->orderBy('courses.grade_id','ASC');
+            ->orderBy('courses.grade_id','ASC')
+            ->orderBy('courses.semester_id','ASC');
 
         $datatables = app('datatables')->of($coursePrograms);
 
