@@ -15,12 +15,15 @@
                     <th>Class</th>
                     <th style="width: 40px"></th>
                 </tr>
-                <tr>
-                    @if($courses == null || empty($courses))
+
+                @if($courses == null || empty($courses))
+                    <tr>
                         <td colspan="4">Empty</td>
-                    @else
-                        <?php $index = 1; ?>
-                        @foreach($courses as $course)
+                    </tr>
+                @else
+                    <?php $index = 1; ?>
+                    @foreach($courses as $course)
+                    <tr>
                         <td>{{$index}}.</td>
                         <td>{{$course['name_en']}}</td>
                         <td>
@@ -31,10 +34,11 @@
                                 <i class="fa fa-plus" data-toggle="tooltip" data-placement="top" title="" data-original-title="'.'input score'.'"></i> Score
                             </a>
                         </td>
-                        <?php $index++; ?>
-                        @endforeach
-                    @endif
-                </tr>
+                    </tr>
+                    <?php $index++; ?>
+                    @endforeach
+                @endif
+
                 </tbody>
             </table>
         </div>

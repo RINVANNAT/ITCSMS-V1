@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Backend\Access\User;
 
 use App\Http\Controllers\Controller;
+use App\Models\Access\User\User;
 use App\Repositories\Backend\User\UserContract;
 use App\Repositories\Backend\Role\RoleRepositoryContract;
 use App\Http\Requests\Backend\Access\User\CreateUserRequest;
@@ -62,6 +63,87 @@ class UserController extends Controller
     {
         return view('backend.access.index')
             ->withUsers($this->users->getUsersPaginated(config('access.users.default_per_page'), 1));
+    }
+
+    public function data()
+    {
+
+        $employees = User::select([
+                                'id',
+                                'name',
+                                'email',
+                                'status',
+                                'confirmed',
+                                'created_at',
+                                'updated_at'
+                            ]);
+
+        $datatables =  app('datatables')->of($employees);
+
+
+        return $datatables
+            ->editColumn('confirmed', function($user) {
+                if($user->confirmed) {
+                    return '<label class="label label-success">Yes</label>';
+                } else {
+                    return '<label class="label label-danger">No</label>';
+                }
+            })
+            ->addColumn('roles', function($user) {
+                $html = "";
+                if($user->roles()->count() > 0){
+                    foreach ($user->roles as $role){
+                        $html = $html.$role->name."<br/>";
+                    }
+                } else {
+                    $html = trans('labels.general.none');
+                }
+                return $html;
+            })
+            ->addColumn('other_permissions', function($user) {
+                $html = "";
+                if($user->permissions()->count() > 0){
+                    foreach ($user->permissions as $perm){
+                        $html = $html.$perm->display_name."<br/>";
+                    }
+                } else {
+                    $html = trans('labels.general.none');
+                }
+
+                return $html;
+            })
+            ->editColumn('created_at', function($user) {
+                return $user->created_at->diffForHumans();
+            })
+            ->editColumn('updated_at', function($user) {
+
+                return $user->updated_at->diffForHumans();
+
+            })
+            ->addColumn('action', function ($user) {
+                $status_button = "";
+                switch ($user->status) {
+                    case 0:
+                        if (access()->allow('reactivate-users')) {
+                            $status_button =  '<a href="' . route('admin.access.user.mark', [$user->id, 1]) . '" class="btn btn-xs btn-success"><i class="fa fa-play" data-toggle="tooltip" data-placement="top" title="' . trans('buttons.backend.access.users.activate') . '"></i></a> ';
+                        }
+
+                        break;
+
+                    case 1:
+                        if (access()->allow('deactivate-users')) {
+                            $status_button =  '<a href="' . route('admin.access.user.mark', [$user->id, 0]) . '" class="btn btn-xs btn-warning"><i class="fa fa-pause" data-toggle="tooltip" data-placement="top" title="' . trans('buttons.backend.access.users.deactivate') . '"></i></a> ';
+                        }
+
+                        break;
+
+                    default:
+                        $status_button =  '';
+                }
+
+                return  $user->edit_button.$user->change_password_button." ".$user->confirmed_button.$status_button.$user->delete_button;
+            })
+            ->make(true);
     }
 
     /**

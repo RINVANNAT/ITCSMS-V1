@@ -543,6 +543,7 @@ class CourseAnnualController extends Controller
             ->orderBy("course_annuals.semester_id","ASC");
 
         $datatables =  app('datatables')->of($courseAnnuals);
+        $employee = Employee::where('user_id', Auth::user()->id)->first();
 
         $datatables
             ->editColumn('class', function ($courseAnnual) {
@@ -565,19 +566,34 @@ class CourseAnnualController extends Controller
                 }
 
             })
-            ->addColumn('action', function ($courseAnnual) {
+            ->addColumn('action', function ($courseAnnual) use ($employee) {
+                if(Auth::user()->id == 1) { // This is admin
+                    return  '<a href="'.route('admin.course.form_input_score_course_annual',$courseAnnual->id).'" class="btn btn-xs btn-info input_score_course"><i class="fa fa-plus" data-toggle="tooltip" data-placement="top" title="" data-original-title="'.'input score'.'"></i> Score </a>'.
+                            ' <a href="'.route('admin.course.course_annual.edit',$courseAnnual->id).'" class="btn btn-xs btn-primary"><i class="fa fa-pencil" data-toggle="tooltip" data-placement="top" title="" data-original-title="'.trans('buttons.general.crud.edit').'"></i> </a>'.
+                            ' <button class="btn btn-xs btn-danger btn-delete" data-remote="'.route('admin.course.course_annual.destroy', $courseAnnual->id) .'"><i class="fa fa-times" data-toggle="tooltip" data-placement="top" title="' . trans('buttons.general.crud.delete') . '"></i></button>';
+                } else {
+                    $my_courses = CourseAnnual::where('employee_id',$employee->id)->lists('id')->toArray();
 
-            if(Auth::user()->allow('input-score-course-annual')) {
-                return
-                    '<a href="'.route('admin.course.course_annual.edit',$courseAnnual->id).'" class="btn btn-xs btn-primary"><i class="fa fa-pencil" data-toggle="tooltip" data-placement="top" title="" data-original-title="'.trans('buttons.general.crud.edit').'"></i> </a>'.
-                    ' <a href="'.route('admin.course.form_input_score_course_annual',$courseAnnual->id).'" class="btn btn-xs btn-info input_score_course"><i class="fa fa-plus" data-toggle="tooltip" data-placement="top" title="" data-original-title="'.'input score'.'"></i> Score </a>';
+                    $actions = "";
 
-            } else {
+                    // Check if this is his/her course and he/she has permission to input score
+                    if(Auth::user()->allow('input-score-course-annual')) {
+                        if(in_array($courseAnnual->id,$my_courses)){
+                            $actions = $actions.'<a href="'.route('admin.course.form_input_score_course_annual',$courseAnnual->id).'" class="btn btn-xs btn-info input_score_course"><i class="fa fa-plus" data-toggle="tooltip" data-placement="top" title="" data-original-title="'.'input score'.'"></i> Score </a>';
+                        }
+                    }
 
-                return  '<a href="'.route('admin.course.course_annual.edit',$courseAnnual->id).'" class="btn btn-xs btn-primary"><i class="fa fa-pencil" data-toggle="tooltip" data-placement="top" title="" data-original-title="'.trans('buttons.general.crud.edit').'"></i> </a>'.
-                ' <button class="btn btn-xs btn-danger btn-delete" data-remote="'.route('admin.course.course_annual.destroy', $courseAnnual->id) .'"><i class="fa fa-times" data-toggle="tooltip" data-placement="top" title="' . trans('buttons.general.crud.delete') . '"></i></button>';
+                    if(Auth::user()->allow('edit-courseAnnuals')) {
+                        $actions = $actions.' <a href="'.route('admin.course.course_annual.edit',$courseAnnual->id).'" class="btn btn-xs btn-primary"><i class="fa fa-pencil" data-toggle="tooltip" data-placement="top" title="" data-original-title="'.trans('buttons.general.crud.edit').'"></i> </a>';
+                    }
 
-            }
+                    if(Auth::user()->allow('delete-courseAnnuals')) {
+                        $actions = $actions.' <button class="btn btn-xs btn-danger btn-delete" data-remote="'.route('admin.course.course_annual.destroy', $courseAnnual->id) .'"><i class="fa fa-times" data-toggle="tooltip" data-placement="top" title="' . trans('buttons.general.crud.delete') . '"></i></button>';
+                    }
+
+                    return $actions;
+
+                }
 
             });
         if ($academic_year = $datatables->request->get('academic_year')) {

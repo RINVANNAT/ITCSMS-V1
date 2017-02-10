@@ -14,6 +14,7 @@ use App\Models\Position;
 use App\Repositories\Backend\Employee\EmployeeRepositoryContract;
 use App\Repositories\Backend\Role\RoleRepositoryContract;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Carbon\Carbon;
 use Maatwebsite\Excel\Facades\Excel;
@@ -49,7 +50,16 @@ class EmployeeController extends Controller
      */
     public function index()
     {
-        return view('backend.employee.index');
+        if(auth()->user()->allow('view-all-employees')){
+            $departments = Department::lists('code','id');
+        } else {
+            $employee = Employee::where('user_id', Auth::user()->id)->first();
+            $departments = $employee->department()->lists("code","id");
+        }
+
+        $positions = Position::lists('title','id');
+        $genders = Gender::lists('code','id');
+        return view('backend.employee.index',compact('departments','positions','genders'));
     }
 
     /**
@@ -142,6 +152,7 @@ class EmployeeController extends Controller
     {
 
         $employees = Employee::leftJoin('departments','employees.department_id','=','departments.id')
+            ->leftJoin('genders','genders.id','=','employees.gender_id')
             ->with('positions')
             ->select([
                 'employees.id',
@@ -150,11 +161,20 @@ class EmployeeController extends Controller
                 'employees.email',
                 'employees.phone',
                 'employees.birthdate',
-                'departments.name_en as department'
+                'employees.gender_id',
+                'departments.name_en as department',
+                'genders.code as gender'
             ])
             ->orderBy('department_id','DESC');
 
         $datatables =  app('datatables')->of($employees);
+
+        if ($department = $datatables->request->get('department')) {
+            $datatables->where('department_id', '=', $department);
+        }
+        if ($gender = $datatables->request->get('gender')) {
+            $datatables->where('gender_id', '=', $gender);
+        }
 
 
         return $datatables

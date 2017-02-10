@@ -12,6 +12,11 @@
 
 @section('after-styles-end')
     {!! Html::style('plugins/datatables/dataTables.bootstrap.css') !!}
+    <style>
+        .toolbar {
+            float:left;
+        }
+    </style>
 @stop
 
 @section('content')
@@ -28,13 +33,13 @@
                     </button>
                 </a>
 
-                <div class="btn-group">
-                    <button class="btn btn-default btn-sm"><i class="fa fa-trash-o"></i></button>
-                    <button class="btn btn-default btn-sm"><i class="fa fa-reply"></i></button>
-                    <button class="btn btn-default btn-sm"><i class="fa fa-share"></i></button>
-                </div>
-                <!-- /.btn-group -->
-                <button class="btn btn-default btn-sm"><i class="fa fa-refresh"></i></button>
+                {{--<div class="btn-group">--}}
+                    {{--<button class="btn btn-default btn-sm"><i class="fa fa-trash-o"></i></button>--}}
+                    {{--<button class="btn btn-default btn-sm"><i class="fa fa-reply"></i></button>--}}
+                    {{--<button class="btn btn-default btn-sm"><i class="fa fa-share"></i></button>--}}
+                {{--</div>--}}
+                {{--<!-- /.btn-group -->--}}
+                {{--<button class="btn btn-default btn-sm"><i class="fa fa-refresh"></i></button>--}}
 
             </div>
 
@@ -48,6 +53,7 @@
                     <tr>
                         <th>{{ trans('labels.backend.employees.fields.name_kh') }}</th>
                         <th>{{ trans('labels.backend.employees.fields.name_latin') }}</th>
+                        <th>{{ trans('labels.backend.employees.fields.gender_id') }}</th>
                         <th>{{ trans('labels.backend.employees.fields.department_id') }}</th>
                         <th>{{ trans('labels.backend.employees.fields.birthdate') }}</th>
                         <th>{{ trans('labels.backend.employees.fields.contact') }}</th>
@@ -68,14 +74,34 @@
     {!! Html::script('plugins/datatables/dataTables.bootstrap.min.js') !!}
     <script>
         $(function() {
-            $('#employees-table').DataTable({
+            @if(count($departments) > 1)
+            var toolbar_html =  '{!! Form::select('department',$departments,null, array('class'=>'form-control','id'=>'filter_department','placeholder'=>'Department')) !!} '+
+                            '{!! Form::select('gender',$genders,null, array('class'=>'form-control','id'=>'filter_gender','placeholder'=>'Gender')) !!} ';
+
+            @else
+            var toolbar_html =  '{!! Form::select('department',$departments,null, array('class'=>'form-control','id'=>'filter_department')) !!} '+
+                            '{!! Form::select('gender',$genders,null, array('class'=>'form-control','id'=>'filter_gender','placeholder'=>'Gender')) !!} ';
+
+            @endif
+
+            var oTable = $('#employees-table').DataTable({
                 processing: true,
                 serverSide: true,
+                dom: 'l<"toolbar">frtip',
                 pageLength: {!! config('app.records_per_page')!!},
-                ajax: '{!! route('admin.employee.data') !!}',
+                deferLoading:true,
+                ajax: {
+                    url:'{!! route('admin.employee.data') !!}',
+                    method:'POST',
+                    data:function(d){
+                        d.department = $('#filter_department').val();
+                        d.gender = $('#filter_gender').val();
+                    }
+                },
                 columns: [
                     { data: 'name_kh', name: 'name_kh'},
                     { data: 'name_latin', name: 'name_latin'},
+                    { data: 'gender', name: 'genders.code', searchable:false},
                     { data: 'department', name: 'department_id',searchable:false},
                     { data: 'birthdate', name: 'birthdate',orderable:false},
                     { data: 'contact', name: 'address',orderable:false},
@@ -85,6 +111,19 @@
             });
 
             enableDeleteRecord($('#employees-table'));
+
+            $("div.toolbar").html(toolbar_html);
+
+            oTable.draw();
+
+            $('#filter_department').on('change', function(e) {
+                oTable.draw();
+                e.preventDefault();
+            });
+            $('#filter_gender').on('change', function(e) {
+                oTable.draw();
+                e.preventDefault();
+            });
         });
     </script>
 @stop

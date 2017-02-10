@@ -21,25 +21,25 @@ class CreateCourseAnnualClassesTable extends Migration
             $table->foreign('degree_id')
                 ->references('id')
                 ->on('degrees')
-                ->onDelete('NO ACTION');
+                ->onDelete('CASCADE');
 
             $table->integer('grade_id')->unsigned()->index()->nullable();
             $table->foreign('grade_id')
                 ->references('id')
                 ->on('grades')
-                ->onDelete('NO ACTION');
+                ->onDelete('CASCADE');
 
             $table->integer('department_id')->unsigned()->index()->nullable();
             $table->foreign('department_id')
                 ->references('id')
                 ->on('departments')
-                ->onDelete('NO ACTION');
+                ->onDelete('CASCADE');
 
             $table->integer('course_annual_id')->unsigned()->index()->nullable();
             $table->foreign('course_annual_id')
                 ->references('id')
                 ->on('course_annuals')
-                ->onDelete('NO ACTION');
+                ->onDelete('CASCADE');
 
 
             $table->timestamps();

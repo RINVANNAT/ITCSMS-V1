@@ -1023,6 +1023,13 @@ class SeedCustomsPermissions extends Seeder
                     'dependency'   => [
                         'view-backend','view-employee-management'
                     ]
+                ],
+                [
+                    'name'         => 'view-all-employees',
+                    'display_name' => 'View All Employees',
+                    'dependency'   => [
+                        'view-backend','view-employee-management'
+                    ]
                 ]
             ]
         ];

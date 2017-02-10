@@ -167,6 +167,10 @@ class EloquentCourseAnnualRepository implements CourseAnnualRepositoryContract
 
         $model = $this->findOrThrowException($id);
 
+        foreach($model->courseAnnualClass as $object){
+            $object->delete();
+        }
+
         if ($model->delete()) {
             return true;
         }

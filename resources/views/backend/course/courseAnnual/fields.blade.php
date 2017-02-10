@@ -91,7 +91,7 @@
     <div class="col-lg-7" id="group_panel">
         @if(isset($groups))
             @foreach($groups as $group)
-                <div class="col-md-1"><label><input type="checkbox" name="groups[]" value="{{$group}}"> {{$group}}</label></div>
+                <div class="col-md-2"><label><input type="checkbox" name="groups[]" value="{{$group}}"> {{$group}}</label></div>
             @endforeach
         @endif
     </div>
