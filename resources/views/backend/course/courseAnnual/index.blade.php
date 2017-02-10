@@ -238,7 +238,7 @@
 
             $.ajax({
                 type: 'GET',
-                url: '{{route('course_annual.get_group_filtering')}}',
+                url: '{{route('course_annual.get_student_group_selection')}}',
                 data: baseData,
                 dataType: "html",
                 success: function(resultData) {
@@ -248,6 +248,8 @@
                         $('#filter_student_group').html(resultData);
                     } else {
                         $('div.toolbar').append(resultData);
+
+                        $('#filter_student_group').addClass('form-control')
                     }
 
                 }

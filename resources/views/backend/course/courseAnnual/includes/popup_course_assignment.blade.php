@@ -231,16 +231,19 @@
 
        $('#filter_academic_year').on('change', function() {
            getVal();
+           appendFilterGroupSeclection();
            $('#annual_teacher').jstree("refresh");
            $('#annual_course').jstree("refresh");
        })
        $('#filter_grade').on('change', function() {
            getVal();
+           appendFilterGroupSeclection();
            $('#annual_teacher').jstree("refresh");
            $('#annual_course').jstree("refresh");
        })
        $('#filter_degree').on('change', function() {
            getVal();
+           appendFilterGroupSeclection();
            $('#annual_teacher').jstree("refresh");
            $('#annual_course').jstree("refresh");
        })
@@ -251,6 +254,7 @@
        })
        $('#filter_dept').on('change', function() {
            getVal();
+           appendFilterGroupSeclection();
            hasDeptOption();
            $('#annual_course').jstree("refresh");
            $('#annual_teacher').jstree("refresh");
@@ -657,6 +661,59 @@
            getVal();
            $('#annual_course').jstree("refresh");
        }
+
+
+       appendFilterGroupSeclection();
+       function appendFilterGroupSeclection() {
+
+           var academic_year_id,degree_id,grade_id, department_id, department_option_id ;
+
+           academic_year_id = $('#filter_academic_year :selected').val();
+           degree_id = $('#filter_degree :selected').val();
+           grade_id  = $('#filter_grade :selected').val();
+           department_option_id = $('#filter_dept_option :selected').val();
+
+
+           @if($user_department_id != null)
+                   department_id = '{{$user_department_id}}';
+           @else
+                   department_id = $('#filter_department :selected').val();
+                   @endif
+           var baseData = {
+                       academic_year_id: academic_year_id,
+                       degree_id: degree_id,
+                       grade_id:grade_id,
+                       department_id:department_id,
+                       department_optioin_id : department_option_id
+                   };
+
+           $.ajax({
+               type: 'GET',
+               url: '{{route('course_annual.get_student_group_selection')}}',
+               data: baseData,
+               dataType: "html",
+               success: function(resultData) {
+
+
+
+                    console.log(resultData);
+                   if($('#filter_student_group').is(':visible')) {
+                       $('#filter_student_group').html(resultData);
+                   } else {
+//                       $('div.toolbar').append(resultData);
+                       $("div.selection > select#filter_dept_option").after(resultData);
+
+
+                   }
+
+               }
+           });
+
+       }
+
+
+
+
 
    </script>
 @stop

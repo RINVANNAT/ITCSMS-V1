@@ -58,6 +58,8 @@ Route::group([
 
     Route::get('course-annual/get-student-group-filtering', 'CourseAnnualController@filteringStudentGroup')->name('course_annual.get_group_filtering');
 
+    Route::get('course-annual/get-student-group-selection', 'CourseAnnualController@getStudentGroupSelection')->name('course_annual.get_student_group_selection');
+
 
 
 //    ------input score by each course annual ----------------
