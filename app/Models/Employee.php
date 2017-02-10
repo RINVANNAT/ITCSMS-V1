@@ -58,9 +58,11 @@ class Employee extends Model
 	public function payslipClient(){
 		return $this->belongsTo('App\Models\PayslipClient');
 	}
+
     public function user(){
-        return $this->hasOne('App\Models\Access\User\User','user_id');
+        return $this->belongsTo('App\Models\Access\User\User');
     }
+
     public function roles()
     {
         return $this->belongsToMany(config('access.role'));

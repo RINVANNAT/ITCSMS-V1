@@ -11,6 +11,7 @@
 
 @section('after-styles-end')
     {!! Html::style('plugins/datetimepicker/bootstrap-datetimepicker.min.css') !!}
+    {!! Html::style('plugins/select2/select2.min.css') !!}
 @endsection
 
 @section('content')
@@ -44,12 +45,50 @@
 @section('after-scripts-end')
     {!! Html::script('plugins/moment/moment.min.js') !!}
     {!! Html::script('plugins/datetimepicker/bootstrap-datetimepicker.min.js') !!}
+    {!! HTML::script('plugins/select2/select2.full.min.js') !!}
 
     <script>
+        var $search_url = "{{route('admin.access.users.search')}}";
+        var base_url = '{{url('img/profiles/')}}';
+
         $(function(){
             $('#birthdate').datetimepicker({
                 format: 'DD/MM/YYYY'
             });
         });
+
+        $(document).ready(function(){
+            var user_search_box = $(".select_user").select2({
+                placeholder: 'Enter name ...',
+                allowClear: true,
+                tags: true,
+                createTag: function (params) {
+                    return {
+                        id: params.term,
+                        name: params.term,
+                        group: 'customer',
+                        newOption: true
+                    }
+                },
+                ajax: {
+                    url: $search_url,
+                    dataType: 'json',
+                    delay: 250,
+                    data: function (params) {
+                        return {
+                            term: params.term || '', // search term
+                            page: params.page || 1
+                        };
+                    },
+                    cache: true
+                },
+                escapeMarkup: function (markup) {
+                    return markup;
+                }, // let our custom formatter work
+                minimumInputLength: 3,
+                templateResult: formatRepoUser, // omitted for brevity, see the source of this page
+                templateSelection: formatRepoSelectionUser, // omitted for brevity, see the source of this page
+            });
+        })
     </script>
 @stop

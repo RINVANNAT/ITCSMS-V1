@@ -110,9 +110,9 @@
         {{ Form::number('time_course',  null, ['class' => 'form-control', 'id'=>'time_course', 'required' => 'required']) }}
     </div>
 
-    {!! Form::label('name_kh', "Name Khmer", ['class' => 'col-lg-3 control-label']) !!}
+    {!! Form::label('name_kh', "Name Khmer", ['class' => 'col-lg-2 control-label']) !!}
 
-    <div class="col-lg-2">
+    <div class="col-lg-3">
         {{ Form::text('name_kh',  null, ['class' => 'form-control', 'id'=>'name_kh', 'required' => 'required']) }}
     </div>
 </div>
@@ -124,9 +124,9 @@
         {{ Form::number('time_td',  null, ['class' => 'form-control', 'id'=> 'time_td', 'required' => 'required']) }}
     </div>
 
-    {!! Form::label('name_en', "Name English", ['class' => 'col-lg-3 control-label']) !!}
+    {!! Form::label('name_en', "Name English", ['class' => 'col-lg-2 control-label']) !!}
 
-    <div class="col-lg-2">
+    <div class="col-lg-3">
         {{ Form::text('name_en',  null, ['class' => 'form-control', 'id'=> 'name_en', 'required' => 'required']) }}
     </div>
 </div>
@@ -137,9 +137,9 @@
         {{ Form::number('time_tp',  null, ['class' => 'form-control', 'id'=>'time_tp', 'required' => 'required']) }}
     </div>
 
-    {!! Form::label('name_fr', "Name France", ['class' => 'col-lg-3 control-label']) !!}
+    {!! Form::label('name_fr', "Name France", ['class' => 'col-lg-2 control-label']) !!}
 
-    <div class="col-lg-2">
+    <div class="col-lg-3">
         {{ Form::text('name_fr',  null, ['class' => 'form-control' , 'id'=> 'name_fr', 'required' => 'required']) }}
     </div>
 </div>

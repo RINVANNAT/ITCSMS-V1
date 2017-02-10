@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Backend\Access\User;
 
 use App\Http\Controllers\Controller;
+use Illuminate\Http\Request;
 use App\Models\Access\User\User;
 use App\Repositories\Backend\User\UserContract;
 use App\Repositories\Backend\Role\RoleRepositoryContract;
@@ -19,6 +20,7 @@ use App\Repositories\Backend\Permission\PermissionRepositoryContract;
 use App\Http\Requests\Backend\Access\User\PermanentlyDeleteUserRequest;
 use App\Repositories\Frontend\User\UserContract as FrontendUserContract;
 use App\Http\Requests\Backend\Access\User\ResendConfirmationEmailRequest;
+use Illuminate\Support\Facades\Input;
 
 /**
  * Class UserController
@@ -297,5 +299,39 @@ class UserController extends Controller
     {
         $user->sendConfirmationEmail($user_id);
         return redirect()->back()->withFlashSuccess(trans('alerts.backend.users.confirmation_email'));
+    }
+
+    public function search(Request $request){
+        if($request->ajax()) {
+
+            $page = Input::get('page');
+            $resultCount = 25;
+            $offset = ($page - 1) * $resultCount;
+            $users = User::where('users.name', 'ilike', "%".Input::get("term") . "%")
+                ->orWhere('users.email', 'ilike', "%".Input::get("term") . "%")
+                ->select([
+                    'users.id as id',
+                    'users.name',
+                    'users.email'
+                ]);
+
+            $client = $users
+                ->orderBy('name')
+                ->skip($offset)
+                ->take($resultCount)
+                ->get();
+
+            $count = Count($users->get());
+            $endCount = $offset + $resultCount;
+            $morePages = $count > $endCount;
+
+            $results = array(
+                'results' => $client,
+                'pagination' => array(
+                    "more" => $morePages
+                )
+            );
+            return response()->json($results);
+        }
     }
 }

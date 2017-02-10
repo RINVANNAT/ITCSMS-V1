@@ -70,10 +70,10 @@ class EmployeeController extends Controller
     public function create()
     {
         $departments = Department::lists('name_kh','id')->toArray();
-        $users = User::lists('name','id')->toArray();
+        //$users = User::lists('name','id')->toArray();
         $genders = Gender::lists('name_en','id')->toArray();
         $positions = Position::get();
-        return view('backend.employee.create',compact('departments','users','genders','positions'));
+        return view('backend.employee.create',compact('departments','genders','positions'));
     }
 
     /**

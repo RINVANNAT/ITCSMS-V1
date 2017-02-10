@@ -59,9 +59,10 @@
 <div class="form-group">
     {!! Form::label('name', trans('labels.backend.employees.fields.user_id'), ['class' => 'col-lg-2 control-label']) !!}
     <div class="col-lg-4">
-        {!! Form::select('user_id',$users, null, ['class' => 'form-control','placeholder'=>'']) !!}
+        <select name="user_select2" class="form-control select_user" id="select_user"></select>
+        {{ Form::hidden('user_id', null, ['class' => 'form-control', 'id'=>'user_id']) }}
     </div>
-</div><!--form control-->
+</div>
 @endif
 
 <div class="form-group">

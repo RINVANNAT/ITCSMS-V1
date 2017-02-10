@@ -1,3 +1,4 @@
+// Search selector for employee
 function formatRepoEmployee (repo) {
 
     if (repo.loading) {
@@ -25,6 +26,30 @@ function formatRepoEmployee (repo) {
             "</div>" +
             "</div>"+
             "</div>";
+        return markup;
+
+    }
+}
+
+function formatRepoSelectionUser (data, container) {
+
+    $('#user_id').val(data.id);
+    return data.name || data.email;
+}
+
+// Search selector for user
+
+function formatRepoUser (repo) {
+
+    if (repo.loading) {
+        return repo.name;
+    }
+    if (repo.newOption) {
+        return '<a href="#" class=""><em>Select user below</em></a>';
+    } else {
+        var markup =    "<div>" +
+                            "<b>"+repo.name+"</b><br/>"+repo.email
+                        "</div>";
         return markup;
 
     }
