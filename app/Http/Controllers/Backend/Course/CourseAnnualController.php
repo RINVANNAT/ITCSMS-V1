@@ -541,16 +541,15 @@ class CourseAnnualController extends Controller
     public function data(Request $request)
     {
 
-        $employee =Employee::where('user_id', Auth::user()->id)->first();
-
-        $courseAnnuals = DB::table('course_annuals')
-            ->leftJoin('courses','course_annuals.course_id', '=', 'courses.id')
+        $courseAnnuals = CourseAnnual::leftJoin('courses','course_annuals.course_id', '=', 'courses.id')
             ->leftJoin('employees','course_annuals.employee_id', '=', 'employees.id')
             ->leftJoin('academicYears','course_annuals.academic_year_id', '=', 'academicYears.id')
             ->leftJoin('departments','course_annuals.department_id', '=', 'departments.id')
             ->leftJoin('degrees','course_annuals.degree_id', '=', 'degrees.id')
             ->leftJoin('grades','course_annuals.grade_id', '=', 'grades.id')
+            ->leftJoin('semesters','course_annuals.semester_id', '=', 'semesters.id')
             ->leftJoin('departmentOptions', 'course_annuals.department_option_id', '=', 'departmentOptions.id')
+            ->with("groups")
             ->select([
                 'courses.name_kh as course',
                 'course_annuals.id',
@@ -559,7 +558,8 @@ class CourseAnnualController extends Controller
                 'course_annuals.active',
                 'course_annuals.academic_year_id',
                 'employees.name_latin as employee_id',
-                'academicYears.name_latin as academic_year',
+                'academicYears.name_kh as academic_year',
+                'semesters.name_kh as semester',
                 'course_annuals.course_id',
                 DB::raw("CONCAT(degrees.code,grades.code,departments.code) as class")
             ])
@@ -572,6 +572,12 @@ class CourseAnnualController extends Controller
         $employee = Employee::where('user_id', Auth::user()->id)->first();
 
         $datatables
+            ->addColumn('checkbox', function($courseAnnual) {
+                return "<input type='checkbox' value='".$courseAnnual->id."'/>";
+            })
+            ->editColumn('name', function($courseAnnual) {
+                return "<b>".$courseAnnual->name."</b><br/><br/>".$courseAnnual->class."<br/>".$courseAnnual->semester."<br/>".$courseAnnual->academic_year;
+            })
             ->editColumn('class', function ($courseAnnual) {
                 $course_annual_classes = DB::table('course_annual_classes')
 

@@ -35,8 +35,16 @@ class CourseAnnual extends Model
 		return $this->belongsTo('App\Models\Course');
 	}
 
+    public function course_group(){
+        return $this->hasMany('App\Models\CourseAnnualClass');
+    }
+
     public function courseAnnualClass(){
         return $this->hasMany('App\Models\CourseAnnualClass');
+    }
+
+    public function groups(){
+        return $this->hasMany('App\Models\CourseGroup');
     }
 
 	public function exams(){

@@ -26,6 +26,11 @@ Route::group([
 
     });
 
+    Route::group([], function() {
+        Route::post('course-session-data', 'CourseSessionController@data')->name('admin.course.course_session.data');
+        Route::resource('course_session', 'CourseSessionController');
+    });
+
 
 //    --------course annual assignment ---------------
 

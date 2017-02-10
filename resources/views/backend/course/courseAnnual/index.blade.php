@@ -11,9 +11,18 @@
     {!! Html::style('plugins/datatables/dataTables.bootstrap.css') !!}
     {!! Html::style('plugins/daterangepicker/daterangepicker-bs3.css') !!}
     <style>
-        .toolbar {
+        .toolbar, #courseAnnuals-table_length {
             float: left;
         }
+
+        .toolbar {
+            margin-bottom: 5px;
+        }
+
+        #courseAnnuals-table_filter {
+            float:right;
+        }
+
         #filter_dept_option {
             margin-left: 5px;
         }
@@ -67,7 +76,12 @@
             </div><!-- /.box-header -->
 
             <div class="box-body">
-                @include("backend.course.courseAnnual.includes.index_table")
+                <div class="col-md-6">
+                    @include("backend.course.courseAnnual.includes.index_table")
+                </div>
+                <div class="col-md-6">
+                    @include("backend.course.courseAnnual.includes.index_course_session_table")
+                </div>
                 <div class="clearfix"></div>
             </div><!-- /.box-body -->
         </div><!--box-->
@@ -88,7 +102,7 @@
                                         '{!! Form::select('dept_option',$deptOptions,null, array('class'=>'form-control','id'=>'filter_dept_option','placeholder'=>'Division')) !!} '+
                                 @endif
                         @else
-                                ' {!! Form::select('department',$departments,$department_id, array('class'=>'form-control','id'=>'filter_department','placeholder'=>'Department')) !!} '+
+                                ' {!! Form::select('department',$departments,$department_id, array('class'=>'form-control','id'=>'filter_department','placeholder'=>'Dept.')) !!} '+
                         @endif
                         '{!! Form::select('semester',$semesters,null, array('class'=>'form-control','id'=>'filter_semester','placeholder'=>'Semester')) !!} '+
                         '{!! Form::select('degree',$degrees,null, array('class'=>'form-control','id'=>'filter_degree','placeholder'=>'Degree')) !!} '+
@@ -98,39 +112,61 @@
                         @else
                         ''
                         @endif
-                var oTable = $('#courseAnnuals-table').DataTable({
-                dom: 'l<"toolbar">frtip',
+
+
+
+            var oTable = $('#courseAnnuals-table').DataTable({
+                    dom: 'lf<"toolbar">rtip',
+                    processing: true,
+                    serverSide: true,
+                    pageLength: {!! config('app.records_per_page')!!},
+                    deferLoading : true,
+                    ajax: {
+                        url:"{!! route('admin.course.course_annual.data') !!}",
+                        type:"POST",
+                        data:function(d){
+                            // In case additional fields is added for filter, modify export view as well: popup_export.blade.php
+                            d.academic_year = $('#filter_academic_year').val();
+                            d.degree = $('#filter_degree').val();
+                            d.grade = $('#filter_grade').val();
+                            d.department = $('#filter_department').val();
+                            d.semester = $('#filter_semester').val();
+                            d.lecturer = $('#filter_lecturer').val();
+                            d.student_group = $('#filter_student_group').val();
+                            d.dept_option = $('#filter_dept_option').val();
+                        }
+                    },
+
+                    columns: [
+                        { data: 'checkbox', name: 'checkbox', orderable:false, searchable:false},
+                        { data: 'name', name: 'course_annuals.name_en'},
+                        { data: 'employee_id', name: 'employee_id',searchable:false},
+                        { data: 'action', name: 'action',orderable: false, searchable: false}
+                    ]
+            });
+
+            enableDeleteRecord($('#courseAnnuals-table'));
+
+            var sessionTable = $('#courseSession-table').DataTable({
+                dom: 'f<"session">rtip',
                 processing: true,
                 serverSide: true,
                 pageLength: {!! config('app.records_per_page')!!},
-                deferLoading : true,
                 ajax: {
-                    url:"{!! route('admin.course.course_annual.data') !!}",
+                    url:"{!! route('admin.course.course_session.data') !!}",
                     type:"POST",
                     data:function(d){
-                        // In case additional fields is added for filter, modify export view as well: popup_export.blade.php
-                        d.academic_year = $('#filter_academic_year').val();
-                        d.degree = $('#filter_degree').val();
-                        d.grade = $('#filter_grade').val();
-                        d.department = $('#filter_department').val();
-                        d.semester = $('#filter_semester').val();
-                        d.lecturer = $('#filter_lecturer').val();
-                        d.student_group = $('#filter_student_group').val();
-                        d.dept_option = $('#filter_dept_option').val();
                     }
                 },
 
                 columns: [
                     { data: 'name', name: 'course_annuals.name_en'},
-                    { data: 'semester_id', name: 'course_annuals.semester_id'},
-                    { data: 'academic_year_id', name: 'course_annuals.academic_year_id'},
-                    { data: 'class', name: 'class',searchable:false},
-                    { data: 'employee_id', name: 'employee_id',searchable:false},
+                    { data: 'lecturer_id', name: 'lecturer_id',searchable:false},
                     { data: 'action', name: 'action',orderable: false, searchable: false}
                 ]
             });
 
-            enableDeleteRecord($('#courseAnnuals-table'));
+            enableDeleteRecord($('#courseSession-table'));
 
 {{--            {{ Form::select('client_id', $client, Input::old('client_id')) }}--}}
 
