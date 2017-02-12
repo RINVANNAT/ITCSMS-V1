@@ -819,6 +819,7 @@ class CourseAnnualController extends Controller
 //        $courseAnnuals = $this->getCourseAnnually();
 
         $courseSessions = $this->getCourseSessionFromDB();
+        $courseSessions = $courseSessions->where('course_sessions.lecturer_id', '=', null);// this to get not assigned courses
 //        $courseAnnuals = $courseAnnuals->where('course_annuals.employee_id', '=', null);// this to get not assigned courses
 
 
@@ -1104,10 +1105,10 @@ class CourseAnnualController extends Controller
 
     private function formatGroupName($listsGroup) {
 
-        dd($listsGroup);
+//        dd($listsGroup);
 
 
-        $listsGroup = array_reverse($listsGroup);
+//        $listsGroup = array_reverse($listsGroup);
         $name = '';
         foreach($listsGroup as $group) {
             $name = $name.' '.$group->group;
@@ -1130,6 +1131,7 @@ class CourseAnnualController extends Controller
         $semester_id = $request->semester_id;
 
         $notSelectedCourses = $this->getNotSelectedCourseByDept($deptId, $academic_year_id, $grade_id, $degree_id, $dept_option_id, $semester_id);
+        $groupFromDB = $this->getGroupBySessionAndAnnualCourse();
 
 //        dd($notSelectedCourses);
         if($notSelectedCourses) {
@@ -1141,9 +1143,10 @@ class CourseAnnualController extends Controller
                 $splitName = explode('_', $course->name_en);
                 $copy = $splitName[count($splitName)-1];
 
+//                dd($groupFromDB);
                 $element = array(
                     "id" => 'department_'.$deptId.'_course_' . $course->course_session_id,
-                    "text" => $course->name_en.' (S_'.$course->semester_id.' = '.$totalCoursePerSemester.')',
+                    "text" => $course->name_en.' (S_'.$course->semester_id.' = '.$totalCoursePerSemester.')'. (isset($groupFromDB[$course->course_session_id])?' (Group:'.$this->formatGroupName($groupFromDB[$course->course_session_id]).')':''),
                     "li_attr" => [
                         'class' => 'department_course '.(($copy == '(copy)')?'current_copy':''),
                         'tp'    => $course->time_tp_session,
@@ -1342,7 +1345,7 @@ class CourseAnnualController extends Controller
                     $teacherId = explode('_', $teacher);
 
                     if(count($teacherId) == 4) {
-                        $employee_id = $teacherId[3];
+                        $lecturer_id = $teacherId[3];
 
                         foreach($arrayCourseId as $course) {
 
@@ -1354,7 +1357,7 @@ class CourseAnnualController extends Controller
 
                                 $input = [
                                     'active' => true,
-                                    'employee_id' => $employee_id,
+                                    'lecturer_id' => $lecturer_id,
                                 ];
                                 $res = $this->updateCourse($course_session_id, $input);
 
@@ -1715,19 +1718,11 @@ class CourseAnnualController extends Controller
 
     private function dataSendToView($courseAnnualId) {
 
-        $courseAnnual = CourseAnnual::find($courseAnnualId);
-//        $courseAnnualClasses = $courseAnnual->courseAnnualClass;
+        $courseAnnual = DB::table('course_annuals')->where('id', $courseAnnualId)->first();
 
         $employee = Employee::where('user_id', Auth::user()->id)->first();
 
         $availableCourses = $this->getAvailableCourse($courseAnnual->department_id, $courseAnnual->academic_year_id, $courseAnnual->semester_id);
-
-
-//        $availableCourses = CourseAnnual::where([
-//            ['department_id', $courseAnnual->department_id],
-//            ['academic_year_id', $courseAnnual->academic_year_id],
-//            ['semester_id', $courseAnnual->semester_id]
-//        ]);
 
         if(auth()->user()->allow("view-all-score-in-all-department") || auth()->user()->allow('view-all-score-course-annual')) {
 
@@ -1745,10 +1740,6 @@ class CourseAnnualController extends Controller
         foreach($availableCourses as $availableCourse) {
             $selectedCourses[$availableCourse->course_annual_id][] = $availableCourse;
         }
-
-//        dd($selectedCourses);
-
-
         return [
             'course_annual' => $courseAnnual,
             'available_course'  =>$selectedCourses
@@ -1762,18 +1753,12 @@ class CourseAnnualController extends Controller
         $courseAnnual = $properties['course_annual'];
         $availableCourses = $properties['available_course'];
 
-
-
-//        dd($availableCourses);
-
         return view('backend.course.courseAnnual.includes.form_input_score_course_annual', compact('courseAnnualId', 'courseAnnual', 'availableCourses'));
     }
 
     public function getCourseAnnualScoreByAjax(Request $request) {
 
         //-----this is a default columns and columnHeader
-
-//        $courseAnnual = $this->getCourseAnnualById($request->course_annual_id);
 
         return $this->handsonTableData($request->course_annual_id);
     }
@@ -1903,8 +1888,6 @@ class CourseAnnualController extends Controller
     private function handsonTableData($courseAnnualId) {
 
 
-//        dd($courseAnnualId);
-
         $arrayData = [];
         $courseAnnual = DB::table('course_annuals')->where('id', $courseAnnualId)->first();
 
@@ -1924,7 +1907,6 @@ class CourseAnnualController extends Controller
         $columnHeader = $headers['colHeader'];
         $columns = $headers['column'];
         $colWidths = $headers['colWidth'];
-
 
 
         $studentByCourse = $this->getStudentByDeptIdGradeIdDegreeId( $department_ids, $degree_ids, $grade_ids, $courseAnnual->academic_year_id);
@@ -2009,7 +1991,7 @@ class CourseAnnualController extends Controller
 //                'department_id'    => $courseAnnual->department_id,
 //                'degree_id'        => $courseAnnual->degree_id,
 //                'grade_id'         => $courseAnnual->grade_id,
-//                'academic_year_id' => $courseAnnual->academic_year_id,
+//                'academic_year_id' => $cours/eAnnual->academic_year_id,
 //                'semester_id'      => $courseAnnual->semester_id,
 //                'employee_id'      => $courseAnnual->employee_id,
                 );
@@ -2019,6 +2001,7 @@ class CourseAnnualController extends Controller
 
             if($checkScoreReachHundredPercent == count($studentByCourse)) {
                 return json_encode([
+                    'status' => true,
                     'colWidths' => $colWidths,
                     'data' => $arrayData,
                     'columnHeader' => $columnHeader,
@@ -2180,7 +2163,7 @@ class CourseAnnualController extends Controller
 
     //this is to add new column name of the exam score ...and we have to initial the value 0 to the student for this type of exam
 
-        dd($request->all());
+//        dd($request->all());
 
         $check =0;
         $courseAnnual = DB::table('course_annuals')->where('id', $request->course_annual_id)->first();
@@ -2460,11 +2443,6 @@ class CourseAnnualController extends Controller
                 }
             }
         }
-//        if($check == true) {
-//            return $storeAverage;
-//        } else {
-//            return [];
-//        }
     }
 
 //    --------------all course annual score  ---------------
@@ -3121,6 +3099,8 @@ class CourseAnnualController extends Controller
             $alpha[] = $letter++;
         }
 
+//        dd($colHeaders);
+
         Excel::create($title, function($excel) use ($studentListScore, $title,$alpha,$colHeaders) {
             $excel->sheet($title, function($sheet) use($studentListScore,$title,$alpha,$colHeaders) {
                 $sheet->fromArray($studentListScore);
@@ -3302,7 +3282,7 @@ class CourseAnnualController extends Controller
                     return redirect()->back()->with(['status'=>'Problem with no data in the first row, or your file misses some fields. To make file corrected please export the template!!']);
                 }
                 if(CourseAnnualController::$isNotAceptedScore) {
-                    return redirect()->back()->with(['warning' => 'Score must be between 0 and '.CourseAnnualController::$headerPercentage]);
+                    return redirect()->back()->with(['status' => 'Score must be between 0 and '.CourseAnnualController::$headerPercentage]);
                 }
                 if(CourseAnnualController::$isStringAllowed) {
                     return redirect()->back()->with(['status' => 'No string allowed!']);

@@ -576,18 +576,18 @@
 
                 return false;
             },
-            beforeTouchScroll: function() {
-
-                return false;
-            },
-            afterScrollHorizontally: function() {
-
-                return false;
-            },
-            afterScrollVertically: function() {
-
-                return false;
-            },
+//            beforeTouchScroll: function() {
+//
+//                return false;
+//            },
+//            afterScrollHorizontally: function() {
+//
+//                return false;
+//            },
+//            afterScrollVertically: function() {
+//
+//                return false;
+//            },
 
             afterColumnResize: function() {
               return false;
@@ -1293,6 +1293,8 @@
                         str = str + '{{$student['student_id']}}'+ ' ';
                 @endforeach
 
+//        alert('ererererer');
+
                  swal({
                     title: "Attention",
                     text: 'Your file has imported but the student with this Id: '+ str +' cannot find in the system' ,
@@ -1302,7 +1304,7 @@
                     closeOnConfirm: true
                 }, function(confirmed) {
                     if (confirmed) {
-
+//                        updateSettingHandsontable(setting);
                     }
                 });
         @endif
