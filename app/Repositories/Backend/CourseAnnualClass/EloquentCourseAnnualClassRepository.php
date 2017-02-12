@@ -68,6 +68,7 @@ class EloquentCourseAnnualClassRepository implements CourseAnnualClassRepository
                 $courseAnnualClass = new CourseAnnualClass();
 
                 $courseAnnualClass->course_annual_id = $input['course_annual_id'];
+                $courseAnnualClass->course_session_id = $input['course_session_id'];
                 $courseAnnualClass->grade_id = $input['grade_id'];
                 $courseAnnualClass->degree_id = $input['degree_id'];
                 $courseAnnualClass->department_id = $input['department_id'];
@@ -84,6 +85,7 @@ class EloquentCourseAnnualClassRepository implements CourseAnnualClassRepository
             $courseAnnualClass = new CourseAnnualClass();
 
             $courseAnnualClass->course_annual_id = $input['course_annual_id'];
+            $courseAnnualClass->course_session_id = $input['course_session_id'];
             $courseAnnualClass->grade_id = $input['grade_id'];
             $courseAnnualClass->degree_id = $input['degree_id'];
             $courseAnnualClass->department_id = $input['department_id'];
@@ -110,12 +112,17 @@ class EloquentCourseAnnualClassRepository implements CourseAnnualClassRepository
     {
 
         $courseAnnualClass = $this->findOrThrowException($id);
+
+        if(!isset($input['department_option_id']) || $input['department_option_id'] == ""){
+            $input['department_option_id'] = $courseAnnualClass->department_option_id;
+        }
         $courseAnnualClass->course_annual_id = isset($input['course_annual_id'])?$input['course_annual_id']:$courseAnnualClass->course_annual_id;
+        $courseAnnualClass->course_session_id = isset($input['course_session_id'])?$input['course_session_id']:$courseAnnualClass->course_session_id;
         $courseAnnualClass->grade_id = isset($input['grade_id'])?$input['grade_id']:$courseAnnualClass->grade_id;
         $courseAnnualClass->degree_id = isset($input['degree_id'])?$input['degree_id']:$courseAnnualClass->degree_id;
         $courseAnnualClass->department_id = isset($input['department_id'])?$input['department_id']:$courseAnnualClass->department_id;
         $courseAnnualClass->group = isset($input['group'])?$input['group']:$courseAnnualClass->group;
-        $courseAnnualClass->department_option_id = isset($input['department_option_id'])?$input['department_option_id']:$courseAnnualClass->department_option_id;
+        $courseAnnualClass->department_option_id = $input['department_option_id'];
         $courseAnnualClass->updated_at = Carbon::now();
         $courseAnnualClass->write_uid = auth()->id();
 

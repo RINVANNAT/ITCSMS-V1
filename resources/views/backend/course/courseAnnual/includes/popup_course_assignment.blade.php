@@ -657,9 +657,19 @@
            });
        });
 
-       function refresh_course_tree() {
+       function refresh_course_tree(node_id) {
            getVal();
            $('#annual_course').jstree("refresh");
+
+//           $('#annual_course').on('open_node.jstree', function (e, data) {
+//               var folderId = data.node.original.id;
+//               var moduleId = data.node.original.moduleId;
+//
+//               if(folderId == node_id) {
+//                   alert(folderId);
+//               }
+//           });
+
        }
 
 
@@ -696,7 +706,7 @@
 
 
 
-                    console.log(resultData);
+//                    console.log(resultData);
                    if($('#filter_student_group').is(':visible')) {
                        $('#filter_student_group').html(resultData);
                    } else {

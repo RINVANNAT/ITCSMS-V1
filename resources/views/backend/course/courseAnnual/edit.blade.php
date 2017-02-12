@@ -50,6 +50,17 @@
         var base_url = '{{url('img/profiles/')}}';
         var get_group_url = "{{route('course_annual.get_group_filtering')}}";
 
+
+        @if(isset($courseAnnual->employee))
+            var selected_user_id = '{{$courseAnnual->employee->id}}';
+            var selected_user = "{{$courseAnnual->employee->name_latin}}";
+        @else
+            var selected_user_id =  null;
+            var selected_user = null;
+
+        @endif
+        var course_program_id = '{{$courseAnnual->course_id}}';
+
         $(document).ready(function() {
             // Search course program
             $("#course_id").select2({
@@ -88,6 +99,10 @@
                 minimumInputLength: 3,
                 templateResult: formatRepoEmployee, // omitted for brevity, see the source of this page
                 templateSelection: formatRepoSelectionEmployee, // omitted for brevity, see the source of this page
+                initSelection : function (element, callback) {
+                    var data = {id: selected_user_id, text: selected_user};
+                    callback(data);
+                }
             });
 
             // On department change, change option

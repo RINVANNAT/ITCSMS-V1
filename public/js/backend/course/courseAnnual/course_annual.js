@@ -1,3 +1,6 @@
+
+
+
 function load_group(){
     var department_id = $("#department_id").val();
     var academic_year_id = $("#academic_year_id").val();
@@ -19,12 +22,15 @@ function load_group(){
             },
             success : function(data){
                 if(data != null){
+
+                    console.log(data);
                     var option_text = "";
+
                     $.each(data, function(key, value){
                         option_text = option_text +
-                            '<div class="col-md-1">'+
-                            '<label><input type="checkbox" name="groups[]" value="'+value+'"> '+value+'</label>'+
-                            '</div>';
+
+                            ' <label><input type="checkbox" class="each_check_box" name="groups[]" value="'+value+'">'+value+'</label>'
+
                     })
                     $("#group_panel").html(option_text);
                 }
@@ -94,8 +100,8 @@ function setSelectedField() {
     })
 
     $('#credit').val(credit);
-    console.log("fsdfsf");
-    load_group();
+    // console.log("fsdfsf");
+    // load_group();
 }
 
 $('#course_id').on('change', function() {
@@ -108,7 +114,16 @@ $('Document').ready(function() {
     if($('#course_id :selected').val()) {
         setTimeCourseTpTd();
         setNameKhEnFr();
-        setSelectedField();
+        // setSelectedField();
+        load_group();
     }
 });
 
+
+$(".check_all_box").change(function() {
+    if(this.checked) {
+        $('.each-check-box').prop('checked', true);
+    } else {
+        $('.each-check-box').prop('checked', false);
+    }
+});

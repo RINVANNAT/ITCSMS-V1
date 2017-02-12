@@ -51,6 +51,10 @@ class CourseAnnual extends Model
 		return $this->belongsToMany('App\Models\Exam');
 	}
 
+    public function employee(){
+        return $this->belongsTo('App\Models\Employee');
+    }
+
 	public function isScoreRuleChange(){
 
 

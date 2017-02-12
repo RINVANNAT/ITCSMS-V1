@@ -106,8 +106,9 @@ class CourseSessionController extends Controller
 
         return $datatables
             ->addColumn('action', function ($course_session) {
-                return  '<a href="'.route('admin.configuration.course_sessions.edit',$course_session->id).'" class="btn btn-xs btn-primary"><i class="fa fa-pencil" data-toggle="tooltip" data-placement="top" title="" data-original-title="'.trans('buttons.general.crud.edit').'"></i> </a>'.
-                        ' <button class="btn btn-xs btn-danger btn-delete" data-remote="'.route('admin.configuration.course_sessions.destroy', $course_session->id) .'"><i class="fa fa-times" data-toggle="tooltip" data-placement="top" title="' . trans('buttons.general.crud.delete') . '"></i></button>';
+//                return ''; // '.route('admin.configuration.course_sessions.edit',$course_session->id).'///'.route('admin.configuration.course_sessions.destroy', $course_session->id) .'
+                return  '<a href="#" class="btn btn-xs btn-primary"><i class="fa fa-pencil" data-toggle="tooltip" data-placement="top" title="" data-original-title="'.trans('buttons.general.crud.edit').'"></i> </a>'.
+                        ' <button class="btn btn-xs btn-danger btn-delete" data-remote="#"><i class="fa fa-times" data-toggle="tooltip" data-placement="top" title="' . trans('buttons.general.crud.delete') . '"></i></button>';
             })
             ->make(true);
     }

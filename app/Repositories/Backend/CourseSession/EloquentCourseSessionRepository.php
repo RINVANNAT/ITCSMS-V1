@@ -2,7 +2,7 @@
 
 
 use App\Exceptions\GeneralException;
-use App\Models\Course;
+use App\Models\CourseSession;
 use Carbon\Carbon;
 
 /**
@@ -18,8 +18,8 @@ class EloquentCourseSessionRepository implements CourseSessionRepositoryContract
      */
     public function findOrThrowException($id)
     {
-        if (! is_null(Course::find($id))) {
-            return Course::find($id);
+        if (! is_null(CourseSession::find($id))) {
+            return CourseSession::find($id);
         }
 
         throw new GeneralException(trans('exceptions.backend.general.not_found'));
@@ -33,7 +33,7 @@ class EloquentCourseSessionRepository implements CourseSessionRepositoryContract
      */
     public function getCourseSessionsPaginated($per_page, $order_by = 'sort', $sort = 'asc')
     {
-        return Course::orderBy($order_by, $sort)
+        return CourseSession::orderBy($order_by, $sort)
             ->paginate($per_page);
     }
 
@@ -44,7 +44,7 @@ class EloquentCourseSessionRepository implements CourseSessionRepositoryContract
      */
     public function getAllCourseSessions($order_by = 'sort', $sort = 'asc')
     {
-        return Course::orderBy($order_by, $sort)
+        return CourseSession::orderBy($order_by, $sort)
             ->get();
     }
 
@@ -59,8 +59,8 @@ class EloquentCourseSessionRepository implements CourseSessionRepositoryContract
         $input['create_uid'] = auth()->id();
         $input['created_at'] = Carbon::now();
 
-        if (Course::create($input)) {
-            return true;
+        if ($courseSession = CourseSession::create($input)) {
+            return $courseSession;
         }
         throw new GeneralException(trans('exceptions.backend.general.create_error'));
     }
@@ -73,14 +73,13 @@ class EloquentCourseSessionRepository implements CourseSessionRepositoryContract
      */
     public function update($id, $input)
     {
-        $courseProgram = $this->findOrThrowException($id);
+        $courseSession = $this->findOrThrowException($id);
 
         $input['updated_at'] = Carbon::now();
         $input['write_uid'] = auth()->id();
 
-
-        if ($courseProgram->update($input)) {
-            return true;
+        if ($courseSession->update($input)) {
+            return $courseSession;
         }
 
         throw new GeneralException(trans('exceptions.backend.general.update_error'));

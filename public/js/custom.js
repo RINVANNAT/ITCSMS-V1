@@ -58,7 +58,7 @@ function formatRepoUser (repo) {
 function formatRepoSelectionEmployee (data, container) {
 
     $('#lecturer_lists').val(data.id);
-    return data.text || data.name_e;
+    return data.text || data.name_latin;
 }
 
 function get_filter_box(){

@@ -1,33 +1,40 @@
 
-    <div class="form-group">
-        {!! Form::label('course', trans('labels.backend.courseAnnuals.fields.course'), ['class' => 'col-lg-3 control-label required']) !!}
-        <div class="col-lg-4">
-            <select name="course_id" id="course_id" class="form-control" required>
-                @foreach($courses as $key => $group)
-                    <option></option>
-                    <optgroup label="{{$key}}">
-                        @foreach($group as $course)
-                            <option value="{{$course->id}}"
-                                    time_course="{{$course->time_course}}"
-                                    time_tp="{{$course->time_tp}}"
-                                    time_td="{{$course->time_td}}"
-                                    name_kh="{{$course->name_kh}}"
-                                    name_en="{{$course->name_en}}"
-                                    name_fr="{{$course->name_fr}}"
-                                    credit="{{$course->credit}}"
-                                    dept="{{$course->department_id}}"
-                                    grade="{{$course->grade_id}}"
-                                    degree="{{$course->degree_id}}"
-                                    dept_option="{{$course->department_option_id}}"
-                                    semester="{{$course->semester_id}}">
-                                {{$course->degree_code.$course->grade_id.$course->option."-S".$course->semester_id." | ".$course->name_en}}
-                            </option>
-                        @endforeach
-                    </optgroup>
-                @endforeach
-            </select>
-        </div>
+<div class="form-group">
+    {!! Form::label('course', trans('labels.backend.courseAnnuals.fields.course'), ['class' => 'col-lg-3 control-label required']) !!}
+    <div class="col-lg-4">
+        <select name="course_id" id="course_id" class="form-control" required>
+            @foreach($courses as $key => $group)
+                <option></option>
+                <optgroup label="{{$key}}">
+                    @foreach($group as $course)
+                        <?php
+                            if(isset($courseAnnual) && $course->id == $courseAnnual->course_id){
+                                $selected = "selected";
+                            } else {
+                                $selected = "";
+                            }
+                        ?>
+                        <option {{$selected}} value="{{$course->id}}"
+                                time_course="{{$course->time_course}}"
+                                time_tp="{{$course->time_tp}}"
+                                time_td="{{$course->time_td}}"
+                                name_kh="{{$course->name_kh}}"
+                                name_en="{{$course->name_en}}"
+                                name_fr="{{$course->name_fr}}"
+                                credit="{{$course->credit}}"
+                                dept="{{$course->department_id}}"
+                                grade="{{$course->grade_id}}"
+                                degree="{{$course->degree_id}}"
+                                dept_option="{{$course->department_option_id}}"
+                                semester="{{$course->semester_id}}">
+                            {{$course->degree_code.$course->grade_id.$course->option."-S".$course->semester_id." | ".$course->name_en}}
+                        </option>
+                    @endforeach
+                </optgroup>
+            @endforeach
+        </select>
     </div>
+</div>
 
 
 <div class="form-group">
@@ -87,20 +94,44 @@
 </div>
 
 <div class="form-group">
-    {!! Form::label('group', trans('labels.backend.courseAnnuals.fields.group'), ['class' => 'col-lg-3 control-label']) !!}
+
+    <div class="col-lg-3">
+        <label for="group" style="float:right" class="control-label"> <input type="checkbox" class="check_all_box"> {{ trans('labels.backend.courseAnnuals.fields.group')}}</label>
+    </div>
+
+{{--    {!! Form::label('group','',  ['class' => 'col-lg-3 control-label']) !!}--}}
     <div class="col-lg-7" id="group_panel">
+
         @if(isset($groups))
-            @foreach($groups as $group)
-                <div class="col-md-2"><label><input type="checkbox" name="groups[]" value="{{$group}}"> {{$group}}</label></div>
-            @endforeach
+
+                @foreach($groups as $group)
+                    <?php $index =0;?>
+
+                    @if($group != null)
+
+                        <?php $status =true;?>
+                        @foreach($courseAnnual->courseAnnualClass as $class)
+                            @if(trim($group) == trim($class->group))
+                                <?php $status =false;?>
+                                <label for="group"> <input type="checkbox" name="groups[]" class="each-check-box" value="{{$class->group}}" checked> {{$class->group}}</label>
+                            @endif
+                        @endforeach
+                        @if($status == true)
+                            <label for="group"> <input type="checkbox" name="groups[]" class="each-check-box" value="{{$group}}"> {{$group}}</label>
+                        @endif
+
+                    @endif
+
+                @endforeach
         @endif
+
     </div>
 </div>
 
 <div class="form-group">
     {!! Form::label('credit', 'Credit', ['class' => 'col-lg-3 control-label required']) !!}
     <div class="col-lg-7">
-        {{ Form::number('credit',  isset($courseAnnual)?$courseAnnual->credit:null, ['class' => 'form-control' , 'id'=> 'credit', 'required' => 'required']) }}
+        {{ Form::text('credit',  isset($courseAnnual)?$courseAnnual->credit:null, ['class' => 'form-control' , 'id'=> 'credit', 'required' => 'required']) }}
     </div>
 </div>
 

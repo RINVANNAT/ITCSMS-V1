@@ -63,9 +63,9 @@ class EloquentCourseAnnualRepository implements CourseAnnualRepositoryContract
 
         $courseAnnual->academic_year_id = $input['academic_year_id'];
         $courseAnnual->semester_id = $input['semester_id'];
-//        $courseAnnual->grade_id = $input['grade_id'];
-//        $courseAnnual->degree_id = $input['degree_id'];
-//        $courseAnnual->department_id = $input['department_id'];
+        $courseAnnual->grade_id = $input['grade_id'];
+        $courseAnnual->degree_id = $input['degree_id'];
+        $courseAnnual->department_id = $input['department_id'];
         $courseAnnual->active = isset($input['active'])?true:false;
 
         $courseAnnual->time_course = isset($input['time_course'])?$input['time_course']:0;
@@ -73,7 +73,10 @@ class EloquentCourseAnnualRepository implements CourseAnnualRepositoryContract
         $courseAnnual->time_tp = isset($input['time_tp'])?$input['time_tp']:0;
 //        $courseAnnual->group = isset($input['group'])?$input['group']:null;
         $courseAnnual->credit = isset($input['credit'])?$input['credit']:null;
-//        $courseAnnual->department_option_id = isset($input['dept_option'])?$input['dept_option']:null;
+        if(!isset($input['department_option_id']) || $input['department_option_id'] == ""){
+            $input['department_option_id'] = null;
+        }
+        $courseAnnual->department_option_id = $input['department_option_id'];
 
         $courseAnnual->name_kh = isset($input['name_kh'])?$input['name_kh']:null;
         $courseAnnual->name_en = isset($input['name_en'])?$input['name_en']:null;
@@ -105,12 +108,16 @@ class EloquentCourseAnnualRepository implements CourseAnnualRepositoryContract
 
         $courseAnnual = $this->findOrThrowException($id);
 
+        if(!isset($input['department_option_id']) || $input['department_option_id'] == ""){
+            $input['department_option_id'] = $courseAnnual->department_option_id;
+        }
+
         $courseAnnual->course_id = $input['course_id'];
         $courseAnnual->semester_id = $input['semester_id'];
         $courseAnnual->active = isset($input['active'])?true:false;
         $courseAnnual->employee_id = isset($input['employee_id'])?$input['employee_id']:null;
-//        $courseAnnual->department_id = $input['department_id'];
-//        $courseAnnual->department_option_id = isset($input['dept_option'])?$input['dept_option']:$courseAnnual->department_option_id;
+        $courseAnnual->department_id = $input['department_id'];
+        $courseAnnual->department_option_id = $input['department_option_id'];
 
         $courseAnnual->time_course = isset($input['time_course'])?$input['time_course']:0;
         $courseAnnual->time_td = isset($input['time_td'])?$input['time_td']:0;
