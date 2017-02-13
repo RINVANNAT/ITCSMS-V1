@@ -15,7 +15,7 @@ class CreateCourseSessionRequest extends Request
      */
     public function authorize()
     {
-        return access()->allow('create-courseCourseSessions');
+        return access()->allow('create-courseSessions');
     }
 
     /**

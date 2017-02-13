@@ -846,6 +846,42 @@ class SeedCustomsPermissions extends Seeder
                         ]
                     ]
                 ],
+                [
+                    'name'=>'Course Session',
+                    'groups'=>[
+                    ],
+                    'permissions' => [
+                        // Leave it empty if there is none
+                        [
+                            'name'         => 'view-courseSession-management',
+                            'display_name' => 'View Course Session Management',
+                            'dependency'   => [
+                                'view-backend','view-course-management'
+                            ]
+                        ],
+                        [
+                            'name'         => 'create-courseSessions',
+                            'display_name' => 'Create Course Sessions',
+                            'dependency'   => [
+                                'view-backend','view-course-management','view-courseSession-management'
+                            ]
+                        ],
+                        [
+                            'name'         => 'delete-courseSessions',
+                            'display_name' => 'Delete Course Sessions',
+                            'dependency'   => [
+                                'view-backend','view-course-management','view-courseSession-management'
+                            ]
+                        ],
+                        [
+                            'name'         => 'edit-courseSessions',
+                            'display_name' => 'Edit Course Sessions',
+                            'dependency'   => [
+                                'view-backend','view-course-management','view-courseSession-management'
+                            ]
+                        ]
+                    ]
+                ],
             ],
             'permissions' => [
                 // Leave it empty if there is none
