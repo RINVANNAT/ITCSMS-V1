@@ -136,6 +136,23 @@
 </div>
 
 <div class="form-group">
+    {!! Form::label('midterm_score', "Midterm Score", ['class' => 'col-lg-3 control-label required']) !!}
+    <div class="col-lg-2">
+        <select name="midterm_score" id="midterm_score_id" class="form-control">
+            <option value="{{\App\Models\Enum\ScoreEnum::Midterm_30}}"> 30% </option>
+            <option value="{{\App\Models\Enum\ScoreEnum::Midterm_40}}"> 40%</option>
+        </select>
+    </div>
+
+    {!! Form::label('final_score', "Final Score", ['class' => 'col-lg-2 control-label required']) !!}
+
+    <div class="col-lg-3">
+        {{ Form::text('final_score',  null, ['class' => 'form-control' , 'id'=> 'final_score_id', 'required' => 'required', 'readonly']) }}
+    </div>
+</div>
+
+
+<div class="form-group">
     {!! Form::label('time_course', "Time Course", ['class' => 'col-lg-3 control-label required']) !!}
     <div class="col-lg-2">
         {{ Form::number('time_course',  null, ['class' => 'form-control', 'id'=>'time_course', 'required' => 'required']) }}

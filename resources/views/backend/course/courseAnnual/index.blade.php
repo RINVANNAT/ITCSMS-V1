@@ -108,7 +108,20 @@
             <div class="box-body">
                 <div class="row">
                     <div class="col-md-7" style="min-height: 15px; padding: 0 30px 15px 30px;" id="filter_panel">
-
+                        {!! Form::select('academic_year',$academicYears,null, array('class'=>'','id'=>'filter_academic_year')) !!}
+                        {!! Form::select('department',$departments,$department_id, array('class'=>'','id'=>'filter_department','placeholder'=>'Dept.')) !!}
+                        <select id="department_option_id" name="department_option_id">
+                            <option value="" selected></option>
+                            @foreach($options as $option)
+                                <option value="{{$option->id}}" class="department_option department_{{$option->department_id}}" style="display: none">{{$option->code}}</option>
+                            @endforeach
+                        </select>
+                        {!! Form::select('semester',$semesters,null, array('class'=>'','id'=>'filter_semester','placeholder'=>'Semester')) !!}
+                        {!! Form::select('degree',$degrees,null, array('class'=>'','id'=>'filter_degree','placeholder'=>'Degree')) !!}
+                        {!! Form::select('grade',$grades,null, array('class'=>'','id'=>'filter_grade','placeholder'=>'Year')) !!}
+                        @if($lecturers != null)
+                            {!! Form::select('lecturer',$lecturers,null, array('class'=>'','id'=>'filter_lecturer','placeholder'=>'Lecturer')) !!}
+                        @endif
                     </div>
                     <div class="col-md-5">
                         <h3 style="margin: 0px;">Course Sessions</h3>
@@ -179,26 +192,6 @@
         var base_url = '{{url('img/profiles/')}}';
         var current_course = null;
         $(function() {
-            var toolbar_html =
-                    '{!! Form::select('academic_year',$academicYears,null, array('class'=>'','id'=>'filter_academic_year')) !!}' +
-                    @if($department_id != null)
-                            ''+
-                            @if(isset($deptOptions))
-                                    '{!! Form::select('dept_option',$deptOptions,null, array('class'=>'','id'=>'filter_dept_option','placeholder'=>'Division')) !!} '+
-                            @endif
-                    @else
-                            ' {!! Form::select('department',$departments,$department_id, array('class'=>'','id'=>'filter_department','placeholder'=>'Dept.')) !!} '+
-                    @endif
-                    '{!! Form::select('semester',$semesters,null, array('class'=>'','id'=>'filter_semester','placeholder'=>'Semester')) !!} '+
-                    '{!! Form::select('degree',$degrees,null, array('class'=>'','id'=>'filter_degree','placeholder'=>'Degree')) !!} '+
-                    '{!! Form::select('grade',$grades,null, array('class'=>'','id'=>'filter_grade','placeholder'=>'Year')) !!} '+
-                    @if($lecturers != null)
-                    '{!! Form::select('lecturer',$lecturers,null, array('class'=>'','id'=>'filter_lecturer','placeholder'=>'Lecturer')) !!} '
-                    @else
-                    ''
-                    @endif
-
-
 
             var oTable = $('#courseAnnuals-table').DataTable({
                     processing: true,
@@ -283,10 +276,6 @@
                 templateSelection: formatRepoSelectionEmployee, // omitted for brevity, see the source of this page
             });
 
-            $("#filter_panel").html(
-                    toolbar_html
-            );
-
 //            $('#filter_academic_year, #filter_degree, #filter_grade, #filter_department').on('change', function(e) {
 //                oTable.draw();
 //                e.preventDefault();
@@ -311,7 +300,10 @@
             $('#filter_department').on('change', function(e) {
                 oTable.draw();
                 appendFilterGroupSeclection();
-                hasDeptOption();
+                //hasDeptOption();
+                $(".department_option").hide();
+                var department_id = $(this).val();
+                $(".department_"+department_id).show();
                 e.preventDefault();
             });
             @if($lecturers != null)
@@ -421,10 +413,11 @@
         }
 
         $('#course_assignment').on('click', function() {
+
             var academic_year_id = $('#filter_academic_year :selected').val();
             var degree_id = $('#filter_degree :selected').val();
             var grade_id  = $('#filter_grade :selected').val();
-            var department_option_id = $('#filter_dept_option :selected').val();
+            var department_option_id = $('#department_option_id :selected').val();
             var semester_id = $('#filter_semester :selected').val();
 
 
@@ -437,7 +430,13 @@
             var grade_name = $('#filter_grade :selected').text();
             var degree_name = $('#filter_degree :selected').text();
             var url = "{!! route('admin.course.course_assignment') !!}";
-            var course_assignment_window = PopupCenterDual(url+'?department_id='+department_id+'&academic_year_id='+academic_year_id+'&degree_id='+degree_id+'&grade_id='+grade_id+'&department_option_id='+department_option_id + '&semester_id='+semester_id,'course assignment','1400','900');
+
+            if(department_id) {
+                var course_assignment_window = PopupCenterDual(url+'?department_id='+department_id+'&academic_year_id='+academic_year_id+'&degree_id='+degree_id+'&grade_id='+grade_id+'&department_option_id='+department_option_id + '&semester_id='+semester_id,'course assignment','1400','900');
+            } else {
+                notify('error', 'Please Select Department', 'Attention')
+            }
+
         });
 
         $('#generate_course_annual').on('click', function() {

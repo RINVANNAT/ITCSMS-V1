@@ -88,6 +88,9 @@ Route::group([
 
     Route::get('/course-annual/get-other-lecturer', 'CourseAnnualController@getOtherLecturer')->name('course_annual.get_other_lecturer');
 
+    Route::get('/list-group-by-course-annual-id', 'CourseAnnualController@getGroupByCourseAnnual')->name('course.list_group_by_course_annual_id');
+
+
 
 
 

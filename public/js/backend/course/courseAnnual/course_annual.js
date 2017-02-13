@@ -121,9 +121,10 @@ $('Document').ready(function() {
 
 
 $(".check_all_box").change(function() {
+
     if(this.checked) {
-        $('.each-check-box').prop('checked', true);
+        $('.each_check_box').prop('checked', true);
     } else {
-        $('.each-check-box').prop('checked', false);
+        $('.each_check_box').prop('checked', false);
     }
 });

@@ -122,6 +122,15 @@
                 load_group();
             });
 
+            if(val = $('select#midterm_score_id :selected').val()) {
+
+                $('#final_score_id').val(parseInt('{{\App\Models\Enum\ScoreEnum::Midterm_Final}}') - val);
+            }
+
+            $('select[name=midterm_score]').on('change', function() {
+                $('#final_score_id').val(parseInt('{{\App\Models\Enum\ScoreEnum::Midterm_Final}}') - $(this).val());
+            });
+
         })
     </script>
 @stop

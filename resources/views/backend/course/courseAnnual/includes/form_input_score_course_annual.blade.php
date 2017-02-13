@@ -1076,7 +1076,7 @@
                     objectStatus.status = val;
                     objectStatus.colName = key;
                 }
-            })
+            });
 
             var url = '{{route('admin.course.save_number_absence')}}';
 
@@ -1291,7 +1291,7 @@
                     closeOnConfirm: true
                 }, function(confirmed) {
                     if (confirmed) {
-
+                        // do some staff if you want ---
                     }
                 });
 
@@ -1299,13 +1299,37 @@
         });
 
 
+        ///---get group by course session id for filtering student lists
+        if($('select[name=available_course] :selected').val()) {
+
+        }
+
+        $('select[name=available_course]').on('change', function() {
+
+
+            $.ajax({
+                type: 'GET',
+                url: '{{route('course.list_group_by_course_session_id')}}',
+                data: {course_annual_id: $(this).val()},
+                dataType: "json",
+                success: function(resultData) {
+
+
+                }
+            });
+
+        })
+
+        function requet_group_course_session() {
+
+        }
+
+
         @if(session('status_student'))
                 var str = ' ';
                 @foreach(session('status_student') as $student)
                         str = str + '{{$student['student_id']}}'+ ' ';
                 @endforeach
-
-//        alert('ererererer');
 
                  swal({
                     title: "Attention",
@@ -1316,7 +1340,7 @@
                     closeOnConfirm: true
                 }, function(confirmed) {
                     if (confirmed) {
-//                        updateSettingHandsontable(setting);
+                        // do some staff if you want ---
                     }
                 });
         @endif

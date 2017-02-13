@@ -18,6 +18,7 @@ use App\Models\Degree;
 use App\Models\Department;
 use App\Models\DepartmentOption;
 use App\Models\Employee;
+use App\Models\Enum\ScoreEnum;
 use App\Models\Grade;
 use App\Models\Score;
 use App\Models\Percentage;
@@ -95,12 +96,12 @@ class CourseAnnualController extends Controller
             $departments = Department::where("parent_id",config('access.departments.department_academic'))->orderBy("code")->lists("code","id");
             $department_id = null;
             $lecturers = Employee::lists("name_kh","id");
-            $deptOptions = null;
+            $options = DepartmentOption::get();
         } else {
             $employee = Employee::where('user_id', Auth::user()->id)->first();
             $departments = $employee->department()->lists("code","id");
             $department_id = $employee->department->id;
-            $deptOptions = $this->deptHasOption($department_id);
+            $options = DepartmentOption::where('department_id',$employee->department_id)->get();
             if(auth()->user()->allow("view-all-score-course-annual")){ // This is chef department, he can see all courses in his department
                 $lecturers = Employee::where('department_id',$department_id)->lists("name_kh","id");
             } else {
@@ -114,7 +115,7 @@ class CourseAnnualController extends Controller
         $semesters = Semester::orderBy('id')->lists('name_en', 'id');
         $studentGroup = StudentAnnual::select('group')->groupBy('group')->orderBy('group')->lists('group');
 
-        return view('backend.course.courseAnnual.index',compact('departments','academicYears','degrees','grades', 'semesters', 'studentGroup','department_id','lecturers', 'deptOptions'));
+        return view('backend.course.courseAnnual.index',compact('departments','academicYears','degrees','grades', 'semesters', 'studentGroup','department_id','lecturers', 'options'));
     }
 
     private function deptHasOption($deptId) {
@@ -351,8 +352,11 @@ class CourseAnnualController extends Controller
 
         $storeCourseAnnual = $this->courseAnnuals->create($data);
         if($storeCourseAnnual) {
-            $data = $data + ['course_annual_id' => $storeCourseAnnual->id];
 
+            //----create score percentage ----
+            $this->createScorePercentage($request->midterm_score, $request->final_score, $storeCourseAnnual->id);
+
+            $data = $data + ['course_annual_id' => $storeCourseAnnual->id];
             $storeCourseAnnualClass = $this->courseAnnualClasses->create($data);
 
             if($storeCourseAnnualClass) {
@@ -837,6 +841,8 @@ class CourseAnnualController extends Controller
 //        $courseAnnuals = $this->getCourseAnnually();
 
         $courseSessions = $this->getCourseSessionFromDB();
+
+//        dd($deptId.'--'.$grade_id. '--'. $degree_id. '--'.$dept_option_id .'--'. $semester_id);
         $courseSessions = $courseSessions->where('course_sessions.lecturer_id', '=', null);// this to get not assigned courses
 //        $courseAnnuals = $courseAnnuals->where('course_annuals.employee_id', '=', null);// this to get not assigned courses
 
@@ -1138,6 +1144,8 @@ class CourseAnnualController extends Controller
     public function getAllCourseByDepartment (Request $request) {
 
         //CourseAnnualAssignmentRequest
+
+//        dd($request->all());
 
         $deptId = explode('_', $_GET['id'])[1];
         $arrayCourses = [];
@@ -1695,9 +1703,6 @@ class CourseAnnualController extends Controller
                 ['course_annual_classes.employee_id', '=', $employeeId]
             ])
             ->get();
-
-
-
         if($select) {
 //            dd($select);
             return true;
@@ -2177,33 +2182,26 @@ class CourseAnnualController extends Controller
         return $studentAnnual;
     }
 
-    public function insertPercentageNameNPercentage(Request $request) {
 
-    //this is to add new column name of the exam score ...and we have to initial the value 0 to the student for this type of exam
+    private function createScorePercentage($midterm, $final, $courseAnnualId) {
 
-//        dd($request->all());
+        $check = 0;
 
-        $check =0;
-        $courseAnnual = DB::table('course_annuals')->where('id', $request->course_annual_id)->first();
-        if($request->percentage <= 90) {
-            $percentageInput = [
-                [
-                    'name'              =>   $request->percentage_name,
-                    'percent'           => $request->percentage,
-                    'percentage_type'   => $request->percentage_type
-                ],
-                [
-                    'name'              =>   'Final-'.(90-$request->percentage).'%',
-                    'percent'           => 90 - $request->percentage,
-                    'percentage_type'   => $request->percentage_type
-                ]
-            ];
+        $courseAnnual = DB::table('course_annuals')->where('id', $courseAnnualId)->first();
+        $percentageInput = [
+            [
+                'name'              =>   'Midterm-'.$midterm.'%',
+                'percent'           => $midterm,
+                'percentage_type'   => 'normal'
+            ],
+            [
+                'name'              =>      'Final-'.$final.'%',
+                'percent'           =>      $final,
+                'percentage_type'   => 'normal'
+            ]
+        ];
 
-        } else {
-            return Response::json(['status' => false, 'message'=> 'Score percentage must not over than 90']);
-        }
-
-        $arrayIdsOfDeptGradeDegreeDeptOption = $this->arrayIdsOfDeptGradeDegreeDeptOption($request->course_annual_id);
+        $arrayIdsOfDeptGradeDegreeDeptOption = $this->arrayIdsOfDeptGradeDegreeDeptOption($courseAnnualId);
         $department_ids = $arrayIdsOfDeptGradeDegreeDeptOption['department_id'];
         $degree_ids = $arrayIdsOfDeptGradeDegreeDeptOption['degree_id'];
         $grade_ids = $arrayIdsOfDeptGradeDegreeDeptOption['grade_id'];
@@ -2224,10 +2222,11 @@ class CourseAnnualController extends Controller
         foreach($percentageInput as $input) {
 
             $savePercentageId = $this->percentages->create($input);// return the percentage id
+
             if($studentByCourse) {
                 foreach( $studentByCourse as $studentScore) {
                     $input = [
-                        'course_annual_id'  =>  $request->course_annual_id,
+                        'course_annual_id'  =>  $courseAnnualId,
                         'student_annual_id' =>  $studentScore->student_annual_id,
                         'department_id'     =>  $courseAnnual->department_id,
                         'degree_id'         =>  $courseAnnual->degree_id,
@@ -2235,14 +2234,11 @@ class CourseAnnualController extends Controller
                         'academic_year_id'  =>  $courseAnnual->academic_year_id,
                         'semester_id'       =>  $courseAnnual->semester_id,
                         'socre_absence'     =>  null
-
                     ];
 
                     $saveScoreId = $this->courseAnnualScores->create($input);// return the socreId
                     $savePercentageScore = $this->courseAnnualScores->createPercentageScore($saveScoreId->id, $savePercentageId->id);
-
                     if($savePercentageScore) {
-
                         $check++;
                     }
                 }
@@ -2250,7 +2246,21 @@ class CourseAnnualController extends Controller
         }
 
         if($check == (count($studentByCourse) * count($percentageInput))) {
+            return true;
+        } else {
+            return false;
+        }
 
+    }
+
+    public function insertPercentageNameNPercentage(Request $request) {
+
+    //this is to add new column name of the exam score ...and we have to initial the value 0 to the student for this type of exam
+
+        $midterm = $request->percentage;
+        $final = ScoreEnum::Midterm_Final - $midterm;
+        $createScore = $this->createScorePercentage($midterm, $final,$request->course_annual_id );
+        if($createScore) {
             $reDrawTable = $this->handsonTableData($request->course_annual_id);
             return $reDrawTable;
         }
@@ -3376,7 +3386,6 @@ class CourseAnnualController extends Controller
             $students = $students->get();
         }
 
-
         foreach($students as $student) {
             $arrayStudent[$student->id_card]=$student;
         }
@@ -3445,6 +3454,42 @@ class CourseAnnualController extends Controller
 //        dd($arrayNotation);
 
         return $arrayNotation;
+
+    }
+
+    public function getGroupByCourseAnnual(Request $request) {
+
+
+//        $courseAnnual = DB::table('course_annuals')->where('id', $request->course_annual_id)->first();
+//
+//        $allGroups = DB::table('course_annual_classes')->where([
+//            ['course_annual_id', $courseAnnual->id],
+//            ['course_session_id', null]
+//        ]);
+//
+//        if(count($allGroups->get()) > 1) {
+//
+//            $allGroups = $allGroups->orderBy('group')->lists('group', 'group');
+//        } else {
+//            foreach($allGroups->get() as $group) {
+//                if($group->group == null) {
+//                    $allGroups = DB::table('studentAnnuals')->where([
+//                        ['department_id', $courseAnnual->department_id],
+//                        ['academic_year_id', $courseAnnual->academic_year_id],
+//                        ['grade_id', $courseAnnual->grade_id],
+//                        ['degree_id', $courseAnnual->degree_id],
+//                    ])->orderBy('group')->lists('group', 'group');
+//
+//                    break;
+//                }
+//            }
+//        }
+//
+//        asort($allGroups);
+//        $groups = $course_session_groups[$request->course_annual_id];
+//        if($groups) {
+//            return view('backend.course.courseSession.group_by_course_session_selection', compact('groups'));
+//        }
 
     }
 
