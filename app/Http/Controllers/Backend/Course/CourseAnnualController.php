@@ -392,6 +392,29 @@ class CourseAnnualController extends Controller
 
         $groups = [];
         $courseAnnual = $this->courseAnnuals->findOrThrowException($id);
+        $scores = $this->getPropertiesFromScoreTable($courseAnnual->id)->get();
+
+        $arrayPercentages =[];
+        foreach($scores as $score) {
+            $arrayPercentages[$score->percentage_id][] =$score;
+        }
+
+
+        foreach($arrayPercentages as $key => $percentage) {
+
+            $explode = explode('-', $percentage[0]->name);
+            if(strtolower($explode[0]) == strtolower(ScoreEnum::Name_Mid)) {
+
+                $midterm['percentage']= $percentage[0]->percent;
+                $midterm['percentage_id']= $key;
+            }
+
+            if(strtolower($explode[0]) == strtolower(ScoreEnum::Name_Fin)){
+                //----find midterm from final value
+                $final['percentage']= $percentage[0]->percent;
+                $final['percentage_id']= $key;
+            }
+        }
 
         $array_groups = $this->getStudentGroupFromDB()
                        ->where('studentAnnuals.department_id', '=',$courseAnnual->department_id)
@@ -404,8 +427,6 @@ class CourseAnnualController extends Controller
         foreach($array_groups as $group) {
             $groups[] = $group;
         }
-
-//        dd($courseAnnual);
 
         if(auth()->user()->allow("view-all-score-in-all-department")){
             $courses = Course::orderBy('updated_at', 'desc')->get();
@@ -484,7 +505,7 @@ class CourseAnnualController extends Controller
         $grades = Grade::lists('name_kh','id')->toArray();
         $semesters = Semester::lists("name_kh", "id");
 
-        return view('backend.course.courseAnnual.edit',compact('courseAnnual','departments','academicYears','degrees','grades','courses', 'options','semesters', 'groups'));
+        return view('backend.course.courseAnnual.edit',compact('courseAnnual','departments','academicYears','degrees','grades','courses', 'options','semesters', 'groups', 'midterm', 'final'));
     }
 
     /**
@@ -498,14 +519,24 @@ class CourseAnnualController extends Controller
     {
 
 
-//        dd($request->all());
+        dd($request->all());
+
+
         $check = 0;
         $input = $request->all();
+
+        $midterm  = [
+            'name'  => 'Final-'.$request->midterm_score.'%',
+            'percent' => $request->midterm_score,
+        ];
+
+        $final = [
+            'name'  => 'Midterm-'.$request->midterm_score.'%',
+            'percent' => $request->midterm_score,
+        ];
+
         $updateCourseAannual = $this->courseAnnuals->update($id, $input);
         if($updateCourseAannual) {
-
-//            dd($updateCourseAannual->courseAnnualClass);
-
             if($updateCourseAannual->courseAnnualClass) {
 
                 $courseAnnualClassess = $updateCourseAannual->courseAnnualClass;
@@ -1484,18 +1515,6 @@ class CourseAnnualController extends Controller
             'time_course'   => $request->time_course,
             'time_td'       => $request->time_td,
             'time_tp'       => $request->time_tp,
-//            'name_kh'       => $request->name_kh,
-//            'name_en'       => $request->name_en,
-//            'name_fr'       => $request->name_fr,
-//            'semester_id'   => $request->semester_id,
-//            'employee_id'   => $courseAnnual->employee_id,
-//            'course_id'     => $courseAnnual->course_id,
-//            'active'        => true,
-//            'credit'        => $request->course_annual_credit,
-//            'department_id'         => $courseAnnual->department_id,
-//            'grade_id'              => $courseAnnual->grade_id,
-//            'degree_id'             => $courseAnnual-> degree_id,
-//            'department_option_id'  => $courseAnnual->department_option_id,
         ];
 
         $update =  $this->courseSessions->update($courseSessionId, $inputs);

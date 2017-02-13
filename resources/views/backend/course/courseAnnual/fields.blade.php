@@ -135,21 +135,58 @@
     </div>
 </div>
 
-<div class="form-group">
-    {!! Form::label('midterm_score', "Midterm Score", ['class' => 'col-lg-3 control-label required']) !!}
-    <div class="col-lg-2">
-        <select name="midterm_score" id="midterm_score_id" class="form-control">
-            <option value="{{\App\Models\Enum\ScoreEnum::Midterm_30}}"> 30% </option>
-            <option value="{{\App\Models\Enum\ScoreEnum::Midterm_40}}"> 40%</option>
-        </select>
+
+@if(isset($midterm) && isset($final))
+
+    <div class="form-group">
+        {!! Form::label('midterm_score', "Midterm Score", ['class' => 'col-lg-3 control-label required']) !!}
+        <div class="col-lg-2">
+            <select name="midterm_score" id="midterm_score_id" class="form-control">
+
+                @if($midterm == \App\Models\Enum\ScoreEnum::Midterm_30)
+                    <option value="{{\App\Models\Enum\ScoreEnum::Midterm_30}}" selected> 30% </option>
+                    <option value="{{\App\Models\Enum\ScoreEnum::Midterm_40}}"> 40%</option>
+
+                    <input type="hidden" name="midter_percentage_id" value="{{$midterm['percentage_id']}}">
+                    <input type="hidden" name="final_percentage_id" value="{{$final['percentage_id']}}">
+                @else
+                    <option value="{{\App\Models\Enum\ScoreEnum::Midterm_30}}"> 30% </option>
+                    <option value="{{\App\Models\Enum\ScoreEnum::Midterm_40}}" selected> 40% </option>
+
+                    <input type="hidden" name="midterm_percentage_id" value="{{$midterm['percentage_id']}}">
+                    <input type="hidden" name="final_percentage_id" value="{{$final['percentage_id']}}">
+
+                @endif
+            </select>
+        </div>
+
+        {!! Form::label('final_score', "Final Score", ['class' => 'col-lg-2 control-label required']) !!}
+
+        <div class="col-lg-3">
+            {{ Form::text('final_score',  null, ['class' => 'form-control' , 'id'=> 'final_score_id', 'required' => 'required', 'readonly']) }}
+        </div>
     </div>
 
-    {!! Form::label('final_score', "Final Score", ['class' => 'col-lg-2 control-label required']) !!}
+@else
+    <div class="form-group">
+        {!! Form::label('midterm_score', "Midterm Score", ['class' => 'col-lg-3 control-label required']) !!}
+        <div class="col-lg-2">
+            <select name="midterm_score" id="midterm_score_id" class="form-control">
+                <option value="{{\App\Models\Enum\ScoreEnum::Midterm_30}}"> 30% </option>
+                <option value="{{\App\Models\Enum\ScoreEnum::Midterm_40}}"> 40%</option>
+            </select>
+        </div>
 
-    <div class="col-lg-3">
-        {{ Form::text('final_score',  null, ['class' => 'form-control' , 'id'=> 'final_score_id', 'required' => 'required', 'readonly']) }}
+        {!! Form::label('final_score', "Final Score", ['class' => 'col-lg-2 control-label required']) !!}
+
+        <div class="col-lg-3">
+            {{ Form::text('final_score',  null, ['class' => 'form-control' , 'id'=> 'final_score_id', 'required' => 'required', 'readonly']) }}
+        </div>
     </div>
-</div>
+@endif
+
+
+
 
 
 <div class="form-group">

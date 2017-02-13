@@ -232,16 +232,6 @@
             }
         });
 
-//        $('.each-check-box').each(function() {
-//
-//            $(this).change(function() {
-//                if(this.checked) {
-//                    $('.all_box').addClass('checkbox_style');
-//                }
-//
-//            });
-//        })
-
 
     </script>
 

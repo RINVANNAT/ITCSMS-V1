@@ -1278,7 +1278,7 @@
             e.preventDefault();
             var url = $(this).attr('href');
             var colHeaders = setting.colHeaders
-            if(colHeaders.length > 7) {// we exactly knew the fixed column header so we just check if the couse has added the score column
+            if(colHeaders.length > parseInt('{{\App\Models\Enum\ScoreEnum::Col_Header}}')) {// we exactly knew the fixed column header so we just check if the couse has added the score column
                 window.open(url+'?course_annual_id='+$('select[name=available_course] :selected').val(), '_self');
 
             } else {
@@ -1297,33 +1297,6 @@
 
             }
         });
-
-
-        ///---get group by course session id for filtering student lists
-        if($('select[name=available_course] :selected').val()) {
-
-        }
-
-        $('select[name=available_course]').on('change', function() {
-
-
-            $.ajax({
-                type: 'GET',
-                url: '{{route('course.list_group_by_course_session_id')}}',
-                data: {course_annual_id: $(this).val()},
-                dataType: "json",
-                success: function(resultData) {
-
-
-                }
-            });
-
-        })
-
-        function requet_group_course_session() {
-
-        }
-
 
         @if(session('status_student'))
                 var str = ' ';

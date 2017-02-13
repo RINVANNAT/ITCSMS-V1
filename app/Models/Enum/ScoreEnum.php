@@ -15,5 +15,9 @@ class ScoreEnum
     const Midterm_Final = 90;
     const Midterm_30 = 30;
     const Midterm_40 = 40;
+    const Col_Header = 7;
+
+    const Name_Mid = 'midterm';
+    const Name_Fin = 'final';
 
 }

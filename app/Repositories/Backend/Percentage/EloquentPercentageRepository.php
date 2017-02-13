@@ -56,11 +56,6 @@ class EloquentPercentageRepository implements PercentageRepositoryContract
         $percentage->create_uid = auth()->id();
 
         if ($percentage->save()) {
-
-//            if(isset($input['departments'])){
-//                $departmentIds = $input['departments'];
-//                $degree->departments()->sync($departmentIds);
-//            }
             return $percentage;
         }
 
@@ -75,23 +70,18 @@ class EloquentPercentageRepository implements PercentageRepositoryContract
      */
     public function update($id, $input)
     {
-        $degree = $this->findOrThrowException($id);
+        $percentage = $this->findOrThrowException($id);
 
-        $degree->name_en = $input['name_en'];
-        $degree->name_fr = $input['name_fr'];
-        $degree->name_kh = $input['name_kh'];
-        $degree->code = $input['code'];
-        $degree->school_id = $input['school_id'];
-        $degree->description = $input['description'];
-        $degree->updated_at = Carbon::now();
-        $degree->write_uid = auth()->id();
+        $percentage->name = isset($input['name'])?$input['name']:$percentage->name;
+        $percentage->percent = isset($input['percent'])?$input['percent']:$percentage->percent;
+        $percentage->percentage_type = isset($input['percentage_type'])?$input['percentage_type']:$percentage->percentage_type;
 
-        if ($degree->save()) {
-            if(isset($input['departments'])){
-                $departmentIds = $input['departments'];
-                $degree->departments()->sync($departmentIds);
-            }
-            return true;
+        $percentage->updated_at = Carbon::now();
+        $percentage->write_uid = auth()->id();
+
+        if ($percentage->save()) {
+
+            return $percentage;
         }
 
         throw new GeneralException(trans('exceptions.configuration.degrees.update_error'));

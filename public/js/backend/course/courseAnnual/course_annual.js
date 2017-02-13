@@ -115,7 +115,7 @@ $('Document').ready(function() {
         setTimeCourseTpTd();
         setNameKhEnFr();
         // setSelectedField();
-        load_group();
+        // load_group();
     }
 });
 
