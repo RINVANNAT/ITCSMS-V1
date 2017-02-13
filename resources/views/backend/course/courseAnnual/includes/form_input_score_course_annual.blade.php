@@ -440,6 +440,7 @@
         }
 
         var objectStatus={};
+        var array_col_status = {};
         var status=false;// to check user if he/she input string in each cell
         var hotInstance;// declaration of handsontable object
         var celldata = []; // each cell data to render in a table
@@ -450,7 +451,8 @@
         var colDataArray = []; // column score data key=>value use to pass data to server
         var rowColor=0;
 
-        // this function is to declare global empty array and we use the empty arrays to store the data when user make change of each cell score value to pass to the sever
+        // this function is to declare global empty array and we use these empty arrays to store the data when user make change of each cell score value to pass to the sever
+        // the main purpose is to get col-change-data and to send them to server by each col
         function declareColumnHeaderDataEmpty() {
             // create empty array by the columns score which user created
             // because we want to store data cell changes by column and send them to the server by one column ...not all columns at once
@@ -645,7 +647,6 @@
 
                                     }
 
-
                                     colDataArray[columnIndex].push(element) // cell changes data by each column score use to pass data to server
                                     cellScoreChanges.push(element); // use this cell score change to test if user has made any changes
                                 }
@@ -704,9 +705,6 @@
                                         });
                                     }
                                     cellChanges.push(element);
-//                                    if(oldValue != newValue){
-//
-//                                    }
                                 }
                             }
                             var count = 0;
@@ -719,6 +717,7 @@
         };
 
         function checkIfStringValExist(colData, colName, count, numAbs, valToCompare) {
+
             var arrayNull=[];
             for(var check =0; check < colData.length; check++) {
                 if($.isNumeric(colData[check]) && (parseInt(colData[check]) >= 0)) {
@@ -736,7 +735,9 @@
 //                console.log((parseInt(numAbs) + arrayNull.length) +'=='+ colData.length);
 
                 if((parseInt(numAbs) + arrayNull.length) == colData.length) {
+
                     objectStatus.status = true;
+
                 } else {
                     objectStatus.status = false;
                     objectStatus.val_to_compare = valToCompare;
@@ -747,6 +748,9 @@
                 objectStatus.val_to_compare = valToCompare;
                 objectStatus.colName = colName;
             }
+            array_col_status[colName] = objectStatus.status;
+
+//            console.log(array_col_status);
         }
 
         function findDataAtCol(colIndex) {
@@ -1065,6 +1069,14 @@
         }
 
         $('#save_editted_score').on('click', function() {
+
+
+            $.each(array_col_status, function(key, val) {
+                if(val == false) {
+                    objectStatus.status = val;
+                    objectStatus.colName = key;
+                }
+            })
 
             var url = '{{route('admin.course.save_number_absence')}}';
 

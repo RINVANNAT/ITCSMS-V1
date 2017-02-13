@@ -3146,6 +3146,7 @@ class CourseAnnualController extends Controller
     public static $errorNumberAbsence = false;
     public static $isStringAllowed = false;
     public static $headerPercentage =0;
+    public static $colHeader = '';
 
 
     public function importScore($courseAnnualId, Request $request) {
@@ -3200,6 +3201,7 @@ class CourseAnnualController extends Controller
                                             } else {
                                                 CourseAnnualController::$isNotAceptedScore = true;
                                                 CourseAnnualController::$headerPercentage = $percent;
+                                                CourseAnnualController::$colHeader = $percentage[$scoreId];
                                                 DB::rollback();
                                                 break;
                                             }
@@ -3300,7 +3302,7 @@ class CourseAnnualController extends Controller
                     return redirect()->back()->with(['status'=>'Problem with no data in the first row, or your file misses some fields. To make file corrected please export the template!!']);
                 }
                 if(CourseAnnualController::$isNotAceptedScore) {
-                    return redirect()->back()->with(['status' => 'Score must be between 0 and '.CourseAnnualController::$headerPercentage]);
+                    return redirect()->back()->with(['status' => CourseAnnualController::$colHeader.' score must be between 0 and '.CourseAnnualController::$headerPercentage.', no string allowed!']);
                 }
                 if(CourseAnnualController::$isStringAllowed) {
                     return redirect()->back()->with(['status' => 'No string allowed!']);
@@ -3352,7 +3354,6 @@ class CourseAnnualController extends Controller
     }
 
     private function getStudentByNameAndIdCard($courseAnnualId) {
-
 
 
         $arrayIdsOf_Dept_Grd_Deg_Group = $this->arrayIdsOfDeptGradeDegreeDeptOption($courseAnnualId);
