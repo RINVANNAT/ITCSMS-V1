@@ -37,6 +37,10 @@ class CourseSession extends Model
         return $this->belongsTo('App\Models\CourseAnnual');
     }
 
+    public function groups(){
+        return $this->hasMany('App\Models\CourseAnnualClass');
+    }
+
     /**
      * The attributes that should be casted to native types.
      *

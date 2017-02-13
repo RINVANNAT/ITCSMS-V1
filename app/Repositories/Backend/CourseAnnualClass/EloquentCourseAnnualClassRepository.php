@@ -75,11 +75,11 @@ class EloquentCourseAnnualClassRepository implements CourseAnnualClassRepository
                     $courseAnnualClass->course_session_id = $input['course_session_id'];
                 }
 
-                $courseAnnualClass->grade_id = $input['grade_id'];
-                $courseAnnualClass->degree_id = $input['degree_id'];
-                $courseAnnualClass->department_id = $input['department_id'];
+                //$courseAnnualClass->grade_id = $input['grade_id'];
+                //$courseAnnualClass->degree_id = $input['degree_id'];
+               // $courseAnnualClass->department_id = $input['department_id'];
                 $courseAnnualClass->group = $group;
-                $courseAnnualClass->department_option_id = $input['department_option_id'];
+                //$courseAnnualClass->department_option_id = $input['department_option_id'];
 
                 $courseAnnualClass->created_at = Carbon::now();
                 $courseAnnualClass->create_uid = auth()->id();
@@ -90,12 +90,18 @@ class EloquentCourseAnnualClassRepository implements CourseAnnualClassRepository
         } else { // if group is not passed, store as well. Just without group
             $courseAnnualClass = new CourseAnnualClass();
 
-            $courseAnnualClass->course_annual_id = $input['course_annual_id'];
-            $courseAnnualClass->course_session_id = $input['course_session_id'];
-            $courseAnnualClass->grade_id = $input['grade_id'];
-            $courseAnnualClass->degree_id = $input['degree_id'];
-            $courseAnnualClass->department_id = $input['department_id'];
-            $courseAnnualClass->department_option_id = $input['department_option_id'];
+            if(isset($input['course_annual_id'])){
+                $courseAnnualClass->course_annual_id = $input['course_annual_id'];
+            }
+
+            if(isset($input['course_session_id'])){
+                $courseAnnualClass->course_session_id = $input['course_session_id'];
+            }
+
+            //$courseAnnualClass->grade_id = $input['grade_id'];
+            //$courseAnnualClass->degree_id = $input['degree_id'];
+            //$courseAnnualClass->department_id = $input['department_id'];
+            //$courseAnnualClass->department_option_id = $input['department_option_id'];
 
             $courseAnnualClass->created_at = Carbon::now();
             $courseAnnualClass->create_uid = auth()->id();

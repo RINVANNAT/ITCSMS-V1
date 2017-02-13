@@ -26,11 +26,7 @@ class StoreCourseSessionRequest extends Request
     public function rules()
     {
         return [
-            "lecturer_id" => "required|numeric",
-            "course_annual_id" => "required|numeric",
-            "time_tp" => "required|numeric",
-            "time_course" => "required|numeric",
-            "time_td" => "required|numeric"
+
         ];
     }
 }

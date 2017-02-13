@@ -74,7 +74,7 @@
         <div class="box box-success">
             <div class="box-header with-border">
                 <div class="mailbox-controls">
-                    <div class="col-md-7">
+                    <div class="col-md-6">
                         @permission('create-courseAnnuals')
                         <a href="{!! route('admin.course.course_annual.create') !!}">
                             <button class="btn btn-primary btn-sm"><i class="fa fa-plus-circle"></i> Add
@@ -99,7 +99,7 @@
                             @endauth
                         </div>
                     </div>
-                    <div class="col-md-5">
+                    <div class="col-md-6">
 
                     </div>
                 </div>
@@ -123,53 +123,16 @@
                             {!! Form::select('lecturer',$lecturers,null, array('class'=>'','id'=>'filter_lecturer','placeholder'=>'Lecturer')) !!}
                         @endif
                     </div>
-                    <div class="col-md-5">
+                    <div class="col-md-6">
                         <h3 style="margin: 0px;">Course Sessions</h3>
                     </div>
                 </div>
-                <div class="col-md-7" style="border-right: 3px solid #b8c7ce;">
+                <div class="col-md-6" style="border-right: 3px solid #b8c7ce;">
                     @include("backend.course.courseAnnual.includes.index_table")
                 </div>
-                <div class="col-md-5">
+                <div class="col-md-6">
                     <div class="course_session_message col-sm-12 box-body with-border text-muted well well-sm no-shadow" style="padding: 20px; min-height: 50px;">
                         <center><h4>Please select any course on the left.</h4></center>
-                        <form class="form_add_session">
-                            <div class="row">
-                                <div class="col-md-2" style="padding-left:3px;padding-right: 3px;">
-                                    <div class="form-group">
-                                        <label for="session_time_course">Course</label>
-                                        <input type="number" class="form-control" id="session_time_course">
-                                    </div>
-                                </div>
-                                <div class="col-md-2" style="padding-left:3px;padding-right: 3px;">
-                                    <div class="form-group">
-                                        <label for="session_time_td">TD</label>
-                                        <input type="number" class="form-control" id="session_time_td">
-                                    </div>
-                                </div>
-                                <div class="col-md-2" style="padding-left:3px;padding-right: 3px;">
-                                    <div class="form-group">
-                                        <label for="session_time_tp">TP</label>
-                                        <input type="number" class="form-control" id="session_time_tp">
-                                    </div>
-                                </div>
-                                <div class="col-md-6" style="padding-left:3px;padding-right: 3px;">
-                                    <div class="form-group">
-                                        <label for="time_tp">Lecturer</label>
-                                        {!! Form::select('employee',[],null,['id'=>'employee','class'=>"select_employee form-control",'style'=>'width:100%;']) !!}
-                                        {{ Form::hidden('employee_id', null, ['class' => 'form-control', 'id'=>'session_lecturer']) }}
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="row">
-                                <div class="col-md-12" style="padding-left:3px;padding-right: 3px;">
-                                    <div class="form-group">
-                                        <label for="groups">Groups</label>
-
-                                    </div>
-                                </div>
-                            </div>
-                        </form>
                     </div>
                     <div class="course_session_wrapper" style="display: none;">
                         {{--@include("backend.course.courseAnnual.includes.index_course_session_table")--}}
@@ -177,8 +140,8 @@
 
                 </div>
                 <div class="clearfix"></div>
-            </div><!-- /.box-body -->
-        </div><!--box-->
+            </div>
+        </div>
 
     </div>
 @stop
@@ -191,6 +154,7 @@
         var $search_url = "{{route('admin.employee.search')}}";
         var base_url = '{{url('img/profiles/')}}';
         var current_course = null;
+        var search_employee_box = null;
         $(function() {
 
             var oTable = $('#courseAnnuals-table').DataTable({
@@ -244,37 +208,6 @@
                 }
             });
 
-            var employee_search_box = $(".select_employee").select2({
-                placeholder: 'Enter name ...',
-                allowClear: true,
-                tags: true,
-                createTag: function (params) {
-                    return {
-                        id: params.term,
-                        name: params.term,
-                        group: 'customer',
-                        newOption: true
-                    }
-                },
-                ajax: {
-                    url: $search_url,
-                    dataType: 'json',
-                    delay: 250,
-                    data: function (params) {
-                        return {
-                            term: params.term || '', // search term
-                            page: params.page || 1
-                        };
-                    },
-                    cache: true
-                },
-                escapeMarkup: function (markup) {
-                    return markup;
-                }, // let our custom formatter work
-                minimumInputLength: 3,
-                templateResult: formatRepoEmployee, // omitted for brevity, see the source of this page
-                templateSelection: formatRepoSelectionEmployee, // omitted for brevity, see the source of this page
-            });
 
 //            $('#filter_academic_year, #filter_degree, #filter_grade, #filter_department').on('change', function(e) {
 //                oTable.draw();
@@ -332,7 +265,57 @@
 
         });
 
+        function init_search_box(){
+            search_employee_box = $(".select_employee").select2({
+                placeholder: 'Enter name ...',
+                allowClear: true,
+                tags: true,
+                createTag: function (params) {
+                    return {
+                        id: params.term,
+                        name: params.term,
+                        group: 'customer',
+                        newOption: true
+                    }
+                },
+                ajax: {
+                    url: $search_url,
+                    dataType: 'json',
+                    delay: 250,
+                    data: function (params) {
+                        return {
+                            term: params.term || '', // search term
+                            page: params.page || 1
+                        };
+                    },
+                    cache: true
+                },
+                escapeMarkup: function (markup) {
+                    return markup;
+                }, // let our custom formatter work
+                minimumInputLength: 3,
+                templateResult: formatRepoEmployee, // omitted for brevity, see the source of this page
+                templateSelection: formatRepoSelectionEmployee, // omitted for brevity, see the source of this page
+            });
+        }
+
+        function edit_session(){
+
+        }
+
+        function delete_session(url){
+            $.ajax({
+                type: 'DELETE',
+                url: url,
+                dataType:"json",
+                success: function(resultData) {
+                    load_session(current_course);
+                }
+            });
+        }
+
         function load_session(current_course){
+
             $.ajax({
                 type: 'POST',
                 url: "{!! route('admin.course.course_session.data') !!}",
@@ -342,6 +325,46 @@
                 dataType: "html",
                 success: function(resultData) {
                     $(".course_session_wrapper").html(resultData);
+                    init_search_box();
+                    $('.btn_add_course_session').unbind('click').bind('click', function(){
+                        if($(".add_session_wrapper").is(":visible")){
+                            $(".add_session_wrapper").hide();
+                        } else {
+                            $(".add_session_wrapper").show();
+                        }
+                    });
+                    // Save course session
+                    $('.btn_save_course_session').unbind('click').bind('click', function(){
+                        $.ajax({
+                            type: 'POST',
+                            url: "{!! route('admin.course.course_session.store') !!}",
+                            data: {
+                                data:$(".form_add_session").serializeArray()
+                            },
+                            dataType: "html",
+                            success: function(resultData) {
+                                load_session(current_course);
+                                $(".add_session_wrapper").hide();
+                            }
+                        });
+                    });
+
+                    // Cancel course session
+                    $('.btn_cancel_course_session').unbind('click').bind('click', function(){
+                        $(".add_session_wrapper").hide();
+                    });
+
+//                    $('.btn_edit_course_session').unbind('click').bind('click', function(){
+//                        $(".add_session_wrapper").show();
+//                        $("input[name='time_course']").val($(this).data('time_course'));
+//                        $("input[name='time_td']").val($(this).data('time_td'));
+//                        $("input[name='time_tp']").val($(this).data('time_tp'));
+//                        search_employee_box.select2('data', {id:103, text:'ENABLED_FROM_JS'});
+//                    });
+
+                    $('.btn_delete_course_session').unbind('click').bind('click', function(){
+                        delete_session($(this).data("url"));
+                    });
                 }
             });
         }

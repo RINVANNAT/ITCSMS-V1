@@ -61,6 +61,7 @@ class CourseAnnualModificationSeeder extends Seeder
 
                 $array = $array + [
                         'course_annual_id'=> $courseAnnual->id,
+                        'course_session_id' => null,
                         'group'   =>  null
                     ];
 

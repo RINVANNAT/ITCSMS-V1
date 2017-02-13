@@ -2,6 +2,7 @@
 
 
 use App\Exceptions\GeneralException;
+use App\Models\CourseAnnualClass;
 use App\Models\CourseSession;
 use Carbon\Carbon;
 
@@ -93,9 +94,18 @@ class EloquentCourseSessionRepository implements CourseSessionRepositoryContract
     public function destroy($id)
     {
 
+        $status = true;
         $model = $this->findOrThrowException($id);
+        $courseAnnualClasses = CourseAnnualClass::where("course_session_id",$model->id)->get();
+        foreach($courseAnnualClasses as $class){
+            if($class->delete()){
+                $status = true;
+            } else {
+                $status = false;
+            }
+        }
 
-        if ($model->delete()) {
+        if($status && $model->delete()){
             return true;
         }
 
