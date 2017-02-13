@@ -58,6 +58,10 @@ class EloquentCourseAnnualRepository implements CourseAnnualRepositoryContract
     public function create($input)
     {
         $courseAnnual = new CourseAnnual();
+
+        if(!isset($input['employee_id']) || $input['employee_id'] == '') {
+            $input['employee_id'] = null;
+        }
         $courseAnnual->course_id = $input['course_id'];
         $courseAnnual->employee_id = isset($input['employee_id'])?$input['employee_id']:null;
 
@@ -110,6 +114,10 @@ class EloquentCourseAnnualRepository implements CourseAnnualRepositoryContract
 
         if(!isset($input['department_option_id']) || $input['department_option_id'] == ""){
             $input['department_option_id'] = $courseAnnual->department_option_id;
+        }
+        if(!isset($input['employee_id']) || $input['employee_id'] == '') {
+            $input['employee_id'] = null;
+
         }
 
         $courseAnnual->course_id = $input['course_id'];
