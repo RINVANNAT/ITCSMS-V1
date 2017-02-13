@@ -50,8 +50,15 @@
     <script>
         var $search_url = "{{route('admin.access.users.search')}}";
         var base_url = '{{url('img/profiles/')}}';
-        var selected_user_id = {{$employee->user->id}};
-        var selected_user = "{{$employee->user->name}}";
+        @if($employee->user != null)
+            var selected_user_id = {{$employee->user->id}};
+            var selected_user = "{{$employee->user->name}}";
+        @else
+            var selected_user_id = null;
+            var selected_user = null;
+        @endif
+
+
 
         $(function(){
             $('#birthdate').datetimepicker({
