@@ -399,7 +399,6 @@ class CourseAnnualController extends Controller
             $arrayPercentages[$score->percentage_id][] =$score;
         }
 
-
         foreach($arrayPercentages as $key => $percentage) {
 
             $explode = explode('-', $percentage[0]->name);
@@ -525,52 +524,55 @@ class CourseAnnualController extends Controller
         $midterm  = [
             'name'  => 'Midterm-'.$request->midterm_score.'%',
             'percent' => (int)$request->midterm_score,
+            'percentage_type' => 'normal'
         ];
 
         $final = [
             'name'  => 'Final-'.$request->final_score.'%',
             'percent' => (int)$request->final_score,
+            'percentage_type' => 'normal'
         ];
 
-        $updateMidterm = $this->percentages->update($midterm_id, $midterm);
+        if(isset($midterm_id) && isset($final_id)) {
+            $this->percentages->update($midterm_id, $midterm);
+            $this->percentages->update($final_id, $final);
+        } else {
+            $this->createScorePercentage($request->midterm_score, $request->final_score, $id);
 
-        if($updateMidterm) {
-            $updateFinal = $this->percentages->update($final_id, $final);
-            if($updateFinal) {
+        }
 
-                $updateCourseAannual = $this->courseAnnuals->update($id, $input);
+        $updateCourseAannual = $this->courseAnnuals->update($id, $input);
 
-                if($updateCourseAannual) {
+        if($updateCourseAannual) {
 
-                    $delete = DB::table('course_annual_classes')->where([
-                        ['course_annual_id',$updateCourseAannual->id],
-                        ['course_session_id',null],
-                    ]);
+            $delete = DB::table('course_annual_classes')->where([
+                ['course_annual_id',$updateCourseAannual->id],
+                ['course_session_id',null],
+            ]);
 
-                    $data = [
-                        'groups'                => $request->groups,
-                        'course_annual_id'      => $updateCourseAannual->id
-                    ];
-                    if(count($delete->get()) > 0) {
-                        $delete =  $delete->delete();
-                        if($delete) {
-                            $create = $this->courseAnnualClasses->create($data);
-                        }
-
-                    } else {
-
-                        $create = $this->courseAnnualClasses->create($data);
-                    }
-
-                    if($create) {
-                        return redirect()->route('admin.course.course_annual.index')->withFlashSuccess(trans('alerts.backend.generals.updated'));
-                    }
-
+            $data = [
+                'groups'                => $request->groups,
+                'course_annual_id'      => $updateCourseAannual->id
+            ];
+            if(count($delete->get()) > 0) {
+                $delete =  $delete->delete();
+                if($delete) {
+                    $create = $this->courseAnnualClasses->create($data);
                 }
 
-                return redirect()->back()->withFlashError('Not Updated');
+            } else {
+
+                $create = $this->courseAnnualClasses->create($data);
             }
+
+            if($create) {
+                return redirect()->route('admin.course.course_annual.index')->withFlashSuccess(trans('alerts.backend.generals.updated'));
+            }
+
         }
+
+        return redirect()->back()->withFlashError('Not Updated');
+
 
 
 
