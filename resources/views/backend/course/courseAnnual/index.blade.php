@@ -123,14 +123,14 @@
                             {!! Form::select('lecturer',$lecturers,null, array('class'=>'','id'=>'filter_lecturer','placeholder'=>'Lecturer')) !!}
                         @endif
                     </div>
-                    <div class="col-md-6">
-                        <h3 style="margin: 0px;">Course Sessions</h3>
+                    <div class="col-md-5">
+                        <h3 style="margin: 0px; float: right;">Course Sessions</h3>
                     </div>
                 </div>
-                <div class="col-md-6" style="border-right: 3px solid #b8c7ce;">
+                <div class="col-md-7" style="border-right: 3px solid #b8c7ce;">
                     @include("backend.course.courseAnnual.includes.index_table")
                 </div>
-                <div class="col-md-6">
+                <div class="col-md-5">
                     <div class="course_session_message col-sm-12 box-body with-border text-muted well well-sm no-shadow" style="padding: 20px; min-height: 50px;">
                         <center><h4>Please select any course on the left.</h4></center>
                     </div>

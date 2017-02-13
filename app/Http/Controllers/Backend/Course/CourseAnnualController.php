@@ -518,10 +518,6 @@ class CourseAnnualController extends Controller
     public function update(UpdateCourseAnnualRequest $request, $id)
     {
 
-
-        dd($request->all());
-
-
         $check = 0;
         $input = $request->all();
 
@@ -598,10 +594,13 @@ class CourseAnnualController extends Controller
             ->leftJoin('grades','course_annuals.grade_id', '=', 'grades.id')
             ->leftJoin('semesters','course_annuals.semester_id', '=', 'semesters.id')
             ->leftJoin('departmentOptions', 'course_annuals.department_option_id', '=', 'departmentOptions.id')
-            ->with("groups")
+            ->with("courseAnnualClass")
             ->select([
                 'courses.name_kh as course',
                 'course_annuals.id',
+                'course_annuals.time_course',
+                'course_annuals.time_tp',
+                'course_annuals.time_td',
                 'course_annuals.name_en as name',
                 'course_annuals.semester_id',
                 'course_annuals.active',
@@ -631,9 +630,16 @@ class CourseAnnualController extends Controller
                     <div class="col-md-9">
                         <span style="display: none" class="course_id"><?php echo $courseAnnual->id ?></span>
                         <h4><?php echo $courseAnnual->name ?></h4>
+                        <span>(C=<?php echo $courseAnnual->time_course?> | TD=<?php echo $courseAnnual->time_td ?> | TP= <?php echo $courseAnnual->time_tp ?>)</span>
                     </div>
                     <div class="col-md-3">
                         <?php echo $courseAnnual->class ?>
+                        <br/>
+                        <?php
+                        foreach($courseAnnual->courseAnnualClass as $obj_group) {
+                            echo $obj_group->group." ";
+                        }
+                        ?>
                     </div>
                 </div>
                 <div class="row">
@@ -667,7 +673,7 @@ class CourseAnnualController extends Controller
             })
             ->addColumn('action', function ($courseAnnual) use ($employee) {
                 if(Auth::user()->id == 1) { // This is admin
-                    return  '<a href="'.route('admin.course.form_input_score_course_annual',$courseAnnual->id).'" class="btn btn-xs btn-info input_score_course"><i class="fa fa-plus" data-toggle="tooltip" data-placement="top" title="" data-original-title="'.'input score'.'"></i> Score </a>'.
+                    return  '<a href="'.route('admin.course.form_input_score_course_annual',$courseAnnual->id).'" class="btn btn-xs btn-info input_score_course"><i class="fa fa-area-chart" data-toggle="tooltip" data-placement="top" title="" data-original-title="'.'input score'.'"></i></a>'.
                             ' <a href="'.route('admin.course.course_annual.edit',$courseAnnual->id).'" class="btn btn-xs btn-primary"><i class="fa fa-pencil" data-toggle="tooltip" data-placement="top" title="" data-original-title="'.trans('buttons.general.crud.edit').'"></i> </a>'.
                             ' <button class="btn btn-xs btn-danger btn-delete" data-remote="'.route('admin.course.course_annual.destroy', $courseAnnual->id) .'"><i class="fa fa-times" data-toggle="tooltip" data-placement="top" title="' . trans('buttons.general.crud.delete') . '"></i></button>';
                 } else {
@@ -678,7 +684,7 @@ class CourseAnnualController extends Controller
                     // Check if this is his/her course and he/she has permission to input score
                     if(Auth::user()->allow('input-score-course-annual')) {
                         if(in_array($courseAnnual->id,$my_courses)){
-                            $actions = $actions.'<a href="'.route('admin.course.form_input_score_course_annual',$courseAnnual->id).'" class="btn btn-xs btn-info input_score_course"><i class="fa fa-plus" data-toggle="tooltip" data-placement="top" title="" data-original-title="'.'input score'.'"></i> Score </a>';
+                            $actions = $actions.'<a href="'.route('admin.course.form_input_score_course_annual',$courseAnnual->id).'" class="btn btn-xs btn-info input_score_course"><i class="fa fa-area-chart" data-toggle="tooltip" data-placement="top" title="" data-original-title="'.'input score'.'"></i></a>';
                         }
                     }
 
