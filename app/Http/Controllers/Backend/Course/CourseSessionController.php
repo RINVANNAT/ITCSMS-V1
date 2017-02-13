@@ -9,6 +9,7 @@ use App\Models\CourseSession;
 use App\Models\School;
 use App\Repositories\Backend\CourseSession\CourseSessionRepositoryContract;
 use Carbon\Carbon;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Maatwebsite\Excel\Facades\Excel;
 
@@ -86,31 +87,53 @@ class CourseSessionController extends Controller
         return redirect()->route('admin.configuration.course_sessions.index')->withFlashSuccess(trans('alerts.backend.generals.deleted'));
     }
 
-    public function data()
-    {
+    public function data(Request $request){
+        $course_id = $request->get('course_id');
 
         $course_sessions = DB::table('course_sessions')
             ->leftJoin("employees","employees.id","=","course_sessions.lecturer_id")
             ->leftJoin("course_annuals","course_annuals.id","=","course_sessions.course_annual_id")
+            ->where("course_annuals.course_id",$course_id)
             ->select([
                 'course_sessions.id',
                 'course_sessions.time_course',
                 'course_sessions.time_td',
                 'course_sessions.time_tp',
+                'course_sessions.course_annual_id',
                 'course_annuals.name_kh as name',
                 'employees.name_kh as employee'
             ]);
-
-        $datatables =  app('datatables')->of($course_sessions);
-
-
-        return $datatables
-            ->addColumn('action', function ($course_session) {
-//                return ''; // '.route('admin.configuration.course_sessions.edit',$course_session->id).'///'.route('admin.configuration.course_sessions.destroy', $course_session->id) .'
-                return  '<a href="#" class="btn btn-xs btn-primary"><i class="fa fa-pencil" data-toggle="tooltip" data-placement="top" title="" data-original-title="'.trans('buttons.general.crud.edit').'"></i> </a>'.
-                        ' <button class="btn btn-xs btn-danger btn-delete" data-remote="#"><i class="fa fa-times" data-toggle="tooltip" data-placement="top" title="' . trans('buttons.general.crud.delete') . '"></i></button>';
-            })
-            ->make(true);
+        return view("backend.course.courseSession.index",compact("course_sessions"))->render();
     }
+
+//    public function data()
+//    {
+//
+//        $course_sessions = DB::table('course_sessions')
+//            ->leftJoin("employees","employees.id","=","course_sessions.lecturer_id")
+//            ->leftJoin("course_annuals","course_annuals.id","=","course_sessions.course_annual_id")
+//            ->select([
+//                'course_sessions.id',
+//                'course_sessions.time_course',
+//                'course_sessions.time_td',
+//                'course_sessions.time_tp',
+//                'course_sessions.course_annual_id',
+//                'course_annuals.name_kh as name',
+//                'employees.name_kh as employee'
+//            ]);
+//
+//        $datatables =  app('datatables')->of($course_sessions);
+//
+//        if($course_id = $datatables->request->get('course_id')) {
+//            $datatables->where('courses.course_annual_id', '=', $course_id);
+//        }
+//
+//        return $datatables
+//            ->addColumn('action', function ($course_session) {
+//                return  '<a href="#" class="btn btn-xs btn-primary"><i class="fa fa-pencil" data-toggle="tooltip" data-placement="top" title="" data-original-title="'.trans('buttons.general.crud.edit').'"></i> </a>'.
+//                        ' <button class="btn btn-xs btn-danger btn-delete" data-remote="#"><i class="fa fa-times" data-toggle="tooltip" data-placement="top" title="' . trans('buttons.general.crud.delete') . '"></i></button>';
+//            })
+//            ->make(true);
+//    }
 
 }

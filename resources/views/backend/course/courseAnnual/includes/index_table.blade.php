@@ -1,5 +1,5 @@
 <div>
-    <table class="table table-striped table-bordered table-hover dt-responsive nowrap" cellspacing="0" width="100%" id="courseAnnuals-table">
+    <table class="table table-bordered table-hover dt-responsive nowrap" cellspacing="0" width="100%" id="courseAnnuals-table">
         <thead>
         <tr>
             <th></th>

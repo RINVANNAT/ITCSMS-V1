@@ -10,8 +10,9 @@
 @section('after-styles-end')
     {!! Html::style('plugins/datatables/dataTables.bootstrap.css') !!}
     {!! Html::style('plugins/daterangepicker/daterangepicker-bs3.css') !!}
+    {!! Html::style('plugins/select2/select2.min.css') !!}
     <style>
-        .toolbar, #courseAnnuals-table_length {
+        .toolbar, .session, #courseAnnuals-table_length {
             float: left;
         }
 
@@ -25,6 +26,39 @@
 
         #filter_dept_option {
             margin-left: 5px;
+        }
+
+        .selected td:first-child {
+            background-color: #83B8EC !important;
+        }
+        .selected td{
+            border-left: 0;
+            border-right: 0;
+            border-top:thin solid #83B8EC !important;
+            border-bottom:thin solid #83B8EC !important;
+        }
+
+        .selected td:last-child {
+            border-right:thin solid #83B8EC !important;
+        }
+
+        .selected .select2-result-repository__forks, .selected .select2-result-repository__stargazers,
+        .selected .select2-result-repository__watchers, .selected .select2-result-repository__description,
+        .selected .select2-result-repository__title{
+            color: white !important;
+        }
+
+        table h4{
+            margin-top: 0px !important;
+        }
+
+        .image_mark {
+            width: 20px;
+        }
+
+        td:first-child, td:last-child {
+            vertical-align: middle !important;
+            text-align: center !important;
         }
     </style>
 @stop
@@ -40,47 +74,94 @@
         <div class="box box-success">
             <div class="box-header with-border">
                 <div class="mailbox-controls">
-                    <!-- Check all button -->
-                    @permission('create-courseAnnuals')
-                    <a href="{!! route('admin.course.course_annual.create') !!}">
-                        <button class="btn btn-primary btn-sm"><i class="fa fa-plus-circle"></i> Add
-                        </button>
-                    </a>
-                    <a href="{!! route('admin.course.course_annual.request_import') !!}">
-                        <button class="btn btn-primary btn-sm"><i class="fa fa-plus-circle"></i> Import
-                        </button>
-                    </a>
-                    @endauth
+                    <div class="col-md-7">
+                        @permission('create-courseAnnuals')
+                        <a href="{!! route('admin.course.course_annual.create') !!}">
+                            <button class="btn btn-primary btn-sm"><i class="fa fa-plus-circle"></i> Add
+                            </button>
+                        </a>
+                        <a href="{!! route('admin.course.course_annual.request_import') !!}">
+                            <button class="btn btn-primary btn-sm"><i class="fa fa-plus-circle"></i> Import
+                            </button>
+                        </a>
+                        @endauth
 
-                    {{--<div class="btn-group">--}}
-                        {{--<button class="btn btn-default btn-sm"><i class="fa fa-trash-o"></i></button>--}}
-                        {{--<button class="btn btn-default btn-sm"><i class="fa fa-reply"></i></button>--}}
-                        {{--<button class="btn btn-default btn-sm"><i class="fa fa-share"></i></button>--}}
-                    {{--</div>--}}
-                    {{--<button class="btn btn-default btn-sm"><i class="fa fa-refresh"></i></button>--}}
+                        <div class="btn-group" style="float: right;">
+                            @permission('course-annual-assignment')
+                            <button class="btn btn-primary btn-sm" id="course_assignment"><i class="fa fa-map-signs"></i> {{trans('buttons.course.course_annual.course_assignment')}}</button>
+                            @endauth
+                            @permission('generate-course-annual')
+                            <button class="btn btn-primary btn-sm" id="generate_course_annual"><i class="fa fa-puzzle-piece"></i> Generate Courses</button>
+                            @endauth
 
-                    @permission('course-annual-assignment')
-                    <button class="btn btn-primary btn-sm pull-right " id="course_assignment"><i class="fa fa-plus-circle"></i> {{trans('buttons.course.course_annual.course_assignment')}}</button>
-                    @endauth
+                            @permission('view-all-score-course-annual')
+                            <button class="btn btn-warning btn-sm" id="all_score_course_annual"><i class="fa fa-eye"></i> View Total Score </button>
+                            @endauth
+                        </div>
+                    </div>
+                    <div class="col-md-5">
 
-                    @permission('generate-course-annual')
-                    <button class="btn btn-primary btn-sm pull-right " id="generate_course_annual" style="margin-right: 5px"><i class="fa fa-plus-circle"></i> Generate From Old Course Annual</button>
-                    @endauth
-
-                    @permission('view-all-score-course-annual')
-                    <button class="btn btn-primary btn-sm pull-right " id="all_score_course_annual" style="margin-right: 5px"><i class="fa fa-plus-circle"></i> All Score Course </button>
-                    @endauth
-
-
+                    </div>
                 </div>
             </div><!-- /.box-header -->
 
             <div class="box-body">
-                <div class="col-md-6">
+                <div class="row">
+                    <div class="col-md-7" style="min-height: 15px; padding: 0 30px 15px 30px;" id="filter_panel">
+
+                    </div>
+                    <div class="col-md-5">
+                        <h3 style="margin: 0px;">Course Sessions</h3>
+                    </div>
+                </div>
+                <div class="col-md-7" style="border-right: 3px solid #b8c7ce;">
                     @include("backend.course.courseAnnual.includes.index_table")
                 </div>
-                <div class="col-md-6">
-                    @include("backend.course.courseAnnual.includes.index_course_session_table")
+                <div class="col-md-5">
+                    <div class="course_session_message col-sm-12 box-body with-border text-muted well well-sm no-shadow" style="padding: 20px; min-height: 50px;">
+                        <center><h4>Please select any course on the left.</h4></center>
+                        <form class="form_add_session">
+                            <div class="row">
+                                <div class="col-md-2" style="padding-left:3px;padding-right: 3px;">
+                                    <div class="form-group">
+                                        <label for="session_time_course">Course</label>
+                                        <input type="number" class="form-control" id="session_time_course">
+                                    </div>
+                                </div>
+                                <div class="col-md-2" style="padding-left:3px;padding-right: 3px;">
+                                    <div class="form-group">
+                                        <label for="session_time_td">TD</label>
+                                        <input type="number" class="form-control" id="session_time_td">
+                                    </div>
+                                </div>
+                                <div class="col-md-2" style="padding-left:3px;padding-right: 3px;">
+                                    <div class="form-group">
+                                        <label for="session_time_tp">TP</label>
+                                        <input type="number" class="form-control" id="session_time_tp">
+                                    </div>
+                                </div>
+                                <div class="col-md-6" style="padding-left:3px;padding-right: 3px;">
+                                    <div class="form-group">
+                                        <label for="time_tp">Lecturer</label>
+                                        {!! Form::select('employee',[],null,['id'=>'employee','class'=>"select_employee form-control",'style'=>'width:100%;']) !!}
+                                        {{ Form::hidden('employee_id', null, ['class' => 'form-control', 'id'=>'session_lecturer']) }}
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-12" style="padding-left:3px;padding-right: 3px;">
+                                    <div class="form-group">
+                                        <label for="groups">Groups</label>
+
+                                    </div>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                    <div class="course_session_wrapper" style="display: none;">
+                        {{--@include("backend.course.courseAnnual.includes.index_course_session_table")--}}
+                    </div>
+
                 </div>
                 <div class="clearfix"></div>
             </div><!-- /.box-body -->
@@ -92,33 +173,38 @@
 @section('after-scripts-end')
     {!! Html::script('plugins/datatables/jquery.dataTables.min.js') !!}
     {!! Html::script('plugins/datatables/dataTables.bootstrap.min.js') !!}
+    {!! HTML::script('plugins/select2/select2.full.min.js') !!}
     <script>
+        var $search_url = "{{route('admin.employee.search')}}";
+        var base_url = '{{url('img/profiles/')}}';
+        var current_course = null;
         $(function() {
-                var toolbar_html =
-                        '{!! Form::select('academic_year',$academicYears,null, array('class'=>'form-control','id'=>'filter_academic_year')) !!}' +
-                        @if($department_id != null)
-                                ''+
-                                @if(isset($deptOptions))
-                                        '{!! Form::select('dept_option',$deptOptions,null, array('class'=>'form-control','id'=>'filter_dept_option','placeholder'=>'Division')) !!} '+
-                                @endif
-                        @else
-                                ' {!! Form::select('department',$departments,$department_id, array('class'=>'form-control','id'=>'filter_department','placeholder'=>'Dept.')) !!} '+
-                        @endif
-                        '{!! Form::select('semester',$semesters,null, array('class'=>'form-control','id'=>'filter_semester','placeholder'=>'Semester')) !!} '+
-                        '{!! Form::select('degree',$degrees,null, array('class'=>'form-control','id'=>'filter_degree','placeholder'=>'Degree')) !!} '+
-                        '{!! Form::select('grade',$grades,null, array('class'=>'form-control','id'=>'filter_grade','placeholder'=>'Year')) !!} '+
-                        @if($lecturers != null)
-                        '{!! Form::select('lecturer',$lecturers,null, array('class'=>'form-control','id'=>'filter_lecturer','placeholder'=>'Lecturer')) !!} '
-                        @else
-                        ''
-                        @endif
+            var toolbar_html =
+                    '{!! Form::select('academic_year',$academicYears,null, array('class'=>'','id'=>'filter_academic_year')) !!}' +
+                    @if($department_id != null)
+                            ''+
+                            @if(isset($deptOptions))
+                                    '{!! Form::select('dept_option',$deptOptions,null, array('class'=>'','id'=>'filter_dept_option','placeholder'=>'Division')) !!} '+
+                            @endif
+                    @else
+                            ' {!! Form::select('department',$departments,$department_id, array('class'=>'','id'=>'filter_department','placeholder'=>'Dept.')) !!} '+
+                    @endif
+                    '{!! Form::select('semester',$semesters,null, array('class'=>'','id'=>'filter_semester','placeholder'=>'Semester')) !!} '+
+                    '{!! Form::select('degree',$degrees,null, array('class'=>'','id'=>'filter_degree','placeholder'=>'Degree')) !!} '+
+                    '{!! Form::select('grade',$grades,null, array('class'=>'','id'=>'filter_grade','placeholder'=>'Year')) !!} '+
+                    @if($lecturers != null)
+                    '{!! Form::select('lecturer',$lecturers,null, array('class'=>'','id'=>'filter_lecturer','placeholder'=>'Lecturer')) !!} '
+                    @else
+                    ''
+                    @endif
 
 
 
             var oTable = $('#courseAnnuals-table').DataTable({
-                    dom: 'lf<"toolbar">rtip',
                     processing: true,
                     serverSide: true,
+                    scrollY:  "90vh",
+                    scrollCollapse: true,
                     pageLength: {!! config('app.records_per_page')!!},
                     deferLoading : true,
                     ajax: {
@@ -138,7 +224,7 @@
                     },
 
                     columns: [
-                        { data: 'checkbox', name: 'checkbox', orderable:false, searchable:false},
+                        { data: 'mark', name:'mark', searchable:false, orderable:false},
                         { data: 'name', name: 'course_annuals.name_en'},
                         { data: 'employee_id', name: 'employee_id',searchable:false},
                         { data: 'action', name: 'action',orderable: false, searchable: false}
@@ -147,33 +233,60 @@
 
             enableDeleteRecord($('#courseAnnuals-table'));
 
-            var sessionTable = $('#courseSession-table').DataTable({
-                dom: 'f<"session">rtip',
-                processing: true,
-                serverSide: true,
-                pageLength: {!! config('app.records_per_page')!!},
-                ajax: {
-                    url:"{!! route('admin.course.course_session.data') !!}",
-                    type:"POST",
-                    data:function(d){
-                    }
-                },
+            $('#courseAnnuals-table tbody').on( 'click', 'td:first-child, td:nth-child(2),td:nth-child(3)', function (event) {
+                if ($(this).closest('tr').hasClass('selected') ) {
+                    $(this).closest('tr').removeClass('selected');
+                    current_course = null;
+                    $(".course_session_message").show();
+                    $(".course_session_wrapper").hide();
+                }
+                else {
+                    oTable.$('tr.selected').removeClass('selected');
+                    $(this).closest('tr').addClass('selected');
+                    current_course = $(this).closest('tr').find('.course_id').html();
 
-                columns: [
-                    { data: 'name', name: 'course_annuals.name_en'},
-                    { data: 'lecturer_id', name: 'lecturer_id',searchable:false},
-                    { data: 'action', name: 'action',orderable: false, searchable: false}
-                ]
+                    $(".course_session_message").hide();
+                    $(".course_session_wrapper").show();
+                    load_session(current_course);
+                }
             });
 
-            enableDeleteRecord($('#courseSession-table'));
+            var employee_search_box = $(".select_employee").select2({
+                placeholder: 'Enter name ...',
+                allowClear: true,
+                tags: true,
+                createTag: function (params) {
+                    return {
+                        id: params.term,
+                        name: params.term,
+                        group: 'customer',
+                        newOption: true
+                    }
+                },
+                ajax: {
+                    url: $search_url,
+                    dataType: 'json',
+                    delay: 250,
+                    data: function (params) {
+                        return {
+                            term: params.term || '', // search term
+                            page: params.page || 1
+                        };
+                    },
+                    cache: true
+                },
+                escapeMarkup: function (markup) {
+                    return markup;
+                }, // let our custom formatter work
+                minimumInputLength: 3,
+                templateResult: formatRepoEmployee, // omitted for brevity, see the source of this page
+                templateSelection: formatRepoSelectionEmployee, // omitted for brevity, see the source of this page
+            });
 
-{{--            {{ Form::select('client_id', $client, Input::old('client_id')) }}--}}
-
-
-             $("div.toolbar").html(
+            $("#filter_panel").html(
                     toolbar_html
             );
+
 //            $('#filter_academic_year, #filter_degree, #filter_grade, #filter_department').on('change', function(e) {
 //                oTable.draw();
 //                e.preventDefault();
@@ -226,6 +339,20 @@
             oTable.draw();
 
         });
+
+        function load_session(current_course){
+            $.ajax({
+                type: 'POST',
+                url: "{!! route('admin.course.course_session.data') !!}",
+                data: {
+                    course_id:current_course
+                },
+                dataType: "html",
+                success: function(resultData) {
+                    $(".course_session_wrapper").html(resultData);
+                }
+            });
+        }
 
         function hasDeptOption() {
             var dept_option_url = '{{route('course_annual.dept_option')}}';
@@ -417,11 +544,6 @@
             window.location.replace(url+'?student_group='+baseData.student_group);
 
         })
-
-//        $(document).on('change', '#filter_student_group', function() {
-//            alert($(this).val())
-//        })
-
 
 
     </script>

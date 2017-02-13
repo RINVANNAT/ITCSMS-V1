@@ -586,11 +586,29 @@ class CourseAnnualController extends Controller
         $employee = Employee::where('user_id', Auth::user()->id)->first();
 
         $datatables
-            ->addColumn('checkbox', function($courseAnnual) {
-                return "<input type='checkbox' value='".$courseAnnual->id."'/>";
+            ->addColumn('mark', function($courseAnnual){
+                return "<img class='image_mark' src='".url('img/arrow.png')."' />";
             })
             ->editColumn('name', function($courseAnnual) {
-                return "<b>".$courseAnnual->name."</b><br/><br/>".$courseAnnual->class."<br/>".$courseAnnual->semester."<br/>".$courseAnnual->academic_year;
+                ob_start();
+                ?>
+                <div class="row">
+                    <div class="col-md-9">
+                        <span style="display: none" class="course_id"><?php echo $courseAnnual->id ?></span>
+                        <h4><?php echo $courseAnnual->name ?></h4>
+                    </div>
+                    <div class="col-md-3">
+                        <?php echo $courseAnnual->class ?>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-12">
+                        <?php echo $courseAnnual->semester." | ".$courseAnnual->academic_year ?>
+                    </div>
+                </div>
+                <?php
+                $html = ob_get_clean();
+                return $html;
             })
             ->editColumn('class', function ($courseAnnual) {
                 $course_annual_classes = DB::table('course_annual_classes')

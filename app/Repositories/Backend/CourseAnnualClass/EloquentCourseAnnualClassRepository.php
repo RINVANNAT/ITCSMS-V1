@@ -67,8 +67,14 @@ class EloquentCourseAnnualClassRepository implements CourseAnnualClassRepository
             foreach($input['groups'] as $group){
                 $courseAnnualClass = new CourseAnnualClass();
 
-                $courseAnnualClass->course_annual_id = $input['course_annual_id'];
-                $courseAnnualClass->course_session_id = $input['course_session_id'];
+                if(isset($input['course_annual_id'])){
+                    $courseAnnualClass->course_annual_id = $input['course_annual_id'];
+                }
+
+                if(isset($input['course_session_id'])){
+                    $courseAnnualClass->course_session_id = $input['course_session_id'];
+                }
+
                 $courseAnnualClass->grade_id = $input['grade_id'];
                 $courseAnnualClass->degree_id = $input['degree_id'];
                 $courseAnnualClass->department_id = $input['department_id'];
