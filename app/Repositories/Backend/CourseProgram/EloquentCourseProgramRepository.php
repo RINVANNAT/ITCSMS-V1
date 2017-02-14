@@ -65,6 +65,10 @@ class EloquentCourseProgramRepository implements CourseProgramRepositoryContract
             $course->responsible_department_id = $input["responsible_department_id"];
         }
 
+        if(isset($input['department_option_id']) && $input['department_option_id'] != ""){
+            $course->department_option_id = $input["department_option_id"];
+        }
+
         $course->name_en = $input["name_en"];
         $course->name_kh = $input["name_kh"];
         $course->name_fr = $input["name_fr"];
@@ -77,7 +81,6 @@ class EloquentCourseProgramRepository implements CourseProgramRepositoryContract
         $course->grade_id = $input["grade_id"];
         $course->department_id = $input["department_id"];
         $course->semester_id = $input["semester_id"];
-        $course->department_option_id = $input["department_option_id"];
 
 
         $course->create_uid = auth()->id();
@@ -103,6 +106,10 @@ class EloquentCourseProgramRepository implements CourseProgramRepositoryContract
             $courseProgram->responsible_department_id = $input["responsible_department_id"];
         }
 
+        if(isset($input['department_option_id']) && $input['department_option_id'] != ""){
+            $courseProgram->department_option_id = $input["department_option_id"];
+        }
+
         $courseProgram->name_en = $input["name_en"];
         $courseProgram->name_kh = $input["name_kh"];
         $courseProgram->name_fr = $input["name_fr"];
@@ -115,7 +122,6 @@ class EloquentCourseProgramRepository implements CourseProgramRepositoryContract
         $courseProgram->grade_id = $input["grade_id"];
         $courseProgram->department_id = $input["department_id"];
         $courseProgram->semester_id = $input["semester_id"];
-        $courseProgram->department_option_id = $input["department_option_id"];
 
         $courseProgram->updated_at = Carbon::now();
         $courseProgram->write_uid = auth()->id();
