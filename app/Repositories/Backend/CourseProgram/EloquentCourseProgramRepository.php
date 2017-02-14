@@ -59,6 +59,9 @@ class EloquentCourseProgramRepository implements CourseProgramRepositoryContract
     public function create($input)
     {
 
+        if(!isset($input['responsible_department_id']) || $input['responsible_department_id'] == ""){
+            $input["responsible_department_id"] == null;
+        }
         $input['create_uid'] = auth()->id();
         $input['created_at'] = Carbon::now();
 
@@ -80,6 +83,9 @@ class EloquentCourseProgramRepository implements CourseProgramRepositoryContract
 
         $input['updated_at'] = Carbon::now();
         $input['write_uid'] = auth()->id();
+        if(!isset($input['responsible_department_id']) || $input['responsible_department_id'] == ""){
+            $input["responsible_department_id"] == null;
+        }
 
 
         if ($courseProgram->update($input)) {
