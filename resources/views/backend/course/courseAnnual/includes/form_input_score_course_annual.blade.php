@@ -6,6 +6,9 @@
 @section('page-header')
 
     <style>
+        .space{
+            margin-left: 5px;
+        }
 
         .popupdiv{
             height:200px;
@@ -355,8 +358,8 @@
 
     <div class="box box-success">
         <div class="box-header with-border">
-            <div class="pull-left">
-                <select  name="available_course" id="available_course" class=" form-control col-md-2 col-lg-2 col-sm-2">
+            <div class="pull-left drop_selection">
+                <select  name="available_course" id="available_course">
                     <option value="">Other Course</option>
                     @foreach($availableCourses as $course_annual_id => $course)
                         @if($course_annual_id == $courseAnnual->id)
@@ -1233,10 +1236,26 @@
 
         $('select[name=available_course]').on('change', function() {
 
+            var baseData = {
+                course_annual_id: $(this).val()
+            }
+            switch_course(baseData);
+            list_group($(this).val());
+
+        });
+
+        $(document).ready(function() {
+            if(val = $('select[name=available_course] :selected').val()) {
+                list_group(val);
+            }
+        });
+
+        function switch_course(baseData) {
+
             $.ajax({
                 type: 'POST',
                 url: '{{route('course_annual.ajax_switch_course_annual')}}',
-                data: {course_annual_id:$(this).val()},
+                data: baseData,
                 dataType: "json",
                 success: function(resultData) {
 
@@ -1244,7 +1263,37 @@
                     declareColumnHeaderDataEmpty()
                 }
             });
-        });
+
+        }
+
+        function list_group(course_annual_id) {
+
+            $.ajax({
+                type: 'GET',
+                url: '{{route('course.list_group_by_course_annual_id')}}',
+                data: {course_annual_id:course_annual_id},
+                dataType: "html",
+                success: function(resultData) {
+
+                    if($('select[name=group_name]').is(':visible')) {
+                        $('select[name=group_name]').html(resultData);
+                    } else {
+                        $('select[name=available_course]').after(resultData);
+                        $('select[name=group_name]').addClass('space')
+                    }
+
+                }
+            });
+        }
+
+        $(document).on('change', 'select[name=group_name]', function() {
+            var baseData = {
+                course_annual_id: $('select[name=available_course] :selected').val(),
+                group : $(this).val()
+            }
+            switch_course(baseData);
+
+        })
 
         $('#export_score').on('click', function(e) {
 

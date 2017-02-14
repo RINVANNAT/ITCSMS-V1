@@ -124,21 +124,20 @@
 
             // On degree, grade, department, option is changed, change group
             $("#academic_year_id").on('change', function (){
-                load_group();
+                load_group('{{\App\Models\Enum\CourseAnnualEnum::EDIT}}');
             });
             $("#degree_id").on('change', function (){
-                load_group();
+                load_group('{{\App\Models\Enum\CourseAnnualEnum::EDIT}}');
             });
             $("#grade_id").on('change', function (){
-                load_group();
+                load_group('{{\App\Models\Enum\CourseAnnualEnum::EDIT}}');
             });
             $("#department_id").on('change', function (){
-                load_group();
+                load_group('{{\App\Models\Enum\CourseAnnualEnum::EDIT}}');
             });
             $("#department_option_id").on('change', function (){
-                load_group();
+                load_group('{{\App\Models\Enum\CourseAnnualEnum::EDIT}}');
             });
-
 
 
             if(val = $('select#midterm_score_id :selected').val()) {
@@ -150,5 +149,19 @@
                 $('#final_score_id').val(parseInt('{{\App\Models\Enum\ScoreEnum::Midterm_Final}}') - $(this).val());
             });
         })
+
+        $('Document').ready(function() {
+            if($('#course_id :selected').val()) {
+                setTimeCourseTpTd();
+                setNameKhEnFr();
+            }
+        });
+
+        $('#course_id').on('change', function() {
+            setTimeCourseTpTd();
+            setNameKhEnFr();
+            setSelectedField();
+            load_group('{{\App\Models\Enum\CourseAnnualEnum::EDIT}}');
+        });
     </script>
 @stop
