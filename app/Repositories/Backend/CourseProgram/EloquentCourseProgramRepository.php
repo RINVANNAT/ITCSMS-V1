@@ -3,7 +3,10 @@
 
 use App\Exceptions\GeneralException;
 use App\Models\Course;
+use App\Models\CourseAnnual;
+use App\Models\CourseAnnualClass;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\DB;
 
 /**
  * Class EloquentCourseProgramRepository
@@ -95,7 +98,16 @@ class EloquentCourseProgramRepository implements CourseProgramRepositoryContract
     {
 
         $model = $this->findOrThrowException($id);
+        // Delete course annual class first
+        $course_annuals = DB::table('course_annuals')->where('course_id',$model->id)->get();
+        foreach($course_annuals as $course_annual){
+            DB::table("course_annual_classes")->where("course_annual_id",$course_annual->id)->delete();
+        }
 
+        // Delete course annual later
+        DB::table("course_annuals")->where('course_id',$model->id)->delete();
+
+        // Delete course program
         if ($model->delete()) {
             return true;
         }
