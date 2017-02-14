@@ -58,6 +58,7 @@ class EloquentCourseAnnualClassRepository implements CourseAnnualClassRepository
     public function create($input)
     {
 
+        $test = [];
         if(!isset($input['department_option_id']) || $input['department_option_id'] == ""){
             $input['department_option_id'] = null;
         }
@@ -77,6 +78,7 @@ class EloquentCourseAnnualClassRepository implements CourseAnnualClassRepository
                 $courseAnnualClass->created_at = Carbon::now();
                 $courseAnnualClass->create_uid = auth()->id();
                 if(!$courseAnnualClass->save()){
+
                     return false;
                 }
             }
@@ -91,11 +93,6 @@ class EloquentCourseAnnualClassRepository implements CourseAnnualClassRepository
                 $courseAnnualClass->course_session_id = $input['course_session_id'];
             }
 
-            //$courseAnnualClass->grade_id = $input['grade_id'];
-            //$courseAnnualClass->degree_id = $input['degree_id'];
-            //$courseAnnualClass->department_id = $input['department_id'];
-            //$courseAnnualClass->department_option_id = $input['department_option_id'];
-
             $courseAnnualClass->created_at = Carbon::now();
             $courseAnnualClass->create_uid = auth()->id();
 
@@ -103,6 +100,7 @@ class EloquentCourseAnnualClassRepository implements CourseAnnualClassRepository
                 return false;
             }
         }
+
 
         return true;
     }

@@ -10,6 +10,7 @@ use App\Http\Requests\Backend\Course\CourseAnnual\CourseAnnualAssignmentRequest;
 use App\Http\Requests\Backend\Course\CourseAnnual\GenerateCourseAnnualRequest;
 
 
+use App\Http\Requests\Frontend\Auth\RegisterRequest;
 use App\Models\Absence;
 use App\Models\AcademicYear;
 use App\Models\Average;
@@ -153,8 +154,12 @@ class CourseAnnualController extends Controller
 
 
         $groups = $this->getStudentGroupFromDB();
+
         $courseAnnualIds = DB::table('course_annuals')->where('course_id', $request->course_program_id)->lists('course_annuals.id');
-        $selectedGroups = DB::table('course_annual_classes')->whereIn('course_annual_id', $courseAnnualIds)->lists('group');
+        $selectedGroups = DB::table('course_annual_classes')
+            ->whereIn('course_annual_id', $courseAnnualIds)
+            ->where('course_session_id', null)
+            ->lists('group');
 
         if($deptId = $request->department_id) {
             $groups = $groups->where('studentAnnuals.department_id', '=',$deptId);
@@ -360,6 +365,7 @@ class CourseAnnualController extends Controller
             $this->createScorePercentage($request->midterm_score, $request->final_score, $storeCourseAnnual->id);
 
             $data = $data + ['course_annual_id' => $storeCourseAnnual->id];
+
             $storeCourseAnnualClass = $this->courseAnnualClasses->create($data);
 
             if($storeCourseAnnualClass) {
@@ -392,6 +398,7 @@ class CourseAnnualController extends Controller
      */
     public function edit(EditCourseAnnualRequest $request, $id)
     {
+
 
         $groups = [];
         $courseAnnual = $this->courseAnnuals->findOrThrowException($id);
@@ -519,7 +526,6 @@ class CourseAnnualController extends Controller
     public function update(UpdateCourseAnnualRequest $request, $id)
     {
 
-        $check = 0;
         $input = $request->all();
         $midterm_id = $request->midterm_percentage_id;
         $final_id = $request->final_percentage_id;
@@ -557,7 +563,10 @@ class CourseAnnualController extends Controller
                 'groups'                => $request->groups,
                 'course_annual_id'      => $updateCourseAannual->id
             ];
+
+            //---if the $delete hase no record the delete method will be error
             if(count($delete->get()) > 0) {
+
                 $delete =  $delete->delete();
                 if($delete) {
                     $create = $this->courseAnnualClasses->create($data);
@@ -575,11 +584,6 @@ class CourseAnnualController extends Controller
         }
 
         return redirect()->back()->withFlashError('Not Updated');
-
-
-
-
-
 
     }
 
@@ -1556,7 +1560,7 @@ class CourseAnnualController extends Controller
         $update =  $this->courseSessions->update($courseSessionId, $inputs);
         if($update) {
             $delete = DB::table('course_annual_classes')->where([
-                ['course_annual_id',$courseSession->course_annual_id],
+                ['course_annual_id',null],
                 ['course_session_id',$courseSession->id],
             ]);
 
@@ -1566,7 +1570,7 @@ class CourseAnnualController extends Controller
                 'degree_id'             => $courseAnnual-> degree_id,
                 'department_option_id'  => $courseAnnual->department_option_id,
                 'groups'                => $groups,
-                'course_annual_id'      => $courseAnnual->id,
+                'course_annual_id'      => null,
                 'course_session_id'      => $update->id
             ];
             if(count($delete->get()) > 0) {
@@ -1617,7 +1621,7 @@ class CourseAnnualController extends Controller
                 'department_id'         => $courseAnnual->department_id,
                 'degree_id'             => $courseAnnual->degree_id,
                 'grade_id'              => $courseAnnual->grade_id,
-                'course_annual_id'      => $courseAnnual->id,
+                'course_annual_id'      => null,
                 'course_session_id'      => $save->id
             ];
 
@@ -1631,13 +1635,15 @@ class CourseAnnualController extends Controller
         }
     }
 
+
+    //---here delete course session
     public function deleteCourseAnnual(CourseAnnualAssignmentRequest $request) {
 
         $explode = explode('_',$request->dept_course_id);
         $courseSessionId = $explode[3];
         $courseSession = DB::table('course_sessions')->where('id', $courseSessionId)->first();
         $courseAnnualClasses = DB::table('course_annual_classes')->where([
-            ['course_annual_id', $courseSession->course_annual_id],
+            ['course_annual_id', null],
             ['course_session_id', $courseSession->id]
         ])->delete();
         if($courseAnnualClasses) {
@@ -1656,17 +1662,7 @@ class CourseAnnualController extends Controller
         $courseAnnual = DB::table('course_annuals')
             ->leftJoin('course_annual_classes', 'course_annual_classes.course_annual_id', '=', 'course_annuals.id')
             ->where('course_annuals.id', $courseAnnualId)
-//            ->select('course_annuals.id as course_annual_id', 'course_annuals.academic_year_id', 'course_annuals.semester_id',
-//                'course_annuals.employee_id', 'course_annuals.name_en', 'course_annuals.name_kh', 'course_annuals.name_fr',
-//                'course_annuals.credit', 'course_annuals.course_id', 'course_annuals.time_course', 'course_annuals.time_td', 'course_annuals.time_tp',
-//                'course_annual_classes.grade_id', 'course_annual_classes.degree_id', 'course_annual_classes.department_id', 'course_annual_classes.department_option_id',
-//                'course_annual_classes.group', 'departments.code as department_code',
-//                'grades.name_en as grade_name'
-//
-//            )
             ->first();
-
-//        $course = CourseAnnual::where('id', $courseAnnualId)->first();
 
         return $courseAnnual;
 
@@ -3489,6 +3485,8 @@ class CourseAnnualController extends Controller
                 }
             }
         }
+
+//        dd($allGroups);
 
         asort($allGroups); $groups = $allGroups;
         if($groups) {
