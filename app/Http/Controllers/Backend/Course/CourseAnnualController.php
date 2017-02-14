@@ -245,6 +245,7 @@ class CourseAnnualController extends Controller
             $departments = Department::where("parent_id",config('access.departments.department_academic'))->orderBy("code")->lists("code","id");
             $department_id = null;
             $options = DepartmentOption::get();
+            $other_departments = Department::where("parent_id",config('access.departments.department_academic'))->orderBy("code")->lists("code","id");
             $raw_courses = Course::join('degrees','degrees.id','=','courses.degree_id')
                 ->join('departments','departments.id','=','courses.department_id')
                 ->leftJoin('departmentOptions','departmentOptions.id','=','courses.department_option_id')
@@ -262,6 +263,7 @@ class CourseAnnualController extends Controller
                     'courses.grade_id',
                     'courses.department_option_id',
                     'courses.semester_id',
+                    'courses.responsible_department_id',
                     'degrees.code as degree_code',
                     'departments.code as department_code',
                     'departmentOptions.code as option'
@@ -275,6 +277,10 @@ class CourseAnnualController extends Controller
             $departments = $employee->department()->lists("code","id");
             $department_id = $employee->department->id;
             $options = DepartmentOption::where('department_id',$employee->department_id)->get();
+            $other_departments = Department::where("parent_id",config('access.departments.department_academic'))
+                                ->where("id", "!=", $employee->department_id)
+                                ->orderBy("code")
+                                ->lists("code","id");
             $raw_courses = Course::where('courses.department_id', $department_id)
                                 ->join('degrees','degrees.id','=','courses.degree_id')
                                 ->join('departments','departments.id','=','courses.department_id')
@@ -315,7 +321,7 @@ class CourseAnnualController extends Controller
         $degrees = Degree::lists('name_kh','id')->toArray();
         $grades = Grade::lists('name_kh','id')->toArray();
         $semesters = Semester::lists("name_kh", "id");
-        return view('backend.course.courseAnnual.create',compact('departments','academicYears','degrees','grades','courses',"semesters", 'options'));
+        return view('backend.course.courseAnnual.create',compact('departments','academicYears','degrees','grades','courses',"semesters", 'options','other_departments'));
     }
 
     public function getDepts() {
@@ -442,6 +448,7 @@ class CourseAnnualController extends Controller
             $departments = Department::where("parent_id",config('access.departments.department_academic'))->orderBy("code")->lists("code","id");
             $department_id = null;
             $options = DepartmentOption::get();
+            $other_departments = Department::where("parent_id",config('access.departments.department_academic'))->orderBy("code")->lists("code","id");
             $raw_courses = Course::join('degrees','degrees.id','=','courses.degree_id')
                 ->join('departments','departments.id','=','courses.department_id')
                 ->leftJoin('departmentOptions','departmentOptions.id','=','courses.department_option_id')
@@ -471,6 +478,10 @@ class CourseAnnualController extends Controller
             $employee = Employee::where('user_id', Auth::user()->id)->first();
             $departments = $employee->department()->lists("code","id");
             $department_id = $employee->department->id;
+            $other_departments = Department::where("parent_id",config('access.departments.department_academic'))
+                ->where("id", "!=", $employee->department_id)
+                ->orderBy("code")
+                ->lists("code","id");
             $options = DepartmentOption::where('department_id',$employee->department_id)->get();
             $raw_courses = Course::where('courses.department_id', $department_id)
                 ->join('degrees','degrees.id','=','courses.degree_id')
@@ -513,7 +524,7 @@ class CourseAnnualController extends Controller
         $grades = Grade::lists('name_kh','id')->toArray();
         $semesters = Semester::lists("name_kh", "id");
 
-        return view('backend.course.courseAnnual.edit',compact('courseAnnual','departments','academicYears','degrees','grades','courses', 'options','semesters', 'groups', 'midterm', 'final'));
+        return view('backend.course.courseAnnual.edit',compact('courseAnnual','departments','academicYears','degrees','grades','courses', 'options','semesters', 'groups', 'midterm', 'final','other_departments'));
     }
 
     /**
@@ -723,7 +734,7 @@ class CourseAnnualController extends Controller
                     }
 
                     if(Auth::user()->allow('edit-courseAnnuals')) {
-                        $actions = $actions.' <a target="_blank" href="'.route('admin.course.course_annual.edit',$courseAnnual->id).'" class="btn btn-xs btn-primary"><i class="fa fa-pencil" data-toggle="tooltip" data-placement="top" title="" data-original-title="'.trans('buttons.general.crud.edit').'"></i> </a>';
+                        $actions = $actions.' <a href="'.route('admin.course.course_annual.edit',$courseAnnual->id).'" class="btn btn-xs btn-primary"><i class="fa fa-pencil" data-toggle="tooltip" data-placement="top" title="" data-original-title="'.trans('buttons.general.crud.edit').'"></i> </a>';
                     }
 
                     if(Auth::user()->allow('delete-courseAnnuals')) {

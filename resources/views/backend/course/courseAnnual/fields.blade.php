@@ -26,7 +26,8 @@
                                 grade="{{$course->grade_id}}"
                                 degree="{{$course->degree_id}}"
                                 dept_option="{{$course->department_option_id}}"
-                                semester="{{$course->semester_id}}">
+                                semester="{{$course->semester_id}}"
+                                responsible_department_id="{{$course->responsible_department_id}}">
                             {{$course->degree_code.$course->grade_id.$course->option."-S".$course->semester_id." | ".$course->name_en}}
                         </option>
                     @endforeach
@@ -49,7 +50,7 @@
 <div class="form-group">
     {!! Form::label('semester', trans('labels.backend.courseAnnuals.fields.academic_year'), ['class' => 'col-lg-3 control-label required']) !!}
     <div class="col-lg-3">
-        {{ Form::select('academic_year_id', $academicYears, null, ['class' => 'form-control','id'=>'academic_year_id', 'placeholder' => 'Academic year']) }}
+        {{ Form::select('academic_year_id', $academicYears, null, ['class' => 'form-control','id'=>'academic_year_id', 'placeholder' => 'Academic year', 'required' => 'required']) }}
     </div>
 </div>
 
@@ -229,6 +230,15 @@
 
     <div class="col-lg-3">
         {{ Form::text('name_fr',  null, ['class' => 'form-control' , 'id'=> 'name_fr', 'required' => 'required']) }}
+    </div>
+</div>
+
+<hr/>
+
+<div class="form-group">
+    {!! Form::label('responsible_department_id', trans('labels.backend.coursePrograms.fields.responsible_department_id'), ['class' => 'col-lg-3 control-label']) !!}
+    <div class="col-lg-3">
+        {{ Form::select('responsible_department_id', $other_departments, null, ['class' => 'form-control','placeholder' => "Department"]) }}
     </div>
 </div>
 

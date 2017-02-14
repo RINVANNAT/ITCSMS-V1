@@ -62,6 +62,11 @@ class EloquentCourseAnnualRepository implements CourseAnnualRepositoryContract
         if(!isset($input['employee_id']) || $input['employee_id'] == '') {
             $input['employee_id'] = null;
         }
+
+        if(!isset($input["responsible_department_id"]) || $input["responsible_department_id"] == ''){
+            $input['responsible_department_id'] = null;
+        }
+
         $courseAnnual->course_id = $input['course_id'];
         $courseAnnual->employee_id = isset($input['employee_id'])?$input['employee_id']:null;
 
@@ -70,6 +75,7 @@ class EloquentCourseAnnualRepository implements CourseAnnualRepositoryContract
         $courseAnnual->grade_id = $input['grade_id'];
         $courseAnnual->degree_id = $input['degree_id'];
         $courseAnnual->department_id = $input['department_id'];
+        $courseAnnual->responsible_department_id = $input['responsible_department_id'];
         $courseAnnual->active = isset($input['active'])?true:false;
 
         $courseAnnual->time_course = isset($input['time_course'])?$input['time_course']:0;
@@ -117,7 +123,9 @@ class EloquentCourseAnnualRepository implements CourseAnnualRepositoryContract
         }
         if(!isset($input['employee_id']) || $input['employee_id'] == '') {
             $input['employee_id'] = null;
-
+        }
+        if(!isset($input["responsible_department_id"]) || $input["responsible_department_id"] == ''){
+            $input['responsible_department_id'] = null;
         }
 
         $courseAnnual->course_id = $input['course_id'];

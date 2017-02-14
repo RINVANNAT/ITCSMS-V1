@@ -70,7 +70,8 @@ function setSelectedField() {
         degree  = $('#course_id :selected').attr('degree'),
         dept_option = $('#course_id :selected').attr('dept_option'),
         semester = $('#course_id :selected').attr('semester'),
-        credit = $('#course_id :selected').attr('credit');
+        credit = $('#course_id :selected').attr('credit'),
+        responsible_department_id = $('#course_id :selected').attr('responsible_department_id');
 
     $('select[name=grade_id] option').each(function() {
         if($(this).val() == grade) {
@@ -98,6 +99,12 @@ function setSelectedField() {
 
     $('select[name=semester_id] option').each(function() {
         if($(this).val() == semester) {
+            $(this).prop('selected', true);
+        }
+    })
+
+    $('select[name=responsible_department_id] option').each(function() {
+        if($(this).val() == responsible_department_id) {
             $(this).prop('selected', true);
         }
     })
