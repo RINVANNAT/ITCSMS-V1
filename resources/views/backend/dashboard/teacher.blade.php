@@ -28,9 +28,9 @@
                         <td>{{$course['name_en']}}</td>
                         <td>
                             {{$course['class']}}
-                            @foreach($course["groups"] as $group)
-                                <span>{{$group["group"]}}</span>
-                            @endforeach
+                            {{--@foreach($course["groups"] as $group)--}}
+                                {{--<span>{{$group["group"]}}</span>--}}
+                            {{--@endforeach--}}
                         </td>
                         <td>
                             <a href="{{route('admin.course.form_input_score_course_annual',$course['id'])}}" class="btn btn-xs btn-info input_score_course">
