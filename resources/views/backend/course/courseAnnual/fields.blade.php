@@ -86,10 +86,23 @@
     <div class="col-lg-3">
         {{--{{ Form::select('department_option_id', $options, null, ['class' => 'form-control']) }}--}}
         <select class="form-control" id="department_option_id" name="department_option_id">
-            <option value="" selected></option>
-            @foreach($options as $option)
-                <option value="{{$option->id}}" class="department_option department_{{$option->department_id}}" style="display: none">{{$option->code}}</option>
-            @endforeach
+            @if(isset($courseAnnual))
+                <option value=""></option>
+                @foreach($options as $option)
+                    <?php
+                        $selected = "";
+                        if($option->id == $courseAnnual->department_option_id){
+                            $selected = "selected";
+                        }
+                    ?>
+                    <option {{$selected}} value="{{$option->id}}" class="department_option department_{{$option->department_id}}" style="display: none">{{$option->code}}</option>
+                @endforeach
+            @else
+                <option value="" selected></option>
+                @foreach($options as $option)
+                    <option value="{{$option->id}}" class="department_option department_{{$option->department_id}}" style="display: none">{{$option->code}}</option>
+                @endforeach
+            @endif
         </select>
     </div>
 </div>

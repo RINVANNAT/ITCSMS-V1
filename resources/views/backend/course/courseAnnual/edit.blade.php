@@ -152,8 +152,8 @@
 
         $('Document').ready(function() {
             if($('#course_id :selected').val()) {
-                setTimeCourseTpTd();
-                setNameKhEnFr();
+//                setTimeCourseTpTd();
+//                setNameKhEnFr();
             }
         });
 

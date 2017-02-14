@@ -508,7 +508,23 @@
 
         $(document).on('click', '#all_score_course_annual', function(e) {
 
-            var  baseUrl = '{{route('admin.course.get_form_evaluation_score')}}';
+
+            swal({
+                title: "Attention",
+                text: "Sorry We are working on this module now, so please wait!",
+                type: "info",
+                confirmButtonColor: "#DD6B55",
+                confirmButtonText: "Yes",
+                closeOnConfirm: true
+            }, function(confirmed) {
+                if (confirmed) {
+
+                }
+            });
+
+
+            /*
+            {{--var  baseUrl = '{{route('admin.course.get_form_evaluation_score')}}';--}}
             @if($department_id != null)
                 var baseData = {
                             academic_year_id: $('#filter_academic_year :selected').val(),
@@ -555,7 +571,7 @@
                 } else {
                     notify('error', 'Degree Not Selected!!', 'info');
                 }
-            }
+            }*/
 
 
 
