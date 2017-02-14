@@ -34,7 +34,6 @@
 
                 <div class="pull-right">
                     <input type="submit" id="submit_form" class="btn btn-success btn-xs" value="{{ trans('buttons.general.crud.create') }}" />
-                    {{--<button class="btn btn-xs btn-success" id="btn_generate_group">Get Group</button>--}}
                 </div>
                 <div class="clearfix"></div>
             </div>
@@ -53,6 +52,10 @@
         var get_group_url = "{{route('course_annual.get_group_filtering')}}";
 
         $(document).ready(function() {
+
+            $('.create_course_annual').submit(function() {
+                toggleLoading(true);
+            });
 
             // Search course program
             $("#course_id").select2({

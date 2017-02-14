@@ -699,7 +699,7 @@ class CourseAnnualController extends Controller
 
             })
             ->addColumn('action', function ($courseAnnual) use ($employee) {
-                if(Auth::user()->id == 1) { // This is admin
+                if(access()->hasRole("Administrator")) { // This is admin
                     return  '<a href="'.route('admin.course.form_input_score_course_annual',$courseAnnual->id).'" class="btn btn-xs btn-info input_score_course"><i class="fa fa-area-chart" data-toggle="tooltip" data-placement="top" title="" data-original-title="'.'input score'.'"></i></a>'.
                             ' <a href="'.route('admin.course.course_annual.edit',$courseAnnual->id).'" class="btn btn-xs btn-primary"><i class="fa fa-pencil" data-toggle="tooltip" data-placement="top" title="" data-original-title="'.trans('buttons.general.crud.edit').'"></i> </a>'.
                             ' <button class="btn btn-xs btn-danger btn-delete" data-remote="'.route('admin.course.course_annual.destroy', $courseAnnual->id) .'"><i class="fa fa-times" data-toggle="tooltip" data-placement="top" title="' . trans('buttons.general.crud.delete') . '"></i></button>';
@@ -716,7 +716,7 @@ class CourseAnnualController extends Controller
                     }
 
                     if(Auth::user()->allow('edit-courseAnnuals')) {
-                        $actions = $actions.' <a href="'.route('admin.course.course_annual.edit',$courseAnnual->id).'" class="btn btn-xs btn-primary"><i class="fa fa-pencil" data-toggle="tooltip" data-placement="top" title="" data-original-title="'.trans('buttons.general.crud.edit').'"></i> </a>';
+                        $actions = $actions.' <a target="_blank" href="'.route('admin.course.course_annual.edit',$courseAnnual->id).'" class="btn btn-xs btn-primary"><i class="fa fa-pencil" data-toggle="tooltip" data-placement="top" title="" data-original-title="'.trans('buttons.general.crud.edit').'"></i> </a>';
                     }
 
                     if(Auth::user()->allow('delete-courseAnnuals')) {

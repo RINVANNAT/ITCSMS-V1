@@ -111,4 +111,13 @@
     </div>
 </div>
 
+<hr/>
+
+<div class="form-group">
+    {!! Form::label('responsible_department_id', trans('labels.backend.coursePrograms.fields.responsible_department_id'), ['class' => 'col-lg-3 control-label']) !!}
+    <div class="col-lg-3">
+        {{ Form::select('responsible_department_id', $other_departments, null, ['class' => 'form-control','placeholder' => "Department"]) }}
+    </div>
+</div>
+
 

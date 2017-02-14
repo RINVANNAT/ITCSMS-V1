@@ -21,6 +21,7 @@ class Course extends Model
 		"grade_id",
 		"department_id",
 		"semester_id",
+        "responsible_department_id",
         "create_uid",
         "write_uid"
 	];

@@ -870,7 +870,8 @@ return [
                 'grade'=>"Grade",
                 'department'=>"Department",
                 'department_option' => "Option",
-                'semester'=>"Semester"
+                'semester'=>"Semester",
+                'responsible_department_id' => "Permit responsibility to"
             ]
         ],
         'scholarships' => [

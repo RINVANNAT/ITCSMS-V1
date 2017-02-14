@@ -76,7 +76,7 @@
                 <div class="mailbox-controls">
                     <div class="col-md-6">
                         @permission('create-courseAnnuals')
-                        <a href="{!! route('admin.course.course_annual.create') !!}">
+                        <a target="_blank" href="{!! route('admin.course.course_annual.create') !!}">
                             <button class="btn btn-primary btn-sm"><i class="fa fa-plus-circle"></i> Add
                             </button>
                         </a>
@@ -262,6 +262,11 @@
             });
 
             oTable.draw();
+
+            $("#filter_lecturer").select2({
+                placeholder: "Lecturer",
+                allowClear: true
+            });
 
         });
 

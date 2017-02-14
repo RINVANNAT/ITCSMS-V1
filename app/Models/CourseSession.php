@@ -14,6 +14,7 @@ class CourseSession extends Model
         "time_course",
         "time_td",
         "course_annual_id",
+        "responsible_department_id",
         "lecturer_id",
         "create_uid",
         "write_uid",

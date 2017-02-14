@@ -62,6 +62,11 @@
         var course_program_id = '{{$courseAnnual->course_id}}';
 
         $(document).ready(function() {
+
+            $('.create_course_annual').submit(function() {
+                toggleLoading(true);
+            });
+
             // Search course program
             $("#course_id").select2({
                 placeholder: "Select a course program",

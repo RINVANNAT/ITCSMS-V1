@@ -123,17 +123,22 @@ class CourseController extends Controller
 
         if(auth()->user()->allow("view-all-score-in-all-department")){
             $departments = Department::where("parent_id",config('access.departments.department_academic'))->orderBy("code")->lists("code","id");
+            $other_departments = Department::where("parent_id",config('access.departments.department_academic'))->orderBy("code")->lists("code","id");
             $options = DepartmentOption::get();
         } else {
             $employee = Employee::where('user_id', Auth::user()->id)->first();
             $departments = $employee->department()->lists("code","id");
+            $other_departments = Department::where("parent_id",config('access.departments.department_academic'))
+                                            ->where("id", "!=", $employee->department_id)
+                                            ->orderBy("code")
+                                            ->lists("code","id");
             $options = DepartmentOption::where('department_id',$employee->department_id)->get();
         }
 
         $degrees = Degree::lists("name_en", "id");
         $grades = Grade::lists("name_en", "id");
         $semesters = Semester::lists("name_en", "id");
-        return view('backend.course.courseProgram.create', compact("degrees", "grades", "departments", "semesters","options"));
+        return view('backend.course.courseProgram.create', compact("degrees", "grades", "departments", "semesters","options","other_departments"));
     }
 
     /**
