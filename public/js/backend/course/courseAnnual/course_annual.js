@@ -1,7 +1,8 @@
 
 
 
-function load_group(){
+function load_group(method){
+    var course_program_id = $('#course_id :selected').val();
     var department_id = $("#department_id").val();
     var academic_year_id = $("#academic_year_id").val();
     var degree_id = $("#degree_id").val();
@@ -18,18 +19,39 @@ function load_group(){
                 academic_year_id:$("#academic_year_id").val(),
                 degree_id:$("#degree_id").val(),
                 grade_id:$("#grade_id").val(),
-                department_option_id:$("#department_option_id").val()
+                department_option_id:$("#department_option_id").val(),
+                course_program_id: course_program_id,
+                _method: method
             },
             success : function(data){
-                if(data != null){
 
-                    console.log(data);
+                if(data.not_selected_group != null){
+
+                    // console.log(data);
                     var option_text = "";
 
-                    $.each(data, function(key, value){
-                        option_text = option_text +
+                    $.each(data.not_selected_group, function(key, value){
+                        var status = true;
+                        // $.each(data.selected_group, function(index, val) {
+                        //
+                        //     if(value == val) {
+                        //
+                        //         option_text = option_text +
+                        //
+                        //             ' <label><input type="checkbox" class="each_check_box" name="groups[]" checked value="'+value+'"> '+value+'</label>'
+                        //
+                        //         status = false;
+                        //
+                        //     }
+                        // });
 
-                            ' <label><input type="checkbox" class="each_check_box" name="groups[]" value="'+value+'">'+value+'</label>'
+                        if(status == true) {
+                            option_text = option_text +
+
+                                ' <label><input type="checkbox" class="each_check_box" name="groups[]" value="'+value+'"> '+value+'</label>'
+
+                        }
+
 
                     })
                     $("#group_panel").html(option_text);
@@ -100,24 +122,8 @@ function setSelectedField() {
     })
 
     $('#credit').val(credit);
-    // console.log("fsdfsf");
-    // load_group();
 }
 
-$('#course_id').on('change', function() {
-    setTimeCourseTpTd();
-    setNameKhEnFr();
-    setSelectedField();
-});
-
-$('Document').ready(function() {
-    if($('#course_id :selected').val()) {
-        setTimeCourseTpTd();
-        setNameKhEnFr();
-        // setSelectedField();
-        // load_group();
-    }
-});
 
 
 $(".check_all_box").change(function() {
@@ -128,3 +134,7 @@ $(".check_all_box").change(function() {
         $('.each_check_box').prop('checked', false);
     }
 });
+
+
+
+
