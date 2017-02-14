@@ -59,13 +59,31 @@ class EloquentCourseProgramRepository implements CourseProgramRepositoryContract
     public function create($input)
     {
 
-        if(!isset($input['responsible_department_id']) || $input['responsible_department_id'] == ""){
-            $input["responsible_department_id"] == null;
-        }
-        $input['create_uid'] = auth()->id();
-        $input['created_at'] = Carbon::now();
+        $course = new Course();
 
-        if (Course::create($input)) {
+        if(isset($input['responsible_department_id']) && $input['responsible_department_id'] != ""){
+            $course->responsible_department_id = $input["responsible_department_id"];
+        }
+
+        $course->name_en = $input["name_en"];
+        $course->name_kh = $input["name_kh"];
+        $course->name_fr = $input["name_fr"];
+        $course->code = $input["name_en"];
+        $course->time_course = $input["time_course"];
+        $course->time_td = $input["time_td"];
+        $course->time_tp = $input["time_tp"];
+        $course->credit = $input["credit"];
+        $course->degree_id = $input["degree_id"];
+        $course->grade_id = $input["grade_id"];
+        $course->department_id = $input["department_id"];
+        $course->semester_id = $input["semester_id"];
+        $course->department_option_id = $input["department_option_id"];
+
+
+        $course->create_uid = auth()->id();
+        $course->created_at = Carbon::now();
+
+        if ($course->save()) {
             return true;
         }
         throw new GeneralException(trans('exceptions.backend.general.create_error'));
@@ -81,14 +99,30 @@ class EloquentCourseProgramRepository implements CourseProgramRepositoryContract
     {
         $courseProgram = $this->findOrThrowException($id);
 
-        $input['updated_at'] = Carbon::now();
-        $input['write_uid'] = auth()->id();
-        if(!isset($input['responsible_department_id']) || $input['responsible_department_id'] == ""){
-            $input["responsible_department_id"] == null;
+        if(isset($input['responsible_department_id']) && $input['responsible_department_id'] != ""){
+            $courseProgram->responsible_department_id = $input["responsible_department_id"];
         }
 
+        $courseProgram->name_en = $input["name_en"];
+        $courseProgram->name_kh = $input["name_kh"];
+        $courseProgram->name_fr = $input["name_fr"];
+        $courseProgram->code = $input["name_en"];
+        $courseProgram->time_course = $input["time_course"];
+        $courseProgram->time_td = $input["time_td"];
+        $courseProgram->time_tp = $input["time_tp"];
+        $courseProgram->credit = $input["credit"];
+        $courseProgram->degree_id = $input["degree_id"];
+        $courseProgram->grade_id = $input["grade_id"];
+        $courseProgram->department_id = $input["department_id"];
+        $courseProgram->semester_id = $input["semester_id"];
+        $courseProgram->department_option_id = $input["department_option_id"];
 
-        if ($courseProgram->update($input)) {
+        $courseProgram->updated_at = Carbon::now();
+        $courseProgram->write_uid = auth()->id();
+
+
+
+        if ($courseProgram->save()) {
             return true;
         }
 
