@@ -181,11 +181,10 @@ class CourseAnnualController extends Controller
         if($request->_method == CourseAnnualEnum::CREATE) {
 
             $not_selected_groups = array_diff($array_group, $selectedGroups);
-            return Response::json(['not_selected_group' =>$not_selected_groups, 'selected_group'=> $selectedGroups]);
+            return Response::json($not_selected_groups);
         } else {
 
-//            dd('here');
-            return Response::json(['not_selected_group'=> $array_group, 'selected_group'=> $selectedGroups]);
+            return Response::json($array_group);
         }
 
 
@@ -1883,11 +1882,13 @@ class CourseAnnualController extends Controller
 
     public function arrayIdsOfDeptGradeDegreeDeptOption($courseAnnualId) {
 
+        $courseAnnual = DB::table('course_annuals')->where('id', $courseAnnualId)->first();
 
-        $department_ids = DB::table('course_annuals')->where('id', $courseAnnualId)->lists('department_id');
-        $grade_ids = DB::table('course_annuals')->where('id', $courseAnnualId)->lists('grade_id');
-        $degree_ids = DB::table('course_annuals')->where('id', $courseAnnualId)->lists('degree_id');
-        $departmentOptionIds = DB::table('course_annuals')->where('id', $courseAnnualId)->lists('department_option_id');
+        $department_ids = [$courseAnnual->department_id];
+        $grade_ids = [$courseAnnual->grade_id];
+        $degree_ids = [$courseAnnual->degree_id];
+        $departmentOptionIds= [$courseAnnual->department_option_id];
+//        $departmentOptionIds = ($courseAnnual->department_option_id !=null)?[$courseAnnual->department_option_id]:null;
 
         $department_option_ids = [];
         foreach($departmentOptionIds as $optionId) {
@@ -1895,54 +1896,6 @@ class CourseAnnualController extends Controller
                 $department_option_ids[] = $optionId;
             }
         }
-
-//        $departments = DB::table('course_annual_classes')
-//            ->distinct('department_id')
-//            ->select('department_id')
-//            ->where('course_annual_id',$courseAnnualId)
-//            ->groupBy('department_id')->get();
-//
-//        $department_ids = array();
-//        foreach ($departments as $department){
-//            array_push($department_ids,$department->department_id);
-//        }
-
-//        $grades = DB::table('course_annual_classes')
-//            ->distinct('grade_id')
-//            ->select('grade_id')
-//            ->where('course_annual_id',$courseAnnualId)
-//            ->groupBy('grade_id')->get();
-//        $grade_ids = array();
-//        foreach ($grades as $grade){
-//            array_push($grade_ids,$grade->grade_id);
-//        }
-//
-//        $degrees = DB::table('course_annual_classes')
-//            ->distinct('degree_id')
-//            ->select('degree_id')
-//            ->where('course_annual_id',$courseAnnualId)
-//            ->groupBy('degree_id')->get();
-//
-//        $degree_ids = array();
-//        foreach ($degrees as $degree){
-//            array_push($degree_ids,$degree->degree_id);
-//        }
-//
-//
-//        $departmentOptions = DB::table('course_annual_classes')
-//            ->distinct('department_option_id')
-//            ->select('department_option_id')
-//            ->where('course_annual_id',$courseAnnualId)
-//            ->groupBy('department_option_id')->get();
-//
-//        $department_option_ids = array();
-//        foreach ($departmentOptions as $departmentOption){
-//            if($departmentOption->department_option_id != null) {
-//                array_push($department_option_ids,$departmentOption->department_option_id);
-//            }
-//
-//        }
-
 
         $array_groups = [];
         $groups = DB::table('course_annual_classes')

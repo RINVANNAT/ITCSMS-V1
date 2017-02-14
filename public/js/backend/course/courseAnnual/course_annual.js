@@ -25,33 +25,14 @@ function load_group(method){
             },
             success : function(data){
 
-                if(data.not_selected_group != null){
-
-                    // console.log(data);
+                if(data != null){
                     var option_text = "";
 
-                    $.each(data.not_selected_group, function(key, value){
-                        var status = true;
-                        // $.each(data.selected_group, function(index, val) {
-                        //
-                        //     if(value == val) {
-                        //
-                        //         option_text = option_text +
-                        //
-                        //             ' <label><input type="checkbox" class="each_check_box" name="groups[]" checked value="'+value+'"> '+value+'</label>'
-                        //
-                        //         status = false;
-                        //
-                        //     }
-                        // });
+                    $.each(data, function(key, value){
 
-                        if(status == true) {
-                            option_text = option_text +
+                        option_text = option_text +
 
-                                ' <label><input type="checkbox" class="each_check_box" name="groups[]" value="'+value+'"> '+value+'</label>'
-
-                        }
-
+                            ' <label><input type="checkbox" class="each_check_box" name="groups[]" value="'+value+'"> '+value+'</label>'
 
                     })
                     $("#group_panel").html(option_text);
