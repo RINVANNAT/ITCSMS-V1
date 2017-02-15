@@ -69,10 +69,14 @@ class EloquentCourseProgramRepository implements CourseProgramRepositoryContract
             $course->department_option_id = $input["department_option_id"];
         }
 
+        if(!isset($input['code']) && $input['code'] == ""){
+            $input["code"] = null;
+        }
+
         $course->name_en = $input["name_en"];
         $course->name_kh = $input["name_kh"];
         $course->name_fr = $input["name_fr"];
-        $course->code = $input["name_en"];
+        $course->code = $input["code"];
         $course->time_course = $input["time_course"];
         $course->time_td = $input["time_td"];
         $course->time_tp = $input["time_tp"];
@@ -110,10 +114,14 @@ class EloquentCourseProgramRepository implements CourseProgramRepositoryContract
             $courseProgram->department_option_id = $input["department_option_id"];
         }
 
+        if(!isset($input['code']) && $input['code'] == ""){
+            $input["code"] = null;
+        }
+
         $courseProgram->name_en = $input["name_en"];
         $courseProgram->name_kh = $input["name_kh"];
         $courseProgram->name_fr = $input["name_fr"];
-        $courseProgram->code = $input["name_en"];
+        $courseProgram->code = $input["code"];
         $courseProgram->time_course = $input["time_course"];
         $courseProgram->time_td = $input["time_td"];
         $courseProgram->time_tp = $input["time_tp"];
