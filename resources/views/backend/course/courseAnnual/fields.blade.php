@@ -1,8 +1,20 @@
-
+<?php
+    if(isset($courseAnnual)){
+        $disabled = "disabled";
+    } else {
+        $disabled = "";
+    }
+?>
 <div class="form-group">
     {!! Form::label('course', trans('labels.backend.courseAnnuals.fields.course'), ['class' => 'col-lg-3 control-label required']) !!}
     <div class="col-lg-4">
-        <select name="course_id" id="course_id" class="form-control" required>
+        <select
+                name="course_id"
+                id="course_id"
+                class="form-control"
+                {{$disabled}}
+                required
+        >
             @foreach($courses as $key => $group)
                 <option></option>
                 <optgroup label="{{$key}}">
@@ -50,7 +62,7 @@
 <div class="form-group">
     {!! Form::label('semester', trans('labels.backend.courseAnnuals.fields.academic_year'), ['class' => 'col-lg-3 control-label required']) !!}
     <div class="col-lg-3">
-        {{ Form::select('academic_year_id', $academicYears, null, ['class' => 'form-control','id'=>'academic_year_id', 'placeholder' => 'Academic year', 'required' => 'required']) }}
+        {{ Form::select('academic_year_id', $academicYears, null, ['class' => 'form-control','id'=>'academic_year_id', 'placeholder' => 'Academic year', 'required' => 'required',$disabled]) }}
     </div>
 </div>
 
@@ -66,21 +78,21 @@
 <div class="form-group">
     {!! Form::label('degree', trans('labels.backend.courseAnnuals.fields.degree'), ['class' => 'col-lg-3 control-label required']) !!}
     <div class="col-lg-5">
-        {{ Form::select('degree_id', $degrees, isset($courseAnnual->courseAnnualClass[0])?$courseAnnual->courseAnnualClass[0]->degree_id:null, ['class' => 'form-control', 'id' => 'degree_id','required'=>'required', 'placeholder' => 'Degree']) }}
+        {{ Form::select('degree_id', $degrees, isset($courseAnnual->courseAnnualClass[0])?$courseAnnual->courseAnnualClass[0]->degree_id:null, ['class' => 'form-control', 'id' => 'degree_id','required'=>'required', 'placeholder' => 'Degree',$disabled]) }}
     </div>
 </div>
 
 <div class="form-group">
     {!! Form::label('grades', trans('labels.backend.courseAnnuals.fields.grade'), ['class' => 'col-lg-3 control-label required']) !!}
     <div class="col-lg-7">
-        {{ Form::select('grade_id', $grades, isset($courseAnnual->courseAnnualClass[0])?$courseAnnual->courseAnnualClass[0]->grade_id:null, ['class' => 'form-control', 'id' => 'grade_id','required'=>'required', 'placeholder' => 'Grade']) }}
+        {{ Form::select('grade_id', $grades, isset($courseAnnual->courseAnnualClass[0])?$courseAnnual->courseAnnualClass[0]->grade_id:null, ['class' => 'form-control', 'id' => 'grade_id','required'=>'required', 'placeholder' => 'Grade',$disabled]) }}
     </div>
 </div>
 
 <div class="form-group">
     {!! Form::label('departments', trans('labels.backend.courseAnnuals.fields.department'), ['class' => 'col-lg-3 control-label required']) !!}
     <div class="col-lg-3">
-        {{ Form::select('department_id', $departments, null, ['class' => 'form-control', 'id' => 'department_id','required'=>'required']) }}
+        {{ Form::select('department_id', $departments, null, ['class' => 'form-control', 'id' => 'department_id','required'=>'required',$disabled]) }}
     </div>
     {!! Form::label('department_option_id', trans('labels.backend.courseAnnuals.fields.department_option_id'), ['class' => 'col-lg-1 control-label']) !!}
     <div class="col-lg-3">
@@ -251,7 +263,7 @@
 <div class="form-group">
     {!! Form::label('responsible_department_id', trans('labels.backend.coursePrograms.fields.responsible_department_id'), ['class' => 'col-lg-3 control-label']) !!}
     <div class="col-lg-3">
-        {{ Form::select('responsible_department_id', $other_departments, null, ['class' => 'form-control','placeholder' => "Department"]) }}
+        {{ Form::select('responsible_department_id', $other_departments, null, ['class' => 'form-control','placeholder' => "Department", $disabled]) }}
     </div>
 </div>
 

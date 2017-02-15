@@ -94,15 +94,16 @@ class CourseAnnualController extends Controller
     public function index()
     {
 
+        $departments = Department::where("parent_id",config('access.departments.department_academic'))->orderBy("code")->lists("code","id");
+
         if(auth()->user()->allow("view-all-score-in-all-department")){
-            // Get all department in case user have previlege to view all department
-            $departments = Department::where("parent_id",config('access.departments.department_academic'))->orderBy("code")->lists("code","id");
+            // Get all department in case user have privilege to view all department
+            // In here, there is no limit (equal to admin privilege)
             $department_id = null;
             $lecturers = Employee::lists("name_kh","id");
             $options = DepartmentOption::get();
         } else {
             $employee = Employee::where('user_id', Auth::user()->id)->first();
-            $departments = $employee->department()->lists("code","id");
             $department_id = $employee->department->id;
             $options = DepartmentOption::where('department_id',$employee->department_id)->get();
             if(auth()->user()->allow("view-all-score-course-annual")){ // This is chef department, he can see all courses in his department
@@ -443,7 +444,7 @@ class CourseAnnualController extends Controller
         }
 
         if(auth()->user()->allow("view-all-score-in-all-department")){
-            $courses = Course::orderBy('updated_at', 'desc')->get();
+            //$courses = Course::orderBy('updated_at', 'desc')->get();
             // Get all department in case user have previlege to view all department
             $departments = Department::where("parent_id",config('access.departments.department_academic'))->orderBy("code")->lists("code","id");
             $department_id = null;
@@ -484,6 +485,7 @@ class CourseAnnualController extends Controller
                 ->lists("code","id");
             $options = DepartmentOption::where('department_id',$employee->department_id)->get();
             $raw_courses = Course::where('courses.department_id', $department_id)
+                ->orWhere('courses.responsible_department_id',$employee->department_id)
                 ->join('degrees','degrees.id','=','courses.degree_id')
                 ->join('departments','departments.id','=','courses.department_id')
                 ->leftJoin('departmentOptions','departmentOptions.id','=','courses.department_option_id')
@@ -519,6 +521,7 @@ class CourseAnnualController extends Controller
             array_push($courses[$raw_course->department_code],$raw_course);
         }
 
+        //dd($courses);
         $academicYears = AcademicYear::orderBy('id', 'desc')->lists('name_latin','id')->toArray();
         $degrees = Degree::lists('name_kh','id')->toArray();
         $grades = Grade::lists('name_kh','id')->toArray();
@@ -639,6 +642,7 @@ class CourseAnnualController extends Controller
             ->leftJoin('grades','course_annuals.grade_id', '=', 'grades.id')
             ->leftJoin('semesters','course_annuals.semester_id', '=', 'semesters.id')
             ->leftJoin('departmentOptions', 'course_annuals.department_option_id', '=', 'departmentOptions.id')
+            ->leftJoin('departments as rd','course_annuals.responsible_department_id', '=', 'rd.id')
             ->with("courseAnnualClass")
             ->select([
                 'courses.name_kh as course',
@@ -654,6 +658,8 @@ class CourseAnnualController extends Controller
                 'academicYears.name_kh as academic_year',
                 'semesters.name_kh as semester',
                 'course_annuals.course_id',
+                'rd.code as responsible_department_name',
+                'course_annuals.responsible_department_id',
                 DB::raw("CONCAT(degrees.code,grades.code,departments.code) as class")
             ])
             ->orderBy("courses.degree_id","ASC")
@@ -674,16 +680,27 @@ class CourseAnnualController extends Controller
                 <div class="row">
                     <div class="col-md-9">
                         <span style="display: none" class="course_id"><?php echo $courseAnnual->id ?></span>
-                        <h4><?php echo $courseAnnual->name ?></h4>
+                        <h4>
+                            <?php
+                                echo $courseAnnual->name;
+                            ?>
+                        </h4>
                         <span>(C=<?php echo $courseAnnual->time_course?> | TD=<?php echo $courseAnnual->time_td ?> | TP= <?php echo $courseAnnual->time_tp ?>)</span>
                     </div>
                     <div class="col-md-3">
-                        <?php echo $courseAnnual->class ?>
+                        <?php
+                            echo $courseAnnual->class;
+                            if($courseAnnual->responsible_department_name != null){
+                                echo "<span style='color: darkred;'> (".$courseAnnual->responsible_department_name.")</span>";
+                            }
+                        ?>
                         <br/>
                         <?php
+                        $a = "";
                         foreach($courseAnnual->courseAnnualClass as $obj_group) {
-                            echo $obj_group->group." ";
+                            $a =  $obj_group->group." ".$a;
                         }
+                        echo $a;
                         ?>
                     </div>
                 </div>
@@ -695,26 +712,6 @@ class CourseAnnualController extends Controller
                 <?php
                 $html = ob_get_clean();
                 return $html;
-            })
-            ->editColumn('class', function ($courseAnnual) {
-                $course_annual_classes = DB::table('course_annual_classes')
-
-                    ->select('group')
-                    ->where('course_annual_classes.course_annual_id',$courseAnnual->id)
-                    ->get();
-
-                $data = "";
-
-                foreach($course_annual_classes as $obj){
-                    $data = $obj->group.'.'.$data;
-                }
-
-                if($data != ".") {
-                    return $courseAnnual->class.'-'.$data;
-                } else {
-                    return $courseAnnual->class;
-                }
-
             })
             ->addColumn('action', function ($courseAnnual) use ($employee) {
                 if(access()->hasRole("Administrator")) { // This is admin
@@ -770,12 +767,22 @@ class CourseAnnualController extends Controller
             $datatables->where('course_annual_classes.group', '=', $group);
         }
 
-        if(auth()->user()->allow("view-all-score-in-all-department")){ // user has permission to view all course/score in all department
-            if ($department = $datatables->request->get('department')) {
+        if ($department = $datatables->request->get('department')) {
+            if(auth()->user()->allow("view-all-score-in-all-department")){
+                // user has permission to view all course/score in all department
+                // This equal to admin, so no need to check anything more. Just return whatever they request
                 $datatables->where('course_annuals.department_id', '=', $department);
+            } else {
+                // The requested department is same as user's department
+                // So return every courses in that department
+                $datatables ->where('course_annuals.department_id', $department );
+
+                if($department != $employee->department->id ){
+                    // The requested department in not the same as user's department
+                    // So return only courses that user responsbile in given department
+                    $datatables ->where('course_annuals.responsible_department_id', $employee->department->id );
+                }
             }
-        } else {
-            $datatables = $datatables ->where('course_annuals.department_id', $employee->department->id );
         }
 
         if(auth()->user()->allow("view-all-score-course-annual")){   // This one is might be chef department, he can view all course/score for all teacher

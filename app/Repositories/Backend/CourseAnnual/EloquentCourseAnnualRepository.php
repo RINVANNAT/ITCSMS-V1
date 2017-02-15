@@ -127,22 +127,50 @@ class EloquentCourseAnnualRepository implements CourseAnnualRepositoryContract
             $courseAnnual->responsible_department_id = $input["responsible_department_id"];
         }
 
-        $courseAnnual->course_id = $input['course_id'];
-        $courseAnnual->semester_id = $input['semester_id'];
-        $courseAnnual->active = isset($input['active'])?true:false;
-        $courseAnnual->employee_id = isset($input['employee_id'])?$input['employee_id']:null;
-        $courseAnnual->department_id = $input['department_id'];
-        $courseAnnual->department_option_id = $input['department_option_id'];
 
-        $courseAnnual->time_course = isset($input['time_course'])?$input['time_course']:0;
-        $courseAnnual->time_td = isset($input['time_td'])?$input['time_td']:0;
-        $courseAnnual->time_tp = isset($input['time_tp'])?$input['time_tp']:0;
 
-        $courseAnnual->name_kh = isset($input['name_kh'])?$input['name_kh']:null;
-        $courseAnnual->name_en = isset($input['name_en'])?$input['name_en']:null;
-        $courseAnnual->name_fr = isset($input['name_fr'])?$input['name_fr']:null;
+
+
+        if(isset($input["course_id"]) && $input["course_id"] != '') {
+            $courseAnnual->course_id = $input['course_id'];
+        }
+        if(isset($input["semester_id"]) && $input["semester_id"] != '') {
+            $courseAnnual->semester_id = $input['semester_id'];
+        }
+        if(isset($input["active"]) && $input["active"] != '') {
+            $courseAnnual->active = $input['active'];
+        }
+        if(isset($input["employee_id"]) && $input["employee_id"] != '') {
+            $courseAnnual->employee_id = $input['employee_id'];
+        }
+        if(isset($input["department_id"]) && $input["department_id"] != '') {
+            $courseAnnual->department_id = $input['department_id'];
+        }
+        if(isset($input["department_option_id"]) && $input["department_option_id"] != '') {
+            $courseAnnual->department_option_id = $input['department_option_id'];
+        }
+        if(isset($input["time_course"]) && $input["time_course"] != '') {
+            $courseAnnual->time_course = $input['time_course'];
+        }
+        if(isset($input["time_td"]) && $input["time_td"] != '') {
+            $courseAnnual->time_td = $input['time_td'];
+        }
+        if(isset($input["time_tp"]) && $input["time_tp"] != '') {
+            $courseAnnual->time_tp = $input['time_tp'];
+        }
+        if(isset($input["name_kh"]) && $input["name_kh"] != '') {
+            $courseAnnual->name_kh = $input['name_kh'];
+        }
+        if(isset($input["name_en"]) && $input["name_en"] != '') {
+            $courseAnnual->name_en = $input['name_en'];
+        }
+        if(isset($input["name_fr"]) && $input["name_fr"] != '') {
+            $courseAnnual->name_fr = $input['name_fr'];
+        }
 //        $courseAnnual->group = isset($input['group'])?$input['group']:$courseAnnual->group;
-        $courseAnnual->credit = isset($input['credit'])?$input['credit']:$courseAnnual->credit;
+        if(isset($input["credit"]) && $input["credit"] != '') {
+            $courseAnnual->credit = $input['credit'];
+        }
 
         $courseAnnual->updated_at = Carbon::now();
 //        $courseAnnual->score_percentage_column_1 = isset($input['score_percentage_column_1'])?$input['score_percentage_column_1']:10;
