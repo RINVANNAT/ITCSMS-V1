@@ -2049,19 +2049,12 @@ class CourseAnnualController extends Controller
                 $element = array(
                     'student_annual_id'=>$student->student_annual_id,
                     'student_id_card' => $student->id_card,
-                    'student_name' => $student->name_latin,
+                    'student_name' => strtoupper($student->name_latin),
                     'student_gender' => $student->code,
                     'absence'          => (($scoreAbsenceByCourse >= 0)?$scoreAbsenceByCourse:10),
                     'num_absence'      => isset($scoreAbsence) ? $scoreAbsence->num_absence:null,
-//                'average'          => isset($totalScore) ? (float)$totalScore->average: null,
                     'average'          => $totalScore,
-                    'notation'        => $storeTotalScore->description,
-//                'department_id'    => $courseAnnual->department_id,
-//                'degree_id'        => $courseAnnual->degree_id,
-//                'grade_id'         => $courseAnnual->grade_id,
-//                'academic_year_id' => $cours/eAnnual->academic_year_id,
-//                'semester_id'      => $courseAnnual->semester_id,
-//                'employee_id'      => $courseAnnual->employee_id,
+                    'notation'        => $storeTotalScore->description
                 );
                 $mergerData = array_merge($element,$scoreData);
                 $arrayData[] = $mergerData;
@@ -2793,13 +2786,11 @@ class CourseAnnualController extends Controller
 
                             $element = $element + ['Abs'.'_'.$courseAnnual->course_name.'_'.$count =>  $numAbs, 'Credit'.'_'.$courseAnnual->course_name.'_'.$count => $scoreBycourse];
                         }
-                        $element = $element +['S'.$semesterId.'_Moyenne'=> number_format((float)($moyenne/$totalCredit), 2, '.', '')];
+                        $element = $element +['S'.$semesterId.'_Moyenne'=> number_format((float)($moyenne/(($totalCredit >0)?$totalCredit:1)), 2, '.', '')];
 
-                        $allMoyenneScoreOfStudentBySemester[$semesterId][] = number_format((float)($moyenne/$totalCredit), 2, '.', '');// to get all moyenne of all student then to find max min and average
-
+                        $allMoyenneScoreOfStudentBySemester[$semesterId][] = number_format((float)($moyenne/(($totalCredit >0)?$totalCredit:1)), 2, '.', '');// to get all moyenne of all student then to find max min and average
 
                     }
-
 
                     $element['total']= $totalAbs; // assign value for the total absence
                     $element['S_'.$semesterId]= $totalAbs;// assigne value to the s_1
