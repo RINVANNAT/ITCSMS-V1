@@ -574,11 +574,13 @@ class StudentAnnualController extends Controller
                 'code'=>$department['code']
             );
 
-            if($degree ==2){
+            if($department['department_options'] == null || count($department['department_options']) == 0){
                 $department['department_options'] = [$empty_option];
             } else {
                 array_unshift($department['department_options'], $empty_option);
             }
+
+            //dd($department);
 
             foreach($department['department_options'] as &$option){
 
@@ -705,7 +707,7 @@ class StudentAnnualController extends Controller
                                 'code'=>$department['code']
                             );
 
-            if($degree ==2){
+            if($department['department_options'] == null || count($department['department_options']) == 0){
                 $department['department_options'] = [$empty_option];
             } else {
                 array_unshift($department['department_options'], $empty_option);
@@ -839,6 +841,7 @@ class StudentAnnualController extends Controller
     public function prepare_print_and_preview($id, $is_preview){
 
         $data = json_decode($_GET['data']);
+
         $params = [
             'scholarships' => []
         ];
