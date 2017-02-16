@@ -60,6 +60,9 @@
             vertical-align: middle !important;
             text-align: center !important;
         }
+        .select2{
+            margin-top: 5px !important;
+        }
     </style>
 @stop
 @section('content')
@@ -74,7 +77,7 @@
         <div class="box box-success">
             <div class="box-header with-border">
                 <div class="mailbox-controls">
-                    <div class="col-md-6">
+                    <div class="col-md-12">
                         @permission('create-courseAnnuals')
                         <a href="{!! route('admin.course.course_annual.create') !!}">
                             <button class="btn btn-primary btn-sm"><i class="fa fa-plus-circle"></i> Add
@@ -91,17 +94,17 @@
                             <button class="btn btn-primary btn-sm" id="course_assignment"><i class="fa fa-map-signs"></i> {{trans('buttons.course.course_annual.course_assignment')}}</button>
                             @endauth
                             @permission('generate-course-annual')
-                            <button class="btn btn-primary btn-sm" id="generate_course_annual"><i class="fa fa-puzzle-piece"></i> Generate Courses</button>
+                            {{--<button class="btn btn-primary btn-sm" id="generate_course_annual"><i class="fa fa-puzzle-piece"></i> Generate Courses</button>--}}
                             @endauth
 
                             @permission('view-all-score-course-annual')
-                            <button class="btn btn-warning btn-sm" id="all_score_course_annual"><i class="fa fa-eye"></i> View Total Score </button>
+                            {{--<button class="btn btn-warning btn-sm" id="all_score_course_annual"><i class="fa fa-eye"></i> View Total Score </button>--}}
                             @endauth
                         </div>
                     </div>
-                    <div class="col-md-6">
+                    {{--<div class="col-md-6">--}}
 
-                    </div>
+                    {{--</div>--}}
                 </div>
             </div><!-- /.box-header -->
 
@@ -120,11 +123,18 @@
                         {!! Form::select('degree',$degrees,null, array('class'=>'','id'=>'filter_degree','placeholder'=>'Degree')) !!}
                         {!! Form::select('grade',$grades,null, array('class'=>'','id'=>'filter_grade','placeholder'=>'Year')) !!}
                         @if($lecturers != null)
-                            {!! Form::select('lecturer',$lecturers,null, array('class'=>'','id'=>'filter_lecturer','placeholder'=>'Lecturer')) !!}
+                            <br/>
+                            <select id="filter_lecturer" name="lecturer" style="margin-top: 5px;">
+                                <option value="" selected>Lecturer</option>
+                                @foreach($lecturers as $lecturer)
+                                    <option value="{{$lecturer->id}}">{{$lecturer->name_latin." | ".$lecturer->name_kh}}</option>
+                                @endforeach
+                            </select>
+{{--                            {!! Form::select('lecturer',$lecturers,null, array('class'=>'','id'=>'filter_lecturer','placeholder'=>'Lecturer')) !!}--}}
                         @endif
                     </div>
                     <div class="col-md-5">
-                        <h3 style="margin: 0px; float: right;">Course Sessions</h3>
+                        <center><h3 style="margin: 0px;">Course Sessions</h3></center>
                     </div>
                 </div>
                 <div class="col-md-7" style="border-right: 3px solid #b8c7ce;">

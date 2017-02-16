@@ -100,14 +100,32 @@ class CourseAnnualController extends Controller
             // Get all department in case user have privilege to view all department
             // In here, there is no limit (equal to admin privilege)
             $department_id = null;
-            $lecturers = Employee::lists("name_kh","id");
+            $lecturers = Employee::select("name_kh","id","name_latin","id_card")->get();
             $options = DepartmentOption::get();
         } else {
             $employee = Employee::where('user_id', Auth::user()->id)->first();
             $department_id = $employee->department->id;
             $options = DepartmentOption::where('department_id',$employee->department_id)->get();
-            if(auth()->user()->allow("view-all-score-course-annual")){ // This is chef department, he can see all courses in his department
-                $lecturers = Employee::where('department_id',$department_id)->lists("name_kh","id");
+            if(auth()->user()->allow("view-all-score-course-annual")){
+                // This is chef department, he can see all courses in his department
+                //$lecturers = Employee::where('department_id',$department_id)->lists("name_kh","id");
+                $lecturers = CourseAnnual::join("employees","course_annuals.employee_id","=","employees.id")
+                                            ->where("course_annuals.department_id",$department_id)
+                                            ->orWhere("course_annuals.responsible_department_id",$department_id)
+                                            ->select([
+                                                "course_annuals.employee_id as id",
+                                                "employees.name_kh as name_kh",
+                                                "employees.name_latin as name_latin",
+                                                "employees.id_card as id_card",
+                                            ])
+                                            ->groupBy([
+                                                'course_annuals.employee_id',
+                                                "employees.name_kh",
+                                                "employees.name_latin",
+                                                "employees.id_card"
+                                            ])
+                                            ->get();
+
             } else {
                 $lecturers = null;
             }
@@ -660,6 +678,7 @@ class CourseAnnualController extends Controller
                 'course_annuals.course_id',
                 'rd.code as responsible_department_name',
                 'course_annuals.responsible_department_id',
+                'departmentOptions.code as department_option',
                 DB::raw("CONCAT(degrees.code,grades.code,departments.code) as class")
             ])
             ->orderBy("courses.degree_id","ASC")
@@ -678,7 +697,7 @@ class CourseAnnualController extends Controller
                 ob_start();
                 ?>
                 <div class="row">
-                    <div class="col-md-9">
+                    <div class="col-md-8">
                         <span style="display: none" class="course_id"><?php echo $courseAnnual->id ?></span>
                         <h4>
                             <?php
@@ -687,9 +706,12 @@ class CourseAnnualController extends Controller
                         </h4>
                         <span>(C=<?php echo $courseAnnual->time_course?> | TD=<?php echo $courseAnnual->time_td ?> | TP= <?php echo $courseAnnual->time_tp ?>)</span>
                     </div>
-                    <div class="col-md-3">
+                    <div class="col-md-4">
                         <?php
                             echo $courseAnnual->class;
+                            if($courseAnnual->department_option != ""){
+                                echo $courseAnnual->department_option;
+                            }
                             if($courseAnnual->responsible_department_name != null){
                                 echo "<span style='color: darkred;'> (".$courseAnnual->responsible_department_name.")</span>";
                             }

@@ -61,6 +61,7 @@ class CourseController extends Controller
 //        $degrees = Degree::lists("name_en", "id");
 //        $grades = Grade::lists("name_en", "id");
 //        $departments = Department::lists("name_en", "id");
+        $responsible_departments = Department::where("parent_id",config('access.departments.department_academic'))->orderBy("code")->lists("code","id");
         $semesters = Semester::lists("name_en", "id");
 
         if(auth()->user()->allow("view-all-score-in-all-department")){
@@ -85,7 +86,8 @@ class CourseController extends Controller
         return view('backend.course.courseProgram.index', compact(
             "degrees", "grades", "departments",
             "semesters", "academicYears", 'deptOptions',
-            'department_id', 'semesters'
+            'department_id', 'semesters',
+            'responsible_departments'
         ));
 
     }
@@ -225,6 +227,7 @@ class CourseController extends Controller
             ->join('semesters', 'semesters.id', '=', 'courses.semester_id')
             ->leftJoin('grades', 'courses.grade_id', '=', 'grades.id')
             ->leftJoin('departments', 'courses.department_id', '=', 'departments.id')
+            ->leftJoin('departments as rd', 'courses.responsible_department_id', '=', 'rd.id')
             ->leftJoin('degrees', 'courses.degree_id', '=', 'degrees.id')
             ->select([
                 'courses.id as course_id',
@@ -237,6 +240,7 @@ class CourseController extends Controller
                 'courses.time_course',
                 'courses.credit',
                 'semesters.name_en as semester',
+                'rd.code as responsible_department',
                 DB::raw("CONCAT(degrees.code,grades.code,departments.code) as class")
             ])
             ->orderBy('courses.department_id','ASC')
@@ -257,6 +261,9 @@ class CourseController extends Controller
         }
         if ($deptOptionId = $datatables->request->get('department_option')) {
             $datatables->where('courses.department_option_id', '=', $deptOptionId);
+        }
+        if ($responsible_department = $datatables->request->get('responsible_department')) {
+            $datatables->where('courses.responsible_department_id', '=', $responsible_department);
         }
         if ($semester = $datatables->request->get('semester')) {
             $datatables->where('courses.semester_id', '=', $semester);

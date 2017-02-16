@@ -63,13 +63,17 @@ class EloquentCourseProgramRepository implements CourseProgramRepositoryContract
 
         if(isset($input['responsible_department_id']) && $input['responsible_department_id'] != ""){
             $course->responsible_department_id = $input["responsible_department_id"];
+        } else {
+            $course->responsible_department_id = null;
         }
 
         if(isset($input['department_option_id']) && $input['department_option_id'] != ""){
             $course->department_option_id = $input["department_option_id"];
+        } else {
+            $course->department_option_id = null;
         }
 
-        if(!isset($input['code']) && $input['code'] == ""){
+        if(!isset($input['code']) || $input['code'] == ""){
             $input["code"] = null;
         }
 
@@ -108,13 +112,17 @@ class EloquentCourseProgramRepository implements CourseProgramRepositoryContract
 
         if(isset($input['responsible_department_id']) && $input['responsible_department_id'] != ""){
             $courseProgram->responsible_department_id = $input["responsible_department_id"];
+        } else {
+            $courseProgram->responsible_department_id = null;
         }
 
         if(isset($input['department_option_id']) && $input['department_option_id'] != ""){
             $courseProgram->department_option_id = $input["department_option_id"];
+        } else {
+            $courseProgram->department_option_id = null;
         }
 
-        if(!isset($input['code']) && $input['code'] == ""){
+        if(!isset($input['code']) || $input['code'] == ""){
             $input["code"] = null;
         }
 

@@ -70,7 +70,9 @@
                 <i class="fa fa-ellipsis-v"></i>
             </span>
 
-            <span class="text">{{$course_session->name}} (C={{$course_session->time_course}} | TD={{$course_session->time_td}} | TP={{$course_session->time_tp}})</span>
+            <span class="text">{{$course_session->name}}</span>
+            <br/>
+            <span style="margin-left: 28px;">(C={{$course_session->time_course}} | TD={{$course_session->time_td}} | TP={{$course_session->time_tp}})</span>
             <small class="label label-danger"><i class="fa fa-user"></i> {{$course_session->employee == ""? "NA":$course_session->employee}}</small>
             <div class="tools">
                 {{--<i class="fa fa-edit btn_edit_course_session"--}}

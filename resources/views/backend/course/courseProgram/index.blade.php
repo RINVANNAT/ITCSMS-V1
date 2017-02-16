@@ -19,6 +19,9 @@
         .toolbar {
             float: left;
         }
+        table td:nth-child(2), table td:nth-child(3) {
+            display: none;
+        }
     </style>
 @stop
 
@@ -61,8 +64,11 @@
                     <thead>
                     <tr>
                         <th>{{ trans('labels.backend.coursePrograms.fields.name_kh') }}</th>
+                        <th style="display: none"></th>
+                        <th style="display: none"></th>
                         <th>{{ trans('labels.backend.coursePrograms.fields.code') }}</th>
                         <th>Class</th>
+                        <th>Permitted to</th>
                         <th>{{ trans('labels.backend.coursePrograms.fields.semester') }}</th>
                         <th width="20px;">{{ trans('labels.backend.coursePrograms.fields.time_course') }}</th>
                         <th width="20px;">{{ trans('labels.backend.coursePrograms.fields.time_td') }}</th>
@@ -96,7 +102,8 @@
                     @endif
                         '{!! Form::select('semester',$semesters,null, array('class'=>'form-control','id'=>'filter_semester','placeholder'=>'Semester')) !!} '+
                         '{!! Form::select('degree',$degrees,null, array('class'=>'form-control','id'=>'filter_degree','placeholder'=>'Degree')) !!} '+
-                        '{!! Form::select('grade',$grades,null, array('class'=>'form-control','id'=>'filter_grade','placeholder'=>'Year')) !!} '
+                        '{!! Form::select('grade',$grades,null, array('class'=>'form-control','id'=>'filter_grade','placeholder'=>'Year')) !!} '+
+                        '{!! Form::select('responsible_department',$responsible_departments,null, array('class'=>'form-control','id'=>'filter_responsible_department','placeholder'=>'Permitted department')) !!} '
 
 
             var oTable = $('#coursePrograms-table').DataTable({
@@ -116,13 +123,17 @@
                         d.department = $('#filter_department').val();
                         d.department_option = $('#filter_dept_option').val();
                         d.semester = $('#filter_semester').val();
+                        d.responsible_department = $('#filter_responsible_department').val();
 
                     }
                 },
                 columns: [
-                    { data: 'name_kh', name: 'name_en'},
+                    { data: 'name_kh', name: 'name_kh'},
+                    { data: 'name_en', name: 'name_en'},
+                    { data: 'name_fr', name: 'name_fr'},
                     { data: 'code', name: 'code'},
                     { data: 'class', name: 'class', searchable:false},
+                    { data: 'responsible_department', name: 'responsible_department', searchable:false},
                     { data: 'semester', name: 'semesters.id'},
                     { data: 'time_course', name: 'time_course'},
                     { data: 'time_td', name: 'time_td'},
@@ -151,6 +162,16 @@
                 hasDeptOption();
                 e.preventDefault();
             });
+            $('#filter_responsible_department').on('change', function(e) {
+                oTable.draw();
+                e.preventDefault();
+            });
+
+            $(document).ready(function() {
+                if($('#filter_department :selected').val()) {
+                    hasDeptOption();
+                }
+            })
 
             $(document).on('change', '#filter_dept_option', function() {
                 oTable.draw();

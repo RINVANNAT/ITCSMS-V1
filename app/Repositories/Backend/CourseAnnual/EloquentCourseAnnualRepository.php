@@ -112,9 +112,6 @@ class EloquentCourseAnnualRepository implements CourseAnnualRepositoryContract
      */
     public function update($id, $input)
     {
-
-//        dd($input);
-
         $courseAnnual = $this->findOrThrowException($id);
 
         if(!isset($input['department_option_id']) || $input['department_option_id'] == ""){
@@ -123,13 +120,14 @@ class EloquentCourseAnnualRepository implements CourseAnnualRepositoryContract
         if(!isset($input['employee_id']) || $input['employee_id'] == '') {
             $input['employee_id'] = null;
         }
+
         if(isset($input["responsible_department_id"]) && $input["responsible_department_id"] != ''){
             $courseAnnual->responsible_department_id = $input["responsible_department_id"];
+        } else {
+            // This is temporary, later if they don't pass along, we do nothing
+            // We must removed disabled attribute in responsible department
+            $courseAnnual->responsible_department_id = null;
         }
-
-
-
-
 
         if(isset($input["course_id"]) && $input["course_id"] != '') {
             $courseAnnual->course_id = $input['course_id'];
@@ -140,15 +138,16 @@ class EloquentCourseAnnualRepository implements CourseAnnualRepositoryContract
         if(isset($input["active"]) && $input["active"] != '') {
             $courseAnnual->active = $input['active'];
         }
-        if(isset($input["employee_id"]) && $input["employee_id"] != '') {
-            $courseAnnual->employee_id = $input['employee_id'];
-        }
+
         if(isset($input["department_id"]) && $input["department_id"] != '') {
             $courseAnnual->department_id = $input['department_id'];
         }
         if(isset($input["department_option_id"]) && $input["department_option_id"] != '') {
             $courseAnnual->department_option_id = $input['department_option_id'];
+        } else {
+            $courseAnnual->department_option_id = null;
         }
+
         if(isset($input["time_course"]) && $input["time_course"] != '') {
             $courseAnnual->time_course = $input['time_course'];
         }
@@ -167,16 +166,11 @@ class EloquentCourseAnnualRepository implements CourseAnnualRepositoryContract
         if(isset($input["name_fr"]) && $input["name_fr"] != '') {
             $courseAnnual->name_fr = $input['name_fr'];
         }
-//        $courseAnnual->group = isset($input['group'])?$input['group']:$courseAnnual->group;
         if(isset($input["credit"]) && $input["credit"] != '') {
             $courseAnnual->credit = $input['credit'];
         }
 
         $courseAnnual->updated_at = Carbon::now();
-//        $courseAnnual->score_percentage_column_1 = isset($input['score_percentage_column_1'])?$input['score_percentage_column_1']:10;
-//        $courseAnnual->score_percentage_column_2 = isset($input['score_percentage_column_2'])?$input['score_percentage_column_2']:30;
-//        $courseAnnual->score_percentage_column_3 = isset($input['score_percentage_column_3'])?$input['score_percentage_column_3']:60;
-
         $courseAnnual->write_uid = auth()->id();
 
         if ($courseAnnual->save()) {
