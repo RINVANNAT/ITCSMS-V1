@@ -720,7 +720,7 @@ class CourseAnnualController extends Controller
                         <?php
                         $a = "";
                         foreach($courseAnnual->courseAnnualClass as $obj_group) {
-                            $a =  $obj_group->group." ".$a;
+                            $a =  $a." ".$obj_group->group;
                         }
                         echo $a;
                         ?>

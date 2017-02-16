@@ -129,7 +129,7 @@
         }
         function submitForm(link){
 
-            window.location = link+"?academic_year_id="+$('#input_academic_year').val()+"&degree_id="+$('#input_degree').val();
+            window.location = link +"?data="+JSON.stringify($("#reporting-form").serializeArray());
         }
 
 

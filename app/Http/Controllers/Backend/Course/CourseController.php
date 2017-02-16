@@ -227,6 +227,7 @@ class CourseController extends Controller
             ->join('semesters', 'semesters.id', '=', 'courses.semester_id')
             ->leftJoin('grades', 'courses.grade_id', '=', 'grades.id')
             ->leftJoin('departments', 'courses.department_id', '=', 'departments.id')
+            ->leftJoin("departmentOptions", 'courses.department_option_id', '=', "departmentOptions.id")
             ->leftJoin('departments as rd', 'courses.responsible_department_id', '=', 'rd.id')
             ->leftJoin('degrees', 'courses.degree_id', '=', 'degrees.id')
             ->select([
@@ -239,6 +240,7 @@ class CourseController extends Controller
                 'courses.time_td',
                 'courses.time_course',
                 'courses.credit',
+                'departmentOptions.code as option',
                 'semesters.name_en as semester',
                 'rd.code as responsible_department',
                 DB::raw("CONCAT(degrees.code,grades.code,departments.code) as class")
@@ -280,6 +282,9 @@ class CourseController extends Controller
         $datatables
             ->editColumn('name_kh' , function($courseProgram) {
                 return '<b>'.$courseProgram->name_kh.'</b><br/>'.$courseProgram->name_en.'<br/>'.$courseProgram->name_fr;
+            })
+            ->editColumn('class' , function($courseProgram) {
+                return $courseProgram->class.$courseProgram->option;
             })
             ->addColumn('action', function ($courseProgram) {
                 return '<a href="' . route('admin.course.course_program.edit', $courseProgram->course_id) . '" class="btn btn-xs btn-primary"><i class="fa fa-pencil" data-toggle="tooltip" data-placement="top" title="" data-original-title="' . trans('buttons.general.crud.edit') . '"></i> </a>' .
