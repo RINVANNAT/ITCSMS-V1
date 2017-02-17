@@ -744,11 +744,12 @@ class CourseAnnualController extends Controller
 
                 if($courseAnnual->is_allow_scoring){
                     $action_toggle_scoring = ' <a href="'.route('admin.course.course_annual.toggle_scoring',$courseAnnual->id).'" class="btn btn-xs btn-warning toggle_scoring"><i class="fa fa-toggle-off" data-toggle="tooltip" data-placement="top" title="" data-original-title="Disable Scoring"></i></a>';
+                    $action_input_score = ' <a href="'.route('admin.course.form_input_score_course_annual',$courseAnnual->id).'" class="btn btn-xs btn-info input_score_course"><i class="fa fa-area-chart" data-toggle="tooltip" data-placement="top" title="" data-original-title="'.'input score'.'"></i></a>';
                 } else {
                     $action_toggle_scoring = ' <a href="'.route('admin.course.course_annual.toggle_scoring',$courseAnnual->id).'" class="btn btn-xs btn-success toggle_scoring"><i class="fa fa-toggle-on" data-toggle="tooltip" data-placement="top" title="" data-original-title="Enable Scoring"></i></a>';
+                    $action_input_score = "";
                 }
 
-                $action_input_score = ' <a href="'.route('admin.course.form_input_score_course_annual',$courseAnnual->id).'" class="btn btn-xs btn-info input_score_course"><i class="fa fa-area-chart" data-toggle="tooltip" data-placement="top" title="" data-original-title="'.'input score'.'"></i></a>';
                 $action_edit_score = ' <a href="'.route('admin.course.course_annual.edit',$courseAnnual->id).'" class="btn btn-xs btn-primary"><i class="fa fa-pencil" data-toggle="tooltip" data-placement="top" title="" data-original-title="'.trans('buttons.general.crud.edit').'"></i> </a>';
                 $action_delete_score = ' <button class="btn btn-xs btn-danger btn-delete" data-remote="'.route('admin.course.course_annual.destroy', $courseAnnual->id) .'"><i class="fa fa-times" data-toggle="tooltip" data-placement="top" title="' . trans('buttons.general.crud.delete') . '"></i></button>';
 
@@ -1883,12 +1884,17 @@ class CourseAnnualController extends Controller
 
     public function getFormScoreByCourse(Request $request, $courseAnnualId) {
 
+        $courseAnnual = CourseAnnual::find($courseAnnualId);
+        if($courseAnnual->is_allow_scoring){
+            $properties = $this->dataSendToView($courseAnnualId);
+            $courseAnnual = $properties['course_annual'];
+            $availableCourses = $properties['available_course'];
 
-        $properties = $this->dataSendToView($courseAnnualId);
-        $courseAnnual = $properties['course_annual'];
-        $availableCourses = $properties['available_course'];
+            return view('backend.course.courseAnnual.includes.form_input_score_course_annual', compact('courseAnnualId', 'courseAnnual', 'availableCourses'));
+        } else {
+            return view('backend.course.courseAnnual.includes.no_permission_to_score', compact('courseAnnualId', 'courseAnnual', 'availableCourses'));
+        }
 
-        return view('backend.course.courseAnnual.includes.form_input_score_course_annual', compact('courseAnnualId', 'courseAnnual', 'availableCourses'));
     }
 
     public function getCourseAnnualScoreByAjax(Request $request) {
@@ -3724,9 +3730,31 @@ class CourseAnnualController extends Controller
     private function mass_toggle_scoring(ToggleScoringCourseAnnualRequest $request, $status){
         $course_annuals = CourseAnnual::where('academic_year_id',$request->get('academic_year'));
 
-        if($request->get('department') != null && $request->get('department') != ""){
-            $course_annuals = $course_annuals->where('department_id',$request->get('department'));
+        // Select department
+        if(access()->hasRole("Administrator")) {
+            if($request->get('department') != null && $request->get('department') != ""){
+                $course_annuals = $course_annuals->where('department_id',$request->get('department'));
+            }
+        } else {
+            // This is not administrator, so he can only manage course in his department
+            // or his responsible department
+            if($request->get('department') != null && $request->get('department') != ""){
+                $department_id = $request->get('department');
+
+                $course_annuals = $course_annuals->where(function($query) use ($department_id){
+
+                    $employee = Employee::where('user_id', Auth::user()->id)->first();
+                    if($department_id != $employee->department->id){
+                        // in different department
+                        $query->where('department_id',$department_id)->where('responsible_department_id',$employee->department->id);
+                    } else {
+                        // in same department
+                        $query->where('department_id',$department_id);
+                    }
+                });
+            }
         }
+
         if($request->get('degree')!= null && $request->get('degree')!= ""){
             $course_annuals = $course_annuals->where('degree_id',$request->get('degree'));
         }
