@@ -83,10 +83,16 @@
                             <button class="btn btn-primary btn-sm"><i class="fa fa-plus-circle"></i> Add
                             </button>
                         </a>
-                        <a href="{!! route('admin.course.course_annual.request_import') !!}">
-                            <button class="btn btn-primary btn-sm"><i class="fa fa-plus-circle"></i> Import
-                            </button>
-                        </a>
+                        {{--<a href="{!! route('admin.course.course_annual.request_import') !!}">--}}
+                            {{--<button class="btn btn-warning btn-sm"><i class="fa fa-plus-circle"></i> Import--}}
+                            {{--</button>--}}
+                        {{--</a>--}}
+                        @endauth
+                        @permission('disable-enable-input-score-into-course-annual')
+                        <div class="btn-group">
+                            <button class="btn btn-warning btn-sm" id="btn_disable_scoring"><i class="fa fa-toggle-on"></i> {{trans('buttons.course.course_annual.disable_scoring')}}</button>
+                            <button class="btn btn-success btn-sm" id="btn_enable_scoring"><i class="fa fa-toggle-off"></i> {{trans('buttons.course.course_annual.enable_scoring')}}</button>
+                        </div>
                         @endauth
 
                         <div class="btn-group" style="float: right;">
@@ -163,6 +169,8 @@
     <script>
         var $search_url = "{{route('admin.employee.search')}}";
         var base_url = '{{url('img/profiles/')}}';
+        var disable_scoring_url = "{{route('admin.course.course_annual.disable_scoring')}}";
+        var enable_scoring_url = "{{route('admin.course.course_annual.enable_scoring')}}";
         var current_course = null;
         var search_employee_box = null;
         $(function() {
@@ -278,6 +286,55 @@
                 allowClear: true
             });
 
+            // Button disable/enable scoring
+
+            $("#btn_disable_scoring").on("click", function(e){
+                $.ajax({
+                    url: disable_scoring_url,
+                    type: 'POST',
+                    data:{
+                        academic_year : $('#filter_academic_year').val(),
+                        degree : $('#filter_degree').val(),
+                        grade : $('#filter_grade').val(),
+                        department : $('#filter_department').val(),
+                        semester : $('#filter_semester').val(),
+                        lecturer : $('#filter_lecturer').val(),
+                        dept_option : $('#filter_dept_option').val()
+                    },
+                    success: function (response) {
+                        if(response.success){
+                            oTable.draw();
+                        } else {
+                            alert("something went wrong");
+                        }
+
+                    }
+                });
+            });
+
+            $("#btn_enable_scoring").on("click", function(e){
+                $.ajax({
+                    url: enable_scoring_url,
+                    type: 'POST',
+                    data:{
+                        academic_year : $('#filter_academic_year').val(),
+                        degree : $('#filter_degree').val(),
+                        grade : $('#filter_grade').val(),
+                        department : $('#filter_department').val(),
+                        semester : $('#filter_semester').val(),
+                        lecturer : $('#filter_lecturer').val(),
+                        dept_option : $('#filter_dept_option').val()
+                    },
+                    success: function (response) {
+                        if(response.success){
+                            oTable.draw();
+                        } else {
+                            alert("something went wrong");
+                        }
+
+                    }
+                });
+            });
         });
 
         function init_search_box(){

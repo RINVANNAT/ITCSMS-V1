@@ -115,10 +115,15 @@ class EloquentCourseAnnualRepository implements CourseAnnualRepositoryContract
         $courseAnnual = $this->findOrThrowException($id);
 
         if(!isset($input['department_option_id']) || $input['department_option_id'] == ""){
-            $input['department_option_id'] = null;
+            $courseAnnual->department_option_id = null;
+        } else {
+            $courseAnnual->department_option_id = $input['department_option_id'];
         }
+
         if(!isset($input['employee_id']) || $input['employee_id'] == '') {
-            $input['employee_id'] = null;
+            $courseAnnual->employee_id = null;
+        } else {
+            $courseAnnual->employee_id = $input['employee_id'];
         }
 
         if(isset($input["responsible_department_id"]) && $input["responsible_department_id"] != ''){

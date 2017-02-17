@@ -18,6 +18,7 @@ class CourseAnnual extends Model
         "degree_id",
         "grade_id",
         "department_id",
+        "is_allow_scoring",
         "responsible_department_id",
         "department_option_id"
 	];
