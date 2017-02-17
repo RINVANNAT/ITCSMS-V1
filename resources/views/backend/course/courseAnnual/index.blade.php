@@ -12,6 +12,9 @@
     {!! Html::style('plugins/daterangepicker/daterangepicker-bs3.css') !!}
     {!! Html::style('plugins/select2/select2.min.css') !!}
     <style>
+        .score_disabled{
+            background-color: gainsboro;
+        }
         .toolbar, .session, #courseAnnuals-table_length {
             float: left;
         }
@@ -63,6 +66,7 @@
         .select2{
             margin-top: 5px !important;
         }
+
     </style>
 @stop
 @section('content')

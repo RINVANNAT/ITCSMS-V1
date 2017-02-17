@@ -737,6 +737,9 @@ class CourseAnnualController extends Controller
                 $html = ob_get_clean();
                 return $html;
             })
+            ->setRowClass(function ($courseAnnual) {
+                return ($courseAnnual->is_allow_scoring ? '' : 'score_disabled');
+            })
             ->addColumn('action', function ($courseAnnual) use ($employee) {
 
                 if($courseAnnual->is_allow_scoring){
