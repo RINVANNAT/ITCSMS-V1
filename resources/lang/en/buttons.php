@@ -73,7 +73,9 @@ return [
 
     'course' => [
         'course_annual' =>[
-            'course_assignment' => 'Course Assignment'
+            'course_assignment' => 'Course Assignment',
+            'disable_scoring' => 'Disable Scoring',
+            'enable_scoring' => 'Enable Scoring'
         ],
         'course_program' => [
 

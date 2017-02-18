@@ -5,6 +5,7 @@ use App\Http\Requests\Backend\Course\CourseAnnual\CreateCourseAnnualRequest;
 use App\Http\Requests\Backend\Course\CourseAnnual\DeleteCourseAnnualRequest;
 use App\Http\Requests\Backend\Course\CourseAnnual\EditCourseAnnualRequest;
 use App\Http\Requests\Backend\Course\CourseAnnual\StoreCourseAnnualRequest;
+use App\Http\Requests\Backend\Course\CourseAnnual\ToggleScoringCourseAnnualRequest;
 use App\Http\Requests\Backend\Course\CourseAnnual\UpdateCourseAnnualRequest;
 use App\Http\Requests\Backend\Course\CourseAnnual\CourseAnnualAssignmentRequest;
 use App\Http\Requests\Backend\Course\CourseAnnual\GenerateCourseAnnualRequest;
@@ -672,6 +673,7 @@ class CourseAnnualController extends Controller
                 'course_annuals.semester_id',
                 'course_annuals.active',
                 'course_annuals.academic_year_id',
+                'course_annuals.is_allow_scoring',
                 'employees.name_latin as employee_id',
                 'academicYears.name_kh as academic_year',
                 'semesters.name_kh as semester',
@@ -735,29 +737,49 @@ class CourseAnnualController extends Controller
                 $html = ob_get_clean();
                 return $html;
             })
+            ->setRowClass(function ($courseAnnual) {
+                return ($courseAnnual->is_allow_scoring ? '' : 'score_disabled');
+            })
             ->addColumn('action', function ($courseAnnual) use ($employee) {
+
+                if($courseAnnual->is_allow_scoring){
+                    $action_toggle_scoring = ' <a href="'.route('admin.course.course_annual.toggle_scoring',$courseAnnual->id).'" class="btn btn-xs btn-warning toggle_scoring"><i class="fa fa-toggle-off" data-toggle="tooltip" data-placement="top" title="" data-original-title="Disable Scoring"></i></a>';
+                    $action_input_score = ' <a href="'.route('admin.course.form_input_score_course_annual',$courseAnnual->id).'" class="btn btn-xs btn-info input_score_course"><i class="fa fa-area-chart" data-toggle="tooltip" data-placement="top" title="" data-original-title="'.'input score'.'"></i></a>';
+                } else {
+                    $action_toggle_scoring = ' <a href="'.route('admin.course.course_annual.toggle_scoring',$courseAnnual->id).'" class="btn btn-xs btn-success toggle_scoring"><i class="fa fa-toggle-on" data-toggle="tooltip" data-placement="top" title="" data-original-title="Enable Scoring"></i></a>';
+                    $action_input_score = "";
+                }
+
+                $action_edit_score = ' <a href="'.route('admin.course.course_annual.edit',$courseAnnual->id).'" class="btn btn-xs btn-primary"><i class="fa fa-pencil" data-toggle="tooltip" data-placement="top" title="" data-original-title="'.trans('buttons.general.crud.edit').'"></i> </a>';
+                $action_delete_score = ' <button class="btn btn-xs btn-danger btn-delete" data-remote="'.route('admin.course.course_annual.destroy', $courseAnnual->id) .'"><i class="fa fa-times" data-toggle="tooltip" data-placement="top" title="' . trans('buttons.general.crud.delete') . '"></i></button>';
+
                 if(access()->hasRole("Administrator")) { // This is admin
-                    return  '<a href="'.route('admin.course.form_input_score_course_annual',$courseAnnual->id).'" class="btn btn-xs btn-info input_score_course"><i class="fa fa-area-chart" data-toggle="tooltip" data-placement="top" title="" data-original-title="'.'input score'.'"></i></a>'.
-                            ' <a href="'.route('admin.course.course_annual.edit',$courseAnnual->id).'" class="btn btn-xs btn-primary"><i class="fa fa-pencil" data-toggle="tooltip" data-placement="top" title="" data-original-title="'.trans('buttons.general.crud.edit').'"></i> </a>'.
-                            ' <button class="btn btn-xs btn-danger btn-delete" data-remote="'.route('admin.course.course_annual.destroy', $courseAnnual->id) .'"><i class="fa fa-times" data-toggle="tooltip" data-placement="top" title="' . trans('buttons.general.crud.delete') . '"></i></button>';
+                    return  $action_toggle_scoring.
+                            $action_input_score.
+                            $action_edit_score.
+                            $action_delete_score;
                 } else {
                     $my_courses = CourseAnnual::where('employee_id',$employee->id)->lists('id')->toArray();
 
                     $actions = "";
 
                     // Check if this is his/her course and he/she has permission to input score
+                    if(Auth::user()->allow('disable-enable-input-score-into-course-annual')){
+                        $actions = $actions.$action_toggle_scoring;
+                    }
+
                     if(Auth::user()->allow('input-score-course-annual')) {
                         if(in_array($courseAnnual->id,$my_courses)){
-                            $actions = $actions.'<a href="'.route('admin.course.form_input_score_course_annual',$courseAnnual->id).'" class="btn btn-xs btn-info input_score_course"><i class="fa fa-area-chart" data-toggle="tooltip" data-placement="top" title="" data-original-title="'.'input score'.'"></i></a>';
+                            $actions = $actions.$action_input_score;
                         }
                     }
 
                     if(Auth::user()->allow('edit-courseAnnuals')) {
-                        $actions = $actions.' <a href="'.route('admin.course.course_annual.edit',$courseAnnual->id).'" class="btn btn-xs btn-primary"><i class="fa fa-pencil" data-toggle="tooltip" data-placement="top" title="" data-original-title="'.trans('buttons.general.crud.edit').'"></i> </a>';
+                        $actions = $actions.$action_edit_score;
                     }
 
                     if(Auth::user()->allow('delete-courseAnnuals')) {
-                        $actions = $actions.' <button class="btn btn-xs btn-danger btn-delete" data-remote="'.route('admin.course.course_annual.destroy', $courseAnnual->id) .'"><i class="fa fa-times" data-toggle="tooltip" data-placement="top" title="' . trans('buttons.general.crud.delete') . '"></i></button>';
+                        $actions = $actions.$action_delete_score;
                     }
 
                     return $actions;
@@ -1862,12 +1884,17 @@ class CourseAnnualController extends Controller
 
     public function getFormScoreByCourse(Request $request, $courseAnnualId) {
 
+        $courseAnnual = CourseAnnual::find($courseAnnualId);
+        if($courseAnnual->is_allow_scoring){
+            $properties = $this->dataSendToView($courseAnnualId);
+            $courseAnnual = $properties['course_annual'];
+            $availableCourses = $properties['available_course'];
 
-        $properties = $this->dataSendToView($courseAnnualId);
-        $courseAnnual = $properties['course_annual'];
-        $availableCourses = $properties['available_course'];
+            return view('backend.course.courseAnnual.includes.form_input_score_course_annual', compact('courseAnnualId', 'courseAnnual', 'availableCourses'));
+        } else {
+            return view('backend.course.courseAnnual.includes.no_permission_to_score', compact('courseAnnualId', 'courseAnnual', 'availableCourses'));
+        }
 
-        return view('backend.course.courseAnnual.includes.form_input_score_course_annual', compact('courseAnnualId', 'courseAnnual', 'availableCourses'));
     }
 
     public function getCourseAnnualScoreByAjax(Request $request) {
@@ -3674,6 +3701,102 @@ class CourseAnnualController extends Controller
     }
 
 
+    public function toggle_scoring(ToggleScoringCourseAnnualRequest $request, $id){
+        $course_annual = CourseAnnual::find($id);
+
+        if($course_annual->is_allow_scoring){
+            $course_annual->is_allow_scoring = false;
+        } else {
+            $course_annual->is_allow_scoring = true;
+        }
+
+        if($course_annual->save()){
+            return redirect()->route('admin.course.course_annual.index')->withFlashSuccess(trans('alerts.backend.generals.updated'));
+        } else {
+            return redirect()->back()->withFlashError('Something is wrong. Cannot toggle scoring!');
+        }
+
+    }
+
+    private function mass_toggle_scoring(ToggleScoringCourseAnnualRequest $request, $status){
+        $course_annuals = CourseAnnual::where('academic_year_id',$request->get('academic_year'));
+
+        // Select department
+        if(access()->hasRole("Administrator")) {
+            if($request->get('department') != null && $request->get('department') != ""){
+                $course_annuals = $course_annuals->where('department_id',$request->get('department'));
+            }
+        } else {
+            // This is not administrator, so he can only manage course in his department
+            // or his responsible department
+            if($request->get('department') != null && $request->get('department') != ""){
+                $department_id = $request->get('department');
+
+                $course_annuals = $course_annuals->where(function($query) use ($department_id){
+
+                    $employee = Employee::where('user_id', Auth::user()->id)->first();
+                    if($department_id != $employee->department->id){
+                        // in different department
+                        $query->where('department_id',$department_id)->where('responsible_department_id',$employee->department->id);
+                    } else {
+                        // in same department
+                        $query->where('department_id',$department_id);
+                    }
+                });
+            }
+        }
+
+        if($request->get('degree')!= null && $request->get('degree')!= ""){
+            $course_annuals = $course_annuals->where('degree_id',$request->get('degree'));
+        }
+        if($request->get('grade')!= null && $request->get('grade')!= ""){
+            $course_annuals = $course_annuals->where('grade_id',$request->get('grade'));
+        }
+        if($request->get('semester')!= null && $request->get('semester')!= ""){
+            $course_annuals = $course_annuals->where('semester_id',$request->get('semester'));
+        }
+        if($request->get('lecturer')!= null && $request->get('lecturer')!= ""){
+            $course_annuals = $course_annuals->where('employee_id',$request->get('lecturer'));
+        }
+        if($request->get('dept_option')!= null && $request->get('dept_option')!= ""){
+            $course_annuals = $course_annuals->where('department_option_id',$request->get('dept_option'));
+        }
+
+        $datas = $course_annuals->get();
+        $result = true;
+
+
+        foreach($datas as $data){
+            $data->is_allow_scoring = $status;
+
+            if(!$data->save()){
+                return false;
+            }
+        }
+
+        return $result;
+    }
+
+    public function enable_scoring(ToggleScoringCourseAnnualRequest $request){
+        if($request->ajax()){ // Only accept through ajax
+            if($this->mass_toggle_scoring($request,true)){
+                return \Illuminate\Support\Facades\Response::json(array("success"=>true, "message" => "All given courses are allowed for scoring."));
+            } else {
+                return \Illuminate\Support\Facades\Response::json(array("success"=>false, "message" => "Something went wrong."));
+            }
+        }
+    }
+
+    public function disable_scoring(ToggleScoringCourseAnnualRequest $request){
+
+        if($request->ajax()){ // Only accept through ajax
+            if($this->mass_toggle_scoring($request,false)){
+                return \Illuminate\Support\Facades\Response::json(array("success"=>true, "message" => "All given courses are blocked from scoring."));
+            } else {
+                return \Illuminate\Support\Facades\Response::json(array("success"=>false, "message" => "Something went wrong."));
+            }
+        }
+    }
 
 
 }

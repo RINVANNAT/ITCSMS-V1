@@ -12,6 +12,9 @@ Route::group([
         Route::post('course-annual-data', 'CourseAnnualController@data')->name('admin.course.course_annual.data');
         Route::get('course-request-import', 'CourseAnnualController@request_import')->name('admin.course.course_annual.request_import');
         Route::post('course-import', 'CourseAnnualController@import')->name('admin.course.course_annual.import');
+        Route::get('course-disable-enable-scoring/{id}', 'CourseAnnualController@toggle_scoring')->name('admin.course.course_annual.toggle_scoring');
+        Route::post('course-mass-disable-scoring', 'CourseAnnualController@disable_scoring')->name('admin.course.course_annual.disable_scoring');
+        Route::post('course-mass-enable-scoring', 'CourseAnnualController@enable_scoring')->name('admin.course.course_annual.enable_scoring');
     });
 
     Route::group([], function() {
