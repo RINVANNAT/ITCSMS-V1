@@ -175,11 +175,15 @@ class CourseAnnualController extends Controller
 
         $groups = $this->getStudentGroupFromDB();
 
-        $courseAnnualIds = DB::table('course_annuals')->where('course_id', $request->course_program_id)->lists('course_annuals.id');
-        $selectedGroups = DB::table('course_annual_classes')
-            ->whereIn('course_annual_id', $courseAnnualIds)
-            ->where('course_session_id', null)
-            ->lists('group');
+        if($request->course_program_id) {
+
+            $courseAnnualIds = DB::table('course_annuals')->where('course_id', $request->course_program_id)->lists('course_annuals.id');
+            $selectedGroups = DB::table('course_annual_classes')
+                ->whereIn('course_annual_id', $courseAnnualIds)
+                ->where('course_session_id', null)
+                ->lists('group');
+
+        }
 
         if($deptId = $request->department_id) {
             $groups = $groups->where('studentAnnuals.department_id', '=',$deptId);
@@ -190,12 +194,14 @@ class CourseAnnualController extends Controller
         if($degree_id = $request->degree_id) {
             $groups = $groups->where('studentAnnuals.degree_id', '=',$degree_id);
         }
+
         if($grade_id = $request->grade_id) {
             $groups = $groups->where('studentAnnuals.grade_id', '=',$grade_id);
         }
         if($option_id = $request->department_option_id) {
             $groups = $groups->where('studentAnnuals.department_option_id', '=',$option_id);
         }
+
         $groups = $groups->lists('group');
         asort($groups);
         $array_group = [];
@@ -203,14 +209,20 @@ class CourseAnnualController extends Controller
             $array_group[] = $group;
         }
 
-        if($request->_method == CourseAnnualEnum::CREATE) {
+        if($request->course_program_id) {
+            if($request->_method == CourseAnnualEnum::CREATE) {
 
-            $not_selected_groups = array_diff($array_group, $selectedGroups);
-            return Response::json($not_selected_groups);
+                $not_selected_groups = array_diff($array_group, $selectedGroups);
+                return Response::json($not_selected_groups);
+            } else {
+
+                return Response::json($array_group);
+            }
         } else {
-
             return Response::json($array_group);
         }
+
+
 
 
     }
@@ -2056,7 +2068,9 @@ class CourseAnnualController extends Controller
 
                 //--calculate score absence to sum with the real score
                 $totalCourseHours = ($courseAnnual->time_course + $courseAnnual->time_tp + $courseAnnual->time_td);
+
                 $scoreAbsenceByCourse =  number_format((float)((($totalCourseHours)-(isset($scoreAbsence)?$scoreAbsence->num_absence:0))*10)/((($totalCourseHours != 0)?$totalCourseHours:1)), 2, '.', '');
+
                 $totalScore = $totalScore + (($scoreAbsenceByCourse >= 0)?$scoreAbsenceByCourse:0);
 
 
@@ -2585,6 +2599,7 @@ class CourseAnnualController extends Controller
         $semesterId = $request->semester_id;
         $deptOptionId = $request->department_option_id;
 
+        $groups = isset($request->groups)?$request->groups:[];
 
         $allStudentGroups = $this->getStudentGroupFromDB();
 
@@ -2642,7 +2657,7 @@ class CourseAnnualController extends Controller
 
         return view('backend.course.courseAnnual.includes.form_all_score_courses_annual', compact('department',
             'degree', 'grade', 'academicYear', 'semesters', 'semesterId',
-            'departments', 'academicYears', 'degrees', 'grades', 'deptOptions', 'deptOptionId', 'department_id', 'coursePrograms', 'allStudentGroups'
+            'departments', 'academicYears', 'degrees', 'grades', 'deptOptions', 'deptOptionId', 'department_id', 'coursePrograms', 'allStudentGroups', 'groups'
             ));
 
     }
@@ -2748,6 +2763,8 @@ class CourseAnnualController extends Controller
     public function allHandsontableData(Request $request) {
 
         // ------declare reqested data ------
+
+        dd($request->all());
 
         $deptId = $request->dept_id;
         $degreeId = $request->degree_id;

@@ -923,9 +923,9 @@
                                 },
                                 items: {
 
-                                    "deletecol": {
-                                        name: '<span><i class="fa fa-trash"> Delete Column</i></span>'
-                                    },
+//                                    "deletecol": {
+//                                        name: '<span><i class="fa fa-trash"> Delete Column</i></span>'
+//                                    },
 
                                     "freeze_column": {
                                         name: function() {

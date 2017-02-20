@@ -8,6 +8,11 @@
 
         <style>
 
+            /*input[type="checkbox"]{*/
+                /*width: 10px; !*Desired width*!*/
+                /*height: 30px; !*Desired height*!*/
+            /*}*/
+
         </style>
         <div class="box-header with-border">
             <h3 class="box-title">Selection</h3>
@@ -68,12 +73,10 @@
 
             <div class="form-group">
                 {!! Form::label('group', 'Student Group', ['class' => 'col-lg-3 control-label required']) !!}
-                <div class="col-lg-7">
-                    {{ Form::select('group', [], null, ['class' => 'form-control', 'id' => 'group','required'=>'required', 'placeholder' => 'Group']) }}
+                <div class="col-lg-7" id="group_panel">
+
                 </div>
             </div>
-
-
             {!! Form::close() !!}
         </div>
 
@@ -98,6 +101,8 @@
     {{--myscript--}}
 
     <script>
+
+        var get_group_url = "{{route('course_annual.get_group_filtering')}}";
 
         function ajaxRequest(method, baseUrl, baseData){
 
@@ -150,7 +155,70 @@
 
         $('select[name=department_id]').on('change', function() {
             $('.department_'+ $(this).val()).show();
-        })
+            load_group('{{\App\Models\Enum\CourseAnnualEnum::CREATE}}');
+
+        });
+
+        // On degree, grade, department, option is changed, change group
+        $("select[name=academic_year_id]").on('change', function (){
+            load_group(empty='');
+        });
+        $("select[name=degree_id]").on('change', function (){
+            load_group(empty='');
+        });
+        $("select[name=grade_id]").on('change', function (){
+            load_group(empty='');
+        });
+        $("select[name=department_option_id]").on('change', function (){
+            load_group();
+        });
+
+        function load_group(method){
+
+
+            var department_id = $("select[name=department_id] :selected").val();
+            var academic_year_id = $("select[name=academic_year_id] :selected").val();
+            var degree_id = $("select[name=degree_id] :selected").val();
+            var grade_id = $("select[name=grade_id] :selected").val();
+            var department_option_id = $("select[name=department_option_id] :selected").val();
+
+
+            // Load group only department, academic year, degree and grade are filled.
+            if(department_id != "" && department_id != null  && academic_year_id != "" && degree_id != "" && grade_id != ""){
+
+                $.ajax({
+                    url : get_group_url,
+                    type: 'GET',
+                    data: {
+                        department_id:$("#department_id").val(),
+                        academic_year_id:$("#academic_year_id").val(),
+                        degree_id:$("#degree_id").val(),
+                        grade_id:$("#grade_id").val(),
+                        department_option_id:$("#department_option_id").val(),
+                        _method: method
+                    },
+                    success : function(data){
+
+                        console.log(data);
+
+                        if(data != null){
+                            var option_text = "";
+
+                            $.each(data, function(key, value){
+
+                                if(value != null) {
+                                    option_text = option_text +
+
+                                            ' <label><input type="checkbox" class="each_check_box " name="groups[]" value="'+value+'"> '+value+'</label>'
+                                }
+
+                            })
+                            $("#group_panel").html(option_text);
+                        }
+                    }
+                })
+            }
+        }
 
     </script>
 
