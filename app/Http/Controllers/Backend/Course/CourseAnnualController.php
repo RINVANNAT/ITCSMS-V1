@@ -2759,8 +2759,10 @@ class CourseAnnualController extends Controller
         //-----------end requested data---------
 
         //-----declaring variable ------
-        $creditInEachSemester =  [];
-        $finalCredit=0;
+        $creditInEachSemester =  [];// ----credit by each semester ---list by semester_id
+        $finalCredit=0; // ---total credit of course
+        $array_data =[];// ---final data to send to view
+        $index =0;// -- count student number
 
          //------get score properties and absence -------
 
@@ -2816,7 +2818,7 @@ class CourseAnnualController extends Controller
                 $program = $course_Annual[0];
                 // ----merge header and col-width by each course-program------
                 $creditInEachSemester[$program->semester_id][] = $program->course_annual_credit;
-                $nestedHeaders[0] = array_merge($nestedHeaders[0], [['label'=>'S'.$program->semester_id.'_'.$program->name_en, 'colspan'=>2]]);
+                $nestedHeaders[0] = array_merge($nestedHeaders[0], [['label'=>'S'.$program->semester_id.'_'.htmlspecialchars($program->name_en), 'colspan'=>2]]);
                 $nestedHeaders[1] = array_merge($nestedHeaders[1], [['label'=>'Abs', 'colspan'=>1], ['label'=> $program->course_annual_credit, 'colspan'=>1]]);
                 $colWidths[] = 65;
                 $colWidths[] = 65;
@@ -2830,7 +2832,6 @@ class CourseAnnualController extends Controller
                 }
 
                 $element = $dataHandSontable['element'];
-
                 $totalAbs = $dataHandSontable['absence'];
                 $totalMoyenne = $dataHandSontable['moyenne'];
                 $each_column_score = $dataHandSontable['each_column_score'];
@@ -2848,8 +2849,6 @@ class CourseAnnualController extends Controller
         $min_array = $extra_rows['min'];
         $average_array = $extra_rows['average'];
 
-
-
         if($semesterId) {
             //---additional row for spacing the handsontable
 
@@ -2863,27 +2862,22 @@ class CourseAnnualController extends Controller
             $nestedHeaders[0] = array_merge($nestedHeaders[0], ['S'.$semesterId.'_Moyenne']);
             $nestedHeaders[1] = array_merge($nestedHeaders[1], [array_sum(isset($creditInEachSemester[$semesterId])?$creditInEachSemester[$semesterId]:[0])]);
         } else {
-            $semesters = Semester::orderBy('id')->get();
-            if($semesters) {
-                foreach($semesters as $semester) {
+            foreach($semesters as $semester) {
 
-                    //---------the same as above ...additional row ----
+                //---------the same as above ...additional row ----
 
-                    $data_empty= $data_empty +['S_'.$semester->id => ""];
-                    $max_array = $max_array +['S_'.$semester->id => ""];
-                    $min_array = $min_array +['S_'.$semester->id => ""];
-                    $average_array = $average_array +['S_'.$semester->id => ""];
+                $data_empty= $data_empty +['S_'.$semester->id => ""];
+                $max_array = $max_array +['S_'.$semester->id => ""];
+                $min_array = $min_array +['S_'.$semester->id => ""];
+                $average_array = $average_array +['S_'.$semester->id => ""];
 
-                    //-----------
+                //-----------
 
-                    $nestedHeaders[0] = array_merge($nestedHeaders[0], ['S'.$semester->id.'_Moyenne']);
-                    $nestedHeaders[1] = array_merge($nestedHeaders[1], [array_sum(isset($creditInEachSemester[$semester->id])?$creditInEachSemester[$semester->id]:[0])]);
-                    $finalCredit= $finalCredit + array_sum(isset($creditInEachSemester[$semester->id])?$creditInEachSemester[$semester->id]:[0]);
-                }
+                $nestedHeaders[0] = array_merge($nestedHeaders[0], ['S'.$semester->id.'_Moyenne']);
+                $nestedHeaders[1] = array_merge($nestedHeaders[1], [array_sum(isset($creditInEachSemester[$semester->id])?$creditInEachSemester[$semester->id]:[0])]);
+                $finalCredit= $finalCredit + array_sum(isset($creditInEachSemester[$semester->id])?$creditInEachSemester[$semester->id]:[0]);
             }
         }
-
-
 
         $nestedHeaders[0] = array_merge($nestedHeaders[0], ['Moyenne']);
         $nestedHeaders[0] = array_merge($nestedHeaders[0], ['Rank']);
@@ -2909,10 +2903,24 @@ class CourseAnnualController extends Controller
         $colWidths[] = 100;
 
 
-        $array_data =[];
-        $index =0;
+        foreach($arrayCourseAnnual as $course_program_id => $course_annual) {
+
+            $tmp_course = $arrayCourseAnnual[$course_program_id][0];
+            $array_val = array_values($each_column_score[$course_program_id]);
+
+            $max = max($array_val);
+            $min = min($array_val);
+            $aver_rage = (array_sum($array_val))/count($array_val);
+
+            $data_empty = array_merge($data_empty,['Abs'.'_'.htmlspecialchars($tmp_course->name_en).'_'.$tmp_course->semester_id => "", 'Credit'.'_'.htmlspecialchars($tmp_course->name_en).'_'.$tmp_course->semester_id => ""]);
+            $max_array = array_merge($max_array,['Abs'.'_'.htmlspecialchars($tmp_course->name_en).'_'.$tmp_course->semester_id => "", 'Credit'.'_'.htmlspecialchars($tmp_course->name_en).'_'.$tmp_course->semester_id => $this->floatFormat($max)]);
+            $min_array = $min_array + ['Abs'.'_'.htmlspecialchars($tmp_course->name_en).'_'.$tmp_course->semester_id => '', 'Credit'.'_'.htmlspecialchars($tmp_course->name_en).'_'.$tmp_course->semester_id => $this->floatFormat($min)];
+            $average_array = $average_array + ['Abs'.'_'.htmlspecialchars($tmp_course->name_en).'_'.$tmp_course->semester_id => '', 'Credit'.'_'.htmlspecialchars($tmp_course->name_en).'_'.$tmp_course->semester_id => $this->floatFormat($aver_rage)];
+
+        }
 
         foreach($element as $key => $value) {
+            $index++;
 
             $total_number_absences = 0;
             $both_semester = 0;
@@ -2939,37 +2947,13 @@ class CourseAnnualController extends Controller
             $value['total'] = $total_number_absences;
             $value['Moyenne'] = number_format((float)$both_semester/(($finalCredit >0)?$finalCredit:1), 2, '.', '');
             $value['Rank'] = 0;
-            $value['Redouble'] = " ";
-            $value['Observation'] = " ";
-            $value['Rattrapage'] = " ";
-            $value['Passage'] = " ";
-            $value[''] = '';// blank column at last
-            $value['number'] = $index++;
-//            dd($value);
+            $value['Redouble'] = "";
+            $value['Observation'] = "";
+            $value['Rattrapage'] = "";
+            $value['Passage'] = "";
+            $value[""] = "";// blank column at last
+            $value["number"] = $index;
             $array_data[] = $value;
-        }
-
-
-        //--------
-
-
-
-        $tes = [];
-//        dd($arrayCourseAnnual);
-        foreach($arrayCourseAnnual as $course_program_id => $course_annual) {
-
-            $tmp_course = $arrayCourseAnnual[$course_program_id][0];
-            $array_val = array_values($each_column_score[$course_program_id]);
-
-            $max = max($array_val);
-            $min = min($array_val);
-            $aver_rage = (array_sum($array_val))/count($array_val);
-
-            $data_empty = array_merge($data_empty,['Abs'.'_'.$tmp_course->name_en.'_'.$tmp_course->semester_id => "", 'Credit'.'_'.$tmp_course->name_en.'_'.$tmp_course->semester_id => ""]);
-            $max_array = array_merge($max_array,['Abs'.'_'.$tmp_course->name_en.'_'.$tmp_course->semester_id => "", 'Credit'.'_'.$tmp_course->name_en.'_'.$tmp_course->semester_id => $this->floatFormat($max)]);
-            $min_array = $min_array + ['Abs'.'_'.$tmp_course->name_en.'_'.$tmp_course->semester_id => '', 'Credit'.'_'.$tmp_course->name_en.'_'.$tmp_course->semester_id => $this->floatFormat($min)];
-            $average_array = $average_array + ['Abs'.'_'.$tmp_course->name_en.'_'.$tmp_course->semester_id => '', 'Credit'.'_'.$tmp_course->name_en.'_'.$tmp_course->semester_id => $this->floatFormat($aver_rage)];
-
         }
 
         $array_data[] = $data_empty;
@@ -2979,22 +2963,11 @@ class CourseAnnualController extends Controller
         $array_data[] = $data_empty;
 
 
-//        dd( json_encode($array_data, JSON_ERROR_UTF8));
-
-//        dd(['data' => $array_data,'nestedHeaders' => $nestedHeaders,'colWidths' => $colWidths]);
-
-
-        return json_encode( [
-            "data" => $array_data,
-            "nestedHeaders" => $nestedHeaders,
-            "colWidths" => $colWidths
-        ] ) ;
-
-//        return Response::json([
-//            'data' => $array_data,
-//            'nestedHeaders' => $nestedHeaders,
-//            'colWidths' => $colWidths
-//        ]);
+        return Response::json([
+            'data' => $array_data,
+            'nestedHeaders' => $nestedHeaders,
+            'colWidths' => $colWidths
+        ]);
 
 
 
@@ -3149,7 +3122,7 @@ class CourseAnnualController extends Controller
                             }
                         }
 
-                        $element[$stu_dent->id_card] = $element[$stu_dent->id_card] + ["Abs_".$eachCourse->name_en."_".$eachCourse->semester_id =>  isset($absence_by_course)?$absence_by_course->num_absence:"", "Credit_".$eachCourse->name_en."_".$eachCourse->semester_id => $each_score];
+                        $element[$stu_dent->id_card] = $element[$stu_dent->id_card] + ["Abs_".htmlspecialchars($eachCourse->name_en)."_".$eachCourse->semester_id =>  isset($absence_by_course)?$absence_by_course->num_absence:"", "Credit_".htmlspecialchars($eachCourse->name_en)."_".$eachCourse->semester_id => $each_score];
 
                     }
 
@@ -3212,7 +3185,7 @@ class CourseAnnualController extends Controller
                         }
 
                     }
-                    $element[$stu_dent->id_card] = $element[$stu_dent->id_card] + ['Abs'.'_'.$tmpCourse->name_en.'_'.$tmpCourse->semester_id =>  isset($absence_by_course)?$absence_by_course->num_absence:"", 'Credit'.'_'.$tmpCourse->name_en.'_'.$tmpCourse->semester_id => $each_score];
+                    $element[$stu_dent->id_card] = $element[$stu_dent->id_card] + ['Abs'.'_'.htmlspecialchars($tmpCourse->name_en).'_'.$tmpCourse->semester_id =>  isset($absence_by_course)?$absence_by_course->num_absence:"", 'Credit'.'_'.htmlspecialchars($tmpCourse->name_en).'_'.$tmpCourse->semester_id => $each_score];
                 }
             }
 
@@ -3258,7 +3231,7 @@ class CourseAnnualController extends Controller
                                 }
                             }
                         }
-                        $element[$stu_dent->id_card] = $element[$stu_dent->id_card] + ['Abs'.'_'.$eachCourse->name_en.'_'.$eachCourse->semester_id =>  isset($absence_by_course)?$absence_by_course->num_absence:"" , 'Credit'.'_'.$eachCourse->name_en.'_'.$eachCourse->semester_id => $each_score];
+                        $element[$stu_dent->id_card] = $element[$stu_dent->id_card] + ['Abs'.'_'.htmlspecialchars($eachCourse->name_en).'_'.$eachCourse->semester_id =>  isset($absence_by_course)?$absence_by_course->num_absence:"" , 'Credit'.'_'.htmlspecialchars($eachCourse->name_en).'_'.$eachCourse->semester_id => $each_score];
                     }
                 }
 
@@ -3306,7 +3279,7 @@ class CourseAnnualController extends Controller
                             }
                         }
                     }
-                    $element[$stu_dent->id_card] = $element[$stu_dent->id_card] + ['Abs'.'_'.$tmpCourse->name_en.'_'.$tmpCourse->semester_id =>  isset($absence_by_course)?$absence_by_course->num_absence:"", 'Credit'.'_'.$tmpCourse->name_en.'_'.$tmpCourse->semester_id => $each_score];
+                    $element[$stu_dent->id_card] = $element[$stu_dent->id_card] + ['Abs'.'_'.htmlspecialchars($tmpCourse->name_en).'_'.$tmpCourse->semester_id =>  isset($absence_by_course)?$absence_by_course->num_absence:"", 'Credit'.'_'.htmlspecialchars($tmpCourse->name_en).'_'.$tmpCourse->semester_id => $each_score];
                 }
             }
         }
