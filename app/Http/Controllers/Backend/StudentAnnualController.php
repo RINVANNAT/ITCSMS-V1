@@ -457,7 +457,7 @@ class StudentAnnualController extends Controller
 
         $grades = [1,2,3,4,5];
         $ages = array(
-            ['min'=>1,'max'=>17,'name'=>'<17','data'=> array()],
+            ['min'=>1,'max'=>17,'name'=>'<16','data'=> array()],
             ['min'=>16,'max'=>17,'name'=>'16','data'=> array()],
             ['min'=>17,'max'=>18,'name'=>'17','data'=> array()],
             ['min'=>18,'max'=>19,'name'=>'18','data'=> array()],
