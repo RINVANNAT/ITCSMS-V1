@@ -32,13 +32,6 @@
                 background: rgba(0,0,0,0.8);
                 z-index: 1;
             }
-            .checkbox_style{
-
-                border-color: #00dd00;
-                background-color: #00dd00;
-
-
-            }
         </style>
         <div class="box-header with-border">
             <h3 class="box-title">Course Annual Edition</h3>
@@ -46,7 +39,7 @@
         <!-- /.box-header -->
         <div class="box-body panel">
 
-            {!! Form::open(['route' => ['admin.course.edit_course_annual',$courseSession->id], 'class' => 'form-horizontal form_edit_course_annual', 'role' => 'form', 'method' => 'put']) !!}
+            {!! Form::open(['route' => ['admin.course.edit_course_annual',$course->id], 'class' => 'form-horizontal form_edit_course_annual', 'role' => 'form', 'method' => 'put']) !!}
 
                 <table class="table table-hover" id="dev-table">
                     <thead>
@@ -58,56 +51,78 @@
                     </thead>
                     <tbody>
                     <tr>
-                        <td>1</td>
-                        <td>Time Course</td>
-                        <td>
-                            {!! Form::text('time_course', ($courseSession->time_course != null)?$courseSession->time_course:0, ['class' => 'form-control number_only inputs_val','required'=>'required']) !!}
-                        </td>
+                        <td width="1cm">1</td>
+                        <td width="20cm"> Khmer</td>
+                        <td><input type="text" name="name_kh" class="form-control inputs_val" value="{{$course->name_kh}}"></td>
+
                     </tr>
                     <tr>
                         <td>2</td>
-                        <td>Time TD</td>
-                        <td>
-                            {!! Form::text('time_td', ($courseSession->time_td != null)?$courseSession->time_td:0, ['class' => 'form-control number_only inputs_val','required'=>'required']) !!}
-                        </td>
+                        <td> English</td>
+                        <td><input type="text" name="name_en" class="form-control inputs_val" value="{{$course->name_en}}"></td>
                     </tr>
                     <tr>
                         <td>3</td>
+                        <td> France</td>
+                        <td><input type="text" name="name_fr" class="form-control inputs_val" value="{{$course->name_fr}}"></td>
+                    </tr>
+                    <tr>
+                        <td>4</td>
+                        <td>Time Course</td>
+                        <td>
+                            {!! Form::text('time_course', ($course->time_course != null)?$course->time_course:0, ['class' => 'form-control number_only inputs_val','required'=>'required']) !!}
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>5</td>
+                        <td>Time TD</td>
+                        <td>
+                            {!! Form::text('time_td', ($course->time_td != null)?$course->time_td:0, ['class' => 'form-control number_only inputs_val','required'=>'required']) !!}
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>6</td>
                         <td>Time TP</td>
                         <td>
-                            {!! Form::text('time_tp', ($courseSession->time_tp != null)?$courseSession->time_tp:0, ['class' => 'form-control number_only inputs_val']) !!}
+                            {!! Form::text('time_tp', ($course->time_tp != null)?$course->time_tp:0, ['class' => 'form-control number_only inputs_val','required'=>'required']) !!}
                         </td>
                     </tr>
 
                     <tr>
-                        <td>4</td>
-                        <td><input type="checkbox" class="all_box"> All Group </td>
+                        <td>7</td>
+                        <td>Credit</td>
+                        <td>
+                            {!! Form::text('course_annual_credit', ($course->credit != null)?$course->credit:0, ['class' => 'form-control inputs_val','required'=> true]) !!}
+                        </td>
+                    </tr>
+
+                    <tr>
+                        <td>7</td>
+                        <td> Semester </td>
 
                         <td>
-                            @foreach($allGroups as $group)
-                                 <?php $index =0;?>
+                            <select name="semester_id" id="select_semester_id" class="enlarge-selection">
+                                @foreach($allSemesters as $semester)
+                                    @if($course->semester_id == $semester->id)
+                                        <option value="{{$semester->id}}" selected>{{$semester->name_en}}</option>
+                                    @else
+                                        <option value="{{$semester->id}}">{{$semester->name_en}}</option>
 
-                                @if($group != null)
+                                    @endif
 
-                                    <?php $status =true;?>
-                                         @foreach($courseAnnualClasses as $class)
-                                             @if($group == $class->group)
-                                                <?php $status =false;?>
-                                                 <label for="group"> <input type="checkbox" class="each-check-box" value="{{$class->group}}" checked> {{$class->group}}</label>
-                                             @endif
-                                         @endforeach
-                                         @if($status == true)
-                                            <label for="group"> <input type="checkbox" class="each-check-box" value="{{$group}}"> {{$group}}</label>
-                                         @endif
+                                @endforeach
 
-
-                                @endif
+                            </select>
+                        </td>
+                    </tr>
 
 
-                            @endforeach
+                    <tr>
+                        <td>8</td>
+                        <td> Group </td>
 
-
-                            {{--{!! Form::select('group',$allGroups,$course->group, array('class'=>'form-control','id'=>'group', 'placeholder' => 'Group')) !!}--}}
+                        <td>
+                            {!! Form::select('group',$allGroups,$course->group, array('class'=>'form-control','id'=>'group', 'placeholder' => 'Group')) !!}
                         </td>
                     </tr>
                     </tbody>
@@ -148,7 +163,7 @@
 
                     if(result.status== true) {
                         notify('success', 'info', result.message);
-                        window.opener.refresh_course_tree(result.selected_element);
+                        window.opener.refresh_course_tree();
 
 //                        window.parent.$("#annual_course");
 
@@ -165,29 +180,12 @@
 
 
         $('#btn_update_course').on('click', function(e) {
-
             e.preventDefault();
             var data = $('form.form_edit_course_annual').serialize();
-            var course = $('input[name=time_course]').val();
-            var td= $('input[name=time_td]').val();
-            var tp = $('input[name=time_tp]').val();
 
-            var url = $('form.form_edit_course_annual').attr('action');
-            var checked_group =[];
+            var credit = $('input[name=course_annual_credit]').val();
 
-
-            $('.each-check-box').each(function (e) {
-                if(this.checked) {
-                    checked_group.push($(this).val())
-                }
-            })
-            var baseData = {
-                group:checked_group
-            }
-
-            if((course == '') ||(td === '') || (tp == '') ) {
-                notify('error', 'Require All Field', 'Attention');
-            } else {
+            if($.isNumeric(credit)) {
                 swal({
                     title: "Confirm",
                     text: "Save Edition??",
@@ -198,9 +196,12 @@
                     closeOnConfirm: true
                 }, function(confirmed) {
                     if (confirmed) {
-                        ajaxRequest('PUT', url+'?'+data, baseData);
+                        ajaxRequest('PUT', $('form.form_edit_course_annual').attr('action'), data);
                     }
                 });
+
+            } else {
+                notify('error', 'Field Credit is not a valid value')
             }
 
         })
@@ -221,14 +222,6 @@
             if (e.which === 13) {
                 var index = $('.inputs_val').index(this) + 1;
                 $('.inputs_val').eq(index).focus().select();
-            }
-        });
-
-        $(".all_box").change(function() {
-            if(this.checked) {
-                $('.each-check-box').prop('checked', true);
-            } else {
-                $('.each-check-box').prop('checked', false);
             }
         });
 

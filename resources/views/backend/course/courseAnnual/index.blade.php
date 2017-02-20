@@ -108,7 +108,7 @@
                             @endauth
 
                             @permission('view-all-score-course-annual')
-                            {{--<button class="btn btn-warning btn-sm" id="all_score_course_annual"><i class="fa fa-eye"></i> View Total Score </button>--}}
+                            <button class="btn btn-warning btn-sm" id="all_score_course_annual"><i class="fa fa-eye"></i> View Total Score </button>
                             @endauth
                         </div>
                     </div>
@@ -121,14 +121,17 @@
             <div class="box-body">
                 <div class="row">
                     <div class="col-md-7" style="min-height: 15px; padding: 0 30px 15px 30px;" id="filter_panel">
+
                         {!! Form::select('academic_year',$academicYears,null, array('class'=>'','id'=>'filter_academic_year')) !!}
                         {!! Form::select('department',$departments,$department_id, array('class'=>'','id'=>'filter_department','placeholder'=>'Dept.')) !!}
+
                         <select id="department_option_id" name="department_option_id">
                             <option value="" selected></option>
                             @foreach($options as $option)
                                 <option value="{{$option->id}}" class="department_option department_{{$option->department_id}}" style="display: none">{{$option->code}}</option>
                             @endforeach
                         </select>
+
                         {!! Form::select('semester',$semesters,null, array('class'=>'','id'=>'filter_semester','placeholder'=>'Semester')) !!}
                         {!! Form::select('degree',$degrees,null, array('class'=>'','id'=>'filter_degree','placeholder'=>'Degree')) !!}
                         {!! Form::select('grade',$grades,null, array('class'=>'','id'=>'filter_grade','placeholder'=>'Year')) !!}
@@ -198,7 +201,7 @@
                             d.semester = $('#filter_semester').val();
                             d.lecturer = $('#filter_lecturer').val();
                             d.student_group = $('#filter_student_group').val();
-                            d.dept_option = $('#filter_dept_option').val();
+                            d.dept_option = $('#department_option_id').val();
                         }
                     },
 
@@ -261,6 +264,16 @@
                 $(".department_"+department_id).show();
                 e.preventDefault();
             });
+
+            $(document).ready(function() {
+                if(val = $('#filter_department :selected').val()) {
+
+                    $(".department_option").hide();
+                    $(".department_"+val).show();
+                }
+            });
+
+
             @if($lecturers != null)
             $('#filter_lecturer').on('change', function(e) {
                 oTable.draw();
@@ -273,13 +286,14 @@
                 e.preventDefault();
             });
 
-            $(document).on('change', '#filter_student_group', function() {
+            $(document).on('change', '#filter_student_group', function(e) {
                 oTable.draw();
                 e.preventDefault();
             })
 
-            $(document).on('change', '#filter_dept_option', function() {
+            $(document).on('change', '#department_option_id', function(e) {
                 oTable.draw();
+//                alert($(this).val());
                 e.preventDefault();
             });
 
@@ -579,8 +593,14 @@
 
         $(document).on('click', '#all_score_course_annual', function(e) {
 
+            var url_score = '{{route('course_annual.form_all_score_properties')}}'
+            var height = $(window).height();
+            var width = $(window).width();
 
-            swal({
+            PopupCenterDual(url_score,'course assignment',width,height);
+
+
+            /*swal({
                 title: "Attention",
                 text: "Sorry We are working on this module now, so please wait!",
                 type: "info",
@@ -591,32 +611,31 @@
                 if (confirmed) {
 
                 }
-            });
-
+            });*/
 
             /*
             {{--var  baseUrl = '{{route('admin.course.get_form_evaluation_score')}}';--}}
-            @if($department_id != null)
+            {{--@if($department_id != null)--}}
                 var baseData = {
                             academic_year_id: $('#filter_academic_year :selected').val(),
                             degree_id : $('#filter_degree :selected').val(),
                             grade_id: $('#filter_grade :selected').val(),
                             department_id:'{{$department_id}}',
                             semester_id:$('#filter_semester :selected').val(),
-                            dept_option_id: $('#filter_dept_option :selected').val(),
+                            depatment_option_id: $('#department_option_id :selected').val(),
                             group_name: $('#filter_student_group :selected').val()
                         };
-            @else
+            {{--@else--}}
                 var baseData = {
                             academic_year_id: $('#filter_academic_year :selected').val(),
                             degree_id : $('#filter_degree :selected').val(),
                             grade_id: $('#filter_grade :selected').val(),
                             department_id:$('#filter_department :selected').val(),
                             semester_id:$('#filter_semester :selected').val(),
-                            dept_option_id: $('#filter_dept_option :selected').val(),
+                            depatment_option_id: $('#depatment_option_id :selected').val(),
                             group_name: $('#filter_student_group :selected').val()
                         };
-            @endif
+            {{--@endif--}}
             if(baseData.academic_year_id != null) {
                 if(baseData.degree_id) {
                     if(baseData.grade_id) {
@@ -627,8 +646,7 @@
                                             '&grade_id='+baseData.grade_id+
                                             '&department_id='+baseData.department_id+
                                             '&semester_id='+baseData.semester_id+
-                                            '&dept_option_id='+baseData.dept_option_id+
-                                            '&group_name='+baseData.group_name
+                                            '&department_option_id='+baseData.depatment_option_id
                             );
 
                         } else {
@@ -642,7 +660,9 @@
                 } else {
                     notify('error', 'Degree Not Selected!!', 'info');
                 }
-            }*/
+            }
+
+            */
 
 
 

@@ -1,218 +1,217 @@
-@extends ('backend.layouts.master')
+@extends ('backend.layouts.popup_master')
 
-@section ('title', trans('labels.backend.courseAnnuals.title') . ' | ' . trans('labels.backend.courseAnnuals.sub_edit_title'))
+@section ('title', 'Course Annual' . ' | ' . 'Total Score Annually')
 
-@section('page-header')
-
-
-    <style>
-
-        .handsontable td.area {
-            background-color: black;
-        }
-
-        /*.ht_master tr > td:nth-of-type(odd) {*/
-            /*background-color: #f00;*/
-        /*}*/
-
-        /*!* Every even column *!*/
-        /*.ht_master tr > td:nth-of-type(even) {*/
-            /*background-color: #919291;*/
-        /*}*/
-
-        /* Every odd row */
-        /*.ht_master tr:nth-of-type(odd) > td {*/
-            /*background-color: #F7F8FF;*/
-        /*}*/
-
-         /*Every even row */
-        /*.ht_master tr:nth-of-type(even) > td {*/
-            /*background-color: #F7F8FF;*/
-        /*}*/
-
-
-        /*.ht_master tr:nth-of-type(50) > td {*/
-            /*background-color: #F7F8FF;*/
-        /*}*/
-        .popupdiv{
-            height:200px;
-            width: 600px;
-            background-color: red;
-            opacity: 60;
-
-        }
-
-        .drop-menu {
-            margin-top: 5px;
-        }
-
-        .pop_margin{
-            margin-right: 30px;
-        }
-
-        .margin-left2 {
-            margin-left: 5px;
-        }
-        .selection {
-            width: 80px;
-            font-size: 10pt;
-            height: 23px;
-            margin-left: 5px;
-
-        }
-        #filter_academic_year {
-            font-size: 10pt;
-            height: 23px;
-            margin-left: 5px;
-        }
-        #filter_semester{
-            font-size: 10pt;
-            height: 23px;
-            margin-left: 5px;
-        }
-        .h4 {
-            text-align: left;
-            margin-top: -3px !important;
-        }
-        .handsontable thead tr:first-child {
-            height: 120px !important;
-            vertical-align: middle !important;
-        }
-        .handsontable thead tr:nth-child(2) {
-            height: 50px !important;
-            vertical-align: middle !important;
-        }
-
-        .handsontable th {
-            white-space: normal !important;
-        }
-
-        .handsontable td {
-            color: #000 !important;
-        }
-
-        .current_row td{
-
-        gradient(to bottom,rgba(181,209,255,0.34) 0,rgba(181,209,255,0.34) 100%);
-            background-image: linear-gradient(rgba(181, 209, 255, 0.5) 0px, rgba(181, 209, 255, 0.341176) 100%);
-            background-position-x: initial;
-            background-position-y: initial;
-            background-size: initial;
-            background-repeat-x: initial;
-            background-repeat-y: initial;
-            background-attachment: initial;
-            background-origin: initial;
-            background-clip: initial;
-            background-color: #fff !important;
-        }
-    </style>
-
-
-    <div class="box-header with-border" style="margin-bottom: -25px !important;">
-        <div class="col-md-12 no-padding col-lg-12 col-sm-12">
-            <h4 for="year" class=" h4 col-md-4 no-padding col-lg-4 col-sm-4">{{$academicYear->name_latin}} /{{$department->code}} /{{$degree->name_en}}/ {{$grade->name_en}}</h4>
-
-            <div class="pull-right">
-                <select  name="academic_year" id="filter_academic_year" style="width: 100px;" class=" col-md-1 col-lg-1 col-sm-1">
-                    @foreach($academicYears as $key=>$year)
-                        @if($key == $academicYear->id)
-                            <option value="{{$key}}" selected> {{$year}}</option>
-                        @else
-                            <option value="{{$key}}"> {{$year}}</option>
-                        @endif
-                    @endforeach
-                </select>
-
-                <select  name="semester" id="filter_semester" style="width: 90px;" class=" col-md-1 col-lg-1 col-sm-1">
-                    <option value="">Semester</option>
-                    @foreach($semesters as $key=>$semester)
-                        @if($key == $semesterId)
-                            <option value="{{$key}}" selected> {{$semester}}</option>
-                        @else
-                            <option value="{{$key}}"> {{$semester}}</option>
-                        @endif
-                    @endforeach
-                </select>
-
-                <select  name="degree" id="filter_degree" class="selection col-md-1 col-lg-1 col-sm-1">
-                    <option value="">Degree</option>
-                    @foreach($degrees as $key=>$degreeName)
-                        @if($key == $degree->id)
-                            <option value="{{$key}}" selected> {{$degreeName}}</option>
-                        @else
-                            <option value="{{$key}}"> {{$degreeName}}</option>
-                        @endif
-                    @endforeach
-                </select>
-
-
-                <select  name="grade" id="filter_grade" class="selection col-md-1 col-lg-1 col-sm-1">
-                    <option value="">Grade</option>
-                    @foreach($grades as $key=>$gradeName)
-                        @if($key == $grade->id)
-                            <option value="{{$key}}" selected> {{$gradeName}}</option>
-                        @else
-                            <option value="{{$key}}"> {{$gradeName}}</option>
-                        @endif
-                    @endforeach
-                </select>
-
-                @if($deptOptions != null)
-                    <select  name="dept_option" id="filter_dept_option" class="selection col-md-1 col-lg-1 col-sm-1">
-                        <option value="">Division</option>
-                        @foreach($deptOptions as $option)
-                            @if($option->id == $deptOptionId)
-                                <option value="{{$option->id}}" selected> {{$option->name_en}}</option>
-                            @else
-                                <option value="{{$option->id}}"> {{$option->name_en}}</option>
-                            @endif
-
-                        @endforeach
-                    </select>
-
-                @else
-                    <select  name="department" id="filter_dept" class="selection col-md-1 col-lg-1 col-sm-1">
-                        <option value="">Department</option>
-                        @foreach($departments as $key=>$departmentName)
-                            @if($key == $department->id)
-                                <option value="{{$key}}" selected> {{$departmentName}}</option>
-                            @else
-                                <option value="{{$key}}"> {{$departmentName}}</option>
-                            @endif
-                        @endforeach
-                    </select>
-                @endif
-
-
-                <select  name="student_group" id="filter_group" class="selection col-md-1 col-lg-1 col-sm-1">
-                    <option value="">Groups</option>
-                    @foreach($allStudentGroups as $key=>$group)
-                        @if($group == $groupName)
-                            <option value="{{$key}}" selected> {{$group}}</option>
-                        @else
-                            <option value="{{$key}}"> {{$group}}</option>
-                        @endif
-                    @endforeach
-                </select>
-
-
-
-
-            </div>
-        </div>
-    </div><!-- /.box-header -->
-
-@endsection
 @section('content')
+
     <div class="box box-success">
 
-        <div class="box-body">
+        <style>
+
+            .handsontable td.area {
+                background-color: black;
+            }
+
+            /*.ht_master tr > td:nth-of-type(odd) {*/
+            /*background-color: #f00;*/
+            /*}*/
+
+            /*!* Every even column *!*/
+            /*.ht_master tr > td:nth-of-type(even) {*/
+            /*background-color: #919291;*/
+            /*}*/
+
+            /* Every odd row */
+            /*.ht_master tr:nth-of-type(odd) > td {*/
+            /*background-color: #F7F8FF;*/
+            /*}*/
+
+            /*Every even row */
+            /*.ht_master tr:nth-of-type(even) > td {*/
+            /*background-color: #F7F8FF;*/
+            /*}*/
+
+
+            /*.ht_master tr:nth-of-type(50) > td {*/
+            /*background-color: #F7F8FF;*/
+            /*}*/
+            .popupdiv{
+                height:200px;
+                width: 600px;
+                background-color: red;
+                opacity: 60;
+
+            }
+
+            .drop-menu {
+                margin-top: 5px;
+            }
+
+            .pop_margin{
+                margin-right: 30px;
+            }
+
+            .margin-left2 {
+                margin-left: 5px;
+            }
+            .selection {
+                width: 80px;
+                font-size: 10pt;
+                height: 23px;
+                margin-left: 5px;
+
+            }
+            #filter_academic_year {
+                font-size: 10pt;
+                height: 23px;
+                margin-left: 5px;
+            }
+            #filter_semester{
+                font-size: 10pt;
+                height: 23px;
+                margin-left: 5px;
+            }
+            .h4 {
+                text-align: left;
+                margin-top: -3px !important;
+            }
+            .handsontable thead tr:first-child {
+                height: 120px !important;
+                vertical-align: middle !important;
+            }
+            .handsontable thead tr:nth-child(2) {
+                height: 50px !important;
+                vertical-align: middle !important;
+            }
+
+            .handsontable th {
+                white-space: normal !important;
+            }
+
+            .handsontable td {
+                color: #000 !important;
+            }
+
+            .current_row td{
+
+            gradient(to bottom,rgba(181,209,255,0.34) 0,rgba(181,209,255,0.34) 100%);
+                background-image: linear-gradient(rgba(181, 209, 255, 0.5) 0px, rgba(181, 209, 255, 0.341176) 100%);
+                background-position-x: initial;
+                background-position-y: initial;
+                background-size: initial;
+                background-repeat-x: initial;
+                background-repeat-y: initial;
+                background-attachment: initial;
+                background-origin: initial;
+                background-clip: initial;
+                background-color: #fff !important;
+            }
+        </style>
+        <div class="box-header with-border">
+            <div class=" no-paddingcol-sm-12">
+                <h4 for="year" class=" col-md-4 no-padding col-lg-4 col-sm-4">{{$academicYear->name_latin}} /{{$department->code}} /{{$degree->name_en}}/ {{$grade->name_en}}</h4>
+
+
+                <div class="pull-right">
+                    <button class="btn btn-primary btn-xs col-sm-1" id="refresh_score_sheet" style="margin-left: -50px"><i class="fa fa-refresh"></i></button>
+
+                    <select  name="academic_year" id="filter_academic_year" style="width: 100px;" class=" col-sm-1">
+                        @foreach($academicYears as $key=>$year)
+                            @if($key == $academicYear->id)
+                                <option value="{{$key}}" selected> {{$year}}</option>
+                            @else
+                                <option value="{{$key}}"> {{$year}}</option>
+                            @endif
+                        @endforeach
+                    </select>
+
+                    <select  name="semester" id="filter_semester" style="width: 90px;" class=" col-sm-1">
+                        <option value="">Semester</option>
+                        @foreach($semesters as $key=>$semester)
+                            @if($key == $semesterId)
+                                <option value="{{$key}}" selected> {{$semester}}</option>
+                            @else
+                                <option value="{{$key}}"> {{$semester}}</option>
+                            @endif
+                        @endforeach
+                    </select>
+
+                    <select  name="degree" id="filter_degree" class="selection  col-sm-1">
+                        <option value="">Degree</option>
+                        @foreach($degrees as $key=>$degreeName)
+                            @if($key == $degree->id)
+                                <option value="{{$key}}" selected> {{$degreeName}}</option>
+                            @else
+                                <option value="{{$key}}"> {{$degreeName}}</option>
+                            @endif
+                        @endforeach
+                    </select>
+
+
+                    <select  name="grade" id="filter_grade" class="selection col-sm-1">
+                        <option value="">Grade</option>
+                        @foreach($grades as $key=>$gradeName)
+                            @if($key == $grade->id)
+                                <option value="{{$key}}" selected> {{$gradeName}}</option>
+                            @else
+                                <option value="{{$key}}"> {{$gradeName}}</option>
+                            @endif
+                        @endforeach
+                    </select>
+
+
+                    @if($deptOptions != null)
+
+                        <select  name="dept_option" id="filter_dept_option" class="selection col-sm-1">
+                            <option value="">Division</option>
+                            @foreach($deptOptions as $option)
+
+                                @if($option->id == $deptOptionId)
+                                    <option value="{{$option->id}}" selected> {{$option->name_en}}</option>
+                                @else
+                                    <option value="{{$option->id}}"> {{$option->name_en}}</option>
+                                @endif
+
+                            @endforeach
+                        </select>
+
+                    @else
+
+                        <select  name="department" id="filter_dept" class="selection col-sm-1">
+                            <option value="">Department</option>
+                            @foreach($departments as $key=>$departmentName)
+                                @if($key == $department->id)
+                                    <option value="{{$key}}" selected> {{$departmentName}}</option>
+                                @else
+                                    <option value="{{$key}}"> {{$departmentName}}</option>
+                                @endif
+                            @endforeach
+                        </select>
+                    @endif
+
+
+                    <select  name="student_group" id="filter_group" class="selection col-sm-1">
+                        <option value="">Groups</option>
+                        @foreach($allStudentGroups as $key=>$group)
+                            <option value="{{$key}}"> {{$group}}</option>
+                        @endforeach
+                    </select>
+
+                </div>
+            </div>
+
+
+
+        </div>
+        <!-- /.box-header -->
+        <div class="box-body panel">
             <div id="all_score_course_annual_table" class="table table-striped handsontable htColumnHeaders">
 
             </div>
+
         </div>
 
-    </div><!--box-->
+    </div>
 @stop
 
 @section('after-scripts-end')
@@ -282,12 +281,12 @@
 
         };
 
-        var numberOfStudents = '{{isset($students)?count($students):0}}';
 
         var table_width;
         var hotInstance;
         var setting = {
             readOnly:true,
+            rowHeaders: false,
             manualColumnMove: false,
             manualColumnResize: false,
             manualRowResize: false,
@@ -325,6 +324,7 @@
             },
             afterGetCellMeta: function () {
                 return false;
+//                setSelectedRow();
             },
             afterSelectionEnd: function() {
                 setSelectedRow();
@@ -363,7 +363,6 @@
                 academic_year_id: '{{$academicYear->id}}',
                 semester_id:'{{$semesterId}}',
                 dept_option_id: '{{$deptOptionId}}',
-                group_name: '{{$groupName}}'
             }
 
             //--------------- when document ready call ajax
@@ -373,6 +372,7 @@
                 data:BaseData ,
                 dataType: "json",
                 success: function(resultData) {
+                    console.log(resultData);
                     if(resultData.status == false) {
 
                         notify('error', 'info', resultData.message);
@@ -534,16 +534,6 @@
                 });
             });
 
-
-            $('.sidebar-toggle').on('click', function() {
-
-//                var table_width = $('.box-body').width();
-//                setting.width = table_width;
-//                hotInstance.updateSettings({
-//                    width: table_width
-//                });
-
-            })
         });
 
         $('#filter_academic_year').on('change', function() {
@@ -568,9 +558,9 @@
 
         function filter_table () {
 
-            @if($department_id != null)
+                    @if($department_id != null)
 
-                var BaseData = {
+            var BaseData = {
                         dept_id: '{{$department_id}}',
                         degree_id: $('#filter_degree :selected').val(),
                         grade_id: $('#filter_grade :selected').val(),
@@ -578,17 +568,17 @@
                         semester_id:$('#filter_semester :selected').val(),
                         dept_option_id: $('#filter_dept_option :selected').val(),
                         group_name: $('#filter_group :selected').val()
-                }
-            @else
-                var BaseData = {
-                    dept_id: $('#filter_dept :selected').val(),
-                    degree_id: $('#filter_degree :selected').val(),
-                    grade_id: $('#filter_grade :selected').val(),
-                    academic_year_id: $('#filter_academic_year :selected').val(),
-                    semester_id:$('#filter_semester :selected').val(),
-                    dept_option_id: $('#filter_dept_option :selected').val(),
-                    group_name: $('#filter_group :selected').val()
-                }
+                    }
+                    @else
+            var BaseData = {
+                        dept_id: $('#filter_dept :selected').val(),
+                        degree_id: $('#filter_degree :selected').val(),
+                        grade_id: $('#filter_grade :selected').val(),
+                        academic_year_id: $('#filter_academic_year :selected').val(),
+                        semester_id:$('#filter_semester :selected').val(),
+                        dept_option_id: $('#filter_dept_option :selected').val(),
+                        group_name: $('#filter_group :selected').val()
+                    }
             @endif
             $.ajax({
                 type: 'GET',
@@ -603,7 +593,7 @@
 
         function updateSettingHandsontable(resultData) {
 
-            console.log(resultData)
+//            console.log(resultData)
             setting.data = resultData.data;
             setting.nestedHeaders = resultData.nestedHeaders;
             setting.colWidths = resultData.colWidths;
@@ -616,5 +606,12 @@
         }
 
 
+        $('#refresh_score_sheet').on('click', function() {
+            filter_table();
+        })
+
+
     </script>
+
+
 @stop

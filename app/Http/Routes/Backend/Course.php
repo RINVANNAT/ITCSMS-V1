@@ -105,6 +105,8 @@ Route::group([
     Route::get('course-annual/get-all-data-course-annual-score', 'CourseAnnualController@allHandsontableData')->name('admin.course.get_all_handsontable_data');
     Route::get('course-annual/filter-course-annual-scores', 'CourseAnnualController@allHandsontableData')->name('admin.course.filter_course_annual_scores');
 
+    Route::get('course-annual/-get-form-all-score-properties', 'CourseAnnualController@formAllScoreSelection')->name('course_annual.form_all_score_properties');
+
 
 
 
