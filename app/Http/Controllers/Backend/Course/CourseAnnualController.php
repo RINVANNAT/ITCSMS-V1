@@ -2022,10 +2022,12 @@ class CourseAnnualController extends Controller
 
             $studentByCourse = $studentByCourse->whereIn('studentAnnuals.group', $groups)->get();
         } else {
-            $studentByCourse = $studentByCourse->get();
+            $studentByCourse = $studentByCourse->orderBy('students.name_latin')->get();
         }
+        usort($studentByCourse, function($a, $b) {
+            return strcmp(strtolower($a->name_latin), strtolower($b->name_latin));
+        });
 
-//        dd($studentByCourse);
 
         //----------------find student score if they have inserted
 
@@ -2248,7 +2250,7 @@ class CourseAnnualController extends Controller
                 'studentAnnuals.department_option_id',
                 'studentAnnuals.degree_id'
             )
-            ->orderBy('students.id_card', 'ASC');
+            ->orderBy('students.name_latin');
         return $studentAnnual;
     }
 
