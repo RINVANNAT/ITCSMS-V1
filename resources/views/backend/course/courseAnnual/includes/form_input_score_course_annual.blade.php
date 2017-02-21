@@ -376,17 +376,17 @@
             <button class="btn btn-primary btn-xs pull-right" id="save_editted_score" style="margin-left:5px">Save Changes!</button>
             <a class="btn btn-primary btn-xs pull-right" id="export_score" href="{{route('course_annual.export_course_score_annual')}}" target="_blank" style="margin-left:5px">Export Score</a>
             <a href="{{route('course_annual.form_import_score')}}" target="_self" class="btn btn-info btn-xs pull-right" id="import_score" style="margin-left: 5px"> Import Score</a>
-            <div class="btn-group pull-right btn_action_group">
+            {{--<div class="btn-group pull-right btn_action_group">--}}
 
-                <button type="button" class="btn btn-warning btn-xs dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
-                    Actions <span class="caret"></span>
-                </button>
-                <ul class="dropdown-menu" role="menu">
+                {{--<button type="button" class="btn btn-warning btn-xs dropdown-toggle" data-toggle="dropdown" aria-expanded="false">--}}
+                    {{--Actions <span class="caret"></span>--}}
+                {{--</button>--}}
+                {{--<ul class="dropdown-menu" role="menu">--}}
 
-                    <li class="drop-menu"> <a href="#"  id="add_column"> <i class="fa fa-plus"> Add Score</i></a></li>
-                    <li class="drop-menu"> <a href="#"  id="get_average"> <i class="fa fa-circle-o-notch"> Generate Average</i></a></li>
-                </ul>
-            </div><!--btn group-->
+                    {{--<li class="drop-menu"> <a href="#"  id="add_column"> <i class="fa fa-plus"> Add Score</i></a></li>--}}
+                    {{--<li class="drop-menu"> <a href="#"  id="get_average"> <i class="fa fa-circle-o-notch"> Generate Average</i></a></li>--}}
+                {{--</ul>--}}
+            {{--</div><!--btn group-->--}}
         </div><!-- /.box-header -->
 
         <div class="box-body">
@@ -410,6 +410,14 @@
     {{--myscript--}}
 
     <script>
+
+
+
+        @if($courseAnnual->is_counted_absence)
+                var is_counted_absence = parseInt('{{\App\Models\Enum\ScoreEnum::is_counted_absence}}')
+        @else
+                var is_counted_absence = 0;
+        @endif
 
         function setSelectedRow() {
 
@@ -459,9 +467,13 @@
         function declareColumnHeaderDataEmpty() {
             // create empty array by the columns score which user created
             // because we want to store data cell changes by column and send them to the server by one column ...not all columns at once
-            for(var i = 5; i < setting.colHeaders.length -1 ; i++) {
+            for(var i = 0; i < setting.colHeaders.length -1 ; i++) {
                 colDataArray[setting.colHeaders[i]] = [];
+
+//                console.log(colDataArray);
             }
+
+
         }
         // use this function to update the table when success of ajax request
         function updateSettingHandsontable(resultData) {
@@ -785,12 +797,13 @@
                         setting.data = resultData.data;
                         setting.colHeaders = resultData.columnHeader;
                         setting.columns = resultData.columns;
-                        if(!resultData.should_add_score) {
-                            $('.btn_action_group').hide();
-                        }
+//                        if(!resultData.should_add_score) {
+//                            $('.btn_action_group').hide();
+//                        }
 //                    setting.colWidths = resultData.colWidths;
                         // loop for declaring array key of columns score with empty value ---> then we will push the cell score change for updating score value--> this idea is to reduce the amount of parametter that pass to the server
                         declareColumnHeaderDataEmpty();
+
                         var table_size = $('.box-body').width();
                         var mainHeaderHeight = $('.main-header').height();
                         var mainFooterHeight = $('.main-footer').height();
@@ -948,7 +961,6 @@
 
                     } else {
 
-
                         swal({
                             title: "Confirm",
                             text: resultData.message,
@@ -1081,11 +1093,16 @@
                 }
             });
 
+
+
             var url = '{{route('admin.course.save_number_absence')}}';
 
             if(cellIndex.length > 0) {
 
+
                 if(objectStatus.status == true) {
+
+
 
                     if(cellChanges.length > 0 || cellScoreChanges.length >0) {
                         swal({
@@ -1101,10 +1118,15 @@
 
                                 if(cellScoreChanges.length > 0) {// save each score
 
+
+                                    alert(is_counted_absence);
+
                                     //recursive function fo send the request by the column data array
                                     function sendRequest (index, message) {
 
                                         var saveBaseUrl = '{{route('admin.course.save_score_course_annual')}}';
+
+                                        console.log();
 
                                         if(index < setting.colHeaders.length -1) {
 
@@ -1132,7 +1154,14 @@
                                             notify('success', 'Score Saved!', 'Info');
                                         }
                                     }
-                                    var index = 5;
+
+
+                                    if(is_counted_absence == parseInt('{{\App\Models\Enum\ScoreEnum::is_counted_absence}}') ) {
+                                        var index = 5; // ---count header column --with absence
+                                    } else {
+                                        var index = 3; // ---count header column-- without absence
+                                    }
+
                                     var message = null;
                                     sendRequest(index, message);
                                     cellScoreChanges=[];
@@ -1370,7 +1399,6 @@
          @if(session('status'))
             notify('success', '{{session('status')}}', 'Info')
         @endif
-
 
     </script>
 @stop

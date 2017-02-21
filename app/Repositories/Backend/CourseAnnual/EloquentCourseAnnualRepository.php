@@ -67,6 +67,18 @@ class EloquentCourseAnnualRepository implements CourseAnnualRepositoryContract
             $courseAnnual->responsible_department_id = $input["responsible_department_id"];
         }
 
+        if(isset($input["is_counted_absence"])){
+            $courseAnnual->is_counted_absence = true;
+        } else {
+            $courseAnnual->is_counted_absence = false;
+        }
+
+        if(isset($input["is_counted_creditability"])){
+            $courseAnnual->is_counted_creditability = true;
+        } else {
+            $courseAnnual->is_counted_creditability = false;
+        }
+
         $courseAnnual->course_id = $input['course_id'];
         $courseAnnual->employee_id = isset($input['employee_id'])?$input['employee_id']:null;
 
@@ -173,6 +185,18 @@ class EloquentCourseAnnualRepository implements CourseAnnualRepositoryContract
         }
         if(isset($input["credit"]) && $input["credit"] != '') {
             $courseAnnual->credit = $input['credit'];
+        }
+
+        if(isset($input["is_counted_absence"])){
+            $courseAnnual->is_counted_absence = true;
+        } else {
+            $courseAnnual->is_counted_absence = false;
+        }
+
+        if(isset($input["is_counted_creditability"])){
+            $courseAnnual->is_counted_creditability = true;
+        } else {
+            $courseAnnual->is_counted_creditability = false;
         }
 
         $courseAnnual->updated_at = Carbon::now();

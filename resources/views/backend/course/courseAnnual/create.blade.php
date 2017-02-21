@@ -11,6 +11,13 @@
 
 @section('after-styles-end')
     {!! Html::style('plugins/select2/select2.min.css') !!}
+    <style>
+        .boolean_input{
+            width: 20px;
+            height: 20px;
+        }
+    </style>
+
 @stop
 
 @section('content')
@@ -125,14 +132,6 @@
                 load_group('{{\App\Models\Enum\CourseAnnualEnum::CREATE}}');
             });
 
-            if(val = $('select#midterm_score_id :selected').val()) {
-
-                $('#final_score_id').val(parseInt('{{\App\Models\Enum\ScoreEnum::Midterm_Final}}') - val);
-            }
-
-            $('select[name=midterm_score]').on('change', function() {
-                $('#final_score_id').val(parseInt('{{\App\Models\Enum\ScoreEnum::Midterm_Final}}') - $(this).val());
-            });
 
             $('Document').ready(function() {
                 if($('#course_id :selected').val()) {
@@ -149,6 +148,52 @@
                 setSelectedField();
                 load_group('{{\App\Models\Enum\CourseAnnualEnum::CREATE}}');
             });
+
+
+
+            $(document).ready(function() {
+
+                $('#count_absence').on('change', function() {
+                    if(this.checked) {
+                        if(val = $('select#midterm_score_id :selected').val()) {
+                            $('#final_score_id').val(parseInt('{{\App\Models\Enum\ScoreEnum::Midterm_Final}}') - val);
+                        }
+
+                        $('select[name=midterm_score]').on('change', function() {
+                            $('#final_score_id').val(parseInt('{{\App\Models\Enum\ScoreEnum::Midterm_Final}}') - $(this).val());
+                        });
+                    } else {
+                        if(val = $('select#midterm_score_id :selected').val()) {
+                            $('#final_score_id').val(parseInt('{{\App\Models\Enum\ScoreEnum::Highest_Score}}') - val);
+                        }
+
+                        $('select[name=midterm_score]').on('change', function() {
+                            $('#final_score_id').val(parseInt('{{\App\Models\Enum\ScoreEnum::Highest_Score}}') - $(this).val());
+                        });
+                    }
+                })
+
+                if($("#count_absence").is(':checked')) {
+
+                    if(val = $('select#midterm_score_id :selected').val()) {
+                        $('#final_score_id').val(parseInt('{{\App\Models\Enum\ScoreEnum::Midterm_Final}}') - val);
+                    }
+
+                    $('select[name=midterm_score]').on('change', function() {
+                        $('#final_score_id').val(parseInt('{{\App\Models\Enum\ScoreEnum::Midterm_Final}}') - $(this).val());
+                    });
+                } else {
+
+                    if(val = $('select#midterm_score_id :selected').val()) {
+                        $('#final_score_id').val(parseInt('{{\App\Models\Enum\ScoreEnum::Highest_Score}}') - val);
+                    }
+
+                    $('select[name=midterm_score]').on('change', function() {
+                        $('#final_score_id').val(parseInt('{{\App\Models\Enum\ScoreEnum::Highest_Score}}') - $(this).val());
+                    });
+                }
+
+            })
 
         })
     </script>

@@ -162,6 +162,31 @@
 </div>
 
 
+<div class="form-group">
+
+    {!! Form::label('count_creditability', "Creditability For Transcript", ['class' => 'col-lg-3 control-label required']) !!}
+    <div class="col-lg-2">
+        <input type="checkbox" name="is_counted_creditability" id="count_credit" class="boolean_input" value="{{\App\Models\Enum\ScoreEnum::is_counted_creditability}}" checked>
+    </div>
+
+    {!! Form::label('count_absence', "Count Score Absence", ['class' => 'col-lg-2 control-label required']) !!}
+
+    <div class="col-lg-3">
+        @if(isset($courseAnnual))
+            @if($courseAnnual->is_counted_absence)
+                <input type="checkbox" name="is_counted_absence" id="count_absence" class="boolean_input" value="{{\App\Models\Enum\ScoreEnum::is_counted_absence}}" checked>
+            @else
+                <input type="checkbox" name="is_counted_absence" id="count_absence" class="boolean_input" value="{{\App\Models\Enum\ScoreEnum::is_counted_absence}}">
+            @endif
+        @else
+            <input type="checkbox" name="is_counted_absence" id="count_absence" class="boolean_input" value="{{\App\Models\Enum\ScoreEnum::is_counted_absence}}" checked>
+        @endif
+
+    </div>
+
+</div>
+
+
 @if(isset($midterm) && isset($final))
 
     <div class="form-group">
@@ -170,7 +195,7 @@
             <select name="midterm_score" id="midterm_score_id" class="form-control">
 
                 @if($midterm['percentage'] == \App\Models\Enum\ScoreEnum::Midterm_30)
-
+                    <option value="{{\App\Models\Enum\ScoreEnum::Midterm_0}}" > 0% </option>
                     <option value="{{\App\Models\Enum\ScoreEnum::Midterm_30}}" selected > 30% </option>
                     <option value="{{\App\Models\Enum\ScoreEnum::Midterm_40}}"> 40%</option>
 
@@ -178,7 +203,19 @@
                     <input type="hidden" name="final_percentage_id" value="{{$final['percentage_id']}}">
 
 
+
+                @elseif($midterm['percentage'] == \App\Models\Enum\ScoreEnum::Midterm_0)
+
+                    <option value="{{\App\Models\Enum\ScoreEnum::Midterm_0}}" selected> 0% </option>
+                    <option value="{{\App\Models\Enum\ScoreEnum::Midterm_30}}"> 30% </option>
+                    <option value="{{\App\Models\Enum\ScoreEnum::Midterm_40}}"> 40% </option>
+
+                    <input type="hidden" name="midterm_percentage_id" value="{{$midterm['percentage_id']}}">
+                    <input type="hidden" name="final_percentage_id" value="{{$final['percentage_id']}}">
+
                 @else
+
+                    <option value="{{\App\Models\Enum\ScoreEnum::Midterm_0}}"> 0% </option>
                     <option value="{{\App\Models\Enum\ScoreEnum::Midterm_30}}"> 30% </option>
                     <option value="{{\App\Models\Enum\ScoreEnum::Midterm_40}}" selected> 40% </option>
 
@@ -201,6 +238,7 @@
         {!! Form::label('midterm_score', "Midterm Score", ['class' => 'col-lg-3 control-label required']) !!}
         <div class="col-lg-2">
             <select name="midterm_score" id="midterm_score_id" class="form-control">
+                <option value="{{\App\Models\Enum\ScoreEnum::Midterm_0}}">  0% </option>
                 <option value="{{\App\Models\Enum\ScoreEnum::Midterm_30}}"> 30% </option>
                 <option value="{{\App\Models\Enum\ScoreEnum::Midterm_40}}"> 40%</option>
             </select>

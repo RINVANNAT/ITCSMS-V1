@@ -20,7 +20,9 @@ class CourseAnnual extends Model
         "department_id",
         "is_allow_scoring",
         "responsible_department_id",
-        "department_option_id"
+        "department_option_id",
+        "is_counted_creditablility",
+        "is_counted_absence"
 	];
 
     public function creator(){
