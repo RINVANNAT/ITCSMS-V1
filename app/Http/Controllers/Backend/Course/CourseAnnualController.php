@@ -3753,15 +3753,27 @@ class CourseAnnualController extends Controller
                 return redirect(route('admin.course.form_input_score_course_annual', $courseAnnualId))->with(['status_student' => $arrayMissedStudent]);
             } else {
 
-                dd((CourseAnnualController::$ifScoreImported/CourseAnnualController::$countStudentScoreType) .'=='. count($students).'& '.(CourseAnnualController::$ifAbsenceUpdated + CourseAnnualController::$ifAbsenceCreated) .'=='. count($students));
-
-                if( ((CourseAnnualController::$ifScoreImported/CourseAnnualController::$countStudentScoreType) == count($students)) || ( (CourseAnnualController::$ifAbsenceUpdated + CourseAnnualController::$ifAbsenceCreated) == count($students) ) ) {
-                    $status = 'File Imported!';
+//                dd((CourseAnnualController::$ifScoreImported/CourseAnnualController::$countStudentScoreType) .'=='. count($students).'& '.(CourseAnnualController::$ifAbsenceUpdated + CourseAnnualController::$ifAbsenceCreated) .'=='. count($students));
+                if($courseAnnual->is_counted_absence) {
+                    if( ((CourseAnnualController::$ifScoreImported/CourseAnnualController::$countStudentScoreType) == count($students)) || ( (CourseAnnualController::$ifAbsenceUpdated + CourseAnnualController::$ifAbsenceCreated) == count($students) ) ) {
+                        $status = 'File Imported!';
 //                    return view('backend.course.courseAnnual.includes.form_input_score_course_annual', compact('courseAnnualId', 'courseAnnual', 'availableCourses', 'status'));
 
-                    return redirect(route('admin.course.form_input_score_course_annual', $courseAnnualId))->with(['status' => 'File Imported']);
+                        return redirect(route('admin.course.form_input_score_course_annual', $courseAnnualId))->with(['status' => 'File Imported']);
+                    } else {
+                        return redirect()->back()->with(['status'=> 'Something went wrong']);
+                    }
                 } else {
-                    return redirect()->back()->with(['status'=> 'Something went wrong']);
+
+                    if( ((CourseAnnualController::$ifScoreImported/CourseAnnualController::$countStudentScoreType) == count($students)) ) {
+                        $status = 'File Imported!';
+//                    return view('backend.course.courseAnnual.includes.form_input_score_course_annual', compact('courseAnnualId', 'courseAnnual', 'availableCourses', 'status'));
+
+                        return redirect(route('admin.course.form_input_score_course_annual', $courseAnnualId))->with(['status' => 'File Imported']);
+                    } else {
+                        return redirect()->back()->with(['status'=> 'Something went wrong']);
+                    }
+
                 }
             }
         } else {
@@ -3834,10 +3846,7 @@ class CourseAnnualController extends Controller
             $arrayPercentage[$percentage->score_id] = $strReplace;
         }
 
-
         return ($arrayPercentage);
-
-
 
     }
 
