@@ -1119,8 +1119,6 @@
                                 if(cellScoreChanges.length > 0) {// save each score
 
 
-                                    alert(is_counted_absence);
-
                                     //recursive function fo send the request by the column data array
                                     function sendRequest (index, message) {
 
@@ -1292,7 +1290,6 @@
                     declareColumnHeaderDataEmpty()
                 }
             });
-
         }
 
         function list_group(course_annual_id) {
@@ -1350,7 +1347,6 @@
             }
 
         });
-
 
         $('#import_score').on('click', function(e) {
             e.preventDefault();

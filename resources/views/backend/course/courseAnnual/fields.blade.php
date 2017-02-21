@@ -186,7 +186,6 @@
 
 </div>
 
-
 @if(isset($midterm) && isset($final))
 
     <div class="form-group">

@@ -2798,7 +2798,7 @@ class CourseAnnualController extends Controller
 
         // ------declare reqested data ------
 
-        dd($request->all());
+//        dd($request->all());
 
         $deptId = $request->dept_id;
         $degreeId = $request->degree_id;
@@ -3585,7 +3585,10 @@ class CourseAnnualController extends Controller
                                 CourseAnnualController::$countStudentScoreType = count($studentScoreIds);
                                 $percentage = $this->getPercentage();
 
+                                $test = [];
                                 foreach($studentScoreIds as $scoreId) {
+                                    $test[] = $percentage[$scoreId];
+
 
                                     if(array_key_exists(strtolower($percentage[$scoreId]), $row)) { // check the array key of score name
 
@@ -3618,7 +3621,9 @@ class CourseAnnualController extends Controller
                                     } else {
                                         CourseAnnualController::$isFileHasColumnScoreType[$percentage[$scoreId]]= $percentage[$scoreId];
                                     }
+
                                 }
+//                                dd($test);
 
                                 if(array_key_exists('abs', $row)) {
 
@@ -3748,9 +3753,9 @@ class CourseAnnualController extends Controller
                 return redirect(route('admin.course.form_input_score_course_annual', $courseAnnualId))->with(['status_student' => $arrayMissedStudent]);
             } else {
 
-//                dd((CourseAnnualController::$ifScoreImported/CourseAnnualController::$countStudentScoreType) .'=='. count($students).'& '.(CourseAnnualController::$ifAbsenceUpdated + CourseAnnualController::$ifAbsenceCreated) .'=='. count($students));
+                dd((CourseAnnualController::$ifScoreImported/CourseAnnualController::$countStudentScoreType) .'=='. count($students).'& '.(CourseAnnualController::$ifAbsenceUpdated + CourseAnnualController::$ifAbsenceCreated) .'=='. count($students));
 
-                if( ((CourseAnnualController::$ifScoreImported/CourseAnnualController::$countStudentScoreType) == count($students)) && ( (CourseAnnualController::$ifAbsenceUpdated + CourseAnnualController::$ifAbsenceCreated) == count($students) ) ) {
+                if( ((CourseAnnualController::$ifScoreImported/CourseAnnualController::$countStudentScoreType) == count($students)) || ( (CourseAnnualController::$ifAbsenceUpdated + CourseAnnualController::$ifAbsenceCreated) == count($students) ) ) {
                     $status = 'File Imported!';
 //                    return view('backend.course.courseAnnual.includes.form_input_score_course_annual', compact('courseAnnualId', 'courseAnnual', 'availableCourses', 'status'));
 
@@ -3829,7 +3834,10 @@ class CourseAnnualController extends Controller
             $arrayPercentage[$percentage->score_id] = $strReplace;
         }
 
+
         return ($arrayPercentage);
+
+
 
     }
 
