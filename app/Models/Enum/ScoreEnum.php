@@ -16,7 +16,7 @@ class ScoreEnum
     const Midterm_30 = 30;
     const Midterm_40 = 40;
     const Midterm_0 = 0;
-    const Col_Header = 7;
+    const Col_Header = 3;
     const Highest_Score = 100;
 
     const Name_Mid = 'midterm';

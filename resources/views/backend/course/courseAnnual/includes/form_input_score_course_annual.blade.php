@@ -1328,9 +1328,9 @@
 
             e.preventDefault();
             var colHeaders = setting.colHeaders
-            if(colHeaders.length > 7) {// we exactly knew the fixed column header so we just check if the couse has added the score column
+            if(colHeaders.length > 3) {// we exactly knew the fixed column header so we just check if the couse has added the score column
                 var url = $(this).attr('href');
-                window.open(url+'?course_annual_id='+ $('select[name=available_course] :selected').val()+'&col_headers='+colHeaders)
+                window.open(url+'?course_annual_id='+ $('select[name=available_course] :selected').val()+'&col_headers='+colHeaders+'&group='+$('select[name=group_name] :selected').val())
 
             } else {
 
@@ -1357,7 +1357,7 @@
             var url = $(this).attr('href');
             var colHeaders = setting.colHeaders
             if(colHeaders.length > parseInt('{{\App\Models\Enum\ScoreEnum::Col_Header}}')) {// we exactly knew the fixed column header so we just check if the couse has added the score column
-                window.open(url+'?course_annual_id='+$('select[name=available_course] :selected').val(), '_self');
+                window.open(url+'?course_annual_id='+$('select[name=available_course] :selected').val()+'&group='+$('select[name=group_name] :selected').val(), '_self');
 
             } else {
                 swal({

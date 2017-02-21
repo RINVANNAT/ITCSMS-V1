@@ -169,7 +169,7 @@
         <input type="checkbox" name="is_counted_creditability" id="count_credit" class="boolean_input" value="{{\App\Models\Enum\ScoreEnum::is_counted_creditability}}" checked>
     </div>
 
-    {!! Form::label('count_absence', "Count Score Absence", ['class' => 'col-lg-2 control-label required']) !!}
+    {!! Form::label('count_absence', " 10%-Absence", ['class' => 'col-lg-2 control-label required']) !!}
 
     <div class="col-lg-3">
         @if(isset($courseAnnual))

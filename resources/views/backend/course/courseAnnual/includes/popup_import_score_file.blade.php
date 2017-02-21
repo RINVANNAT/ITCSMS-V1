@@ -31,6 +31,8 @@
                     <div class="form-group col-sm-12 box-body with-border text-muted well well-sm no-shadow" style="padding: 20px;">
                         {!! Form::label('import','Selected File (csv, xls, xlsx)') !!}
                         {!! Form::file('import', null) !!}
+                        {{ Form::hidden('group',  ($group !=null)?$group:null, ['class' => 'form-control', 'id'=>'name_kh', 'required' => 'required']) }}
+
                     </div>
 
                 </div>

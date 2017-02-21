@@ -3381,7 +3381,7 @@ class CourseAnnualController extends Controller
     }
 
     public function switchCourseAnnual(Request $request) {
-        return $this->studentListScore($request->course_annual_id, $request->group);
+        return $this->handsonTableData($request->course_annual_id, $request->group);
     }
 
 
@@ -3410,6 +3410,8 @@ class CourseAnnualController extends Controller
 
     public function exportCourseScore(Request $request) {
 
+//        dd($request->all());
+
         $studentListScore=[];
         $colHeaders =explode(',',  $request->col_headers);
         $courseAnnual = $this->courseAnnuals->findOrThrowException($request->course_annual_id);
@@ -3431,17 +3433,32 @@ class CourseAnnualController extends Controller
         if(count($department_option_ids) > 0) {
             $students = $students->whereIn('studentAnnuals.department_option_id', $department_option_ids);
         }
-        if($groups) {
-            $students = $students->whereIn('studentAnnuals.group', $groups)->get();
+
+        if($group = $request->group) {
+            $students = $students->where('studentAnnuals.group', $group)->get();
         } else {
-            $students= $students->get();
+            if($groups) {
+                $students = $students->whereIn('studentAnnuals.group', $groups)->get();
+            } else {
+                $students= $students->get();
+            }
         }
 
         foreach($students as $student ) {
 
-            $studentScores = isset($allScoreByCourseAnnual[$courseAnnual->id][$student->student_annual_id])?$allScoreByCourseAnnual[$courseAnnual->id][$student->student_annual_id]:[];
-            $scoreAbsence = isset($allNumberAbsences[$courseAnnual->id][$student->student_annual_id])?$allNumberAbsences[$courseAnnual->id][$student->student_annual_id]:null;// get number of absence from database
             $totalScore = 0;
+
+            $studentScores = isset($allScoreByCourseAnnual[$courseAnnual->id][$student->student_annual_id])?$allScoreByCourseAnnual[$courseAnnual->id][$student->student_annual_id]:[];
+
+            if($courseAnnual->is_counted_absence) {
+                $scoreAbsence = isset($allNumberAbsences[$courseAnnual->id][$student->student_annual_id])?$allNumberAbsences[$courseAnnual->id][$student->student_annual_id]:null;// get number of absence from database
+                //--calculate score absence to sum with the real score
+                $totalCourseHours = ($courseAnnual->time_course + $courseAnnual->time_tp + $courseAnnual->time_td);
+                $scoreAbsenceByCourse =  number_format((float)((($totalCourseHours)-(isset($scoreAbsence)?$scoreAbsence->num_absence:0))*10)/((($totalCourseHours != 0)?$totalCourseHours:1)), 2, '.', '');
+                $totalScore = $totalScore + (($scoreAbsenceByCourse >= 0)?$scoreAbsenceByCourse:0);
+            }
+
+
             if($studentScores) {
                 foreach($studentScores as $score) {
                     $totalScore = $totalScore + ($score->score);// calculate score for stuent annual
@@ -3451,22 +3468,24 @@ class CourseAnnualController extends Controller
                 $scoreData=[];
             }
 
-            //--calculate score absence to sum with the real score
-            $totalCourseHours = ($courseAnnual->time_course + $courseAnnual->time_tp + $courseAnnual->time_td);
-            $scoreAbsenceByCourse =  number_format((float)((($totalCourseHours)-(isset($scoreAbsence)?$scoreAbsence->num_absence:0))*10)/((($totalCourseHours != 0)?$totalCourseHours:1)), 2, '.', '');
-            $totalScore = $totalScore + (($scoreAbsenceByCourse >= 0)?$scoreAbsenceByCourse:0);
-
-                    $element =[
-                        "Student ID" => $student->id_card,
-                        "Student Name" => $student->name_latin,
-                        "M/F"           => $student->code,
-                        "Abs"           => ($scoreAbsence)?$scoreAbsence->num_absence:0,
-                        "Abs-10%"       => $scoreAbsenceByCourse,
-                    ];
+            if($courseAnnual->is_counted_absence) {
+                $element =[
+                    "Student ID" => $student->id_card,
+                    "Student Name" => $student->name_latin,
+                    "M/F"           => $student->code,
+                    "Abs"           => ($scoreAbsence)?$scoreAbsence->num_absence:0,
+                    "Abs-10%"       => $scoreAbsenceByCourse,
+                ];
+            } else {
+                $element =[
+                    "Student ID" => $student->id_card,
+                    "Student Name" => $student->name_latin,
+                    "M/F"           => $student->code
+                ];
+            }
             $element = $element + $scoreData+ ["Total" =>$totalScore, "Notation" => isset($studentNotations[$student->student_annual_id])?$studentNotations[$student->student_annual_id]->description:''];
             $studentListScore[] = $element;
         }
-
 
         $courseName = explode(" ", $courseAnnual->name_en);
         $acronym = "";
@@ -3492,9 +3511,14 @@ class CourseAnnualController extends Controller
     }
 
     public function formImportScore(Request $request) {
-//        dd($request->all());
+
+        if($request->group) {
+            $group = $request->group;
+        } else {
+            $group = null;
+        }
         $courseAnnual = $this->courseAnnuals->findOrThrowException($request->course_annual_id);
-        return view('backend.course.courseAnnual.includes.popup_import_score_file', compact('courseAnnual'));
+        return view('backend.course.courseAnnual.includes.popup_import_score_file', compact('courseAnnual', 'group'));
     }
 
 
@@ -3524,8 +3548,16 @@ class CourseAnnualController extends Controller
                 base_path() . '/public/assets/uploaded_file/course_annuals/', $import
             );
             $storage_path = base_path() . '/public/assets/uploaded_file/course_annuals/'.$import;
-            $students = $this->getStudentByNameAndIdCard($courseAnnualId);
-            $absences = $this->getStudentAbsence($courseAnnualId);
+            $students = $this->getStudentByNameAndIdCard($courseAnnualId, $request->group);
+
+            //----if count not count 10% absence
+            if($courseAnnual->is_counted_absence) {
+                $absences = $this->getStudentAbsence($courseAnnualId);
+            } else {
+                $absences = null;
+            }
+
+
             $notations = $this->getStudentNotation($courseAnnualId);
 
             DB::beginTransaction();
@@ -3533,15 +3565,22 @@ class CourseAnnualController extends Controller
                 Excel::filter('chunk')->load($storage_path)->chunk(150, function($results) use ($students, $courseAnnualId, $courseAnnual, $absences, $notations){
 
                     $firstrow = $results->first()->toArray();
-                    if (isset($firstrow['student_id']) && isset($firstrow['student_name']) && array_key_exists("abs",$firstrow) && (count($firstrow)>7)) {
+
+                    if (isset($firstrow['student_id']) && isset($firstrow['student_name']) && (count($firstrow)>3)) {
+
                         $results->each(function($row) use($students, $courseAnnualId, $courseAnnual, $absences, $notations)  {
+
                             $row = $row->toArray();
                             $scoreIds = $this->getScoreId($courseAnnualId);
+
                             if(isset($students[$row['student_id']])) {
+
+                                //-----here we knew student has already intial the score of this course..so the upload file must contain students whom Id_card march with the record of score from DB
                                 $studentScoreIds = $scoreIds[$students[$row['student_id']]->student_annual_id];
                             } else {
                                 $studentScoreIds=[];
                             }
+
                             if(count($studentScoreIds) > 0) {
                                 CourseAnnualController::$countStudentScoreType = count($studentScoreIds);
                                 $percentage = $this->getPercentage();
@@ -3549,10 +3588,12 @@ class CourseAnnualController extends Controller
                                 foreach($studentScoreIds as $scoreId) {
 
                                     if(array_key_exists(strtolower($percentage[$scoreId]), $row)) { // check the array key of score name
+
                                         if( ($row[strtolower($percentage[$scoreId])] == null) || is_numeric($row[strtolower($percentage[$scoreId])]) ) {
 
                                             $explode = explode('_',strtolower($percentage[$scoreId]));
                                             $percent = $explode[count($explode)-1];
+
                                             if(  (((float)$row[strtolower($percentage[$scoreId])] <= (float)$percent) && ((float)$row[strtolower($percentage[$scoreId])] >= 0)) ) {
                                                 $input = [
                                                     'score'=> $row[strtolower($percentage[$scoreId])]
@@ -3579,52 +3620,59 @@ class CourseAnnualController extends Controller
                                     }
                                 }
 
-                                if(is_numeric($row['abs']) || ($row['abs'] == null)) { // ---absence column
+                                if(array_key_exists('abs', $row)) {
 
-                                    if( ( (float)($row['abs'] <= ($courseAnnual->time_course + $courseAnnual->time_td + $courseAnnual->time_tp)) && ((float)$row['abs'] >= 0)) ) {
+                                    if($absences != null) {
 
-                                        if(isset($absences[$students[$row['student_id']]->student_annual_id])) {
+                                        if(is_numeric($row['abs']) || ($row['abs'] == null)) { // ---absence column
 
-                                            $absence = $absences[$students[$row['student_id']]->student_annual_id];
+                                            if( ( (float)($row['abs'] <= ($courseAnnual->time_course + $courseAnnual->time_td + $courseAnnual->time_tp)) && ((float)$row['abs'] >= 0)) ) {
 
-                                            if($absence) {
-                                                //----update student absence
-                                                $input = [
-                                                    'num_absence' => $row['abs']
-                                                ];
-                                                $update = $this->absences->update($absence->id, $input);
-                                                if($update) {
-                                                    CourseAnnualController::$ifAbsenceUpdated++;
+                                                if(isset($absences[$students[$row['student_id']]->student_annual_id])) {
+
+                                                    $absence = $absences[$students[$row['student_id']]->student_annual_id];
+
+                                                    if($absence) {
+                                                        //----update student absence
+                                                        $input = [
+                                                            'num_absence' => $row['abs']
+                                                        ];
+                                                        $update = $this->absences->update($absence->id, $input);
+                                                        if($update) {
+                                                            CourseAnnualController::$ifAbsenceUpdated++;
+                                                        }
+                                                    }
+                                                } else {
+
+                                                    //----create student absence
+                                                    $input = [
+                                                        'course_annual_id' => $courseAnnualId,
+                                                        'student_annual_id' => $students[$row['student_id']]->student_annual_id,
+                                                        'num_absence'       => $row['abs']
+                                                    ];
+                                                    $store = $this->absences->create($input);
+                                                    if($store) {
+                                                        CourseAnnualController::$ifAbsenceCreated++;
+                                                    }
                                                 }
+                                            } else {
+
+                                                // the absence value is not in the conditioin
+                                                CourseAnnualController::$errorNumberAbsence = true;
+                                                DB::rollback();
                                             }
+
                                         } else {
-
-                                            //----create student absence
-                                            $input = [
-                                                'course_annual_id' => $courseAnnualId,
-                                                'student_annual_id' => $students[$row['student_id']]->student_annual_id,
-                                                'num_absence'       => $row['abs']
-                                            ];
-                                            $store = $this->absences->create($input);
-                                            if($store) {
-                                                CourseAnnualController::$ifAbsenceCreated++;
-                                            }
+                                            // the absence value is exactly string
+                                            CourseAnnualController::$errorNumberAbsence = true;
+                                            DB::rollback();
                                         }
-                                    } else {
-
-                                        // the absence value is not in the conditioin
-                                        CourseAnnualController::$errorNumberAbsence = true;
-                                        DB::rollback();
                                     }
 
-                                } else {
-                                    // the absence value is exactly string
-                                    CourseAnnualController::$errorNumberAbsence = true;
-                                    DB::rollback();
-                                }
+                                } //------end if course has counted absence score ---
+
 
                                 //----------store notation-------------
-
 
                                 if(isset($row['notation'])) { // ---notation column
 
@@ -3653,6 +3701,7 @@ class CourseAnnualController extends Controller
                                     }
                                 }
                             } else {
+                                //----here if the score ids of student does not exit ...it mean they miss out the student id-card or this student does not exist in our System
                                CourseAnnualController::$arrayMissedStudent[] = $row;
                             }
                         });
@@ -3691,9 +3740,7 @@ class CourseAnnualController extends Controller
             }
 
             DB::commit();
-            $dataSendToview = $this->dataSendToView($courseAnnualId);
-            $courseAnnual = $dataSendToview['course_annual'];
-            $availableCourses = $dataSendToview['available_course'];
+
             if(count(CourseAnnualController::$arrayMissedStudent) > 0) {
                 $message ='Some student are missing!';
                 $arrayMissedStudent = CourseAnnualController::$arrayMissedStudent;
@@ -3717,7 +3764,7 @@ class CourseAnnualController extends Controller
         }
     }
 
-    private function getStudentByNameAndIdCard($courseAnnualId) {
+    private function getStudentByNameAndIdCard($courseAnnualId, $request_group) {
 
 
         $arrayIdsOf_Dept_Grd_Deg_Group = $this->arrayIdsOfDeptGradeDegreeDeptOption($courseAnnualId);
@@ -3734,10 +3781,14 @@ class CourseAnnualController extends Controller
         if(count($department_option_ids)>0) {
             $students = $students->whereIn('studentAnnuals.department_option_id', $department_option_ids);
         }
-        if($groups) {
-            $students = $students->whereIn('studentAnnuals.group', $groups)->get();
+        if($request_group) {
+            $students = $students->where('studentAnnuals.group', $request_group)->get();
         } else {
-            $students = $students->get();
+            if($groups) {
+                $students = $students->whereIn('studentAnnuals.group', $groups)->get();
+            } else {
+                $students = $students->get();
+            }
         }
 
         foreach($students as $student) {
