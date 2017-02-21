@@ -271,13 +271,14 @@ class CourseAnnualController extends Controller
      */
     public function create(CreateCourseAnnualRequest $request)
     {
+        $other_departments = Department::where("parent_id",config('access.departments.department_academic'))->orderBy("code")->lists("code","id");
         if(auth()->user()->allow("view-all-score-in-all-department")){
             $courses = Course::orderBy('updated_at', 'desc')->get();
             // Get all department in case user have previlege to view all department
             $departments = Department::where("parent_id",config('access.departments.department_academic'))->orderBy("code")->lists("code","id");
             $department_id = null;
             $options = DepartmentOption::get();
-            $other_departments = Department::where("parent_id",config('access.departments.department_academic'))->orderBy("code")->lists("code","id");
+
             $raw_courses = Course::join('degrees','degrees.id','=','courses.degree_id')
                 ->join('departments','departments.id','=','courses.department_id')
                 ->leftJoin('departmentOptions','departmentOptions.id','=','courses.department_option_id')
@@ -309,10 +310,7 @@ class CourseAnnualController extends Controller
             $departments = $employee->department()->lists("code","id");
             $department_id = $employee->department->id;
             $options = DepartmentOption::where('department_id',$employee->department_id)->get();
-            $other_departments = Department::where("parent_id",config('access.departments.department_academic'))
-                                ->where("id", "!=", $employee->department_id)
-                                ->orderBy("code")
-                                ->lists("code","id");
+
             $raw_courses = Course::where('courses.department_id', $department_id)
                                 ->join('degrees','degrees.id','=','courses.degree_id')
                                 ->join('departments','departments.id','=','courses.department_id')
@@ -475,13 +473,14 @@ class CourseAnnualController extends Controller
             $groups[] = $group;
         }
 
+        $other_departments = Department::where("parent_id",config('access.departments.department_academic'))->orderBy("code")->lists("code","id");
         if(auth()->user()->allow("view-all-score-in-all-department")){
             //$courses = Course::orderBy('updated_at', 'desc')->get();
             // Get all department in case user have previlege to view all department
             $departments = Department::where("parent_id",config('access.departments.department_academic'))->orderBy("code")->lists("code","id");
             $department_id = null;
             $options = DepartmentOption::get();
-            $other_departments = Department::where("parent_id",config('access.departments.department_academic'))->orderBy("code")->lists("code","id");
+
             $raw_courses = Course::join('degrees','degrees.id','=','courses.degree_id')
                 ->join('departments','departments.id','=','courses.department_id')
                 ->leftJoin('departmentOptions','departmentOptions.id','=','courses.department_option_id')
@@ -511,10 +510,7 @@ class CourseAnnualController extends Controller
             $employee = Employee::where('user_id', Auth::user()->id)->first();
             $departments = $employee->department()->lists("code","id");
             $department_id = $employee->department->id;
-            $other_departments = Department::where("parent_id",config('access.departments.department_academic'))
-                ->where("id", "!=", $employee->department_id)
-                ->orderBy("code")
-                ->lists("code","id");
+
             $options = DepartmentOption::where('department_id',$employee->department_id)->get();
             $raw_courses = Course::where('courses.department_id', $department_id)
                 ->orWhere('courses.responsible_department_id',$employee->department_id)
@@ -772,7 +768,6 @@ class CourseAnnualController extends Controller
                             $action_edit_score.
                             $action_delete_score;
                 } else {
-                    $my_courses = CourseAnnual::where('employee_id',$employee->id)->lists('id')->toArray();
 
                     $actions = "";
 
@@ -782,6 +777,7 @@ class CourseAnnualController extends Controller
                     }
 
                     if(Auth::user()->allow('input-score-course-annual')) {
+                        $my_courses = CourseAnnual::where('employee_id',$employee->id)->lists('id')->toArray();
                         if(in_array($courseAnnual->id,$my_courses)){
                             $actions = $actions.$action_input_score;
                         }

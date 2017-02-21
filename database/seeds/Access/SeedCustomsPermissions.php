@@ -253,6 +253,20 @@ class SeedCustomsPermissions extends Seeder
                             'dependency' => [
                                 'view-backend','view-student-management'
                             ]
+                        ],
+                        [
+                            'name' => 'manage-student-reporting',
+                            'display_name' => 'Manage student reporting',
+                            'dependency' => [
+                                'view-backend','view-student-management'
+                            ]
+                        ],
+                        [
+                            'name' => 'export-student-list',
+                            'display_name' => 'Export student list',
+                            'dependency' => [
+                                'view-backend','view-student-management'
+                            ]
                         ]
                     ]
                 ]

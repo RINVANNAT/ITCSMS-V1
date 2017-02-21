@@ -19,6 +19,7 @@ use App\Models\StudentAnnual;
 use App\Repositories\Backend\Scholarship\ScholarshipRepositoryContract;
 use App\Repositories\Backend\Role\RoleRepositoryContract;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Maatwebsite\Excel\Facades\Excel;
 
@@ -151,9 +152,15 @@ class ScholarshipController extends Controller
                 return $scholarship->name_kh."<br/>".$scholarship->name_en."<br/>".$scholarship->name_fr;
             })
             ->addColumn('action', function ($scholarship) {
-                return  '<a href="'.route('admin.scholarships.edit',$scholarship->id).'" class="btn btn-xs btn-primary"><i class="fa fa-pencil" data-toggle="tooltip" data-placement="top" title="" data-original-title="'.trans('buttons.general.crud.edit').'"></i> </a>'.
-                ' <button class="btn btn-xs btn-danger btn-delete" data-remote="'.route('admin.scholarships.destroy', $scholarship->id) .'"><i class="fa fa-times" data-toggle="tooltip" data-placement="top" title="' . trans('buttons.general.crud.delete') . '"></i></button>'.
-                ' <a href="'.route('admin.scholarships.show',$scholarship->id).'" class="btn btn-xs btn-info"><i class="fa fa-eye" data-toggle="tooltip" data-placement="top" title="" data-original-title="'.trans('buttons.general.crud.view').'"></i> </a>';
+                $actions = "";
+                if(Auth::user()->allow('edit-scholarships')) {
+                    $actions = $actions.'<a href="'.route('admin.scholarships.edit',$scholarship->id).'" class="btn btn-xs btn-primary"><i class="fa fa-pencil" data-toggle="tooltip" data-placement="top" title="" data-original-title="'.trans('buttons.general.crud.edit').'"></i> </a>';
+                }
+                if(Auth::user()->allow('delete-scholarships')) {
+                    $actions = $actions.' <button class="btn btn-xs btn-danger btn-delete" data-remote="'.route('admin.scholarships.destroy', $scholarship->id) .'"><i class="fa fa-times" data-toggle="tooltip" data-placement="top" title="' . trans('buttons.general.crud.delete') . '"></i></button>';
+                }
+                $actions = $actions.' <a href="'.route('admin.scholarships.show',$scholarship->id).'" class="btn btn-xs btn-info"><i class="fa fa-eye" data-toggle="tooltip" data-placement="top" title="" data-original-title="'.trans('buttons.general.crud.view').'"></i> </a>';
+                return  $actions;
             })
             ->make(true);
     }

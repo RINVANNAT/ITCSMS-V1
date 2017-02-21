@@ -30,14 +30,26 @@ class DashboardController extends Controller
             $courses = CourseAnnual::leftJoin('departments','course_annuals.department_id', '=', 'departments.id')
                 ->leftJoin('degrees','course_annuals.degree_id', '=', 'degrees.id')
                 ->leftJoin('grades','course_annuals.grade_id', '=', 'grades.id')
+                ->leftJoin('semesters','course_annuals.semester_id', '=', 'semesters.id')
+                ->leftJoin('departmentOptions','course_annuals.department_option_id', '=', 'departmentOptions.id')
                 ->where('course_annuals.academic_year_id',$last_year->id)
                 ->where('employee_id',$employee->id)
                 ->with("courseAnnualClass")
                 ->select([
+                    'course_annuals.department_id',
+                    'course_annuals.degree_id',
+                    'course_annuals.grade_id',
+                    'course_annuals.semester_id',
                     'course_annuals.name_en',
                     'course_annuals.id',
+                    'semesters.name_kh as semester',
+                    'departmentOptions.code as option',
                     DB::raw("CONCAT(degrees.code,grades.code,departments.code) as class")
                 ])
+                ->orderBy('course_annuals.department_id',"ASC")
+                ->orderBy('course_annuals.degree_id',"ASC")
+                ->orderBy('course_annuals.grade_id',"ASC")
+                ->orderBy('course_annuals.semester_id',"ASC")
                 ->get()
                 ->toArray();
         }

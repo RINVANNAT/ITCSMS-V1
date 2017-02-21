@@ -3,7 +3,7 @@
         <thead>
         <tr>
             <th></th>
-            <th>{{ trans('labels.backend.courseAnnuals.fields.name') }}</th>
+            <th width="300px;">{{ trans('labels.backend.courseAnnuals.fields.name') }}</th>
             <th>{{ trans('labels.backend.courseAnnuals.fields.employee') }}</th>
             <th>{{ trans('labels.general.actions') }}</th>
         </tr>

@@ -13,6 +13,8 @@
                     <th style="width: 10px">#</th>
                     <th>Courses</th>
                     <th>Class</th>
+                    <th>Group</th>
+                    <th>Semester</th>
                     <th style="width: 40px"></th>
                 </tr>
 
@@ -27,10 +29,17 @@
                         <td>{{$index}}.</td>
                         <td>{{$course['name_en']}}</td>
                         <td>
-                            {{$course['class']}}
-                            {{--@foreach($course["groups"] as $group)--}}
-                                {{--<span>{{$group["group"]}}</span>--}}
-                            {{--@endforeach--}}
+                            {{$course['class'].$course['option']}}
+                        </td>
+                        <td>
+                            @if(isset($course["course_annual_class"]) && count($course["course_annual_class"])>0)
+                                @foreach($course["course_annual_class"] as $group)
+                                    <span>{{$group["group"]}}</span>
+                                @endforeach
+                            @endif
+                        </td>
+                        <td>
+                            {{$course['semester']}}
                         </td>
                         <td>
                             <a href="{{route('admin.course.form_input_score_course_annual',$course['id'])}}" class="btn btn-xs btn-info input_score_course">

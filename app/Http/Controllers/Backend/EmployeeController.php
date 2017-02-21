@@ -67,7 +67,7 @@ class EmployeeController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function create()
+    public function create(CreateEmployeeRequest $request)
     {
         $departments = Department::lists('name_kh','id')->toArray();
         //$users = User::lists('name','id')->toArray();
@@ -203,8 +203,16 @@ class EmployeeController extends Controller
                 return $phone.$email.$address;
             })
             ->addColumn('action', function ($employee) {
-                return  '<a href="'.route('admin.employees.edit',$employee->id).'" class="btn btn-xs btn-primary"><i class="fa fa-pencil" data-toggle="tooltip" data-placement="top" title="" data-original-title="'.trans('buttons.general.crud.edit').'"></i> </a>'.
-                ' <button class="btn btn-xs btn-danger btn-delete" data-remote="'.route('admin.employees.destroy', $employee->id) .'"><i class="fa fa-times" data-toggle="tooltip" data-placement="top" title="' . trans('buttons.general.crud.delete') . '"></i></button>';
+                $actions = "";
+
+                if(Auth::user()->allow('edit-employees')) {
+                    $actions = $actions.'<a href="'.route('admin.employees.edit',$employee->id).'" class="btn btn-xs btn-primary"><i class="fa fa-pencil" data-toggle="tooltip" data-placement="top" title="" data-original-title="'.trans('buttons.general.crud.edit').'"></i> </a>';
+                }
+                if(Auth::user()->allow('delete-employees')) {
+                    $actions = $actions.' <button class="btn btn-xs btn-danger btn-delete" data-remote="'.route('admin.employees.destroy', $employee->id) .'"><i class="fa fa-times" data-toggle="tooltip" data-placement="top" title="' . trans('buttons.general.crud.delete') . '"></i></button>';
+                }
+                return  $actions;
+
             })
             ->make(true);
     }

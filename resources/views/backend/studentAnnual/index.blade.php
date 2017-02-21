@@ -40,7 +40,7 @@
     <div class="box box-success">
         <div class="box-header with-border">
             <div class="mailbox-controls">
-                <!-- Check all button -->
+                @permission("create-students")
                 <a href="{!! route('admin.studentAnnuals.create') !!}">
                     <button class="btn btn-primary btn-sm"><i class="fa fa-plus-circle"></i> Add
                     </button>
@@ -49,6 +49,7 @@
                     <button class="btn btn-primary btn-sm"><i class="fa fa-plus-circle"></i> Import
                     </button>
                 </a>
+                @endauth
 
                 <button class="btn btn-default btn-sm"><i class="fa fa-refresh"></i></button>
 

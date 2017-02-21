@@ -36,21 +36,13 @@
     <div class="box box-success">
         <div class="box-header with-border">
             <div class="mailbox-controls">
-                <!-- Check all button -->
+                @permission("create-coursePrograms")
                 <a href="{!! route('admin.course.course_program.create') !!}">
                     <button class="btn btn-primary btn-sm"><i class="fa fa-plus-circle"></i> Add
                     </button>
                 </a>
-                {{--<a href="{!! route('admin.course.course_program.request_import') !!}">--}}
-                    {{--<button class="btn btn-primary btn-sm"><i class="fa fa-plus-circle"></i> Import--}}
-                    {{--</button>--}}
-                {{--</a>--}}
+                @endauth
 
-                {{--<div class="btn-group">--}}
-                    {{--<button class="btn btn-default btn-sm"><i class="fa fa-trash-o"></i></button>--}}
-                    {{--<button class="btn btn-default btn-sm"><i class="fa fa-reply"></i></button>--}}
-                    {{--<button class="btn btn-default btn-sm"><i class="fa fa-share"></i></button>--}}
-                {{--</div>--}}
                 {{--<button class="btn btn-default btn-sm"><i class="fa fa-refresh"></i></button>--}}
 
             </div>
