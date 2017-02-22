@@ -3687,10 +3687,9 @@ class CourseAnnualController extends Controller
                                 foreach($studentScoreIds as $scoreId) {
                                     $test[] = $percentage[$scoreId];
 
-
                                     if(array_key_exists(strtolower($percentage[$scoreId]), $row)) { // check the array key of score name
 
-                                        if( (($row[strtolower($percentage[$scoreId])] == null) || is_numeric($row[strtolower($percentage[$scoreId])])) || ($row[strtolower($percentage[$scoreId])] == ScoreEnum::Absence || $row[strtolower($percentage[$scoreId])] == ScoreEnum::Fraud ))   {
+                                        if( (($row[strtolower($percentage[$scoreId])] == null) || is_numeric($row[strtolower($percentage[$scoreId])])) || (($row[strtolower($percentage[$scoreId])] == ScoreEnum::Absence) ||  ($row[strtolower($percentage[$scoreId])] == ScoreEnum::Fraud)))   {
 
                                             $explode = explode('_',strtolower($percentage[$scoreId]));
                                             $percent = $explode[count($explode)-1];
