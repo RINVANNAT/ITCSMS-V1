@@ -568,6 +568,7 @@ class CourseAnnualController extends Controller
     public function update(UpdateCourseAnnualRequest $request, $id)
     {
 
+//        dd($request->all());
         $input = $request->all();
         $midterm_id = $request->midterm_percentage_id;
         $final_id = $request->final_percentage_id;
@@ -587,10 +588,14 @@ class CourseAnnualController extends Controller
         if(isset($midterm_id) && isset($final_id)) {
             $this->percentages->update($midterm_id, $midterm);
             $this->percentages->update($final_id, $final);
+            $test = DB::table('scores')->where('course_annual_id', $id)->get();
+            dd($test);
         } else {
             $this->createScorePercentage($request->midterm_score, $request->final_score, $id);
 
         }
+
+        dd('ererer');
 
         $updateCourseAannual = $this->courseAnnuals->update($id, $input);
 
@@ -3422,12 +3427,14 @@ class CourseAnnualController extends Controller
 
     public function exportCourseScore(Request $request) {
 
-//        dd($request->all());
+
 
         $studentListScore=[];
         $colHeaders =explode(',',  $request->col_headers);
         $courseAnnual = $this->courseAnnuals->findOrThrowException($request->course_annual_id);
         $allScoreByCourseAnnual = $this->studentScoreCourseAnnually($courseAnnual);
+
+
 
 
         $arrayIdsOf_Dept_Deg_Grd_DeptOp_Grooup = $this->arrayIdsOfDeptGradeDegreeDeptOption($request->course_annual_id);
@@ -3437,6 +3444,8 @@ class CourseAnnualController extends Controller
         $grade_ids = $arrayIdsOf_Dept_Deg_Grd_DeptOp_Grooup['grade_id'];
         $department_option_ids = $arrayIdsOf_Dept_Deg_Grd_DeptOp_Grooup['department_option_id'];
 
+
+
         $allNumberAbsences = $this->getAbsenceFromDB();
         $studentNotations = $this->getStudentNotation($request->course_annual_id);
         $students = $this->getStudentByDeptIdGradeIdDegreeId($department_ids, $degree_ids, $grade_ids,$courseAnnual->academic_year_id);
@@ -3445,6 +3454,8 @@ class CourseAnnualController extends Controller
         if(count($department_option_ids) > 0) {
             $students = $students->whereIn('studentAnnuals.department_option_id', $department_option_ids);
         }
+
+
 
         if($group = $request->group) {
             $students = $students->where('studentAnnuals.group', $group)->get();
@@ -3456,9 +3467,12 @@ class CourseAnnualController extends Controller
             }
         }
 
+
+
         foreach($students as $student ) {
 
             $totalScore = 0;
+
 
             $studentScores = isset($allScoreByCourseAnnual[$courseAnnual->id][$student->student_annual_id])?$allScoreByCourseAnnual[$courseAnnual->id][$student->student_annual_id]:[];
 
@@ -3471,12 +3485,16 @@ class CourseAnnualController extends Controller
             }
 
 
+
+
             if($studentScores) {
                 foreach($studentScores as $score) {
+
                     $totalScore = $totalScore + ($score->score);// calculate score for stuent annual
                     $scoreData[$score->name] = (($score->score != null)?$score->score: null);
                 }
             } else{
+
                 $scoreData=[];
             }
 
@@ -3489,15 +3507,26 @@ class CourseAnnualController extends Controller
                     "Abs-10%"       => $scoreAbsenceByCourse,
                 ];
             } else {
+
                 $element =[
                     "Student ID" => $student->id_card,
                     "Student Name" => $student->name_latin,
                     "M/F"           => $student->code
                 ];
+
+
             }
+
+
+
+
+
             $element = $element + $scoreData+ ["Total" =>$totalScore, "Notation" => isset($studentNotations[$student->student_annual_id])?$studentNotations[$student->student_annual_id]->description:''];
             $studentListScore[] = $element;
+
+
         }
+
 
         $courseName = explode(" ", $courseAnnual->name_en);
         $acronym = "";
@@ -3505,20 +3534,23 @@ class CourseAnnualController extends Controller
         foreach ($courseName as $char) {
             $acronym .= $char[0];
         }
-        $title = 'Student_Score_'.$acronym;
+        $title = 'Student_Score_Lists';
         $alpha = [];
         $letter = 'A';
         while ($letter !== 'AAA') {
             $alpha[] = $letter++;
         }
 
-//        dd($colHeaders);
+
+//        dd($studentListScore);
 
         Excel::create($title, function($excel) use ($studentListScore, $title,$alpha,$colHeaders) {
+
             $excel->sheet($title, function($sheet) use($studentListScore,$title,$alpha,$colHeaders) {
                 $sheet->fromArray($studentListScore);
             });
-        })->download('xls');
+
+        })->download('xlsx');
 
     }
 
