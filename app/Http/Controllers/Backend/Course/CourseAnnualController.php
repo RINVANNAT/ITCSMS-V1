@@ -1358,7 +1358,7 @@ class CourseAnnualController extends Controller
         }
         $groups = $groups->get();
 
-        dd($groups);
+//        dd($groups);
 
         usort($groups, function($a, $b) {
             return $a->group - $b->group;
@@ -1367,7 +1367,7 @@ class CourseAnnualController extends Controller
         if(count($groups) > 0) {
             foreach($groups as $group) {
                 echo($group->group);
-                dd($groups);
+//                dd($groups);
                 if($group->group != null) {
 
 
@@ -1388,7 +1388,6 @@ class CourseAnnualController extends Controller
 
         }
 
-        dd(Response::json($arrayGroup));
         return Response::json($arrayGroup);
     }
 
@@ -1424,7 +1423,6 @@ class CourseAnnualController extends Controller
             $deptOption = null;
         }
 
-//        dd($departmentOptions);
         return view('backend.course.courseAnnual.includes.popup_course_assignment', compact(
             'academicYear', 'departmentId', 'gradeId','academicYears', 'degrees', 'grades', 'semesters','departmentOptions','departments','user_department_id',
             'degreeId', 'deptOption', 'semesterId'));
@@ -2485,92 +2483,6 @@ class CourseAnnualController extends Controller
         }
     }
 
-
-    public function calculateAverageByCourseAnnual($courseAnnualId, Request $request) {
-
-        $colHeaders = $request->colHeader;
-        $dataArray  = $request->data;
-
-        dd($dataArray);
-        $studentScores = [];
-        $check =0;
-        $count = 0;
-        foreach($dataArray as $data){
-
-            $count++;
-
-            if($count < count($dataArray)) {
-                $totalScore = 0;// this is the total score by only one course
-                $scoreId = [];
-
-                for($index=0; $index< count($colHeaders); $index++) {
-
-                    if($index > 4  && $index < (count($colHeaders)-1)) { // we know the exact column header of the score so this we need only the score which every teacher created
-
-                        $scoreHeader = explode('-', $colHeaders[$index]);
-                        $percentage = (int)$scoreHeader[count($scoreHeader)-1];// convert string X% to integer X
-                        $score = $data[$colHeaders[$index]];
-                        $percentage_id = $data['percentage_id_'.$colHeaders[$index]];
-                        $totalScore = $totalScore + (($score*$percentage)/100);
-
-                        $scoreId[] = $data['score_id_'.$colHeaders[$index]];
-                    }
-
-                }
-
-                // store average score in table average and relation table average_score
-                $input = [
-                    'course_annual_id' => $courseAnnualId,
-                    'student_annual_id'=> $data['student_annual_id'],
-                    'average'   => $totalScore
-                ];
-
-
-
-                $totalScore = $this->averages->findAverageByCourseIdAndStudentId($courseAnnualId, (int)$data['student_annual_id']);
-
-                if($totalScore) {
-                    //update calcuation total score
-                    $UpdateAverage = $this->averages->update($totalScore->id, $input);
-
-                    if($UpdateAverage) {
-                        $check++;
-                    }
-                } else {
-
-                    // insert new calculation score
-                    $storeAverage = $this->averages->create($input);
-                    if($storeAverage) {
-                        // this is to store the relation table
-                        $checkRelation =0;
-                        foreach($scoreId as $score_id) {
-                            $storeRelationTable = $this->averages->storeTableRelation($storeAverage->id, $score_id);
-
-                            if($storeRelationTable) {
-                                $checkRelation++;
-                            }
-                        }
-
-                        if($checkRelation == count($scoreId) ) {
-                            $check++;
-                        }
-                    }
-                }
-
-                $studentScores[$data['student_annual_id']][] = $totalScore;// if we wan to get array of total scores in one subject
-            }
-        }
-
-        if($check == count($dataArray)-1) {
-
-            $reDrawTable = $this->handsonTableData($courseAnnualId, $group=null);
-            return $reDrawTable;
-        } else {
-            return 'check is not enouht';
-        }
-
-//        dd($studentScores);
-    }
 
 
     public function storeTotalScoreEachCourseAnnual($input,$scoreIds) {
@@ -3724,56 +3636,52 @@ class CourseAnnualController extends Controller
                                 }
 //                                dd($test);
 
-                                if(array_key_exists('abs', $row)) {
+                                if($absences != null) {
 
-                                    if($absences != null) {
+                                    if(is_numeric($row['abs']) || ($row['abs'] == null)) { // ---absence column
 
-                                        if(is_numeric($row['abs']) || ($row['abs'] == null)) { // ---absence column
+                                        if( ( (float)($row['abs'] <= ($courseAnnual->time_course + $courseAnnual->time_td + $courseAnnual->time_tp)) && ((float)$row['abs'] >= 0)) ) {
 
-                                            if( ( (float)($row['abs'] <= ($courseAnnual->time_course + $courseAnnual->time_td + $courseAnnual->time_tp)) && ((float)$row['abs'] >= 0)) ) {
+                                            if(isset($absences[$students[$row['student_id']]->student_annual_id])) {
 
-                                                if(isset($absences[$students[$row['student_id']]->student_annual_id])) {
+                                                $absence = $absences[$students[$row['student_id']]->student_annual_id];
 
-                                                    $absence = $absences[$students[$row['student_id']]->student_annual_id];
-
-                                                    if($absence) {
-                                                        //----update student absence
-                                                        $input = [
-                                                            'num_absence' => $row['abs']
-                                                        ];
-                                                        $update = $this->absences->update($absence->id, $input);
-                                                        if($update) {
-                                                            CourseAnnualController::$ifAbsenceUpdated++;
-                                                        }
-                                                    }
-                                                } else {
-
-                                                    //----create student absence
+                                                if($absence) {
+                                                    //----update student absence
                                                     $input = [
-                                                        'course_annual_id' => $courseAnnualId,
-                                                        'student_annual_id' => $students[$row['student_id']]->student_annual_id,
-                                                        'num_absence'       => $row['abs']
+                                                        'num_absence' => $row['abs']
                                                     ];
-                                                    $store = $this->absences->create($input);
-                                                    if($store) {
-                                                        CourseAnnualController::$ifAbsenceCreated++;
+                                                    $update = $this->absences->update($absence->id, $input);
+                                                    if($update) {
+                                                        CourseAnnualController::$ifAbsenceUpdated++;
                                                     }
                                                 }
                                             } else {
 
-                                                // the absence value is not in the conditioin
-                                                CourseAnnualController::$errorNumberAbsence = true;
-                                                DB::rollback();
+                                                //----create student absence
+                                                $input = [
+                                                    'course_annual_id' => $courseAnnualId,
+                                                    'student_annual_id' => $students[$row['student_id']]->student_annual_id,
+                                                    'num_absence'       => $row['abs']
+                                                ];
+                                                $store = $this->absences->create($input);
+                                                if($store) {
+                                                    CourseAnnualController::$ifAbsenceCreated++;
+                                                }
                                             }
-
                                         } else {
-                                            // the absence value is exactly string
+
+                                            // the absence value is not in the conditioin
                                             CourseAnnualController::$errorNumberAbsence = true;
                                             DB::rollback();
                                         }
-                                    }
 
-                                } //------end if course has counted absence score ---
+                                    } else {
+                                        // the absence value is exactly string
+                                        CourseAnnualController::$errorNumberAbsence = true;
+                                        DB::rollback();
+                                    }
+                                }
 
 
                                 //----------store notation-------------
