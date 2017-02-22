@@ -1957,7 +1957,7 @@ class CourseAnnualController extends Controller
                     $columns = array_merge($columns, array(['data'=>$column->name]));
                     $colWidths[] = 70;
                 }
-                $columns = array_merge($columns, array(['data' => 'average', 'readOnly' => true, 'type'=> 'string'], ['data'=> 'notation']));
+                $columns = array_merge($columns, array(['data' => 'average', 'readOnly' => true, 'type'=> 'numeric'], ['data'=> 'notation']));
                 $columnHeader = array_merge($columnHeader, array('Total', 'Notation'));
                 $colWidths[] = 70;
 
@@ -2099,8 +2099,10 @@ class CourseAnnualController extends Controller
                         if((strtoupper($score->score) == ScoreEnum::Fraud) || ($score->score == ScoreEnum::Absence)) {
                             $totalScore = $totalScore;
                         } else {
-                            $totalScore = $totalScore +$score->score;// calculate score for stuent annual
+                            $totalScore = $totalScore + $score->score;// calculate score for stuent annual
                         }
+
+
                         $scoreData[$score->name] = (($score->score != null)?$score->score: null);
                         $scoreData['percentage_id'.'_'.$score->name] =  $score->percentage_id;
                         $scoreData['score_id'.'_'.$score->name]=$score->score_id;
@@ -3662,7 +3664,7 @@ class CourseAnnualController extends Controller
 
             DB::beginTransaction();
             try{
-                Excel::filter('chunk')->load($storage_path)->chunk(150, function($results) use ($percentage,$students, $courseAnnualId,$scoreIds, $courseAnnual, $absences, $notations){
+                Excel::filter('chunk')->load($storage_path)->chunk(100, function($results) use ($percentage,$students, $courseAnnualId,$scoreIds, $courseAnnual, $absences, $notations){
 
                     $firstrow = $results->first()->toArray();
 

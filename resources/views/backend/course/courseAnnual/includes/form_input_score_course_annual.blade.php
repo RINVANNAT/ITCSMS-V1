@@ -636,7 +636,6 @@
 
                                 if((newValue <= percentage) ||  (newValue >= parseInt('{{\App\Models\Enum\ScoreEnum::Zero}}') ) || (newValue == '') || ((newValue == '{{\App\Models\Enum\ScoreEnum::Fraud}}') || (newValue == '{{\App\Models\Enum\ScoreEnum::Absence}}'))) {
 
-                                    alert(newValue);
                                     var rowData = hotInstance.getData();
                                     var element={};
                                     var score_id = 'score_id'+'_'+columnIndex;
