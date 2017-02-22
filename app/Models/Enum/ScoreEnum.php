@@ -24,4 +24,13 @@ class ScoreEnum
     const is_counted_creditability = 1;
     const is_counted_absence = 1;
 
+
+    const Pass_Moyenne  = 50;
+    const Under_30 = 30;
+    const Degree_I = 1;
+    const Degree_T = 2;
+    const Red_I = 'Red.I';
+    const Red_T = 'Red.T';
+    const Pass = 'P';
+
 }
