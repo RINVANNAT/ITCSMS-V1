@@ -677,7 +677,7 @@
 
                                     colDataArray[columnIndex].push(element) // cell changes data by each column score use to pass data to server
                                     cellScoreChanges.push(element); // use this cell score change to test if user has made any changes
-                                    console.log(colDataArray);
+//                                    console.log(colDataArray);
                                 }
                             }
 
@@ -1143,13 +1143,11 @@
 
                                 if(cellScoreChanges.length > 0) {// save each score
 
-
                                     //recursive function fo send the request by the column data array
                                     function sendRequest (index, message) {
 
                                         var saveBaseUrl = '{{route('admin.course.save_score_course_annual')}}';
 
-                                        console.log();
 
                                         if(index < setting.colHeaders.length -1) {
 

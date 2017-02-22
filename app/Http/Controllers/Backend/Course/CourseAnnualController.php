@@ -2394,7 +2394,7 @@ class CourseAnnualController extends Controller
         $final = ScoreEnum::Midterm_Final - $midterm;
         $createScore = $this->createScorePercentage($midterm, $final,$request->course_annual_id );
         if($createScore) {
-            $reDrawTable = $this->handsonTableData($request->course_annual_id);
+            $reDrawTable = $this->handsonTableData($request->course_annual_id, $group= null);
             return $reDrawTable;
         }
 
@@ -2440,14 +2440,14 @@ class CourseAnnualController extends Controller
                     }
                 }
             } else {
-                $reDrawTable = $this->handsonTableData($data['course_annual_id']);
+                $reDrawTable = $this->handsonTableData($data['course_annual_id'], $group= null);
                 $reDrawTable = json_decode($reDrawTable);
                 return Response::json(['status' => false, 'message' => 'There are null or String Value in cell!', 'handsonData'=> $reDrawTable]);
             }
 
         }
         if($checkStore+$checkUpdate == count($baseData)- $checkNOTUpdatOrStore) {
-            $reDrawTable = $this->handsonTableData($data['course_annual_id']);
+            $reDrawTable = $this->handsonTableData($data['course_annual_id'], $group = null);
             $reDrawTable = json_decode($reDrawTable);
             return Response::json(['status' => true, 'message' => 'Stored!', 'handsonData'=> $reDrawTable]);
         }
@@ -2480,7 +2480,7 @@ class CourseAnnualController extends Controller
 
 //        dd($deleteScore .'=='. count($scores));
         if($deleteScore) {
-            $reDrawTable = $this->handsonTableData($request->course_annual_id);
+            $reDrawTable = $this->handsonTableData($request->course_annual_id, $group= null);
             return $reDrawTable;
         }
     }
@@ -2563,7 +2563,7 @@ class CourseAnnualController extends Controller
 
         if($check == count($dataArray)-1) {
 
-            $reDrawTable = $this->handsonTableData($courseAnnualId);
+            $reDrawTable = $this->handsonTableData($courseAnnualId, $group=null);
             return $reDrawTable;
         } else {
             return 'check is not enouht';
