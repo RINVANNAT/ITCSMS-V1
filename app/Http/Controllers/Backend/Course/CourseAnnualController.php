@@ -1957,7 +1957,7 @@ class CourseAnnualController extends Controller
                     $columns = array_merge($columns, array(['data'=>$column->name]));
                     $colWidths[] = 70;
                 }
-                $columns = array_merge($columns, array(['data' => 'average', 'readOnly' => true, 'type'=> 'numeric'], ['data'=> 'notation']));
+                $columns = array_merge($columns, array(['data' => 'average', 'readOnly' => true, 'type'=> 'string'], ['data'=> 'notation']));
                 $columnHeader = array_merge($columnHeader, array('Total', 'Notation'));
                 $colWidths[] = 70;
 
@@ -2071,6 +2071,7 @@ class CourseAnnualController extends Controller
         //----------------find student score if they have inserted
 
         $checkScoreReachHundredPercent=0;
+        $check_test = [];
 
         if($studentByCourse) {
 
@@ -2094,7 +2095,12 @@ class CourseAnnualController extends Controller
                     foreach($studentScore as $score) {
 
                         $checkPercent = $checkPercent +$score->percent; // we check the percentage if it is equal or bigger than 90 then we should now allow teacher to create more score
-                        $totalScore = $totalScore + ($score->score);// calculate score for stuent annual
+
+                        if((strtoupper($score->score) == ScoreEnum::Fraud) || ($score->score == ScoreEnum::Absence)) {
+                            $totalScore = $totalScore;
+                        } else {
+                            $totalScore = $totalScore +$score->score;// calculate score for stuent annual
+                        }
                         $scoreData[$score->name] = (($score->score != null)?$score->score: null);
                         $scoreData['percentage_id'.'_'.$score->name] =  $score->percentage_id;
                         $scoreData['score_id'.'_'.$score->name]=$score->score_id;
@@ -2103,6 +2109,7 @@ class CourseAnnualController extends Controller
                 } else{
                     $scoreData=[];
                 }
+                $check_test[] = $totalScore;
                 //----check if every student has the score equal or upper then 90 then we set status to true..then we will not allow teacher to add any score
 //                if($checkPercent >= 90 ) {
 //                    $checkScoreReachHundredPercent++;
@@ -2126,9 +2133,9 @@ class CourseAnnualController extends Controller
                         'student_id_card' => $student->id_card,
                         'student_name' => strtoupper($student->name_latin),
                         'student_gender' => $student->code,
-                        'absence'          => (($scoreAbsenceByCourse >= 0)?$scoreAbsenceByCourse:10),
+                        'absence'          => (string)(($scoreAbsenceByCourse >= 0)?$scoreAbsenceByCourse:10),
                         'num_absence'      => isset($scoreAbsence) ? $scoreAbsence->num_absence:null,
-                        'average'          => $totalScore,
+                        'average'          => $this->floatFormat($totalScore),
                         'notation'        => $storeTotalScore->description
                     );
                 } else {
@@ -2145,6 +2152,7 @@ class CourseAnnualController extends Controller
                 $mergerData = array_merge($element,$scoreData);
                 $arrayData[] = $mergerData;
             }
+
 
             return json_encode([
                 'status' => true,
@@ -2165,12 +2173,15 @@ class CourseAnnualController extends Controller
     public function saveScoreByCourseAnnual(Request $request) {
 
         $inputs = $request->data;
+
+
         $checkUpdate = 0;
         $checkNotUpdated = 0;
 
         if($inputs) {
 
             foreach($inputs as $input) {
+
 
                 if($input['score_id'] != null) {
                     $updateScore = $this->courseAnnualScores->update($input['score_id'], $input);
@@ -3075,6 +3086,18 @@ class CourseAnnualController extends Controller
         $array_data[] = $average_array;
         $array_data[] = $data_empty;
 
+//        foreach($array_data as $data) {
+//            json_encode($data);
+//        }
+
+
+//        dd($array_data);
+//      return json_encode([
+//          'data' => $array_data,
+//          'nestedHeaders' => $nestedHeaders,
+//          'colWidths' => $colWidths
+//      ]);
+
 
         return Response::json([
             'data' => $array_data,
@@ -3830,10 +3853,8 @@ class CourseAnnualController extends Controller
 
 //                dd((CourseAnnualController::$ifScoreImported/CourseAnnualController::$countStudentScoreType) .'=='. count($students).'& '.(CourseAnnualController::$ifAbsenceUpdated + CourseAnnualController::$ifAbsenceCreated) .'=='. count($students));
                 if($courseAnnual->is_counted_absence) {
-                    if( ((CourseAnnualController::$ifScoreImported/CourseAnnualController::$countStudentScoreType) == count($students)) || ( (CourseAnnualController::$ifAbsenceUpdated + CourseAnnualController::$ifAbsenceCreated) == count($students) ) ) {
-                        $status = 'File Imported!';
-//                    return view('backend.course.courseAnnual.includes.form_input_score_course_annual', compact('courseAnnualId', 'courseAnnual', 'availableCourses', 'status'));
 
+                    if( ((CourseAnnualController::$ifScoreImported/CourseAnnualController::$countStudentScoreType) == count($students)) || ( (CourseAnnualController::$ifAbsenceUpdated + CourseAnnualController::$ifAbsenceCreated) == count($students) ) ) {
                         return redirect(route('admin.course.form_input_score_course_annual', $courseAnnualId))->with(['status' => 'File Imported']);
                     } else {
                         return redirect()->back()->with(['status'=> 'Something went wrong']);
@@ -3841,14 +3862,11 @@ class CourseAnnualController extends Controller
                 } else {
 
                     if( ((CourseAnnualController::$ifScoreImported/CourseAnnualController::$countStudentScoreType) == count($students)) ) {
-                        $status = 'File Imported!';
-//                    return view('backend.course.courseAnnual.includes.form_input_score_course_annual', compact('courseAnnualId', 'courseAnnual', 'availableCourses', 'status'));
 
                         return redirect(route('admin.course.form_input_score_course_annual', $courseAnnualId))->with(['status' => 'File Imported']);
                     } else {
                         return redirect()->back()->with(['status'=> 'Something went wrong']);
                     }
-
                 }
             }
         } else {

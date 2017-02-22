@@ -18,6 +18,15 @@ class ScoreEnum
     const Midterm_0 = 0;
     const Col_Header = 3;
     const Highest_Score = 100;
+    const Fraud = 'F';
+    const Absence = 'A';
+    const Zero = 0;
+    const Notation = 'notation';
+    const Index_Num_Abs = 'num_absence';
+    const Stu_Id_Card = 'student_id_card';
+    const Col_Abs = 'Absence';
+    const Index_Abs = 'absence';
+
 
     const Name_Mid = 'midterm';
     const Name_Fin = 'final';

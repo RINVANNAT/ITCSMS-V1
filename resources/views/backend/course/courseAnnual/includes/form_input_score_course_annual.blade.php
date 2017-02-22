@@ -510,14 +510,14 @@
                         if((prop != 'notation')) {
                             td.style.backgroundColor = '#cc3300';
                         }
-                    } else {
-//                        td.style.backgroundColor = '#FEFFB0';
                     }
                 } else {
-                    if(value == '') {
-                        td.style.backgroundColor = ''
 
-                    } else if (value == null) {
+                    if((value == '{{\App\Models\Enum\ScoreEnum::Fraud}}') || (value == '{{\App\Models\Enum\ScoreEnum::Absence}}')) {
+                        td.style.backgroundColor = 'gray'
+                    } else if(value == '') {
+                        td.style.backgroundColor = ''
+                    } else if(value == null) {
                         td.style.backgroundColor = ''
                     } else {
                         td.style.backgroundColor = '#cc3300';
@@ -530,8 +530,12 @@
             if(prop == 'average') {
 
                 if($.isNumeric(value)) {
-                    if(value < 30) {
-                        td.style.backgroundColor = '#cc3300';
+                    if(value < 50) {
+                        if(value < 30) {
+                            td.style.backgroundColor = '#cc3300';
+                        } else {
+                            td.style.backgroundColor = '#D2B500';
+                        }
                     }
                 }
             }
@@ -541,8 +545,6 @@
                     if(value > parseInt('{{$courseAnnual->time_course + $courseAnnual->time_td + $courseAnnual->time_tp}}')) {
                         td.style.backgroundColor = '#cc3300';
                     }
-                }  else {
-//                    td.style.backgroundColor = '#cc3300';
                 }
             }
         };
@@ -614,26 +616,32 @@
                 if(changes){
 
                     $.each(changes, function (index, element) {
+
                         var change = element;
                         var rowIndex = change[0];
                         var columnIndex = change[1];
                         var oldValue = change[2];
                         var newValue = change[3];
                         var tableData = setting.data;
+
                         if(columnIndex != 'num_absence' && columnIndex != 'notation') {
 
                             var colData = findDataAtCol(columnIndex);
                             var explode = columnIndex.split('-');
                             var percentage = parseInt(explode[explode.length-1]);
 
+                            if(($.isNumeric(newValue) || (newValue == '')) || ((newValue == '{{\App\Models\Enum\ScoreEnum::Fraud}}') || (newValue == '{{\App\Models\Enum\ScoreEnum::Absence}}'))) {
 
-                            if($.isNumeric(newValue) || (newValue == '') ) {
-                                if((newValue <= percentage) ||  (newValue >= 0) || (newValue == '')) {
 
+
+                                if((newValue <= percentage) ||  (newValue >= parseInt('{{\App\Models\Enum\ScoreEnum::Zero}}') ) || (newValue == '') || ((newValue == '{{\App\Models\Enum\ScoreEnum::Fraud}}') || (newValue == '{{\App\Models\Enum\ScoreEnum::Absence}}'))) {
+
+                                    alert(newValue);
                                     var rowData = hotInstance.getData();
                                     var element={};
                                     var score_id = 'score_id'+'_'+columnIndex;
                                     for(var keyIndex=0; keyIndex< tableData.length; keyIndex++) {
+
                                         $.each(tableData[keyIndex],function(i, value){
 
                                             if(rowData[rowIndex][0] == value) {
@@ -646,9 +654,16 @@
                                                         course_annual_id: $('select[name=available_course] :selected').val()
                                                     };
 
-                                                } else {
+                                                } else if(!$.isNumeric(newValue))  {
 
-                                                    notify('error', 'Danger', 'Score must be less than or equal to '+percentage )
+//                                                    notify('error', 'Danger', 'Score must be less than or equal to '+percentage )
+                                                    element = {
+                                                        score_id: tableData[keyIndex][score_id],
+                                                        score: newValue,
+                                                        score_absence: tableData[keyIndex]['absence'],
+                                                        course_annual_id: $('select[name=available_course] :selected').val()
+                                                    };
+                                                } else {
                                                     element = {
                                                         score_id: tableData[keyIndex][score_id],
                                                         score: 0,
@@ -656,7 +671,6 @@
                                                         course_annual_id: $('select[name=available_course] :selected').val()
                                                     };
                                                 }
-
                                             }
                                         });
 
@@ -664,6 +678,7 @@
 
                                     colDataArray[columnIndex].push(element) // cell changes data by each column score use to pass data to server
                                     cellScoreChanges.push(element); // use this cell score change to test if user has made any changes
+                                    console.log(colDataArray);
                                 }
                             }
 
@@ -735,14 +750,30 @@
 
             var arrayNull=[];
             for(var check =0; check < colData.length; check++) {
-                if($.isNumeric(colData[check]) && (parseInt(colData[check]) >= 0)) {
-                    count++;
-                    if((colData[check] <= valToCompare) ) {
-                        numAbs++;
+
+                if(colName != 'Absence') {
+
+                    if($.isNumeric(colData[check]) && (parseInt(colData[check]) >= 0)) {
+                        count++;
+                        if((colData[check] <= valToCompare) ) {
+                            numAbs++;
+                        }
+                    } else if( ((colData[check] == null) || (colData[check] == ''))  || ((colData[check] == '{{\App\Models\Enum\ScoreEnum::Fraud}}') || (colData[check] == '{{\App\Models\Enum\ScoreEnum::Absence}}'))) {// to check if he/she deose not input any value or input only empty string
+                        arrayNull.push(colData[check])
                     }
-                } else if((colData[check] == null) || (colData[check] == '')) {// to check if he/she deose not input any value or input only empty string
-                    arrayNull.push(colData[check])
+                } else {
+
+                    if($.isNumeric(colData[check]) && (parseInt(colData[check]) >= 0)) {
+                        count++;
+                        if((colData[check] <= valToCompare) ) {
+                            numAbs++;
+                        }
+                    } else if( ((colData[check] == null) || (colData[check] == '')) ) {// to check if he/she deose not input any value or input only empty string
+                        arrayNull.push(colData[check])
+                    }
+
                 }
+
             }
 
             if((parseInt(count) + arrayNull.length) == colData.length) {
@@ -1093,16 +1124,11 @@
                 }
             });
 
-
-
             var url = '{{route('admin.course.save_number_absence')}}';
 
             if(cellIndex.length > 0) {
 
-
                 if(objectStatus.status == true) {
-
-
 
                     if(cellChanges.length > 0 || cellScoreChanges.length >0) {
                         swal({
