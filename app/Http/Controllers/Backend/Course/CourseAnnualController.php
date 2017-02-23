@@ -568,7 +568,6 @@ class CourseAnnualController extends Controller
     public function update(UpdateCourseAnnualRequest $request, $id)
     {
 
-//        dd($request->all());
         $input = $request->all();
         $midterm_id = $request->midterm_percentage_id;
         $final_id = $request->final_percentage_id;
@@ -586,16 +585,19 @@ class CourseAnnualController extends Controller
         ];
 
         if(isset($midterm_id) && isset($final_id)) {
-            $this->percentages->update($midterm_id, $midterm);
-            $this->percentages->update($final_id, $final);
-            $test = DB::table('scores')->where('course_annual_id', $id)->get();
-            dd($test);
+
+            $score_by_course_annual = DB::table('scores')->where('course_annual_id', $id)->get();
+            if($score_by_course_annual) {
+                $this->percentages->update($midterm_id, $midterm);
+                $this->percentages->update($final_id, $final);
+            } else {
+                $this->createScorePercentage($request->midterm_score, $request->final_score, $id);
+            }
+
         } else {
             $this->createScorePercentage($request->midterm_score, $request->final_score, $id);
 
         }
-
-        dd('ererer');
 
         $updateCourseAannual = $this->courseAnnuals->update($id, $input);
 
@@ -3550,7 +3552,7 @@ class CourseAnnualController extends Controller
                 $sheet->fromArray($studentListScore);
             });
 
-        })->download('xlsx');
+        })->download('xls');
 
     }
 
@@ -3579,10 +3581,33 @@ class CourseAnnualController extends Controller
     public static $isStringAllowed = false;
     public static $headerPercentage =0;
     public static $colHeader = '';
+    public static $studentAbsenceIdError = [];
+
+    private function unset_params() {
+
+        unset(CourseAnnualController::$isError);
+        unset(CourseAnnualController::$isNotAceptedScore);
+        unset(CourseAnnualController::$ifScoreImported);
+        unset(CourseAnnualController::$ifAbsenceUpdated);
+        unset(CourseAnnualController::$ifAbsenceCreated);
+        unset(CourseAnnualController::$countStudentScoreType);
+        unset(CourseAnnualController::$arrayMissedStudent);
+        unset(CourseAnnualController::$isFileHasColumnScoreType);
+        unset(CourseAnnualController::$errorNumberAbsence);
+        unset(CourseAnnualController::$isStringAllowed);
+        unset(CourseAnnualController::$headerPercentage);
+        unset(CourseAnnualController::$colHeader);
+
+
+
+    }
+
 
 
     public function importScore($courseAnnualId, Request $request) {
         //$now = Carbon::now()->format('Y_m_d_H');
+
+//        $this->unset_params();
 
         $courseAnnual = $this->getCourseAnnualById($courseAnnualId);
 
@@ -3592,17 +3617,19 @@ class CourseAnnualController extends Controller
                 base_path() . '/public/assets/uploaded_file/course_annuals/', $import
             );
             $storage_path = base_path() . '/public/assets/uploaded_file/course_annuals/'.$import;
-            $students = $this->getStudentByNameAndIdCard($courseAnnualId, $request->group);
-            $scoreIds = $this->getScoreId($courseAnnualId);
-            $percentage = $this->getPercentage();
 
-            //----if count not count 10% absence
+            $students = $this->getStudentByNameAndIdCard($courseAnnualId, $request->group);
+            $score_property = $this->getScoreId($courseAnnualId);
+            $scoreIds = $score_property['score_by_student'];
+            $percentage = $this->getPercentage($score_property['score_id']);
+
+//            ----if count not count 10% absence
             if($courseAnnual->is_counted_absence) {
                 $absences = $this->getStudentAbsence($courseAnnualId);
+
             } else {
                 $absences = null;
             }
-
 
             $notations = $this->getStudentNotation($courseAnnualId);
 
@@ -3619,9 +3646,14 @@ class CourseAnnualController extends Controller
                             $row = $row->toArray();
 
                             if(isset($students[$row['student_id']])) {
-
                                 //-----here we knew student has already intial the score of this course..so the upload file must contain students whom Id_card march with the record of score from DB
-                                $studentScoreIds = $scoreIds[$students[$row['student_id']]->student_annual_id];
+
+                                if(isset($scoreIds[$students[$row['student_id']]->student_annual_id])) {
+                                    $studentScoreIds = $scoreIds[$students[$row['student_id']]->student_annual_id];
+                                } else {
+
+                                    $studentScoreIds= [];//----do nothing
+                                }
                             } else {
                                 $studentScoreIds=[];
                             }
@@ -3666,11 +3698,15 @@ class CourseAnnualController extends Controller
                                     }
 
                                 }
-//                                dd($test);
 
-                                if($absences != null) {
+                                if($courseAnnual->is_counted_absence) {
 
-                                    if(is_numeric($row['abs']) || ($row['abs'] == null)) { // ---absence column
+                                    if(is_numeric($row['abs']) || ( ( trim($row['abs']) == null) || (trim($row['abs']) == '')) ) { // ---absence column
+
+
+                                        if(trim($row['abs']) == null || trim($row['abs']) == '') {
+                                            $row['abs'] = null;
+                                        }
 
                                         if( ( (float)($row['abs'] <= ($courseAnnual->time_course + $courseAnnual->time_td + $courseAnnual->time_tp)) && ((float)$row['abs'] >= 0)) ) {
 
@@ -3703,18 +3739,22 @@ class CourseAnnualController extends Controller
                                             }
                                         } else {
 
+                                            CourseAnnualController::$studentAbsenceIdError[] = $row;
                                             // the absence value is not in the conditioin
                                             CourseAnnualController::$errorNumberAbsence = true;
+
                                             DB::rollback();
                                         }
 
                                     } else {
                                         // the absence value is exactly string
+                                        CourseAnnualController::$studentAbsenceIdError[] = $row;
                                         CourseAnnualController::$errorNumberAbsence = true;
                                         DB::rollback();
                                     }
+                                } else {
+                                    //dd('this course is not counted for absence');---do nothing
                                 }
-
 
                                 //----------store notation-------------
 
@@ -3775,7 +3815,21 @@ class CourseAnnualController extends Controller
 //                    return redirect()->back()->with(['status'=> 'Cell Value Null is not allow. Please Add as 0']);
 //                }
                 if( CourseAnnualController::$errorNumberAbsence ) {
-                    $string = 'The absence value must be between 0 and '.($courseAnnual->time_course + $courseAnnual->time_td + $courseAnnual->time_tp). ', and No string allowed!';
+                    $error_ids = CourseAnnualController::$studentAbsenceIdError;
+                    if(count($error_ids) >1) {
+                        $str = ' Error '.'IDs: ';
+                        $str_special = '';
+
+                        foreach($error_ids as $error) {
+                            $str_special =$str_special. $error['student_id'].' Col :[ABS = '.$error['abs'].']'.', ';
+                        }
+
+                        $str = $str.rtrim($str_special, ',');
+                    } else {
+                        $str = ' Error '.'ID: '. $error_ids[0]['student_id'].' Col :[ABS= '.$error_ids[0]['abs'].']';
+                    }
+                    $string = 'The absence value must be between 0 and '.($courseAnnual->time_course + $courseAnnual->time_td + $courseAnnual->time_tp). ', No string allowed!'.$str;
+
                     return redirect()->back()->with(['status'=> htmlspecialchars($string)]);
                 }
             } catch(Exception $e){
@@ -3852,6 +3906,7 @@ class CourseAnnualController extends Controller
     private function getScoreId($courseAnnualId) {
 
         $arrayScores = [];
+        $score_ids = [];
 
         $scores = DB::table('scores')
             ->where([
@@ -3860,19 +3915,36 @@ class CourseAnnualController extends Controller
 
         foreach($scores as $score) {
             $arrayScores[$score->student_annual_id][] = $score->id;
+            $score_ids[] = $score->id;
         }
 
-        return $arrayScores;
+        return [
+            'score_by_student' => $arrayScores,
+            'score_id' => $score_ids
+        ];
     }
 
-    private function getPercentage() {
+    private function getPercentage($score_ids) {
 
         $arrayPercentage=[];
         $percentages = DB::table('percentages')
-            ->join('percentage_scores','percentage_scores.percentage_id','=', 'percentages.id')
-            ->join('scores', 'scores.id','=', 'percentage_scores.score_id')
+            ->leftJoin('percentage_scores','percentage_scores.percentage_id','=', 'percentages.id')
+            ->leftJoin('scores', 'scores.id','=', 'percentage_scores.score_id')
+            ->whereIn('scores.id', $score_ids)
             ->select('scores.id as score_id', 'percentages.percent', 'percentages.name')
             ->get();
+
+
+//        $test = DB::table('percentages')
+//            ->leftJoin('percentage_scores','percentage_scores.percentage_id','=', 'percentages.id')
+//            ->leftJoin('scores', 'scores.id','=', 'percentage_scores.score_id')
+//            ->whereIn('scores.id', $score_ids)
+//            ->select('scores.id as score_id', 'percentages.percent', 'percentages.name')
+//            ->groupBy(function($t = 'vannat') {
+//                $group = $t;
+//                return $group;
+//            })
+//            ->get();
 
         foreach($percentages as $percentage) {
             $trim =trim($percentage->name, '%');
