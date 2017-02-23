@@ -294,7 +294,7 @@
             fixedColumnsLeft: 3,
             filters: true,
             dropdownMenu: ['filter_by_condition', 'filter_action_bar'],
-            className: "htLeft",
+            className: "htRight",
             cells: function (row, col, prop) {
                 this.renderer = colorRenderer;
 

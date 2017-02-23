@@ -661,7 +661,7 @@ class CourseAnnualController extends Controller
     public function destroy(DeleteCourseAnnualRequest $request, $id)
     {
         $scoreByCourseAnnualId = DB::table('scores')->where('course_annual_id', $id);
-        if($scoreByCourseAnnualId->get) {
+        if($scoreByCourseAnnualId->get()) {
             $scoreByCourseAnnualId->delete();
         }
         $this->courseAnnuals->destroy($id);
@@ -2953,6 +2953,7 @@ class CourseAnnualController extends Controller
 
 
 
+            $value['Rank'] = "";
             if($moyenne < ScoreEnum::Pass_Moyenne) {
                 if($degreeId == ScoreEnum::Degree_I) {
                     $value['Redouble'] = ScoreEnum::Red_I.$gradeId;
