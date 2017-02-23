@@ -393,7 +393,6 @@ class CourseAnnualController extends Controller
     public function store(StoreCourseAnnualRequest $request)
     {
 
-//        dd($request->all());
         $data = $request->all();
         $storeCourseAnnual = $this->courseAnnuals->create($data);
 
@@ -598,7 +597,6 @@ class CourseAnnualController extends Controller
             $this->createScorePercentage($request->midterm_score, $request->final_score, $id);
 
         }
-
         $updateCourseAannual = $this->courseAnnuals->update($id, $input);
 
         if($updateCourseAannual) {
@@ -662,7 +660,12 @@ class CourseAnnualController extends Controller
      */
     public function destroy(DeleteCourseAnnualRequest $request, $id)
     {
+        $scoreByCourseAnnualId = DB::table('scores')->where('course_annual_id', $id);
+        if($scoreByCourseAnnualId->get) {
+            $scoreByCourseAnnualId->delete();
+        }
         $this->courseAnnuals->destroy($id);
+
         return redirect()->route('admin.course.academicYears.index')->withFlashSuccess(trans('alerts.backend.generals.deleted'));
     }
 
@@ -2028,7 +2031,6 @@ class CourseAnnualController extends Controller
 
         $arrayIdsOfDeptDegreeGradeDeptOption = $this->arrayIdsOfDeptGradeDegreeDeptOption($courseAnnualId);
 
-
         $department_ids = $arrayIdsOfDeptDegreeGradeDeptOption['department_id'];
         $degree_ids = $arrayIdsOfDeptDegreeGradeDeptOption['degree_id'];
         $grade_ids = $arrayIdsOfDeptDegreeGradeDeptOption['grade_id'];
@@ -2047,11 +2049,8 @@ class CourseAnnualController extends Controller
 
         $studentByCourse = $this->getStudentByDeptIdGradeIdDegreeId( $department_ids, $degree_ids, $grade_ids, $courseAnnual->academic_year_id);
 
-
-
         $allScoreByCourseAnnual = $this->studentScoreCourseAnnually($courseAnnual);
         $allNumberAbsences = $this->getAbsenceFromDB();
-
 
         if(count($department_option_ids)>0) {
             $studentByCourse = $studentByCourse->whereIn('studentAnnuals.department_option_id', $department_option_ids);
@@ -2079,7 +2078,6 @@ class CourseAnnualController extends Controller
         $check_test = [];
 
         if($studentByCourse) {
-
             foreach($studentByCourse as $student) {
                 $totalScore = 0;
                 $checkPercent=0;
@@ -2095,6 +2093,7 @@ class CourseAnnualController extends Controller
                     $scoreAbsenceByCourse =  number_format((float)((($totalCourseHours)-(isset($scoreAbsence)?$scoreAbsence->num_absence:0))*10)/((($totalCourseHours != 0)?$totalCourseHours:1)), 2, '.', '');
                     $totalScore = $totalScore + (($scoreAbsenceByCourse >= 0)?$scoreAbsenceByCourse:0);
                 }
+
 
                 if($studentScore) {
                     foreach($studentScore as $score) {
@@ -2116,6 +2115,7 @@ class CourseAnnualController extends Controller
                 } else{
                     $scoreData=[];
                 }
+
                 $check_test[] = $totalScore;
                 //----check if every student has the score equal or upper then 90 then we set status to true..then we will not allow teacher to add any score
 //                if($checkPercent >= 90 ) {
@@ -2159,7 +2159,6 @@ class CourseAnnualController extends Controller
                 $mergerData = array_merge($element,$scoreData);
                 $arrayData[] = $mergerData;
             }
-
 
             return json_encode([
                 'status' => true,
@@ -2259,8 +2258,8 @@ class CourseAnnualController extends Controller
         $arrayData = [];
 
         $scores = DB::table('scores')
-            ->join('percentage_scores', 'percentage_scores.score_id', '=', 'scores.id')
-            ->join('percentages', 'percentages.id', '=', 'percentage_scores.percentage_id')
+            ->leftJoin('percentage_scores', 'percentage_scores.score_id', '=', 'scores.id')
+            ->leftJoin('percentages', 'percentages.id', '=', 'percentage_scores.percentage_id')
             ->whereIn('scores.degree_id', $degree_ids)
             ->whereIn('scores.department_id', $department_ids)
             ->whereIn('scores.grade_id', $grade_ids)
@@ -3436,9 +3435,6 @@ class CourseAnnualController extends Controller
         $courseAnnual = $this->courseAnnuals->findOrThrowException($request->course_annual_id);
         $allScoreByCourseAnnual = $this->studentScoreCourseAnnually($courseAnnual);
 
-
-
-
         $arrayIdsOf_Dept_Deg_Grd_DeptOp_Grooup = $this->arrayIdsOfDeptGradeDegreeDeptOption($request->course_annual_id);
         $groups = $arrayIdsOf_Dept_Deg_Grd_DeptOp_Grooup['group'];
         $department_ids = $arrayIdsOf_Dept_Deg_Grd_DeptOp_Grooup['department_id'];
@@ -3456,7 +3452,6 @@ class CourseAnnualController extends Controller
         if(count($department_option_ids) > 0) {
             $students = $students->whereIn('studentAnnuals.department_option_id', $department_option_ids);
         }
-
 
 
         if($group = $request->group) {
@@ -3606,8 +3601,6 @@ class CourseAnnualController extends Controller
 
     public function importScore($courseAnnualId, Request $request) {
         //$now = Carbon::now()->format('Y_m_d_H');
-
-//        $this->unset_params();
 
         $courseAnnual = $this->getCourseAnnualById($courseAnnualId);
 
