@@ -593,11 +593,12 @@
 
         $(document).on('click', '#all_score_course_annual', function(e) {
 
-            var url_score = '{{route('course_annual.form_all_score_properties')}}'
+            {{--var url_score = '{{route('course_annual.form_all_score_properties')}}'--}}
+                    var url_score = '{{route('admin.course.get_form_evaluation_score')}}'
             var height = $(window).height();
             var width = $(window).width();
 
-            PopupCenterDual(url_score,'course assignment',width,height);
+            window.open(url_score,'_blank');
 
 
             /*swal({

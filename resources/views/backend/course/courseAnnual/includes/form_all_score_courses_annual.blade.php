@@ -109,98 +109,70 @@
         </style>
         <div class="box-header with-border">
             <div class=" no-paddingcol-sm-12">
-                <h4 for="year" class=" col-md-4 no-padding col-lg-4 col-sm-4">{{$academicYear->name_latin}} /{{$department->code}} /{{$degree->name_en}}/ {{$grade->name_en}}</h4>
-
 
                 <div class="pull-right">
                     <button class="btn btn-primary btn-xs col-sm-1" id="refresh_score_sheet" style="margin-left: -50px"><i class="fa fa-refresh"></i></button>
 
                     <select  name="academic_year" id="filter_academic_year" style="width: 100px;" class=" col-sm-1">
                         @foreach($academicYears as $key=>$year)
-                            @if($key == $academicYear->id)
-                                <option value="{{$key}}" selected> {{$year}}</option>
-                            @else
-                                <option value="{{$key}}"> {{$year}}</option>
-                            @endif
+                            <option value="{{$key}}"> {{$year}}</option>
+                        @endforeach
+                    </select>
+
+                    <select  name="department" id="filter_dept" class="selection col-sm-1">
+                        @foreach($departments as $key=>$departmentName)
+                            <option value="{{$key}}"> {{$departmentName}}</option>
+                        @endforeach
+                    </select>
+
+                    <select  name="dept_option" id="filter_dept_option" class="selection col-sm-1">
+                        <option value="">Option</option>
+                        @foreach($departmentOptions as $option)
+                            <option value="{{$option->id}}" class="dept_option department_{{$option->department_id}}">{{$option->code}}</option>
                         @endforeach
                     </select>
 
                     <select  name="semester" id="filter_semester" style="width: 90px;" class=" col-sm-1">
-                        <option value="">Semester</option>
                         @foreach($semesters as $key=>$semester)
-                            @if($key == $semesterId)
-                                <option value="{{$key}}" selected> {{$semester}}</option>
-                            @else
-                                <option value="{{$key}}"> {{$semester}}</option>
-                            @endif
+                            <option value="{{$key}}"> {{$semester}}</option>
                         @endforeach
+                            <option value=""> Semesters </option>
                     </select>
 
                     <select  name="degree" id="filter_degree" class="selection  col-sm-1">
-                        <option value="">Degree</option>
                         @foreach($degrees as $key=>$degreeName)
-                            @if($key == $degree->id)
-                                <option value="{{$key}}" selected> {{$degreeName}}</option>
-                            @else
-                                <option value="{{$key}}"> {{$degreeName}}</option>
-                            @endif
+                            <option value="{{$key}}"> {{$degreeName}}</option>
                         @endforeach
                     </select>
 
 
                     <select  name="grade" id="filter_grade" class="selection col-sm-1">
-                        <option value="">Grade</option>
                         @foreach($grades as $key=>$gradeName)
-                            @if($key == $grade->id)
-                                <option value="{{$key}}" selected> {{$gradeName}}</option>
+
+                            @if($department_id = \App\Models\Enum\ScoreEnum::Dept_TC)
+
+                                @if($key == \App\Models\Enum\ScoreEnum::Year_1)
+
+                                    <option id="{{$key}}" value="{{$key}}" selected> {{$gradeName}}</option>
+                                @else
+                                    <option id="{{$key}}" value="{{$key}}"> {{$gradeName}}</option>
+                                @endif
+
                             @else
-                                <option value="{{$key}}"> {{$gradeName}}</option>
+                                @if($key == \App\Models\Enum\ScoreEnum::Year_3)
+
+                                    <option id="{{$key}}" value="{{$key}}" selected> {{$gradeName}}</option>
+                                @else
+                                    <option id=" {{$key}}" value="{{$key}}"> {{$gradeName}}</option>
+                                @endif
+
                             @endif
-                        @endforeach
-                    </select>
 
-
-                    @if($deptOptions != null)
-
-                        <select  name="dept_option" id="filter_dept_option" class="selection col-sm-1">
-                            <option value="">Division</option>
-                            @foreach($deptOptions as $option)
-
-                                @if($option->id == $deptOptionId)
-                                    <option value="{{$option->id}}" selected> {{$option->name_en}}</option>
-                                @else
-                                    <option value="{{$option->id}}"> {{$option->name_en}}</option>
-                                @endif
-
-                            @endforeach
-                        </select>
-
-                    @else
-
-                        <select  name="department" id="filter_dept" class="selection col-sm-1">
-                            <option value="">Department</option>
-                            @foreach($departments as $key=>$departmentName)
-                                @if($key == $department->id)
-                                    <option value="{{$key}}" selected> {{$departmentName}}</option>
-                                @else
-                                    <option value="{{$key}}"> {{$departmentName}}</option>
-                                @endif
-                            @endforeach
-                        </select>
-                    @endif
-
-
-                    <select  name="student_group" id="filter_group" class="selection col-sm-1">
-                        <option value="">Groups</option>
-                        @foreach($allStudentGroups as $key=>$group)
-                            <option value="{{$key}}"> {{$group}}</option>
                         @endforeach
                     </select>
 
                 </div>
             </div>
-
-
 
         </div>
         <!-- /.box-header -->
@@ -308,6 +280,22 @@
                 } else if ( prop  === 'Passage') {
                     cellProperties.readOnly = false;
                 }
+
+                if(prop == 'number') {
+                    cellProperties.className = 'htLeft';
+                } else if(prop == 'student_name') {
+                    cellProperties.className = 'htLeft';
+
+                } else if (prop == 'student_gender') {
+                    cellProperties.className = 'htLeft';
+
+                } else if(prop == 'student_id_card') {
+                    cellProperties.className = 'htLeft';
+                }
+
+//                console.log(prop);
+
+
                 return cellProperties;
             },
             beforeOnCellMouseDown: function (event,coord, TD) {
@@ -351,18 +339,78 @@
                 return false;
             },
 
+            afterChange: function(changes, source) {
+
+                if(changes) {
+                    $.each(changes, function (index, element) {
+
+                        var change = element;
+                        var rowIndex = change[0];
+                        var columnIndex = change[1];
+
+                        if(columnIndex == 'Observation') {
+                            var rowData = hotInstance.getData();
+                            var route = '{{route('course_annual.save_each_cell_observation')}}';
+                            var baseData ={};
+
+                            console.log(rowData[rowIndex]);
+//                    $.ajax({
+//                        type: 'POST',
+//                        url: route,
+//                        data: baseData,
+//                        dataType: "json",
+//                        success: function(resultData) {
+//
+//                        }
+//                    });
+                        }
+                    })
+                }
+            }
+
         };
+
+        $('.dept_option').hide();
 
         $(document).ready(function() {
 
+            if(val = $('#filter_dept :selected').val()) {
+                $('.department_'+ val).show();
+
+                if(val == parseInt('{{\App\Models\Enum\ScoreEnum::Dept_TC}}')) {
+
+                    $('#filter_grade option').each(function(key, val) {
+
+                        if($(this).val() == parseInt('{{\App\Models\Enum\ScoreEnum::Year_1}}')) {
+                            $(this).prop('selected', true);
+                        }
+                    });
+
+                } else {
+                    $('#filter_grade option').each(function(key, val) {
+
+                        if($(this).val() == parseInt('{{\App\Models\Enum\ScoreEnum::Year_3}}')) {
+                            $(this).prop('selected', true);
+                        }
+                    });
+                }
+            }
+
+            initTable();
+
+        });
+
+        function initTable() {
+
+
             var BaseUrl = '{{route('admin.course.get_all_handsontable_data')}}';
             var BaseData = {
-                dept_id: '{{$department->id}}',
-                degree_id: '{{$degree->id}}',
-                grade_id: '{{$grade->id}}',
-                academic_year_id: '{{$academicYear->id}}',
-                semester_id:'{{$semesterId}}',
-                dept_option_id: '{{$deptOptionId}}',
+                dept_id: $('#filter_dept :selected').val(),
+                degree_id: $('#filter_degree :selected').val(),
+                grade_id: $('#filter_grade').val(),
+                academic_year_id: $('#filter_academic_year :selected').val(),
+                semester_id:$('#filter_semester :selected').val(),
+                dept_option_id: $('#filter_dept_option :selected').val(),
             }
 
             //--------------- when document ready call ajax
@@ -372,7 +420,6 @@
                 data:BaseData ,
                 dataType: "json",
                 success: function(resultData) {
-                    console.log(resultData);
                     if(resultData.status == false) {
 
                         notify('error', 'info', resultData.message);
@@ -387,10 +434,8 @@
                         var mainFooterHeight = $('.main-footer').height();
                         var boxHeaderHeight = $('.box-header').height();
                         var height = $(document).height();
-
                         var tab_height = height - (mainHeaderHeight + mainFooterHeight + boxHeaderHeight + 60);
 
-//                    alert(tab_height);
 
                         setting.height=tab_height;
 
@@ -533,60 +578,44 @@
                     width: table_width
                 });
             });
+        }
 
-        });
-
-        $('#filter_academic_year').on('change', function() {
-            filter_table();
-        })
-        $('#filter_grade').on('change', function(){
-            filter_table();
-        });
-        $('#filter_semester').on('change', function() {
-            filter_table();
-        })
-        $('#filter_degree').on('change', function(){
-            filter_table();
-        });
-        $('#filter_dept').on('change', function() {
-            filter_table();
-        })
-
-        $('#filter_group').on('change', function() {
-            filter_table();
-        });
 
         function filter_table () {
 
-                    @if($department_id != null)
+            var BaseData = {
+                dept_id: $('#filter_dept :selected').val(),
+                degree_id: $('#filter_degree :selected').val(),
+                grade_id: $('#filter_grade :selected').val(),
+                academic_year_id: $('#filter_academic_year :selected').val(),
+                semester_id:$('#filter_semester :selected').val(),
+                dept_option_id: $('#filter_dept_option :selected').val(),
+                group_name: $('#filter_group :selected').val()
+            }
 
-            var BaseData = {
-                        dept_id: '{{$department_id}}',
-                        degree_id: $('#filter_degree :selected').val(),
-                        grade_id: $('#filter_grade :selected').val(),
-                        academic_year_id: $('#filter_academic_year :selected').val(),
-                        semester_id:$('#filter_semester :selected').val(),
-                        dept_option_id: $('#filter_dept_option :selected').val(),
-                        group_name: $('#filter_group :selected').val()
-                    }
-                    @else
-            var BaseData = {
-                        dept_id: $('#filter_dept :selected').val(),
-                        degree_id: $('#filter_degree :selected').val(),
-                        grade_id: $('#filter_grade :selected').val(),
-                        academic_year_id: $('#filter_academic_year :selected').val(),
-                        semester_id:$('#filter_semester :selected').val(),
-                        dept_option_id: $('#filter_dept_option :selected').val(),
-                        group_name: $('#filter_group :selected').val()
-                    }
-            @endif
             $.ajax({
                 type: 'GET',
                 url: '{{route('admin.course.filter_course_annual_scores')}}',
                 data: BaseData,
                 dataType: "json",
                 success: function(resultData) {
-                    updateSettingHandsontable(resultData);
+                    if(resultData.status == false) {
+                        swal({
+                            title: "Attention",
+                            text: 'Please Check Incase Yours Department Option Is Not Select!!' ,
+                            type: "warning",
+                            confirmButtonColor: "red",
+                            confirmButtonText: "Close",
+                            closeOnConfirm: true
+                        }, function(confirmed) {
+                            if (confirmed) {
+                                // do some staff if you want ---
+                            }
+                        });
+                    } else {
+                        updateSettingHandsontable(resultData);
+                    }
+
                 }
             });
         }
@@ -606,9 +635,101 @@
         }
 
 
+
         $('#refresh_score_sheet').on('click', function() {
             filter_table();
+        });
+
+        $('#filter_dept').on('change', function() {
+            $('.dept_option').hide();
+            $('.department_'+ $(this).val()).show();
+
+            if($(this).val() == parseInt('{{\App\Models\Enum\ScoreEnum::Dept_TC}}')) {
+
+                $('#filter_grade option').each(function(key, val) {
+
+                    if($(this).val() == parseInt('{{\App\Models\Enum\ScoreEnum::Year_1}}')) {
+                        $(this).prop('selected', true);
+                    }
+                });
+
+            } else {
+
+                $('#filter_grade option').each(function(key, val) {
+
+                    if($(this).val() == parseInt('{{\App\Models\Enum\ScoreEnum::Year_3}}')) {
+                        $(this).prop('selected', true);
+                    }
+                });
+            }
+
+            filter_table();
+        });
+
+        $('#filter_academic_year').on('change', function() {
+            filter_table();
         })
+        $('#filter_grade').on('change', function(){
+            filter_table();
+        });
+        $('#filter_semester').on('change', function() {
+            filter_table();
+        })
+        $('#filter_degree').on('change', function(){
+            filter_table();
+        });
+
+        $('#filter_group').on('change', function() {
+            filter_table();
+        });
+
+
+
+
+        function load_group(method){
+
+
+            var department_id = $("#filter_dept :selected").val();
+            var academic_year_id = $("#filter_academic_year :selected").val();
+            var degree_id = $("#filter_degree :selected").val();
+            var grade_id = $("#filter_grade :selected").val();
+            var department_option_id = $("#filter_dept_option :selected").val();
+
+
+            // Load group only department, academic year, degree and grade are filled.
+            if(department_id != "" && department_id != null  && academic_year_id != "" && degree_id != "" && grade_id != ""){
+
+                $.ajax({
+                    url : get_group_url,
+                    type: 'GET',
+                    data: {
+                        department_id:$("#department_id").val(),
+                        academic_year_id:$("#academic_year_id").val(),
+                        degree_id:$("#degree_id").val(),
+                        grade_id:$("#grade_id").val(),
+                        department_option_id:$("#department_option_id").val(),
+                        _method: method
+                    },
+                    success : function(data){
+
+                        if(data != null){
+                            var option_text = "";
+
+                            $.each(data, function(key, value){
+
+                                if(value != null) {
+                                    option_text = option_text +
+
+                                            ' <label><input type="checkbox" class="each_check_box " name="groups[]" value="'+value+'"> '+value+'</label>'
+                                }
+
+                            })
+                            $(".group_panel").html(option_text);
+                        }
+                    }
+                })
+            }
+        }
 
 
     </script>

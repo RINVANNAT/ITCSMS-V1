@@ -27,12 +27,10 @@ class ScoreEnum
     const Col_Abs = 'Absence';
     const Index_Abs = 'absence';
 
-
     const Name_Mid = 'midterm';
     const Name_Fin = 'final';
     const is_counted_creditability = 1;
     const is_counted_absence = 1;
-
 
     const Pass_Moyenne  = 50;
     const Under_30 = 30;
@@ -41,5 +39,12 @@ class ScoreEnum
     const Red_I = 'Red.I';
     const Red_T = 'Red.T';
     const Pass = 'P';
+
+
+
+
+    const Year_3 = 3;
+    const Year_1= 1;
+    const Dept_TC = 8;
 
 }
