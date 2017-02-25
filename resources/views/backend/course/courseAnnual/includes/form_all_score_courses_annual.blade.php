@@ -228,7 +228,7 @@
             if(jQuery.isNumeric(value) ) {
                 if(value < 5) {
                     if(prop != 'number' ) {
-                        if(prop != 'Rank') {
+                        if(prop != 'Rank' && prop != 'Rattrapage') {
                             var check = prop.split('_');
                             if(check[0] != 'Abs') {
 
@@ -291,6 +291,10 @@
 
                 } else if(prop == 'student_id_card') {
                     cellProperties.className = 'htLeft';
+                } else if(prop == 'Observation') {
+                    cellProperties.className = 'htLeft';
+                } else if (prop == 'Remark') {
+                    cellProperties.className = 'htLeft';
                 }
 
 //                console.log(prop);
@@ -347,22 +351,24 @@
                         var change = element;
                         var rowIndex = change[0];
                         var columnIndex = change[1];
+                        var newValue = change[3];
 
                         if(columnIndex == 'Observation') {
-                            var rowData = hotInstance.getData();
-                            var route = '{{route('course_annual.save_each_cell_observation')}}';
-                            var baseData ={};
+//                            var rowData = hotInstance.getData();//----all table data
+                            var col_student_id = hotInstance.getDataAtProp('student_id_card'); //---array data of column student_id
 
-                            console.log(rowData[rowIndex]);
-//                    $.ajax({
-//                        type: 'POST',
-//                        url: route,
-//                        data: baseData,
-//                        dataType: "json",
-//                        success: function(resultData) {
-//
-//                        }
-//                    });
+                            var route = '{{route('course_annual.save_each_cell_observation')}}';
+                            var baseData ={student_id_card: col_student_id[rowIndex], observation: newValue};
+
+                            $.ajax({
+                                type: 'POST',
+                                url: route,
+                                data: baseData,
+                                dataType: "json",
+                                success: function(resultData) {
+
+                                }
+                            });
                         }
                     })
                 }
@@ -446,21 +452,28 @@
 
                                     if (key === 'sort') {
                                         setTimeout(function () {
+//                                            console.log(hotInstance);
+//                                            console.log(hotInstance.getDataAtCol(2));
                                             //timeout is used to make sure the menu collapsed before alert is shown
 
+                                            var col_student_id = hotInstance.getDataAtProp('student_id_card')
                                             var row = hotInstance.getSelected()[0];
                                             var col = hotInstance.getSelected()[1];
+
                                             var data = hotInstance.getData();
                                             var settingData = setting.data;
                                             var arrayData = [];
                                             var averageMaxMin = [];
+
+
                                             for(var key = 0; key < data.length; key++) {
-                                                if(data[key][col] != null) {
+                                                if((data[key][col] != null) && (data[key][col] != '')) {
                                                     arrayData.push({student_id_card: data[key][1], score: data[key][col]});
                                                 } else {
                                                     break;
                                                 }
                                             }
+
                                             if(col > 3 && col < (hotInstance.countCols() - 5)) {
 
                                                 arrayData.sort(SortByScore);

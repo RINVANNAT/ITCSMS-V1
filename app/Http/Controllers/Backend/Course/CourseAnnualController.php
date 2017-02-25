@@ -2282,7 +2282,8 @@ class CourseAnnualController extends Controller
                 'studentAnnuals.academic_year_id',
                 'studentAnnuals.department_id',
                 'studentAnnuals.department_option_id',
-                'studentAnnuals.degree_id'
+                'studentAnnuals.degree_id',
+                'students.observation'
             )
             ->orderBy('students.name_latin');
         return $studentAnnual;
@@ -2701,6 +2702,7 @@ class CourseAnnualController extends Controller
         $each_column_score = [];
         $fail_subjects = [];
         $array_rank = [];
+        $array_observation = [];
 
 
         if($arrayCourseAnnual) {
@@ -2719,11 +2721,11 @@ class CourseAnnualController extends Controller
                 $colWidths[] = 65;
                 //------end----
                 if($status_info_stu) {
-                    $dataHandSontable = $this->manageArrayHandSontableData($request, $course_Annual, $groups, $eachCourseAnnualScores, $element, $status_info_stu, $semesterId, $semesters, $absences, $totalAbs, $totalMoyenne, $each_column_score, $fail_subjects);
+                    $dataHandSontable = $this->manageArrayHandSontableData($request, $course_Annual, $groups, $eachCourseAnnualScores, $element, $status_info_stu, $semesterId, $semesters, $absences, $totalAbs, $totalMoyenne, $each_column_score, $fail_subjects, $array_observation);
                     $status_info_stu = false;
 
                 } else {
-                    $dataHandSontable = $this->manageArrayHandSontableData($request, $course_Annual, $groups, $eachCourseAnnualScores, $element, $status_info_stu, $semesterId, $semesters, $absences, $totalAbs, $totalMoyenne, $each_column_score, $fail_subjects);
+                    $dataHandSontable = $this->manageArrayHandSontableData($request, $course_Annual, $groups, $eachCourseAnnualScores, $element, $status_info_stu, $semesterId, $semesters, $absences, $totalAbs, $totalMoyenne, $each_column_score, $fail_subjects, $array_observation);
                 }
 
 
@@ -2733,6 +2735,7 @@ class CourseAnnualController extends Controller
                     $totalMoyenne = $dataHandSontable['moyenne'];
                     $each_column_score = $dataHandSontable['each_column_score'];
                     $fail_subjects = $dataHandSontable['fail_subject'];
+                    $array_observation = $dataHandSontable['observation'];
                 } else {
                     return Response::json([
                         'status' => false,
@@ -2788,10 +2791,11 @@ class CourseAnnualController extends Controller
         $nestedHeaders[0] = array_merge($nestedHeaders[0], ['Moyenne']);
         $nestedHeaders[0] = array_merge($nestedHeaders[0], ['Rank']);
         $nestedHeaders[0] = array_merge($nestedHeaders[0], ['Redouble']);
-        $nestedHeaders[0] = array_merge($nestedHeaders[0], ['Observation']);
+
         $nestedHeaders[0] = array_merge($nestedHeaders[0], ['Rattrapage']);
         $nestedHeaders[0] = array_merge($nestedHeaders[0], ['Passage']);
-
+        $nestedHeaders[0] = array_merge($nestedHeaders[0], ['Observation']);
+        $nestedHeaders[0] = array_merge($nestedHeaders[0], ['Remark']);
         $nestedHeaders[1] = array_merge($nestedHeaders[1], [$finalCredit]);
         $nestedHeaders[1] = array_merge($nestedHeaders[1], [' ']);
         $nestedHeaders[1] = array_merge($nestedHeaders[1], [' ']);
@@ -2802,11 +2806,12 @@ class CourseAnnualController extends Controller
         $colWidths[] = 100;
         $colWidths[] = 100;
         $colWidths[] = 100;
-        $colWidths[] = 100;
-        $colWidths[] = 100;
-        $colWidths[] = 100;
-        $colWidths[] = 100;
-        $colWidths[] = 100;
+        $colWidths[] = 100;//Rattrapage
+        $colWidths[] = 100;//Passage
+        $colWidths[] = 500;//observation
+        $colWidths[] = 300;// Remark
+        $colWidths[] = 100;//blank header
+
 
         foreach($arrayCourseAnnual as $course_program_id => $course_annual) {
 
@@ -2825,8 +2830,6 @@ class CourseAnnualController extends Controller
         }
 
         $array_tmp_rank = [];
-
-
         foreach($element as $key => $value) {
             $index++;
 
@@ -2875,9 +2878,11 @@ class CourseAnnualController extends Controller
                 $value['Redouble'] = ScoreEnum::Pass;
             }
 
-            $value['Observation'] = "";
+
             $value['Rattrapage'] = count($fail_subjects[$key]);
             $value['Passage'] = "";
+            $value['Observation'] = $array_observation[$key]->observation;
+            $value['Remark'] = '_N';
             $value[""] = "";// blank column at last
             $value["number"] = $index;
             $element[$key] = $value;
@@ -2899,34 +2904,34 @@ class CourseAnnualController extends Controller
         //------assign max min average for column s1_moyenne, s2_moyenne and total moyenne
 
 
-        if($semesterId) {
-            $data_empty = array_merge($data_empty,['S'.$semesterId. '_Moyenne' => ""]);
-            $max_array = array_merge($max_array, ['S'.$semesterId.'_Moyenne' => max($average_moyenne_by_semester[$semesterId])]);
-            $min_array = array_merge($min_array, ['S'.$semesterId.'_Moyenne' => min($average_moyenne_by_semester[$semesterId])]);
-            $average_array = array_merge($average_array, ['S'.$semesterId.'_Moyenne' => $this->floatFormat((array_sum($average_moyenne_by_semester[$semesterId]))/count($average_moyenne_by_semester[$semesterId]) )]);
-        } else {
+        if(count($average_moyenne_by_semester) > 0) {
+            if($semesterId) {
+                $data_empty = array_merge($data_empty,['S'.$semesterId. '_Moyenne' => ""]);
+                $max_array = array_merge($max_array, ['S'.$semesterId.'_Moyenne' => max($average_moyenne_by_semester[$semesterId])]);
+                $min_array = array_merge($min_array, ['S'.$semesterId.'_Moyenne' => min($average_moyenne_by_semester[$semesterId])]);
+                $average_array = array_merge($average_array, ['S'.$semesterId.'_Moyenne' => $this->floatFormat((array_sum($average_moyenne_by_semester[$semesterId]))/count($average_moyenne_by_semester[$semesterId]) )]);
+            } else {
 
-            foreach ($semesters as $s){
-                $data_empty = array_merge($data_empty,['S'.$s->id => ""]);
-                $max_array = array_merge($max_array, ['S'.$s->id.'_Moyenne' => max($average_moyenne_by_semester[$s->id])]);
-                $min_array = array_merge($min_array, ['S'.$s->id.'_Moyenne' => min($average_moyenne_by_semester[$s->id])]);
-                $average_array = array_merge($average_array, ['S'.$s->id.'_Moyenne' => $this->floatFormat((array_sum($average_moyenne_by_semester[$s->id]))/count($average_moyenne_by_semester[$s->id]) )]);
+                foreach ($semesters as $s){
+                    $data_empty = array_merge($data_empty,['S'.$s->id => ""]);
+                    $max_array = array_merge($max_array, ['S'.$s->id.'_Moyenne' => max($average_moyenne_by_semester[$s->id])]);
+                    $min_array = array_merge($min_array, ['S'.$s->id.'_Moyenne' => min($average_moyenne_by_semester[$s->id])]);
+                    $average_array = array_merge($average_array, ['S'.$s->id.'_Moyenne' => $this->floatFormat((array_sum($average_moyenne_by_semester[$s->id]))/count($average_moyenne_by_semester[$s->id]) )]);
+                }
+
             }
 
+            $data_empty = array_merge($data_empty,['Moyenne' => ""]);
+            $max_array = array_merge($max_array, ['Moyenne' => max($finalMoynne)]);
+            $min_array = array_merge($min_array, ['Moyenne' => min($finalMoynne)]);
+            $average_array = array_merge($average_array, ['Moyenne' => $this->floatFormat((array_sum($finalMoynne))/count($finalMoynne) )]);
+
+            $array_data[] = $data_empty;
+            $array_data[] = $max_array;
+            $array_data[] = $min_array;
+            $array_data[] = $average_array;
+            $array_data[] = $data_empty;
         }
-
-
-
-        $data_empty = array_merge($data_empty,['Moyenne' => ""]);
-        $max_array = array_merge($max_array, ['Moyenne' => max($finalMoynne)]);
-        $min_array = array_merge($min_array, ['Moyenne' => min($finalMoynne)]);
-        $average_array = array_merge($average_array, ['Moyenne' => $this->floatFormat((array_sum($finalMoynne))/count($finalMoynne) )]);
-
-        $array_data[] = $data_empty;
-        $array_data[] = $max_array;
-        $array_data[] = $min_array;
-        $array_data[] = $average_array;
-        $array_data[] = $data_empty;
 
         return Response::json([
             'status' => true,
@@ -3019,7 +3024,7 @@ class CourseAnnualController extends Controller
     }
 
 
-    private function manageArrayHandSontableData($request, $annualCourses, $groups, $eachCourseAnnualScores, $element, $status, $semesterId, $semesters, $absences, $totalAbs, $totalMoyenne, $each_column_score, $fail_subjects) {
+    private function manageArrayHandSontableData($request, $annualCourses, $groups, $eachCourseAnnualScores, $element, $status, $semesterId, $semesters, $absences, $totalAbs, $totalMoyenne, $each_column_score, $fail_subjects, $array_observation) {
 
         //-----loop arrange table from column to row ---
         if($status) {
@@ -3047,6 +3052,7 @@ class CourseAnnualController extends Controller
 
                     foreach($filtered_students as $stu_dent) {
 
+                        $array_observation[$stu_dent->id_card] = $stu_dent;
                         $each_score = isset($eachCourseAnnualScores[$eachCourse->course_annual_id])?(isset($eachCourseAnnualScores[$eachCourse->course_annual_id][$stu_dent->student_annual_id])?$eachCourseAnnualScores[$eachCourse->course_annual_id][$stu_dent->student_annual_id]->average:0):0;
 
                         $each_column_score[$eachCourse->course_id][$stu_dent->id_card] = $each_score;
@@ -3135,6 +3141,7 @@ class CourseAnnualController extends Controller
 
 
                 foreach($filtered_students as $stu_dent) {
+                    $array_observation[$stu_dent->id_card] = $stu_dent;
                     //-----$annualCourses[0] this array contains only one course annual that which this course is the same withe course program
                     $absence_by_course = isset($absences[$tmpCourse->course_annual_id])?(isset($absences[$tmpCourse->course_annual_id][$stu_dent->student_annual_id])?$absences[$tmpCourse->course_annual_id][$stu_dent->student_annual_id]:null):null;
                     $each_score = isset($eachCourseAnnualScores[$tmpCourse->course_annual_id])?(isset($eachCourseAnnualScores[$tmpCourse->course_annual_id][$stu_dent->student_annual_id])?$eachCourseAnnualScores[$tmpCourse->course_annual_id][$stu_dent->student_annual_id]->average:0):0;
@@ -3212,6 +3219,7 @@ class CourseAnnualController extends Controller
 
                     foreach($filtered_students as $stu_dent) {
 
+                        $array_observation[$stu_dent->id_card] = $stu_dent;
                         $absence_by_course = isset($absences[$eachCourse->course_annual_id])?(isset($absences[$eachCourse->course_annual_id][$stu_dent->student_annual_id])?$absences[$eachCourse->course_annual_id][$stu_dent->student_annual_id]:null):null;
                         $each_score = isset($eachCourseAnnualScores[$eachCourse->course_annual_id])?(isset($eachCourseAnnualScores[$eachCourse->course_annual_id][$stu_dent->student_annual_id])?$eachCourseAnnualScores[$eachCourse->course_annual_id][$stu_dent->student_annual_id]->average:0):0;
                         $each_column_score[$eachCourse->course_id][$stu_dent->id_card] = $each_score;
@@ -3286,6 +3294,7 @@ class CourseAnnualController extends Controller
                 foreach($filtered_students as $stu_dent) {
                     //-----$annualCourses[0] this array contains only one course annual that which this course is the same withe course program
 
+                    $array_observation[$stu_dent->id_card] = $stu_dent;
                     $absence_by_course = isset($absences[$tmpCourse->course_annual_id])?(isset($absences[$tmpCourse->course_annual_id][$stu_dent->student_annual_id])?$absences[$tmpCourse->course_annual_id][$stu_dent->student_annual_id]:null):null;
                     $each_score = isset($eachCourseAnnualScores[$tmpCourse->course_annual_id])?(isset($eachCourseAnnualScores[$tmpCourse->course_annual_id][$stu_dent->student_annual_id])?$eachCourseAnnualScores[$eachCourse->course_annual_id][$stu_dent->student_annual_id]->average:0):0;
                     $each_column_score[$tmpCourse->course_id][$stu_dent->id_card] = $each_score;
@@ -3332,7 +3341,8 @@ class CourseAnnualController extends Controller
             'absence' => $totalAbs,
             'moyenne' => $totalMoyenne,
             'each_column_score' => $each_column_score,
-            'fail_subject' => $fail_subjects
+            'fail_subject' => $fail_subjects,
+            'observation' => $array_observation
         ];
 
     }
@@ -4218,8 +4228,18 @@ class CourseAnnualController extends Controller
     public function saveEachObservation(Request $request) {
 
 
-        dd($request->all());
+        //----update observation by student id_card
+
+        $student = DB::table('students')
+            ->where('id_card', $request->student_id_card)
+            ->update(['observation' => $request->observation]);
+        if($student) {
+            return Response::json(['status' => true]);
+        }
     }
+
+
+
 
 
 }
