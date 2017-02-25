@@ -2752,6 +2752,7 @@ class CourseAnnualController extends Controller
         }
         //----end if course-program
 
+
         $extra_rows = $this->find_max_min_average_mark();
         $data_empty = $extra_rows['data_empty'];
         $max_array = $extra_rows['max'];
@@ -2881,7 +2882,7 @@ class CourseAnnualController extends Controller
 
             $value['Rattrapage'] = count($fail_subjects[$key]);
             $value['Passage'] = "";
-            $value['Observation'] ='';// $array_observation[$key]->observation;
+            $value['Observation'] = $array_observation[$key]->observation;
             $value['Remark'] = '_N';
             $value[""] = "";// blank column at last
             $value["number"] = $index;
@@ -3088,6 +3089,8 @@ class CourseAnnualController extends Controller
 
                         if($each_score < ScoreEnum::Under_30) {
                             $fail_subjects[$stu_dent->id_card][] = $each_score;
+                        } else {
+                            $fail_subjects[$stu_dent->id_card] = [] ;
                         }
 
                         if(isset($element[$stu_dent->id_card])) {
@@ -3175,6 +3178,8 @@ class CourseAnnualController extends Controller
                     }
                     if($each_score < ScoreEnum::Under_30) {
                         $fail_subjects[$stu_dent->id_card][] = $each_score;
+                    } else {
+                        $fail_subjects[$stu_dent->id_card] = [] ;
                     }
 
                     if(isset($element[$stu_dent->id_card])) {
@@ -3240,6 +3245,8 @@ class CourseAnnualController extends Controller
                         }
                         if($each_score < ScoreEnum::Under_30) {
                             $fail_subjects[$stu_dent->id_card][] = $each_score;
+                        } else {
+                            $fail_subjects[$stu_dent->id_card] = [] ;
                         }
 
                         if(isset($element[$stu_dent->id_card])) {
@@ -3315,6 +3322,8 @@ class CourseAnnualController extends Controller
 
                     if($each_score < ScoreEnum::Under_30) {
                         $fail_subjects[$stu_dent->id_card][] = $each_score;
+                    } else {
+                        $fail_subjects[$stu_dent->id_card] = [] ;
                     }
 
                     if(isset($element[$stu_dent->id_card])) {
