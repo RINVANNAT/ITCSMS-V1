@@ -18,9 +18,9 @@ class ScoreEnum
     const Midterm_0 = 0;
     const Col_Header = 3;
     const Highest_Score = 100;
-    const Fraud = 'F';
-    const Absence = 'A';
+
     const Zero = 0;
+    const One = 1;
     const Notation = 'notation';
     const Index_Num_Abs = 'num_absence';
     const Stu_Id_Card = 'student_id_card';
@@ -32,19 +32,24 @@ class ScoreEnum
     const is_counted_creditability = 1;
     const is_counted_absence = 1;
 
-    const Pass_Moyenne  = 50;
-    const Under_30 = 30;
+
     const Degree_I = 1;
     const Degree_T = 2;
     const Red_I = 'Red.I';
     const Red_T = 'Red.T';
     const Pass = 'P';
 
-
-
-
     const Year_3 = 3;
     const Year_1= 1;
     const Dept_TC = 8;
+
+
+    //--------check score -----
+    const Pass_Moyenne  = 50;
+    const Under_30 = 30;
+    const Score_10 = 10;
+    const Fraud = 'F';
+    const Absence = 'A';
+
 
 }

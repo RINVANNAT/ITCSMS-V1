@@ -530,8 +530,8 @@
             if(prop == 'average') {
 
                 if($.isNumeric(value)) {
-                    if(value < 50) {
-                        if(value < 30) {
+                    if(value < parseInt('{{\App\Models\Enum\ScoreEnum::Pass_Moyenne}}') ) {
+                        if(value < parseInt('{{\App\Models\Enum\ScoreEnum::Under_30}}')) {
                             td.style.backgroundColor = '#cc3300';
                         } else {
                             td.style.backgroundColor = '#D2B500';

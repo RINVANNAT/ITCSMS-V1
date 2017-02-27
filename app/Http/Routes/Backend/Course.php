@@ -108,6 +108,7 @@ Route::group([
     Route::get('course-annual/-get-form-all-score-properties', 'CourseAnnualController@formAllScoreSelection')->name('course_annual.form_all_score_properties');
 
     Route::post('course_annual/save-each-cell-observation', 'CourseAnnualController@saveEachObservation')->name('course_annual.save_each_cell_observation');
+    Route::post('course_annual/save-each-cell-remark', 'CourseAnnualController@saveEachORemark')->name('course_annual.save_each_cell_remark');
 
 
 

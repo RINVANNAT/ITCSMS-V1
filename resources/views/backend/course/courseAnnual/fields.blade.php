@@ -166,7 +166,16 @@
 
     {!! Form::label('count_creditability', "Creditability For Transcript", ['class' => 'col-lg-3 control-label required']) !!}
     <div class="col-lg-2">
-        <input type="checkbox" name="is_counted_creditability" id="count_credit" class="boolean_input" value="{{\App\Models\Enum\ScoreEnum::is_counted_creditability}}" checked>
+        @if(isset($courseAnnual))
+            @if($courseAnnual->is_counted_creditability)
+                <input type="checkbox" name="is_counted_creditability" id="count_credit" class="boolean_input" value="{{\App\Models\Enum\ScoreEnum::is_counted_creditability}}" checked>
+            @else
+                <input type="checkbox" name="is_counted_creditability" id="count_credit" class="boolean_input" value="{{\App\Models\Enum\ScoreEnum::is_counted_creditability}}" >
+            @endif
+        @else
+            <input type="checkbox" name="is_counted_creditability" id="count_credit" class="boolean_input" value="{{\App\Models\Enum\ScoreEnum::is_counted_creditability}}" checked>
+        @endif
+
     </div>
 
     {!! Form::label('count_absence', " 10%-Absence", ['class' => 'col-lg-2 control-label required']) !!}

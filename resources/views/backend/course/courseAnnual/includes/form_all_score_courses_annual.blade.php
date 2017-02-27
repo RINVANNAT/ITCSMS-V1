@@ -76,11 +76,11 @@
                 margin-top: -3px !important;
             }
             .handsontable thead tr:first-child {
-                height: 120px !important;
+                height: 80px !important;
                 vertical-align: middle !important;
             }
             .handsontable thead tr:nth-child(2) {
-                height: 50px !important;
+                height: 40px !important;
                 vertical-align: middle !important;
             }
 
@@ -226,7 +226,7 @@
             Handsontable.renderers.TextRenderer.apply(this, arguments);
 
             if(jQuery.isNumeric(value) ) {
-                if(value < 5) {
+                if(value < parseInt('{{\App\Models\Enum\ScoreEnum::Pass_Moyenne}}')) {
                     if(prop != 'number' ) {
                         if(prop != 'Rank' && prop != 'Rattrapage') {
                             var check = prop.split('_');
@@ -235,7 +235,20 @@
                                 if(prop != 'total') {
                                     var colSemester = prop.split('_');
                                     if(colSemester[0] != 'S' ) {
-                                        td.style.backgroundColor = '#cc3300';
+
+                                        if(value < parseInt('{{\App\Models\Enum\ScoreEnum::Under_30}}')) {
+
+
+                                            if(value <= parseInt('{{\App\Models\Enum\ScoreEnum::Score_10}}')) {
+                                                td.style.backgroundColor = '#A41C00';
+                                            } else {
+                                                td.style.backgroundColor = '#F76A4D';
+                                            }
+
+                                        } else {
+                                            td.style.backgroundColor = '#D2B500';
+                                        }
+
                                     }
                                 }
                             }
@@ -278,6 +291,8 @@
                 } else if ( prop  === 'Rattrapage') {
                     cellProperties.readOnly = false;
                 } else if ( prop  === 'Passage') {
+                    cellProperties.readOnly = false;
+                } else if(prop == 'Remark') {
                     cellProperties.readOnly = false;
                 }
 
@@ -352,11 +367,11 @@
                         var rowIndex = change[0];
                         var columnIndex = change[1];
                         var newValue = change[3];
+                        var col_student_id = hotInstance.getDataAtProp('student_id_card'); //---array data of column student_id
 
                         if(columnIndex == 'Observation') {
 //                            var rowData = hotInstance.getData();//----all table data
-                            var col_student_id = hotInstance.getDataAtProp('student_id_card'); //---array data of column student_id
-
+                        
                             var route = '{{route('course_annual.save_each_cell_observation')}}';
                             var baseData ={student_id_card: col_student_id[rowIndex], observation: newValue};
 
@@ -367,6 +382,23 @@
                                 dataType: "json",
                                 success: function(resultData) {
 
+                                    //---call back function ....do some stuff
+                                }
+                            });
+                        }
+
+                        if(columnIndex == 'Remark') {
+                            var remark_rul = '{{route('course_annual.save_each_cell_remark')}}';
+                            var baseData_remark ={student_id_card: col_student_id[rowIndex], remark: newValue};
+
+                            $.ajax({
+                                type: 'POST',
+                                url: remark_rul,
+                                data: baseData_remark,
+                                dataType: "json",
+                                success: function(resultData) {
+
+                                    //---call back function ....do some stuff
                                 }
                             });
                         }
@@ -411,7 +443,7 @@
 
             var BaseUrl = '{{route('admin.course.get_all_handsontable_data')}}';
             var BaseData = {
-                dept_id: $('#filter_dept :selected').val(),
+                department_id: $('#filter_dept :selected').val(),
                 degree_id: $('#filter_degree :selected').val(),
                 grade_id: $('#filter_grade').val(),
                 academic_year_id: $('#filter_academic_year :selected').val(),
@@ -428,7 +460,18 @@
                 success: function(resultData) {
                     if(resultData.status == false) {
 
-                        notify('error', 'info', resultData.message);
+                        swal({
+                            title: "Attention",
+                            text: 'Please Check Incase Yours Department Option Is Not Select!!' ,
+                            type: "warning",
+                            confirmButtonColor: "red",
+                            confirmButtonText: "Close",
+                            closeOnConfirm: true
+                        }, function(confirmed) {
+                            if (confirmed) {
+                                // do some staff if you want ---
+                            }
+                        });
 
                     } else {
                         setting.data = resultData.data;
@@ -597,7 +640,7 @@
         function filter_table () {
 
             var BaseData = {
-                dept_id: $('#filter_dept :selected').val(),
+                department_id: $('#filter_dept :selected').val(),
                 degree_id: $('#filter_degree :selected').val(),
                 grade_id: $('#filter_grade :selected').val(),
                 academic_year_id: $('#filter_academic_year :selected').val(),
@@ -606,31 +649,37 @@
                 group_name: $('#filter_group :selected').val()
             }
 
-            $.ajax({
-                type: 'GET',
-                url: '{{route('admin.course.filter_course_annual_scores')}}',
-                data: BaseData,
-                dataType: "json",
-                success: function(resultData) {
-                    if(resultData.status == false) {
-                        swal({
-                            title: "Attention",
-                            text: 'Please Check Incase Yours Department Option Is Not Select!!' ,
-                            type: "warning",
-                            confirmButtonColor: "red",
-                            confirmButtonText: "Close",
-                            closeOnConfirm: true
-                        }, function(confirmed) {
-                            if (confirmed) {
-                                // do some staff if you want ---
-                            }
-                        });
-                    } else {
-                        updateSettingHandsontable(resultData);
-                    }
+            if(hotInstance) {
 
-                }
-            });
+                $.ajax({
+                    type: 'GET',
+                    url: '{{route('admin.course.filter_course_annual_scores')}}',
+                    data: BaseData,
+                    dataType: "json",
+                    success: function(resultData) {
+                        if(resultData.status == false) {
+                            swal({
+                                title: "Attention",
+                                text: 'Please Check Incase Yours Department Option Is Not Select!!' ,
+                                type: "warning",
+                                confirmButtonColor: "red",
+                                confirmButtonText: "Close",
+                                closeOnConfirm: true
+                            }, function(confirmed) {
+                                if (confirmed) {
+                                    // do some staff if you want ---
+                                }
+                            });
+                        } else {
+                            updateSettingHandsontable(resultData);
+                        }
+
+                    }
+                });
+            } else {
+
+                initTable();
+            }
         }
 
         function updateSettingHandsontable(resultData) {
@@ -696,53 +745,6 @@
             filter_table();
         });
 
-
-
-
-        function load_group(method){
-
-
-            var department_id = $("#filter_dept :selected").val();
-            var academic_year_id = $("#filter_academic_year :selected").val();
-            var degree_id = $("#filter_degree :selected").val();
-            var grade_id = $("#filter_grade :selected").val();
-            var department_option_id = $("#filter_dept_option :selected").val();
-
-
-            // Load group only department, academic year, degree and grade are filled.
-            if(department_id != "" && department_id != null  && academic_year_id != "" && degree_id != "" && grade_id != ""){
-
-                $.ajax({
-                    url : get_group_url,
-                    type: 'GET',
-                    data: {
-                        department_id:$("#department_id").val(),
-                        academic_year_id:$("#academic_year_id").val(),
-                        degree_id:$("#degree_id").val(),
-                        grade_id:$("#grade_id").val(),
-                        department_option_id:$("#department_option_id").val(),
-                        _method: method
-                    },
-                    success : function(data){
-
-                        if(data != null){
-                            var option_text = "";
-
-                            $.each(data, function(key, value){
-
-                                if(value != null) {
-                                    option_text = option_text +
-
-                                            ' <label><input type="checkbox" class="each_check_box " name="groups[]" value="'+value+'"> '+value+'</label>'
-                                }
-
-                            })
-                            $(".group_panel").html(option_text);
-                        }
-                    }
-                })
-            }
-        }
 
 
     </script>
