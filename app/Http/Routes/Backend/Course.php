@@ -105,6 +105,8 @@ Route::group([
     Route::get('course-annual/get-all-data-course-annual-score', 'CourseAnnualController@allHandsontableData')->name('admin.course.get_all_handsontable_data');
     Route::get('course-annual/filter-course-annual-scores', 'CourseAnnualController@allHandsontableData')->name('admin.course.filter_course_annual_scores');
 
+    Route::get('course-annual/print_total_score', 'CourseAnnualController@print_total_score')->name('admin.course.print_total_score');
+
     Route::get('course-annual/-get-form-all-score-properties', 'CourseAnnualController@formAllScoreSelection')->name('course_annual.form_all_score_properties');
 
     Route::post('course_annual/save-each-cell-observation', 'CourseAnnualController@saveEachObservation')->name('course_annual.save_each_cell_observation');

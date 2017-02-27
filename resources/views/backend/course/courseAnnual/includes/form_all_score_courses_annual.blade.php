@@ -110,7 +110,12 @@
         <div class="box-header with-border">
             <div class=" no-paddingcol-sm-12">
 
+                <div class="pull-left">
+                    <button class="btn btn-primary btn-xs" id="btn-print"><i class="fa fa-print"></i> Print</button>
+                </div>
+
                 <div class="pull-right">
+
                     <button class="btn btn-primary btn-xs col-sm-1" id="refresh_score_sheet" style="margin-left: -50px"><i class="fa fa-refresh"></i></button>
 
                     <select  name="academic_year" id="filter_academic_year" style="width: 100px;" class=" col-sm-1">
@@ -269,6 +274,7 @@
 
         var table_width;
         var hotInstance;
+        var print_url = "{{route('admin.course.print_total_score')}}";
         var setting = {
             readOnly:true,
             rowHeaders: false,
@@ -411,6 +417,26 @@
         $('.dept_option').hide();
 
         $(document).ready(function() {
+
+            $("#btn-print").on("click", function(){
+
+                var department_id= $('#filter_dept :selected').val();
+                var degree_id= $('#filter_degree :selected').val();
+                var grade_id= $('#filter_grade').val();
+                var academic_year_id= $('#filter_academic_year :selected').val();
+                var semester_id=$('#filter_semester :selected').val();
+                var dept_option_id= $('#filter_dept_option :selected').val();
+
+                var win = window.open(print_url+
+                        "?department_id="+department_id+
+                        "&degree_id="+degree_id+
+                        "&grade_id="+grade_id+
+                        "&academic_year_id="+academic_year_id+
+                        "&semester_id="+semester_id+
+                        "&dept_option_id="+dept_option_id
+                        , '_blank');
+                win.focus();
+            });
 
             if(val = $('#filter_dept :selected').val()) {
                 $('.department_'+ val).show();

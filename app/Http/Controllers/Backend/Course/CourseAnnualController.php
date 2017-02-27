@@ -2636,6 +2636,7 @@ class CourseAnnualController extends Controller
         $deptOptionId = $request->dept_option_id;
 //        $groupName = $request->group_name;
 
+
         $request_group_filter = '';
         //-----------end requested data---------
 
@@ -2744,8 +2745,6 @@ class CourseAnnualController extends Controller
         //----end if course-program
 
 
-
-
         $extra_rows = $this->find_max_min_average_mark();
         $data_empty = $extra_rows['data_empty'];
         $max_array = $extra_rows['max'];
@@ -2782,26 +2781,30 @@ class CourseAnnualController extends Controller
             }
         }
 
+        // First header
         $nestedHeaders[0] = array_merge($nestedHeaders[0], ['Moyenne']);
         $nestedHeaders[0] = array_merge($nestedHeaders[0], ['Rank']);
         $nestedHeaders[0] = array_merge($nestedHeaders[0], ['Redouble']);
-
         $nestedHeaders[0] = array_merge($nestedHeaders[0], ['Rattrapage']);
-        $nestedHeaders[0] = array_merge($nestedHeaders[0], ['Passage']);
-        $nestedHeaders[0] = array_merge($nestedHeaders[0], ['Observation']);
+        //$nestedHeaders[0] = array_merge($nestedHeaders[0], ['Passage']);
         $nestedHeaders[0] = array_merge($nestedHeaders[0], ['Remark']);
+        $nestedHeaders[0] = array_merge($nestedHeaders[0], ['Observation']);
+
+        // Second header
         $nestedHeaders[1] = array_merge($nestedHeaders[1], [$finalCredit]);
-        $nestedHeaders[1] = array_merge($nestedHeaders[1], [' ']);
-        $nestedHeaders[1] = array_merge($nestedHeaders[1], [' ']);
-        $nestedHeaders[1] = array_merge($nestedHeaders[1], [' ']);
-        $nestedHeaders[1] = array_merge($nestedHeaders[1], [' ']);
-        $nestedHeaders[1] = array_merge($nestedHeaders[1], [' ']);
+        $nestedHeaders[1] = array_merge($nestedHeaders[1], ['rank']);
+        $nestedHeaders[1] = array_merge($nestedHeaders[1], ['redouble']);
+        $nestedHeaders[1] = array_merge($nestedHeaders[1], ['rattrapage']);
+        $nestedHeaders[1] = array_merge($nestedHeaders[1], ['remark']);
+        $nestedHeaders[1] = array_merge($nestedHeaders[1], ['observation']);
+
+//        $nestedHeaders[1] = array_merge($nestedHeaders[1], [' ']);
         $colWidths[] = 100;
         $colWidths[] = 100;
         $colWidths[] = 100;
         $colWidths[] = 100;
         $colWidths[] = 100;//Rattrapage
-        $colWidths[] = 100;//Passage
+//        $colWidths[] = 100;//Passage
         $colWidths[] = 500;//observation
         $colWidths[] = 300;// Remark
         $colWidths[] = 100;//blank header
@@ -2886,9 +2889,9 @@ class CourseAnnualController extends Controller
 
 
             $value['Rattrapage'] = count($fail_subjects[$key]);
-            $value['Passage'] = "";
-            $value['Observation'] = $array_observation[$key]->observation;
+//            $value['Passage'] = "";
             $value['Remark'] = $array_observation[$key]->remark;;
+            $value['Observation'] = $array_observation[$key]->observation;
             $value[""] = "";// blank column at last
             $value["number"] = $index;
             $element[$key] = $value;
@@ -2941,12 +2944,54 @@ class CourseAnnualController extends Controller
             $array_data[] = $emptyData['data_empty'];
         }
 
-        return Response::json([
+
+
+
+        return json_encode([
             'status' => true,
             'data' => $array_data,
             'nestedHeaders' => $nestedHeaders,
             'colWidths' => $colWidths
         ]);
+    }
+
+    /*
+     * @params Request $request
+     * @params dept_id,
+     * @params degree_id,
+     * @params grade_id,
+     * @params academic_year_id,
+     * @params semester_id,
+     * @params dept_option_id
+     * @return view
+     */
+    public function print_total_score(Request $request){
+        $data = $this->allHandsontableData($request);
+        $data = json_decode($data);
+
+        $academic_year = AcademicYear::where('id',$request->get('academic_year_id'))->first();
+        $department = Department::where('id',$request->get('department_id'))->first();
+        $degree = Degree::where('id',$request->get('degree_id'))->first();
+        $grade = Grade::where('id',$request->get('grade_id'))->first();
+
+        if($request->get('semester_id') != null){
+            $semester = Semester::where('id',$request->get('semester_id'))->first();
+        } else {
+            $semester = null;
+        }
+
+        if($request->get('dept_option_id') != null){
+            $dept_option = DepartmentOption::where('id',$request->get('dept_option_id'))->first();
+        } else {
+            $dept_option = null;
+        }
+
+        return view("backend.course.courseAnnual.print.print_total_score",
+            compact('data','academic_year','department','degree','semester','dept_option','grade'));
+    }
+
+    function findRank($array, $val) {
+
     }
 
     private function floatFormat($val) {
@@ -2959,33 +3004,33 @@ class CourseAnnualController extends Controller
         $data_empty = array_merge($data_empty,['Rank' => ""]);
         $data_empty = array_merge($data_empty,['Redouble' => ""]);
         $data_empty = array_merge($data_empty,['Rattrapage' => ""]);
-        $data_empty = array_merge($data_empty,['Passage' => ""]);
-        $data_empty = array_merge($data_empty,['Observation' => ""]);
+//        $data_empty = array_merge($data_empty,['Passage' => ""]);
         $data_empty = array_merge($data_empty,['Remark' => ""]);
+        $data_empty = array_merge($data_empty,['Observation' => ""]);
         $data_empty = array_merge($data_empty,['' => ""]);
 
         $max_array = array_merge($max_array,['Rank' => ""]);
         $max_array = array_merge($max_array,['Redouble' => ""]);
         $max_array = array_merge($max_array,['Rattrapage' => ""]);
-        $max_array = array_merge($max_array,['Passage' => ""]);
-        $max_array = array_merge($max_array,['Observation' => ""]);
+//        $max_array = array_merge($max_array,['Passage' => ""]);
         $max_array = array_merge($max_array,['Remark' => ""]);
+        $max_array = array_merge($max_array,['Observation' => ""]);
         $max_array = array_merge($max_array,['' => ""]);
 
         $min_array = array_merge($min_array,['Rank' => ""]);
         $min_array = array_merge($min_array,['Redouble' => ""]);
         $min_array = array_merge($min_array,['Rattrapage' => ""]);
-        $min_array = array_merge($min_array,['Passage' => ""]);
-        $min_array = array_merge($min_array,['Observation' => ""]);
+//        $min_array = array_merge($min_array,['Passage' => ""]);
         $min_array = array_merge($min_array,['Remark' => ""]);
+        $min_array = array_merge($min_array,['Observation' => ""]);
         $min_array = array_merge($min_array,['' => ""]);
 
         $average_array = array_merge($average_array,['Rank' => ""]);
         $average_array = array_merge($average_array,['Redouble' => ""]);
         $average_array = array_merge($average_array,['Rattrapage' => ""]);
-        $average_array = array_merge($average_array,['Passage' => ""]);
-        $average_array = array_merge($average_array,['Observation' => ""]);
+//        $average_array = array_merge($average_array,['Passage' => ""]);
         $average_array = array_merge($average_array,['Remark' => ""]);
+        $average_array = array_merge($average_array,['Observation' => ""]);
         $average_array = array_merge($average_array,['' => ""]);
 
         return [
