@@ -2891,7 +2891,7 @@ class CourseAnnualController extends Controller
             $value['Rattrapage'] = count($fail_subjects[$key]);
 //            $value['Passage'] = "";
             $value['Remark'] = $array_observation[$key]->remark;;
-            $value['Observation'] = $array_observation[$key]->observation;
+            $value['Observation'] = "";//$array_observation[$key]->observation;
             $value[""] = "";// blank column at last
             $value["number"] = $index;
             $element[$key] = $value;
