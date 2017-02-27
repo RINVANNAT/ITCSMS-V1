@@ -377,23 +377,23 @@
                         var newValue = change[3];
                         var col_student_id = hotInstance.getDataAtProp('student_id_card'); //---array data of column student_id
 
-                        if(columnIndex == 'Observation') {
-//                            var rowData = hotInstance.getData();//----all table data
-                        
-                            var route = '{{route('course_annual.save_each_cell_observation')}}';
-                            var baseData ={student_id_card: col_student_id[rowIndex], observation: newValue};
+                        {{--if(columnIndex == 'Observation') {--}}
+{{--//                            var rowData = hotInstance.getData();//----all table data--}}
+                        {{----}}
+                            {{--var route = '{{route('course_annual.save_each_cell_observation')}}';--}}
+                            {{--var baseData ={student_id_card: col_student_id[rowIndex], observation: newValue};--}}
 
-                            $.ajax({
-                                type: 'POST',
-                                url: route,
-                                data: baseData,
-                                dataType: "json",
-                                success: function(resultData) {
+                            {{--$.ajax({--}}
+                                {{--type: 'POST',--}}
+                                {{--url: route,--}}
+                                {{--data: baseData,--}}
+                                {{--dataType: "json",--}}
+                                {{--success: function(resultData) {--}}
 
-                                    //---call back function ....do some stuff
-                                }
-                            });
-                        }
+                                    {{--//---call back function ....do some stuff--}}
+                                {{--}--}}
+                            {{--});--}}
+                        {{--}--}}
 
                         if(columnIndex == 'Remark') {
                             var remark_rul = '{{route('course_annual.save_each_cell_remark')}}';
