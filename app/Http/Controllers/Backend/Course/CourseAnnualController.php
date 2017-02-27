@@ -2138,7 +2138,6 @@ class CourseAnnualController extends Controller
 
         $inputs = $request->data;
 
-
         $checkUpdate = 0;
         $checkNotUpdated = 0;
 
@@ -2227,6 +2226,7 @@ class CourseAnnualController extends Controller
             ->select(
                 'scores.course_annual_id','scores.student_annual_id',
                 'scores.score', 'scores.score_absence', 'percentages.name', 'percentages.percent', 'percentages.id as percentage_id', 'scores.id as score_id')
+            ->orderBy('percentages.id')
             ->get();
 
         foreach($scores as $score) {
@@ -2729,7 +2729,7 @@ class CourseAnnualController extends Controller
                     $fail_subjects = $dataHandSontable['fail_subject'];
                     $array_observation = $dataHandSontable['observation'];
                 } else {
-                    return Response::json([
+                    return json_encode([
                         'status' => false,
                         'data' => [],
                         'nestedHeaders' => [],
@@ -2943,8 +2943,6 @@ class CourseAnnualController extends Controller
             $array_data[] = $emptyData['average'];
             $array_data[] = $emptyData['data_empty'];
         }
-
-
 
 
         return json_encode([
@@ -3646,13 +3644,8 @@ class CourseAnnualController extends Controller
 
             }
 
-
-
-
-
             $element = $element + $scoreData+ ["Total" =>$totalScore, "Notation" => isset($studentNotations[$student->student_annual_id])?$studentNotations[$student->student_annual_id]->description:''];
             $studentListScore[] = $element;
-
 
         }
 
@@ -4405,5 +4398,119 @@ class CourseAnnualController extends Controller
 
 
 
+    public function exportTotalScore(Request $request) {
+
+        $array_data = $this->allHandsontableData($request);
+        $array_data = (array)json_decode($array_data);
+
+        $first_headers = [];
+        $second_headers = [];
+        $col_span = [];
+        $letter = 'A';
+        $alpha = [];
+
+        // -----first headers
+        foreach($array_data['nestedHeaders'][0] as $header) {
+
+            if(is_object($header)) {
+
+                $col = $letter.'1:';
+
+                $first_headers[] = $header->label;
+                for($i= 1 ; $i< $header->colspan; $i++) {
+                    $letter++;
+                    $alpha[] = $letter;
+
+                    $first_headers[]="";
+
+                }
+                $col_span[] = $col.$letter.'1';
+
+            } else {
+                if($header== '') {
+                    $first_headers[] = 'No';
+                } else {
+                    $first_headers[] = $header;
+                }
+            }
+
+            $alpha[] = $letter;
+            $letter++;
+            $alpha = array_unique($alpha);
+
+
+        }
+
+        //-----second headers
+
+        foreach($array_data['nestedHeaders'][1] as $second_header) {
+
+            if(is_object($second_header)) {
+                $second_headers[] = $second_header->label;
+            } else {
+                $second_headers[] = $second_header;
+            }
+        }
+
+        Excel::create('Student Final Result', function($excel) use ($array_data, $alpha, $first_headers, $second_headers, $col_span) {
+
+
+            $excel->sheet('Student List Score', function($sheet) use ($array_data, $alpha, $first_headers, $second_headers, $col_span) {
+
+//                $sheet->setOrientation('landscap');
+                // Set top, right, bottom, left
+                $sheet->setPageMargin(array(0.25, 0.30, 0.25, 0.30));
+
+                // Set all margins
+                $sheet->setPageMargin(0.25);
+
+                $sheet->setAllBorders('thin');
+                // Font size
+                $sheet->setFontSize(10);
+
+                // Font bold
+//                $sheet->setFontBold(true);
+
+                $sheet->setFontBold('A1:A2',true);
+
+//                $sheet->setHeight(1, 60);
+//                $sheet->cell('A1', function($cell) {
+//                    $cell->setAlignment('center');
+//                    $cell->setFont(array(
+//                        'size'       => '16',
+//                        'bold'       =>  true
+//                    ));
+//                });
+
+                $sheet->row(1, $first_headers);
+                foreach($alpha as $l) {
+                    if($l == 'C') {
+                        $sheet->setWidth([$l  => 20]);
+                    } elseif ($l == 'A') {
+                        $sheet->setWidth([$l  => 5]);
+                    }
+                    else {
+                        $sheet->setWidth([$l  => 10]);
+                    }
+                }
+                foreach($col_span as $span) {
+                    $sheet->mergeCells($span);
+                }
+                $sheet->appendRow($second_headers);
+
+                foreach($array_data['data'] as $data) {
+                    $row = [];
+                    foreach($data as $d) {
+                        $row = array_merge($row, [$d]);
+                    }
+
+                    $sheet->appendRow($row);
+
+                }
+            });
+
+        })->export('xls');
+
+    }
 
 }

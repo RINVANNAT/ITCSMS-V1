@@ -114,6 +114,8 @@
                     <button class="btn btn-primary btn-xs" id="btn-print"><i class="fa fa-print"></i> Print</button>
                 </div>
 
+                <button class="btn btn-xs btn-primary pull-left" id="btn_export_score" style="margin-left: 5px"> <i class="fa fa-export">Export</i></button>
+
                 <div class="pull-right">
 
                     <button class="btn btn-primary btn-xs col-sm-1" id="refresh_score_sheet" style="margin-left: -50px"><i class="fa fa-refresh"></i></button>
@@ -772,6 +774,27 @@
         });
 
 
+
+        $('#btn_export_score').on('click', function() {
+
+            var route = '{{route('course_annual.export_view_total_score')}}'
+            var D = {
+                department_id: $('#filter_dept :selected').val(),
+                degree_id: $('#filter_degree :selected').val(),
+                grade_id: $('#filter_grade :selected').val(),
+                academic_year_id: $('#filter_academic_year :selected').val(),
+                semester_id:$('#filter_semester :selected').val(),
+                dept_option_id: $('#filter_dept_option :selected').val()
+            }
+
+            window.open(route+'?department_id='+ D.department_id+
+                    '&degree_id='+D.degree_id+
+                    '&grade_id='+D.grade_id+
+                    '&academic_year_id='+ D.academic_year_id+
+                    '&semester_id='+D.semester_id+
+                    '&dept_option_id='+D.dept_option_id, '_blank'
+            )
+        })
 
     </script>
 

@@ -112,6 +112,8 @@ Route::group([
     Route::post('course_annual/save-each-cell-observation', 'CourseAnnualController@saveEachObservation')->name('course_annual.save_each_cell_observation');
     Route::post('course_annual/save-each-cell-remark', 'CourseAnnualController@saveEachORemark')->name('course_annual.save_each_cell_remark');
 
+    Route::get('course-annual/export-view-total-score', 'CourseAnnualController@exportTotalScore')->name('course_annual.export_view_total_score');
+
 
 
 
