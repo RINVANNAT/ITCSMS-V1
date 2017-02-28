@@ -273,7 +273,6 @@
 
         };
 
-
         var table_width;
         var hotInstance;
         var print_url = "{{route('admin.course.print_total_score')}}";
@@ -439,6 +438,29 @@
                         , '_blank');
                 win.focus();
             });
+
+
+
+            $('#btn_export_score').on('click', function() {
+
+                var route_export = '{{route('course_annual.export_view_total_score')}}'
+                var D = {
+                    department_id: $('#filter_dept :selected').val(),
+                    degree_id: $('#filter_degree :selected').val(),
+                    grade_id: $('#filter_grade :selected').val(),
+                    academic_year_id: $('#filter_academic_year :selected').val(),
+                    semester_id:$('#filter_semester :selected').val(),
+                    dept_option_id: $('#filter_dept_option :selected').val()
+                }
+
+                window.open(route_export+'?department_id='+ D.department_id+
+                        '&degree_id='+D.degree_id+
+                        '&grade_id='+D.grade_id+
+                        '&academic_year_id='+ D.academic_year_id+
+                        '&semester_id='+D.semester_id+
+                        '&dept_option_id='+D.dept_option_id, '_blank'
+                )
+            })
 
             if(val = $('#filter_dept :selected').val()) {
                 $('.department_'+ val).show();
@@ -774,27 +796,6 @@
         });
 
 
-
-        $('#btn_export_score').on('click', function() {
-
-            var route = '{{route('course_annual.export_view_total_score')}}'
-            var D = {
-                department_id: $('#filter_dept :selected').val(),
-                degree_id: $('#filter_degree :selected').val(),
-                grade_id: $('#filter_grade :selected').val(),
-                academic_year_id: $('#filter_academic_year :selected').val(),
-                semester_id:$('#filter_semester :selected').val(),
-                dept_option_id: $('#filter_dept_option :selected').val()
-            }
-
-            window.open(route+'?department_id='+ D.department_id+
-                    '&degree_id='+D.degree_id+
-                    '&grade_id='+D.grade_id+
-                    '&academic_year_id='+ D.academic_year_id+
-                    '&semester_id='+D.semester_id+
-                    '&dept_option_id='+D.dept_option_id, '_blank'
-            )
-        })
 
     </script>
 

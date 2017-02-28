@@ -93,6 +93,8 @@ Route::group([
 
     Route::get('/list-group-by-course-annual-id', 'CourseAnnualController@getGroupByCourseAnnual')->name('course.list_group_by_course_annual_id');
 
+    Route::get('/course-annual/is-allow-scoring', 'CourseAnnualController@isAllowScoring')->name('course_annual.is_allow_scoring');
+
 
 
 

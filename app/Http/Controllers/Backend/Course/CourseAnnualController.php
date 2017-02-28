@@ -1839,7 +1839,6 @@ class CourseAnnualController extends Controller
             }
         }
 
-
         $selectedCourses =[];
 
         foreach($availableCourses as $availableCourse) {
@@ -1855,7 +1854,9 @@ class CourseAnnualController extends Controller
     public function getFormScoreByCourse(Request $request, $courseAnnualId) {
 
         $courseAnnual = CourseAnnual::find($courseAnnualId);
+
         if($courseAnnual->is_allow_scoring){
+
             $properties = $this->dataSendToView($courseAnnualId);
             $courseAnnual = $properties['course_annual'];
             $availableCourses = $properties['available_course'];
@@ -4402,7 +4403,10 @@ class CourseAnnualController extends Controller
 
         $array_data = $this->allHandsontableData($request);
         $array_data = (array)json_decode($array_data);
-
+        $academicYear = DB::table('academicYears')->where('id', $request->academic_year_id)->first();
+        $department = DB::table('departments')->where('id', $request->department_id)->first();
+        $degree = Degree::find($request->degree_id)->first();
+        $grade = $request->grade_id;
         $first_headers = [];
         $second_headers = [];
         $col_span = [];
@@ -4414,8 +4418,8 @@ class CourseAnnualController extends Controller
 
             if(is_object($header)) {
 
-                $col = $letter.'1:';
-
+                // ---arrang column-span
+                $col = $letter.'6:';
                 $first_headers[] = $header->label;
                 for($i= 1 ; $i< $header->colspan; $i++) {
                     $letter++;
@@ -4424,7 +4428,7 @@ class CourseAnnualController extends Controller
                     $first_headers[]="";
 
                 }
-                $col_span[] = $col.$letter.'1';
+                $col_span[] = $col.$letter.'6';
 
             } else {
                 if($header== '') {
@@ -4437,8 +4441,6 @@ class CourseAnnualController extends Controller
             $alpha[] = $letter;
             $letter++;
             $alpha = array_unique($alpha);
-
-
         }
 
         //-----second headers
@@ -4446,18 +4448,27 @@ class CourseAnnualController extends Controller
         foreach($array_data['nestedHeaders'][1] as $second_header) {
 
             if(is_object($second_header)) {
-                $second_headers[] = $second_header->label;
+                if($second_header->label != 'remark' && $second_header->label != 'redouble' && $second_header->label != 'rattrapage' && $second_header->label != 'rank' && $second_header->label != 'observation') {
+                    $second_headers[] = $second_header->label;
+                } else {
+                    $second_headers[] = '';
+                }
             } else {
-                $second_headers[] = $second_header;
+                if($second_header != 'remark' && $second_header != 'redouble' && $second_header != 'rattrapage' && $second_header != 'rank' && $second_header != 'observation') {
+                    $second_headers[] = $second_header;
+                } else {
+                    $second_headers[] = '';
+                }
+
             }
         }
 
-        Excel::create('Student Final Result', function($excel) use ($array_data, $alpha, $first_headers, $second_headers, $col_span) {
+        Excel::create('Student Final Result', function($excel) use ($grade,$degree,$department,$academicYear,$array_data, $alpha, $first_headers, $second_headers, $col_span) {
 
 
-            $excel->sheet('Student List Score', function($sheet) use ($array_data, $alpha, $first_headers, $second_headers, $col_span) {
+            $excel->sheet('Student List Score', function($sheet) use ($grade,$degree,$department,$academicYear,$array_data, $alpha, $first_headers, $second_headers, $col_span) {
 
-//                $sheet->setOrientation('landscap');
+                $sheet->setOrientation('portrait');
                 // Set top, right, bottom, left
                 $sheet->setPageMargin(array(0.25, 0.30, 0.25, 0.30));
 
@@ -4468,36 +4479,131 @@ class CourseAnnualController extends Controller
                 // Font size
                 $sheet->setFontSize(10);
 
-                // Font bold
-//                $sheet->setFontBold(true);
+                //---- create header and subheader--------
+                $tmp_alpha = [];
+                $index = 0;
+                $header_data = [];
+                $sub_header_data = [];
+                $school_name = [];
+                $school_name = array_merge($school_name, ['']);
+                $school_name[] = 'Institut de Technologie du Cambodge';
+                $sub_sub_header_data = [];
+                $sub_sub_header_data = array_merge($sub_sub_header_data, ['']);
+                $sub_sub_header_data[] = 'Département:'.$department->name_fr;
+                $class = [];
+                $class = array_merge($class, ['']);
+                $class[] = 'Classe:'.$degree->code.$grade.'-'.$department->code;
 
-                $sheet->setFontBold('A1:A2',true);
+                //---end herer------
 
-//                $sheet->setHeight(1, 60);
-//                $sheet->cell('A1', function($cell) {
-//                    $cell->setAlignment('center');
-//                    $cell->setFont(array(
-//                        'size'       => '16',
-//                        'bold'       =>  true
-//                    ));
-//                });
-
-                //----
-                $sheet->row(1, $first_headers);
+                //----alpha array of columns (A-Z--ZZ)
                 foreach($alpha as $l) {
+
+                    //---set width for specific column
                     if($l == 'C') {
                         $sheet->setWidth([$l  => 20]);
                     } elseif ($l == 'A') {
                         $sheet->setWidth([$l  => 5]);
+                    } elseif($l == 'B') {
+                        $sheet->setWidth([$l  => 15]);
                     }
                     else {
-                        $sheet->setWidth([$l  => 10]);
+//
+                        $sheet->setSize($l.'6', 10, 150);
                     }
+
+                    //----assigne cell value in the middle of sheet
+
+                    if($index == (count($alpha)/2)) {
+                        $header_data[] = 'RELEVE DES NOTES DE CONTROLE';
+                        $sub_header_data[] = 'Année Scolaire '.$academicYear->name_latin;
+
+                    } else {
+
+                        //----adding empty space
+                        $header_data[] = '';
+                        $sub_header_data[] = '';
+                        $sub_sub_header_data[]='';
+                    }
+                    $index++;
+                    $tmp_alpha[] = $l;// store array alpha by order of array index
+
                 }
+
+                /*---set styling cell property ----*/
+                //dd($tmp_alpha[0].'1:'.$tmp_alpha[count($tmp_alpha)-1].'1')---(A1:..Z:1) set col-A row-1 to col-Z row-1
+
+                $sheet->cells($tmp_alpha[0].'1:'.$tmp_alpha[count($tmp_alpha)-1].'1', function($cells) {
+                    $cells->setBackground('#C0C0C0 ');
+                    $cells->setAlignment('center');
+                    $cells->setFont(array(
+                        'size'       => '18'
+                    ));
+                });
+
+                $sheet->cells($tmp_alpha[0].'2:'.$tmp_alpha[count($tmp_alpha)-1].'2', function($cells) {
+                    $cells->setBackground('#C0C0C0 ');
+                    $cells->setAlignment('center');
+                    $cells->setFont(array(
+                        'size'       => '14'
+                    ));
+                });
+
+                $sheet->cells($tmp_alpha[0].'3:'.$tmp_alpha[count($tmp_alpha)-1].'3', function($cells) {
+                    $cells->setBackground('#E6F4F8 ');
+                    $cells->setAlignment('left');
+                    $cells->setFont(array(
+                        'size'       => '14'
+                    ));
+                });
+
+                $sheet->cells($tmp_alpha[0].'4:'.$tmp_alpha[count($tmp_alpha)-1].'4', function($cells) {
+                    $cells->setBackground('#E6F4F8 ');
+                    $cells->setAlignment('left');
+                    $cells->setFont(array(
+                        'size'       => '14'
+                    ));
+                });
+
+                $sheet->cells($tmp_alpha[0].'5:'.$tmp_alpha[count($tmp_alpha)-1].'5', function($cells) {
+                    $cells->setBackground('#E6F4F8 ');
+                    $cells->setAlignment('left');
+                    $cells->setFont(array(
+                        'size'       => '14'
+                    ));
+                });
+
+
+                $sheet->cells($tmp_alpha[0].'6:'.$tmp_alpha[count($tmp_alpha)-1].'6', function($cells) {
+                    $cells->setBackground('#C0C0C0 ');
+                    $cells->setAlignment('center');
+                    $cells->setValignment('center');
+                    $cells->setTextRotation(-90);
+                    $cells->setFont(array(
+                        'size'       => '12'
+                    ));
+                });
+
+                $sheet->cells($tmp_alpha[0].'7:'.$tmp_alpha[count($tmp_alpha)-1].'7', function($cells) {
+                    $cells->setAlignment('center');
+                    $cells->setFont(array(
+                        'size'       => '12'
+                    ));
+                });
+
+                /*--merge colum---*/
                 foreach($col_span as $span) {
                     $sheet->mergeCells($span);
                 }
-                $sheet->appendRow($second_headers);
+
+                /*--set row sheet value--*/
+                $sheet->row(1, $header_data);
+                $sheet->row(2, $sub_header_data);
+                $sheet->row(3, $school_name);
+                $sheet->row(4, $sub_sub_header_data);
+                $sheet->row(5, $class);
+                $sheet->row(6, $first_headers);
+                $sheet->row(7, $second_headers);
 
                 foreach($array_data['data'] as $data) {
                     $row = [];
@@ -4512,6 +4618,16 @@ class CourseAnnualController extends Controller
 
         })->export('xls');
 
+    }
+
+    public function isAllowScoring(Request $request) {
+
+        $courseAnnual = $this->courseAnnuals->findOrThrowException($request->course_annual_id);
+        if($courseAnnual->is_allow_scoring) {
+            return Response::json(['status' => true, 'message' => 'Allowed!']);
+        } else {
+            return Response::json(['status' => false, 'message' => 'You are not allowed to make any changes on the score sheet, please ask the administrator to enable scoring!!']);
+        }
     }
 
 }

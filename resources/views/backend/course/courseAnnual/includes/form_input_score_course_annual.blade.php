@@ -1115,123 +1115,154 @@
 
         $('#save_editted_score').on('click', function() {
 
+            var course_annual_id = $('#available_course :selected').val();
 
-            $.each(array_col_status, function(key, val) {
-                if(val == false) {
-                    objectStatus.status = val;
-                    objectStatus.colName = key;
-                }
-            });
+            $.ajax({
+                type: 'GET',
+                url: '{{route('course_annual.is_allow_scoring')}}',
+                data: {course_annual_id:course_annual_id},
+                dataType: "json",
+                success: function(resultData) {
 
-            var url = '{{route('admin.course.save_number_absence')}}';
+                    if(resultData.status) {
+                        $.each(array_col_status, function(key, val) {
+                            if(val == false) {
+                                objectStatus.status = val;
+                                objectStatus.colName = key;
+                            }
+                        });
 
-            if(cellIndex.length > 0) {
+                        var url = '{{route('admin.course.save_number_absence')}}';
 
-                if(objectStatus.status == true) {
+                        if(cellIndex.length > 0) {
 
-                    if(cellChanges.length > 0 || cellScoreChanges.length >0) {
+                            if(objectStatus.status == true) {
+
+                                if(cellChanges.length > 0 || cellScoreChanges.length >0) {
+                                    swal({
+                                        title: "Confirm",
+                                        text: "Save Changes?",
+                                        type: "info",
+                                        showCancelButton: true,
+                                        confirmButtonColor: "#DD6B55",
+                                        confirmButtonText: "Yes",
+                                        closeOnConfirm: true
+                                    }, function(confirmed) {
+                                        if (confirmed) {
+
+                                            if(cellScoreChanges.length > 0) {// save each score
+
+                                                //recursive function fo send the request by the column data array
+                                                function sendRequest (index, message) {
+
+                                                    var saveBaseUrl = '{{route('admin.course.save_score_course_annual')}}';
+
+
+                                                    if(index < setting.colHeaders.length -1) {
+
+                                                        if(colDataArray[setting.colHeaders[index]].length > 0 ) {
+                                                            $.ajax({
+                                                                type: 'POST',
+                                                                url: saveBaseUrl,
+                                                                data: {data:colDataArray[setting.colHeaders[index]]},
+                                                                dataType: "json",
+                                                                success: function(resultData) {
+                                                                    if(resultData.status) {
+                                                                        index++;
+                                                                        updateSettingHandsontable(resultData.handsontableData);
+                                                                        sendRequest(index);
+                                                                    } else {
+                                                                        notify('error', resultData.message, 'Alert');
+                                                                    }
+                                                                }
+                                                            })
+                                                        } else {
+                                                            index++;
+                                                            sendRequest(index, message);
+                                                        }
+                                                    } else {
+                                                        notify('success', 'Score Saved!', 'Info');
+                                                    }
+                                                }
+
+
+                                                if(is_counted_absence == parseInt('{{\App\Models\Enum\ScoreEnum::is_counted_absence}}') ) {
+                                                    var index = 5; // ---count header column --with absence
+                                                } else {
+                                                    var index = 3; // ---count header column-- without absence
+                                                }
+
+                                                var message = null;
+                                                sendRequest(index, message);
+                                                cellScoreChanges=[];
+                                            }
+
+                                            if(cellChanges.length > 0) { // save each number absence
+
+                                                var url = '{{route('admin.course.save_number_absence')}}';
+                                                $.ajax({
+                                                    type: 'POST',
+                                                    url: url,
+                                                    data: {baseData:cellChanges},
+                                                    dataType: "json",
+                                                    success: function(resultData) {
+
+                                                        if(resultData.status) {
+                                                            notify('success', resultData.message, 'Info')
+
+                                                            updateSettingHandsontable(resultData.handsonData);
+
+                                                        } else {
+                                                            notify('error', resultData.message, 'Attention')
+                                                            updateSettingHandsontable(resultData.handsonData);
+                                                        }
+                                                        cellChanges=[];
+                                                    }
+                                                });
+                                            }
+                                        }
+                                    });
+                                } else {
+                                    notify('error', 'There are no changes!!', 'Info');
+                                }
+                            } else {
+
+                                swal({
+                                    title: "Attention",
+                                    text: objectStatus.colName+" value must be: 0 <= X <= "+ objectStatus.val_to_compare + ', No String Allowed!' ,
+                                    type: "warning",
+                                    confirmButtonColor: "red",
+                                    confirmButtonText: "Close",
+                                    closeOnConfirm: true
+                                }, function(confirmed) {
+                                    if (confirmed) {
+
+                                    }
+                                });
+                            }
+                        }
+
+                    } else {
+
+
                         swal({
-                            title: "Confirm",
-                            text: "Save Changes?",
-                            type: "info",
-                            showCancelButton: true,
-                            confirmButtonColor: "#DD6B55",
-                            confirmButtonText: "Yes",
+                            title: "Attention",
+                            text: resultData.message,
+                            type: "warning",
+                            confirmButtonColor: "red",
+                            confirmButtonText: "Close",
                             closeOnConfirm: true
                         }, function(confirmed) {
                             if (confirmed) {
 
-                                if(cellScoreChanges.length > 0) {// save each score
-
-                                    //recursive function fo send the request by the column data array
-                                    function sendRequest (index, message) {
-
-                                        var saveBaseUrl = '{{route('admin.course.save_score_course_annual')}}';
-
-
-                                        if(index < setting.colHeaders.length -1) {
-
-                                            if(colDataArray[setting.colHeaders[index]].length > 0 ) {
-                                                $.ajax({
-                                                    type: 'POST',
-                                                    url: saveBaseUrl,
-                                                    data: {data:colDataArray[setting.colHeaders[index]]},
-                                                    dataType: "json",
-                                                    success: function(resultData) {
-                                                        if(resultData.status) {
-                                                            index++;
-                                                            updateSettingHandsontable(resultData.handsontableData);
-                                                            sendRequest(index);
-                                                        } else {
-                                                            notify('error', resultData.message, 'Alert');
-                                                        }
-                                                    }
-                                                })
-                                            } else {
-                                                index++;
-                                                sendRequest(index, message);
-                                            }
-                                        } else {
-                                            notify('success', 'Score Saved!', 'Info');
-                                        }
-                                    }
-
-
-                                    if(is_counted_absence == parseInt('{{\App\Models\Enum\ScoreEnum::is_counted_absence}}') ) {
-                                        var index = 5; // ---count header column --with absence
-                                    } else {
-                                        var index = 3; // ---count header column-- without absence
-                                    }
-
-                                    var message = null;
-                                    sendRequest(index, message);
-                                    cellScoreChanges=[];
-                                }
-
-                                if(cellChanges.length > 0) { // save each number absence
-
-                                    var url = '{{route('admin.course.save_number_absence')}}';
-                                    $.ajax({
-                                        type: 'POST',
-                                        url: url,
-                                        data: {baseData:cellChanges},
-                                        dataType: "json",
-                                        success: function(resultData) {
-
-                                            if(resultData.status) {
-                                                notify('success', resultData.message, 'Info')
-
-                                                updateSettingHandsontable(resultData.handsonData);
-
-                                            } else {
-                                                notify('error', resultData.message, 'Attention')
-                                                updateSettingHandsontable(resultData.handsonData);
-                                            }
-                                            cellChanges=[];
-                                        }
-                                    });
-                                }
+                                /*----after confirm do some stuff----*/
                             }
                         });
-                    } else {
-                        notify('error', 'There are no changes!!', 'Info');
+
                     }
-                } else {
-
-                    swal({
-                        title: "Attention",
-                        text: objectStatus.colName+" value must be: 0 <= X <= "+ objectStatus.val_to_compare + ', No String Allowed!' ,
-                        type: "warning",
-                        confirmButtonColor: "red",
-                        confirmButtonText: "Close",
-                        closeOnConfirm: true
-                    }, function(confirmed) {
-                        if (confirmed) {
-
-                        }
-                    });
                 }
-            }
+            })
+
         });
 
         window.onbeforeunload = function(e){
