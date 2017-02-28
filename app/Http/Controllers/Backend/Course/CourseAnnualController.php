@@ -2828,6 +2828,8 @@ class CourseAnnualController extends Controller
 
         }
 
+
+
         $array_tmp_rank = [];
         foreach($element as $key => $value) {
             $index++;
@@ -2889,14 +2891,22 @@ class CourseAnnualController extends Controller
             }
 
 
+            //----find all fail subject of each student
+
+            $num_subject_redouble = $this->findRedoubleSubject($fail_subjects[$key]);
+
+            dump($num_subject_redouble);
+
             $value['Rattrapage'] = count($fail_subjects[$key]);
 //            $value['Passage'] = "";
-            $value['Remark'] = $array_observation[$key]->remark;;
+            $value['Remark'] = $array_observation[$key]->remark;
             $value['Observation'] = "";//$array_observation[$key]->observation;
             $value[""] = "";// blank column at last
             $value["number"] = $index;
             $element[$key] = $value;
         }
+
+        dd($element);
 
         //-----find student classement
         asort($array_tmp_rank);
@@ -2953,6 +2963,35 @@ class CourseAnnualController extends Controller
             'colWidths' => $colWidths
         ]);
     }
+
+    private function findRedoubleSubject($array) {
+
+
+        $validate_score = 0;
+        $total_credit = 0;
+        if(isset($array['fail'])) {
+            if(isset($array['pass'])) {
+                foreach($array['fail'] as $fail) {
+
+                    $total_credit = $total_credit + $fail['credit'];
+                    $validate_score = $validate_score + (ScoreEnum::Pass_Moyenne * $fail['credit']);
+                }
+                foreach($array['pass'] as $pass) {
+                    $total_credit = $total_credit + $pass['credit'];
+                    $validate_score = $validate_score + ($pass['score'] * $pass['credit']);
+                }
+                $approximation_moyenne = $validate_score / $total_credit;
+
+                dd($approximation_moyenne);
+            } else {
+                return count($array['fail']);
+            }
+        } else {
+
+            return ScoreEnum::Zero;
+        }
+    }
+
 
     /*
      * @params Request $request
@@ -3195,10 +3234,12 @@ class CourseAnnualController extends Controller
                             }
                         }
 
+
+
                         if($each_score < ScoreEnum::Under_30) {
-                            $fail_subjects[$stu_dent->id_card][] = $each_score;
+                            $fail_subjects[$stu_dent->id_card]['fail'][] = array('credit'=> $eachCourse->course_annual_credit, 'score'=> $each_score);
                         } else {
-                            $fail_subjects[$stu_dent->id_card] = [] ;
+                            $fail_subjects[$stu_dent->id_card]['pass'][] = array('credit'=> $eachCourse->course_annual_credit, 'score'=> $each_score);
                         }
 
                         if(isset($element[$stu_dent->id_card])) {
@@ -3293,10 +3334,12 @@ class CourseAnnualController extends Controller
                         }
 
                     }
+
+
                     if($each_score < ScoreEnum::Under_30) {
-                        $fail_subjects[$stu_dent->id_card][] = $each_score;
+                        $fail_subjects[$stu_dent->id_card]['fail'][] = array('credit'=> $tmpCourse->course_annual_credit, 'score'=> $each_score);
                     } else {
-                        $fail_subjects[$stu_dent->id_card] = [] ;
+                        $fail_subjects[$stu_dent->id_card]['pass'][] = array('credit'=> $tmpCourse->course_annual_credit, 'score'=> $each_score);
                     }
 
                     if(isset($element[$stu_dent->id_card])) {
@@ -3376,10 +3419,13 @@ class CourseAnnualController extends Controller
                                 }
                             }
                         }
+
+
+
                         if($each_score < ScoreEnum::Under_30) {
-                            $fail_subjects[$stu_dent->id_card][] = $each_score;
+                            $fail_subjects[$stu_dent->id_card]['fail'][] = array('credit'=> $eachCourse->course_annual_credit, 'score'=> $each_score);
                         } else {
-                            $fail_subjects[$stu_dent->id_card] = [] ;
+                            $fail_subjects[$stu_dent->id_card]['pass'][] = array('credit'=> $eachCourse->course_annual_credit, 'score'=> $each_score);
                         }
 
                         if(isset($element[$stu_dent->id_card])) {
@@ -3462,9 +3508,9 @@ class CourseAnnualController extends Controller
                     }
 
                     if($each_score < ScoreEnum::Under_30) {
-                        $fail_subjects[$stu_dent->id_card][] = $each_score;
+                        $fail_subjects[$stu_dent->id_card]['fail'][] = array('credit'=> $eachCourse->course_annual_credit, 'score'=> $each_score);
                     } else {
-                        $fail_subjects[$stu_dent->id_card] = [] ;
+                        $fail_subjects[$stu_dent->id_card]['pass'][] = array('credit'=> $eachCourse->course_annual_credit, 'score'=> $each_score);
                     }
 
                     if(isset($element[$stu_dent->id_card])) {
@@ -3645,8 +3691,13 @@ class CourseAnnualController extends Controller
 
             }
 
+
+
+
+
             $element = $element + $scoreData+ ["Total" =>$totalScore, "Notation" => isset($studentNotations[$student->student_annual_id])?$studentNotations[$student->student_annual_id]->description:''];
             $studentListScore[] = $element;
+
 
         }
 

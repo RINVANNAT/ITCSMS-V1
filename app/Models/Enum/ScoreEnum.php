@@ -46,6 +46,7 @@ class ScoreEnum
 
     //--------check score -----
     const Pass_Moyenne  = 50;
+    const Aproximation_Moyenne = 55.00;
     const Under_30 = 30;
     const Score_10 = 10;
     const Fraud = 'F';
