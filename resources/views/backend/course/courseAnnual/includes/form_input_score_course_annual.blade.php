@@ -1124,7 +1124,7 @@
                 dataType: "json",
                 success: function(resultData) {
 
-                    if(resultData.status) {
+                    if(resultData.status) {``
                         $.each(array_col_status, function(key, val) {
                             if(val == false) {
                                 objectStatus.status = val;

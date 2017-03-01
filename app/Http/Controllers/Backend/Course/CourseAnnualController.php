@@ -559,7 +559,7 @@ class CourseAnnualController extends Controller
      * Update the specified resource in storage.
      *
      * @param  UpdateCourseAnnualRequest  $request
-     * @param  int  $id
+     * @param  int  $id---course-annual-id
      * @return \Illuminate\Http\Response
      */
     public function update(UpdateCourseAnnualRequest $request, $id)
@@ -568,6 +568,7 @@ class CourseAnnualController extends Controller
         $input = $request->all();
         $midterm_id = $request->midterm_percentage_id;
         $final_id = $request->final_percentage_id;
+        $count_absence = $request->is_counted_absence;
 
         $midterm  = [
             'name'  => 'Midterm-'.$request->midterm_score.'%',
@@ -581,14 +582,80 @@ class CourseAnnualController extends Controller
             'percentage_type' => 'normal'
         ];
 
-        if(isset($midterm_id) && isset($final_id)) {
+        if(!isset($count_absence)) {
+            //---if the course doese not count the absence ..then find absence score and delete
 
-            $score_by_course_annual = DB::table('scores')->where('course_annual_id', $id)->get();
-            if($score_by_course_annual) {
-                $this->percentages->update($midterm_id, $midterm);
-                $this->percentages->update($final_id, $final);
+            $absences = DB::table('absences')->where('course_annual_id', $id);
+            if($absences->get()) {
+                $absences->delete();
+            }
+        }
+
+        if(isset($midterm_id) || isset($final_id)) {
+
+            if(isset($midterm_id)) {//----record score midterm has been created
+                if($midterm['percent'] > 0) {//---score midterm requested from user---
+                    //----make change the record ---
+                    $scores = DB::table('scores')->where('course_annual_id', $id);//---prevent if percentage created but score record was not created
+                    if($scores->get()) {
+
+                        $check_percentage = DB::table('percentages')->where('id', $midterm_id)->first();
+                        if($check_percentage->percent != $midterm['percent']) {
+
+                            //---update percentage
+                            $this->percentages->update($midterm_id, $midterm);
+                            $this->percentages->update($final_id, $final);
+                            //--delete scores from table scores
+                            $scores->update(['score'=> null]);
+                        }
+
+                    } else {
+                        $this->createScorePercentage($request->midterm_score, $request->final_score, $id);
+                    }
+
+                } else {
+                    //---$midterm_id is the percentage id for midterm score
+                    //---the score midterm is requested to be 0----
+                    //---so we have to delete the existing midterm id and update the final-score
+
+                    $scores = DB::table('scores')
+                            ->join('percentage_scores', 'percentage_scores.score_id', '=', 'scores.id')
+                            ->join('percentages', 'percentages.id', '=', 'percentage_scores.percentage_id')
+                            ->where('percentages.id', $midterm_id)->select('scores.id as score_id')->get();
+
+                    if($scores) {
+                        foreach($scores as $score) {
+
+                            Score::find($score->score_id)->delete();
+                        }
+                    }
+                    $midterm_percentage = DB::table('percentages')->where('id', $midterm_id);
+
+                    if($midterm_percentage->get()) {
+                        $midterm_percentage->delete();
+                    }
+                    //----because score midterm is 0 so we only update score final
+                    $this->percentages->update($final_id, $final);
+                }
             } else {
-                $this->createScorePercentage($request->midterm_score, $request->final_score, $id);
+                //---score midterm has not been created...this case the course has only score final
+
+                if($midterm['percent'] > 0) {//----if the request change score midterm bigger than 0 ::mean:: they want to create score midterm
+                    //----delete previous score then recreate them ---
+                    $scores = DB::table('scores')->where('scores.course_annual_id', $id);
+                    if($scores->get()) {
+                        $scores->delete();
+                    }
+                    $delete_final_percentage = DB::table('percentages')->where('id', $final_id)->delete();
+                    $this->createScorePercentage($request->midterm_score, $request->final_score, $id);
+
+                } else {
+
+                    //----update only the final-percentage
+
+                    $this->percentages->update($final_id, $final);
+                }
+
             }
 
         } else {
@@ -2283,18 +2350,33 @@ class CourseAnnualController extends Controller
         $check = 0;
 
         $courseAnnual = DB::table('course_annuals')->where('id', $courseAnnualId)->first();
-        $percentageInput = [
-            [
-                'name'              =>   'Midterm-'.$midterm.'%',
-                'percent'           => $midterm,
-                'percentage_type'   => 'normal'
-            ],
-            [
-                'name'              =>      'Final-'.$final.'%',
-                'percent'           =>      $final,
-                'percentage_type'   => 'normal'
-            ]
-        ];
+        if($midterm >  0) {
+
+
+            $percentageInput = [
+                [
+                    'name'              =>   'Midterm-'.$midterm.'%',
+                    'percent'           => $midterm,
+                    'percentage_type'   => 'normal'
+                ],
+                [
+                    'name'              =>      'Final-'.$final.'%',
+                    'percent'           =>      $final,
+                    'percentage_type'   => 'normal'
+                ]
+            ];
+        } else {
+
+            $percentageInput = [
+                [
+                    'name'              =>      'Final-'.$final.'%',
+                    'percent'           =>      $final,
+                    'percentage_type'   => 'normal'
+                ]
+            ];
+
+        }
+
 
         $arrayIdsOfDeptGradeDegreeDeptOption = $this->arrayIdsOfDeptGradeDegreeDeptOption($courseAnnualId);
 
@@ -2708,7 +2790,15 @@ class CourseAnnualController extends Controller
                     $creditInEachSemester[$program->semester_id][] = $program->course_annual_credit;
                 }
 
-                $nestedHeaders[0] = array_merge($nestedHeaders[0], [['label'=>'S'.$program->semester_id.'_'.htmlspecialchars($program->name_en), 'colspan'=>2]]);
+
+
+                if(strlen($program->name_en) > 45) {
+                    $course_name = substr($program->name_en, 0,45). '...';
+                } else {
+                    $course_name = $program->name_en;
+                }
+
+                $nestedHeaders[0] = array_merge($nestedHeaders[0], [['label'=>'S'.$program->semester_id.'_'.$course_name, 'colspan'=>2]]);
                 $nestedHeaders[1] = array_merge($nestedHeaders[1], [['label'=>'Abs', 'colspan'=>1], ['label'=> $program->course_annual_credit, 'colspan'=>1]]);
                 $colWidths[] = 65;
                 $colWidths[] = 65;
@@ -2893,11 +2983,19 @@ class CourseAnnualController extends Controller
 
             //----find all fail subject of each student
 
+
+//            dd($fail_subjects['e20120716']);
             $num_subject_redouble = $this->findRedoubleSubject($fail_subjects[$key]);
 
-            dump($num_subject_redouble);
+            //dump($num_subject_redouble);
 
-            $value['Rattrapage'] = count($fail_subjects[$key]);
+            if($num_subject_redouble['status']) {
+                $value['Rattrapage'] = $num_subject_redouble['count'];
+            } else {
+                $value['Rattrapage'] = $num_subject_redouble['count'].'_';
+            }
+            //dd('stop');
+
 //            $value['Passage'] = "";
             $value['Remark'] = $array_observation[$key]->remark;
             $value['Observation'] = "";//$array_observation[$key]->observation;
@@ -2905,8 +3003,6 @@ class CourseAnnualController extends Controller
             $value["number"] = $index;
             $element[$key] = $value;
         }
-
-        dd($element);
 
         //-----find student classement
         asort($array_tmp_rank);
@@ -2966,30 +3062,93 @@ class CourseAnnualController extends Controller
 
     private function findRedoubleSubject($array) {
 
+        //dump($array);
 
-        $validate_score = 0;
         $total_credit = 0;
+        $array_pass = [];
+
         if(isset($array['fail'])) {
             if(isset($array['pass'])) {
+
+                $validate_score = 0;
+
                 foreach($array['fail'] as $fail) {
+                    //dump($validate_score.'=='.$validate_score .'+'.'('.ScoreEnum::Pass_Moyenne .'*'.$fail['credit'].')');
 
                     $total_credit = $total_credit + $fail['credit'];
                     $validate_score = $validate_score + (ScoreEnum::Pass_Moyenne * $fail['credit']);
                 }
+
+
                 foreach($array['pass'] as $pass) {
+
+                    //dump($validate_score.'=='.$validate_score .'+'.'('.$pass['score'] .'*'.$pass['credit'].')');
+
                     $total_credit = $total_credit + $pass['credit'];
                     $validate_score = $validate_score + ($pass['score'] * $pass['credit']);
+                    $array_pass[] = $pass['score'];
                 }
                 $approximation_moyenne = $validate_score / $total_credit;
 
-                dd($approximation_moyenne);
+                //dump($validate_score.'--'.$total_credit);
+                if($approximation_moyenne < ScoreEnum::Aproximation_Moyenne) {
+
+                    //dump($approximation_moyenne.'  <  '.ScoreEnum::Aproximation_Moyenne);
+
+                    $find_min = $this->findMin($array['pass']);
+                    if($find_min['element']['score'] < ScoreEnum::Pass_Moyenne) {
+
+                        $array['fail'][] = $find_min['element'];
+                        unset($array['pass'][$find_min['index']]);
+                        $array['pass'] = array_values($array['pass']);
+                        //-----because the prediction score of subplementary _course were not to reach the approximation moyenne..
+                        // so we need to find the lowest score from array['pass']---and consider as fail to enforce student to re-exam it
+                        //---then we do the findRedoubleSubject again until student pass...and return number of subjects for student to re-exam
+                        //dump($array);
+                        return $this->findRedoubleSubject($array);
+                    } else {
+                        if($approximation_moyenne > ScoreEnum::Pass_Moyenne) {
+
+                            return ['status' => false, 'message' => 'student may have tiny percent to pass if they re-exam the sujects and obtain the highest score '.ScoreEnum::Pass_Moyenne, 'count' => count($array['fail'])];
+
+                        } else {
+                            return ['status' => false, 'message' => 'student is not able to pass if they re-exam all sujects having score lower then '.ScoreEnum::Pass_Moyenne, 'count' => count($array['fail'])];
+                        }
+                    }
+
+                } else {
+                    return ['status' => true, 'message' => 'Student have to re-exam theses subject', 'count' => count($array['fail'])];
+                }
+
             } else {
-                return count($array['fail']);
+
+                return ['status' => true, 'message' => 'Student  have to re-exam all sujects', 'count' => count($array['fail'])];
+
             }
         } else {
-
-            return ScoreEnum::Zero;
+            return ['status' => true, 'message' => 'Student passed  all subject', 'count' => ScoreEnum::Zero];
         }
+    }
+
+    private function findMin($array_val) {// ---array_val :: pass
+
+        $min = $array_val[0]['score'];
+        $credit = $array_val[0]['credit'];
+        $index = 0;
+
+        for($in = 1; $in < count($array_val); $in++) {
+
+            if($min > $array_val[$in]['score']) {
+                $index = $in;
+                $min = $array_val[$in]['score'];
+                $credit = $array_val[$in]['credit'];
+            }
+        }
+        //dump($min);
+        return [
+            'element' => ['score'=> $min, 'credit' => $credit],
+            'index'  => $index
+        ];
     }
 
 
