@@ -831,8 +831,10 @@ class CourseAnnualController extends Controller
                     $action_input_score = ' <a href="'.route('admin.course.form_input_score_course_annual',$courseAnnual->id).'" class="btn btn-xs btn-info input_score_course"><i class="fa fa-area-chart" data-toggle="tooltip" data-placement="top" title="" data-original-title="'.'input score'.'"></i></a>';
                 } else {
                     $action_toggle_scoring = ' <a href="'.route('admin.course.course_annual.toggle_scoring',$courseAnnual->id).'" class="btn btn-xs btn-warning toggle_scoring"><i class="fa fa-toggle-on" data-toggle="tooltip" data-placement="top" title="" data-original-title="Enable Scoring"></i></a>';
-                    $action_input_score = "";
+                    $action_input_score = ' <a href="'.route('admin.course.form_input_score_course_annual',$courseAnnual->id).'" class="btn btn-xs btn-default input_score_course"><i class="fa fa-area-chart" data-toggle="tooltip" data-placement="top" title="" data-original-title="'.'input score'.'"></i></a>';
                 }
+
+                $action_view_score = ' <a href="'.route('admin.course.form_input_score_course_annual',$courseAnnual->id).'?mode=view'.'" class="btn btn-xs btn-default view_score_course"><i class="fa fa-area-chart" data-toggle="tooltip" data-placement="top" title="" data-original-title="'.'view score'.'"></i></a>';
 
                 $action_edit_score = ' <a href="'.route('admin.course.course_annual.edit',$courseAnnual->id).'" class="btn btn-xs btn-primary"><i class="fa fa-pencil" data-toggle="tooltip" data-placement="top" title="" data-original-title="'.trans('buttons.general.crud.edit').'"></i> </a>';
                 $action_delete_score = ' <button class="btn btn-xs btn-danger btn-delete" data-remote="'.route('admin.course.course_annual.destroy', $courseAnnual->id) .'"><i class="fa fa-times" data-toggle="tooltip" data-placement="top" title="' . trans('buttons.general.crud.delete') . '"></i></button>';
@@ -855,7 +857,11 @@ class CourseAnnualController extends Controller
                         $my_courses = CourseAnnual::where('employee_id',$employee->id)->lists('id')->toArray();
                         if(in_array($courseAnnual->id,$my_courses)){
                             $actions = $actions.$action_input_score;
+                        } else if(Auth::user()->allow('view-all-score-course-annual')) {
+                            $actions = $actions.$action_view_score;
                         }
+                    } else if(Auth::user()->allow('view-all-score-course-annual')) {
+                        $actions = $actions.$action_view_score;
                     }
 
                     if(Auth::user()->allow('edit-courseAnnuals')) {
@@ -1922,16 +1928,29 @@ class CourseAnnualController extends Controller
 
         $courseAnnual = CourseAnnual::find($courseAnnualId);
 
-        if($courseAnnual->is_allow_scoring){
+        $properties = $this->dataSendToView($courseAnnualId);
+        $courseAnnual = $properties['course_annual'];
+        $availableCourses = $properties['available_course'];
+        $mode = null;
 
-            $properties = $this->dataSendToView($courseAnnualId);
-            $courseAnnual = $properties['course_annual'];
-            $availableCourses = $properties['available_course'];
+        if(access()->hasRole("administrator")){
+            $mode = "edit";
 
-            return view('backend.course.courseAnnual.includes.form_input_score_course_annual', compact('courseAnnualId', 'courseAnnual', 'availableCourses'));
         } else {
-            return view('backend.course.courseAnnual.includes.no_permission_to_score', compact('courseAnnualId', 'courseAnnual', 'availableCourses'));
+            $employee = Employee::where('user_id', Auth::user()->id)->first();
+            $my_courses = CourseAnnual::where('employee_id',$employee->id)->lists('id')->toArray();
+
+            if(Auth::user()->allow('input-score-course-annual') && in_array($courseAnnualId,$my_courses)) {
+                $mode = "edit";
+            } else if(Auth::user()->allow('view-all-score-course-annual')){
+                $mode = "view";
+            } else {
+                // This course is not belong to current user, and user don't have permission to view score
+                return view('backend.course.courseAnnual.includes.no_permission_to_score');
+            }
         }
+
+        return view('backend.course.courseAnnual.includes.form_input_score_course_annual', compact('courseAnnualId', 'courseAnnual', 'availableCourses','mode'));
 
     }
 
@@ -2987,7 +3006,7 @@ class CourseAnnualController extends Controller
 //            dd($fail_subjects['e20120716']);
             $num_subject_redouble = $this->findRedoubleSubject($fail_subjects[$key]);
 
-            //dump($num_subject_redouble);
+//            dump($num_subject_redouble);
 
             if($num_subject_redouble['status']) {
                 $value['Rattrapage'] = $num_subject_redouble['count'];
@@ -4485,18 +4504,20 @@ class CourseAnnualController extends Controller
 
 
     public function toggle_scoring(ToggleScoringCourseAnnualRequest $request, $id){
-        $course_annual = CourseAnnual::find($id);
+        if($request->ajax()){
+            $course_annual = CourseAnnual::find($id);
 
-        if($course_annual->is_allow_scoring){
-            $course_annual->is_allow_scoring = false;
-        } else {
-            $course_annual->is_allow_scoring = true;
-        }
+            if($course_annual->is_allow_scoring){
+                $course_annual->is_allow_scoring = false;
+            } else {
+                $course_annual->is_allow_scoring = true;
+            }
 
-        if($course_annual->save()){
-            return redirect()->route('admin.course.course_annual.index')->withFlashSuccess(trans('alerts.backend.generals.updated'));
-        } else {
-            return redirect()->back()->withFlashError('Something is wrong. Cannot toggle scoring!');
+            if($course_annual->save()){
+                return \Illuminate\Support\Facades\Response::json(array("success"=>true, "message" => "Operation is successful."));
+            } else {
+                return \Illuminate\Support\Facades\Response::json(array("success"=>false, "message" => "Something went wrong."));
+            }
         }
 
     }

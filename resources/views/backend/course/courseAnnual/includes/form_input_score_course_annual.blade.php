@@ -373,9 +373,13 @@
 
             </div>
 {{--            <label for="description" class="label label-success">{{$courseAnnual->academic_year->name_latin}} </label>--}}
+            @if($courseAnnual->is_allow_scoring && $mode == "edit")
             <button class="btn btn-primary btn-xs pull-right" id="save_editted_score" style="margin-left:5px">Save Changes!</button>
+            @endif
             <a class="btn btn-primary btn-xs pull-right" id="export_score" href="{{route('course_annual.export_course_score_annual')}}" target="_blank" style="margin-left:5px">Export Score</a>
+            @if($courseAnnual->is_allow_scoring && $mode == "edit")
             <a href="{{route('course_annual.form_import_score')}}" target="_self" class="btn btn-info btn-xs pull-right" id="import_score" style="margin-left: 5px"> Import Score</a>
+            @endif
             {{--<div class="btn-group pull-right btn_action_group">--}}
 
                 {{--<button type="button" class="btn btn-warning btn-xs dropdown-toggle" data-toggle="dropdown" aria-expanded="false">--}}
@@ -390,6 +394,22 @@
         </div><!-- /.box-header -->
 
         <div class="box-body">
+
+            @if($mode == "view")
+            <div class="alert alert-info">
+                <h4><i class="icon fa fa-info"></i> Viewing mode!</h4>
+                <p>
+                    This is in viewing mode. You cannot delete or modify this course.
+                </p>
+            </div>
+            @elseif(!$courseAnnual->is_allow_scoring)
+            <div class="alert alert-danger">
+                <h4><i class="icon fa fa-info"></i> Scoring is blocked!</h4>
+                <p>
+                    This course is blocked for scoring. Please contact student & study affair office if you wish to make change.
+                </p>
+            </div>
+            @endif
 
             <div id="score_table" class="handsontable htColumnHeaders">
 

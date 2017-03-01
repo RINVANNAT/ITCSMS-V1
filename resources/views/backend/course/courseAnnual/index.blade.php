@@ -304,8 +304,26 @@
                 allowClear: true
             });
 
-            // Button disable/enable scoring
+            // ----------- Button disable/enable scoring -----------
+            $(document).on("click",".toggle_scoring", function(e){
+                e.preventDefault();
+                $.ajax({
+                    url: $(this).attr('href'),
+                    type: 'GET',
+                    success: function (response) {
+                        if(response.success){
+                            oTable.draw();
+                            notify("success","",response.message.toString());
+                        } else {
+                            notify("error","",response.message.toString());
+                        }
 
+                    }
+                });
+
+            });
+
+            // diable multiple course
             $("#btn_disable_scoring").on("click", function(e){
                 $.ajax({
                     url: disable_scoring_url,
@@ -322,8 +340,9 @@
                     success: function (response) {
                         if(response.success){
                             oTable.draw();
+                            notify("success","",response.message.toString());
                         } else {
-                            alert("something went wrong");
+                            notify("error","",response.message.toString());
                         }
 
                     }
@@ -346,8 +365,9 @@
                     success: function (response) {
                         if(response.success){
                             oTable.draw();
+                            notify("success","",response.message.toString());
                         } else {
-                            alert("something went wrong");
+                            notify("error","",response.message.toString());
                         }
 
                     }
