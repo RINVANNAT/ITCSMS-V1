@@ -2992,10 +2992,8 @@ class CourseAnnualController extends Controller
             if($num_subject_redouble['status']) {
                 $value['Rattrapage'] = $num_subject_redouble['count'];
             } else {
-                $value['Rattrapage'] = $num_subject_redouble['count'].'_';
+                $value['Rattrapage'] = $num_subject_redouble['count'];
             }
-            //dd('stop');
-
 //            $value['Passage'] = "";
             $value['Remark'] = $array_observation[$key]->remark;
             $value['Observation'] = "";//$array_observation[$key]->observation;
@@ -3062,7 +3060,7 @@ class CourseAnnualController extends Controller
 
     private function findRedoubleSubject($array) {
 
-        //dump($array);
+//        dump($array);
 
         $total_credit = 0;
         $array_pass = [];
@@ -3073,7 +3071,7 @@ class CourseAnnualController extends Controller
                 $validate_score = 0;
 
                 foreach($array['fail'] as $fail) {
-                    //dump($validate_score.'=='.$validate_score .'+'.'('.ScoreEnum::Pass_Moyenne .'*'.$fail['credit'].')');
+//                    dump($validate_score.'=='.$validate_score .'+'.'('.ScoreEnum::Pass_Moyenne .'*'.$fail['credit'].')');
 
                     $total_credit = $total_credit + $fail['credit'];
                     $validate_score = $validate_score + (ScoreEnum::Pass_Moyenne * $fail['credit']);
@@ -3082,7 +3080,7 @@ class CourseAnnualController extends Controller
 
                 foreach($array['pass'] as $pass) {
 
-                    //dump($validate_score.'=='.$validate_score .'+'.'('.$pass['score'] .'*'.$pass['credit'].')');
+//                    dump($validate_score.'=='.$validate_score .'+'.'('.$pass['score'] .'*'.$pass['credit'].')');
 
                     $total_credit = $total_credit + $pass['credit'];
                     $validate_score = $validate_score + ($pass['score'] * $pass['credit']);
@@ -3090,30 +3088,36 @@ class CourseAnnualController extends Controller
                 }
                 $approximation_moyenne = $validate_score / $total_credit;
 
-                //dump($validate_score.'--'.$total_credit);
+//                dump($validate_score.'--'.$total_credit);
                 if($approximation_moyenne < ScoreEnum::Aproximation_Moyenne) {
 
-                    //dump($approximation_moyenne.'  <  '.ScoreEnum::Aproximation_Moyenne);
+//                    dump($approximation_moyenne.'  <  '.ScoreEnum::Aproximation_Moyenne);
 
-                    $find_min = $this->findMin($array['pass']);
-                    if($find_min['element']['score'] < ScoreEnum::Pass_Moyenne) {
+                    if(count($array['pass']) > 0) {
 
-                        $array['fail'][] = $find_min['element'];
-                        unset($array['pass'][$find_min['index']]);
-                        $array['pass'] = array_values($array['pass']);
-                        //-----because the prediction score of subplementary _course were not to reach the approximation moyenne..
-                        // so we need to find the lowest score from array['pass']---and consider as fail to enforce student to re-exam it
-                        //---then we do the findRedoubleSubject again until student pass...and return number of subjects for student to re-exam
-                        //dump($array);
-                        return $this->findRedoubleSubject($array);
-                    } else {
-                        if($approximation_moyenne > ScoreEnum::Pass_Moyenne) {
+                        $find_min = $this->findMin($array['pass']);
 
-                            return ['status' => false, 'message' => 'student may have tiny percent to pass if they re-exam the sujects and obtain the highest score '.ScoreEnum::Pass_Moyenne, 'count' => count($array['fail'])];
+                        if($find_min['element']['score'] < ScoreEnum::Pass_Moyenne) {
 
+                            $array['fail'][] = $find_min['element'];
+                            unset($array['pass'][$find_min['index']]);
+                            $array['pass'] = array_values($array['pass']);
+                            //-----because the prediction score of subplementary _course were not to reach the approximation moyenne..
+                            // so we need to find the lowest score from array['pass']---and consider as fail to enforce student to re-exam it
+                            //---then we do the findRedoubleSubject again until student pass...and return number of subjects for student to re-exam
+                            //dump($array);
+                            return $this->findRedoubleSubject($array);
                         } else {
-                            return ['status' => false, 'message' => 'student is not able to pass if they re-exam all sujects having score lower then '.ScoreEnum::Pass_Moyenne, 'count' => count($array['fail'])];
+                            if($approximation_moyenne > ScoreEnum::Pass_Moyenne) {
+
+                                return ['status' => false, 'message' => 'student may have tiny percent to pass if they re-exam the sujects and obtain the highest score '.ScoreEnum::Pass_Moyenne, 'count' => count($array['fail'])];
+
+                            } else {
+                                return ['status' => false, 'message' => 'student is not able to pass if they re-exam all sujects having score lower then '.ScoreEnum::Pass_Moyenne, 'count' => count($array['fail'])];
+                            }
                         }
+                    } else {
+                        return ['status' => true, 'message' => 'Student have to re-exam theses subject', 'count' => count($array['fail'])];
                     }
 
                 } else {
@@ -3144,7 +3148,7 @@ class CourseAnnualController extends Controller
                 $credit = $array_val[$in]['credit'];
             }
         }
-        //dump($min);
+//        dump($min);
         return [
             'element' => ['score'=> $min, 'credit' => $credit],
             'index'  => $index

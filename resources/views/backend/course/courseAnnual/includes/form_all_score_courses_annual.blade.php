@@ -80,7 +80,7 @@
                 vertical-align: middle !important;
             }
             .handsontable thead tr:nth-child(2) {
-                height: 40px !important;
+                height: 50px !important;
                 vertical-align: middle !important;
             }
 
