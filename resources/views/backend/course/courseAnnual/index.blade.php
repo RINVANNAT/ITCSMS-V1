@@ -94,8 +94,8 @@
                         @endauth
                         @permission('disable-enable-input-score-into-course-annual')
                         <div class="btn-group">
-                            <button class="btn btn-warning btn-sm" id="btn_disable_scoring"><i class="fa fa-toggle-on"></i> {{trans('buttons.course.course_annual.disable_scoring')}}</button>
-                            <button class="btn btn-success btn-sm" id="btn_enable_scoring"><i class="fa fa-toggle-off"></i> {{trans('buttons.course.course_annual.enable_scoring')}}</button>
+                            <button class="btn btn-success btn-sm" id="btn_disable_scoring"><i class="fa fa-toggle-on"></i> {{trans('buttons.course.course_annual.disable_scoring')}}</button>
+                            <button class="btn btn-warning btn-sm" id="btn_enable_scoring"><i class="fa fa-toggle-off"></i> {{trans('buttons.course.course_annual.enable_scoring')}}</button>
                         </div>
                         @endauth
 

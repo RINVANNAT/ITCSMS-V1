@@ -760,10 +760,10 @@ class CourseAnnualController extends Controller
             ->addColumn('action', function ($courseAnnual) use ($employee) {
 
                 if($courseAnnual->is_allow_scoring){
-                    $action_toggle_scoring = ' <a href="'.route('admin.course.course_annual.toggle_scoring',$courseAnnual->id).'" class="btn btn-xs btn-warning toggle_scoring"><i class="fa fa-toggle-off" data-toggle="tooltip" data-placement="top" title="" data-original-title="Disable Scoring"></i></a>';
+                    $action_toggle_scoring = ' <a href="'.route('admin.course.course_annual.toggle_scoring',$courseAnnual->id).'" class="btn btn-xs btn-success toggle_scoring"><i class="fa fa-toggle-off" data-toggle="tooltip" data-placement="top" title="" data-original-title="Disable Scoring"></i></a>';
                     $action_input_score = ' <a href="'.route('admin.course.form_input_score_course_annual',$courseAnnual->id).'" class="btn btn-xs btn-info input_score_course"><i class="fa fa-area-chart" data-toggle="tooltip" data-placement="top" title="" data-original-title="'.'input score'.'"></i></a>';
                 } else {
-                    $action_toggle_scoring = ' <a href="'.route('admin.course.course_annual.toggle_scoring',$courseAnnual->id).'" class="btn btn-xs btn-success toggle_scoring"><i class="fa fa-toggle-on" data-toggle="tooltip" data-placement="top" title="" data-original-title="Enable Scoring"></i></a>';
+                    $action_toggle_scoring = ' <a href="'.route('admin.course.course_annual.toggle_scoring',$courseAnnual->id).'" class="btn btn-xs btn-warning toggle_scoring"><i class="fa fa-toggle-on" data-toggle="tooltip" data-placement="top" title="" data-original-title="Enable Scoring"></i></a>';
                     $action_input_score = "";
                 }
 
@@ -4342,7 +4342,7 @@ class CourseAnnualController extends Controller
         $course_annuals = CourseAnnual::where('academic_year_id',$request->get('academic_year'));
 
         // Select department
-        if(access()->hasRole("Administrator")) {
+        if(Auth::user()->allow("disable-enable-input-score-into-course-annual-in-all-department")) {
             if($request->get('department') != null && $request->get('department') != ""){
                 $course_annuals = $course_annuals->where('department_id',$request->get('department'));
             }

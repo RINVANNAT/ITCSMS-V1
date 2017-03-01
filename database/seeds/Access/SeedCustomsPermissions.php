@@ -817,7 +817,14 @@ class SeedCustomsPermissions extends Seeder
                         ],
                         [
                             'name'         => 'disable-enable-input-score-into-course-annual',
-                            'display_name' => 'Disable/Enable inputting score into course annual',
+                            'display_name' => 'Disable/Enable scoring in own department',
+                            'dependency'   => [
+                                'view-backend','view-course-management','view-courseAnnual-management'
+                            ]
+                        ],
+                        [
+                            'name'         => 'disable-enable-input-score-into-course-annual-in-all-department',
+                            'display_name' => 'Disable/Enable scoring in all department',
                             'dependency'   => [
                                 'view-backend','view-course-management','view-courseAnnual-management'
                             ]
