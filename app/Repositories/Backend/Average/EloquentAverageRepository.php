@@ -118,7 +118,7 @@ class EloquentAverageRepository implements AverageRepositoryContract
 
     public function findAverageByCourseIdAndStudentId($courseAnnualId, $studentAnnualId) {
 
-        $average = Average::where([
+        $average = DB::table('averages')->where([
             ['course_annual_id', $courseAnnualId],
             ['student_annual_id', $studentAnnualId]
         ])->first();

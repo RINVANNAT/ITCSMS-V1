@@ -290,6 +290,8 @@
             cells: function (row, col, prop) {
                 this.renderer = colorRenderer;
 
+//                console.log(row+'------'+col+'----'+prop);
+
                 var cellProperties = {};
                 if ( prop  === 'Redouble') {
                     cellProperties.readOnly = false;
