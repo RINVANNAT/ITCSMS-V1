@@ -1951,6 +1951,8 @@ class CourseAnnualController extends Controller
                 // This course is not belong to current user, and user don't have permission to view score
                 return view('backend.course.courseAnnual.includes.no_permission_to_score');
             }
+
+
         }
 
         return view('backend.course.courseAnnual.includes.form_input_score_course_annual', compact('courseAnnualId', 'courseAnnual', 'availableCourses','mode'));
