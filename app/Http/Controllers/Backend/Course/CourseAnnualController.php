@@ -1936,7 +1936,7 @@ class CourseAnnualController extends Controller
         $availableCourses = $properties['available_course'];
         $mode = null;
 
-        if(access()->hasRole("administrator")){
+        if(access()->hasRole("Administrator")){
             $mode = "edit";
 
         } else {
