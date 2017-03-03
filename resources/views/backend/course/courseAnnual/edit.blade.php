@@ -158,44 +158,103 @@
 
         $(document).ready(function() {
 
+            function swal_alert(midterm_object, selected_score, previouse_score, highest_score) {
+
+                swal({
+                    title: "Attention",
+                    text: "If you make this change, the previous score will be errased!!",
+                    type: "warning",
+                    showCancelButton: true,
+                    confirmButtonColor: "#DD6B55",
+                    confirmButtonText: "Yes",
+                    closeOnConfirm: true
+                }, function(confirmed) {
+
+                    if (confirmed) {
+                        midterm_object.val(selected_score);
+                        assign_score_finall(highest_score);
+                    } else {
+                        midterm_object.val(previouse_score);
+                        assign_score_finall(highest_score);
+                    }
+
+                });
+            }
+
+            function assign_score_finall(score) {
+
+                if(val = $('select#midterm_score_id :selected').val()) {
+
+                    $('#final_score_id').val(parseInt(score) - val);
+                }
+            }      
+
+
+
             $('#count_absence').on('change', function() {
+
                 if(this.checked) {
-                    if(val = $('select#midterm_score_id :selected').val()) {
-                        $('#final_score_id').val(parseInt('{{\App\Models\Enum\ScoreEnum::Midterm_Final}}') - val);
-                    }
 
-                    $('select[name=midterm_score]').on('change', function() {
-                        $('#final_score_id').val(parseInt('{{\App\Models\Enum\ScoreEnum::Midterm_Final}}') - $(this).val());
+                    assign_score_finall('{{\App\Models\Enum\ScoreEnum::Midterm_Final}}');
+                    var previous_score;
+
+                    $('select[name=midterm_score]').on('focus', function() {
+                        previous_score = $(this).val();
+
+                    }).on('change', function() {
+
+                        swal_alert( $('select[name=midterm_score]'),$(this).val(), previous_score, '{{\App\Models\Enum\ScoreEnum::Midterm_Final}}');
                     });
+
                 } else {
-                    if(val = $('select#midterm_score_id :selected').val()) {
-                        $('#final_score_id').val(parseInt('{{\App\Models\Enum\ScoreEnum::Highest_Score}}') - val);
-                    }
 
-                    $('select[name=midterm_score]').on('change', function() {
-                        $('#final_score_id').val(parseInt('{{\App\Models\Enum\ScoreEnum::Highest_Score}}') - $(this).val());
+                    assign_score_finall('{{\App\Models\Enum\ScoreEnum::Highest_Score}}');
+
+                    var previous_score;
+
+                    $('select[name=midterm_score]').on('focus', function() {
+                        previous_score = $(this).val();
+
+                    }).on('change', function() {
+
+                        swal_alert($('select[name=midterm_score]'), $(this).val(), previous_score, '{{\App\Models\Enum\ScoreEnum::Highest_Score}}');
+
                     });
+
+                    
                 }
             })
 
             if($("#count_absence").is(':checked')) {
 
-                if(val = $('select#midterm_score_id :selected').val()) {
-                    $('#final_score_id').val(parseInt('{{\App\Models\Enum\ScoreEnum::Midterm_Final}}') - val);
-                }
+                assign_score_finall('{{\App\Models\Enum\ScoreEnum::Midterm_Final}}');
 
-                $('select[name=midterm_score]').on('change', function() {
-                    $('#final_score_id').val(parseInt('{{\App\Models\Enum\ScoreEnum::Midterm_Final}}') - $(this).val());
-                });
+                var previous_score;
+
+                    $('select[name=midterm_score]').on('focus', function() {
+                        previous_score = $(this).val();
+
+                    }).on('change', function() {
+
+                        swal_alert($('select[name=midterm_score]'), $(this).val(), previous_score, '{{\App\Models\Enum\ScoreEnum::Midterm_Final}}');
+
+                    });
+
+
             } else {
 
-                if(val = $('select#midterm_score_id :selected').val()) {
-                    $('#final_score_id').val(parseInt('{{\App\Models\Enum\ScoreEnum::Highest_Score}}') - val);
-                }
+                assign_score_finall('{{\App\Models\Enum\ScoreEnum::Highest_Score}}');
 
-                $('select[name=midterm_score]').on('change', function() {
-                    $('#final_score_id').val(parseInt('{{\App\Models\Enum\ScoreEnum::Highest_Score}}') - $(this).val());
-                });
+                var previous_score;
+
+                    $('select[name=midterm_score]').on('focus', function() {
+                        previous_score = $(this).val();
+
+                    }).on('change', function() {
+
+                        swal_alert($('select[name=midterm_score]'), $(this).val(), previous_score, '{{\App\Models\Enum\ScoreEnum::Highest_Score}}');
+
+                    });
             }
 
         })
