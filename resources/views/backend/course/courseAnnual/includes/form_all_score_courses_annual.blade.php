@@ -108,6 +108,8 @@
             }
         </style>
         <div class="box-header with-border">
+
+
             <div class=" no-paddingcol-sm-12">
 
                 <div class="pull-left">
@@ -115,6 +117,7 @@
                 </div>
 
                 <button class="btn btn-xs btn-primary pull-left" id="btn_export_score" style="margin-left: 5px"> <i class="fa fa-export">Export</i></button>
+                <button class="btn btn-xs btn-success pull-left" id="generate_redouble" style="margin-left: 5px"> <i class="fa fa-circle-o"> Redouble</i></button>
 
                 <div class="pull-right">
 
@@ -245,6 +248,27 @@
 
                                         if(value < parseInt('{{\App\Models\Enum\ScoreEnum::Under_30}}')) {
 
+                                            /*var mark_subject = setting.mark_subjected;
+                                            var data  = setting.data
+                                            $.each(data, function(index, value_data){
+
+                                                if(value_data['student_id_card'] in mark_subject) {
+                                                    var s = mark_subject[value_data['student_id_card']];
+                                                    var explode = prop.split('_');
+                                                    var id_course = explode[2];
+                                                    for(var key=0; key<s.length; s++) {
+                                                        if(id_course == s[key].course_id) {
+                                                            if(value == s[key].score) {
+                                                                td.style.backgroundColor = 'green';
+                                                            }
+
+                                                        }
+                                                    }
+                                                }
+
+                                            })*/
+
+
 
                                             if(value <= parseInt('{{\App\Models\Enum\ScoreEnum::Score_10}}')) {
                                                 td.style.backgroundColor = '#A41C00';
@@ -273,6 +297,7 @@
 
         };
 
+
         var table_width;
         var hotInstance;
         var print_url = "{{route('admin.course.print_total_score')}}";
@@ -288,6 +313,8 @@
             dropdownMenu: ['filter_by_condition', 'filter_action_bar'],
             className: "htRight",
             cells: function (row, col, prop) {
+
+
                 this.renderer = colorRenderer;
 
 //                console.log(row+'------'+col+'----'+prop);
@@ -320,8 +347,6 @@
                 } else if (prop == 'Remark') {
                     cellProperties.className = 'htLeft';
                 }
-
-//                console.log(prop);
 
 
                 return cellProperties;
@@ -529,6 +554,10 @@
                         setting.data = resultData.data;
                         setting.nestedHeaders = resultData.nestedHeaders;
                         setting.colWidths = resultData.colWidths;
+                        setting.subject = resultData.subject;
+                        setting.mark_subjected = resultData.mark_subjected;
+
+                        setting.array_fail_subject = resultData.array_fail_subject;
 
                         var table_size = $('.box-body').width() + 30;
                         var mainHeaderHeight = $('.main-header').height();
@@ -541,6 +570,7 @@
                         setting.height=tab_height;
 
                         hotInstance = new Handsontable(jQuery("#all_score_course_annual_table")[0], setting);
+                        assignNumberRattrapage();// ---after initial handsontable
                         hotInstance.updateSettings({
                             contextMenu: {
                                 callback: function (key, options) {
@@ -724,6 +754,7 @@
                             });
                         } else {
                             updateSettingHandsontable(resultData);
+                            assignNumberRattrapage();
                         }
 
                     }
@@ -731,6 +762,7 @@
             } else {
 
                 initTable();
+
             }
         }
 
@@ -740,18 +772,19 @@
             setting.data = resultData.data;
             setting.nestedHeaders = resultData.nestedHeaders;
             setting.colWidths = resultData.colWidths;
+            setting.array_fail_subject = resultData.array_fail_subject;
 //            hotInstance = new Handsontable(jQuery("#all_score_course_annual_table")[0], setting)
             hotInstance.updateSettings({
                 data: resultData['data'],
                 nestedHeaders:resultData['nestedHeaders'],
                 colWidths:resultData['colWidths']
+
             });
         }
 
-
-
         $('#refresh_score_sheet').on('click', function() {
             filter_table();
+            assignNumberRattrapage();
         });
 
         $('#filter_dept').on('change', function() {
@@ -798,6 +831,330 @@
         });
 
 
+
+        $('#generate_redouble').on('click',function() {
+
+            var pop_url = '{{route('course_annual.student_redouble_exam')}}';
+            var array_fail_subject = setting.array_fail_subject;
+            var table_data = setting.data;
+            var academic_year_id = $('#filter_academic_year :selected').val();
+
+            var base_data = {};
+            var count = 0;
+
+            $.each(table_data, function(i, student) {
+
+                if(count < table_data.length -5) {
+
+                    if(student['student_id_card'] != null && student['student_id_card'] != '')  {
+
+                        var student_id_card = student['student_id_card'];
+                        var student_exam_subjects = getStudentReExam(array_fail_subject[student_id_card]);
+
+                        if('fail' in student_exam_subjects) {
+
+                            if(student_exam_subjects['fail'].length > 0) {
+
+                                if('pass' in student_exam_subjects ) {
+
+                                    //----here if we want to set that ..only student who obtain the final moyenne upper than 30 %, will be allowed to take re-exam
+                                    //---then we should not check the subjects['pass'] length we check only the finally moyenne
+                                    if(student_exam_subjects['pass'].length == 0) {
+                                        var average =  calculate_moyenne(student_exam_subjects);
+                                        if(average > parseFloat('{{\App\Models\Enum\ScoreEnum::Under_30}}')) {
+
+                                            base_data[student_id_card]= removeElement(student_exam_subjects);
+                                        }
+                                    } else {
+
+                                        base_data[student_id_card]= removeElement(student_exam_subjects);
+                                    }
+
+                                    //------end checking moyenne upper then 30
+
+                                } else {
+
+                                    //----student have to re-exam for all subject ---but we have to check if their final moyenne is upper than 30, or he will be redouble
+
+                                    var average =  calculate_moyenne(student_exam_subjects);
+                                    if(average > parseFloat('{{\App\Models\Enum\ScoreEnum::Under_30}}')) {
+
+                                        base_data[student_id_card]= removeElement(student_exam_subjects);
+                                    }
+                                }
+
+                            }
+                        }
+                    }
+                }
+                count++;
+            });
+
+           var  data = dataToSend(base_data);
+            console.log(data);
+            student_reexam_lists = PopupCenterDual(pop_url+'?data='+data+'&academic_year_id='+academic_year_id,'Student Redouble Lists','1500','900');
+        });
+
+        function dataToSend(base_data) {
+
+            var array_data = [];
+
+            $.each(base_data, function(student_id_card, object) {
+                var fail = '';
+                var pass = '';
+
+                fail = fail+ student_id_card + ':F_';
+
+                if('fail' in object) {
+
+                    $.each(object['fail'], function(f_key, f_val) {
+
+                        fail = fail+ f_val['course_annual_id']+ '_'
+                    })
+                }
+                fail = fail+ ':P';
+                if('pass' in object) {
+
+                    $.each(object['pass'], function(p_key, p_val) {
+                        pass = pass+'_'+ p_val['course_annual_id']+'_'
+                    })
+                }
+
+                array_data.push(fail+pass);
+            })
+
+            return array_data;
+
+        }
+        function removeElement (student_exam_subjects) {
+
+            if('pass' in student_exam_subjects) {
+                $.each(student_exam_subjects['pass'], function (index, value) {
+                    delete  value['score'];
+                    delete value['credit'];
+                })
+            }
+            if('fail' in student_exam_subjects) {
+
+                $.each(student_exam_subjects['fail'], function (key, val) {
+                    delete  val['score'];
+                    delete val['credit'];
+                })
+
+            }
+
+            return student_exam_subjects;
+
+        }
+
+
+        function assignNumberRattrapage() {
+
+            var array_fail_subject = setting.array_fail_subject;
+            var table_data = setting.data;
+
+            $.each(table_data, function(i, student) {
+
+                if(student['student_id_card'] != null && student['student_id_card'] != '')  {
+                    /*if(student['student_id_card'] == 'e20160662') {
+                        console.log(student);
+                        console.log(array_fail_subject[student['student_id_card']]);
+
+                    }*/
+
+                    var number_rattrapage = numberSubjectRattrapage(array_fail_subject[student['student_id_card']]);
+                    student['Rattrapage'] = number_rattrapage;
+                }
+            });
+
+            setting.data = table_data;
+            hotInstance.updateSettings({
+                data: table_data,
+                colWidths: setting.colWidths
+
+            });
+        }
+
+        function numberSubjectRattrapage(subjects) {
+
+            var number_subject = getStudentReExam(subjects);
+
+            if('fail' in number_subject) {
+                return number_subject['fail'].length;
+            } else {
+                return 0;
+            }
+        }
+
+        function calculate_moyenne(subjects) {
+
+            var credit = 0;
+            var score = 0;
+            if('fail' in subjects) {
+                if('pass' in subjects) {
+
+                    $.each(subjects['fail'], function(f_index, f_value) {
+                        credit = credit + parseFloat(f_value['credit']);
+                        score = score + (parseFloat(f_value['score']) * parseFloat(f_value['credit']));
+                    });
+
+                    $.each(subjects['pass'], function(p_index, p_value) {
+                        credit = credit + parseFloat(p_value['credit']);
+                        score = score + (parseFloat(p_value['score']) * parseFloat(p_value['credit']));
+                    });
+
+                    return parseFloat(parseFloat(score)/parseFloat(credit));
+
+                } else {
+
+                    $.each(subjects['fail'], function(f_index, f_value) {
+                        credit = credit + parseFloat(f_value['credit']);
+                        score = score + (parseFloat(f_value['score']) * parseFloat(f_value['credit']));
+                    });
+
+                    return parseFloat(parseFloat(score)/parseFloat(credit));
+                }
+
+            } else {
+
+                $.each(subjects['pass'], function(index, value) {
+                    credit = credit + parseFloat(value['credit']);
+                    score = score + (parseFloat(value['score']) * parseFloat(value['credit']));
+                });
+
+                return parseFloat(parseFloat(score)/parseFloat(credit));
+            }
+        }
+
+
+        function getStudentReExam(subjects) {
+
+            var total_credit = 0;
+            if('fail' in subjects) {//=== isset() in php
+                if('pass' in subjects) {
+
+                    var validate_score = 0;
+                    $.each(subjects['fail'], function(f_key, f_val) {
+
+                        //console.log(validate_score +'=='+ validate_score +'++'+ parseFloat('{{\App\Models\Enum\ScoreEnum::Pass_Moyenne}}') +'*'+ f_val['credit']);
+                         total_credit = total_credit + parseFloat(f_val['credit']);
+                         validate_score = validate_score + parseFloat('{{\App\Models\Enum\ScoreEnum::Pass_Moyenne}}') * f_val['credit'];
+                        //console.log(validate_score);
+                    });
+
+                    $.each(subjects['pass'], function(p_key, p_val) {
+                        //console.log(validate_score +'=='+ validate_score +'++'+ parseFloat(p_val['score']) +'*'+ p_val['credit']);
+                        total_credit = total_credit +parseFloat(p_val['credit']) ;
+                        validate_score = validate_score + (parseFloat(p_val['score']) * p_val['credit']);
+                        //console.log(validate_score);
+                    });
+
+                    var approximation_moyenne = parseFloat((parseFloat(validate_score) / parseFloat(total_credit)));
+
+                    //console.log(approximation_moyenne +'=='+ (parseFloat(validate_score) +'/'+ parseFloat(total_credit)));
+
+                    if(approximation_moyenne < parseFloat('{{\App\Models\Enum\ScoreEnum::Aproximation_Moyenne}}')) {//----55
+
+                        if(subjects['pass'].length > 0) {
+
+                            var find_min = findMinScore(subjects['pass']);
+
+                            if(find_min['element']['score'] < parseFloat('{{\App\Models\Enum\ScoreEnum::Pass_Moyenne}}')) {//--count couse score for only less than 50
+
+                                subjects['fail'].push(find_min['element'])
+                                delete subjects['pass'][find_min['index']] ;
+
+                                var tmp_subject_pass=[];
+
+                                $.each(subjects['pass'], function(key, obj_subject) {
+                                    if(!$.isEmptyObject(obj_subject)) {
+                                        tmp_subject_pass.push(obj_subject);
+                                    }
+                                }) ;
+                                subjects['pass'] = tmp_subject_pass;
+
+                                return getStudentReExam(subjects); //---recuring this function again
+                            } else {
+
+                                //---if approximation  moyenne is bigger than 50 allow him
+                                if(approximation_moyenne > parseFloat('{{\App\Models\Enum\ScoreEnum::Pass_Moyenne}}') ) {
+                                    return subjects;
+                                } else {
+                                    return subjects;
+                                }
+                            }
+                        } else {
+
+                            return subjects;
+                        }
+                    } else {
+                        return subjects;
+                    }
+                } else {
+                    return subjects; //---student fail all subject
+                }
+            } else  {
+
+                /*--check if the moyenne of student is under 50 and all subject are bigger than 30*/
+
+                var approximation_moyenne = calculate_moyenne(subjects);
+
+                if(approximation_moyenne < parseFloat('{{\App\Models\Enum\ScoreEnum::Pass_Moyenne}}')) {
+
+                    subjects['fail'] = [];
+                    if(subjects['pass'].length > 0) {
+
+                        var find_min = findMinScore(subjects['pass']);
+
+                        if(find_min['element']['score'] < parseFloat('{{\App\Models\Enum\ScoreEnum::Pass_Moyenne}}')) {
+
+                            subjects['fail'].push(find_min['element'])
+                            delete subjects['pass'][find_min['index']] ;
+                            var tmp_subject_pass=[];
+                            $.each(subjects['pass'], function(key, obj_subject) {
+                                if(!$.isEmptyObject(obj_subject)) {
+                                    tmp_subject_pass.push(obj_subject);
+                                }
+                            }) ;
+                            subjects['pass'] = tmp_subject_pass;
+                            return getStudentReExam(subjects); //---recuring this function again
+
+                        } else {
+
+                            return subjects;
+                        }
+                    } else {
+                        return subjects;
+                    }
+
+                } else {
+
+                    return subjects;
+                }
+            }
+        }
+
+        function findMinScore(subjects_pass) {
+
+           var  min = subjects_pass[0]['score'];
+           var  credit = subjects_pass[0]['credit'];
+           var  course_annual_id = subjects_pass[0]['course_annual_id'];
+           var  index = 0;
+
+            for(var int=1; int< subjects_pass.length; int++) {
+                if(min > subjects_pass[int]['score']) {
+
+                    index = int;
+                    min = subjects_pass[int]['score'];
+                    credit = subjects_pass[int]['credit'];
+                    course_annual_id = subjects_pass[int]['course_annual_id'];
+                }
+            }
+            return {
+                element: {score:min, credit: credit, course_annual_id:course_annual_id},
+                index: index
+            }
+        }
 
     </script>
 

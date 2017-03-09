@@ -117,6 +117,19 @@ Route::group([
     Route::get('course-annual/export-view-total-score', 'CourseAnnualController@exportTotalScore')->name('course_annual.export_view_total_score');
 
 
+    Route::get('course-annual/student-redouble-liste}', 'CourseAnnualController@studentRedoubleListe')->name('course_annual.student_redouble_exam');
+
+    Route::post('course-annual/export-student-redouble-list}', 'CourseAnnualController@exportStudentRedoubleList')->name('course_annual.export_student_re_exam');
+
+    Route::post('course-annual/export-supplementary-subject-list}', 'CourseAnnualController@exportSupplementarySubjects')->name('course_annual.export_supplementary_subject');
+
+
+
+
+
+    Route::get('course-annual/empty-view', 'CourseAnnualController@emptyView')->name('empty_view');
+
+
 
 
 

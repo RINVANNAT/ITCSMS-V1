@@ -2748,22 +2748,23 @@ class CourseAnnualController extends Controller
         $average_moyenne_by_semester = [];
         $finalMoynne = []; // get both semesters
 
-         //------get score properties and absence -------
-
-        $allProperties = $this->getCourseAnnualWithScore();
-        $eachCourseAnnualScores = $allProperties['averages'];
-        $absences = $allProperties['absences'];
-        $arrayCourseScore = $allProperties['arrayCourseScore'];
-
         //------get course type -------
 
         $courseType = $this->getCourseProAndAnnual($deptId,$academicYearID, $degreeId,$gradeId ,$semesterId, $deptOptionId);
-
         $courseAnnuals = $courseType['course_annual'];
+        $array_course_annual_ids = [];
         $arrayCourseAnnual=[];
         foreach($courseAnnuals as $courseAnnual) {
             $arrayCourseAnnual[$courseAnnual->course_id][] = $courseAnnual;
+            $array_course_annual_ids[] = $courseAnnual->course_annual_id;
         }
+
+        //------get score properties and absence -------
+
+        $allProperties = $this->getCourseAnnualWithScore($array_course_annual_ids);
+        $eachCourseAnnualScores = $allProperties['averages'];
+        $absences = $allProperties['absences'];
+        $arrayCourseScore = $allProperties['arrayCourseScore'];
 
         //---get Selected Group by course annual-----
 
@@ -2852,7 +2853,6 @@ class CourseAnnualController extends Controller
             //----there are no course program applying for student yet .....
         }
         //----end if course-program
-
 
 
         $extra_rows = $this->find_max_min_average_mark();
@@ -2974,6 +2974,7 @@ class CourseAnnualController extends Controller
         }
 
         $array_tmp_rank = [];
+
         foreach($element as $key => $value) {
             $index++;
 
@@ -3032,19 +3033,9 @@ class CourseAnnualController extends Controller
                 $value['Redouble'] = ScoreEnum::Pass;
             }
 
+            //---assign number of rattrapage
+            $value['Rattrapage'] = '';
 
-            //----find all fail subject of each student
-
-//            dd($fail_subjects['e20120716']);
-            $num_subject_redouble = $this->findRedoubleSubject($fail_subjects[$key]);
-
-//            dump($num_subject_redouble);
-
-            if($num_subject_redouble['status']) {
-                $value['Rattrapage'] = $num_subject_redouble['count'];
-            } else {
-                $value['Rattrapage'] = $num_subject_redouble['count'];
-            }
            // $value['Passage'] = "";
             $value['Remark'] = $array_observation[$key]->remark;
 
@@ -3065,7 +3056,6 @@ class CourseAnnualController extends Controller
             $array_data[] = $element[$key_id];
             $classement++;
         }
-
         //------assign max min average for column s1_moyenne, s2_moyenne and total moyenne
 
         if(count($average_moyenne_by_semester) > 0) {
@@ -3098,8 +3088,8 @@ class CourseAnnualController extends Controller
             $array_data[] = $emptyData['data_empty'];
         }
 
-
         return json_encode([
+            'array_fail_subject' => $fail_subjects,
             'status' => true,
             'data' => $array_data,
             'nestedHeaders' => $nestedHeaders,
@@ -3107,86 +3097,155 @@ class CourseAnnualController extends Controller
         ]);
     }
 
-    private function findRedoubleSubject($array) {
 
-//        dump($array);
+    private function calculateMoyenne($array_subject) {
+
+         $credit = 0;
+        $score = 0;
+        if(isset($array_subject['fail'])) {
+            if(isset($array_subject['pass'])) {
+
+                foreach($array_subject['fail'] as $fail) {
+                    $credit= $credit+ $fail['credit'];
+                    $score = $score + ($fail['score']* $fail['credit']);
+                }
+
+                foreach($array_subject['pass'] as $pass) {
+                    $credit= $credit+ $pass['credit'];
+                    $score = $score + ($pass['score']* $pass['credit']);
+                }
+
+                return $this->floatFormat($score/$credit);
+
+            } else {
+
+                foreach($array_subject['fail'] as $fail) {
+                    $credit= $credit+ $fail['credit'];
+                    $score = $score + ($fail['score']* $fail['credit']);
+                }
+
+                return $this->floatFormat($score/$credit);
+            }
+
+            } else {
+
+            foreach($array_subject['pass'] as $pass) {
+                $credit= $credit+ $pass['credit'];
+                $score = $score + ($pass['score']* $pass['credit']);
+            }
+
+            return $this->floatFormat($score/$credit);
+        }
+
+    }
+
+    private function findRattrapageSubject($array) {
 
         $total_credit = 0;
-        $array_pass = [];
-
+        //----array with key fail ---mean the couse score is under 30---
         if(isset($array['fail'])) {
+
             if(isset($array['pass'])) {
 
                 $validate_score = 0;
 
                 foreach($array['fail'] as $fail) {
-//                    dump($validate_score.'=='.$validate_score .'+'.'('.ScoreEnum::Pass_Moyenne .'*'.$fail['credit'].')');
-
                     $total_credit = $total_credit + $fail['credit'];
                     $validate_score = $validate_score + (ScoreEnum::Pass_Moyenne * $fail['credit']);
                 }
-
-
                 foreach($array['pass'] as $pass) {
-
-//                    dump($validate_score.'=='.$validate_score .'+'.'('.$pass['score'] .'*'.$pass['credit'].')');
 
                     $total_credit = $total_credit + $pass['credit'];
                     $validate_score = $validate_score + ($pass['score'] * $pass['credit']);
-                    $array_pass[] = $pass['score'];
                 }
                 $approximation_moyenne = $validate_score / $total_credit;
-
-//                dump($validate_score.'--'.$total_credit);
-                if($approximation_moyenne < ScoreEnum::Aproximation_Moyenne) {
-
-//                    dump($approximation_moyenne.'  <  '.ScoreEnum::Aproximation_Moyenne);
+                if($approximation_moyenne < ScoreEnum::Aproximation_Moyenne) {//----55
 
                     if(count($array['pass']) > 0) {
 
                         $find_min = $this->findMin($array['pass']);
 
-                        if($find_min['element']['score'] < ScoreEnum::Pass_Moyenne) {
+                        if($find_min['element']['score'] < ScoreEnum::Pass_Moyenne) {//---50
 
+                            $mark_subjected[] = $find_min['element'];
                             $array['fail'][] = $find_min['element'];
                             unset($array['pass'][$find_min['index']]);
                             $array['pass'] = array_values($array['pass']);
 
                             //-----because the prediction score of subplementary _course were not to reach the approximation moyenne..
                             // so we need to find the lowest score from array['pass']---and consider as fail to enforce student to re-exam it
-                            //---then we do the findRedoubleSubject again until student pass...and return number of subjects for student to re-exam
+                            //---then we do the findRattrapageSubject again until student pass...and return number of subjects for student to re-exam
                             //dump($array);
-                            return $this->findRedoubleSubject($array);
+                            return $this->findRattrapageSubject($array);
                         } else {
+
+                            //----even student take more supplementary exam he/she still not able to reacher the score 55..so in case his/her score is biggger than 50 ..so we can let him or her a try..
                             if($approximation_moyenne > ScoreEnum::Pass_Moyenne) {
-
-                                return ['status' => false, 'message' => 'student may have tiny percent to pass if they re-exam the sujects and obtain the highest score '.ScoreEnum::Pass_Moyenne, 'count' => count($array['fail'])];
-
+                                return $array;
                             } else {
-                                return ['status' => false, 'message' => 'student is not able to pass if they re-exam all sujects having score lower then '.ScoreEnum::Pass_Moyenne, 'count' => count($array['fail'])];
+                                //---fail all courses
+                                return $array;
                             }
                         }
                     } else {
-                        return ['status' => true, 'message' => 'Student have to re-exam theses subject', 'count' => count($array['fail'])];
+                        //---student have to take exam for all subject---
+                        return $array;
                     }
-
                 } else {
-                    return ['status' => true, 'message' => 'Student have to re-exam theses subject', 'count' => count($array['fail'])];
+
+                    //---student take exam in amount of subject then he or she will pass
+                    return $array;
                 }
 
             } else {
 
-                return ['status' => true, 'message' => 'Student  have to re-exam all sujects', 'count' => count($array['fail'])];
+                //---all subject score are under 30
+                return $array;
+
             }
         } else {
-            return ['status' => true, 'message' => 'Student passed  all subject', 'count' => ScoreEnum::Zero];
+
+
+            /*--check if the moyenne of student is under 50 and all subject are bigger than 30*/
+
+             $average = $this->calculateMoyenne($array);
+
+            if($average < ScoreEnum::Pass_Moyenne) {
+
+                $array['fail'] = [];
+                if(count($array['pass']) > 0) {
+
+                     $find_min = $this->findMin($array['pass']);
+
+                    if($find_min['element']['score'] < ScoreEnum::Pass_Moyenne) {
+
+                        $array['fail'][]= $find_min['element'];
+                        unset($array['pass'][$find_min['index']]);
+                        $array['pass'] = array_values($array['pass']);
+
+                            return $this->findRattrapageSubject($array); //---recuring this function again
+
+                        } else {
+
+                        return $array;
+                    }
+                } else {
+                    return $array;
+                }
+
+            } else {
+
+                return $array;
+            }
         }
+
     }
 
     private function findMin($array_val) {// ---array_val :: pass
 
         $min = $array_val[0]['score'];
         $credit = $array_val[0]['credit'];
+        $course_annual_id = $array_val[0]['course_annual_id'];
         $index = 0;
 
         for($in = 1; $in < count($array_val); $in++) {
@@ -3195,13 +3254,41 @@ class CourseAnnualController extends Controller
                 $index = $in;
                 $min = $array_val[$in]['score'];
                 $credit = $array_val[$in]['credit'];
+                $course_annual_id = $array_val[$in]['course_annual_id'];
             }
         }
 //        dump($min);
         return [
-            'element' => ['score'=> $min, 'credit' => $credit],
+            'element' => ['score'=> $min, 'credit' => $credit, 'course_annual_id'=>$course_annual_id],
             'index'  => $index
         ];
+    }
+
+    private function numberRattrapage($arrayFailSubject) {
+
+        $subjectRattrapages = $this->findRattrapageSubject($arrayFailSubject);
+
+        if(isset($subjectRattrapages['fail'])) {
+            return count($subjectRattrapages['fail']);
+        } else {
+            return ScoreEnum::Zero;
+        }
+    }
+
+
+    private function assignValueRattrapage($arrayData, $arrayFailSubject) {
+
+        $dataWithRattrapage=[];
+        foreach($arrayData as $data) {
+
+            if($data['student_id_card'] != null) {
+                $numberRattrapage = $this->numberRattrapage($arrayFailSubject[$data['student_id_card']]);
+                $data['Rattrapage'] = $numberRattrapage;
+            }
+            $dataWithRattrapage[] = $data;
+        }
+        return $dataWithRattrapage;
+
     }
 
 
@@ -3427,9 +3514,11 @@ class CourseAnnualController extends Controller
 
                         } else {
                             foreach($semesters as $semester) {
+
                                 if($eachCourse->semester_id == $semester->id) {
 
-                                    if($eachCourse->is_counted_creiditability) {
+
+                                    if($eachCourse->is_counted_creditability) {
                                         $totalMoyenne[$stu_dent->id_card][$semester->id][] =  $this->calculateScoreByCredit($eachCourse->course_annual_credit, $each_score);
                                     }
 
@@ -3439,10 +3528,13 @@ class CourseAnnualController extends Controller
                             }
                         }
 
-                        if($each_score < ScoreEnum::Under_30) {
-                            $fail_subjects[$stu_dent->id_card]['fail'][] = array('credit'=> $eachCourse->course_annual_credit, 'score'=> $each_score);
-                        } else {
-                            $fail_subjects[$stu_dent->id_card]['pass'][] = array('credit'=> $eachCourse->course_annual_credit, 'score'=> $each_score);
+                        if($eachCourse->is_counted_creditability) {
+
+                            if($each_score < ScoreEnum::Under_30) {
+                                $fail_subjects[$stu_dent->id_card]['fail'][] = array('credit'=> $eachCourse->course_annual_credit, 'score'=> $each_score, 'course_annual_id' => $eachCourse->course_annual_id);
+                            } else {
+                                $fail_subjects[$stu_dent->id_card]['pass'][] = array('credit'=> $eachCourse->course_annual_credit, 'score'=> $each_score, 'course_annual_id' => $eachCourse->course_annual_id);
+                            }
                         }
 
                         if(isset($element[$stu_dent->id_card])) {
@@ -3533,11 +3625,16 @@ class CourseAnnualController extends Controller
                             $element[$stu_dent->id_card] = $element[$stu_dent->id_card] + ['S_'.$semester->id => 'Total_S_'.$semester->id];
                         }
                     }
-                    if($each_score < ScoreEnum::Under_30) {
-                        $fail_subjects[$stu_dent->id_card]['fail'][] = array('credit'=> $tmpCourse->course_annual_credit, 'score'=> $each_score);
-                    } else {
-                        $fail_subjects[$stu_dent->id_card]['pass'][] = array('credit'=> $tmpCourse->course_annual_credit, 'score'=> $each_score);
+
+                    if($tmpCourse->is_counted_creditability) {
+
+                        if($each_score < ScoreEnum::Under_30) {
+                            $fail_subjects[$stu_dent->id_card]['fail'][] = array('credit'=> $tmpCourse->course_annual_credit, 'score'=> $each_score, 'course_annual_id' => $tmpCourse->course_annual_id);
+                        } else {
+                            $fail_subjects[$stu_dent->id_card]['pass'][] = array('credit'=> $tmpCourse->course_annual_credit, 'score'=> $each_score, 'course_annual_id' => $tmpCourse->course_annual_id);
+                        }
                     }
+
 
                     if(isset($element[$stu_dent->id_card])) {
                         $array_student_id_card ['id_card'][] =$stu_dent->id_card;
@@ -3612,10 +3709,12 @@ class CourseAnnualController extends Controller
                             }
                         }
 
-                        if($each_score < ScoreEnum::Under_30) {
-                            $fail_subjects[$stu_dent->id_card]['fail'][] = array('credit'=> $eachCourse->course_annual_credit, 'score'=> $each_score);
-                        } else {
-                            $fail_subjects[$stu_dent->id_card]['pass'][] = array('credit'=> $eachCourse->course_annual_credit, 'score'=> $each_score);
+                        if($eachCourse->is_counted_creditability) {
+                            if($each_score < ScoreEnum::Under_30) {
+                                $fail_subjects[$stu_dent->id_card]['fail'][] = array('credit'=> $eachCourse->course_annual_credit, 'score'=> $each_score, 'course_annual_id' => $eachCourse->course_annual_id);
+                            } else {
+                                $fail_subjects[$stu_dent->id_card]['pass'][] = array('credit'=> $eachCourse->course_annual_credit, 'score'=> $each_score, 'course_annual_id' => $eachCourse->course_annual_id);
+                            }
                         }
 
                         if(isset($element[$stu_dent->id_card])) {
@@ -3695,12 +3794,14 @@ class CourseAnnualController extends Controller
                             }
                         }
                     }
-                    if($each_score < ScoreEnum::Under_30) {
-                        $fail_subjects[$stu_dent->id_card]['fail'][] = array('credit'=> $eachCourse->course_annual_credit, 'score'=> $each_score);
-                    } else {
-                        $fail_subjects[$stu_dent->id_card]['pass'][] = array('credit'=> $eachCourse->course_annual_credit, 'score'=> $each_score);
-                    }
 
+                    if($tmpCourse->is_counted_creditability) {
+                        if($each_score < ScoreEnum::Under_30) {
+                            $fail_subjects[$stu_dent->id_card]['fail'][] = array('credit'=> $eachCourse->course_annual_credit, 'score'=> $each_score,  'course_annual_id'=> $tmpCourse->course_annual_id);
+                        } else {
+                            $fail_subjects[$stu_dent->id_card]['pass'][] = array('credit'=> $eachCourse->course_annual_credit, 'score'=> $each_score,  'course_annual_id'=> $tmpCourse->course_annual_id);
+                        }
+                    }
                     if(isset($element[$stu_dent->id_card])) {
                         $element[$stu_dent->id_card] = $element[$stu_dent->id_card] + ['Abs'.'_'.htmlspecialchars($tmpCourse->course_id).'_'.$tmpCourse->semester_id =>  isset($absence_by_course)?$absence_by_course->num_absence:"", 'Credit'.'_'.htmlspecialchars($tmpCourse->course_id).'_'.$tmpCourse->semester_id => $this->floatFormat($each_score)];
                     } else {
@@ -3730,20 +3831,22 @@ class CourseAnnualController extends Controller
 
     }
 
-    private function getCourseAnnualWithScore() {// ---$courseAnnually---collections of all courses by dept, grade, semester ...
+    private function getCourseAnnualWithScore($array_course_annual_ids) {// ---$courseAnnually---collections of all courses by dept, grade, semester ...
 
-        $averageProps = $this->averagePropertiesFromDB();;
+        $averageProps = $this->averagePropertiesFromDB($array_course_annual_ids);;
         $averageScore =  $averageProps['average_score'];
         $averageObject = $averageProps['average_object'];
-        $absences = $this->absencePropFromDB();
+        $absences = $this->absencePropFromDB($array_course_annual_ids);
         return ['averages'=>$averageObject,'absences'=>$absences, 'arrayCourseScore'=>$averageScore] ;
     }
-    private function averagePropertiesFromDB() {
+    private function averagePropertiesFromDB($array_course_annual_ids) {
         $arrayAverage = [];
         $arrayScores=[];
         $averageProperties = DB::table('averages')
+            ->whereIn('course_annual_id', $array_course_annual_ids)
             ->select('average', 'course_annual_id', 'student_annual_id', 'description')
             ->orderBy('student_annual_id')->get();
+
         foreach($averageProperties as $average) {
             $arrayAverage[$average->course_annual_id][$average->student_annual_id]= $average;
             $arrayScores[$average->course_annual_id][] = $average->average;
@@ -3753,10 +3856,10 @@ class CourseAnnualController extends Controller
             'average_object'=> $arrayAverage
         ];
     }
-    private function absencePropFromDB() {
+    private function absencePropFromDB($array_course_annual_ids) {
 
         $arrayAbsence=[];
-        $absenceProperties = DB::table('absences')->get();
+        $absenceProperties = DB::table('absences')->whereIn('course_annual_id', $array_course_annual_ids)->get();
         foreach($absenceProperties as $absence) {
             $arrayAbsence[$absence->course_annual_id][$absence->student_annual_id]= $absence;
         }
@@ -4455,7 +4558,12 @@ class CourseAnnualController extends Controller
     public function exportTotalScore(Request $request) {
 
         $array_data = $this->allHandsontableData($request);
-        $array_data = (array)json_decode($array_data);
+        $array_data = json_decode($array_data);
+        $array_data  = json_encode($array_data);
+        $array_data = json_decode($array_data, true);
+        $tableData = $this->assignValueRattrapage($array_data['data'], $array_data['array_fail_subject']);
+        $array_data['data'] = $tableData;
+
         $academicYear = DB::table('academicYears')->where('id', $request->academic_year_id)->first();
         $department = DB::table('departments')->where('id', $request->department_id)->first();
         $degree = Degree::find($request->degree_id)->first();
@@ -4466,15 +4574,21 @@ class CourseAnnualController extends Controller
         $letter = 'A';
         $alpha = [];
 
+
+
+
         // -----first headers
         foreach($array_data['nestedHeaders'][0] as $header) {
 
-            if(is_object($header)) {
+
+
+
+            if(is_array($header)) {
 
                 // ---arrang column-span
                 $col = $letter.'6:';
-                $first_headers[] = $header->label;
-                for($i= 1 ; $i< $header->colspan; $i++) {
+                $first_headers[] = $header['label'];
+                for($i= 1 ; $i< $header['colspan']; $i++) {
                     $letter++;
                     $alpha[] = $letter;
 
@@ -4500,9 +4614,9 @@ class CourseAnnualController extends Controller
 
         foreach($array_data['nestedHeaders'][1] as $second_header) {
 
-            if(is_object($second_header)) {
-                if($second_header->label != 'remark' && $second_header->label != 'redouble' && $second_header->label != 'rattrapage' && $second_header->label != 'rank' && $second_header->label != 'observation') {
-                    $second_headers[] = $second_header->label;
+            if(is_array($second_header)) {
+                if($second_header['label'] != 'remark' && $second_header['label'] != 'redouble' && $second_header['label'] != 'rattrapage' && $second_header['label'] != 'rank' && $second_header['label'] != 'observation') {
+                    $second_headers[] = $second_header['label'];
                 } else {
                     $second_headers[] = '';
                 }
@@ -4512,7 +4626,6 @@ class CourseAnnualController extends Controller
                 } else {
                     $second_headers[] = '';
                 }
-
             }
         }
 
@@ -4583,6 +4696,8 @@ class CourseAnnualController extends Controller
 
                 }
 
+
+
                 /*---set styling cell property ----*/
                 //dd($tmp_alpha[0].'1:'.$tmp_alpha[count($tmp_alpha)-1].'1')---(A1:..Z:1) set col-A row-1 to col-Z row-1
 
@@ -4593,6 +4708,8 @@ class CourseAnnualController extends Controller
                         'size'       => '18'
                     ));
                 });
+
+
 
                 $sheet->cells($tmp_alpha[0].'2:'.$tmp_alpha[count($tmp_alpha)-1].'2', function($cells) {
                     $cells->setBackground('#C0C0C0 ');
@@ -4649,6 +4766,7 @@ class CourseAnnualController extends Controller
                     $sheet->mergeCells($span);
                 }
 
+
                 /*--set row sheet value--*/
                 $sheet->row(1, $header_data);
                 $sheet->row(2, $sub_header_data);
@@ -4657,7 +4775,6 @@ class CourseAnnualController extends Controller
                 $sheet->row(5, $class);
                 $sheet->row(6, $first_headers);
                 $sheet->row(7, $second_headers);
-
                 foreach($array_data['data'] as $data) {
                     $row = [];
                     foreach($data as $d) {
@@ -4670,7 +4787,6 @@ class CourseAnnualController extends Controller
             });
 
         })->export('xls');
-
     }
 
     public function isAllowScoring(Request $request) {
@@ -4682,5 +4798,410 @@ class CourseAnnualController extends Controller
             return Response::json(['status' => false, 'message' => 'You are not allowed to make any changes on the score sheet, please ask the administrator to enable scoring!!']);
         }
     }
+
+    public function studentRedoubleListe(Request $request) {
+
+        $exam_subjects=[];
+        $studentIdCard = [];
+        $courseAnnualIds = [];
+        $data = $request->data;
+        $academic_year_id=$request->academic_year_id;
+
+        $academicYear = DB::table('academicYears')->where('id', $academic_year_id)->first();
+        $explode_data = explode(',',$data );
+
+        foreach($explode_data as $explode) {
+
+            $array_course_pass=[];
+            $array_course_fail=[];
+
+            $splits = explode(':', $explode);// array of 3 value 0->student_id_card, 1-> fail_subject_id, 2->Pass_subject_id
+
+            $studentIdCard[] = $splits[0];
+
+            $fail_subjects = $splits[1];
+            $pass_subjects = $splits[2];
+            $course_annual_id_fails = explode('_', $fail_subjects);
+            $course_annual_id_passes = explode('_', $pass_subjects);
+
+            foreach($course_annual_id_fails as $id_fail) {
+                if($id_fail != 'F' && $id_fail != '') {
+                    $courseAnnualIds[] = $id_fail;
+                    $array_course_fail[] = $id_fail;
+                }
+            }
+            foreach($course_annual_id_passes as $id_pass) {
+
+                if($id_pass != 'P' && $id_pass != '') {
+                    $courseAnnualIds[] = $id_pass;
+                    $array_course_pass[] = $id_pass;
+                }
+            }
+            $courseAnnualIds = array_unique($courseAnnualIds);
+            $courseAnnualIds = array_values($courseAnnualIds);
+            $exam_subjects[$splits[0]]['fail'] =$array_course_fail;
+            $exam_subjects[$splits[0]]['pass'] =$array_course_pass;
+
+        }
+
+        $students = DB::table('students')
+            ->join('studentAnnuals', 'studentAnnuals.student_id', '=', 'students.id')
+            ->whereIn('id_card', $studentIdCard)
+            ->where('studentAnnuals.academic_year_id', $academic_year_id)
+            ->select(
+                'students.name_latin', 'students.id_card', 'students.id as student_id',
+                'studentAnnuals.id as student_annual_id'
+            )->orderBy('students.name_latin', 'ASC')
+            ->get();
+
+        $courseAnnuals = DB::table('course_annuals')
+            ->whereIn('id', $courseAnnualIds)
+            ->get();
+
+        $courseAnnualByProgram=[];
+        $course_program_ids = [];
+        $courseAnnualByCourseProgramObject = [];
+        foreach($courseAnnuals as $courseAnnual) {
+            $courseAnnualByProgram[$courseAnnual->course_id][] = $courseAnnual->id;
+            $course_program_ids[] = $courseAnnual->course_id;
+            $courseAnnualByCourseProgramObject[$courseAnnual->course_id][] = $courseAnnual;
+        }
+
+        $courseProgramIds = array_unique($course_program_ids);
+        $courseProgramIds = array_values($courseProgramIds);
+        $coursePrograms = DB::table('courses')->whereIn('id', $courseProgramIds)->get();
+        $courseScoreProperties = $this->getCourseAnnualWithScore($courseAnnualIds);
+        $averages = $courseScoreProperties['averages'];
+        return view('backend.course.courseAnnual.includes.student_redouble_lists', compact('students', 'courseAnnuals', 'coursePrograms', 'exam_subjects', 'courseAnnualByProgram', 'academicYear', 'averages', 'courseAnnualByCourseProgramObject'));
+    }
+
+
+    public function exportStudentRedoubleList(Request $request) {
+
+        $data = $request->all();
+        $academic_year_id = $request->academic_year_id;
+        $academicYear = DB::table('academicYears')->where('id', $academic_year_id)->first();
+        $rattrapage_students = $request->student_id_card;
+        $supplementary_subjects = [];
+        $data_lists=[];
+        foreach($rattrapage_students as $student) {
+
+            foreach($data[$student] as $course_program_id) {
+                if(!in_array($course_program_id, $supplementary_subjects)) {
+                    $supplementary_subjects[] = $course_program_id;
+                }
+            }
+        }
+        $coursePrograms = DB::table('courses')->whereIn('id', $supplementary_subjects)->get();
+
+        $students = DB::table('students')
+            ->join('genders', 'genders.id', '=', 'students.gender_id')
+            ->whereIn('id_card', $rattrapage_students)
+            ->orderBy('name_latin')
+            -> select(
+                'students.name_latin', 'students.id as student_id',
+                'genders.code', 'students.id_card'
+            )
+            ->get();
+
+        $index = 1;
+
+        $true = true;
+        $row_header = [];
+        $test_data=[];
+        foreach($students as $student) {
+            if($true) {
+                $one_student = $student;
+
+                $true= false;
+            }
+            $element =[
+                "No" => $index,
+                "Student ID" => $student->id_card,
+                "Student Name" => $student->name_latin,
+                "M/F"           => $student->code
+            ];
+
+            $array = [$index, $student->id_card, $student->name_latin, $student->code];
+
+            $row_header = ['No', 'Student ID', 'Student Name', 'M/F'];
+
+            foreach($coursePrograms as $program) {
+
+                if(in_array($program->id, $data[$student->id_card])) {
+
+                    $array = array_merge($array, ['Ratt']);
+                    $element = array_merge($element, [$program->name_en => 'Ratt']);
+                } else {
+
+                    $array = array_merge($array, ['']);
+                    $element = array_merge($element, [$program->name_en => '']);
+                }
+
+
+                $row_header = array_merge($row_header, [$program->name_en]);
+            }
+
+            $count = count($element);
+            $data_lists[] = $array;
+
+            $index++;
+        }
+
+        $alpha = [];
+        $letter = 'A';
+        while ($letter !== 'AAA') {
+            $alpha[] = $letter++;
+        }
+
+        $studentAnnual = DB::table('studentAnnuals')->where([
+            ['student_id', $one_student->student_id],
+            ['academic_year_id', $academic_year_id]
+        ])->first();
+
+        $department = DB::table('departments')->where('id', $studentAnnual->department_id)->first();
+        $degree = DB::table('degrees')->where('id', $studentAnnual->degree_id)->first();
+        $grade = DB::table('grades')->where('id', $studentAnnual->grade_id)->first();
+        $header = 'Student Supplementary Exam Lists';
+        $sub_header = 'Academic Year: '.$academicYear->name_latin;
+        $schoolTitle = 'Institute of Technology of Cambodia';
+        $class = $degree->code.$grade->code.'-'.$department->code;
+
+        Excel::create('Student Supplementary Courses', function($excel) use ($data_lists, $alpha, $count, $header, $sub_header, $schoolTitle, $class, $row_header,$department) {
+
+            $excel->sheet('Student Supplementary Courses', function($sheet) use($data_lists, $alpha,  $count, $header, $sub_header, $schoolTitle, $class, $row_header, $department) {
+
+
+                $sheet->setOrientation('portrait');
+                // Set top, right, bottom, left
+                $sheet->setPageMargin(array(0.25, 0.30, 0.25, 0.30));
+
+                // Set all margins
+                $sheet->setPageMargin(0.25);
+                $sheet->setAllBorders('thin');
+
+                $sheet->cells('A1:'.$alpha[$count-1].'1', function($cells) {
+                    $cells->setBackground('#C0C0C0 ');
+                    $cells->setAlignment('center');
+                    $cells->setFont(array(
+                        'size'       => '16'
+                    ));
+                });
+
+                $sheet->cells('A2:'.$alpha[$count-1].'2', function($cells) {
+                    $cells->setBackground('#C0C0C0 ');
+                    $cells->setAlignment('center');
+                    $cells->setFont(array(
+                        'size'       => '12'
+                    ));
+                });
+
+                $sheet->cells('A3:'.$alpha[$count-1].'3', function($cells) {
+                    $cells->setBackground('#E6F4F8 ');
+                    $cells->setAlignment('left');
+                    $cells->setFont(array(
+                        'size'       => '12'
+                    ));
+                });
+                $sheet->cells('A4:'.$alpha[$count-1].'4', function($cells) {
+                    $cells->setBackground('#E6F4F8 ');
+                    $cells->setAlignment('left');
+                    $cells->setFont(array(
+                        'size'       => '12'
+                    ));
+                });
+
+                $sheet->cells('A5:'.$alpha[$count-1].'5', function($cells) {
+                    $cells->setBackground('#E6F4F8 ');
+                    $cells->setAlignment('left');
+                    $cells->setFont(array(
+                        'size'       => '12'
+                    ));
+                });
+
+                $sheet->cells('A6:'.$alpha[$count-1].'6', function($cells) {
+                    $cells->setBackground('#C0C0C0 ');
+                    $cells->setAlignment('left');
+                    $cells->setValignment('center');
+                    $cells->setTextRotation(-90);
+                    $cells->setFont(array(
+                        'size'       => '12',
+                        'font'      => 'bold'
+
+                    ));
+                });
+                for($key=0; $key< $count; $key++) {
+                    if($alpha[$key] == 'C') {
+                        $sheet->setWidth([$alpha[$key]  => 15]);
+                    } else {
+                        $sheet->setSize($alpha[$key].'6', 10, 150);
+                    }
+                }
+                $sheet->row(1, []);
+                $sheet->row(2, []);
+                $sheet->row(3, [$schoolTitle ]);
+                $sheet->row(4, ['Department: '.$department->name_en ]);
+                $sheet->row(5, [$class ]);
+                $sheet->row(6, $row_header);
+                $sheet->setCellValue($alpha[$count/2].'1', $header);
+                $sheet->setCellValue($alpha[$count/2].'2', $sub_header);
+
+                foreach($data_lists as $data) {
+                    $sheet->appendRow($data);
+                }
+            });
+
+        })->download('xls');
+
+    }
+
+
+    public function exportSupplementarySubjects(Request $request) {
+
+        $data = $request->all();
+
+        $data_array =[];
+        $courseProgramIds = $request->course_program_id;
+        $academicYearId = $request->academic_year_id;
+
+        $coursePrograms = DB::table('courses')->whereIn('id', $courseProgramIds)->get();
+
+        $tableHeader = [
+            'No',
+            'Subjects',
+            'Date',
+            'Time',
+            'Room'
+        ];
+
+        $index = 1;
+        foreach($coursePrograms as $program) {
+
+            $date_label = 'date_'.$program->id;
+            $start_time_label = 'start_time_'.$program->id;
+            $end_time_label = 'end_time_'.$program->id;
+            $room_label = 'room_'.$program->id;
+            $date = $data[$date_label];
+            $startTime = $data[$start_time_label];
+            $end_time = $data[$end_time_label];
+            $room = $data[$room_label];
+            $element = [
+                $index,
+                $program->name_en,
+                $date,
+                $startTime.'-'.$end_time,
+                $room
+
+            ];
+
+            $data_array[] = $element;
+            $index++;
+        }
+
+        $academicYear = DB::table('academicYears')->where('id', $academicYearId)->first();
+        $department = DB::table('departments')->where('id', $program->department_id)->first();
+        $degree = DB::table('degrees')->where('id', $program->degree_id)->first();
+        $grade = DB::table('grades')->where('id', $program->grade_id)->first();
+        $header = 'Student Supplementary Exam Lists';
+        $sub_header = 'Academic Year: '.$academicYear->name_latin;
+        $schoolTitle = 'Institute of Technology of Cambodia';
+        $class = $degree->code.$grade->code.'-'.$department->code;
+
+        $alpha = [];
+        $letter = 'A';
+        while ($letter !== 'AAA') {
+            $alpha[] = $letter++;
+        }
+
+
+        Excel::create('Supplementary Course Schedule', function($excel) use ($data_array, $alpha, $header, $sub_header, $schoolTitle, $class, $tableHeader,$department) {
+
+            $excel->sheet('Supplementary Course Schedule', function($sheet) use($data_array, $alpha, $header, $sub_header, $schoolTitle, $class, $tableHeader, $department) {
+
+                $count = count($tableHeader);
+                $sheet->setOrientation('portrait');
+                // Set top, right, bottom, left
+                $sheet->setPageMargin(array(0.25, 0.30, 0.25, 0.30));
+
+                // Set all margins
+                $sheet->setPageMargin(0.25);
+                $sheet->setAllBorders('thin');
+
+                $sheet->cells('A1:'.$alpha[$count-1].'1', function($cells) {
+                    $cells->setBackground('#C0C0C0 ');
+                    $cells->setAlignment('center');
+                    $cells->setFont(array(
+                        'size'       => '16'
+                    ));
+                });
+
+                $sheet->cells('A2:'.$alpha[$count-1].'2', function($cells) {
+                    $cells->setBackground('#C0C0C0 ');
+                    $cells->setAlignment('center');
+                    $cells->setFont(array(
+                        'size'       => '12'
+                    ));
+                });
+
+                $sheet->cells('A3:'.$alpha[$count-1].'3', function($cells) {
+                    $cells->setBackground('#E6F4F8 ');
+                    $cells->setAlignment('left');
+                    $cells->setFont(array(
+                        'size'       => '12'
+                    ));
+                });
+                $sheet->cells('A4:'.$alpha[$count-1].'4', function($cells) {
+                    $cells->setBackground('#E6F4F8 ');
+                    $cells->setAlignment('left');
+                    $cells->setFont(array(
+                        'size'       => '12'
+                    ));
+                });
+
+                $sheet->cells('A5:'.$alpha[$count-1].'5', function($cells) {
+                    $cells->setBackground('#E6F4F8 ');
+                    $cells->setAlignment('left');
+                    $cells->setFont(array(
+                        'size'       => '12'
+                    ));
+                });
+
+                $sheet->cells('A6:'.$alpha[$count-1].'6', function($cells) {
+                    $cells->setBackground('#C0C0C0 ');
+                    $cells->setAlignment('left');
+                    $cells->setValignment('center');
+                    //$cells->setTextRotation(-90);
+                    $cells->setFont(array(
+                        'size'       => '12',
+                        'font'      => 'bold'
+
+                    ));
+                });
+                for($key=0; $key< $count; $key++) {
+
+                    $sheet->setWidth([$alpha[$key]  => 20]);
+
+
+
+                }
+                $sheet->row(1, []);
+                $sheet->row(2, []);
+                $sheet->row(3, [$schoolTitle ]);
+                $sheet->row(4, ['Department: '.$department->name_en ]);
+                $sheet->row(5, [$class ]);
+                $sheet->row(6, $tableHeader);
+                $sheet->setCellValue($alpha[$count/2].'1', $header);
+                $sheet->setCellValue($alpha[$count/2].'2', $sub_header);
+
+                foreach($data_array as $data) {
+                    $sheet->appendRow($data);
+                }
+            });
+
+        })->download('xls');
+
+    }
+
+
 
 }
