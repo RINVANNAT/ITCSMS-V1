@@ -77,13 +77,13 @@
                                     $courseAnnualIdArray = array_intersect($exam_subjects[$student->id_card]['fail'], $courseAnnualByProgram[$program->id]);
                                     //---this array have only one element of exact course annual
                                     foreach($courseAnnualIdArray as $courseAnnualId) {
-                                        $studentScore = $averages[$courseAnnualId][$student->student_annual_id];
+                                        $studentScore = isset($averages[$courseAnnualId])?$averages[$courseAnnualId][$student->student_annual_id]:null;
                                     }
                                     //---we need to find the course annual credit not course program credit
-                                    $totalScore = $totalScore + ($studentScore->average * $courseAnnual->credit);
+                                    $totalScore = $totalScore + ( (($studentScore != null)?$studentScore->average:0) * $courseAnnual->credit);
                                 ?>
                                 <td>
-                                    <label for="score"><input type="checkbox" name="{{$student->id_card}}[]" value="{{$program->id}}" checked> {{$studentScore->average}}</label>
+                                    <label for="score"><input type="checkbox" name="{{$student->id_card}}[]" value="{{$program->id}}" checked> {{($studentScore!=null)?$studentScore->average:0}}</label>
 
                                 </td>
                             @else
@@ -93,13 +93,13 @@
                                 $courseAnnualIdArray = array_intersect($exam_subjects[$student->id_card]['pass'], $courseAnnualByProgram[$program->id]);
                                 //---this array have only one element of exact course annual
                                 foreach($courseAnnualIdArray as $courseAnnualId) {
-                                    $studentScore = $averages[$courseAnnualId][$student->student_annual_id];
+                                    $studentScore = isset($averages[$courseAnnualId])?$averages[$courseAnnualId][$student->student_annual_id]:null;
                                     //-----course annual credit not course program credit
-                                    $totalScore = $totalScore + ($studentScore->average * $courseAnnual->credit);
+                                    $totalScore = $totalScore + ( (($studentScore !=null)?$studentScore->average:0) * $courseAnnual->credit);
                                 }
                                 ?>
                                 <td width="">
-                                    <label for="score"><input type="checkbox" name="{{$student->id_card}}[]" value="{{$program->id}}"> {{$studentScore->average}}</label>
+                                    <label for="score"><input type="checkbox" name="{{$student->id_card}}[]" value="{{$program->id}}"> {{($studentScore!=null)?$studentScore->average:0}}</label>
 
                                 </td>
 

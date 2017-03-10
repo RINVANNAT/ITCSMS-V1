@@ -4580,9 +4580,6 @@ class CourseAnnualController extends Controller
         // -----first headers
         foreach($array_data['nestedHeaders'][0] as $header) {
 
-
-
-
             if(is_array($header)) {
 
                 // ---arrang column-span
@@ -4804,10 +4801,21 @@ class CourseAnnualController extends Controller
         $exam_subjects=[];
         $studentIdCard = [];
         $courseAnnualIds = [];
-        $data = $request->data;
         $academic_year_id=$request->academic_year_id;
-
         $academicYear = DB::table('academicYears')->where('id', $academic_year_id)->first();
+        $data = $request->data;
+
+        if($data == '') {
+            $students=[];
+            $courseAnnuals = [];
+            $coursePrograms=[];
+            $exam_subjects=[];
+            $courseAnnualByProgram=[];
+            $averages=[];
+            $courseAnnualByCourseProgramObject=[];
+            return view('backend.course.courseAnnual.includes.student_redouble_lists', compact('students', 'courseAnnuals', 'coursePrograms', 'exam_subjects', 'courseAnnualByProgram', 'academicYear', 'averages', 'courseAnnualByCourseProgramObject'));
+        }
+
         $explode_data = explode(',',$data );
 
         foreach($explode_data as $explode) {
@@ -4872,6 +4880,28 @@ class CourseAnnualController extends Controller
         $coursePrograms = DB::table('courses')->whereIn('id', $courseProgramIds)->get();
         $courseScoreProperties = $this->getCourseAnnualWithScore($courseAnnualIds);
         $averages = $courseScoreProperties['averages'];
+
+
+        //-----testor -----
+
+        /*foreach($students as $student) {
+            foreach($coursePrograms as $program) {
+
+                $courseAnnualIdArray = array_intersect($exam_subjects[$student->id_card]['fail'], $courseAnnualByProgram[$program->id]);
+
+                if(count($courseAnnualIdArray) > 0) {
+
+                    $courseAnnualIdArray = array_values($courseAnnualIdArray);
+
+                    dump($courseAnnualIdArray[0]);
+                    $studentScore = $averages[$courseAnnualIdArray[0]][$student->student_annual_id];
+                    dump($studentScore);
+                    dd();
+                }
+            }
+        }
+        dd();*/
+
         return view('backend.course.courseAnnual.includes.student_redouble_lists', compact('students', 'courseAnnuals', 'coursePrograms', 'exam_subjects', 'courseAnnualByProgram', 'academicYear', 'averages', 'courseAnnualByCourseProgramObject'));
     }
 
@@ -5180,9 +5210,6 @@ class CourseAnnualController extends Controller
                 for($key=0; $key< $count; $key++) {
 
                     $sheet->setWidth([$alpha[$key]  => 20]);
-
-
-
                 }
                 $sheet->row(1, []);
                 $sheet->row(2, []);

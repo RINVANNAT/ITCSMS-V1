@@ -186,6 +186,16 @@
 
         </div>
         <!-- /.box-header -->
+        @if (session('status'))
+            <div class=" message alert alert-success">
+                {{ session('status') }}
+            </div>
+        @endif
+        @if (session('warning'))
+            <div class=" message alert alert-danger">
+                {{ session('warning') }}
+            </div>
+        @endif
         <div class="box-body panel">
             <div id="all_score_course_annual_table" class="table table-striped handsontable htColumnHeaders">
 
@@ -1154,6 +1164,13 @@
                 element: {score:min, credit: credit, course_annual_id:course_annual_id},
                 index: index
             }
+        }
+
+
+        if($('.message').is(':visible')) {
+            setTimeout(function(){
+                $(".message").fadeOut("slow");
+            },3000);
         }
 
     </script>
