@@ -3291,8 +3291,15 @@ class CourseAnnualController extends Controller
      * @return view
      */
     public function print_total_score(Request $request){
+
         $data = $this->allHandsontableData($request);
-        $data = json_decode($data);
+
+        $array_data = json_decode($data, true);//---array key value
+        $tableData = $this->assignValueRattrapage($array_data['data'], $array_data['array_fail_subject']);
+        $array_data['data'] = $tableData;
+
+        $data = json_encode($array_data);// ---string json
+        $data = json_decode($data); //----array object value
 
         $academic_year = AcademicYear::where('id',$request->get('academic_year_id'))->first();
         $department = Department::where('id',$request->get('department_id'))->first();

@@ -223,22 +223,13 @@
                                             $width = "style='width:40mm !important'";
                                         }
                                     }
-                                            
+
                                     ?>
                                     @if($key == "student_name")
                                         <td {!! $width !!} class="left {{$custom_class}}">{{$value}}</td>
                                     @elseif($key != "_empty_")
                                         <?php
                                                 $td_style = "";
-{{--                                                if(is_numeric($value)){--}}
-{{--                                                    if($value<= 10) {--}}
-{{--                                                        $td_style = "style='background-color:red'";--}}
-{{--                                                    } else if($value < 30){--}}
-{{--                                                        $td_style = "style='background-color:orange'";--}}
-{{--                                                    } else if($value < 50){--}}
-{{--                                                        $td_style = "style='background-color:yellow'";--}}
-{{--                                                    }--}}
-{{--                                                }--}}
                                         ?>
                                         <td {!! $width !!} {!! $td_style !!} class="center {{$custom_class}}">{{$value}}</td>
                                     @endif
