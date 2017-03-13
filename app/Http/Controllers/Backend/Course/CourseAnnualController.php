@@ -155,15 +155,6 @@ class CourseAnnualController extends Controller
         return $deptOptions;
     }
 
-    private function courseAnnualByDeptId ($deptId) {
-
-        $coursePrograms = DB::table('courses')->where('department_id', $deptId)->lists('name_en', 'id');
-//        $courseAnnuals = $courseAnnuals->where('course_annual_classes.department_id', $deptId)->lists('course_name', 'course_annual_id');
-
-        return $coursePrograms;
-
-    }
-
     public function getDeptOption(Request $request) {
 
         $deptOptions = $this->deptHasOption($request->department_id);
@@ -222,9 +213,6 @@ class CourseAnnualController extends Controller
         } else {
             return Response::json($array_group);
         }
-
-
-
 
     }
 
@@ -5228,6 +5216,100 @@ class CourseAnnualController extends Controller
         })->download('xls');
 
     }
+
+
+    public function getStudentFinalResult(Request $request) {
+
+
+        $student = [];
+        $courseAnnualByProgram = [];
+         $arrayCourseAnnualIds = [];
+         $classByCourseAnnualIds = [];
+//        $studentId = $request->student_id;
+        $studentAnnualId = 20486;//21638;//;20530;//19954;
+//        $semester_id = $request->semester_id;
+        $semester_id = 1;
+        $studentAnnual = DB::table('studentAnnuals')->where('id', $studentAnnualId)->first();
+        $semesters = DB::table('semesters')->get();
+
+        $courseAnnuals = $this->getCourseAnnually();
+
+        $courseAnnuals = $courseAnnuals->where('course_annuals.department_id', $studentAnnual->department_id);
+        $courseAnnuals = $courseAnnuals->where('course_annuals.academic_year_id', $studentAnnual->academic_year_id);
+        $courseAnnuals = $courseAnnuals->where('course_annuals.degree_id', $studentAnnual->degree_id);
+        $courseAnnuals = $courseAnnuals->where('course_annuals.grade_id', $studentAnnual->grade_id);
+        $courseAnnuals = $courseAnnuals->where('course_annuals.department_option_id', $studentAnnual->department_option_id);
+
+        if($semester_id) {
+            $courseAnnuals = $courseAnnuals->where('course_annuals.semester_id', $semester_id);
+        }
+
+        $courseAnnuals = $courseAnnuals->get();
+
+        foreach($courseAnnuals as $courseAnnual) {
+            $arrayCourseAnnualIds[] = $courseAnnual->course_annual_id;
+            $courseAnnualByProgram[$courseAnnual->course_id][] = $courseAnnual;
+        }
+
+        $eachScoreCourseAnnual = $this->getCourseAnnualWithScore($arrayCourseAnnualIds);
+        $averages = $eachScoreCourseAnnual['averages'];
+        $courseAnnualClass = DB::table('course_annual_classes')->whereIn('course_annual_id', $arrayCourseAnnualIds)->get();
+
+        foreach($courseAnnualClass as $class) {
+            $classByCourseAnnualIds[$class->course_annual_id][]= $class->group;  
+        }
+
+        foreach($courseAnnuals as $courseAnnual) {
+
+            $groups = isset($classByCourseAnnualIds[$courseAnnual->course_annual_id])?$classByCourseAnnualIds[$courseAnnual->course_annual_id]:[];
+            $class = [];
+            foreach($groups as $group) {
+                if($group != null) {
+                    $class[] = $group;
+                }
+            }
+            if(count($class) > 0) {
+                if(in_array($studentAnnual->group, $groups)) {
+                    //---this is the course annual which this student learn
+                    $student[$studentAnnual->id][$courseAnnual->course_annual_id] = [
+
+                            'name_kh' => $courseAnnual->name_kh,
+                            'name_en' => $courseAnnual->name_en,
+                            'name_fr' => $courseAnnual->name_fr,
+                            'credit'  => $courseAnnual->course_annual_credit,
+                            'score'    => isset($averages[$courseAnnual->course_annual_id])?$averages[$courseAnnual->course_annual_id][$studentAnnual->id]->average:null
+                        ];
+                } 
+            } else {
+            
+                $student[$studentAnnual->id][$courseAnnual->course_annual_id] = [
+
+                            'name_kh' => $courseAnnual->name_kh,
+                            'name_en' => $courseAnnual->name_en,
+                            'name_fr' => $courseAnnual->name_fr,
+                            'credit'  => $courseAnnual->course_annual_credit,
+                            'score'    => isset($averages[$courseAnnual->course_annual_id])?$averages[$courseAnnual->course_annual_id][$studentAnnual->id]->average:null
+                        ];
+            }
+        }
+
+        $subjects = $student[$studentAnnualId];
+        $totalCredit = 0;
+        $score = 0;
+        foreach ($subjects as $course_annual_id => $subject) {
+            $totalCredit = $totalCredit + $subject['credit'];
+            $score = $score + ($subject['credit'] * $subject['score']);
+        }
+
+        $moyenne = $this->floatFormat(($score/$totalCredit));
+
+        $student[$studentAnnualId] = array_merge($subjects, ['final_score' => $moyenne]);
+
+        return $student;
+
+    }
+
+
 
 
 

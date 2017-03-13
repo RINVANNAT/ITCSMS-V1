@@ -189,8 +189,6 @@
                 }
             }      
 
-
-
             $('#count_absence').on('change', function() {
 
                 if(this.checked) {
