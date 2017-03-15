@@ -255,6 +255,13 @@ class SeedCustomsPermissions extends Seeder
                             ]
                         ],
                         [
+                            'name' => 'print-transcript',
+                            'display_name' => 'Print Transcript',
+                            'dependency' => [
+                                'view-backend','view-student-management'
+                            ]
+                        ],
+                        [
                             'name' => 'manage-student-reporting',
                             'display_name' => 'Manage student reporting',
                             'dependency' => [

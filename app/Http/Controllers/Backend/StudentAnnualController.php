@@ -6,6 +6,7 @@ use App\Http\Requests\Backend\Student\DeleteStudentRequest;
 use App\Http\Requests\Backend\Student\EditStudentRequest;
 use App\Http\Requests\Backend\Student\ImportStudentRequest;
 use App\Http\Requests\Backend\Student\PrintStudentIDCardRequest;
+use App\Http\Requests\Backend\Student\PrintTranscriptRequest;
 use App\Http\Requests\Backend\Student\RequestImportStudentRequest;
 use App\Http\Requests\Backend\Student\StoreStudentRequest;
 use App\Http\Requests\Backend\Student\UpdateStudentRequest;
@@ -29,6 +30,7 @@ use App\Models\Scholarship;
 use App\Models\Student;
 use App\Models\StudentAnnual;
 use App\Repositories\Backend\StudentAnnual\StudentAnnualRepositoryContract;
+use App\Traits\StudentScore;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -41,6 +43,7 @@ use Illuminate\Support\Facades\Response;
 
 class StudentAnnualController extends Controller
 {
+    use StudentScore;
     /**
      * @var StudentAnnualRepositoryContract
      */
@@ -136,12 +139,28 @@ class StudentAnnualController extends Controller
         $smis_server = Configuration::where("key","smis_server")->first();
         $studentAnnual = $this->students->findOrThrowException($id);
 
-        $student = Student::with(['studentAnnuals','studentAnnuals.scholarships','gender','origin','studentAnnuals.department',
-            'studentAnnuals.grade','studentAnnuals.degree','studentAnnuals.department_option','studentAnnuals.academic_year'])
+        $student = Student::with([
+            'studentAnnuals' => function ($q) {
+                $q->orderBy("academic_year_id", "desc");
+            },
+            'studentAnnuals.scholarships',
+            'gender',
+            'origin',
+            'studentAnnuals.department',
+            'studentAnnuals.grade',
+            'studentAnnuals.degree',
+            'studentAnnuals.department_option',
+            'studentAnnuals.academic_year'
+        ])
             ->find($studentAnnual->student_id);
 
-        //dd($student);
-        return view('backend.studentAnnual.popup_show',compact('student','smis_server'));
+        $scores =  [];
+
+        foreach ($student->studentAnnuals as $studentAnnual){
+            $scores[$studentAnnual->id] = $this->getStudentScoreBySemester($studentAnnual->id,1);
+        }
+
+        return view('backend.studentAnnual.popup_show',compact('student','smis_server','scores'));
     }
 
     /**
@@ -2016,6 +2035,45 @@ class StudentAnnualController extends Controller
         DB::commit();
 
         return Response::json(array('success'=>true,'message'=>"Number of card printing is updated!"));
+    }
+
+    public function print_transcript(PrintTranscriptRequest $request){
+        $student  = StudentAnnual::select([
+                        'students.id_card',
+                        'students.name_kh',
+                        'students.name_latin',
+                        'departments.name_kh as department',
+                        'students.photo',
+                        'studentAnnuals.department_id',
+                        'studentAnnuals.degree_id',
+                        'studentAnnuals.grade_id',
+                        'studentAnnuals.academic_year_id',
+                        'studentAnnuals.id',
+                        'departments.name_kh as department_kh',
+                        'departments.name_en as department_en',
+                        'departments.name_fr as department_fr',
+                        'degrees.name_en as degree_en',
+                        'degrees.name_fr as degree_fr',
+                        'degrees.name_kh as degree_kh',
+                        'grades.name_en as grade_en',
+                        'grades.name_fr as grade_fr',
+                        'grades.name_kh as grade_kh',
+                        'academicYears.name_kh as academic_year_kh',
+                        'academicYears.name_latin as academic_year_latin'
+                    ])
+                        ->leftJoin('students','students.id','=','studentAnnuals.student_id')
+                        ->leftJoin('academicYears', 'studentAnnuals.academic_year_id', '=', 'academicYears.id')
+                        ->leftJoin('genders', 'students.gender_id', '=', 'genders.id')
+                        ->leftJoin('grades', 'studentAnnuals.grade_id', '=', 'grades.id')
+                        ->leftJoin('departmentOptions', 'studentAnnuals.department_option_id', '=', 'departmentOptions.id')
+                        ->leftJoin('departments', 'studentAnnuals.department_id', '=', 'departments.id')
+                        ->leftJoin('degrees', 'studentAnnuals.degree_id', '=', 'degrees.id')
+                        ->where('studentAnnuals.id',$request->get("student_annual_id"))
+                        ->first();
+
+        $semester = $request->get("semester_id");
+        $scores = $this->getStudentScoreBySemester($request->get("student_annual_id"),$request->get("semester_id"));
+        return view('backend.studentAnnual.print.transcript_semester',compact('scores','student','semester'));
     }
 
 }

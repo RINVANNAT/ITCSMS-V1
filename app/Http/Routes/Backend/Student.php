@@ -44,7 +44,7 @@
         Route::post('student/{id}/generate_student_group', 'StudentAnnualController@generate_group')->name('admin.student.generate_student_group');
 
 
-
+        Route::get('student/print_transcript', 'StudentAnnualController@print_transcript')->name('admin.student.print_transcript');
 
     });
 

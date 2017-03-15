@@ -1,0 +1,59 @@
+h1, h2, h3, h4, h5, h6, .h1, .h2, .h3, .h4, .h5, .h6 {
+    font-family: 'bayon';
+}
+.modal-title{
+    font-family: 'KhmerOSMoulpali';
+}
+
+@font-face {
+    font-family: bayon;
+    src: url('../../assets/fonts/Bayon.ttf');
+}
+@font-face {
+    font-family: kh-bokor;
+    src: url("../../assets/fonts/Kh-Bokor.ttf");
+}
+@font-face {
+    font-family: khmerosmoulpali;
+    src: url("../../assets/fonts/KhmerOSMoulpali.ttf");
+}
+@font-face {
+    font-family: metal;
+    src: url("../../assets/fonts/Metal.ttf");
+}
+@font-face {
+    font-family: tactieng;
+    src: url("../../assets/fonts/TACTIENG.TTF");
+}
+@font-face {
+    font-family: khmeros;
+    src: url("../../assets/fonts/KhmerOSContent-Regular.ttf");
+}
+
+body {
+    width: 100%;
+    height: 100%;
+    margin: 0;
+    padding: 0;
+    background-color: #FAFAFA;
+    font: 10pt "Tahoma";
+}
+* {
+    box-sizing: border-box;
+    -moz-box-sizing: border-box;
+}
+.page {
+    width: 210mm;
+    height: 297mm;
+    margin: 0 auto;
+    padding: 10mm;
+    border-radius: 5px;
+    background: white;
+    position: relative;
+}
+.footer{
+    position: absolute;
+    bottom: 10px;
+    width: 100%;
+    padding-right:40mm;
+}
