@@ -36,7 +36,8 @@ body {
     margin: 0;
     padding: 0;
     background-color: #FAFAFA;
-    font: 10pt "Times New Roman";
+    font: 12pt "Times New Roman";
+    line-height: 110%;
 }
 
 h4, h3, h2, h1 {
@@ -60,4 +61,8 @@ h4, h3, h2, h1 {
     bottom: 10px;
     width: 100%;
     padding-right:40mm;
+}
+
+td {
+    font-family: "Times New Roman" !important;
 }

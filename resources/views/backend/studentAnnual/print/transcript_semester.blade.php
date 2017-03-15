@@ -46,17 +46,18 @@
             <div class="subject-credits-grades">
                 <table class="subject">
                     <tr>
-                        <th style="text-align: left; width: 40%">Subjects</th>
-                        <th style="text-align: center;width: 20%">Credits</th>
-                        <th style="text-align: center;width: 40%">Grades</th>
+                        <th style="text-align: left;" colspan="2">Subjects</th>
+                        <th style="text-align: center;">Credits</th>
+                        <th style="text-align: center;">Grades</th>
                     </tr>
 
                     <?php $i = 1 ?>
                     @foreach($scores as $key => $score)
                         @if(is_numeric($key))
                         <tr>
-                            <td>{{ $i }} - {{isset($score['name_en'])?$score['name_en']:""}}</td>
-                            <td>{{ $score["credit"] }}</td>
+                            <td width="5%">{{ $i }} -</td>
+                            <td style="text-align: left;width: 35%">{{isset($score['name_en'])?$score['name_en']:""}}</td>
+                            <td style="width: 20%">{{ $score["credit"] }}</td>
                             <?php
                                 $grade = "";
                                 if($score["score"] >= 85){
@@ -78,7 +79,7 @@
                                 }
 
                             ?>
-                            <td class="col-right">{!! $grade !!}</td>
+                            <td class="col-right" style="width: 40%;">{!! $grade !!}</td>
                         </tr>
                         <?php $i++ ?>
                         @endif
@@ -119,7 +120,7 @@
             <div class="director-signature">
                 <center>
                 <p>Phnom Penh, March 13, 2017</p>
-                <h4>Deputy Director General</h4>
+                <h4><b>Deputy Director General</b></h4>
                 </center>
             </div>
             <div class="clearfix"></div>
@@ -128,7 +129,7 @@
         {{--transcript footer--}}
         <div class="transcript-footer">
             <div class="grading-system">
-                <h4>GRADING SYSTEM:</h4>
+                <h4><b>GRADING SYSTEM:</b></h4>
                 <table class="">
                     <tr>
                         <td>A = 85% -100% = 4.00 = Excellent</td>
@@ -149,7 +150,7 @@
                 </table>
             </div>
             <div class="remark">
-                <h4>Remark:</h4>
+                <h4><b>Remark:</b></h4>
                 <ul class="list-remark" type="square">
                     <li>The annual Grade Point Average minimum requirement to pass to the higher class is 2.0.</li>
                     <li>This transcript cannot be given for the second time.</li>
