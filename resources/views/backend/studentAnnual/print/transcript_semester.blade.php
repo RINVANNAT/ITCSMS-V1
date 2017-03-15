@@ -17,27 +17,28 @@
         <div class="transcript-header">
             <table class="head">
                 <tr>
-                    <td colspan="2"><h4>Department: <span class="no-bold">{{$student->department_en}}</span></h4></td>
+                    <td colspan="2"><h4><b>Department:</b> <span class="no-bold">{{$student->department_en}}</span></h4></td>
                 </tr>
                 <tr>
-                    <td width="50%"><h4>Degree: <span class="no-bold">Engineer</span> </h4></td>
-                    <td class="col-right" width="50%"><h4>Class: <span class="no-bold">{{$student->grade_en}}</span></h4></td>
+                    <td width="80%"><h4><b>Degree:</b> <span class="no-bold">Engineer</span> </h4></td>
+                    <td width="20%"><h4><b>Class:</b> <span class="no-bold">{{$student->grade_en}}</span></h4></td>
                 </tr>
                 <tr>
-                    <td colspan="2" class="col-right"><h4>1<sup>st</sup> <span class="no-bold">Semester</span></h4></td>
+                    <td width="80%"></td>
+                    <td width="20%"><h4>1<sup>st</sup> <span class="no-bold">Semester</span></h4></td>
                 </tr>
 
                 <tr>
-                    <td colspan="2" class="break-line"><h4>ID: <span class="no-bold">{{$student->id_card}}</span></h4></td>
+                    <td colspan="2" class="break-line"><h4><b>ID:</b> <span class="no-bold">{{$student->id_card}}</span></h4></td>
                 </tr>
                 <tr>
-                    <td><h4><b>Name:</b> {{$student->name_latin}}</h4></td>
-                    <td class="col-right"><h4>Sex: <span class="no-bold">Female</span></h4></td>
+                    <td width="80%"><h4><b>Name: {{$student->name_latin}}</b></h4></td>
+                    <td width="20%"><h4><b>Sex:</b> <span class="no-bold">Female</span></h4></td>
                 </tr>
             </table>
             <div class="transcript-title">
-                <h2>Academic Transcript</h2>
-                <h4>Academic Year: {{$student->academic_year_latin}}</h4>
+                <center><img src="{{url('img/transcript/transcript.gif')}}"></center>
+                <h4><b>Academic Year: {{$student->academic_year_latin}}</b></h4>
             </div>
         </div>
         {{--transcript body--}}
@@ -45,9 +46,9 @@
             <div class="subject-credits-grades">
                 <table class="subject">
                     <tr>
-                        <th align="left">Subjects</th>
-                        <th style="text-align: center;width: 30mm">Credits</th>
-                        <th style="text-align: center;width: 30mm">Grades</th>
+                        <th style="text-align: left; width: 40%">Subjects</th>
+                        <th style="text-align: center;width: 20%">Credits</th>
+                        <th style="text-align: center;width: 40%">Grades</th>
                     </tr>
 
                     <?php $i = 1 ?>
@@ -113,11 +114,13 @@
                         $gpa = "0.0";
                     }
                 ?>
-                <h4>GPA: {{$gpa}}</h4>
+                <h4> <b>GPA: {{$gpa}}</b></h4>
             </div>
             <div class="director-signature">
+                <center>
                 <p>Phnom Penh, March 13, 2017</p>
                 <h4>Deputy Director General</h4>
+                </center>
             </div>
             <div class="clearfix"></div>
 

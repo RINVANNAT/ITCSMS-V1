@@ -36,7 +36,11 @@ body {
     margin: 0;
     padding: 0;
     background-color: #FAFAFA;
-    font: 10pt "Tahoma";
+    font: 10pt "Times New Roman";
+}
+
+h4, h3, h2, h1 {
+    font-family: "Times New Roman"
 }
 * {
     box-sizing: border-box;
