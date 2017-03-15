@@ -21,7 +21,7 @@
                 </tr>
                 <tr>
                     <td width="50%"><h4>Degree: <span class="no-bold">Engineer</span> </h4></td>
-                    <td class="col-right" width="50%"><h4>Class: <span class="no-bold">{{$student->degree_en}}</span></h4></td>
+                    <td class="col-right" width="50%"><h4>Class: <span class="no-bold">{{$student->grade_en}}</span></h4></td>
                 </tr>
                 <tr>
                     <td colspan="2" class="col-right"><h4>1<sup>st</sup> <span class="no-bold">Semester</span></h4></td>
@@ -85,10 +85,38 @@
                 </table>
             </div>
             <div class="gpa">
-                <h4>GPA: 3.0</h4>
+                <?php
+                    if($semester == 1) {
+                        $last_score = $scores["final_score_s1"];
+                    } else if ($semester == 2) {
+                        $last_score = $scores["final_score_s2"];
+                    } else {
+                        $last_score = $scores["final_score"];
+                    }
+
+                    $gpa = "";
+                    if($last_score >= 85){
+                        $gpa = "4.0";
+                    } else if ($last_score >= 80) {
+                        $gpa = "3.5";
+                    } else if ($last_score >= 70) {
+                        $gpa = "3.0";
+                    } else if ($last_score >= 65) {
+                        $gpa = "2.5";
+                    } else if ($last_score >= 50) {
+                        $gpa = "2.0";
+                    } else if ($last_score >= 45) {
+                        $gpa = "1.5";
+                    } else if ($last_score >= 40) {
+                        $gpa = "1.0";
+                    }  else {
+                        $gpa = "0.0";
+                    }
+                ?>
+                <h4>GPA: {{$gpa}}</h4>
             </div>
             <div class="director-signature">
-                <p>Phnom Penh, March 07, 2016</p>
+                <p>Phnom Penh, March 13, 2017</p>
                 <h4>Deputy Director General</h4>
             </div>
             <div class="clearfix"></div>

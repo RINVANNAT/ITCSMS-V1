@@ -2073,6 +2073,7 @@ class StudentAnnualController extends Controller
 
         $semester = $request->get("semester_id");
         $scores = $this->getStudentScoreBySemester($request->get("student_annual_id"),$request->get("semester_id"));
+
         return view('backend.studentAnnual.print.transcript_semester',compact('scores','student','semester'));
     }
 
