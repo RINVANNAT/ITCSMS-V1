@@ -1,5 +1,6 @@
 <?php namespace App\Http\Controllers\Backend\Course;
 
+use App\Exceptions\GeneralException;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Backend\Course\CourseAnnual\CreateCourseAnnualRequest;
 use App\Http\Requests\Backend\Course\CourseAnnual\DeleteCourseAnnualRequest;
@@ -2522,23 +2523,31 @@ class CourseAnnualController extends Controller
 
     public function storeTotalScoreEachCourseAnnual($input) {
 
-        $totalScore = $this->averages->findAverageByCourseIdAndStudentId($input['course_annual_id'], (int)$input['student_annual_id']);// check if total score existe
+        $courseAnnual = CourseAnnual::where('id', $input['course_annual_id'])->first();
+        if($courseAnnual->is_allow_scoring || auth()->user()->allow("input-score-without-blocking")) {
+            $totalScore = $this->averages->findAverageByCourseIdAndStudentId($input['course_annual_id'], (int)$input['student_annual_id']);// check if total score existe
 
-        if($totalScore) {
+            if($totalScore) {
 
-            //update calcuation total score
-            $UpdateAverage = $this->averages->update($totalScore->id, $input);
-            if($UpdateAverage) {
-                return $UpdateAverage;
+                //update calcuation total score
+                $UpdateAverage = $this->averages->update($totalScore->id, $input);
+                if($UpdateAverage) {
+                    return $UpdateAverage;
+                }
+
+            } else {
+                // insert new calculation score
+                $storeAverage = $this->averages->create($input); // store total score then return collection-with ID
+                if($storeAverage) {
+                    return $storeAverage;
+                }
             }
-
         } else {
-            // insert new calculation score
-            $storeAverage = $this->averages->create($input); // store total score then return collection-with ID
-            if($storeAverage) {
-                return $storeAverage;
-            }
+
+            throw new GeneralException("Permission denied.");
+
         }
+
     }
 
 //    --------------all course annual score  ---------------

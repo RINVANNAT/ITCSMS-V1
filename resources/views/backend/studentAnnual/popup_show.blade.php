@@ -307,7 +307,7 @@
                                                                 } else if($s<50){
                                                                     $score_color = "style=color:orange";
                                                                 } else {
-                                                                    $score_color = "style=color:white";
+                                                                    $score_color = "style=color:black";
                                                                 }
 
                                                             ?>

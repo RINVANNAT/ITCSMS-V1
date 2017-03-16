@@ -835,6 +835,13 @@ class SeedCustomsPermissions extends Seeder
                             'dependency'   => [
                                 'view-backend','view-course-management','view-courseAnnual-management'
                             ]
+                        ],
+                        [
+                            'name'         => 'input-score-without-blocking',
+                            'display_name' => 'Input score without blocking (Special Permission - Be careful)',
+                            'dependency'   => [
+                                'view-backend','view-course-management','view-courseAnnual-management'
+                            ]
                         ]
                     ]
                 ],
