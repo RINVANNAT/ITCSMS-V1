@@ -31,17 +31,21 @@ class ScoreEnum
     const Name_Fin = 'final';
     const is_counted_creditability = 1;
     const is_counted_absence = 1;
-
-
     const Degree_I = 1;
     const Degree_T = 2;
-    const Red_I = 'Red.I';
-    const Red_T = 'Red.T';
+    const Red_I = 'Red. I';
+    const Red_T = 'Red. T';
     const Pass = 'P';
+    const ENGINEER = 'I';
+    const ASSOCIATION = 'T';
 
     const Year_3 = 3;
     const Year_1= 1;
     const Dept_TC = 8;
+
+    //-----
+
+    const RADIE = 'Radié';
 
 
     //--------check score -----

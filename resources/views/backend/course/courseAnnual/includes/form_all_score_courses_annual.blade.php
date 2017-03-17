@@ -106,6 +106,24 @@
                 background-clip: initial;
                 background-color: #fff !important;
             }
+
+            .htAutocompleteArrow{
+
+                float:right !important;
+                font-size:10px !important;
+                color:#EEE !important;
+                cursor:default !important;
+                width:16px !important;
+                text-align:center !important;
+            }
+            .handsontable td .htAutocompleteArrow:hover{
+                color:#777 !important;
+            }
+
+            .handsontable td.area .htAutocompleteArrow{
+
+                color:#d3d3d3 !important;
+            }
         </style>
         <div class="box-header with-border">
 
@@ -116,8 +134,9 @@
                     <button class="btn btn-primary btn-xs" id="btn-print"><i class="fa fa-print"></i> Print</button>
                 </div>
 
-                <button class="btn btn-xs btn-primary pull-left" id="btn_export_score" style="margin-left: 5px"> <i class="fa fa-export">Export</i></button>
-                <button class="btn btn-xs btn-success pull-left" id="generate_redouble" style="margin-left: 5px"> <i class="fa fa-circle-o"> Redouble</i></button>
+                <button class="btn btn-xs btn-info pull-left" id="btn_export_score" style="margin-left: 5px"> <i class="fa fa-download"> Export</i></button>
+                <button class="btn btn-xs btn-warning pull-left" id="get_radie" style="margin-left: 5px"> <i class="fa fa-download"> Radié</i></button>
+                <button class="btn btn-xs btn-success pull-left" id="generate_rattrapage" style="margin-left: 5px"> <i class="fa fa-circle-o"> Rattrapage</i></button>
 
                 <div class="pull-right">
 
@@ -245,6 +264,11 @@
 
             Handsontable.renderers.TextRenderer.apply(this, arguments);
 
+            if(prop == 'Redouble') {
+//                td.textContent = '<div class="htAutocompleteArrow"> ▼ </div>'
+//                td.div =
+            }
+
             if(jQuery.isNumeric(value) ) {
                 if(value < parseInt('{{\App\Models\Enum\ScoreEnum::Pass_Moyenne}}')) {
                     if(prop != 'number' ) {
@@ -257,28 +281,6 @@
                                     if(colSemester[0] != 'S' ) {
 
                                         if(value < parseInt('{{\App\Models\Enum\ScoreEnum::Under_30}}')) {
-
-                                            /*var mark_subject = setting.mark_subjected;
-                                            var data  = setting.data
-                                            $.each(data, function(index, value_data){
-
-                                                if(value_data['student_id_card'] in mark_subject) {
-                                                    var s = mark_subject[value_data['student_id_card']];
-                                                    var explode = prop.split('_');
-                                                    var id_course = explode[2];
-                                                    for(var key=0; key<s.length; s++) {
-                                                        if(id_course == s[key].course_id) {
-                                                            if(value == s[key].score) {
-                                                                td.style.backgroundColor = 'green';
-                                                            }
-
-                                                        }
-                                                    }
-                                                }
-
-                                            })*/
-
-
 
                                             if(value <= parseInt('{{\App\Models\Enum\ScoreEnum::Score_10}}')) {
                                                 td.style.backgroundColor = '#A41C00';
@@ -306,16 +308,15 @@
             }
 
         };
-
-
         var table_width;
         var hotInstance;
         var print_url = "{{route('admin.course.print_total_score')}}";
         var setting = {
             readOnly:true,
             rowHeaders: false,
-            manualColumnMove: false,
-            manualColumnResize: false,
+            manualColumnMove: true,
+            manualColumnResize: true,
+
             manualRowResize: false,
             minSpareRows: false,
             fixedColumnsLeft: 3,
@@ -358,44 +359,45 @@
                     cellProperties.className = 'htLeft';
                 }
 
+                if (prop === 'Redouble') {
+                    cellProperties.className = "htRight";
+                    this.type = 'autocomplete';
+                    this.filter = false;
+                    if($.trim($('#filter_degree :selected').text().toUpperCase()) == 'ENGINEER') {
+                        this.source =  ['Red. '+ 'I'+ $('#filter_grade :selected').val(), 'Radié'] // to add to the beginning do this.source.unshift(val) instead
+                    } else {
+                        this.source =  ['Red. '+"T"+$('#filter_grade :selected').val(), 'Radié'] // to add to the beginning do this.source.unshift(val) instead
+                    }
+
+                }
 
                 return cellProperties;
+
+
             },
             beforeOnCellMouseDown: function (event,coord, TD) {
-                return false;
+                return true;
             },
             afterOnCellMouseDown: function (event,coord, TD) {
-                return false;
+                return true;
             },
             afterCellMetaReset: function() {
-                return  false;
+                return  true;
             },
             afterRowMove: function() {
-                return false;
+                return true;
             },
-            afterGetCellMeta: function () {
-                return false;
-//                setSelectedRow();
-            },
+
             afterSelectionEnd: function() {
                 setSelectedRow();
             },
-
-            afterMomentumScroll: function() {
-
-                return false;
-            },
             beforeTouchScroll: function() {
 
-                return false;
+                return true;
             },
             afterScrollHorizontally: function() {
 
-                return false;
-            },
-            afterScrollVertically: function() {
-
-                return false;
+                return true;
             },
 
             afterColumnResize: function() {
@@ -430,6 +432,29 @@
                                 {{--}--}}
                             {{--});--}}
                         {{--}--}}
+
+                        if(columnIndex == 'Redouble') {
+                            var remark_rul = '{{route('student.update_status')}}';
+                            var baseData_redouble ={student_id_card: col_student_id[rowIndex], redouble: newValue, academic_year_id: $('#filter_academic_year :selected').val()};
+                            $.ajax({
+                                type: 'POST',
+                                url: remark_rul,
+                                data: baseData_redouble,
+                                dataType: "json",
+                                success: function(resultData) {
+
+                                    if(resultData.status) {
+                                        notify('success', resultData.message, 'Info');
+                                    } else {
+
+                                        notify('error', resultData.message, 'Attention');
+
+                                    }
+
+
+                                }
+                            });
+                        }
 
                         if(columnIndex == 'Remark') {
                             var remark_rul = '{{route('course_annual.save_each_cell_remark')}}';
@@ -561,11 +586,12 @@
                         });
 
                     } else {
+
+
                         setting.data = resultData.data;
                         setting.nestedHeaders = resultData.nestedHeaders;
                         setting.colWidths = resultData.colWidths;
                         setting.subject = resultData.subject;
-                        setting.mark_subjected = resultData.mark_subjected;
 
                         setting.array_fail_subject = resultData.array_fail_subject;
 
@@ -842,6 +868,33 @@
 
 
 
+        $('#generate_rattrapage').on('click', function() {
+
+
+            var pop_url = '{{route('course_annual.student_redouble_exam')}}';
+            var BaseData = {
+                department_id: $('#filter_dept :selected').val(),
+                degree_id: $('#filter_degree :selected').val(),
+                grade_id: $('#filter_grade :selected').val(),
+                academic_year_id: $('#filter_academic_year :selected').val(),
+                semester_id:$('#filter_semester :selected').val(),
+                dept_option_id: $('#filter_dept_option :selected').val(),
+
+            }
+
+            student_reexam_lists = window.open(
+                    pop_url+
+                            '?department_id='+BaseData.department_id+
+                            '&degree_id='+BaseData.degree_id+
+                            '&grade_id='+BaseData.grade_id+
+                            '&semester_id='+BaseData.semester_id+
+                            '&dept_option_id='+BaseData.dept_option_id+
+                            '&academic_year_id='+BaseData.academic_year_id,'_blank');
+
+        })
+
+
+        //----this one is not use----
         $('#generate_redouble').on('click',function() {
 
             var pop_url = '{{route('course_annual.student_redouble_exam')}}';
@@ -901,7 +954,6 @@
             });
 
            var  data = dataToSend(base_data);
-            console.log(data);
             student_reexam_lists = PopupCenterDual(pop_url+'?data='+data+'&academic_year_id='+academic_year_id,'Student Redouble Lists','1500','900');
         });
 
@@ -922,11 +974,11 @@
                         fail = fail+ f_val['course_annual_id']+ '_'
                     })
                 }
-                fail = fail+ ':P';
+                fail = fail+ ':P_';
                 if('pass' in object) {
 
                     $.each(object['pass'], function(p_key, p_val) {
-                        pass = pass+'_'+ p_val['course_annual_id']+'_'
+                        pass = pass+ p_val['course_annual_id']+'_'
                     })
                 }
 
@@ -1171,7 +1223,31 @@
             setTimeout(function(){
                 $(".message").fadeOut("slow");
             },3000);
-        }
+        };
+
+
+
+
+        $('#get_radie').on('click', function() {
+            var academic_year_id = $('#filter_academic_year :selected').val();
+            var department_id = $('#filter_dept :selected').val();
+
+
+            swal({
+                title: "Attention",
+                text: 'Please wait we are working on it!!' ,
+                type: "warning",
+                confirmButtonColor: "red",
+                confirmButtonText: "Close",
+                closeOnConfirm: true
+            }, function(confirmed) {
+                if (confirmed) {
+                    // do some staff if you want ---
+                }
+            });
+
+
+        })
 
     </script>
 

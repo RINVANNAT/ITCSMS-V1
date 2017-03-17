@@ -34,95 +34,24 @@
         <!-- /.box-header -->
         <div class="box-body panel">
 
+            <ul class="nav nav-tabs">
+                <li class="active tablink"><a href="#" id="student" >Student Supplementary Lists</a></li>
+                <li class="tablink"><a href="#" id="subject" > Course Supplementary List </a></li>
+            </ul>
+
+        </div>
+
+        <div id="student_resit_list" class="tabcontent">
             {!! Form::open(['route' => 'course_annual.export_student_re_exam', 'class' => 'form-horizontal', 'role' => 'form', 'method' => 'post', 'id' => 'student_re_exam_form']) !!}
+            @include('backend.course.courseAnnual.includes.student_resit_list')
+            {!! Form::close() !!}
+        </div>
 
-            <input type="hidden" name="academic_year_id" value="{{$academicYear->id}}">
-            <table class="table table-bordered">
-                <thead>
-                <tr>
-                    <th>No</th>
-                    <th>ID-Card</th>
-                    <th>Name</th>
-                    <?php $totalCredit=0?>
-                    @foreach($coursePrograms as $program)
-                        <?php $course = $courseAnnualByCourseProgramObject[$program->id][0]?>
-                        <?php
-                            $totalCredit = $totalCredit + $course->credit;
-                        ?>
-                        <th><div class="vertical">{{$program->name_en}}<br>{{$course->credit}}  </div> </th>
-                    @endforeach
-                    <th>Moyenne <br>{{$totalCredit}} </th>
-                </tr>
-                </thead>
-                <tbody>
+        <div id="subject_resit_list" class="tabcontent" style="display: none">
 
-                <?php $index = 1;?>
+            {!! Form::open(['route' => 'course_annual.export_supplementary_subject', 'name' => 'resit-form' , 'class' => 'form-horizontal ',  'role' => 'form', 'method' => 'post', 'id' => 'supplementary_subject_lists']) !!}
 
-                @foreach($students as $student)
-
-                    <?php $totalScore =0;?>
-
-                    <input type="hidden" value="{{$student->id_card}}" name="student_id_card[]">
-                    <tr>
-                        <td>{{$index}}</td>
-                        <td>{{$student->id_card}}</td>
-                        <td >{{$student->name_latin}}</td>
-                        @foreach($coursePrograms as $program)
-                            <?php $courseAnnual = $courseAnnualByCourseProgramObject[$program->id][0]?>
-
-                            @if(count(array_intersect($exam_subjects[$student->id_card]['fail'], $courseAnnualByProgram[$program->id]))> 0)
-
-                                <?php
-
-                                    $courseAnnualIdArray = array_intersect($exam_subjects[$student->id_card]['fail'], $courseAnnualByProgram[$program->id]);
-                                    //---this array have only one element of exact course annual
-                                    foreach($courseAnnualIdArray as $courseAnnualId) {
-                                        $studentScore = isset($averages[$courseAnnualId])?$averages[$courseAnnualId][$student->student_annual_id]:null;
-                                    }
-                                    //---we need to find the course annual credit not course program credit
-                                    $totalScore = $totalScore + ( (($studentScore != null)?$studentScore->average:0) * $courseAnnual->credit);
-                                ?>
-                                <td>
-                                    <label for="score"><input type="checkbox" name="{{$student->id_card}}[]" value="{{$program->id}}" checked> {{($studentScore!=null)?$studentScore->average:0}}</label>
-
-                                </td>
-                            @else
-
-                                <?php
-
-                                $courseAnnualIdArray = array_intersect($exam_subjects[$student->id_card]['pass'], $courseAnnualByProgram[$program->id]);
-                                //---this array have only one element of exact course annual
-                                foreach($courseAnnualIdArray as $courseAnnualId) {
-                                    $studentScore = isset($averages[$courseAnnualId])?$averages[$courseAnnualId][$student->student_annual_id]:null;
-                                    //-----course annual credit not course program credit
-                                    $totalScore = $totalScore + ( (($studentScore !=null)?$studentScore->average:0) * $courseAnnual->credit);
-                                }
-                                ?>
-                                <td width="">
-                                    <label for="score"><input type="checkbox" name="{{$student->id_card}}[]" value="{{$program->id}}"> {{($studentScore!=null)?$studentScore->average:0}}</label>
-
-                                </td>
-
-                            @endif
-
-                        @endforeach
-                        <?php
-
-                            $moyenne = number_format((float)($totalScore/(($totalCredit >0)?$totalCredit:1)), 2, '.', '');
-                        ?>
-                        <td>{{$moyenne}}</td>
-                    </tr>
-
-                    <?php $index++;?>
-
-                @endforeach
-
-
-                </tbody>
-            </table>
-
-            <button type="submit" class="btn btn-info"> Export Lists </button>
-
+            @include('backend.course.courseAnnual.includes.resit_subject_lists')
 
             {!! Form::close() !!}
 
@@ -130,70 +59,6 @@
 
     </div>
 
-    {{--secod table--}}
-
-
-    <div class="box box-success">
-
-        <style>
-            .spacing{
-                margin-right: 5px;
-            }
-
-        </style>
-        <div class="box-header with-border">
-            <h3 class="box-title">Schedule Supplementary Subjects</h3>
-        </div>
-        <!-- /.box-header -->
-        <div class="box-body panel">
-
-            {!! Form::open(['route' => 'course_annual.export_supplementary_subject', 'class' => 'form-horizontal ', 'role' => 'form', 'method' => 'post', 'id' => 'supplementary_subject_lists']) !!}
-
-            <input type="hidden" name="academic_year_id" value="{{$academicYear->id}}">
-            <table class="table table-bordered">
-                <thead>
-                <tr>
-                    <th>No</th>
-                    <th>Subject</th>
-                    <th>Date Time</th>
-                    <th>Room</th>
-
-                </tr>
-                </thead>
-                <tbody>
-
-                <?php $index = 1;?>
-
-                @foreach($coursePrograms as $courseProgram)
-
-                    <input type="hidden" value="{{$courseProgram->id}}" name="course_program_id[]">
-                    <tr>
-                        <td>{{$index}}</td>
-                        <td>{{$courseProgram->name_en}}</td>
-                        <td>
-                            <label for="start_time" class="spacing"> Date </label><input type="date" name="date_{{$courseProgram->id}}" required >
-                            <label for="start_time" class="spacing"> Sart-Time </label><input type="time" name="start_time_{{$courseProgram->id}}" required >
-                            <label for="end_time" class="spacing"> End Time </label><input type="time" value="2" name="end_time_{{$courseProgram->id}}" required>
-                        </td>
-                        <td><input type="text" name="room_{{$courseProgram->id}}" required></td>
-
-                    </tr>
-
-                    <?php $index++;?>
-
-                @endforeach
-
-
-                </tbody>
-            </table>
-
-            <button class="btn btn-info" type="submit" id="export_course_lists"> Export Schedule </button>
-
-            {!! Form::close() !!}
-
-        </div>
-
-    </div>
 
     <div class="box box-success">
         <div class="box-body">
@@ -215,12 +80,212 @@
 
     <script>
 
-        $('#cancel_table').on('click', function() {
-            window.close();
+
+
+
+        var current_resit_subjects= [];
+        $(document).ready(function() {
+            current_resit_subjects = getCurrentCheckBoxVal();
         })
 
+        $('#cancel_table').on('click', function() {
+            window.close();
+        });
+
+        function calculateScore(object) {
+            var student_id = object.attr('student_id');
+           if(object.is(':checked')) {
+               var selected_score = object.attr('score');
+               if(parseFloat(selected_score) > parseFloat('{{\App\Models\Enum\ScoreEnum::Pass_Moyenne}}')) {
+                   swal({
+                       title: "Attention",
+                       text: "Sorry you cannot select score which is upper or equal 50",
+                       type: "warning",
+                       showCancelButton: true,
+                       confirmButtonColor: "#DD6B55",
+                       confirmButtonText: "Yes",
+                       closeOnConfirm: true
+                   }, function(confirmed) {
+
+                       if (confirmed) {
+                           object.prop('checked', false);
+                       } else {
+                           object.prop('checked', false);
+                       }
+                   });
+
+               } else {
+
+                   /*$('.'+student_id).serializeArray()*/
+
+                   var total_score = 0;
+                   var total_credit=0;
+
+                   $('.'+student_id).each(function() {
+                       var score = $(this).attr('score');
+                       var credit = $(this).attr('credit');
+                       total_credit = parseFloat(total_credit) + parseFloat(credit);
+
+                       if($(this).is(':checked')) {
+                           total_score = parseFloat(total_score) + (parseFloat('{{\App\Models\Enum\ScoreEnum::Pass_Moyenne}}')* parseFloat(credit));
+                       } else {
+                           total_score = parseFloat(total_score) + (parseFloat(score) * parseFloat(credit));
+                       }
+                   });
+
+                   var moyenne = parseFloat(total_score)/parseFloat(total_credit)
+
+                   $('label#'+student_id).html(parseFloat(moyenne.toFixed(2)))
+               }
+           } else {
+
+               var total_score = 0;
+               var total_credit=0;
+               var course_program_id = object.val();
+
+               $('.'+student_id).each(function() {
+                   var score = $(this).attr('score');
+                   var credit = $(this).attr('credit');
+                   total_credit = parseFloat(total_credit) + parseFloat(credit);
+
+                   if($(this).is(':checked')) {
+                       total_score = parseFloat(total_score) + (parseFloat('{{\App\Models\Enum\ScoreEnum::Pass_Moyenne}}')* parseFloat(credit));
+                   } else {
+                       total_score = parseFloat(total_score) + (parseFloat(score) * parseFloat(credit));
+                   }
+               });
+
+               var moyenne = parseFloat(total_score)/parseFloat(total_credit)
+
+               $('label#'+student_id).html(parseFloat(moyenne.toFixed(2)))
+
+           }
+        }
 
 
+        $('button.save_change').on('click',function() {
+            var url = '{{route('save_student_resit_exam')}}'
+            var data = $('form#student_re_exam_form').serialize();
+
+            $.ajax({
+                type: 'POST',
+                url: url,
+                data:data ,
+                dataType: "json",
+                success:function(result) {
+                    if(result.status) {
+                        notify('success', result.message, 'Info');
+                        current_resit_subjects= getCurrentCheckBoxVal();
+                    }
+
+                }
+            })
+
+        });
+
+        function getCurrentCheckBoxVal() {
+            var resit_subjects = [];
+            $('input.input_value').each(function() {
+                if(this.checked) {
+                    resit_subjects.push($(this).val())
+                }
+            })
+
+            return resit_subjects;
+
+        }
+
+        function afterChangeCheckBox() {
+            var checkbox_chanes = [];
+            $('input.input_value').each(function() {
+                if(this.checked) {
+                    checkbox_chanes.push($(this).val())
+                }
+            })
+
+            return checkbox_chanes;
+        }
+
+
+        $('#student').on('click', function(e) {
+            openTab($(this), 'student_resit_list');
+        });
+        $('#schedule').on('click', function(e) {
+            openTab($(this), 'resit_schedule');
+        })
+        $('#subject').on('click', function(e) {
+            openTab($(this), 'subject_resit_list');
+        })
+
+        function openTab(object, tab) {
+
+            var i, tabcontent, tablinks;
+
+            tabcontent = $('.tabcontent');
+            $.each(tabcontent, function() {
+                $(this).hide();
+            });
+
+            $.each($('.tablink'), function() {
+                $(this).removeClass('active');
+            });
+
+            var clickedTab = $('#'+tab);
+            clickedTab.show();
+            object.parent('li').addClass('active')
+        }
+
+
+        $('form#student_re_exam_form').on('submit',function(e) {
+
+            var change = afterChangeCheckBox();
+            var status = true;
+            if(change.length !== current_resit_subjects.length) {
+                status = false;
+            } else {
+                $.each(change, function(key, value) {
+                    if(current_resit_subject[key] != value ) {
+                        status = false;
+                    }
+                })
+            }
+            if(status) {
+                return true;
+            } else {
+
+                swal({
+                    title: "Attention",
+                    text: "Please Save Change Before Export",
+                    type: "warning",
+                    showCancelButton: true,
+                    confirmButtonColor: "#DD6B55",
+                    closeOnConfirm: true
+                }, function(confirmed) {
+
+                    if (confirmed) {
+
+                    }
+                });
+
+                return false;
+            }
+
+        });
+
+        nonResitSubject();
+        function nonResitSubject() {
+            $('.count_resit').each(function(key, value) {
+
+                console.log($(this).text())
+                if($.trim($(this).text()) == "-") {
+                   $(this).parent('tr').addClass('danger')
+                    $(this).parent('tr').find('input').each(function() {
+                        $(this).prop('disabled', true);
+                        $(this).removeAttr('required');
+                    })
+                }
+            })
+        }
     </script>
 
 

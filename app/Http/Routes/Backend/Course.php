@@ -106,22 +106,18 @@ Route::group([
     Route::get('course-annual/get-form-all-course-annual-score', 'CourseAnnualController@formScoreAllCourseAnnual')->name('admin.course.get_form_evaluation_score');
     Route::get('course-annual/get-all-data-course-annual-score', 'CourseAnnualController@allHandsontableData')->name('admin.course.get_all_handsontable_data');
     Route::get('course-annual/filter-course-annual-scores', 'CourseAnnualController@allHandsontableData')->name('admin.course.filter_course_annual_scores');
-
     Route::get('course-annual/print_total_score', 'CourseAnnualController@print_total_score')->name('admin.course.print_total_score');
-
     Route::get('course-annual/-get-form-all-score-properties', 'CourseAnnualController@formAllScoreSelection')->name('course_annual.form_all_score_properties');
-
     Route::post('course_annual/save-each-cell-observation', 'CourseAnnualController@saveEachObservation')->name('course_annual.save_each_cell_observation');
     Route::post('course_annual/save-each-cell-remark', 'CourseAnnualController@saveEachORemark')->name('course_annual.save_each_cell_remark');
-
     Route::get('course-annual/export-view-total-score', 'CourseAnnualController@exportTotalScore')->name('course_annual.export_view_total_score');
-
-
     Route::get('course-annual/student-redouble-liste}', 'CourseAnnualController@studentRedoubleListe')->name('course_annual.student_redouble_exam');
-
     Route::post('course-annual/export-student-redouble-list}', 'CourseAnnualController@exportStudentRedoubleList')->name('course_annual.export_student_re_exam');
+    Route::post('course-annual/save-student-resit}', 'CourseAnnualController@saveStudentResit')->name('save_student_resit_exam');
+    Route::post('course-annual/export-supplementary-subject-list', 'CourseAnnualController@exportSupplementarySubjects')->name('course_annual.export_supplementary_subject');
 
-    Route::post('course-annual/export-supplementary-subject-list}', 'CourseAnnualController@exportSupplementarySubjects')->name('course_annual.export_supplementary_subject');
+
+    Route::post('/student/update-status', 'CourseAnnualController@updateStudentStatus')->name('student.update_status');
 
     Route::get('course-annual/empty-view', 'CourseAnnualController@emptyView')->name('empty_view');
 
