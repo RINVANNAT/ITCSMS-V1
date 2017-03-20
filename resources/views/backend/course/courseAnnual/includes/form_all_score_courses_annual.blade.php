@@ -1229,11 +1229,36 @@
 
 
         $('#get_radie').on('click', function() {
-            var academic_year_id = $('#filter_academic_year :selected').val();
-            var department_id = $('#filter_dept :selected').val();
+
+            /*var academic_year_id = $('#filter_academic_year :selected').val();
+            var department_id = $('#filter_dept :selected').val();*/
 
 
-            swal({
+
+            var pop_url = '{{route('student.dismiss')}}';
+            var BaseData = {
+                department_id: $('#filter_dept :selected').val(),
+                degree_id: $('#filter_degree :selected').val(),
+                grade_id: $('#filter_grade :selected').val(),
+                academic_year_id: $('#filter_academic_year :selected').val(),
+                semester_id:$('#filter_semester :selected').val(),
+                dept_option_id: $('#filter_dept_option :selected').val(),
+
+            }
+
+            student_reexam_lists = window.open(
+                    pop_url+
+                    '?department_id='+BaseData.department_id+
+                    '&degree_id='+BaseData.degree_id+
+                    '&grade_id='+BaseData.grade_id+
+                    '&semester_id='+BaseData.semester_id+
+                    '&dept_option_id='+BaseData.dept_option_id+
+                    '&academic_year_id='+BaseData.academic_year_id,'_blank');
+
+
+
+
+            /*swal({
                 title: "Attention",
                 text: 'Please wait we are working on it!!' ,
                 type: "warning",
@@ -1244,7 +1269,7 @@
                 if (confirmed) {
                     // do some staff if you want ---
                 }
-            });
+            });*/
 
 
         })

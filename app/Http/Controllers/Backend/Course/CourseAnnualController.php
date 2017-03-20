@@ -23,6 +23,7 @@ use App\Models\DepartmentOption;
 use App\Models\Employee;
 use App\Models\Enum\CourseAnnualEnum;
 use App\Models\Enum\ScoreEnum;
+use App\Models\Gender;
 use App\Models\Grade;
 use App\Models\Redouble;
 use App\Models\Score;
@@ -3065,6 +3066,7 @@ class CourseAnnualController extends Controller
                     }
                 } else {
                     $value['Redouble'] = 'Radié .';//even the student has score upper than 30 cos student have been set radie as true;
+                    $this->updateStatusStudent($key, $status = true);
                 }
 
 
@@ -5710,6 +5712,147 @@ class CourseAnnualController extends Controller
             }
 
         }
+
+    }
+
+
+
+    public function getStudentDismiss(Request $request) {
+
+        $studentRadies = [];
+        $studentData = [];
+        $index = 1;
+
+        $department = Department::where('id', $request->department_id)->first();
+        $students = Student::join('studentAnnuals', 'studentAnnuals.student_id', '=', 'students.id')
+            ->where([
+                ['department_id', $request->department_id],
+                ['studentAnnuals.academic_year_id', $request->academic_year_id]
+            ])
+            ->orderBy('studentAnnuals.degree_id')
+            ->orderBy('studentAnnuals.grade_id')
+            ->orderBy('studentAnnuals.department_option_id')
+            ->get();
+        foreach($students as $student) {
+
+            if($student->radie == true) {
+
+                $gender = Gender::where('id', $student->gender_id)->first();
+                $grade = Grade::where('id', $student->grade_id)->first();
+
+                if($student->department_option_id) {
+                    $departmentOption = DepartmentOption::where('id', $student->department_option_id)->first();
+                    $element = [
+                        $index,
+                        $student->id_card,
+                        $student->name_latin,
+                        $gender->name_en,
+                        $grade->name_en,
+                        $departmentOption->name_en
+                    ];
+
+                    $headers = [
+                        'No',
+                        'ID Card',
+                        'Name Latin',
+                        'Sexe',
+                        'Grade',
+                        'Option'
+                    ];
+                } else {
+
+                    $element = [
+                        $index,
+                        $student->id_card,
+                        $student->name_latin,
+                        $gender->name_en,
+                        $grade->name_en,
+                    ];
+
+                    $headers = [
+                        'No',
+                        'ID Card',
+                        'Name Latin',
+                        'Sexe',
+                        'Grade',
+                    ];
+                }
+
+                $studentData[] = $element;
+                $index++;
+
+            }
+        }
+        $alpha = [];
+        $letter = 'A';
+        while ($letter !== 'AAA') {
+            $alpha[] = $letter++;
+        }
+        $title = 'Student Elimination Lists';
+
+        Excel::create('Supplementary Course Schedule', function($excel) use ($alpha, $title, $headers, $studentData, $studentRadies,$department) {
+
+            $excel->sheet('Supplementary Course Schedule', function($sheet) use($alpha,$title, $headers, $studentData, $studentRadies, $department) {
+
+                $sheet->setOrientation('portrait');
+                // Set top, right, bottom, left
+                $sheet->setPageMargin(array(0.25, 0.30, 0.25, 0.30));
+
+                // Set all margins
+                $sheet->setPageMargin(0.25);
+                $sheet->setAllBorders('thin');
+                $sheet->setOrientation('portrait');
+                // Set top, right, bottom, left
+                $sheet->setPageMargin(array(0.25, 0.30, 0.25, 0.30));
+
+                // Set all margins
+                $sheet->setPageMargin(0.25);
+                $sheet->setAllBorders('thin');
+
+                $sheet->cells('A1:F1', function($cells) {
+                    $cells->setBackground('#C0C0C0 ');
+                    $cells->setAlignment('center');
+                    $cells->setFont(array(
+                        'size'       => '16'
+                    ));
+                });
+                $sheet->cells('A2:F2', function($cells) {
+                    $cells->setBackground('#C0C0C0 ');
+                    $cells->setAlignment('center');
+                    $cells->setFont(array(
+                        'size'       => '12'
+                    ));
+                });
+                $sheet->cells('A3:F3', function($cells) {
+                    $cells->setBackground('#C0C0C0 ');
+                    $cells->setAlignment('left');
+                    $cells->setValignment('center');
+                    //$cells->setTextRotation(-90);
+                    $cells->setFont(array(
+                        'size'       => '12',
+                        'font'      => 'bold'
+
+                    ));
+                });
+                $sheet->row(2, ['', 'Department: '.$department->name_en ]);
+                $sheet->row(3, $headers);
+                $sheet->setCellValue('C1', $title);
+
+                for($key=0; $key< 6; $key++) {
+                    if($alpha[$key] == 'C') {
+                        $sheet->setWidth([$alpha[$key]  => 15]);
+                    } else {
+                        $sheet->setSize($alpha[$key].'3', 10, 20);
+                    }
+                }
+
+                foreach($studentData as $data_row) {
+                    $sheet->appendRow($data_row);
+
+                }
+            });
+
+        })->download('xls');
 
     }
 }

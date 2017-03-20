@@ -120,9 +120,9 @@ Route::group([
     Route::post('/student/update-status', 'CourseAnnualController@updateStudentStatus')->name('student.update_status');
 
     Route::get('course-annual/empty-view', 'CourseAnnualController@emptyView')->name('empty_view');
-
-
     Route::get('/course-annual/student-final-result', 'CourseAnnualController@getStudentFinalResult')->name('course_annual.student_annual_final_result');
+
+    Route::get('/student/dismiss', 'CourseAnnualController@getStudentDismiss')->name('student.dismiss');
 
 
 });
