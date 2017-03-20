@@ -176,6 +176,7 @@
                     if(result.status) {
                         notify('success', result.message, 'Info');
                         current_resit_subjects= getCurrentCheckBoxVal();
+                        location.reload();
                     }
 
                 }
@@ -276,7 +277,7 @@
         function nonResitSubject() {
             $('.count_resit').each(function(key, value) {
 
-                console.log($(this).text())
+//                console.log($(this).text())
                 if($.trim($(this).text()) == "-") {
                    $(this).parent('tr').addClass('danger')
                     $(this).parent('tr').find('input').each(function() {

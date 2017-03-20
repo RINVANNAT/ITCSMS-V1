@@ -45,6 +45,7 @@
 
                     <?php
                     $courseAnnual = $program->courseAnnual()->first();//---because on course program has many course annual and in every course annual have the same proper of the course so we can use only the first course annual(name, credit)
+
                         $subjectRattrapages = $studentRattrapages[$student->id_card];
                         if(isset($subjectRattrapages['fail'])) {
                             $courseAnnualFailId = array_intersect($studentRattrapages[$student->id_card]['fail'], $courseAnnualByProgram[$program->id]);
@@ -66,12 +67,14 @@
                         $approximation_score = $approximation_score + (\App\Models\Enum\ScoreEnum::Pass_Moyenne * $courseAnnual->credit);
                         ?>
                         <td>
+                            {{--set checked--}}
                             <label for="score"><input credit="{{$courseAnnual->credit}}" student_id="{{$student->id_card}}" class="{{$student->id_card}} input_value" type="checkbox" onchange="calculateScore($(this))" name="{{$student->id_card}}[]" value="{{$courseAnnualId}}" checked score="{{($studentScore!=null)?$studentScore->average:0}}"> {{number_format((float)(($studentScore!=null)?$studentScore->average:0), 2, '.', '')}}</label>
 
                         </td>
                     @else
 
                         <?php
+
 
                         $courseAnnualPassId = array_intersect($studentRattrapages[$student->id_card]['pass'], $courseAnnualByProgram[$program->id]);
                         //---this array have only one element of exact course annual
