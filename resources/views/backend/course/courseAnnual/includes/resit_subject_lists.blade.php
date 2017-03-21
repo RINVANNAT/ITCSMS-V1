@@ -59,9 +59,9 @@
             </td>
 
             <td>
-                <label for="start_time" class="spacing"> Date </label><input type="date" name="date_{{$courseProgram->id}}"  >
-                <label for="start_time" class="spacing"> Sart </label><input type="time" name="start_time_{{$courseProgram->id}}"  >
-                <label for="end_time" class="spacing"> End </label><input type="time" value="2" name="end_time_{{$courseProgram->id}}" >
+                <label for="start_time" class="spacing"> Date </label><input type="date" name="date_{{$courseProgram->id}}" required >
+                <label for="start_time" class="spacing"> Sart </label><input type="time" name="start_time_{{$courseProgram->id}}" required >
+                <label for="end_time" class="spacing"> End </label><input type="time" value="2" name="end_time_{{$courseProgram->id}}" required>
             </td>
             <td><input type="text" name="room_{{$courseProgram->id}}" required></td>
 

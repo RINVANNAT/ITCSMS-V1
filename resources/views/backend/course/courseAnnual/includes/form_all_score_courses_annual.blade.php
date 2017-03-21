@@ -364,9 +364,9 @@
                     this.type = 'autocomplete';
                     this.filter = false;
                     if($.trim($('#filter_degree :selected').text().toUpperCase()) == 'ENGINEER') {
-                        this.source =  ['Red. '+ 'I'+ $('#filter_grade :selected').val(), 'Radié'] // to add to the beginning do this.source.unshift(val) instead
+                        this.source =  ['Red. '+ 'I'+ $('#filter_grade :selected').val(), 'Radié', '{{\App\Models\Enum\ScoreEnum::Pass}}'] // to add to the beginning do this.source.unshift(val) instead
                     } else {
-                        this.source =  ['Red. '+"T"+$('#filter_grade :selected').val(), 'Radié'] // to add to the beginning do this.source.unshift(val) instead
+                        this.source =  ['Red. '+"T"+$('#filter_grade :selected').val(), 'Radié', '{{\App\Models\Enum\ScoreEnum::Pass}}'] // to add to the beginning do this.source.unshift(val) instead
                     }
 
                 }
@@ -412,6 +412,7 @@
                         var change = element;
                         var rowIndex = change[0];
                         var columnIndex = change[1];
+                        var oldValue = change[2];
                         var newValue = change[3];
                         var col_student_id = hotInstance.getDataAtProp('student_id_card'); //---array data of column student_id
 
@@ -434,26 +435,29 @@
                         {{--}--}}
 
                         if(columnIndex == 'Redouble') {
-                            var remark_rul = '{{route('student.update_status')}}';
-                            var baseData_redouble ={student_id_card: col_student_id[rowIndex], redouble: newValue, academic_year_id: $('#filter_academic_year :selected').val()};
-                            $.ajax({
-                                type: 'POST',
-                                url: remark_rul,
-                                data: baseData_redouble,
-                                dataType: "json",
-                                success: function(resultData) {
 
-                                    if(resultData.status) {
-                                        notify('success', resultData.message, 'Info');
-                                    } else {
+                            if(oldValue != newValue) {
+                                var remark_rul = '{{route('student.update_status')}}';
+                                var baseData_redouble ={student_id_card: col_student_id[rowIndex], redouble: newValue, academic_year_id: $('#filter_academic_year :selected').val(), old_value: oldValue};
+                                $.ajax({
+                                    type: 'POST',
+                                    url: remark_rul,
+                                    data: baseData_redouble,
+                                    dataType: "json",
+                                    success: function(resultData) {
 
-                                        notify('error', resultData.message, 'Attention');
+                                        if(resultData.status) {
+                                            notify('success', resultData.message, 'Info');
+                                        } else {
+
+                                            notify('error', resultData.message, 'Attention');
+
+                                        }
+
 
                                     }
-
-
-                                }
-                            });
+                                });
+                            }
                         }
 
                         if(columnIndex == 'Remark') {

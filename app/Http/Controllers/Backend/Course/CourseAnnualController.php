@@ -2917,9 +2917,11 @@ class CourseAnnualController extends Controller
 
 
         $array_student_observation=[];
+        $idCardPointToStudent= [];
         $students = DB::table('students')
             ->leftJoin('studentAnnuals', 'studentAnnuals.student_id', '=', 'students.id')
             ->leftJoin('redouble_student', 'students.id', '=', 'redouble_student.student_id')
+
             ->leftJoin('redoubles', 'redoubles.id', '=', 'redouble_student.redouble_id')
             ->leftJoin('histories', 'histories.id', '=', 'studentAnnuals.history_id')
             ->leftJoin('scholarship_student_annual', 'studentAnnuals.id', '=', 'scholarship_student_annual.student_annual_id')
@@ -2928,7 +2930,7 @@ class CourseAnnualController extends Controller
                 'scholarships.name_en as scholarship_name',
                 'redoubles.name_en as redouble_name',
                 'histories.name_en as history_name',
-                'students.id_card',
+                'students.id_card', 'students.id as student_id', 'students.radie',
                 'studentAnnuals.id as student_annual_id',
                 'redouble_student.academic_year_id'
             )
@@ -2940,6 +2942,8 @@ class CourseAnnualController extends Controller
         $studentRedoubleHistory = [];
 
         foreach($students as $student ) {
+
+            $idCardPointToStudent[$student->id_card] = $student;
             $observation_info= '';
             if(isset($array_student_observation[$student->id_card])) {
 
@@ -3015,61 +3019,25 @@ class CourseAnnualController extends Controller
 
             if($moyenne < ScoreEnum::Pass_Moyenne) {
 
-                $check_redouble = $this->checkRedouble($key, $academicYearID);
+                $check_redouble = $this->checkRedouble($idCardPointToStudent[$key], $academicYearID);//---check this current year if student has been change in redouble
 
                 if($check_redouble !== false) {
-                    if($moyenne < ScoreEnum::Under_30) {//----if student average is under 30
-                        if($degreeId == ScoreEnum::Degree_I) {//---if student is in ENgineer or association
 
-                            if(isset($studentRedoubleHistory[$key])) {//----if student previous academic has redouble
-
-                                $value['Redouble'] = 'Radié .';
-                                $this->updateStatusStudent($key, $status = true); //----if student fail two time in his 5 year academic ---he must be eliminate from school
-
-                            } else {
-
-                                if($check_redouble !== null) {// check current redouble of this current year ...if we already set him as redouble
-
-                                    //---because his final average score is lowwer than 30 ...he/she must fail in this year ....so we create redouble record
-                                    $this->createRedoubleRecord($check_redouble, $redName = trim(ScoreEnum::Red_I.$gradeId), $academicYearID);
-                                    $value['Redouble'] = ScoreEnum::Red_I.$gradeId.' .';
-
-                                } else{
-
-                                    //----student has been set as fail in this year ...so we assign value of redouble for this year (view in table )
-
-                                    $value['Redouble'] = ScoreEnum::Red_I.$gradeId.' .';
-                                }
-                            }
-                        } else {
-
-                            if(isset($studentRedoubleHistory[$key])) {
-                                $value['Redouble'] = 'Radié .';
-                                $this->updateStatusStudent($key, $status = true);
-
-                            } else {
-
-                                if($check_redouble !== null) {
-
-                                    $this->createRedoubleRecord($check_redouble, $redName = trim(ScoreEnum::Red_T.$gradeId), $academicYearID);
-                                    $value['Redouble'] = ScoreEnum::Red_T . $gradeId . ' .';
-                                } else {
-                                    $value['Redouble'] = ScoreEnum::Red_T . $gradeId . ' .';
-                                }
-
-                            }
-                        }
+                    if($degreeId == ScoreEnum::Degree_I) {//---if student is in ENgineer or association
+                        $value['Redouble'] = $this->studentEliminationManager($idCardPointToStudent, $studentRedoubleHistory, $key, $check_redouble, $gradeId, $academicYearID, ScoreEnum::Red_I);
 
                     } else {
+                        /*---student association degree-----*/
 
-                        $value['Redouble'] = 'Rath .';//ScoreEnum::Red_I.$gradeId;
+                        $value['Redouble'] = $this->studentEliminationManager($idCardPointToStudent, $studentRedoubleHistory, $key, $check_redouble, $gradeId, $academicYearID, ScoreEnum::Red_T);
                     }
                 } else {
-                    $value['Redouble'] = 'Radié .';//even the student has score upper than 30 cos student have been set radie as true;
+
+                    //---student has been set as Elimination (Radié)
+
+                    $value['Redouble'] = 'Radié';//even the student has score upper than 30 cos student have been set radie as true;
                     $this->updateStatusStudent($key, $status = true);
                 }
-
-
 
             } else {
                 $value['Redouble'] = ScoreEnum::Pass;
@@ -3140,38 +3108,30 @@ class CourseAnnualController extends Controller
             'colWidths' => $colWidths
         ]);
     }
-
-    private function updateStatusStudent($studentIdCard, $status) {
-        $student = DB::table('students')->where('id_card', $studentIdCard)
-            ->update(
-                ['radie' => $status]
-            );
-        return $student;
-    }
-
-    private function createRedoubleRecord($student, $redName, $academicYearId ) {
-
-        $redouble= Redouble::where('name_en', $redName)->first();
-        $student->redoubles()->attach($redouble->id, ['academic_year_id' => $academicYearId]);
-    }
+    private function checkRedouble($student, $academicYearId) {
 
 
-    private function checkRedouble($studentIdCard, $academicYearId) {
 
-        $student = Student::where('id_card', $studentIdCard)->first();
         if(!$student->radie) {
 
             $redouble_student = DB::table('redouble_student')->where([
                 ['academic_year_id', $academicYearId],
-                ['student_id', $student->id]
+                ['student_id', $student->student_id]
             ])->first();
 
+
+
             if($redouble_student) {
-                return null;
+
+                $redouble_student = (object)array_merge((array)$redouble_student, ['redouble_name' => $student->redouble_name]);
+                return $redouble_student;
+
             } else {
-                return $student;//have no record of redouble
+                return null;//have no record of redouble
             }
+
         } else {
+
             return false;
         }
 
@@ -3220,6 +3180,7 @@ class CourseAnnualController extends Controller
 
     private function findRattrapageSubject($array) {
 
+
         $total_credit = 0;
         //----array with key fail ---mean the couse score is under 30---
         if(isset($array['fail'])) {
@@ -3229,6 +3190,7 @@ class CourseAnnualController extends Controller
                 $validate_score = 0;
 
                 foreach($array['fail'] as $fail) {
+
                     $total_credit = $total_credit + $fail['credit'];
                     $validate_score = $validate_score + (ScoreEnum::Pass_Moyenne * $fail['credit']);
                 }
@@ -3325,6 +3287,7 @@ class CourseAnnualController extends Controller
         $min = $array_val[0]['score'];
         $credit = $array_val[0]['credit'];
         $course_annual_id = $array_val[0]['course_annual_id'];
+        $student_annual_id = $array_val[0]['student_annual_id'];
         $index = 0;
 
         for($in = 1; $in < count($array_val); $in++) {
@@ -3334,11 +3297,12 @@ class CourseAnnualController extends Controller
                 $min = $array_val[$in]['score'];
                 $credit = $array_val[$in]['credit'];
                 $course_annual_id = $array_val[$in]['course_annual_id'];
+                $student_annual_id = $array_val[$in]['student_annual_id'];
             }
         }
 //        dump($min);
         return [
-            'element' => ['score'=> $min, 'credit' => $credit, 'course_annual_id'=>$course_annual_id],
+            'element' => ['score'=> $min, 'credit' => $credit, 'course_annual_id'=>$course_annual_id, 'student_annual_id' => $student_annual_id],
             'index'  => $index
         ];
     }
@@ -4856,7 +4820,6 @@ class CourseAnnualController extends Controller
 
             if($data['student_id_card'] != null) {
                 $subjectRattrapages = $this->findRattrapageSubject($array_fial_subject[$data['student_id_card']]);
-
                 $studentResitExam[$data['student_id_card']] = ['resit_subject'=>$subjectRattrapages, 'student_prop'=>$data, 'course_program_id' => $courseProgramIds];
             }
         }
@@ -4947,6 +4910,7 @@ class CourseAnnualController extends Controller
 
 
         $studentRattrapages=[];
+        $studentRattrapagesByStudentAnnualId = [];/*---store student-annual-id as key with key pass and fail for rattrapage-course-annual---*/
         $studentIdCards = [];
         $courseProgramIds = [];
         $courseAnnualIds = [];
@@ -4961,6 +4925,7 @@ class CourseAnnualController extends Controller
 
         $resitStudentAnnualFromDB = $this->hasRattrapages($array_fial_subject, $request);
 
+
         if(count($resitStudentAnnualFromDB['resit_student']) > 0) {
 
             $students = DB::table('studentAnnuals')
@@ -4974,7 +4939,6 @@ class CourseAnnualController extends Controller
 
             $courseAnnuals = $resitStudentAnnualFromDB['course_annual'];
 
-//            dd($courseAnnuals);
 
             foreach($courseAnnuals as $courseAnnual) {
                 $courseAnnualByProgram[$courseAnnual->course_id][] = $courseAnnual->course_annual_id;
@@ -4989,18 +4953,24 @@ class CourseAnnualController extends Controller
             $studentRattrapages = $resitStudentAnnualFromDB['resit_student'];
 
         } else {
+
             $studentResitExam = $this->findResitStudentAutomatic($handsonData, $array_fial_subject);
 
             foreach($studentResitExam as $student_id => $resit) {
 
                 if(isset($resit['resit_subject']['fail'])) {
+
                     $subjects = $resit['resit_subject'];
 
                     if(isset($subjects['pass'])) {
+
                         foreach($subjects as $keyPOrF => $subVal) {
                             foreach($subVal as $val) {
+
                                 $studentRattrapages[$student_id][$keyPOrF][] = $val['course_annual_id'];
+                                $studentRattrapagesByStudentAnnualId[$val['student_annual_id']][$keyPOrF][] = $val['course_annual_id'];
                             }
+
                         }
                         $studentIdCards[] = $student_id;
                     } else {
@@ -5015,6 +4985,7 @@ class CourseAnnualController extends Controller
                             foreach($subjects['fail'] as  $fail) {
 
                                 $studentRattrapages[$student_id]['fail'][]= $fail['course_annual_id'];
+                                $studentRattrapagesByStudentAnnualId[$fail['student_annual_id']]['fail'][] = $fail['course_annual_id'];
                             }
                             $studentIdCards[] = $student_id;
                         }
@@ -5023,6 +4994,10 @@ class CourseAnnualController extends Controller
                 }
                 $courseProgramIds= $resit['course_program_id'];
             }
+
+           /*------save student rattrapaer automatic-----*/
+            //$this->saveStudentResitAutomatic($studentRattrapagesByStudentAnnualId);
+           /*----end saving ----*/
 
             $students = $this->getStudentByIdCardYearly($studentIdCards, $academic_year_id);
 
@@ -5686,31 +5661,63 @@ class CourseAnnualController extends Controller
         $studentIdCard = $request->student_id_card;
         $redouble = $request->redouble;
         $student = Student::where('id_card', $studentIdCard)->first();
-
+        $studentAnnual = StudentAnnual::where([
+            ['student_id', $student->id],
+            ['academic_year_id', $academicYearId]
+        ])->first();
+        $degree = $studentAnnual->degree;
+        $grade = $studentAnnual->grade;
+        if($degree->code == ScoreEnum::ENGINEER) {
+            $redName = ScoreEnum::Red_I.$grade->code;
+        } else {
+            $redName = ScoreEnum::Red_T.$grade->code;
+        }
         if($redouble == ScoreEnum::RADIE) {
            $update =  $this->updateStatusStudent($studentIdCard, $status= true);
             if($update) {
                 return Response::json(['status' => true, 'message' => 'updated']);
             }
-        } else {
+        } else if($redouble == ScoreEnum::Pass) {
+
             $update = $this->updateStatusStudent($studentIdCard, $status= false);
-
             if($update) {
-                $redouble_students = DB::table('redouble_student')->where('student_id', $student->id)->get();
+                $redouble_students = DB::table('redouble_student')->where('student_id', $student->id);
 
-                foreach($redouble_students as  $redouble_student) {
-                    if($redouble_student->academic_year_id == $academicYearId) {
+                if(count($redouble_students->get()) > 0) {
+                    $updateRedouble = $redouble_students->where('academic_year_id', $academicYearId)->update(['is_changed' => true]);
 
-                        $delete = DB::table('redouble_student')->where('id', $redouble_student->id)->delete();
-
-                        if($delete) {
-
-                            return Response::json(['status' => true, 'message' => 'One Record Deleted']);
-                        }
+                    if($updateRedouble) {
+                        return Response::json(['status' => true, 'message' => 'Updated']);
                     }
+                } else {
+                    return Response::json(['status' => true, 'message' => 'Updated']);
                 }
             }
+        } else {
 
+            /*---change from pass or radie to Red---*/
+
+
+            $previousValue = $request->old_value;
+            if($previousValue == ScoreEnum::RADIE) {
+                return Response::json(['status' => false, 'message' => 'You cannot make change!']);
+            } else {
+
+                $redouble_students = DB::table('redouble_student')
+                    ->where([
+                        ['student_id', $student->id],
+                        ['academic_year_id', $academicYearId]
+                    ]);
+                if(count($redouble_students->get()) > 0 ) {
+                    $redouble_students->update(['is_changed' => false]);
+
+                    return Response::json(['status' => true, 'message' => 'changed!']);
+                } else {
+
+                    $this->createRedoubleRecord($student, $redName, $academicYearId );
+                    return Response::json(['status' => true, 'message' => 'changed!']);
+                }
+            }
         }
 
     }

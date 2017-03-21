@@ -39,7 +39,9 @@
             <td>{{$index}}</td>
             <td>{{$student->id_card}}</td>
             <td >{{$student->name_latin}}</td>
+            <?php $count_label=1;?>
             @foreach($coursePrograms as $program)
+                <?php $count_label++;?>
 
                 @if($program->is_counted_creditability)
 
@@ -68,7 +70,7 @@
                         ?>
                         <td>
                             {{--set checked--}}
-                            <label for="score"><input credit="{{$courseAnnual->credit}}" student_id="{{$student->id_card}}" class="{{$student->id_card}} input_value" type="checkbox" onchange="calculateScore($(this))" name="{{$student->id_card}}[]" value="{{$courseAnnualId}}" checked score="{{($studentScore!=null)?$studentScore->average:0}}"> {{number_format((float)(($studentScore!=null)?$studentScore->average:0), 2, '.', '')}}</label>
+                            <label for="{{$student->id_card}}_{{$count_label}}"><input id="{{$student->id_card}}_{{$count_label}}" credit="{{$courseAnnual->credit}}" student_id="{{$student->id_card}}" class="{{$student->id_card}} input_value" type="checkbox" onchange="calculateScore($(this))" name="{{$student->id_card}}[]" value="{{$courseAnnualId}}" checked score="{{($studentScore!=null)?$studentScore->average:0}}"> {{number_format((float)(($studentScore!=null)?$studentScore->average:0), 2, '.', '')}}</label>
 
                         </td>
                     @else
@@ -87,7 +89,7 @@
                         }
                         ?>
                         <td width="">
-                            <label for="score"><input type="checkbox" credit="{{$courseAnnual->credit}}" student_id="{{$student->id_card}}" class="{{$student->id_card}} input_value" onchange="calculateScore($(this))" name="{{$student->id_card}}[]" value="{{$courseAnnualId}}" score="{{($studentScore!=null)?$studentScore->average:0}}"> {{number_format((float)(($studentScore!=null)?$studentScore->average:0), 2, '.', '')}}</label>
+                            <label for="{{$student->id_card}}_{{$count_label}}"><input id="{{$student->id_card}}_{{$count_label}}" type="checkbox" credit="{{$courseAnnual->credit}}" student_id="{{$student->id_card}}" class="{{$student->id_card}} input_value" onchange="calculateScore($(this))" name="{{$student->id_card}}[]" value="{{$courseAnnualId}}" score="{{($studentScore!=null)?$studentScore->average:0}}"> {{number_format((float)(($studentScore!=null)?$studentScore->average:0), 2, '.', '')}}</label>
 
                         </td>
 

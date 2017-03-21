@@ -2,8 +2,22 @@
 namespace App\Traits;
 
 use Illuminate\Support\Facades\DB;
+use App\Models\Redouble;
+use App\Repositories\Backend\ResitStudentAnnual\ResitStudentAnnualRepositoryContract;
+use App\Repositories\Backend\ResitStudentAnnual\EloquentResitStudentAnnualRepository;
+
 
 trait StudentScore {
+
+
+    protected $resits;
+
+    public function __construct(ResitStudentAnnualRepositoryContract $resitRepo)
+    {
+
+        $this->resits = $resitRepo;
+
+    }
 
     private function floatFormat($val) {
 
@@ -224,6 +238,84 @@ trait StudentScore {
             return $student;
         } else {
             return null;
+        }
+
+    }
+
+
+
+    public function studentEliminationManager($idCardPointToStudent, $studentRedoubleHistory, $studentIdCard, $check_redouble, $gradeId, $academicYearId, $degreeName) {
+
+        if(isset($studentRedoubleHistory[$studentIdCard])) {//----if student previous academic has had redouble record
+
+            if($check_redouble) {//----/*--if we already set him/her as redouble automaticlly----*/
+                if($check_redouble->is_changed) {
+                    return 'P';
+                } else {
+
+                    $this->updateStatusStudent($studentIdCard, $status = true); //----if student fail two time in his 5 year academic ---he must be eliminate from school
+                    return  'Radié';
+                }
+            } else {
+
+                $this->updateStatusStudent($studentIdCard, $status = true); //----if student fail two time in his 5 year academic ---he must be eliminate from school
+                return  'Radié';/*---we dont have to store the redouble of this year because the jurry consider to eliminate this student from the system (set status active=false)*/
+            }
+
+        } else {
+
+            if($check_redouble) { /*--if we already set him/her as redouble automaticlly----*/
+                /*--if the record exist we dont create more but we have to check if he/she were changed----*/
+
+                if($check_redouble->is_changed) {
+                    //---we already set this student as fail for this year but the jurry made changed to pass
+                   return 'P';
+                } else {
+                   return  $check_redouble->redouble_name;
+                }
+
+            } else {
+                //---because his final average score is lowwer than 30 ...he/she must fail in this year ....so we create redouble record
+                $this->createRedoubleRecord($idCardPointToStudent[$studentIdCard], $redName = trim($degreeName.$gradeId), $academicYearId);
+                return $degreeName.$gradeId;
+            }
+        }
+
+    }
+
+
+    public function updateStatusStudent($studentIdCard, $status) {
+        $student = DB::table('students')->where('id_card', $studentIdCard)
+            ->update(
+                ['radie' => $status]
+            );
+        return $student;
+    }
+
+    public function createRedoubleRecord($student, $redName, $academicYearId ) {
+
+        $redouble= Redouble::where('name_en', $redName)->first();
+        $create = DB::table('redouble_student')
+            ->insert(
+                ['redouble_id' => $redouble->id, 'student_id' => $student->student_id,'academic_year_id' => $academicYearId]
+            );
+
+        return $create;
+    }
+
+    public function saveStudentResitAutomatic($studentRattrapages) {
+
+        $resitStudentAnnual = new EloquentResitStudentAnnualRepository();
+        foreach($studentRattrapages as $studentAnnualId =>  $subjectRattrapage) {
+            foreach($subjectRattrapage['fail'] as $courseAnnualId) {
+
+                $input = [
+                    'course_annual_id' => $courseAnnualId['course_annual_id'],
+                    'student_annual_id' => $studentAnnualId
+                ];
+                $resitStudentAnnual->create($input);
+            }
+
         }
 
     }

@@ -101,9 +101,9 @@
                        title: "Attention",
                        text: "Sorry you cannot select score which is upper or equal 50",
                        type: "warning",
-                       showCancelButton: true,
+                       showCancelButton: false,
                        confirmButtonColor: "#DD6B55",
-                       confirmButtonText: "Yes",
+                       confirmButtonText: "OK",
                        closeOnConfirm: true
                    }, function(confirmed) {
 
