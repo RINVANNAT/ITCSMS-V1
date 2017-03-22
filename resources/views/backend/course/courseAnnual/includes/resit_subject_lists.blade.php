@@ -63,7 +63,7 @@
                 <label for="start_time" class="spacing"> Sart </label><input type="time" name="start_time_{{$courseProgram->id}}" required >
                 <label for="end_time" class="spacing"> End </label><input type="time" name="end_time_{{$courseProgram->id}}" required>
             </td>
-            <td><input type="text" name="room_{{$courseProgram->id}}" required></td>
+            <td width="3cm"><input type="text" style="width: 2cm" name="room_{{$courseProgram->id}}" required></td>
 
             <td class="count_resit">
                 {{($count > 0)?$count:'-'}}
