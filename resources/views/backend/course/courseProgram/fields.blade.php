@@ -64,14 +64,32 @@
         </div>
     </div>
 </div>
+
 <div class="row no-margin">
     <div class="form-group">
+
         {!! Form::label('credit', trans('labels.backend.coursePrograms.fields.credit'), ['class' => 'col-lg-3 control-label required']) !!}
         <div class="col-lg-3">
             {!! Form::text('credit', null, ['class' => 'form-control','required'=>'required']) !!}
         </div>
+
+
+        {!! Form::label('count_credit', "Creditability For Transcript", ['class' => 'col-lg-3 control-label required']) !!}
+        <div class="col-lg-2">
+            @if(isset($courseProgram))
+                @if($courseProgram->is_counted_creditability)
+                    <input type="checkbox" name="is_counted_creditability" id="count_credit" class="boolean_input" value="{{\App\Models\Enum\ScoreEnum::is_counted_creditability}}" checked>
+                @else
+                    <input type="checkbox" name="is_counted_creditability" id="count_credit" class="boolean_input" value="{{\App\Models\Enum\ScoreEnum::is_counted_creditability}}" >
+                @endif
+            @else
+                <input type="checkbox" name="is_counted_creditability" id="count_credit" class="boolean_input" value="{{\App\Models\Enum\ScoreEnum::is_counted_creditability}}" checked>
+            @endif
+
+        </div>
     </div>
 </div>
+
 
 <div class="form-group">
     {!! Form::label('degree', trans('labels.backend.coursePrograms.fields.degree'), ['class' => 'col-lg-3 control-label required']) !!}

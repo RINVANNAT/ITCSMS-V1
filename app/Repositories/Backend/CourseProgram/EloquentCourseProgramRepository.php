@@ -73,9 +73,15 @@ class EloquentCourseProgramRepository implements CourseProgramRepositoryContract
             $course->department_option_id = null;
         }
 
+        if(!isset($input['is_counted_creditability'])) {
+            $course->is_counted_creditability = false;//---this course program is consider to be studied by student but they dont count it for the student creditability
+        }
+
         if(!isset($input['code']) || $input['code'] == ""){
             $input["code"] = null;
         }
+
+
 
         $course->name_en = $input["name_en"];
         $course->name_kh = $input["name_kh"];
@@ -120,6 +126,10 @@ class EloquentCourseProgramRepository implements CourseProgramRepositoryContract
             $courseProgram->department_option_id = $input["department_option_id"];
         } else {
             $courseProgram->department_option_id = null;
+        }
+
+        if(!isset($input['is_counted_creditability'])) {
+            $courseProgram->is_counted_creditability = false;//---this course program is consider to be studied by student but they dont count it for the student creditability
         }
 
         if(!isset($input['code']) || $input['code'] == ""){

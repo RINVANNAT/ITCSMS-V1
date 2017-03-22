@@ -5015,17 +5015,31 @@ class CourseAnnualController extends Controller
         }
 
 
-        //dd($studentRattrapages);
+        /*foreach($coursePrograms as $program) {
+            $courseAnnualFailId = array_intersect($studentRattrapages['e20160057']['fail'], $courseAnnualByProgram[$program->id]);
 
-        /*foreach($students as $student) {
+            dd($courseAnnualByProgram[758]);
+            dump($program->id);
+            dump($courseAnnualFailId);
+        }
 
-            if($student->id_card == 'e20140819') {
+        dump($studentRattrapages['e20160057']);
+
+
+
+        $courseAnnuals = CourseAnnual::whereIn('id', $studentRattrapages['e20160057']['fail'])->get();
+
+        dd($courseAnnuals);
+
+        foreach($students as $student) {
+
+            if(true) {//$student->id_card == 'e20140819'
 
                 $subjectRattrapages = $studentRattrapages[$student->id_card];
 
                 //dd($subjectRattrapages);
 
-                dd($coursePrograms);
+                //dd($coursePrograms);
 
                 foreach($coursePrograms as $program) {
 
@@ -5044,13 +5058,18 @@ class CourseAnnualController extends Controller
 
                         $studentScore = isset($averages[$courseAnnualFailId[0]])?$averages[$courseAnnualFailId[0]][$student->student_annual_id]:null;
 
-                        dump($studentScore);
+//                        dump($studentScore);
 
 
                     } else {
 
 
-                        dd($subjectRattrapages['pass']);
+                        dump($courseAnnualFailId);
+                        if($student->id_card == 'e20160057') {
+
+                            dump($studentRattrapages[$student->id_card]);
+                        }
+
 
                     }
                 }
@@ -5096,7 +5115,6 @@ class CourseAnnualController extends Controller
     public function exportStudentRedoubleList(Request $request) {
 
         $data = $request->all();
-
         $academic_year_id = $request->academic_year_id;
         $academicYear = DB::table('academicYears')->where('id', $academic_year_id)->first();
         $rattrapage_students = $request->student_id_card;
