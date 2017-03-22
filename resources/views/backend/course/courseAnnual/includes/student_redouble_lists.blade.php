@@ -279,7 +279,7 @@
 
 //                console.log($(this).text())
                 if($.trim($(this).text()) == "-") {
-                   $(this).parent('tr').css('display', 'none')
+                   $(this).parent('tr').css('display', 'hidden');
                     /*$(this).parent('tr').find('input').each(function() {
                         $(this).prop('disabled', true);
                         $(this).removeAttr('required');
