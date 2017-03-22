@@ -14,13 +14,11 @@
         <th>Name</th>
         <?php $totalCredit=0?>
         @foreach($coursePrograms as $program)
-            @if($program->is_counted_creditability)
-                <?php $course = $program->courseAnnual()->first()?>
-                <?php
-                $totalCredit = $totalCredit + $course->credit;
-                ?>
-                <th><div class="vertical">{{$program->name_en}}<br>{{$course->credit}}  </div> </th>
-            @endif
+            <?php $course = $program->courseAnnual()->first()?>
+            <?php
+            $totalCredit = $totalCredit + $course->credit;
+            ?>
+            <th><div class="vertical">{{$program->name_en}}<br>{{$course->credit}}  </div> </th>
 
         @endforeach
         <th>Moyenne <br>{{$totalCredit}} </th>
@@ -43,61 +41,58 @@
             @foreach($coursePrograms as $program)
                 <?php $count_label++;?>
 
-                @if($program->is_counted_creditability)
+                <?php
+                $courseAnnual = $program->courseAnnual()->first();//---because on course program has many course annual and in every course annual have the same proper of the course so we can use only the first course annual(name, credit)
+
+                $subjectRattrapages = $studentRattrapages[$student->id_card];
+                if(isset($subjectRattrapages['fail'])) {
+                    $courseAnnualFailId = array_intersect($studentRattrapages[$student->id_card]['fail'], $courseAnnualByProgram[$program->id]);
+                } else {
+                    $courseAnnualFailId=[];
+                }
+                ?>
+
+                @if(count($courseAnnualFailId)> 0)
 
                     <?php
-                    $courseAnnual = $program->courseAnnual()->first();//---because on course program has many course annual and in every course annual have the same proper of the course so we can use only the first course annual(name, credit)
 
-                        $subjectRattrapages = $studentRattrapages[$student->id_card];
-                        if(isset($subjectRattrapages['fail'])) {
-                            $courseAnnualFailId = array_intersect($studentRattrapages[$student->id_card]['fail'], $courseAnnualByProgram[$program->id]);
-                        } else {
-                            $courseAnnualFailId=[];
-                        }
+                    //---this array have only one element of exact course annual of the student who must take the resit
+                    foreach($courseAnnualFailId as $courseAnnualId) {// loop only one time
+                        $studentScore = isset($averages[$courseAnnualId])?$averages[$courseAnnualId][$student->student_annual_id]:null;
+                    }
+                    //---we need to find the course annual credit not course program credit
+                    $totalScore = $totalScore + ( (($studentScore != null)?$studentScore->average:0) * $courseAnnual->credit);
+                    $approximation_score = $approximation_score + (\App\Models\Enum\ScoreEnum::Pass_Moyenne * $courseAnnual->credit);
                     ?>
+                    <td>
+                        {{--set checked--}}
+                        <label for="{{$student->id_card}}_{{$count_label}}"><input id="{{$student->id_card}}_{{$count_label}}" credit="{{$courseAnnual->credit}}" student_id="{{$student->id_card}}" class="{{$student->id_card}} input_value" type="checkbox" onchange="calculateScore($(this))" name="{{$student->id_card}}[]" value="{{$courseAnnualId}}" checked score="{{($studentScore!=null)?$studentScore->average:0}}"> {{number_format((float)(($studentScore!=null)?$studentScore->average:0), 2, '.', '')}}</label>
 
-                    @if(count($courseAnnualFailId)> 0)
+                    </td>
+                @else
 
+                    @if(isset($studentRattrapages[$student->id_card]['pass']))
                         <?php
 
-                        //---this array have only one element of exact course annual of the student who must take the resit
-                        foreach($courseAnnualFailId as $courseAnnualId) {// loop only one time
+
+                        $courseAnnualPassId = array_intersect($studentRattrapages[$student->id_card]['pass'], $courseAnnualByProgram[$program->id]);
+                        //---this array have only one element of exact course annual
+                        foreach($courseAnnualPassId as $courseAnnualId) {
                             $studentScore = isset($averages[$courseAnnualId])?$averages[$courseAnnualId][$student->student_annual_id]:null;
+                            //-----course annual credit not course program credit
+                            $totalScore = $totalScore + ( (($studentScore !=null)?$studentScore->average:0) * $courseAnnual->credit);
+
+                            $approximation_score = $approximation_score + ( (($studentScore !=null)?$studentScore->average:0) * $courseAnnual->credit);
                         }
-                        //---we need to find the course annual credit not course program credit
-                        $totalScore = $totalScore + ( (($studentScore != null)?$studentScore->average:0) * $courseAnnual->credit);
-                        $approximation_score = $approximation_score + (\App\Models\Enum\ScoreEnum::Pass_Moyenne * $courseAnnual->credit);
                         ?>
-                        <td>
-                            {{--set checked--}}
-                            <label for="{{$student->id_card}}_{{$count_label}}"><input id="{{$student->id_card}}_{{$count_label}}" credit="{{$courseAnnual->credit}}" student_id="{{$student->id_card}}" class="{{$student->id_card}} input_value" type="checkbox" onchange="calculateScore($(this))" name="{{$student->id_card}}[]" value="{{$courseAnnualId}}" checked score="{{($studentScore!=null)?$studentScore->average:0}}"> {{number_format((float)(($studentScore!=null)?$studentScore->average:0), 2, '.', '')}}</label>
+
+                        <td width="">
+                            <label for="{{$student->id_card}}_{{$count_label}}"><input id="{{$student->id_card}}_{{$count_label}}" type="checkbox" credit="{{$courseAnnual->credit}}" student_id="{{$student->id_card}}" class="{{$student->id_card}} input_value" onchange="calculateScore($(this))" name="{{$student->id_card}}[]" value="{{$courseAnnualId}}" score="{{($studentScore!=null)?$studentScore->average:0}}"> {{number_format((float)(($studentScore!=null)?$studentScore->average:0), 2, '.', '')}}</label>
 
                         </td>
-                    @else
-
-                        @if(isset($studentRattrapages[$student->id_card]['pass']))
-                                <?php
-
-
-                                $courseAnnualPassId = array_intersect($studentRattrapages[$student->id_card]['pass'], $courseAnnualByProgram[$program->id]);
-                                //---this array have only one element of exact course annual
-                                foreach($courseAnnualPassId as $courseAnnualId) {
-                                    $studentScore = isset($averages[$courseAnnualId])?$averages[$courseAnnualId][$student->student_annual_id]:null;
-                                    //-----course annual credit not course program credit
-                                    $totalScore = $totalScore + ( (($studentScore !=null)?$studentScore->average:0) * $courseAnnual->credit);
-
-                                    $approximation_score = $approximation_score + ( (($studentScore !=null)?$studentScore->average:0) * $courseAnnual->credit);
-                                }
-                                ?>
-
-                                    <td width="">
-                                        <label for="{{$student->id_card}}_{{$count_label}}"><input id="{{$student->id_card}}_{{$count_label}}" type="checkbox" credit="{{$courseAnnual->credit}}" student_id="{{$student->id_card}}" class="{{$student->id_card}} input_value" onchange="calculateScore($(this))" name="{{$student->id_card}}[]" value="{{$courseAnnualId}}" score="{{($studentScore!=null)?$studentScore->average:0}}"> {{number_format((float)(($studentScore!=null)?$studentScore->average:0), 2, '.', '')}}</label>
-
-                                    </td>
-
-                        @endif
 
                     @endif
+
                 @endif
 
 

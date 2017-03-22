@@ -307,16 +307,86 @@ trait StudentScore {
 
         $resitStudentAnnual = new EloquentResitStudentAnnualRepository();
         foreach($studentRattrapages as $studentAnnualId =>  $subjectRattrapage) {
-            foreach($subjectRattrapage['fail'] as $courseAnnualId) {
 
-                $input = [
-                    'course_annual_id' => $courseAnnualId['course_annual_id'],
-                    'student_annual_id' => $studentAnnualId
-                ];
-                $resitStudentAnnual->create($input);
+            $studentResitSocre = $this->getStudentResitScore($studentAnnualId);
+
+            if($resitCourses = $studentResitSocre->get()) {
+
+                $destroy = $studentResitSocre->delete();
+                if($destroy) {
+
+                    if(isset($subjectRattrapage['fail'])) {
+
+                        $courseAnnualIds = $subjectRattrapage['fail'];
+                        foreach($courseAnnualIds as $courseAnnualId) {
+
+                            $input = [
+                                'student_annual_id' => $studentAnnualId,
+                                'course_annual_id' => $courseAnnualId
+                            ];
+
+                            $resitStudentAnnual ->create($input);
+                        }
+
+                    } else {
+                        //---store one student back
+
+                        if($resitCourses) {
+
+                            $true = true;
+                            foreach($resitCourses as $course) {
+                                if($true) {
+                                    $input = [
+                                        'student_annual_id' => $course->student_annual_id,
+                                        'course_annual_id' => null
+                                    ];
+                                    $resitStudentAnnual->create($input);
+                                    $true = false;
+                                } else {
+                                    break;
+                                }
+                            }
+
+                        }
+
+                    }
+                }
+            } else {
+
+                if(isset($subjectRattrapage['fail'])) {
+
+                    $courseAnnualIds = $subjectRattrapage['fail'];
+
+                    foreach($courseAnnualIds as $courseAnnualId) {
+
+                        $input = [
+                            'student_annual_id' => $studentAnnualId,
+                            'course_annual_id' => $courseAnnualId
+                        ];
+
+                        $resitStudentAnnual->create($input);
+                    }
+                } else {
+
+                    $input = [
+                        'student_annual_id' => $studentAnnualId,
+                        'course_annual_id' => null
+                    ];
+
+                    $resitStudentAnnual->create($input);
+                }
             }
-
         }
+
+    }
+
+    public function getStudentResitScore($studentAnnualId) {
+
+        $studentScore = DB::table('resit_student_annuals')
+            ->orderBy('id')
+            ->where('student_annual_id', $studentAnnualId);
+
+        return $studentScore;
 
     }
 }

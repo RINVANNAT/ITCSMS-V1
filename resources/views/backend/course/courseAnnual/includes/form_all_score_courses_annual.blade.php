@@ -557,6 +557,7 @@
         function initTable() {
 
 
+            toggleLoading(true);
             var BaseUrl = '{{route('admin.course.get_all_handsontable_data')}}';
             var BaseData = {
                 department_id: $('#filter_dept :selected').val(),
@@ -574,6 +575,8 @@
                 data:BaseData ,
                 dataType: "json",
                 success: function(resultData) {
+
+                    toggleLoading(false);
                     if(resultData.status == false) {
 
                         swal({
@@ -761,6 +764,7 @@
 
         function filter_table () {
 
+            toggleLoading(true);
             var BaseData = {
                 department_id: $('#filter_dept :selected').val(),
                 degree_id: $('#filter_degree :selected').val(),
@@ -779,6 +783,7 @@
                     data: BaseData,
                     dataType: "json",
                     success: function(resultData) {
+                        toggleLoading(false);
                         if(resultData.status == false) {
                             swal({
                                 title: "Attention",
