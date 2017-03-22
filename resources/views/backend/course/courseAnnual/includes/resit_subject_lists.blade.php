@@ -79,4 +79,4 @@
     </tbody>
 </table>
 
-<button class="btn btn-info" type="submit" id="export_course_lists" style="margin-left: 5px; margin-bottom: 5px"> Export Schedule </button>
+<button class="btn btn-info" type="submit" id="export_course_lists" style="margin-left: 5px; margin-bottom: 5px"> Save & Export </button>
