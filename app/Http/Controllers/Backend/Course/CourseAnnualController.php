@@ -2683,12 +2683,20 @@ class CourseAnnualController extends Controller
 
         $courseType = $this->getCourseProAndAnnual($deptId,$academicYearID, $degreeId,$gradeId ,$semesterId, $deptOptionId);
         $courseAnnuals = $courseType['course_annual'];
+
+        if(count($courseAnnuals) == 0) {
+            return json_encode([
+                'message' => 'No courses!',
+                'status' => false
+            ]);
+        }
         $array_course_annual_ids = [];
         $arrayCourseAnnual=[];
         foreach($courseAnnuals as $courseAnnual) {
             $arrayCourseAnnual[$courseAnnual->course_id][] = $courseAnnual;
             $array_course_annual_ids[] = $courseAnnual->course_annual_id;
         }
+
 
         //------get score properties and absence -------
 
