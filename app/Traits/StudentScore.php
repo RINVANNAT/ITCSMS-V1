@@ -685,12 +685,23 @@ trait StudentScore {
             $students = $this->getStudentByIdCardYearly($studentIdCards, $academic_year_id);
             $courseAnnuals = $resitStudentAnnualFromDB['course_annual'];
             $objectCourseAnnualByIds = [];
+
             foreach($courseAnnuals as $courseAnnual) {
 
-                if($courseAnnual->is_counted_creditability) {
-                    $courseAnnualByProgram[$courseAnnual->course_id][] = $courseAnnual->course_annual_id;
-                    $courseProgramIds[] = $courseAnnual->course_id;
-                    $objectCourseAnnualByIds[$courseAnnual->course_annual_id] =  $courseAnnual;
+                if($option = $request->dept_option_id) {
+                    if($option == $courseAnnual->department_option_id) {
+                        if($courseAnnual->is_counted_creditability) {
+                            $courseAnnualByProgram[$courseAnnual->course_id][] = $courseAnnual->course_annual_id;
+                            $courseProgramIds[] = $courseAnnual->course_id;
+                            $objectCourseAnnualByIds[$courseAnnual->course_annual_id] =  $courseAnnual;
+                        }
+                    }
+                } else {
+                    if($courseAnnual->is_counted_creditability) {
+                        $courseAnnualByProgram[$courseAnnual->course_id][] = $courseAnnual->course_annual_id;
+                        $courseProgramIds[] = $courseAnnual->course_id;
+                        $objectCourseAnnualByIds[$courseAnnual->course_annual_id] =  $courseAnnual;
+                    }
                 }
             }
             $courseProgramIds = array_unique($courseProgramIds);
@@ -920,8 +931,6 @@ trait StudentScore {
 
     public function hasRattrapages($array_fial_subject, $request ) {
 
-
-
         $courseType = $this->getCourseProAndAnnual($request->department_id,$request->academic_year_id, $request->degree_id,$request->grade_id ,$request->semester_id, $request->department_option_id);
         $courseAnnuals = $courseType['course_annual'];
 
@@ -984,9 +993,9 @@ trait StudentScore {
 
                 $findResit = DB::table('resit_student_annuals')
                     ->whereIn('student_annual_id', $studentAnnualIds)
+                    ->Orwhere('course_annual_id', null)
                     ->whereIn('course_annual_id', $coursenAnnualIds[$semster->id])
                     ->where('semester_id', $semster->id)
-                    ->Orwhere('course_annual_id', null)
                     ->get();
 
                 if(count($findResit) > 0) {

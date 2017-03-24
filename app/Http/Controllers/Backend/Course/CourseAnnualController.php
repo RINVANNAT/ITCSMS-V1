@@ -4596,7 +4596,10 @@ class CourseAnnualController extends Controller
         $departmentOptionId = $request->dept_option_id;
         $departmentId = $request->department_id;
 
+
         $studentDataProperties = $this->studentResitData($request);
+
+//        dd($studentDataProperties);
         $students = $studentDataProperties['student'];
         $coursePrograms =$studentDataProperties['courseprogram'];
         $studentRattrapages = $studentDataProperties['student_rattrapage'];
