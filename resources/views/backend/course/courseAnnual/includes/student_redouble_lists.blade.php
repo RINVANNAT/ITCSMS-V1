@@ -42,19 +42,25 @@
         </div>
 
         <div id="student_resit_list" class="tabcontent">
-            {!! Form::open(['route' => 'course_annual.export_student_re_exam', 'class' => 'form-horizontal', 'role' => 'form', 'method' => 'post', 'id' => 'student_re_exam_form']) !!}
-            @include('backend.course.courseAnnual.includes.student_resit_list')
-            {!! Form::close() !!}
+
+            <div class="table-responsive">
+                {!! Form::open(['route' => 'course_annual.export_student_re_exam', 'class' => 'form-horizontal', 'role' => 'form', 'method' => 'post', 'id' => 'student_re_exam_form']) !!}
+                @include('backend.course.courseAnnual.includes.student_resit_list')
+                {!! Form::close() !!}
+            </div>
+
         </div>
 
         <div id="subject_resit_list" class="tabcontent" style="display: none">
 
-            {!! Form::open(['route' => 'course_annual.export_supplementary_subject', 'name' => 'resit-form' , 'class' => 'form-horizontal ',  'role' => 'form', 'method' => 'post', 'id' => 'supplementary_subject_lists']) !!}
+            <div class="table-responsive">
+                {!! Form::open(['route' => 'course_annual.export_supplementary_subject', 'name' => 'resit-form' , 'class' => 'form-horizontal ',  'role' => 'form', 'method' => 'post', 'id' => 'supplementary_subject_lists']) !!}
 
-            @include('backend.course.courseAnnual.includes.resit_subject_lists')
-
-            {!! Form::close() !!}
-
+                <div id="resit_subject">
+                    @include('backend.course.courseAnnual.includes.resit_subject_lists')
+                </div>
+                {!! Form::close() !!}
+            </div>
         </div>
 
     </div>
@@ -176,7 +182,9 @@
                     if(result.status) {
                         notify('success', result.message, 'Info');
                         current_resit_subjects= getCurrentCheckBoxVal();
-                        location.reload();
+
+                        refreshContent();
+
                     }
 
                 }
@@ -279,11 +287,34 @@
 
 //                console.log($(this).text())
                 if($.trim($(this).text()) == "-") {
-                   $(this).parent('tr').css('display', 'hidden');
-                    /*$(this).parent('tr').find('input').each(function() {
+                   $(this).parent('tr').addClass('danger');
+                    $(this).parent('tr').find('input').each(function() {
                         $(this).prop('disabled', true);
-                        $(this).removeAttr('required');
-                    })*/
+//                        $(this).removeAttr('required');
+                    })
+                }
+            })
+        }
+
+        function refreshContent() {
+
+            var url = '{{route('student.resit_subject_lists')}}'
+            var baseData = {
+                degree_id : '{{$degreeId}}',
+                grade_id: '{{$gradeId}}',
+                semester_id: '{{$semesterId}}',
+                academic_year_id: '{{$academicYearId}}',
+                department_id:'{{$departmentId}}',
+                department_option_id: '{{$departmentOptionId}}'
+            };
+            $.ajax({
+                type: 'GET',
+                url: url,
+                data: baseData,
+                dataType: "html",
+                success:function(result) {
+                    $('div#resit_subject').html(result);
+                    nonResitSubject();
                 }
             })
         }

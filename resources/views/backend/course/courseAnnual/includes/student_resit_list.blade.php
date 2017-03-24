@@ -51,7 +51,6 @@
                     $courseAnnualFailId=[];
                 }
                 ?>
-
                 @if(count($courseAnnualFailId)> 0)
 
                     <?php
@@ -86,10 +85,13 @@
                         }
                         ?>
 
-                        <td width="">
-                            <label for="{{$student->id_card}}_{{$count_label}}"><input id="{{$student->id_card}}_{{$count_label}}" type="checkbox" credit="{{$courseAnnual->credit}}" student_id="{{$student->id_card}}" class="{{$student->id_card}} input_value" onchange="calculateScore($(this))" name="{{$student->id_card}}[]" value="{{$courseAnnualId}}" score="{{($studentScore!=null)?$studentScore->average:0}}"> {{number_format((float)(($studentScore!=null)?$studentScore->average:0), 2, '.', '')}}</label>
+                        @if(count($courseAnnualPassId) >0)
 
-                        </td>
+                                <td width="">
+                                    <label for="{{$student->id_card}}_{{$count_label}}"><input id="{{$student->id_card}}_{{$count_label}}" type="checkbox" credit="{{$courseAnnual->credit}}" student_id="{{$student->id_card}}" class="{{$student->id_card}} input_value" onchange="calculateScore($(this))" name="{{$student->id_card}}[]" value="{{$courseAnnualId}}" score="{{($studentScore!=null)?$studentScore->average:0}}"> {{number_format((float)(($studentScore!=null)?$studentScore->average:0), 2, '.', '')}}</label>
+
+                                </td>
+                        @endif
 
                     @endif
 

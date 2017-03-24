@@ -2655,53 +2655,6 @@ class CourseAnnualController extends Controller
         return ['col_width'=> $colWidths, 'nested_header'=>$nestedHeaders];
     }
 
-    private function getCourseProAndAnnual($deptId,$academicYearID, $degreeId,$gradeId ,$semesterId, $deptOptionId) {
-
-
-        $courseAnnuals = $this->getCourseAnnually();
-
-        if($deptId) {
-            $courseAnnuals = $courseAnnuals->where('course_annuals.department_id', '=',$deptId);
-        }
-
-        if($academicYearID) {
-            $courseAnnuals = $courseAnnuals->where('course_annuals.academic_year_id', '=',$academicYearID);
-        }
-        if($degreeId) {
-            $courseAnnuals = $courseAnnuals->where('course_annuals.degree_id', '=',$degreeId);
-        }
-        if($gradeId) {
-            $courseAnnuals = $courseAnnuals->where('course_annuals.grade_id', '=',$gradeId);
-        }
-        if($semesterId) {
-            $courseAnnuals = $courseAnnuals->where('course_annuals.semester_id', '=',$semesterId);
-        }
-        if($deptOptionId) {
-            $courseAnnuals = $courseAnnuals->where('course_annuals.department_option_id', '=',$deptOptionId);
-        }
-
-        $courseAnnuals = $courseAnnuals->orderBy('course_annuals.semester_id')->orderBy('course_annuals.name_en')->get();// note restricted order by semester this is very important to make dynamic table course of each year [if change there would have bugs]
-
-        return ['course_annual' => $courseAnnuals, 'course_program' => []];
-
-    }
-
-    private function selectedGroupByCourseAnnual() {
-
-        $arrayGroups = [];
-        $selectedGroups = DB::table('course_annual_classes')
-            ->where('course_session_id', null)
-            ->get();
-        foreach($selectedGroups as $group) {
-            if($group->group != null) {
-                $arrayGroups[$group->course_annual_id][] = $group->group;
-            }
-        }
-
-        return $arrayGroups;
-    }
-
-
     public function allHandsontableData(Request $request) {
 
         // ------declare reqested data ------
@@ -2746,7 +2699,7 @@ class CourseAnnualController extends Controller
 
         //---get Selected Group by course annual-----
 
-        $groups = $this-> selectedGroupByCourseAnnual();
+        $groups = $this-> selectedGroupByCourseAnnual($array_course_annual_ids);
         $semesters = DB::table('semesters')->orderBy('semesters.id')->get();
 
         //------get filtering student -------
@@ -3025,7 +2978,6 @@ class CourseAnnualController extends Controller
 
                     if($degreeId == ScoreEnum::Degree_I) {//---if student is in ENgineer or association
                         $value['Redouble'] = $this->studentEliminationManager($idCardPointToStudent, $studentRedoubleHistory, $key, $check_redouble, $gradeId, $academicYearID, ScoreEnum::Red_I);
-
                     } else {
                         /*---student association degree-----*/
 
@@ -3137,175 +3089,9 @@ class CourseAnnualController extends Controller
 
     }
 
-    private function calculateMoyenne($array_subject) {
-
-         $credit = 0;
-        $score = 0;
-        if(isset($array_subject['fail'])) {
-            if(isset($array_subject['pass'])) {
-
-                foreach($array_subject['fail'] as $fail) {
-                    $credit= $credit+ $fail['credit'];
-                    $score = $score + ($fail['score']* $fail['credit']);
-                }
-
-                foreach($array_subject['pass'] as $pass) {
-                    $credit= $credit+ $pass['credit'];
-                    $score = $score + ($pass['score']* $pass['credit']);
-                }
-
-                return $this->floatFormat($score/$credit);
-
-            } else {
-
-                foreach($array_subject['fail'] as $fail) {
-                    $credit= $credit+ $fail['credit'];
-                    $score = $score + ($fail['score']* $fail['credit']);
-                }
-
-                return $this->floatFormat($score/$credit);
-            }
-
-            } else {
-
-            foreach($array_subject['pass'] as $pass) {
-                $credit= $credit+ $pass['credit'];
-                $score = $score + ($pass['score']* $pass['credit']);
-            }
-
-            return $this->floatFormat($score/$credit);
-        }
-
-    }
-
-    private function findRattrapageSubject($array) {
 
 
-        $total_credit = 0;
-        //----array with key fail ---mean the couse score is under 30---
-        if(isset($array['fail'])) {
 
-            if(isset($array['pass'])) {
-
-                $validate_score = 0;
-
-                foreach($array['fail'] as $fail) {
-
-                    $total_credit = $total_credit + $fail['credit'];
-                    $validate_score = $validate_score + (ScoreEnum::Pass_Moyenne * $fail['credit']);
-                }
-                foreach($array['pass'] as $pass) {
-
-                    $total_credit = $total_credit + $pass['credit'];
-                    $validate_score = $validate_score + ($pass['score'] * $pass['credit']);
-                }
-                $approximation_moyenne = $validate_score / $total_credit;
-                if($approximation_moyenne < ScoreEnum::Aproximation_Moyenne) {//----55
-
-                    if(count($array['pass']) > 0) {
-
-                        $find_min = $this->findMin($array['pass']);
-
-                        if($find_min['element']['score'] < ScoreEnum::Pass_Moyenne) {//---50
-
-                            $mark_subjected[] = $find_min['element'];
-                            $array['fail'][] = $find_min['element'];
-                            unset($array['pass'][$find_min['index']]);
-                            $array['pass'] = array_values($array['pass']);
-
-                            //-----because the prediction score of subplementary _course were not to reach the approximation moyenne..
-                            // so we need to find the lowest score from array['pass']---and consider as fail to enforce student to re-exam it
-                            //---then we do the findRattrapageSubject again until student pass...and return number of subjects for student to re-exam
-                            //dump($array);
-                            return $this->findRattrapageSubject($array);
-                        } else {
-
-                            //----even student take more supplementary exam he/she still not able to reacher the score 55..so in case his/her score is biggger than 50 ..so we can let him or her a try..
-                            if($approximation_moyenne > ScoreEnum::Pass_Moyenne) {
-                                return $array;
-                            } else {
-                                //---fail all courses
-                                return $array;
-                            }
-                        }
-                    } else {
-                        //---student have to take exam for all subject---
-                        return $array;
-                    }
-                } else {
-
-                    //---student take exam in amount of subject then he or she will pass
-                    return $array;
-                }
-
-            } else {
-
-                //---all subject score are under 30
-                return $array;
-
-            }
-        } else {
-
-
-            /*--check if the moyenne of student is under 50 and all subject are bigger than 30*/
-
-             $average = $this->calculateMoyenne($array);
-
-            if($average < ScoreEnum::Pass_Moyenne) {
-
-                $array['fail'] = [];
-                if(count($array['pass']) > 0) {
-
-                     $find_min = $this->findMin($array['pass']);
-
-                    if($find_min['element']['score'] < ScoreEnum::Pass_Moyenne) {
-
-                        $array['fail'][]= $find_min['element'];
-                        unset($array['pass'][$find_min['index']]);
-                        $array['pass'] = array_values($array['pass']);
-
-                            return $this->findRattrapageSubject($array); //---recuring this function again
-
-                        } else {
-
-                        return $array;
-                    }
-                } else {
-                    return $array;
-                }
-
-            } else {
-
-                return $array;
-            }
-        }
-
-    }
-
-    private function findMin($array_val) {// ---array_val :: pass
-
-        $min = $array_val[0]['score'];
-        $credit = $array_val[0]['credit'];
-        $course_annual_id = $array_val[0]['course_annual_id'];
-        $student_annual_id = $array_val[0]['student_annual_id'];
-        $index = 0;
-
-        for($in = 1; $in < count($array_val); $in++) {
-
-            if($min > $array_val[$in]['score']) {
-                $index = $in;
-                $min = $array_val[$in]['score'];
-                $credit = $array_val[$in]['credit'];
-                $course_annual_id = $array_val[$in]['course_annual_id'];
-                $student_annual_id = $array_val[$in]['student_annual_id'];
-            }
-        }
-//        dump($min);
-        return [
-            'element' => ['score'=> $min, 'credit' => $credit, 'course_annual_id'=>$course_annual_id, 'student_annual_id' => $student_annual_id],
-            'index'  => $index
-        ];
-    }
 
     private function numberRattrapage($arrayFailSubject) {
 
@@ -4801,322 +4587,87 @@ class CourseAnnualController extends Controller
     }
 
 
-    private function findResitStudentAutomatic($handsonData,$array_fial_subject ) {
-
-        $studentResitExam = [];
-        $courseProgramIds = [];
-        $true = true;
-        foreach($handsonData as $data) {
-
-            if($true) {
-                foreach($data as $key => $value) {
-                    $splits = explode('_',$key);
-                    if($splits[0] == 'Credit') {
-                        $courseProgramIds[] = $splits[1];
-                    }
-                }
-                $true=false;
-            }
-
-            if($data['student_id_card'] != null) {
-                $subjectRattrapages = $this->findRattrapageSubject($array_fial_subject[$data['student_id_card']]);
-                $studentResitExam[$data['student_id_card']] = ['resit_subject'=>$subjectRattrapages, 'student_prop'=>$data, 'course_program_id' => $courseProgramIds];
-            }
-        }
-
-        return $studentResitExam;
-    }
-
-
-
-    private function hasRattrapages($array_fial_subject, $request ) {
-
-
-        $courseType = $this->getCourseProAndAnnual($request->department_id,$request->academic_year_id, $request->degree_id,$request->grade_id ,$request->semester_id, $request->department_option_id);
-        $courseAnnuals = $courseType['course_annual'];
-
-        $idCardPointToIdAnnual = [];
-        $studentAnnualIds = [];
-        $resitStudentAnnualIDs = [];
-        $studentResits = [];
-
-        $studentWithCourseAnnuals = [];
-
-        foreach($array_fial_subject as $key => $subjects) {
-
-            if(isset($subjects['fail'])) {
-
-                if(isset($subjects['pass'])) {
-
-                    $studentAnnualIds[] = $subjects['fail'][0]['student_annual_id'];
-                    $idCardPointToIdAnnual[$subjects['fail'][0]['student_annual_id']] = $key;
-
-                    foreach($subjects['fail'] as $fail) {
-
-                        $studentWithCourseAnnuals[$fail['student_annual_id']][] = $fail['course_annual_id'];
-                    }
-                    foreach($subjects['pass'] as $pass) {
-
-                        $studentWithCourseAnnuals[$pass['student_annual_id']][] = $pass['course_annual_id'];
-                    }
-                } else {
-                    $studentAnnualIds[] = $subjects['fail'][0]['student_annual_id'];
-                    $idCardPointToIdAnnual[$subjects['fail'][0]['student_annual_id']] = $key;
-                    foreach($subjects['fail'] as $fail) {
-
-                        $studentWithCourseAnnuals[$fail['student_annual_id']][] = $fail['course_annual_id'];
-                    }
-                }
-            }else {
-
-                $studentAnnualIds[] = $subjects['pass'][0]['student_annual_id'];
-                $idCardPointToIdAnnual[$subjects['pass'][0]['student_annual_id']] =  $key;
-                foreach($subjects['pass'] as $pass) {
-
-                    $studentWithCourseAnnuals[$pass['student_annual_id']][] = $pass['course_annual_id'];
-                }
-            }
-        }
-
-        /*----resit student course annuals from database=------ */
-        $findResit = DB::table('resit_student_annuals')->whereIn('student_annual_id', $studentAnnualIds)->get();
-
-        $studentAnnualWithResitCourseAnnuals = [];
-       if($findResit) {
-
-           foreach($findResit as $resit) {
-               $resitStudentAnnualIDs[] = $resit->student_annual_id;
-               $studentAnnualWithResitCourseAnnuals[$resit->student_annual_id][] = $resit->course_annual_id;
-           }
-           foreach($studentAnnualWithResitCourseAnnuals as $studentAnnualId => $resitCourse) {
-
-               $courseDifferences = array_diff($studentWithCourseAnnuals[$studentAnnualId], $resitCourse);
-               $resitStudents[$idCardPointToIdAnnual[$studentAnnualId]]['fail'] = $resitCourse;
-               $resitStudents[$idCardPointToIdAnnual[$studentAnnualId]]['pass'] = $courseDifferences;
-
-           }
-       } else {
-           $resitStudents=[];
-       }
-
-        return [
-            'student_annual_id' => $resitStudentAnnualIDs,
-            'course_annual' => $courseAnnuals,
-            'resit_student' => $resitStudents
-        ];
-    }
-
     public function studentRedoubleListe(Request $request) {
 
+        $semesterId = $request->semester_id;
+        $degreeId = $request->degree_id;
+        $gradeId = $request->grade_id;
+        $academicYearId = $request->academic_year_id;
+        $departmentOptionId = $request->dept_option_id;
+        $departmentId = $request->department_id;
 
-        $studentRattrapages=[];
-        $studentRattrapagesByStudentAnnualId = [];/*---store student-annual-id as key with key pass and fail for rattrapage-course-annual---*/
-        $studentIdCards = [];
-        $courseProgramIds = [];
-        $courseAnnualIds = [];
-        $courseAnnualByProgram = [];
-        $arrayCourseAnnualIds = [];
+        $studentDataProperties = $this->studentResitData($request);
+        $students = $studentDataProperties['student'];
+        $coursePrograms =$studentDataProperties['courseprogram'];
+        $studentRattrapages = $studentDataProperties['student_rattrapage'];
+        $courseAnnualByProgram = $studentDataProperties['course_annual_by_program'];
+        $academicYear = $studentDataProperties['academic_year'];
+        $averages = $studentDataProperties['average'];
+        $fullUrl = $studentDataProperties['full_url'];
+        $onlyResitCourseAnnuals = $studentDataProperties['resit_course_annual'];
 
-        $array_data = $this->allHandsontableData($request);
-        $array_data = json_decode($array_data, true);
-        $handsonData = $array_data['data'];
-        $academic_year_id = $request->academic_year_id;
-        $academicYear = DB::table('academicYears')->where('id', $academic_year_id)->first();
-        $array_fial_subject = $array_data['array_fail_subject'];
+        /*foreach($students as $student) {
+            foreach($coursePrograms as $program) {
+                $courseAnnualFailId = array_intersect($studentRattrapages[$student->id_card]['fail'], $courseAnnualByProgram[$program->id]);
+                dump($courseAnnualFailId);
 
-        $resitStudentAnnualFromDB = $this->hasRattrapages($array_fial_subject, $request);
+                if(count($courseAnnualFailId) > 0) {
+                    dump($courseAnnualFailId);
+                } else {
+                    $courseAnnualPassId = array_intersect($studentRattrapages[$student->id_card]['pass'], $courseAnnualByProgram[$program->id]);
 
-
-        if(count($resitStudentAnnualFromDB['resit_student']) > 0) {
-
-            $students = DB::table('studentAnnuals')
-                ->join('students', 'students.id', '=', 'studentAnnuals.student_id')
-                ->whereIn('studentAnnuals.id', $resitStudentAnnualFromDB['student_annual_id'])
-                ->select(
-                    'students.name_latin', 'students.id_card', 'students.id as student_id',
-                    'studentAnnuals.id as student_annual_id'
-                )->orderBy('students.name_latin', 'ASC')
-                ->get();
-
-            $courseAnnuals = $resitStudentAnnualFromDB['course_annual'];
-
-
-            foreach($courseAnnuals as $courseAnnual) {
-                if($courseAnnual->is_counted_creditability) {
-
-                    $courseAnnualByProgram[$courseAnnual->course_id][] = $courseAnnual->course_annual_id;
-                    $courseAnnualIds[] = $courseAnnual->course_annual_id;
-                    $courseProgramIds[] = $courseAnnual->course_id;
-                }
-
-            }
-
-            $coursePrograms = Course::whereIn('courses.id', $courseProgramIds)->get();
-            $courseScoreProperties = $this->getCourseAnnualWithScore($courseAnnualIds);
-            $averages = $courseScoreProperties['averages'];
-
-            $studentRattrapages = $resitStudentAnnualFromDB['resit_student'];
-
-        } else {
-
-            $studentResitExam = $this->findResitStudentAutomatic($handsonData, $array_fial_subject);
-
-            foreach($studentResitExam as $student_id => $resit) {
-
-                if(isset($resit['resit_subject']['fail'])) {
-
-                    $subjects = $resit['resit_subject'];
-
-                    if(isset($subjects['pass'])) {
-
-                        foreach($subjects as $keyPOrF => $subVal) {
-                            foreach($subVal as $val) {
-
-                                $arrayCourseAnnualIds[] = $val['course_annual_id'];
-                                $studentRattrapages[$student_id][$keyPOrF][] = $val['course_annual_id'];
-                                $studentRattrapagesByStudentAnnualId[$val['student_annual_id']][$keyPOrF][] = $val['course_annual_id'];
-                            }
-
-                        }
-                        $studentIdCards[] = $student_id;
+                    if(count($courseAnnualPassId) > 0) {
+                        dump($student->id_card);
+                        dump($courseAnnualPassId);
                     } else {
-
-                        //---students fail all subjects so we need to
-                        //---calculate moyenne again if the score is upper than 30 student will be allowed to resit the exam else they must be redouble
-
-                        $average = $this->calculateMoyenne($subjects);
-                        if($average >= ScoreEnum::Under_30) {
-
-                            //--allow student to resit
-                            foreach($subjects['fail'] as  $fail) {
-
-                                $arrayCourseAnnualIds[] = $fail['course_annual_id'];
-                                $studentRattrapages[$student_id]['fail'][]= $fail['course_annual_id'];
-                                $studentRattrapagesByStudentAnnualId[$fail['student_annual_id']]['fail'][] = $fail['course_annual_id'];
-                            }
-                            $studentIdCards[] = $student_id;
-                        }
-                        /// else ---do not count these student
-                    }
-                }
-
-            }
-
-           /*------save student rattrapaer automatic-----*/
-            $this->saveStudentResitAutomatic($studentRattrapagesByStudentAnnualId);
-           /*----end saving ----*/
-
-
-            $arrayCourseAnnualIds = array_unique($arrayCourseAnnualIds);
-            $arrayCourseAnnualIds = array_merge($arrayCourseAnnualIds);
-            $students = $this->getStudentByIdCardYearly($studentIdCards, $academic_year_id);
-            $courseAnnuals = DB::table('course_annuals')->whereIn('id', $arrayCourseAnnualIds)->get();
-            foreach($courseAnnuals as $courseAnnual) {
-                if($courseAnnual->is_counted_creditability) {
-                    $courseAnnualByProgram[$courseAnnual->course_id][] = $courseAnnual->id;
-                    $courseProgramIds[] = $courseAnnual->course_id;
-                }
-            }
-            $coursePrograms = Course::whereIn('courses.id', $courseProgramIds)->get();
-            $courseScoreProperties = $this->getCourseAnnualWithScore($arrayCourseAnnualIds);
-            $averages = $courseScoreProperties['averages'];
-        }
-
-
-        /*foreach($coursePrograms as $program) {
-            $courseAnnualFailId = array_intersect($studentRattrapages['e20160057']['fail'], $courseAnnualByProgram[$program->id]);
-
-            dd($courseAnnualByProgram[758]);
-            dump($program->id);
-            dump($courseAnnualFailId);
-        }
-
-        dump($studentRattrapages['e20160057']);
-
-
-
-        $courseAnnuals = CourseAnnual::whereIn('id', $studentRattrapages['e20160057']['fail'])->get();
-
-        dd($courseAnnuals);
-
-        foreach($students as $student) {
-
-            if(true) {//$student->id_card == 'e20140819'
-
-                $subjectRattrapages = $studentRattrapages[$student->id_card];
-
-                //dd($subjectRattrapages);
-
-                //dd($coursePrograms);
-
-                foreach($coursePrograms as $program) {
-
-
-
-                    if(isset($subjectRattrapages['fail'])) {
-
-                        $courseAnnualFailId = array_intersect($studentRattrapages[$student->id_card]['fail'], $courseAnnualByProgram[$program->id]);
-                    } else {
-                        $courseAnnualFailId=[];
+                        dd($student->id_card);
+                        dd($courseAnnualPassId);
                     }
 
-                    $courseAnnualFailId= array_values($courseAnnualFailId);
-
-                    if(count($courseAnnualFailId) > 0) {
-
-                        $studentScore = isset($averages[$courseAnnualFailId[0]])?$averages[$courseAnnualFailId[0]][$student->student_annual_id]:null;
-
-//                        dump($studentScore);
-
-
-                    } else {
-
-
-                        dump($courseAnnualFailId);
-                        if($student->id_card == 'e20160057') {
-
-                            dump($studentRattrapages[$student->id_card]);
-                        }
-
-
-                    }
-                }
-
-            }
-        }*/
-
-        /*
-        dump($studentRattrapages);
-        foreach($coursePrograms as $program) {
-            foreach($studentRattrapages  as $ratt) {
-                $resitSubject = $courseAnnualByProgram[$program->id];
-
-                $check = array_intersect($resitSubject, $ratt['fail']);
-                if($check) {
-                    dump($ratt);
                 }
             }
         }*/
 
-//        dd($studentRattrapages);
 
-        return view('backend.course.courseAnnual.includes.student_redouble_lists', compact('students', 'coursePrograms', 'courseAnnualByProgram', 'academicYear', 'averages', 'studentRattrapages'));
+
+        return view('backend.course.courseAnnual.includes.student_redouble_lists',
+            compact(
+                'students',
+                'coursePrograms',
+                'courseAnnualByProgram',
+                'academicYear', 'averages',
+                'studentRattrapages',
+                'fullUrl', 'onlyResitCourseAnnuals',
+                'semesterId', 'degreeId', 'gradeId', 'departmentOptionId', 'departmentId', 'academicYearId'
+            )
+        );
     }
 
+    public function resitSubjectLists(Request $request) {
+        $studentDataProperties = $this->studentResitData($request);
 
-    private function getStudentByIdCardYearly($array_studentIdCard,$academic_year_id ) {
+        $studentDataProperties = $this->studentResitData($request);
+        $students = $studentDataProperties['student'];
+        $coursePrograms =$studentDataProperties['courseprogram'];
+        $studentRattrapages = $studentDataProperties['student_rattrapage'];
+        $courseAnnualByProgram = $studentDataProperties['course_annual_by_program'];
+        $academicYear = $studentDataProperties['academic_year'];
+        $averages = $studentDataProperties['average'];
+        $onlyResitCourseAnnuals = $studentDataProperties['resit_course_annual'];
+        $fullUrl = $studentDataProperties['full_url'];
 
-        $students = DB::table('students')
-            ->join('studentAnnuals', 'studentAnnuals.student_id', '=', 'students.id')
-            ->whereIn('id_card', $array_studentIdCard)
-            ->where('studentAnnuals.academic_year_id', $academic_year_id)
-            ->select(
-                'students.name_latin', 'students.id_card', 'students.id as student_id',
-                'studentAnnuals.id as student_annual_id'
-            )->orderBy('students.name_latin', 'ASC')
-            ->get();
 
-        return $students;
+        return view('backend.course.courseAnnual.includes.resit_subject_lists',
+            compact(
+                'students',
+                'coursePrograms',
+                'courseAnnualByProgram',
+                'academicYear', 'averages',
+                'studentRattrapages','onlyResitCourseAnnuals',
+                'fullUrl'
+            )
+        );
+
     }
 
 
@@ -5560,7 +5111,6 @@ class CourseAnnualController extends Controller
 
     }
 
-
     public function getStudentFinalResult(Request $request) {
 
         // This function is in the App/traits folder
@@ -5570,10 +5120,20 @@ class CourseAnnualController extends Controller
 
     public function saveStudentResit(Request $request) {
 
+        $arrayCourseAnnualIds=[];
         $academicYearId = $request->academic_year_id;
         $studentIdCards = $request->student_id_card;
         $data = $request->all();
+        foreach($studentIdCards as $idCard) {
+            if(isset($data[$idCard])) {
+                $arrayCourseAnnualIds = array_merge($arrayCourseAnnualIds, $data[$idCard]);
+            }
 
+        }
+        $arrayCourseAnnualIds= array_unique($arrayCourseAnnualIds);
+        $arrayCourseAnnualIds = array_values($arrayCourseAnnualIds);
+
+        $semesterIds = DB::table('course_annuals')->whereIn('id', $arrayCourseAnnualIds)->lists('semester_id', 'id');
 
         $students = $this->getStudentByIdCardYearly($studentIdCards, $academicYearId);
 
@@ -5581,7 +5141,6 @@ class CourseAnnualController extends Controller
         foreach($students as $student) {
 
             $studentResitSocre = $this->getStudentResitScore($student->student_annual_id);
-
 
             if($resitCourses = $studentResitSocre->get()) {
 
@@ -5597,7 +5156,8 @@ class CourseAnnualController extends Controller
 
                             $input = [
                                 'student_annual_id' => $student->student_annual_id,
-                                'course_annual_id' => $courseAnnualId
+                                'course_annual_id' => $courseAnnualId,
+                                'semester_id' => $semesterIds[$courseAnnualId]
                             ];
 
                             $this->resitStudentAannuals ->create($input);
@@ -5613,7 +5173,8 @@ class CourseAnnualController extends Controller
                                 if($true) {
                                     $input = [
                                         'student_annual_id' => $course->student_annual_id,
-                                        'course_annual_id' => null
+                                        'course_annual_id' => null,
+                                        'semester_id' => $course->semester_id
                                     ];
                                     $this->resitStudentAannuals->create($input);
                                     $true = false;
@@ -5636,7 +5197,8 @@ class CourseAnnualController extends Controller
 
                         $input = [
                             'student_annual_id' => $student->student_annual_id,
-                            'course_annual_id' => $courseAnnualId
+                            'course_annual_id' => $courseAnnualId,
+                            'semester_id' => $semesterIds[$courseAnnualId]
                         ];
 
                         $this->resitStudentAannuals->create($input);
@@ -5645,7 +5207,8 @@ class CourseAnnualController extends Controller
 
                     $input = [
                         'student_annual_id' => $student->student_annual_id,
-                        'course_annual_id' => null
+                        'course_annual_id' => null,
+                        'semester_id' => $semesterIds[$courseAnnualId]
                     ];
 
                     $this->resitStudentAannuals->create($input);
@@ -5660,18 +5223,22 @@ class CourseAnnualController extends Controller
         $academicYearId = $request->academic_year_id;
         $studentIdCard = $request->student_id_card;
         $redouble = $request->redouble;
+
         $student = Student::where('id_card', $studentIdCard)->first();
         $studentAnnual = StudentAnnual::where([
             ['student_id', $student->id],
             ['academic_year_id', $academicYearId]
         ])->first();
+
         $degree = $studentAnnual->degree;
         $grade = $studentAnnual->grade;
+
         if($degree->code == ScoreEnum::ENGINEER) {
             $redName = ScoreEnum::Red_I.$grade->code;
         } else {
             $redName = ScoreEnum::Red_T.$grade->code;
         }
+
         if($redouble == ScoreEnum::RADIE) {
            $update =  $this->updateStatusStudent($studentIdCard, $status= true);
             if($update) {
@@ -5684,11 +5251,19 @@ class CourseAnnualController extends Controller
                 $redouble_students = DB::table('redouble_student')->where('student_id', $student->id);
 
                 if(count($redouble_students->get()) > 0) {
-                    $updateRedouble = $redouble_students->where('academic_year_id', $academicYearId)->update(['is_changed' => true]);
 
-                    if($updateRedouble) {
+                    $updateRedouble = $redouble_students->where('academic_year_id', $academicYearId);
+
+                    if($updateRedouble->get()) {
+
+                        $updateRedouble->update(['is_changed' => true]);
+
+                        return Response::json(['status' => true, 'message' => 'Updated']);
+                    } else {
                         return Response::json(['status' => true, 'message' => 'Updated']);
                     }
+
+
                 } else {
                     return Response::json(['status' => true, 'message' => 'Updated']);
                 }

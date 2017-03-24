@@ -124,5 +124,7 @@ Route::group([
 
     Route::get('/student/dismiss', 'CourseAnnualController@getStudentDismiss')->name('student.dismiss');
 
+    Route::get('/student/resit-subject-lists', 'CourseAnnualController@resitSubjectLists')->name('student.resit_subject_lists');
+
 
 });

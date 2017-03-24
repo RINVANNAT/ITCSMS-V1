@@ -66,6 +66,7 @@ class EloquentResitStudentAnnualRepository implements ResitStudentAnnualReposito
         $resitStudentAnnual->student_annual_id = isset($input['student_annual_id'])?$input['student_annual_id']:null;
         $resitStudentAnnual->resit_score = isset($input['resit_score'])?$input['resit_score']:null;
         $resitStudentAnnual->resit_room = isset($input['resit_room'])?$input['resit_room']:null;
+        $resitStudentAnnual->semester_id = isset($input['semester_id'])?$input['semester_id']:null;
         $resitStudentAnnual->created_at = Carbon::now();
         $resitStudentAnnual->create_uid = auth()->id();
 
