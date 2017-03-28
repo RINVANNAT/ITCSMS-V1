@@ -123,6 +123,7 @@ Route::group([
     Route::get('/course-annual/student-final-result', 'CourseAnnualController@getStudentFinalResult')->name('course_annual.student_annual_final_result');
 
     Route::get('/student/dismiss', 'CourseAnnualController@getStudentDismiss')->name('student.dismiss');
+    Route::get('/student/redouble', 'CourseAnnualController@getStudentRedouble')->name('student.redouble');
 
     Route::get('/student/resit-subject-lists', 'CourseAnnualController@resitSubjectLists')->name('student.resit_subject_lists');
 

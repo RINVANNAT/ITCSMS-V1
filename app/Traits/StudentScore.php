@@ -253,7 +253,7 @@ trait StudentScore {
 
             if($check_redouble) {//----/*--if we already set him/her as redouble automaticlly----*/
                 if($check_redouble->is_changed) {
-                    return 'P';
+                    return '';/*---student pass---*/
                 } else {
 
                     $this->updateStatusStudent($studentIdCard, $status = true); //----if student fail two time in his 5 year academic ---he must be eliminate from school
@@ -262,7 +262,7 @@ trait StudentScore {
             } else {
 
                 $this->updateStatusStudent($studentIdCard, $status = true); //----if student fail two time in his 5 year academic ---he must be eliminate from school
-                $this->createRedoubleRecord($idCardPointToStudent[$studentIdCard], $redName = trim($degreeName.$gradeId), $academicYearId);
+                $this->createRedoubleRecord($idCardPointToStudent[$studentIdCard], $redName = trim($degreeName.$gradeId), $academicYearId, $isChanged = false);
                 return  'Radié';/*---we dont have to store the redouble of this year because the jurry consider to eliminate this student from the system (set status active=false)*/
             }
 
@@ -273,14 +273,14 @@ trait StudentScore {
 
                 if($check_redouble->is_changed) {
                     //---we already set this student as fail for this year but the jurry made changed to pass
-                   return 'P';
+                   return '';//--student pass
                 } else {
                    return  $check_redouble->redouble_name;
                 }
 
             } else {
                 //---because his final average score is lowwer than 30 ...he/she must fail in this year ....so we create redouble record
-                $this->createRedoubleRecord($idCardPointToStudent[$studentIdCard], $redName = trim($degreeName.$gradeId), $academicYearId);
+                $this->createRedoubleRecord($idCardPointToStudent[$studentIdCard], $redName = trim($degreeName.$gradeId), $academicYearId, $isChanged = false);
                 return $degreeName.$gradeId;
             }
         }
@@ -296,13 +296,14 @@ trait StudentScore {
         return $student;
     }
 
-    public function createRedoubleRecord($student, $redName, $academicYearId ) {
+    public function createRedoubleRecord($student, $redName, $academicYearId, $isChanged ) {
 
         $redouble= Redouble::where('name_en', $redName)->first();
         $create = DB::table('redouble_student')
             ->insert(
-                ['redouble_id' => $redouble->id, 'student_id' => $student->student_id,'academic_year_id' => $academicYearId]
+                ['redouble_id' => $redouble->id, 'student_id' => $student->student_id,'academic_year_id' => $academicYearId, 'is_changed' => $isChanged]
             );
+
 
         return $create;
     }

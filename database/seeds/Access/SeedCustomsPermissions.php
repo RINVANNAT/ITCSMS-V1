@@ -842,6 +842,13 @@ class SeedCustomsPermissions extends Seeder
                             'dependency'   => [
                                 'view-backend','view-course-management','view-courseAnnual-management'
                             ]
+                        ],
+                        [
+                            'name'         => 'evaluation-student-final-score',
+                            'display_name' => 'To evaluate student for the final result,the user is able to set student status as Radie or Redouble',
+                            'dependency'   => [
+                                'view-backend','view-course-management','view-courseAnnual-management'
+                            ]
                         ]
                     ]
                 ],

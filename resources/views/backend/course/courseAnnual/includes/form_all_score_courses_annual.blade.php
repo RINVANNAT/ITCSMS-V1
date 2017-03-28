@@ -55,12 +55,18 @@
                 margin-left: 5px;
             }
             .selection {
+
                 width: 80px;
                 font-size: 10pt;
                 height: 23px;
                 margin-left: 5px;
-
             }
+            /*@-moz-document url-prefix() { !* targets Firefox only *!
+                select {
+                    padding: 15px 0!important;
+
+                }
+            }*/
             #filter_academic_year {
                 font-size: 10pt;
                 height: 23px;
@@ -136,6 +142,7 @@
 
                 <button class="btn btn-xs btn-info pull-left" id="btn_export_score" style="margin-left: 5px"> <i class="fa fa-download"> Export</i></button>
                 <button class="btn btn-xs btn-warning pull-left" id="get_radie" style="margin-left: 5px"> <i class="fa fa-download"> Radié</i></button>
+                <button class="btn btn-xs btn-black pull-left" id="get_redouble" style="margin-left: 5px"> <i class="fa fa-download"> Redouble</i></button>
                 <button class="btn btn-xs btn-success pull-left" id="generate_rattrapage" style="margin-left: 5px"> <i class="fa fa-circle-o"> Rattrapage</i></button>
 
                 <div class="pull-right">
@@ -359,17 +366,20 @@
                     cellProperties.className = 'htLeft';
                 }
 
-                if (prop === 'Redouble') {
-                    cellProperties.className = "htRight";
-                    this.type = 'autocomplete';
-                    this.filter = false;
-                    if($.trim($('#filter_degree :selected').text().toUpperCase()) == 'ENGINEER') {
-                        this.source =  ['Red. '+ 'I'+ $('#filter_grade :selected').val(), 'Radié', '{{\App\Models\Enum\ScoreEnum::Pass}}'] // to add to the beginning do this.source.unshift(val) instead
-                    } else {
-                        this.source =  ['Red. '+"T"+$('#filter_grade :selected').val(), 'Radié', '{{\App\Models\Enum\ScoreEnum::Pass}}'] // to add to the beginning do this.source.unshift(val) instead
-                    }
+                @permission('evaluation-student-final-score')
+                    if (prop === 'Redouble') {
+                        cellProperties.className = "htRight";
+                        this.type = 'autocomplete';
+                        this.filter = false;
+                        if($.trim($('#filter_degree :selected').text().toUpperCase()) == 'ENGINEER') {
+                            this.source =  ['Red. '+ 'I'+ $('#filter_grade :selected').val(), 'Radié'] // to add to the beginning do this.source.unshift(val) instead
+                        } else {
+                            this.source =  ['Red. '+"T"+$('#filter_grade :selected').val(), 'Radié'] // to add to the beginning do this.source.unshift(val) instead
+                        }
 
-                }
+                    }
+                @endauth
+
 
                 return cellProperties;
 
@@ -434,51 +444,77 @@
                             {{--});--}}
                         {{--}--}}
 
-                        if(columnIndex == 'Redouble') {
+                        @permission('evaluation-student-final-score')
 
-                            if(oldValue != newValue) {
-                                var remark_rul = '{{route('student.update_status')}}';
-                                var baseData_redouble ={student_id_card: col_student_id[rowIndex], redouble: newValue, academic_year_id: $('#filter_academic_year :selected').val(), old_value: oldValue};
+                            if(columnIndex == 'Redouble') {
+
+                                if(oldValue != newValue) {
+                                    var remark_rul = '{{route('student.update_status')}}';
+                                    var baseData_redouble ={student_id_card: col_student_id[rowIndex], redouble: newValue, academic_year_id: $('#filter_academic_year :selected').val(), old_value: oldValue};
+
+                                    swal({
+                                        title: "Attention",
+                                        text: "Student will be "+newValue+ ' Are you sure?',
+                                        type: "warning",
+                                        showCancelButton: true,
+                                        confirmButtonColor: "#DD6B55",
+                                        confirmButtonText: "Skip",
+                                        closeOnConfirm: true
+                                    }, function(confirmed) {
+                                        if (confirmed) {
+
+                                            $.ajax({
+                                                type: 'POST',
+                                                url: remark_rul,
+                                                data: baseData_redouble,
+                                                dataType: "json",
+                                                success: function(resultData) {
+
+                                                    if(resultData.status) {
+                                                        notify('success', resultData.message, 'Info');
+                                                        filter_table ()
+                                                    } else {
+
+                                                        notify('error', resultData.message, 'Attention');
+
+
+                                                    }
+
+
+                                                }
+                                            });
+
+                                        } else {
+                                            filter_table ()
+                                        }
+                                    });
+
+                                }
+                            }
+
+
+
+                            if(columnIndex == 'Remark') {
+                                var remark_rul = '{{route('course_annual.save_each_cell_remark')}}';
+                                var baseData_remark ={student_id_card: col_student_id[rowIndex], remark: newValue};
+
                                 $.ajax({
                                     type: 'POST',
                                     url: remark_rul,
-                                    data: baseData_redouble,
+                                    data: baseData_remark,
                                     dataType: "json",
                                     success: function(resultData) {
 
-                                        if(resultData.status) {
-                                            notify('success', resultData.message, 'Info');
-                                        } else {
-
-                                            notify('error', resultData.message, 'Attention');
-
-                                        }
-
-
+                                        //---call back function ....do some stuff
                                     }
                                 });
                             }
-                        }
+                        @endauth
 
-                        if(columnIndex == 'Remark') {
-                            var remark_rul = '{{route('course_annual.save_each_cell_remark')}}';
-                            var baseData_remark ={student_id_card: col_student_id[rowIndex], remark: newValue};
 
-                            $.ajax({
-                                type: 'POST',
-                                url: remark_rul,
-                                data: baseData_remark,
-                                dataType: "json",
-                                success: function(resultData) {
-
-                                    //---call back function ....do some stuff
-                                }
-                            });
-                        }
                     })
                 }
             }
-
         };
 
         $('.dept_option').hide();
@@ -529,6 +565,7 @@
             })
 
             if(val = $('#filter_dept :selected').val()) {
+
                 $('.department_'+ val).show();
 
                 if(val == parseInt('{{\App\Models\Enum\ScoreEnum::Dept_TC}}')) {
@@ -865,7 +902,21 @@
             filter_table();
         });
         $('#filter_semester').on('change', function() {
-            filter_table();
+
+
+            swal({
+                title: "Attention",
+                text: "The student record will be chagened....Are you sure?",
+                type: "warning",
+                showCancelButton: true,
+                confirmButtonColor: "#DD6B55",
+                confirmButtonText: "Skip",
+                closeOnConfirm: true
+            }, function(confirmed) {
+                if (confirmed) {
+                    filter_table();
+                }
+            });
         })
         $('#filter_degree').on('change', function(){
             filter_table();
@@ -1280,6 +1331,31 @@
                 }
             });*/
 
+
+        });
+
+
+        $('#get_redouble').on('click', function() {
+
+            var pop_url = '{{route('student.redouble')}}';
+            var BaseData = {
+                department_id: $('#filter_dept :selected').val(),
+                degree_id: $('#filter_degree :selected').val(),
+                grade_id: $('#filter_grade :selected').val(),
+                academic_year_id: $('#filter_academic_year :selected').val(),
+                semester_id:$('#filter_semester :selected').val(),
+                dept_option_id: $('#filter_dept_option :selected').val(),
+
+            }
+
+            student_reexam_lists = window.open(
+                    pop_url+
+                    '?department_id='+BaseData.department_id+
+                    '&degree_id='+BaseData.degree_id+
+                    '&grade_id='+BaseData.grade_id+
+                    '&semester_id='+BaseData.semester_id+
+                    '&dept_option_id='+BaseData.dept_option_id+
+                    '&academic_year_id='+BaseData.academic_year_id,'_blank');
 
         })
 
