@@ -37,8 +37,9 @@ class StudentApiController extends Controller
     public function studentDataFromDB(StudentApiRequest $request) {
 
         $students = DB::table('students')
-            //->select('students.id_card', 'students.dob')
+            ->select('students.id_card', 'students.dob', 'students.name_latin')
             ->get();
+
         return $students;
     }
 
