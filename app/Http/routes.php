@@ -78,6 +78,10 @@ Route::group(['prefix'=> 'api', 'namespace' => 'API'], function() {
     Route::group(['prefix' => 'student'],function() {
         require (__DIR__ . '/Routes/Backend/API/Student.php');
     });
+
+    Route::group(['prefix' => 'employee'], function() {
+        require (__DIR__ . '/Routes/Backend/API/Employee.php');
+    });
 });
 
 

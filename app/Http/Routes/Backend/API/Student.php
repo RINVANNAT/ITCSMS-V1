@@ -7,3 +7,5 @@
  */
 
 Route::get('/score', 'StudentApiController@studentScore')->name('student.score');
+Route::get('/data', 'StudentApiController@studentDataFromDB')->name('student.data');
+Route::get('/annual-object', 'StudentApiController@studentObject')->name('student.annual_object');

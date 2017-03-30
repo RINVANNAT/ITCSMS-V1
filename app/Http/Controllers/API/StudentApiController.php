@@ -10,6 +10,8 @@ use App\Http\Requests\API\StudentApiRequest;
 use App\Traits\StudentScore;
 use Illuminate\Http\Response;
 use App\Utils\FormParamManager;
+use Illuminate\Support\Facades\DB;
+use App\Models\Student;
 
 class StudentApiController extends Controller
 {
@@ -30,6 +32,35 @@ class StudentApiController extends Controller
             return ['data' => $this->getStudentScoreBySemester($studentAnnualId, $semesterId=null)];
         }
 
-
     }
+
+    public function studentDataFromDB(StudentApiRequest $request) {
+
+        $students = DB::table('students')
+            ->select('students.id_card', 'students.dob')
+            ->get();
+        return $students;
+    }
+
+    public function studentObject(StudentApiRequest $request) {
+
+        $dataParams = FormParamManager::getFormParams($request);
+        $studentIdCard = $dataParams['student_id_card'];
+        $academicYearId = $dataParams['academic_year_id'];
+        $student = Student::where('id_card', $studentIdCard)->first();
+
+        if($academicYearId) {
+
+            $studentAnnuals = $student->studentAnnuals;//->where('academic_year_id', $academicYearId)->get();
+            foreach($studentAnnuals as $studentAnnual) {
+                if($studentAnnual->academic_year_id == $academicYearId) {
+                    return $studentAnnual;
+                }
+            }
+        } else {
+            $studentAnnuals = $student->studentAnnuals;
+            return ($studentAnnuals);
+        }
+    }
+
 }
