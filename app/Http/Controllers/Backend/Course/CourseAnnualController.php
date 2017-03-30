@@ -4443,18 +4443,23 @@ class CourseAnnualController extends Controller
     }
 
 
-    public function saveEachORemark(Request $request) {
+    public function saveEachRemark(Request $request) {
         //----update remark by student id_card in table student_annuals
 
 
-        $student = DB::table('students')->where('id_card', $request->student_id_card)->first();
+        if(Auth::user()->allow('write-student-remark')) {
+            $student = DB::table('students')->where('id_card', $request->student_id_card)->first();
 
-        $student_annual = DB::table('studentAnnuals')
-            ->where('student_id', $student->id)
-            ->update(['remark' => $request->remark]);
-        if($student_annual) {
-            return Response::json(['status' => true]);
+            $student_annual = DB::table('studentAnnuals')
+                ->where('student_id', $student->id)
+                ->update(['remark' => $request->remark]);
+            if($student_annual) {
+                return Response::json(['status' => true]);
+            }
+        } else {
+            return Response::json(['status' => false, 'message' => 'Forbidden!']);
         }
+
     }
 
     public function exportTotalScore(Request $request) {
@@ -5344,7 +5349,7 @@ class CourseAnnualController extends Controller
     public function updateStudentStatus(Request $request) {
 
 
-        if(auth()->user()->allow("evaluation-student-final-score")) {
+        if(auth()->user()->allow("evaluate-student")) {
 
             $academicYearId = $request->academic_year_id;
             $studentIdCard = $request->student_id_card;

@@ -109,7 +109,7 @@ Route::group([
     Route::get('course-annual/print_total_score', 'CourseAnnualController@print_total_score')->name('admin.course.print_total_score');
     Route::get('course-annual/-get-form-all-score-properties', 'CourseAnnualController@formAllScoreSelection')->name('course_annual.form_all_score_properties');
     Route::post('course_annual/save-each-cell-observation', 'CourseAnnualController@saveEachObservation')->name('course_annual.save_each_cell_observation');
-    Route::post('course_annual/save-each-cell-remark', 'CourseAnnualController@saveEachORemark')->name('course_annual.save_each_cell_remark');
+    Route::post('course_annual/save-each-cell-remark', 'CourseAnnualController@saveEachRemark')->name('course_annual.save_each_cell_remark');
     Route::get('course-annual/export-view-total-score', 'CourseAnnualController@exportTotalScore')->name('course_annual.export_view_total_score');
     Route::get('course-annual/student-redouble-liste}', 'CourseAnnualController@studentRedoubleListe')->name('course_annual.student_redouble_exam');
     Route::post('course-annual/export-student-redouble-list}', 'CourseAnnualController@exportStudentRedoubleList')->name('course_annual.export_student_re_exam');

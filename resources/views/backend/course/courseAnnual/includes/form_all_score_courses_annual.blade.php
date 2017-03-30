@@ -347,7 +347,14 @@
                 } else if ( prop  === 'Passage') {
                     cellProperties.readOnly = false;
                 } else if(prop == 'Remark') {
-                    cellProperties.readOnly = false;
+
+                    @if(access()->user()->allow('write-student-remark'))
+
+                            cellProperties.readOnly = false;
+                    @else
+                            cellProperties.readOnly = true;
+                    @endif
+
                 }
 
                 if(prop == 'number') {
@@ -366,7 +373,7 @@
                     cellProperties.className = 'htLeft';
                 }
 
-                @permission('evaluation-student-final-score')
+                @permission('evaluate-student')
                     if (prop === 'Redouble') {
                         cellProperties.className = "htRight";
                         this.type = 'autocomplete';
@@ -444,7 +451,7 @@
                             {{--});--}}
                         {{--}--}}
 
-                        @permission('evaluation-student-final-score')
+                        @permission('evaluate-student')
 
                             if(columnIndex == 'Redouble') {
 
@@ -476,11 +483,7 @@
                                                     } else {
 
                                                         notify('error', resultData.message, 'Attention');
-
-
                                                     }
-
-
                                                 }
                                             });
 
@@ -492,7 +495,10 @@
                                 }
                             }
 
+                        @endauth
 
+
+                        @permission('write-student-remark')
 
                             if(columnIndex == 'Remark') {
                                 var remark_rul = '{{route('course_annual.save_each_cell_remark')}}';

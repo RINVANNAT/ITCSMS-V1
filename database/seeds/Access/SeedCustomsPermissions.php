@@ -844,8 +844,15 @@ class SeedCustomsPermissions extends Seeder
                             ]
                         ],
                         [
-                            'name'         => 'evaluation-student-final-score',
+                            'name'         => 'evaluate-student',
                             'display_name' => 'To evaluate student for the final result,the user is able to set student status as Radie or Redouble',
+                            'dependency'   => [
+                                'view-backend','view-course-management','view-courseAnnual-management'
+                            ]
+                        ],
+                        [
+                            'name'         => 'write-student-remark',
+                            'display_name' => 'A permission to make a note on each student remark',
                             'dependency'   => [
                                 'view-backend','view-course-management','view-courseAnnual-management'
                             ]

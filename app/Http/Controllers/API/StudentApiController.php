@@ -27,7 +27,6 @@ class StudentApiController extends Controller
             return $this->getStudentScoreBySemester($studentAnnualId, $semesterId);//20486,1
         } else {
 
-//            dd($this->getStudentScoreBySemester($studentAnnualId, $semesterId=null));
             return ['data' => $this->getStudentScoreBySemester($studentAnnualId, $semesterId=null)];
         }
 
