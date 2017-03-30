@@ -48,6 +48,8 @@ Route::group(['namespace' => 'Backend', 'prefix' => 'admin', 'middleware' => 'ad
     
     require (__DIR__ . '/Routes/Backend/employeeExamRole.php');
     require (__DIR__ . '/Routes/Backend/EntranceExamCourse.php');
+
+
 });
 
 
@@ -67,4 +69,18 @@ Route::group([
         require (__DIR__ . '/api_routes.php');
     });
 });
+
+
+/*----this api is used for student portal accessibility-----*/
+
+Route::group(['prefix'=> 'api', 'namespace' => 'API'], function() {
+
+    Route::group(['prefix' => 'student'],function() {
+        require (__DIR__ . '/Routes/Backend/API/Student.php');
+    });
+});
+
+
+
+
 

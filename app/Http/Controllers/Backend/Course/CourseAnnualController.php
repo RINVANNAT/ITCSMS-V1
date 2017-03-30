@@ -2316,8 +2316,12 @@ class CourseAnnualController extends Controller
 
     public function getStudentByDeptIdGradeIdDegreeId($deptId, $degreeId, $gradeId, $academicYearID) {
 
-        $studentAnnual = DB::table('studentAnnuals')
-            ->join('students', 'students.id', '=', 'studentAnnuals.student_id')
+
+        $studentAnnual = DB::table('students')
+            ->join('studentAnnuals', 'studentAnnuals.student_id', '=', 'students.id')
+            ->leftJoin('redouble_student', 'students.id', '=', 'redouble_student.student_id')
+            ->leftJoin('redoubles', 'redoubles.id', '=', 'redouble_student.redouble_id')
+
             ->join('genders', 'genders.id', '=', 'students.gender_id')
             ->whereIn('studentAnnuals.department_id', $deptId)
             ->whereIn('studentAnnuals.degree_id', $degreeId)
@@ -2335,7 +2339,8 @@ class CourseAnnualController extends Controller
                 'studentAnnuals.department_option_id',
                 'studentAnnuals.degree_id',
                 'students.observation',
-                'studentAnnuals.remark'
+                'studentAnnuals.remark',
+                'redoubles.name_en as redouble_name'
             )
             ->orderBy('students.name_latin');
         return $studentAnnual;
@@ -2933,8 +2938,11 @@ class CourseAnnualController extends Controller
         foreach($element as $key => $value) {
             $index++;
 
+
+
             $total_number_absences = 0;
             $both_semester = 0;
+            $check_redouble = $this->checkRedouble($idCardPointToStudent[$key], $academicYearID);//---check this current year if student has been change in redouble
 
             if($semesterId) {
 
@@ -2944,6 +2952,7 @@ class CourseAnnualController extends Controller
 
                 $each_course_score = $this->calculateFinalMoyenne($totalMoyenne[$key][$semesterId], isset($creditInEachSemester[$semesterId])?$creditInEachSemester[$semesterId]:1);
                 if($each_course_score > ScoreEnum::Zero) {
+
                     $average_moyenne_by_semester[$semesterId][] = $each_course_score;
                 }
 
@@ -2959,6 +2968,7 @@ class CourseAnnualController extends Controller
                     $value['S'.$semes->id.'_Moyenne'] = $this->calculateFinalMoyenne($totalMoyenne[$key][$semes->id], isset($creditInEachSemester[$semes->id])?$creditInEachSemester[$semes->id]:1);
                     $each_course_score = $this->calculateFinalMoyenne($totalMoyenne[$key][$semes->id], isset($creditInEachSemester[$semes->id])?$creditInEachSemester[$semes->id]:1);
                     if($each_course_score > ScoreEnum::Zero) {
+
                         $average_moyenne_by_semester[$semes->id][] =  $each_course_score;
                     }
 
@@ -2979,12 +2989,8 @@ class CourseAnnualController extends Controller
             $value['Rank'] = "";
 
 
-
             if(!$semesterId) {
-
                 if($moyenne < ScoreEnum::Pass_Moyenne) {
-
-                    $check_redouble = $this->checkRedouble($idCardPointToStudent[$key], $academicYearID);//---check this current year if student has been change in redouble
 
                     if($check_redouble !== false) {
 
@@ -3011,7 +3017,6 @@ class CourseAnnualController extends Controller
                             }
                         }
 
-
                     } else {
 
                         //---student has been set as Elimination (Radié)
@@ -3027,7 +3032,7 @@ class CourseAnnualController extends Controller
 
                 //----request each semester ----
 
-                $check_redouble = $this->checkRedouble($idCardPointToStudent[$key], $academicYearID);//---check this current year if student has been change in redouble
+                //$check_redouble = $this->checkRedouble($idCardPointToStudent[$key], $academicYearID);//---check this current year if student has been change in redouble
 
                /* if($key == 'e20140650') {
 
@@ -3038,10 +3043,11 @@ class CourseAnnualController extends Controller
 
                     if($check_redouble !== null) {
 
+
+
                         if($check_redouble->is_changed) {
 
                             $value['Redouble'] = $check_redouble->redouble_name;
-
                         } else {
                             $value['Redouble'] = '';
                         }
@@ -3117,8 +3123,6 @@ class CourseAnnualController extends Controller
         ]);
     }
     private function checkRedouble($student, $academicYearId) {
-
-
 
         if(!$student->radie) {
 
@@ -3410,6 +3414,19 @@ class CourseAnnualController extends Controller
                         if($eachCourse->is_counted_creditability) {
 
                             if($each_score < ScoreEnum::Under_30) {
+
+                                $check_redouble = $this->checkRedouble($stu_dent, $eachCourse->academic_year_id);//---check this current year if student has been change in redouble
+                                /*----create one redouble record for this student ----*/
+                                /*---before create redouble record, we have to check if the student has already marked as redouble for this year --then we skip ---*/
+                                if($check_redouble === null) {
+                                    if($eachCourse->degree_id == ScoreEnum::Degree_I) {
+                                        $this->createRedoubleRecord($stu_dent, $redName = trim(ScoreEnum::Red_I.$eachCourse->grade_id), $eachCourse->academic_year_id, $isChanged = false);
+                                    } else {
+                                        $this->createRedoubleRecord($stu_dent, $redName = trim(ScoreEnum::Red_T.$eachCourse->grade_id), $eachCourse->academic_year_id, $isChanged = false);
+                                    }
+
+                                }
+
                                 $fail_subjects[$stu_dent->id_card]['fail'][] = array('credit'=> $eachCourse->course_annual_credit, 'score'=> $each_score, 'course_annual_id' => $eachCourse->course_annual_id, 'student_annual_id' => $stu_dent->student_annual_id);
                             } else {
                                 $fail_subjects[$stu_dent->id_card]['pass'][] = array('credit'=> $eachCourse->course_annual_credit, 'score'=> $each_score, 'course_annual_id' => $eachCourse->course_annual_id, 'student_annual_id' => $stu_dent->student_annual_id);
@@ -3509,6 +3526,20 @@ class CourseAnnualController extends Controller
                     if($tmpCourse->is_counted_creditability) {
 
                         if($each_score < ScoreEnum::Under_30) {
+
+
+                            $check_redouble = $this->checkRedouble($stu_dent, $tmpCourse->academic_year_id);//---check this current year if student has been change in redouble
+                            /*----create one redouble record for this student ----*/
+                            /*---before create redouble record, we have to check if the student has already marked as redouble for this year --then we skip ---*/
+                            if($check_redouble === null) {
+                                if($tmpCourse->degree_id == ScoreEnum::Degree_I) {
+                                    $this->createRedoubleRecord($stu_dent, $redName = trim(ScoreEnum::Red_I.$tmpCourse->grade_id), $tmpCourse->academic_year_id, $isChanged = false);
+                                } else {
+                                    $this->createRedoubleRecord($stu_dent, $redName = trim(ScoreEnum::Red_T.$tmpCourse->grade_id), $tmpCourse->academic_year_id, $isChanged = false);
+                                }
+
+                            }
+
                             $fail_subjects[$stu_dent->id_card]['fail'][] = array('credit'=> $tmpCourse->course_annual_credit, 'score'=> $each_score, 'course_annual_id' => $tmpCourse->course_annual_id, 'student_annual_id' => $stu_dent->student_annual_id);
                         } else {
                             $fail_subjects[$stu_dent->id_card]['pass'][] = array('credit'=> $tmpCourse->course_annual_credit, 'score'=> $each_score, 'course_annual_id' => $tmpCourse->course_annual_id, 'student_annual_id' => $stu_dent->student_annual_id);
@@ -3591,6 +3622,19 @@ class CourseAnnualController extends Controller
 
                         if($eachCourse->is_counted_creditability) {
                             if($each_score < ScoreEnum::Under_30) {
+
+                                $check_redouble = $this->checkRedouble($stu_dent, $eachCourse->academic_year_id);//---check this current year if student has been change in redouble
+                                /*----create one redouble record for this student ----*/
+                                /*---before create redouble record, we have to check if the student has already marked as redouble for this year --then we skip ---*/
+                                if($check_redouble === null) {
+                                    if($eachCourse->degree_id == ScoreEnum::Degree_I) {
+                                        $this->createRedoubleRecord($stu_dent, $redName = trim(ScoreEnum::Red_I.$eachCourse->grade_id), $eachCourse->academic_year_id, $isChanged = false);
+                                    } else {
+                                        $this->createRedoubleRecord($stu_dent, $redName = trim(ScoreEnum::Red_T.$eachCourse->grade_id), $eachCourse->academic_year_id, $isChanged = false);
+                                    }
+
+                                }
+
                                 $fail_subjects[$stu_dent->id_card]['fail'][] = array('credit'=> $eachCourse->course_annual_credit, 'score'=> $each_score, 'course_annual_id' => $eachCourse->course_annual_id, 'student_annual_id' => $stu_dent->student_annual_id);
                             } else {
                                 $fail_subjects[$stu_dent->id_card]['pass'][] = array('credit'=> $eachCourse->course_annual_credit, 'score'=> $each_score, 'course_annual_id' => $eachCourse->course_annual_id, 'student_annual_id' => $stu_dent->student_annual_id);
@@ -3677,6 +3721,20 @@ class CourseAnnualController extends Controller
 
                     if($tmpCourse->is_counted_creditability) {
                         if($each_score < ScoreEnum::Under_30) {
+
+
+                            $check_redouble = $this->checkRedouble($stu_dent, $tmpCourse->academic_year_id);//---check this current year if student has been change in redouble
+                            /*----create one redouble record for this student ----*/
+                            /*---before create redouble record, we have to check if the student has already marked as redouble for this year --then we skip ---*/
+                            if($check_redouble === null) {
+                                if($tmpCourse->degree_id == ScoreEnum::Degree_I) {
+                                    $this->createRedoubleRecord($stu_dent, $redName = trim(ScoreEnum::Red_I.$tmpCourse->grade_id), $tmpCourse->academic_year_id, $isChanged = false);
+                                } else {
+                                    $this->createRedoubleRecord($stu_dent, $redName = trim(ScoreEnum::Red_T.$tmpCourse->grade_id), $tmpCourse->academic_year_id, $isChanged = false);
+                                }
+                            }
+
+
                             $fail_subjects[$stu_dent->id_card]['fail'][] = array('credit'=> $eachCourse->course_annual_credit, 'score'=> $each_score,  'course_annual_id'=> $tmpCourse->course_annual_id, 'student_annual_id' => $stu_dent->student_annual_id);
                         } else {
                             $fail_subjects[$stu_dent->id_card]['pass'][] = array('credit'=> $eachCourse->course_annual_credit, 'score'=> $each_score,  'course_annual_id'=> $tmpCourse->course_annual_id, 'student_annual_id' => $stu_dent->student_annual_id);
@@ -5641,7 +5699,7 @@ class CourseAnnualController extends Controller
                             $row = [
                                 $count,
                                 $studentAnnual->id_card,
-                                $studentAnnual->name_latin,
+                                strtoupper($studentAnnual->name_latin),
                                 $studentAnnual->code,
                                 $studentRedoubles[$studentAnnual->student_id]->redouble_name
                             ];

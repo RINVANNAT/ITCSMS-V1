@@ -50,3 +50,4 @@ Route::get('scoreEvaluations',[
 ]);
 
 Route::get('attacheStudentEvalStatuses',array(  "uses"=>'StudentEvaStatusAPIController@attache',"as"=>"attacheStudentEvalStatuses.api.v1",));
+
