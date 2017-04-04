@@ -13,13 +13,14 @@ class CreateStudentBac2sTable extends Migration
 	 */
 	public function up()
 	{
-		Schema::create("studentBac2s", function(Blueprint $table)
-		{
-			$table->increments('id');
+
+        Schema::create("studentBac2s", function(Blueprint $table)
+        {
+            $table->increments('id');
             $table->string('can_id',25);
             $table->integer('mcs_no');
             $table->integer('province_id')->unsigned()->index();
-			$table->string('name_kh',100)->index();
+            $table->string('name_kh',100)->index();
             $table->timestamp('dob');
             $table->integer('gender_id')->unsigned()->index();
             $table->string('father_name',100)->nullable();
@@ -95,6 +96,7 @@ class CreateStudentBac2sTable extends Migration
                 ->onDelete('CASCADE');
 
         });
+
 	}
 
 	/**

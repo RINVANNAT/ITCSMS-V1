@@ -1814,6 +1814,55 @@ class SeedCustomsPermissions extends Seeder
             ]
         ];
 
+        /*--schedule permission management--*/
+        $roots[] = [
+            'name' => 'Schedule Management',
+            'groups' => [
+                [
+                    'name' => 'Calendar Management',
+                    'groups' => [
+
+                    ],
+                    'permissions' =>[
+                        [
+                            'name' => 'view-calendar-management',
+                            'display_name' => 'View Calendar Viewer',
+                            'dependency' => [
+                                'view-backend', 'view-schedule-management'
+                            ]
+                        ]
+                    ]
+                ],
+                [
+                    'name' => 'Timetable Management',
+                    'groups' => [
+
+
+                    ],
+                    'permissions' =>[
+                        [
+                            'name' => 'view-timetable-management',
+                            'display_name' => 'View Timetable Viewer',
+                            'dependency' => [
+                                'view-backend', 'view-schedule-management'
+                            ]
+                        ]
+                    ]
+                ]
+            ],
+            'permissions' => [
+                [
+                    'name'         => 'view-schedule-management',
+                    'display_name' => 'View Schedule Management',
+                    'dependency'   => [
+                        'view-backend'
+                    ]
+                ]
+
+            ]
+
+        ];
+
         $this->saveGroupPemission($roots, null);
 
     }
