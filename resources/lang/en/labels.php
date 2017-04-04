@@ -982,6 +982,13 @@ return [
                 'description' => "Description"
             ]
         ],
+
+        'schedule' => [
+            'calendar' => [
+                'title'             => 'Calendar Management',
+                'sub_title'         => 'Sub title calendar management'
+            ]
+        ]
     ],
 
     'frontend' => [

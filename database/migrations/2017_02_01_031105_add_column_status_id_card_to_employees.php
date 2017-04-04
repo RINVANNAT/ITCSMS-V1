@@ -13,8 +13,7 @@ class AddColumnStatusIdCardToEmployees extends Migration
     public function up()
     {
         Schema::table('employees', function (Blueprint $table) {
-            $table->integer('id_card')->nullable();
-            $table->string('status')->nullable();
+
             $table->string('salary_rate',100)->nullable();
             $table->string('service')->nullable();
             $table->string('state_position')->nullable();

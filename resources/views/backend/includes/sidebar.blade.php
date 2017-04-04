@@ -125,6 +125,32 @@
                 </ul>
             </li>
             @endauth
+
+            @permission('view-schedule-management')
+            <li class="{{ Active::pattern('admin/schedule*') }} treeview">
+                <a href="#">
+                    <i class="fa fa-calendar"></i>
+                    <span>{{ trans('menus.backend.schedule.title') }}</span>
+                    <i class="fa fa-angle-left pull-right"></i>
+                </a>
+                <ul class="treeview-menu {{ Active::pattern('admin/schedule/*', 'menu-open') }}" style="display: none; {{ Active::pattern('admin/schedule*', 'display: block;') }}">
+                    @permission('view-calendar-management')
+                    <li class="{{ Active::pattern('admin/schedule/calendars*') }}">
+                        <a href="{{ route('admin.schedule.calendars.index') }}">{{ trans('menus.backend.schedule.calendar_title') }}</a>
+                    </li>
+                    @endauth
+
+                    @permission('view-timetable-management')
+                    <li class="{{ Active::pattern('admin/schedule/timetables*') }}">
+                        <a href="{!! url('admin/schedule/timetables') !!}">{{ trans('menus.backend.schedule.timetable_title') }}</a>
+                    </li>
+                    @endauth
+
+                </ul>
+            </li>
+            @endauth
+
+
             @permission('view-accounting-management')
             <li class="{{ Active::pattern('admin/accounting*') }} treeview">
                 <a href="#">
