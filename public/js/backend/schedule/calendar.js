@@ -40,75 +40,64 @@ $(document).ready(function () {
     // Render full calendar
     calendar();
     renderingEventsOnSideLeft($('#calendar').fullCalendar('getDate').format('YYYY'));
-    // Render Event on full calendar
-    // getAllEvents();
+
 
     // Add more events.
-    //$('#form-create-event').on('submit', function (e) {
-    //    e.preventDefault();
-    //
-    //    $.ajax({
-    //        type: 'POST',
-    //        url: '/admin/schedule/calendars',
-    //        data: $(this).serialize(),
-    //        success: function (response) {
-    //            if (response.status == true) {
-    //                swal(
-    //                    $('input[name="title"]').val(),
-    //                    'You have been successfully to create a new event.',
-    //                    'success'
-    //                );
-    //                $('#form-create-event')[0].reset();
-    //                calendar();
-		//			$('#modal-add-event').modal('toggle');
-    //                renderingEventsOnSideLeft($('#calendar').fullCalendar('getDate')._i[0]);
-    //            }
-    //
-    //        },
-    //        error: function (data) {
-    //            var errors = "";
-    //            $.each(data.responseJSON, function (key, val) {
-    //                errors += val + '</br>';
-    //            });
-    //            swal(
-    //                'Oops... ' + status,
-    //                errors,
-    //                'error'
-    //            )
-    //        }
-    //    });
-    //
-    //
-    //});
+    $('#form-create-event').on('submit', function (e) {
+        e.preventDefault();
 
-	// prev event on full calendar
+        $.ajax({
+            type: 'POST',
+            url: '/admin/schedule/calendars',
+            data: $(this).serialize(),
+            success: function (response) {
+                if (response.status == true) {
+                    swal(
+                        $('input[name="title"]').val(),
+                        'You have been successfully to create a new event.',
+                        'success'
+                    );
+                    $('#form-create-event')[0].reset();
+                    calendar();
+                    $('#modal-add-event').modal('toggle');
+                    renderingEventsOnSideLeft($('#calendar').fullCalendar('getDate')._i[0]);
+                }
 
-    $('.fc-prev-button.fc-button.fc-state-default.fc-corner-left').click(function(){
-		//var moment = $('#calendar').fullCalendar('getDate');
-		//sweetAlert(moment.format('Y'));
-        //console.log($('#calendar').fullCalendar('getDate').format('YYYY'));
+            },
+            error: function (data) {
+                var errors = "";
+                $.each(data.responseJSON, function (key, val) {
+                    errors += val + '</br>';
+                });
+                swal(
+                    'Oops... ' + status,
+                    errors,
+                    'error'
+                )
+            }
+        });
+
+    });
+
+    // prev event on full calendar
+
+    $('.fc-prev-button.fc-button.fc-state-default.fc-corner-left').click(function () {
         renderingEventsOnSideLeft($('#calendar').fullCalendar('getDate').format('YYYY'));
     });
 
     // next event on full calendar
 
-    $('.fc-next-button.fc-button.fc-state-default.fc-corner-right').click(function(){
-		//var moment = $('#calendar').fullCalendar('getDate');
-		//sweetAlert(moment.format('Y'));
-        //$("#calendar").fullCalendar( 'refresh' );
-        //console.log($('#calendar').fullCalendar('getDate').format('YYYY'));
+    $('.fc-next-button.fc-button.fc-state-default.fc-corner-right').click(function () {
         renderingEventsOnSideLeft($('#calendar').fullCalendar('getDate').format('YYYY'));
     });
 
     // today event click.
-    $('.fc-today-button.fc-button.fc-state-default.fc-corner-left.fc-corner-right').click(function(){
-        //$("#calendar").fullCalendar( 'refresh' );
-        //console.log($('#calendar').fullCalendar('getDate')+"right");
+    $('.fc-today-button.fc-button.fc-state-default.fc-corner-left.fc-corner-right').click(function () {
         renderingEventsOnSideLeft($('#calendar').fullCalendar('getDate').format('YYYY'));
     });
 });
 
-function calendar() {
+var calendar = function () {
     /* initialize the external events
      -----------------------------------------------------------------*/
     function ini_events(ele) {
@@ -187,55 +176,55 @@ function calendar() {
 
         },
         eventDrop: function (event, delta, revertFunc) {
-            updateEvent(event);
+            moveEvent(event);
         },
         eventClick: function (event) {
             removeEvent(event);
         },
-        eventMouseover: function(calEvent, jsEvent) {
+        eventMouseover: function (calEvent, jsEvent) {
             var tooltip = '<div class="tooltipevent">' + calEvent.title + '</div>';
             var $tooltip = $(tooltip).appendTo('body');
 
-            $(this).mouseover(function(e) {
+            $(this).mouseover(function (e) {
                 $(this).css('z-index', 10000);
                 $tooltip.fadeIn('500');
                 $tooltip.fadeTo('10', 1.9);
-            }).mousemove(function(e) {
+            }).mousemove(function (e) {
                 $tooltip.css('top', e.pageY + 10);
                 $tooltip.css('left', e.pageX + 20);
             });
         },
-        eventMouseout: function(calEvent, jsEvent) {
+        eventMouseout: function (calEvent, jsEvent) {
             $(this).css('z-index', 8);
             $('.tooltipevent').remove();
         }
     });
 }
-var renderingEventsOnSideLeft = function(year)
-{
-    $.ajax({
-       type: 'GET',
-        url: '/admin/schedule/calendars/event/'+year,
-        success:function (response) {
-			if (response.status == true) {
-				var event = '';
-				$.each(response.events, function (key, val) {
-					if (val.category_event_id == 1) {
-						event += '<div class="external-event bg-aqua ui-draggable ui-draggable-handle" data-bg="bg-aqua" event-id="' + val.id + '">' + val.title + '</div>';
-					}
-					else if (val.category_event_id == 2) {
-						event += '<div class="external-event bg-green ui-draggable ui-draggable-handle" data-bg="bg-green" event-id="' + val.id + '">' + val.title + '</div>';
-					}
-					else {
-						event += '<div class="external-event bg-red ui-draggable ui-draggable-handle" data-bg="bg-red" event-id="' + val.id + '">' + val.title + '</div>';
-					}
-				});
 
-				$('#external-events').html(event);
-				calendar();
-			}
+var renderingEventsOnSideLeft = function (year) {
+    $.ajax({
+        type: 'GET',
+        url: '/admin/schedule/calendars/fullcalendar/' + year,
+        success: function (response) {
+            if (response.status == true) {
+                var event = '';
+                $.each(response.events, function (key, val) {
+                    if (val.category_event_id == 1) {
+                        event += '<div class="external-event bg-aqua ui-draggable ui-draggable-handle" data-bg="bg-aqua" event-id="' + val.id + '">' + val.title + '</div>';
+                    }
+                    else if (val.category_event_id == 2) {
+                        event += '<div class="external-event bg-green ui-draggable ui-draggable-handle" data-bg="bg-green" event-id="' + val.id + '">' + val.title + '</div>';
+                    }
+                    else {
+                        event += '<div class="external-event bg-red ui-draggable ui-draggable-handle" data-bg="bg-red" event-id="' + val.id + '">' + val.title + '</div>';
+                    }
+                });
+
+                $('#external-events').html(event);
+                calendar();
+            }
         },
-        error:function (response) {
+        error: function (response) {
             sweetAlert(response.errors);
         }
     });
@@ -244,7 +233,7 @@ var renderingEventsOnSideLeft = function(year)
 var addEvent = function (event) {
     $.ajax({
         type: 'POST',
-        url: '/admin/schedule/calendars/event/drag',
+        url: '/admin/schedule/calendars/fullcalendar/add',
         contentType: "application/json",
         dataType: "json",
         cache: false,
@@ -264,7 +253,7 @@ var addEvent = function (event) {
                 newEvent.allDay = true;
                 newEvent.start = response.event.start;
                 newEvent.end = response.event.end;
-                $("#calendar").fullCalendar( 'refresh' );
+                $("#calendar").fullCalendar('refresh');
                 $('#calendar').fullCalendar('renderEvent', newEvent, true);
                 toastr["success"]("You have been added the event successfully.");
                 renderingEventsOnSideLeft($('#calendar').fullCalendar('getDate').format('YYYY'));
@@ -274,73 +263,77 @@ var addEvent = function (event) {
         }
     });
 };
-//
-//var updateEvent = function (event) {
-//    $.ajax({
-//        type: 'POST',
-//        url: '/admin/schedule/calendars/event/move',
-//        data: {
-//            id: event.id,
-//            start: event.start.format(),
-//            end: event.start.format()
-//        },
-//        success: function (response) {
-//            if (response.status == true) {
-//                toastr["info"]("You have been updated successfully.", "Information");
-//            } else {
-//                toastr["error"]("Something went wrong !");
-//            }
-//        }
-//    });
-//};
-//
-//var removeEvent = function (event) {
-//    swal({
-//        title: 'Are you sure?',
-//        text: "You won't be able to revert this!",
-//        type: 'warning',
-//        showCancelButton: true,
-//        confirmButtonColor: '#3085d6',
-//        cancelButtonColor: '#d33',
-//        confirmButtonText: 'Yes, delete it!'
-//    }).then(function () {
-//        $.ajax({
-//            type: 'POST',
-//            url: '/admin/schedule/calendars/event/delete',
-//            data: {
-//                id: event.id
-//            },
-//            success: function (response) {
-//                if (response.status == true) {
-//                    $('#calendar').fullCalendar('removeEvents', response.id);
-//                    renderingEventsOnSideLeft($('#calendar').fullCalendar('getDate')._i[0]);
-//                }
-//            }
-//        });
-//        swal(
-//            'Deleted!',
-//            'Your file has been deleted.',
-//            'success'
-//        )
-//    });
-//};
-//
-//var resizeEvent = function (id, start, end) {
-//    $.ajax({
-//        type: 'POST',
-//        url: '/admin/schedule/calendars/event/resize',
-//        data: {
-//            id: id,
-//            start: start,
-//            end: end
-//        },
-//        success: function (response) {
-//            if (response.status == true) {
-//                toastr["success"]("You have been added the event successfully.", "Have been updated");
-//                calendar();
-//            } else {
-//                toastr["error"]("Error !", "Something went wrong.");
-//            }
-//        }
-//    })
-//};
+
+var moveEvent = function (event) {
+    $.ajax({
+        type: 'POST',
+        url: '/admin/schedule/calendars/fullcalendar/move',
+        data: {
+            id: event.id,
+            start: event.start.format(),
+            end: event.start.format()
+        },
+        success: function (response) {
+            if (response.status == true) {
+                toastr["info"]("You have been updated successfully.", "Information");
+            } else {
+                toastr["error"]("Something went wrong !");
+            }
+        }
+    });
+};
+
+var removeEvent = function (event) {
+    swal({
+        title: 'Are you sure?',
+        text: "You won't be able to revert this!",
+        type: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#3085d6',
+        cancelButtonColor: '#d33',
+        confirmButtonText: 'Yes, delete it!'
+    }).then(function () {
+        $.ajax({
+            type: 'POST',
+            url: '/admin/schedule/calendars/fullcalendar/delete',
+            data: {
+                id: event.id
+            },
+            success: function (response) {
+                if (response.status == true) {
+                    $('#calendar').fullCalendar('removeEvents', response.id);
+                    renderingEventsOnSideLeft($('#calendar').fullCalendar('getDate').format('YYYY'));
+                    swal(
+                        'Deleted!',
+                        'Your file has been deleted.',
+                        'success'
+                    )
+                }
+            },
+            error: function (error, jqXHR, exception) {
+                sweetAlert("Oops...", "Something went wrong!", "error");
+            }
+        });
+
+    });
+};
+
+var resizeEvent = function (id, start, end) {
+    $.ajax({
+        type: 'POST',
+        url: '/admin/schedule/calendars/fullcalendar/resize',
+        data: {
+            id: id,
+            start: start,
+            end: end
+        },
+        success: function (response) {
+            if (response.status == true) {
+                toastr["success"]("You have been added the event successfully.", "Have been updated");
+                calendar();
+            } else {
+                toastr["error"]("Error !", "Something went wrong.");
+            }
+        }
+    })
+};

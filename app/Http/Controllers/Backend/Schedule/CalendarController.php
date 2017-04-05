@@ -55,8 +55,7 @@ class CalendarController extends Controller
     public function getEventsByYear($year)
     {
         $findYear = $this->yearRepository->findByYear($year);
-        if($findYear instanceof Year)
-        {
+        if ($findYear instanceof Year) {
             $events = $this->eventRepository->getEventsByYear($findYear->id);
             return Response::json(['status' => true, 'events' => $events]);
         }
@@ -113,8 +112,80 @@ class CalendarController extends Controller
      */
     public function getEvents()
     {
-
         $events = $this->eventRepository->getAllObjectEvents();
         return Response::json($events);
+    }
+
+    /**
+     * @return mixed
+     */
+    public function deleteEvent()
+    {
+        $status = DB::table('event_year')
+            ->where([
+                ['id', '=', request('id')]
+            ])->delete();
+
+        return Response::json(['status' => $status, 'id' => request('id')]);
+    }
+
+    /**
+     * @return mixed
+     */
+    public function resizeEvent()
+    {
+        $status = DB::table('event_year')
+            ->where([
+                ['id', '=', request('id')]
+            ])
+            ->update([
+                'start' => request('start'),
+                'end' => request('end')
+            ]);
+
+        return Response::json(['status' => $status]);
+    }
+
+    /**
+     * @return mixed
+     */
+    public function moveEvent()
+    {
+
+        $event = DB::table('event_year')
+            ->where('id', request('id'))
+            ->update(['start' => request('start'), 'end' => request('start')]);
+
+        if (empty($event)) {
+            return Response::json(['status' => false]);
+        }
+
+        return Response::json(['status' => true]);
+    }
+
+    /***
+     * @return mixed
+     */
+    public function store()
+    {
+        dd(request()->all());
+
+        $newEvent = new Event();
+
+        $newEvent->title = $request->title;
+        $newEvent->category_event_id = $request->category_id;
+
+
+        if (isset($request->study)) {
+            $newEvent->study = $request->study;
+        }
+
+        $status = false;
+
+        if ($newEvent->save()) {
+            $status = true;
+        }
+
+        return Response::json(['status' => $status]);
     }
 }
