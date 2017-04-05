@@ -2,9 +2,11 @@
 
 namespace App\Http\Controllers\Backend\Schedule;
 
+use App\Models\Department;
 use App\Models\Schedule\Calendar\CategoryEvent;
 use App\Models\Schedule\Calendar\Event;
 use App\Models\Schedule\Calendar\Year;
+use App\Repositories\Backend\Department\EloquentDepartmentRepository;
 use App\Repositories\Backend\Schedule\EloquentEventRepository;
 use App\Repositories\Backend\Schedule\EloquentYearRepository;
 
@@ -44,8 +46,8 @@ class CalendarController extends Controller
     {
         $categoryEvents = CategoryEvent::all();
         $events = Event::latest()->get();
-
-        return view('backend.schedule.calendars.index', compact('categoryEvents', 'events'));
+        $departments = Department::all();
+        return view('backend.schedule.calendars.index', compact('categoryEvents', 'events', 'departments'));
     }
 
     /**

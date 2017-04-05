@@ -199,7 +199,7 @@ var calendar = function () {
             $('.tooltipevent').remove();
         }
     });
-}
+};
 
 var renderingEventsOnSideLeft = function (year) {
     $.ajax({

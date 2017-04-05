@@ -26,14 +26,13 @@ class StudentApiController extends Controller
         $semesterId = $dataParams['semester_id'];
 
         if($semesterId) {
-            return $this->getStudentScoreBySemester($studentAnnualId, $semesterId);//20486,1
+            return ['data' => $this->getStudentScoreBySemester($studentAnnualId, $semesterId)];//20486,1
         } else {
 
             return ['data' => $this->getStudentScoreBySemester($studentAnnualId, $semesterId=null)];
         }
 
     }
-
     public function studentDataFromDB(StudentApiRequest $request) {
 
         $students = DB::table('students')
@@ -46,8 +45,8 @@ class StudentApiController extends Controller
     public function studentObject(StudentApiRequest $request) {
 
         $dataParams = FormParamManager::getFormParams($request);
-        $studentIdCard = $dataParams['student_id_card'];
-        $academicYearId = $dataParams['academic_year_id'];
+        $studentIdCard = isset($dataParams['student_id_card'])?$dataParams['student_id_card']:null;
+        $academicYearId = isset($dataParams['academic_year_id'])?$dataParams['academic_year_id']:null;
         $student = Student::where('id_card', $studentIdCard)->first();
 
         if($academicYearId) {
@@ -63,5 +62,45 @@ class StudentApiController extends Controller
             return ($studentAnnuals);
         }
     }
+
+    public function studentScoreAnnually(Request $request) {
+
+        $dataParams = FormParamManager::getFormParams($request);
+        $studentIdCard = isset($dataParams['student_id_card'])?$dataParams['student_id_card']:null;
+        $academicYearId = isset($dataParams['academic_year_id'])?$dataParams['academic_year_id']:null;
+        $student = Student::where('id_card', $studentIdCard)->first();
+        $courseAnnualByYears = [];
+
+        if($academicYearId) {
+            $studentAnnuals = $student->studentAnnuals;//->where('academic_year_id', $academicYearId)->get();
+            foreach($studentAnnuals as $studentAnnual) {
+                if($studentAnnual->academic_year_id == $academicYearId) {
+                    $courseAnnualByYear = $this->getStudentScoreBySemester($studentAnnual->id, $semesterId = null);
+                    return [
+                        'student' => $student,
+                        'student_annual' => $studentAnnual,
+                        'course_score' => $courseAnnualByYear
+                    ];
+                }
+            }
+
+        } else {
+            $studentAnnuals = $student->studentAnnuals;
+
+            foreach($studentAnnuals as $studentAnnual) {
+                $studentScoreEachYear = $this->getStudentScoreBySemester($studentAnnual->id, $semesterId = null);
+                $courseAnnualByYears[$studentAnnual->academic_year_id] = $studentScoreEachYear;
+            }
+
+            return [
+                'student' => $student,
+                'student_annual' => $studentAnnuals,
+                'course_score' => $courseAnnualByYears
+            ];
+        }
+    }
+
+
+
 
 }
