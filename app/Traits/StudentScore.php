@@ -1,6 +1,7 @@
 <?php
 namespace App\Traits;
 
+use App\Models\Student;
 use Illuminate\Support\Facades\DB;
 use App\Models\Redouble;
 use App\Repositories\Backend\ResitStudentAnnual\ResitStudentAnnualRepositoryContract;
@@ -1074,6 +1075,15 @@ trait StudentScore {
         $courseAnnuals = $courseAnnuals->orderBy('course_annuals.semester_id')->orderBy('course_annuals.name_en')->get();// note restricted order by semester this is very important to make dynamic table course of each year [if change there would have bugs]
 
         return ['course_annual' => $courseAnnuals, 'course_program' => []];
+
+    }
+
+
+    public function getStudentScoreYearly($studentIdCard, $academicYearId) {
+
+        $student = Student::where('id_card', $studentIdCard)->first();
+        $studentAnnuals = $student->studentAnnuals;
+
 
     }
 }

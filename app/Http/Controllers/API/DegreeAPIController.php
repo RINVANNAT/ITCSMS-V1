@@ -12,6 +12,8 @@ use InfyOm\Generator\Criteria\LimitOffsetCriteria;
 use InfyOm\Generator\Utils\ResponseUtil;
 use Prettus\Repository\Criteria\RequestCriteria;
 use Response;
+use App\Utils\FormParamManager;
+use Illuminate\Support\Facades\DB;
 
 /**
  * Class DegreeController
@@ -126,5 +128,17 @@ class DegreeAPIController extends AppBaseController
         $degree->delete();
 
         return $this->sendResponse($id, 'Degree deleted successfully');
+    }
+
+    public function getAll() {
+
+        $degrees = DB::table('degrees')->get();
+        return $degrees;
+    }
+
+    public function unique(Request $request) {
+        $params = FormParamManager::getFormParams($request);
+        $degree = DB::table('degrees')->where('id',$params['degree_id'])->first();
+        return (array) $degree;
     }
 }
