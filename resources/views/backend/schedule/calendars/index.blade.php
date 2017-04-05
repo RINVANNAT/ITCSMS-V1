@@ -13,6 +13,8 @@
 @section('after-styles-end')
     <link rel="stylesheet" href="{{ asset('plugins/fullcalendar/fullcalendar.min.css') }}"/>
     <link rel="stylesheet" href="{{ asset('plugins/sweetalert2/dist/sweetalert2.min.css') }}"/>
+    <link rel="stylesheet" href="{{ asset('plugins/datetimepicker/bootstrap-datetimepicker.min.css') }}"/>
+    <link rel="stylesheet" href="{{ asset('plugins/select2/select2.min.css') }}"/>
     <link rel="stylesheet" href="{{ asset('css/calendar.css') }}"/>
 @stop
 
@@ -70,9 +72,42 @@
 @section('after-scripts-end')
 
     <script type="text/javascript" src="{{ asset('plugins/sweetalert2/dist/sweetalert2.min.js') }}"></script>
+    <script type="text/javascript" src="{{ asset('plugins/select2/select2.full.min.js') }}"></script>
     <script type="text/javascript" src="{{ asset('js/backend/schedule/jquery-ui.min.js') }}"></script>
     <script type="text/javascript" src="{{ asset('plugins/moment/moment.min.js') }}"></script>
     <script type="text/javascript" src="{{ asset('plugins/fullcalendar/fullcalendar.js') }}"></script>
     <script type="text/javascript" src="{{ asset('js/backend/schedule/calendar.js') }}"></script>
+    <script type="text/javascript" src="{{ asset('plugins/datetimepicker/bootstrap-datetimepicker.min.js') }}"></script>
+
+    <script type="text/javascript">
+        $(document).ready(function(){
+            $('.extra-input').hide();
+
+            $('#start_date').datetimepicker({
+                format: 'YYYY-MM-DD'
+            });
+            $('#end_date').datetimepicker({
+                format: 'YYYY-MM-DD'
+            });
+
+            $('input[name="fix"]').click(function(){
+                if($(this).prop("checked") == true){
+                    $('.extra-input').show();
+                }
+                else if($(this).prop("checked") == false){
+                    $('.extra-input').toggle();
+                }
+            });
+
+
+            $('#category').select2({
+                placeholder: 'Chose category'
+            });
+
+            $('#departments').select2({
+                placeholder: 'Chose department'
+            });
+        });
+    </script>
 
 @stop
