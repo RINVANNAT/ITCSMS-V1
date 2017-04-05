@@ -13,26 +13,7 @@
 @section('after-styles-end')
     <link rel="stylesheet" href="{{ asset('plugins/fullcalendar/fullcalendar.min.css') }}"/>
     <link rel="stylesheet" href="{{ asset('plugins/sweetalert2/dist/sweetalert2.min.css') }}"/>
-    <style type="text/css">
-        .fc-content {
-            height: 18px;
-        }
-
-        .bg-green, .bg-red, .bg-aqua {
-            padding:4px;
-            border: 1px solid #fff;
-        }
-
-        .tooltipevent {
-            padding: 10px;
-            border-radius: 4px;
-            width: 200px;
-            height: auto;
-            background: #ccc;
-            position: absolute;
-            z-index: 10001
-        }
-    </style>
+    <link rel="stylesheet" href="{{ asset('css/calendar.css') }}"/>
 @stop
 
 @section('content')
@@ -41,22 +22,22 @@
 
             <div class="box box-success">
                 <div class="box-header with-border">
-                    <h3 class="box-title">Events</h3>
+                    <h3 class="box-title">{{ trans('labels.backend.schedule.event.panel.title') }}</h3>
                     <div class="pull-right box-tools">
                         <button type="button"
                                 class="btn btn-primary btn-sm"
                                 data-toggle="modal"
                                 data-target="#modal-add-event">
-                            <i class="fa fa-plus-circle"></i> Add
+                            <i class="fa fa-plus-circle"></i> {{ trans('buttons.backend.schedule.event.panel.add') }}
                         </button>
                     </div>
                 </div>
                 <div class="box-body">
-
+                    {{--List all events--}}
                     @if(isset($events))
                         <div id="external-events"></div>
                     @endif
-
+                    {{--End list events--}}
                 </div>
             </div>
         </div>
@@ -64,20 +45,20 @@
         <div class="col-md-9">
             <div class="box box-success">
                 <div class="box-header with-border">
-                    <h3 class="box-title">Calendar</h3>
+                    <h3 class="box-title">{{ trans('labels.backend.schedule.calendar.panel.title') }}</h3>
                     <div class="pull-right box-tools">
                         <button type="button" class="btn btn-success btn-sm">
-                            <i class="fa fa-file-excel-o"></i> Export
+                            <i class="fa fa-file-excel-o"></i> {{ trans('buttons.backend.schedule.calendar.panel.export') }}
                         </button>
                         <button type="button" class="btn btn-warning btn-sm">
-                            <i class="fa fa-power-off"></i> Uneditable
+                            <i class="fa fa-power-off"></i> {{ trans('buttons.backend.schedule.calendar.panel.uneditable') }}
                         </button>
                     </div>
                 </div>
                 <div class="box-body">
-
+                    {{--Rendering calendar--}}
                     <div id="calendar"></div>
-
+                    {{--End rendering calendar--}}
                 </div>
             </div>
         </div>

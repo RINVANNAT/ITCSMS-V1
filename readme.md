@@ -1,4 +1,5 @@
-## Laravel 5.* Boilerplate, Currently 5.2.12 [Screenshots](http://imgur.com/a/uEKuq)
+SMIS | ITC [Screenshots](http://elearning.itc.edu.kh:1000/elearning/wp-content/uploads/2016/07/ITC_logo.jpg)
+====================================================
 
 [![Latest Stable Version](https://poser.pugx.org/rappasoft/laravel-5-boilerplate/v/stable)](https://packagist.org/packages/rappasoft/laravel-5-boilerplate) [![Latest Unstable Version](https://poser.pugx.org/rappasoft/laravel-5-boilerplate/v/unstable)](https://packagist.org/packages/rappasoft/laravel-5-boilerplate)
 
@@ -33,3 +34,8 @@ If you would like to help the continued efforts of this project, any size [donat
 ### License
 
 The Laravel framework is open-sourced software licensed under the MIT license
+
+### Migration Command
+- Edit migrate file `2016_09_15_165639_modify_bac2_max_name_size.php` and rename `\"studentBac2s\"`
+- And then run command `php artisan migrate`
+- Re-edit migrate file `2016_09_15_165639_modify_bac2_max_name_size.php` 

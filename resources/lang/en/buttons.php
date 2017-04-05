@@ -1,4 +1,3 @@
-
 <?php
 
 return [
@@ -25,6 +24,19 @@ return [
                 'restore_user' => 'Restore User',
             ],
         ],
+        'schedule' => [
+            'calendar' => [
+                'panel' => [
+                    'export' => 'Export',
+                    'uneditable' => 'Uneditable'
+                ]
+            ],
+            'event' => [
+                'panel' => [
+                    'add' => 'Add'
+                ]
+            ]
+        ]
     ],
 
     'general' => [
@@ -72,7 +84,7 @@ return [
     ],
 
     'course' => [
-        'course_annual' =>[
+        'course_annual' => [
             'course_assignment' => 'Course Assignment',
             'disable_scoring' => 'Disable Scoring',
             'enable_scoring' => 'Enable Scoring'
