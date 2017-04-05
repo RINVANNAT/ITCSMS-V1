@@ -12,6 +12,8 @@ use InfyOm\Generator\Criteria\LimitOffsetCriteria;
 use InfyOm\Generator\Utils\ResponseUtil;
 use Prettus\Repository\Criteria\RequestCriteria;
 use Response;
+use App\Utils\FormParamManager;
+use Illuminate\Support\Facades\DB;
 
 /**
  * Class DepartmentController
@@ -133,5 +135,18 @@ class DepartmentAPIController extends AppBaseController
         $department->delete();
 
         return $this->sendResponse($id, 'Department deleted successfully');
+    }
+
+
+    public function getAll() {
+
+        $departments = DB::table('departments')->get();
+        return $departments;
+    }
+
+    public function unique(Request $request) {
+        $params = FormParamManager::getFormParams($request);
+        $department = DB::table('departments')->where('id',$params['department_id'])->first();
+        return (array) $department;
     }
 }

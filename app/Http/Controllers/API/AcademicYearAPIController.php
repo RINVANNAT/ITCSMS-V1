@@ -4,7 +4,9 @@ use App\Http\Requests\API\CreateAcademicYearAPIRequest;
 use App\Http\Requests\API\UpdateAcademicYearAPIRequest;
 use App\Models\AcademicYear;
 use App\Repositories\AcademicYearRepository;
+use App\Utils\FormParamManager;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use InfyOm\Generator\Controller\AppBaseController;
 use InfyOm\Generator\Criteria\LimitOffsetCriteria;
 use InfyOm\Generator\Utils\ResponseUtil;
@@ -125,5 +127,17 @@ class AcademicYearAPIController extends AppBaseController
         $academicYear->delete();
 
         return $this->sendResponse($id, 'AcademicYear deleted successfully');
+    }
+
+    public function getAll() {
+
+        $academicYears = DB::table('academicYears')->get();
+        return $academicYears;
+    }
+
+    public function unique(Request $request) {
+        $params = FormParamManager::getFormParams($request);
+        $academicYear = DB::table('academicYears')->where('id',$params['academic_year_id'])->first();
+        return (array) $academicYear;
     }
 }

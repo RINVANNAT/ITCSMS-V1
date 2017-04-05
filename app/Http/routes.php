@@ -82,6 +82,30 @@ Route::group(['prefix'=> 'api', 'namespace' => 'API'], function() {
     Route::group(['prefix' => 'employee'], function() {
         require (__DIR__ . '/Routes/Backend/API/Employee.php');
     });
+
+    Route::group(['prefix' => 'department'], function() {
+        require (__DIR__ . '/Routes/Backend/API/Department.php');
+    });
+
+    Route::group(['prefix' => 'grade'], function() {
+        require (__DIR__ . '/Routes/Backend/API/Grade.php');
+    });
+
+    Route::group(['prefix' => 'degree'], function() {
+        require (__DIR__ . '/Routes/Backend/API/Degree.php');
+    });
+
+    Route::group(['prefix' => 'option'], function() {
+        require (__DIR__ . '/Routes/Backend/API/Option.php');
+    });
+
+    Route::group(['prefix' => 'gender'], function() {
+        require (__DIR__ . '/Routes/Backend/API/Gender.php');
+    });
+
+    Route::group(['prefix' => 'academic-year'], function() {
+        require (__DIR__ . '/Routes/Backend/API/AcademicYear.php');
+    });
 });
 
 

@@ -6,6 +6,6 @@
  * Time: 11:48 AM
  */
 
-Route::get('/score', 'StudentApiController@studentScore')->name('student.score');
+Route::get('/score', 'StudentApiController@studentScoreAnnually')->name('student.score');
 Route::get('/data', 'StudentApiController@studentDataFromDB')->name('student.data');
 Route::get('/annual-object', 'StudentApiController@studentObject')->name('student.annual_object');

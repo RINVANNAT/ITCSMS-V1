@@ -7,12 +7,15 @@ use App\Http\Requests\API\UpdateGradeAPIRequest;
 use App\Models\Grade;
 use App\Repositories\GradeRepository;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use InfyOm\Generator\Controller\AppBaseController;
 use InfyOm\Generator\Criteria\LimitOffsetCriteria;
 use InfyOm\Generator\Utils\ResponseUtil;
 use Prettus\Repository\Criteria\RequestCriteria;
 use Response;
 
+use App\Http\Requests\API\Server88APIRequest;
+use App\Utils\FormParamManager;
 /**
  * Class GradeController
  * @package App\Http\Controllers\API
@@ -126,5 +129,21 @@ class GradeAPIController extends AppBaseController
         $grade->delete();
 
         return $this->sendResponse($id, 'Grade deleted successfully');
+    }
+
+
+    public function getAll(Server88APIRequest $request) {
+
+       $grades = DB::table('grades')->get();
+
+        return $grades;
+
+    }
+
+    public function unique(Server88APIRequest $request) {
+
+        $param = FormParamManager::getFormParams($request);
+        $grade =  DB::table('grades')->where('id', $param['grade_id'])->first();
+        return (array)$grade;
     }
 }
