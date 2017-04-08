@@ -106,7 +106,7 @@ Route::group(['prefix'=> 'api', 'namespace' => 'API'], function() {
     });
 
     Route::group(['prefix' => 'academic-year'], function() {
-        require (__DIR__ . '/Routes/Backend/API/AcademicYear.php');
+        require (__DIR__ . '/Routes/Backend/API/academicYear.php');
     });
 });
 
