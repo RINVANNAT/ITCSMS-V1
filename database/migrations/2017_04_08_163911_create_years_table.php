@@ -14,19 +14,30 @@ class CreateYearsTable extends Migration
     {
         Schema::create('years', function (Blueprint $table) {
             $table->increments('id');
-            $table->integer('year');
+            $table->string('name');
             $table->timestamps();
         });
 
         Schema::create('event_year', function (Blueprint $table) {
             $table->increments('id');
-            $table->integer('event_id')->unsigned();
-            $table->integer('year_id')->unsigned();
-            $table->dateTime('start');
-            $table->dateTime('end');
 
-            $table->foreign('event_id')->references('id')->on('events')->onDelete('cascade');
-            $table->foreign('year_id')->references('id')->on('years')->onDelete('cascade');
+            $table->integer('event_id');
+            $table->integer('year_id');
+
+            $table->foreign('event_id')
+                  ->references('id')
+                  ->on('events')
+                  ->onDelete('CASCADE');
+
+            $table->foreign('year_id')
+                ->references('id')
+                ->on('years')
+                ->onDelete('CASCADE');
+
+            $table->integer('created_uid');
+            $table->integer('updated_uid');
+
+            $table->timestamps();
         });
     }
 

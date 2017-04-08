@@ -18,6 +18,8 @@
     <link rel="stylesheet" href="{{ asset('plugins/datetimepicker/bootstrap-datetimepicker.min.css') }}"/>
     <link rel="stylesheet" href="{{ asset('plugins/select2/select2.min.css') }}"/>
     <link rel="stylesheet" href="{{ asset('css/calendar.css') }}"/>
+    <link rel="stylesheet" href="{{ asset('plugins/iCheck/square/red.css') }}"/>
+
 
 @stop
 
@@ -83,6 +85,7 @@
     <script type="text/javascript" src="{{ asset('js/backend/schedule/jquery-ui.min.js') }}"></script>
     <script type="text/javascript" src="{{ asset('plugins/moment/moment.min.js') }}"></script>
     <script type="text/javascript" src="{{ asset('plugins/fullcalendar/fullcalendar.js') }}"></script>
+    <script type="text/javascript" src="{{ asset('plugins/iCheck/icheck.js') }}"></script>
     <script type="text/javascript" src="{{ asset('js/backend/schedule/calendar.js') }}"></script>
     <script type="text/javascript" src="{{ asset('plugins/datetimepicker/bootstrap-datetimepicker.min.js') }}"></script>
 

@@ -28,12 +28,16 @@ return [
             'calendar' => [
                 'panel' => [
                     'export' => 'Export',
-                    'uneditable' => 'Uneditable'
+                    'uneditable' => 'Un-editable'
                 ]
             ],
             'event' => [
                 'panel' => [
                     'add' => 'Add'
+                ],
+                'modal_create_event' => [
+                    'save_change' => 'Save Change',
+                    'cancel' => 'Cancel'
                 ]
             ]
         ]

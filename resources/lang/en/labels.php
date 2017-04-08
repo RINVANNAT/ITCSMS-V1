@@ -994,6 +994,23 @@ return [
             'event' => [
                 'panel' => [
                     'title' => 'Event'
+                ],
+                'modal_create_event' => [
+                    'title' => 'Add a new event',
+                    'form_input' => [
+                        'title' => 'Title',
+                        'department' => 'Departments',
+                        'start_date' => 'Start Date',
+                        'end_date' => 'End Date',
+                        'allow_student_study' => 'Allow student study',
+                        'repeat_all_year' => 'Repeat all year',
+                        'placeholder' => [
+                            'title' => 'Event title',
+                            'chose_department' => 'Chose Department',
+                            'start_date' => 'Start Date',
+                            'end_date' => 'End Date'
+                        ]
+                    ]
                 ]
             ]
         ]
