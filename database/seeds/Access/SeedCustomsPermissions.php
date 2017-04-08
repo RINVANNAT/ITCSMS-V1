@@ -16,163 +16,163 @@ class SeedCustomsPermissions extends Seeder
     {
         /* Access Permissions */
         $roots[] = [
-            'name'=>'Access',
-            'groups'=>[
+            'name' => 'Access',
+            'groups' => [
                 [
-                    'name'=>'User',
+                    'name' => 'User',
                     'groups' => [
 
                     ],
                     'permissions' => [
                         [
-                            'name'         => 'create-users',
+                            'name' => 'create-users',
                             'display_name' => 'Create Users',
-                            'dependency'   => [
-                                'view-backend','view-access-management'
+                            'dependency' => [
+                                'view-backend', 'view-access-management'
                             ]
                         ],
                         [
-                            'name'         => 'edit-users',
+                            'name' => 'edit-users',
                             'display_name' => 'Edit Users',
-                            'dependency'   => [
-                                'view-backend','view-access-management'
+                            'dependency' => [
+                                'view-backend', 'view-access-management'
                             ]
                         ],
                         [
-                            'name'         => 'delete-users',
+                            'name' => 'delete-users',
                             'display_name' => 'Delete Users',
-                            'dependency'   => [
-                                'view-backend','view-access-management'
+                            'dependency' => [
+                                'view-backend', 'view-access-management'
                             ]
                         ],
                         [
-                            'name'         => 'change-user-password',
+                            'name' => 'change-user-password',
                             'display_name' => 'Change User Password',
-                            'dependency'   => [
-                                'view-backend','view-access-management'
+                            'dependency' => [
+                                'view-backend', 'view-access-management'
                             ]
                         ],
                         [
-                            'name'         => 'deactivate-users',
+                            'name' => 'deactivate-users',
                             'display_name' => 'Deactivate Users',
-                            'dependency'   => [
-                                'view-backend','view-access-management'
+                            'dependency' => [
+                                'view-backend', 'view-access-management'
                             ]
                         ],
                         [
-                            'name'         => 'reactivate-users',
+                            'name' => 'reactivate-users',
                             'display_name' => 'Re-Activate Users',
-                            'dependency'   => [
-                                'view-backend','view-access-management'
+                            'dependency' => [
+                                'view-backend', 'view-access-management'
                             ]
                         ],
                         [
-                            'name'         => 'undelete-users',
+                            'name' => 'undelete-users',
                             'display_name' => 'Restore Users',
-                            'dependency'   => [
-                                'view-backend','view-access-management'
+                            'dependency' => [
+                                'view-backend', 'view-access-management'
                             ]
                         ],
                         [
-                            'name'         => 'permanently-delete-users',
+                            'name' => 'permanently-delete-users',
                             'display_name' => 'Permanently Delete Users',
-                            'dependency'   => [
-                                'view-backend','view-access-management'
+                            'dependency' => [
+                                'view-backend', 'view-access-management'
                             ]
                         ],
                         [
-                            'name'         => 'resend-user-confirmation-email',
+                            'name' => 'resend-user-confirmation-email',
                             'display_name' => 'Resend Confirmation E-mail',
-                            'dependency'   => [
-                                'view-backend','view-access-management'
+                            'dependency' => [
+                                'view-backend', 'view-access-management'
                             ]
                         ],
                     ]
                 ],
                 [
-                    'name'=>'Role',
+                    'name' => 'Role',
                     'groups' => [
 
                     ],
                     'permissions' => [
                         [
-                            'name'         => 'create-roles',
+                            'name' => 'create-roles',
                             'display_name' => 'Create Roles',
-                            'dependency'   => [
-                                'view-backend','view-access-management'
+                            'dependency' => [
+                                'view-backend', 'view-access-management'
                             ]
                         ],
                         [
-                            'name'         => 'edit-roles',
+                            'name' => 'edit-roles',
                             'display_name' => 'Edit Roles',
-                            'dependency'   => [
-                                'view-backend','view-access-management'
+                            'dependency' => [
+                                'view-backend', 'view-access-management'
                             ]
                         ],
                         [
-                            'name'         => 'delete-roles',
+                            'name' => 'delete-roles',
                             'display_name' => 'Delete Roles',
-                            'dependency'   => [
-                                'view-backend','view-access-management'
+                            'dependency' => [
+                                'view-backend', 'view-access-management'
                             ]
                         ]
                     ]
                 ],
                 [
-                    'name'=>'Permission',
+                    'name' => 'Permission',
                     'groups' => [
 
                     ],
                     'permissions' => [
                         /* Permissions Group */
                         [
-                            'name'         => 'create-permission-groups',
+                            'name' => 'create-permission-groups',
                             'display_name' => 'Create Permission Groups',
-                            'dependency'   => [
-                                'view-backend','view-access-management'
+                            'dependency' => [
+                                'view-backend', 'view-access-management'
                             ]
                         ],
                         [
-                            'name'         => 'edit-permission-groups',
+                            'name' => 'edit-permission-groups',
                             'display_name' => 'Edit Permission Groups',
-                            'dependency'   => [
-                                'view-backend','view-access-management'
+                            'dependency' => [
+                                'view-backend', 'view-access-management'
                             ]
                         ],
                         [
-                            'name'         => 'delete-permission-groups',
+                            'name' => 'delete-permission-groups',
                             'display_name' => 'Delete Permission Groups',
-                            'dependency'   => [
-                                'view-backend','view-access-management'
+                            'dependency' => [
+                                'view-backend', 'view-access-management'
                             ]
                         ],
                         [
-                            'name'         => 'sort-permission-groups',
+                            'name' => 'sort-permission-groups',
                             'display_name' => 'Sort Permission Groups',
-                            'dependency'   => [
-                                'view-backend','view-access-management'
+                            'dependency' => [
+                                'view-backend', 'view-access-management'
                             ]
                         ],
                         /* Permissions */
                         [
-                            'name'         => 'create-permissions',
+                            'name' => 'create-permissions',
                             'display_name' => 'Create Permissions',
-                            'dependency'   => [
-                                'view-backend','view-access-management'
+                            'dependency' => [
+                                'view-backend', 'view-access-management'
                             ]
                         ],
                         [
-                            'name'         => 'edit-permissions',
+                            'name' => 'edit-permissions',
                             'display_name' => 'Edit Permissions',
-                            'dependency'   => [
-                                'view-backend','view-access-management'
+                            'dependency' => [
+                                'view-backend', 'view-access-management'
                             ]
                         ],
                         [
-                            'name'         => 'delete-permissions',
+                            'name' => 'delete-permissions',
                             'display_name' => 'Delete Permissions',
-                            'dependency'   => [
-                                'view-backend','view-access-management'
+                            'dependency' => [
+                                'view-backend', 'view-access-management'
                             ]
                         ]
                     ]
@@ -181,15 +181,15 @@ class SeedCustomsPermissions extends Seeder
             'permissions' => [
                 // Leave it empty if there is none
                 [
-                    'name'         => 'view-backend',
+                    'name' => 'view-backend',
                     'display_name' => 'View Backend',
-                    'dependency'   => [
+                    'dependency' => [
                     ]
                 ],
                 [
-                    'name'         => 'view-access-management',
+                    'name' => 'view-access-management',
                     'display_name' => 'View Access Management',
-                    'dependency'   => [
+                    'dependency' => [
                     ]
                 ]
             ]
@@ -197,82 +197,82 @@ class SeedCustomsPermissions extends Seeder
 
         /* Student affair permissions */
         $roots[] = [
-            'name'=>'Student & Study Affair',
-            'groups'=>[
+            'name' => 'Student & Study Affair',
+            'groups' => [
                 [
-                    'name'=>'Student',
+                    'name' => 'Student',
                     'groups' => [
 
                     ],
                     'permissions' => [
                         [
-                            'name'         => 'view-student-management',
+                            'name' => 'view-student-management',
                             'display_name' => 'View Student Management',
-                            'dependency'   => [
+                            'dependency' => [
                                 'view-backend'
                             ]
                         ],
                         [
-                            'name'         => 'create-students',
+                            'name' => 'create-students',
                             'display_name' => 'Create Students',
-                            'dependency'   => [
-                                'view-backend','view-student-management'
+                            'dependency' => [
+                                'view-backend', 'view-student-management'
                             ]
                         ],
                         [
-                            'name'         => 'edit-students',
+                            'name' => 'edit-students',
                             'display_name' => 'Edit Students',
-                            'dependency'   => [
-                                'view-backend','view-student-management'
+                            'dependency' => [
+                                'view-backend', 'view-student-management'
                             ]
                         ],
                         [
-                            'name'         => 'delete-students',
+                            'name' => 'delete-students',
                             'display_name' => 'Delete Students',
-                            'dependency'   => [
-                                'view-backend','view-student-management'
+                            'dependency' => [
+                                'view-backend', 'view-student-management'
                             ]
                         ],
                         [
                             'name' => 'generate-student-group',
                             'display_name' => 'Generate Student Group',
                             'dependency' => [
-                                'view-backend','view-student-management'
+                                'view-backend', 'view-student-management'
                             ]
                         ],
                         [
                             'name' => 'generate-student-id-card',
                             'display_name' => 'Generate Student ID Cards',
                             'dependency' => [
-                                'view-backend','view-student-management'
+                                'view-backend', 'view-student-management'
                             ]
                         ],
                         [
                             'name' => 'print-students-id-card',
                             'display_name' => 'Print Student ID Cards',
                             'dependency' => [
-                                'view-backend','view-student-management'
+                                'view-backend', 'view-student-management'
                             ]
                         ],
                         [
                             'name' => 'print-transcript',
                             'display_name' => 'Print Transcript',
                             'dependency' => [
-                                'view-backend','view-student-management'
+                                'view-backend', 'view-student-management'
                             ]
                         ],
                         [
                             'name' => 'manage-student-reporting',
                             'display_name' => 'Manage student reporting',
                             'dependency' => [
-                                'view-backend','view-student-management'
+                                'view-backend', 'view-student-management'
                             ]
                         ],
                         [
                             'name' => 'export-student-list',
                             'display_name' => 'Export student list',
                             'dependency' => [
-                                'view-backend','view-student-management'
+                                'view-backend', 'view-student-management'
                             ]
                         ]
                     ]
@@ -287,128 +287,128 @@ class SeedCustomsPermissions extends Seeder
 
         /* Accounting Permissions */
         $roots[] = [
-            'name'=>'Accounting',
-            'groups'=>[
+            'name' => 'Accounting',
+            'groups' => [
                 [
-                    'name'=>'Income',
+                    'name' => 'Income',
                     'groups' => [
 
                     ],
                     'permissions' => [
                         [
-                            'name'         => 'view-income-management',
+                            'name' => 'view-income-management',
                             'display_name' => 'View Income Management',
-                            'dependency'   => [
-                                'view-backend','view-accounting-management'
+                            'dependency' => [
+                                'view-backend', 'view-accounting-management'
                             ]
                         ],
                         [
-                            'name'         => 'create-incomes',
+                            'name' => 'create-incomes',
                             'display_name' => 'Create Incomes',
-                            'dependency'   => [
-                                'view-backend','view-accounting-management','view-income-management'
+                            'dependency' => [
+                                'view-backend', 'view-accounting-management', 'view-income-management'
                             ]
                         ],
                         [
-                            'name'         => 'edit-incomes',
+                            'name' => 'edit-incomes',
                             'display_name' => 'Edit Incomes',
-                            'dependency'   => [
-                                'view-backend','view-accounting-management','view-income-management'
+                            'dependency' => [
+                                'view-backend', 'view-accounting-management', 'view-income-management'
                             ]
                         ],
                         [
-                            'name'         => 'delete-incomes',
+                            'name' => 'delete-incomes',
                             'display_name' => 'Delete Incomes',
-                            'dependency'   => [
-                                'view-backend','view-accounting-management','view-income-management'
+                            'dependency' => [
+                                'view-backend', 'view-accounting-management', 'view-income-management'
                             ]
                         ],
                     ]
                 ],
                 [
-                    'name'=>'Outcome',
+                    'name' => 'Outcome',
                     'groups' => [
 
                     ],
                     'permissions' => [
                         [
-                            'name'         => 'view-outcome-management',
+                            'name' => 'view-outcome-management',
                             'display_name' => 'View Outcome Management',
-                            'dependency'   => [
-                                'view-backend','view-accounting-management'
+                            'dependency' => [
+                                'view-backend', 'view-accounting-management'
                             ]
                         ],
                         [
-                            'name'         => 'create-outcomes',
+                            'name' => 'create-outcomes',
                             'display_name' => 'Create Outcomes',
-                            'dependency'   => [
-                                'view-backend','view-accounting-management','view-outcome-management'
+                            'dependency' => [
+                                'view-backend', 'view-accounting-management', 'view-outcome-management'
                             ]
                         ],
                         [
-                            'name'         => 'edit-outcomes',
+                            'name' => 'edit-outcomes',
                             'display_name' => 'Edit Outcomes',
-                            'dependency'   => [
-                                'view-backend','view-accounting-management','view-outcome-management'
+                            'dependency' => [
+                                'view-backend', 'view-accounting-management', 'view-outcome-management'
                             ]
                         ],
                         [
-                            'name'         => 'delete-outcomes',
+                            'name' => 'delete-outcomes',
                             'display_name' => 'Edit Outcomes',
-                            'dependency'   => [
-                                'view-backend','view-accounting-management','view-outcome-management'
+                            'dependency' => [
+                                'view-backend', 'view-accounting-management', 'view-outcome-management'
                             ]
                         ],
                     ]
                 ],
                 [
-                    'name'=>'Student Payment',
+                    'name' => 'Student Payment',
                     'groups' => [
 
                     ],
                     'permissions' => [
                         [
-                            'name'         => 'view-student-payment-management',
+                            'name' => 'view-student-payment-management',
                             'display_name' => 'View Student Payment Management',
-                            'dependency'   => [
-                                'view-backend','view-accounting-management'
+                            'dependency' => [
+                                'view-backend', 'view-accounting-management'
                             ]
                         ]
 
                     ]
                 ],
                 [
-                    'name'=>'Customer',
+                    'name' => 'Customer',
                     'groups' => [
 
                     ],
                     'permissions' => [
                         [
-                            'name'         => 'view-customer-management',
+                            'name' => 'view-customer-management',
                             'display_name' => 'View Customer Management',
-                            'dependency'   => [
-                                'view-backend','view-accounting-management'
+                            'dependency' => [
+                                'view-backend', 'view-accounting-management'
                             ]
                         ],
                         [
-                            'name'         => 'create-customers',
+                            'name' => 'create-customers',
                             'display_name' => 'Create Customers',
-                            'dependency'   => [
-                                'view-backend','view-accounting-management','view-customer-management'
+                            'dependency' => [
+                                'view-backend', 'view-accounting-management', 'view-customer-management'
                             ]
                         ],
                         [
-                            'name'         => 'edit-customers',
+                            'name' => 'edit-customers',
                             'display_name' => 'Edit Customers',
-                            'dependency'   => [
-                                'view-backend','view-accounting-management','view-customer-management'
+                            'dependency' => [
+                                'view-backend', 'view-accounting-management', 'view-customer-management'
                             ]
                         ],
                         [
-                            'name'         => 'delete-customers',
+                            'name' => 'delete-customers',
                             'display_name' => 'Delete Customers',
-                            'dependency'   => [
-                                'view-backend','view-accounting-management','view-customer-management'
+                            'dependency' => [
+                                'view-backend', 'view-accounting-management', 'view-customer-management'
                             ]
                         ]
                     ]
@@ -417,9 +417,9 @@ class SeedCustomsPermissions extends Seeder
             'permissions' => [
                 // Leave it empty if there is none
                 [
-                    'name'         => 'view-accounting-management',
+                    'name' => 'view-accounting-management',
                     'display_name' => 'View Accounting Management',
-                    'dependency'   => [
+                    'dependency' => [
                         'view-backend'
                     ]
                 ]
@@ -428,37 +428,37 @@ class SeedCustomsPermissions extends Seeder
 
         /* Scholarship Permissions */
         $roots[] = [
-            'name'=>'Scholarship',
-            'groups'=>[
+            'name' => 'Scholarship',
+            'groups' => [
             ],
             'permissions' => [
                 // Leave it empty if there is none
                 [
-                    'name'         => 'view-scholarship-management',
+                    'name' => 'view-scholarship-management',
                     'display_name' => 'View Scholarship Management',
-                    'dependency'   => [
+                    'dependency' => [
                         'view-backend'
                     ]
                 ],
                 [
-                    'name'         => 'create-scholarships',
+                    'name' => 'create-scholarships',
                     'display_name' => 'Create Scholarships',
-                    'dependency'   => [
-                        'view-backend','view-scholarship-management'
+                    'dependency' => [
+                        'view-backend', 'view-scholarship-management'
                     ]
                 ],
                 [
-                    'name'         => 'edit-scholarships',
+                    'name' => 'edit-scholarships',
                     'display_name' => 'Edit Scholarships',
-                    'dependency'   => [
-                        'view-backend','view-scholarship-management'
+                    'dependency' => [
+                        'view-backend', 'view-scholarship-management'
                     ]
                 ],
                 [
-                    'name'         => 'delete-scholarships',
+                    'name' => 'delete-scholarships',
                     'display_name' => 'Delete Scholarships',
-                    'dependency'   => [
-                        'view-backend','view-scholarship-management'
+                    'dependency' => [
+                        'view-backend', 'view-scholarship-management'
                     ]
                 ]
             ]
@@ -466,243 +466,243 @@ class SeedCustomsPermissions extends Seeder
 
         /* Examination Permissions */
         $roots[] = [
-            'name'=>'Examination',
-            'groups'=>[
+            'name' => 'Examination',
+            'groups' => [
                 [
-                    'name'=>'Examination Documents',
+                    'name' => 'Examination Documents',
                     'groups' => [
                     ],
                     'permissions' => [
                         [
-                            'name'         => 'view-exam-document',
+                            'name' => 'view-exam-document',
                             'display_name' => "View exam's documents",
-                            'dependency'   => [
-                                'view-backend','view-exam-management'
+                            'dependency' => [
+                                'view-backend', 'view-exam-management'
                             ]
                         ],
                         [
-                            'name'         => 'download-dut-result-detail',
+                            'name' => 'download-dut-result-detail',
                             'display_name' => "Download DUT Result Detail",
-                            'dependency'   => [
-                                'view-backend','view-exam-management'
+                            'dependency' => [
+                                'view-backend', 'view-exam-management'
                             ]
                         ],
                         [
-                            'name'         => 'download-ing-result-detail',
+                            'name' => 'download-ing-result-detail',
                             'display_name' => "Download Engineer Result Detail",
-                            'dependency'   => [
-                                'view-backend','view-exam-management'
+                            'dependency' => [
+                                'view-backend', 'view-exam-management'
                             ]
                         ],
                         [
-                            'name'         => 'download-examination-document',
+                            'name' => 'download-examination-document',
                             'display_name' => "Download examination's documents",
-                            'dependency'   => [
-                                'view-backend','view-exam-management','view-exam-document'
+                            'dependency' => [
+                                'view-backend', 'view-exam-management', 'view-exam-document'
                             ]
                         ],
                     ]
                 ],
                 [
-                    'name'=>'Staff',
+                    'name' => 'Staff',
                     'groups' => [
                     ],
                     'permissions' => [
                         [
-                            'name'         => 'view-exam-staff',
+                            'name' => 'view-exam-staff',
                             'display_name' => "View exam's staffs",
-                            'dependency'   => [
-                                'view-backend','view-exam-management'
+                            'dependency' => [
+                                'view-backend', 'view-exam-management'
                             ]
                         ],
                         [
-                            'name'         => 'modify-examination-staff',
+                            'name' => 'modify-examination-staff',
                             'display_name' => 'Modify Examination Staff',
-                            'dependency'   => [
-                                'view-backend','view-exam-management','view-exam-staff'
+                            'dependency' => [
+                                'view-backend', 'view-exam-management', 'view-exam-staff'
                             ]
                         ],
                         [
-                            'name'         => 'add-temporary-examination-staff',
+                            'name' => 'add-temporary-examination-staff',
                             'display_name' => 'Add/Import Examination Staff from Ministry',
-                            'dependency'   => [
-                                'view-backend','view-exam-management','view-exam-staff'
+                            'dependency' => [
+                                'view-backend', 'view-exam-management', 'view-exam-staff'
                             ]
                         ],
                     ]
                 ],
                 [
-                    'name'      => 'Examination Course',
-                    'groups'    => [
+                    'name' => 'Examination Course',
+                    'groups' => [
 
                     ],
-                    'permissions'   => [
+                    'permissions' => [
                         [
-                            'name'          => 'view-entrance-exam-course',
-                            'display_name'  => "View entrance exam's courses",
-                            'dependency'   => [
-                                'view-backend','view-exam-management'
+                            'name' => 'view-entrance-exam-course',
+                            'display_name' => "View entrance exam's courses",
+                            'dependency' => [
+                                'view-backend', 'view-exam-management'
                             ]
                         ],
                         [
-                            'name'          => 'create-entrance-exam-course',
-                            'display_name'  => 'Add new entrance exam course',
-                            'dependency'   => [
-                                'view-backend','view-exam-management','view-entrance-exam-course'
-                            ]
-
-                        ],
-                        [
-                            'name'          => 'edit-entrance-exam-course',
-                            'display_name'  => 'Edit entrance exam course',
-                            'dependency'   => [
-                                'view-backend','view-exam-management','view-entrance-exam-course'
+                            'name' => 'create-entrance-exam-course',
+                            'display_name' => 'Add new entrance exam course',
+                            'dependency' => [
+                                'view-backend', 'view-exam-management', 'view-entrance-exam-course'
                             ]
 
                         ],
                         [
-                            'name'          => 'delete-entrance-exam-course',
-                            'display_name'  => 'Delete entrance exam course',
-                            'dependency'   => [
-                                'view-backend','view-exam-management','view-entrance-exam-course'
+                            'name' => 'edit-entrance-exam-course',
+                            'display_name' => 'Edit entrance exam course',
+                            'dependency' => [
+                                'view-backend', 'view-exam-management', 'view-entrance-exam-course'
                             ]
 
                         ],
                         [
-                            'name'          => 'create-entrance-exam-score',
-                            'display_name'  => 'Input Entrance Exam Score',
-                            'dependency'   => [
-                                'view-backend','view-exam-management'
+                            'name' => 'delete-entrance-exam-course',
+                            'display_name' => 'Delete entrance exam course',
+                            'dependency' => [
+                                'view-backend', 'view-exam-management', 'view-entrance-exam-course'
                             ]
 
                         ],
                         [
-                            'name'          => 'get-candidate-result-score',
-                            'display_name'  => 'Generate Candidate Score (Engineer)',
-                            'dependency'   => [
-                                'view-backend','view-exam-management'
+                            'name' => 'create-entrance-exam-score',
+                            'display_name' => 'Input Entrance Exam Score',
+                            'dependency' => [
+                                'view-backend', 'view-exam-management'
                             ]
 
                         ],
                         [
-                            'name'          => 'get-candidate-result-score-dut',
-                            'display_name'  => 'Generate Candidate Score (DUT)',
-                            'dependency'   => [
-                                'view-backend','view-exam-management'
+                            'name' => 'get-candidate-result-score',
+                            'display_name' => 'Generate Candidate Score (Engineer)',
+                            'dependency' => [
+                                'view-backend', 'view-exam-management'
                             ]
 
                         ],
                         [
-                            'name'          => 'report-error-on-inputted-score',
-                            'display_name'  => 'Get Inputted Score Error && Add New Correction',
-                            'dependency'   => [
-                                'view-backend','view-exam-management', 'create-entrance-exam-score'
+                            'name' => 'get-candidate-result-score-dut',
+                            'display_name' => 'Generate Candidate Score (DUT)',
+                            'dependency' => [
+                                'view-backend', 'view-exam-management'
+                            ]
+
+                        ],
+                        [
+                            'name' => 'report-error-on-inputted-score',
+                            'display_name' => 'Get Inputted Score Error && Add New Correction',
+                            'dependency' => [
+                                'view-backend', 'view-exam-management', 'create-entrance-exam-score'
                             ]
                         ],
                         [
-                            'name'          => 'view-entrance-exam-course-score',
-                            'display_name'  => 'Get Inputted Score Error && Add New Correction',
-                            'dependency'   => [
-                                'view-backend','view-exam-management', 'create-entrance-exam-score'
+                            'name' => 'view-entrance-exam-course-score',
+                            'display_name' => 'Get Inputted Score Error && Add New Correction',
+                            'dependency' => [
+                                'view-backend', 'view-exam-management', 'create-entrance-exam-score'
                             ]
                         ]
                     ]
                 ],
                 [
-                    'name'      => 'Examination Candidate',
-                    'groups'    => [
+                    'name' => 'Examination Candidate',
+                    'groups' => [
 
                     ],
-                    'permissions'   => [
+                    'permissions' => [
                         [
-                            'name'          => 'view-exam-candidate',
-                            'display_name'  => "View exam's candidate",
-                            'dependency'   => [
-                                'view-backend','view-exam-management'
+                            'name' => 'view-exam-candidate',
+                            'display_name' => "View exam's candidate",
+                            'dependency' => [
+                                'view-backend', 'view-exam-management'
                             ]
                         ],
                         [
-                            'name'          => 'create-exam-candidate',
-                            'display_name'  => 'Add new exam candidate',
-                            'dependency'   => [
-                                'view-backend','view-exam-management','view-exam-candidate'
-                            ]
-
-                        ],
-                        [
-                            'name'          => 'edit-exam-candidate',
-                            'display_name'  => 'Edit exam candidate',
-                            'dependency'   => [
-                                'view-backend','view-exam-management','view-exam-candidate'
+                            'name' => 'create-exam-candidate',
+                            'display_name' => 'Add new exam candidate',
+                            'dependency' => [
+                                'view-backend', 'view-exam-management', 'view-exam-candidate'
                             ]
 
                         ],
                         [
-                            'name'          => 'delete-exam-candidate',
-                            'display_name'  => 'Delete exam candidate',
-                            'dependency'   => [
-                                'view-backend','view-exam-management','view-exam-candidate'
+                            'name' => 'edit-exam-candidate',
+                            'display_name' => 'Edit exam candidate',
+                            'dependency' => [
+                                'view-backend', 'view-exam-management', 'view-exam-candidate'
                             ]
 
                         ],
                         [
-                            'name'          => 'register-exam-candidate',
-                            'display_name'  => 'Register candidate',
-                            'dependency'   => [
-                                'view-backend','view-exam-management','view-exam-candidate'
+                            'name' => 'delete-exam-candidate',
+                            'display_name' => 'Delete exam candidate',
+                            'dependency' => [
+                                'view-backend', 'view-exam-management', 'view-exam-candidate'
                             ]
 
                         ],
                         [
-                            'name'          => 'generate-room-exam-candidate',
-                            'display_name'  => 'Generate examination room',
-                            'dependency'   => [
-                                'view-backend','view-exam-management','view-exam-candidate'
+                            'name' => 'register-exam-candidate',
+                            'display_name' => 'Register candidate',
+                            'dependency' => [
+                                'view-backend', 'view-exam-management', 'view-exam-candidate'
                             ]
 
                         ],
                         [
-                            'name'          => 'view-exam-candidate-score',
-                            'display_name'  => "View candidate's score",
-                            'dependency'   => [
-                                'view-backend','view-exam-management','view-exam-candidate'
+                            'name' => 'generate-room-exam-candidate',
+                            'display_name' => 'Generate examination room',
+                            'dependency' => [
+                                'view-backend', 'view-exam-management', 'view-exam-candidate'
+                            ]
+
+                        ],
+                        [
+                            'name' => 'view-exam-candidate-score',
+                            'display_name' => "View candidate's score",
+                            'dependency' => [
+                                'view-backend', 'view-exam-management', 'view-exam-candidate'
                             ]
 
                         ],
                     ]
                 ],
                 [
-                    'name'      => 'Examination Room',
-                    'groups'    => [
+                    'name' => 'Examination Room',
+                    'groups' => [
 
                     ],
-                    'permissions'   => [
+                    'permissions' => [
                         [
-                            'name'          => 'view-exam-room',
-                            'display_name'  => "View exam's room",
-                            'dependency'   => [
-                                'view-backend','view-exam-management'
+                            'name' => 'view-exam-room',
+                            'display_name' => "View exam's room",
+                            'dependency' => [
+                                'view-backend', 'view-exam-management'
                             ]
                         ],
                         [
-                            'name'          => 'modify-exam-room',
-                            'display_name'  => 'Modify exam room',
-                            'dependency'   => [
-                                'view-backend','view-exam-management','view-exam-room'
+                            'name' => 'modify-exam-room',
+                            'display_name' => 'Modify exam room',
+                            'dependency' => [
+                                'view-backend', 'view-exam-management', 'view-exam-room'
                             ]
                         ],
                         [
-                            'name'          => 'view-secret-codes',
-                            'display_name'  => "View exam's rooms secret code",
-                            'dependency'   => [
-                                'view-backend','view-exam-management','view-exam-room'
+                            'name' => 'view-secret-codes',
+                            'display_name' => "View exam's rooms secret code",
+                            'dependency' => [
+                                'view-backend', 'view-exam-management', 'view-exam-room'
                             ]
                         ],
                         [
-                            'name'          => 'generate-exam-room-secret-code',
-                            'display_name'  => "Generate exam's rooms secret code",
-                            'dependency'   => [
-                                'view-backend','view-exam-management','view-exam-room','view-secret-codes'
+                            'name' => 'generate-exam-room-secret-code',
+                            'display_name' => "Generate exam's rooms secret code",
+                            'dependency' => [
+                                'view-backend', 'view-exam-management', 'view-exam-room', 'view-secret-codes'
                             ]
                         ],
                     ]
@@ -712,31 +712,31 @@ class SeedCustomsPermissions extends Seeder
                 // Leave it empty if there is none
 
                 [
-                    'name'         => 'view-exam-management',
+                    'name' => 'view-exam-management',
                     'display_name' => 'View Exam Management',
-                    'dependency'   => [
+                    'dependency' => [
                         'view-backend'
                     ]
                 ],
                 [
-                    'name'         => 'create-exams',
+                    'name' => 'create-exams',
                     'display_name' => 'Create Exams',
-                    'dependency'   => [
-                        'view-backend','view-exam-management'
+                    'dependency' => [
+                        'view-backend', 'view-exam-management'
                     ]
                 ],
                 [
-                    'name'         => 'edit-exams',
+                    'name' => 'edit-exams',
                     'display_name' => 'Edit Exams',
-                    'dependency'   => [
-                        'view-backend','view-exam-management'
+                    'dependency' => [
+                        'view-backend', 'view-exam-management'
                     ]
                 ],
                 [
-                    'name'         => 'delete-exams',
+                    'name' => 'delete-exams',
                     'display_name' => 'Delete Exams',
-                    'dependency'   => [
-                        'view-backend','view-exam-management'
+                    'dependency' => [
+                        'view-backend', 'view-exam-management'
                     ]
                 ]
             ]
@@ -744,196 +744,196 @@ class SeedCustomsPermissions extends Seeder
 
         /* Course Permissions */
         $roots[] = [
-            'name'=>'Course',
-            'groups'=>[
+            'name' => 'Course',
+            'groups' => [
                 [
-                    'name'=>'Course Annual',
-                    'groups'=>[
+                    'name' => 'Course Annual',
+                    'groups' => [
                     ],
                     'permissions' => [
                         // Leave it empty if there is none
                         [
-                            'name'         => 'view-courseAnnual-management',
+                            'name' => 'view-courseAnnual-management',
                             'display_name' => 'View Course Annual Management',
-                            'dependency'   => [
-                                'view-backend','view-course-management'
+                            'dependency' => [
+                                'view-backend', 'view-course-management'
                             ]
                         ],
                         [
-                            'name'         => 'create-courseAnnuals',
+                            'name' => 'create-courseAnnuals',
                             'display_name' => 'Create Course Annuals',
-                            'dependency'   => [
-                                'view-backend','view-course-management','view-courseAnnual-management'
+                            'dependency' => [
+                                'view-backend', 'view-course-management', 'view-courseAnnual-management'
                             ]
                         ],
                         [
-                            'name'         => 'delete-courseAnnuals',
+                            'name' => 'delete-courseAnnuals',
                             'display_name' => 'Delete Course Annuals',
-                            'dependency'   => [
-                                'view-backend','view-course-management','view-courseAnnual-management'
+                            'dependency' => [
+                                'view-backend', 'view-course-management', 'view-courseAnnual-management'
                             ]
                         ],
                         [
-                            'name'         => 'edit-courseAnnuals',
+                            'name' => 'edit-courseAnnuals',
                             'display_name' => 'Edit Course Annuals',
-                            'dependency'   => [
-                                'view-backend','view-course-management','view-courseAnnual-management'
+                            'dependency' => [
+                                'view-backend', 'view-course-management', 'view-courseAnnual-management'
                             ]
                         ],
                         [
-                            'name'         => 'import-courseAnnuals',
+                            'name' => 'import-courseAnnuals',
                             'display_name' => 'Import Course Annuals',
-                            'dependency'   => [
-                                'view-backend','view-course-management','view-courseAnnual-management'
+                            'dependency' => [
+                                'view-backend', 'view-course-management', 'view-courseAnnual-management'
                             ]
                         ],
                         [
-                            'name'         => 'course-annual-assignment',
+                            'name' => 'course-annual-assignment',
                             'display_name' => 'Assign Course Annual for Each Teacher',
-                            'dependency'   => [
-                                'view-backend','view-course-management','view-courseAnnual-management'
+                            'dependency' => [
+                                'view-backend', 'view-course-management', 'view-courseAnnual-management'
                             ]
                         ],
                         [
-                            'name'         => 'generate-course-annual',
+                            'name' => 'generate-course-annual',
                             'display_name' => 'Generate Course Annual From The Previous Course AnnualProgram',
-                            'dependency'   => [
-                                'view-backend','view-course-management','view-courseAnnual-management'
+                            'dependency' => [
+                                'view-backend', 'view-course-management', 'view-courseAnnual-management'
                             ]
                         ],
                         [
-                            'name'         => 'view-all-score-course-annual', // View all score/course in a department
+                            'name' => 'view-all-score-course-annual', // View all score/course in a department
                             'display_name' => 'View all scores of course annual',
-                            'dependency'   => [
-                                'view-backend','view-course-management','view-courseAnnual-management'
+                            'dependency' => [
+                                'view-backend', 'view-course-management', 'view-courseAnnual-management'
                             ]
                         ],
                         [
-                            'name'         => 'view-all-score-in-all-department', // View all score/course in all departments
+                            'name' => 'view-all-score-in-all-department', // View all score/course in all departments
                             'display_name' => 'View all score in all department',
-                            'dependency'   => [
-                                'view-backend','view-course-management','view-courseAnnual-management'
+                            'dependency' => [
+                                'view-backend', 'view-course-management', 'view-courseAnnual-management'
                             ]
                         ],
                         [
-                            'name'         => 'input-score-course-annual',
+                            'name' => 'input-score-course-annual',
                             'display_name' => 'Input each score course annual',
-                            'dependency'   => [
-                                'view-backend','view-course-management','view-courseAnnual-management'
+                            'dependency' => [
+                                'view-backend', 'view-course-management', 'view-courseAnnual-management'
                             ]
                         ],
                         [
-                            'name'         => 'disable-enable-input-score-into-course-annual',
+                            'name' => 'disable-enable-input-score-into-course-annual',
                             'display_name' => 'Disable/Enable scoring in own department',
-                            'dependency'   => [
-                                'view-backend','view-course-management','view-courseAnnual-management'
+                            'dependency' => [
+                                'view-backend', 'view-course-management', 'view-courseAnnual-management'
                             ]
                         ],
                         [
-                            'name'         => 'disable-enable-input-score-into-course-annual-in-all-department',
+                            'name' => 'disable-enable-input-score-into-course-annual-in-all-department',
                             'display_name' => 'Disable/Enable scoring in all department',
-                            'dependency'   => [
-                                'view-backend','view-course-management','view-courseAnnual-management'
+                            'dependency' => [
+                                'view-backend', 'view-course-management', 'view-courseAnnual-management'
                             ]
                         ],
                         [
-                            'name'         => 'input-score-without-blocking',
+                            'name' => 'input-score-without-blocking',
                             'display_name' => 'Input score without blocking (Special Permission - Be careful)',
-                            'dependency'   => [
-                                'view-backend','view-course-management','view-courseAnnual-management'
+                            'dependency' => [
+                                'view-backend', 'view-course-management', 'view-courseAnnual-management'
                             ]
                         ],
                         [
-                            'name'         => 'evaluate-student',
+                            'name' => 'evaluate-student',
                             'display_name' => 'To evaluate student for the final result,the user is able to set student status as Radie or Redouble',
-                            'dependency'   => [
-                                'view-backend','view-course-management','view-courseAnnual-management'
+                            'dependency' => [
+                                'view-backend', 'view-course-management', 'view-courseAnnual-management'
                             ]
                         ],
                         [
-                            'name'         => 'write-student-remark',
+                            'name' => 'write-student-remark',
                             'display_name' => 'A permission to make a note on each student remark',
-                            'dependency'   => [
-                                'view-backend','view-course-management','view-courseAnnual-management'
+                            'dependency' => [
+                                'view-backend', 'view-course-management', 'view-courseAnnual-management'
                             ]
                         ]
                     ]
                 ],
                 [
-                    'name'=>'Course Program',
-                    'groups'=>[
+                    'name' => 'Course Program',
+                    'groups' => [
                     ],
                     'permissions' => [
                         // Leave it empty if there is none
                         [
-                            'name'         => 'view-courseProgram-management',
+                            'name' => 'view-courseProgram-management',
                             'display_name' => 'View Course Program Management',
-                            'dependency'   => [
-                                'view-backend','view-course-management'
+                            'dependency' => [
+                                'view-backend', 'view-course-management'
                             ]
                         ],
                         [
-                            'name'         => 'create-coursePrograms',
+                            'name' => 'create-coursePrograms',
                             'display_name' => 'Create Course Programs',
-                            'dependency'   => [
-                                'view-backend','view-course-management','view-courseProgram-management'
+                            'dependency' => [
+                                'view-backend', 'view-course-management', 'view-courseProgram-management'
                             ]
                         ],
                         [
-                            'name'         => 'delete-coursePrograms',
+                            'name' => 'delete-coursePrograms',
                             'display_name' => 'Delete Course Programs',
-                            'dependency'   => [
-                                'view-backend','view-course-management','view-courseProgram-management'
+                            'dependency' => [
+                                'view-backend', 'view-course-management', 'view-courseProgram-management'
                             ]
                         ],
                         [
-                            'name'         => 'edit-coursePrograms',
+                            'name' => 'edit-coursePrograms',
                             'display_name' => 'Edit Course Programs',
-                            'dependency'   => [
-                                'view-backend','view-course-management','view-courseProgram-management'
+                            'dependency' => [
+                                'view-backend', 'view-course-management', 'view-courseProgram-management'
                             ]
                         ],
                         [
-                            'name'         => 'import-coursePrograms',
+                            'name' => 'import-coursePrograms',
                             'display_name' => 'Import Course Programs',
-                            'dependency'   => [
-                                'view-backend','view-course-management','view-courseProgram-management'
+                            'dependency' => [
+                                'view-backend', 'view-course-management', 'view-courseProgram-management'
                             ]
                         ]
                     ]
                 ],
                 [
-                    'name'=>'Course Session',
-                    'groups'=>[
+                    'name' => 'Course Session',
+                    'groups' => [
                     ],
                     'permissions' => [
                         // Leave it empty if there is none
                         [
-                            'name'         => 'view-courseSession-management',
+                            'name' => 'view-courseSession-management',
                             'display_name' => 'View Course Session Management',
-                            'dependency'   => [
-                                'view-backend','view-course-management'
+                            'dependency' => [
+                                'view-backend', 'view-course-management'
                             ]
                         ],
                         [
-                            'name'         => 'create-courseSessions',
+                            'name' => 'create-courseSessions',
                             'display_name' => 'Create Course Sessions',
-                            'dependency'   => [
-                                'view-backend','view-course-management','view-courseSession-management'
+                            'dependency' => [
+                                'view-backend', 'view-course-management', 'view-courseSession-management'
                             ]
                         ],
                         [
-                            'name'         => 'delete-courseSessions',
+                            'name' => 'delete-courseSessions',
                             'display_name' => 'Delete Course Sessions',
-                            'dependency'   => [
-                                'view-backend','view-course-management','view-courseSession-management'
+                            'dependency' => [
+                                'view-backend', 'view-course-management', 'view-courseSession-management'
                             ]
                         ],
                         [
-                            'name'         => 'edit-courseSessions',
+                            'name' => 'edit-courseSessions',
                             'display_name' => 'Edit Course Sessions',
-                            'dependency'   => [
-                                'view-backend','view-course-management','view-courseSession-management'
+                            'dependency' => [
+                                'view-backend', 'view-course-management', 'view-courseSession-management'
                             ]
                         ]
                     ]
@@ -942,9 +942,9 @@ class SeedCustomsPermissions extends Seeder
             'permissions' => [
                 // Leave it empty if there is none
                 [
-                    'name'         => 'view-course-management',
+                    'name' => 'view-course-management',
                     'display_name' => 'View Course Management',
-                    'dependency'   => [
+                    'dependency' => [
                         'view-backend'
                     ]
                 ]
@@ -952,130 +952,130 @@ class SeedCustomsPermissions extends Seeder
         ];
 
         $roots[] = [
-            'name'=>'Score',
-            'groups'=>[
+            'name' => 'Score',
+            'groups' => [
             ],
             'permissions' => [
                 // Leave it empty if there is none
                 [
-                    'name'         => 'view-score-management',
+                    'name' => 'view-score-management',
                     'display_name' => 'View Score Management',
-                    'dependency'   => [
+                    'dependency' => [
                         'view-backend'
                     ]
                 ],
                 [
-                    'name'         => 'create-score',
+                    'name' => 'create-score',
                     'display_name' => 'Create Score',
-                    'dependency'   => [
-                        'view-backend','view-score-management'
+                    'dependency' => [
+                        'view-backend', 'view-score-management'
                     ]
                 ],
                 [
-                    'name'         => 'edit-score',
+                    'name' => 'edit-score',
                     'display_name' => 'Edit Score',
-                    'dependency'   => [
-                        'view-backend','view-score-management'
+                    'dependency' => [
+                        'view-backend', 'view-score-management'
                     ]
                 ],
                 [
-                    'name'         => 'delete-score',
+                    'name' => 'delete-score',
                     'display_name' => 'Delete Score',
-                    'dependency'   => [
-                        'view-backend','view-score-management'
+                    'dependency' => [
+                        'view-backend', 'view-score-management'
                     ]
                 ],
                 [
-                    'name'         => 'import-score',
+                    'name' => 'import-score',
                     'display_name' => 'Import Score',
-                    'dependency'   => [
-                        'view-backend','view-score-management'
+                    'dependency' => [
+                        'view-backend', 'view-score-management'
                     ]
                 ]
             ]
         ];
         $roots[] = [
-            'name'=>'Absence',
-            'groups'=>[
+            'name' => 'Absence',
+            'groups' => [
             ],
             'permissions' => [
                 // Leave it empty if there is none
                 [
-                    'name'         => 'view-absence-management',
+                    'name' => 'view-absence-management',
                     'display_name' => 'View Absence Management',
-                    'dependency'   => [
+                    'dependency' => [
                         'view-backend'
                     ]
                 ],
                 [
-                    'name'         => 'create-absence',
+                    'name' => 'create-absence',
                     'display_name' => 'Create Absence',
-                    'dependency'   => [
-                        'view-backend','view-absence-management'
+                    'dependency' => [
+                        'view-backend', 'view-absence-management'
                     ]
                 ],
                 [
-                    'name'         => 'edit-absence',
+                    'name' => 'edit-absence',
                     'display_name' => 'Edit Absence',
-                    'dependency'   => [
-                        'view-backend','view-absence-management'
+                    'dependency' => [
+                        'view-backend', 'view-absence-management'
                     ]
                 ],
                 [
-                    'name'         => 'delete-absence',
+                    'name' => 'delete-absence',
                     'display_name' => 'Delete Absence',
-                    'dependency'   => [
-                        'view-backend','view-absence-management'
+                    'dependency' => [
+                        'view-backend', 'view-absence-management'
                     ]
                 ],
                 [
-                    'name'         => 'import-absence',
+                    'name' => 'import-absence',
                     'display_name' => 'Import Absence',
-                    'dependency'   => [
-                        'view-backend','view-absence-management'
+                    'dependency' => [
+                        'view-backend', 'view-absence-management'
                     ]
                 ]
             ]
         ];
         $roots[] = [
-            'name'=>'EvalStatus',
-            'groups'=>[
+            'name' => 'EvalStatus',
+            'groups' => [
             ],
             'permissions' => [
                 // Leave it empty if there is none
                 [
-                    'name'         => 'view-evalStatus-management',
+                    'name' => 'view-evalStatus-management',
                     'display_name' => 'View Eval Status Management',
-                    'dependency'   => [
+                    'dependency' => [
                         'view-backend'
                     ]
                 ],
                 [
-                    'name'         => 'create-evalStatus',
+                    'name' => 'create-evalStatus',
                     'display_name' => 'Create Eval Status',
-                    'dependency'   => [
+                    'dependency' => [
                         'view-evalStatus-management'
                     ]
                 ],
                 [
-                    'name'         => 'edit-evalStatus',
+                    'name' => 'edit-evalStatus',
                     'display_name' => 'Edit Eval Status',
-                    'dependency'   => [
-                        'view-backend','view-evalStatus-management'
+                    'dependency' => [
+                        'view-backend', 'view-evalStatus-management'
                     ]
                 ],
                 [
-                    'name'         => 'delete-evalStatus',
+                    'name' => 'delete-evalStatus',
                     'display_name' => 'Delete Eval Status',
-                    'dependency'   => [
-                        'view-backend','view-evalStatus-management'
+                    'dependency' => [
+                        'view-backend', 'view-evalStatus-management'
                     ]
                 ],
                 [
-                    'name'         => 'import-evalStatus',
+                    'name' => 'import-evalStatus',
                     'display_name' => 'Import Eval Status',
-                    'dependency'   => [
-                        'view-backend','view-evalStatus-management'
+                    'dependency' => [
+                        'view-backend', 'view-evalStatus-management'
                     ]
                 ]
             ]
@@ -1083,44 +1083,44 @@ class SeedCustomsPermissions extends Seeder
 
         /* Employee Permissions */
         $roots[] = [
-            'name'=>'Employee',
-            'groups'=>[
+            'name' => 'Employee',
+            'groups' => [
             ],
             'permissions' => [
                 // Leave it empty if there is none
                 [
-                    'name'         => 'view-employee-management',
+                    'name' => 'view-employee-management',
                     'display_name' => 'View Employee Management',
-                    'dependency'   => [
+                    'dependency' => [
                         'view-backend'
                     ]
                 ],
                 [
-                    'name'         => 'create-employees',
+                    'name' => 'create-employees',
                     'display_name' => 'Create Employees',
-                    'dependency'   => [
-                        'view-backend','view-employee-management'
+                    'dependency' => [
+                        'view-backend', 'view-employee-management'
                     ]
                 ],
                 [
-                    'name'         => 'edit-employees',
+                    'name' => 'edit-employees',
                     'display_name' => 'Edit Employees',
-                    'dependency'   => [
-                        'view-backend','view-employee-management'
+                    'dependency' => [
+                        'view-backend', 'view-employee-management'
                     ]
                 ],
                 [
-                    'name'         => 'delete-employees',
+                    'name' => 'delete-employees',
                     'display_name' => 'Delete Employees',
-                    'dependency'   => [
-                        'view-backend','view-employee-management'
+                    'dependency' => [
+                        'view-backend', 'view-employee-management'
                     ]
                 ],
                 [
-                    'name'         => 'view-all-employees',
+                    'name' => 'view-all-employees',
                     'display_name' => 'View All Employees',
-                    'dependency'   => [
-                        'view-backend','view-employee-management'
+                    'dependency' => [
+                        'view-backend', 'view-employee-management'
                     ]
                 ]
             ]
@@ -1128,37 +1128,37 @@ class SeedCustomsPermissions extends Seeder
 
         /* Inventory Permissions */
         $roots[] = [
-            'name'=>'Inventory',
-            'groups'=>[
+            'name' => 'Inventory',
+            'groups' => [
             ],
             'permissions' => [
                 // Leave it empty if there is none
                 [
-                    'name'         => 'view-inventory-management',
+                    'name' => 'view-inventory-management',
                     'display_name' => 'View Inventory Management',
-                    'dependency'   => [
+                    'dependency' => [
                         'view-backend'
                     ]
                 ],
                 [
-                    'name'         => 'create-inventories',
+                    'name' => 'create-inventories',
                     'display_name' => 'Create Inventories',
-                    'dependency'   => [
-                        'view-backend','view-inventory-management'
+                    'dependency' => [
+                        'view-backend', 'view-inventory-management'
                     ]
                 ],
                 [
-                    'name'         => 'edit-inventories',
+                    'name' => 'edit-inventories',
                     'display_name' => 'Edit Inventories',
-                    'dependency'   => [
-                        'view-backend','view-inventory-management'
+                    'dependency' => [
+                        'view-backend', 'view-inventory-management'
                     ]
                 ],
                 [
-                    'name'         => 'delete-inventories',
+                    'name' => 'delete-inventories',
                     'display_name' => 'Delete Inventories',
-                    'dependency'   => [
-                        'view-backend','view-inventory-management'
+                    'dependency' => [
+                        'view-backend', 'view-inventory-management'
                     ]
                 ]
             ]
@@ -1166,580 +1166,580 @@ class SeedCustomsPermissions extends Seeder
 
         /* Configuration Permissions */
         $roots[] = [
-            'name'=>'Configuration',
-            'groups'=>[
+            'name' => 'Configuration',
+            'groups' => [
                 [
-                    'name'=>'Department',
-                    'groups'=>[
+                    'name' => 'Department',
+                    'groups' => [
                     ],
                     'permissions' => [
                         // Leave it empty if there is none
                         [
-                            'name'         => 'view-department-management',
+                            'name' => 'view-department-management',
                             'display_name' => 'View Department Management',
-                            'dependency'   => [
-                                'view-backend','view-configuration-management'
+                            'dependency' => [
+                                'view-backend', 'view-configuration-management'
                             ]
                         ],
                         [
-                            'name'         => 'create-departments',
+                            'name' => 'create-departments',
                             'display_name' => 'Create Departments',
-                            'dependency'   => [
-                                'view-backend','view-configuration-management','view-department-management'
+                            'dependency' => [
+                                'view-backend', 'view-configuration-management', 'view-department-management'
                             ]
                         ],
                         [
-                            'name'         => 'edit-departments',
+                            'name' => 'edit-departments',
                             'display_name' => 'Edit Departments',
-                            'dependency'   => [
-                                'view-backend','view-configuration-management','view-department-management'
+                            'dependency' => [
+                                'view-backend', 'view-configuration-management', 'view-department-management'
                             ]
                         ],
                         [
-                            'name'         => 'delete-departments',
+                            'name' => 'delete-departments',
                             'display_name' => 'Delete Departments',
-                            'dependency'   => [
-                                'view-backend','view-configuration-management','view-department-management'
+                            'dependency' => [
+                                'view-backend', 'view-configuration-management', 'view-department-management'
                             ]
                         ]
                     ]
                 ],
                 [
-                    'name'=>'Degree',
-                    'groups'=>[
+                    'name' => 'Degree',
+                    'groups' => [
                     ],
                     'permissions' => [
                         // Leave it empty if there is none
                         [
-                            'name'         => 'view-degree-management',
+                            'name' => 'view-degree-management',
                             'display_name' => 'View Degree Management',
-                            'dependency'   => [
-                                'view-backend','view-configuration-management'
+                            'dependency' => [
+                                'view-backend', 'view-configuration-management'
                             ]
                         ],
                         [
-                            'name'         => 'create-degrees',
+                            'name' => 'create-degrees',
                             'display_name' => 'Create Degrees',
-                            'dependency'   => [
-                                'view-backend','view-configuration-management','view-degree-management'
+                            'dependency' => [
+                                'view-backend', 'view-configuration-management', 'view-degree-management'
                             ]
                         ],
                         [
-                            'name'         => 'edit-degrees',
+                            'name' => 'edit-degrees',
                             'display_name' => 'Edit Degrees',
-                            'dependency'   => [
-                                'view-backend','view-configuration-management','view-degree-management'
+                            'dependency' => [
+                                'view-backend', 'view-configuration-management', 'view-degree-management'
                             ]
                         ],
                         [
-                            'name'         => 'delete-degrees',
+                            'name' => 'delete-degrees',
                             'display_name' => 'Delete Degrees',
-                            'dependency'   => [
-                                'view-backend','view-configuration-management','view-degree-management'
+                            'dependency' => [
+                                'view-backend', 'view-configuration-management', 'view-degree-management'
                             ]
                         ]
                     ]
                 ],
                 [
-                    'name'=>'Grade',
-                    'groups'=>[
+                    'name' => 'Grade',
+                    'groups' => [
                     ],
                     'permissions' => [
                         // Leave it empty if there is none
                         [
-                            'name'         => 'view-grade-management',
+                            'name' => 'view-grade-management',
                             'display_name' => 'View Grade Management',
-                            'dependency'   => [
-                                'view-backend','view-configuration-management'
+                            'dependency' => [
+                                'view-backend', 'view-configuration-management'
                             ]
                         ],
                         [
-                            'name'         => 'create-grades',
+                            'name' => 'create-grades',
                             'display_name' => 'Create Grades',
-                            'dependency'   => [
-                                'view-backend','view-configuration-management','view-grade-management'
+                            'dependency' => [
+                                'view-backend', 'view-configuration-management', 'view-grade-management'
                             ]
                         ],
                         [
-                            'name'         => 'edit-grades',
+                            'name' => 'edit-grades',
                             'display_name' => 'Edit Grades',
-                            'dependency'   => [
-                                'view-backend','view-configuration-management','view-grade-management'
+                            'dependency' => [
+                                'view-backend', 'view-configuration-management', 'view-grade-management'
                             ]
                         ],
                         [
-                            'name'         => 'delete-grades',
+                            'name' => 'delete-grades',
                             'display_name' => 'Delete Grades',
-                            'dependency'   => [
-                                'view-backend','view-configuration-management','view-grade-management'
+                            'dependency' => [
+                                'view-backend', 'view-configuration-management', 'view-grade-management'
                             ]
                         ]
                     ]
                 ],
                 [
-                    'name'=>'Academic Year',
-                    'groups'=>[
+                    'name' => 'Academic Year',
+                    'groups' => [
                     ],
                     'permissions' => [
                         // Leave it empty if there is none
                         [
-                            'name'         => 'view-academicYear-management',
+                            'name' => 'view-academicYear-management',
                             'display_name' => 'View Academic Year Management',
-                            'dependency'   => [
-                                'view-backend','view-configuration-management'
+                            'dependency' => [
+                                'view-backend', 'view-configuration-management'
                             ]
                         ],
                         [
-                            'name'         => 'create-academicYears',
+                            'name' => 'create-academicYears',
                             'display_name' => 'Create Academic Years',
-                            'dependency'   => [
-                                'view-backend','view-configuration-management','view-academicYear-management'
+                            'dependency' => [
+                                'view-backend', 'view-configuration-management', 'view-academicYear-management'
                             ]
                         ],
                         [
-                            'name'         => 'edit-academicYears',
+                            'name' => 'edit-academicYears',
                             'display_name' => 'Edit Academic Years',
-                            'dependency'   => [
-                                'view-backend','view-configuration-management','view-academicYear-management'
+                            'dependency' => [
+                                'view-backend', 'view-configuration-management', 'view-academicYear-management'
                             ]
                         ],
                         [
-                            'name'         => 'delete-academicYears',
+                            'name' => 'delete-academicYears',
                             'display_name' => 'Delete Academic Years',
-                            'dependency'   => [
-                                'view-backend','view-configuration-management','view-academicYear-management'
+                            'dependency' => [
+                                'view-backend', 'view-configuration-management', 'view-academicYear-management'
                             ]
                         ]
                     ]
                 ],
                 [
-                    'name'=>'Account',
-                    'groups'=>[
+                    'name' => 'Account',
+                    'groups' => [
                     ],
                     'permissions' => [
                         // Leave it empty if there is none
                         [
-                            'name'         => 'view-account-management',
+                            'name' => 'view-account-management',
                             'display_name' => 'View Account Management',
-                            'dependency'   => [
-                                'view-backend','view-configuration-management'
+                            'dependency' => [
+                                'view-backend', 'view-configuration-management'
                             ]
                         ],
                         [
-                            'name'         => 'create-accounts',
+                            'name' => 'create-accounts',
                             'display_name' => 'Create Accounts',
-                            'dependency'   => [
-                                'view-backend','view-configuration-management','view-account-management'
+                            'dependency' => [
+                                'view-backend', 'view-configuration-management', 'view-account-management'
                             ]
                         ],
                         [
-                            'name'         => 'edit-accounts',
+                            'name' => 'edit-accounts',
                             'display_name' => 'Edit Accounts',
-                            'dependency'   => [
-                                'view-backend','view-configuration-management','view-account-management'
+                            'dependency' => [
+                                'view-backend', 'view-configuration-management', 'view-account-management'
                             ]
                         ],
                         [
-                            'name'         => 'delete-accounts',
+                            'name' => 'delete-accounts',
                             'display_name' => 'Delete Accounts',
-                            'dependency'   => [
-                                'view-backend','view-configuration-management','view-account-management'
+                            'dependency' => [
+                                'view-backend', 'view-configuration-management', 'view-account-management'
                             ]
                         ]
                     ]
                 ],
                 [
-                    'name'=>'Building',
-                    'groups'=>[
+                    'name' => 'Building',
+                    'groups' => [
                     ],
                     'permissions' => [
                         // Leave it empty if there is none
                         [
-                            'name'         => 'view-building-management',
+                            'name' => 'view-building-management',
                             'display_name' => 'View Building Management',
-                            'dependency'   => [
-                                'view-backend','view-configuration-management'
+                            'dependency' => [
+                                'view-backend', 'view-configuration-management'
                             ]
                         ],
                         [
-                            'name'         => 'create-buildings',
+                            'name' => 'create-buildings',
                             'display_name' => 'Create Buildings',
-                            'dependency'   => [
-                                'view-backend','view-configuration-management','view-building-management'
+                            'dependency' => [
+                                'view-backend', 'view-configuration-management', 'view-building-management'
                             ]
                         ],
                         [
-                            'name'         => 'edit-buildings',
+                            'name' => 'edit-buildings',
                             'display_name' => 'Edit Buildings',
-                            'dependency'   => [
-                                'view-backend','view-configuration-management','view-building-management'
+                            'dependency' => [
+                                'view-backend', 'view-configuration-management', 'view-building-management'
                             ]
                         ],
                         [
-                            'name'         => 'delete-buildings',
+                            'name' => 'delete-buildings',
                             'display_name' => 'Delete Buildings',
-                            'dependency'   => [
-                                'view-backend','view-configuration-management','view-building-management'
+                            'dependency' => [
+                                'view-backend', 'view-configuration-management', 'view-building-management'
                             ]
                         ]
                     ]
                 ],
                 [
-                    'name'=>'High School',
-                    'groups'=>[
+                    'name' => 'High School',
+                    'groups' => [
                     ],
                     'permissions' => [
                         // Leave it empty if there is none
                         [
-                            'name'         => 'view-highSchool-management',
+                            'name' => 'view-highSchool-management',
                             'display_name' => 'View High School Management',
-                            'dependency'   => [
-                                'view-backend','view-configuration-management'
+                            'dependency' => [
+                                'view-backend', 'view-configuration-management'
                             ]
                         ],
                         [
-                            'name'         => 'create-highSchools',
+                            'name' => 'create-highSchools',
                             'display_name' => 'Create High Schools',
-                            'dependency'   => [
-                                'view-backend','view-configuration-management','view-highSchool-management'
+                            'dependency' => [
+                                'view-backend', 'view-configuration-management', 'view-highSchool-management'
                             ]
                         ],
                         [
-                            'name'         => 'edit-highSchools',
+                            'name' => 'edit-highSchools',
                             'display_name' => 'Edit High Schools',
-                            'dependency'   => [
-                                'view-backend','view-configuration-management','view-highSchool-management'
+                            'dependency' => [
+                                'view-backend', 'view-configuration-management', 'view-highSchool-management'
                             ]
                         ],
                         [
-                            'name'         => 'delete-highSchools',
+                            'name' => 'delete-highSchools',
                             'display_name' => 'Delete High Schools',
-                            'dependency'   => [
-                                'view-backend','view-configuration-management','view-highSchool-management'
+                            'dependency' => [
+                                'view-backend', 'view-configuration-management', 'view-highSchool-management'
                             ]
                         ]
                     ]
                 ],
                 [
-                    'name'=>'Income Type',
-                    'groups'=>[
+                    'name' => 'Income Type',
+                    'groups' => [
                     ],
                     'permissions' => [
                         // Leave it empty if there is none
                         [
-                            'name'         => 'view-incomeType-management',
+                            'name' => 'view-incomeType-management',
                             'display_name' => 'View Income Type Management',
-                            'dependency'   => [
-                                'view-backend','view-configuration-management'
+                            'dependency' => [
+                                'view-backend', 'view-configuration-management'
                             ]
                         ],
                         [
-                            'name'         => 'create-incomeTypes',
+                            'name' => 'create-incomeTypes',
                             'display_name' => 'Create Income Types',
-                            'dependency'   => [
-                                'view-backend','view-configuration-management','view-incomeType-management'
+                            'dependency' => [
+                                'view-backend', 'view-configuration-management', 'view-incomeType-management'
                             ]
                         ],
                         [
-                            'name'         => 'edit-incomeTypes',
+                            'name' => 'edit-incomeTypes',
                             'display_name' => 'Edit Income Types',
-                            'dependency'   => [
-                                'view-backend','view-configuration-management','view-incomeType-management'
+                            'dependency' => [
+                                'view-backend', 'view-configuration-management', 'view-incomeType-management'
                             ]
                         ],
                         [
-                            'name'         => 'delete-incomeTypes',
+                            'name' => 'delete-incomeTypes',
                             'display_name' => 'Delete Income Types',
-                            'dependency'   => [
-                                'view-backend','view-configuration-management','view-incomeType-management'
+                            'dependency' => [
+                                'view-backend', 'view-configuration-management', 'view-incomeType-management'
                             ]
                         ]
                     ]
                 ],
                 [
-                    'name'=>'Outcome Type',
-                    'groups'=>[
+                    'name' => 'Outcome Type',
+                    'groups' => [
                     ],
                     'permissions' => [
                         // Leave it empty if there is none
                         [
-                            'name'         => 'view-outcomeType-management',
+                            'name' => 'view-outcomeType-management',
                             'display_name' => 'View Outcome Type Management',
-                            'dependency'   => [
-                                'view-backend','view-configuration-management'
+                            'dependency' => [
+                                'view-backend', 'view-configuration-management'
                             ]
                         ],
                         [
-                            'name'         => 'create-outcomeTypes',
+                            'name' => 'create-outcomeTypes',
                             'display_name' => 'Create Outcome Types',
-                            'dependency'   => [
-                                'view-backend','view-configuration-management','view-outcomeType-management'
+                            'dependency' => [
+                                'view-backend', 'view-configuration-management', 'view-outcomeType-management'
                             ]
                         ],
                         [
-                            'name'         => 'edit-outcomeTypes',
+                            'name' => 'edit-outcomeTypes',
                             'display_name' => 'Edit Outcome Types',
-                            'dependency'   => [
-                                'view-backend','view-configuration-management','view-outcomeType-management'
+                            'dependency' => [
+                                'view-backend', 'view-configuration-management', 'view-outcomeType-management'
                             ]
                         ],
                         [
-                            'name'         => 'delete-outcomeTypes',
+                            'name' => 'delete-outcomeTypes',
                             'display_name' => 'Delete Outcome Types',
-                            'dependency'   => [
-                                'view-backend','view-configuration-management','view-outcomeType-management'
+                            'dependency' => [
+                                'view-backend', 'view-configuration-management', 'view-outcomeType-management'
                             ]
                         ]
                     ]
                 ],
                 [
-                    'name'=>'School & Scholarship Fee',
-                    'groups'=>[
+                    'name' => 'School & Scholarship Fee',
+                    'groups' => [
                     ],
                     'permissions' => [
                         // Leave it empty if there is none
                         [
-                            'name'         => 'view-schoolFee-management',
+                            'name' => 'view-schoolFee-management',
                             'display_name' => 'View School Fee Management',
-                            'dependency'   => [
-                                'view-backend','view-configuration-management'
+                            'dependency' => [
+                                'view-backend', 'view-configuration-management'
                             ]
                         ],
                         [
-                            'name'         => 'create-schoolFees',
+                            'name' => 'create-schoolFees',
                             'display_name' => 'Create School Fees',
-                            'dependency'   => [
-                                'view-backend','view-configuration-management','view-schoolFee-management'
+                            'dependency' => [
+                                'view-backend', 'view-configuration-management', 'view-schoolFee-management'
                             ]
                         ],
                         [
-                            'name'         => 'edit-schoolFees',
+                            'name' => 'edit-schoolFees',
                             'display_name' => 'Edit School Fees',
-                            'dependency'   => [
-                                'view-backend','view-configuration-management','view-schoolFee-management'
+                            'dependency' => [
+                                'view-backend', 'view-configuration-management', 'view-schoolFee-management'
                             ]
                         ],
                         [
-                            'name'         => 'delete-schoolFees',
+                            'name' => 'delete-schoolFees',
                             'display_name' => 'Delete School Fees',
-                            'dependency'   => [
-                                'view-backend','view-configuration-management','view-schoolFee-management'
+                            'dependency' => [
+                                'view-backend', 'view-configuration-management', 'view-schoolFee-management'
                             ]
                         ]
                     ]
                 ],
                 [
-                    'name'=>'Room',
-                    'groups'=>[
+                    'name' => 'Room',
+                    'groups' => [
                     ],
                     'permissions' => [
                         // Leave it empty if there is none
                         [
-                            'name'         => 'view-room-management',
+                            'name' => 'view-room-management',
                             'display_name' => 'View Room Management',
-                            'dependency'   => [
-                                'view-backend','view-configuration-management'
+                            'dependency' => [
+                                'view-backend', 'view-configuration-management'
                             ]
                         ],
                         [
-                            'name'         => 'create-rooms',
+                            'name' => 'create-rooms',
                             'display_name' => 'Create Rooms',
-                            'dependency'   => [
-                                'view-backend','view-configuration-management','view-room-management'
+                            'dependency' => [
+                                'view-backend', 'view-configuration-management', 'view-room-management'
                             ]
                         ],
                         [
-                            'name'         => 'edit-rooms',
+                            'name' => 'edit-rooms',
                             'display_name' => 'Edit Rooms',
-                            'dependency'   => [
-                                'view-backend','view-configuration-management','view-room-management'
+                            'dependency' => [
+                                'view-backend', 'view-configuration-management', 'view-room-management'
                             ]
                         ],
                         [
-                            'name'         => 'delete-rooms',
+                            'name' => 'delete-rooms',
                             'display_name' => 'Delete Rooms',
-                            'dependency'   => [
-                                'view-backend','view-configuration-management','view-room-management'
+                            'dependency' => [
+                                'view-backend', 'view-configuration-management', 'view-room-management'
                             ]
                         ]
                     ]
                 ],
                 [
-                    'name'=>'Room Type',
-                    'groups'=>[
+                    'name' => 'Room Type',
+                    'groups' => [
                     ],
                     'permissions' => [
                         // Leave it empty if there is none
                         [
-                            'name'         => 'view-roomType-management',
+                            'name' => 'view-roomType-management',
                             'display_name' => 'View Room Type Management',
-                            'dependency'   => [
-                                'view-backend','view-configuration-management'
+                            'dependency' => [
+                                'view-backend', 'view-configuration-management'
                             ]
                         ],
                         [
-                            'name'         => 'create-roomTypes',
+                            'name' => 'create-roomTypes',
                             'display_name' => 'Create Room Types',
-                            'dependency'   => [
-                                'view-backend','view-configuration-management','view-roomType-management'
+                            'dependency' => [
+                                'view-backend', 'view-configuration-management', 'view-roomType-management'
                             ]
                         ],
                         [
-                            'name'         => 'edit-roomTypes',
+                            'name' => 'edit-roomTypes',
                             'display_name' => 'Edit Room Types',
-                            'dependency'   => [
-                                'view-backend','view-configuration-management','view-roomType-management'
+                            'dependency' => [
+                                'view-backend', 'view-configuration-management', 'view-roomType-management'
                             ]
                         ],
                         [
-                            'name'         => 'delete-roomTypes',
+                            'name' => 'delete-roomTypes',
                             'display_name' => 'Delete Room Types',
-                            'dependency'   => [
-                                'view-backend','view-configuration-management','view-roomType-management'
+                            'dependency' => [
+                                'view-backend', 'view-configuration-management', 'view-roomType-management'
                             ]
                         ]
                     ]
                 ],
                 [
-                    'name'=>'Student BacII',
-                    'groups'=>[
+                    'name' => 'Student BacII',
+                    'groups' => [
                     ],
                     'permissions' => [
                         // Leave it empty if there is none
                         [
-                            'name'         => 'view-studentBac2-management',
+                            'name' => 'view-studentBac2-management',
                             'display_name' => 'View Student BacII Management',
-                            'dependency'   => [
-                                'view-backend','view-configuration-management'
+                            'dependency' => [
+                                'view-backend', 'view-configuration-management'
                             ]
                         ],
                         [
-                            'name'         => 'create-studentBac2s',
+                            'name' => 'create-studentBac2s',
                             'display_name' => 'Create Student BacII',
-                            'dependency'   => [
-                                'view-backend','view-configuration-management','view-studentBac2-management'
+                            'dependency' => [
+                                'view-backend', 'view-configuration-management', 'view-studentBac2-management'
                             ]
                         ],
                         [
-                            'name'         => 'edit-studentBac2s',
+                            'name' => 'edit-studentBac2s',
                             'display_name' => 'Edit Student BacII',
-                            'dependency'   => [
-                                'view-backend','view-configuration-management','view-studentBac2-management'
+                            'dependency' => [
+                                'view-backend', 'view-configuration-management', 'view-studentBac2-management'
                             ]
                         ],
                         [
-                            'name'         => 'delete-studentBac2s',
+                            'name' => 'delete-studentBac2s',
                             'display_name' => 'Delete Student BacII',
-                            'dependency'   => [
-                                'view-backend','view-configuration-management','view-studentBac2-management'
+                            'dependency' => [
+                                'view-backend', 'view-configuration-management', 'view-studentBac2-management'
                             ]
                         ]
                     ]
                 ],
                 [
-                    'name'=>'Department Option/ Technique',
-                    'groups'=>[
+                    'name' => 'Department Option/ Technique',
+                    'groups' => [
                     ],
                     'permissions' => [
                         // Leave it empty if there is none
                         [
-                            'name'         => 'view-departmentOption-management',
+                            'name' => 'view-departmentOption-management',
                             'display_name' => 'View Department Option Management',
-                            'dependency'   => [
-                                'view-backend','view-configuration-management'
+                            'dependency' => [
+                                'view-backend', 'view-configuration-management'
                             ]
                         ],
                         [
-                            'name'         => 'create-departmentOptions',
+                            'name' => 'create-departmentOptions',
                             'display_name' => 'Create Department Options',
-                            'dependency'   => [
-                                'view-backend','view-configuration-management','view-departmentOption-management'
+                            'dependency' => [
+                                'view-backend', 'view-configuration-management', 'view-departmentOption-management'
                             ]
                         ],
                         [
-                            'name'         => 'edit-departmentOptions',
+                            'name' => 'edit-departmentOptions',
                             'display_name' => 'Edit Department Options',
-                            'dependency'   => [
-                                'view-backend','view-configuration-management','view-departmentOption-management'
+                            'dependency' => [
+                                'view-backend', 'view-configuration-management', 'view-departmentOption-management'
                             ]
                         ],
                         [
-                            'name'         => 'delete-departmentOptions',
+                            'name' => 'delete-departmentOptions',
                             'display_name' => 'Delete Department Options',
-                            'dependency'   => [
-                                'view-backend','view-configuration-management','view-departmentOption-management'
+                            'dependency' => [
+                                'view-backend', 'view-configuration-management', 'view-departmentOption-management'
                             ]
                         ]
                     ]
                 ],
                 [
-                    'name'=>'Promotion',
-                    'groups'=>[
+                    'name' => 'Promotion',
+                    'groups' => [
                     ],
                     'permissions' => [
                         // Leave it empty if there is none
                         [
-                            'name'         => 'view-promotion-management',
+                            'name' => 'view-promotion-management',
                             'display_name' => 'View Promotion Management',
-                            'dependency'   => [
-                                'view-backend','view-configuration-management'
+                            'dependency' => [
+                                'view-backend', 'view-configuration-management'
                             ]
                         ],
                         [
-                            'name'         => 'create-promotions',
+                            'name' => 'create-promotions',
                             'display_name' => 'Create Promotions',
-                            'dependency'   => [
-                                'view-backend','view-configuration-management','view-promotion-management'
+                            'dependency' => [
+                                'view-backend', 'view-configuration-management', 'view-promotion-management'
                             ]
                         ],
                         [
-                            'name'         => 'edit-promotions',
+                            'name' => 'edit-promotions',
                             'display_name' => 'Edit Promotions',
-                            'dependency'   => [
-                                'view-backend','view-configuration-management','view-promotion-management'
+                            'dependency' => [
+                                'view-backend', 'view-configuration-management', 'view-promotion-management'
                             ]
                         ],
                         [
-                            'name'         => 'delete-promotions',
+                            'name' => 'delete-promotions',
                             'display_name' => 'Delete Promotions',
-                            'dependency'   => [
-                                'view-backend','view-configuration-management','view-promotion-management'
+                            'dependency' => [
+                                'view-backend', 'view-configuration-management', 'view-promotion-management'
                             ]
                         ]
                     ]
                 ],
                 [
-                    'name'=>'Redouble',
-                    'groups'=>[
+                    'name' => 'Redouble',
+                    'groups' => [
                     ],
                     'permissions' => [
                         // Leave it empty if there is none
                         [
-                            'name'         => 'view-redouble-management',
+                            'name' => 'view-redouble-management',
                             'display_name' => 'View Redouble Management',
-                            'dependency'   => [
-                                'view-backend','view-configuration-management'
+                            'dependency' => [
+                                'view-backend', 'view-configuration-management'
                             ]
                         ],
                         [
-                            'name'         => 'create-redoubles',
+                            'name' => 'create-redoubles',
                             'display_name' => 'Create Redoubles',
-                            'dependency'   => [
-                                'view-backend','view-configuration-management','view-redouble-management'
+                            'dependency' => [
+                                'view-backend', 'view-configuration-management', 'view-redouble-management'
                             ]
                         ],
                         [
-                            'name'         => 'edit-redoubles',
+                            'name' => 'edit-redoubles',
                             'display_name' => 'Edit Redoubles',
-                            'dependency'   => [
-                                'view-backend','view-configuration-management','view-redouble-management'
+                            'dependency' => [
+                                'view-backend', 'view-configuration-management', 'view-redouble-management'
                             ]
                         ],
                         [
-                            'name'         => 'delete-redoubles',
+                            'name' => 'delete-redoubles',
                             'display_name' => 'Delete Redoubles',
-                            'dependency'   => [
-                                'view-backend','view-configuration-management','view-redouble-management'
+                            'dependency' => [
+                                'view-backend', 'view-configuration-management', 'view-redouble-management'
                             ]
                         ]
                     ]
@@ -1750,9 +1750,9 @@ class SeedCustomsPermissions extends Seeder
                 // Permissions for configuration
                 // Leave it empty if there is none
                 [
-                    'name'         => 'view-configuration-management',
+                    'name' => 'view-configuration-management',
                     'display_name' => 'View Configuration Management',
-                    'dependency'   => [
+                    'dependency' => [
                         'view-backend'
                     ]
                 ]
@@ -1761,53 +1761,53 @@ class SeedCustomsPermissions extends Seeder
 
         /* Inventory Permissions */
         $roots[] = [
-            'name'=>'Error Reporting',
-            'groups'=>[
+            'name' => 'Error Reporting',
+            'groups' => [
             ],
             'permissions' => [
                 // Leave it empty if there is none
                 [
-                    'name'         => 'view-reporting-management',
+                    'name' => 'view-reporting-management',
                     'display_name' => 'View Error Reporting Management',
-                    'dependency'   => [
+                    'dependency' => [
                         'view-backend'
                     ]
                 ],
                 [
-                    'name'         => 'create-reporting',
+                    'name' => 'create-reporting',
                     'display_name' => 'Create error reporting',
-                    'dependency'   => [
-                        'view-backend','view-reporting-management'
+                    'dependency' => [
+                        'view-backend', 'view-reporting-management'
                     ]
                 ],
                 [
-                    'name'         => 'edit-reporting',
+                    'name' => 'edit-reporting',
                     'display_name' => 'Edit error reporting',
-                    'dependency'   => [
-                        'view-backend','view-reporting-management'
+                    'dependency' => [
+                        'view-backend', 'view-reporting-management'
                     ]
                 ],
                 [
-                    'name'         => 'delete-reporting',
+                    'name' => 'delete-reporting',
                     'display_name' => 'Delete error reporting',
-                    'dependency'   => [
-                        'view-backend','view-reporting-management'
+                    'dependency' => [
+                        'view-backend', 'view-reporting-management'
                     ]
                 ]
             ]
         ];
 
         $roots[] = [
-            'name'=>'Other',
-            'groups'=>[
+            'name' => 'Other',
+            'groups' => [
 
             ],
             'permissions' => [
                 // Leave it empty if there is none
                 [
-                    'name'         => 'view-log-viewer-management',
+                    'name' => 'view-log-viewer-management',
                     'display_name' => 'View Log Viewer',
-                    'dependency'   => [
+                    'dependency' => [
                         'view-backend'
                     ]
                 ]
@@ -1823,7 +1823,7 @@ class SeedCustomsPermissions extends Seeder
                     'groups' => [
 
                     ],
-                    'permissions' =>[
+                    'permissions' => [
                         [
                             'name' => 'view-calendar-management',
                             'display_name' => 'View Calendar Viewer',
@@ -1834,12 +1834,66 @@ class SeedCustomsPermissions extends Seeder
                     ]
                 ],
                 [
+                    'name' => 'Event Management',
+                    'groups' => [],
+                    'permissions' => [
+                        [
+                            'name' => 'view-event',
+                            'display_name' => 'View Event',
+                            'dependency' => [
+                                'view-backend', 'view-schedule-management', 'view-calendar-management'
+                            ]
+                        ],
+                        [
+                            'name' => 'create-event',
+                            'display_name' => 'Create Event',
+                            'dependency' => [
+                                'view-backend', 'view-schedule-management', 'view-calendar-management'
+                            ]
+                        ],
+                        [
+                            'name' => 'edit-event',
+                            'display_name' => 'Edit Event',
+                            'dependency' => [
+                                'view-backend', 'view-schedule-management', 'view-calendar-management'
+                            ]
+                        ],
+                        [
+                            'name' => 'delete-event',
+                            'display_name' => 'Delete Event',
+                            'dependency' => [
+                                'view-backend', 'view-schedule-management', 'view-calendar-management'
+                            ]
+                        ]
+                    ]
+                ],
+                [
+                    'name' => 'Create Event',
+                    'groups' => [],
+                    'permissions' => [
+                        [
+                            'name' => 'create-public-event',
+                            'display_name' => 'Create Public Event',
+                            'dependency' => [
+                                'view-backend', 'view-schedule-management', 'view-calendar-management', 'create-event'
+                            ]
+                        ],
+                        [
+                            'name' => 'create-private-event',
+                            'display_name' => 'Create Private Event',
+                            'dependency' => [
+                                'view-backend', 'view-schedule-management', 'view-calendar-management', 'create-event'
+                            ]
+                        ]
+                    ]
+                ],
+                [
                     'name' => 'Timetable Management',
                     'groups' => [
 
 
                     ],
-                    'permissions' =>[
+                    'permissions' => [
                         [
                             'name' => 'view-timetable-management',
                             'display_name' => 'View Timetable Viewer',
@@ -1852,9 +1906,9 @@ class SeedCustomsPermissions extends Seeder
             ],
             'permissions' => [
                 [
-                    'name'         => 'view-schedule-management',
+                    'name' => 'view-schedule-management',
                     'display_name' => 'View Schedule Management',
-                    'dependency'   => [
+                    'dependency' => [
                         'view-backend'
                     ]
                 ]
@@ -1867,55 +1921,56 @@ class SeedCustomsPermissions extends Seeder
 
     }
 
-    private function saveGroupPemission($groupPermission,$parent_id){
-        for($a=0;$a<count($groupPermission);$a++){
+    private function saveGroupPemission($groupPermission, $parent_id)
+    {
+        for ($a = 0; $a < count($groupPermission); $a++) {
             $permission = $groupPermission[$a];
 
             // Save group first
-            $group_model       = config('access.group');
-            $group             = $group_model::where('name',$permission['name'])->first();
-            if($group == null) $group = new $group_model;
+            $group_model = config('access.group');
+            $group = $group_model::where('name', $permission['name'])->first();
+            if ($group == null) $group = new $group_model;
 
-            $group->name       = $permission['name'];
-            $group->sort       = $a+1; // Sort start from 1
-            $group->parent_id  = $parent_id;
+            $group->name = $permission['name'];
+            $group->sort = $a + 1; // Sort start from 1
+            $group->parent_id = $parent_id;
             $group->created_at = Carbon::now();
             $group->updated_at = Carbon::now();
             $group->save();
 
             // Save permissions for current group second
-            for($b=0;$b<count($permission['permissions']);$b++){
+            for ($b = 0; $b < count($permission['permissions']); $b++) {
 
-                $child  = $permission['permissions'][$b];
+                $child = $permission['permissions'][$b];
 
-                $permission_model= config('access.permission');
-                $p               = $permission_model::where('name',$child['name'])->first();
-                if($p==null) $p = new $permission_model;
+                $permission_model = config('access.permission');
+                $p = $permission_model::where('name', $child['name'])->first();
+                if ($p == null) $p = new $permission_model;
 
                 $p->display_name = $child['display_name'];
                 $p->name = $child['name'];
-                $p->system       = true;
-                $p->group_id     = $group->id;
-                $p->sort         = $b+1;
-                $p->created_at   = Carbon::now();
-                $p->updated_at   = Carbon::now();
+                $p->system = true;
+                $p->group_id = $group->id;
+                $p->sort = $b + 1;
+                $p->created_at = Carbon::now();
+                $p->updated_at = Carbon::now();
                 $p->save();
 
                 // Permission dependency
-                if(count($child['dependency']) > 0){
-                    foreach($child['dependency'] as $dependency){
+                if (count($child['dependency']) > 0) {
+                    foreach ($child['dependency'] as $dependency) {
                         $permission_id = $p->id;
                         $dependency_id = DB::table('permissions')->where('name', $dependency)->first()->id;
 
                         // check if already have dependency
-                        $db_dependency =  DB::table(config('access.permission_dependencies_table'))->where(['permission_id'=>$permission_id,'dependency_id'=>$dependency_id])->first();
+                        $db_dependency = DB::table(config('access.permission_dependencies_table'))->where(['permission_id' => $permission_id, 'dependency_id' => $dependency_id])->first();
                         // Insert new if there isn't
-                        if($db_dependency == null){
+                        if ($db_dependency == null) {
                             DB::table(config('access.permission_dependencies_table'))->insert([
                                 'permission_id' => $permission_id,
                                 'dependency_id' => $dependency_id,
-                                'created_at'    => Carbon::now(),
-                                'updated_at'    => Carbon::now(),
+                                'created_at' => Carbon::now(),
+                                'updated_at' => Carbon::now(),
                             ]);
                         }
                     }
@@ -1923,8 +1978,8 @@ class SeedCustomsPermissions extends Seeder
             }
 
             // Save Child groups third, and repeat
-            if(!empty($permission['groups'])){
-                $this->saveGroupPemission($permission['groups'],$group->id);
+            if (!empty($permission['groups'])) {
+                $this->saveGroupPemission($permission['groups'], $group->id);
             }
         }
     }
