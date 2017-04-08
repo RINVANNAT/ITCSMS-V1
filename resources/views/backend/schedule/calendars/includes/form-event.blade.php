@@ -1,30 +1,43 @@
 {{ csrf_field() }}
 
 <div class="form-group @if($errors->has('title')) has-error @endif">
-    <label for="title" class="control-label col-md-2">Title</label>
+    <label for="title" class="control-label col-md-2">
+        {{ trans('labels.backend.schedule.event.modal_create_event.form_input.title') }}
+    </label>
     <div class="col-md-10">
         <input type="text"
                name="title"
                id="title"
                class="form-control"
                value="{{ old('title') }}"
-               placeholder="Title event"/>
+               placeholder="{{ trans('labels.backend.schedule.event.modal_create_event.form_input.placeholder.title') }}"/>
     </div>
 </div>
 
 @permission('create-public-event')
 <div class="form-group @if($errors->has('department')) has-error @endif">
-    <label for="category" class="control-label col-md-2">Department</label>
+    <label for="category" class="control-label col-md-2">
+        {{ trans('labels.backend.schedule.event.modal_create_event.form_input.department') }}
+    </label>
     <div class="col-md-10">
-        <select class="form-control"
-                name="departments[]"
-                id="departments" style="width: 100%;" multiple>
-            @foreach($departments as $department)
+        <div class="checkbox">
+            <label>
+                <input type="checkbox"
+                       id="checkbox-all"
+                       checked/> All
+            </label>
+        </div>
 
-                <option value="{{ $department->id }}">{{ $department->name_en }}</option>
-
-            @endforeach
-        </select>
+        <div class="checkbox">
+        @foreach($departments as $department)
+            <label>
+                <input type="checkbox"
+                       name="departments[]"
+                       checked="true"
+                       value="{{ $department->id }}"/> {{ $department->code }}
+            </label>
+        @endforeach
+        </div>
     </div>
 </div>
 @endauth
@@ -36,8 +49,8 @@
             <label for="study">
                 <input type="checkbox"
                        name="study"
-                       value="1"
-                       id="study" checked/> Study or not?
+                       value="true"
+                       id="study" checked/> {{ trans('labels.backend.schedule.event.modal_create_event.form_input.allow_student_study') }}.
             </label>
         </div>
     </div>
@@ -50,7 +63,7 @@
                 <input type="checkbox"
                        name="fix"
                        value="1"
-                       id="fx"/> Fix date or not?
+                       id="fx"/> {{ trans('labels.backend.schedule.event.modal_create_event.form_input.repeat_all_year') }}.
             </label>
         </div>
     </div>

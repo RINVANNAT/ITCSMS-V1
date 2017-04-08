@@ -1,5 +1,13 @@
 $(document).ready(function () {
-
+    // Checkbox all
+    $('#checkbox-all').change(function () {
+        $('input[name="departments[]"]:checkbox').not(this).prop('checked', this.checked);
+    });
+    // iCheck
+    // $('input[type="checkbox"]').iCheck({
+    //     checkboxClass: 'icheckbox_square',
+    //     increaseArea: '40%' // optional
+    // });
     // Setup toastr plugin
     toastr.options = {
         "closeButton": true,

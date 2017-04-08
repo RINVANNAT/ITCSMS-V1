@@ -14,14 +14,12 @@ class CreateEventsTable extends Migration
     {
         Schema::create('events', function (Blueprint $table) {
             $table->increments('id');
-            $table->integer('category_event_id')->unsigned();
             $table->string('title');
-            $table->boolean('allDay')->default(true);
+            $table->string('description');
             $table->boolean('study')->default(false);
-            $table->boolean('fix')->default(true);
-            $table->timestamps();
 
-            $table->foreign('category_event_id')->references('id')->on('category_events')->onDelete('cascade');
+            $table->integer('repeat_id')->nullable();
+            $table->timestamps();
         });
     }
 
