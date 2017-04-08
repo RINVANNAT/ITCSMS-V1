@@ -11,8 +11,8 @@
                     @include('backend.schedule.calendars.includes.form-event')
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-                    <input type="submit" class="btn btn-primary" value="Save Change"/>
+                    <button type="button" class="btn btn-default btn-sm" data-dismiss="modal">Close</button>
+                    <input type="submit" class="btn btn-primary btn-sm" value="Save Change"/>
                 </div>
             </form>
         </div>
