@@ -19,24 +19,6 @@ $(document).ready(function () {
         "hideMethod": "fadeOut"
     };
 
-    // Event click on each object events.
-    //$(document).on('click', '.external-event', function () {
-    //    // swal({
-    //    //     title: 'Submit email to run ajax request',
-    //    //     input: 'email',
-    //    //     showCancelButton: true,
-    //    //     confirmButtonText: 'Submit',
-    //    //     showLoaderOnConfirm: true,
-    //    //     allowOutsideClick: false
-    //    // }).then(function (email) {
-    //    //     swal({
-    //    //         type: 'success',
-    //    //         title: 'Ajax request finished!',
-    //    //         html: 'Submitted email: ' + email
-    //    //     })
-    //    // });
-    //});
-
     // Render full calendar
     calendar();
     renderingEventsOnSideLeft($('#calendar').fullCalendar('getDate').format('YYYY'));
@@ -94,6 +76,53 @@ $(document).ready(function () {
     // today event click.
     $('.fc-today-button.fc-button.fc-state-default.fc-corner-left.fc-corner-right').click(function () {
         renderingEventsOnSideLeft($('#calendar').fullCalendar('getDate').format('YYYY'));
+    });
+
+
+    // Add new event.
+    $('input[name="fix"]').click(function(){
+        var startEndDateInput = '';
+        startEndDateInput = '<div class="form-group extra-input">' +
+                                '<label for="start_date" class="control-label col-md-2">Start Date</label>' +
+                                '<div class="col-md-10">' +
+                                    '<div class="input-group">' +
+                                        '<input type="datetime" class="form-control" name="start_date" id="start_date"/>' +
+                                        '<span class="input-group-addon">' +
+                                            '<span class="glyphicon glyphicon-calendar"></span>' +
+                                        '</span>' +
+                                    '</div>' +
+                                '</div>' +
+                            '</div>' +
+
+                            '<div class="form-group extra-input">' +
+                                '<label for="end_date" class="control-label col-md-2">End Date</label>' +
+                                '<div class="col-md-10">' +
+                                    '<div class="input-group">' +
+                                    '<input type="datetime" class="form-control" name="end_date" id="end_date"/>' +
+                                    '<span class="input-group-addon">' +
+                                        '<span class="glyphicon glyphicon-calendar"></span>' +
+                                    '</span>' +
+                                    '</div>' +
+                                '</div>' +
+                            '</div>';
+
+        if($(this).prop("checked") == true){
+            $('#form-create-event').children().eq(0).append(startEndDateInput);
+            $('#start_date').datetimepicker({format: 'YYYY-MM-DD'});
+            $('#end_date').datetimepicker({format: 'YYYY-MM-DD'});
+        }
+        else if($(this).prop("checked") == false){
+            $('#form-create-event').find('.extra-input').remove();
+        }
+    });
+
+
+    $('#category').select2({
+        placeholder: 'Chose category'
+    });
+
+    $('#departments').select2({
+        placeholder: 'Chose department'
     });
 });
 
