@@ -14,33 +14,23 @@
     </div>
 </div>
 
-@permission('create-public-event')
+
 <div class="form-group @if($errors->has('department')) has-error @endif">
     <label for="category" class="control-label col-md-2">
-        {{ trans('labels.backend.schedule.event.modal_create_event.form_input.department') }}
+        {{ trans('labels.backend.schedule.event.modal_create_event.form_input.event_type') }}
     </label>
     <div class="col-md-10">
-        <div class="checkbox">
-            <label>
-                <input type="checkbox"
-                       id="checkbox-all"
-                       checked/> All
-            </label>
-        </div>
-
-        <div class="checkbox">
-        @foreach($departments as $department)
-            <label>
-                <input type="checkbox"
-                       name="departments[]"
-                       checked="true"
-                       value="{{ $department->id }}"/> {{ $department->code }}
-            </label>
-        @endforeach
-        </div>
+        <select class="form-control" name="public" id="public">
+            @permission('create-public-event')
+            <option value="true">Public</option>
+            @endauth
+            @permission('create-private-event')
+            <option value="false">Private</option>
+            @endauth
+        </select>
     </div>
 </div>
-@endauth
+
 
 
 <div class="form-group">
@@ -62,7 +52,7 @@
             <label for="fix">
                 <input type="checkbox"
                        name="fix"
-                       value="1"
+                       value="true"
                        id="fx"/> {{ trans('labels.backend.schedule.event.modal_create_event.form_input.repeat_all_year') }}.
             </label>
         </div>

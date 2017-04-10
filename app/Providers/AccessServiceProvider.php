@@ -293,6 +293,11 @@ class AccessServiceProvider extends ServiceProvider
         /*---------------------------------------
             binding For Module score
         ----------------------------------------*/
+
+        $this->app->bind(
+            \App\Repositories\Backend\Schedule\Calendar\EventRepositoryContract::class,
+            \App\Repositories\Backend\Schedule\Calendar\EloquentEventRepository::class
+        );
     }
 
     /**

@@ -60,9 +60,11 @@
                         <button type="button" class="btn btn-success btn-xs">
                             <i class="fa fa-file-excel-o"></i> {{ trans('buttons.backend.schedule.calendar.panel.export') }}
                         </button>
-                        <button type="button" class="btn btn-warning btn-xs">
+                        @permission('edit-event')
+                        <button type="button" class="btn btn-danger  btn-xs">
                             <i class="fa fa-power-off"></i> {{ trans('buttons.backend.schedule.calendar.panel.uneditable') }}
                         </button>
+                        @endauth
                     </div>
                 </div>
                 <div class="box-body">

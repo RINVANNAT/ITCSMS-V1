@@ -1000,6 +1000,7 @@ return [
                     'form_input' => [
                         'title' => 'Title',
                         'department' => 'Departments',
+                        'event_type' => 'Type',
                         'start_date' => 'Start Date',
                         'end_date' => 'End Date',
                         'allow_student_study' => 'Allow student study',

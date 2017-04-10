@@ -1,13 +1,4 @@
 $(document).ready(function () {
-    // Checkbox all
-    $('#checkbox-all').change(function () {
-        $('input[name="departments[]"]:checkbox').not(this).prop('checked', this.checked);
-    });
-    // iCheck
-    // $('input[type="checkbox"]').iCheck({
-    //     checkboxClass: 'icheckbox_square',
-    //     increaseArea: '40%' // optional
-    // });
     // Setup toastr plugin
     toastr.options = {
         "closeButton": true,
@@ -29,7 +20,7 @@ $(document).ready(function () {
 
     // Render full calendar
     calendar();
-    renderingEventsOnSideLeft($('#calendar').fullCalendar('getDate').format('YYYY'));
+    // renderingEventsOnSideLeft($('#calendar').fullCalendar('getDate').format('YYYY'));
 
 
     // Add more events.
@@ -38,7 +29,7 @@ $(document).ready(function () {
 
         $.ajax({
             type: 'POST',
-            url: '/admin/schedule/calendars',
+            url: '/admin/schedule/calendars/events/store',
             data: $(this).serialize(),
             success: function (response) {
                 if (response.status == true) {
@@ -91,10 +82,10 @@ $(document).ready(function () {
     $('input[name="fix"]').click(function(){
         var startEndDateInput = '';
         startEndDateInput = '<div class="form-group extra-input">' +
-                                '<label for="start_date" class="control-label col-md-2">Start Date</label>' +
+                                '<label for="start" class="control-label col-md-2">Start Date</label>' +
                                 '<div class="col-md-10">' +
                                     '<div class="input-group">' +
-                                        '<input type="datetime" class="form-control" name="start_date" id="start_date"/>' +
+                                        '<input type="datetime" class="form-control" name="start" id="start"/>' +
                                         '<span class="input-group-addon">' +
                                             '<span class="glyphicon glyphicon-calendar"></span>' +
                                         '</span>' +
@@ -103,10 +94,10 @@ $(document).ready(function () {
                             '</div>' +
 
                             '<div class="form-group extra-input">' +
-                                '<label for="end_date" class="control-label col-md-2">End Date</label>' +
+                                '<label for="end" class="control-label col-md-2">End Date</label>' +
                                 '<div class="col-md-10">' +
                                     '<div class="input-group">' +
-                                    '<input type="datetime" class="form-control" name="end_date" id="end_date"/>' +
+                                    '<input type="datetime" class="form-control" name="end" id="end"/>' +
                                     '<span class="input-group-addon">' +
                                         '<span class="glyphicon glyphicon-calendar"></span>' +
                                     '</span>' +
@@ -125,12 +116,28 @@ $(document).ready(function () {
     });
 
 
-    $('#category').select2({
-        placeholder: 'Chose category'
-    });
+    /**
+     * Select Event Type.
+     * @author mab
+     */
+    if($('#public').val() == "true")
+    {
+        $('#departments').remove();
+    }
+    else
+    {
+        selectInputDepartment();
+    }
 
-    $('#departments').select2({
-        placeholder: 'Chose department'
+    $(document).on('change', '#public', function(){
+        if($('#public').val() == "true")
+        {
+            $('#departments').remove();
+        }
+        else
+        {
+            selectInputDepartment();
+        }
     });
 });
 
@@ -183,7 +190,7 @@ var calendar = function () {
             day: 'Day'
         },
         //Random default events
-        events: '/admin/schedule/calendars/events/render',
+        // events: '/admin/schedule/calendars/events/render',
         columnFormat: 'dddd',
         drop: function (date) { // this function is called when something is dropped
             var originalEventObject = $(this).data('eventObject');
@@ -373,4 +380,26 @@ var resizeEvent = function (id, start, end) {
             }
         }
     })
+};
+
+var selectInputDepartment = function () {
+    $.ajax({
+        type: 'GET',
+        url: '/admin/schedule/departments',
+        success:function (response) {
+            var departments = '<div class="form-group" id="departments"><div class="col-md-10 col-md-offset-2">';
+            $.each(response.data, function (key, val) {
+               departments += '<input type="checkbox" value="'+val.id+'" name="departments[]"> '+val.name_en+'<br/>';
+            });
+            departments += '</div></div>';
+            $('#public').parent().parent().after(departments);
+        },
+        error:function () {
+            swal(
+                'Oops...',
+                'Something went wrong while get all departments!',
+                'error'
+            );
+        }
+    });
 };

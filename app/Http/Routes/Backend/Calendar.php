@@ -15,5 +15,10 @@ Route::group(['namespace' => 'Schedule', 'prefix' => 'schedule'], function () {
     // Moving event
     Route::post('calendars/fullcalendar/move', 'CalendarController@moveEvent')->name('fullcalendar.move');
 
+
+    // Create event
+    Route::post('calendars/events/store', 'CalendarController@store')->name('events.store');
+    // AjaxTraitCalendarController with traits
+    Route::get('/departments', 'CalendarController@getDepartments');
 });
 
