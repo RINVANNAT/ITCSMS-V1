@@ -1,6 +1,7 @@
 <?php
 
 namespace App\Models\Schedule\Calendar\Event\Traits\Relationship;
+use App\Models\Department;
 use App\Models\Schedule\Calendar\Repeat\Repeat;
 use App\Models\Schedule\Calendar\Year\Year;
 
@@ -26,5 +27,13 @@ trait EventRelationship
     public function repeat()
     {
         return $this->belongsTo(Repeat::class);
+    }
+
+    /**
+     * @return mixed
+     */
+    public function departments()
+    {
+        return $this->belongsToMany(Department::class);
     }
 }

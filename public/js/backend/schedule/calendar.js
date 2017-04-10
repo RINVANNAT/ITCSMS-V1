@@ -35,7 +35,7 @@ $(document).ready(function () {
                 if (response.status == true) {
                     swal(
                         $('input[name="title"]').val(),
-                        'You have been successfully to create a new event.',
+                        response.message,
                         'success'
                     );
                     $('#form-create-event')[0].reset();
@@ -80,35 +80,34 @@ $(document).ready(function () {
 
     // Add new event.
     $('input[name="fix"]').click(function(){
-        var startEndDateInput = '';
-        startEndDateInput = '<div class="form-group extra-input">' +
-                                '<label for="start" class="control-label col-md-2">Start Date</label>' +
-                                '<div class="col-md-10">' +
-                                    '<div class="input-group">' +
-                                        '<input type="datetime" class="form-control" name="start" id="start"/>' +
+        var startEndDateInput = '<div class="form-group extra-input">' +
+                                    '<label for="start" class="control-label col-md-2">Start Date</label>' +
+                                    '<div class="col-md-10">' +
+                                        '<div class="input-group">' +
+                                            '<input type="datetime" class="form-control" name="start" id="start"/>' +
+                                            '<span class="input-group-addon">' +
+                                                '<span class="glyphicon glyphicon-calendar"></span>' +
+                                            '</span>' +
+                                        '</div>' +
+                                    '</div>' +
+                                '</div>' +
+
+                                '<div class="form-group extra-input">' +
+                                    '<label for="end" class="control-label col-md-2">End Date</label>' +
+                                    '<div class="col-md-10">' +
+                                        '<div class="input-group">' +
+                                        '<input type="datetime" class="form-control" name="end" id="end"/>' +
                                         '<span class="input-group-addon">' +
                                             '<span class="glyphicon glyphicon-calendar"></span>' +
                                         '</span>' +
+                                        '</div>' +
                                     '</div>' +
-                                '</div>' +
-                            '</div>' +
-
-                            '<div class="form-group extra-input">' +
-                                '<label for="end" class="control-label col-md-2">End Date</label>' +
-                                '<div class="col-md-10">' +
-                                    '<div class="input-group">' +
-                                    '<input type="datetime" class="form-control" name="end" id="end"/>' +
-                                    '<span class="input-group-addon">' +
-                                        '<span class="glyphicon glyphicon-calendar"></span>' +
-                                    '</span>' +
-                                    '</div>' +
-                                '</div>' +
-                            '</div>';
+                                '</div>';
 
         if($(this).prop("checked") == true){
             $('#form-create-event').children().eq(0).append(startEndDateInput);
-            $('#start_date').datetimepicker({format: 'YYYY-MM-DD'});
-            $('#end_date').datetimepicker({format: 'YYYY-MM-DD'});
+            $('#start').datetimepicker({format: 'YYYY-MM-DD'});
+            $('#end').datetimepicker({format: 'YYYY-MM-DD'});
         }
         else if($(this).prop("checked") == false){
             $('#form-create-event').find('.extra-input').remove();
@@ -387,9 +386,9 @@ var selectInputDepartment = function () {
         type: 'GET',
         url: '/admin/schedule/departments',
         success:function (response) {
-            var departments = '<div class="form-group" id="departments"><div class="col-md-10 col-md-offset-2">';
+            var departments = '<div class="form-group" id="departments"><label class="control-label col-md-2">Department</label><div class="col-md-10">';
             $.each(response.data, function (key, val) {
-               departments += '<input type="checkbox" value="'+val.id+'" name="departments[]"> '+val.name_en+'<br/>';
+               departments += '<input type="checkbox" value="'+val.id+'" name="departments[]"> '+val.code+' ';
             });
             departments += '</div></div>';
             $('#public').parent().parent().after(departments);
