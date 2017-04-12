@@ -6,9 +6,14 @@ use App\Http\Controllers\Backend\Schedule\Traits\AjaxCalendarController;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Backend\Schedule\Calendar\CreateEventRequest;
 use App\Models\Department;
+use App\Models\Schedule\Calendar\Event\Event;
 use App\Repositories\Backend\Schedule\Calendar\EloquentEventRepository;
+use Illuminate\Support\Facades\Response;
 
-
+/**
+ * Class CalendarController
+ * @package App\Http\Controllers\Backend\Schedule
+ */
 class CalendarController extends Controller
 {
     use AjaxCalendarController;
@@ -38,9 +43,13 @@ class CalendarController extends Controller
 
     /**
      * @param CreateEventRequest $request
+     * @return mixed
      */
     public function store(CreateEventRequest $request)
     {
-        $this->eventRepository->createEvent($request);
+        if ($this->eventRepository->createEvent($request) == true) {
+            return Response::json(['status' => true, 'data' => Event::all()]);
+        }
+        return Response::json(['status' => false]);
     }
 }

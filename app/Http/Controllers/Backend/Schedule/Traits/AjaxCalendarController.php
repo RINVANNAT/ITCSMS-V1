@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Backend\Schedule\Traits;
 
 use App\Models\Department;
+use App\Models\Schedule\Calendar\Event\Event;
 use Illuminate\Support\Facades\Response;
 
 /**
@@ -20,5 +21,13 @@ trait AjaxCalendarController
            'status' => true,
             'data' => Department::all()
         ]);
+    }
+
+    /**
+     * @return mixed
+     */
+    public function listEventsOnSideLeft()
+    {
+        return Response::json(['status' => true, 'events' => Event::latest()->get()]);
     }
 }
