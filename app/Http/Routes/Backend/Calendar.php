@@ -4,7 +4,8 @@ Route::group(['namespace' => 'Schedule', 'prefix' => 'schedule'], function () {
 
     Route::resource('calendars', 'CalendarController');
 
-    Route::get('calendars/fullcalendar/{year}', 'CalendarController@getEventsByYear')->name('fullcalendar.viewer');
+//    Route::get('calendars/fullcalendar/{year}', 'CalendarController@getEventsByYear')->name('fullcalendar.viewer');
+    Route::get('calendars/fullcalendar/events', 'CalendarController@listEventsOnSideLeft')->name('events.viewer');
     Route::post('calendars/fullcalendar/add', 'CalendarController@dragEvent')->name('fullcalendar.add');
     // Rendering events
     Route::get('calendars/events/render', 'CalendarController@getEvents')->name('fullcalendar.render');

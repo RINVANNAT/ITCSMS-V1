@@ -5,7 +5,6 @@ namespace App\Repositories\Backend\Schedule\Calendar;
 use App\Http\Requests\Backend\Schedule\Calendar\CreateEventRequest;
 use App\Models\Schedule\Calendar\Event\Event;
 use App\Models\Schedule\Calendar\Repeat\Repeat;
-use Illuminate\Support\Facades\Response;
 
 /**
  * Class EloquentEventRepository
@@ -34,6 +33,7 @@ class EloquentEventRepository implements EventRepositoryContract
         // Create new instance event.
         $newEvent = new Event();
         $newEvent->title = $request->title;
+        // @TODO Remove description field.
         $newEvent->description = "You can write description here.";
         $newEvent->created_uid = auth()->user()->id;
         $newEvent->updated_uid = auth()->user()->id;
@@ -52,11 +52,10 @@ class EloquentEventRepository implements EventRepositoryContract
         if ($newEvent->save()) {
             if ($request->public == 'false') {
                 $newEvent->departments()->attach($request->departments);
-                return Response::json(['status' => true, 'message' => 'The event was created successfully.', 'data' => Event::all()]);
             }
-            return Response::json(['status' => true, 'message' => 'The event was created successfully.', 'data' => Event::all()]);
+            return true;
         } else {
-            return Response::json(['status' => false, 'message' => 'The event can\'t create']);
+            return false;
         }
     }
 }

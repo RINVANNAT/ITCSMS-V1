@@ -44,8 +44,8 @@
                 </div>
                 <div class="box-body">
                     {{--List all events--}}
-                    @if(isset($events))
-                        <div id="external-events"></div>
+                    <div id="external-events"></div>
+                @if(isset($events))
                     @endif
                     {{--End list events--}}
                 </div>

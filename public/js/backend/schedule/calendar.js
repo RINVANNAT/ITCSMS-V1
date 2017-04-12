@@ -20,7 +20,7 @@ $(document).ready(function () {
 
     // Render full calendar
     calendar();
-    // renderingEventsOnSideLeft($('#calendar').fullCalendar('getDate').format('YYYY'));
+    renderingEventsOnSideLeft($('#calendar').fullCalendar('getDate').format('YYYY'));
 
 
     // Add more events.
@@ -35,13 +35,13 @@ $(document).ready(function () {
                 if (response.status == true) {
                     swal(
                         $('input[name="title"]').val(),
-                        response.message,
+                        'The event was created successfully.',
                         'success'
                     );
                     $('#form-create-event')[0].reset();
                     calendar();
                     $('#modal-add-event').modal('toggle');
-                    renderingEventsOnSideLeft($('#calendar').fullCalendar('getDate')._i[0]);
+                    // renderingEventsOnSideLeft($('#calendar').fullCalendar('getDate')._i[0]);
                 }
 
             },
@@ -206,7 +206,7 @@ var calendar = function () {
 
             addEvent(copiedEventObject);
             $('#calendar').fullCalendar('renderEvent', copiedEventObject, true);
-            renderingEventsOnSideLeft($('#calendar').fullCalendar('getDate').format('YYYY'));
+            // renderingEventsOnSideLeft($('#calendar').fullCalendar('getDate').format('YYYY'));
 
         },
         editable: true,
@@ -247,19 +247,16 @@ var calendar = function () {
 var renderingEventsOnSideLeft = function (year) {
     $.ajax({
         type: 'GET',
-        url: '/admin/schedule/calendars/fullcalendar/' + year,
+        url: '/admin/schedule/calendars/fullcalendar/events',
         success: function (response) {
             if (response.status == true) {
                 var event = '';
                 $.each(response.events, function (key, val) {
-                    if (val.category_event_id == 1) {
-                        event += '<div class="external-event bg-aqua ui-draggable ui-draggable-handle" data-bg="bg-aqua" event-id="' + val.id + '">' + val.title + '</div>';
+                    if (val.public == true) {
+                        event += '<div class="external-event bg-red ui-draggable ui-draggable-handle" data-bg="bg-aqua" event-id="' + val.id + '">' + val.title + '</div>';
                     }
-                    else if (val.category_event_id == 2) {
+                    else{
                         event += '<div class="external-event bg-green ui-draggable ui-draggable-handle" data-bg="bg-green" event-id="' + val.id + '">' + val.title + '</div>';
-                    }
-                    else {
-                        event += '<div class="external-event bg-red ui-draggable ui-draggable-handle" data-bg="bg-red" event-id="' + val.id + '">' + val.title + '</div>';
                     }
                 });
 
@@ -299,7 +296,7 @@ var addEvent = function (event) {
                 $("#calendar").fullCalendar('refresh');
                 $('#calendar').fullCalendar('renderEvent', newEvent, true);
                 toastr["success"]("You have been added the event successfully.");
-                renderingEventsOnSideLeft($('#calendar').fullCalendar('getDate').format('YYYY'));
+                // renderingEventsOnSideLeft($('#calendar').fullCalendar('getDate').format('YYYY'));
             } else {
                 toastr["error"]("The event is already added in this year!");
             }
@@ -345,7 +342,7 @@ var removeEvent = function (event) {
             success: function (response) {
                 if (response.status == true) {
                     $('#calendar').fullCalendar('removeEvents', response.id);
-                    renderingEventsOnSideLeft($('#calendar').fullCalendar('getDate').format('YYYY'));
+                    // renderingEventsOnSideLeft($('#calendar').fullCalendar('getDate').format('YYYY'));
                     swal(
                         'Deleted!',
                         'Your file has been deleted.',
