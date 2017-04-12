@@ -39,7 +39,7 @@
                                         <td>{!! $user->created_at !!} ({!! $user->created_at->diffForHumans() !!})</td>
                                     </tr>
                                     <tr>
-                                        <th>{{ trans('labels.frontend.user.profile.last_updated') }}</th>
+                                        <th>{{ trans('profiles') }}</th>
                                         <td>{!! $user->updated_at !!} ({!! $user->updated_at->diffForHumans() !!})</td>
                                     </tr>
                                     <tr>

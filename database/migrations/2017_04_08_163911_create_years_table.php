@@ -34,6 +34,9 @@ class CreateYearsTable extends Migration
                 ->on('years')
                 ->onDelete('CASCADE');
 
+            $table->dateTime('start');
+            $table->dateTime('end');
+
             $table->integer('created_uid');
             $table->integer('updated_uid');
 

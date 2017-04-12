@@ -5,7 +5,7 @@ namespace App\Repositories\Backend\Schedule\Calendar;
 use App\Http\Requests\Backend\Schedule\Calendar\CreateEventRequest;
 use App\Models\Schedule\Calendar\Event\Event;
 use App\Models\Schedule\Calendar\Repeat\Repeat;
-use Illuminate\Support\Facades\Response;
+use Illuminate\Support\Facades\DB;
 
 /**
  * Class EloquentEventRepository
@@ -19,9 +19,9 @@ class EloquentEventRepository implements EventRepositoryContract
      */
     public function createEvent(CreateEventRequest $request)
     {
-        // Initialize repeat_id variable.
+        // initialize repeat_id variable.
         $repeat_id = null;
-        // Check the event is fix or not.
+        // check the event is fix or not.
         if ($request->fix == 'true') {
             // Create repeat instance
             $newRepeat = new Repeat();
@@ -31,9 +31,10 @@ class EloquentEventRepository implements EventRepositoryContract
                 $repeat_id = $newRepeat->id;
             }
         }
-        // Create new instance event.
+        // create new instance event.
         $newEvent = new Event();
         $newEvent->title = $request->title;
+        // @TODO Remove description field.
         $newEvent->description = "You can write description here.";
         $newEvent->created_uid = auth()->user()->id;
         $newEvent->updated_uid = auth()->user()->id;
@@ -52,11 +53,44 @@ class EloquentEventRepository implements EventRepositoryContract
         if ($newEvent->save()) {
             if ($request->public == 'false') {
                 $newEvent->departments()->attach($request->departments);
-                return Response::json(['status' => true, 'message' => 'The event was created successfully.', 'data' => Event::all()]);
             }
-            return Response::json(['status' => true, 'message' => 'The event was created successfully.', 'data' => Event::all()]);
+            return true;
         } else {
-            return Response::json(['status' => false, 'message' => 'The event can\'t create']);
+            return false;
         }
+    }
+
+    /**
+     * Find event by Id.
+     *
+     * @param $id
+     * @return mixed
+     */
+    public function find($id)
+    {
+        if (Event::find($id) instanceof Event) {
+            return Event::find($id);
+        }
+        return null;
+    }
+
+    /**
+     * Check the event is already existed or not yet.
+     *
+     * @param $event_id
+     * @param $year_id
+     * @return bool
+     */
+    public function objectEventExisted($event_id, $year_id)
+    {
+        $query = DB::table('event_year')->where([
+            ['event_id', '=', $event_id],
+            ['year_id', '=', $year_id]
+        ])->first();
+
+        if (is_object($query)) {
+            return (bool) true;
+        }
+        return (bool) false;
     }
 }

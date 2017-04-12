@@ -13,7 +13,7 @@ class CreateEventRequest extends Request
      */
     public function authorize()
     {
-        return access()->allow('crate-event');
+        return access()->allow('create-private-event') || access()->allow('create-public-event');
     }
 
     /**

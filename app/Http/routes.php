@@ -50,6 +50,7 @@ Route::group(['namespace' => 'Backend', 'prefix' => 'admin', 'middleware' => 'ad
     require (__DIR__ . '/Routes/Backend/EntranceExamCourse.php');
 
     require (__DIR__ . '/Routes/Backend/Calendar.php');
+    require (__DIR__ . '/Routes/Backend/Timetable.php');
 
 
 });
