@@ -34,4 +34,12 @@ interface EventRepositoryContract
      * @return bool
      */
     public function objectEventExisted($event_id, $year_id);
+
+    /**
+     * Find all events by year.
+     *
+     * @param $yearId
+     * @return mixed
+     */
+    public function findEventsByYear($yearId);
 }

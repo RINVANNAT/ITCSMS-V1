@@ -89,8 +89,24 @@ class EloquentEventRepository implements EventRepositoryContract
         ])->first();
 
         if (is_object($query)) {
-            return (bool) true;
+            return (bool)true;
         }
-        return (bool) false;
+        return (bool)false;
+    }
+
+    /**
+     * Find all events by year.
+     *
+     * @param $yearId
+     * @return mixed
+     */
+    public function findEventsByYear($yearId)
+    {
+        return DB::table('events')
+            ->whereNotIn('id', function ($query) use ($yearId) {
+                $query->select('event_year.event_id')
+                    ->from('event_year')
+                    ->where('event_year.year_id', $yearId);
+            })->get();
     }
 }
