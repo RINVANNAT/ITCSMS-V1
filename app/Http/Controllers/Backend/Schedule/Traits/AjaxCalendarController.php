@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Backend\Schedule\Traits;
 
 use App\Models\Department;
 use App\Models\Schedule\Calendar\Event\Event;
+use App\Models\Schedule\Calendar\Year\EventYear;
 use App\Models\Schedule\Calendar\Year\Year;
 use App\Repositories\Backend\Schedule\Calendar\EloquentEventRepository;
 use App\Repositories\Backend\Schedule\Calendar\EloquentYearRepository;
@@ -192,7 +193,7 @@ trait AjaxCalendarController
         return DB::table('event_year')
             ->join('years', 'event_year.year_id', '=', 'years.id')
             ->join('events', 'event_year.event_id', '=', 'events.id')
-            ->select('event_year.id', 'events.title', 'event_year.start', 'event_year.end', 'events.allDay', 'events.public')
+            ->select('event_year.id', 'events.title', 'events.description', 'event_year.start', 'event_year.end', 'events.allDay', 'events.public', 'events.created_uid')
             ->get();
     }
 
@@ -204,12 +205,43 @@ trait AjaxCalendarController
      */
     public function findEventsByYear($year)
     {
+        // dd(auth()->user()->id);
         $objYear = Year::where('name', $year)->first();
 
         if ($objYear instanceof Year) {
-            $events = $this->eventRepository->findEventsByYear($objYear->id);
+            $events = $this->eventRepository->findEventsByYearAndAuthor($objYear->id, auth()->user()->id);
             return Response::json(['status' => true, 'events' => $events]);
         }
         return Response::json(['status' => true, 'events' => Event::latest()->get()]);
+    }
+
+    /**
+     * @param $year
+     * @return mixed
+     */
+    public function renderRepeatEvent($year)
+    {
+        $objYear = Year::where('name', $year)->first();
+        if($objYear instanceof Year)
+        {
+            $repeatEvents = Event::where([
+                ['repeat_id', '!=', null]
+            ])->get();
+
+            if($repeatEvents != null){
+                foreach ($repeatEvents as $event)
+                {
+                    if($this->eventRepository->objectEventExisted($event->id, $objYear->id))
+                    {
+                        continue;
+                    }
+                    else
+                    {
+                        $newEventYear = new EventYear();
+                    }
+                }
+            }
+        }
+
     }
 }

@@ -63,7 +63,15 @@ $(document).ready(function () {
     // prev event on full calendar
 
     $('.fc-prev-button.fc-button.fc-state-default.fc-corner-left').click(function () {
-        renderingEventsOnSideLeft($('#calendar').fullCalendar('getDate').format('YYYY'));
+        var year = $('#calendar').fullCalendar('getDate').format('YYYY');
+        renderingEventsOnSideLeft(year);
+        $.ajax({
+            type: 'GET',
+            url: '/admin/schedule/events/repeat/' + year,
+            success:function () {
+                //sweetAlert('Hello World !');
+            }
+        })
     });
 
     // [NEXT EVENT _CLICK] on full calendar
@@ -79,7 +87,7 @@ $(document).ready(function () {
 
 
     // [TYPE_EVENT]
-    $('input[name="fix"]').click(function () {
+    $('input[name="dailyYear"]').click(function () {
         var startEndDateInput = '<div class="form-group extra-input">' +
             '<label for="start" class="control-label col-md-2">Start Date</label>' +
             '<div class="col-md-10">' +
@@ -155,7 +163,7 @@ var calendar = function () {
 
             // make the event draggable using jQuery UI
             $(this).draggable({
-                zIndex: 1070,
+                zIndex: 100070,
                 revert: true, // will cause the event to go back to its
                 revertDuration: 0  //  original position after the drag
             });
@@ -200,7 +208,7 @@ var calendar = function () {
             copiedEventObject.allDay = true;
 
             addEvent(copiedEventObject);
-            $('#calendar').fullCalendar('renderEvent', copiedEventObject, true);
+            // $('#calendar').fullCalendar('renderEvent', copiedEventObject, true);
             // renderingEventsOnSideLeft($('#calendar').fullCalendar('getDate').format('YYYY'));
 
         },
@@ -236,7 +244,7 @@ var calendar = function () {
             $(this).css('z-index', 8);
             $('.tooltipevent').remove();
         },
-        eventRender: function (event, element) {
+        eventRender: function (event, element){
             if (event.public == true) {
                 element.addClass('bg-red');
             }
@@ -256,7 +264,7 @@ var renderingEventsOnSideLeft = function (year) {
                 var event = '';
                 $.each(response.events, function (key, val) {
                     if (val.public == true) {
-                        event += '<div class="external-event bg-red ui-draggable ui-draggable-handle" data-bg="bg-aqua" event-id="' + val.id + '">' + val.title + '</div>';
+                        event += '<div class="external-event bg-red ui-draggable ui-draggable-handle" data-bg="bg-red" event-id="' + val.id + '">' + val.title + '</div>';
                     }
                     else {
                         event += '<div class="external-event bg-green ui-draggable ui-draggable-handle" data-bg="bg-green" event-id="' + val.id + '">' + val.title + '</div>';
@@ -288,22 +296,13 @@ var addEvent = function (event) {
         }),
         success: function (response) {
             if (response.status == true) {
-                var newEvent = new Object();
 
-                newEvent.title = response.title;
-                newEvent.id = response.id;
-                newEvent.allDay = true;
-                newEvent.start = response.start;
-                newEvent.end = response.end;
-                newEvent.className = 'bg-green';
-                if (response.public == true) {
-                    newEvent.className = 'bg-red';
-                }
-                $('#calendar').fullCalendar('renderEvent', newEvent, false);
+                $('#calendar').fullCalendar('renderEvent', event, true);
                 $("#calendar").fullCalendar('refresh');
-                calendar();
+
                 toastr["success"]("The event is added.", "Successfully");
                 renderingEventsOnSideLeft($('#calendar').fullCalendar('getDate').format('YYYY'));
+                calendar();
             } else {
                 toastr["info"]("The event is already added.", "Already existed!");
             }
