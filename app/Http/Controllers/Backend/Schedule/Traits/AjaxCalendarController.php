@@ -157,7 +157,7 @@ trait AjaxCalendarController
         return DB::table('event_year')
             ->join('years', 'event_year.year_id', '=', 'years.id')
             ->join('events', 'event_year.event_id', '=', 'events.id')
-            ->select('event_year.id', 'events.title', 'event_year.start', 'event_year.end', 'events.allDay')
+            ->select('event_year.id', 'events.title', 'event_year.start', 'event_year.end', 'events.allDay', 'events.public')
             ->get();
     }
 }
