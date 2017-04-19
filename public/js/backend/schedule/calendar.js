@@ -41,7 +41,7 @@ $(document).ready(function () {
                     $('#form-create-event')[0].reset();
                     calendar();
                     $('#modal-add-event').modal('toggle');
-                    // renderingEventsOnSideLeft($('#calendar').fullCalendar('getDate')._i[0]);
+                    renderingEventsOnSideLeft($('#calendar').fullCalendar('getDate').format('YYYY'));
                 }
 
             },
@@ -288,17 +288,21 @@ var addEvent = function (event) {
         }),
         success: function (response) {
             if (response.status == true) {
-                // var newEvent = new Object();
-                //
-                // newEvent.title = response.title;
-                // newEvent.id = response.event.id;
-                // newEvent.allDay = true;
-                // newEvent.start = response.event.start;
-                // newEvent.end = response.event.end;
-                // $("#calendar").fullCalendar('refresh');
-                // $('#calendar').fullCalendar('renderEvent', newEvent, true);
-                toastr["success"]("The event is added.", "Successfully");
+                var newEvent = new Object();
+
+                newEvent.title = response.title;
+                newEvent.id = response.id;
+                newEvent.allDay = true;
+                newEvent.start = response.start;
+                newEvent.end = response.end;
+                newEvent.className = 'bg-green';
+                if (response.public == true) {
+                    newEvent.className = 'bg-red';
+                }
+                $('#calendar').fullCalendar('renderEvent', newEvent, false);
+                $("#calendar").fullCalendar('refresh');
                 calendar();
+                toastr["success"]("The event is added.", "Successfully");
                 renderingEventsOnSideLeft($('#calendar').fullCalendar('getDate').format('YYYY'));
             } else {
                 toastr["info"]("The event is already added.", "Already existed!");
@@ -330,7 +334,6 @@ var moveEvent = function (event) {
 };
 
 var removeEvent = function (event) {
-    alert(event.id);
     swal({
         title: 'Are you sure?',
         text: "You won't be able to revert this!",
@@ -347,8 +350,9 @@ var removeEvent = function (event) {
                 id: event.id
             },
             success: function (response) {
+                console.log(response)
                 if (response.status == true) {
-                    $('#calendar').fullCalendar('removeEvents', response.id);
+                    $('#calendar').fullCalendar('removeEvents', event.id);
                     renderingEventsOnSideLeft($('#calendar').fullCalendar('getDate').format('YYYY'));
                     swal(
                         'Deleted!',

@@ -106,7 +106,16 @@ trait AjaxCalendarController
                         'updated_at' => Carbon::now()
                     ]
                 );
-                return Response::json(['status' => true, 'event' => $objEvent]);
+                // Find the latest event_year record.
+                $latestEventYear = DB::table('event_year')->latest()->first();
+                return Response::json([
+                    'status' => true,
+                    'title' => request('title'),
+                    'id' => $latestEventYear->id,
+                    'public' => $objEvent->public,
+                    'start' => $latestEventYear->start,
+                    'end' => $latestEventYear->end
+                ]);
             }
         }
         return Response::json(['status' => false]);

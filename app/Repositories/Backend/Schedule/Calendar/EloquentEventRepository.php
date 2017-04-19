@@ -89,9 +89,9 @@ class EloquentEventRepository implements EventRepositoryContract
         ])->first();
 
         if (is_object($query)) {
-            return (bool) true;
+            return (bool)true;
         }
-        return (bool) false;
+        return (bool)false;
     }
 
     /**
