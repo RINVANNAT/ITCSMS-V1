@@ -119,6 +119,15 @@ trait AjaxCalendarController
      */
     public function resizeEvent()
     {
+        $objEvent = DB::table('event_year')->where('id', request('id'));
+
+        if (is_object($objEvent)) {
+            $objEvent->update([
+                'start' => request('start'),
+                'end' => request('end')
+            ]);
+            return Response::json(['status' => true]);
+        }
         return Response::json(['status' => false]);
     }
 
@@ -129,6 +138,23 @@ trait AjaxCalendarController
      */
     public function moveEvent()
     {
+        $objEvent = DB::table('event_year')->where('id', request('id'));
+
+        if (is_object($objEvent)) {
+            // Copy object to find times of days.
+            $tmp = $objEvent->first();
+            $startOld = new \DateTime($tmp->start);
+            $endOld = new \DateTime($tmp->end);
+            /** @var integer $interval */
+            $interval = $startOld->diff($endOld);
+            $startNewTmp = new Carbon(request('start'));
+            $endNew = $startNewTmp->addDays($interval->days);
+            $objEvent->update([
+                'start' => new Carbon(request('start')),
+                'end' => $endNew
+            ]);
+            return Response::json(['status' => true]);
+        }
         return Response::json(['status' => false]);
     }
 
@@ -159,5 +185,22 @@ trait AjaxCalendarController
             ->join('events', 'event_year.event_id', '=', 'events.id')
             ->select('event_year.id', 'events.title', 'event_year.start', 'event_year.end', 'events.allDay', 'events.public')
             ->get();
+    }
+
+    /**
+     * Find all events by year.
+     *
+     * @param $year
+     * @return mixed
+     */
+    public function findEventsByYear($year)
+    {
+        $objYear = Year::where('name', $year)->first();
+
+        if ($objYear instanceof Year) {
+            $events = $this->eventRepository->findEventsByYear($objYear->id);
+            return Response::json(['status' => true, 'events' => $events]);
+        }
+        return Response::json(['status' => true, 'events' => Event::latest()->get()]);
     }
 }
