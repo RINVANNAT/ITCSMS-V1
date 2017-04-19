@@ -66,19 +66,19 @@ $(document).ready(function () {
         renderingEventsOnSideLeft($('#calendar').fullCalendar('getDate').format('YYYY'));
     });
 
-    // next event on full calendar
+    // [NEXT EVENT _CLICK] on full calendar
 
     $('.fc-next-button.fc-button.fc-state-default.fc-corner-right').click(function () {
         renderingEventsOnSideLeft($('#calendar').fullCalendar('getDate').format('YYYY'));
     });
 
-    // today event click.
+    // [TODAY _CLICK]
     $('.fc-today-button.fc-button.fc-state-default.fc-corner-left.fc-corner-right').click(function () {
         renderingEventsOnSideLeft($('#calendar').fullCalendar('getDate').format('YYYY'));
     });
 
 
-    // Add new event.
+    // [TYPE_EVENT]
     $('input[name="fix"]').click(function(){
         var startEndDateInput = '<div class="form-group extra-input">' +
                                     '<label for="start" class="control-label col-md-2">Start Date</label>' +
@@ -189,7 +189,7 @@ var calendar = function () {
             day: 'Day'
         },
         //Random default events
-        // events: '/admin/schedule/calendars/events/render',
+        events: '/admin/schedule/events',
         columnFormat: 'dddd',
         drop: function (date) { // this function is called when something is dropped
             var originalEventObject = $(this).data('eventObject');
@@ -247,7 +247,7 @@ var calendar = function () {
 var renderingEventsOnSideLeft = function (year) {
     $.ajax({
         type: 'GET',
-        url: '/admin/schedule/calendars/fullcalendar/events',
+        url: '/admin/schedule/calendars/fullcalendar/events/'+year,
         success: function (response) {
             if (response.status == true) {
                 var event = '';
@@ -273,7 +273,7 @@ var renderingEventsOnSideLeft = function (year) {
 var addEvent = function (event) {
     $.ajax({
         type: 'POST',
-        url: '/admin/schedule/calendars/fullcalendar/add',
+        url: '/admin/schedule/calendars/fullcalendar/drag',
         contentType: "application/json",
         dataType: "json",
         cache: false,
@@ -285,21 +285,24 @@ var addEvent = function (event) {
         }),
         success: function (response) {
             if (response.status == true) {
-
-                var newEvent = new Object();
-
-                newEvent.title = response.title;
-                newEvent.id = response.event.id;
-                newEvent.allDay = true;
-                newEvent.start = response.event.start;
-                newEvent.end = response.event.end;
-                $("#calendar").fullCalendar('refresh');
-                $('#calendar').fullCalendar('renderEvent', newEvent, true);
-                toastr["success"]("You have been added the event successfully.");
+                // var newEvent = new Object();
+                //
+                // newEvent.title = response.title;
+                // newEvent.id = response.event.id;
+                // newEvent.allDay = true;
+                // newEvent.start = response.event.start;
+                // newEvent.end = response.event.end;
+                // $("#calendar").fullCalendar('refresh');
+                // $('#calendar').fullCalendar('renderEvent', newEvent, true);
+                toastr["success"]("The event is added.", "Successfully");
+                calendar();
                 // renderingEventsOnSideLeft($('#calendar').fullCalendar('getDate').format('YYYY'));
             } else {
-                toastr["error"]("The event is already added in this year!");
+                toastr["warning"]("The event is already added.", "Warning");
             }
+        },
+        error: function () {
+            toastr["error"]("The event does not add.", "error");
         }
     });
 };
@@ -315,9 +318,9 @@ var moveEvent = function (event) {
         },
         success: function (response) {
             if (response.status == true) {
-                toastr["info"]("You have been updated successfully.", "Information");
+                toastr["info"]("You have been updated successfully.", "Successfully");
             } else {
-                toastr["error"]("Something went wrong !");
+                toastr["error"]("The event does not move.", "Error");
             }
         }
     });
@@ -347,7 +350,8 @@ var removeEvent = function (event) {
                         'Deleted!',
                         'Your file has been deleted.',
                         'success'
-                    )
+                    );
+                    calendar();
                 }
             },
             error: function (error, jqXHR, exception) {
@@ -372,7 +376,7 @@ var resizeEvent = function (id, start, end) {
                 toastr["success"]("You have been added the event successfully.", "Have been updated");
                 calendar();
             } else {
-                toastr["error"]("Error !", "Something went wrong.");
+                toastr["warning"]("The event does not resize.", "Warning");
             }
         }
     })

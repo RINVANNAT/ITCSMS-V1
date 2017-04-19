@@ -20,7 +20,6 @@
     <link rel="stylesheet" href="{{ asset('css/calendar.css') }}"/>
     <link rel="stylesheet" href="{{ asset('plugins/iCheck/square/red.css') }}"/>
 
-
 @stop
 
 @section('content')
@@ -45,7 +44,7 @@
                 <div class="box-body">
                     {{--List all events--}}
                     <div id="external-events"></div>
-                @if(isset($events))
+                    @if(isset($events))
                     @endif
                     {{--End list events--}}
                 </div>

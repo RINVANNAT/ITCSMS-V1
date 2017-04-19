@@ -11,8 +11,10 @@
                     @include('backend.schedule.calendars.includes.form-event')
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-default btn-sm" data-dismiss="modal">{{ trans('buttons.backend.schedule.event.modal_create_event.cancel') }}</button>
-                    <input type="submit" class="btn btn-primary btn-sm" value="{{ trans('buttons.backend.schedule.event.modal_create_event.save_change') }}"/>
+                    <button type="button" class="btn btn-default btn-sm"
+                            data-dismiss="modal">{{ trans('buttons.backend.schedule.event.modal_create_event.cancel') }}</button>
+                    <input type="submit" class="btn btn-primary btn-sm"
+                           value="{{ trans('buttons.backend.schedule.event.modal_create_event.save_change') }}"/>
                 </div>
             </form>
         </div>

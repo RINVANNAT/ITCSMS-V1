@@ -337,7 +337,7 @@
     <script>
         var avatar = "{{url('img/profiles/avatar.png')}}";
         $(document).ready(function(){
-            $('.profile-user-img').error(function(){
+            $('.profiles-user-img').error(function(){
                 $(this).attr('src', avatar);
             });
 

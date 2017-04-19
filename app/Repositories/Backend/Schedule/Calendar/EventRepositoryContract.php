@@ -17,4 +17,21 @@ interface EventRepositoryContract
      * @return mixed
      */
     public function createEvent(CreateEventRequest $request);
+
+    /**
+     * Find event by Id.
+     *
+     * @param $id
+     * @return mixed
+     */
+    public function find($id);
+
+    /**
+     * Check event that match with the year.
+     *
+     * @param $event_id
+     * @param $year_id
+     * @return bool
+     */
+    public function objectEventExisted($event_id, $year_id);
 }
