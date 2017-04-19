@@ -22,5 +22,9 @@ Route::group(['namespace' => 'Schedule', 'prefix' => 'schedule'], function () {
     Route::get('/departments', 'CalendarController@getDepartments');
     // Rendering event on full calendar.
     Route::get('/events', 'CalendarController@renderEventsOnFullCalendar');
+    // Finding events by year.
+    Route::get('/find_events_by_year/{year}', 'CalendarController@findEventsByYear')->name('events.findByYear');
+    // Store and view all repeat event.
+    Route::get('/events/repeat/{year}', 'CalendarController@renderRepeatEvent')->name('events.repeat');
 });
 

@@ -1004,7 +1004,7 @@ return [
                         'start_date' => 'Start Date',
                         'end_date' => 'End Date',
                         'allow_student_study' => 'Allow student study',
-                        'repeat_all_year' => 'Repeat all year',
+                        'repeat_daily_year' => 'Daily Year',
                         'placeholder' => [
                             'title' => 'Event title',
                             'chose_department' => 'Chose Department',

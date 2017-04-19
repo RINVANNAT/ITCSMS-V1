@@ -41,7 +41,7 @@ $(document).ready(function () {
                     $('#form-create-event')[0].reset();
                     calendar();
                     $('#modal-add-event').modal('toggle');
-                    // renderingEventsOnSideLeft($('#calendar').fullCalendar('getDate')._i[0]);
+                    renderingEventsOnSideLeft($('#calendar').fullCalendar('getDate').format('YYYY'));
                 }
 
             },
@@ -63,7 +63,15 @@ $(document).ready(function () {
     // prev event on full calendar
 
     $('.fc-prev-button.fc-button.fc-state-default.fc-corner-left').click(function () {
-        renderingEventsOnSideLeft($('#calendar').fullCalendar('getDate').format('YYYY'));
+        var year = $('#calendar').fullCalendar('getDate').format('YYYY');
+        renderingEventsOnSideLeft(year);
+        $.ajax({
+            type: 'GET',
+            url: '/admin/schedule/events/repeat/' + year,
+            success:function () {
+                //sweetAlert('Hello World !');
+            }
+        })
     });
 
     // [NEXT EVENT _CLICK] on full calendar
@@ -79,37 +87,37 @@ $(document).ready(function () {
 
 
     // [TYPE_EVENT]
-    $('input[name="fix"]').click(function(){
+    $('input[name="dailyYear"]').click(function () {
         var startEndDateInput = '<div class="form-group extra-input">' +
-                                    '<label for="start" class="control-label col-md-2">Start Date</label>' +
-                                    '<div class="col-md-10">' +
-                                        '<div class="input-group">' +
-                                            '<input type="datetime" class="form-control" name="start" id="start"/>' +
-                                            '<span class="input-group-addon">' +
-                                                '<span class="glyphicon glyphicon-calendar"></span>' +
-                                            '</span>' +
-                                        '</div>' +
-                                    '</div>' +
-                                '</div>' +
+            '<label for="start" class="control-label col-md-2">Start Date</label>' +
+            '<div class="col-md-10">' +
+            '<div class="input-group">' +
+            '<input type="datetime" class="form-control" name="start" id="start"/>' +
+            '<span class="input-group-addon">' +
+            '<span class="glyphicon glyphicon-calendar"></span>' +
+            '</span>' +
+            '</div>' +
+            '</div>' +
+            '</div>' +
 
-                                '<div class="form-group extra-input">' +
-                                    '<label for="end" class="control-label col-md-2">End Date</label>' +
-                                    '<div class="col-md-10">' +
-                                        '<div class="input-group">' +
-                                        '<input type="datetime" class="form-control" name="end" id="end"/>' +
-                                        '<span class="input-group-addon">' +
-                                            '<span class="glyphicon glyphicon-calendar"></span>' +
-                                        '</span>' +
-                                        '</div>' +
-                                    '</div>' +
-                                '</div>';
+            '<div class="form-group extra-input">' +
+            '<label for="end" class="control-label col-md-2">End Date</label>' +
+            '<div class="col-md-10">' +
+            '<div class="input-group">' +
+            '<input type="datetime" class="form-control" name="end" id="end"/>' +
+            '<span class="input-group-addon">' +
+            '<span class="glyphicon glyphicon-calendar"></span>' +
+            '</span>' +
+            '</div>' +
+            '</div>' +
+            '</div>';
 
-        if($(this).prop("checked") == true){
+        if ($(this).prop("checked") == true) {
             $('#form-create-event').children().eq(0).append(startEndDateInput);
             $('#start').datetimepicker({format: 'YYYY-MM-DD'});
             $('#end').datetimepicker({format: 'YYYY-MM-DD'});
         }
-        else if($(this).prop("checked") == false){
+        else if ($(this).prop("checked") == false) {
             $('#form-create-event').find('.extra-input').remove();
         }
     });
@@ -119,22 +127,18 @@ $(document).ready(function () {
      * Select Event Type.
      * @author mab
      */
-    if($('#public').val() == "true")
-    {
+    if ($('#public').val() == "true") {
         $('#departments').remove();
     }
-    else
-    {
+    else {
         selectInputDepartment();
     }
 
-    $(document).on('change', '#public', function(){
-        if($('#public').val() == "true")
-        {
+    $(document).on('change', '#public', function () {
+        if ($('#public').val() == "true") {
             $('#departments').remove();
         }
-        else
-        {
+        else {
             selectInputDepartment();
         }
     });
@@ -159,7 +163,7 @@ var calendar = function () {
 
             // make the event draggable using jQuery UI
             $(this).draggable({
-                zIndex: 1070,
+                zIndex: 100070,
                 revert: true, // will cause the event to go back to its
                 revertDuration: 0  //  original position after the drag
             });
@@ -193,7 +197,6 @@ var calendar = function () {
         columnFormat: 'dddd',
         drop: function (date) { // this function is called when something is dropped
             var originalEventObject = $(this).data('eventObject');
-            console.log(originalEventObject);
 
             // we need to copy it, so that multiple events don't have a reference to the same object
             var copiedEventObject = $.extend({}, originalEventObject);
@@ -205,7 +208,7 @@ var calendar = function () {
             copiedEventObject.allDay = true;
 
             addEvent(copiedEventObject);
-            $('#calendar').fullCalendar('renderEvent', copiedEventObject, true);
+            // $('#calendar').fullCalendar('renderEvent', copiedEventObject, true);
             // renderingEventsOnSideLeft($('#calendar').fullCalendar('getDate').format('YYYY'));
 
         },
@@ -241,13 +244,11 @@ var calendar = function () {
             $(this).css('z-index', 8);
             $('.tooltipevent').remove();
         },
-        eventRender: function(event, element) {
-            if(event.public == true)
-            {
+        eventRender: function (event, element){
+            if (event.public == true) {
                 element.addClass('bg-red');
             }
-            else
-            {
+            else {
                 element.addClass('bg-green');
             }
         }
@@ -257,15 +258,15 @@ var calendar = function () {
 var renderingEventsOnSideLeft = function (year) {
     $.ajax({
         type: 'GET',
-        url: '/admin/schedule/calendars/fullcalendar/events/'+year,
+        url: '/admin/schedule/find_events_by_year/' + year,
         success: function (response) {
             if (response.status == true) {
                 var event = '';
                 $.each(response.events, function (key, val) {
                     if (val.public == true) {
-                        event += '<div class="external-event bg-red ui-draggable ui-draggable-handle" data-bg="bg-aqua" event-id="' + val.id + '">' + val.title + '</div>';
+                        event += '<div class="external-event bg-red ui-draggable ui-draggable-handle" data-bg="bg-red" event-id="' + val.id + '">' + val.title + '</div>';
                     }
-                    else{
+                    else {
                         event += '<div class="external-event bg-green ui-draggable ui-draggable-handle" data-bg="bg-green" event-id="' + val.id + '">' + val.title + '</div>';
                     }
                 });
@@ -295,20 +296,15 @@ var addEvent = function (event) {
         }),
         success: function (response) {
             if (response.status == true) {
-                // var newEvent = new Object();
-                //
-                // newEvent.title = response.title;
-                // newEvent.id = response.event.id;
-                // newEvent.allDay = true;
-                // newEvent.start = response.event.start;
-                // newEvent.end = response.event.end;
-                // $("#calendar").fullCalendar('refresh');
-                // $('#calendar').fullCalendar('renderEvent', newEvent, true);
+
+                $('#calendar').fullCalendar('renderEvent', event, true);
+                $("#calendar").fullCalendar('refresh');
+
                 toastr["success"]("The event is added.", "Successfully");
+                renderingEventsOnSideLeft($('#calendar').fullCalendar('getDate').format('YYYY'));
                 calendar();
-                // renderingEventsOnSideLeft($('#calendar').fullCalendar('getDate').format('YYYY'));
             } else {
-                toastr["warning"]("The event is already added.", "Warning");
+                toastr["info"]("The event is already added.", "Already existed!");
             }
         },
         error: function () {
@@ -328,7 +324,7 @@ var moveEvent = function (event) {
         },
         success: function (response) {
             if (response.status == true) {
-                toastr["info"]("You have been updated successfully.", "Successfully");
+                toastr["info"]("The event already is moved.", "Successfully");
             } else {
                 toastr["error"]("The event does not move.", "Error");
             }
@@ -353,9 +349,10 @@ var removeEvent = function (event) {
                 id: event.id
             },
             success: function (response) {
+                console.log(response)
                 if (response.status == true) {
-                    $('#calendar').fullCalendar('removeEvents', response.id);
-                    // renderingEventsOnSideLeft($('#calendar').fullCalendar('getDate').format('YYYY'));
+                    $('#calendar').fullCalendar('removeEvents', event.id);
+                    renderingEventsOnSideLeft($('#calendar').fullCalendar('getDate').format('YYYY'));
                     swal(
                         'Deleted!',
                         'Your file has been deleted.',
@@ -383,7 +380,7 @@ var resizeEvent = function (id, start, end) {
         },
         success: function (response) {
             if (response.status == true) {
-                toastr["success"]("You have been added the event successfully.", "Have been updated");
+                toastr["info"]("The event is already updated.", "Successfully");
                 calendar();
             } else {
                 toastr["warning"]("The event does not resize.", "Warning");
@@ -396,15 +393,15 @@ var selectInputDepartment = function () {
     $.ajax({
         type: 'GET',
         url: '/admin/schedule/departments',
-        success:function (response) {
+        success: function (response) {
             var departments = '<div class="form-group" id="departments"><label class="control-label col-md-2">Department</label><div class="col-md-10">';
             $.each(response.data, function (key, val) {
-               departments += '<input type="checkbox" value="'+val.id+'" name="departments[]"> '+val.code+' ';
+                departments += '<input type="checkbox" value="' + val.id + '" name="departments[]"> ' + val.code + ' ';
             });
             departments += '</div></div>';
             $('#public').parent().parent().after(departments);
         },
-        error:function () {
+        error: function () {
             swal(
                 'Oops...',
                 'Something went wrong while get all departments!',

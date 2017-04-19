@@ -49,11 +49,11 @@
 <div class="form-group">
     <div class="col-sm-offset-2 col-sm-10">
         <div class="checkbox">
-            <label for="fix">
+            <label for="dailyYear">
                 <input type="checkbox"
-                       name="fix"
+                       name="dailyYear"
                        value="true"
-                       id="fx"/> {{ trans('labels.backend.schedule.event.modal_create_event.form_input.repeat_all_year') }}.
+                       id="dailyYear"/> {{ trans('labels.backend.schedule.event.modal_create_event.form_input.repeat_daily_year') }}.
             </label>
         </div>
     </div>
