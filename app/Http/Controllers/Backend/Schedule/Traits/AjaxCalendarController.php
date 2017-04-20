@@ -7,6 +7,7 @@ use App\Models\Schedule\Calendar\Event\Event;
 use App\Models\Schedule\Calendar\Year\EventYear;
 use App\Models\Schedule\Calendar\Year\Year;
 use App\Repositories\Backend\Schedule\Calendar\EloquentEventRepository;
+use App\Repositories\Backend\Schedule\Calendar\EloquentRepeatRepository;
 use App\Repositories\Backend\Schedule\Calendar\EloquentYearRepository;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
@@ -29,17 +30,25 @@ trait AjaxCalendarController
     protected $eventRepository;
 
     /**
+     * @var EloquentRepeatRepository
+     */
+    protected $repeatRepository;
+
+    /**
      * AjaxCalendarController constructor.
      * @param EloquentYearRepository $eloquentYearRepository
      * @param EloquentEventRepository $eloquentEventRepository
+     * @param EloquentRepeatRepository $eloquentRepeatRepository
      */
     public function __construct(
         EloquentYearRepository $eloquentYearRepository,
-        EloquentEventRepository $eloquentEventRepository
+        EloquentEventRepository $eloquentEventRepository,
+        EloquentRepeatRepository $eloquentRepeatRepository
     )
     {
         $this->yearRepository = $eloquentYearRepository;
         $this->eventRepository = $eloquentEventRepository;
+        $this->repeatRepository = $eloquentRepeatRepository;
     }
 
     /**
@@ -186,15 +195,33 @@ trait AjaxCalendarController
     /**
      * Rendering events on full calendar.
      *
+     * @param $departmentId
      * @return mixed
      */
-    public function renderEventsOnFullCalendar()
+    public function renderEventsOnFullCalendar($departmentId)
     {
         return DB::table('event_year')
-            ->join('years', 'event_year.year_id', '=', 'years.id')
-            ->join('events', 'event_year.event_id', '=', 'events.id')
+            ->join('years', function ($yearQuery) {
+                $yearQuery->on('event_year.year_id', '=', 'years.id');
+            })
+            ->join('events', function ($eventQuery) use ($departmentId) {
+                $eventQuery->on('events.id', '=', 'event_year.event_id')
+                    ->where('events.public', '=', true)
+                    ->orWhere(function ($deptQuery) use ($departmentId) {
+                        $eventIds = DB::table('department_event')
+                            ->select('department_event.event_id')
+                            ->where('department_event.department_id', $departmentId)
+                            ->lists('event_id');
+                        if ($eventIds) {
+                            $deptQuery->whereIn('events.id', $eventIds);
+                        } else {
+                            $deptQuery = null;
+                        }
+                    });
+            })
             ->select('event_year.id', 'events.title', 'events.description', 'event_year.start', 'event_year.end', 'events.allDay', 'events.public', 'events.created_uid')
             ->get();
+
     }
 
     /**
@@ -205,7 +232,6 @@ trait AjaxCalendarController
      */
     public function findEventsByYear($year)
     {
-        // dd(auth()->user()->id);
         $objYear = Year::where('name', $year)->first();
 
         if ($objYear instanceof Year) {
@@ -216,32 +242,36 @@ trait AjaxCalendarController
     }
 
     /**
+     * Store all repeat event to each year.
+     *
      * @param $year
      * @return mixed
      */
     public function renderRepeatEvent($year)
     {
         $objYear = Year::where('name', $year)->first();
-        if($objYear instanceof Year)
-        {
-            $repeatEvents = Event::where([
-                ['repeat_id', '!=', null]
-            ])->get();
 
-            if($repeatEvents != null){
-                foreach ($repeatEvents as $event)
-                {
-                    if($this->eventRepository->objectEventExisted($event->id, $objYear->id))
-                    {
-                        continue;
-                    }
-                    else
-                    {
-                        $newEventYear = new EventYear();
-                    }
+        if (!$objYear instanceof Year) {
+            $objYear = new Year();
+
+            $objYear->name = $year;
+            $objYear->save();
+        }
+
+        $repeatEvents = Event::where([
+            ['repeat_id', '!=', null]
+        ])->get();
+
+        if ($repeatEvents != null) {
+            foreach ($repeatEvents as $event) {
+                if ($this->eventRepository->findEventYear($event->id, $objYear->id) instanceof EventYear) {
+                    continue;
+                } else {
+                    /** @var Event $event */
+                    /** @var Year $objYear */
+                    $this->repeatRepository->copiedObjectRepeatEvent($event, $objYear);
                 }
             }
         }
-
     }
 }

@@ -21,7 +21,7 @@ Route::group(['namespace' => 'Schedule', 'prefix' => 'schedule'], function () {
     // AjaxTraitCalendarController with traits
     Route::get('/departments', 'CalendarController@getDepartments');
     // Rendering event on full calendar.
-    Route::get('/events', 'CalendarController@renderEventsOnFullCalendar');
+    Route::get('/events/{departmentId}', 'CalendarController@renderEventsOnFullCalendar');
     // Finding events by year.
     Route::get('/find_events_by_year/{year}', 'CalendarController@findEventsByYear')->name('events.findByYear');
     // Store and view all repeat event.
