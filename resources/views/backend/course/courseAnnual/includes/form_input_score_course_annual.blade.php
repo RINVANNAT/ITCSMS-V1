@@ -22,294 +22,6 @@
             margin-top: 5px;
         }
 
-        .pop_margin{
-            margin-right: 30px;
-        }
-        .popup_wrapper .popup {
-            background: #08B65F;
-            width: 400px;
-            border-radius: 3px;
-            border: 0;
-            box-shadow: 0 5px 20px rgba(0,0,0,1);
-            outline: 1px solid #ddd;
-            outline: 1px solid rgba(0,0,0,.03);
-            font-family: "Roboto", sans-serif;
-
-        }
-        .popup_wrapper .popup .popup_title {
-            color:#FFF;
-            font-weight:bold;
-            line-height: 45px;
-            padding: 0 20px;
-            margin-bottom: 10px;
-            min-height: 20px;
-        }
-        .popup_wrapper .popup .popup_title h1,
-        .popup_wrapper .popup .popup_title h2,
-        .popup_wrapper .popup .popup_title h3,
-        .popup_wrapper .popup .popup_title h4,
-        .popup_wrapper .popup .popup_title h5,
-        .popup_wrapper .popup .popup_title h6 {
-            margin: 0;
-        }
-        .popup_wrapper .popup .popup_title h1 {
-            font-size: 22px;
-        }
-        .popup_wrapper .popup .popup_title h2 {
-            font-size: 18px;
-        }
-        .popup_wrapper .popup .popup_title h3 {
-            font-size: 16px;
-        }
-        .popup_wrapper .popup .popup_title h4 {
-            font-size: 14px;
-        }
-        .popup_wrapper .popup .popup_title h5 {
-            font-size: 12px;
-        }
-        .popup_wrapper .popup .popup_title h6 {
-            font-size: 12px;
-        }
-        .popup_wrapper .popup_close {
-            position: absolute;
-            top: 5px;
-            right: 6px;
-            width: 20px;
-            height: 20px;
-            border-radius: 3px;
-            cursor: pointer;
-            font-family: "Roboto", sans-serif;
-            font-size: 10px;
-            text-align: center;
-            line-height: 17px;
-            color:#FFF;
-        }
-        .popup_wrapper .popup_close svg {
-            position: absolute;
-            top: 0;
-            left: 0;
-            fill: #FFF;
-            border-radius: 3px;
-            color:#FFF;
-        }
-        .popup_wrapper .popup_content {
-            color:#FFF;
-            padding: 0 20px;
-        }
-        .popup_wrapper .popup p {
-            font-size: 16px;
-            color: #FFF;
-        }
-        .popup_wrapper .popup p + p {
-            margin: 16px 0 0 0;
-        }
-        .popup_wrapper .popup input,
-        .popup_wrapper .popup textarea {
-
-            outline: 0;
-            font-size:15px;
-
-            padding:5px;
-            line-height: 20px;
-            padding: 8px 8px;
-            color: #000;
-            box-shadow: none;
-        }
-        .popup_wrapper .popup input:focus,
-        .popup_wrapper .popup textarea:focus {
-
-        }
-        .popup_wrapper .popup p + textarea,
-        .popup_wrapper .popup p + input,
-        .popup_wrapper .popup input + textarea,
-        .popup_wrapper .popup textarea + input {
-            margin: 16px 0 0 0;
-        }
-        .popup_wrapper .popup .popup_buttons {
-            float: left;
-            width: 100%;
-            box-sizing: border-box;
-            padding: 0 10px 0 0;
-            min-height: 10px;
-        }
-        b.author{
-            font-family: "Roboto", sans-serif;
-            font-size: 14px;
-            font-weight: 700;
-            color: #FFF;
-            line-height: 20px;
-            padding: 0 10px;
-            margin: 20px 10px 20px 0;
-            border: 0;
-            border-radius: 3px;
-            background: none;
-            outline: 0;
-        }
-        b.author{
-            font-weight: normal;
-        }
-        .popup_wrapper .popup .popup_buttons button {
-            font-family: "Roboto", sans-serif;
-            font-size: 14px;
-            color: #FFF;
-            line-height: 20px;
-            padding: 0 10px;
-            margin: 20px 10px 20px 0;
-            border: 0;
-            border-radius: 3px;
-            background: none;
-            float: right;
-            cursor: pointer;
-            outline: 0;
-            text-decoration: underline;
-        }
-        .popup_wrapper .popup .popup_close:hover,
-        .popup_wrapper .popup .popup_close:hover svg,
-        .popup_wrapper .popup .popup_buttons button:hover {
-
-        }
-        .popup_wrapper .popup .popup_close:active,
-        .popup_wrapper .popup .popup_close:active svg,
-        .popup_wrapper .popup .popup_buttons button:active {
-            text-decoration: underline;
-        }
-        .popup_wrapper .popup .popup_buttons button.ok {
-            text-decoration: underline;
-        }
-        .popup_wrapper .popup .popup_buttons button.no {
-            text-decoration: underline;
-        }
-        /* stretchTop & stretchBottom */
-        .popup_wrapper[data-position="stretchTop"] .popup,
-        .popup_wrapper[data-position="stretchBottom"] .popup {
-            border-radius: 0;
-        }
-        /* stretchLeft & stretchRight */
-        .popup_wrapper[data-position="stretchLeft"] .popup,
-        .popup_wrapper[data-position="stretchRight"] .popup {
-            border-radius: 0;
-        }
-        .popup_wrapper[data-position="stretchLeft"] .popup  .popup_title,
-        .popup_wrapper[data-position="stretchRight"] .popup .popup_title {
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-        }
-        .popup_wrapper[data-position="stretchLeft"] .popup  .popup_buttons,
-        .popup_wrapper[data-position="stretchRight"] .popup .popup_buttons {
-            position: absolute;
-            bottom: 0;
-            left: 0;
-            right: 0;
-        }
-        .popup_wrapper[data-position="stretchLeft"] .popup .popup_content,
-        .popup_wrapper[data-position="stretchRight"] .popup .popup_content {
-            position: absolute;
-            top: 74px;
-            left: 0;
-            right: 0;
-            bottom: 76px;
-            overflow: auto;
-        }
-        /* Overflow */
-        .popup_wrapper.popup_overflow_y,
-        .popup_wrapper.popup_overflow_y .popup {
-            height: 100% !important;
-            top: 0 !important;
-        }
-        .popup_wrapper.popup_overflow_x:not([data-position="stretchTop"]):not([data-position="stretchBottom"]),
-        .popup_wrapper.popup_overflow_x:not([data-position="stretchTop"]):not([data-position="stretchBottom"]) .popup {
-            width: 100% !important;
-            height: 100% !important;
-            top: 0 !important;
-            left: 0 !important;
-            border: 0;
-            border-radius: 0;
-        }
-        .popup_wrapper.popup_overflow_y .popup .popup_title,
-        .popup_wrapper.popup_overflow_x:not([data-position="stretchTop"]):not([data-position="stretchBottom"]) .popup .popup_title {
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-        }
-        .popup_wrapper.popup_overflow_x:not([data-position="stretchTop"]):not([data-position="stretchBottom"]) .popup .popup_title {
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            cursor: inherit !important;
-        }
-        .popup_wrapper.popup_overflow_y .popup .popup_buttons,
-        .popup_wrapper.popup_overflow_x:not([data-position="stretchTop"]):not([data-position="stretchBottom"]) .popup .popup_buttons {
-            position: absolute;
-            bottom: 0;
-            left: 0;
-            right: 0;
-        }
-        .popup_wrapper.popup_overflow_y .popup .popup_content,
-        .popup_wrapper.popup_overflow_x:not([data-position="stretchTop"]):not([data-position="stretchBottom"]) .popup .popup_content {
-            position: absolute;
-
-            top: 74px;
-            left: 0;
-            right: 0;
-            bottom: 76px;
-            overflow: auto;
-        }
-        /* ScrollTop */
-        .popup_wrapper .popup .popup_title:after,
-        .popup_wrapper .popup .popup_buttons:before,
-        .popup_wrapper .popup .popup_title:after,
-        .popup_wrapper .popup .popup_buttons:before {
-            content: "";
-            position: absolute;
-            left: 0;
-            right: 0;
-            height: 10px;
-            pointer-events: none;
-            opacity: .1;
-            transition: margin-top .3s,
-            margin-bottom .3s,
-            height .3s;
-        }
-        .popup_wrapper .popup .popup_title:after,
-        .popup_wrapper .popup .popup_title:after {
-            margin-bottom: -20px;
-            bottom: 0;
-            background: -webkit-linear-gradient(rgba(0,0,0,1) 0%, rgba(0,0,0,0) 100%);
-            background: -moz-linear-gradient(rgba(0,0,0,1) 0%, rgba(0,0,0,0) 100%);
-            background: -o-linear-gradient(rgba(0,0,0,1) 0%, rgba(0,0,0,0) 100%);
-            background: linear-gradient(rgba(0,0,0,1) 0%, rgba(0,0,0,0) 100%);
-            z-index: 1;
-        }
-        .popup_wrapper .popup .popup_buttons:before,
-        .popup_wrapper .popup .popup_buttons:before {
-            margin-top: -10px;
-            top: 0;
-            background: -webkit-linear-gradient(rgba(0,0,0,0) 0%, rgba(0,0,0,1) 100%);
-            background: -moz-linear-gradient(rgba(0,0,0,0) 0%, rgba(0,0,0,1) 100%);
-            background: -o-linear-gradient(rgba(0,0,0,0) 0%, rgba(0,0,0,1) 100%);
-            background: linear-gradient(rgba(0,0,0,0) 0%, rgba(0,0,0,1) 100%);
-        }
-        .popup_wrapper.popup_scroll_top .popup .popup_title:after,
-        .popup_wrapper.popup_scroll_bottom .popup .popup_buttons:before,
-        .popup_wrapper.popup_scroll_top .popup .popup_title:after,
-        .popup_wrapper.popup_scroll_bottom .popup .popup_buttons:before {
-            height: 0;
-            opacity: 0;
-        }
-        .popup_wrapper.popup_scroll_top .popup .popup_title:after,
-        .popup_wrapper.popup_scroll_top .popup .popup_title:after {
-            margin-bottom: -10px;
-        }
-        .popup_wrapper.popup_scroll_bottom .popup .popup_buttons:before,
-        .popup_wrapper.popup_scroll_bottom .popup .popup_buttons:before {
-            margin-top: 0;
-        }
-
-
         .handsontable td{
             color: #000 !important;
         }
@@ -480,6 +192,7 @@
         var sentrow, sentcol; // not use
         var cellIndex=[]; // to get each col and row and check value with colorRenderer
         var colDataArray = []; // column score data key=>value use to pass data to server
+        var resitScoreChange = [];
         var rowColor=0;
 
         // this function is to declare global empty array and we use these empty arrays to store the data when user make change of each cell score value to pass to the sever
@@ -519,7 +232,9 @@
 
             Handsontable.renderers.TextRenderer.apply(this, arguments);
 
-            if( ((prop != 'student_id_card')&& (prop != 'student_name')) && ((prop != 'student_gender')&& (prop != 'absence')) && (((prop != 'average')&& (prop != 'notation'))) ) {
+
+            if( $.inArray(prop,['student_id_card', 'student_name', 'student_gender', 'absence', 'average', 'notation', 'resit'])) {
+
 
                 var explode = prop.split('-');
                 var percentage = parseInt(explode[explode.length-1]);
@@ -534,7 +249,9 @@
                 } else {
 
                     if((value == '{{\App\Models\Enum\ScoreEnum::Fraud}}') || (value == '{{\App\Models\Enum\ScoreEnum::Absence}}')) {
+
                         td.style.backgroundColor = 'gray'
+
                     } else if(value == '') {
                         td.style.backgroundColor = ''
                     } else if(value == null) {
@@ -563,8 +280,18 @@
 
                 if($.isNumeric(value) && value >= 0) {
                     if(value > parseInt('{{$courseAnnual->time_course + $courseAnnual->time_td + $courseAnnual->time_tp}}')) {
+
                         td.style.backgroundColor = '#cc3300';
                     }
+                } else if(value == '') {
+
+                    td.style.backgroundColor = '';
+
+                } else if(value == null) {
+
+                    td.style.backgroundColor = '';
+                } else {
+                    td.style.backgroundColor = '#cc3300';
                 }
             }
         };
@@ -588,6 +315,10 @@
                     this.renderer = colorRenderer;
                 }
                 if(prop == 'average') {
+                    this.renderer = colorRenderer;
+                }
+
+                if(prop == 'resit') {
                     this.renderer = colorRenderer;
                 }
             },
@@ -615,18 +346,6 @@
 
                 return false;
             },
-//            beforeTouchScroll: function() {
-//
-//                return false;
-//            },
-//            afterScrollHorizontally: function() {
-//
-//                return false;
-//            },
-//            afterScrollVertically: function() {
-//
-//                return false;
-//            },
 
             afterColumnResize: function() {
               return false;
@@ -644,7 +363,7 @@
                         var newValue = change[3];
                         var tableData = setting.data;
 
-                        if(columnIndex != 'num_absence' && columnIndex != 'notation') {
+                        if(columnIndex != 'num_absence' && columnIndex != 'notation' && columnIndex != 'resit') {
 
                             var colData = findDataAtCol(columnIndex);
                             var explode = columnIndex.split('-');
@@ -759,6 +478,35 @@
                             var count = 0;
                             var numAbs = 0;
                             checkIfStringValExist(colData,'Absence', count, numAbs, parseInt('{{$courseAnnual->time_course + $courseAnnual->time_td + $courseAnnual->time_tp}}'));
+                        }
+
+                        if(columnIndex == 'resit') {
+                            var colData = findDataAtCol('Resit-Score');
+
+                            if(($.isNumeric(newValue) || (newValue == '')) || ((newValue == '{{\App\Models\Enum\ScoreEnum::Fraud}}') || (newValue == '{{\App\Models\Enum\ScoreEnum::Absence}}'))) {
+
+                                if((newValue <= parseInt('{{ \App\Models\Enum\ScoreEnum::Pass_Moyenne }}')) ||  (newValue >= parseInt('{{\App\Models\Enum\ScoreEnum::Zero}}') ) || (newValue == '') || ((newValue == '{{\App\Models\Enum\ScoreEnum::Fraud}}') || (newValue == '{{\App\Models\Enum\ScoreEnum::Absence}}'))) {
+
+                                    var rowData = hotInstance.getData();
+                                    for(var keyIndex=0; keyIndex< tableData.length; keyIndex++) {
+                                        $.each(tableData[keyIndex],function(i, value){
+                                            if(rowData[rowIndex][0] == value) {//rowData[rowIndex][0] with the row data we get rowDat by Key rowIndex then we will get the student_id_card
+                                                element = {
+                                                    resit_score: newValue,
+                                                    student_annual_id: tableData[keyIndex]['student_annual_id'],
+                                                    course_annual_id: $('select[name=available_course] :selected').val()
+                                                };
+                                            }
+                                        });
+                                    }
+                                    resitScoreChange.push(element);
+                                }
+                            }
+
+                            var count = 0;
+                            var numAbs = 0;
+                            checkIfStringValExist(colData,'Resit-Score', count, numAbs, parseInt('{{ \App\Models\Enum\ScoreEnum::Pass_Moyenne }}'));
+
                         }
                     });
                 }
@@ -1029,110 +777,6 @@
             });
         });
 
-        var pop;
-        $('#add_column').on('click', function(e) {
-
-             pop = new jPopup({
-                title: 'Add New Column',
-                content: '<div class="form-group col-sm-12 no-padding">' +
-                '<label for="percentage" class="col-sm-2 control-label pop_margin no-padding "> Percentage</label>'+
-                '<div class="col-sm-7 no-padding">'+
-                '<input type="text" id="percentage" class="form-control number_only" required>'+
-                '</div>'+
-                '</div>'+
-
-                '<div class="form-group col-sm-12 no-padding">' +
-                '<label for="column_name" class="col-sm-2 control-label pop_margin no-padding">Score Name</label>'+
-                '<div class="col-sm-7 no-padding">'+
-                '<input type="text" class="form-control" id="name_exam" name="name_exam" required value="Midterm" readonly="readonly">'+
-                '</div>'+
-                '</div class="form-group col-sm-12 no-padding">'+
-                '<div class="form-group col-sm-12 no-padding">' +
-                '<label for="score_type" class="col-sm-3 no-padding"> Score Type</label>'+
-                '<div class="col-sm-7 no-padding">' +
-                '<select name="score_type" class="form-control" id="score_type">'+
-                '<option value="normal">Normal</option>'+
-                '<option value="subplementary_exam"> Subplementary Exam</option>'+
-                '</select>'+
-                '</div>'+
-                '</div>'+
-                '<button id="add_col_ok" class="btn btn-xs btn-primary pull-right"> OK </button>',
-                closeButton:true,
-                buttons:[{
-//                    text: '<button class="btn btn-danger"> OK </button>',
-//                    value: 'ok',
-//                    "class": "ok_event"
-                }]
-            });
-
-            pop.open(function(r) {// call this function to open dialog
-                switch(r) {
-                    case 'ok':// vaule of btn
-
-                        break;
-                }
-
-            });
-        });
-
-        function addColumns(colHeader, percentage) {
-
-            if(percentage > 0 && percentage < 90) {
-                var headerLength = setting.colHeaders.length;
-//            var averageData = setting.columns[headerLength-1].data;
-                var averageDataType = setting.columns[headerLength-1].type;
-                var averageHeader = setting.colHeaders[headerLength-1];
-                var baseData = {
-                    percentage_name: colHeader+'-'+percentage+'%',
-                    percentage:percentage,
-                    percentage_type: $('#score_type :selected').val(),
-                    course_annual_id:$('select[name=available_course] :selected').val()
-                };
-
-                var addScoreBaseUrl = '{{route('admin.course.add_new_column_courseannual')}}'
-
-                swal({
-                    title: "Confirm",
-                    text: "You want to add column?",
-                    type: "info",
-                    showCancelButton: true,
-                    confirmButtonColor: "#DD6B55",
-                    confirmButtonText: "Yes, add id!!",
-                    closeOnConfirm: true
-                }, function(confirmed) {
-                    if (confirmed) {
-                        $.ajax({
-                            type: 'POST',
-                            url: addScoreBaseUrl,
-                            data: baseData,
-                            dataType: "json",
-                            success: function(resultData) {
-                                updateSettingHandsontable(resultData);
-                                declareColumnHeaderDataEmpty();
-                                $('#popup').hide();
-                            }
-                        });
-                        pop.close();
-                    }
-                });
-            } else {
-
-                swal({
-                    title: "Attention",
-                    text: "0 < value < 90",
-                    type: "warning",
-                    confirmButtonColor: "red",
-                    confirmButtonText: "Close",
-                    closeOnConfirm: true
-                }, function(confirmed) {
-                    if (confirmed) {
-
-                    }
-                });
-
-            }
-        }
-
         $('#save_editted_score').on('click', function() {
 
             var course_annual_id = $('#available_course :selected').val();
@@ -1150,7 +794,7 @@
 
                 if(objectStatus.status == true) {
 
-                    if(cellChanges.length > 0 || cellScoreChanges.length >0) {
+                    if(cellChanges.length > 0 || cellScoreChanges.length >0 || resitScoreChange.length > 0) {
                         swal({
                             title: "Confirm",
                             text: "Save Changes?",
@@ -1229,6 +873,32 @@
                                                 updateSettingHandsontable(resultData.handsonData);
                                             }
                                             cellChanges=[];
+                                        }
+                                    });
+                                }
+
+                                if(resitScoreChange.length > 0) {
+
+                                    var url = '{{route('admin.score.store_resit')}}';
+                                    $.ajax({
+                                        type: 'POST',
+                                        url: url,
+                                        data: {baseData:resitScoreChange},
+                                        dataType: "json",
+                                        success: function(resultData) {
+
+                                            if(resultData.status) {
+                                                notify('success', resultData.message, 'Info')
+
+                                                console.log(resultData);
+
+                                                updateSettingHandsontable(resultData.handsontableData);
+
+                                            } else {
+                                                notify('error', resultData.message, 'Attention')
+                                                updateSettingHandsontable(resultData.handsontableData);
+                                            }
+                                            resitScoreChange=[]; // set to empty array
                                         }
                                     });
                                 }
