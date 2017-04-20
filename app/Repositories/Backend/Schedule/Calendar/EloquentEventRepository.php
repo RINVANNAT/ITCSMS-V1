@@ -5,6 +5,7 @@ namespace App\Repositories\Backend\Schedule\Calendar;
 use App\Http\Requests\Backend\Schedule\Calendar\CreateEventRequest;
 use App\Models\Schedule\Calendar\Event\Event;
 use App\Models\Schedule\Calendar\Repeat\Repeat;
+use App\Models\Schedule\Calendar\Year\EventYear;
 use App\Models\Schedule\Calendar\Year\Year;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
@@ -21,10 +22,7 @@ class EloquentEventRepository implements EventRepositoryContract
      */
     public function createEvent(CreateEventRequest $request)
     {
-        //d(auth()->user()->id);
         if (!empty($request->dailyYear)) {
-            //dd($request->all());
-
             $newRepeat = new Repeat();
 
             $newRepeat->start = new Carbon($request->start);
@@ -37,13 +35,11 @@ class EloquentEventRepository implements EventRepositoryContract
                 $newEvent->description = "Typing your description here.";
                 $newEvent->repeat_id = $newRepeat->id;
                 $newEvent->allDay = false;
+                $newEvent->public = $request->public;
                 if (empty($request->study)) {
-                    $request->study = false;
+                    $newEvent->study = false;
                 }
-
-                if (empty($request->public)) {
-                    $request->public = false;
-                }
+                $newEvent->study = $request->study;
 
                 $newEvent->created_uid = auth()->user()->id;
                 $newEvent->updated_uid = auth()->user()->id;
@@ -150,16 +146,31 @@ class EloquentEventRepository implements EventRepositoryContract
     }
 
     /**
+     * Find object EventYear.
+     *
+     * @param $event_id
+     * @param $year_id
+     * @return mixed
+     */
+    public function findEventYear($event_id, $year_id)
+    {
+        return EventYear::where([
+            'event_id' => $event_id,
+            'year_id' => $year_id
+        ])->first();
+    }
+
+    /**
      * Find all events by year and author.
      *
      * @param $yearId
      * @param $authorId
      * @return mixed
      */
-    public function findEventsByYearAndAuthor($yearId, $authorId)
+    public function findEventsByYearAndAuthor($yearId, $authorId, $departmentId)
     {
         return DB::table('events')
-            ->whereNotIn('id', function ($query) use ($yearId) {
+            ->whereNotIn('id', function ($query) use ($yearId, $departmentId) {
                 $query->select('event_year.event_id')
                     ->from('event_year')
                     ->where('event_year.year_id', $yearId);
@@ -168,6 +179,19 @@ class EloquentEventRepository implements EventRepositoryContract
                 ['created_uid', '=', $authorId],
                 ['repeat_id', '=', null]
             ])
+            /*->orWhere(function ($departmentQuery) use ($departmentId){
+                $departmentIds = DB::table('department_event')
+                    ->select('department_event.event_id')
+                    ->where('department_event', $departmentId)
+                    ->lists('event_id');
+                if($departmentQuery)
+                {
+                    $departmentQuery->whereIn('events.id', $departmentIds);
+                }
+                else{
+                    $departmentQuery->null;
+                }
+            })*/
             ->get();
     }
 }
