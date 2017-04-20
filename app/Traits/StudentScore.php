@@ -33,7 +33,7 @@ trait StudentScore {
         $arrayScores=[];
         $averageProperties = DB::table('averages')
             ->whereIn('course_annual_id', $array_course_annual_ids)
-            ->select('average', 'course_annual_id', 'student_annual_id', 'description')
+            ->select('average', 'course_annual_id', 'student_annual_id', 'description', 'resit_score')
             ->orderBy('student_annual_id')->get();
 
         foreach($averageProperties as $average) {

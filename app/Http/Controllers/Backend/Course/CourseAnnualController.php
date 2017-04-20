@@ -41,6 +41,7 @@ use App\Repositories\Backend\ResitStudentAnnual\ResitStudentAnnualRepositoryCont
 use App\Repositories\Backend\Average\AverageRepositoryContract;
 
 use App\Traits\StudentScore;
+use App\Traits\ScoreProp;
 use Illuminate\Support\Facades\DB;
 use App\Http\Requests\Backend\Course\CourseAnnual\ImportCourseAnnualRequest;
 use Carbon\Carbon;
@@ -61,6 +62,7 @@ use App\Models\ResitStudentAnnual;
 class CourseAnnualController extends Controller
 {
     use StudentScore;
+    use ScoreProp;
     /**
      * @var CourseAnnualRepositoryContract
      */
@@ -436,6 +438,7 @@ class CourseAnnualController extends Controller
 
         $groups = [];
         $courseAnnual = $this->courseAnnuals->findOrThrowException($id);
+
         $scores = $this->getPropertiesFromScoreTable($courseAnnual->id)->get();
 
         $arrayPercentages =[];
@@ -1899,7 +1902,7 @@ class CourseAnnualController extends Controller
 
     public function getFormScoreByCourse(Request $request, $courseAnnualId) {
 
-        $courseAnnual = CourseAnnual::find($courseAnnualId);
+//        $courseAnnual = CourseAnnual::find($courseAnnualId);
 
         $properties = $this->dataSendToView($courseAnnualId);
         $courseAnnual = $properties['course_annual'];
@@ -1950,7 +1953,9 @@ class CourseAnnualController extends Controller
                 ['data' => 'num_absence', 'type' => 'numeric'],
                 ['data' => 'absence', 'type' => 'numeric', 'readOnly'=>true],
             );
-            $colWidths = [80,180,55, 55, 55];
+            $colWidths = [80,180,55, 55];// width of each column
+
+
             if($columnName) {
 
                 foreach($columnName as $column) {
@@ -1958,16 +1963,34 @@ class CourseAnnualController extends Controller
                     $columns = array_merge($columns, array(['data'=>$column->name]));
                     $colWidths[] = 70;
                 }
-                $columns = array_merge($columns, array(['data' => 'average', 'readOnly' => true, 'type'=> 'numeric'], ['data'=> 'notation']));
-                $columnHeader = array_merge($columnHeader, array('Total', 'Notation'));
-                $colWidths[] = 70;
+
+                if($courseAnnual->is_having_resitted) {
+                    $columns = array_merge($columns, array(['data' => 'resit'], ['data' => 'average', 'readOnly' => true, 'type'=> 'numeric'], ['data'=> 'notation']));
+                    $columnHeader = array_merge($columnHeader, array('Resit-Score', 'Total', 'Notation'));
+                    $colWidths[] = 55;
+                    $colWidths[] = 70;
+                } else {
+                    $columns = array_merge($columns, array(['data' => 'average', 'readOnly' => true, 'type'=> 'numeric'], ['data'=> 'notation']));
+                    $columnHeader = array_merge($columnHeader, array('Total', 'Notation'));
+                    $colWidths[] = 70;
+                }
 
             } else {
 
-                $columns = array_merge($columns, array(['data' => 'average', 'readOnly' => true], ['data'=> 'notation']));
-                $columnHeader = array_merge($columnHeader, array('Average' ,'Notation'));
-                $colWidths[] = 70;
+
+                if($courseAnnual->is_having_resitted) {
+                    $columns = array_merge($columns, array( ['data' => 'resit'],['data' => 'average', 'readOnly' => true], ['data'=> 'notation']));
+                    $columnHeader = array_merge($columnHeader, array('Resit-Score', 'Average' ,'Notation'));
+                    $colWidths[] = 55;
+                    $colWidths[] = 70;
+                } else {
+                    $columns = array_merge($columns, array(['data' => 'average', 'readOnly' => true], ['data'=> 'notation']));
+                    $columnHeader = array_merge($columnHeader, array('Average' ,'Notation'));
+                    $colWidths[] = 70;
+                }
+
             }
+
         } else {
 
             $columnHeader = array(/*'Student_annual_id',*/'Student ID', 'Student Name', 'M/F');
@@ -1978,6 +2001,7 @@ class CourseAnnualController extends Controller
                 ['data' => 'student_gender', 'readOnly'=>true]
             );
             $colWidths = [80,180,55];
+
             if($columnName) {
 
                 foreach($columnName as $column) {
@@ -1985,19 +2009,34 @@ class CourseAnnualController extends Controller
                     $columns = array_merge($columns, array(['data'=>$column->name]));
                     $colWidths[] = 70;
                 }
-                $columns = array_merge($columns, array(['data' => 'average', 'readOnly' => true, 'type'=> 'numeric'], ['data'=> 'notation']));
-                $columnHeader = array_merge($columnHeader, array('Total', 'Notation'));
-                $colWidths[] = 70;
+
+
+                if($courseAnnual->is_having_resitted) {
+                    $columns = array_merge($columns, array(['data' => 'resit'], ['data' => 'average', 'readOnly' => true, 'type'=> 'numeric'], ['data'=> 'notation']));
+                    $columnHeader = array_merge($columnHeader, array('Resit-Score', 'Total', 'Notation'));
+                    $colWidths[] = 55;
+                    $colWidths[] = 70;
+                } else {
+                    $columns = array_merge($columns, array(['data' => 'average', 'readOnly' => true, 'type'=> 'numeric'], ['data'=> 'notation']));
+                    $columnHeader = array_merge($columnHeader, array('Total', 'Notation'));
+                    $colWidths[] = 70;
+                }
+
 
             } else {
 
-                $columns = array_merge($columns, array(['data' => 'average', 'readOnly' => true], ['data'=> 'notation']));
-                $columnHeader = array_merge($columnHeader, array('Average' ,'Notation'));
-                $colWidths[] = 70;
+                if($courseAnnual->is_having_resitted) {
+                    $columns = array_merge($columns, array( ['data' => 'resit'],['data' => 'average', 'readOnly' => true], ['data'=> 'notation']));
+                    $columnHeader = array_merge($columnHeader, array('Resit-Score', 'Average' ,'Notation'));
+                    $colWidths[] = 55;
+                    $colWidths[] = 70;
+                } else {
+                    $columns = array_merge($columns, array(['data' => 'average', 'readOnly' => true], ['data'=> 'notation']));
+                    $columnHeader = array_merge($columnHeader, array('Average' ,'Notation'));
+                    $colWidths[] = 70;
+                }
             }
-
         }
-
         return [
             'colHeader' => $columnHeader,
             'column'  => $columns,
@@ -2067,10 +2106,14 @@ class CourseAnnualController extends Controller
         $colWidths = $headers['colWidth'];
 
 
+
+
         $studentByCourse = $this->getStudentByDeptIdGradeIdDegreeId( $department_ids, $degree_ids, $grade_ids, $courseAnnual->academic_year_id);
 
         $allScoreByCourseAnnual = $this->studentScoreCourseAnnually($courseAnnual);
         $allNumberAbsences = $this->getAbsenceFromDB();
+        $resitScores = $this->resitScoreFromDB($courseAnnualId);//Trait/ScoreProp
+
 
         if(count($department_option_ids)>0) {
             $studentByCourse = $studentByCourse->whereIn('studentAnnuals.department_option_id', $department_option_ids);
@@ -2095,6 +2138,7 @@ class CourseAnnualController extends Controller
         //----------------find student score if they have inserted
 
         if($studentByCourse) {
+
             foreach($studentByCourse as $student) {
                 $totalScore = 0;
                 $checkPercent=0;
@@ -2160,25 +2204,57 @@ class CourseAnnualController extends Controller
 
                 if($courseAnnual->is_counted_absence) {
 
-                    $element = array(
-                        'student_annual_id'=>$student->student_annual_id,
-                        'student_id_card' => $student->id_card,
-                        'student_name' => strtoupper($student->name_latin),
-                        'student_gender' => $student->code,
-                        'absence'          => (string)(($scoreAbsenceByCourse >= 0)?$scoreAbsenceByCourse:10),
-                        'num_absence'      => isset($scoreAbsence) ? $scoreAbsence->num_absence:null,
-                        'average'          => $this->floatFormat($totalScore),
-                        'notation'        => $storeTotalScore->description
-                    );
+                    if($courseAnnual->is_having_resitted) {
+
+                        $element = array(
+                            'student_annual_id' =>$student->student_annual_id,
+                            'student_id_card'   => $student->id_card,
+                            'student_name'      => strtoupper($student->name_latin),
+                            'student_gender'    => $student->code,
+                            'absence'           => (string)(($scoreAbsenceByCourse >= 0)?$scoreAbsenceByCourse:10),
+                            'num_absence'       => isset($scoreAbsence) ? $scoreAbsence->num_absence:null,
+                            'resit'             => $resitScores[$student->student_annual_id]->resit_score,
+                            'average'           => $this->floatFormat($totalScore),
+                            'notation'          => $storeTotalScore->description
+                        );
+                    } else {
+                        $element = array(
+                            'student_annual_id' =>$student->student_annual_id,
+                            'student_id_card'   => $student->id_card,
+                            'student_name'      => strtoupper($student->name_latin),
+                            'student_gender'    => $student->code,
+                            'absence'           => (string)(($scoreAbsenceByCourse >= 0)?$scoreAbsenceByCourse:10),
+                            'num_absence'       => isset($scoreAbsence) ? $scoreAbsence->num_absence:null,
+                            'average'           => $this->floatFormat($totalScore),
+                            'notation'          => $storeTotalScore->description
+                        );
+                    }
+
+
                 } else {
-                    $element = array(
-                        'student_annual_id'=>$student->student_annual_id,
-                        'student_id_card' => $student->id_card,
-                        'student_name' => strtoupper($student->name_latin),
-                        'student_gender' => $student->code,
-                        'average'          => $totalScore,
-                        'notation'        => $storeTotalScore->description
-                    );
+
+                    if($courseAnnual->is_having_resitted) {
+                        $element = array(
+                            'student_annual_id' =>$student->student_annual_id,
+                            'student_id_card'   => $student->id_card,
+                            'student_name'      => strtoupper($student->name_latin),
+                            'student_gender'    => $student->code,
+                            'resit'             => $resitScores[$student->student_annual_id]->resit_score,
+                            'average'           => $totalScore,
+                            'notation'          => $storeTotalScore->description
+                        );
+                    } else {
+                        $element = array(
+                            'student_annual_id' =>$student->student_annual_id,
+                            'student_id_card'   => $student->id_card,
+                            'student_name'      => strtoupper($student->name_latin),
+                            'student_gender'    => $student->code,
+                            'average'           => $totalScore,
+                            'notation'          => $storeTotalScore->description
+                        );
+                    }
+
+
                 }
 
                 $mergerData = array_merge($element,$scoreData);
@@ -3369,7 +3445,7 @@ class CourseAnnualController extends Controller
                     foreach($filtered_students as $stu_dent) {
 
                         $array_observation[$stu_dent->id_card] = $stu_dent;
-                        $each_score = isset($eachCourseAnnualScores[$eachCourse->course_annual_id])?(isset($eachCourseAnnualScores[$eachCourse->course_annual_id][$stu_dent->student_annual_id])?$eachCourseAnnualScores[$eachCourse->course_annual_id][$stu_dent->student_annual_id]->average:0):0;
+                        $each_score = isset($eachCourseAnnualScores[$eachCourse->course_annual_id])?(isset($eachCourseAnnualScores[$eachCourse->course_annual_id][$stu_dent->student_annual_id])?$this->compareScoreResit($eachCourseAnnualScores[$eachCourse->course_annual_id][$stu_dent->student_annual_id]):0):0;
 
                         if($each_score > ScoreEnum::Zero) {
                             $each_column_score[$eachCourse->course_id][$stu_dent->id_card] = $each_score;
@@ -3489,7 +3565,7 @@ class CourseAnnualController extends Controller
                     $array_observation[$stu_dent->id_card] = $stu_dent;
                     //-----$annualCourses[0] this array contains only one course annual that which this course is the same withe course program
                     $absence_by_course = isset($absences[$tmpCourse->course_annual_id])?(isset($absences[$tmpCourse->course_annual_id][$stu_dent->student_annual_id])?$absences[$tmpCourse->course_annual_id][$stu_dent->student_annual_id]:null):null;
-                    $each_score = isset($eachCourseAnnualScores[$tmpCourse->course_annual_id])?(isset($eachCourseAnnualScores[$tmpCourse->course_annual_id][$stu_dent->student_annual_id])?$eachCourseAnnualScores[$tmpCourse->course_annual_id][$stu_dent->student_annual_id]->average:0):0;
+                    $each_score = isset($eachCourseAnnualScores[$tmpCourse->course_annual_id])?(isset($eachCourseAnnualScores[$tmpCourse->course_annual_id][$stu_dent->student_annual_id])?$this->compareScoreResit($eachCourseAnnualScores[$tmpCourse->course_annual_id][$stu_dent->student_annual_id]):0):0;
 
                     if($each_score > ScoreEnum::Zero) {//----student with score 0 consider as giving up studying do not count for jurring student average
                         $each_column_score[$tmpCourse->course_id][$stu_dent->id_card] = $each_score;
@@ -3595,7 +3671,7 @@ class CourseAnnualController extends Controller
 
                         $array_observation[$stu_dent->id_card] = $stu_dent;
                         $absence_by_course = isset($absences[$eachCourse->course_annual_id])?(isset($absences[$eachCourse->course_annual_id][$stu_dent->student_annual_id])?$absences[$eachCourse->course_annual_id][$stu_dent->student_annual_id]:null):null;
-                        $each_score = isset($eachCourseAnnualScores[$eachCourse->course_annual_id])?(isset($eachCourseAnnualScores[$eachCourse->course_annual_id][$stu_dent->student_annual_id])?$eachCourseAnnualScores[$eachCourse->course_annual_id][$stu_dent->student_annual_id]->average:0):0;
+                        $each_score = isset($eachCourseAnnualScores[$eachCourse->course_annual_id])?(isset($eachCourseAnnualScores[$eachCourse->course_annual_id][$stu_dent->student_annual_id])?$this->compareScoreResit($eachCourseAnnualScores[$eachCourse->course_annual_id][$stu_dent->student_annual_id]):0):0;
 
                         if($each_score > ScoreEnum::Zero) {//----student with score 0 consider as giving up studying do not count for jurring student average
                             $each_column_score[$eachCourse->course_id][$stu_dent->id_card] = $each_score;
@@ -3694,7 +3770,7 @@ class CourseAnnualController extends Controller
 
                     $array_observation[$stu_dent->id_card] = $stu_dent;
                     $absence_by_course = isset($absences[$tmpCourse->course_annual_id])?(isset($absences[$tmpCourse->course_annual_id][$stu_dent->student_annual_id])?$absences[$tmpCourse->course_annual_id][$stu_dent->student_annual_id]:null):null;
-                    $each_score = isset($eachCourseAnnualScores[$tmpCourse->course_annual_id])?(isset($eachCourseAnnualScores[$tmpCourse->course_annual_id][$stu_dent->student_annual_id])?$eachCourseAnnualScores[$eachCourse->course_annual_id][$stu_dent->student_annual_id]->average:0):0;
+                    $each_score = isset($eachCourseAnnualScores[$tmpCourse->course_annual_id])?(isset($eachCourseAnnualScores[$tmpCourse->course_annual_id][$stu_dent->student_annual_id])?$this->compareScoreResit($eachCourseAnnualScores[$tmpCourse->course_annual_id][$stu_dent->student_annual_id]):0):0;
 
                     if($each_score > ScoreEnum::Zero) {//----student with score 0 consider as giving up studying do not count for jurring student average
                         $each_column_score[$tmpCourse->course_id][$stu_dent->id_card] = $each_score;
@@ -5742,4 +5818,26 @@ class CourseAnnualController extends Controller
 
         return $students;
     }
+
+
+    public function storeResitScore(Request $request) {
+
+        $count=0;
+        $resitScores = $request->baseData;
+
+        foreach($resitScores as $score) {
+            $courseAnnualId = $score['course_annual_id'];
+            $store = $this->averages->updateResitScore($score);
+            if($store) {
+                $count++;
+            }
+        }
+        if($count == count($resitScores)) {
+
+            $reDrawTable = $this->handsonTableData($courseAnnualId, $group = null);
+            return Response::json(['status' => true, 'message' => 'Score Inserted', 'handsontableData' => $reDrawTable]);
+        }
+
+    }
+
 }

@@ -52,5 +52,7 @@ interface AverageRepositoryContract
 
     public function findAverageByCourseIdAndStudentId($courseAnnualId, $studentAnnualId);
 
+    public function updateResitScore($input);
+
 
 }
