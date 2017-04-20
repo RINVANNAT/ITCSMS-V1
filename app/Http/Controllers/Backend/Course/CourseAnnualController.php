@@ -5795,7 +5795,6 @@ class CourseAnnualController extends Controller
 
         })->download('xls');
 
-
     }
 
 
