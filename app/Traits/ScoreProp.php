@@ -46,7 +46,7 @@ trait ScoreProp {
         return $arrayScore;
     }
 
-    public function compareScoreResit($average) {
+    public function compareResitScore($average) {
         if($average->resit_score > $average->average) {
             return $average->resit_score;
         } else {
