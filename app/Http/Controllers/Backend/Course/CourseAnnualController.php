@@ -179,14 +179,26 @@ class CourseAnnualController extends Controller
 
         $groups = $this->getStudentGroupFromDB();
 
+
+
         if($request->course_program_id) {
 
-            $courseAnnualIds = DB::table('course_annuals')->where('course_id', $request->course_program_id)->lists('course_annuals.id');
+            /*$courseAnnualIds = DB::table('course_annuals')->where('course_id', $request->course_program_id)->lists('course_annuals.id');
             $selectedGroups = DB::table('course_annual_classes')
                 ->whereIn('course_annual_id', $courseAnnualIds)
                 ->where('course_session_id', null)
-                ->lists('group');
+                ->lists('group');*/
 
+                $selectedGroups = DB::table('course_annuals')
+                    ->where(function($query) use ($request) {
+                        $query->where('course_annuals.course_id', $request->course_program_id);
+                    })
+                    ->join('course_annual_classes', function($courseQuery){
+                        $courseQuery->on('course_annuals.id', '=', 'course_annual_classes.course_annual_id');
+                    })
+                    ->join('groups', function($groupQuery) {
+                        $groupQuery->on('groups.id', '=', 'course_annual_classes.group_id');
+                    })->lists('groups.code');
         }
 
         if($deptId = $request->department_id) {
@@ -206,28 +218,28 @@ class CourseAnnualController extends Controller
             $groups = $groups->where('studentAnnuals.department_option_id', '=',$option_id);
         }
 
-        $groups = $groups->lists('group');
-        asort($groups);
-        $array_group = [];
-        foreach($groups as $group) {
-            $array_group[] = $group;
-        }
+        $groupCodes = $groups->lists('group_code');
+        $groupIdCodes = $groups->lists('group_id', 'group_code');
+
+        asort($groupCodes);
+        $array_group = array_values($groupCodes);
 
         if($request->course_program_id) {
             if($request->_method == CourseAnnualEnum::CREATE) {
 
                 $not_selected_groups = array_diff($array_group, $selectedGroups);
-                return Response::json($not_selected_groups);
+                return Response::json(['group_code' =>$not_selected_groups, 'group_id' => $groupIdCodes]);
             } else {
 
-                return Response::json($array_group);
+                return Response::json(['group_code' =>$array_group, 'group_id' => $groupIdCodes]);
+                //return Response::json($array_group);
             }
         } else {
-            return Response::json($array_group);
+            return Response::json(['group_code' =>$array_group, 'group_id' => $groupIdCodes]);
+            //return Response::json($array_group);
         }
 
     }
-
 
     public function getStudentGroupSelection(Request $request) {
 
@@ -248,7 +260,7 @@ class CourseAnnualController extends Controller
         if($option_id = $request->department_option_id) {
             $groups = $groups->where('studentAnnuals.department_option_id', '=',$option_id);
         }
-        $groups = $groups->lists('group');
+        $groups = $groups->lists('group_code');
 
         return view('backend.course.courseAnnual.includes.student_group_selection', compact('groups'))->render();
 
@@ -256,10 +268,30 @@ class CourseAnnualController extends Controller
 
     private function getStudentGroupFromDB() {
 
-        $groups = DB::table('studentAnnuals')
+
+        /*$groups = DB::table('studentAnnuals')
+            ->join('groups', function($query) {
+                $query->on('groups.id', '=', 'studentAnnuals.group_id');
+            })
+            ->select('groups.code', 'groups.id as group_id')
+            ->groupBy('code')
+            ->orderBy('code', 'ASC');*/
+
+        $groups = DB::table('groups')
+            ->join('studentAnnuals', function($query) {
+                $query->on('groups.id', '=', 'studentAnnuals.group_id');
+            })
+            ->select('groups.id as group_id', 'groups.code as group_code')
+            ->groupBy('groups.id')
+            ->orderBy('group_code');
+
+
+
+
+        /*$groups = DB::table('studentAnnuals')
             ->select('group')
             ->groupBy('group')
-            ->orderBy('group', 'ASC');
+            ->orderBy('group', 'ASC');*/
 
         return $groups;
     }
@@ -467,11 +499,14 @@ class CourseAnnualController extends Controller
                        ->where('studentAnnuals.degree_id', '=',$courseAnnual->degree_id)
                        ->where('studentAnnuals.grade_id', '=',$courseAnnual->grade_id)
                        ->where('studentAnnuals.department_option_id', '=',$courseAnnual->department_option_id)
-                       ->lists('group');
-        asort($array_groups);
-        foreach($array_groups as $group) {
-            $groups[] = $group;
-        }
+                       ->orderBy('group_code')
+                       ->get();
+
+        usort($array_groups, function($a, $b) {
+            return  $a->group_code - $b->group_code;
+        });
+
+        $groups = $array_groups;
 
         $other_departments = Department::where("parent_id",config('access.departments.department_academic'))->orderBy("code")->lists("code","id");
         if(auth()->user()->allow("view-all-score-in-all-department")){
@@ -778,12 +813,13 @@ class CourseAnnualController extends Controller
 
         $datatables =  app('datatables')->of($courseAnnuals);
         $employee = Employee::where('user_id', Auth::user()->id)->first();
+        $allGroups = DB::table('groups')->select('id', 'code')->lists('code', 'id');
 
         $datatables
             ->addColumn('mark', function($courseAnnual){
                 return "<img class='image_mark' src='".url('img/arrow.png')."' />";
             })
-            ->editColumn('name', function($courseAnnual) {
+            ->editColumn('name', function($courseAnnual) use ($allGroups) {
                 ob_start();
                 ?>
                 <div class="row">
@@ -809,8 +845,13 @@ class CourseAnnualController extends Controller
                         <br/>
                         <?php
                         $a = "";
-                        foreach($courseAnnual->courseAnnualClass as $obj_group) {
-                            $a =  $a." ".$obj_group->group;
+
+                        $courseClass = $courseAnnual->courseAnnualClass->toArray();
+
+                        foreach($courseClass as $obj_group) {
+                            if($obj_group['group_id']) {
+                                $a =  $a." ".(isset($allGroups[$obj_group['group_id']])?$allGroups[$obj_group['group_id']]:'');
+                            }
                         }
                         echo $a;
                         ?>
@@ -4371,6 +4412,7 @@ class CourseAnnualController extends Controller
     }
 
     public function getGroupByCourseAnnual(Request $request) {
+
 
 
         $courseAnnual = DB::table('course_annuals')->where('id', $request->course_annual_id)->first();

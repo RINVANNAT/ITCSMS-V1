@@ -62,7 +62,7 @@ class EloquentCourseAnnualClassRepository implements CourseAnnualClassRepository
         if(!isset($input['department_option_id']) || $input['department_option_id'] == ""){
             $input['department_option_id'] = null;
         }
-        if(isset($input['groups']) && count($input['groups']) > 0){
+        if(isset($input['groups']) && count($input['groups']) > 0){ //---array of group_id selected for one specific course_annual
 
             // For now, only group has many records
             foreach($input['groups'] as $group){
@@ -74,7 +74,8 @@ class EloquentCourseAnnualClassRepository implements CourseAnnualClassRepository
                 if(isset($input['course_session_id'])){
                     $courseAnnualClass->course_session_id = $input['course_session_id'];
                 }
-                $courseAnnualClass->group = $group;
+                // $courseAnnualClass->group = $group;
+                $courseAnnualClass->group_id = $group;
                 $courseAnnualClass->created_at = Carbon::now();
                 $courseAnnualClass->create_uid = auth()->id();
                 if(!$courseAnnualClass->save()){

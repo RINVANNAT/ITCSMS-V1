@@ -28,11 +28,11 @@ function load_group(method){
                 if(data != null){
                     var option_text = "";
 
-                    $.each(data, function(key, value){
+                    $.each(data.group_code, function(key, value){
 
                         option_text = option_text +
 
-                            ' <label><input type="checkbox" class="each_check_box" name="groups[]" value="'+value+'"> '+value+'</label>'
+                            ' <label><input type="checkbox" class="each_check_box" name="groups[]" value="'+data.group_id[value]+'"> '+value+'</label>'
 
                     })
                     $("#group_panel").html(option_text);

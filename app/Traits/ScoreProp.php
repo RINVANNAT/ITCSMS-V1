@@ -54,5 +54,25 @@ trait ScoreProp {
         }
     }
 
+    public function groupByCourseAnnualTrait($courseAnnualId) {
+
+        $groups = DB::table('groups')
+            ->whereIn('id', function($queryClass) use ($courseAnnualId) {
+
+                $groupIds = DB::table('course_annual_classes')->where([ ['course_annual_id', $courseAnnualId], ['course_session_id', null] ])->lists('group_id');
+                $queryClass->select( $groupIds );
+            })->get();
+
+            dd($groups);
+
+    }
+
 
 }
+
+
+
+
+
+
+

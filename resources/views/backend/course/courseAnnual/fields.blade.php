@@ -136,13 +136,13 @@
 
                         <?php $status =true;?>
                         @foreach($courseAnnual->courseAnnualClass as $class)
-                            @if(trim($group) == trim($class->group))
+                            @if(trim($group->group_id) == trim($class->group_id))
                                 <?php $status =false;?>
-                                <label for="{{$class->group}}"> <input id="{{$class->group}}" type="checkbox" name="groups[]" class="each_check_box" value="{{$class->group}}" checked> {{$class->group}}</label>
+                                <label for="{{$class->group}}"> <input id="{{$class->group_id}}" type="checkbox" name="groups[]" class="each_check_box" value="{{$class->group_id}}" checked> {{$group->group_code}}</label>
                             @endif
                         @endforeach
                         @if($status == true)
-                            <label for="{{$group}}"> <input id="{{$group}}" type="checkbox" name="groups[]" class="each_check_box" value="{{$group}}"> {{$group}}</label>
+                            <label for="{{$group->group_code}}"> <input id="{{$group->group_code}}" type="checkbox" name="groups[]" class="each_check_box" value="{{$group->group_id}}"> {{$group->group_code}}</label>
                         @endif
 
                     @endif
