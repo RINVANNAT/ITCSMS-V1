@@ -22,12 +22,6 @@ class CreateEventsTable extends Migration
             $table->boolean('allDay')->default(true);
             $table->integer('created_uid');
             $table->integer('updated_uid');
-
-            $table->foreign('repeat_id')
-                ->references('id')
-                ->on('repeats')
-                ->onDelete('CASCADE');
-
             $table->timestamps();
         });
     }

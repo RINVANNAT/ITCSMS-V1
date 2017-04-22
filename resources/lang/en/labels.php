@@ -1013,6 +1013,11 @@ return [
                         ]
                     ]
                 ]
+            ],
+            'timetable' => [
+                'title' => 'Schedule Management',
+                'sub_index_title' => 'Timetable Management',
+
             ]
         ]
     ],
