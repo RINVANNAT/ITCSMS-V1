@@ -49,7 +49,8 @@ interface EventRepositoryContract
      *
      * @param $yearId
      * @param $authorId
+     * @param $departmentId
      * @return mixed
      */
-    public function findEventsByYearAndAuthor($yearId, $authorId);
+    public function findEventsByYearAndAuthor($yearId, $authorId, $departmentId);
 }

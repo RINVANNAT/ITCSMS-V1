@@ -200,13 +200,13 @@ trait AjaxCalendarController
      */
     public function renderEventsOnFullCalendar($departmentId)
     {
-        return DB::table('event_year')
+        /*return DB::table('event_year')
             ->join('years', function ($yearQuery) {
                 $yearQuery->on('event_year.year_id', '=', 'years.id');
             })
             ->join('events', function ($eventQuery) use ($departmentId) {
                 $eventQuery->on('events.id', '=', 'event_year.event_id')
-                    ->where('events.public', '=', true)
+                    ->where('events.public', '=', true);
                     ->orWhere(function ($deptQuery) use ($departmentId) {
                         $eventIds = DB::table('department_event')
                             ->select('department_event.event_id')
@@ -220,8 +220,26 @@ trait AjaxCalendarController
                     });
             })
             ->select('event_year.id', 'events.title', 'events.description', 'event_year.start', 'event_year.end', 'events.allDay', 'events.public', 'events.created_uid')
+            ->get();*/
+
+        $eventsPublic = DB::table('event_year')
+            ->join('events', function ($eventsQuery) {
+                $eventsQuery->on('events.id', '=', 'event_year.event_id')
+                    ->where('events.public', '=', true);
+            })
+            ->select('event_year.id', 'events.title', 'events.description', 'event_year.start', 'event_year.end', 'events.allDay', 'events.public', 'events.created_uid');
+
+        $eventsPrivate = DB::table('department_event')
+            ->join('event_year', function ($eventYearQuery) use ($departmentId){
+                $eventYearQuery->on('department_event.event_id', '=', 'event_year.event_id')
+                    ->where('department_event.department_id', '=', $departmentId);
+            })
+            ->join('events', 'events.id', '=', 'department_event.event_id')
+            ->select('event_year.id', 'events.title', 'events.description', 'event_year.start', 'event_year.end', 'events.allDay', 'events.public', 'events.created_uid')
+            ->union($eventsPublic)
             ->get();
 
+        return $eventsPrivate;
     }
 
     /**
@@ -234,10 +252,10 @@ trait AjaxCalendarController
     {
         $objYear = Year::where('name', $year)->first();
 
-        if ($objYear instanceof Year) {
-            $events = $this->eventRepository->findEventsByYearAndAuthor($objYear->id, auth()->user()->id);
-            return Response::json(['status' => true, 'events' => $events]);
-        }
+//        if ($objYear instanceof Year) {
+//            $events = $this->eventRepository->findEventsByYearAndAuthor($objYear->id, auth()->user()->id, auth()->user()->getDepartment());
+//            return Response::json(['status' => true, 'events' => $events]);
+//        }
         return Response::json(['status' => true, 'events' => Event::latest()->get()]);
     }
 

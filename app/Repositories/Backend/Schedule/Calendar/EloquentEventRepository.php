@@ -167,10 +167,10 @@ class EloquentEventRepository implements EventRepositoryContract
      * @param $authorId
      * @return mixed
      */
-    public function findEventsByYearAndAuthor($yearId, $authorId)
+    public function findEventsByYearAndAuthor($yearId, $authorId, $departmentId)
     {
         return DB::table('events')
-            ->whereNotIn('id', function ($query) use ($yearId) {
+            ->whereNotIn('id', function ($query) use ($yearId, $departmentId) {
                 $query->select('event_year.event_id')
                     ->from('event_year')
                     ->where('event_year.year_id', $yearId);
@@ -179,6 +179,19 @@ class EloquentEventRepository implements EventRepositoryContract
                 ['created_uid', '=', $authorId],
                 ['repeat_id', '=', null]
             ])
+            /*->orWhere(function ($departmentQuery) use ($departmentId){
+                $departmentIds = DB::table('department_event')
+                    ->select('department_event.event_id')
+                    ->where('department_event', $departmentId)
+                    ->lists('event_id');
+                if($departmentQuery)
+                {
+                    $departmentQuery->whereIn('events.id', $departmentIds);
+                }
+                else{
+                    $departmentQuery->null;
+                }
+            })*/
             ->get();
     }
 }
