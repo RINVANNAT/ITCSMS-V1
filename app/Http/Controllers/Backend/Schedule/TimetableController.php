@@ -31,4 +31,24 @@ class TimetableController extends Controller
             )
         );
     }
+
+    /**
+     * Create timetable page.
+     *
+     * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View
+     */
+    public function create()
+    {
+        $academicYears = AcademicYear::all();
+        $degrees = Degree::all();
+        $grades = Grade::all();
+
+        return view('backend.schedule.timetables.create',
+            compact(
+                'academicYears',
+                'degrees',
+                'grades'
+            )
+        );
+    }
 }

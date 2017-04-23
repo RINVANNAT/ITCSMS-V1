@@ -24,9 +24,12 @@
         <div class="box-header with-border">
             <div class="mailbox-controls">
                 <div class="pull-right">
-                    <a href="#">
-                        <button class="btn btn-primary btn-sm">
-                            <i class="fa fa-plus-circle"></i> Create Timetable
+                    <a href="{{ route('admin.schedule.timetables.create') }}">
+                        <button class="btn btn-primary btn-sm" data-toggle="tooltip"
+                                data-placement="left" title="Create a new timetable"
+                                data-original-title="Create a new timetable">
+                            <i class="fa fa-plus-circle"
+                            ></i> Create Timetable
                         </button>
                     </a>
                 </div>
@@ -94,20 +97,33 @@
                         <tr>
                             <td>{{ $i+1 }}</td>
                             <td>Weekly{{$i+1}}</td>
-                            <td><span class="btn btn-success btn-xs"><i class="fa fa-check"></i> </span></td>
-                            <td><a href="http://localhost:8000/admin/access/users/1/edit"
-                                   class="btn btn-xs btn-primary"><i class="fa fa-pencil" data-toggle="tooltip"
-                                                                     data-placement="top" title=""
-                                                                     data-original-title="Edit"></i></a> <a
-                                        href="http://localhost:8000/admin/access/user/1/password/change"
-                                        class="btn btn-xs btn-info"><i class="fa fa-refresh" data-toggle="tooltip"
-                                                                       data-placement="top" title="Change Password"></i></a>
-                                <a href="http://localhost:8000/admin/access/user/1/mark/0"
-                                   class="btn btn-xs btn-warning"><i class="fa fa-pause" data-toggle="tooltip"
-                                                                     data-placement="top" title="Deactivate"></i></a> <a
-                                        href="http://localhost:8000/admin/access/users/1" data-method="delete"
-                                        class="btn btn-xs btn-danger"><i class="fa fa-trash" data-toggle="tooltip"
-                                                                         data-placement="top" title="Delete"></i></a>
+                            <td>
+                                @if($i%2==0)
+                                    {{--<label class="label label-success label-lg">Completed</label>--}}
+                                    <span class="btn btn-info btn-xs">
+                                        <i class="fa fa-check"
+                                           data-toggle="tooltip"
+                                           data-placement="right" title="Completed"
+                                           data-original-title="Completed"></i>
+                                    </span>
+                                @else
+                                    {{--<label class="label label-warning">Uncompleted</label>--}}
+                                    <span class="btn btn-danger btn-xs">
+                                        <i class="fa fa-times-circle"
+                                           data-toggle="tooltip"
+                                           data-placement="right" title="Uncompleted"
+                                           data-original-title="Uncompleted"></i>
+                                    </span>
+                                @endif
+                            </td>
+                            <td>
+                                <a href="#" class="btn btn-xs btn-primary">
+                                    <i class="fa fa-share-square-o" data-toggle="tooltip"
+                                       data-placement="top" title="View"
+                                       data-original-title="View">
+
+                                    </i>
+                                </a>
                             </td>
                         </tr>
                     @endfor
