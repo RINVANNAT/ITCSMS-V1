@@ -2,10 +2,9 @@
 
 namespace App\Http\Controllers\Backend\Schedule;
 
+use App\Http\Controllers\Backend\Schedule\Traits\AjaxCloneTimetableController;
+use App\Http\Controllers\Backend\Schedule\Traits\AjaxFilterTimetableController;
 use App\Http\Controllers\Controller;
-use App\Models\AcademicYear;
-use App\Models\Degree;
-use App\Models\Grade;
 
 /**
  * Class TimetableController
@@ -13,23 +12,16 @@ use App\Models\Grade;
  */
 class TimetableController extends Controller
 {
+    use AjaxFilterTimetableController, AjaxCloneTimetableController;
+
     /**
+     * Timetable home page.
      *
      * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View
      */
     public function index()
     {
-        $academicYears = AcademicYear::all();
-        $degrees = Degree::all();
-        $grades = Grade::all();
-
-        return view('backend.schedule.timetables.index',
-            compact(
-                'academicYears',
-                'degrees',
-                'grades'
-            )
-        );
+        return view('backend.schedule.timetables.index');
     }
 
     /**
@@ -39,16 +31,15 @@ class TimetableController extends Controller
      */
     public function create()
     {
-        $academicYears = AcademicYear::all();
-        $degrees = Degree::all();
-        $grades = Grade::all();
+        return view('backend.schedule.timetables.create');
+    }
 
-        return view('backend.schedule.timetables.create',
-            compact(
-                'academicYears',
-                'degrees',
-                'grades'
-            )
-        );
+    /**
+     * Show timetable's details page.
+     * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View
+     */
+    public function show()
+    {
+        return view('backend.schedule.timetables.show');
     }
 }
