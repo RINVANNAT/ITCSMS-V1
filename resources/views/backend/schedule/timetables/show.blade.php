@@ -17,7 +17,7 @@
     {!! Html::style('plugins/fullcalendar/fullcalendar.css') !!}
     {!! Html::style('plugins/sweetalert2/dist/sweetalert2.css') !!}
     {!! Html::style('plugins/iCheck/all.css') !!}
-    {!! Html::style('css/backend/timetable.css') !!}
+    {!! Html::style('css/backend/schedule/timetable.css') !!}
 
 @stop
 
@@ -133,5 +133,6 @@
     {!! Html::script('plugins/fullcalendar/fullcalendar.js') !!}
     {!! Html::script('plugins/sweetalert2/dist/sweetalert2.js') !!}
     {!! Html::script('js/backend/schedule/timetable.js') !!}
+    {!! Html::script('js/backend/schedule/clone-timetable.js') !!}
 
 @stop

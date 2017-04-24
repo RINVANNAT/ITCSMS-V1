@@ -16,7 +16,7 @@
     {!! Html::style('plugins/jQueryUI/jquery-ui.css') !!}
     {!! Html::style('plugins/fullcalendar/fullcalendar.css') !!}
     {!! Html::style('plugins/sweetalert2/dist/sweetalert2.css') !!}
-    {!! Html::style('css/backend/timetable.css') !!}
+    {!! Html::style('css/backend/schedule/timetable.css') !!}
 
 @stop
 
@@ -27,7 +27,8 @@
                 <div class="pull-right">
 
                     <a href="#">
-                        <button class="btn btn-primary btn-sm" disabled="true">
+                        <button class="btn btn-primary btn-sm"
+                                disabled="true">
                             Generate
                         </button>
                     </a>

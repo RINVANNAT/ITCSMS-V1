@@ -44,4 +44,10 @@
     background-color: green;
     color: #fff;
     border: 1px solid transparent;
+    font-size: 14px;
+    padding: 2px;
+}
+.course{
+    padding: 5px;
+    font-size: 14px;
 }

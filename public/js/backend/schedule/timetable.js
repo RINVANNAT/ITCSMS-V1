@@ -20,40 +20,10 @@ $(document).ready(function () {
     });
 
     // Dragging courses sessions.
-    $('.courses .course-item').each(function () {
-
-        // store data so the calendar knows to render an event upon drop
-        $(this).data('event', {
-            title: $.trim($(this).text()), // use the element's text as the event title
-            stick: true // maintain when user navigates (see docs on the renderEvent method)
-        });
-
-        // make the event draggable using jQuery UI
-        $(this).draggable({
-            zIndex: 999,
-            revert: true,      // will cause the event to go back to its
-            revertDuration: 0  //  original position after the drag
-        });
-
-    });
+    drag_course_session();
 
     // Dragging rooms.
-    $('.rooms .room-item').each(function () {
-
-        // store data so the calendar knows to render an event upon drop
-        $(this).data('event', {
-            title: $.trim($(this).text()), // use the element's text as the event title
-            stick: true // maintain when user navigates (see docs on the renderEvent method)
-        });
-
-        // make the event draggable using jQuery UI
-        $(this).draggable({
-            zIndex: 999,
-            revert: true,      // will cause the event to go back to its
-            revertDuration: 0  //  original position after the drag
-        });
-
-    });
+    drag_room();
 
     // Timetable sections.
     $('#timetable').fullCalendar({
@@ -74,73 +44,36 @@ $(document).ready(function () {
         maxTime: '20:00:00',
         slotLabelFormat: 'h:mm a',
         columnFormat: 'dddd',
-        events: [
-            {
-                title: 'Cloud Computing',
-                start: '2017-04-24 07:00:00',
-                description: 'Course: 4H, Room: F-404, Group: A',
-                end: '2017-03-17 09:00:00',
-                backgroundColor: '#00a65a',
-                borderColor: 'white',
-                textColor: 'white'
-            }
-        ],
+        events: [],
         editable: true,
         droppable: true,
         dragRevertDuration: 0,
         eventDragStart: function (event, jsEvent, ui, view) {
             var room = '';
             room += '<div class="room-item ui-draggable ui-draggable-handle">';
-            room += '<i class="fa fa-ellipsis-v"></i> ';
-            room += '<i class="fa fa-ellipsis-v"></i> Suggest Rooms Here';
+            room += '<i class="fa fa-refresh"></i> Loading...';
             room += '</div>';
             $('.rooms').html(room);
         },
         eventDragStop: function (event, jsEvent, ui, view) {
-            if (isEventOverDiv(jsEvent.clientX, jsEvent.clientY)) {
-                var courses = '';
-                courses += '<li class="course-item">'
-                    +'<span class="handle ui-sortable-handle">'
-                    +'<i class="fa fa-ellipsis-v"></i>'
-                    +'<i class="fa fa-ellipsis-v"></i>'
-                    +'</span>'
-                    +'<span class="text">'+event.title+'</span><br>'
-                    // +'<span style="margin-left: 28px;">Mr. YOU Vanndy</span><br/>'
-                    // +'<span style="margin-left: 28px;">Course = 8H</span>'
-                    +'</li>';
-
-                $('#calendar').fullCalendar('removeEvents', event._id);
-                var el = $('.courses').append(courses);
-                el.draggable({
-                    zIndex: 999,
-                    revert: true,
-                    revertDuration: 0
-                });
-                el.data('event', {title: event.title, id: event.id, stick: true});
-            }
+            // Implementation event back.
         },
         eventClick: function (calEvent, jsEvent, view) {
-            $(this).css('backgroundColor', '#00c0ef').css('borderColor', '#fff');
+            $('body').find('.course-selected').removeClass('course-selected');
+            $(this).addClass('course-selected');
             var room = '';
-            room += '<div class="room-item ui-draggable ui-draggable-handle">';
+            room += '<div class="room-item">';
             room += '<i class="fa fa-ellipsis-v"></i> ';
-            room += '<i class="fa fa-ellipsis-v"></i> Suggest Rooms Here';
+            room += '<i class="fa fa-ellipsis-v"></i> F-404';
             room += '</div>';
             $('.rooms').html(room);
+            drag_room();
         },
-        eventDrop: function(event, delta, revertFunc) {
-
-            var room = '';
-            room += '<div class="room-item ui-draggable ui-draggable-handle">';
-            room += '<i class="fa fa-ellipsis-v"></i> ';
-            room += '<i class="fa fa-ellipsis-v"></i> Suggest Rooms Here';
-            room += '</div>';
-            $('.rooms').html(room);
-
+        eventDrop: function (event, delta, revertFunc) {
+            // Implementations.
         },
-        eventRender: function( event, element, view ) {
-            //event.className('hello');
-            console.log(event);
+        eventRender: function (event, element, view) {
+            element.addClass('course');
         }
     });
 
@@ -160,39 +93,50 @@ $(document).ready(function () {
             && x <= offset.right
             && y <= offset.bottom;
     }
-
-    /** Clone timetable **/
-    /** iCheckbox */
-    $('input[type="checkbox"].square').iCheck({
-        checkboxClass: 'icheckbox_square-blue'
-    });
-
-    /** Form submit clone */
-    $('#form-clone-timetable').on('submit', function (event) {
-        event.preventDefault();
-        $.ajax({
-            type: 'POST',
-            url: '/admin/schedule/timetables/clone',
-            data: $('#form-clone-timetable').serialize(),
-            success: function (response) {
-                console.log(response);
-                $('#clone-timetable').modal('toggle');
-                $('#form-clone-timetable')[0].reset();
-                // Reset selected checkbox.
-                $('input[type="checkbox"].square').iCheck('update');
-                swal(
-                    'Success',
-                    'You have been cloned timetable.',
-                    'success'
-                );
-            },
-            error: function () {
-                swal(
-                    'Oops...',
-                    'Something went wrong!',
-                    'error'
-                );
-            }
-        })
-    })
 });
+
+var drag_room = function () {
+    $('.rooms .room-item').each(function () {
+
+        $(this).data('event', {
+            title: $.trim($(this).text()),
+            stick: true
+        });
+
+        $(this).draggable({
+            zIndex: 999,
+            revert: true,
+            revertDuration: 0
+        });
+
+    });
+};
+
+var drag_course_session = function () {
+    $('.courses .course-item').each(function () {
+
+        $(this).data('event', {
+            title: $.trim($(this).text()),
+            stick: true
+        });
+
+        $(this).draggable({
+            zIndex: 999,
+            revert: true,
+            revertDuration: 0
+        });
+
+    });
+};
+
+var rooms = function (nb_rooms) {
+    var room = '';
+    room += '<div class="room-item">'
+         +'<i class="fa fa-ellipsis-v"></i>'
+         +'<i class="fa fa-ellipsis-v"></i> F-306</div>';
+    for(var i=0; i<nb_rooms; i++)
+    {
+        room += room;
+    }
+    $('.rooms').append(room);
+};
