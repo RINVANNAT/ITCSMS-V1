@@ -179,19 +179,6 @@ class EloquentEventRepository implements EventRepositoryContract
                 ['created_uid', '=', $authorId],
                 ['repeat_id', '=', null]
             ])
-            /*->orWhere(function ($departmentQuery) use ($departmentId){
-                $departmentIds = DB::table('department_event')
-                    ->select('department_event.event_id')
-                    ->where('department_event', $departmentId)
-                    ->lists('event_id');
-                if($departmentQuery)
-                {
-                    $departmentQuery->whereIn('events.id', $departmentIds);
-                }
-                else{
-                    $departmentQuery->null;
-                }
-            })*/
             ->get();
     }
 }
