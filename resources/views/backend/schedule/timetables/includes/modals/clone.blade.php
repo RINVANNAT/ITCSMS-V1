@@ -6,7 +6,11 @@
                 <h4 class="modal-title" id="myModalLabel">Clone timetable</h4>
             </div>
             <div class="modal-body">
-                <form action="" method="POST" class="form-horizontal">
+                <form action="{{ route('admin.schedule.timetables.clone') }}"
+                      method="POST"
+                      name="form-clone-timetable"
+                      id="form-clone-timetable"
+                      class="form-horizontal">
                     @include('backend.schedule.timetables.includes.forms.clone')
                 </form>
             </div>

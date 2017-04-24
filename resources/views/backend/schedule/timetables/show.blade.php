@@ -16,6 +16,7 @@
     {!! Html::style('plugins/jQueryUI/jquery-ui.css') !!}
     {!! Html::style('plugins/fullcalendar/fullcalendar.css') !!}
     {!! Html::style('plugins/sweetalert2/dist/sweetalert2.css') !!}
+    {!! Html::style('plugins/iCheck/all.css') !!}
     {!! Html::style('css/backend/timetable.css') !!}
 
 @stop
@@ -25,12 +26,16 @@
         <div class="box-header with-border">
             <div class="mailbox-controls">
                 <div class="pull-right">
-
                     <a href="#">
                         <button class="btn btn-primary btn-sm" disabled="true">
                             Generate
                         </button>
                     </a>
+                    <button class="btn btn-warning btn-sm"
+                            data-toggle="modal"
+                            data-target="#clone-timetable">
+                        Clone
+                    </button>
                     <a href="#">
                         <button class="btn btn-info btn-sm">
                             Publish
@@ -114,10 +119,13 @@
         </div>
     </div>
 
+    @include('backend.schedule.timetables.includes.modals.clone')
+
 @stop
 
 @section('after-scripts-end')
 
+    {!! Html::script('plugins/ichecks/icheck.js') !!}
     {!! Html::script('plugins/datatables/jquery.dataTables.min.js') !!}
     {!! Html::script('plugins/datatables/dataTables.bootstrap.min.js') !!}
     {!! Html::script('plugins/jQueryUI/jquery-ui.js') !!}

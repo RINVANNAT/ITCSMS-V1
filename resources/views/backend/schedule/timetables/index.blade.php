@@ -12,6 +12,7 @@
 
 @section('after-styles-end')
     {!! Html::style('plugins/datatables/dataTables.bootstrap.css') !!}
+    {!! Html::style('plugins/sweetalert2/dist/sweetalert2.css') !!}
     <style>
         .toolbar {
             float: left;
@@ -26,7 +27,7 @@
                 <div class="pull-right">
                     <a href="{{ route('admin.schedule.timetables.create') }}">
                         <button class="btn btn-primary btn-sm" data-toggle="tooltip"
-                                data-placement="left" title="Create a new timetable"
+                                data-placement="top" title="Create a new timetable"
                                 data-original-title="Create a new timetable">
                             <i class="fa fa-plus-circle"
                             ></i> Create Timetable
@@ -34,56 +35,19 @@
                     </a>
                 </div>
 
-                {{--Option--}}
-                <select name="academicYear">
-                    <option selected disabled>Academic</option>
-                    @foreach($academicYears as $academicYear)
-                        <option value="{{ $academicYear->id }}">{{ $academicYear->name_latin }}</option>
-                    @endforeach
-                </select>
-
-                <select name="degree">
-                    <option selected disabled>Degree</option>
-                    @foreach($degrees as $degree)
-                        <option value="{{ $degree->id }}">{{ $degree->name_en }}</option>
-                    @endforeach
-                </select>
-
-                <select name="grade">
-                    <option selected disabled>Year</option>
-                    @foreach($grades as $grade)
-                        <option value="{{ $grade->id }}">{{ $grade->name_en }}</option>
-                    @endforeach
-                </select>
-
-                <select name="grade">
-                    <option selected disabled>Option</option>
-                    @foreach($grades as $grade)
-                        <option value="{{ $grade->id }}">{{ $grade->name_en }}</option>
-                    @endforeach
-                </select>
-
-                <select name="grade">
-                    <option selected disabled>Semester</option>
-                    @foreach($grades as $grade)
-                        <option value="{{ $grade->id }}">{{ $grade->name_en }}</option>
-                    @endforeach
-                </select>
-
-                <select name="grade">
-                    <option selected disabled>Group</option>
-                    @foreach($grades as $grade)
-                        <option value="{{ $grade->id }}">{{ $grade->name_en }}</option>
-                    @endforeach
-                </select>
+                <form name="filter-timetable-view"
+                      id="filter-timetable-view"
+                      method="POST"
+                      action="{{ route('admin.schedule.timetables.filter') }}">
+                    @include('backend.schedule.timetables.includes.partials.option')
+                </form>
 
             </div>
         </div>
 
         <div class="box-body">
             <div>
-                <table class="table table-striped table-bordered table-hover dt-responsive nowrap" cellspacing="0"
-                       id="employees-table">
+                <table class="table table-striped table-bordered table-hover dt-responsive nowrap" id="list-timetable">
                     <thead>
                     <tr>
                         <th>No.</th>
@@ -99,25 +63,23 @@
                             <td>Weekly{{$i+1}}</td>
                             <td>
                                 @if($i%2==0)
-                                    {{--<label class="label label-success label-lg">Completed</label>--}}
                                     <span class="btn btn-info btn-xs">
                                         <i class="fa fa-check"
                                            data-toggle="tooltip"
-                                           data-placement="right" title="Completed"
+                                           data-placement="top" title="Completed"
                                            data-original-title="Completed"></i>
                                     </span>
                                 @else
-                                    {{--<label class="label label-warning">Uncompleted</label>--}}
                                     <span class="btn btn-danger btn-xs">
                                         <i class="fa fa-times-circle"
                                            data-toggle="tooltip"
-                                           data-placement="right" title="Uncompleted"
+                                           data-placement="top" title="Uncompleted"
                                            data-original-title="Uncompleted"></i>
                                     </span>
                                 @endif
                             </td>
                             <td>
-                                <a href="#" class="btn btn-xs btn-primary">
+                                <a href="{{ route('admin.schedule.timetables.show') }}" class="btn btn-xs btn-primary">
                                     <i class="fa fa-share-square-o" data-toggle="tooltip"
                                        data-placement="top" title="View"
                                        data-original-title="View">
@@ -132,14 +94,38 @@
             </div>
 
             <div class="clearfix"></div>
-        </div><!-- /.box-body -->
-    </div><!--box-->
+        </div>
+    </div>
 @stop
 
 @section('after-scripts-end')
+
     {!! Html::script('plugins/datatables/jquery.dataTables.min.js') !!}
     {!! Html::script('plugins/datatables/dataTables.bootstrap.min.js') !!}
-    <script>
-        $('#employees-table').DataTable();
+    {!! Html::script('plugins/sweetalert2/dist/sweetalert2.js') !!}
+    <script type="text/javascript">
+        $('#list-timetable').DataTable();
+
+        $('#filter-timetable-view').on('change', function (e) {
+            e.preventDefault();
+
+            $.ajax({
+                type: 'POST',
+                url: '/admin/schedule/timetables/filter',
+                data: $('#filter-timetable-view').serialize(),
+                success: function (response) {
+                    console.log(response);
+                },
+                error: function () {
+                    swal(
+                        'Oops...',
+                        'Something went wrong!',
+                        'error'
+                    );
+                }
+            });
+
+        });
     </script>
+
 @stop
