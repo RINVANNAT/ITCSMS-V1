@@ -1,6 +1,6 @@
 @extends ('backend.layouts.master')
 
-@section ('title', trans('labels.backend.schedule.timetable.title'))
+@section ('title', trans('labels.backend.schedule.timetable.meta_title'))
 
 @section('page-header')
     <h1>
@@ -29,17 +29,17 @@
                     <a href="#">
                         <button class="btn btn-primary btn-sm"
                                 disabled="true">
-                            Generate
+                            {{ trans('buttons.backend.schedule.timetable.generate') }}
                         </button>
                     </a>
                     <a href="#">
                         <button class="btn btn-info btn-sm">
-                            Publish
+                            {{ trans('buttons.backend.schedule.timetable.publish') }}
                         </button>
                     </a>
                     <a href="#">
                         <button class="btn btn-danger btn-sm">
-                            Save Change
+                            {{ trans('buttons.backend.schedule.timetable.save_change') }}
                         </button>
                     </a>
                 </div>
@@ -65,7 +65,7 @@
                             <div class="box box-solid">
                                 <div class="box-header with-border">
                                     <i class="fa fa-drivers-license-o"></i>
-                                    <h3 class="box-title">Courses Sessions</h3>
+                                    <h3 class="box-title">{{ trans('labels.backend.schedule.timetable.courses_sessions') }}</h3>
                                 </div>
                                 <div class="box-body courses-sessions">
                                     <ul class="courses todo-list">
@@ -92,7 +92,7 @@
                             <div class="box box-solid">
                                 <div class="box-header with-border">
                                     <i class="fa fa-building-o"></i>
-                                    <h3 class="box-title">Available Rooms</h3>
+                                    <h3 class="box-title">{{ trans('labels.backend.schedule.timetable.rooms') }}</h3>
                                 </div>
                                 <div class="box-body">
                                     <div class="rooms">

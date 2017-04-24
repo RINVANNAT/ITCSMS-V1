@@ -1,6 +1,6 @@
 @extends ('backend.layouts.master')
 
-@section ('title', trans('labels.backend.schedule.timetable.title'))
+@section ('title', trans('labels.backend.schedule.timetable.meta_title'))
 
 @section('page-header')
     <h1>
@@ -50,9 +50,9 @@
                 <table class="table table-striped table-bordered table-hover dt-responsive nowrap" id="list-timetable">
                     <thead>
                     <tr>
-                        <th>No.</th>
-                        <th>Weekly</th>
-                        <th>Status</th>
+                        <th>{{ trans('labels.backend.schedule.timetable.index_timetable.number') }}</th>
+                        <th>{{ trans('labels.backend.schedule.timetable.index_timetable.weekly') }}</th>
+                        <th>{{ trans('labels.backend.schedule.timetable.index_timetable.status') }}</th>
                         <th>{{ trans('labels.general.actions') }}</th>
                     </tr>
                     </thead>

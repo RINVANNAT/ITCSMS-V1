@@ -1015,9 +1015,23 @@ return [
                 ]
             ],
             'timetable' => [
+                'meta_title' => 'Timetable Management',
                 'title' => 'Schedule Management',
                 'sub_index_title' => 'Timetable Management',
-
+                'modal_clone' => [
+                    'title' => 'Clone Timetable',
+                    'body' => [
+                        'weekly' => 'Weekly',
+                        'group' => 'Group'
+                    ]
+                ],
+                'courses_sessions' => 'Courses Sessions',
+                'rooms' => 'Available Rooms',
+                'index_timetable' => [
+                    'number' => 'No.',
+                    'weekly' => 'Weekly',
+                    'status' => 'Status'
+                ]
             ]
         ]
     ],

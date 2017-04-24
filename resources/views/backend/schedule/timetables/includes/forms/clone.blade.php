@@ -10,7 +10,9 @@
 <input type="hidden" name="option" value="_ee">
 
 <div class="form-group">
-    <label class="col-md-3 control-label">Weekly</label>
+    <label class="col-md-3 control-label">
+        {{ trans('labels.backend.schedule.timetable.modal_clone.body.weekly') }}
+    </label>
     <div class="col-md-8">
         <div class="row">
             @for($i=1; $i<=18; $i++)
@@ -25,7 +27,9 @@
 </div>
 
 <div class="form-group">
-    <label class="col-md-3 control-label">Group</label>
+    <label class="col-md-3 control-label">
+        {{ trans('labels.backend.schedule.timetable.modal_clone.body.group') }}
+    </label>
     <div class="col-md-8">
         <div class="row">
             @for($i=1; $i<=18; $i++)
@@ -41,8 +45,8 @@
 
 <div class="form-group">
     <div class="col-md-offset-3 col-md-8">
-        <input type="submit" class="btn btn-primary btn-sm" value="Clone">
-        <button type="button" class="btn btn-default btn-sm" data-dismiss="modal">Close</button>
+        <input type="submit" class="btn btn-primary btn-sm" value="{{ trans('buttons.backend.schedule.timetable.modal_clone.clone') }}">
+        <button type="button" class="btn btn-default btn-sm" data-dismiss="modal">{{ trans('buttons.backend.schedule.timetable.modal_clone.close') }}</button>
     </div>
 </div>
 

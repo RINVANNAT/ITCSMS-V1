@@ -39,6 +39,17 @@ return [
                     'save_change' => 'Save Change',
                     'cancel' => 'Cancel'
                 ]
+            ],
+            'timetable' => [
+                'create' => 'Create Timetable',
+                'clone' => 'Clone',
+                'generate' => 'Generate',
+                'save_change' => 'Save Change',
+                'publish' => 'Publish',
+                'modal_clone' => [
+                    'clone' => 'Clone',
+                    'close' => 'Close'
+                ]
             ]
         ]
     ],
