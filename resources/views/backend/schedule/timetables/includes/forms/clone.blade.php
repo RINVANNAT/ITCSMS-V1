@@ -2,57 +2,51 @@
     {{ csrf_field() }}
 </div>
 
+<input type="hidden" name="academicYeas" value="2017">
+<input type="hidden" name="degree" value="23">
+<input type="hidden" name="grade" value="2">
+<input type="hidden" name="semester" value="1">
+<input type="hidden" name="group" value="a">
+<input type="hidden" name="option" value="_ee">
+
 <div class="form-group">
-    <label class="col-md-3 control-label">Academic Year</label>
+    <label class="col-md-3 control-label">
+        {{ trans('labels.backend.schedule.timetable.modal_clone.body.weekly') }}
+    </label>
     <div class="col-md-8">
-        <select name="academicYear" class="form-control">
-            <option selected disabled>Academic</option>
-            @foreach($academicYears as $academicYear)
-                <option value="{{ $academicYear->id }}">{{ $academicYear->name_latin }}</option>
-            @endforeach
-        </select>
+        <div class="row">
+            @for($i=1; $i<=18; $i++)
+                <div class="col-md-3">
+                    <label for="{{ $i }}">
+                        <input type="checkbox" name="weeks[]" class="square" value="{{ $i }}"> Week {{ $i }}
+                    </label>
+                </div>
+            @endfor
+        </div>
     </div>
 </div>
 
 <div class="form-group">
-    <label class="col-md-3 control-label">Semester</label>
+    <label class="col-md-3 control-label">
+        {{ trans('labels.backend.schedule.timetable.modal_clone.body.group') }}
+    </label>
     <div class="col-md-8">
-        <select name="grade" class="form-control">
-            <option selected disabled>Semester</option>
-            @foreach($grades as $grade)
-                <option value="{{ $grade->id }}">{{ $grade->name_en }}</option>
-            @endforeach
-        </select>
-    </div>
-</div>
-
-<div class="form-group">
-    <label class="col-md-3 control-label">Weekly</label>
-    <div class="col-md-8">
-        @for($i=1; $i<=18; $i++)
-            <label for="{{ $i }}" class="control-label">
-                <input type="checkbox" name="weekly[]"> Week {{ $i }}
-            </label>
-        @endfor
-    </div>
-</div>
-
-<div class="form-group">
-    <label class="col-md-3 control-label">Group</label>
-    <div class="col-md-8">
-        <select name="grade" class="form-control">
-            <option selected disabled>Group</option>
-            @foreach($grades as $grade)
-                <option value="{{ $grade->id }}">{{ $grade->name_en }}</option>
-            @endforeach
-        </select>
+        <div class="row">
+            @for($i=1; $i<=18; $i++)
+                <div class="col-md-2">
+                    <label for="{{ $i }}">
+                        <input type="checkbox" name="groups[]" class="square" value="{{ $i }}"> A
+                    </label>
+                </div>
+            @endfor
+        </div>
     </div>
 </div>
 
 <div class="form-group">
     <div class="col-md-offset-3 col-md-8">
-        <input type="submit" class="btn btn-primary btn-sm" value="Clone">
-        <button type="button" class="btn btn-default btn-sm" data-dismiss="modal">Close</button>
+        <input type="submit" class="btn btn-primary btn-sm" value="{{ trans('buttons.backend.schedule.timetable.modal_clone.clone') }}">
+        <button type="button" class="btn btn-default btn-sm" data-dismiss="modal">{{ trans('buttons.backend.schedule.timetable.modal_clone.close') }}</button>
     </div>
 </div>
 

@@ -16,6 +16,7 @@
     {!! Html::style('plugins/jQueryUI/jquery-ui.css') !!}
     {!! Html::style('plugins/fullcalendar/fullcalendar.css') !!}
     {!! Html::style('plugins/sweetalert2/dist/sweetalert2.css') !!}
+    {!! Html::style('plugins/iCheck/all.css') !!}
     {!! Html::style('css/backend/schedule/timetable.css') !!}
 
 @stop
@@ -25,13 +26,16 @@
         <div class="box-header with-border">
             <div class="mailbox-controls">
                 <div class="pull-right">
-
                     <a href="#">
-                        <button class="btn btn-primary btn-sm"
-                                disabled="true">
+                        <button class="btn btn-primary btn-sm" disabled="true">
                             {{ trans('buttons.backend.schedule.timetable.generate') }}
                         </button>
                     </a>
+                    <button class="btn btn-warning btn-sm"
+                            data-toggle="modal"
+                            data-target="#clone-timetable">
+                        {{ trans('buttons.backend.schedule.timetable.clone') }}
+                    </button>
                     <a href="#">
                         <button class="btn btn-info btn-sm">
                             {{ trans('buttons.backend.schedule.timetable.publish') }}
@@ -115,10 +119,13 @@
         </div>
     </div>
 
+    @include('backend.schedule.timetables.includes.modals.clone')
+
 @stop
 
 @section('after-scripts-end')
 
+    {!! Html::script('plugins/ichecks/icheck.js') !!}
     {!! Html::script('plugins/datatables/jquery.dataTables.min.js') !!}
     {!! Html::script('plugins/datatables/dataTables.bootstrap.min.js') !!}
     {!! Html::script('plugins/jQueryUI/jquery-ui.js') !!}
@@ -126,5 +133,6 @@
     {!! Html::script('plugins/fullcalendar/fullcalendar.js') !!}
     {!! Html::script('plugins/sweetalert2/dist/sweetalert2.js') !!}
     {!! Html::script('js/backend/schedule/timetable.js') !!}
+    {!! Html::script('js/backend/schedule/clone-timetable.js') !!}
 
 @stop
