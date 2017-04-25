@@ -35,7 +35,7 @@
 
 <select name="weekly">
     <option selected disabled>{{ trans('inputs.backend.schedule.timetable.options.weekly') }}</option>
-    @foreach($semesters as $semester)
-        <option value="{{ $semester->id }}">{{ $semester->name_en }}</option>
-    @endforeach
+    <option value="1">Week 1</option>
+    <option value="2">Week 2</option>
+    <option value="3">Week 3</option>
 </select>

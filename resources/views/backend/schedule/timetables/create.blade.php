@@ -76,9 +76,10 @@
                                                     <i class="fa fa-ellipsis-v"></i>
                                                     <i class="fa fa-ellipsis-v"></i>
                                                 </span>
-                                                <span class="text">Cloud Computing</span><br>
-                                                <span style="margin-left: 28px;">Mr. YOU Vanndy</span><br/>
-                                                <span style="margin-left: 28px;">Course = 8H</span>
+                                                <span class="text course-name">Cloud Computing</span><br>
+                                                <span style="margin-left: 28px;" class="teacher-name">Mr. YOU Vanndy</span><br/>
+                                                <span style="margin-left: 28px;" class="course-type">Course</span> :
+                                                <span class="times">8</span> H
                                             </li>
 
                                         @endfor

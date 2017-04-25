@@ -19,10 +19,10 @@ $(document).ready(function () {
         })
     });
 
-    // Dragging courses sessions.
+    // Call function dragging courses sessions.
     drag_course_session();
 
-    // Dragging rooms.
+    // Call function dragging rooms.
     drag_room();
 
     // Timetable sections.
@@ -48,6 +48,9 @@ $(document).ready(function () {
         editable: true,
         droppable: true,
         dragRevertDuration: 0,
+        drag: function () {
+          alert('Drag');
+        },
         eventDragStart: function (event, jsEvent, ui, view) {
             var room = '';
             room += '<div class="room-item ui-draggable ui-draggable-handle">';
@@ -56,24 +59,20 @@ $(document).ready(function () {
             $('.rooms').html(room);
         },
         eventDragStop: function (event, jsEvent, ui, view) {
-            // Implementation event back.
+            // Trigger when stop drag the event.
         },
         eventClick: function (calEvent, jsEvent, view) {
-            $('body').find('.course-selected').removeClass('course-selected');
-            $(this).addClass('course-selected');
-            var room = '';
-            room += '<div class="room-item">';
-            room += '<i class="fa fa-ellipsis-v"></i> ';
-            room += '<i class="fa fa-ellipsis-v"></i> F-404';
-            room += '</div>';
-            $('.rooms').html(room);
-            drag_room();
+            // Trigger when click the event.
         },
         eventDrop: function (event, delta, revertFunc) {
-            // Implementations.
+            // Trigger where move and drop the event on full calendar.
         },
         eventRender: function (event, element, view) {
+            console.log(event);
             element.addClass('course');
+        },
+        eventAfterRender: function( event, element, view ) {
+            // Trigger when after render the event.
         }
     });
 
@@ -92,9 +91,24 @@ $(document).ready(function () {
             && y >= offset.top
             && x <= offset.right
             && y <= offset.bottom;
-    }
+    };
+
+    // Click on course show available room.
+    $(document).on('click', '.course-item', function () {
+        $('body').find('.course-selected').removeClass('course-selected');
+        $(this).addClass('course-selected');
+        var room = '';
+        room += '<div class="room-item">';
+        room += '<i class="fa fa-ellipsis-v"></i> ';
+        room += '<i class="fa fa-ellipsis-v"></i> F-404';
+        room += '</div>';
+        // Apply with $.ajax({ /** implementation.... */ });
+        $('.rooms').html(room);
+        drag_room();
+    })
 });
 
+// Drag room into timetable.
 var drag_room = function () {
     $('.rooms .room-item').each(function () {
 
@@ -104,7 +118,7 @@ var drag_room = function () {
         });
 
         $(this).draggable({
-            zIndex: 999,
+            zIndex: 1000000,
             revert: true,
             revertDuration: 0
         });
@@ -112,16 +126,22 @@ var drag_room = function () {
     });
 };
 
+// Drag course session into timetable.
 var drag_course_session = function () {
+
     $('.courses .course-item').each(function () {
 
         $(this).data('event', {
-            title: $.trim($(this).text()),
-            stick: true
+            title: $(this).find('.course-name').text(),
+            stick: true,
+            className: 'course-item',
+            teacherName: $(this).find('.teacher-name').text(),
+            typeCourseSession: $(this).find('.course-type').text(),
+            times: $(this).find('.times').text()
         });
 
         $(this).draggable({
-            zIndex: 999,
+            zIndex: 1000000,
             revert: true,
             revertDuration: 0
         });
@@ -129,13 +149,13 @@ var drag_course_session = function () {
     });
 };
 
+// List all rooms.
 var rooms = function (nb_rooms) {
     var room = '';
     room += '<div class="room-item">'
-         +'<i class="fa fa-ellipsis-v"></i>'
-         +'<i class="fa fa-ellipsis-v"></i> F-306</div>';
-    for(var i=0; i<nb_rooms; i++)
-    {
+        + '<i class="fa fa-ellipsis-v"></i>'
+        + '<i class="fa fa-ellipsis-v"></i> F-306</div>';
+    for (var i = 0; i < nb_rooms; i++) {
         room += room;
     }
     $('.rooms').append(room);
