@@ -98,7 +98,7 @@ $(document).ready(function () {
                     + '<i class="fa fa-ellipsis-v"></i>'
                     + '</span>'
                     + '<span class="text course-name">' + event.title + '</span><br>'
-                    + '<span style="margin-left: 28px;" class="teacher-name conflict">' + event.teacherName + '<div class="confict-tools">GEE</div> </span><br/>'
+                    + '<span style="margin-left: 28px;" class="teacher-name">' + event.teacherName + '</span><br/>'
                     + '<span style="margin-left: 28px;" class="course-type">' + event.typeCourseSession + '</span> :'
                     + '<span class="times">' + event.times + '</span> H'
                     + '</li>';
