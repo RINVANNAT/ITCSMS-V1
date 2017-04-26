@@ -7,6 +7,7 @@
 .modal-content {
     background-image: none;
 }
+
 .modal-title {
     font-family: 'Source Sans Pro', sans-serif !important;
 }
@@ -40,14 +41,34 @@
     box-sizing: border-box;
 }
 
-.course-selected {
-    background-color: green;
-    color: #fff;
-    border: 1px solid transparent;
-    font-size: 14px;
-    padding: 2px;
-}
-.course{
+.course {
     padding: 5px;
     font-size: 14px;
+}
+
+.side-course {
+    float: left;
+    background-color: #fff;
+    color: #000;
+    width: 60%;
+}
+
+.side-room {
+    float: right;
+    width: 40%;
+}
+
+.side-course, .side-room {
+    padding: 10px;
+    min-height: 560px;
+    box-sizing: border-box;
+}
+
+.course-selected {
+    background-color: #ddd !important;
+}
+
+.conflict {
+    color: red;
+    text-decoration: line-through;
 }

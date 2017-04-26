@@ -22,97 +22,23 @@
 @stop
 
 @section('content')
+
     <div class="box box-success">
-        <div class="box-header with-border">
-            <div class="mailbox-controls">
-                <div class="pull-right">
-                    <a href="#">
-                        <button class="btn btn-primary btn-sm" disabled="true">
-                            {{ trans('buttons.backend.schedule.timetable.generate') }}
-                        </button>
-                    </a>
-                    <button class="btn btn-warning btn-sm"
-                            data-toggle="modal"
-                            data-target="#clone-timetable">
-                        {{ trans('buttons.backend.schedule.timetable.clone') }}
-                    </button>
-                    <a href="#">
-                        <button class="btn btn-info btn-sm">
-                            {{ trans('buttons.backend.schedule.timetable.publish') }}
-                        </button>
-                    </a>
-                    <a href="#">
-                        <button class="btn btn-danger btn-sm">
-                            {{ trans('buttons.backend.schedule.timetable.save_change') }}
-                        </button>
-                    </a>
-                </div>
-
-                <form name="filter-courses-sessions"
-                      id="filter-courses-sessions"
-                      method="POST"
-                      action="{{ route('admin.schedule.timetables.filter') }}">
-                    @include('backend.schedule.timetables.includes.partials.option')
-                </form>
-
-            </div>
-        </div>
+        {{--Group buttons action--}}
+        @include('backend.schedule.timetables.includes.partials.buttons-action')
 
         <div class="box-body">
             <div class="row">
                 <div class="col-md-9">
+                    {{--Timetable render--}}
                     <div id="timetable"></div>
                 </div>
                 <div class="col-md-3">
-                    <div class="row">
-                        <div class="col-md-12">
-                            <div class="box box-solid">
-                                <div class="box-header with-border">
-                                    <i class="fa fa-drivers-license-o"></i>
-                                    <h3 class="box-title">{{ trans('labels.backend.schedule.timetable.courses_sessions') }}</h3>
-                                </div>
-                                <div class="box-body courses-sessions">
-                                    <ul class="courses todo-list">
-                                        @for($i=0; $i<10; $i++)
 
-                                            <li class="course-item">
-                                                <span class="handle ui-sortable-handle">
-                                                    <i class="fa fa-ellipsis-v"></i>
-                                                    <i class="fa fa-ellipsis-v"></i>
-                                                </span>
-                                                <span class="text course-name">Cloud Computing</span><br>
-                                                <span style="margin-left: 28px;" class="teacher-name">Mr. YOU Vanndy</span><br/>
-                                                <span style="margin-left: 28px;" class="course-type">Course</span> :
-                                                <span class="times">8</span> H
-                                            </li>
+                    @include('backend.schedule.timetables.includes.partials.courses-sessions')
 
-                                        @endfor
-                                    </ul>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="row">
-                        <div class="col-md-12">
-                            <div class="box box-solid">
-                                <div class="box-header with-border">
-                                    <i class="fa fa-building-o"></i>
-                                    <h3 class="box-title">{{ trans('labels.backend.schedule.timetable.rooms') }}</h3>
-                                </div>
-                                <div class="box-body">
-                                    <div class="rooms">
-                                        @for($i=0; $i<100; $i++)
-                                            <div class="room-item">
-                                                <i class="fa fa-ellipsis-v"></i>
-                                                <i class="fa fa-ellipsis-v"></i>
-                                                F-309
-                                            </div>
-                                        @endfor
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
+                    @include('backend.schedule.timetables.includes.partials.rooms')
+
                 </div>
             </div>
 
@@ -129,7 +55,6 @@
     {!! Html::script('plugins/iCheck/icheck.js') !!}
     {!! Html::script('plugins/datatables/jquery.dataTables.min.js') !!}
     {!! Html::script('plugins/datatables/dataTables.bootstrap.min.js') !!}
-    {!! Html::script('plugins/jQueryUI/jquery-ui.js') !!}
     {!! Html::script('plugins/moment/moment.min.js') !!}
     {!! Html::script('plugins/fullcalendar/fullcalendar.js') !!}
     {!! Html::script('plugins/sweetalert2/dist/sweetalert2.js') !!}
