@@ -21,6 +21,7 @@
 @stop
 
 @section('content')
+
     <div class="box box-success">
         <div class="box-header with-border">
             <div class="mailbox-controls">
@@ -86,6 +87,13 @@
 
                                     </i>
                                 </a>
+                                <a href="{{ route('admin.schedule.timetables.show') }}" class="btn btn-xs btn-danger">
+                                    <i class="fa fa-trash" data-toggle="tooltip"
+                                       data-placement="top" title="Delete"
+                                       data-original-title="Delete">
+
+                                    </i>
+                                </a>
                             </td>
                         </tr>
                     @endfor
@@ -96,6 +104,7 @@
             <div class="clearfix"></div>
         </div>
     </div>
+
 @stop
 
 @section('after-scripts-end')
