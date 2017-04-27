@@ -60,12 +60,26 @@ trait ScoreProp {
             ->whereIn('id', function($queryClass) use ($courseAnnualId) {
 
                 $groupIds = DB::table('course_annual_classes')->where([ ['course_annual_id', $courseAnnualId], ['course_session_id', null] ])->lists('group_id');
+
+                dd($groupIds);
                 $queryClass->select( $groupIds );
             })->get();
 
             dd($groups);
 
     }
+
+    public function score_constraint( $each_score, $tmp_course,$student, $each_column_score) {
+
+        if($each_score > ScoreEnum::Zero) {//----student with score 0 consider as giving up studying do not count for jurring student average
+            $each_column_score[$tmp_course->course_id][$student->id_card] = $each_score;
+        }
+
+        return $each_column_score;
+    }
+
+
+
 
 
 }

@@ -23,7 +23,7 @@ trait StudentScore {
 
     }
 
-    private function floatFormat($val) {
+    public function floatFormat($val) {
 
         return number_format((float)$val, 2, '.', '');
     }
@@ -410,8 +410,8 @@ trait StudentScore {
             ->whereIn('course_annual_id', $array_course_annual_ids)
             ->get();
         foreach($selectedGroups as $group) {
-            if($group->group != null) {
-                $arrayGroups[$group->course_annual_id][] = $group->group;
+            if($group->group_id != null) {
+                $arrayGroups[$group->course_annual_id][] = $group->group_id;
             }
         }
 
@@ -1084,6 +1084,33 @@ trait StudentScore {
         $student = Student::where('id_card', $studentIdCard)->first();
         $studentAnnuals = $student->studentAnnuals;
 
+
+    }
+
+
+    public function generating_student_redouble($each_course, $stu_dent, $each_score, $fail_subjects) {
+
+        if($each_course->is_counted_creditability) {
+
+            if($each_score < ScoreEnum::Under_30) {
+
+                $check_redouble = $this->checkRedouble($stu_dent, $each_course->academic_year_id);//---check this current year if student has been change in redouble
+                /*----create one redouble record for this student ----*/
+                /*---before create redouble record, we have to check if the student has already marked as redouble for this year --then we skip ---*/
+                if($check_redouble === null) {
+                    if($each_course->degree_id == ScoreEnum::Degree_I) {
+                        $this->createRedoubleRecord($stu_dent, $redName = trim(ScoreEnum::Red_I.$each_course->grade_id), $each_course->academic_year_id, $isChanged = false);
+                    } else {
+                        $this->createRedoubleRecord($stu_dent, $redName = trim(ScoreEnum::Red_T.$each_course->grade_id), $each_course->academic_year_id, $isChanged = false);
+                    }
+                }
+                $fail_subjects[$stu_dent->id_card]['fail'][] = array('credit'=> $each_course->course_annual_credit, 'score'=> $each_score, 'course_annual_id' => $each_course->course_annual_id, 'student_annual_id' => $stu_dent->student_annual_id);
+            } else {
+                $fail_subjects[$stu_dent->id_card]['pass'][] = array('credit'=> $each_course->course_annual_credit, 'score'=> $each_score, 'course_annual_id' => $each_course->course_annual_id, 'student_annual_id' => $stu_dent->student_annual_id);
+            }
+        }
+
+        return $fail_subjects;
 
     }
 }

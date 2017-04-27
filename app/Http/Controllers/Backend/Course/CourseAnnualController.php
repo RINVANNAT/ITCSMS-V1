@@ -40,6 +40,7 @@ use App\Repositories\Backend\ResitStudentAnnual\ResitStudentAnnualRepositoryCont
 
 use App\Repositories\Backend\Average\AverageRepositoryContract;
 
+use App\Traits\CourseSessionTrait;
 use App\Traits\StudentScore;
 use App\Traits\ScoreProp;
 use Illuminate\Support\Facades\DB;
@@ -55,6 +56,7 @@ use Illuminate\Support\Facades\Auth;
 use App\Models\Enum\SemesterEnum;
 use App\Http\Controllers\Backend\Course\CourseAnnualHelperController;
 use App\Models\ResitStudentAnnual;
+use App\Traits\StudentTrait;
 
 
 
@@ -63,6 +65,8 @@ class CourseAnnualController extends Controller
 {
     use StudentScore;
     use ScoreProp;
+    use StudentTrait;
+    use CourseSessionTrait;
     /**
      * @var CourseAnnualRepositoryContract
      */
@@ -268,15 +272,6 @@ class CourseAnnualController extends Controller
 
     private function getStudentGroupFromDB() {
 
-
-        /*$groups = DB::table('studentAnnuals')
-            ->join('groups', function($query) {
-                $query->on('groups.id', '=', 'studentAnnuals.group_id');
-            })
-            ->select('groups.code', 'groups.id as group_id')
-            ->groupBy('code')
-            ->orderBy('code', 'ASC');*/
-
         $groups = DB::table('groups')
             ->join('studentAnnuals', function($query) {
                 $query->on('groups.id', '=', 'studentAnnuals.group_id');
@@ -284,14 +279,6 @@ class CourseAnnualController extends Controller
             ->select('groups.id as group_id', 'groups.code as group_code')
             ->groupBy('groups.id')
             ->orderBy('group_code');
-
-
-
-
-        /*$groups = DB::table('studentAnnuals')
-            ->select('group')
-            ->groupBy('group')
-            ->orderBy('group', 'ASC');*/
 
         return $groups;
     }
@@ -1010,288 +997,28 @@ class CourseAnnualController extends Controller
         }
     }
 
-
-    private function courseSessionByTeacherFromDB($academicYearId, $grade_id, $degree_id) {
-
-        $arrayCourses = [];
-
-        $courseSessions = $this->getCourseSessionFromDB();
-        $courseSessions = $courseSessions->where('course_annuals.academic_year_id', $academicYearId);
-        if($degree_id) {
-            $courseSessions = $courseSessions->where('course_annuals.degree_id', '=',$degree_id);
-        }
-        if($grade_id) {
-            $courseSessions = $courseSessions->where('course_annuals.grade_id', '=',$grade_id);
-        }
-        $courseSessions = $courseSessions->get();
-
-
-        foreach($courseSessions as $courseSession) {
-            if($courseSession->lecturer_id != null) {
-                $arrayCourses[$courseSession->lecturer_id][] = $courseSession;
-            }
-
-        }
-        return $arrayCourses;
-    }
-
-    private function getCourseSessionFromDB() {
-
-        $courseSessions = DB::table('course_sessions')
-            ->leftJoin('course_annuals', 'course_annuals.id', '=', 'course_sessions.course_annual_id')
-            ->leftJoin('degrees', 'degrees.id', '=', 'course_annuals.degree_id')
-            ->select(
-                'course_sessions.lecturer_id', 'course_sessions.time_course as time_course_session', 'course_sessions.time_td as time_td_session', 'course_sessions.time_tp as time_tp_session',
-                'course_sessions.course_annual_id', 'course_sessions.id as course_session_id', 'course_annuals.department_id', 'course_annuals.degree_id', 'course_annuals.grade_id',
-                'course_annuals.department_option_id', 'course_annuals.semester_id', 'course_annuals.academic_year_id',
-                'course_annuals.name_en as name_en','course_annuals.name_kh', 'course_annuals.name_fr', 'degrees.code as degree_code'
-            );
-
-        return $courseSessions;
-    }
-
-    private function getNotSelectedCourseByDept($deptId, $academicYearId, $grade_id, $degree_id, $dept_option_id, $semester_id) {
-
-        $courseSessions = $this->getCourseSessionFromDB();
-
-        $courseSessions = $courseSessions->where('course_sessions.lecturer_id', '=', null);// this to get not assigned courses
-//        $courseAnnuals = $courseAnnuals->where('course_annuals.employee_id', '=', null);// this to get not assigned courses
-
-
-        if($deptId) {
-            $courseSessions = $courseSessions->where('course_annuals.department_id', $deptId);
-//            $courseAnnuals = $courseAnnuals->where('departments.id', '=',$deptId);
-        }
-        if($academicYearId) {
-            $courseSessions = $courseSessions->where('course_annuals.academic_year_id', $academicYearId);
-//            $courseAnnuals = $courseAnnuals->where('course_annuals.academic_year_id', '=',$academicYearId);
-        }
-
-
-        if($degree_id) {
-            $courseSessions = $courseSessions->where('course_annuals.degree_id', $degree_id);
-//            $courseAnnuals = $courseAnnuals->where('course_annuals.degree_id', '=',$degree_id);
-        }
-
-        if($grade_id) {
-            $courseSessions = $courseSessions->where('course_annuals.grade_id', $grade_id);
-//            $courseAnnuals = $courseAnnuals->where('course_annuals.grade_id', '=',$grade_id);
-        }
-
-        if($dept_option_id != 'null') {
-            $courseSessions = $courseSessions->where('course_annuals.department_option_id', $dept_option_id);
-//            $courseAnnuals = $courseAnnuals->where('course_annuals.department_option_id', '=',$dept_option_id);
-        }
-        if($semester_id) {
-            $courseSessions = $courseSessions->where('course_annuals.semester_id', $semester_id);
-//            $courseAnnuals = $courseAnnuals->where('course_annuals.semester_id', '=',$semester_id);
-        }
-        $courseSessions = $courseSessions->get();
-
-
-
-        return $courseSessions;
-
-    }
-
-    private function getAllteacherByDeptId ($deptID) {
-
-        $allTeachers = DB::table('employees')
-            ->select('employees.name_kh as teacher_name', 'employees.id as teacher_id', 'employees.department_id as department_id')
-            ->where('employees.department_id', $deptID)
-            ->orderBy('teacher_name')
-            ->distinct('BINARY employees.name_kh')
-            ->get();
-
-        return $allTeachers;
-
-    }
-
     public function getAllDepartments(CourseAnnualAssignmentRequest $request) {
 
-
-        $allDepartments= [];
-
-        $deparmentId = $request->department_id;
-        $gradeId = $request->grade_id;
-        $degreeId = $request->degree_id;
-        $academicId = $request->academic_year_id;
-
-
-        $depts = Department::where([
-                ["parent_id",config('access.departments.department_academic')],
-                ['departments.active', '=', true]
-            ])
-            ->select('departments.id as department_id', 'departments.name_en as department_name', 'departments.code as name_abr')
-            ->orderBy('name_abr', 'ASC')
-            ->get();
-
-        foreach($depts as $dept) {
-
-            if($deparmentId == $dept->department_id) {
-
-                $element = array(
-                    "id" => 'department_' . $dept->department_id,
-                    "text" => 'Department '.$dept->name_abr,
-                    "children" => true,
-                    "type" => "department",
-                    "state" => ["opened" => true, "selected" => false ]
-                );
-
-                if($request->tree_side == 'teacher_annual') {
-
-                    array_push($allDepartments, $element);
-
-                } else if($request->tree_side == 'course_annual') {
-
-                    return Response::json(array($element));
-                }
-
-            } else {
-
-                $element = array(
-                    "id" => 'department_' . $dept->department_id,
-                    "text" => 'Department'.$dept->name_abr,
-                    "children" => true,
-                    "type" => "department",
-                    "state" => ["opened" => false, "selected" => false ]
-
-                );
-                array_push($allDepartments, $element);
-            }
-        }
-
+        $allDepartments= $this->get_department_tree($request);
         return Response::json($allDepartments);
     }
 
     public function getAllTeacherByDepartmentId (CourseAnnualAssignmentRequest $request) {
 
-        $teachers = [];
         $department_id = explode('_', $_GET['id'])[1];
-        $academic_year_id = $request->academic_year_id;
-        $grade_id = $request->grade_id;
-        $degree_id = $request->degree_id;
-        $semesters = Semester::get();
-
-        $allTeachers = $this->getAllteacherByDeptId($department_id);
-        $courseByTeacher = $this->courseSessionByTeacherFromDB($academic_year_id, $grade_id, $degree_id);
-
-            foreach ($allTeachers as $teacher) {
-                $selectedCourses = isset($courseByTeacher[$teacher->teacher_id])?$courseByTeacher[$teacher->teacher_id]:null;
-
-                $totalCoursePerSemester=[];
-                $timeTpS1 =0;
-                $timeTpS2 =0;
-                $timeTdS1 =0;
-                $timeTdS2 =0;
-                $timeCourseS1 =0;
-                $timeCourseS2 =0;
-
-                if($selectedCourses !=null) {
-                    foreach($selectedCourses as $course) {
-
-                        $totalCoursePerSemester[$course->semester_id][]=$course->time_tp_session + $course->time_td_session + $course->time_course_session;
-
-                        if($course->semester_id == SemesterEnum::SEMESTER_ONE) {
-
-                            $timeTpS1 = $timeTpS1 +  $course->time_tp_session;
-                            $timeTdS1 =$timeTdS1 + $course->time_td_session;
-                            $timeCourseS1 = $timeCourseS1 + $course->time_course_session;
-
-                        } else {
-                            $timeTpS2 = $timeTpS2 +  $course->time_tp_session;
-                            $timeTdS2 =$timeTdS2 + $course->time_td_session;
-                            $timeCourseS2 = $timeCourseS2 + $course->time_course_session;
-                        }
-
-                    }
-                }
-
-
-
-                if($teacher->department_id == $department_id) {
-                    $t_HourS1 = 0;
-                    $t_HourS2 = 0;
-
-
-                    if(isset($totalCoursePerSemester[SemesterEnum::SEMESTER_ONE])) {
-                        foreach($totalCoursePerSemester[SemesterEnum::SEMESTER_ONE] as $S1_total) {
-                            $t_HourS1 = $t_HourS1 + $S1_total;
-                        }
-                    }
-                    if(isset($totalCoursePerSemester[SemesterEnum::SEMESTER_TWO])) {
-                        foreach($totalCoursePerSemester[SemesterEnum::SEMESTER_TWO] as $S2_toal) {
-                            $t_HourS2 = $t_HourS2 + $S2_toal;
-                        }
-                    }
-
-
-                    $element = array(
-                        "id"        => 'department_'.$department_id.'_teacher_' . $teacher->teacher_id,
-                        "text"      => $teacher->teacher_name.' (S1 = '.$t_HourS1. ' | S2 = '.$t_HourS2.')',
-                        "children"  => true,
-                        "type"      => "teacher",
-                        "state"     => ["opened" => true, "selected" => false ],
-                        "li_attr"   => [
-                            'class'         => 'teacher',
-                            'time_tp'       => ' (S1 = '.$timeTpS1. ' | S2 = '.$timeTpS2.')',
-                            'time_td'       => ' (S1 = '.$timeTdS1. ' | S2 = '.$timeTdS2.')',
-                            'time_course'  => ' (S1 = '.$timeCourseS1. ' | S2 = '.$timeCourseS2.')'
-                        ],
-
-                    );
-                    array_push($teachers, $element);
-
-                } else {
-                    $element = array(
-                        "id" => 'department_'.$department_id.'_teacher_' . $teacher->teacher_id,
-                        "text" =>  $teacher->teacher_name.' (S1 = '.$t_HourS1. ' | S2 = '.$t_HourS2.')',
-                        "children" => true,
-                        "type" => "teacher",
-                        "state" => ["opened" => false, "selected" => false ],
-                        "li_attr" => [
-                            'class' => 'teacher',
-                            'time_tp'       => ' (S1 = '.$timeTpS1. ' | S2 = '.$timeTpS2.')',
-                            'time_td'       => ' (S1 = '.$timeTdS1. ' | S2 = '.$timeTdS2.')',
-                            'time_course'  => ' (S1 = '.$timeCourseS1. ' | S2 = '.$timeCourseS2.')'
-                        ],
-
-                    );
-                    array_push($teachers, $element);
-                }
-            }
-
+        $teachers = $this->all_teacher_by_department($request, $department_id);
         return Response::json($teachers);
-
-    }
-
-
-    private function getGroupBySessionAndAnnualCourse() {
-
-        $array =[];
-        $groups = DB::table('course_annual_classes')->get();
-
-        foreach($groups as $group) {
-            if($group->course_session_id != null) {
-                $array[$group->course_session_id][] = $group;
-            }
-        }
-        return ($array);
 
     }
 
     public function getSeletedCourseByTeacherID(CourseAnnualAssignmentRequest $request) {
 
         $courses = [];
-        $arayCourse =[];
         $academic_year_id = $request->academic_year_id;
         $grade_id = $request->grade_id;
         $degree_id = $request->degree_id;
         $parent_id = $_GET['id'];
         $teacher_id = explode('_', $_GET['id'])[3];
-
-        $arrayCourseSelected=[];
-
 
         $courseByTeacher = $this->courseSessionByTeacherFromDB($academic_year_id, $grade_id, $degree_id );
         $selectedCourses = isset($courseByTeacher[$teacher_id])?$courseByTeacher[$teacher_id]:null;
@@ -1319,12 +1046,6 @@ class CourseAnnualController extends Controller
 
             }
 
-//            $res = array_map("unserialize", array_unique(array_map("serialize", $courses)));
-//
-//            foreach ($res as $a) {
-//                array_push($arayCourse, $a);
-//            }
-
             return Response::json($courses);
         }
 
@@ -1343,58 +1064,8 @@ class CourseAnnualController extends Controller
 
     public function getAllCourseByDepartment (Request $request) {
 
-        //CourseAnnualAssignmentRequest
-
         $deptId = explode('_', $_GET['id'])[1];
-        $arrayCourses = [];
-        $Course = [];
-        $academic_year_id = $request->academic_year_id;
-        $grade_id = $request->grade_id;
-        $degree_id = $request->degree_id;
-        $dept_option_id = $request->department_option_id;
-        $semester_id = $request->semester_id;
-
-        $notSelectedCourses = $this->getNotSelectedCourseByDept($deptId, $academic_year_id, $grade_id, $degree_id, $dept_option_id, $semester_id);
-        $groupFromDB = $this->getGroupBySessionAndAnnualCourse();
-
-        if($notSelectedCourses) {
-
-            foreach($notSelectedCourses as $course) {
-
-                $totalCoursePerSemester = $course->time_tp_session + $course->time_td_session + $course->time_course_session;
-
-                $splitName = explode('_', $course->name_en);
-                $copy = $splitName[count($splitName)-1];
-
-                $element = array(
-                    "id" => 'department_'.$deptId.'_course_' . $course->course_session_id,
-                    "text" => $course->name_en.' (S_'.$course->semester_id.' = '.$totalCoursePerSemester.')'. (isset($groupFromDB[$course->course_session_id])?' (Group:'.$this->formatGroupName($groupFromDB[$course->course_session_id]).')':''),
-                    "li_attr" => [
-                        'class' => 'department_course '.(($copy == '(copy)')?'current_copy':''),
-                        'tp'    => $course->time_tp_session,
-                        'td'    => $course->time_td_session,
-                        'course' => $course->time_course_session,
-                        'course_name' => $course->name_en
-                    ],
-
-                    'grade' => $course->grade_id,
-                    "type" => "course",
-                    "state" => ["opened" => false, "selected" => false ]
-
-                );
-
-                array_push($arrayCourses, $element);
-
-            }
-
-        }
-
-//        $res = array_map("unserialize", array_unique(array_map("serialize", $arrayCourses)));
-//
-//        foreach ($res as $a) {
-//            array_push($Course, $a);
-//        }
-
+        $arrayCourses = $this->allCourseByDepartment($request, $deptId);
         return Response::json($arrayCourses);
 
     }
@@ -2105,9 +1776,9 @@ class CourseAnnualController extends Controller
 
         $array_groups = [];
         $groups = DB::table('course_annual_classes')
-            ->select('group')
+            ->select('group_id')
             ->where('course_annual_id',$courseAnnualId)
-            ->lists('group');
+            ->lists('group_id');
         foreach($groups as $group) {
             if($group !=null) {
                 $array_groups[] = $group;
@@ -2131,11 +1802,12 @@ class CourseAnnualController extends Controller
 
         $arrayIdsOfDeptDegreeGradeDeptOption = $this->arrayIdsOfDeptGradeDegreeDeptOption($courseAnnualId);
 
+
         $department_ids = $arrayIdsOfDeptDegreeGradeDeptOption['department_id'];
         $degree_ids = $arrayIdsOfDeptDegreeGradeDeptOption['degree_id'];
         $grade_ids = $arrayIdsOfDeptDegreeGradeDeptOption['grade_id'];
         $department_option_ids = $arrayIdsOfDeptDegreeGradeDeptOption['department_option_id'];
-        $groups = $arrayIdsOfDeptDegreeGradeDeptOption['group'];
+        $groups = $arrayIdsOfDeptDegreeGradeDeptOption['group'];// lists of group_ids
 
 
         $columnName = $this->getPropertiesFromScoreTable($courseAnnualId);
@@ -2155,7 +1827,6 @@ class CourseAnnualController extends Controller
         $allNumberAbsences = $this->getAbsenceFromDB();
         $resitScores = $this->resitScoreFromDB($courseAnnualId);//Trait/ScoreProp
 
-
         if(count($department_option_ids)>0) {
             $studentByCourse = $studentByCourse->whereIn('studentAnnuals.department_option_id', $department_option_ids);
 
@@ -2163,10 +1834,10 @@ class CourseAnnualController extends Controller
 
         //----if has reqest selection groups in one course annual ----
         if($request_group != null) {
-            $studentByCourse = $studentByCourse->where('studentAnnuals.group', $request_group)->get();
+            $studentByCourse = $studentByCourse->where('studentAnnuals.group_id', $request_group)->get();
         } else {
             if(count($groups)) {
-                $studentByCourse = $studentByCourse->whereIn('studentAnnuals.group', $groups)->get();
+                $studentByCourse = $studentByCourse->whereIn('studentAnnuals.group_id', $groups)->get();
             } else {
                 $studentByCourse = $studentByCourse->orderBy('students.name_latin')->get();
             }
@@ -2326,8 +1997,6 @@ class CourseAnnualController extends Controller
         if($inputs) {
 
             foreach($inputs as $input) {
-
-
                 if($input['score_id'] != null) {
                     $updateScore = $this->courseAnnualScores->update($input['score_id'], $input);
 
@@ -2431,37 +2100,6 @@ class CourseAnnualController extends Controller
 
     }
 
-    public function getStudentByDeptIdGradeIdDegreeId($deptId, $degreeId, $gradeId, $academicYearID) {
-
-
-        $studentAnnual = DB::table('students')
-            ->join('studentAnnuals', 'studentAnnuals.student_id', '=', 'students.id')
-            ->leftJoin('redouble_student', 'students.id', '=', 'redouble_student.student_id')
-            ->leftJoin('redoubles', 'redoubles.id', '=', 'redouble_student.redouble_id')
-
-            ->join('genders', 'genders.id', '=', 'students.gender_id')
-            ->whereIn('studentAnnuals.department_id', $deptId)
-            ->whereIn('studentAnnuals.degree_id', $degreeId)
-            ->whereIn('studentAnnuals.grade_id', $gradeId)
-            ->where('studentAnnuals.academic_year_id', $academicYearID)
-            ->select(
-                'studentAnnuals.id as student_annual_id',
-                'students.name_latin',
-                'students.name_kh','students.radie',
-                'students.id_card','students.id as student_id',
-                'genders.code',
-                'studentAnnuals.group',
-                'studentAnnuals.academic_year_id',
-                'studentAnnuals.department_id',
-                'studentAnnuals.department_option_id',
-                'studentAnnuals.degree_id',
-                'students.observation',
-                'studentAnnuals.remark',
-                'redoubles.name_en as redouble_name'
-            )
-            ->orderBy('students.name_latin');
-        return $studentAnnual;
-    }
 
 
     private function createScorePercentage($midterm, $final, $courseAnnualId) {
@@ -2915,7 +2553,6 @@ class CourseAnnualController extends Controller
         }
         //----end if course-program
 
-
         $extra_rows = $this->find_max_min_average_mark();
         $data_empty = $extra_rows['data_empty'];
         $max_array = $extra_rows['max'];
@@ -2999,63 +2636,15 @@ class CourseAnnualController extends Controller
         }
 
 
-        $array_student_observation=[];
-        $idCardPointToStudent= [];
-        $students = DB::table('students')
-            ->leftJoin('studentAnnuals', 'studentAnnuals.student_id', '=', 'students.id')
-            ->leftJoin('redouble_student', 'students.id', '=', 'redouble_student.student_id')
-
-            ->leftJoin('redoubles', 'redoubles.id', '=', 'redouble_student.redouble_id')
-            ->leftJoin('histories', 'histories.id', '=', 'studentAnnuals.history_id')
-            ->leftJoin('scholarship_student_annual', 'studentAnnuals.id', '=', 'scholarship_student_annual.student_annual_id')
-            ->leftJoin('scholarships', 'scholarships.id', '=', 'scholarship_student_annual.scholarship_id')
-            ->select(
-                'scholarships.name_en as scholarship_name',
-                'redoubles.name_en as redouble_name',
-                'histories.name_en as history_name',
-                'students.id_card', 'students.id as student_id', 'students.radie',
-                'studentAnnuals.id as student_annual_id',
-                'redouble_student.academic_year_id'
-            )
-            ->whereIn('id_card', $array_student_id_card['id_card'])
-            ->whereIn('studentAnnuals.id', $array_student_id_card['student_annual_id'])
-            ->orderBy('studentAnnuals.id')
-            ->get();
-
-        $studentRedoubleHistory = [];
-
-        foreach($students as $student ) {
-
-            $idCardPointToStudent[$student->id_card] = $student;
-            $observation_info= '';
-            if(isset($array_student_observation[$student->id_card])) {
-
-                if($student->academic_year_id != $academicYearID) {
-                    $studentRedoubleHistory[$student->id_card] = $student->redouble_name;
-                    $new_str_info = $student->redouble_name.' '.$array_student_observation[$student->id_card];
-                    $array_student_observation[$student->id_card] = $new_str_info;
-                }
-
-            } else {
-
-
-                if($student->academic_year_id != $academicYearID) {
-
-                    $studentRedoubleHistory[$student->id_card] = $student->redouble_name;
-                    $observation_info = $observation_info.' '.$student->redouble_name;
-                    $observation_info = $observation_info.' '.$student->history_name;
-                    $observation_info = $observation_info.' '.$student->scholarship_name;
-                    $array_student_observation[$student->id_card] = $observation_info;
-                }
-            }
-        }
 
         $array_tmp_rank = [];
+        $function_data = $this->student_hisory($array_student_id_card['id_card'], $array_student_id_card['student_annual_id'], $academicYearID);
+        $array_student_observation=$function_data['student_observation'];
+        $idCardPointToStudent= $function_data['id_card_to_student'];
+        $studentRedoubleHistory = $function_data['history'];
 
         foreach($element as $key => $value) {
             $index++;
-
-
 
             $total_number_absences = 0;
             $both_semester = 0;
@@ -3265,9 +2854,6 @@ class CourseAnnualController extends Controller
     }
 
 
-
-
-
     private function numberRattrapage($arrayFailSubject) {
 
         $subjectRattrapages = $this->findRattrapageSubject($arrayFailSubject);
@@ -3437,9 +3023,6 @@ class CourseAnnualController extends Controller
        }
     }
 
-    private function calculateScoreByCredit($credit, $score_by_course) {
-        return $score_by_course * $credit;
-    }
 
     private function calculateFinalMoyenne($arrayScore, $array_totalCreditBySemester) {
         $allScore = array_sum($arrayScore);
@@ -3458,226 +3041,62 @@ class CourseAnnualController extends Controller
 
                 foreach($annualCourses as $eachCourse) {
 
-                    $groupByCourseAnnual = isset($groups[$eachCourse->course_annual_id])?$groups[$eachCourse->course_annual_id]:null;
-
-                    if($deptOptionId = $eachCourse->department_option_id) {
-
-                        $filtered_students =  $this->getStudentByDeptIdGradeIdDegreeId([$eachCourse->department_id], [$eachCourse->degree_id], [$eachCourse->grade_id], $eachCourse->academic_year_id);
-                        $filtered_students = $filtered_students->whereIn('studentAnnuals.department_option_id', [$deptOptionId]);
-
-                        if($groupByCourseAnnual != null) {
-                            $filtered_students = $filtered_students->whereIn('group', $groupByCourseAnnual)->get();
-                        } else {
-                            $filtered_students =  $filtered_students->get();//->where('studentAnnuals.group', null)->get();
-                        }
-
-                    } else {
-
-                        $filtered_students =  $this->getStudentByDeptIdGradeIdDegreeId([$eachCourse->department_id], [$eachCourse->degree_id], [$eachCourse->grade_id], $eachCourse->academic_year_id);
-
-                        if($groupByCourseAnnual != null) {
-                            $filtered_students = $filtered_students->whereIn('group', $groupByCourseAnnual)->get();
-                        } else {
-                            $filtered_students =  $filtered_students->get();//->where('studentAnnuals.group', null)->get();
-                        }
-
-                    }
+                    $filtered_students = $this->filtering_student_annual($eachCourse, $groups);
 
                     foreach($filtered_students as $stu_dent) {
 
                         $array_observation[$stu_dent->id_card] = $stu_dent;
                         $each_score = isset($eachCourseAnnualScores[$eachCourse->course_annual_id])?(isset($eachCourseAnnualScores[$eachCourse->course_annual_id][$stu_dent->student_annual_id])?$this->compareResitScore($eachCourseAnnualScores[$eachCourse->course_annual_id][$stu_dent->student_annual_id]):0):0;
-
-                        if($each_score > ScoreEnum::Zero) {
-                            $each_column_score[$eachCourse->course_id][$stu_dent->id_card] = $each_score;
-                        }
-
-                        $element[$stu_dent->id_card] = [
-                            'number'  => "",
-                            'student_id_card' => trim($stu_dent->id_card),
-                            'student_name' => trim(strtoupper($stu_dent->name_latin)),
-                            'student_gender' => trim($stu_dent->code),
-                            'total' => "0",
-
-                        ];
+                        $each_column_score = $this->score_constraint($each_score, $eachCourse, $stu_dent, $each_column_score);
+                        $element = $this->init_element($stu_dent, $element);
 
                         //--------request for only one semester ------
                         $absence_by_course = isset($absences[$eachCourse->course_annual_id])?(isset($absences[$eachCourse->course_annual_id][$stu_dent->student_annual_id])?$absences[$eachCourse->course_annual_id][$stu_dent->student_annual_id]:null):null;
-                        if($semesterId) {
+                        $each_element_semester = $this->add_element_by_semester($each_score, $semesterId, $semesters, $eachCourse, $stu_dent, $element, $absence_by_course, $totalMoyenne, $totalAbs , $array_student_id_card);
 
-                            if($eachCourse->is_counted_creditability) {
-                                $totalMoyenne[$stu_dent->id_card][$semesterId][] =  $this->calculateScoreByCredit($eachCourse->course_annual_credit, $each_score);
-                            }
-
-                            $totalAbs[$stu_dent->id_card][$semesterId][] = isset($absence_by_course)?$absence_by_course->num_absence:0 ;
-                            $element[$stu_dent->id_card] = $element[$stu_dent->id_card] + ["S_".$eachCourse->semester_id => "total_".$eachCourse->semester_id];
+                        if($each_element_semester != false) {
+                            $totalMoyenne = $each_element_semester['total_moyenne'];
+                            $totalAbs = $each_element_semester['abs'];
+                            $element = $each_element_semester['element'];
+                            $array_student_id_card = $each_element_semester['student_id_card'];
 
                         } else {
-                            foreach($semesters as $semester) {
-
-                                if($eachCourse->semester_id == $semester->id) {
-
-
-                                    if($eachCourse->is_counted_creditability) {
-                                        $totalMoyenne[$stu_dent->id_card][$semester->id][] =  $this->calculateScoreByCredit($eachCourse->course_annual_credit, $each_score);
-                                    }
-
-                                    $totalAbs[$stu_dent->id_card][$semester->id][] = isset($absence_by_course)?$absence_by_course->num_absence:0 ;
-                                }
-                                $element[$stu_dent->id_card] = $element[$stu_dent->id_card] + ["S_".$semester->id => "total_".$semester->id];
-                            }
+                            return $this->empty_data();
                         }
-
-                        if($eachCourse->is_counted_creditability) {
-
-                            if($each_score < ScoreEnum::Under_30) {
-
-                                $check_redouble = $this->checkRedouble($stu_dent, $eachCourse->academic_year_id);//---check this current year if student has been change in redouble
-                                /*----create one redouble record for this student ----*/
-                                /*---before create redouble record, we have to check if the student has already marked as redouble for this year --then we skip ---*/
-                                if($check_redouble === null) {
-                                    if($eachCourse->degree_id == ScoreEnum::Degree_I) {
-                                        $this->createRedoubleRecord($stu_dent, $redName = trim(ScoreEnum::Red_I.$eachCourse->grade_id), $eachCourse->academic_year_id, $isChanged = false);
-                                    } else {
-                                        $this->createRedoubleRecord($stu_dent, $redName = trim(ScoreEnum::Red_T.$eachCourse->grade_id), $eachCourse->academic_year_id, $isChanged = false);
-                                    }
-
-                                }
-
-                                $fail_subjects[$stu_dent->id_card]['fail'][] = array('credit'=> $eachCourse->course_annual_credit, 'score'=> $each_score, 'course_annual_id' => $eachCourse->course_annual_id, 'student_annual_id' => $stu_dent->student_annual_id);
-                            } else {
-                                $fail_subjects[$stu_dent->id_card]['pass'][] = array('credit'=> $eachCourse->course_annual_credit, 'score'=> $each_score, 'course_annual_id' => $eachCourse->course_annual_id, 'student_annual_id' => $stu_dent->student_annual_id);
-                            }
-                        }
-
-
-                        if(isset($element[$stu_dent->id_card])) {
-                            $array_student_id_card ['id_card'][] =$stu_dent->id_card;
-                            $array_student_id_card ['student_annual_id'][] =$stu_dent->student_annual_id;
-                            $element[$stu_dent->id_card] = $element[$stu_dent->id_card] + ["Abs_".htmlspecialchars($eachCourse->course_id)."_".$eachCourse->semester_id =>  isset($absence_by_course)?$absence_by_course->num_absence:"", "Credit_".htmlspecialchars($eachCourse->course_id)."_".$eachCourse->semester_id => $this->floatFormat($each_score)];
-                        } else {
-                            return [
-                                'status' => false,
-                                'element' =>[],
-                                'absence' => [],
-                                'moyenne' => [],
-                                'each_column_score' => [],
-                                'fail_subject' => []
-                            ];
-                        }
+                        $fail_subjects = $this->generating_student_redouble($eachCourse, $stu_dent, $each_score, $fail_subjects);
 
                     }
-
                 }
 
-
             } else {
-
                 //---course-program and course-annual are the same (one to one)
 
                 foreach($annualCourses as $course) {
                     $tmpCourse = $course;
-
-                    $groupByCourseAnnual = isset($groups[$course->course_annual_id])?$groups[$course->course_annual_id]:null;
-
-                    if($deptOptionId = $course->department_option_id) {
-
-                        $filtered_students =  $this->getStudentByDeptIdGradeIdDegreeId([$course->department_id], [$course->degree_id], [$course->grade_id], $course->academic_year_id);
-                        $filtered_students = $filtered_students->whereIn('studentAnnuals.department_option_id', [$deptOptionId]);
-
-                        if($groupByCourseAnnual != null) {
-                            $filtered_students = $filtered_students->whereIn('group', $groupByCourseAnnual)->get();
-                        } else {
-                            $filtered_students =  $filtered_students->get();//->where('studentAnnuals.group', null)->get();
-                        }
-
-                    } else {
-                        $filtered_students =  $this->getStudentByDeptIdGradeIdDegreeId([$course->department_id], [$course->degree_id], [$course->grade_id], $course->academic_year_id);
-
-                        if($groupByCourseAnnual != null) {
-                            $filtered_students = $filtered_students->whereIn('group', $groupByCourseAnnual)->get();
-                        } else {
-                            $filtered_students =  $filtered_students->get();//->where('studentAnnuals.group', null)->get();
-                        }
-                    }
+                    $filtered_students = $this->filtering_student_annual($course, $groups);
                 }
-
                 foreach($filtered_students as $stu_dent) {
                     $array_observation[$stu_dent->id_card] = $stu_dent;
                     //-----$annualCourses[0] this array contains only one course annual that which this course is the same withe course program
                     $absence_by_course = isset($absences[$tmpCourse->course_annual_id])?(isset($absences[$tmpCourse->course_annual_id][$stu_dent->student_annual_id])?$absences[$tmpCourse->course_annual_id][$stu_dent->student_annual_id]:null):null;
                     $each_score = isset($eachCourseAnnualScores[$tmpCourse->course_annual_id])?(isset($eachCourseAnnualScores[$tmpCourse->course_annual_id][$stu_dent->student_annual_id])?$this->compareResitScore($eachCourseAnnualScores[$tmpCourse->course_annual_id][$stu_dent->student_annual_id]):0):0;
+                    $each_column_score = $this->score_constraint($each_score, $tmpCourse, $stu_dent, $each_column_score);
+                    $element = $this->init_element($stu_dent,$element );
 
-                    if($each_score > ScoreEnum::Zero) {//----student with score 0 consider as giving up studying do not count for jurring student average
-                        $each_column_score[$tmpCourse->course_id][$stu_dent->id_card] = $each_score;
-                    }
-                    $element[$stu_dent->id_card] = [
-                        'number' => "",
-                        'student_id_card' => trim($stu_dent->id_card),
-                        'student_name' => trim(strtoupper($stu_dent->name_latin)),
-                        'student_gender' => trim($stu_dent->code),
-                        'total' => "0"
-                    ];
                     //--------request for only one semester ------
-                    if($semesterId) {
 
-                        if($tmpCourse->is_counted_creditability) {
-                            $totalMoyenne[$stu_dent->id_card][$semesterId][] =  $this->calculateScoreByCredit($tmpCourse->course_annual_credit, $each_score);
-                        }
-                        $totalAbs[$stu_dent->id_card][$semesterId][] = isset($absence_by_course)?$absence_by_course->num_absence:0;
-                        $element[$stu_dent->id_card] = $element[$stu_dent->id_card] + ['S_'.$tmpCourse->semester_id => 'Total_S_'.$tmpCourse->semester_id];
+                    $each_element_semester = $this->add_element_by_semester($each_score, $semesterId, $semesters, $tmpCourse, $stu_dent, $element, $absence_by_course, $totalMoyenne, $totalAbs, $array_student_id_card );
+                    if($each_element_semester != false) {
+                        $totalMoyenne = $each_element_semester['total_moyenne'];
+                        $totalAbs = $each_element_semester['abs'];
+                        $element = $each_element_semester['element'];
+                        $array_student_id_card = $each_element_semester['student_id_card'];
 
                     } else {
-                        foreach($semesters as $semester) {
-                            if($semester->id == $tmpCourse->semester_id) {
-                                if($tmpCourse->is_counted_creditability) {
-                                    $totalMoyenne[$stu_dent->id_card][$semester->id][]=  $this->calculateScoreByCredit($tmpCourse->course_annual_credit, $each_score);
-                                }
-                                $totalAbs[$stu_dent->id_card][$semester->id][] = isset($absence_by_course)?$absence_by_course->num_absence:0 ;
-
-                            }
-                            $element[$stu_dent->id_card] = $element[$stu_dent->id_card] + ['S_'.$semester->id => 'Total_S_'.$semester->id];
-                        }
+                        return $this->empty_data();
                     }
+                    $fail_subjects = $this->generating_student_redouble($tmpCourse, $stu_dent, $each_score, $fail_subjects);
 
-                    if($tmpCourse->is_counted_creditability) {
-
-                        if($each_score < ScoreEnum::Under_30) {
-
-
-                            $check_redouble = $this->checkRedouble($stu_dent, $tmpCourse->academic_year_id);//---check this current year if student has been change in redouble
-                            /*----create one redouble record for this student ----*/
-                            /*---before create redouble record, we have to check if the student has already marked as redouble for this year --then we skip ---*/
-                            if($check_redouble === null) {
-                                if($tmpCourse->degree_id == ScoreEnum::Degree_I) {
-                                    $this->createRedoubleRecord($stu_dent, $redName = trim(ScoreEnum::Red_I.$tmpCourse->grade_id), $tmpCourse->academic_year_id, $isChanged = false);
-                                } else {
-                                    $this->createRedoubleRecord($stu_dent, $redName = trim(ScoreEnum::Red_T.$tmpCourse->grade_id), $tmpCourse->academic_year_id, $isChanged = false);
-                                }
-
-                            }
-
-                            $fail_subjects[$stu_dent->id_card]['fail'][] = array('credit'=> $tmpCourse->course_annual_credit, 'score'=> $each_score, 'course_annual_id' => $tmpCourse->course_annual_id, 'student_annual_id' => $stu_dent->student_annual_id);
-                        } else {
-                            $fail_subjects[$stu_dent->id_card]['pass'][] = array('credit'=> $tmpCourse->course_annual_credit, 'score'=> $each_score, 'course_annual_id' => $tmpCourse->course_annual_id, 'student_annual_id' => $stu_dent->student_annual_id);
-                        }
-                    }
-
-
-                    if(isset($element[$stu_dent->id_card])) {
-                        $array_student_id_card ['id_card'][] =$stu_dent->id_card;
-                        $array_student_id_card ['student_annual_id'][] =$stu_dent->student_annual_id;
-                        $element[$stu_dent->id_card] = $element[$stu_dent->id_card] + ['Abs'.'_'.htmlspecialchars($tmpCourse->course_id).'_'.$tmpCourse->semester_id =>  isset($absence_by_course)?$absence_by_course->num_absence:"", 'Credit'.'_'.htmlspecialchars($tmpCourse->course_id).'_'.$tmpCourse->semester_id => $this->floatFormat($each_score)];
-                    } else {
-                        return [
-                            'status' => false,
-                            'element' =>[],
-                            'absence' => [],
-                            'moyenne' => [],
-                            'each_column_score' => [],
-                            'fail_subject' => []
-                        ];
-                    }
                 }
             }
         } else {
@@ -3686,90 +3105,25 @@ class CourseAnnualController extends Controller
 
                 foreach($annualCourses as $eachCourse) {
 
-                    $groupByCourseAnnual = isset($groups[$eachCourse->course_annual_id])?$groups[$eachCourse->course_annual_id]:null;
+                    $filtered_students = $this->filtering_student_annual($eachCourse, $groups);
 
-                    if($deptOptionId = $eachCourse->department_option_id) {
-
-                        $filtered_students =  $this->getStudentByDeptIdGradeIdDegreeId([$eachCourse->department_id], [$eachCourse->degree_id], [$eachCourse->grade_id], $eachCourse->academic_year_id);
-                        $filtered_students = $filtered_students->whereIn('studentAnnuals.department_option_id', [$deptOptionId]);
-
-                        if($groupByCourseAnnual != null) {
-                            $filtered_students = $filtered_students->whereIn('group', $groupByCourseAnnual)->get();
-                        } else {
-                            $filtered_students =  $filtered_students->get();//->where('studentAnnuals.group', null)->get();
-                        }
-
-                    } else {
-                        $filtered_students =  $this->getStudentByDeptIdGradeIdDegreeId([$eachCourse->department_id], [$eachCourse->degree_id], [$eachCourse->grade_id], $eachCourse->academic_year_id);
-
-                        if($groupByCourseAnnual != null) {
-                            $filtered_students = $filtered_students->whereIn('group', $groupByCourseAnnual)->get();
-                        } else {
-                            $filtered_students =  $filtered_students->get();//->where('studentAnnuals.group', null)->get();
-                        }
-                    }
                     foreach($filtered_students as $stu_dent) {
 
                         $array_observation[$stu_dent->id_card] = $stu_dent;
                         $absence_by_course = isset($absences[$eachCourse->course_annual_id])?(isset($absences[$eachCourse->course_annual_id][$stu_dent->student_annual_id])?$absences[$eachCourse->course_annual_id][$stu_dent->student_annual_id]:null):null;
                         $each_score = isset($eachCourseAnnualScores[$eachCourse->course_annual_id])?(isset($eachCourseAnnualScores[$eachCourse->course_annual_id][$stu_dent->student_annual_id])?$this->compareResitScore($eachCourseAnnualScores[$eachCourse->course_annual_id][$stu_dent->student_annual_id]):0):0;
+                        $each_column_score = $this->score_constraint($each_score, $eachCourse, $stu_dent, $each_column_score);
 
-                        if($each_score > ScoreEnum::Zero) {//----student with score 0 consider as giving up studying do not count for jurring student average
-                            $each_column_score[$eachCourse->course_id][$stu_dent->id_card] = $each_score;
-                        }
-                        if($semesterId) {
-                            if($eachCourse->is_counted_creditability) {
-                                $totalMoyenne[$stu_dent->id_card][$semesterId][] = $this->calculateScoreByCredit($eachCourse->course_annual_credit, $each_score);
-                            }
-
-                            $totalAbs[$stu_dent->id_card][$semesterId][] = isset($absence_by_course)?$absence_by_course->num_absence:0;
-
+                        $each_element_semester = $this->concate_element_by_semester($each_score, $semesterId, $semesters, $eachCourse, $stu_dent, $element, $absence_by_course, $totalMoyenne, $totalAbs);
+                        if($each_element_semester == false) {
+                            return $this->empty_data();
                         } else {
-                            foreach($semesters as $semester) {
-                                if($semester->id == $eachCourse->semester_id) {
-                                    if($eachCourse->is_counted_creditability) {
-                                        $totalMoyenne[$stu_dent->id_card][$semester->id][] =  $this->calculateScoreByCredit($eachCourse->course_annual_credit, $each_score);
-                                    }
-
-                                    $totalAbs[$stu_dent->id_card][$semester->id][] = isset($absence_by_course)?$absence_by_course->num_absence:0;
-
-                                }
-                            }
+                            $totalMoyenne = $each_element_semester['total_moyenne'];
+                            $totalAbs = $each_element_semester['abs'];
+                            $element = $each_element_semester['element'];
                         }
 
-                        if($eachCourse->is_counted_creditability) {
-                            if($each_score < ScoreEnum::Under_30) {
-
-                                $check_redouble = $this->checkRedouble($stu_dent, $eachCourse->academic_year_id);//---check this current year if student has been change in redouble
-                                /*----create one redouble record for this student ----*/
-                                /*---before create redouble record, we have to check if the student has already marked as redouble for this year --then we skip ---*/
-                                if($check_redouble === null) {
-                                    if($eachCourse->degree_id == ScoreEnum::Degree_I) {
-                                        $this->createRedoubleRecord($stu_dent, $redName = trim(ScoreEnum::Red_I.$eachCourse->grade_id), $eachCourse->academic_year_id, $isChanged = false);
-                                    } else {
-                                        $this->createRedoubleRecord($stu_dent, $redName = trim(ScoreEnum::Red_T.$eachCourse->grade_id), $eachCourse->academic_year_id, $isChanged = false);
-                                    }
-
-                                }
-
-                                $fail_subjects[$stu_dent->id_card]['fail'][] = array('credit'=> $eachCourse->course_annual_credit, 'score'=> $each_score, 'course_annual_id' => $eachCourse->course_annual_id, 'student_annual_id' => $stu_dent->student_annual_id);
-                            } else {
-                                $fail_subjects[$stu_dent->id_card]['pass'][] = array('credit'=> $eachCourse->course_annual_credit, 'score'=> $each_score, 'course_annual_id' => $eachCourse->course_annual_id, 'student_annual_id' => $stu_dent->student_annual_id);
-                            }
-                        }
-
-                        if(isset($element[$stu_dent->id_card])) {
-                            $element[$stu_dent->id_card] = $element[$stu_dent->id_card] + ['Abs'.'_'.htmlspecialchars($eachCourse->course_id).'_'.$eachCourse->semester_id =>  isset($absence_by_course)?$absence_by_course->num_absence:"" , 'Credit'.'_'.htmlspecialchars($eachCourse->course_id).'_'.$eachCourse->semester_id => $this->floatFormat($each_score)];
-                        } else {
-                            return [
-                                'status' => false,
-                                'element' =>[],
-                                'absence' => [],
-                                'moyenne' => [],
-                                'each_column_score' => [],
-                                'fail_subject' => []
-                            ];
-                        }
+                        $fail_subjects = $this->generating_student_redouble($eachCourse, $stu_dent, $each_score, $fail_subjects);
 
                     }
                 }
@@ -3780,30 +3134,7 @@ class CourseAnnualController extends Controller
 
                 foreach($annualCourses as $eachCourse) {
                     $tmpCourse = $eachCourse;
-
-                    $groupByCourseAnnual = isset($groups[$eachCourse->course_annual_id])?$groups[$eachCourse->course_annual_id]:null;
-
-                    if($deptOptionId = $eachCourse->department_option_id) {
-
-                        $filtered_students =  $this->getStudentByDeptIdGradeIdDegreeId([$eachCourse->department_id], [$eachCourse->degree_id], [$eachCourse->grade_id], $eachCourse->academic_year_id);
-                        $filtered_students = $filtered_students->whereIn('studentAnnuals.department_option_id', [$deptOptionId]);
-
-                        if($groupByCourseAnnual != null) {
-                            $filtered_students = $filtered_students->whereIn('group', $groupByCourseAnnual)->get();
-                        } else {
-                            $filtered_students =  $filtered_students->get();//->where('studentAnnuals.group', null)->get();
-                        }
-
-                    } else {
-                        $filtered_students =  $this->getStudentByDeptIdGradeIdDegreeId([$eachCourse->department_id], [$eachCourse->degree_id], [$eachCourse->grade_id], $eachCourse->academic_year_id);
-
-                        if($groupByCourseAnnual != null) {
-                            $filtered_students = $filtered_students->whereIn('group', $groupByCourseAnnual)->get();
-                        } else {
-                            $filtered_students =  $filtered_students->get();//->where('studentAnnuals.group', null)->get();
-                        }
-
-                    }
+                    $filtered_students = $this->filtering_student_annual($eachCourse, $groups);
                 }
 
                 foreach($filtered_students as $stu_dent) {
@@ -3813,62 +3144,19 @@ class CourseAnnualController extends Controller
                     $absence_by_course = isset($absences[$tmpCourse->course_annual_id])?(isset($absences[$tmpCourse->course_annual_id][$stu_dent->student_annual_id])?$absences[$tmpCourse->course_annual_id][$stu_dent->student_annual_id]:null):null;
                     $each_score = isset($eachCourseAnnualScores[$tmpCourse->course_annual_id])?(isset($eachCourseAnnualScores[$tmpCourse->course_annual_id][$stu_dent->student_annual_id])?$this->compareResitScore($eachCourseAnnualScores[$tmpCourse->course_annual_id][$stu_dent->student_annual_id]):0):0;
 
-                    if($each_score > ScoreEnum::Zero) {//----student with score 0 consider as giving up studying do not count for jurring student average
-                        $each_column_score[$tmpCourse->course_id][$stu_dent->id_card] = $each_score;
-                    }
+                    $each_column_score = $this->score_constraint($each_score, $tmpCourse, $stu_dent, $each_column_score);
 
-                    if($semesterId) {
-                        if($tmpCourse->is_counted_creditability) {
-                            $totalMoyenne[$stu_dent->id_card][$semesterId][] =  $this->calculateScoreByCredit($tmpCourse->course_annual_credit, $each_score);
-                        }
 
-                        $totalAbs[$stu_dent->id_card][$semesterId][] = isset($absence_by_course)?$absence_by_course->num_absence:0 ;
-
+                    $each_element_semester = $this->concate_element_by_semester($each_score, $semesterId, $semesters, $tmpCourse, $stu_dent, $element, $absence_by_course, $totalMoyenne, $totalAbs);
+                    if($each_element_semester == false) {
+                        return $this->empty_data();
                     } else {
-                        foreach($semesters as $semester) {
-                            if($semester->id == $tmpCourse->semester_id) {
-                                if($tmpCourse->is_counted_creditability) {
-                                    $totalMoyenne[$stu_dent->id_card][$semester->id][] =  $this->calculateScoreByCredit($tmpCourse->course_annual_credit, $each_score);
-                                }
-
-                                $totalAbs[$stu_dent->id_card][$semester->id][] = isset($absence_by_course)?$absence_by_course->num_absence:0 ;
-                            }
-                        }
+                        $totalMoyenne = $each_element_semester['total_moyenne'];
+                        $totalAbs = $each_element_semester['abs'];
+                        $element = $each_element_semester['element'];
                     }
 
-                    if($tmpCourse->is_counted_creditability) {
-                        if($each_score < ScoreEnum::Under_30) {
-
-
-                            $check_redouble = $this->checkRedouble($stu_dent, $tmpCourse->academic_year_id);//---check this current year if student has been change in redouble
-                            /*----create one redouble record for this student ----*/
-                            /*---before create redouble record, we have to check if the student has already marked as redouble for this year --then we skip ---*/
-                            if($check_redouble === null) {
-                                if($tmpCourse->degree_id == ScoreEnum::Degree_I) {
-                                    $this->createRedoubleRecord($stu_dent, $redName = trim(ScoreEnum::Red_I.$tmpCourse->grade_id), $tmpCourse->academic_year_id, $isChanged = false);
-                                } else {
-                                    $this->createRedoubleRecord($stu_dent, $redName = trim(ScoreEnum::Red_T.$tmpCourse->grade_id), $tmpCourse->academic_year_id, $isChanged = false);
-                                }
-                            }
-
-
-                            $fail_subjects[$stu_dent->id_card]['fail'][] = array('credit'=> $eachCourse->course_annual_credit, 'score'=> $each_score,  'course_annual_id'=> $tmpCourse->course_annual_id, 'student_annual_id' => $stu_dent->student_annual_id);
-                        } else {
-                            $fail_subjects[$stu_dent->id_card]['pass'][] = array('credit'=> $eachCourse->course_annual_credit, 'score'=> $each_score,  'course_annual_id'=> $tmpCourse->course_annual_id, 'student_annual_id' => $stu_dent->student_annual_id);
-                        }
-                    }
-                    if(isset($element[$stu_dent->id_card])) {
-                        $element[$stu_dent->id_card] = $element[$stu_dent->id_card] + ['Abs'.'_'.htmlspecialchars($tmpCourse->course_id).'_'.$tmpCourse->semester_id =>  isset($absence_by_course)?$absence_by_course->num_absence:"", 'Credit'.'_'.htmlspecialchars($tmpCourse->course_id).'_'.$tmpCourse->semester_id => $this->floatFormat($each_score)];
-                    } else {
-                        return [
-                            'status' => false,
-                            'element' =>[],
-                            'absence' => [],
-                            'moyenne' => [],
-                            'each_column_score' => [],
-                            'fail_subject' => []
-                        ];
-                    }
+                    $fail_subjects = $this->generating_student_redouble($tmpCourse, $stu_dent, $each_score, $fail_subjects);
 
                 }
             }
@@ -3887,7 +3175,9 @@ class CourseAnnualController extends Controller
     }
 
     public function switchCourseAnnual(Request $request) {
-        return $this->handsonTableData($request->course_annual_id, $request->group);
+
+
+        return $this->handsonTableData($request->course_annual_id, $request->group_id);
     }
 
     public function saveEachCellNotationCourseAnnual (Request $request) {
@@ -3915,7 +3205,6 @@ class CourseAnnualController extends Controller
 
     public function exportCourseScore(Request $request) {
 
-
         $studentListScore=[];
         $colHeaders =explode(',',  $request->col_headers);
         $courseAnnual = $this->courseAnnuals->findOrThrowException($request->course_annual_id);
@@ -3938,11 +3227,11 @@ class CourseAnnualController extends Controller
             $students = $students->whereIn('studentAnnuals.department_option_id', $department_option_ids);
         }
 
-        if($group = $request->group) {
-            $students = $students->where('studentAnnuals.group', $group)->get();
+        if($group = $request->group_id) {
+            $students = $students->where('studentAnnuals.group_id', $group)->get();
         } else {
             if($groups) {
-                $students = $students->whereIn('studentAnnuals.group', $groups)->get();
+                $students = $students->whereIn('studentAnnuals.group_id', $groups)->get();
             } else {
                 $students= $students->get();
             }
@@ -3951,7 +3240,6 @@ class CourseAnnualController extends Controller
         foreach($students as $student ) {
 
             $totalScore = 0;
-
 
             $studentScores = isset($allScoreByCourseAnnual[$courseAnnual->id][$student->student_annual_id])?$allScoreByCourseAnnual[$courseAnnual->id][$student->student_annual_id]:[];
 
@@ -4028,8 +3316,8 @@ class CourseAnnualController extends Controller
 
     public function formImportScore(Request $request) {
 
-        if($request->group) {
-            $group = $request->group;
+        if($request->group_id) {
+            $group = $request->group_id;
         } else {
             $group = null;
         }
@@ -4056,6 +3344,7 @@ class CourseAnnualController extends Controller
     public function importScore($courseAnnualId, Request $request) {
         //$now = Carbon::now()->format('Y_m_d_H');
 
+
         $courseAnnual = $this->getCourseAnnualById($courseAnnualId);
 
         if($request->file('import')!= null){
@@ -4065,7 +3354,7 @@ class CourseAnnualController extends Controller
             );
             $storage_path = base_path() . '/public/assets/uploaded_file/course_annuals/'.$import;
 
-            $students = $this->getStudentByNameAndIdCard($courseAnnualId, $request->group);
+            $students = $this->getStudentByNameAndIdCard($courseAnnualId, $request->group_id);
             $score_property = $this->getScoreId($courseAnnualId);
             $scoreIds = $score_property['score_by_student'];
             $percentage = $this->getPercentage($score_property['score_id']);
@@ -4317,7 +3606,8 @@ class CourseAnnualController extends Controller
         $degree_ids = $arrayIdsOf_Dept_Grd_Deg_Group['degree_id'];
         $grade_ids = $arrayIdsOf_Dept_Grd_Deg_Group['grade_id'];
         $department_option_ids = $arrayIdsOf_Dept_Grd_Deg_Group['department_option_id'];
-        $groups = $arrayIdsOf_Dept_Grd_Deg_Group['group'];
+        $groups = $arrayIdsOf_Dept_Grd_Deg_Group['group'];// list group ids
+
 
         $arrayStudent = [];
         $courseAnnual = $this->courseAnnuals->findOrThrowException($courseAnnualId);
@@ -4327,10 +3617,10 @@ class CourseAnnualController extends Controller
             $students = $students->whereIn('studentAnnuals.department_option_id', $department_option_ids);
         }
         if($request_group) {
-            $students = $students->where('studentAnnuals.group', $request_group)->get();
+            $students = $students->where('studentAnnuals.group_id', $request_group)->get();
         } else {
             if($groups) {
-                $students = $students->whereIn('studentAnnuals.group', $groups)->get();
+                $students = $students->whereIn('studentAnnuals.group_id', $groups)->get();
             } else {
                 $students = $students->get();
             }
@@ -4414,26 +3704,39 @@ class CourseAnnualController extends Controller
     public function getGroupByCourseAnnual(Request $request) {
 
 
-
         $courseAnnual = DB::table('course_annuals')->where('id', $request->course_annual_id)->first();
 
-        $allGroups = DB::table('course_annual_classes')->where([
-            ['course_annual_id', $courseAnnual->id],
-            ['course_session_id', null]
-        ]);
+        $allGroups = DB::table('course_annual_classes')
+
+            ->where([
+                ['course_annual_id', $courseAnnual->id],
+                ['course_session_id', null]
+            ]);
 
         if(count($allGroups->get()) > 1) {
 
-            $allGroups = $allGroups->orderBy('group')->get();
+            $allGroups = $allGroups->join('groups', function($groupQuery) {
+                $groupQuery->on('course_annual_classes.group_id', '=', 'groups.id');
+
+            })->orderBy('groups.code')->get();
+
         } else {
+
             foreach($allGroups->get() as $group) {
-                if($group->group == null) {
-                    $allGroups = DB::table('studentAnnuals')->where([
-                        ['department_id', $courseAnnual->department_id],
-                        ['academic_year_id', $courseAnnual->academic_year_id],
-                        ['grade_id', $courseAnnual->grade_id],
-                        ['degree_id', $courseAnnual->degree_id],
-                    ])->select('group')->distinct('group')->groupBy('group')->orderBy('group')->get();
+
+                if($group->group_id == null) {
+
+                    $query = DB::table('studentAnnuals')
+                                ->where([
+                                    ['department_id', $courseAnnual->department_id],
+                                    ['academic_year_id', $courseAnnual->academic_year_id],
+                                    ['grade_id', $courseAnnual->grade_id],
+                                    ['degree_id', $courseAnnual->degree_id],
+                                ])
+                                ->distinct('group_id')->groupBy('group_id')->lists('group_id');
+
+                    $allGroups = DB::table('groups')
+                        ->whereIn('id',$query)->get();
 
                     break;
                 }
@@ -4682,6 +3985,7 @@ class CourseAnnualController extends Controller
                 $class = array_merge($class, ['']);
                 $class[] = 'Classe:'.$degree->code.$grade.'-'.$department->code;
 
+
                 //---end herer------
 
                 //----alpha array of columns (A-Z--ZZ)
@@ -4702,7 +4006,7 @@ class CourseAnnualController extends Controller
 
                     //----assigne cell value in the middle of sheet
 
-                    if($index == (count($alpha)/2)) {
+                    if($index == (ceil(count($alpha)/2))) {
                         $header_data[] = 'RELEVE DES NOTES DE CONTROLE';
                         $sub_header_data[] = 'Année Scolaire '.$academicYear->name_latin;
 
@@ -4716,8 +4020,8 @@ class CourseAnnualController extends Controller
                     $index++;
                     $tmp_alpha[] = $l;// store array alpha by order of array index
 
-                }
 
+                }
 
 
                 /*---set styling cell property ----*/
@@ -4787,7 +4091,6 @@ class CourseAnnualController extends Controller
                 foreach($col_span as $span) {
                     $sheet->mergeCells($span);
                 }
-
 
                 /*--set row sheet value--*/
                 $sheet->row(1, $header_data);
@@ -5593,6 +4896,8 @@ class CourseAnnualController extends Controller
             ->orderBy('studentAnnuals.grade_id')
             ->orderBy('studentAnnuals.department_option_id')
             ->get();
+
+
         foreach($students as $student) {
 
             if($student->radie == true) {
@@ -5640,6 +4945,16 @@ class CourseAnnualController extends Controller
 
                 $studentData[] = $element;
                 $index++;
+
+            } else {
+
+                $headers = [
+                    'No',
+                    'ID Card',
+                    'Name Latin',
+                    'Sexe',
+                    'Grade',
+                ];
 
             }
         }
@@ -5715,8 +5030,6 @@ class CourseAnnualController extends Controller
         })->download('xls');
 
     }
-
-
 
     public function getStudentRedouble(Request $request) {
 
@@ -5837,9 +5150,7 @@ class CourseAnnualController extends Controller
 
         })->download('xls');
 
-
     }
-
 
     private function studentRedoubleFromDB($studentIds, $academicYearId) {
 
@@ -5860,7 +5171,6 @@ class CourseAnnualController extends Controller
 
         return $students;
     }
-
 
     public function storeResitScore(Request $request) {
 
