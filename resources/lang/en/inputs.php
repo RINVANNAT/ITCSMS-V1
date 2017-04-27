@@ -19,7 +19,8 @@
                         'grade' => 'Grade',
                         'option' => 'Option',
                         'semester' => 'Semester',
-                        'weekly' => 'Weekly'
+                        'weekly' => 'Weekly',
+                        'group' => 'Group'
                     ]
                 ]
             ]

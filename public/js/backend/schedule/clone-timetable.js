@@ -5,6 +5,16 @@ $(document).ready(function () {
         checkboxClass: 'icheckbox_square-blue'
     });
 
+    // Checked or Unchecked weeks.
+    $('#all-weeks').on('ifToggled', function(event){
+        $('input[data-target="weeks"]:checkbox').iCheck('toggle');
+    });
+
+    // Checked or Unchecked groups.
+    $('#all-groups').on('ifToggled', function(event){
+        $('input[data-target="groups"]:checkbox').iCheck('toggle');
+    });
+
     /** Form submit clone */
     $('#form-clone-timetable').on('submit', function (event) {
         event.preventDefault();

@@ -25,6 +25,7 @@
     <div class="box box-success">
         <div class="box-header with-border">
             <div class="mailbox-controls">
+                @permission('create-timetable')
                 <div class="pull-right">
                     <a href="{{ route('admin.schedule.timetables.create') }}">
                         <button class="btn btn-primary btn-sm" data-toggle="tooltip"
@@ -35,6 +36,7 @@
                         </button>
                     </a>
                 </div>
+                @endauth
 
                 <form name="filter-timetable-view"
                       id="filter-timetable-view"
@@ -54,7 +56,9 @@
                         <th>{{ trans('labels.backend.schedule.timetable.index_timetable.number') }}</th>
                         <th>{{ trans('labels.backend.schedule.timetable.index_timetable.weekly') }}</th>
                         <th>{{ trans('labels.backend.schedule.timetable.index_timetable.status') }}</th>
-                        <th>{{ trans('labels.general.actions') }}</th>
+                        @if(access()->allow('view-timetable') || access()->allow('delete-timetable'))
+                            <th>{{ trans('labels.general.actions') }}</th>
+                        @endif
                     </tr>
                     </thead>
                     <tbody>
@@ -79,22 +83,29 @@
                                     </span>
                                 @endif
                             </td>
-                            <td>
-                                <a href="{{ route('admin.schedule.timetables.show') }}" class="btn btn-xs btn-primary">
-                                    <i class="fa fa-share-square-o" data-toggle="tooltip"
-                                       data-placement="top" title="View"
-                                       data-original-title="View">
+                            @if(access()->allow('view-timetable') || access()->allow('delete-timetable'))
+                                <td>
+                                    @permission('view-timetable')
+                                    <a href="{{ route('admin.schedule.timetables.show') }}" class="btn btn-xs btn-primary">
+                                        <i class="fa fa-share-square-o" data-toggle="tooltip"
+                                           data-placement="top" title="View"
+                                           data-original-title="View">
 
-                                    </i>
-                                </a>
-                                <a href="{{ route('admin.schedule.timetables.show') }}" class="btn btn-xs btn-danger">
-                                    <i class="fa fa-trash" data-toggle="tooltip"
-                                       data-placement="top" title="Delete"
-                                       data-original-title="Delete">
+                                        </i>
+                                    </a>
+                                    @endauth
 
-                                    </i>
-                                </a>
-                            </td>
+                                    @permission('delete-timetable')
+                                    <a href="{{ route('admin.schedule.timetables.show') }}" class="btn btn-xs btn-danger">
+                                        <i class="fa fa-trash" data-toggle="tooltip"
+                                           data-placement="top" title="Delete"
+                                           data-original-title="Delete">
+
+                                        </i>
+                                    </a>
+                                    @endauth
+                                </td>
+                            @endif
                         </tr>
                     @endfor
                     </tbody>
