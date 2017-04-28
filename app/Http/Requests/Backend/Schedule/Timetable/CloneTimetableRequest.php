@@ -17,7 +17,7 @@ class CloneTimetableRequest extends Request
      */
     public function authorize()
     {
-        return true;
+        return access()->allow('clone-timetable');
     }
 
     /**
@@ -28,8 +28,8 @@ class CloneTimetableRequest extends Request
     public function rules()
     {
         return [
-            'weeks' => 'required|array|max:1',
-            'groups' => 'required|array|max:1'
+            'weeks' => 'required|array|min:1',
+            'groups' => 'required|array|min:1'
         ];
     }
 

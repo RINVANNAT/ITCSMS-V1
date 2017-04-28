@@ -1919,6 +1919,13 @@ class SeedCustomsPermissions extends Seeder
                             ]
                         ],
                         [
+                            'name' => 'clone-timetable',
+                            'display_name' => 'Clone Timetable',
+                            'dependency' => [
+                                'view-backend', 'view-schedule-management', 'view-timetable-management'
+                            ]
+                        ],
+                        [
                             'name' => 'edit-timetable',
                             'display_name' => 'Edit Timetable',
                             'dependency' => [
@@ -1928,6 +1935,27 @@ class SeedCustomsPermissions extends Seeder
                         [
                             'name' => 'delete-timetable',
                             'display_name' => 'Delete Timetable',
+                            'dependency' => [
+                                'view-backend', 'view-schedule-management', 'view-timetable-management'
+                            ]
+                        ],
+                        [
+                            'name' => 'publish-timetable',
+                            'display_name' => 'Publish Timetable',
+                            'dependency' => [
+                                'view-backend', 'view-schedule-management', 'view-timetable-management'
+                            ]
+                        ],
+                        [
+                            'name' => 'generate-timetable',
+                            'display_name' => 'Generate Timetable',
+                            'dependency' => [
+                                'view-backend', 'view-schedule-management', 'view-timetable-management'
+                            ]
+                        ],
+                        [
+                            'name' => 'save-change-timetable',
+                            'display_name' => 'Save Change Timetable',
                             'dependency' => [
                                 'view-backend', 'view-schedule-management', 'view-timetable-management'
                             ]
