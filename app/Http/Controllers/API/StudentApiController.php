@@ -100,7 +100,6 @@ class StudentApiController extends Controller
         }
     }
 
-
     public function student_program(Request $request) {
 
         $dataParams = FormParamManager::getFormParams($request);
