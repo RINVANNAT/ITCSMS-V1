@@ -101,9 +101,16 @@ class StudentApiController extends Controller
     }
 
 
-    public function student_program($student_id_card) {
+    public function student_program(Request $request) {
 
-        return Student::where('id_card', $student_id_card)->first();
+        $dataParams = FormParamManager::getFormParams($request);
+        $studentIdCard = isset($dataParams['student_id_card'])?$dataParams['student_id_card']:null;
+        if ($studentIdCard != null) {
+            return Student::where('id_card', $studentIdCard)->first();
+        } else {
+            return [];
+        }
+
 
     }
 
