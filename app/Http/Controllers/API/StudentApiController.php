@@ -120,7 +120,7 @@ class StudentApiController extends Controller
         $studentProp = Student::where('id_card', $studentIdCard)
             ->join('genders', function($query) {
                 $query->on('genders.id', '=', 'students.gender_id');
-            })->get();
+            })->first();
 
         return $studentProp;
 
