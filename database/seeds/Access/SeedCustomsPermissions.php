@@ -1834,6 +1834,19 @@ class SeedCustomsPermissions extends Seeder
                     ]
                 ],
                 [
+                    'name' => 'Timetable Management',
+                    'groups' => [],
+                    'permissions' => [
+                        [
+                            'name' => 'view-timetable-management',
+                            'display_name' => 'View Timetable Viewer',
+                            'dependency' => [
+                                'view-backend', 'view-schedule-management'
+                            ]
+                        ]
+                    ]
+                ],
+                [
                     'name' => 'Event Management',
                     'groups' => [],
                     'permissions' => [
@@ -1888,21 +1901,87 @@ class SeedCustomsPermissions extends Seeder
                     ]
                 ],
                 [
-                    'name' => 'Timetable Management',
-                    'groups' => [
-
-
-                    ],
+                    'name' => 'Timetable',
+                    'groups' => [],
                     'permissions' => [
                         [
-                            'name' => 'view-timetable-management',
-                            'display_name' => 'View Timetable Viewer',
+                            'name' => 'view-timetable',
+                            'display_name' => 'View Timetable',
                             'dependency' => [
-                                'view-backend', 'view-schedule-management'
+                                'view-backend', 'view-schedule-management', 'view-timetable-management'
+                            ]
+                        ],
+                        [
+                            'name' => 'create-timetable',
+                            'display_name' => 'Create Timetable',
+                            'dependency' => [
+                                'view-backend', 'view-schedule-management', 'view-timetable-management'
+                            ]
+                        ],
+                        [
+                            'name' => 'clone-timetable',
+                            'display_name' => 'Clone Timetable',
+                            'dependency' => [
+                                'view-backend', 'view-schedule-management', 'view-timetable-management'
+                            ]
+                        ],
+                        [
+                            'name' => 'edit-timetable',
+                            'display_name' => 'Edit Timetable',
+                            'dependency' => [
+                                'view-backend', 'view-schedule-management', 'view-timetable-management'
+                            ]
+                        ],
+                        [
+                            'name' => 'delete-timetable',
+                            'display_name' => 'Delete Timetable',
+                            'dependency' => [
+                                'view-backend', 'view-schedule-management', 'view-timetable-management'
+                            ]
+                        ],
+                        [
+                            'name' => 'publish-timetable',
+                            'display_name' => 'Publish Timetable',
+                            'dependency' => [
+                                'view-backend', 'view-schedule-management', 'view-timetable-management'
+                            ]
+                        ],
+                        [
+                            'name' => 'generate-timetable',
+                            'display_name' => 'Generate Timetable',
+                            'dependency' => [
+                                'view-backend', 'view-schedule-management', 'view-timetable-management'
+                            ]
+                        ],
+                        [
+                            'name' => 'save-change-timetable',
+                            'display_name' => 'Save Change Timetable',
+                            'dependency' => [
+                                'view-backend', 'view-schedule-management', 'view-timetable-management'
                             ]
                         ]
                     ]
-                ]
+                ],
+                [
+                    'name' => 'General Timetable Management',
+                    'groups' => [],
+                    'permissions' => [
+                        [
+                            'name' => 'global-timetable-management',
+                            'display_name' => 'Global Timetable Management',
+                            'dependency' => [
+                                'view-backend', 'view-schedule-management', 'view-timetable-management'
+                            ]
+                        ],
+                        [
+                            'name' => 'personal-timetable-management',
+                            'display_name' => 'Personal Timetable Management',
+                            'dependency' => [
+                                'view-backend', 'view-schedule-management', 'view-timetable-management'
+                            ]
+                        ]
+                    ]
+                ],
             ],
             'permissions' => [
                 [

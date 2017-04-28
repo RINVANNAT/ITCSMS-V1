@@ -1,6 +1,8 @@
 <?php
 
 namespace App\Http\Controllers\Backend\Schedule\Traits;
+
+use App\Http\Requests\Backend\Schedule\Timetable\CloneTimetableRequest;
 use Illuminate\Support\Facades\Response;
 
 /**
@@ -10,10 +12,11 @@ use Illuminate\Support\Facades\Response;
 trait AjaxCloneTimetableController
 {
     /**
+     * @param CloneTimetableRequest $request
      * @return mixed
      */
-    public function cloneTimetable()
+    public function cloneTimetable(CloneTimetableRequest $request)
     {
-        return Response::json(['status'=>true, 'data'=>request()->all()]);
+        return Response::json(['status' => true, 'data' => $request->all()]);
     }
 }

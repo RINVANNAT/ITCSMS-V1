@@ -1021,8 +1021,8 @@ return [
                 'modal_clone' => [
                     'title' => 'Clone Timetable',
                     'body' => [
-                        'weekly' => 'Weekly',
-                        'group' => 'Group'
+                        'all_weeks' => 'All Weeks',
+                        'all_groups' => 'All Groups'
                     ]
                 ],
                 'courses_sessions' => 'Courses Sessions',

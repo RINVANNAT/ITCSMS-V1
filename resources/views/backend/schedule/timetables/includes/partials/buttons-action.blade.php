@@ -1,6 +1,8 @@
 <div class="box-header with-border">
     <div class="mailbox-controls">
         <div class="pull-right">
+
+            @permission('generate-timetable')
             <a href="#">
                 <button class="btn btn-primary btn-sm"
                         data-placement="right"
@@ -9,8 +11,10 @@
                     {{ trans('buttons.backend.schedule.timetable.generate') }}
                 </button>
             </a>
+            @endauth
 
-            <button class="btn btn-warning btn-sm"
+            @permission('clone-timetable')
+            <button class="btn btn-success btn-sm"
                     data-toggle="modal"
                     data-target="#clone-timetable"
                     data-toggle="tooltip"
@@ -18,7 +22,9 @@
                     title="{{ trans('buttons.backend.schedule.timetable.clone') }}">
                 {{ trans('buttons.backend.schedule.timetable.clone') }}
             </button>
+            @endauth
 
+            @permission('publish-timetable')
             <a href="#">
                 <button class="btn btn-info btn-sm"
                         data-toggle="tooltip"
@@ -27,6 +33,9 @@
                     {{ trans('buttons.backend.schedule.timetable.publish') }}
                 </button>
             </a>
+            @endauth
+
+            @permission('save-change-timetable')
             <a href="#">
                 <button class="btn btn-danger btn-sm"
                         data-toggle="tooltip"
@@ -35,6 +44,8 @@
                     {{ trans('buttons.backend.schedule.timetable.save_change') }}
                 </button>
             </a>
+            @endauth
+
         </div>
 
         <form name="filter-courses-sessions"
