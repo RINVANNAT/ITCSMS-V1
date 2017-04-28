@@ -51,7 +51,7 @@ $(document).ready(function () {
                 id: 1,
                 title: 'Event Conflict',
                 start: '2017-01-02 07:00:00',
-                end: '2017-01-02 10:00:00',
+                end: '2017-01-02 09:00:00',
                 teacherName: 'CHUN Thavorac',
                 typeCourseSession: 'TP',
                 times: 23,
@@ -119,24 +119,28 @@ $(document).ready(function () {
             // Trigger where move and drop the event on full calendar.
         },
         eventRender: function (event, element, view) {
-            var object = '<a class="fc-time-grid-event fc-v-event fc-event fc-start fc-end course-item  fc-draggable fc-resizable" style="top: 65px; bottom: -153px; z-index: 1; left: 0%; right: 0%;">' +
+            var object ='<a class="fc-time-grid-event fc-v-event fc-event fc-start fc-end course-item  fc-draggable fc-resizable" style="top: 65px; bottom: -153px; z-index: 1; left: 0%; right: 0%;">' +
 
-                '<div class="fc-content">' +
-                '<div class="container-room">' +
-                '<div class="side-course">' +
-                '<div class="fc-title conflict" data-toggle="tooltip" data-placement="right" title="Tooltip on top">' + event.title + '</div>' +
-                '<p class="text-primary conflict">Mr. YOU Vandy</p> ' +
-                '<p class="text-primary conflict">Course</p> ' +
-                '</div>' +
-                '<div class="side-room">' +
-                '</label> ' +
-                '</div> ' +
-                '<div class="clearfix"></div> ' +
-                '</div>' +
-                '</div>' +
-                '<div class="fc-bgd"></div>' +
-                '<div class="fc-resizer fc-end-resizer"></div>' +
-                '</a>';
+                        '<div class="fc-content">' +
+                            '<div class="container-room">' +
+                                '<div class="side-course">' +
+                                    '<div class="fc-title conflict" data-toggle="tooltip" data-placement="right" title="Tooltip on top">' + event.title + '</div>' +
+                                    '<p class="text-primary conflict">Mr. YOU Vandy</p> ' +
+                                    '<p class="text-primary conflict">Course</p> ' +
+                                '</div>' +
+                                '<div class="side-room">' +
+                                    '<div class="room-name"><span class="render-room"></span></div> ' +
+                                    '<div class="room-action">' +
+                                        '<button class="btn btn-warning btn-xs" id="btn-conflict"><i class="fa fa-question"></i> </button> ' +
+                                        '<span class="render-trash"></span> ' +
+                                    '</div> ' +
+                                '</div> ' +
+                                '<div class="clearfix"></div> ' +
+                            '</div>' +
+                        '</div>' +
+                        '<div class="fc-bgd"></div>' +
+                        '<div class="fc-resizer fc-end-resizer"></div>' +
+                        '</a>';
 
             return $(object);
         },
@@ -145,9 +149,6 @@ $(document).ready(function () {
         },
         eventOverlap: function (stillEvent, movingEvent) {
             return stillEvent.allDay && movingEvent.allDay;
-        },
-        select: function (start, end, jsEvent, view) {
-            alert(start);
         }
 
     });
@@ -172,6 +173,7 @@ $(document).ready(function () {
     // Clicking to remove the room from course.
     $(document).on('click', '.remove-room', function (e) {
         $(this).addClass('rf-room');
+        $(this).parent().parent().parent().children().eq(0).children().eq(0).addClass('rf-room-name');
         swal({
             title: 'Are you sure?',
             text: "You won't be able to revert this!",
@@ -182,6 +184,7 @@ $(document).ready(function () {
             confirmButtonText: 'Yes, delete it!'
         }).then(function () {
             $('body').find('.rf-room').remove();
+            $('body').find('.rf-room-name').empty().removeClass('rf-room-name');
             swal(
                 'Removed !',
                 'The room have been removed from this course.',
@@ -209,13 +212,39 @@ $(document).ready(function () {
 
     // Add room into course
     $(document).on('click', '.suggest-room', function () {
-
-        var suggest_room = '';
-        suggest_room += '<label class="label label-danger remove-room">' +
-            $(this).text() +
-            ' <i class="fa fa-trash"></i> ';
-        $('.course-selected').parent().children().eq(1).html(suggest_room);
+        var btn_delete = '<button class="btn btn-danger btn-xs remove-room"><i class="fa fa-trash"></i></button>';
+        $('.course-selected').parent().children().eq(1).children().eq(0).children().text($(this).text());
+        $('.course-selected').parent().children().eq(1).children().eq(1).children().eq(1).html(btn_delete);
         $(this).remove();
+
+    });
+
+    // Conflict button action
+    $(document).on('click', '#btn-conflict', function (event) {
+        event.preventDefault();
+        var table = '';
+        table += '<table class="table table-bordered room-item">' +
+            '<thead>' +
+            '<tr>' +
+            '<th>No.</th>' +
+            '<th>Conflict Name</th>' +
+            '<th>Description</th>' +
+            '<th>Action</th>' +
+            '</tr>' +
+            '</thead>' +
+            '<tbody>' +
+            '<tr>' +
+            '<td>01</td>' +
+            '<td>Room</td>' +
+            '<td>Please solve conflict</td>' +
+            '<td>' +
+            '<button class="btn btn-success btn-xs"><i class="fa fa-check"></i> </button> ' +
+            '<button class="btn btn-danger btn-xs"><i class="fa fa-times"></i> </button> ' +
+            '</td>' +
+            '</tr>' +
+            '</tbody>' +
+            '</table>';
+        $('.rooms').html(table);
 
     });
 

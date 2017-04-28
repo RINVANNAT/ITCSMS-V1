@@ -14,7 +14,7 @@
             @endauth
 
             @permission('clone-timetable')
-            <button class="btn btn-warning btn-sm"
+            <button class="btn btn-success btn-sm"
                     data-toggle="modal"
                     data-target="#clone-timetable"
                     data-toggle="tooltip"
