@@ -101,6 +101,13 @@ class StudentApiController extends Controller
     }
 
 
+    public function student_program($student_id_card) {
+
+        return Student::where('id_card', $student_id_card)->first();
+
+    }
+
+
 
 
 }
