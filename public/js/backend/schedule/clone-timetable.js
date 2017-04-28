@@ -6,12 +6,12 @@ $(document).ready(function () {
     });
 
     // Checked or Unchecked weeks.
-    $('#all-weeks').on('ifToggled', function(event){
+    $('#all-weeks').on('ifToggled', function () {
         $('input[data-target="weeks"]:checkbox').iCheck('toggle');
     });
 
     // Checked or Unchecked groups.
-    $('#all-groups').on('ifToggled', function(event){
+    $('#all-groups').on('ifToggled', function () {
         $('input[data-target="groups"]:checkbox').iCheck('toggle');
     });
 
@@ -34,10 +34,15 @@ $(document).ready(function () {
                     'success'
                 );
             },
-            error: function () {
+            error: function (response) {
+                var message = '';
+                $.each(response.responseJSON, function (key, val) {
+                    message += val + '<br/>';
+                });
+
                 swal(
-                    'Oops...',
-                    'Something went wrong!',
+                    'Form submission is failed',
+                    message,
                     'error'
                 );
             }
