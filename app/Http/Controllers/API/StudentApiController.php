@@ -109,6 +109,21 @@ class StudentApiController extends Controller
         } else {
             return [];
         }
+    }
+
+
+    public function student_prop(Request $request) {
+
+        $dataParams = FormParamManager::getFormParams($request);
+        $studentIdCard = isset($dataParams['student_id_card'])?$dataParams['student_id_card']:null;
+
+        $studentProp = Student::where('id_card', $studentIdCard)
+            ->join('genders', function($query) {
+                $query->on('genders.id', '=', 'students.gender_id');
+            })->get();
+
+        return $studentProp;
+
 
 
     }

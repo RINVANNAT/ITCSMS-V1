@@ -10,3 +10,4 @@ Route::get('/score', 'StudentApiController@studentScoreAnnually')->name('student
 Route::get('/data', 'StudentApiController@studentDataFromDB')->name('student.data');
 Route::get('/annual-object', 'StudentApiController@studentObject')->name('student.annual_object');
 Route::get('/program', 'StudentApiController@student_program')->name('student.program');
+Route::get('/prop', 'StudentApiController@student_prop')->name('student.prop');
