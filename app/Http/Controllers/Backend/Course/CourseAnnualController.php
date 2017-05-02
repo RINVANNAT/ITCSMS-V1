@@ -158,19 +158,6 @@ class CourseAnnualController extends Controller
         return view('backend.course.courseAnnual.index',compact('departments','academicYears','degrees','grades', 'semesters', 'studentGroup','department_id','lecturers', 'options'));
     }
 
-    private function deptHasOption($deptId) {
-
-        $dept = Department::find($deptId);
-
-        if($dept->department_options) {
-            $deptOptions = $dept->department_options->lists('name_en', 'id');
-        } else {
-            $deptOptions = [];
-        }
-
-        return $deptOptions;
-    }
-
     public function getDeptOption(Request $request) {
 
         $deptOptions = $this->deptHasOption($request->department_id);
@@ -180,10 +167,7 @@ class CourseAnnualController extends Controller
 
     public function filteringStudentGroup(Request $request) {
 
-
         $groups = $this->getStudentGroupFromDB();
-
-
 
         if($request->course_program_id) {
 
@@ -270,18 +254,6 @@ class CourseAnnualController extends Controller
 
     }
 
-    private function getStudentGroupFromDB() {
-
-        $groups = DB::table('groups')
-            ->join('studentAnnuals', function($query) {
-                $query->on('groups.id', '=', 'studentAnnuals.group_id');
-            })
-            ->select('groups.id as group_id', 'groups.code as group_code')
-            ->groupBy('groups.id')
-            ->orderBy('group_code');
-
-        return $groups;
-    }
 
     /**
      * Show the form for creating a new resource.
@@ -453,8 +425,6 @@ class CourseAnnualController extends Controller
      */
     public function edit(EditCourseAnnualRequest $request, $id)
     {
-
-
         $groups = [];
         $courseAnnual = $this->courseAnnuals->findOrThrowException($id);
 
@@ -1013,53 +983,10 @@ class CourseAnnualController extends Controller
 
     public function getSeletedCourseByTeacherID(CourseAnnualAssignmentRequest $request) {
 
-        $courses = [];
-        $academic_year_id = $request->academic_year_id;
-        $grade_id = $request->grade_id;
-        $degree_id = $request->degree_id;
         $parent_id = $_GET['id'];
         $teacher_id = explode('_', $_GET['id'])[3];
-
-        $courseByTeacher = $this->courseSessionByTeacherFromDB($academic_year_id, $grade_id, $degree_id );
-        $selectedCourses = isset($courseByTeacher[$teacher_id])?$courseByTeacher[$teacher_id]:null;
-        $groupFromDB = $this->getGroupBySessionAndAnnualCourse();
-
-
-        if($selectedCourses != null) {
-
-            foreach($selectedCourses as $courseSession) {
-
-//                (isset($groupFromDB[$courseSession->course_session_id])?', Group: '.$this->formatGroupName($groupFromDB[$courseSession->course_session_id]):'');
-
-
-                $element = array(
-                    "id" => $parent_id.'_course-session_' . $courseSession->course_session_id,
-                    "text" => $courseSession->name_en.(isset($groupFromDB[$courseSession->course_session_id])?', Group: '.$this->formatGroupName($groupFromDB[$courseSession->course_session_id]):'').' ('.$courseSession->degree_code.$courseSession->grade_id.')',
-                    "children" => false,
-                    "type" => "course",
-                    "state" => ["opened" => false, "selected" => false ],
-                    "li_attr" => [
-                        'class' => 'teacher_course',
-                    ],
-                );
-                array_push($courses, $element);
-
-            }
-
-            return Response::json($courses);
-        }
-
-    }
-
-    private function formatGroupName($listsGroup) {
-
-
-        $name = '';
-        foreach($listsGroup as $group) {
-            $name = $name.' '.$group->group;
-        }
-
-        return $name;
+        $courses = $this->selected_course_by_teacher($request, $parent_id, $teacher_id);
+        return Response::json($courses);
     }
 
     public function getAllCourseByDepartment (Request $request) {
@@ -1072,56 +999,8 @@ class CourseAnnualController extends Controller
 
     public function studentGroupByDept(Request $request) {
 
-        $arrayGroup = [];
         $nodeId = explode('_', $_GET['id']);
-        $deptId = $nodeId[count($nodeId)-1];
-        $groups = $this->getStudentGroupFromDB();
-        $groups = $groups->where('studentAnnuals.department_id', '=',$deptId);
-
-        if($academicYearId = $request->academic_year_id) {
-            $groups = $groups->where('studentAnnuals.academic_year_id', '=',$academicYearId);
-        }
-//        if($semesterId = $request->semester_id) {
-//            $groups = $groups->where('studentAnnuals.semester_id', '=',$semesterId);
-//        }
-        if($gradeId = $request->grade_id) {
-            $groups = $groups->where('studentAnnuals.grade_id', '=',$gradeId);
-        }
-        if($degreeId = $request->degree_id) {
-            $groups = $groups->where('studentAnnuals.degree_id', '=',$degreeId);
-        }
-        if($deptOptionId = $request->department_option_id) {
-            $groups = $groups->where('studentAnnuals.degree_id', '=',$degreeId);
-        }
-        $groups = $groups->get();
-
-        usort($groups, function($a, $b) {
-            return $a->group - $b->group;
-        });
-
-        if(count($groups) > 0) {
-            foreach($groups as $group) {
-                echo($group->group);
-                if($group->group != null) {
-
-
-                    $element = [
-                        'id' => 'department_'.$deptId.'_'.$group->group,
-                        'text' => (($degreeId == 1)?'I':'T ').$gradeId.'_'.$group->group,
-                        'li_attr' => [
-                            'class' => 'student_group'
-                        ],
-                        "type" => "group",
-                        "state" => ["opened" => false, "selected" => false ]
-
-                    ];
-
-                    $arrayGroup[] = $element;
-                }
-            }
-
-        }
-
+        $arrayGroup = $this->group_student_by_department($request, $nodeId);
         return Response::json($arrayGroup);
     }
 
@@ -1162,40 +1041,13 @@ class CourseAnnualController extends Controller
             'degreeId', 'deptOption', 'semesterId'));
     }
 
-
     public function removeCourse (CourseAnnualAssignmentRequest $request) {
 
         $input = $request->course_selected;
-        $nodeID = json_decode($input);
-
-        if(count($nodeID) > 0) {
-            $check = 0;
-            $uncount =0;
-
-            foreach ($nodeID as $id) {
-                $explode = explode('_', $id);
-                if(count($explode) > 4) {// the node id here will return the above node so we want to delete only the depest node (course) then the id of each course length must greater than 4
-//                    $deparment_id = $explode[1];
-//                    $teacher_id =  $explode[3];
-                    $course_session_id = $explode[5];
-                    $update = $this->updateCourse($course_session_id, $inputs = '');
-
-                    if($update) {
-                        $check++;
-                    }
-
-                } else {
-                    $uncount++;
-                }
-            }
-        }
-
-        if($check == (count($nodeID) - $uncount) ) {
-
+        $status_remove = $this->remove_course($input);
+        if($status_remove) {
             return Response::json(['status' => true, 'message' => 'You Have Removed Selected Courses']);
-
         }
-
     }
 
     private function updateCourse($courseSessionId, $input) {
@@ -1283,7 +1135,7 @@ class CourseAnnualController extends Controller
         }
     }
 
-
+    /*--form edit course-session in course assignment panel---*/
     public function formEditCourseAnnual(CourseAnnualAssignmentRequest $request) {
 
 
@@ -1292,11 +1144,10 @@ class CourseAnnualController extends Controller
         $deptId = $explode[1];
 
         $courseSession = DB::table('course_sessions')->where('id', $courseSessionId)->first();
-
         $courseAnnual = DB::table('course_annuals')->where('id', $courseSession->course_annual_id)->first();
 
         $courseAnnualClasses = DB::table('course_annual_classes')->where([
-            ['course_annual_id', $courseSession->course_annual_id],
+//            ['course_annual_id', $courseSession->course_annual_id],
             ['course_session_id', $courseSessionId]
         ])->get();
 

@@ -12,6 +12,7 @@ use App\Models\Department;
 use Illuminate\Support\Facades\Response;
 use App\Models\Semester;
 use App\Models\Enum\SemesterEnum;
+
 trait CourseSessionTrait
 {
 
@@ -40,8 +41,6 @@ trait CourseSessionTrait
         return $arrayCourses;
     }
 
-
-
     public function getCourseSessionFromDB() {
 
         $courseSessions = DB::table('course_sessions')
@@ -57,11 +56,30 @@ trait CourseSessionTrait
         return $courseSessions;
     }
 
+    public function course_session_by_dept($dept_id) {
 
+        $course_sessions = DB::table('course_sessions')
+            ->join('course_annuals', 'course_annuals.id','=', 'course_sessions.course_annual_id')
+            ->join('degrees', 'degrees.id', '=', 'course_annuals.degree_id')
+            ->where(function($query) use ($dept_id) {
+                $query->whereIn('course_sessions.course_annual_id', DB::table('course_annuals')->where('department_id', $dept_id)->lists('id'));
+            })->select(
+                'course_sessions.lecturer_id', 'course_sessions.time_course as time_course_session', 'course_sessions.time_td as time_td_session', 'course_sessions.time_tp as time_tp_session',
+                'course_sessions.course_annual_id', 'course_sessions.id as course_session_id', 'course_annuals.department_id', 'course_annuals.degree_id', 'course_annuals.grade_id',
+                'course_annuals.department_option_id', 'course_annuals.semester_id', 'course_annuals.academic_year_id',
+                'course_annuals.name_en as name_en','course_annuals.name_kh', 'course_annuals.name_fr', 'degrees.code as degree_code'
+            );
+        return $course_sessions;
+
+    }
 
     public function getNotSelectedCourseByDept($deptId, $academicYearId, $grade_id, $degree_id, $dept_option_id, $semester_id) {
 
-        $courseSessions = $this->getCourseSessionFromDB();
+        if($deptId) {
+            $courseSessions = $this->course_session_by_dept($deptId);
+        } else {
+            $courseSessions = $this->getCourseSessionFromDB();
+        }
 
         $courseSessions = $courseSessions->where('course_sessions.lecturer_id', '=', null);// this to get not assigned courses
 //        $courseAnnuals = $courseAnnuals->where('course_annuals.employee_id', '=', null);// this to get not assigned courses
@@ -75,7 +93,6 @@ trait CourseSessionTrait
             $courseSessions = $courseSessions->where('course_annuals.academic_year_id', $academicYearId);
 //            $courseAnnuals = $courseAnnuals->where('course_annuals.academic_year_id', '=',$academicYearId);
         }
-
 
         if($degree_id) {
             $courseSessions = $courseSessions->where('course_annuals.degree_id', $degree_id);
@@ -103,7 +120,6 @@ trait CourseSessionTrait
 
     public function allCourseByDepartment($request, $deptId) {
 
-
         $arrayCourses = [];
         $academic_year_id = $request->academic_year_id;
         $grade_id = $request->grade_id;
@@ -113,7 +129,6 @@ trait CourseSessionTrait
 
         $notSelectedCourses = $this->getNotSelectedCourseByDept($deptId, $academic_year_id, $grade_id, $degree_id, $dept_option_id, $semester_id);
         $groupFromDB = $this->getGroupBySessionAndAnnualCourse();
-
 
         if($notSelectedCourses) {
 
@@ -174,7 +189,6 @@ trait CourseSessionTrait
         return $allTeachers;
 
     }
-
 
     public function get_department_tree($request) {
 
@@ -329,8 +343,7 @@ trait CourseSessionTrait
         return $teachers;
     }
 
-
-    /*public function selected_course_by_teacher($request, $parent_id, $teacher_id) {
+    public function selected_course_by_teacher($request, $parent_id, $teacher_id) {
 
         $courses = [];
         $academic_year_id = $request->academic_year_id;
@@ -341,13 +354,10 @@ trait CourseSessionTrait
         $selectedCourses = isset($courseByTeacher[$teacher_id])?$courseByTeacher[$teacher_id]:null;
         $groupFromDB = $this->getGroupBySessionAndAnnualCourse();
 
-
         if($selectedCourses != null) {
 
             foreach($selectedCourses as $courseSession) {
-
 //                (isset($groupFromDB[$courseSession->course_session_id])?', Group: '.$this->formatGroupName($groupFromDB[$courseSession->course_session_id]):'');
-
 
                 $element = array(
                     "id" => $parent_id.'_course-session_' . $courseSession->course_session_id,
@@ -360,13 +370,129 @@ trait CourseSessionTrait
                     ],
                 );
                 array_push($courses, $element);
-
             }
-
-            return Response::json($courses);
+            return $courses;
+        } else {
+            return [];
         }
 
-    }*/
+    }
 
+    public function group_student_by_department($request, $nodeId) {
+
+        $arrayGroup = [];
+        $deptId = $nodeId[count($nodeId)-1];
+        $groups = $this->getStudentGroupFromDB();
+        $groups = $groups->where('studentAnnuals.department_id', '=',$deptId);
+
+        if($academicYearId = $request->academic_year_id) {
+            $groups = $groups->where('studentAnnuals.academic_year_id', '=',$academicYearId);
+        }
+//        if($semesterId = $request->semester_id) {
+//            $groups = $groups->where('studentAnnuals.semester_id', '=',$semesterId);
+//        }
+        if($gradeId = $request->grade_id) {
+            $groups = $groups->where('studentAnnuals.grade_id', '=',$gradeId);
+        }
+        if($degreeId = $request->degree_id) {
+            $groups = $groups->where('studentAnnuals.degree_id', '=',$degreeId);
+        }
+        if($deptOptionId = $request->department_option_id) {
+            $groups = $groups->where('studentAnnuals.degree_id', '=',$degreeId);
+        }
+        $groups = $groups->get();
+
+        usort($groups, function($a, $b) {
+            return $a->group - $b->group;
+        });
+
+        if(count($groups) > 0) {
+            foreach($groups as $group) {
+                //echo($group->group);
+                if($group->group_id != null) {
+
+                    $element = [
+                        'id' => 'department_'.$deptId.'_'.$group->group_code,
+                        'text' => (($degreeId == 1)?'I':'T ').$gradeId.'_'.$group->group_code,
+                        'li_attr' => [
+                            'class' => 'student_group'
+                        ],
+                        "type" => "group",
+                        "state" => ["opened" => false, "selected" => false ]
+
+                    ];
+                    $arrayGroup[] = $element;
+                }
+            }
+        }
+        return $arrayGroup;
+    }
+
+    public function getStudentGroupFromDB() {
+
+        $groups = DB::table('groups')
+            ->join('studentAnnuals', function($query) {
+                $query->on('groups.id', '=', 'studentAnnuals.group_id');
+            })
+            ->select('groups.id as group_id', 'groups.code as group_code')
+            ->groupBy('groups.id')
+            ->orderBy('group_code');
+
+        return $groups;
+    }
+
+    public function deptHasOption($deptId) {
+
+        $dept = Department::find($deptId);
+        if($dept->department_options) {
+            $deptOptions = $dept->department_options->lists('name_en', 'id');
+        } else {
+            $deptOptions = [];
+        }
+        return $deptOptions;
+    }
+
+    public function remove_course($input) {
+
+        $nodeID = json_decode($input);
+
+        if(count($nodeID) > 0) {
+            $check = 0;
+            $uncount =0;
+
+            foreach ($nodeID as $id) {
+                $explode = explode('_', $id);
+                if(count($explode) > 4) {// the node id here will return the above node so we want to delete only the depest node (course) then the id of each course length must greater than 4
+//                    $deparment_id = $explode[1];
+//                    $teacher_id =  $explode[3];
+                    $course_session_id = $explode[5];
+                    $update = $this->updateCourse($course_session_id, $inputs = '');
+
+                    if($update) {
+                        $check++;
+                    }
+
+                } else {
+                    $uncount++;
+                }
+            }
+        }
+        if($check == (count($nodeID) - $uncount) ) {
+            return true;
+
+        } else {
+            return false;
+        }
+    }
+
+    public function formatGroupName($listsGroup) {
+
+        dd($listsGroup);
+        $name = '';
+        foreach($listsGroup as $group) {
+            $name = $name.' '.$group->group;
+        }
+        return $name;
+    }
 
 }
