@@ -485,7 +485,7 @@ class StudentAnnualController extends Controller
 
         $grades = [1,2,3,4,5];
         $ages = array(
-            ['min'=>1,'max'=>17,'name'=>'<16','data'=> array()],
+            ['min'=>0,'max'=>16,'name'=>'<16','data'=> array()],
             ['min'=>16,'max'=>17,'name'=>'16','data'=> array()],
             ['min'=>17,'max'=>18,'name'=>'17','data'=> array()],
             ['min'=>18,'max'=>19,'name'=>'18','data'=> array()],
@@ -501,14 +501,18 @@ class StudentAnnualController extends Controller
             ['min'=>40,'max'=>100,'name'=>'>39','data'=> array()]
         );
 
+        $total_scholarship = 0;
+        $total_paid = 0;
+
 
         foreach($ages as &$age){
             $t_st = 0;
             $t_sf = 0;
             $t_pt = 0;
             $t_pf = 0;
+
             foreach($grades as $grade){
-                $minDate = Carbon::createFromFormat("d/m/Y",$date)->subYears($age['max'])->subDay();
+                $minDate = Carbon::createFromFormat("d/m/Y",$date)->subYears($age['max'])->startOfDay();
                 $maxDate = Carbon::createFromFormat("d/m/Y",$date)->subYears($age['min'])->subDay()->endOfDay();
 
                 $total = DB::table('studentAnnuals')
@@ -574,7 +578,11 @@ class StudentAnnualController extends Controller
             }
 
             array_push($age['data'],array('st'=>$t_st,'sf'=>$t_sf,'pt'=>$t_pt,'pf'=>$t_pf));
+            $total_scholarship = $total_scholarship+ $t_st;
+            $total_paid = $total_paid + $t_pt;
         }
+
+        //dd("total:".$total_scholarship." | scholarship:".$total_paid." | all: ".($total_paid+$total_scholarship));
         return $ages;
     }
 
