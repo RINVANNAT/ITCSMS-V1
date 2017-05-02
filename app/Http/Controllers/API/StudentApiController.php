@@ -100,6 +100,34 @@ class StudentApiController extends Controller
         }
     }
 
+    public function student_program(Request $request) {
+
+        $dataParams = FormParamManager::getFormParams($request);
+        $studentIdCard = isset($dataParams['student_id_card'])?$dataParams['student_id_card']:null;
+        if ($studentIdCard != null) {
+            return Student::where('id_card', $studentIdCard)->first();
+        } else {
+            return [];
+        }
+    }
+
+
+    public function student_prop(Request $request) {
+
+        $dataParams = FormParamManager::getFormParams($request);
+        $studentIdCard = isset($dataParams['student_id_card'])?$dataParams['student_id_card']:null;
+
+        $studentProp = Student::where('id_card', $studentIdCard)
+            ->join('genders', function($query) {
+                $query->on('genders.id', '=', 'students.gender_id');
+            })->first();
+
+        return $studentProp;
+
+
+
+    }
+
 
 
 

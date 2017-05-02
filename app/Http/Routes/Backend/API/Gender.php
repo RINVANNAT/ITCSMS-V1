@@ -7,5 +7,5 @@
  */
 
 
-Route::get('/all', 'GenderApiController@getAll')->name('gender.all');
-Route::get('/unique', 'GenderApiController@unique')->name('gender.unique');
+Route::get('/all', 'GenderAPIController@getAll')->name('gender.all');
+Route::get('/unique', 'GenderAPIController@unique')->name('gender.unique');
