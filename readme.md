@@ -36,6 +36,28 @@ If you would like to help the continued efforts of this project, any size [donat
 The Laravel framework is open-sourced software licensed under the MIT license
 
 ### Migration Command
-- Edit migrate file `2016_09_15_165639_modify_bac2_max_name_size.php` and rename `\"studentBac2s\"`
-- And then run command `php artisan migrate`
-- Re-edit migrate file `2016_09_15_165639_modify_bac2_max_name_size.php` 
+
+- Edit migrate file 
+    ```
+    2016_09_15_165639_modify_bac2_max_name_size.php
+    ```
+    and rename `\"studentBac2s\"`
+- And then run command 
+    ```
+    php artisan migrate
+    ```
+- Re-edit migrate file 
+    ```
+    2016_09_15_165639_modify_bac2_max_name_size.php
+    ``` 
+    
+### Generate data into database
+- Run db:seed command
+
+    ```
+    php artisan db:seed
+    php artisan db:seed --class=SeedCustomsPermissions
+    php artisan db:seed --class=GroupTableSeeder
+    php artisan db:seed --class=GroupStudentAnnualSeeder
+    php artisan db:seed --class=CourseAnnualGroupSeeder
+    ```
