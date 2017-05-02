@@ -144,6 +144,16 @@ class EloquentAverageRepository implements AverageRepositoryContract
     }
 
 
+    public function updateResitScore($input) {
+
+        $average = $this->findAverageByCourseIdAndStudentId($input['course_annual_id'], $input['student_annual_id']);
+        $averageModel = $this->findOrThrowException($average->id);
+        $averageModel->resit_score = $input['resit_score'];
+        if($averageModel->save()) {
+            return true;
+        }
+
+    }
 
 
 }

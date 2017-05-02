@@ -44,7 +44,7 @@ class AppServiceProvider extends ServiceProvider
         view()->composer('backend.schedule.timetables.includes.partials.option', function ($view) {
             if (access()->allow('global-timetable-management')) {
                 $view->with([
-                    'academicYears' => AcademicYear::all(),
+                    'academicYears' => AcademicYear::latest()->get(),
                     'departments' => Department::all(),
                     'degrees' => Degree::all(),
                     'grades' => Grade::all(),
@@ -53,7 +53,7 @@ class AppServiceProvider extends ServiceProvider
                 ]);
             } else {
                 $view->with([
-                    'academicYears' => AcademicYear::all(),
+                    'academicYears' => AcademicYear::latest()->get(),
                     'department' => Department::find(auth()->user()->getDepartment()),
                     'grades' => Grade::all(),
                     'semesters' => Semester::all()

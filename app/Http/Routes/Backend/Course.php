@@ -127,5 +127,7 @@ Route::group([
 
     Route::get('/student/resit-subject-lists', 'CourseAnnualController@resitSubjectLists')->name('student.resit_subject_lists');
 
+    Route::post('/course/store-resit-score', 'CourseAnnualController@storeResitScore')->name('admin.score.store_resit');
+
 
 });

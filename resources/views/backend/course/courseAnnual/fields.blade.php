@@ -74,7 +74,6 @@
 </div>
 
 
-
 <div class="form-group">
     {!! Form::label('degree', trans('labels.backend.courseAnnuals.fields.degree'), ['class' => 'col-lg-3 control-label required']) !!}
     <div class="col-lg-5">
@@ -126,7 +125,7 @@
     </div>
 
 {{--    {!! Form::label('group','',  ['class' => 'col-lg-3 control-label']) !!}--}}
-    <div class="col-lg-7" id="group_panel">
+    <div class="col-lg-2" id="group_panel">
 
         @if(isset($groups))
 
@@ -139,11 +138,11 @@
                         @foreach($courseAnnual->courseAnnualClass as $class)
                             @if(trim($group) == trim($class->group))
                                 <?php $status =false;?>
-                                <label for="group"> <input type="checkbox" name="groups[]" class="each_check_box" value="{{$class->group}}" checked> {{$class->group}}</label>
+                                <label for="{{$class->group}}"> <input id="{{$class->group}}" type="checkbox" name="groups[]" class="each_check_box" value="{{$class->group}}" checked> {{$class->group}}</label>
                             @endif
                         @endforeach
                         @if($status == true)
-                            <label for="group"> <input type="checkbox" name="groups[]" class="each_check_box" value="{{$group}}"> {{$group}}</label>
+                            <label for="{{$group}}"> <input id="{{$group}}" type="checkbox" name="groups[]" class="each_check_box" value="{{$group}}"> {{$group}}</label>
                         @endif
 
                     @endif
@@ -152,6 +151,19 @@
         @endif
 
     </div>
+
+      @if(isset($courseAnnual))
+          @if($courseAnnual->is_having_resitted)
+            <label for="having_resitted" class="col-lg-2 control-label required"> Allow Resit <input id="having_resitted" type="checkbox" name="is_having_resitted"  value="{{\App\Models\Enum\ScoreEnum::is_having_resitted}}" checked>  </label>
+          @else
+            <label for="having_resitted" class="col-lg-2 control-label required"> Allow Resit <input id="having_resitted" type="checkbox" name="is_having_resitted"  value="{{\App\Models\Enum\ScoreEnum::is_having_resitted}}">  </label>
+          @endif
+
+      @else
+        <label for="having_resitted" class="col-lg-2 control-label required"> Allow Resit <input id="having_resitted" type="checkbox" name="is_having_resitted"  value="{{\App\Models\Enum\ScoreEnum::is_having_resitted}}">  </label>
+      @endif
+
+
 </div>
 
 <div class="form-group">

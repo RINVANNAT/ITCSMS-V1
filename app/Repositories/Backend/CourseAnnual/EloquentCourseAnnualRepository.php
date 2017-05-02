@@ -79,6 +79,13 @@ class EloquentCourseAnnualRepository implements CourseAnnualRepositoryContract
             $courseAnnual->is_counted_creditability = false;
         }
 
+
+        if(isset($input["is_having_resitted"])){
+            $courseAnnual->is_having_resitted = true;
+        } else {
+            $courseAnnual->is_having_resitted = false;
+        }
+
         $courseAnnual->course_id = $input['course_id'];
         $courseAnnual->employee_id = isset($input['employee_id'])?$input['employee_id']:null;
 
@@ -191,6 +198,12 @@ class EloquentCourseAnnualRepository implements CourseAnnualRepositoryContract
             $courseAnnual->is_counted_absence = true;
         } else {
             $courseAnnual->is_counted_absence = false;
+        }
+
+        if(isset($input["is_having_resitted"])){
+            $courseAnnual->is_having_resitted = true;
+        } else {
+            $courseAnnual->is_having_resitted = false;
         }
 
         if(isset($input["is_counted_creditability"])){

@@ -81,4 +81,3 @@
                 data-dismiss="modal">{{ trans('buttons.backend.schedule.timetable.modal_clone.close') }}</button>
     </div>
 </div>
-

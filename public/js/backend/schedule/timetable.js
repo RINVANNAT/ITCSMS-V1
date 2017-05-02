@@ -121,26 +121,26 @@ $(document).ready(function () {
         eventRender: function (event, element, view) {
             var object ='<a class="fc-time-grid-event fc-v-event fc-event fc-start fc-end course-item  fc-draggable fc-resizable" style="top: 65px; bottom: -153px; z-index: 1; left: 0%; right: 0%;">' +
 
-                        '<div class="fc-content">' +
-                            '<div class="container-room">' +
-                                '<div class="side-course">' +
-                                    '<div class="fc-title conflict" data-toggle="tooltip" data-placement="right" title="Tooltip on top">' + event.title + '</div>' +
-                                    '<p class="text-primary conflict">Mr. YOU Vandy</p> ' +
-                                    '<p class="text-primary conflict">Course</p> ' +
-                                '</div>' +
-                                '<div class="side-room">' +
-                                    '<div class="room-name"><span class="render-room"></span></div> ' +
-                                    '<div class="room-action">' +
-                                        '<button class="btn btn-warning btn-xs" id="btn-conflict"><i class="fa fa-question"></i> </button> ' +
-                                        '<span class="render-trash"></span> ' +
-                                    '</div> ' +
-                                '</div> ' +
-                                '<div class="clearfix"></div> ' +
-                            '</div>' +
-                        '</div>' +
-                        '<div class="fc-bgd"></div>' +
-                        '<div class="fc-resizer fc-end-resizer"></div>' +
-                        '</a>';
+                '<div class="fc-content">' +
+                '<div class="container-room">' +
+                '<div class="side-course">' +
+                '<div class="fc-title conflict" data-toggle="tooltip" data-placement="right" title="Tooltip on top">' + event.title + '</div>' +
+                '<p class="text-primary conflict">Mr. YOU Vandy</p> ' +
+                '<p class="text-primary conflict">Course</p> ' +
+                '</div>' +
+                '<div class="side-room">' +
+                '<div class="room-name"><span class="render-room"></span></div> ' +
+                '<div class="room-action">' +
+                '<button class="btn btn-warning btn-xs" id="btn-conflict"><i class="fa fa-question"></i> </button> ' +
+                '<span class="render-trash"></span> ' +
+                '</div> ' +
+                '</div> ' +
+                '<div class="clearfix"></div> ' +
+                '</div>' +
+                '</div>' +
+                '<div class="fc-bgd"></div>' +
+                '<div class="fc-resizer fc-end-resizer"></div>' +
+                '</a>';
 
             return $(object);
         },
