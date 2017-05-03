@@ -41,6 +41,11 @@ $(document).ready(function () {
         get_course_sessions();
     });
 
+    // search rooms.
+    $(document).on('keyup', 'input[name="search_room_query"]', function () {
+        search_rooms($(this).val());
+    });
+
     // Call function dragging courses sessions.
     $('.room-item').removeAttr('style');
     $('.course-item').removeAttr('style');
@@ -76,8 +81,7 @@ $(document).ready(function () {
         var room = '';
         for (var i = 0; i < 10; i++) {
             room += '<div class="room-item suggest-room">';
-            room += '<i class="fa fa-ellipsis-v"></i> ';
-            room += '<i class="fa fa-ellipsis-v"></i> F-' + Math.floor(Math.random() * 201)
+            room += '<i class="fa fa-building"></i> F-' + Math.floor(Math.random() * 201)
             room += '</div> ';
         }
         // Apply with $.ajax({ /** implementation.... */ });
@@ -186,11 +190,10 @@ var get_groups = function () {
             url: '/admin/schedule/timetables/get_groups',
             data: $('#options-filter').serialize(),
             success: function (response) {
-                if(response.status == true)
-                {
+                if (response.status == true) {
                     var group_item = '';
                     $.each(response.groups, function (key, val) {
-                        group_item += '<option value="'+val.id+'">'+val.group+'</option>';
+                        group_item += '<option value="' + val.id + '">' + val.group + '</option>';
                     });
 
                     $('select[name="group"]').html(group_item);
@@ -286,4 +289,38 @@ var get_course_sessions = function () {
             }
         });
     }, 100);
+};
+
+var search_rooms = function (query) {
+    $.ajax({
+        type: 'POST',
+        url: '/admin/schedule/timetables/search_rooms',
+        data: {query: query},
+        success: function (response) {
+            if (response.status == true) {
+                var room_item = '';
+                $.each(response.rooms, function (key, val) {
+                    room_item += '<div class="room-item">'
+                        + '<i class="fa fa-building-o"></i> '
+                        + val.name
+                        + '</div> ';
+                });
+
+                $('.rooms').html(room_item);
+            }
+            else {
+                var message = '<div class="room-item bg-danger" style="width: 100%; background-color: red; color: #fff;">' +
+                    '<i class="fa fa-warning"></i> Room not found!' +
+                    '</div>';
+                $('.rooms').html(message);
+            }
+        },
+        error: function () {
+            swal(
+                'Oops...',
+                'Something went wrong!',
+                'error'
+            );
+        }
+    });
 };

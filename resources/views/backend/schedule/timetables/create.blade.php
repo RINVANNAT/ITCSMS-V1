@@ -28,11 +28,11 @@
 
         <div class="box-body">
             <div class="row">
-                <div class="col-md-9">
+                <div class="col-md-8" style="overflow-x: auto">
                     {{--Timetable render--}}
-                    <div id="timetable"></div>
+                    <div id="timetable" style="width: 1345px;"></div>
                 </div>
-                <div class="col-md-3">
+                <div class="col-md-4">
 
                     @include('backend.schedule.timetables.includes.partials.courses-sessions')
 
@@ -134,7 +134,7 @@
                         '<div class="fc-content">' +
                         '<div class="container-room">' +
                         '<div class="side-course">' +
-                        '<div class="fc-title">' + event.title + '</div>' +
+                        '<div class="fc-title">'+(event.title).substring(0, 10)+'...</div>' +
                         '<p class="text-primary">'+event.teacherName+'</p> ' +
                         '<p class="text-primary">'+event.typeCourseSession+'</p> ' +
                         '</div>' +

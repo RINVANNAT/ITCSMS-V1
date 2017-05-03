@@ -14,6 +14,7 @@ Route::group(['namespace' => 'Schedule', 'prefix' => 'schedule'], function () {
     Route::post('timetables/get_options', 'TimetableController@get_options')->name('admin.schedule.timetables.get_options');
     Route::post('timetables/get_groups', 'TimetableController@get_groups')->name('admin.schedule.timetables.get_groups');
     Route::post('timetables/get_course_sessions', 'TimetableController@get_course_sessions')->name('admin.schedule.timetables.get_course_sessions');
+    Route::post('timetables/search_rooms', 'TimetableController@search_rooms')->name('admin.schedule.timetables.search_rooms');
 
     Route::post('timetables/filter-courses-sessions', 'TimetableController@filterCoursesSessions')->name('admin.schedule.timetables.filterCoursesSessions');
 
