@@ -123,6 +123,7 @@
     {!! Html::script('plugins/datatables/jquery.dataTables.min.js') !!}
     {!! Html::script('plugins/datatables/dataTables.bootstrap.min.js') !!}
     {!! Html::script('plugins/sweetalert2/dist/sweetalert2.js') !!}
+    {!! Html::script('js/backend/schedule/timetable.js') !!}
     <script type="text/javascript">
         $('#list-timetable').DataTable();
 
@@ -134,7 +135,7 @@
                 url: '/admin/schedule/timetables/filter',
                 data: $('#filter-timetable-view').serialize(),
                 success: function (response) {
-                    console.log(response);
+                    // console.log(response);
                 },
                 error: function () {
                     swal(

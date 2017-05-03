@@ -7,13 +7,15 @@
             </div>
             <div class="box-body">
                 <div class="rooms">
-                    @for($i=0; $i<100; $i++)
-                        <div class="room-item">
-                            <i class="fa fa-ellipsis-v"></i>
-                            <i class="fa fa-ellipsis-v"></i>
-                            F-309
-                        </div>
-                    @endfor
+                    @if(isset($rooms))
+                        @foreach($rooms as $room)
+                            <div class="room-item">
+                                <i class="fa fa-ellipsis-v"></i>
+                                <i class="fa fa-ellipsis-v"></i>
+                                {{ $room->name }}
+                            </div>
+                        @endforeach
+                    @endif
                 </div>
             </div>
         </div>

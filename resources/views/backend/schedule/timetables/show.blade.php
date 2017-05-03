@@ -60,5 +60,6 @@
     {!! Html::script('plugins/sweetalert2/dist/sweetalert2.js') !!}
     {!! Html::script('js/backend/schedule/timetable.js') !!}
     {!! Html::script('js/backend/schedule/clone-timetable.js') !!}
+    {!! Html::script('js/backend/schedule/timetable.js') !!}
 
 @stop
