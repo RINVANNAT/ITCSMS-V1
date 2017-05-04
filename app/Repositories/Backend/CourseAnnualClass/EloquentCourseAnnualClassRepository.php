@@ -57,7 +57,6 @@ class EloquentCourseAnnualClassRepository implements CourseAnnualClassRepository
      */
     public function create($input)
     {
-
         $test = [];
         if(!isset($input['department_option_id']) || $input['department_option_id'] == ""){
             $input['department_option_id'] = null;

@@ -405,17 +405,31 @@ trait StudentScore {
     public function selectedGroupByCourseAnnual($array_course_annual_ids) {
 
         $arrayGroups = [];
-        $selectedGroups = DB::table('course_annual_classes')
+        $selectedGroups = collect(
+            DB::table('course_annual_classes')
             ->where('course_session_id', null)
+            ->whereNotNull('group_id')
             ->whereIn('course_annual_id', $array_course_annual_ids)
-            ->get();
+            ->select('course_annual_id', 'group_id')
+            ->get()
+        )->groupBy('course_annual_id');
+
+        $groups = $selectedGroups->toArray();
+        foreach($array_course_annual_ids as $annual_id) {
+            if(isset($groups[$annual_id])) {
+                $arrayGroups[$annual_id] =array_column( json_decode(json_encode($groups[$annual_id]), true), 'group_id');
+            }
+        }
+        return $arrayGroups;
+
+       /*
         foreach($selectedGroups as $group) {
             if($group->group_id != null) {
                 $arrayGroups[$group->course_annual_id][] = $group->group_id;
             }
         }
 
-        return $arrayGroups;
+        return $arrayGroups;*/
     }
 
     public function findPassOrFailStudentScore($request) {

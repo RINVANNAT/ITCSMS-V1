@@ -128,12 +128,15 @@ trait StudentTrait
 
         $groupByCourseAnnual = isset($groups[$course_annual->course_annual_id])?$groups[$course_annual->course_annual_id]:null;
 
+
+
         if($deptOptionId = $course_annual->department_option_id) {
 
             $filtered_students =  $this->getStudentByDeptIdGradeIdDegreeId([$course_annual->department_id], [$course_annual->degree_id], [$course_annual->grade_id], $course_annual->academic_year_id);
             $filtered_students = $filtered_students->whereIn('studentAnnuals.department_option_id', [$deptOptionId]);
 
             if($groupByCourseAnnual != null) {
+
                 $filtered_students = $filtered_students->whereIn('studentAnnuals.group_id', $groupByCourseAnnual)->get();
             } else {
                 $filtered_students =  $filtered_students->get();//->where('studentAnnuals.group', null)->get();
@@ -144,6 +147,7 @@ trait StudentTrait
             $filtered_students =  $this->getStudentByDeptIdGradeIdDegreeId([$course_annual->department_id], [$course_annual->degree_id], [$course_annual->grade_id], $course_annual->academic_year_id);
 
             if($groupByCourseAnnual != null) {
+
                 $filtered_students = $filtered_students->whereIn('studentAnnuals.group_id', $groupByCourseAnnual)->get();
             } else {
                 $filtered_students =  $filtered_students->get();//->where('studentAnnuals.group', null)->get();

@@ -7,21 +7,22 @@
  */
 
 namespace App\Traits;
+use App\Models\Course;
+use App\Models\CourseAnnual;
+use App\Models\CourseSession;
 use Illuminate\Support\Facades\DB;
 use App\Models\Department;
 use Illuminate\Support\Facades\Response;
 use App\Models\Semester;
 use App\Models\Enum\SemesterEnum;
-
+use App\Models\CourseAnnualClass;
 trait CourseSessionTrait
 {
 
 
     public function courseSessionByTeacherFromDB($academicYearId, $grade_id, $degree_id) {
 
-        $arrayCourses = [];
-
-        $courseSessions = $this->getCourseSessionFromDB();
+        $courseSessions = $this->course_session_by_teacher($academicYearId);
         $courseSessions = $courseSessions->where('course_annuals.academic_year_id', $academicYearId);
         if($degree_id) {
             $courseSessions = $courseSessions->where('course_annuals.degree_id', '=',$degree_id);
@@ -29,16 +30,42 @@ trait CourseSessionTrait
         if($grade_id) {
             $courseSessions = $courseSessions->where('course_annuals.grade_id', '=',$grade_id);
         }
-        $courseSessions = $courseSessions->get();
+        $courseSessions = $courseSessions->get()->groupBy('lecturer_id');
+
+        return $courseSessions;
+    }
+
+    public function course_session_by_teacher($academicYearId/*, $grade_id, $degree_id*/) {
 
 
-        foreach($courseSessions as $courseSession) {
-            if($courseSession->lecturer_id != null) {
-                $arrayCourses[$courseSession->lecturer_id][] = $courseSession;
-            }
+        /*
+        $activeUsers = DB::table('course_sessions')
+            ->select('lecturer_id', DB::raw('count(*) as lecturer_ids'))
+            ->groupBy('lecturer_id')
+            ->orderBy('lecturer_ids', 'desc')
+            ->get();
+        $courseSession = collect(DB::table('course_sessions')->get())->groupBy('lecturer_id')->toArray();
+        dd($courseSession);
+        */
 
-        }
-        return $arrayCourses;
+        $course_annuals = CourseAnnual::where('academic_year_id', $academicYearId)
+            ->join('course_sessions', function($query) {
+                    $query->on('course_annuals.id', '=', 'course_sessions.course_annual_id')
+                            ->whereNotNull('course_sessions.lecturer_id');
+            })
+            ->join('degrees', 'degrees.id','=', 'course_annuals.degree_id')
+            ->select($this->getCols());
+
+        return $course_annuals;
+
+    }
+
+    public function getCols() {
+
+        return ['course_sessions.lecturer_id', 'course_sessions.time_course as time_course_session', 'course_sessions.time_td as time_td_session', 'course_sessions.time_tp as time_tp_session',
+            'course_sessions.course_annual_id', 'course_sessions.id as course_session_id', 'course_annuals.department_id', 'course_annuals.degree_id', 'course_annuals.grade_id',
+            'course_annuals.department_option_id', 'course_annuals.semester_id', 'course_annuals.academic_year_id',
+            'course_annuals.name_en as name_en','course_annuals.name_kh', 'course_annuals.name_fr', 'degrees.code as degree_code'];
     }
 
     public function getCourseSessionFromDB() {
@@ -46,30 +73,30 @@ trait CourseSessionTrait
         $courseSessions = DB::table('course_sessions')
             ->leftJoin('course_annuals', 'course_annuals.id', '=', 'course_sessions.course_annual_id')
             ->leftJoin('degrees', 'degrees.id', '=', 'course_annuals.degree_id')
-            ->select(
-                'course_sessions.lecturer_id', 'course_sessions.time_course as time_course_session', 'course_sessions.time_td as time_td_session', 'course_sessions.time_tp as time_tp_session',
-                'course_sessions.course_annual_id', 'course_sessions.id as course_session_id', 'course_annuals.department_id', 'course_annuals.degree_id', 'course_annuals.grade_id',
-                'course_annuals.department_option_id', 'course_annuals.semester_id', 'course_annuals.academic_year_id',
-                'course_annuals.name_en as name_en','course_annuals.name_kh', 'course_annuals.name_fr', 'degrees.code as degree_code'
-            );
+            ->select($this->getCols());
 
         return $courseSessions;
     }
 
     public function course_session_by_dept($dept_id) {
 
-        $course_sessions = DB::table('course_sessions')
+       /* $course_sessions = DB::table('course_sessions')
             ->join('course_annuals', 'course_annuals.id','=', 'course_sessions.course_annual_id')
             ->join('degrees', 'degrees.id', '=', 'course_annuals.degree_id')
             ->where(function($query) use ($dept_id) {
                 $query->whereIn('course_sessions.course_annual_id', DB::table('course_annuals')->where('department_id', $dept_id)->lists('id'));
-            })->select(
-                'course_sessions.lecturer_id', 'course_sessions.time_course as time_course_session', 'course_sessions.time_td as time_td_session', 'course_sessions.time_tp as time_tp_session',
-                'course_sessions.course_annual_id', 'course_sessions.id as course_session_id', 'course_annuals.department_id', 'course_annuals.degree_id', 'course_annuals.grade_id',
-                'course_annuals.department_option_id', 'course_annuals.semester_id', 'course_annuals.academic_year_id',
-                'course_annuals.name_en as name_en','course_annuals.name_kh', 'course_annuals.name_fr', 'degrees.code as degree_code'
-            );
-        return $course_sessions;
+            })->select($this->getCols());*/
+
+        $courseSessions =  CourseAnnual::where('department_id', $dept_id)
+            ->join('course_sessions', function($query) {
+                $query->on('course_annuals.id', '=', 'course_sessions.course_annual_id')
+                    ->whereNull('course_sessions.lecturer_id');
+            })
+            ->join('degrees', 'degrees.id','=', 'course_annuals.degree_id')
+            ->select($this->getCols());
+
+
+        return $courseSessions;
 
     }
 
@@ -78,7 +105,13 @@ trait CourseSessionTrait
         if($deptId) {
             $courseSessions = $this->course_session_by_dept($deptId);
         } else {
-            $courseSessions = $this->getCourseSessionFromDB();
+            $courseSessions =  CourseAnnual::where('academic_year_id', $academicYearId)
+                ->join('course_sessions', function($query) {
+                    $query->on('course_annuals.id', '=', 'course_sessions.course_annual_id')
+                        ->whereNull('course_sessions.lecturer_id');
+                })
+                ->join('degrees', 'degrees.id','=', 'course_annuals.degree_id')
+                ->select($this->getCols());
         }
 
         $courseSessions = $courseSessions->where('course_sessions.lecturer_id', '=', null);// this to get not assigned courses
@@ -89,10 +122,10 @@ trait CourseSessionTrait
             $courseSessions = $courseSessions->where('course_annuals.department_id', $deptId);
 //            $courseAnnuals = $courseAnnuals->where('departments.id', '=',$deptId);
         }
-        if($academicYearId) {
+        /*if($academicYearId) {
             $courseSessions = $courseSessions->where('course_annuals.academic_year_id', $academicYearId);
 //            $courseAnnuals = $courseAnnuals->where('course_annuals.academic_year_id', '=',$academicYearId);
-        }
+        }*/
 
         if($degree_id) {
             $courseSessions = $courseSessions->where('course_annuals.degree_id', $degree_id);
@@ -113,6 +146,7 @@ trait CourseSessionTrait
 //            $courseAnnuals = $courseAnnuals->where('course_annuals.semester_id', '=',$semester_id);
         }
         $courseSessions = $courseSessions->get();
+
 
         return $courseSessions;
 
@@ -165,15 +199,15 @@ trait CourseSessionTrait
 
     public function getGroupBySessionAndAnnualCourse() {
 
-        $array =[];
-        $groups = DB::table('course_annual_classes')->get();
+        $groups = CourseAnnualClass::all()
+            ->whereIn('course_session_id',DB::table('course_sessions')->lists('id'))
+            ->groupBy('course_session_id', true)
+            ->toArray();//keyBy('course_session_id')->
+        return ($groups);
 
-        foreach($groups as $group) {
-            if($group->course_session_id != null) {
-                $array[$group->course_session_id][] = $group;
-            }
-        }
-        return ($array);
+    }
+
+    public function course_annual_class_group() {
 
     }
 
@@ -487,12 +521,121 @@ trait CourseSessionTrait
 
     public function formatGroupName($listsGroup) {
 
-        dd($listsGroup);
         $name = '';
+
         foreach($listsGroup as $group) {
-            $name = $name.' '.$group->group;
+            $name = $name.' '.$group['group_id'];
         }
         return $name;
+    }
+
+    public function assign_course($request) {
+
+        $arrayCourseId = $request->course_id;
+        $arrayTeacherId = $request->teacher_id;
+        $check =0;
+        $uncount =0;
+        $index=0;
+
+        if(count($arrayTeacherId) > 0) {
+
+            if(count($arrayCourseId) >0 ) {
+
+
+                foreach($arrayTeacherId as $teacher) {
+
+                    $teacherId = explode('_', $teacher);
+
+                    if(count($teacherId) == 4) {
+                        $lecturer_id = $teacherId[3];
+
+                        foreach($arrayCourseId as $course) {
+
+                            $courseId = explode('_', $course);
+
+                            if(count($courseId) == 4) {
+
+                                $course_session_id = $courseId[3];
+
+                                $input = [
+                                    'active' => true,
+                                    'lecturer_id' => $lecturer_id,
+                                ];
+                                $res = $this->updateCourse($course_session_id, $input);
+
+                                if($res) {
+                                    $check++;
+                                }
+
+                            } else {
+                                $index++;
+                            }
+                        }
+
+                    } else {
+                        $uncount++;
+                    }
+                }
+
+                if((count($arrayTeacherId)- $uncount) != 0) {
+                    if($check == ( count($arrayCourseId) - $index ) * (count($arrayTeacherId)- $uncount) ) {
+
+                        return['status' => true, 'message' => 'Course Added'];
+
+                    } else {
+                        return ['status' => false, 'message' => 'Course Not Added!!'];
+                    }
+                } else {
+                    return ['status' => false, 'message' => 'Teacher Not Selected!!'];
+                }
+
+            } else {
+                return ['status' => false, 'message' => 'Not Selected Course!!'];
+            }
+
+        } else {
+            return ['status' => false, 'message' => 'Not Seleted Teacher!'];
+        }
+
+    }
+
+
+    public function updateCourse($courseSessionId, $input) {
+
+
+        $courseSession = CourseSession::where('id', $courseSessionId)->first();
+        $courseSession->lecturer_id = isset($input['lecturer_id'])?$input['lecturer_id']:null;
+        $courseSession->write_uid = auth()->id();
+
+        if ($courseSession->save()) {
+            return true;
+        } else {
+            return false;
+        }
+
+    }
+
+
+    public function selectedGroupByCourseSession($array_course_session_ids) {
+
+        $arrayGroups = [];
+        $selectedGroups = collect(
+            DB::table('course_annual_classes')
+                ->where('course_annual_id', null)
+                ->whereNotNull('group_id')
+                ->whereIn('course_session_id', $array_course_session_ids)
+                ->select('course_session_id', 'group_id')
+                ->get()
+        )->groupBy('course_session_id');
+
+        $groups = $selectedGroups->toArray();
+        foreach($array_course_session_ids as $annual_id) {
+            if(isset($groups[$annual_id])) {
+                $arrayGroups[$annual_id] =array_column( json_decode(json_encode($groups[$annual_id]), true), 'group_id');
+            }
+        }
+        return $arrayGroups;
+
     }
 
 }

@@ -46,87 +46,77 @@
                     <tr style="background-color: #0a6aa1; color: #00ee00">
                         <th>Order</th>
                         <th>Name</th>
-                        <th>Updating</th>
+                        <th>Input Value</th>
                     </tr>
                     </thead>
                     <tbody>
                     <tr>
-                        <td width="1cm">1</td>
-                        <td width="20cm"> Khmer</td>
-                        <td><input type="text" name="name_kh" class="form-control inputs_val" value="{{$course->name_kh}}"></td>
-
-                    </tr>
-                    <tr>
-                        <td>2</td>
-                        <td> English</td>
-                        <td><input type="text" name="name_en" class="form-control inputs_val" value="{{$course->name_en}}"></td>
-                    </tr>
-                    <tr>
-                        <td>3</td>
-                        <td> France</td>
-                        <td><input type="text" name="name_fr" class="form-control inputs_val" value="{{$course->name_fr}}"></td>
-                    </tr>
-                    <tr>
-                        <td>4</td>
+                        <td>1</td>
                         <td>Time Course</td>
                         <td>
                             {!! Form::text('time_course', ($course->time_course != null)?$course->time_course:0, ['class' => 'form-control number_only inputs_val','required'=>'required']) !!}
                         </td>
                     </tr>
                     <tr>
-                        <td>5</td>
+                        <td>1</td>
                         <td>Time TD</td>
                         <td>
                             {!! Form::text('time_td', ($course->time_td != null)?$course->time_td:0, ['class' => 'form-control number_only inputs_val','required'=>'required']) !!}
                         </td>
                     </tr>
                     <tr>
-                        <td>6</td>
+                        <td>2</td>
                         <td>Time TP</td>
                         <td>
                             {!! Form::text('time_tp', ($course->time_tp != null)?$course->time_tp:0, ['class' => 'form-control number_only inputs_val','required'=>'required']) !!}
                         </td>
                     </tr>
-
-                    <tr>
-                        <td>7</td>
-                        <td>Credit</td>
-                        <td>
-                            {!! Form::text('course_annual_credit', ($course->credit != null)?$course->credit:0, ['class' => 'form-control inputs_val','required'=> true]) !!}
-                        </td>
-                    </tr>
-
-                    <tr>
-                        <td>7</td>
-                        <td> Semester </td>
-
-                        <td>
-                            <select name="semester_id" id="select_semester_id" class="enlarge-selection">
-                                @foreach($allSemesters as $semester)
-                                    @if($course->semester_id == $semester->id)
-                                        <option value="{{$semester->id}}" selected>{{$semester->name_en}}</option>
-                                    @else
-                                        <option value="{{$semester->id}}">{{$semester->name_en}}</option>
-
-                                    @endif
-
-                                @endforeach
-
-                            </select>
-                        </td>
-                    </tr>
-
-
-                    <tr>
-                        <td>8</td>
-                        <td> Group </td>
-
-                        <td>
-                            {!! Form::select('group',$allGroups,$course->group, array('class'=>'form-control','id'=>'group', 'placeholder' => 'Group')) !!}
-                        </td>
-                    </tr>
+                    
                     </tbody>
                 </table>
+
+            @if(isset($studentGroups))
+
+                <div class="col-md-12 no-padding" style=" text-align: left">
+                    <label style="font-size: 12pt" for="student" class="btn btn-primary btn-xs">
+                        <input type="checkbox" name="student" id="student" value="all">
+                        All Group
+                    </label>
+
+                </div>
+
+
+                <div class="col-md-12">
+                    @foreach($studentGroups as $group)
+                        @if(count($selected_groups) > 0))
+
+                            @if(in_array($group->group_code, $selected_groups[$course->id]))
+                                <label for="{{$group->group_id}}" style="font-size: 12pt" class="col-md-2 btn btn-xs">
+                                    <input type="checkbox" class="student_group" checked name="group[]" id="{{$group->group_id}}" value="{{$group->group_id}}">
+                                    {{$group->group_code}}
+                                </label>
+                            @else
+                                <label for="{{$group->group_id}}" style="font-size: 12pt" class=" col-md-2 btn  btn-xs">
+                                    <input type="checkbox"  class="student_group" name="group[]" id="{{$group->group_id}}" value="{{$group->group_id}}">
+                                    {{$group->group_code}}
+                                </label>
+
+                            @endif
+                        @else
+
+                            <label for="{{$group->group_id}}" style="font-size: 12pt" class=" col-md-2 btn btn-xs">
+                                <input type="checkbox" name="group[]" class="student_group" id="{{$group->group_id}}" value="{{$group->group_id}}">
+                                {{$group->group_code}}
+                            </label>
+                        @endif
+
+
+
+                    @endforeach
+                </div>
+
+            @endif
+
             {!! Form::close() !!}
         </div>
 
@@ -224,6 +214,15 @@
                 $('.inputs_val').eq(index).focus().select();
             }
         });
+
+
+        $('input[name=student]').on('change', function() {
+            if($(this).is(':checked')) {
+                $('.student_group').prop('checked', true);
+            } else {
+                $('.student_group').prop('checked', false);
+            }
+        })
 
 
     </script>
