@@ -3,6 +3,7 @@
 @section ('title', trans('labels.backend.schedule.timetable.meta_title'))
 
 @section('page-header')
+
     <h1>
         {{ trans('labels.backend.schedule.timetable.title') }}
         <small>{{ trans('labels.backend.schedule.timetable.sub_index_title') }}</small>
@@ -28,11 +29,11 @@
 
         <div class="box-body">
             <div class="row">
-                <div class="col-md-8" style="overflow-x: auto">
+                <div class="col-md-9 col-sm-12 col-xs-12" style="overflow-x: auto">
                     {{--Timetable render--}}
                     <div id="timetable" style="width: 1345px;"></div>
                 </div>
-                <div class="col-md-4">
+                <div class="col-md-3 col-sm-12 col-xs-12">
 
                     @include('backend.schedule.timetables.includes.partials.courses-sessions')
 
@@ -79,26 +80,18 @@
                 maxTime: '20:00:00',
                 slotLabelFormat: 'h:mm a',
                 columnFormat: 'dddd',
-                events: [],
+                events: '{{ route('admin.schedule.timetables.create') }}',
                 editable: true,
                 droppable: true,
                 dragRevertDuration: 10,
                 drop: function () {
-                    $(this).addClass('course-selected');
-
-                    setTimeout(function () {
-                        $(this).removeClass('course-selected');
-                    }, 100);
+                    store_save_timetable();
                 },
                 eventDragStart: function (event, jsEvent, ui, view) {
-                    var room = '';
-                    room += '<div class="room-item ui-draggable ui-draggable-handle">';
-                    room += '<i class="fa fa-refresh"></i> Loading...';
-                    room += '</div>';
-                    $('.rooms').html(room);
+                    get_rooms();
                 },
                 eventDragStop: function (event, jsEvent, ui, view) {
-                    if(isEventOverDiv(jsEvent.clientX, jsEvent.clientY)) {
+                    if (isEventOverDiv(jsEvent.clientX, jsEvent.clientY)) {
                         $('#timetable').fullCalendar('removeEvents', event._id);
                         $('#timetable').fullCalendar('removeEvents', event._id);
                         var course = '';
@@ -127,21 +120,21 @@
                 },
                 eventDrop: function (event, delta, revertFunc) {
                     // Trigger where move and drop the event on full calendar.
+                    alert('Drop all events.');
                 },
                 eventRender: function (event, element, view) {
-                    var object ='<a class="fc-time-grid-event fc-v-event fc-event fc-start fc-end course-item  fc-draggable fc-resizable" style="top: 65px; bottom: -153px; z-index: 1; left: 0%; right: 0%;">' +
+                    var object = '<a class="fc-time-grid-event fc-v-event fc-event fc-start fc-end course-item  fc-draggable fc-resizable" style="top: 65px; bottom: -153px; z-index: 1; left: 0%; right: 0%;">' +
 
                         '<div class="fc-content">' +
                         '<div class="container-room">' +
                         '<div class="side-course">' +
-                        '<div class="fc-title">'+(event.title).substring(0, 10)+'...</div>' +
-                        '<p class="text-primary">'+event.teacherName+'</p> ' +
-                        '<p class="text-primary">'+event.typeCourseSession+'</p> ' +
+                        '<div class="fc-title">' + (event.title).substring(0, 10) + '...</div>' +
+                        '<p class="text-primary">' + event.teacherName + '</p> ' +
+                        '<p class="text-primary">' + event.typeCourseSession + '</p> ' +
                         '</div>' +
                         '<div class="side-room">' +
                         '<div class="room-name"><span class="render-room"></span></div> ' +
                         '<div class="room-action">' +
-//                        '<button class="btn btn-warning btn-xs" id="btn-conflict"><i class="fa fa-question"></i> </button> ' +
                         '<span class="render-trash"></span> ' +
                         '</div> ' +
                         '</div> ' +
@@ -163,6 +156,7 @@
 
             });
 
+            // EventOverDiv
             var isEventOverDiv = function (x, y) {
 
                 var courses = $('.courses');

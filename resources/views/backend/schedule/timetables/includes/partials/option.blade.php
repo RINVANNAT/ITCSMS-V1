@@ -1,5 +1,8 @@
 @if(isset($academicYears))
-    <select name="academicYear">
+    <select name="academicYear"
+            data-toggle="tooltip"
+            data-placement="top"
+            title="{{ trans('inputs.backend.schedule.timetable.options.academic_year') }}">
         <option disabled>{{ trans('inputs.backend.schedule.timetable.options.academic_year') }}</option>
         @foreach($academicYears as $index => $academicYear)
             @if($index == 0)
@@ -13,7 +16,10 @@
 {{--admin--}}
 @if(access()->allow('global-timetable-management'))
     @if(isset($departments))
-        <select name="department">
+        <select name="department"
+                data-toggle="tooltip"
+                data-placement="top"
+                title="Department">
             @foreach($departments as $department)
                 <option value="{{ $department->id }}">{{ $department->code }}</option>
             @endforeach
@@ -21,7 +27,10 @@
     @endif
 
     @if(isset($degrees))
-        <select name="degree">
+        <select name="degree"
+                data-toggle="tooltip"
+                data-placement="top"
+                title="{{ trans('inputs.backend.schedule.timetable.options.degree') }}">
             <option disabled>{{ trans('inputs.backend.schedule.timetable.options.degree') }}</option>
             @foreach($degrees as $index => $degree)
                 @if($index == 0)
@@ -34,7 +43,10 @@
     @endif
 
     @if(isset($options))
-        <select name="option">
+        <select name="option"
+                data-toggle="tooltip"
+                data-placement="top"
+                title="{{ trans('inputs.backend.schedule.timetable.options.option') }}">
             <option selected disabled>{{ trans('inputs.backend.schedule.timetable.options.option') }}</option>
             @foreach($options as $option)
                 <option value="{{ $option->id }}">{{ $option->code }}</option>
@@ -44,7 +56,10 @@
 @else
 
     @if(isset($department))
-        <select name="degree">
+        <select name="degree"
+                data-toggle="tooltip"
+                data-placement="top"
+                title="{{ trans('inputs.backend.schedule.timetable.options.degree') }}">
             <option selected disabled>{{ trans('inputs.backend.schedule.timetable.options.degree') }}</option>
             @foreach($department->degrees as $degree)
                 <option value="{{ $degree->id }}">{{ $degree->name_en }}</option>
@@ -53,7 +68,10 @@
     @endif
 
     @if(count($department->department_options)>0)
-        <select name="option">
+        <select name="option"
+                data-toggle="tooltip"
+                data-placement="top"
+                title="{{ trans('inputs.backend.schedule.timetable.options.option') }}">
             <option selected disabled>{{ trans('inputs.backend.schedule.timetable.options.option') }}</option>
             @foreach($department->department_options as $option)
                 <option value="{{ $option->id }}">{{ $option->code }}</option>
@@ -63,7 +81,10 @@
 @endif
 
 @if(isset($grades))
-    <select name="grade">
+    <select name="grade"
+            data-toggle="tooltip"
+            data-placement="top"
+            title="{{ trans('inputs.backend.schedule.timetable.options.grade') }}">
         <option disabled>{{ trans('inputs.backend.schedule.timetable.options.grade') }}</option>
         @foreach($grades as $index => $grade)
             @if($index == 2)
@@ -76,7 +97,10 @@
 @endif
 
 @if(isset($semesters))
-    <select name="semester">
+    <select name="semester"
+            data-toggle="tooltip"
+            data-placement="top"
+            title="{{ trans('inputs.backend.schedule.timetable.options.semester') }}">
         <option disabled>{{ trans('inputs.backend.schedule.timetable.options.semester') }}</option>
         @foreach($semesters as $index => $semester)
             @if($index == 0)
@@ -88,12 +112,18 @@
     </select>
 @endif
 
-<select name="group">
+<select name="group"
+        data-toggle="tooltip"
+        data-placement="top"
+        title="{{ trans('inputs.backend.schedule.timetable.options.group') }}">
     <option selected disabled>{{ trans('inputs.backend.schedule.timetable.options.group') }}</option>
 </select>
 
 @if(isset($weeks))
-    <select name="weekly">
+    <select name="weekly"
+            data-toggle="tooltip"
+            data-placement="top"
+            title="{{ trans('inputs.backend.schedule.timetable.options.weekly') }}">
         <option selected disabled>{{ trans('inputs.backend.schedule.timetable.options.weekly') }}</option>
         @foreach($weeks as $week)
             <option value="{{ $week->id }}">{{ $week->name_en }}</option>

@@ -65,14 +65,6 @@ class AppServiceProvider extends ServiceProvider
             }
         });
 
-        /**
-         * Rooms records.
-         */
-        view()->composer('backend.schedule.timetables.includes.partials.rooms', function($view){
-           $view->with([
-               'rooms' => Room::all()
-           ]);
-        });
     }
 
     /**

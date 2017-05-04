@@ -28,11 +28,11 @@
 
         <div class="box-body">
             <div class="row">
-                <div class="col-md-8" style="overflow-x: auto">
+                <div class="col-md-9 col-sm-12 col-xs-12" style="overflow-x: auto">
                     {{--Timetable render--}}
                     <div id="timetable" style="width: 1345px;"></div>
                 </div>
-                <div class="col-md-4">
+                <div class="col-md-3 col-sm-12 col-xs-12">
 
                     @include('backend.schedule.timetables.includes.partials.courses-sessions')
 

@@ -3,7 +3,6 @@
 namespace App\Http\Controllers\Backend\Schedule\Traits;
 
 use App\Models\DepartmentOption;
-use App\Models\Room;
 use App\Models\Schedule\Timetable\Week;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Response;
@@ -36,6 +35,7 @@ trait AjaxFilterTimetableController
 
     /**
      * Get weeks by semester.
+     *
      * @return array
      * @internal param Request $request
      */
@@ -76,74 +76,28 @@ trait AjaxFilterTimetableController
         $degree_id = request('degree');
         $grade_id = request('grade');
         $semester_id = request('semester');
-        $option_id = request('option');
-
-        if (array_key_exists('option', request()->all())) {
-
-            $course_sessions = DB::table('course_sessions')
-                ->join('course_annuals', 'course_annuals.id', '=', 'course_sessions.course_annual_id')
-//                ->whereIn('course_sessions.course_annual_id', function ($query) use (
-//                    $academic_year_id,
-//                    $department_id,
-//                    $degree_id,
-//                    $grade_id,
-//                    $semester_id,
-//                    $option_id
-//                ) {
-//                    $query->select('course_annuals.id')
-//                        ->from('course_annuals')
-//                        ->where([
-//                            'course_annuals.academic_year_id' => $academic_year_id,
-//                            'course_annuals.department_id' => $department_id,
-//                            'course_annuals.degree_id' => $degree_id,
-//                            'course_annuals.grade_id' => $grade_id,
-//                            'course_annuals.semester_id' => $semester_id,
-//                            'course_annuals.department_option_id' => $option_id
-//                        ]);
-//                })
-                ->leftJoin('employees', 'employees.id', '=', 'course_sessions.lecturer_id')
-                ->select(
-                    'course_sessions.id as id',
-                    'course_annuals.name_en as course_name',
-                    'employees.name_latin as teacher_name',
-                    'course_sessions.time_tp as tp',
-                    'course_sessions.time_td as td',
-                    'course_sessions.time_course as courses'
-                )
-                ->orderBy('course_name', 'as', 'asc')
-                ->get();
-        } else {
-            $course_sessions = DB::table('course_sessions')
-                ->join('course_annuals', 'course_annuals.id', '=', 'course_sessions.course_annual_id')
-                ->whereIn('course_sessions.course_annual_id', function ($query) use (
-                    $academic_year_id,
-                    $department_id,
-                    $degree_id,
-                    $grade_id,
-                    $semester_id
-                ) {
-                    $query->select('course_annuals.id')
-                        ->from('course_annuals')
-                        ->where([
-                            'course_annuals.academic_year_id' => $academic_year_id,
-                            'course_annuals.department_id' => $department_id,
-                            'course_annuals.degree_id' => $degree_id,
-                            'course_annuals.grade_id' => $grade_id,
-                            'course_annuals.semester_id' => $semester_id
-                        ]);
-                })
-                ->leftJoin('employees', 'employees.id', '=', 'course_sessions.lecturer_id')
-                ->select(
-                    'course_sessions.id as id',
-                    'course_annuals.name_en as course_name',
-                    'employees.name_latin as teacher_name',
-                    'course_sessions.time_tp as tp',
-                    'course_sessions.time_td as td',
-                    'course_sessions.time_course as courses'
-                )
-                ->orderBy('course_name', 'as', 'asc')
-                ->get();
-        }
+        $option_id = request('option') == null ? null : request('option');
+        $group_id = request('group') == null ? null : request('group');
+        $course_sessions = DB::table('course_annuals')
+            ->where([
+                ['course_annuals.academic_year_id', $academic_year_id],
+                ['course_annuals.department_id', $department_id],
+                ['course_annuals.degree_id', $degree_id],
+                ['course_annuals.grade_id', $grade_id],
+                ['course_annuals.semester_id', $semester_id],
+                ['course_annuals.department_option_id', $option_id],
+            ])
+            ->join('course_sessions', 'course_sessions.course_annual_id', '=', 'course_annuals.id')
+            ->leftJoin('employees', 'employees.id', '=', 'course_sessions.lecturer_id')
+            ->select(
+                'course_sessions.id',
+                'course_sessions.time_tp as tp',
+                'course_sessions.time_td as td',
+                'course_sessions.time_course as tc',
+                'course_annuals.name_en as course_name',
+                'employees.name_latin as teacher_name'
+            )
+            ->get();
 
         if (count($course_sessions) > 0) {
             return Response::json([
@@ -168,18 +122,21 @@ trait AjaxFilterTimetableController
         $department_id = request('department');
         $degree_id = request('degree');
         $grade_id = request('grade');
+        $option_id = request('option') == null ? null : request('option');
 
         $groups = DB::table('studentAnnuals')
             ->where([
-                'academic_year_id' => $academic_year_id,
-                'department_id' => $department_id,
-                'degree_id' => $degree_id,
-                'grade_id' => $grade_id
+                ['academic_year_id', $academic_year_id],
+                ['department_id', $department_id],
+                ['degree_id', $degree_id],
+                ['grade_id', $grade_id],
+                ['department_option_id', $option_id]
             ])
-            ->select('studentAnnuals.group', 'studentAnnuals.group_id')
-            ->distinct('studentAnnuals.group')
+            ->join('groups', 'groups.id', '=', 'studentAnnuals.group_id')
+            ->orderBy('groups.code', 'asc')
+            ->select('studentAnnuals.group_id as id', 'groups.code as name')
+            ->distinct('studentAnnuals.group_id')
             ->get();
-
 
         if (count($groups) > 1) {
             return Response::json(['status' => true, 'groups' => $groups]);
@@ -188,13 +145,20 @@ trait AjaxFilterTimetableController
     }
 
     /**
+     * Search rooms.
+     *
      * @return array|string
      */
     public function search_rooms()
     {
         if (array_key_exists('query', request()->all())) {
-            if (request('query') != null) {
-                $rooms = Room::where('name', 'like', request('query') . "%")->get();
+            if (request('query') != ' ') {
+                $rooms = DB::table('rooms')
+                    ->join('buildings', 'buildings.id', '=', 'rooms.building_id')
+                    ->where('rooms.name', 'like', '%' . request('query') . '%')
+                    ->orWhere('buildings.code', 'like', '%' . request('query') . '%')
+                    ->select('rooms.id as id', 'rooms.name as name', 'buildings.code as code')
+                    ->get();
                 if (count($rooms) > 0) {
                     return Response::json([
                         'status' => true,
@@ -205,9 +169,24 @@ trait AjaxFilterTimetableController
                 }
             }
         }
+        $this->get_rooms();
+    }
+
+    /**
+     * Get all rooms.
+     *
+     * @return mixed
+     */
+    public function get_rooms()
+    {
+        $rooms = DB::table('rooms')
+            ->join('buildings', 'buildings.id', '=', 'rooms.building_id')
+            ->select('rooms.id as id', 'rooms.name as name', 'buildings.code as code')
+            ->get();
+
         return Response::json([
             'status' => true,
-            'rooms' => Room::all()
+            'rooms' => $rooms
         ]);
     }
 }

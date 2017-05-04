@@ -10,6 +10,7 @@ $(document).ready(function () {
     get_course_sessions();
     get_groups();
     drag_course_session();
+    get_rooms();
 
     /**********************************
      * Option select semester.
@@ -38,14 +39,17 @@ $(document).ready(function () {
     });
     // get course session.
     $(document).on('change', 'select[name="grade"]', function () {
+        get_groups();
         get_course_sessions();
     });
-
+    // get groups
+    $(document).on('change', 'select[name="group"]', function () {
+        get_course_sessions();
+    });
     // search rooms.
     $(document).on('keyup', 'input[name="search_room_query"]', function () {
         search_rooms($(this).val());
     });
-
     // Call function dragging courses sessions.
     $('.room-item').removeAttr('style');
     $('.course-item').removeAttr('style');
@@ -72,23 +76,14 @@ $(document).ready(function () {
             )
         })
     });
-
     // Click on course item show available room.
     $(document).on('click', '.side-course', function () {
 
         $('body').find('.course-selected').removeClass('course-selected');
         $(this).addClass('course-selected');
-        var room = '';
-        for (var i = 0; i < 10; i++) {
-            room += '<div class="room-item suggest-room">';
-            room += '<i class="fa fa-building"></i> F-' + Math.floor(Math.random() * 201)
-            room += '</div> ';
-        }
-        // Apply with $.ajax({ /** implementation.... */ });
-        $('.rooms').html(room);
+        get_rooms();
 
     });
-
     // Add room into course
     $(document).on('click', '.suggest-room', function () {
         var btn_delete = '<button class="btn btn-danger btn-xs remove-room"><i class="fa fa-trash"></i></button>';
@@ -97,7 +92,6 @@ $(document).ready(function () {
         $(this).remove();
 
     });
-
     // Conflict button action
     $(document).on('click', '#btn-conflict', function (event) {
         event.preventDefault();
@@ -168,21 +162,34 @@ var drag_course_session = function () {
     });
 };
 
-// List all rooms.
-var rooms = function (nb_rooms) {
+/** List all rooms. **/
+var get_rooms = function () {
+    $.ajax({
+        type: 'POST',
+        url: '/admin/schedule/timetables/get_rooms',
+        success: function (response) {
+            if (response.status == true) {
+                var room_item = '';
+                $.each(response.rooms, function (key, val) {
+                    room_item += '<div class="room-item" id="room' + val.id + '">'
+                        + '<i class="fa fa-building-o"></i> '
+                        + val.name + '-' + val.code
+                        + '</div> ';
+                });
 
-    var room = '';
-    room += '<div class="room-item">'
-        + '<i class="fa fa-ellipsis-v"></i>'
-        + '<i class="fa fa-ellipsis-v"></i> F-306</div>';
-    for (var i = 0; i < nb_rooms; i++) {
-        room += room;
-    }
-
-    $('.rooms').append(room);
+                $('.rooms').html(room_item);
+            }
+            else {
+                var message = '<div class="room-item bg-danger" style="width: 100%; background-color: red; color: #fff;">' +
+                    '<i class="fa fa-warning"></i> Room not found!' +
+                    '</div>';
+                $('.rooms').html(message);
+            }
+        }
+    })
 
 };
-
+/** Get rooms. **/
 var get_groups = function () {
     setTimeout(function () {
         $.ajax({
@@ -193,10 +200,13 @@ var get_groups = function () {
                 if (response.status == true) {
                     var group_item = '';
                     $.each(response.groups, function (key, val) {
-                        group_item += '<option value="' + val.id + '">' + val.group + '</option>';
+                        group_item += '<option value="' + val.id + '">' + val.name + '</option>';
                     });
 
                     $('select[name="group"]').html(group_item);
+                }
+                else {
+                    $('select[name="group"]').html('');
                 }
             },
             error: function () {
@@ -205,7 +215,7 @@ var get_groups = function () {
         })
     }, 100);
 };
-
+/** Get weeks. **/
 var get_weeks = function (semester_id) {
     $.ajax({
         type: 'POST',
@@ -224,7 +234,7 @@ var get_weeks = function (semester_id) {
         }
     });
 };
-
+/** Get options. **/
 var get_options = function (department_id) {
     $.ajax({
         type: 'POST',
@@ -243,7 +253,7 @@ var get_options = function (department_id) {
         }
     });
 };
-
+/** Get course sessions. **/
 var get_course_sessions = function () {
     setTimeout(function () {
         $.ajax({
@@ -254,7 +264,6 @@ var get_course_sessions = function () {
                 if (response.status == true) {
                     var course_session_item = '';
                     $.each(response.course_sessions, function (key, val) {
-
                         course_session_item += '<li class="course-item">' +
                             '<span class="handle ui-sortable-handle">' +
                             '<i class="fa fa-ellipsis-v"></i> ' +
@@ -272,7 +281,7 @@ var get_course_sessions = function () {
                         }
                         else {
                             course_session_item += '<span style="margin-left: 28px;" class="course-type">Course</span> : ' +
-                                '<span class="times">' + val.courses + '</span> H'
+                                '<span class="times">' + val.tc + '</span> H'
                         }
                         course_session_item += '<span class="text courses-session-id" style="display: none;">' + val.id + '</span><br>' + '</li>';
                     });
@@ -290,7 +299,7 @@ var get_course_sessions = function () {
         });
     }, 100);
 };
-
+/** Search rooms. **/
 var search_rooms = function (query) {
     $.ajax({
         type: 'POST',
@@ -300,9 +309,9 @@ var search_rooms = function (query) {
             if (response.status == true) {
                 var room_item = '';
                 $.each(response.rooms, function (key, val) {
-                    room_item += '<div class="room-item">'
+                    room_item += '<div class="room-item" id="room' + val.id + '">'
                         + '<i class="fa fa-building-o"></i> '
-                        + val.name
+                        + val.name + '-' + val.code
                         + '</div> ';
                 });
 
