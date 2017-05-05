@@ -1,0 +1,18 @@
+.fc-content {
+    height: 18px;
+}
+
+.bg-green, .bg-red, .bg-aqua {
+    padding: 4px;
+    border: 1px solid #fff;
+}
+
+.tooltipevent {
+    padding: 10px;
+    border-radius: 4px;
+    width: 200px;
+    height: auto;
+    background: #ccc;
+    position: absolute;
+    z-index: 10001
+}

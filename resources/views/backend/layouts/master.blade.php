@@ -74,6 +74,7 @@
     <!-- JavaScripts -->
     {!! Html::script('plugins/jquery.min.js') !!}
     <script>window.jQuery || document.write('<script src="{{asset('js/vendor/jquery/jquery-2.1.4.min.js')}}"><\/script>')</script>
+    {!! Html::script('plugins/jQueryUI/jquery-ui.js') !!}
     {!! Html::script('js/vendor/bootstrap/bootstrap.min.js') !!}
     {!! Html::script('plugins/slimScroll/jquery.slimscroll.min.js') !!}
     {!! Html::script('plugins/toastr/toastr.min.js') !!}

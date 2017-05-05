@@ -106,6 +106,11 @@ return [
             'student_payments' => 'Student Payment',
             'candidate_payments' => 'Candidate Payment'
         ],
+        'schedule' => [
+            'title'                     => 'Schedule Management',
+            'calendar_title'            => 'Calendar Management',
+            'timetable_title'           => 'Timetable Management'
+        ],
         'course' => [
             'title' => 'Course Management',
             'course_annuals' => 'Courses Annually',

@@ -1,4 +1,3 @@
-
 <?php
 
 return [
@@ -25,6 +24,34 @@ return [
                 'restore_user' => 'Restore User',
             ],
         ],
+        'schedule' => [
+            'calendar' => [
+                'panel' => [
+                    'export' => 'Export',
+                    'uneditable' => 'Un-editable'
+                ]
+            ],
+            'event' => [
+                'panel' => [
+                    'add' => 'Add'
+                ],
+                'modal_create_event' => [
+                    'save_change' => 'Save Change',
+                    'cancel' => 'Cancel'
+                ]
+            ],
+            'timetable' => [
+                'create' => 'Create Timetable',
+                'clone' => 'Clone',
+                'generate' => 'Generate',
+                'save_change' => 'Save Change',
+                'publish' => 'Publish',
+                'modal_clone' => [
+                    'clone' => 'Clone',
+                    'close' => 'Close'
+                ]
+            ]
+        ]
     ],
 
     'general' => [
@@ -72,7 +99,7 @@ return [
     ],
 
     'course' => [
-        'course_annual' =>[
+        'course_annual' => [
             'course_assignment' => 'Course Assignment',
             'disable_scoring' => 'Disable Scoring',
             'enable_scoring' => 'Enable Scoring'

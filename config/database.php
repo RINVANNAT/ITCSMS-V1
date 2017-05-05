@@ -73,6 +73,7 @@ return [
             'charset'  => 'utf8',
             'prefix'   => '',
             'schema'   => 'public',
+            'port' => env('DB_PORT', '5432'),
         ],
 
         'sqlsrv' => [

@@ -130,7 +130,7 @@ return [
             'sub_edit_title' => 'Edit department',
             'sub_create_title' => 'Create department',
             'sub_detail_title' => 'Detail of department',
-            'fields'=>[
+            'fields' => [
                 'code' => 'Code',
                 'name_kh' => 'Name KH',
                 'name_en' => "Name EN",
@@ -147,7 +147,7 @@ return [
             'sub_edit_title' => 'Edit degree',
             'sub_create_title' => 'Create new academic degree',
             'sub_detail_title' => 'Detail of an academic degree',
-            'fields'=>[
+            'fields' => [
                 'code' => 'Code',
                 'name_kh' => 'Name KH',
                 'name_en' => "Name EN",
@@ -163,7 +163,7 @@ return [
             'sub_edit_title' => 'Edit grade',
             'sub_create_title' => 'Create grade',
             'sub_detail_title' => 'Detail of grade',
-            'fields'=>[
+            'fields' => [
                 'code' => 'Code',
                 'name_kh' => 'Name KH',
                 'name_en' => "Name EN",
@@ -176,7 +176,7 @@ return [
             'sub_create_title' => 'Create academic year',
             'sub_edit_title' => 'Edit academic year',
             'sub_detail_title' => 'Detail of academic year',
-            'fields'=>[
+            'fields' => [
                 'code' => 'Code',
                 'name_kh' => 'Name KH',
                 'name_latin' => 'Name Latin',
@@ -192,7 +192,7 @@ return [
             'sub_edit_title' => 'Edit account',
             'sub_create_title' => 'Create new account',
             'sub_detail_title' => 'Detail of an account',
-            'fields'=>[
+            'fields' => [
                 'name' => 'Name',
                 'active' => 'Is Active',
                 'description' => "Description",
@@ -208,7 +208,7 @@ return [
             'sub_create_title' => 'Create new building',
             'sub_detail_title' => 'Detail of an building',
             'sub_import_title' => 'Import buildings',
-            'fields'=>[
+            'fields' => [
                 'name' => 'Name',
                 'code' => 'Code',
                 'description' => "Description",
@@ -221,7 +221,7 @@ return [
             'sub_edit_title' => 'Edit income type information',
             'sub_create_title' => 'Create new income type',
             'sub_detail_title' => 'Detail of an income type',
-            'fields'=>[
+            'fields' => [
                 'name' => 'Name',
                 'active' => 'Is Active',
                 'description' => "Description",
@@ -235,7 +235,7 @@ return [
             'sub_create_title' => 'Create new outcome type',
             'sub_detail_title' => 'Detail of an outcome type',
             'sub_import_title' => 'Import outcome types',
-            'fields'=>[
+            'fields' => [
                 'code' => "Code",
                 'origin' => "Origin",
                 'name' => 'Name',
@@ -249,7 +249,7 @@ return [
             'sub_edit_title' => 'Edit fee rate information',
             'sub_create_title' => 'Create new fee rate',
             'sub_detail_title' => 'Detail of a fee rate',
-            'fields'=>[
+            'fields' => [
                 'group' => "Group",
                 'promotion_id' => "Promotion",
                 'scholarship_id' => 'Scholarship',
@@ -275,7 +275,7 @@ return [
             'sub_create_title' => 'Create new room',
             'sub_detail_title' => 'Detail of a room',
             'sub_import_title' => 'Import rooms',
-            'fields'=>[
+            'fields' => [
                 'active' => 'Is Active',
                 'name' => "Name",
                 'nb_desk' => "Total Desk",
@@ -296,7 +296,7 @@ return [
             'sub_create_title' => 'Create new room type',
             'sub_detail_title' => 'Detail of a room type',
             'sub_import_title' => 'Import room types',
-            'fields'=>[
+            'fields' => [
                 'id' => 'ID',
                 'active' => 'Is Active',
                 'name' => "Name",
@@ -309,7 +309,7 @@ return [
             'sub_edit_title' => 'Edit redouble information',
             'sub_create_title' => 'Create new redouble',
             'sub_detail_title' => 'Detail of a redouble',
-            'fields'=>[
+            'fields' => [
                 'id' => 'ID',
                 'active' => 'Is Active',
                 'name_kh' => "Name Khmer",
@@ -324,7 +324,7 @@ return [
             'sub_edit_title' => 'Edit student Bac II information',
             'sub_create_title' => 'Create new student Bac II',
             'sub_detail_title' => 'Detail of a student Bac II',
-            'fields'=>[
+            'fields' => [
                 'active' => 'Is Active',
                 'can_id' => "Candidate ID",
                 'mcs_no' => "Ministry No",
@@ -348,8 +348,8 @@ return [
                 'bac_year' => "BacII Year",
                 'status' => "Status",
                 'is_registered' => "Is Registered",
-                'bac2_score_grade' =>"BacII Score/Grade",
-                'origin' =>'Origin'
+                'bac2_score_grade' => "BacII Score/Grade",
+                'origin' => 'Origin'
             ]
         ],
         'studentBac2OldRecords' => [
@@ -367,7 +367,7 @@ return [
             'sub_create_title' => 'Create new High School',
             'sub_detail_title' => 'Detail of an High School',
             'sub_import_title' => 'Import high schools',
-            'fields'=>[
+            'fields' => [
                 'name_en' => 'Name Latin',
                 'description' => "Description",
                 'name_kh' => 'Name Khmer',
@@ -397,7 +397,7 @@ return [
             'sub_print_title' => "Print ID Card",
             'basic_info' => 'Basic Information',
             'more_info' => 'More Information',
-            'fields'=>[
+            'fields' => [
                 'id_card' => 'ID Card',
                 'name_kh' => 'Name KH',
                 'name_latin' => 'Name Latin',
@@ -427,7 +427,7 @@ return [
                 'history_id' => 'History',
                 'scholarship_id' => 'Scholarships',
                 'highschool_id' => 'High School',
-                'academic_year_id' =>'Academic Year',
+                'academic_year_id' => 'Academic Year',
                 'redouble_id' => 'Redouble',
                 'group' => 'Group',
                 'department_option_id' => 'Geo Technique',
@@ -450,7 +450,7 @@ return [
             'sub_create_title' => 'Register new employee',
             'sub_detail_title' => 'Detail of employee',
             'sub_import_title' => "Import employees",
-            'fields'=>[
+            'fields' => [
                 'name_kh' => 'Name KH',
                 'name_latin' => 'Name Latin',
                 'phone' => "Phone",
@@ -519,7 +519,7 @@ return [
                 'staff_info' => 'Staff Information',
                 'download' => 'Download'
             ],
-            'fields'=>[
+            'fields' => [
                 'name' => 'Exam Name',
                 'date_start' => 'Date Start',
                 'date_end' => 'Date End',
@@ -532,7 +532,7 @@ return [
                 'academic_year_id' => 'Academic Year',
                 'number_room_controller' => 'Number of controller/Room',
                 'number_floor_controller' => 'Number of controller/Floor',
-                'math_score_quote' =>  "Math Max Score",
+                'math_score_quote' => "Math Max Score",
                 'phys_chem_score_quote' => "Physique/Chemistry Max Score",
                 'logic_score_quote' => "Logic Max Score",
             ],
@@ -540,23 +540,23 @@ return [
             //------vannat
 
             'score' => [
-                'input_score'       => 'Input Score',
+                'input_score' => 'Input Score',
                 'request_score_form' => 'Request Input Score Form',
-                'select_subject'    => 'Select Subject:',
-                'correction_1'      => 'Correction 1',
-                'correction_2'      => 'Correction 2',
+                'select_subject' => 'Select Subject:',
+                'correction_1' => 'Correction 1',
+                'correction_2' => 'Correction 2',
                 'Logic' => 'Logic',
-                'Mathematics'       => 'Mathematics',
-                'Physic/Chemistry'  => ' Physic/Chemistry',
-                'btn_ok'            => 'OK',
-                'btn_cancel'        => 'Cancel',
-                'select_room'       => 'Select Room Code :',
+                'Mathematics' => 'Mathematics',
+                'Physic/Chemistry' => ' Physic/Chemistry',
+                'btn_ok' => 'OK',
+                'btn_cancel' => 'Cancel',
+                'select_room' => 'Select Room Code :',
 
                 'form_score' => [
                     'form_input_score' => 'Form Input Candidate Score',
                     'room_code' => 'ROOM CODE',
                     'scoring_sheet' => 'SCORING SHEET',
-                    'correction'    => 'CORRECTION',
+                    'correction' => 'CORRECTION',
                     'corrector_name' => 'CORRECTOR NAME: ',
                     'order' => 'Order',
                     'correct' => 'Correct',
@@ -565,15 +565,15 @@ return [
                 ],
                 'message' => [
                     'save_success' => 'your record have been save!',
-                    'save_duplicate'    => 'Duplicate Record!',
+                    'save_duplicate' => 'Duplicate Record!',
                     'corrector_missing' => 'Please add the Corrector Name',
-                    'zero_value'        => 'You have inputted 0 Value!!!',
+                    'zero_value' => 'You have inputted 0 Value!!!',
 
                 ]
             ],
 
             'result' => [
-              'generate_result' => 'Generate Result'
+                'generate_result' => 'Generate Result'
             ],
 
             'engineer' => [
@@ -592,15 +592,15 @@ return [
                 'department' => 'Department',
                 'engineer_statistic' => [
                     'candidate_register' => 'Candidiate Engineer Registration',
-                    'no_data'   => 'There is no candidate registration yet',
-                    'yaxis'     => 'Number of Student',
+                    'no_data' => 'There is no candidate registration yet',
+                    'yaxis' => 'Number of Student',
                     'btn_candidate_registration' => 'Candidate Registration',
-                    'btn_attendence_list' =>'Candidate Attendance List',
+                    'btn_attendence_list' => 'Candidate Attendance List',
                     'student_engineer' => 'Student Engineer Registration',
                     'student_statistic' => 'Student Engineer Statistic',
-                    'no_student_registration'=> 'There is no student engineer registration',
+                    'no_student_registration' => 'There is no student engineer registration',
                     'result_candidate_engineer' => 'Candidate Engineer Result',
-                    'result_list'=> 'Result List',
+                    'result_list' => 'Result List',
                     'result_statistic' => 'Candidate Result',
                     'no_result' => 'The result is not yet released់',
                     'total_pass' => 'Total Pass Students',
@@ -613,16 +613,16 @@ return [
                 ],
                 'dut_statistic' => [
                     'candidate_dut_register' => 'Candidate Dut Registration',
-                    'no_data'   => 'There is no candidate dut registration',
+                    'no_data' => 'There is no candidate dut registration',
                     'btn_dut_statistic' => 'Candidate Dut Statistic',
-                    'btn_register_list' =>'Candidate Dut List',
+                    'btn_register_list' => 'Candidate Dut List',
 
                     'student_dut_registration_statistic' => 'Student DUT Registration',
                     'student_dut_statistic' => 'Student Dut Statistic',
-                    'no_student_registration'=> 'There is no student dut registration',
+                    'no_student_registration' => 'There is no student dut registration',
 
                     'result_candidate_dut' => 'Candidate DUT Result',
-                    'dut_result_list'=> 'Result List',
+                    'dut_result_list' => 'Result List',
                     'dut_result_statistic' => 'Dut Result Statistic',
                     'no_result' => 'The result is not yet released',
                     'male' => 'Male',
@@ -645,7 +645,7 @@ return [
                 'study_record' => 'Study Record',
                 'academic_information' => 'Academic Information'
             ],
-            'fields'=>[
+            'fields' => [
                 'name_latin' => 'Name Latin',
                 'name_kh' => 'Name Khmer',
                 'register_id' => 'Register ID',
@@ -725,7 +725,7 @@ return [
         ],
         'accounting' => [
 
-            'fields'=>[
+            'fields' => [
                 'amount_dollar' => "Amount ($)",
                 'amount_riel' => "Amount (៛)",
                 'amount_kh' => "Amount as Letters",
@@ -767,7 +767,7 @@ return [
             'sub_create_title' => 'Create new outcome',
             'sub_detail_title' => 'Detail of an outcome',
             'search_client' => 'Search for client',
-            'search_result' =>'Search result',
+            'search_result' => 'Search result',
             'fields' => [
                 'is' => "Is",
                 'name' => 'Name',
@@ -780,7 +780,7 @@ return [
             'sub_create_title' => 'Create new customer',
             'sub_detail_title' => 'Detail of an customer',
             'search_client' => 'Search for client',
-            'search_result' =>'Search result',
+            'search_result' => 'Search result',
             'fields' => [
                 'name' => "Name",
                 'address' => 'Address',
@@ -799,7 +799,7 @@ return [
             'sub_detail_title' => 'Detail of an course',
             'sub_import_title' => 'Import course',
             'fields' => [
-                'course'=>'Cource Name',
+                'course' => 'Cource Name',
                 'name' => "Name",
                 'semester' => 'Semester',
                 'academic_year' => 'Academic year',
@@ -810,31 +810,31 @@ return [
                 'employee' => 'Lecturer',
                 'department_option_id' => 'Option',
                 'group' => 'Group',
-                'credit'=>"Credit",
-                'code'=>"Code"
+                'credit' => "Credit",
+                'code' => "Code"
             ]
         ],
 
-         'Absence' => [
-                    'title' => 'Student Absence',
-                    'sub_index_title' => 'View Student Absence',
-                    'sub_edit_title' => 'Edit Student Absence',
-                    'sub_create_title' => 'Add Student Absence',
-                    'sub_detail_title' => 'Detail',
-                    'fields' => [
-                        'name' => "Name",
-                        'semester' => 'Semester',
-                        'academic_year_id' => 'Academic year',
-                        'department_id' => 'Department',
-                        'degree_id' => 'Degree',
-                        'grade_id' => 'Grade',
-                        'employee_id' => 'Lecturer'
-                    ]
-                ],
+        'Absence' => [
+            'title' => 'Student Absence',
+            'sub_index_title' => 'View Student Absence',
+            'sub_edit_title' => 'Edit Student Absence',
+            'sub_create_title' => 'Add Student Absence',
+            'sub_detail_title' => 'Detail',
+            'fields' => [
+                'name' => "Name",
+                'semester' => 'Semester',
+                'academic_year_id' => 'Academic year',
+                'department_id' => 'Department',
+                'degree_id' => 'Degree',
+                'grade_id' => 'Grade',
+                'employee_id' => 'Lecturer'
+            ]
+        ],
         'score' => [
             'title' => 'Score',
             'sub_index_title' => 'View Score',
-            "sub_ranking"=>"Score Ranking",
+            "sub_ranking" => "Score Ranking",
             'sub_edit_title' => 'Edit Score',
             'sub_create_title' => 'Add Score',
             'sub_input_title' => 'Input Score',
@@ -855,22 +855,22 @@ return [
             'sub_edit_title' => 'Edit course program information',
             'sub_create_title' => 'Create new course program',
             'sub_detail_title' => 'Detail of a course program',
-            'sub_import_title'=> 'Import course program',
+            'sub_import_title' => 'Import course program',
             'fields' => [
                 'name_kh' => "Name in Khmer",
                 'name_en' => 'Name in English',
                 'name_fr' => 'Name in French',
                 'duration' => 'Duration',
                 'code' => 'Code',
-                'credit'=> 'Credit',
+                'credit' => 'Credit',
                 'time_tp' => "TP",
                 'time_td' => 'TD',
                 'time_course' => 'Course',
-                'degree'=>"Degree",
-                'grade'=>"Grade",
-                'department'=>"Department",
+                'degree' => "Degree",
+                'grade' => "Grade",
+                'department' => "Department",
                 'department_option' => "Option",
-                'semester'=>"Semester",
+                'semester' => "Semester",
                 'responsible_department_id' => "Permit responsibility to"
             ]
         ],
@@ -904,8 +904,8 @@ return [
             'school_fee_and_award_tab' => [
                 'degree' => 'Degree',
                 'promotion' => 'Promotion',
-                'school_fee_rate' =>'School Fee Rate',
-                'scholarship_budget' =>'Scholarship Budget',
+                'school_fee_rate' => 'School Fee Rate',
+                'scholarship_budget' => 'Scholarship Budget',
             ],
             'scholarship_holder_tab' => [
                 'id_card' => 'ID Card',
@@ -976,12 +976,64 @@ return [
             'sub_create_title' => 'Create configurations',
             'sub_edit_title' => 'Edit configurations',
             'sub_detail_title' => 'Detail of configurations',
-            'fields'=>[
+            'fields' => [
                 'key' => 'Key',
                 'value' => 'Value',
                 'description' => "Description"
             ]
         ],
+
+        'schedule' => [
+            'calendar' => [
+                'title' => 'Calendar Management',
+                'sub_title' => 'Sub title calendar management',
+                'panel' => [
+                    'title' => 'Calendar'
+                ]
+            ],
+            'event' => [
+                'panel' => [
+                    'title' => 'Event'
+                ],
+                'modal_create_event' => [
+                    'title' => 'Add a new event',
+                    'form_input' => [
+                        'title' => 'Title',
+                        'department' => 'Departments',
+                        'event_type' => 'Type',
+                        'start_date' => 'Start Date',
+                        'end_date' => 'End Date',
+                        'allow_student_study' => 'Allow student study',
+                        'repeat_daily_year' => 'Daily Year',
+                        'placeholder' => [
+                            'title' => 'Event title',
+                            'chose_department' => 'Chose Department',
+                            'start_date' => 'Start Date',
+                            'end_date' => 'End Date'
+                        ]
+                    ]
+                ]
+            ],
+            'timetable' => [
+                'meta_title' => 'Timetable Management',
+                'title' => 'Schedule Management',
+                'sub_index_title' => 'Timetable Management',
+                'modal_clone' => [
+                    'title' => 'Clone Timetable',
+                    'body' => [
+                        'all_weeks' => 'All Weeks',
+                        'all_groups' => 'All Groups'
+                    ]
+                ],
+                'courses_sessions' => 'Courses Sessions',
+                'rooms' => 'Available Rooms',
+                'index_timetable' => [
+                    'number' => 'No.',
+                    'weekly' => 'Weekly',
+                    'status' => 'Status'
+                ]
+            ]
+        ]
     ],
 
     'frontend' => [
