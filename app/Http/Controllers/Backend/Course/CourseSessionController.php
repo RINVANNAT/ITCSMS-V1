@@ -6,15 +6,17 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\Backend\Course\CourseSession\StoreCourseSessionRequest;
 use App\Http\Requests\Backend\Course\CourseSession\UpdateCourseSessionRequest;
 use App\Models\CourseSession;
-use App\Models\School;
 use App\Repositories\Backend\CourseAnnualClass\CourseAnnualClassRepositoryContract;
 use App\Repositories\Backend\CourseSession\CourseSessionRepositoryContract;
-use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Response;
-use Maatwebsite\Excel\Facades\Excel;
 
+
+/**
+ * Class CourseSessionController
+ * @package App\Http\Controllers\Backend\Course
+ */
 class CourseSessionController extends Controller
 {
     /**
