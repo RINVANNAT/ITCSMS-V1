@@ -180,8 +180,6 @@ class CourseSessionController extends Controller
             }
         }*/
 
-//        asort($groups);
-
         $course_sessions = CourseSession::leftJoin("employees","employees.id","=","course_sessions.lecturer_id")
             ->leftJoin("course_annuals","course_annuals.id","=","course_sessions.course_annual_id")
             ->where("course_sessions.course_annual_id",$course_id)
