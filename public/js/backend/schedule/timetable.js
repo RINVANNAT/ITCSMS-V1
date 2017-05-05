@@ -1,51 +1,4 @@
 $(document).ready(function () {
-
-    /*********************************
-     * Load module.
-     *
-     *********************************/
-
-    get_options($('select[name="department"] :selected').val());
-    get_weeks($('select[name="semester"] :selected').val());
-    get_course_sessions();
-    get_groups();
-    drag_course_session();
-    get_rooms();
-
-    /**********************************
-     * Option select semester.
-     * Department selected show option
-     *
-     **********************************/
-    // get weeks.
-    $(document).on('change', 'select[name="semester"]', function () {
-        get_weeks($(this).val());
-        get_course_sessions();
-    });
-    // get options.
-    $(document).on('change', 'select[name="department"]', function () {
-        get_options($(this).val());
-        get_groups();
-        get_course_sessions();
-    });
-    // get course session.
-    $(document).on('change', 'select[name="academicYear"]', function () {
-        get_course_sessions();
-    });
-    // get group and course session.
-    $(document).on('change', 'select[name="option"]', function () {
-        get_groups();
-        get_course_sessions();
-    });
-    // get course session.
-    $(document).on('change', 'select[name="grade"]', function () {
-        get_groups();
-        get_course_sessions();
-    });
-    // get groups
-    $(document).on('change', 'select[name="group"]', function () {
-        get_course_sessions();
-    });
     // search rooms.
     $(document).on('keyup', 'input[name="search_room_query"]', function () {
         search_rooms($(this).val());
@@ -122,46 +75,30 @@ $(document).ready(function () {
     });
 });
 
-// Drag room into timetable.
-var drag_room = function () {
-    $('.rooms .room-item').each(function () {
-
-        $(this).data('event', {
-            title: $.trim($(this).text()),
-            stick: true
-        });
-
-        $(this).draggable({
-            zIndex: 1000000,
-            revert: true,
-            revertDuration: 0
-        });
-
-    });
-};
-
-// Drag course session into timetable.
+/*Drag course session into timetable.*/
 var drag_course_session = function () {
 
     $('.courses .course-item').each(function () {
+
+        // store data so the calendar knows to render an event upon drop
         $(this).data('event', {
-            id: $(this).find('.courses-session-id').text(),
-            title: $(this).find('.course-name').text(),
-            className: 'course-item',
-            teacherName: $(this).find('.teacher-name').text(),
-            typeCourseSession: $(this).find('.course-type').text(),
+            course_session_id: $(this).find('.courses-session-id').text(),
+            course_name: $(this).find('.course-name').text(),
+            class_name: 'course-item',
+            teacher_name: $(this).find('.teacher-name').text(),
+            course_type: $(this).find('.course-type').text(),
             times: $(this).find('.times').text()
         });
 
+        // make the event draggable using jQuery UI
         $(this).draggable({
-            zIndex: 1000000,
-            revert: true,
-            revertDuration: 0
+            zIndex: 999,
+            revert: true,      // will cause the event to go back to its
+            revertDuration: 0  //  original position after the drag
         });
 
     });
 };
-
 /** List all rooms. **/
 var get_rooms = function () {
     $.ajax({
@@ -213,7 +150,7 @@ var get_groups = function () {
 
             }
         })
-    }, 100);
+    }, 200);
 };
 /** Get weeks. **/
 var get_weeks = function (semester_id) {
@@ -297,7 +234,7 @@ var get_course_sessions = function () {
 
             }
         });
-    }, 100);
+    }, 300);
 };
 /** Search rooms. **/
 var search_rooms = function (query) {

@@ -1,6 +1,8 @@
 <?php
 
 namespace App\Repositories\Backend\Schedule\Timetable;
+use App\Http\Requests\Backend\Schedule\Timetable\CreateTimetableRequest;
+use App\Models\Schedule\Timetable\Timetable;
 
 /**
  * Interface TimetableSlotRepositoryContract
@@ -9,26 +11,19 @@ namespace App\Repositories\Backend\Schedule\Timetable;
 interface TimetableSlotRepositoryContract
 {
     /**
-     * Filter course session with the attribute below.
+     * Create timetable slot.
      *
-     * @param null $academic_year_id
-     * @param null $department_id
-     * @param null $degree_id
-     * @param null $grade_id
-     * @param null $option_id
-     * @param null $semester_id
-     * @param null $week_id
-     * @param null $group_id
+     * @param Timetable $timetable
+     * @param CreateTimetableRequest $request
      * @return mixed
      */
-    public function filter_course_sessions(
-        $academic_year_id = null,
-        $department_id = null,
-        $degree_id = null,
-        $grade_id = null,
-        $option_id = null,
-        $semester_id = null,
-        $week_id = null,
-        $group_id = null
-    );
+    public function create_timetable_slot(Timetable $timetable, CreateTimetableRequest $request);
+
+    /**
+     * Get timetable slots by a timetable.
+     *
+     * @param Timetable $timetable
+     * @return mixed
+     */
+    public function get_timetable_slots(Timetable $timetable);
 }

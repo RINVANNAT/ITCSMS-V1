@@ -2,8 +2,13 @@
 
 namespace App\Http\Controllers\Backend\Schedule\Traits;
 
+use App\Http\Requests\Backend\Schedule\Timetable\CreateTimetableRequest;
 use App\Models\DepartmentOption;
+use App\Models\Schedule\Timetable\Timetable;
+use App\Models\Schedule\Timetable\TimetableSlot;
 use App\Models\Schedule\Timetable\Week;
+use App\Repositories\Backend\Schedule\Timetable\EloquentTimetableRepository;
+use App\Repositories\Backend\Schedule\Timetable\EloquentTimetableSlotRepository;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Response;
 
@@ -13,6 +18,31 @@ use Illuminate\Support\Facades\Response;
  */
 trait AjaxFilterTimetableController
 {
+    /**
+     * @var EloquentTimetableRepository
+     */
+    protected $timetableRepository;
+
+    /**
+     * @var EloquentTimetableSlotRepository
+     */
+    protected $timetableSlotRepository;
+
+    /**
+     * AjaxFilterTimetableController constructor.
+     * @param EloquentTimetableRepository $eloquentTimetableRepository
+     * @param EloquentTimetableSlotRepository $eloquentTimetableSlotRepository
+     */
+    public function __construct
+    (
+        EloquentTimetableRepository $eloquentTimetableRepository,
+        EloquentTimetableSlotRepository $eloquentTimetableSlotRepository
+    )
+    {
+        $this->timetableRepository = $eloquentTimetableRepository;
+        $this->timetableSlotRepository = $eloquentTimetableSlotRepository;
+    }
+
     /**
      * Filter timetable.
      *
@@ -78,6 +108,8 @@ trait AjaxFilterTimetableController
         $semester_id = request('semester');
         $option_id = request('option') == null ? null : request('option');
         $group_id = request('group') == null ? null : request('group');
+
+        /*dd(request('group'));*/
         $course_sessions = DB::table('course_annuals')
             ->where([
                 ['course_annuals.academic_year_id', $academic_year_id],
@@ -89,13 +121,11 @@ trait AjaxFilterTimetableController
             ])
             ->join('course_sessions', 'course_sessions.course_annual_id', '=', 'course_annuals.id')
             ->leftJoin('employees', 'employees.id', '=', 'course_sessions.lecturer_id')
-            /*->where(function ($query) use ($group_id) {
-
+            ->where(function ($query) use ($group_id) {
                 $groups = DB::table('course_annual_classes')->where('course_annual_classes.group_id', $group_id)
                     ->lists('course_annual_classes.course_session_id');
-
-                $query->whereIn('course_sessions.id', $groups == null ? null : $groups);
-            })*/
+                $query->whereIn('course_sessions.id', $groups == null ? [] : $groups);
+            })
             ->select(
                 'course_sessions.id',
                 'course_sessions.time_tp as tp',
@@ -195,5 +225,21 @@ trait AjaxFilterTimetableController
             'status' => true,
             'rooms' => $rooms
         ]);
+    }
+
+    /**
+     * Get timetable slots.
+     *
+     * @param CreateTimetableRequest $request
+     * @return mixed
+     */
+    public function get_timetable_slots(CreateTimetableRequest $request)
+    {
+        $timetable = $this->timetableRepository->find_timetable_is_existed($request);
+        if ($timetable instanceof Timetable) {
+            $timetable_slots = $this->timetableSlotRepository->get_timetable_slots($timetable);
+            return Response::json(['status'=> true, 'timetable_slots'=>$timetable_slots]);
+        }
+        return Response::json(['status' => false]);
     }
 }

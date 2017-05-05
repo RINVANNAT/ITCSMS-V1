@@ -58,10 +58,69 @@
     {!! Html::script('js/backend/schedule/timetable.js') !!}
 
     <script type="text/javascript">
-        $(document).ready(function () {
-            // Timetable sections.
-            $('#timetable').fullCalendar({
+        function get_timetable_slots() {
+            setTimeout(function () {
+                $.ajax({
+                    type: 'POST',
+                    url: '{!! route('get_timetable_slots') !!}',
+                    data: $('#options-filter').serialize(),
+                    success: function (response) {
+                        if (response.status == true) {
+                            var events = [];
+                            $.each(response.timetable_slots, function (key, val) {
+                                events.push({
+                                    id: val.id,
+                                    course_name: val.course_name,
+                                    teacher_name: val.teacher_name,
+                                    start: val.start,
+                                    end: val.end
+                                });
+                            });
 
+                            $('#calendar').fullCalendar({
+                                events: response.timetable_slots
+                            });
+                        }
+                    }
+                });
+            }, 300);
+        }
+        function create_timetable_slots(copiedEventObject) {
+            console.log(copiedEventObject);
+            $.ajax({
+                type: 'POST',
+                url: '{{ route('admin.schedule.timetables.store') }}',
+                data: {
+                    'academicYear': $('select[name="academicYear"] :selected').val(),
+                    'department': $('select[name="department"] :selected').val(),
+                    'option': $('select[name="option"] :selected').val(),
+                    'degree': $('select[name="degree"] :selected').val(),
+                    'grade': $('select[name="grade"] :selected').val(),
+                    'semester': $('select[name="semester"] :selected').val(),
+                    'weekly': $('select[name="weekly"] :selected').val(),
+                    'group': $('select[name="group"] :selected').val(),
+                    'course_session_id': copiedEventObject.course_session_id,
+                    'course_name': copiedEventObject.course_name,
+                    'teacher_name': copiedEventObject.teacher_name,
+                    'course_type': copiedEventObject.course_type,
+                    'start': copiedEventObject.start,
+                    'end': copiedEventObject.end
+                },
+                success: function () {
+                    console.log(200);
+                },
+                error: function () {
+                    console.log(404);
+                }
+            })
+        };
+        function get_timetable() {
+
+            var date = new Date();
+            var d = date.getDate(),
+                m = date.getMonth(),
+                y = date.getFullYear();
+            $('#timetable').fullCalendar({
                 defaultView: 'timetable',
                 defaultDate: '2017-01-01',
                 header: false,
@@ -80,47 +139,57 @@
                 maxTime: '20:00:00',
                 slotLabelFormat: 'h:mm a',
                 columnFormat: 'dddd',
-                events: '{{ route('admin.schedule.timetables.create') }}',
                 editable: true,
                 droppable: true,
-                dragRevertDuration: 10,
-                drop: function () {
-                    //store_save_timetable();
+                dragRevertDuration: 0,
+                drop: function (date) {
+                    var originalEventObject = $(this).data('event');
+
+                    var copiedEventObject = $.extend({}, originalEventObject);
+
+                    var tempDate = new Date(date);
+                    copiedEventObject.id = Math.floor(Math.random() * 1800) + 1;
+                    copiedEventObject.start = tempDate;
+                    copiedEventObject.end = new Date(copiedEventObject.start);
+                    copiedEventObject.end.setHours(copiedEventObject.start.getHours() + 2);
+                    copiedEventObject.allDay = true;
+
+                    create_timetable_slots(copiedEventObject);
                 },
                 eventDragStart: function (event, jsEvent, ui, view) {
                     get_rooms();
                 },
                 eventDragStop: function (event, jsEvent, ui, view) {
-                    if (isEventOverDiv(jsEvent.clientX, jsEvent.clientY)) {
-                        $('#timetable').fullCalendar('removeEvents', event._id);
-                        $('#timetable').fullCalendar('removeEvents', event._id);
-                        var course = '';
-                        course += '<li class="course-item drag-course-back">'
-                            + '<span class="handle ui-sortable-handle">'
-                            + '<i class="fa fa-ellipsis-v"></i> '
-                            + '<i class="fa fa-ellipsis-v"></i>'
-                            + '</span>'
-                            + '<span class="text course-name">' + event.title + '</span><br>'
-                            + '<span style="margin-left: 28px;" class="teacher-name">' + event.teacherName + '</span><br/>'
-                            + '<span style="margin-left: 28px;" class="course-type">' + event.typeCourseSession + '</span> :'
-                            + '<span class="times">' + event.times + '</span> H'
-                            + '</li>';
+                    /*if (isEventOverDiv(jsEvent.clientX, jsEvent.clientY)) {
+                     $('#timetable').fullCalendar('removeEvents', event._id);
+                     $('#timetable').fullCalendar('removeEvents', event._id);
+                     var course = '';
+                     course += '<li class="course-item drag-course-back">'
+                     + '<span class="handle ui-sortable-handle">'
+                     + '<i class="fa fa-ellipsis-v"></i> '
+                     + '<i class="fa fa-ellipsis-v"></i>'
+                     + '</span>'
+                     + '<span class="text course-name">' + event.title + '</span><br>'
+                     + '<span style="margin-left: 28px;" class="teacher-name">' + event.teacherName + '</span><br/>'
+                     + '<span style="margin-left: 28px;" class="course-type">' + event.typeCourseSession + '</span> :'
+                     + '<span class="times">' + event.times + '</span> H'
+                     + '</li>';
 
                         $('.courses').prepend(course);
 
-                        setTimeout(function () {
-                            $('.courses').find('.drag-course-back').removeClass('drag-course-back');
-                        }, 300);
+                     setTimeout(function () {
+                     $('.courses').find('.drag-course-back').removeClass('drag-course-back');
+                     }, 300);
 
-                        drag_course_session();
-                    }
+                     drag_course_session();
+                     }*/
                 },
                 eventClick: function (calEvent, jsEvent, view) {
                     // Trigger when click the event.
                 },
                 eventDrop: function (event, delta, revertFunc) {
                     // Trigger where move and drop the event on full calendar.
-                    alert('Drop all events.');
+                    // console.log(event);
                 },
                 eventRender: function (event, element, view) {
                     var object = '<a class="fc-time-grid-event fc-v-event fc-event fc-start fc-end course-item  fc-draggable fc-resizable" style="top: 65px; bottom: -153px; z-index: 1; left: 0%; right: 0%;">' +
@@ -128,9 +197,9 @@
                         '<div class="fc-content">' +
                         '<div class="container-room">' +
                         '<div class="side-course">' +
-                        '<div class="fc-title">' + (event.title).substring(0, 10) + '...</div>' +
-                        '<p class="text-primary">' + event.teacherName + '</p> ' +
-                        '<p class="text-primary">' + event.typeCourseSession + '</p> ' +
+                        '<div class="fc-title">' + (event.course_name).substring(0, 10) + '...</div>' +
+                        '<p class="text-primary">' + event.teacher_name + '</p> ' +
+                        '<p class="text-primary">' + event.course_type + '</p> ' +
                         '</div>' +
                         '<div class="side-room">' +
                         '<div class="room-name"><span class="render-room"></span></div> ' +
@@ -153,26 +222,69 @@
                 eventOverlap: function (stillEvent, movingEvent) {
                     return stillEvent.allDay && movingEvent.allDay;
                 }
-
             });
+        }
+        var isEventOverDiv = function (x, y) {
 
-            // EventOverDiv
-            var isEventOverDiv = function (x, y) {
+            var external_events = $('.courses .course-item');
+            var offset = external_events.offset();
+            offset.right = external_events.width() + offset.left;
+            offset.bottom = external_events.height() + offset.top;
 
-                var courses = $('.courses');
-                var offset = courses.offset();
-                offset.right = courses.width() + offset.left;
-                offset.bottom = courses.height() + offset.top;
+            // Compare
+            if (x >= offset.left
+                && y >= offset.top
+                && x <= offset.right
+                && y <= offset.bottom) {
+                return true;
+            }
+            return false;
 
-                /** Compare*/
-                return x >= offset.left
-                    && y >= offset.top
-                    && x <= offset.right
-                    && y <= offset.bottom;
-            };
+        };
+        $(document).ready(function () {
 
-            // Reload courses.
-            $('#timetable').fullCalendar('rerenderEvents');
+            // load modules.
+            get_options($('select[name="department"] :selected').val());
+            get_weeks($('select[name="semester"] :selected').val());
+            get_course_sessions();
+            get_groups();
+            drag_course_session();
+            get_rooms();
+            get_timetable();
+            get_timetable_slots();
+
+
+            // get weeks.
+            $(document).on('change', 'select[name="semester"]', function () {
+                get_weeks($(this).val());
+                get_course_sessions();
+            });
+            // get options.
+            $(document).on('change', 'select[name="department"]', function () {
+                get_options($(this).val());
+                get_groups();
+                get_course_sessions();
+                get_timetable_slots();
+            });
+            // get course session.
+            $(document).on('change', 'select[name="academicYear"]', function () {
+                get_course_sessions();
+                get_timetable();
+            });
+            // get group and course session.
+            $(document).on('change', 'select[name="option"]', function () {
+                get_groups();
+                get_course_sessions();
+            });
+            // get course session.
+            $(document).on('change', 'select[name="grade"]', function () {
+                get_groups();
+                get_course_sessions();
+            });
+            // get groups
+            $(document).on('change', 'select[name="group"]', function () {
+                get_course_sessions();
+            });
         });
     </script>
 @stop
