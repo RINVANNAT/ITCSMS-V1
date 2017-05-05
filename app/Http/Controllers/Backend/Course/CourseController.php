@@ -4,35 +4,32 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\Backend\Course\CourseProgram\CreateCourseProgramRequest;
 use App\Http\Requests\Backend\Course\CourseProgram\DeleteCourseProgramRequest;
 use App\Http\Requests\Backend\Course\CourseProgram\EditCourseProgramRequest;
+use App\Http\Requests\Backend\Course\CourseProgram\ImportCourseProgramRequest;
+use App\Http\Requests\Backend\Course\CourseProgram\RequestImportCourseProgramRequest;
 use App\Http\Requests\Backend\Course\CourseProgram\StoreCourseProgramRequest;
 use App\Http\Requests\Backend\Course\CourseProgram\UpdateCourseProgramRequest;
 use App\Models\AcademicYear;
-use App\Models\DepartmentOption;
-use App\Models\Employee;
-use App\Repositories\Backend\CourseProgram\CourseProgramRepositoryContract;
-use App\Utils\StringUtils;
-use Illuminate\Support\Facades\DB;
-use App\Http\Requests\Backend\Course\CourseProgram\ImportCourseProgramRequest;
-use App\Http\Requests\Backend\Course\CourseProgram\RequestImportCourseProgramRequest;
-use Carbon\Carbon;
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Redirect;
-use Maatwebsite\Excel\Facades\Excel;
 use App\Models\Course;
 use App\Models\CourseAnnual;
 use App\Models\Degree;
 use App\Models\Department;
+use App\Models\DepartmentOption;
+use App\Models\Employee;
 use App\Models\Grade;
 use App\Models\Semester;
-use Flash;
+use App\Repositories\Backend\CourseProgram\CourseProgramRepositoryContract;
 use App\Utils\ArrayUtils;
+use Carbon\Carbon;
+use Flash;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
+use Maatwebsite\Excel\Facades\Excel;
 
-use Illuminate\Foundation\Validation\ValidatesRequests;
-
-
-
-
+/**
+ * Class CourseController
+ * @package App\Http\Controllers\Backend\Course
+ */
 class CourseController extends Controller
 {
     /**
