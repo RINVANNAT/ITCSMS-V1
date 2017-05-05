@@ -89,13 +89,13 @@ trait AjaxFilterTimetableController
             ])
             ->join('course_sessions', 'course_sessions.course_annual_id', '=', 'course_annuals.id')
             ->leftJoin('employees', 'employees.id', '=', 'course_sessions.lecturer_id')
-            ->where(function ($query) use ($group_id) {
+            /*->where(function ($query) use ($group_id) {
 
                 $groups = DB::table('course_annual_classes')->where('course_annual_classes.group_id', $group_id)
                     ->lists('course_annual_classes.course_session_id');
 
                 $query->whereIn('course_sessions.id', $groups == null ? null : $groups);
-            })
+            })*/
             ->select(
                 'course_sessions.id',
                 'course_sessions.time_tp as tp',

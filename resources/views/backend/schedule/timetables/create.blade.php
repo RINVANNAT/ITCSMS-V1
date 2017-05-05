@@ -85,7 +85,7 @@
                 droppable: true,
                 dragRevertDuration: 10,
                 drop: function () {
-                    store_save_timetable();
+                    //store_save_timetable();
                 },
                 eventDragStart: function (event, jsEvent, ui, view) {
                     get_rooms();
