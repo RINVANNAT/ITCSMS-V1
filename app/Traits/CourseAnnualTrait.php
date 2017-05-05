@@ -14,9 +14,6 @@ use App\Repositories\Backend\CourseAnnualClass\CourseAnnualClassRepositoryContra
 use Illuminate\Support\Facades\Auth;
 use App\Models\Employee;
 
-
-
-
 trait CourseAnnualTrait
 {
    /* protected $course_annual_repo;
