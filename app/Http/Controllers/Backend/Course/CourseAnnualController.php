@@ -57,6 +57,7 @@ use App\Models\Enum\SemesterEnum;
 use App\Http\Controllers\Backend\Course\CourseAnnualHelperController;
 use App\Models\ResitStudentAnnual;
 use App\Traits\StudentTrait;
+use App\Traits\CourseAnnualTrait;
 
 
 
@@ -67,6 +68,8 @@ class CourseAnnualController extends Controller
     use ScoreProp;
     use StudentTrait;
     use CourseSessionTrait;
+    use CourseAnnualTrait;
+
     /**
      * @var CourseAnnualRepositoryContract
      */
@@ -1053,157 +1056,31 @@ class CourseAnnualController extends Controller
 
     public function assignCourse(CourseAnnualAssignmentRequest $request) {
 
-        return Response::json($this->assign_course($request));
+        return Response::json($this->assign_course($request));/*---courseSessionTrait---*/
     }
 
     /*--form edit course-session in course assignment panel---*/
     public function formEditCourseAnnual(CourseAnnualAssignmentRequest $request) {
 
-
-        $explode = explode('_', $request->dept_course_id);// department with course session id concatination
-        $courseSessionId = $explode[3];
-        $deptId = $explode[1];
-
-        $course = DB::table('course_sessions')->where('id', $courseSessionId)->first();
-        $courseAnnual = DB::table('course_annuals')->where('id', $course->course_annual_id)->first();
-//        $selected_groups = $this->selectedGroupByCourseAnnual([$courseAnnual->id]);/*--Student Score Trait--*/
-
-        $selected_groups = $this->selectedGroupByCourseSession([$course->id]); /*--Course Session Trait--*/
-
-        $studentGroups = $this->getStudentGroupFromDB();
-        $studentGroups = $studentGroups->where([
-            ['studentAnnuals.academic_year_id', $courseAnnual->academic_year_id],
-            ['studentAnnuals.department_id', $courseAnnual->department_id],
-            ['studentAnnuals.degree_id', $courseAnnual->degree_id],
-            ['studentAnnuals.grade_id', $courseAnnual->grade_id],
-            ['groups.semester_id', $courseAnnual->semester_id]
-        ]);
-        if(isset($courseAnnual->department_option_id)) {
-            $studentGroups = $studentGroups->where('studentAnnuals.department_option_id', $courseAnnual->department_option_id)->get();
-        } else {
-            $studentGroups = $studentGroups->get();
-        }
-
-        usort($studentGroups, function($a, $b) {
-            return  $a->group_code - $b->group_code;
-        });
-        if($courseAnnual) {
-            return view('backend.course.courseAnnual.includes.popup_edit_course_annual', compact('studentGroups', 'course', 'selected_groups'));
-        }
+        return $this->edit_course_session($request);
 
     }
 
-    public function editCourseAnnual($courseSessionId, CourseAnnualAssignmentRequest $request) {
+    public function updateCourseSession($courseSessionId, CourseAnnualAssignmentRequest $request) { /*---update course session in course assignment pane --*/
 
-
-        $groups = $request->group;
-        $courseSession = DB::table('course_sessions')->where('id', $courseSessionId)->first();
-        $courseAnnual = DB::table('course_annuals')->where('id', $courseSession->course_annual_id)->first();
-        $inputs = [
-            'time_course'   => $request->time_course,
-            'time_td'       => $request->time_td,
-            'time_tp'       => $request->time_tp,
-        ];
-
-        $update =  $this->courseSessions->update($courseSessionId, $inputs);
-        if($update) {
-            $delete = DB::table('course_annual_classes')->where([
-                ['course_annual_id',null],
-                ['course_session_id',$courseSession->id],
-            ]);
-
-            $data = [
-                'department_id'         => $courseAnnual->department_id,
-                'grade_id'              => $courseAnnual->grade_id,
-                'degree_id'             => $courseAnnual-> degree_id,
-                'department_option_id'  => $courseAnnual->department_option_id,
-                'groups'                => $groups,
-                'course_annual_id'      => null,
-                'course_session_id'      => $update->id
-            ];
-            if(count($delete->get()) > 0) {
-
-                $delete =  $delete->delete();
-                if($delete) {
-                    $create = $this->courseAnnualClasses->create($data);
-                }
-
-            } else {
-
-                $create = $this->courseAnnualClasses->create($data);
-            }
-
-            if($create) {
-                return Response::json(['status'=>true, 'message'=>'update course successfully!', 'selected_element' => 'department_'.$courseAnnual->department_id.'_course_' . $courseAnnual->id,]);
-            }
-
-        } else {
-            return Response::json(['status'=>false, 'message'=>'Error Updating!!']);
-        }
+        return $this->update_course_session($courseSessionId, $request); /*--course session trait---*/
     }
 
-    public function douplicateCourseAnnual(CourseAnnualAssignmentRequest $request) {
+    public function douplicateCourseAnnual(CourseAnnualAssignmentRequest $request) { /*--douplicate course session not course annual --*/
 
-        $explode = explode('_',$request->dept_course_id);
-        $courseAnnualId = $explode[3];
-        $couseSesssionId = $explode[3];
-        $courseSession = DB::table('course_sessions')->where('id',$couseSesssionId)->first();
-        $courseAnnual = DB::table('course_annuals')->where('id', $courseSession->course_annual_id)->first();
-
-        $courseAnnualClasses = DB::table('course_annual_classes')->where([
-//            ['course_annual_id', $courseAnnualId],
-            ['course_session_id', $couseSesssionId]
-        ])->lists('group');
-
-        $inputs = [
-            'time_course'   => $courseSession->time_course,
-            'time_td'       => $courseSession->time_td,
-            'time_tp'       => $courseSession->time_tp,
-            'course_annual_id'     => $courseSession->course_annual_id
-        ];
-        $save =  $this->courseSessions->create($inputs);
-        if($save) {
-
-            $data = [
-                'groups'                 => $courseAnnualClasses,
-                'department_option_id'  => $courseAnnual->department_option_id,
-                'department_id'         => $courseAnnual->department_id,
-                'degree_id'             => $courseAnnual->degree_id,
-                'grade_id'              => $courseAnnual->grade_id,
-                'course_annual_id'      => null,
-                'course_session_id'      => $save->id
-            ];
-
-            $saveCourseAnnualClass = $this->courseAnnualClasses->create($data);
-
-            if ($saveCourseAnnualClass) {
-                return Response::json(['status'=>true, 'message'=>'Course Duplicated!']);
-            } else {
-                return Response::json(['status'=>false, 'message'=>'Error Duplicated!']);
-            }
-        }
+        return Response::json($this->duplicate_couse_session($request));
     }
 
 
     //---here delete course session
-    public function deleteCourseAnnual(CourseAnnualAssignmentRequest $request) {
+    public function deleteCourseSession(CourseAnnualAssignmentRequest $request) {
 
-        $explode = explode('_',$request->dept_course_id);
-        $courseSessionId = $explode[3];
-        $courseSession = DB::table('course_sessions')->where('id', $courseSessionId)->first();
-        $courseAnnualClasses = DB::table('course_annual_classes')->where([
-            ['course_annual_id', null],
-            ['course_session_id', $courseSession->id]
-        ])->delete();
-        if($courseAnnualClasses) {
-            $delete = $this->courseSessions->destroy($courseSessionId);
-            if($delete) {
-                return Response::json(['status'=>true, 'message'=>'Successfully Deleted!']);
-            } else {
-                return Response::json(['status'=>true, 'message'=>'Error Deleted!']);
-            }
-        }
-
+        return Response::json($this->delete_course_session($request));
     }
 
     private function getCourseAnnualById ($courseAnnualId) {
@@ -1217,160 +1094,9 @@ class CourseAnnualController extends Controller
 
     }
 
-
     public function generateCourseAnnual(Request $request) {
 
-        $courseAnnual= DB::table('course_annuals')
-            ->join('course_annual_classes', 'course_annual_classes.course_annual_id', '=', 'course_annuals.id')
-            ->where('academic_year_id', $request->academic_year_id-1);
-        $departmentId = $request->department_id;
-        $degreeId = $request->degree_id;
-        $gradeId = $request->grade_id;
-        $check =0;
-        $unCheck=0;
-        $countIsGenerated =0;
-
-        if($departmentId) {
-            $courseAnnual = $courseAnnual->where('course_annual_classes.department_id', '=', $departmentId);
-        }
-        if($degreeId) {
-            $courseAnnual = $courseAnnual->where('course_annual_classes.degree_id', '=', $degreeId);
-        }
-        if($gradeId) {
-            $courseAnnual = $courseAnnual->where('course_annual_classes.grade_id', '=', $gradeId);
-        }
-        $courseAnnual = $courseAnnual->get();
-
-        foreach($courseAnnual as $course) {
-            $input = [
-                'time_course'   => $course->time_course,
-                'time_td'       => $course->time_td,
-                'time_tp'       => $course->time_tp,
-                'name_kh'       => $course->name_kh,
-                'name_en'       => $course->name_en,
-                'name_fr'       => $course->name_fr,
-                'course_id'     => $course->course_id,
-                'semester_id'   => $course->semester_id,
-                'active'        => true,
-                'academic_year_id'      => $request->academic_year_id,
-                'department_id'         => $course->department_id,
-                'degree_id'             => $course->degree_id,
-                'grade_id'              => $course->grade_id,
-                'employee_id'           => $course->employee_id,
-            ];
-
-            // check for preventing a sencond time of generating Course Annual
-
-            $isGenerated = $this->isCourseAnnualGenerated($course->course_id,$course->semester_id,$request->academic_year_id,$course->department_id, $course->degree_id,$course->grade_id, $course->employee_id);
-
-            if($isGenerated) {
-                $unCheck++;
-                continue;
-
-//                return Response::json(['status'=> false, 'message'=>'Duplicated Generating!!']);
-
-            } else {
-                $store = $this->courseAnnuals->create($input);
-
-                if($store) {
-                    $check++;
-                }
-            }
-        }
-
-        if($check == count($courseAnnual) - $unCheck) {
-            return Response::json(['status'=> true, 'message'=>'Course Annual Generated!!']);
-
-        } else {
-            return Response::json(['status'=> true, 'message'=>'Course Annual Not Generated!!']);
-        }
-
-
-    }
-
-    private function isCourseAnnualGenerated($courseId, $semesterId, $academicYearId, $departmentId, $degreeId, $gradeId, $employeeId) {
-
-        $select = DB::table('course_annuals')
-            ->join('course_annual_classes', 'course_annual_classes.course_annual_id', '=', 'course_annuals.id')
-            ->where([
-                ['course_id', '=', $courseId],
-                ['semester_id', '=', $semesterId],
-                ['academic_year_id', '=', $academicYearId],
-                ['course_annual_classes.department_id', '=', $departmentId],
-                ['course_annual_classes.degree_id', '=', $degreeId],
-                ['course_annual_classes.grade_id', '=', $gradeId],
-                ['course_annual_classes.employee_id', '=', $employeeId]
-            ])
-            ->get();
-        if($select) {
-            return true;
-        } else {
-            return false;
-        }
-
-    }
-
-    private function getAvailableCourse($deptId, $academicYearId, $semesterId) {
-
-        $availableCourses = DB::table('course_annuals')
-            ->leftJoin('course_annual_classes', 'course_annual_classes.course_annual_id', '=', 'course_annuals.id')
-            ->leftJoin('departments', 'departments.id', '=', 'course_annuals.department_id')
-            ->leftJoin('grades', 'grades.id', '=', 'course_annuals.grade_id')
-
-            ->select('course_annuals.id as course_annual_id', 'course_annuals.academic_year_id', 'course_annuals.semester_id',
-                'course_annuals.employee_id', 'course_annuals.name_en', 'course_annuals.name_kh', 'course_annuals.name_fr',
-                'course_annuals.credit', 'course_annuals.course_id', 'course_annuals.time_course', 'course_annuals.time_td', 'course_annuals.time_tp',
-                'course_annuals.grade_id', 'course_annuals.degree_id', 'course_annuals.department_id', 'course_annuals.department_option_id',
-                'course_annual_classes.group', 'departments.code as department_code',
-                'grades.name_en as grade_name'
-
-            )
-            ->where([
-                ['course_annuals.academic_year_id', $academicYearId],
-                ['course_annuals.semester_id', $semesterId]
-            ]);
-
-        if($deptId) {
-            $availableCourses = $availableCourses->where('course_annuals.department_id', $deptId);
-        }
-
-        return $availableCourses;
-    }
-
-    private function dataSendToView($courseAnnualId) {
-
-        $courseAnnual = DB::table('course_annuals')->where('id', $courseAnnualId)->first();
-
-        $employee = Employee::where('user_id', Auth::user()->id)->first();
-
-        $availableCourses = $this->getAvailableCourse($dept=null, $courseAnnual->academic_year_id, $courseAnnual->semester_id);
-
-
-
-
-        if(auth()->user()->allow("view-all-score-in-all-department") || auth()->user()->allow('view-all-score-course-annual')) {
-
-            $availableCourses = $availableCourses->orderBy('course_annuals.id')->get();
-        } else {
-            if(auth()->user()->allow("input-score-course-annual")){ // only teacher in every department who have this permission
-
-                $availableCourses = $availableCourses->where('employee_id', $employee->id)->orderBy('course_annuals.id')->get();
-
-            } else {
-                $availableCourses = $availableCourses->orderBy('course_annuals.id')->get();
-            }
-        }
-
-        $selectedCourses =[];
-
-        foreach($availableCourses as $availableCourse) {
-            $selectedCourses[$availableCourse->course_annual_id][] = $availableCourse;
-        }
-
-        return [
-            'course_annual' => $courseAnnual,
-            'available_course'  =>$selectedCourses
-        ];
+        return Response::json($this->generate_course_annual($request)); /*--course annual trait--*/
     }
 
     public function getFormScoreByCourse(Request $request, $courseAnnualId) {
@@ -1411,7 +1137,6 @@ class CourseAnnualController extends Controller
 
         return $this->handsonTableData($request->course_annual_id, $request_group = null);
     }
-
 
     public function handsonTableHeaders($columnName, $courseAnnual) {
 
@@ -1783,7 +1508,6 @@ class CourseAnnualController extends Controller
         }
     }
 
-
     public function getPropertiesFromScoreTable($courseAnnualId) {
 
 
@@ -1857,6 +1581,8 @@ class CourseAnnualController extends Controller
                 $arrayData[$absence->course_annual_id][$absence->student_annual_id] = $absence;
             }
         }
+
+        dd($arrayData);
         return $arrayData;
 
     }

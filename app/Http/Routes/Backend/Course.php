@@ -35,7 +35,7 @@ Route::group([
     });
 
 
-//    --------course annual assignment ---------------
+//    -------- --------------- course session assignment -----
 
     Route::get('course-annual/course-assignment', 'CourseAnnualController@courseAssignment')->name('admin.course.course_assignment');
 
@@ -56,11 +56,11 @@ Route::group([
 
     Route::get('course-annual/get-student-group', 'CourseAnnualController@studentGroupByDept')->name('course_annual.student_group');
 
-    Route::put('course-annual/{id}/edit_course_annual', 'CourseAnnualController@editCourseAnnual')->name('admin.course.edit_course_annual');
+    Route::put('course-annual/{id}/edit_course_annual', 'CourseAnnualController@updateCourseSession')->name('admin.course.edit_course_annual'); /*---course session instead --*/
 
     Route::post('course-annual/add_course_annual', 'CourseAnnualController@douplicateCourseAnnual')->name('admin.course.add_course_annual');
 
-    Route::delete('course-annual/delete_course_annual', 'CourseAnnualController@deleteCourseAnnual')->name('admin.course.delete_course_annual');
+    Route::delete('course-annual/delete_course_annual', 'CourseAnnualController@deleteCourseSession')->name('admin.course.delete_course_annual');/*--delete course session not course annual ---*/
 
     Route::get('course-annual/generate-course-annual', 'CourseAnnualController@generateCourseAnnual')->name('admin.course.generate_course_annual');
 

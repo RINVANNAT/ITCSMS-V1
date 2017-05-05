@@ -75,7 +75,7 @@
                     </tbody>
                 </table>
 
-            @if(isset($studentGroups))
+            @if(isset($group_by_course_annual))
 
                 <div class="col-md-12 no-padding" style=" text-align: left">
                     <label style="font-size: 12pt" for="student" class="btn btn-primary btn-xs">
@@ -87,10 +87,10 @@
 
 
                 <div class="col-md-12">
-                    @foreach($studentGroups as $group)
-                        @if(count($selected_groups) > 0))
+                    @foreach($group_by_course_annual as $group)
+                        @if(count($selected_groups) > 0)
 
-                            @if(in_array($group->group_code, $selected_groups[$course->id]))
+                            @if(in_array($group->group_id, $selected_groups[$course->id]))
                                 <label for="{{$group->group_id}}" style="font-size: 12pt" class="col-md-2 btn btn-xs">
                                     <input type="checkbox" class="student_group" checked name="group[]" id="{{$group->group_id}}" value="{{$group->group_id}}">
                                     {{$group->group_code}}
@@ -174,8 +174,9 @@
             var data = $('form.form_edit_course_annual').serialize();
 
             var credit = $('input[name=course_annual_credit]').val();
+            ajaxRequest('PUT', $('form.form_edit_course_annual').attr('action'), data);
 
-            if($.isNumeric(credit)) {
+            /*if($.isNumeric(credit)) {
                 swal({
                     title: "Confirm",
                     text: "Save Edition??",
@@ -186,13 +187,13 @@
                     closeOnConfirm: true
                 }, function(confirmed) {
                     if (confirmed) {
-                        ajaxRequest('PUT', $('form.form_edit_course_annual').attr('action'), data);
+
                     }
                 });
 
             } else {
                 notify('error', 'Field Credit is not a valid value')
-            }
+            }*/
 
         })
 

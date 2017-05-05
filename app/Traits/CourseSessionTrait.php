@@ -631,11 +631,141 @@ trait CourseSessionTrait
         $groups = $selectedGroups->toArray();
         foreach($array_course_session_ids as $annual_id) {
             if(isset($groups[$annual_id])) {
-                $arrayGroups[$annual_id] =array_column( json_decode(json_encode($groups[$annual_id]), true), 'group_id');
+                $arrayGroups[$annual_id] = array_column( json_decode(json_encode($groups[$annual_id]), true), 'group_id');
             }
         }
         return $arrayGroups;
 
     }
+
+    public function duplicate_couse_session($request) {
+
+
+        $explode = explode('_',$request->dept_course_id);
+        $courseAnnualId = $explode[3];
+        $couseSesssionId = $explode[3];
+        $courseSession = DB::table('course_sessions')->where('id',$couseSesssionId)->first();
+
+        $courseAnnualClasses = DB::table('course_annual_classes')
+            ->where('course_session_id', $couseSesssionId)
+            ->whereNull('course_annual_id')
+            ->lists('group_id');
+
+
+        $inputs = [
+            'time_course'   => $courseSession->time_course,
+            'time_td'       => $courseSession->time_td,
+            'time_tp'       => $courseSession->time_tp,
+            'course_annual_id'     => $courseSession->course_annual_id
+        ];
+        $save =  $this->courseSessions->create($inputs);
+        if($save) {
+
+            $data = [
+                'groups'                 => $courseAnnualClasses,
+                'course_annual_id'      => null,
+                'course_session_id'      => $save->id
+            ];
+
+            $saveCourseAnnualClass = $this->courseAnnualClasses->create($data);
+
+            if ($saveCourseAnnualClass) {
+                return ['status'=>true, 'message'=>'Course Duplicated!'];
+            } else {
+                return ['status'=>false, 'message'=>'Error Duplicated!'];
+            }
+        }
+    }
+
+
+    public function edit_course_session ($request)
+    {
+
+        $explode = explode('_', $request->dept_course_id);// department with course session id concatination
+        $courseSessionId = $explode[3];
+        $deptId = $explode[1];
+
+        $course = DB::table('course_sessions')->where('id', $courseSessionId)->first();
+        $courseAnnual = DB::table('course_annuals')->where('id', $course->course_annual_id)->first();
+//        $selected_groups = $this->selectedGroupByCourseAnnual([$courseAnnual->id]);/*--Student Score Trait--*/
+
+        $selected_groups = $this->selectedGroupByCourseSession([$course->id]); /*--Course Session Trait--*/
+
+
+        $group_by_course_annual = DB::table('course_annual_classes')
+            ->whereNull('course_session_id')
+            ->where('course_annual_id', $course->course_annual_id)
+            ->join('groups', 'groups.id', '=', 'course_annual_classes.group_id')
+            ->select('groups.id as group_id', 'groups.code as group_code')
+            ->orderBy('groups.code')->get();
+
+
+        usort($group_by_course_annual, function ($a, $b) {
+            return $a->group_code - $b->group_code;
+        });
+        if ($courseAnnual) {
+            return view('backend.course.courseAnnual.includes.popup_edit_course_annual', compact('group_by_course_annual', 'course', 'selected_groups'));
+        }
+    }
+
+    public function update_course_session($course_session_id, $request) {
+        $groups = $request->group;
+        $courseSession = DB::table('course_sessions')->where('id', $course_session_id)->first();
+        $courseAnnual = DB::table('course_annuals')->where('id', $courseSession->course_annual_id)->first();
+        $inputs = [
+            'time_course'   => $request->time_course,
+            'time_td'       => $request->time_td,
+            'time_tp'       => $request->time_tp,
+        ];
+
+        $update =  $this->courseSessions->update($course_session_id, $inputs);
+        if($update) {
+            $delete = DB::table('course_annual_classes')->where([
+                ['course_annual_id',null],
+                ['course_session_id',$courseSession->id],
+            ]);
+
+            $data = [
+                'groups'                => $groups,
+                'course_annual_id'      => null,
+                'course_session_id'      => $update->id
+            ];
+            if(count($delete->get()) > 0) {
+                $delete =  $delete->delete();
+                if($delete) {
+                    $create = $this->courseAnnualClasses->create($data);
+                }
+            } else {
+                $create = $this->courseAnnualClasses->create($data);
+            }
+
+            if($create) {
+                return ['status'=>true, 'message'=>'update course successfully!', 'selected_element' => 'department_'.$courseAnnual->department_id.'_course_' . $courseAnnual->id];
+            }
+
+        } else {
+            return ['status'=>false, 'message'=>'Error Updating!!'];
+        }
+    }
+
+    public function delete_course_session($request) {
+
+        $explode = explode('_',$request->dept_course_id);
+        $courseSessionId = $explode[3];
+        $courseSession = DB::table('course_sessions')->where('id', $courseSessionId)->first();
+        $courseAnnualClasses = DB::table('course_annual_classes')->where([
+            ['course_annual_id', null],
+            ['course_session_id', $courseSession->id]
+        ])->delete();
+        if($courseAnnualClasses) {
+            $delete = $this->courseSessions->destroy($courseSessionId);
+            if($delete) {
+                return ['status'=>true, 'message'=>'Successfully Deleted!'];
+            } else {
+                return ['status'=>true, 'message'=>'Error Deleted!'];
+            }
+        }
+    }
+
 
 }
