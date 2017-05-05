@@ -78,6 +78,8 @@ trait AjaxFilterTimetableController
         $semester_id = request('semester');
         $option_id = request('option') == null ? null : request('option');
         $group_id = request('group') == null ? null : request('group');
+
+        /*dd(request('group'));*/
         $course_sessions = DB::table('course_annuals')
             ->where([
                 ['course_annuals.academic_year_id', $academic_year_id],
@@ -89,13 +91,11 @@ trait AjaxFilterTimetableController
             ])
             ->join('course_sessions', 'course_sessions.course_annual_id', '=', 'course_annuals.id')
             ->leftJoin('employees', 'employees.id', '=', 'course_sessions.lecturer_id')
-            /*->where(function ($query) use ($group_id) {
-
+            ->where(function ($query) use ($group_id) {
                 $groups = DB::table('course_annual_classes')->where('course_annual_classes.group_id', $group_id)
                     ->lists('course_annual_classes.course_session_id');
-
                 $query->whereIn('course_sessions.id', $groups == null ? null : $groups);
-            })*/
+            })
             ->select(
                 'course_sessions.id',
                 'course_sessions.time_tp as tp',
@@ -195,5 +195,15 @@ trait AjaxFilterTimetableController
             'status' => true,
             'rooms' => $rooms
         ]);
+    }
+
+    /**
+     * Get timetable slots.
+     *
+     * @return mixed
+     */
+    public function get_timetable_slots()
+    {
+        dd(\request()->all());
     }
 }
