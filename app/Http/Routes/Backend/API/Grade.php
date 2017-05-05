@@ -7,5 +7,5 @@
  */
 
 
-Route::get('/all', 'GradeApiController@getAll')->name('grade.all');
-Route::get('/unique', 'GradeApiController@unique')->name('grade.unique');
+Route::get('/all', 'GradeAPIController@getAll')->name('grade.all');
+Route::get('/unique', 'GradeAPIController@unique')->name('grade.unique');

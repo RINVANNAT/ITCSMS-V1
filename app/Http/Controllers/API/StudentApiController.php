@@ -111,7 +111,6 @@ class StudentApiController extends Controller
         }
     }
 
-
     public function student_prop(Request $request) {
 
         $dataParams = FormParamManager::getFormParams($request);
@@ -124,11 +123,6 @@ class StudentApiController extends Controller
 
         return $studentProp;
 
-
-
     }
-
-
-
 
 }

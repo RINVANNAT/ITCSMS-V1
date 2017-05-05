@@ -7,5 +7,5 @@
  */
 
 
-Route::get('/all', 'DepartmentApiController@getAll')->name('department.all');
-Route::get('/get-unique', 'DepartmentApiController@unique')->name('department.unique');
+Route::get('/all', 'DepartmentAPIController@getAll')->name('department.all');
+Route::get('/get-unique', 'DepartmentAPIController@unique')->name('department.unique');

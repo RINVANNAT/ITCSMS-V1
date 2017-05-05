@@ -7,5 +7,5 @@
  */
 
 
-Route::get('/all', 'AcademicYearApiController@getAll')->name('academic_year.all');
-Route::get('/unique', 'AcademicYearApiController@unique')->name('academic_year.unique');
+Route::get('/all', 'AcademicYearAPIController@getAll')->name('academic_year.all');
+Route::get('/unique', 'AcademicYearAPIController@unique')->name('academic_year.unique');
