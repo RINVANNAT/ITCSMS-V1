@@ -1,177 +1,61 @@
 $(document).ready(function () {
-    // Filter courses sessions.
-    $('#filter-courses-sessions').on('change', function (e) {
 
-        e.preventDefault();
+    /*********************************
+     * Load module.
+     *
+     *********************************/
 
-        $.ajax({
-            type: 'POST',
-            url: '/admin/schedule/timetables/filter-courses-sessions    ',
-            data: $('#filter-courses-sessions').serialize(),
-            success: function (response) {
-                console.log(response);
-            },
-            error: function () {
-                swal(
-                    'Oops...',
-                    'Something went wrong!',
-                    'error'
-                );
-            }
-        });
-
-    });
-
-    // Call function dragging courses sessions.
+    get_options($('select[name="department"] :selected').val());
+    get_weeks($('select[name="semester"] :selected').val());
+    get_course_sessions();
+    get_groups();
     drag_course_session();
+    get_rooms();
 
-    // Timetable sections.
-    $('#timetable').fullCalendar({
-
-        defaultView: 'timetable',
-        defaultDate: '2017-01-01',
-        header: false,
-        footer: false,
-        views: {
-            timetable: {
-                type: 'agendaWeek',
-                setHeight: '100px'
-            }
-        },
-        allDaySlot: false,
-        hiddenDays: [0],
-        height: 650,
-        fixedWeekCount: false,
-        minTime: '07:00:00',
-        maxTime: '20:00:00',
-        slotLabelFormat: 'h:mm a',
-        columnFormat: 'dddd',
-        events: [
-            {
-                id: 1,
-                title: 'Event Conflict',
-                start: '2017-01-02 07:00:00',
-                end: '2017-01-02 09:00:00',
-                teacherName: 'CHUN Thavorac',
-                typeCourseSession: 'TP',
-                times: 23,
-                allDay: false,
-                status: true
-            },
-            {
-                id: 2,
-                title: 'Computer Architecture',
-                start: '2017-01-03 07:00:00',
-                end: '2017-01-03 09:00:00',
-                teacherName: 'CHUN Thavorac',
-                typeCourseSession: 'TP',
-                times: 23,
-                allDay: false,
-                status: false
-            }
-        ],
-        editable: true,
-        droppable: true,
-        dragRevertDuration: 10,
-        drop: function () {
-            $(this).addClass('course-selected');
-
-            setTimeout(function () {
-                $(this).removeClass('course-selected');
-            }, 100);
-        },
-        eventDragStart: function (event, jsEvent, ui, view) {
-            var room = '';
-            room += '<div class="room-item ui-draggable ui-draggable-handle">';
-            room += '<i class="fa fa-refresh"></i> Loading...';
-            room += '</div>';
-            $('.rooms').html(room);
-        },
-        eventDragStop: function (event, jsEvent, ui, view) {
-            // Trigger when stop drag the event.
-            if (isEventOverDiv(jsEvent.clientX, jsEvent.clientY)) {
-                $('#timetable').fullCalendar('removeEvents', event._id);
-                var course = '';
-                course += '<li class="course-item drag-course-back">'
-                    + '<span class="handle ui-sortable-handle">'
-                    + '<i class="fa fa-ellipsis-v"></i> '
-                    + '<i class="fa fa-ellipsis-v"></i>'
-                    + '</span>'
-                    + '<span class="text course-name">' + event.title + '</span><br>'
-                    + '<span style="margin-left: 28px;" class="teacher-name">' + event.teacherName + '</span><br/>'
-                    + '<span style="margin-left: 28px;" class="course-type">' + event.typeCourseSession + '</span> :'
-                    + '<span class="times">' + event.times + '</span> H'
-                    + '</li>';
-
-                $('.courses').prepend(course);
-
-                setTimeout(function () {
-                    $('.courses').find('.drag-course-back').removeClass('drag-course-back');
-                }, 300);
-
-                drag_course_session();
-            }
-        },
-        eventClick: function (calEvent, jsEvent, view) {
-            // Trigger when click the event.
-        },
-        eventDrop: function (event, delta, revertFunc) {
-            // Trigger where move and drop the event on full calendar.
-        },
-        eventRender: function (event, element, view) {
-            var object ='<a class="fc-time-grid-event fc-v-event fc-event fc-start fc-end course-item  fc-draggable fc-resizable" style="top: 65px; bottom: -153px; z-index: 1; left: 0%; right: 0%;">' +
-
-                '<div class="fc-content">' +
-                '<div class="container-room">' +
-                '<div class="side-course">' +
-                '<div class="fc-title conflict" data-toggle="tooltip" data-placement="right" title="Tooltip on top">' + event.title + '</div>' +
-                '<p class="text-primary conflict">Mr. YOU Vandy</p> ' +
-                '<p class="text-primary conflict">Course</p> ' +
-                '</div>' +
-                '<div class="side-room">' +
-                '<div class="room-name"><span class="render-room"></span></div> ' +
-                '<div class="room-action">' +
-                '<button class="btn btn-warning btn-xs" id="btn-conflict"><i class="fa fa-question"></i> </button> ' +
-                '<span class="render-trash"></span> ' +
-                '</div> ' +
-                '</div> ' +
-                '<div class="clearfix"></div> ' +
-                '</div>' +
-                '</div>' +
-                '<div class="fc-bgd"></div>' +
-                '<div class="fc-resizer fc-end-resizer"></div>' +
-                '</a>';
-
-            return $(object);
-        },
-        eventAfterAllRender: function (view) {
-
-        },
-        eventOverlap: function (stillEvent, movingEvent) {
-            return stillEvent.allDay && movingEvent.allDay;
-        }
-
+    /**********************************
+     * Option select semester.
+     * Department selected show option
+     *
+     **********************************/
+    // get weeks.
+    $(document).on('change', 'select[name="semester"]', function () {
+        get_weeks($(this).val());
+        get_course_sessions();
     });
-
+    // get options.
+    $(document).on('change', 'select[name="department"]', function () {
+        get_options($(this).val());
+        get_groups();
+        get_course_sessions();
+    });
+    // get course session.
+    $(document).on('change', 'select[name="academicYear"]', function () {
+        get_course_sessions();
+    });
+    // get group and course session.
+    $(document).on('change', 'select[name="option"]', function () {
+        get_groups();
+        get_course_sessions();
+    });
+    // get course session.
+    $(document).on('change', 'select[name="grade"]', function () {
+        get_groups();
+        get_course_sessions();
+    });
+    // get groups
+    $(document).on('change', 'select[name="group"]', function () {
+        get_course_sessions();
+    });
+    // search rooms.
+    $(document).on('keyup', 'input[name="search_room_query"]', function () {
+        search_rooms($(this).val());
+    });
+    // Call function dragging courses sessions.
     $('.room-item').removeAttr('style');
     $('.course-item').removeAttr('style');
 
-    var isEventOverDiv = function (x, y) {
-
-        var courses = $('.courses');
-        var offset = courses.offset();
-        offset.right = courses.width() + offset.left;
-        offset.bottom = courses.height() + offset.top;
-
-        /** Compare*/
-        return x >= offset.left
-            && y >= offset.top
-            && x <= offset.right
-            && y <= offset.bottom;
-    };
-
     // Clicking to remove the room from course.
-    $(document).on('click', '.remove-room', function (e) {
+    $(document).on('click', '.remove-room', function () {
         $(this).addClass('rf-room');
         $(this).parent().parent().parent().children().eq(0).children().eq(0).addClass('rf-room-name');
         swal({
@@ -192,24 +76,14 @@ $(document).ready(function () {
             )
         })
     });
-
     // Click on course item show available room.
     $(document).on('click', '.side-course', function () {
 
         $('body').find('.course-selected').removeClass('course-selected');
         $(this).addClass('course-selected');
-        var room = '';
-        for (var i = 0; i < 10; i++) {
-            room += '<div class="room-item suggest-room">';
-            room += '<i class="fa fa-ellipsis-v"></i> ';
-            room += '<i class="fa fa-ellipsis-v"></i> F-' + Math.floor(Math.random() * 201)
-            room += '</div> ';
-        }
-        // Apply with $.ajax({ /** implementation.... */ });
-        $('.rooms').html(room);
+        get_rooms();
 
     });
-
     // Add room into course
     $(document).on('click', '.suggest-room', function () {
         var btn_delete = '<button class="btn btn-danger btn-xs remove-room"><i class="fa fa-trash"></i></button>';
@@ -218,7 +92,6 @@ $(document).ready(function () {
         $(this).remove();
 
     });
-
     // Conflict button action
     $(document).on('click', '#btn-conflict', function (event) {
         event.preventDefault();
@@ -247,10 +120,6 @@ $(document).ready(function () {
         $('.rooms').html(table);
 
     });
-
-    // Reload courses.
-    $('#timetable').fullCalendar('rerenderEvents');
-
 });
 
 // Drag room into timetable.
@@ -275,10 +144,9 @@ var drag_room = function () {
 var drag_course_session = function () {
 
     $('.courses .course-item').each(function () {
-
         $(this).data('event', {
+            id: $(this).find('.courses-session-id').text(),
             title: $(this).find('.course-name').text(),
-            stick: true,
             className: 'course-item',
             teacherName: $(this).find('.teacher-name').text(),
             typeCourseSession: $(this).find('.course-type').text(),
@@ -294,17 +162,174 @@ var drag_course_session = function () {
     });
 };
 
-// List all rooms.
-var rooms = function (nb_rooms) {
+/** List all rooms. **/
+var get_rooms = function () {
+    $.ajax({
+        type: 'POST',
+        url: '/admin/schedule/timetables/get_rooms',
+        success: function (response) {
+            if (response.status == true) {
+                var room_item = '';
+                $.each(response.rooms, function (key, val) {
+                    room_item += '<div class="room-item" id="room' + val.id + '">'
+                        + '<i class="fa fa-building-o"></i> '
+                        + val.name + '-' + val.code
+                        + '</div> ';
+                });
 
-    var room = '';
-    room += '<div class="room-item">'
-        + '<i class="fa fa-ellipsis-v"></i>'
-        + '<i class="fa fa-ellipsis-v"></i> F-306</div>';
-    for (var i = 0; i < nb_rooms; i++) {
-        room += room;
-    }
+                $('.rooms').html(room_item);
+            }
+            else {
+                var message = '<div class="room-item bg-danger" style="width: 100%; background-color: red; color: #fff;">' +
+                    '<i class="fa fa-warning"></i> Room not found!' +
+                    '</div>';
+                $('.rooms').html(message);
+            }
+        }
+    })
 
-    $('.rooms').append(room);
+};
+/** Get rooms. **/
+var get_groups = function () {
+    setTimeout(function () {
+        $.ajax({
+            type: 'POST',
+            url: '/admin/schedule/timetables/get_groups',
+            data: $('#options-filter').serialize(),
+            success: function (response) {
+                if (response.status == true) {
+                    var group_item = '';
+                    $.each(response.groups, function (key, val) {
+                        group_item += '<option value="' + val.id + '">' + val.name + '</option>';
+                    });
 
+                    $('select[name="group"]').html(group_item);
+                }
+                else {
+                    $('select[name="group"]').html('');
+                }
+            },
+            error: function () {
+
+            }
+        })
+    }, 100);
+};
+/** Get weeks. **/
+var get_weeks = function (semester_id) {
+    $.ajax({
+        type: 'POST',
+        url: '/admin/schedule/timetables/get_weeks',
+        data: {semester_id: semester_id},
+        success: function (response) {
+            var option = '';
+            $.each(response.weeks, function (key, val) {
+                option += '<option value="' + val.id + '">' + val.name_en + '</option>';
+            });
+
+            $('select[name="weekly"]').html(option);
+        },
+        error: function () {
+
+        }
+    });
+};
+/** Get options. **/
+var get_options = function (department_id) {
+    $.ajax({
+        type: 'POST',
+        url: '/admin/schedule/timetables/get_options',
+        data: {department_id: department_id},
+        success: function (response) {
+            var option = '';
+            $.each(response.options, function (key, val) {
+                option += '<option value="' + val.id + '">' + val.code + '</option>';
+            });
+
+            $('select[name="option"]').html(option);
+        },
+        error: function () {
+
+        }
+    });
+};
+/** Get course sessions. **/
+var get_course_sessions = function () {
+    setTimeout(function () {
+        $.ajax({
+            type: 'POST',
+            url: '/admin/schedule/timetables/get_course_sessions',
+            data: $('#options-filter').serialize(),
+            success: function (response) {
+                if (response.status == true) {
+                    var course_session_item = '';
+                    $.each(response.course_sessions, function (key, val) {
+                        course_session_item += '<li class="course-item">' +
+                            '<span class="handle ui-sortable-handle">' +
+                            '<i class="fa fa-ellipsis-v"></i> ' +
+                            '<i class="fa fa-ellipsis-v"></i>' +
+                            '</span>' +
+                            '<span class="text course-name">' + val.course_name + '</span><br>' +
+                            '<span style="margin-left: 28px;" class="teacher-name">' + val.teacher_name + '</span><br/>';
+                        if (val.tp != 0) {
+                            course_session_item += '<span style="margin-left: 28px;" class="course-type">TP</span> : ' +
+                                '<span class="times">' + val.tp + '</span> H'
+                        }
+                        else if (val.td != 0) {
+                            course_session_item += '<span style="margin-left: 28px;" class="course-type">TD</span> : ' +
+                                '<span class="times">' + val.td + '</span> H'
+                        }
+                        else {
+                            course_session_item += '<span style="margin-left: 28px;" class="course-type">Course</span> : ' +
+                                '<span class="times">' + val.tc + '</span> H'
+                        }
+                        course_session_item += '<span class="text courses-session-id" style="display: none;">' + val.id + '</span><br>' + '</li>';
+                    });
+
+                    $('.courses.todo-list').html(course_session_item);
+                    drag_course_session()
+                }
+                else {
+                    $('.courses.todo-list').html("<li class='course-item'>There are no course sessions created yet.</li>");
+                }
+            },
+            error: function () {
+
+            }
+        });
+    }, 100);
+};
+/** Search rooms. **/
+var search_rooms = function (query) {
+    $.ajax({
+        type: 'POST',
+        url: '/admin/schedule/timetables/search_rooms',
+        data: {query: query},
+        success: function (response) {
+            if (response.status == true) {
+                var room_item = '';
+                $.each(response.rooms, function (key, val) {
+                    room_item += '<div class="room-item" id="room' + val.id + '">'
+                        + '<i class="fa fa-building-o"></i> '
+                        + val.name + '-' + val.code
+                        + '</div> ';
+                });
+
+                $('.rooms').html(room_item);
+            }
+            else {
+                var message = '<div class="room-item bg-danger" style="width: 100%; background-color: red; color: #fff;">' +
+                    '<i class="fa fa-warning"></i> Room not found!' +
+                    '</div>';
+                $('.rooms').html(message);
+            }
+        },
+        error: function () {
+            swal(
+                'Oops...',
+                'Something went wrong!',
+                'error'
+            );
+        }
+    });
 };

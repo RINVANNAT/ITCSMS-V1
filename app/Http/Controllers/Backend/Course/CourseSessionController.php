@@ -71,7 +71,7 @@ class CourseSessionController extends Controller
 
             if($storeCourseSession) {
                 $data = $data + ['course_session_id' => $storeCourseSession->id];
-
+                unset($data['course_annual_id']);/*---we cannot save together of course annual id and course session id */
                 $storeCourseAnnualClass = $this->courseAnnualClasses->create($data);
 
                 if($storeCourseAnnualClass) {

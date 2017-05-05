@@ -48,8 +48,8 @@
 
         </div>
 
-        <form name="filter-courses-sessions"
-              id="filter-courses-sessions"
+        <form name="options-filter"
+              id="options-filter"
               method="POST"
               action="{{ route('admin.schedule.timetables.filter') }}">
             @include('backend.schedule.timetables.includes.partials.option')

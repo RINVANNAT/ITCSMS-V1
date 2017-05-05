@@ -8,7 +8,9 @@ use App\Models\Department;
 use App\Models\DepartmentOption;
 use App\Models\Employee;
 use App\Models\Grade;
+use App\Models\Room;
 use App\Models\Schedule\Calendar\Year\Year;
+use App\Models\Schedule\Timetable\Week;
 use App\Models\Semester;
 use Carbon\Carbon;
 use Illuminate\Support\ServiceProvider;
@@ -45,21 +47,24 @@ class AppServiceProvider extends ServiceProvider
             if (access()->allow('global-timetable-management')) {
                 $view->with([
                     'academicYears' => AcademicYear::latest()->get(),
-                    'departments' => Department::all(),
+                    'departments' => Department::where('parent_id', 11)->get(),
                     'degrees' => Degree::all(),
                     'grades' => Grade::all(),
                     'options' => DepartmentOption::all(),
-                    'semesters' => Semester::all()
+                    'semesters' => Semester::all(),
+                    'weeks' => Week::all()
                 ]);
             } else {
                 $view->with([
                     'academicYears' => AcademicYear::latest()->get(),
                     'department' => Department::find(auth()->user()->getDepartment()),
                     'grades' => Grade::all(),
-                    'semesters' => Semester::all()
+                    'semesters' => Semester::all(),
+                    'weeks' => Week::all()
                 ]);
             }
         });
+
     }
 
     /**
