@@ -197,6 +197,8 @@ class CourseSessionController extends Controller
                 'employees.name_kh as employee'
             ])->get();
 
+
+
         $arraySelectedGroupIds = [];
         foreach($course_sessions as $session) {
 
