@@ -147,12 +147,9 @@ class CourseSessionController extends Controller
         $course_annual = DB::table("course_annuals")
             ->where("course_annuals.id", $course_id)
             ->first();
-
-        $courseSessionIds = DB::table('course_sessions')->where('course_annual_id', $course_annual->id)->lists('id');
-
         $groups = DB::table('course_annual_classes')
-            ->whereIn('course_session_id', $courseSessionIds)
-            ->whereNull('course_annual_id')
+            ->whereNull('course_session_id')
+            ->where('course_annual_id', $course_id)
             ->join('groups', 'groups.id', '=', 'course_annual_classes.group_id')
             ->select('groups.id as group_id', 'groups.code as group_code')
             ->orderBy('groups.code')->get();
@@ -173,25 +170,6 @@ class CourseSessionController extends Controller
                 ->groupBy('groups.id')
                 ->orderBy('group_code')->get();
         }
-
-/*
-        if(count($groups->get()) > 1) {
-            $groups = $groups->orderBy('groups.code')->lists('groups.id', 'groups.code');
-        } else {
-            foreach($groups->get() as $group) {
-                if($group->group == null) {
-                    $groups = DB::table('studentAnnuals')->where([
-                        ['department_id', $course_annual->department_id],
-                        ['academic_year_id', $course_annual->academic_year_id],
-                        ['grade_id', $course_annual->grade_id],
-                        ['degree_id', $course_annual->degree_id],
-                    ])->orderBy('group')->lists('group', 'group');
-
-                    break;
-                }
-            }
-        }*/
-
         $course_sessions = CourseSession::leftJoin("employees","employees.id","=","course_sessions.lecturer_id")
             ->leftJoin("course_annuals","course_annuals.id","=","course_sessions.course_annual_id")
             ->where("course_sessions.course_annual_id",$course_id)
@@ -205,22 +183,16 @@ class CourseSessionController extends Controller
                 'course_sessions.lecturer_id',
                 'course_annuals.name_kh as name',
                 'employees.name_kh as employee'
-            ])->get();
+            ]);
 
+        $arrayCourseSessionIds = $course_sessions->lists('course_sessions.id')->toArray();
+        $course_sessions = $course_sessions->get();
 
+        $selectedGroups = collect(DB::table('course_annual_classes')
+            ->whereIn('course_annual_classes.course_session_id', $arrayCourseSessionIds)
+            ->join('groups', 'groups.id', '=', 'course_annual_classes.group_id')
+            ->get())->groupBy('course_session_id');
 
-        $arraySelectedGroupIds = [];
-        foreach($course_sessions as $session) {
-
-           foreach($session->groups as $group_session) {
-               $arraySelectedGroupIds = array_merge($arraySelectedGroupIds, [$group_session->group_id]);
-           }
-        }
-        if(count($arraySelectedGroupIds) > 0) {
-            $selectedGroups = DB::table('groups')->whereIn('groups.id', $arraySelectedGroupIds)->get();
-        } else {
-            $selectedGroups=[];
-        }
         return view("backend.course.courseSession.index",compact("course_sessions","course_annual", "groups", 'selectedGroups'))->render();
     }
 

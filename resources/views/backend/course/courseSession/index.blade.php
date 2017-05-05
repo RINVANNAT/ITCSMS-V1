@@ -88,8 +88,8 @@
             </div>
             <br/>
             <span style="margin-left: 28px;">Groups:
-                @if(count($selectedGroups)>0)
-                    @foreach($selectedGroups as $group)
+                @if(isset($selectedGroups[$course_session->id]))
+                    @foreach($selectedGroups[$course_session->id] as $group)
                         {{$group->code}}
                     @endforeach
                 @endif
