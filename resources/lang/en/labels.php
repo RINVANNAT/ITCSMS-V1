@@ -1026,7 +1026,7 @@ return [
                     ]
                 ],
                 'courses_sessions' => 'Courses Sessions',
-                'rooms' => 'Available Rooms',
+                'rooms' => 'Rooms',
                 'index_timetable' => [
                     'number' => 'No.',
                     'weekly' => 'Weekly',
