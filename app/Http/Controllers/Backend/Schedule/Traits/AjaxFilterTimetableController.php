@@ -237,9 +237,10 @@ trait AjaxFilterTimetableController
     {
         $timetable = $this->timetableRepository->find_timetable_is_existed($request);
         if ($timetable instanceof Timetable) {
-            $timetable_slots = $this->timetableSlotRepository->get_timetable_slots($timetable);
-            return Response::json(['status'=> true, 'timetable_slots'=>$timetable_slots]);
+            $timetable_slots = TimetableSlot::where('timetable_id', $timetable->id)
+                ->select('id', 'course_name as title', 'course_name', 'teacher_name', 'type as course_type', 'start', 'end')
+                ->get();
+            return \GuzzleHttp\json_decode($timetable_slots);
         }
-        return Response::json(['status' => false]);
     }
 }

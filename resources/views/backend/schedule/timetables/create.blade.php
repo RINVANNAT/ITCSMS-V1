@@ -65,25 +65,12 @@
                     url: '{!! route('get_timetable_slots') !!}',
                     data: $('#options-filter').serialize(),
                     success: function (response) {
-                        if (response.status == true) {
-                            var events = [];
-                            $.each(response.timetable_slots, function (key, val) {
-                                events.push({
-                                    id: val.id,
-                                    course_name: val.course_name,
-                                    teacher_name: val.teacher_name,
-                                    start: val.start,
-                                    end: val.end
-                                });
-                            });
-
-                            $('#calendar').fullCalendar({
-                                events: response.timetable_slots
-                            });
-                        }
+                        $('#timetable').fullCalendar('removeEvents');
+                        $('#timetable').fullCalendar('renderEvents', response, true);
+                        $('#timetable').fullCalendar('rerenderEvents');
                     }
                 });
-            }, 300);
+            }, 400);
         }
         function create_timetable_slots(copiedEventObject) {
             console.log(copiedEventObject);
@@ -150,6 +137,7 @@
                     var tempDate = new Date(date);
                     copiedEventObject.id = Math.floor(Math.random() * 1800) + 1;
                     copiedEventObject.start = tempDate;
+                    copiedEventObject.start.setHours(copiedEventObject.start.getHours() - 7);
                     copiedEventObject.end = new Date(copiedEventObject.start);
                     copiedEventObject.end.setHours(copiedEventObject.start.getHours() + 2);
                     copiedEventObject.allDay = true;
@@ -175,7 +163,7 @@
                      + '<span class="times">' + event.times + '</span> H'
                      + '</li>';
 
-                        $('.courses').prepend(course);
+                     $('.courses').prepend(course);
 
                      setTimeout(function () {
                      $('.courses').find('.drag-course-back').removeClass('drag-course-back');
@@ -258,6 +246,7 @@
             $(document).on('change', 'select[name="semester"]', function () {
                 get_weeks($(this).val());
                 get_course_sessions();
+                get_timetable_slots();
             });
             // get options.
             $(document).on('change', 'select[name="department"]', function () {
@@ -270,20 +259,28 @@
             $(document).on('change', 'select[name="academicYear"]', function () {
                 get_course_sessions();
                 get_timetable();
+                get_timetable_slots();
             });
             // get group and course session.
             $(document).on('change', 'select[name="option"]', function () {
                 get_groups();
                 get_course_sessions();
+                get_timetable_slots();
             });
             // get course session.
             $(document).on('change', 'select[name="grade"]', function () {
                 get_groups();
                 get_course_sessions();
+                get_timetable_slots();
             });
             // get groups
             $(document).on('change', 'select[name="group"]', function () {
                 get_course_sessions();
+                get_timetable_slots();
+            });
+
+            $(document).on('change', 'select[name="weekly"]', function () {
+                get_timetable_slots();
             });
         });
     </script>
