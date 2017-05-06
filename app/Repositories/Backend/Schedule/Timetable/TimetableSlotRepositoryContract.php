@@ -18,4 +18,12 @@ interface TimetableSlotRepositoryContract
      * @return mixed
      */
     public function create_timetable_slot(Timetable $timetable, CreateTimetableRequest $request);
+
+    /**
+     * Get timetable slots by a timetable.
+     *
+     * @param Timetable $timetable
+     * @return mixed
+     */
+    public function get_timetable_slots(Timetable $timetable);
 }

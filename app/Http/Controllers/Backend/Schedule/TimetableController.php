@@ -79,10 +79,8 @@ class TimetableController extends Controller
     {
         $findTimetable = $this->timetableRepository->find_timetable_is_existed($request);
         if ($findTimetable instanceof Timetable) {
-
             $this->timetableSlotRepository->create_timetable_slot($findTimetable, $request);
         } else {
-
             $newTimetable = $this->timetableRepository->create_timetable($request);
 
             if ($newTimetable instanceof Timetable) {

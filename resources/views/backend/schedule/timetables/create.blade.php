@@ -58,20 +58,34 @@
     {!! Html::script('js/backend/schedule/timetable.js') !!}
 
     <script type="text/javascript">
+        function get_timetable_slots() {
+            setTimeout(function () {
+                $.ajax({
+                    type: 'POST',
+                    url: '{!! route('get_timetable_slots') !!}',
+                    data: $('#options-filter').serialize(),
+                    success: function (response) {
+                        $('#timetable').fullCalendar('removeEvents');
+                        $('#timetable').fullCalendar('renderEvents', response, true);
+                        $('#timetable').fullCalendar('rerenderEvents');
+                    }
+                });
+            }, 400);
+        }
         function create_timetable_slots(copiedEventObject) {
             console.log(copiedEventObject);
             $.ajax({
                 type: 'POST',
                 url: '{{ route('admin.schedule.timetables.store') }}',
                 data: {
-                    'academic_year_id': $('select[name="academicYear"] :selected').val(),
-                    'department_id': $('select[name="department"] :selected').val(),
-                    'option_id': $('select[name="option"] :selected').val(),
-                    'degree_id': $('select[name="degree"] :selected').val(),
-                    'grade_id': $('select[name="grade"] :selected').val(),
-                    'semester_id': $('select[name="semester"] :selected').val(),
-                    'week_id': $('select[name="weekly"] :selected').val(),
-                    'group_id': $('select[name="group"] :selected').val(),
+                    'academicYear': $('select[name="academicYear"] :selected').val(),
+                    'department': $('select[name="department"] :selected').val(),
+                    'option': $('select[name="option"] :selected').val(),
+                    'degree': $('select[name="degree"] :selected').val(),
+                    'grade': $('select[name="grade"] :selected').val(),
+                    'semester': $('select[name="semester"] :selected').val(),
+                    'weekly': $('select[name="weekly"] :selected').val(),
+                    'group': $('select[name="group"] :selected').val(),
                     'course_session_id': copiedEventObject.course_session_id,
                     'course_name': copiedEventObject.course_name,
                     'teacher_name': copiedEventObject.teacher_name,
@@ -112,7 +126,6 @@
                 maxTime: '20:00:00',
                 slotLabelFormat: 'h:mm a',
                 columnFormat: 'dddd',
-                events: '{!! route('admin.schedule.timetables.get_timetable_slots') !!}',
                 editable: true,
                 droppable: true,
                 dragRevertDuration: 0,
@@ -124,6 +137,7 @@
                     var tempDate = new Date(date);
                     copiedEventObject.id = Math.floor(Math.random() * 1800) + 1;
                     copiedEventObject.start = tempDate;
+                    copiedEventObject.start.setHours(copiedEventObject.start.getHours() - 7);
                     copiedEventObject.end = new Date(copiedEventObject.start);
                     copiedEventObject.end.setHours(copiedEventObject.start.getHours() + 2);
                     copiedEventObject.allDay = true;
@@ -134,36 +148,36 @@
                     get_rooms();
                 },
                 eventDragStop: function (event, jsEvent, ui, view) {
-                    if (isEventOverDiv(jsEvent.clientX, jsEvent.clientY)) {
-                        $('#timetable').fullCalendar('removeEvents', event._id);
-                        $('#timetable').fullCalendar('removeEvents', event._id);
-                        var course = '';
-                        course += '<li class="course-item drag-course-back">'
-                            + '<span class="handle ui-sortable-handle">'
-                            + '<i class="fa fa-ellipsis-v"></i> '
-                            + '<i class="fa fa-ellipsis-v"></i>'
-                            + '</span>'
-                            + '<span class="text course-name">' + event.title + '</span><br>'
-                            + '<span style="margin-left: 28px;" class="teacher-name">' + event.teacherName + '</span><br/>'
-                            + '<span style="margin-left: 28px;" class="course-type">' + event.typeCourseSession + '</span> :'
-                            + '<span class="times">' + event.times + '</span> H'
-                            + '</li>';
+                    /*if (isEventOverDiv(jsEvent.clientX, jsEvent.clientY)) {
+                     $('#timetable').fullCalendar('removeEvents', event._id);
+                     $('#timetable').fullCalendar('removeEvents', event._id);
+                     var course = '';
+                     course += '<li class="course-item drag-course-back">'
+                     + '<span class="handle ui-sortable-handle">'
+                     + '<i class="fa fa-ellipsis-v"></i> '
+                     + '<i class="fa fa-ellipsis-v"></i>'
+                     + '</span>'
+                     + '<span class="text course-name">' + event.title + '</span><br>'
+                     + '<span style="margin-left: 28px;" class="teacher-name">' + event.teacherName + '</span><br/>'
+                     + '<span style="margin-left: 28px;" class="course-type">' + event.typeCourseSession + '</span> :'
+                     + '<span class="times">' + event.times + '</span> H'
+                     + '</li>';
 
-                        $('.courses').prepend(course);
+                     $('.courses').prepend(course);
 
-                        setTimeout(function () {
-                            $('.courses').find('.drag-course-back').removeClass('drag-course-back');
-                        }, 300);
+                     setTimeout(function () {
+                     $('.courses').find('.drag-course-back').removeClass('drag-course-back');
+                     }, 300);
 
-                        drag_course_session();
-                    }
+                     drag_course_session();
+                     }*/
                 },
                 eventClick: function (calEvent, jsEvent, view) {
                     // Trigger when click the event.
                 },
                 eventDrop: function (event, delta, revertFunc) {
                     // Trigger where move and drop the event on full calendar.
-                    console.log(event);
+                    // console.log(event);
                 },
                 eventRender: function (event, element, view) {
                     var object = '<a class="fc-time-grid-event fc-v-event fc-event fc-start fc-end course-item  fc-draggable fc-resizable" style="top: 65px; bottom: -153px; z-index: 1; left: 0%; right: 0%;">' +
@@ -197,7 +211,6 @@
                     return stillEvent.allDay && movingEvent.allDay;
                 }
             });
-
         }
         var isEventOverDiv = function (x, y) {
 
@@ -226,44 +239,48 @@
             drag_course_session();
             get_rooms();
             get_timetable();
+            get_timetable_slots();
 
 
             // get weeks.
             $(document).on('change', 'select[name="semester"]', function () {
                 get_weeks($(this).val());
                 get_course_sessions();
-                get_timetable();
+                get_timetable_slots();
             });
             // get options.
             $(document).on('change', 'select[name="department"]', function () {
                 get_options($(this).val());
-                setTimeout(function () {
-                    get_groups();
-                }, 100);
+                get_groups();
                 get_course_sessions();
-                get_timetable();
+                get_timetable_slots();
             });
             // get course session.
             $(document).on('change', 'select[name="academicYear"]', function () {
                 get_course_sessions();
                 get_timetable();
+                get_timetable_slots();
             });
             // get group and course session.
             $(document).on('change', 'select[name="option"]', function () {
                 get_groups();
                 get_course_sessions();
-                get_timetable();
+                get_timetable_slots();
             });
             // get course session.
             $(document).on('change', 'select[name="grade"]', function () {
                 get_groups();
                 get_course_sessions();
-                get_timetable();
+                get_timetable_slots();
             });
             // get groups
             $(document).on('change', 'select[name="group"]', function () {
                 get_course_sessions();
-                get_timetable();
+                get_timetable_slots();
+            });
+
+            $(document).on('change', 'select[name="weekly"]', function () {
+                get_timetable_slots();
             });
         });
     </script>

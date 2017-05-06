@@ -150,7 +150,7 @@ var get_groups = function () {
 
             }
         })
-    }, 100);
+    }, 200);
 };
 /** Get weeks. **/
 var get_weeks = function (semester_id) {
@@ -192,7 +192,6 @@ var get_options = function (department_id) {
 };
 /** Get course sessions. **/
 var get_course_sessions = function () {
-    console.log($('#options-filter').serialize());
     setTimeout(function () {
         $.ajax({
             type: 'POST',

@@ -2,8 +2,13 @@
 
 namespace App\Http\Controllers\Backend\Schedule\Traits;
 
+use App\Http\Requests\Backend\Schedule\Timetable\CreateTimetableRequest;
 use App\Models\DepartmentOption;
+use App\Models\Schedule\Timetable\Timetable;
+use App\Models\Schedule\Timetable\TimetableSlot;
 use App\Models\Schedule\Timetable\Week;
+use App\Repositories\Backend\Schedule\Timetable\EloquentTimetableRepository;
+use App\Repositories\Backend\Schedule\Timetable\EloquentTimetableSlotRepository;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Response;
 
@@ -13,6 +18,31 @@ use Illuminate\Support\Facades\Response;
  */
 trait AjaxFilterTimetableController
 {
+    /**
+     * @var EloquentTimetableRepository
+     */
+    protected $timetableRepository;
+
+    /**
+     * @var EloquentTimetableSlotRepository
+     */
+    protected $timetableSlotRepository;
+
+    /**
+     * AjaxFilterTimetableController constructor.
+     * @param EloquentTimetableRepository $eloquentTimetableRepository
+     * @param EloquentTimetableSlotRepository $eloquentTimetableSlotRepository
+     */
+    public function __construct
+    (
+        EloquentTimetableRepository $eloquentTimetableRepository,
+        EloquentTimetableSlotRepository $eloquentTimetableSlotRepository
+    )
+    {
+        $this->timetableRepository = $eloquentTimetableRepository;
+        $this->timetableSlotRepository = $eloquentTimetableSlotRepository;
+    }
+
     /**
      * Filter timetable.
      *
@@ -94,7 +124,7 @@ trait AjaxFilterTimetableController
             ->where(function ($query) use ($group_id) {
                 $groups = DB::table('course_annual_classes')->where('course_annual_classes.group_id', $group_id)
                     ->lists('course_annual_classes.course_session_id');
-                $query->whereIn('course_sessions.id', $groups == null ? null : $groups);
+                $query->whereIn('course_sessions.id', $groups == null ? [] : $groups);
             })
             ->select(
                 'course_sessions.id',
@@ -200,10 +230,17 @@ trait AjaxFilterTimetableController
     /**
      * Get timetable slots.
      *
+     * @param CreateTimetableRequest $request
      * @return mixed
      */
-    public function get_timetable_slots()
+    public function get_timetable_slots(CreateTimetableRequest $request)
     {
-        dd(\request()->all());
+        $timetable = $this->timetableRepository->find_timetable_is_existed($request);
+        if ($timetable instanceof Timetable) {
+            $timetable_slots = TimetableSlot::where('timetable_id', $timetable->id)
+                ->select('id', 'course_name as title', 'course_name', 'teacher_name', 'type as course_type', 'start', 'end')
+                ->get();
+            return \GuzzleHttp\json_decode($timetable_slots);
+        }
     }
 }

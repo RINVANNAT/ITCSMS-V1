@@ -10,7 +10,7 @@ Route::group(['namespace' => 'Schedule', 'prefix' => 'schedule'], function () {
     /** Ajax Requesting. */
     Route::post('timetables/filter', 'TimetableController@filter')->name('admin.schedule.timetables.filter');
     Route::post('timetables/store', 'TimetableController@store')->name('admin.schedule.timetables.store');
-    Route::get('timetables/get_timetable_slots', 'TimetableController@get_timetable_slots')->name('admin.schedule.timetables.get_timetable_slots');
+    Route::post('timetables/get_timetable_slots', 'TimetableController@get_timetable_slots')->name('get_timetable_slots');
 
     /** Options controls. */
     Route::post('timetables/get_weeks', 'TimetableController@get_weeks')->name('admin.schedule.timetables.get_weeks');

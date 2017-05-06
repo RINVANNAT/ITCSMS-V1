@@ -6,6 +6,7 @@ use App\Http\Requests\Backend\Schedule\Timetable\CreateTimetableRequest;
 use App\Models\Schedule\Timetable\Timetable;
 use App\Models\Schedule\Timetable\TimetableSlot;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\DB;
 
 /**
  * Class EloquentTimetableSlotRepository
@@ -42,5 +43,16 @@ class EloquentTimetableSlotRepository implements TimetableSlotRepositoryContract
             return true;
         }
         return false;
+    }
+
+    /**
+     * Get timetable slots by a timetable.
+     *
+     * @param Timetable $timetable
+     * @return mixed
+     */
+    public function get_timetable_slots(Timetable $timetable)
+    {
+        return TimetableSlot::where('timetable_id', $timetable->id)->get();
     }
 }

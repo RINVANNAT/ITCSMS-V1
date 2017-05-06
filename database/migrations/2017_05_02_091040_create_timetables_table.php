@@ -22,7 +22,7 @@ class CreateTimetablesTable extends Migration
             $table->integer('option_id')->nullable();
             $table->integer('semester_id')->unsigned();
             $table->integer('week_id')->unsigned();
-            $table->integer('group_id');
+            $table->integer('group_id')->nullable();
 
             $table->boolean('completed')->default(false);
 

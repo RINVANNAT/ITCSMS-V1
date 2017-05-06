@@ -21,14 +21,14 @@ class EloquentTimetableRepository implements TimetableRepositoryContract
     public function find_timetable_is_existed(CreateTimetableRequest $request)
     {
         $timetable = Timetable::where([
-            ['academic_year_id', $request->academic_year_id],
-            ['department_id', $request->department_id],
-            ['degree_id', $request->degree_id],
-            ['grade_id', $request->grade_id],
-            ['option_id', $request->option_id],
-            ['semester_id', $request->semester_id],
-            ['week_id', $request->week_id],
-            ['group_id', $request->group_id]
+            ['academic_year_id', $request->academicYear],
+            ['department_id', $request->department],
+            ['degree_id', $request->degree],
+            ['grade_id', $request->grade],
+            ['option_id', $request->option == null ? null : $request->option],
+            ['semester_id', $request->semester],
+            ['week_id', $request->weekly],
+            ['group_id', $request->group == null ? null : $request->group]
         ])
             ->first();
 
@@ -48,14 +48,14 @@ class EloquentTimetableRepository implements TimetableRepositoryContract
     {
         $newTimetable = new Timetable();
 
-        $newTimetable->academic_year_id = $request->academic_year_id;
-        $newTimetable->department_id = $request->department_id;
-        $newTimetable->degree_id = $request->degree_id;
-        $newTimetable->grade_id = $request->grade_id;
-        $request->option_id == null ? null : $newTimetable->option_id = $request->option_id;
-        $newTimetable->semester_id = $request->semester_id;
-        $newTimetable->week_id = $request->week_id;
-        $newTimetable->group_id = $request->group_id;
+        $newTimetable->academic_year_id = $request->academicYear;
+        $newTimetable->department_id = $request->department;
+        $newTimetable->degree_id = $request->degree;
+        $newTimetable->grade_id = $request->grade;
+        $newTimetable->option_id = $request->option == null ? null : $request->option;
+        $newTimetable->semester_id = $request->semester;
+        $newTimetable->week_id = $request->weekly;
+        $newTimetable->group_id = $request->group == null ? null : $request->group;
         $newTimetable->created_uid = auth()->user()->id;
         $newTimetable->updated_uid = auth()->user()->id;
 
