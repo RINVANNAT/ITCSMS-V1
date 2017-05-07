@@ -6,7 +6,6 @@ use App\Http\Requests\Backend\Schedule\Timetable\CreateTimetableRequest;
 use App\Models\Schedule\Timetable\Timetable;
 use App\Models\Schedule\Timetable\TimetableSlot;
 use Carbon\Carbon;
-use Illuminate\Support\Facades\DB;
 
 /**
  * Class EloquentTimetableSlotRepository
@@ -33,14 +32,14 @@ class EloquentTimetableSlotRepository implements TimetableSlotRepositoryContract
         $newTimetableSlot->course_name = $request->course_name;
         $newTimetableSlot->teacher_name = $request->teacher_name;
         $newTimetableSlot->type = $request->course_type;
-        $newTimetableSlot->durations = 2; // @TODO change that point.
         $newTimetableSlot->start = new Carbon($request->start);
         $newTimetableSlot->end = new Carbon($request->end == null ? $request->start : $request->end);
+        $newTimetableSlot->durations = $this->durations($newTimetableSlot->start, $newTimetableSlot->end);
         $newTimetableSlot->created_uid = auth()->user()->id;
         $newTimetableSlot->updated_uid = auth()->user()->id;
 
         if ($newTimetableSlot->save()) {
-            return true;
+            return $newTimetableSlot;
         }
         return false;
     }
@@ -54,5 +53,17 @@ class EloquentTimetableSlotRepository implements TimetableSlotRepositoryContract
     public function get_timetable_slots(Timetable $timetable)
     {
         return TimetableSlot::where('timetable_id', $timetable->id)->get();
+    }
+
+    /**
+     * Get interval Hours.
+     *
+     * @param Carbon $start
+     * @param Carbon $end
+     * @return mixed
+     */
+    public function durations(Carbon $start, Carbon $end)
+    {
+        return $start->diffInHours($end);
     }
 }

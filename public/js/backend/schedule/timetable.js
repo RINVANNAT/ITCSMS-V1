@@ -1,4 +1,22 @@
 $(document).ready(function () {
+    toastr.options = {
+        "closeButton": true,
+        "debug": false,
+        "newestOnTop": true,
+        "progressBar": false,
+        "positionClass": "toast-bottom-right",
+        "preventDuplicates": false,
+        "onclick": null,
+        "showDuration": "300",
+        "hideDuration": "1000",
+        "timeOut": "5000",
+        "extendedTimeOut": "1000",
+        "showEasing": "swing",
+        "hideEasing": "linear",
+        "showMethod": "fadeIn",
+        "hideMethod": "fadeOut"
+    };
+
     // search rooms.
     $(document).on('keyup', 'input[name="search_room_query"]', function () {
         search_rooms($(this).val());
@@ -9,41 +27,60 @@ $(document).ready(function () {
 
     // Clicking to remove the room from course.
     $(document).on('click', '.remove-room', function () {
-        $(this).addClass('rf-room');
-        $(this).parent().parent().parent().children().eq(0).children().eq(0).addClass('rf-room-name');
-        swal({
-            title: 'Are you sure?',
-            text: "You won't be able to revert this!",
-            type: 'warning',
-            showCancelButton: true,
-            confirmButtonColor: '#3085d6',
-            cancelButtonColor: '#d33',
-            confirmButtonText: 'Yes, delete it!'
-        }).then(function () {
-            $('body').find('.rf-room').remove();
-            $('body').find('.rf-room-name').empty().removeClass('rf-room-name');
-            swal(
-                'Removed !',
-                'The room have been removed from this course.',
-                'success'
-            )
+        var dom = $(this);
+        var timetable_slot_id = $(this).parent().parent().parent().children().eq(0).attr('id');
+        $.ajax({
+            type: 'POST',
+            url: '/admin/schedule/timetables/remove_room_from_timetable_slot',
+            data: {
+                timetable_slot_id: timetable_slot_id
+            },
+            success: function () {
+                dom.parent().parent().children().eq(0).empty();
+                dom.remove();
+                toastr['info']('The room was removed.', 'REMOVING ROOM');
+            },
+            error: function () {
+                swal(
+                    'Oops...',
+                    'Something went wrong!',
+                    'error'
+                )
+            }
         })
     });
     // Click on course item show available room.
     $(document).on('click', '.side-course', function () {
-
         $('body').find('.course-selected').removeClass('course-selected');
         $(this).addClass('course-selected');
         get_rooms();
 
     });
     // Add room into course
-    $(document).on('click', '.suggest-room', function () {
-        var btn_delete = '<button class="btn btn-danger btn-xs remove-room"><i class="fa fa-trash"></i></button>';
-        $('.course-selected').parent().children().eq(1).children().eq(0).children().text($(this).text());
-        $('.course-selected').parent().children().eq(1).children().eq(1).children().eq(1).html(btn_delete);
-        $(this).remove();
+    $(document).on('click', '.rooms .room-item', function () {
+        var dom_room = $(this);
+        $.ajax({
+            type: 'POST',
+            url: '/admin/schedule/timetables/insert_room_into_timetable_slot',
+            data: {
+                timetable_slot_id: $('.side-course.course-selected').attr('id'),
+                room_id: $(this).attr('id')
+            },
+            success: function (response) {
+                if (response.status == true) {
+                    var btn_delete = '<button class="btn btn-danger btn-xs remove-room"><i class="fa fa-trash"></i></button>';
+                    $('.container-room').find('.side-course.course-selected').parent().children().eq(1).children().eq(1).html(btn_delete);
+                    $('.container-room').find('.side-course.course-selected').parent().children().eq(1).children().eq(0).text(dom_room.children().eq(1).text());
 
+                    dom_room.remove();
+                    toastr['success']('Room was added.', 'ADDING ROOM');
+                    // $('#timetable').fullCalendar('refresh');
+                }
+            },
+            error: function () {
+                toastr['error']('Something went wrong.', 'ADDING ROOM ERROR');
+            }
+        })
     });
     // Conflict button action
     $(document).on('click', '#btn-conflict', function (event) {
@@ -106,11 +143,12 @@ var get_rooms = function () {
         url: '/admin/schedule/timetables/get_rooms',
         success: function (response) {
             if (response.status == true) {
+                console.log
                 var room_item = '';
                 $.each(response.rooms, function (key, val) {
-                    room_item += '<div class="room-item" id="room' + val.id + '">'
+                    room_item += '<div class="room-item" id="' + val.id + '">'
                         + '<i class="fa fa-building-o"></i> '
-                        + val.name + '-' + val.code
+                        + '<span>' + val.name + '-' + val.code + '</span>'
                         + '</div> ';
                 });
 
@@ -246,9 +284,9 @@ var search_rooms = function (query) {
             if (response.status == true) {
                 var room_item = '';
                 $.each(response.rooms, function (key, val) {
-                    room_item += '<div class="room-item" id="room' + val.id + '">'
+                    room_item += '<div class="room-item" id="' + val.id + '">'
                         + '<i class="fa fa-building-o"></i> '
-                        + val.name + '-' + val.code
+                        + '<span>' + val.name + '-' + val.code + '</span>'
                         + '</div> ';
                 });
 

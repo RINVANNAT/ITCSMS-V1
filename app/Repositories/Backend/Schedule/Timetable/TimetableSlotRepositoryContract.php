@@ -3,6 +3,7 @@
 namespace App\Repositories\Backend\Schedule\Timetable;
 use App\Http\Requests\Backend\Schedule\Timetable\CreateTimetableRequest;
 use App\Models\Schedule\Timetable\Timetable;
+use Carbon\Carbon;
 
 /**
  * Interface TimetableSlotRepositoryContract
@@ -26,4 +27,13 @@ interface TimetableSlotRepositoryContract
      * @return mixed
      */
     public function get_timetable_slots(Timetable $timetable);
+
+    /**
+     * Get interval Hours.
+     *
+     * @param Carbon $start
+     * @param Carbon $end
+     * @return mixed
+     */
+    public function durations(Carbon $start, Carbon $end);
 }

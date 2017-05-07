@@ -3,12 +3,15 @@
 namespace App\Http\Controllers\Backend\Schedule\Traits;
 
 use App\Http\Requests\Backend\Schedule\Timetable\CreateTimetableRequest;
+use App\Http\Requests\Backend\Schedule\Timetable\MoveTimetableSlotRequest;
+use App\Http\Requests\Backend\Schedule\Timetable\ResizeTimetableSlotRequest;
 use App\Models\DepartmentOption;
 use App\Models\Schedule\Timetable\Timetable;
 use App\Models\Schedule\Timetable\TimetableSlot;
 use App\Models\Schedule\Timetable\Week;
 use App\Repositories\Backend\Schedule\Timetable\EloquentTimetableRepository;
 use App\Repositories\Backend\Schedule\Timetable\EloquentTimetableSlotRepository;
+use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Response;
 
@@ -108,6 +111,7 @@ trait AjaxFilterTimetableController
         $semester_id = request('semester');
         $option_id = request('option') == null ? null : request('option');
         $group_id = request('group') == null ? null : request('group');
+
 
         /*dd(request('group'));*/
         $course_sessions = DB::table('course_annuals')
@@ -238,9 +242,98 @@ trait AjaxFilterTimetableController
         $timetable = $this->timetableRepository->find_timetable_is_existed($request);
         if ($timetable instanceof Timetable) {
             $timetable_slots = TimetableSlot::where('timetable_id', $timetable->id)
-                ->select('id', 'course_name as title', 'course_name', 'teacher_name', 'type as course_type', 'start', 'end')
+                ->leftJoin('rooms', 'rooms.id', '=', 'timetable_slots.room_id')
+                ->leftJoin('buildings', 'buildings.id', '=', 'rooms.building_id')
+                ->select(
+                    'timetable_slots.id',
+                    'timetable_slots.course_name as title',
+                    'timetable_slots.course_name',
+                    'timetable_slots.teacher_name',
+                    'timetable_slots.type as course_type',
+                    'timetable_slots.start',
+                    'timetable_slots.end',
+                    'buildings.code as building',
+                    'rooms.name as room'
+                )
                 ->get();
             return \GuzzleHttp\json_decode($timetable_slots);
         }
+    }
+
+    /**
+     * Move timetable slot.
+     *
+     * @param MoveTimetableSlotRequest $request
+     * @return mixed
+     */
+    public function move_timetable_slot(MoveTimetableSlotRequest $request)
+    {
+        if (isset($request->timetable_slot_id)) {
+            $timetable_slot = TimetableSlot::find($request->timetable_slot_id);
+            if ($timetable_slot instanceof TimetableSlot) {
+                $start = new Carbon($request->start_date);
+                $end = $start->addHours($timetable_slot->durations);
+                $timetable_slot->start = new Carbon($request->start_date);
+                $timetable_slot->end = $end;
+                $timetable_slot->update();
+                return Response::json(['status' => true, 'timetable_slot' => $timetable_slot]);
+            }
+        }
+        return Response::json(['status' => false]);
+    }
+
+    /**
+     * Resize timetable slot.
+     *
+     * @param ResizeTimetableSlotRequest $request
+     * @return mixed
+     */
+    public function resize_timetable_slot(ResizeTimetableSlotRequest $request)
+    {
+        if (isset($request->timetable_slot_id)) {
+            $timetable_slot = TimetableSlot::find($request->timetable_slot_id);
+            if ($timetable_slot instanceof TimetableSlot) {
+                $timetable_slot->durations = $this->timetableSlotRepository->durations(new Carbon($timetable_slot->start), new Carbon($request->end));
+                $timetable_slot->end = new Carbon($request->end);
+                $timetable_slot->update();
+                return Response::json(['status' => true, 'timetable_slot' => $timetable_slot]);
+            }
+        }
+        return Response::json(['status' => false]);
+    }
+
+    /**
+     * Insert room into timetable slot.
+     *
+     * @return mixed
+     */
+    public function insert_room_into_timetable_slot()
+    {
+        $timetable_slot_id = request('timetable_slot_id');
+        $room_id = request('room_id');
+        if (isset($timetable_slot_id) && isset($room_id)) {
+            $timetable_slot = TimetableSlot::find($timetable_slot_id);
+            $timetable_slot->room_id = $room_id;
+            $timetable_slot->update();
+            return Response::json(['status' => true]);
+        }
+        return Response::json(['status' => false]);
+    }
+
+    /**
+     * Remove room.
+     *
+     * @return mixed
+     */
+    public function remove_room()
+    {
+        $timetable_slot_id = request('timetable_slot_id');
+        if (isset($timetable_slot_id)) {
+            $timetable_slot = TimetableSlot::find($timetable_slot_id);
+            $timetable_slot->room_id = null;
+            $timetable_slot->update();
+            return Response::json(['status' => true, 'timetable_slot' => $timetable_slot]);
+        }
+        return Response::json(['status' => false]);
     }
 }

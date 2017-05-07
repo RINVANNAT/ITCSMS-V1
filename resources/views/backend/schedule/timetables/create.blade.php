@@ -17,6 +17,7 @@
     {!! Html::style('plugins/jQueryUI/jquery-ui.css') !!}
     {!! Html::style('plugins/fullcalendar/fullcalendar.css') !!}
     {!! Html::style('plugins/sweetalert2/dist/sweetalert2.css') !!}
+    {!! Html::style('plugins/toastr/toastr.min.css') !!}
     {!! Html::style('css/backend/schedule/timetable.css') !!}
 
 @stop
@@ -55,6 +56,7 @@
     {!! Html::script('plugins/moment/moment.min.js') !!}
     {!! Html::script('plugins/fullcalendar/fullcalendar.js') !!}
     {!! Html::script('plugins/sweetalert2/dist/sweetalert2.js') !!}
+    {!! Html::script('plugins/toastr/toastr.min.js') !!}
     {!! Html::script('js/backend/schedule/timetable.js') !!}
 
     <script type="text/javascript">
@@ -73,7 +75,6 @@
             }, 400);
         }
         function create_timetable_slots(copiedEventObject) {
-            console.log(copiedEventObject);
             $.ajax({
                 type: 'POST',
                 url: '{{ route('admin.schedule.timetables.store') }}',
@@ -93,8 +94,9 @@
                     'start': copiedEventObject.start,
                     'end': copiedEventObject.end
                 },
-                success: function () {
-                    console.log(200);
+                success: function (response) {
+                    $('#timetable').fullCalendar('renderEvent', response.timetable_slot);
+                    $('#timetable').fullCalendar('rerenderEvents');
                 },
                 error: function () {
                     console.log(404);
@@ -148,52 +150,53 @@
                     get_rooms();
                 },
                 eventDragStop: function (event, jsEvent, ui, view) {
-                    /*if (isEventOverDiv(jsEvent.clientX, jsEvent.clientY)) {
-                     $('#timetable').fullCalendar('removeEvents', event._id);
-                     $('#timetable').fullCalendar('removeEvents', event._id);
-                     var course = '';
-                     course += '<li class="course-item drag-course-back">'
-                     + '<span class="handle ui-sortable-handle">'
-                     + '<i class="fa fa-ellipsis-v"></i> '
-                     + '<i class="fa fa-ellipsis-v"></i>'
-                     + '</span>'
-                     + '<span class="text course-name">' + event.title + '</span><br>'
-                     + '<span style="margin-left: 28px;" class="teacher-name">' + event.teacherName + '</span><br/>'
-                     + '<span style="margin-left: 28px;" class="course-type">' + event.typeCourseSession + '</span> :'
-                     + '<span class="times">' + event.times + '</span> H'
-                     + '</li>';
-
-                     $('.courses').prepend(course);
-
-                     setTimeout(function () {
-                     $('.courses').find('.drag-course-back').removeClass('drag-course-back');
-                     }, 300);
-
-                     drag_course_session();
-                     }*/
+                    $('#timetable').fullCalendar('rerenderEvents');
                 },
                 eventClick: function (calEvent, jsEvent, view) {
                     // Trigger when click the event.
                 },
                 eventDrop: function (event, delta, revertFunc) {
-                    // Trigger where move and drop the event on full calendar.
-                    // console.log(event);
+                    var start_date = event.start.format();
+                    $.ajax({
+                        type: 'POST',
+                        url: '{!! route('move_timetable_slot') !!}',
+                        data: {
+                            timetable_slot_id: event.id,
+                            start_date: start_date
+                        },
+                        success: function (response) {
+                            if (response.status == true) {
+                                toastr["success"]("Timetable slot have been changed.", "Change Timetable Slot");
+                                $('#timetable').fullCalendar('rerenderEvents');
+                            }
+                        },
+                        error: function () {
+
+                        }
+                    })
                 },
                 eventRender: function (event, element, view) {
+                    var btn_delete = '<button class="btn btn-danger btn-xs remove-room"><i class="fa fa-trash"></i></button>';
                     var object = '<a class="fc-time-grid-event fc-v-event fc-event fc-start fc-end course-item  fc-draggable fc-resizable" style="top: 65px; bottom: -153px; z-index: 1; left: 0%; right: 0%;">' +
 
                         '<div class="fc-content">' +
                         '<div class="container-room">' +
-                        '<div class="side-course">' +
+                        '<div class="side-course" id="' + event.id + '">' +
                         '<div class="fc-title">' + (event.course_name).substring(0, 10) + '...</div>' +
                         '<p class="text-primary">' + event.teacher_name + '</p> ' +
                         '<p class="text-primary">' + event.course_type + '</p> ' +
                         '</div>' +
                         '<div class="side-room">' +
-                        '<div class="room-name"><span class="render-room"></span></div> ' +
-                        '<div class="room-action">' +
-                        '<span class="render-trash"></span> ' +
-                        '</div> ' +
+                        '<div class="room-name">';
+                    if (event.room != null) {
+                        object += '<p>' + event.room + '-' + event.building + '</p>';
+                    }
+                    object += '</div> ' +
+                        '<div class="room-action">';
+                    if (event.room != null) {
+                        object += btn_delete;
+                    }
+                    object += '</div> ' +
                         '</div> ' +
                         '<div class="clearfix"></div> ' +
                         '</div>' +
@@ -209,6 +212,28 @@
                 },
                 eventOverlap: function (stillEvent, movingEvent) {
                     return stillEvent.allDay && movingEvent.allDay;
+                },
+                eventResize: function (event, delta, revertFunc) {
+
+                    var end = event.end.format();
+
+                    $.ajax({
+                        type: 'POST',
+                        url: '{!! route('resize_timetable_slot') !!}',
+                        data: {
+                            timetable_slot_id: event.id,
+                            end: end
+                        },
+                        success: function (response) {
+                            if (response.status == true) {
+                                toastr["success"]("Timetable slot have been changed.", "Timetable Slot Change");
+                            }
+                        },
+                        error: function () {
+                            toastr['error']('Something went wrong', "Error updating");
+                        }
+                    })
+
                 }
             });
         }
@@ -220,17 +245,14 @@
             offset.bottom = external_events.height() + offset.top;
 
             // Compare
-            if (x >= offset.left
-                && y >= offset.top
-                && x <= offset.right
-                && y <= offset.bottom) {
-                return true;
-            }
-            return false;
+            return (x >= offset.left
+            && y >= offset.top
+            && x <= offset.right
+            && y <= offset.bottom);
 
         };
-        $(document).ready(function () {
 
+        $(document).ready(function () {
             // load modules.
             get_options($('select[name="department"] :selected').val());
             get_weeks($('select[name="semester"] :selected').val());
