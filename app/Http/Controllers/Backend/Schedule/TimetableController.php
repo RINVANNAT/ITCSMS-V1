@@ -7,8 +7,10 @@ use App\Http\Controllers\Backend\Schedule\Traits\AjaxFilterTimetableController;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Backend\Schedule\Timetable\CreateTimetableRequest;
 use App\Models\Schedule\Timetable\Timetable;
+use App\Models\Schedule\Timetable\TimetableSlot;
 use App\Repositories\Backend\Schedule\Timetable\EloquentTimetableRepository;
 use App\Repositories\Backend\Schedule\Timetable\EloquentTimetableSlotRepository;
+use Illuminate\Support\Facades\Response;
 
 /**
  * Class TimetableController
@@ -78,14 +80,19 @@ class TimetableController extends Controller
     public function store(CreateTimetableRequest $request)
     {
         $findTimetable = $this->timetableRepository->find_timetable_is_existed($request);
+        $new_timetable_slot = new TimetableSlot();
         if ($findTimetable instanceof Timetable) {
-            $this->timetableSlotRepository->create_timetable_slot($findTimetable, $request);
+            $new_timetable_slot = $this->timetableSlotRepository->create_timetable_slot($findTimetable, $request);
         } else {
             $newTimetable = $this->timetableRepository->create_timetable($request);
 
             if ($newTimetable instanceof Timetable) {
-                $this->timetableSlotRepository->create_timetable_slot($newTimetable, $request);
+                $new_timetable_slot = $this->timetableSlotRepository->create_timetable_slot($newTimetable, $request);
             }
         }
+        if ($new_timetable_slot) {
+            return Response::json(['status' => true, 'timetable_slot' => \GuzzleHttp\json_decode($new_timetable_slot)]);
+        }
+        return Response::json(['status' => false]);
     }
 }

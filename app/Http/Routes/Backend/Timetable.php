@@ -11,6 +11,10 @@ Route::group(['namespace' => 'Schedule', 'prefix' => 'schedule'], function () {
     Route::post('timetables/filter', 'TimetableController@filter')->name('admin.schedule.timetables.filter');
     Route::post('timetables/store', 'TimetableController@store')->name('admin.schedule.timetables.store');
     Route::post('timetables/get_timetable_slots', 'TimetableController@get_timetable_slots')->name('get_timetable_slots');
+    Route::post('timetables/move_timetable_slot', 'TimetableController@move_timetable_slot')->name('move_timetable_slot');
+    Route::post('timetables/resize_timetable_slot', 'TimetableController@resize_timetable_slot')->name('resize_timetable_slot');
+    Route::post('timetables/insert_room_into_timetable_slot', 'TimetableController@insert_room_into_timetable_slot')->name('insert_room_into_timetable_slot');
+    Route::post('timetables/remove_room_from_timetable_slot', 'TimetableController@remove_room')->name('remove_room');
 
     /** Options controls. */
     Route::post('timetables/get_weeks', 'TimetableController@get_weeks')->name('admin.schedule.timetables.get_weeks');
