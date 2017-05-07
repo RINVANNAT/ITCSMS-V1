@@ -6,11 +6,19 @@ use App\Http\Controllers\Backend\Schedule\Traits\AjaxCloneTimetableController;
 use App\Http\Controllers\Backend\Schedule\Traits\AjaxFilterTimetableController;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Backend\Schedule\Timetable\CreateTimetableRequest;
+use App\Models\AcademicYear;
+use App\Models\Degree;
+use App\Models\Department;
+use App\Models\DepartmentOption;
+use App\Models\Grade;
 use App\Models\Schedule\Timetable\Timetable;
 use App\Models\Schedule\Timetable\TimetableSlot;
+use App\Models\Schedule\Timetable\Week;
+use App\Models\Semester;
 use App\Repositories\Backend\Schedule\Timetable\EloquentTimetableRepository;
 use App\Repositories\Backend\Schedule\Timetable\EloquentTimetableSlotRepository;
 use Illuminate\Support\Facades\Response;
+use Yajra\Datatables\Datatables;
 
 /**
  * Class TimetableController
@@ -51,7 +59,86 @@ class TimetableController extends Controller
      */
     public function index()
     {
-        return view('backend.schedule.timetables.index');
+        return view('backend.schedule.timetables.index')->with([
+            'academicYears' => AcademicYear::latest()->get(),
+            'departments' => Department::where('parent_id', 11)->get(),
+            'degrees' => Degree::all(),
+            'grades' => Grade::all(),
+            'options' => DepartmentOption::all(),
+            'semesters' => Semester::all(),
+            'weeks' => Week::all()
+        ]);
+    }
+
+    /**
+     * Get all timetables.
+     *
+     * @return mixed
+     */
+    public function get_timetables()
+    {
+        $timetables = Timetable::join('weeks', 'weeks.id', '=', 'timetables.week_id')
+            ->join('academicYears', 'academicYears.id', '=', 'timetables.academic_year_id')
+            ->join('departments', 'departments.id', '=', 'timetables.department_id')
+            ->join('degrees', 'degrees.id', '=', 'timetables.degree_id')
+            ->join('grades', 'grades.id', '=', 'timetables.grade_id')
+            ->leftJoin('departmentOptions', 'departmentOptions.id', '=', 'timetables.option_id')
+            ->join('semesters', 'semesters.id', '=', 'timetables.semester_id')
+            ->leftJoin('groups', 'groups.id', '=', 'timetables.group_id')
+            ->select([
+                'academicYears.name_latin as academic_year',
+                'departments.code as department',
+                'degrees.name_en as degree',
+                'grades.code as grade',
+                'departmentOptions.name_en as option',
+                'semesters.name_en as semester',
+                'groups.code as group',
+                'weeks.name_en as weekly',
+                'timetables.completed as status'
+            ])
+            ->get();
+        return Datatables::of($timetables)
+            ->addColumn('action', function ($timetables) {
+                $view = '<a href="' . route('admin.schedule.timetables.create') . '" class="btn btn-xs btn-primary">'
+                    . '<i class="fa fa-share-square-o" data-toggle="tooltip"'
+                    . 'data-placement="top" title="View"'
+                    . 'data-original-title="View">'
+                    . '</i></a>';
+
+                $delete = ' <a href="' . route('admin.schedule.timetables.create') . '" class="btn btn-xs btn-danger">'
+                    . '<i class="fa fa-trash" data-toggle="tooltip"'
+                    . 'data-placement="top" title="Delete"'
+                    . 'data-original-title="Delete">'
+
+                    . '</i>'
+                    . '</a>';
+
+                if (access()->allow('delete-timetable') || access()->allow('view-timetable')) {
+                    return $view . $delete;
+                } else if (access()->allow('view-timetable')) {
+                    return $view;
+                }
+            })
+            ->editColumn('status', function ($timetables) {
+                $view = '';
+                if ($timetables->completed == false) {
+                    $view = '<span class="btn btn-danger btn-xs">'
+                        . '<i class="fa fa-times-circle"'
+                        . 'data-toggle="tooltip"'
+                        . 'data-placement="top" title="Uncompleted"'
+                        . 'data-original-title="Uncompleted"></i>'
+                        . '</span>';
+                } else {
+                    $view = '<span class="btn btn-info btn-xs">'
+                        . '<i class="fa fa-times-circle"'
+                        . 'data-toggle="tooltip"'
+                        . 'data-placement="top" title="Completed"'
+                        . 'data-original-title="Uncompleted"></i>'
+                        . '</span>';
+                }
+                return $view;
+            })
+            ->make(true);
     }
 
     /**

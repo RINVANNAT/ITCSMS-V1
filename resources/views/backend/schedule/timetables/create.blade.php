@@ -151,29 +151,6 @@
                 },
                 eventDragStop: function (event, jsEvent, ui, view) {
                     $('#timetable').fullCalendar('rerenderEvents');
-                    /*if (isEventOverDiv(jsEvent.clientX, jsEvent.clientY)) {
-                     $('#timetable').fullCalendar('removeEvents', event._id);
-                     $('#timetable').fullCalendar('removeEvents', event._id);
-                     var course = '';
-                     course += '<li class="course-item drag-course-back">'
-                     + '<span class="handle ui-sortable-handle">'
-                     + '<i class="fa fa-ellipsis-v"></i> '
-                     + '<i class="fa fa-ellipsis-v"></i>'
-                     + '</span>'
-                     + '<span class="text course-name">' + event.title + '</span><br>'
-                     + '<span style="margin-left: 28px;" class="teacher-name">' + event.teacherName + '</span><br/>'
-                     + '<span style="margin-left: 28px;" class="course-type">' + event.typeCourseSession + '</span> :'
-                     + '<span class="times">' + event.times + '</span> H'
-                     + '</li>';
-
-                     $('.courses').prepend(course);
-
-                     setTimeout(function () {
-                     $('.courses').find('.drag-course-back').removeClass('drag-course-back');
-                     }, 300);
-
-                     drag_course_session();
-                     }*/
                 },
                 eventClick: function (calEvent, jsEvent, view) {
                     // Trigger when click the event.
@@ -268,17 +245,14 @@
             offset.bottom = external_events.height() + offset.top;
 
             // Compare
-            if (x >= offset.left
-                && y >= offset.top
-                && x <= offset.right
-                && y <= offset.bottom) {
-                return true;
-            }
-            return false;
+            return (x >= offset.left
+            && y >= offset.top
+            && x <= offset.right
+            && y <= offset.bottom);
 
         };
-        $(document).ready(function () {
 
+        $(document).ready(function () {
             // load modules.
             get_options($('select[name="department"] :selected').val());
             get_weeks($('select[name="semester"] :selected').val());

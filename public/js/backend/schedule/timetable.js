@@ -29,39 +29,24 @@ $(document).ready(function () {
     $(document).on('click', '.remove-room', function () {
         var dom = $(this);
         var timetable_slot_id = $(this).parent().parent().parent().children().eq(0).attr('id');
-        console.log(timetable_slot_id);
-        swal({
-            title: 'Are you sure?',
-            text: "You won't be able to revert this!",
-            type: 'warning',
-            showCancelButton: true,
-            confirmButtonColor: '#3085d6',
-            cancelButtonColor: '#d33',
-            confirmButtonText: 'Yes, delete it!'
-        }).then(function () {
-            $.ajax({
-                type: 'POST',
-                url: '/admin/schedule/timetables/remove_room_from_timetable_slot',
-                data: {
-                    timetable_slot_id: timetable_slot_id
-                },
-                success: function () {
-                    dom.parent().parent().children().eq(0).empty();
-                    dom.remove();
-                    swal(
-                        'Removed !',
-                        'The room have been removed from this course.',
-                        'success'
-                    )
-                },
-                error: function () {
-                    swal(
-                        'Oops...',
-                        'Something went wrong!',
-                        'error'
-                    )
-                }
-            })
+        $.ajax({
+            type: 'POST',
+            url: '/admin/schedule/timetables/remove_room_from_timetable_slot',
+            data: {
+                timetable_slot_id: timetable_slot_id
+            },
+            success: function () {
+                dom.parent().parent().children().eq(0).empty();
+                dom.remove();
+                toastr['info']('The room was removed.', 'REMOVING ROOM');
+            },
+            error: function () {
+                swal(
+                    'Oops...',
+                    'Something went wrong!',
+                    'error'
+                )
+            }
         })
     });
     // Click on course item show available room.
@@ -88,12 +73,12 @@ $(document).ready(function () {
                     $('.container-room').find('.side-course.course-selected').parent().children().eq(1).children().eq(0).text(dom_room.children().eq(1).text());
 
                     dom_room.remove();
-                    toastr['success']('Room was added.', 'Adding room');
+                    toastr['success']('Room was added.', 'ADDING ROOM');
                     // $('#timetable').fullCalendar('refresh');
                 }
             },
             error: function () {
-                toastr['error']('Something went wrong.', 'Adding room error');
+                toastr['error']('Something went wrong.', 'ADDING ROOM ERROR');
             }
         })
     });
