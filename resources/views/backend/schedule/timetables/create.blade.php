@@ -170,13 +170,12 @@
                         toastr['info']('The course was added.', 'ADDING COURSE');
                         get_timetable_slots();
                     }
-                    
-
                 },
                 error: function () {
                     toastr['error']('The course was not added.', 'ERROR ADDING COURSE');
                 }
             });
+            
             $('#timetable').fullCalendar("rerenderEvents");
         };
 
