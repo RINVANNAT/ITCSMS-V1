@@ -168,26 +168,14 @@
                 success: function (response) {
                     if (response.status == true) {
                         toastr['info']('The course was added.', 'ADDING COURSE');
-
-                        event.id = response.timetable_slot.id;
-                        event.title = response.timetable_slot.course_name;
-                        event.course_name = response.timetable_slot.course_name;
-                        event.teacher_name = response.timetable_slot.teacher_name;
-                        event.course_type = response.timetable_slot.type;
-                        event.start = response.timetable_slot.start;
-                        event.end = response.timetable_slot.end;
-                        event.allDay = true;
-
-                        /*$('#timetable').fullCalendar('renderEvent', event, true);
-                        $('#timetable').fullCalendar("refetchEvents");
-                        $('#timetable').fullCalendar("rerenderEvents");*/
+                        get_timetable_slots();
                     }
-
                 },
                 error: function () {
                     toastr['error']('The course was not added.', 'ERROR ADDING COURSE');
                 }
             });
+            
             $('#timetable').fullCalendar("rerenderEvents");
         };
 
