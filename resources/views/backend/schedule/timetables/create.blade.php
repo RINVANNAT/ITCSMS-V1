@@ -170,6 +170,7 @@
                         toastr['info']('The course was added.', 'ADDING COURSE');
                         get_timetable_slots();
                     }
+                    
 
                 },
                 error: function () {
