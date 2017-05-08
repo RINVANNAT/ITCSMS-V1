@@ -1,3 +1,26 @@
+{{--<div class="row">--}}
+{{--<div class="col-md-12">--}}
+{{--<div class="box box-solid">--}}
+
+{{--<div id="rooms">--}}
+{{--<div class="box-header with-border">--}}
+{{--<i class="fa fa-building"></i>--}}
+{{--<h3 class="box-title">{{ trans('labels.backend.schedule.timetable.rooms') }}</h3>--}}
+{{--<div class="box-tools pull-right">--}}
+{{--<input class="search form-control input-sm" placeholder="Search"/>--}}
+{{--</div>--}}
+{{--</div>--}}
+
+{{--<div class="box-body">--}}
+{{--<ul class="list">--}}
+{{--</ul>--}}
+{{--</div>--}}
+{{----}}
+{{--</div>--}}
+{{--</div>--}}
+{{--</div>--}}
+{{--</div>--}}
+
 <div class="row">
     <div class="col-md-12">
         <div class="box box-solid">

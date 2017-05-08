@@ -6,6 +6,7 @@ use App\Http\Requests\Backend\Schedule\Timetable\CreateTimetableRequest;
 use App\Http\Requests\Backend\Schedule\Timetable\MoveTimetableSlotRequest;
 use App\Http\Requests\Backend\Schedule\Timetable\ResizeTimetableSlotRequest;
 use App\Models\DepartmentOption;
+use App\Models\Room;
 use App\Models\Schedule\Timetable\Timetable;
 use App\Models\Schedule\Timetable\TimetableSlot;
 use App\Models\Schedule\Timetable\Week;
@@ -74,7 +75,7 @@ trait AjaxFilterTimetableController
      */
     public function get_weeks()
     {
-        $semester_id = \request('semester_id');
+        $semester_id = request('semester_id');
 
         if (isset($semester_id)) {
             return Response::json(['status' => true, 'weeks' => Week::where('semester_id', $semester_id)->get()]);
@@ -89,7 +90,7 @@ trait AjaxFilterTimetableController
      */
     public function get_options()
     {
-        $department_id = \request('department_id');
+        $department_id = request('department_id');
 
         if (isset($department_id)) {
             return Response::json(['status' => true, 'options' => DepartmentOption::where('department_id', $department_id)->get()]);
@@ -335,5 +336,62 @@ trait AjaxFilterTimetableController
             return Response::json(['status' => true, 'timetable_slot' => $timetable_slot]);
         }
         return Response::json(['status' => false]);
+    }
+
+    /**
+     * Get all suggest room.
+     *
+     * @return mixed
+     */
+    public function get_suggest_room()
+    {
+        $academic_year_id = request('academic_year_id');
+        $week_id = request('week_id');
+        $timetable_slot_id = request('timetable_slot_id');
+
+        if (isset($timetable_slot_id)) {
+            $timetable_slot = TimetableSlot::find($timetable_slot_id);
+
+            if (isset($academic_year_id) && isset($week_id)) {
+
+                $rooms_used = DB::table('timetables')
+                    ->join('timetable_slots', 'timetable_slots.timetable_id', '=', 'timetables.id')
+                    ->where([
+                        ['timetables.academic_year_id', $academic_year_id],
+                        ['timetables.week_id', $week_id],
+                        ['timetable_slots.start', $timetable_slot->start],
+                        ['timetable_slots.end', $timetable_slot->end]
+                    ])
+                    ->whereNotNull('timetable_slots.room_id')
+                    ->join('rooms', 'rooms.id', '=', 'timetable_slots.room_id')
+                    ->join('buildings', 'buildings.id', '=', 'rooms.building_id')
+                    ->select('rooms.id as id', 'rooms.name as name', 'buildings.code as code')
+                    ->get();
+
+                $rooms_tmp = DB::table('timetables')
+                    ->join('timetable_slots', 'timetable_slots.timetable_id', '=', 'timetables.id')
+                    ->where([
+                        ['timetables.academic_year_id', $academic_year_id],
+                        ['timetables.week_id', $week_id],
+                        ['timetable_slots.start', $timetable_slot->start],
+                        ['timetable_slots.end', $timetable_slot->end]
+                    ])
+                    ->whereNotNull('timetable_slots.room_id')
+                    ->lists('timetable_slots.room_id');
+
+                $rooms_remaining = DB::table('rooms')
+                    ->whereNotIn('rooms.id', $rooms_tmp == [] ? [] : $rooms_tmp)
+                    ->join('buildings', 'buildings.id', '=', 'rooms.building_id')
+                    ->select('rooms.id as id', 'rooms.name as name', 'buildings.code as code')
+                    ->get();
+
+                return Response::json([
+                    'status' => true,
+                    'roomUsed' => $rooms_used,
+                    'roomRemain' => $rooms_remaining
+                ]);
+
+            }
+        }
     }
 }

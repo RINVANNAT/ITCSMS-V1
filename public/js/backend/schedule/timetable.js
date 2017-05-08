@@ -1,3 +1,14 @@
+function render_room(data) {
+    var room_item = '';
+    $.each(data, function (key, val) {
+        room_item += '<div class="room-item" id="' + val.id + '">'
+            + '<i class="fa fa-building-o"></i> '
+            + '<span>' + val.name + '-' + val.code + '</span>'
+            + '</div> ';
+    });
+
+    $('.rooms').html(room_item);
+}
 $(document).ready(function () {
     toastr.options = {
         "closeButton": true,
@@ -16,7 +27,6 @@ $(document).ready(function () {
         "showMethod": "fadeIn",
         "hideMethod": "fadeOut"
     };
-
     // search rooms.
     $(document).on('keyup', 'input[name="search_room_query"]', function () {
         search_rooms($(this).val());
@@ -50,12 +60,7 @@ $(document).ready(function () {
         })
     });
     // Click on course item show available room.
-    $(document).on('click', '.side-course', function () {
-        $('body').find('.course-selected').removeClass('course-selected');
-        $(this).addClass('course-selected');
-        get_rooms();
 
-    });
     // Add room into course
     $(document).on('click', '.rooms .room-item', function () {
         var dom_room = $(this);
@@ -75,12 +80,14 @@ $(document).ready(function () {
                     dom_room.remove();
                     toastr['success']('Room was added.', 'ADDING ROOM');
                     // $('#timetable').fullCalendar('refresh');
+                } else {
+                    toastr['warning']('Please select which course.', 'ADDING ROOM ERROR');
                 }
             },
             error: function () {
                 toastr['error']('Something went wrong.', 'ADDING ROOM ERROR');
             }
-        })
+        });
     });
     // Conflict button action
     $(document).on('click', '#btn-conflict', function (event) {
@@ -110,6 +117,7 @@ $(document).ready(function () {
         $('.rooms').html(table);
 
     });
+
 });
 
 /*Drag course session into timetable.*/
@@ -136,34 +144,7 @@ var drag_course_session = function () {
 
     });
 };
-/** List all rooms. **/
-var get_rooms = function () {
-    $.ajax({
-        type: 'POST',
-        url: '/admin/schedule/timetables/get_rooms',
-        success: function (response) {
-            if (response.status == true) {
-                console.log
-                var room_item = '';
-                $.each(response.rooms, function (key, val) {
-                    room_item += '<div class="room-item" id="' + val.id + '">'
-                        + '<i class="fa fa-building-o"></i> '
-                        + '<span>' + val.name + '-' + val.code + '</span>'
-                        + '</div> ';
-                });
 
-                $('.rooms').html(room_item);
-            }
-            else {
-                var message = '<div class="room-item bg-danger" style="width: 100%; background-color: red; color: #fff;">' +
-                    '<i class="fa fa-warning"></i> Room not found!' +
-                    '</div>';
-                $('.rooms').html(message);
-            }
-        }
-    })
-
-};
 /** Get rooms. **/
 var get_groups = function () {
     setTimeout(function () {
