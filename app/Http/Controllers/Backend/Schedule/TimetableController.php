@@ -85,6 +85,7 @@ class TimetableController extends Controller
             ->leftJoin('departmentOptions', 'departmentOptions.id', '=', 'timetables.option_id')
             ->join('semesters', 'semesters.id', '=', 'timetables.semester_id')
             ->leftJoin('groups', 'groups.id', '=', 'timetables.group_id')
+            ->orderBy('timetables.created_at', 'desc')
             ->select([
                 'academicYears.name_latin as academic_year',
                 'departments.code as department',

@@ -43,6 +43,7 @@ class CreateTimetableSlotsTable extends Migration
                 ->on('rooms')
                 ->onDelete('cascade');
 
+            
             $table->timestamps();
         });
     }
