@@ -96,10 +96,12 @@
             $('#timetables-table').DataTable({
                 processing: true,
                 serverSide: true,
-                deferLoading:true,
                 ajax: {
                     url: '{!! route('admin.schedule.timetables.get_timetables') !!}',
-                    method: 'POST'
+                    method: 'POST',
+                    data: {
+                        _token: '{{ csrf_token() }}'
+                    }
                 },
                 columns: [
                     {data: 'academic_year', name: 'academic_year', searchable: true},

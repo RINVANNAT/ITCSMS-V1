@@ -82,7 +82,7 @@
                         $.each(response.rooms, function (key, val) {
                             room_item += '<div class="room-item enabled" id="' + val.id + '">'
                                 + '<i class="fa fa-building-o"></i> '
-                                + '<span>' + val.name + '-' + val.code + '</span>'
+                                + '<span>' + val.code + '-' + val.name + '</span>'
                                 + '</div> ';
                         });
 
@@ -114,14 +114,14 @@
                         $.each(response.roomRemain, function (key, val) {
                             room_item += '<div class="room-item enabled" id="' + val.id + '">'
                                 + '<i class="fa fa-building-o"></i> '
-                                + '<span>' + val.name + '-' + val.code + '</span>'
+                                + '<span>' + val.code + '-' + val.name + '</span>'
                                 + '</div> ';
                         });
 
                         $.each(response.roomUsed, function (key, val) {
                             room_item += '<div class="room-item disabled bg-danger" id="' + val.id + '">'
                                 + '<i class="fa fa-building-o"></i> '
-                                + '<span>' + val.name + '-' + val.code + '</span>'
+                                + '<span>' + val.code + '-' + val.name + '</span>'
                                 + '</div> ';
                         });
                         $('.rooms').html(room_item);
@@ -156,14 +156,14 @@
                         $.each(response.roomRemain, function (key, val) {
                             room_item += '<div class="room-item enabled" id="' + val.id + '">'
                                 + '<i class="fa fa-building-o"></i> '
-                                + '<span>' + val.name + '-' + val.code + '</span>'
+                                + '<span>' + val.code + '-' + val.name + '</span>'
                                 + '</div> ';
                         });
 
                         $.each(response.roomUsed, function (key, val) {
                             room_item += '<div class="room-item bg-danger" id="' + val.id + '">'
                                 + '<i class="fa fa-building-o"></i> '
-                                + '<span>' + val.name + '-' + val.code + '</span>'
+                                + '<span>' + val.code + '-' + val.name + '</span>'
                                 + '</div> ';
                         });
                         $('.rooms').html(room_item);
@@ -219,9 +219,16 @@
                         toastr['info']('The course was added.', 'ADDING COURSE');
                         get_timetable_slots();
                     }
+                    else{
+                        toastr['error']('The timetable slot was not created.', 'ERROR !');
+                        get_timetable();
+                    }
                 },
                 error: function () {
                     toastr['error']('The course was not added.', 'ERROR ADDING COURSE');
+                },
+                complete:function () {
+                    get_course_sessions();
                 }
             });
 
@@ -262,11 +269,14 @@
                     if (response.status == true) {
                         toastr["success"]("Timetable slot have been changed.", "Timetable Slot Change");
                     } else {
-                        toastr['error']('The course was not resize.', "ERROR RESIZE COURSE");
+                        toastr['error'](response.message, "ERROR RESIZE COURSE");
                     }
                 },
-                error: function () {
-                    toastr['error']('The course was not resize.', "ERROR RESIZE COURSE");
+                error: function (response) {
+                    toastr['error'](response.message, "ERROR RESIZE COURSE");
+                },
+                complete: function () {
+                    get_course_sessions();
                 }
             })
         }
@@ -312,7 +322,7 @@
                     copiedEventObject.allDay = true;
 
                     create_timetable_slots(copiedEventObject);
-
+                    get_course_sessions();
                 },
                 eventDragStart: function (event, jsEvent, ui, view) {
                     get_rooms();
@@ -326,6 +336,8 @@
                 eventDrop: function (event, delta, revertFunc) {
                     var start_date = event.start.format();
                     move_timetable_slot(event, start_date);
+                    get_timetable();
+                    get_course_sessions();
                 },
                 eventRender: function (event, element, view) {
                     var object = '<a class="fc-time-grid-event fc-v-event fc-event fc-start fc-end course-item  fc-draggable fc-resizable" style="top: 65px; bottom: -153px; z-index: 1; left: 0%; right: 0%;">' +
@@ -339,7 +351,7 @@
                         '<div class="side-room">' +
                         '<div class="room-name">';
                     if (event.room != null) {
-                        object += '<p class="fc-room">' + event.room + '-' + event.building + '</p>';
+                        object += '<p class="fc-room">' + event.building + '-' + event.room + '</p>';
                     }
                     object += '</div> ' +
                         '</div> ' +
@@ -358,6 +370,7 @@
                 eventResize: function (event, delta, revertFunc) {
                     var end = event.end.format();
                     resize_timetable_slot(event.id, end);
+                    $('#timetable').fullCalendar('rerenderEvents');
                 }
             });
         }
@@ -437,6 +450,10 @@
             });
             // get timetable slot by on change department option.
             $(document).on('change', 'select[name="department"]', function () {
+                get_options($('select[name="department"] :selected').val());
+            });
+            // get timetable slot by on change department option.
+            $(document).on('change', 'select[name="degree"]', function () {
                 get_options($('select[name="department"] :selected').val());
             });
             // get timetable slot by on change academic year option.

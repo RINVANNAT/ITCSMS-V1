@@ -138,15 +138,15 @@ function get_course_sessions() {
                         '<span style="margin-left: 28px;" class="teacher-name">' + val.teacher_name + '</span><br/>';
                     if (val.tp != 0) {
                         course_session_item += '<span style="margin-left: 28px;" class="course-type">TP</span> : ' +
-                            '<span class="times">' + val.tp + '</span> H'
+                            '<span class="times">' + val.remaining + '</span> H'
                     }
                     else if (val.td != 0) {
                         course_session_item += '<span style="margin-left: 28px;" class="course-type">TD</span> : ' +
-                            '<span class="times">' + val.td + '</span> H'
+                            '<span class="times">' + val.remaining + '</span> H'
                     }
                     else {
                         course_session_item += '<span style="margin-left: 28px;" class="course-type">Course</span> : ' +
-                            '<span class="times">' + val.tc + '</span> H'
+                            '<span class="times">' + val.remaining + '</span> H'
                     }
                     course_session_item += '<span class="text courses-session-id" style="display: none;">' + val.id + '</span><br>' + '</li>';
                 });
@@ -176,7 +176,7 @@ function search_rooms(query) {
                 $.each(response.rooms, function (key, val) {
                     room_item += '<div class="room-item" id="' + val.id + '">'
                         + '<i class="fa fa-building-o"></i> '
-                        + '<span>' + val.name + '-' + val.code + '</span>'
+                        + '<span>' + val.code + '-' + val.name + '</span>'
                         + '</div> ';
                 });
 
