@@ -1026,10 +1026,16 @@ return [
                     ]
                 ],
                 'courses_sessions' => 'Courses Sessions',
-                'rooms' => 'Available Rooms',
-                'index_timetable' => [
-                    'number' => 'No.',
-                    'weekly' => 'Weekly',
+                'rooms' => 'Rooms',
+                'table' => [
+                    'academic_year' => 'Academic Year',
+                    'department'=> 'Department',
+                    'degree' => 'Degree',
+                    'grade' => 'Grade',
+                    'option' => 'Option',
+                    'group' => 'Group',
+                    'semester' => 'Semester',
+                    'week' => 'Week',
                     'status' => 'Status'
                 ]
             ]

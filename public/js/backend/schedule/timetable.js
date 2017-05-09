@@ -1,51 +1,32 @@
+function render_room(data) {
+    var room_item = '';
+    $.each(data, function (key, val) {
+        room_item += '<div class="room-item" id="' + val.id + '">'
+            + '<i class="fa fa-building-o"></i> '
+            + '<span>' + val.name + '-' + val.code + '</span>'
+            + '</div> ';
+    });
+
+    $('.rooms').html(room_item);
+}
 $(document).ready(function () {
-
-    /*********************************
-     * Load module.
-     *
-     *********************************/
-
-    get_options($('select[name="department"] :selected').val());
-    get_weeks($('select[name="semester"] :selected').val());
-    get_course_sessions();
-    get_groups();
-    drag_course_session();
-    get_rooms();
-
-    /**********************************
-     * Option select semester.
-     * Department selected show option
-     *
-     **********************************/
-    // get weeks.
-    $(document).on('change', 'select[name="semester"]', function () {
-        get_weeks($(this).val());
-        get_course_sessions();
-    });
-    // get options.
-    $(document).on('change', 'select[name="department"]', function () {
-        get_options($(this).val());
-        get_groups();
-        get_course_sessions();
-    });
-    // get course session.
-    $(document).on('change', 'select[name="academicYear"]', function () {
-        get_course_sessions();
-    });
-    // get group and course session.
-    $(document).on('change', 'select[name="option"]', function () {
-        get_groups();
-        get_course_sessions();
-    });
-    // get course session.
-    $(document).on('change', 'select[name="grade"]', function () {
-        get_groups();
-        get_course_sessions();
-    });
-    // get groups
-    $(document).on('change', 'select[name="group"]', function () {
-        get_course_sessions();
-    });
+    toastr.options = {
+        "closeButton": true,
+        "debug": false,
+        "newestOnTop": true,
+        "progressBar": false,
+        "positionClass": "toast-bottom-right",
+        "preventDuplicates": false,
+        "onclick": null,
+        "showDuration": "300",
+        "hideDuration": "1000",
+        "timeOut": "5000",
+        "extendedTimeOut": "1000",
+        "showEasing": "swing",
+        "hideEasing": "linear",
+        "showMethod": "fadeIn",
+        "hideMethod": "fadeOut"
+    };
     // search rooms.
     $(document).on('keyup', 'input[name="search_room_query"]', function () {
         search_rooms($(this).val());
@@ -56,41 +37,57 @@ $(document).ready(function () {
 
     // Clicking to remove the room from course.
     $(document).on('click', '.remove-room', function () {
-        $(this).addClass('rf-room');
-        $(this).parent().parent().parent().children().eq(0).children().eq(0).addClass('rf-room-name');
-        swal({
-            title: 'Are you sure?',
-            text: "You won't be able to revert this!",
-            type: 'warning',
-            showCancelButton: true,
-            confirmButtonColor: '#3085d6',
-            cancelButtonColor: '#d33',
-            confirmButtonText: 'Yes, delete it!'
-        }).then(function () {
-            $('body').find('.rf-room').remove();
-            $('body').find('.rf-room-name').empty().removeClass('rf-room-name');
-            swal(
-                'Removed !',
-                'The room have been removed from this course.',
-                'success'
-            )
+        var dom = $(this);
+        var timetable_slot_id = $(this).parent().parent().parent().children().eq(0).attr('id');
+        $.ajax({
+            type: 'POST',
+            url: '/admin/schedule/timetables/remove_room_from_timetable_slot',
+            data: {
+                timetable_slot_id: timetable_slot_id
+            },
+            success: function () {
+                dom.parent().parent().children().eq(0).empty();
+                dom.remove();
+                toastr['info']('The room was removed.', 'REMOVING ROOM');
+            },
+            error: function () {
+                swal(
+                    'Oops...',
+                    'Something went wrong!',
+                    'error'
+                )
+            }
         })
     });
     // Click on course item show available room.
-    $(document).on('click', '.side-course', function () {
 
-        $('body').find('.course-selected').removeClass('course-selected');
-        $(this).addClass('course-selected');
-        get_rooms();
-
-    });
     // Add room into course
-    $(document).on('click', '.suggest-room', function () {
-        var btn_delete = '<button class="btn btn-danger btn-xs remove-room"><i class="fa fa-trash"></i></button>';
-        $('.course-selected').parent().children().eq(1).children().eq(0).children().text($(this).text());
-        $('.course-selected').parent().children().eq(1).children().eq(1).children().eq(1).html(btn_delete);
-        $(this).remove();
+    $(document).on('click', '.rooms .room-item', function () {
+        var dom_room = $(this);
+        $.ajax({
+            type: 'POST',
+            url: '/admin/schedule/timetables/insert_room_into_timetable_slot',
+            data: {
+                timetable_slot_id: $('.side-course.course-selected').attr('id'),
+                room_id: $(this).attr('id')
+            },
+            success: function (response) {
+                if (response.status == true) {
+                    var btn_delete = '<button class="btn btn-danger btn-xs remove-room"><i class="fa fa-trash"></i></button>';
+                    $('.container-room').find('.side-course.course-selected').parent().children().eq(1).children().eq(1).html(btn_delete);
+                    $('.container-room').find('.side-course.course-selected').parent().children().eq(1).children().eq(0).text(dom_room.children().eq(1).text());
 
+                    dom_room.remove();
+                    toastr['success']('Room was added.', 'ADDING ROOM');
+                    // $('#timetable').fullCalendar('refresh');
+                } else {
+                    toastr['warning']('Please select which course.', 'ADDING ROOM ERROR');
+                }
+            },
+            error: function () {
+                toastr['error']('Something went wrong.', 'ADDING ROOM ERROR');
+            }
+        });
     });
     // Conflict button action
     $(document).on('click', '#btn-conflict', function (event) {
@@ -120,75 +117,34 @@ $(document).ready(function () {
         $('.rooms').html(table);
 
     });
+
 });
 
-// Drag room into timetable.
-var drag_room = function () {
-    $('.rooms .room-item').each(function () {
-
-        $(this).data('event', {
-            title: $.trim($(this).text()),
-            stick: true
-        });
-
-        $(this).draggable({
-            zIndex: 1000000,
-            revert: true,
-            revertDuration: 0
-        });
-
-    });
-};
-
-// Drag course session into timetable.
+/*Drag course session into timetable.*/
 var drag_course_session = function () {
 
     $('.courses .course-item').each(function () {
+
+        // store data so the calendar knows to render an event upon drop
         $(this).data('event', {
-            id: $(this).find('.courses-session-id').text(),
-            title: $(this).find('.course-name').text(),
-            className: 'course-item',
-            teacherName: $(this).find('.teacher-name').text(),
-            typeCourseSession: $(this).find('.course-type').text(),
+            course_session_id: $(this).find('.courses-session-id').text(),
+            course_name: $(this).find('.course-name').text(),
+            class_name: 'course-item',
+            teacher_name: $(this).find('.teacher-name').text(),
+            course_type: $(this).find('.course-type').text(),
             times: $(this).find('.times').text()
         });
 
+        // make the event draggable using jQuery UI
         $(this).draggable({
-            zIndex: 1000000,
-            revert: true,
-            revertDuration: 0
+            zIndex: 999,
+            revert: true,      // will cause the event to go back to its
+            revertDuration: 0  //  original position after the drag
         });
 
     });
 };
 
-/** List all rooms. **/
-var get_rooms = function () {
-    $.ajax({
-        type: 'POST',
-        url: '/admin/schedule/timetables/get_rooms',
-        success: function (response) {
-            if (response.status == true) {
-                var room_item = '';
-                $.each(response.rooms, function (key, val) {
-                    room_item += '<div class="room-item" id="room' + val.id + '">'
-                        + '<i class="fa fa-building-o"></i> '
-                        + val.name + '-' + val.code
-                        + '</div> ';
-                });
-
-                $('.rooms').html(room_item);
-            }
-            else {
-                var message = '<div class="room-item bg-danger" style="width: 100%; background-color: red; color: #fff;">' +
-                    '<i class="fa fa-warning"></i> Room not found!' +
-                    '</div>';
-                $('.rooms').html(message);
-            }
-        }
-    })
-
-};
 /** Get rooms. **/
 var get_groups = function () {
     setTimeout(function () {
@@ -213,7 +169,7 @@ var get_groups = function () {
 
             }
         })
-    }, 100);
+    }, 200);
 };
 /** Get weeks. **/
 var get_weeks = function (semester_id) {
@@ -297,7 +253,7 @@ var get_course_sessions = function () {
 
             }
         });
-    }, 100);
+    }, 300);
 };
 /** Search rooms. **/
 var search_rooms = function (query) {
@@ -309,9 +265,9 @@ var search_rooms = function (query) {
             if (response.status == true) {
                 var room_item = '';
                 $.each(response.rooms, function (key, val) {
-                    room_item += '<div class="room-item" id="room' + val.id + '">'
+                    room_item += '<div class="room-item" id="' + val.id + '">'
                         + '<i class="fa fa-building-o"></i> '
-                        + val.name + '-' + val.code
+                        + '<span>' + val.name + '-' + val.code + '</span>'
                         + '</div> ';
                 });
 

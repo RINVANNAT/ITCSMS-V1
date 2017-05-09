@@ -26,89 +26,63 @@
         <div class="box-header with-border">
             <div class="mailbox-controls">
                 @permission('create-timetable')
-                <div class="pull-right">
+                <div class="pull-left">
                     <a href="{{ route('admin.schedule.timetables.create') }}">
                         <button class="btn btn-primary btn-sm" data-toggle="tooltip"
                                 data-placement="top" title="Create a new timetable"
                                 data-original-title="Create a new timetable">
                             <i class="fa fa-plus-circle"
-                            ></i> Create Timetable
+                            ></i>
+                            {{ trans('buttons.backend.schedule.timetable.create') }}
                         </button>
                     </a>
                 </div>
                 @endauth
 
-                <form name="filter-timetable-view"
+                {{--<form name="filter-timetable-view"
                       id="filter-timetable-view"
                       method="POST"
                       action="{{ route('admin.schedule.timetables.filter') }}">
                     @include('backend.schedule.timetables.includes.partials.option')
-                </form>
+                </form>--}}
 
             </div>
         </div>
 
         <div class="box-body">
-            <div>
-                <table class="table table-striped table-bordered table-hover dt-responsive nowrap" id="list-timetable">
+            <div class="tables-responsive">
+                <table class="table table-striped table-bordered table-hover dt-responsive nowrap"
+                       id="timetables-table">
                     <thead>
                     <tr>
-                        <th>{{ trans('labels.backend.schedule.timetable.index_timetable.number') }}</th>
-                        <th>{{ trans('labels.backend.schedule.timetable.index_timetable.weekly') }}</th>
-                        <th>{{ trans('labels.backend.schedule.timetable.index_timetable.status') }}</th>
+                        <th>{{ trans('labels.backend.schedule.timetable.table.academic_year') }}</th>
+                        <th>{{ trans('labels.backend.schedule.timetable.table.department') }}</th>
+                        <th>{{ trans('labels.backend.schedule.timetable.table.degree') }}</th>
+                        <th>{{ trans('labels.backend.schedule.timetable.table.grade') }}</th>
+                        <th>{{ trans('labels.backend.schedule.timetable.table.option') }}</th>
+                        <th>{{ trans('labels.backend.schedule.timetable.table.semester') }}</th>
+                        <th>{{ trans('labels.backend.schedule.timetable.table.group') }}</th>
+                        <th>{{ trans('labels.backend.schedule.timetable.table.week') }}</th>
+                        <th>{{ trans('labels.backend.schedule.timetable.table.status') }}</th>
                         @if(access()->allow('view-timetable') || access()->allow('delete-timetable'))
                             <th>{{ trans('labels.general.actions') }}</th>
                         @endif
                     </tr>
                     </thead>
                     <tbody>
-                    @for($i=0; $i<100; $i++)
-                        <tr>
-                            <td>{{ $i+1 }}</td>
-                            <td>Weekly{{$i+1}}</td>
-                            <td>
-                                @if($i%2==0)
-                                    <span class="btn btn-info btn-xs">
-                                        <i class="fa fa-check"
-                                           data-toggle="tooltip"
-                                           data-placement="top" title="Completed"
-                                           data-original-title="Completed"></i>
-                                    </span>
-                                @else
-                                    <span class="btn btn-danger btn-xs">
-                                        <i class="fa fa-times-circle"
-                                           data-toggle="tooltip"
-                                           data-placement="top" title="Uncompleted"
-                                           data-original-title="Uncompleted"></i>
-                                    </span>
-                                @endif
-                            </td>
-                            @if(access()->allow('view-timetable') || access()->allow('delete-timetable'))
-                                <td>
-                                    @permission('view-timetable')
-                                    <a href="{{ route('admin.schedule.timetables.show') }}" class="btn btn-xs btn-primary">
-                                        <i class="fa fa-share-square-o" data-toggle="tooltip"
-                                           data-placement="top" title="View"
-                                           data-original-title="View">
-
-                                        </i>
-                                    </a>
-                                    @endauth
-
-                                    @permission('delete-timetable')
-                                    <a href="{{ route('admin.schedule.timetables.show') }}" class="btn btn-xs btn-danger">
-                                        <i class="fa fa-trash" data-toggle="tooltip"
-                                           data-placement="top" title="Delete"
-                                           data-original-title="Delete">
-
-                                        </i>
-                                    </a>
-                                    @endauth
-                                </td>
-                            @endif
-                        </tr>
-                    @endfor
                     </tbody>
+                    <tfoot>
+                    <tr>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                    </tr>
+                    </tfoot>
                 </table>
             </div>
 
@@ -125,7 +99,87 @@
     {!! Html::script('plugins/sweetalert2/dist/sweetalert2.js') !!}
     {!! Html::script('js/backend/schedule/timetable.js') !!}
     <script type="text/javascript">
-        $('#list-timetable').DataTable();
+        $('#timetables-table').DataTable({
+            processing: true,
+            serverSide: true,
+            ajax: '{!! route('admin.schedule.timetables.get_timetables') !!}',
+            columns: [
+                {data: 'academic_year', name: 'academic_year', searchable: true},
+                {data: 'department', name: 'department', searchable: true},
+                {data: 'degree', name: 'degree', searchable: true},
+                {data: 'grade', name: 'grade', searchable: true},
+                {data: 'option', name: 'option', searchable: true},
+                {data: 'semester', name: 'semester', searchable: true},
+                {data: 'group', name: 'group', searchable: true},
+                {data: 'weekly', name: 'weekly', searchable: true},
+                {data: 'status', name: 'status', searchable: false, orderable: false},
+                {data: 'action', name: 'action', searchable: false, orderable: false}
+            ],
+            initComplete: function () {
+                var td_level = 0;
+                this.api().columns().every(function () {
+                    var column = this;
+                    var select = '';
+                    if (td_level == 0) {
+                        select = '<select class="form-control">';
+                        select += '<option selected disabled>{{ trans('labels.backend.schedule.timetable.table.academic_year') }}</option>';
+                        @foreach($academicYears as $academicYear)
+                            select += '<option>{!! $academicYear->name_latin !!}</option>';
+                        @endforeach
+                            select += '</select>';
+                    }
+                    else if (td_level == 1) {
+                        select = '<select class="form-control">';
+                        select += '<option selected disabled>{{ trans('labels.backend.schedule.timetable.table.department') }}</option>';
+                        @foreach($departments as $department)
+                            select += "<option>" + "{!! $department->code !!}" + "</option>";
+                        @endforeach
+                            select += '</select>';
+                    }
+
+                    else if (td_level == 2) {
+                        select = '<select class="form-control">';
+                        select += '<option selected disabled>{{ trans('labels.backend.schedule.timetable.table.degree') }}</option>';
+                        @foreach($degrees as $degree)
+                            select += "<option>" + "{!! $degree->name_en !!}" + "</option>";
+                        @endforeach
+                            select += '</select>';
+                    }
+
+                    else if (td_level == 3) {
+                        select = '<select class="form-control">';
+                        select += '<option selected disabled>{{ trans('labels.backend.schedule.timetable.table.grade') }}</option>';
+                        @foreach($grades as $grade)
+                            select += "<option>" + "{!! $grade->code !!}" + "</option>";
+                        @endforeach
+                            select += '</select>';
+                    }
+
+                    else if (td_level == 5) {
+                        select = '<select class="form-control">';
+                        select += '<option selected disabled>{{ trans('labels.backend.schedule.timetable.table.semester') }}</option>';
+                        @foreach($semesters as $semester)
+                            select += "<option>" + "{!! $semester->name_en !!}" + "</option>";
+                        @endforeach
+                            select += '</select>';
+                    }
+                    else if (td_level == 7) {
+                        select = '<select class="form-control">';
+                        select += '<option selected disabled>{{ trans('labels.backend.schedule.timetable.table.week') }}</option>';
+                        @foreach($weeks as $week)
+                            select += "<option>" + "{!! $week->name_en !!}" + "</option>";
+                        @endforeach
+                            select += '</select>';
+                    }
+
+                    $(select).appendTo($(column.footer()).empty())
+                        .on('change', function () {
+                            column.search($(this).val(), false, false, true).draw();
+                        });
+                    td_level++;
+                });
+            }
+        });
 
         $('#filter-timetable-view').on('change', function (e) {
             e.preventDefault();

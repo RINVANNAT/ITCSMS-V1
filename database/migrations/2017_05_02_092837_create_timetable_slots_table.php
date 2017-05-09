@@ -18,6 +18,9 @@ class CreateTimetableSlotsTable extends Migration
             $table->integer('timetable_id')->unsigned();
             $table->integer('course_session_id')->unsigned();
             $table->integer('room_id')->nullable();
+            $table->string('course_name');
+            $table->string('teacher_name');
+            $table->string('type');
             $table->integer('durations')->unsigned();
 
             $table->dateTime('start');
@@ -40,6 +43,7 @@ class CreateTimetableSlotsTable extends Migration
                 ->on('rooms')
                 ->onDelete('cascade');
 
+            
             $table->timestamps();
         });
     }

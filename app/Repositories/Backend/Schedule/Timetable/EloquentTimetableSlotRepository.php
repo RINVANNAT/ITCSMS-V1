@@ -2,7 +2,10 @@
 
 namespace App\Repositories\Backend\Schedule\Timetable;
 
-use Illuminate\Support\Facades\DB;
+use App\Http\Requests\Backend\Schedule\Timetable\CreateTimetableRequest;
+use App\Models\Schedule\Timetable\Timetable;
+use App\Models\Schedule\Timetable\TimetableSlot;
+use Carbon\Carbon;
 
 /**
  * Class EloquentTimetableSlotRepository
@@ -10,31 +13,57 @@ use Illuminate\Support\Facades\DB;
  */
 class EloquentTimetableSlotRepository implements TimetableSlotRepositoryContract
 {
-
     /**
-     * Filter course session with the attribute below.
+     * Create timetable slot.
      *
-     * @param null $academic_year_id
-     * @param null $department_id
-     * @param null $degree_id
-     * @param null $grade_id
-     * @param null $option_id
-     * @param null $semester_id
-     * @param null $week_id
-     * @param null $group_id
+     * @param Timetable $timetable
+     * @param CreateTimetableRequest $request
      * @return mixed
      */
-    public function filter_course_sessions(
-        $academic_year_id = null,
-        $department_id = null,
-        $degree_id = null,
-        $grade_id = null,
-        $option_id = null,
-        $semester_id = null,
-        $week_id = null,
-        $group_id = null
-    )
+    public function create_timetable_slot(Timetable $timetable, CreateTimetableRequest $request)
     {
-        return DB::table('course_sessions')->get();
+
+        // TODO: Implement create_timetable_slot() method.
+        $newTimetableSlot = new TimetableSlot();
+
+        $newTimetableSlot->timetable_id = $timetable->id;
+        $newTimetableSlot->course_session_id = $request->course_session_id;
+        $request->room_id == null ?: $newTimetableSlot->room_id = $request->room_id;
+        $newTimetableSlot->course_name = $request->course_name;
+        $newTimetableSlot->teacher_name = $request->teacher_name;
+        $newTimetableSlot->type = $request->course_type;
+        $newTimetableSlot->start = new Carbon($request->start);
+        $newTimetableSlot->end = new Carbon($request->end == null ? $request->start : $request->end);
+        $newTimetableSlot->durations = $this->durations($newTimetableSlot->start, $newTimetableSlot->end);
+        $newTimetableSlot->created_uid = auth()->user()->id;
+        $newTimetableSlot->updated_uid = auth()->user()->id;
+
+        if ($newTimetableSlot->save()) {
+            return $newTimetableSlot;
+        }
+        return false;
+    }
+
+    /**
+     * Get timetable slots by a timetable.
+     *
+     * @param Timetable $timetable
+     * @return mixed
+     */
+    public function get_timetable_slots(Timetable $timetable)
+    {
+        return TimetableSlot::where('timetable_id', $timetable->id)->get();
+    }
+
+    /**
+     * Get interval Hours.
+     *
+     * @param Carbon $start
+     * @param Carbon $end
+     * @return mixed
+     */
+    public function durations(Carbon $start, Carbon $end)
+    {
+        return $start->diffInHours($end);
     }
 }
