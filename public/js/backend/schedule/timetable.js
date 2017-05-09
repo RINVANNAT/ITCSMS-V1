@@ -45,29 +45,30 @@ function drag_course_session() {
 
 /** Get rooms. **/
 function get_groups() {
-    setTimeout(function () {
-        $.ajax({
-            type: 'POST',
-            url: '/admin/schedule/timetables/get_groups',
-            data: $('#options-filter').serialize(),
-            success: function (response) {
-                if (response.status == true) {
-                    var group_item = '';
-                    $.each(response.groups, function (key, val) {
-                        group_item += '<option value="' + val.id + '">' + val.name + '</option>';
-                    });
+    $.ajax({
+        type: 'POST',
+        url: '/admin/schedule/timetables/get_groups',
+        data: $('#options-filter').serialize(),
+        success: function (response) {
+            if (response.status == true) {
+                var group_item = '';
+                $.each(response.groups, function (key, val) {
+                    group_item += '<option value="' + val.id + '">' + val.name + '</option>';
+                });
 
-                    $('select[name="group"]').html(group_item);
-                }
-                else {
-                    $('select[name="group"]').html('');
-                }
-            },
-            error: function () {
-
+                $('select[name="group"]').html(group_item);
             }
-        })
-    }, 200);
+            else {
+                $('select[name="group"]').html('');
+            }
+        },
+        error: function () {
+
+        },
+        complete: function () {
+            get_weeks($('select[name="semester"] :selected').val());
+        }
+    })
 }
 
 /** Get weeks. **/
@@ -86,6 +87,11 @@ function get_weeks(semester_id) {
         },
         error: function () {
 
+        },
+        complete: function () {
+            get_course_sessions();
+            get_timetable();
+            get_timetable_slots();
         }
     });
 }
@@ -106,55 +112,56 @@ function get_options(department_id) {
         },
         error: function () {
 
+        },
+        complete: function () {
+            get_groups();
         }
     });
 }
 
 /** Get course sessions. **/
 function get_course_sessions() {
-    setTimeout(function () {
-        $.ajax({
-            type: 'POST',
-            url: '/admin/schedule/timetables/get_course_sessions',
-            data: $('#options-filter').serialize(),
-            success: function (response) {
-                if (response.status == true) {
-                    var course_session_item = '';
-                    $.each(response.course_sessions, function (key, val) {
-                        course_session_item += '<li class="course-item">' +
-                            '<span class="handle ui-sortable-handle">' +
-                            '<i class="fa fa-ellipsis-v"></i> ' +
-                            '<i class="fa fa-ellipsis-v"></i>' +
-                            '</span>' +
-                            '<span class="text course-name">' + val.course_name + '</span><br>' +
-                            '<span style="margin-left: 28px;" class="teacher-name">' + val.teacher_name + '</span><br/>';
-                        if (val.tp != 0) {
-                            course_session_item += '<span style="margin-left: 28px;" class="course-type">TP</span> : ' +
-                                '<span class="times">' + val.tp + '</span> H'
-                        }
-                        else if (val.td != 0) {
-                            course_session_item += '<span style="margin-left: 28px;" class="course-type">TD</span> : ' +
-                                '<span class="times">' + val.td + '</span> H'
-                        }
-                        else {
-                            course_session_item += '<span style="margin-left: 28px;" class="course-type">Course</span> : ' +
-                                '<span class="times">' + val.tc + '</span> H'
-                        }
-                        course_session_item += '<span class="text courses-session-id" style="display: none;">' + val.id + '</span><br>' + '</li>';
-                    });
+    $.ajax({
+        type: 'POST',
+        url: '/admin/schedule/timetables/get_course_sessions',
+        data: $('#options-filter').serialize(),
+        success: function (response) {
+            if (response.status == true) {
+                var course_session_item = '';
+                $.each(response.course_sessions, function (key, val) {
+                    course_session_item += '<li class="course-item">' +
+                        '<span class="handle ui-sortable-handle">' +
+                        '<i class="fa fa-ellipsis-v"></i> ' +
+                        '<i class="fa fa-ellipsis-v"></i>' +
+                        '</span>' +
+                        '<span class="text course-name">' + val.course_name + '</span><br>' +
+                        '<span style="margin-left: 28px;" class="teacher-name">' + val.teacher_name + '</span><br/>';
+                    if (val.tp != 0) {
+                        course_session_item += '<span style="margin-left: 28px;" class="course-type">TP</span> : ' +
+                            '<span class="times">' + val.tp + '</span> H'
+                    }
+                    else if (val.td != 0) {
+                        course_session_item += '<span style="margin-left: 28px;" class="course-type">TD</span> : ' +
+                            '<span class="times">' + val.td + '</span> H'
+                    }
+                    else {
+                        course_session_item += '<span style="margin-left: 28px;" class="course-type">Course</span> : ' +
+                            '<span class="times">' + val.tc + '</span> H'
+                    }
+                    course_session_item += '<span class="text courses-session-id" style="display: none;">' + val.id + '</span><br>' + '</li>';
+                });
 
-                    $('.courses.todo-list').html(course_session_item);
-                    drag_course_session()
-                }
-                else {
-                    $('.courses.todo-list').html("<li class='course-item'>There are no course sessions created yet.</li>");
-                }
-            },
-            error: function () {
-
+                $('.courses.todo-list').html(course_session_item);
+                drag_course_session()
             }
-        });
-    }, 300);
+            else {
+                $('.courses.todo-list').html("<li class='course-item'>There are no course sessions created yet.</li>");
+            }
+        },
+        error: function () {
+
+        }
+    });
 }
 
 /** Search rooms. **/

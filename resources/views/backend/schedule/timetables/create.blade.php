@@ -182,18 +182,16 @@
         }
         /** get timetable slots */
         function get_timetable_slots() {
-            setTimeout(function () {
-                $.ajax({
-                    type: 'POST',
-                    url: '{!! route('get_timetable_slots') !!}',
-                    data: $('#options-filter').serialize(),
-                    success: function (response) {
-                        $('#timetable').fullCalendar('removeEvents');
-                        $('#timetable').fullCalendar('renderEvents', response, true);
-                        $('#timetable').fullCalendar('rerenderEvents');
-                    }
-                });
-            }, 400);
+            $.ajax({
+                type: 'POST',
+                url: '{!! route('get_timetable_slots') !!}',
+                data: $('#options-filter').serialize(),
+                success: function (response) {
+                    $('#timetable').fullCalendar('removeEvents');
+                    $('#timetable').fullCalendar('renderEvents', response, true);
+                    $('#timetable').fullCalendar('rerenderEvents');
+                }
+            });
         }
         /** create timetable slot */
         function create_timetable_slots(copiedEventObject) {
@@ -354,9 +352,6 @@
 
                     return $(object);
                 },
-                eventAfterRender: function (event, element, view) {
-                    console.log(event.id);
-                },
                 eventOverlap: function (stillEvent, movingEvent) {
                     return stillEvent.allDay && movingEvent.allDay;
                 },
@@ -367,16 +362,10 @@
             });
         }
 
-        $(document).ready(function () {
-            // load modules.
+        $(function () {
             get_options($('select[name="department"] :selected').val());
-            get_weeks($('select[name="semester"] :selected').val());
-            get_course_sessions();
-            get_groups();
             drag_course_session();
             get_rooms();
-            get_timetable();
-            get_timetable_slots();
 
             // select timetable slot to add room.
             $(document).on('click', '.side-course', function () {
@@ -445,41 +434,31 @@
             // get timetable slot by on change semester option.
             $(document).on('change', 'select[name="semester"]', function () {
                 get_weeks($(this).val());
-                get_course_sessions();
-                get_timetable_slots();
             });
             // get timetable slot by on change department option.
             $(document).on('change', 'select[name="department"]', function () {
-                get_options($(this).val());
-                get_groups();
-                get_course_sessions();
-                get_timetable_slots();
+                get_options($('select[name="department"] :selected').val());
             });
             // get timetable slot by on change academic year option.
             $(document).on('change', 'select[name="academicYear"]', function () {
-                get_course_sessions();
-                get_timetable();
-                get_timetable_slots();
+                get_weeks($('select[name="semester"] :selected').val());
             });
             // get timetable slot by on change option.
             $(document).on('change', 'select[name="option"]', function () {
                 get_groups();
-                get_course_sessions();
-                get_timetable_slots();
             });
             // get timetable slot by on change grade option.
             $(document).on('change', 'select[name="grade"]', function () {
-                get_groups();
-                get_course_sessions();
-                get_timetable_slots();
+                get_weeks($('select[name="semester"] :selected').val());
             });
             // get timetable slot by on change group option.
             $(document).on('change', 'select[name="group"]', function () {
-                get_course_sessions();
-                get_timetable_slots();
+                get_weeks($('select[name="semester"] :selected').val());
             });
             // get timetable slots by on change weekly option.
             $(document).on('change', 'select[name="weekly"]', function () {
+                get_course_sessions();
+                get_timetable();
                 get_timetable_slots();
             });
             // search rooms.
