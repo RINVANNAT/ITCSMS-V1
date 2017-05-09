@@ -1605,12 +1605,9 @@ class CourseAnnualController extends Controller
                 $arrayData[$absence->course_annual_id][$absence->student_annual_id] = $absence;
             }
         }
-
-        dd($arrayData);
         return $arrayData;
 
     }
-
 
     private function createScorePercentage($midterm, $final, $courseAnnualId)
     {
@@ -3204,7 +3201,6 @@ class CourseAnnualController extends Controller
 
     private function getStudentNotation($courseAnnualId)
     {
-
         $notations = collect(DB::table('averages')
             ->where('course_annual_id', $courseAnnualId)
             ->get())->keyBy('student_annual_id')->toArray();

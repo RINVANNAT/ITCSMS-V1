@@ -68,15 +68,14 @@
     {!! Html::script('plugins/sweetalert2/dist/sweetalert2.js') !!}
     {!! Html::script('plugins/toastr/toastr.min.js') !!}
     {!! Html::script('js/backend/schedule/timetable.js') !!}
-    {!! Html::script('plugins/list.js/list.min.js') !!}
 
     <script type="text/javascript">
-        /** get rooms **/
+        /** init rooms */
         function get_rooms() {
             $.ajax({
                 type: 'POST',
                 url: '/admin/schedule/timetables/get_rooms',
-                data:{_token:'{{csrf_token()}}'},
+                data: {_token: '{{csrf_token()}}'},
                 success: function (response) {
                     if (response.status == true) {
                         var room_item = '';
@@ -98,6 +97,7 @@
                 }
             })
         }
+        /** get suggest rooms */
         function get_suggest_room(academic_year_id, week_id, timetable_slot_id) {
             $.ajax({
                 type: 'POST',
@@ -138,6 +138,7 @@
                 }
             })
         }
+        /** search suggest rooms */
         function search_suggest_room(academic_year_id, week_id, timetable_slot_id, room_number) {
             $.ajax({
                 type: 'POST',
@@ -153,7 +154,7 @@
                         var room_item = '';
 
                         $.each(response.roomRemain, function (key, val) {
-                            room_item += '<div class="room-item" id="' + val.id + '">'
+                            room_item += '<div class="room-item enabled" id="' + val.id + '">'
                                 + '<i class="fa fa-building-o"></i> '
                                 + '<span>' + val.name + '-' + val.code + '</span>'
                                 + '</div> ';
@@ -167,7 +168,7 @@
                         });
                         $('.rooms').html(room_item);
                     } else {
-                        var message = '<div class="room-item bg-danger" style="width: 100%; background-color: red; color: #fff;">' +
+                        var message = '<div class="room-item disabled bg-danger" style="width: 100%; background-color: red; color: #fff;">' +
                             '<i class="fa fa-warning"></i> Room not found!' +
                             '</div>';
                         $('.rooms').html(message);
@@ -179,6 +180,7 @@
                 }
             })
         }
+        /** get timetable slots */
         function get_timetable_slots() {
             setTimeout(function () {
                 $.ajax({
@@ -193,8 +195,8 @@
                 });
             }, 400);
         }
+        /** create timetable slot */
         function create_timetable_slots(copiedEventObject) {
-            var event = copiedEventObject;
             $.ajax({
                 type: 'POST',
                 url: '{{ route('admin.schedule.timetables.store') }}',
@@ -226,7 +228,8 @@
             });
 
             $('#timetable').fullCalendar("rerenderEvents");
-        };
+        }
+        /** move timetable slot */
         function move_timetable_slot(event, start_date) {
             $.ajax({
                 type: 'POST',
@@ -247,7 +250,29 @@
                     toastr["error"]("Something went wrong.", "ERROR MOVING COURSE");
                 }
             })
-        };
+        }
+        /** resize timetable slot */
+        function resize_timetable_slot(timetable_slot_id, end_date) {
+            $.ajax({
+                type: 'POST',
+                url: '{!! route('resize_timetable_slot') !!}',
+                data: {
+                    timetable_slot_id: timetable_slot_id,
+                    end: end_date
+                },
+                success: function (response) {
+                    if (response.status == true) {
+                        toastr["success"]("Timetable slot have been changed.", "Timetable Slot Change");
+                    } else {
+                        toastr['error']('The course was not resize.', "ERROR RESIZE COURSE");
+                    }
+                },
+                error: function () {
+                    toastr['error']('The course was not resize.', "ERROR RESIZE COURSE");
+                }
+            })
+        }
+        /** get timetable */
         function get_timetable() {
             var date = new Date();
             var d = date.getDate(),
@@ -305,9 +330,7 @@
                     move_timetable_slot(event, start_date);
                 },
                 eventRender: function (event, element, view) {
-                    var btn_delete = '<button class="btn btn-danger btn-xs remove-room"><i class="fa fa-trash"></i></button>';
                     var object = '<a class="fc-time-grid-event fc-v-event fc-event fc-start fc-end course-item  fc-draggable fc-resizable" style="top: 65px; bottom: -153px; z-index: 1; left: 0%; right: 0%;">' +
-
                         '<div class="fc-content">' +
                         '<div class="container-room">' +
                         '<div class="side-course" id="' + event.id + '">' +
@@ -338,28 +361,8 @@
                     return stillEvent.allDay && movingEvent.allDay;
                 },
                 eventResize: function (event, delta, revertFunc) {
-
                     var end = event.end.format();
-
-                    $.ajax({
-                        type: 'POST',
-                        url: '{!! route('resize_timetable_slot') !!}',
-                        data: {
-                            timetable_slot_id: event.id,
-                            end: end
-                        },
-                        success: function (response) {
-                            if (response.status == true) {
-                                toastr["success"]("Timetable slot have been changed.", "Timetable Slot Change");
-                            } else {
-                                toastr['error']('The course was not resize.', "ERROR RESIZE COURSE");
-                            }
-                        },
-                        error: function () {
-                            toastr['error']('The course was not resize.', "ERROR RESIZE COURSE");
-                        }
-                    })
-
+                    resize_timetable_slot(event.id, end);
                 }
             });
         }
@@ -375,7 +378,7 @@
             get_timetable();
             get_timetable_slots();
 
-
+            // select timetable slot to add room.
             $(document).on('click', '.side-course', function () {
                 $('body').find('.course-selected').removeClass('course-selected');
                 $(this).addClass('course-selected');
@@ -386,47 +389,99 @@
 
             });
 
-            // get weeks.
+            // remove room from timetable slot.
+            $(document).on('click', '.fc-room', function () {
+                var dom = $(this);
+                var timetable_slot_id = $(this).parent().parent().parent().children().eq(0).attr('id');
+                $.ajax({
+                    type: 'POST',
+                    url: '/admin/schedule/timetables/remove_room_from_timetable_slot',
+                    data: {
+                        timetable_slot_id: timetable_slot_id
+                    },
+                    success: function () {
+                        dom.parent().parent().children().eq(0).empty();
+                        dom.remove();
+                        toastr['info']('The room was removed.', 'REMOVING ROOM');
+                    },
+                    error: function () {
+                        swal(
+                            'Oops...',
+                            'Something went wrong!',
+                            'error'
+                        )
+                    }
+                })
+            });
+
+            // add room to timetable slot.
+            $(document).on('click', '.rooms .room-item.enabled', function () {
+                var dom_room = $(this);
+                $.ajax({
+                    type: 'POST',
+                    url: '/admin/schedule/timetables/insert_room_into_timetable_slot',
+                    data: {
+                        timetable_slot_id: $('.side-course.course-selected').attr('id'),
+                        room_id: $(this).attr('id')
+                    },
+                    success: function (response) {
+                        if (response.status == true) {
+                            var btn_delete = '<button class="btn btn-danger btn-xs remove-room"><i class="fa fa-trash"></i></button>';
+                            $('.container-room').find('.side-course.course-selected').parent().children().eq(1).children().eq(1).html(btn_delete);
+                            $('.container-room').find('.side-course.course-selected').parent().children().eq(1).children().eq(0).html('<p class="fc-room">' + dom_room.children().eq(1).text() + '</p>');
+
+                            dom_room.remove();
+                            toastr['success']('Room was added.', 'ADDING ROOM');
+                        } else {
+                            toastr['warning']('Please select which course.', 'ADDING ROOM ERROR');
+                        }
+                    },
+                    error: function () {
+                        toastr['error']('Something went wrong.', 'ADDING ROOM ERROR');
+                    }
+                });
+            });
+
+            // get timetable slot by on change semester option.
             $(document).on('change', 'select[name="semester"]', function () {
                 get_weeks($(this).val());
                 get_course_sessions();
                 get_timetable_slots();
             });
-            // get options.
+            // get timetable slot by on change department option.
             $(document).on('change', 'select[name="department"]', function () {
                 get_options($(this).val());
                 get_groups();
                 get_course_sessions();
                 get_timetable_slots();
             });
-            // get course session.
+            // get timetable slot by on change academic year option.
             $(document).on('change', 'select[name="academicYear"]', function () {
                 get_course_sessions();
                 get_timetable();
                 get_timetable_slots();
             });
-            // get group and course session.
+            // get timetable slot by on change option.
             $(document).on('change', 'select[name="option"]', function () {
                 get_groups();
                 get_course_sessions();
                 get_timetable_slots();
             });
-            // get course session.
+            // get timetable slot by on change grade option.
             $(document).on('change', 'select[name="grade"]', function () {
                 get_groups();
                 get_course_sessions();
                 get_timetable_slots();
             });
-            // get groups
+            // get timetable slot by on change group option.
             $(document).on('change', 'select[name="group"]', function () {
                 get_course_sessions();
                 get_timetable_slots();
             });
-
+            // get timetable slots by on change weekly option.
             $(document).on('change', 'select[name="weekly"]', function () {
                 get_timetable_slots();
             });
-
             // search rooms.
             $(document).on('keyup', 'input[name="search_room_query"]', function () {
                 if ($('.container-room').find('.side-course.course-selected').length == 1) {
@@ -440,7 +495,6 @@
                     search_rooms($(this).val());
                 }
             });
-
         });
 
     </script>

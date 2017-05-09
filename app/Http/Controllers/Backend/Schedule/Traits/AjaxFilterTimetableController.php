@@ -6,12 +6,9 @@ use App\Http\Requests\Backend\Schedule\Timetable\CreateTimetableRequest;
 use App\Http\Requests\Backend\Schedule\Timetable\MoveTimetableSlotRequest;
 use App\Http\Requests\Backend\Schedule\Timetable\ResizeTimetableSlotRequest;
 use App\Models\DepartmentOption;
-use App\Models\Room;
 use App\Models\Schedule\Timetable\Timetable;
 use App\Models\Schedule\Timetable\TimetableSlot;
 use App\Models\Schedule\Timetable\Week;
-use App\Repositories\Backend\Schedule\Timetable\EloquentTimetableRepository;
-use App\Repositories\Backend\Schedule\Timetable\EloquentTimetableSlotRepository;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Response;
@@ -22,31 +19,6 @@ use Illuminate\Support\Facades\Response;
  */
 trait AjaxFilterTimetableController
 {
-    /**
-     * @var EloquentTimetableRepository
-     */
-//    protected $timetableRepository;
-
-    /**
-     * @var EloquentTimetableSlotRepository
-     */
-//    protected $timetableSlotRepository;
-
-    /**
-     * AjaxFilterTimetableController constructor.
-     * @param EloquentTimetableRepository $eloquentTimetableRepository
-     * @param EloquentTimetableSlotRepository $eloquentTimetableSlotRepository
-     */
-    /*public function __construct
-    (
-        EloquentTimetableRepository $eloquentTimetableRepository,
-        EloquentTimetableSlotRepository $eloquentTimetableSlotRepository
-    )
-    {
-        $this->timetableRepository = $eloquentTimetableRepository;
-        $this->timetableSlotRepository = $eloquentTimetableSlotRepository;
-    }*/
-
     /**
      * Filter timetable.
      *
@@ -199,8 +171,10 @@ trait AjaxFilterTimetableController
                     ->join('buildings', 'buildings.id', '=', 'rooms.building_id')
                     ->where('rooms.name', 'like', '%' . request('query') . '%')
                     ->orWhere('buildings.code', 'like', '%' . request('query') . '%')
+                    //->where(DB::raw('CONCAT(rooms.name, buildings.code) as result'), 'like', request('query'))
                     ->select('rooms.id as id', 'rooms.name as name', 'buildings.code as code')
                     ->get();
+
                 if (count($rooms) > 0) {
                     return Response::json([
                         'status' => true,
@@ -364,7 +338,7 @@ trait AjaxFilterTimetableController
                         ['timetable_slots.start', $timetable_slot->start],
                         ['timetable_slots.end', $timetable_slot->end]
                     ])
-                    ->where('rooms.name', 'like', '%'.$query == null ? null : $query.'%')
+                    ->where('rooms.name', 'like', '%' . $query == null ? null : $query . '%')
                     ->whereNotNull('timetable_slots.room_id')
                     ->join('buildings', 'buildings.id', '=', 'rooms.building_id')
                     ->select('rooms.id as id', 'rooms.name as name', 'buildings.code as code')
@@ -383,18 +357,18 @@ trait AjaxFilterTimetableController
 
                 $rooms_remaining = DB::table('rooms')
                     ->whereNotIn('rooms.id', $rooms_tmp == [] ? [] : $rooms_tmp)
-                    ->where('rooms.name', 'like', '%'.$query == null ? null : $query.'%')
+                    ->where('rooms.name', 'like', '%' . $query == null ? null : $query . '%')
                     ->join('buildings', 'buildings.id', '=', 'rooms.building_id')
                     ->select('rooms.id as id', 'rooms.name as name', 'buildings.code as code')
                     ->get();
 
-                if(count($rooms_remaining) > 0){
+                if (count($rooms_remaining) > 0) {
                     return Response::json([
                         'status' => true,
                         'roomUsed' => $rooms_used,
                         'roomRemain' => $rooms_remaining
                     ]);
-                }else{
+                } else {
                     return Response::json([
                         'status' => false
                     ]);

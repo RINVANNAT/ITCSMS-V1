@@ -15,8 +15,8 @@ use App\Models\Schedule\Timetable\Timetable;
 use App\Models\Schedule\Timetable\TimetableSlot;
 use App\Models\Schedule\Timetable\Week;
 use App\Models\Semester;
-use App\Repositories\Backend\Schedule\Timetable\EloquentTimetableRepository;
-use App\Repositories\Backend\Schedule\Timetable\EloquentTimetableSlotRepository;
+use App\Repositories\Backend\Schedule\Timetable\TimetableRepositoryContract;
+use App\Repositories\Backend\Schedule\Timetable\TimetableSlotRepositoryContract;
 use Illuminate\Support\Facades\Response;
 use Yajra\Datatables\Datatables;
 
@@ -29,23 +29,24 @@ class TimetableController extends Controller
     use AjaxFilterTimetableController, AjaxCloneTimetableController;
 
     /**
-     * @var EloquentTimetableRepository
+     * @var TimetableRepositoryContract
      */
     protected $timetableRepository;
+
     /**
-     * @var EloquentTimetableSlotRepository
+     * @var TimetableSlotRepositoryContract
      */
     protected $timetableSlotRepository;
 
     /**
      * TimetableController constructor.
-     * @param EloquentTimetableSlotRepository $timetableSlotRepository
-     * @param EloquentTimetableRepository $timetableRepository
+     * @param TimetableSlotRepositoryContract $timetableSlotRepository
+     * @param TimetableRepositoryContract $timetableRepository
      */
     public function __construct
     (
-        EloquentTimetableSlotRepository $timetableSlotRepository,
-        EloquentTimetableRepository $timetableRepository
+        TimetableSlotRepositoryContract $timetableSlotRepository,
+        TimetableRepositoryContract $timetableRepository
     )
     {
         $this->timetableSlotRepository = $timetableSlotRepository;

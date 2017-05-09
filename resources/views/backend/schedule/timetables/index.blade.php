@@ -38,14 +38,6 @@
                     </a>
                 </div>
                 @endauth
-
-                {{--<form name="filter-timetable-view"
-                      id="filter-timetable-view"
-                      method="POST"
-                      action="{{ route('admin.schedule.timetables.filter') }}">
-                    @include('backend.schedule.timetables.includes.partials.option')
-                </form>--}}
-
             </div>
         </div>
 
@@ -98,109 +90,116 @@
     {!! Html::script('plugins/datatables/dataTables.bootstrap.min.js') !!}
     {!! Html::script('plugins/sweetalert2/dist/sweetalert2.js') !!}
     {!! Html::script('js/backend/schedule/timetable.js') !!}
+
     <script type="text/javascript">
-        $('#timetables-table').DataTable({
-            processing: true,
-            serverSide: true,
-            ajax: '{!! route('admin.schedule.timetables.get_timetables') !!}',
-            columns: [
-                {data: 'academic_year', name: 'academic_year', searchable: true},
-                {data: 'department', name: 'department', searchable: true},
-                {data: 'degree', name: 'degree', searchable: true},
-                {data: 'grade', name: 'grade', searchable: true},
-                {data: 'option', name: 'option', searchable: true},
-                {data: 'semester', name: 'semester', searchable: true},
-                {data: 'group', name: 'group', searchable: true},
-                {data: 'weekly', name: 'weekly', searchable: true},
-                {data: 'status', name: 'status', searchable: false, orderable: false},
-                {data: 'action', name: 'action', searchable: false, orderable: false}
-            ],
-            initComplete: function () {
-                var td_level = 0;
-                this.api().columns().every(function () {
-                    var column = this;
-                    var select = '';
-                    if (td_level == 0) {
-                        select = '<select class="form-control">';
-                        select += '<option selected disabled>{{ trans('labels.backend.schedule.timetable.table.academic_year') }}</option>';
-                        @foreach($academicYears as $academicYear)
-                            select += '<option>{!! $academicYear->name_latin !!}</option>';
-                        @endforeach
-                            select += '</select>';
-                    }
-                    else if (td_level == 1) {
-                        select = '<select class="form-control">';
-                        select += '<option selected disabled>{{ trans('labels.backend.schedule.timetable.table.department') }}</option>';
-                        @foreach($departments as $department)
-                            select += "<option>" + "{!! $department->code !!}" + "</option>";
-                        @endforeach
-                            select += '</select>';
-                    }
-
-                    else if (td_level == 2) {
-                        select = '<select class="form-control">';
-                        select += '<option selected disabled>{{ trans('labels.backend.schedule.timetable.table.degree') }}</option>';
-                        @foreach($degrees as $degree)
-                            select += "<option>" + "{!! $degree->name_en !!}" + "</option>";
-                        @endforeach
-                            select += '</select>';
-                    }
-
-                    else if (td_level == 3) {
-                        select = '<select class="form-control">';
-                        select += '<option selected disabled>{{ trans('labels.backend.schedule.timetable.table.grade') }}</option>';
-                        @foreach($grades as $grade)
-                            select += "<option>" + "{!! $grade->code !!}" + "</option>";
-                        @endforeach
-                            select += '</select>';
-                    }
-
-                    else if (td_level == 5) {
-                        select = '<select class="form-control">';
-                        select += '<option selected disabled>{{ trans('labels.backend.schedule.timetable.table.semester') }}</option>';
-                        @foreach($semesters as $semester)
-                            select += "<option>" + "{!! $semester->name_en !!}" + "</option>";
-                        @endforeach
-                            select += '</select>';
-                    }
-                    else if (td_level == 7) {
-                        select = '<select class="form-control">';
-                        select += '<option selected disabled>{{ trans('labels.backend.schedule.timetable.table.week') }}</option>';
-                        @foreach($weeks as $week)
-                            select += "<option>" + "{!! $week->name_en !!}" + "</option>";
-                        @endforeach
-                            select += '</select>';
-                    }
-
-                    $(select).appendTo($(column.footer()).empty())
-                        .on('change', function () {
-                            column.search($(this).val(), false, false, true).draw();
-                        });
-                    td_level++;
-                });
-            }
-        });
-
-        $('#filter-timetable-view').on('change', function (e) {
-            e.preventDefault();
-
-            $.ajax({
-                type: 'POST',
-                url: '/admin/schedule/timetables/filter',
-                data: $('#filter-timetable-view').serialize(),
-                success: function (response) {
-                    // console.log(response);
+        $(function () {
+            $('#timetables-table').DataTable({
+                processing: true,
+                serverSide: true,
+                deferLoading:true,
+                ajax: {
+                    url: '{!! route('admin.schedule.timetables.get_timetables') !!}',
+                    method: 'POST'
                 },
-                error: function () {
-                    swal(
-                        'Oops...',
-                        'Something went wrong!',
-                        'error'
-                    );
+                columns: [
+                    {data: 'academic_year', name: 'academic_year', searchable: true},
+                    {data: 'department', name: 'department', searchable: true},
+                    {data: 'degree', name: 'degree', searchable: true},
+                    {data: 'grade', name: 'grade', searchable: true},
+                    {data: 'option', name: 'option', searchable: true},
+                    {data: 'semester', name: 'semester', searchable: true},
+                    {data: 'group', name: 'group', searchable: true},
+                    {data: 'weekly', name: 'weekly', searchable: true},
+                    {data: 'status', name: 'status', searchable: false, orderable: false},
+                    {data: 'action', name: 'action', searchable: false, orderable: false}
+                ],
+                initComplete: function () {
+                    var td_level = 0;
+                    this.api().columns().every(function () {
+                        var column = this;
+                        var select = '';
+                        if (td_level == 0) {
+                            select = '<select class="form-control">';
+                            select += '<option selected disabled>{{ trans('labels.backend.schedule.timetable.table.academic_year') }}</option>';
+                            @foreach($academicYears as $academicYear)
+                                select += '<option>{!! $academicYear->name_latin !!}</option>';
+                            @endforeach
+                                select += '</select>';
+                        }
+                        else if (td_level == 1) {
+                            select = '<select class="form-control">';
+                            select += '<option selected disabled>{{ trans('labels.backend.schedule.timetable.table.department') }}</option>';
+                            @foreach($departments as $department)
+                                select += "<option>" + "{!! $department->code !!}" + "</option>";
+                            @endforeach
+                                select += '</select>';
+                        }
+
+                        else if (td_level == 2) {
+                            select = '<select class="form-control">';
+                            select += '<option selected disabled>{{ trans('labels.backend.schedule.timetable.table.degree') }}</option>';
+                            @foreach($degrees as $degree)
+                                select += "<option>" + "{!! $degree->name_en !!}" + "</option>";
+                            @endforeach
+                                select += '</select>';
+                        }
+
+                        else if (td_level == 3) {
+                            select = '<select class="form-control">';
+                            select += '<option selected disabled>{{ trans('labels.backend.schedule.timetable.table.grade') }}</option>';
+                            @foreach($grades as $grade)
+                                select += "<option>" + "{!! $grade->code !!}" + "</option>";
+                            @endforeach
+                                select += '</select>';
+                        }
+
+                        else if (td_level == 5) {
+                            select = '<select class="form-control">';
+                            select += '<option selected disabled>{{ trans('labels.backend.schedule.timetable.table.semester') }}</option>';
+                            @foreach($semesters as $semester)
+                                select += "<option>" + "{!! $semester->name_en !!}" + "</option>";
+                            @endforeach
+                                select += '</select>';
+                        }
+                        else if (td_level == 7) {
+                            select = '<select class="form-control">';
+                            select += '<option selected disabled>{{ trans('labels.backend.schedule.timetable.table.week') }}</option>';
+                            @foreach($weeks as $week)
+                                select += "<option>" + "{!! $week->name_en !!}" + "</option>";
+                            @endforeach
+                                select += '</select>';
+                        }
+
+                        $(select).appendTo($(column.footer()).empty())
+                            .on('change', function () {
+                                column.search($(this).val(), false, false, true).draw();
+                            });
+                        td_level++;
+                    });
                 }
             });
 
-        });
+            $('#filter-timetable-view').on('change', function (e) {
+                e.preventDefault();
+
+                $.ajax({
+                    type: 'POST',
+                    url: '/admin/schedule/timetables/filter',
+                    data: $('#filter-timetable-view').serialize(),
+                    success: function (response) {
+                        // console.log(response);
+                    },
+                    error: function () {
+                        swal(
+                            'Oops...',
+                            'Something went wrong!',
+                            'error'
+                        );
+                    }
+                });
+
+            });
+        })
     </script>
 
 @stop

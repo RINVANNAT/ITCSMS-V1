@@ -16,60 +16,6 @@ $(document).ready(function () {
         "showMethod": "fadeIn",
         "hideMethod": "fadeOut"
     };
-
-
-    // Clicking to remove the room from course.
-    $(document).on('click', '.fc-room', function () {
-        var dom = $(this);
-        var timetable_slot_id = $(this).parent().parent().parent().children().eq(0).attr('id');
-        $.ajax({
-            type: 'POST',
-            url: '/admin/schedule/timetables/remove_room_from_timetable_slot',
-            data: {
-                timetable_slot_id: timetable_slot_id
-            },
-            success: function () {
-                dom.parent().parent().children().eq(0).empty();
-                dom.remove();
-                toastr['info']('The room was removed.', 'REMOVING ROOM');
-            },
-            error: function () {
-                swal(
-                    'Oops...',
-                    'Something went wrong!',
-                    'error'
-                )
-            }
-        })
-    });
-
-    // Add room into course
-    $(document).on('click', '.rooms .room-item.enabled', function () {
-        var dom_room = $(this);
-        $.ajax({
-            type: 'POST',
-            url: '/admin/schedule/timetables/insert_room_into_timetable_slot',
-            data: {
-                timetable_slot_id: $('.side-course.course-selected').attr('id'),
-                room_id: $(this).attr('id')
-            },
-            success: function (response) {
-                if (response.status == true) {
-                    var btn_delete = '<button class="btn btn-danger btn-xs remove-room"><i class="fa fa-trash"></i></button>';
-                    $('.container-room').find('.side-course.course-selected').parent().children().eq(1).children().eq(1).html(btn_delete);
-                    $('.container-room').find('.side-course.course-selected').parent().children().eq(1).children().eq(0).text(dom_room.children().eq(1).text());
-
-                    dom_room.remove();
-                    toastr['success']('Room was added.', 'ADDING ROOM');
-                } else {
-                    toastr['warning']('Please select which course.', 'ADDING ROOM ERROR');
-                }
-            },
-            error: function () {
-                toastr['error']('Something went wrong.', 'ADDING ROOM ERROR');
-            }
-        });
-    });
 });
 
 /*Drag course session into timetable.*/
@@ -123,6 +69,7 @@ function get_groups() {
         })
     }, 200);
 }
+
 /** Get weeks. **/
 function get_weeks(semester_id) {
     $.ajax({
@@ -142,6 +89,7 @@ function get_weeks(semester_id) {
         }
     });
 }
+
 /** Get options. **/
 function get_options(department_id) {
     $.ajax({
@@ -161,6 +109,7 @@ function get_options(department_id) {
         }
     });
 }
+
 /** Get course sessions. **/
 function get_course_sessions() {
     setTimeout(function () {
@@ -207,6 +156,7 @@ function get_course_sessions() {
         });
     }, 300);
 }
+
 /** Search rooms. **/
 function search_rooms(query) {
     $.ajax({
