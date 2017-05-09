@@ -76,6 +76,7 @@
             $.ajax({
                 type: 'POST',
                 url: '/admin/schedule/timetables/get_rooms',
+                data:{_token:'{{csrf_token()}}'},
                 success: function (response) {
                     if (response.status == true) {
                         var room_item = '';

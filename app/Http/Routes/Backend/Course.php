@@ -115,19 +115,20 @@ Route::group([
     Route::post('course-annual/export-student-redouble-list}', 'CourseAnnualController@exportStudentRedoubleList')->name('course_annual.export_student_re_exam');
     Route::post('course-annual/save-student-resit}', 'CourseAnnualController@saveStudentResit')->name('save_student_resit_exam');
     Route::post('course-annual/export-supplementary-subject-list', 'CourseAnnualController@exportSupplementarySubjects')->name('course_annual.export_supplementary_subject');
-
-
     Route::post('/student/update-status', 'CourseAnnualController@updateStudentStatus')->name('student.update_status');
-
     Route::get('course-annual/empty-view', 'CourseAnnualController@emptyView')->name('empty_view');
     Route::get('/course-annual/student-final-result', 'CourseAnnualController@getStudentFinalResult')->name('course_annual.student_annual_final_result');
-
     Route::get('/student/dismiss', 'CourseAnnualController@getStudentDismiss')->name('student.dismiss');
     Route::get('/student/redouble', 'CourseAnnualController@getStudentRedouble')->name('student.redouble');
-
     Route::get('/student/resit-subject-lists', 'CourseAnnualController@resitSubjectLists')->name('student.resit_subject_lists');
-
     Route::post('/course/store-resit-score', 'CourseAnnualController@storeResitScore')->name('admin.score.store_resit');
+
+
+    /*
+     * ---student statistic----
+     * */
+
+    Route::get('/student/statistic-radie', 'CourseAnnualController@student_statistic_radie')->name('student.statistic_radie');
 
 
 });

@@ -130,20 +130,31 @@
 
                 color:#d3d3d3 !important;
             }
+            .top{
+                margin-top: 5px;
+                color: #0A0A0A;
+            }
+            .top a {
+                color: black;
+            }
         </style>
         <div class="box-header with-border">
 
-
             <div class=" no-paddingcol-sm-12">
 
-                <div class="pull-left">
-                    <button class="btn btn-primary btn-xs" id="btn-print"><i class="fa fa-print"></i> Print</button>
-                </div>
+                <div class="dropdown pull-left">
+                    <button class="btn btn-primary dropdown-toggle" type="button" data-toggle="dropdown">Action
+                        <span class="caret"></span></button>
+                    <ul class="dropdown-menu" >
+                        <li class="top"><a href="#" class="btn btn-xs" id="btn-print"><i class="fa fa-print"></i> Print</a></li>
+                        <li class="top"><a href="#" class="btn btn-xs " id="get_radie"><i class="fa fa-download"></i> Radié</a></li>
+                        <li class="top"><a href="#" class="btn btn-xs " id="btn_export_score"><i class="fa fa-download"></i> Export</a></li>
+                        <li class="top"><a href="#" class="btn btn-xs" id="get_redouble"><i class="fa fa-download"></i> Redouble</a></li>
+                        <li class="top"><a href="#" class="btn btn-xs" id="generate_rattrapage"> <i class="fa fa-circle-o"></i> Rattrapage</a></li>
+                        <li class="top"><a href="{{route('student.statistic_radie')}}" class="btn btn-xs" id="print_total_radie"> <i class="fa fa-bar-chart"> </i>Statistic Radie</a></li>
 
-                <button class="btn btn-xs btn-info pull-left" id="btn_export_score" style="margin-left: 5px"> <i class="fa fa-download"> Export</i></button>
-                <button class="btn btn-xs btn-warning pull-left" id="get_radie" style="margin-left: 5px"> <i class="fa fa-download"> Radié</i></button>
-                <button class="btn btn-xs btn-black pull-left" id="get_redouble" style="margin-left: 5px"> <i class="fa fa-download"> Redouble</i></button>
-                <button class="btn btn-xs btn-success pull-left" id="generate_rattrapage" style="margin-left: 5px"> <i class="fa fa-circle-o"> Rattrapage</i></button>
+                    </ul>
+                </div>
 
                 <div class="pull-right">
 
@@ -652,7 +663,6 @@
                         var height = $(document).height();
                         var tab_height = height - (mainHeaderHeight + mainFooterHeight + boxHeaderHeight + 60);
 
-
                         setting.height=tab_height;
 
                         hotInstance = new Handsontable(jQuery("#all_score_course_annual_table")[0], setting);
@@ -707,9 +717,7 @@
                                                 hotInstance.updateSettings({
                                                     data: finalData
                                                 });
-
                                             }
-
                                             if(col == 1) {
 
                                                 var dataToSort = settingData.slice(0,arrayData.length);
@@ -1363,6 +1371,18 @@
                     '&dept_option_id='+BaseData.dept_option_id+
                     '&academic_year_id='+BaseData.academic_year_id,'_blank');
 
+        });
+
+        $('#print_total_radie').on('click', function(e) {
+            e.preventDefault();
+            var remote_url = $(this).attr('href');
+            var academic_year_id = $('select[name=academic_year] :selected').val()
+            var semester_id = $('select[name=semester] :selected').val();
+            if(academic_year_id) {
+              window.open(remote_url+'?academic_year_id='+academic_year_id +'&semester_id='+semester_id, '_blank')
+            } else {
+                notify('info', 'Please select a year!')
+            }
         })
 
     </script>

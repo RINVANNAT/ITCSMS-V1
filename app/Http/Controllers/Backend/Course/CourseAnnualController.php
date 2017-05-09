@@ -11,7 +11,6 @@ use App\Http\Requests\Backend\Course\CourseAnnual\UpdateCourseAnnualRequest;
 use App\Http\Requests\Backend\Course\CourseAnnual\CourseAnnualAssignmentRequest;
 use App\Http\Requests\Backend\Course\CourseAnnual\GenerateCourseAnnualRequest;
 
-
 use App\Http\Requests\Frontend\Auth\RegisterRequest;
 use App\Models\Absence;
 use App\Models\AcademicYear;
@@ -58,6 +57,7 @@ use App\Http\Controllers\Backend\Course\CourseAnnualHelperController;
 use App\Models\ResitStudentAnnual;
 use App\Traits\StudentTrait;
 use App\Traits\CourseAnnualTrait;
+use App\Http\Controllers\Backend\Course\CourseHelperTrait\StudentStatisticTrait;
 
 
 
@@ -69,6 +69,7 @@ class CourseAnnualController extends Controller
     use StudentTrait;
     use CourseSessionTrait;
     use CourseAnnualTrait;
+    use StudentStatisticTrait;
 
     /**
      * @var CourseAnnualRepositoryContract
@@ -161,6 +162,10 @@ class CourseAnnualController extends Controller
         return view('backend.course.courseAnnual.index',compact('departments','academicYears','degrees','grades', 'semesters', 'studentGroup','department_id','lecturers', 'options'));
     }
 
+    /**
+     * @param Request $request
+     * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View
+     */
     public function getDeptOption(Request $request) {
 
         $deptOptions = $this->deptHasOption($request->department_id);
@@ -2342,6 +2347,11 @@ class CourseAnnualController extends Controller
         }
     }
 
+    /**
+     * @param $arrayData
+     * @param $arrayFailSubject
+     * @return array
+     */
     private function assignValueRattrapage($arrayData, $arrayFailSubject) {
 
         $dataWithRattrapage=[];

@@ -25,19 +25,19 @@ trait AjaxFilterTimetableController
     /**
      * @var EloquentTimetableRepository
      */
-    protected $timetableRepository;
+//    protected $timetableRepository;
 
     /**
      * @var EloquentTimetableSlotRepository
      */
-    protected $timetableSlotRepository;
+//    protected $timetableSlotRepository;
 
     /**
      * AjaxFilterTimetableController constructor.
      * @param EloquentTimetableRepository $eloquentTimetableRepository
      * @param EloquentTimetableSlotRepository $eloquentTimetableSlotRepository
      */
-    public function __construct
+    /*public function __construct
     (
         EloquentTimetableRepository $eloquentTimetableRepository,
         EloquentTimetableSlotRepository $eloquentTimetableSlotRepository
@@ -45,7 +45,7 @@ trait AjaxFilterTimetableController
     {
         $this->timetableRepository = $eloquentTimetableRepository;
         $this->timetableSlotRepository = $eloquentTimetableSlotRepository;
-    }
+    }*/
 
     /**
      * Filter timetable.
