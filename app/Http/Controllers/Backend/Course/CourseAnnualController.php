@@ -1310,7 +1310,7 @@ class CourseAnnualController extends Controller
         $studentByCourse = $this->getStudentByDeptIdGradeIdDegreeId( $department_ids, $degree_ids, $grade_ids, $courseAnnual->academic_year_id);
 
         $allScoreByCourseAnnual = $this->studentScoreCourseAnnually($courseAnnual);
-        $allNumberAbsences = $this->getAbsenceFromDB();
+        $allNumberAbsences = $this->getAbsenceFromDB($courseAnnualId);
         $resitScores = $this->resitScoreFromDB($courseAnnualId);//Trait/ScoreProp
 
         if(count($department_option_ids)>0) {
@@ -1571,22 +1571,19 @@ class CourseAnnualController extends Controller
         return ($arrayData);
     }
 
-    public function getAbsenceFromDB() {
+    public function getAbsenceFromDB($courseAnnualId) {
 
         $arrayData=[];
+        $absences = DB::table('absences')->where('course_annual_id', $courseAnnualId)->get();
 
-        $absences = DB::table('absences')->get();
         if($absences) {
             foreach($absences as $absence) {
                 $arrayData[$absence->course_annual_id][$absence->student_annual_id] = $absence;
             }
         }
-
-        dd($arrayData);
         return $arrayData;
 
     }
-
 
 
     private function createScorePercentage($midterm, $final, $courseAnnualId) {
@@ -2693,7 +2690,7 @@ class CourseAnnualController extends Controller
         $department_option_ids = $arrayIdsOf_Dept_Deg_Grd_DeptOp_Grooup['department_option_id'];
 
 
-        $allNumberAbsences = $this->getAbsenceFromDB();
+        $allNumberAbsences = $this->getAbsenceFromDB($request->course_annual_id);
         $studentNotations = $this->getStudentNotation($request->course_annual_id);
         $students = $this->getStudentByDeptIdGradeIdDegreeId($department_ids, $degree_ids, $grade_ids,$courseAnnual->academic_year_id);
 
@@ -2874,20 +2871,20 @@ class CourseAnnualController extends Controller
 
                                 $test = [];
                                 foreach($studentScoreIds as $scoreId) {
-                                    $test[] = $percentage[$scoreId];
+                                    $test[] = $percentage[$scoreId->id];
 
-                                    if(array_key_exists(strtolower($percentage[$scoreId]), $row)) { // check the array key of score name
+                                    if(array_key_exists(strtolower($percentage[$scoreId->id]), $row)) { // check the array key of score name
 
-                                        if( (($row[strtolower($percentage[$scoreId])] == null) || is_numeric($row[strtolower($percentage[$scoreId])])) || (($row[strtolower($percentage[$scoreId])] == ScoreEnum::Absence) ||  ($row[strtolower($percentage[$scoreId])] == ScoreEnum::Fraud)))   {
+                                        if( (($row[strtolower($percentage[$scoreId->id])] == null) || is_numeric($row[strtolower($percentage[$scoreId->id])])) || (($row[strtolower($percentage[$scoreId->id])] == ScoreEnum::Absence) ||  ($row[strtolower($percentage[$scoreId->id])] == ScoreEnum::Fraud)))   {
 
-                                            $explode = explode('_',strtolower($percentage[$scoreId]));
+                                            $explode = explode('_',strtolower($percentage[$scoreId->id]));
                                             $percent = $explode[count($explode)-1];
 
-                                            if(  (((float)$row[strtolower($percentage[$scoreId])] <= (float)$percent) && ((float)$row[strtolower($percentage[$scoreId])] >= 0)) ) {
+                                            if(  (((float)$row[strtolower($percentage[$scoreId->id])] <= (float)$percent) && ((float)$row[strtolower($percentage[$scoreId->id])] >= 0)) ) {
                                                 $input = [
-                                                    'score'=> $row[strtolower($percentage[$scoreId])]
+                                                    'score'=> $row[strtolower($percentage[$scoreId->id])]
                                                 ];
-                                                $score = $this->courseAnnualScores->update($scoreId, $input);
+                                                $score = $this->courseAnnualScores->update($scoreId->id, $input);
 
                                                 if($score) {
                                                     CourseAnnualController::$ifScoreImported++;
@@ -2895,7 +2892,7 @@ class CourseAnnualController extends Controller
                                             } else {
                                                 CourseAnnualController::$isNotAceptedScore = true;
                                                 CourseAnnualController::$headerPercentage = $percent;
-                                                CourseAnnualController::$colHeader = $percentage[$scoreId];
+                                                CourseAnnualController::$colHeader = $percentage[$scoreId->id];
                                                 DB::rollback();
                                                 break;
                                             }
@@ -2905,7 +2902,7 @@ class CourseAnnualController extends Controller
                                             CourseAnnualController::$isStringAllowed = true;
                                         }
                                     } else {
-                                        CourseAnnualController::$isFileHasColumnScoreType[$percentage[$scoreId]]= $percentage[$scoreId];
+                                        CourseAnnualController::$isFileHasColumnScoreType[$percentage[$scoreId->id]]= $percentage[$scoreId->id];
                                     }
                                 }
 
@@ -3110,22 +3107,13 @@ class CourseAnnualController extends Controller
 
     private function getScoreId($courseAnnualId) {
 
-        $arrayScores = [];
-        $score_ids = [];
-
-        $scores = DB::table('scores')
-            ->where([
-                ['scores.course_annual_id', $courseAnnualId],
-            ])->get();
-
-        foreach($scores as $score) {
-            $arrayScores[$score->student_annual_id][] = $score->id;
-            $score_ids[] = $score->id;
-        }
+        $scores = DB::table('scores')->where('scores.course_annual_id', $courseAnnualId);
+        $scoreIds = $scores->lists('scores.id');
+        $scores = collect($scores->get())->groupBy('student_annual_id')->toArray();
 
         return [
-            'score_by_student' => $arrayScores,
-            'score_id' => $score_ids
+            'score_by_student' => $scores,
+            'score_id' => $scoreIds
         ];
     }
 
@@ -3151,28 +3139,20 @@ class CourseAnnualController extends Controller
 
     private function getStudentAbsence($courseAnnualId) {
 
-        $arrayAbsence =[];
-        $absences = DB::table('absences')
+        $absences = collect(DB::table('absences')
             ->where('course_annual_id', $courseAnnualId)
-            ->get();
+            ->get())->keyBy('student_annual_id')->toArray();
 
-        foreach($absences as $absence) {
-            $arrayAbsence[$absence->student_annual_id] = $absence;
-        }
-        return $arrayAbsence;
+        return $absences;
     }
 
     private function getStudentNotation($courseAnnualId) {
-        $arrayNotation =[];
-        $notations = DB::table('averages')
+
+        $notations = collect(DB::table('averages')
             ->where('course_annual_id', $courseAnnualId)
-            ->get();
+            ->get())->keyBy('student_annual_id')->toArray();
 
-        foreach($notations as $notation) {
-            $arrayNotation[$notation->student_annual_id] = $notation;
-        }
-
-        return $arrayNotation;
+        return $notations;
 
     }
 
@@ -3337,7 +3317,6 @@ class CourseAnnualController extends Controller
             return Response::json(['status' => true]);
         }
     }
-
 
     public function saveEachRemark(Request $request) {
         //----update remark by student id_card in table student_annuals
@@ -3685,7 +3664,6 @@ class CourseAnnualController extends Controller
         );
 
     }
-
 
     public function exportStudentRedoubleList(Request $request) {
 

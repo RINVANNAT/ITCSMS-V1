@@ -11,6 +11,10 @@ use Illuminate\Support\Facades\DB;
 use App\Repositories\Backend\CourseAnnual\CourseAnnualRepositoryContract;
 use App\Repositories\Backend\CourseSession\CourseSessionRepositoryContract;
 use App\Repositories\Backend\CourseAnnualClass\CourseAnnualClassRepositoryContract;
+use Illuminate\Support\Facades\Auth;
+use App\Models\Employee;
+
+
 
 
 trait CourseAnnualTrait
