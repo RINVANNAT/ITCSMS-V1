@@ -80,7 +80,7 @@
                     if (response.status == true) {
                         var room_item = '';
                         $.each(response.rooms, function (key, val) {
-                            room_item += '<div class="room-item" id="' + val.id + '">'
+                            room_item += '<div class="room-item enabled" id="' + val.id + '">'
                                 + '<i class="fa fa-building-o"></i> '
                                 + '<span>' + val.name + '-' + val.code + '</span>'
                                 + '</div> ';
@@ -96,7 +96,7 @@
                     }
                 }
             })
-        };
+        }
         function get_suggest_room(academic_year_id, week_id, timetable_slot_id) {
             $.ajax({
                 type: 'POST',
@@ -107,26 +107,74 @@
                     timetable_slot_id: timetable_slot_id
                 },
                 success: function (response) {
-                    var room_item = '';
-                    $.each(response.roomRemain, function (key, val) {
-                        room_item += '<div class="room-item" id="' + val.id + '">'
-                            + '<i class="fa fa-building-o"></i> '
-                            + '<span>' + val.name + '-' + val.code + '</span>'
-                            + '</div> ';
-                    });
+                    if (response.status == true) {
+                        var room_item = '';
 
-                    $.each(response.roomUsed, function (key, val) {
-                        room_item += '<div class="room-item bg-danger" id="' + val.id + '">'
-                            + '<i class="fa fa-building-o"></i> '
-                            + '<span>' + val.name + '-' + val.code + '</span>'
-                            + '</div> ';
-                    });
+                        $.each(response.roomRemain, function (key, val) {
+                            room_item += '<div class="room-item enabled" id="' + val.id + '">'
+                                + '<i class="fa fa-building-o"></i> '
+                                + '<span>' + val.name + '-' + val.code + '</span>'
+                                + '</div> ';
+                        });
 
-                    $('.rooms').html(room_item);
+                        $.each(response.roomUsed, function (key, val) {
+                            room_item += '<div class="room-item disabled bg-danger" id="' + val.id + '">'
+                                + '<i class="fa fa-building-o"></i> '
+                                + '<span>' + val.name + '-' + val.code + '</span>'
+                                + '</div> ';
+                        });
+                        $('.rooms').html(room_item);
+                    }
+                    else {
+                        var message = '<div class="room-item bg-danger" style="width: 100%; background-color: red; color: #fff;">' +
+                            '<i class="fa fa-warning"></i> Room not found!' +
+                            '</div>';
+                        $('.rooms').html(message);
+                    }
+                },
+                error: function () {
+                    toastr['error']('Something went wrong.', 'ERROR SUGGESTION ROOM');
+                }
+            })
+        }
+        function search_suggest_room(academic_year_id, week_id, timetable_slot_id, room_number) {
+            $.ajax({
+                type: 'POST',
+                url: '/admin/schedule/timetables/get_suggest_room',
+                data: {
+                    academic_year_id: academic_year_id,
+                    week_id: week_id,
+                    timetable_slot_id: timetable_slot_id,
+                    room_number: room_number
+                },
+                success: function (response) {
+                    if (response.status == true) {
+                        var room_item = '';
+
+                        $.each(response.roomRemain, function (key, val) {
+                            room_item += '<div class="room-item" id="' + val.id + '">'
+                                + '<i class="fa fa-building-o"></i> '
+                                + '<span>' + val.name + '-' + val.code + '</span>'
+                                + '</div> ';
+                        });
+
+                        $.each(response.roomUsed, function (key, val) {
+                            room_item += '<div class="room-item bg-danger" id="' + val.id + '">'
+                                + '<i class="fa fa-building-o"></i> '
+                                + '<span>' + val.name + '-' + val.code + '</span>'
+                                + '</div> ';
+                        });
+                        $('.rooms').html(room_item);
+                    } else {
+                        var message = '<div class="room-item bg-danger" style="width: 100%; background-color: red; color: #fff;">' +
+                            '<i class="fa fa-warning"></i> Room not found!' +
+                            '</div>';
+                        $('.rooms').html(message);
+                    }
 
                 },
                 error: function () {
-                    toastr['error']('Somthing went wrong.', 'ERROR SUGGESTION ROOM');
+                    toastr['error']('Something went wrong.', 'ERROR SUGGESTION ROOM');
                 }
             })
         }
@@ -175,10 +223,9 @@
                     toastr['error']('The course was not added.', 'ERROR ADDING COURSE');
                 }
             });
-            
+
             $('#timetable').fullCalendar("rerenderEvents");
         };
-
         function move_timetable_slot(event, start_date) {
             $.ajax({
                 type: 'POST',
@@ -270,12 +317,7 @@
                         '<div class="side-room">' +
                         '<div class="room-name">';
                     if (event.room != null) {
-                        object += '<p>' + event.room + '-' + event.building + '</p>';
-                    }
-                    object += '</div> ' +
-                        '<div class="room-action">';
-                    if (event.room != null) {
-                        object += btn_delete;
+                        object += '<p class="fc-room">' + event.room + '-' + event.building + '</p>';
                     }
                     object += '</div> ' +
                         '</div> ' +
@@ -288,7 +330,7 @@
 
                     return $(object);
                 },
-                eventAfterRender:function( event, element, view ) {
+                eventAfterRender: function (event, element, view) {
                     console.log(event.id);
                 },
                 eventOverlap: function (stillEvent, movingEvent) {
@@ -319,70 +361,7 @@
 
                 }
             });
-
         }
-
-        /*function get_suggest_room(academic_year_id, week_id, timetable_slot_id) {
-         $.ajax({
-         type: 'POST',
-         url: '/admin/schedule/timetables/get_suggest_room',
-         data: {
-         academic_year_id: academic_year_id,
-         week_id: week_id,
-         timetable_slot_id: timetable_slot_id
-         },
-         success: function (response) {
-         $('ul.list').empty();
-         var values =[];
-         var options = {
-         valueNames: ['id', 'name', 'code'],
-         item: '<li><span class="id hidden"></span><span class="name"></span>-<span class="code"></span></li>'
-         };
-
-         $.each(response.roomRemain, function (key, val) {
-         values.push(val);
-         });
-
-         $.each(response.roomUsed, function (key, val) {
-         values.push(val);
-         });
-
-         new List('rooms', options, values);
-         },
-         error: function () {
-         toastr['error']('Somthing went wrong.', 'ERROR SUGGESTION ROOM');
-         }
-         })
-         }*/
-        /** List all rooms. **/
-        /*function ini_rooms() {
-         $.ajax({
-         type: 'POST',
-         url: '/admin/schedule/timetables/get_rooms',
-         success: function (response) {
-         if (response.status == true) {
-         $('ul.list').empty();
-         var options = {
-         valueNames: [ 'id', 'name', 'code'],
-         item: '<li><span class="id hidden"></span><span class="name"></span>-<span class="code"></span></li>'
-         };
-         var values = [];
-
-         $.each(response.rooms, function (key, val) {
-         values.push(val);
-         });
-         new List('rooms', options, values);
-
-         }
-         else {
-         var message = '<div class="room-item bg-danger" style="width: 100%; background-color: red; color: #fff;">' +
-         '<i class="fa fa-warning"></i> Room not found!' +
-         '</div>';
-         $('.rooms').html(message);
-         }
-         }
-         })
-         };*/
 
         $(document).ready(function () {
             // load modules.
@@ -449,7 +428,16 @@
 
             // search rooms.
             $(document).on('keyup', 'input[name="search_room_query"]', function () {
-                search_rooms($(this).val());
+                if ($('.container-room').find('.side-course.course-selected').length == 1) {
+                    var academic_year_id = $('select[name="academicYear"] :selected').val();
+                    var week_id = $('select[name="weekly"] :selected').val();
+                    var timetable_slot_id = $('.container-room').find('.side-course.course-selected').attr('id');
+                    var query = $(this).val();
+                    search_suggest_room(academic_year_id, week_id, timetable_slot_id, query);
+                }
+                else {
+                    search_rooms($(this).val());
+                }
             });
 
         });

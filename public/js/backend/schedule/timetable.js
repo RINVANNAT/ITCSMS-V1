@@ -1,14 +1,3 @@
-function render_room(data) {
-    var room_item = '';
-    $.each(data, function (key, val) {
-        room_item += '<div class="room-item" id="' + val.id + '">'
-            + '<i class="fa fa-building-o"></i> '
-            + '<span>' + val.name + '-' + val.code + '</span>'
-            + '</div> ';
-    });
-
-    $('.rooms').html(room_item);
-}
 $(document).ready(function () {
     toastr.options = {
         "closeButton": true,
@@ -27,16 +16,10 @@ $(document).ready(function () {
         "showMethod": "fadeIn",
         "hideMethod": "fadeOut"
     };
-    // search rooms.
-    $(document).on('keyup', 'input[name="search_room_query"]', function () {
-        search_rooms($(this).val());
-    });
-    // Call function dragging courses sessions.
-    $('.room-item').removeAttr('style');
-    $('.course-item').removeAttr('style');
+
 
     // Clicking to remove the room from course.
-    $(document).on('click', '.remove-room', function () {
+    $(document).on('click', '.fc-room', function () {
         var dom = $(this);
         var timetable_slot_id = $(this).parent().parent().parent().children().eq(0).attr('id');
         $.ajax({
@@ -59,10 +42,9 @@ $(document).ready(function () {
             }
         })
     });
-    // Click on course item show available room.
 
     // Add room into course
-    $(document).on('click', '.rooms .room-item', function () {
+    $(document).on('click', '.rooms .room-item.enabled', function () {
         var dom_room = $(this);
         $.ajax({
             type: 'POST',
@@ -79,7 +61,6 @@ $(document).ready(function () {
 
                     dom_room.remove();
                     toastr['success']('Room was added.', 'ADDING ROOM');
-                    // $('#timetable').fullCalendar('refresh');
                 } else {
                     toastr['warning']('Please select which course.', 'ADDING ROOM ERROR');
                 }
@@ -89,39 +70,10 @@ $(document).ready(function () {
             }
         });
     });
-    // Conflict button action
-    $(document).on('click', '#btn-conflict', function (event) {
-        event.preventDefault();
-        var table = '';
-        table += '<table class="table table-bordered room-item">' +
-            '<thead>' +
-            '<tr>' +
-            '<th>No.</th>' +
-            '<th>Conflict Name</th>' +
-            '<th>Description</th>' +
-            '<th>Action</th>' +
-            '</tr>' +
-            '</thead>' +
-            '<tbody>' +
-            '<tr>' +
-            '<td>01</td>' +
-            '<td>Room</td>' +
-            '<td>Please solve conflict</td>' +
-            '<td>' +
-            '<button class="btn btn-success btn-xs"><i class="fa fa-check"></i> </button> ' +
-            '<button class="btn btn-danger btn-xs"><i class="fa fa-times"></i> </button> ' +
-            '</td>' +
-            '</tr>' +
-            '</tbody>' +
-            '</table>';
-        $('.rooms').html(table);
-
-    });
-
 });
 
 /*Drag course session into timetable.*/
-var drag_course_session = function () {
+function drag_course_session() {
 
     $('.courses .course-item').each(function () {
 
@@ -143,10 +95,10 @@ var drag_course_session = function () {
         });
 
     });
-};
+}
 
 /** Get rooms. **/
-var get_groups = function () {
+function get_groups() {
     setTimeout(function () {
         $.ajax({
             type: 'POST',
@@ -170,9 +122,9 @@ var get_groups = function () {
             }
         })
     }, 200);
-};
+}
 /** Get weeks. **/
-var get_weeks = function (semester_id) {
+function get_weeks(semester_id) {
     $.ajax({
         type: 'POST',
         url: '/admin/schedule/timetables/get_weeks',
@@ -189,9 +141,9 @@ var get_weeks = function (semester_id) {
 
         }
     });
-};
+}
 /** Get options. **/
-var get_options = function (department_id) {
+function get_options(department_id) {
     $.ajax({
         type: 'POST',
         url: '/admin/schedule/timetables/get_options',
@@ -208,9 +160,9 @@ var get_options = function (department_id) {
 
         }
     });
-};
+}
 /** Get course sessions. **/
-var get_course_sessions = function () {
+function get_course_sessions() {
     setTimeout(function () {
         $.ajax({
             type: 'POST',
@@ -254,9 +206,9 @@ var get_course_sessions = function () {
             }
         });
     }, 300);
-};
+}
 /** Search rooms. **/
-var search_rooms = function (query) {
+function search_rooms(query) {
     $.ajax({
         type: 'POST',
         url: '/admin/schedule/timetables/search_rooms',
@@ -288,4 +240,4 @@ var search_rooms = function (query) {
             );
         }
     });
-};
+}

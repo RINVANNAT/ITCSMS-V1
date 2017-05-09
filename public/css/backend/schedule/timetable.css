@@ -41,6 +41,10 @@
     box-sizing: border-box;
 }
 
+.room-item > .disabled:hover {
+    cursor: help;
+}
+
 .box-body .rooms {
     background-color: #f1f1f1;
     height: 280px;
@@ -71,20 +75,7 @@ ul.list {
     overflow-y: auto;
     padding: 4px;
 }
-ul.list > li {
-    padding: 10px;
-    margin: 2px;
-    display: inline-block;
-    background-color: #FFF;
-    box-shadow: 0 1px 2px rgba(0, 0, 0, .1);
-    -moz-box-sizing: border-box;
-    box-sizing: border-box;
-    cursor: pointer;
-}
-ul.list > li:hover {
-    background-color: #f1f1f1;
-    color: #000000;
-}
+
 .course {
     padding: 5px;
     font-size: 14px;

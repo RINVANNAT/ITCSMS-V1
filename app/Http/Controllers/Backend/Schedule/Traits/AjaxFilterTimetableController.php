@@ -348,6 +348,7 @@ trait AjaxFilterTimetableController
         $academic_year_id = request('academic_year_id');
         $week_id = request('week_id');
         $timetable_slot_id = request('timetable_slot_id');
+        $query = request('room_number');
 
         if (isset($timetable_slot_id)) {
             $timetable_slot = TimetableSlot::find($timetable_slot_id);
@@ -356,14 +357,15 @@ trait AjaxFilterTimetableController
 
                 $rooms_used = DB::table('timetables')
                     ->join('timetable_slots', 'timetable_slots.timetable_id', '=', 'timetables.id')
+                    ->join('rooms', 'rooms.id', '=', 'timetable_slots.room_id')
                     ->where([
                         ['timetables.academic_year_id', $academic_year_id],
                         ['timetables.week_id', $week_id],
                         ['timetable_slots.start', $timetable_slot->start],
                         ['timetable_slots.end', $timetable_slot->end]
                     ])
+                    ->where('rooms.name', 'like', '%'.$query == null ? null : $query.'%')
                     ->whereNotNull('timetable_slots.room_id')
-                    ->join('rooms', 'rooms.id', '=', 'timetable_slots.room_id')
                     ->join('buildings', 'buildings.id', '=', 'rooms.building_id')
                     ->select('rooms.id as id', 'rooms.name as name', 'buildings.code as code')
                     ->get();
@@ -381,16 +383,22 @@ trait AjaxFilterTimetableController
 
                 $rooms_remaining = DB::table('rooms')
                     ->whereNotIn('rooms.id', $rooms_tmp == [] ? [] : $rooms_tmp)
+                    ->where('rooms.name', 'like', '%'.$query == null ? null : $query.'%')
                     ->join('buildings', 'buildings.id', '=', 'rooms.building_id')
                     ->select('rooms.id as id', 'rooms.name as name', 'buildings.code as code')
                     ->get();
 
-                return Response::json([
-                    'status' => true,
-                    'roomUsed' => $rooms_used,
-                    'roomRemain' => $rooms_remaining
-                ]);
-
+                if(count($rooms_remaining) > 0){
+                    return Response::json([
+                        'status' => true,
+                        'roomUsed' => $rooms_used,
+                        'roomRemain' => $rooms_remaining
+                    ]);
+                }else{
+                    return Response::json([
+                        'status' => false
+                    ]);
+                }
             }
         }
     }
