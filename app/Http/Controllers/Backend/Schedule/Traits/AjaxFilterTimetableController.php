@@ -7,6 +7,7 @@ use App\Http\Requests\Backend\Schedule\Timetable\MoveTimetableSlotRequest;
 use App\Http\Requests\Backend\Schedule\Timetable\ResizeTimetableSlotRequest;
 use App\Models\CourseSession;
 use App\Models\DepartmentOption;
+use App\Models\Room;
 use App\Models\Schedule\Timetable\Timetable;
 use App\Models\Schedule\Timetable\TimetableSlot;
 use App\Models\Schedule\Timetable\Week;
@@ -294,6 +295,14 @@ trait AjaxFilterTimetableController
                     else{
                         $timetableSlot->put('is_conflict_course', false);
                     }
+                    if($this->timetableSlotRepo->is_conflict_room($newTimetableSlot, Room::find($newTimetableSlot->room_id)) == true){
+                        $timetableSlot->put('is_conflict_room', true);
+                    }
+                    else{
+                        $timetableSlot->put('is_conflict_room', false);
+                    }
+                    $timetableSlot->put('building', $timetable_slot->building);
+                    $timetableSlot->put('room', $timetable_slot->room);
                     $timetableSlots->push($timetableSlot);
                 }
             }
@@ -318,7 +327,28 @@ trait AjaxFilterTimetableController
                 $timetable_slot->start = new Carbon($request->start_date);
                 $timetable_slot->end = $end;
                 $timetable_slot->update();
-                return Response::json(['status' => true, 'timetable_slot' => $timetable_slot]);
+                $collectionTimetableSlot = new Collection($timetable_slot);
+                if($this->timetableSlotRepo->is_conflict_course($timetable_slot) == true){
+                    $collectionTimetableSlot->put('is_conflict_course', true);
+                }
+                else{
+                    $collectionTimetableSlot->put('is_conflict_course', false);
+                }
+                if($this->timetableSlotRepo->is_conflict_lecturer($timetable_slot) == true){
+                    $collectionTimetableSlot->put('is_conflict_lecturer', true);
+                }
+                else{
+                    $collectionTimetableSlot->put('is_conflict_lecturer', false);
+                }
+                if($timetable_slot->room_id != null){
+                    if($this->timetableSlotRepo->is_conflict_room($timetable_slot, Room::find($timetable_slot->room_id)) == true){
+                        $collectionTimetableSlot->put('is_conflict_room', true);
+                    }
+                    else{
+                        $collectionTimetableSlot->put('is_conflict_room', false);
+                    }
+                }
+                return Response::json(['status' => true, 'timetable_slot' => $collectionTimetableSlot]);
             }
         }
         return Response::json(['status' => false]);
