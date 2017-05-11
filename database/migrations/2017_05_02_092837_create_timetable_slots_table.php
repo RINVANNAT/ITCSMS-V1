@@ -21,7 +21,7 @@ class CreateTimetableSlotsTable extends Migration
             $table->string('course_name');
             $table->string('teacher_name');
             $table->string('type');
-            $table->integer('durations')->unsigned();
+            $table->double('durations')->unsigned();
 
             $table->dateTime('start');
             $table->dateTime('end');

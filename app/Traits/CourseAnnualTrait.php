@@ -7,50 +7,46 @@
  */
 
 namespace App\Traits;
-use Illuminate\Support\Facades\DB;
-use App\Repositories\Backend\CourseAnnual\CourseAnnualRepositoryContract;
-use App\Repositories\Backend\CourseSession\CourseSessionRepositoryContract;
-use App\Repositories\Backend\CourseAnnualClass\CourseAnnualClassRepositoryContract;
-use Illuminate\Support\Facades\Auth;
+
 use App\Models\Employee;
-
-
-
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 
 trait CourseAnnualTrait
 {
-   /* protected $course_annual_repo;
-    protected $course_session_repo;
-    protected $course_annual_class_repo;
-    public function __construct(
-        CourseAnnualRepositoryContract $courseAnnualContract,
-        CourseSessionRepositoryContract $courseSessionContract,
-        CourseAnnualClassRepositoryContract $courseAnnualClassContract
-        )
+    /* protected $course_annual_repo;
+     protected $course_session_repo;
+     protected $course_annual_class_repo;
+     public function __construct(
+         CourseAnnualRepositoryContract $courseAnnualContract,
+         CourseSessionRepositoryContract $courseSessionContract,
+         CourseAnnualClassRepositoryContract $courseAnnualClassContract
+         )
+     {
+         $this->course_annual_repo = $courseAnnualContract;
+         $this->course_session_repo = $courseSessionContract;
+         $this->course_annual_class_repo = $courseAnnualClassContract;
+
+     }*/
+
+    public function generate_course_annual($request)
     {
-        $this->course_annual_repo = $courseAnnualContract;
-        $this->course_session_repo = $courseSessionContract;
-        $this->course_annual_class_repo = $courseAnnualClassContract;
 
-    }*/
-
-    public function generate_course_annual($request) {
-
-        $courseAnnuals = DB::table('course_annuals')->where('course_annuals.academic_year_id', ($request->academic_year_id-1));
+        $courseAnnuals = DB::table('course_annuals')->where('course_annuals.academic_year_id', ($request->academic_year_id - 1));
 
         $departmentId = $request->department_id;
         $degreeId = $request->degree_id;
         $gradeId = $request->grade_id;
-        $check =0;
-        $unCheck=0;
-        if($departmentId) {
+        $check = 0;
+        $unCheck = 0;
+        if ($departmentId) {
 
             $courseAnnuals = $courseAnnuals->where('course_annuals.department_id', '=', $departmentId);
         }
-        if($degreeId) {
+        if ($degreeId) {
             $courseAnnuals = $courseAnnuals->where('course_annuals.degree_id', '=', $degreeId);
         }
-        if($gradeId) {
+        if ($gradeId) {
             $courseAnnuals = $courseAnnuals->where('course_annuals.grade_id', '=', $gradeId);
         }
 
@@ -72,29 +68,29 @@ trait CourseAnnualTrait
         $courseAnnuals = $courseAnnuals->get();
 
         /*--create course annual for requested academic year----*/
-        foreach($courseAnnuals as $course) {
+        foreach ($courseAnnuals as $course) {
 
             $input = (array)$course;
             $input['academic_year_id'] = (int)$request->academic_year_id;
 
             // check for preventing a sencond time of generating Course Annual
-            $isGenerated = $this->isCourseAnnualGenerated($course->course_id,$course->semester_id,$request->academic_year_id,$course->department_id, $course->degree_id,$course->grade_id, $course->employee_id);
-            if($isGenerated) {
+            $isGenerated = $this->isCourseAnnualGenerated($course->course_id, $course->semester_id, $request->academic_year_id, $course->department_id, $course->degree_id, $course->grade_id, $course->employee_id);
+            if ($isGenerated) {
                 $unCheck++;
                 continue;
             } else {
                 $store = $this->courseAnnuals->create($input);
 
                 /*---create course session by course annual ---*/
-                if(isset($courseSessions[$course->id])) {
+                if (isset($courseSessions[$course->id])) {
                     /*--create new course session for the generated course annual---*/
-                    foreach($courseSessions[$course->id] as $courseSession) {
+                    foreach ($courseSessions[$course->id] as $courseSession) {
                         $sessionInput = (array)$courseSession;
                         $sessionInput['course_annual_id'] = $store->id;
                         $saveCourseSession = $this->courseSessions->create($sessionInput);
                         /*---create course annual class by previous course session but change to the generated one ---*/
 
-                        if(isset($courseAannualClassesBySession[$courseSession->id])) {
+                        if (isset($courseAannualClassesBySession[$courseSession->id])) {
 
                             $encode_course = json_encode($courseAannualClassesBySession[$courseSession->id]);
                             $decode_course = json_decode($encode_course, true);
@@ -109,7 +105,7 @@ trait CourseAnnualTrait
                 }
 
                 /*----create course annual class by course annual ---*/
-                if(isset($courseAannualClassesByAnnual[$course->id])) {
+                if (isset($courseAannualClassesByAnnual[$course->id])) {
                     $json = json_encode($courseAannualClassesByAnnual[$course->id]);
                     $decode = json_decode($json, true);
                     $annualclassInput = [
@@ -119,23 +115,24 @@ trait CourseAnnualTrait
                     $saveCourseAnnualClassByAnnual = $this->courseAnnualClasses->create($annualclassInput);
                 }
 
-                if($store) {
+                if ($store) {
                     $check++;
                 }
             }
         }
 
-        if($check == count($courseAnnuals) - $unCheck) {
+        if ($check == count($courseAnnuals) - $unCheck) {
 
-            return ['status'=> true, 'message'=>'Course Annual Generated!!'];
+            return ['status' => true, 'message' => 'Course Annual Generated!!'];
 
         } else {
-            return ['status'=> true, 'message'=>'Course Annual Not Generated!!'];
+            return ['status' => true, 'message' => 'Course Annual Not Generated!!'];
         }
 
     }
 
-    public function isCourseAnnualGenerated($courseId, $semesterId, $academicYearId, $departmentId, $degreeId, $gradeId, $employeeId) {
+    public function isCourseAnnualGenerated($courseId, $semesterId, $academicYearId, $departmentId, $degreeId, $gradeId, $employeeId)
+    {
 
         $select = DB::table('course_annuals')
             ->where([
@@ -148,7 +145,7 @@ trait CourseAnnualTrait
                 ['employee_id', $employeeId]
             ])
             ->get();
-        if($select) {
+        if ($select) {
             return true;
         } else {
             return false;
@@ -156,7 +153,8 @@ trait CourseAnnualTrait
 
     }
 
-    public function getAvailableCourse($deptId, $academicYearId, $semesterId) {
+    public function getAvailableCourse($deptId, $academicYearId, $semesterId)
+    {
 
         $availableCourses = DB::table('course_annuals')
             ->leftJoin('course_annual_classes', 'course_annual_classes.course_annual_id', '=', 'course_annuals.id')
@@ -174,26 +172,27 @@ trait CourseAnnualTrait
                 ['course_annuals.semester_id', $semesterId]
             ]);
 
-        if($deptId) {
+        if ($deptId) {
             $availableCourses = $availableCourses->where('course_annuals.department_id', $deptId);
         }
 
         return $availableCourses;
     }
 
-    public function dataSendToView($courseAnnualId) {
+    public function dataSendToView($courseAnnualId)
+    {
 
         $courseAnnual = DB::table('course_annuals')->where('id', $courseAnnualId)->first();
 
         $employee = Employee::where('user_id', Auth::user()->id)->first();
 
-        $availableCourses = $this->getAvailableCourse($dept=null, $courseAnnual->academic_year_id, $courseAnnual->semester_id);
+        $availableCourses = $this->getAvailableCourse($dept = null, $courseAnnual->academic_year_id, $courseAnnual->semester_id);
 
-        if(auth()->user()->allow("view-all-score-in-all-department") || auth()->user()->allow('view-all-score-course-annual')) {
+        if (auth()->user()->allow("view-all-score-in-all-department") || auth()->user()->allow('view-all-score-course-annual')) {
 
             $availableCourses = $availableCourses->orderBy('course_annuals.id')->get();
         } else {
-            if(auth()->user()->allow("input-score-course-annual")){ // only teacher in every department who have this permission
+            if (auth()->user()->allow("input-score-course-annual")) { // only teacher in every department who have this permission
 
                 $availableCourses = $availableCourses->where('employee_id', $employee->id)->orderBy('course_annuals.id')->get();
 
@@ -202,15 +201,15 @@ trait CourseAnnualTrait
             }
         }
 
-        $selectedCourses =[];
+        $selectedCourses = [];
 
-        foreach($availableCourses as $availableCourse) {
+        foreach ($availableCourses as $availableCourse) {
             $selectedCourses[$availableCourse->course_annual_id][] = $availableCourse;
         }
 
         return [
             'course_annual' => $courseAnnual,
-            'available_course'  =>$selectedCourses
+            'available_course' => $selectedCourses
         ];
     }
 

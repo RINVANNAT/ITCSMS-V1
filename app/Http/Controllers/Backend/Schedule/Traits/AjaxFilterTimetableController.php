@@ -5,14 +5,15 @@ namespace App\Http\Controllers\Backend\Schedule\Traits;
 use App\Http\Requests\Backend\Schedule\Timetable\CreateTimetableRequest;
 use App\Http\Requests\Backend\Schedule\Timetable\MoveTimetableSlotRequest;
 use App\Http\Requests\Backend\Schedule\Timetable\ResizeTimetableSlotRequest;
+use App\Models\CourseSession;
 use App\Models\DepartmentOption;
-use App\Models\Room;
 use App\Models\Schedule\Timetable\Timetable;
 use App\Models\Schedule\Timetable\TimetableSlot;
 use App\Models\Schedule\Timetable\Week;
 use App\Repositories\Backend\Schedule\Timetable\EloquentTimetableRepository;
 use App\Repositories\Backend\Schedule\Timetable\EloquentTimetableSlotRepository;
 use Carbon\Carbon;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Response;
 
@@ -25,27 +26,40 @@ trait AjaxFilterTimetableController
     /**
      * @var EloquentTimetableRepository
      */
-//    protected $timetableRepository;
+    public $timetableRepo;
 
     /**
      * @var EloquentTimetableSlotRepository
      */
-//    protected $timetableSlotRepository;
+    public $timetableSlotRepo;
 
     /**
      * AjaxFilterTimetableController constructor.
-     * @param EloquentTimetableRepository $eloquentTimetableRepository
-     * @param EloquentTimetableSlotRepository $eloquentTimetableSlotRepository
+     *
+     * @param EloquentTimetableRepository $timetableRepository
+     * @param EloquentTimetableSlotRepository $timetableSlotRepository
      */
-    /*public function __construct
-    (
-        EloquentTimetableRepository $eloquentTimetableRepository,
-        EloquentTimetableSlotRepository $eloquentTimetableSlotRepository
+    public function __construct(
+        EloquentTimetableRepository $timetableRepository,
+        EloquentTimetableSlotRepository $timetableSlotRepository
     )
     {
-        $this->timetableRepository = $eloquentTimetableRepository;
-        $this->timetableSlotRepository = $eloquentTimetableSlotRepository;
-    }*/
+        $this->timetableRepo = $timetableRepository;
+        $this->timetableSlotRepo = $timetableSlotRepository;
+    }
+
+    /**
+     * @param EloquentTimetableRepository $timetableRepository
+     * @param EloquentTimetableSlotRepository $timetableSlotRepository
+     */
+    public function setRepository(
+        EloquentTimetableRepository $timetableRepository,
+        EloquentTimetableSlotRepository $timetableSlotRepository
+    )
+    {
+        $this->timetableRepo = $timetableRepository;
+        $this->timetableSlotRepo = $timetableSlotRepository;
+    }
 
     /**
      * Filter timetable.
@@ -105,6 +119,7 @@ trait AjaxFilterTimetableController
      */
     public function get_course_sessions()
     {
+        $this->timetableSlotRepo->set_value_into_time_remaining_course_session();
         $academic_year_id = request('academicYear');
         $department_id = request('department');
         $degree_id = request('degree');
@@ -131,11 +146,13 @@ trait AjaxFilterTimetableController
                     ->lists('course_annual_classes.course_session_id');
                 $query->whereIn('course_sessions.id', $groups == null ? [] : $groups);
             })
+            ->where('course_sessions.time_remaining', '>', 0)
             ->select(
                 'course_sessions.id',
                 'course_sessions.time_tp as tp',
                 'course_sessions.time_td as td',
                 'course_sessions.time_course as tc',
+                'course_sessions.time_remaining as remaining',
                 'course_annuals.name_en as course_name',
                 'employees.name_latin as teacher_name'
             )
@@ -197,10 +214,10 @@ trait AjaxFilterTimetableController
             if (request('query') != ' ') {
                 $rooms = DB::table('rooms')
                     ->join('buildings', 'buildings.id', '=', 'rooms.building_id')
-                    ->where('rooms.name', 'like', '%' . request('query') . '%')
-                    ->orWhere('buildings.code', 'like', '%' . request('query') . '%')
+                    ->where(DB::raw("CONCAT(buildings.code, '-', rooms.name)"), 'LIKE', "%" . request('query') . "%")
                     ->select('rooms.id as id', 'rooms.name as name', 'buildings.code as code')
                     ->get();
+
                 if (count($rooms) > 0) {
                     return Response::json([
                         'status' => true,
@@ -240,7 +257,7 @@ trait AjaxFilterTimetableController
      */
     public function get_timetable_slots(CreateTimetableRequest $request)
     {
-        $timetable = $this->timetableRepository->find_timetable_is_existed($request);
+        $timetable = $this->timetableRepo->find_timetable_is_existed($request);
         if ($timetable instanceof Timetable) {
             $timetable_slots = TimetableSlot::where('timetable_id', $timetable->id)
                 ->leftJoin('rooms', 'rooms.id', '=', 'timetable_slots.room_id')
@@ -257,7 +274,31 @@ trait AjaxFilterTimetableController
                     'rooms.name as room'
                 )
                 ->get();
-            return \GuzzleHttp\json_decode($timetable_slots);
+
+            $timetableSlots = new Collection();
+            foreach ($timetable_slots as $timetable_slot)
+            {
+                if(($timetable_slot instanceof  TimetableSlot) && is_object($timetable_slot)){
+
+                    $newTimetableSlot = TimetableSlot::find($timetable_slot->id);
+                    $timetableSlot = new Collection($newTimetableSlot);
+                    if($this->timetableSlotRepo->is_conflict_lecturer($newTimetableSlot) == true){
+                        $timetableSlot->put('is_conflict_lecturer', true);
+                    }
+                    else{
+                        $timetableSlot->put('is_conflict_lecturer', false);
+                    }
+                    if($this->timetableSlotRepo->is_conflict_course($newTimetableSlot) == true){
+                        $timetableSlot->put('is_conflict_course', true);
+                    }
+                    else{
+                        $timetableSlot->put('is_conflict_course', false);
+                    }
+                    $timetableSlots->push($timetableSlot);
+                }
+            }
+
+            return \GuzzleHttp\json_decode($timetableSlots);
         }
     }
 
@@ -294,13 +335,31 @@ trait AjaxFilterTimetableController
         if (isset($request->timetable_slot_id)) {
             $timetable_slot = TimetableSlot::find($request->timetable_slot_id);
             if ($timetable_slot instanceof TimetableSlot) {
-                $timetable_slot->durations = $this->timetableSlotRepository->durations(new Carbon($timetable_slot->start), new Carbon($request->end));
+                $old_durations = $timetable_slot->durations;
+                $new_durations = $this->timetableSlotRepo->durations(new Carbon($timetable_slot->start), new Carbon($request->end));
+                $timetable_slot->durations = $new_durations;
                 $timetable_slot->end = new Carbon($request->end);
-                $timetable_slot->update();
-                return Response::json(['status' => true, 'timetable_slot' => $timetable_slot]);
+
+                $course_session = CourseSession::find($timetable_slot->course_session_id);
+
+                if ($new_durations > $old_durations) {
+                    $interval = $new_durations - $old_durations;
+                    $course_session->time_remaining = $course_session->time_remaining - $interval;
+                } else {
+                    $interval = $old_durations - $new_durations;
+                    $course_session->time_remaining = $course_session->time_remaining + $interval;
+                }
+
+                if (($course_session->time_remaining <= $course_session->time_used) && $course_session->time_remaining >= 0) {
+                    $course_session->update();
+                    $timetable_slot->update();
+                    return Response::json(['status' => true, 'timetable_slot' => $timetable_slot]);
+                } else {
+                    return Response::json(['status' => false, 'message' => 'Time is limited.']);
+                }
             }
         }
-        return Response::json(['status' => false]);
+        return Response::json(['status' => false, 'message' => 'The timetable slot did not create yet.']);
     }
 
     /**
@@ -364,37 +423,40 @@ trait AjaxFilterTimetableController
                         ['timetable_slots.start', $timetable_slot->start],
                         ['timetable_slots.end', $timetable_slot->end]
                     ])
-                    ->where('rooms.name', 'like', '%'.$query == null ? null : $query.'%')
-                    ->whereNotNull('timetable_slots.room_id')
                     ->join('buildings', 'buildings.id', '=', 'rooms.building_id')
+                    ->where(DB::raw("CONCAT(buildings.code, '-', rooms.name)"), 'LIKE', "%" . $query . "%")
+                    ->whereNotNull('timetable_slots.room_id')
                     ->select('rooms.id as id', 'rooms.name as name', 'buildings.code as code')
                     ->get();
 
                 $rooms_tmp = DB::table('timetables')
                     ->join('timetable_slots', 'timetable_slots.timetable_id', '=', 'timetables.id')
+                    ->join('rooms', 'rooms.id', '=', 'timetable_slots.room_id')
                     ->where([
                         ['timetables.academic_year_id', $academic_year_id],
                         ['timetables.week_id', $week_id],
                         ['timetable_slots.start', $timetable_slot->start],
                         ['timetable_slots.end', $timetable_slot->end]
                     ])
+                    ->join('buildings', 'buildings.id', '=', 'rooms.building_id')
+                    ->where(DB::raw("CONCAT(buildings.code, '-', rooms.name)"), 'LIKE', "%" . $query . "%")
                     ->whereNotNull('timetable_slots.room_id')
                     ->lists('timetable_slots.room_id');
 
                 $rooms_remaining = DB::table('rooms')
-                    ->whereNotIn('rooms.id', $rooms_tmp == [] ? [] : $rooms_tmp)
-                    ->where('rooms.name', 'like', '%'.$query == null ? null : $query.'%')
                     ->join('buildings', 'buildings.id', '=', 'rooms.building_id')
+                    ->whereNotIn('rooms.id', $rooms_tmp == [] ? [] : $rooms_tmp)
+                    ->where(DB::raw("CONCAT(buildings.code, '-', rooms.name)"), 'LIKE', "%" . $query . "%")
                     ->select('rooms.id as id', 'rooms.name as name', 'buildings.code as code')
                     ->get();
 
-                if(count($rooms_remaining) > 0){
+                if (count($rooms_remaining) > 0) {
                     return Response::json([
                         'status' => true,
                         'roomUsed' => $rooms_used,
                         'roomRemain' => $rooms_remaining
                     ]);
-                }else{
+                } else {
                     return Response::json([
                         'status' => false
                     ]);

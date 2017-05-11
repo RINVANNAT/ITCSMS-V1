@@ -15,8 +15,8 @@ use App\Models\Schedule\Timetable\Timetable;
 use App\Models\Schedule\Timetable\TimetableSlot;
 use App\Models\Schedule\Timetable\Week;
 use App\Models\Semester;
-use App\Repositories\Backend\Schedule\Timetable\EloquentTimetableRepository;
-use App\Repositories\Backend\Schedule\Timetable\EloquentTimetableSlotRepository;
+use App\Repositories\Backend\Schedule\Timetable\TimetableRepositoryContract;
+use App\Repositories\Backend\Schedule\Timetable\TimetableSlotRepositoryContract;
 use Illuminate\Support\Facades\Response;
 use Yajra\Datatables\Datatables;
 
@@ -29,27 +29,30 @@ class TimetableController extends Controller
     use AjaxFilterTimetableController, AjaxCloneTimetableController;
 
     /**
-     * @var EloquentTimetableRepository
+     * @var TimetableRepositoryContract
      */
     protected $timetableRepository;
+
     /**
-     * @var EloquentTimetableSlotRepository
+     * @var TimetableSlotRepositoryContract
      */
     protected $timetableSlotRepository;
 
     /**
      * TimetableController constructor.
-     * @param EloquentTimetableSlotRepository $timetableSlotRepository
-     * @param EloquentTimetableRepository $timetableRepository
+     *
+     * @param TimetableSlotRepositoryContract $timetableSlotRepository
+     * @param TimetableRepositoryContract $timetableRepository
      */
     public function __construct
     (
-        EloquentTimetableSlotRepository $timetableSlotRepository,
-        EloquentTimetableRepository $timetableRepository
+        TimetableSlotRepositoryContract $timetableSlotRepository,
+        TimetableRepositoryContract $timetableRepository
     )
     {
         $this->timetableSlotRepository = $timetableSlotRepository;
         $this->timetableRepository = $timetableRepository;
+        $this->setRepository($this->timetableRepository, $this->timetableSlotRepository);
     }
 
     /**
@@ -176,10 +179,15 @@ class TimetableController extends Controller
 
             if ($newTimetable instanceof Timetable) {
                 $new_timetable_slot = $this->timetableSlotRepository->create_timetable_slot($newTimetable, $request);
+
             }
         }
         if ($new_timetable_slot) {
-            return Response::json(['status' => true, 'timetable_slot' => \GuzzleHttp\json_decode($new_timetable_slot)]);
+            return Response::json([
+                'status' => true,
+                'timetable_slot' => \GuzzleHttp\json_decode($new_timetable_slot),
+                'is_conflict_course' => $this->timetableSlotRepository->is_conflict_course($new_timetable_slot)
+            ]);
         }
         return Response::json(['status' => false]);
     }

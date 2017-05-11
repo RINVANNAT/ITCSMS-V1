@@ -68,14 +68,9 @@
     -moz-box-sizing: border-box;
     box-sizing: border-box;
 }
-
-ul.list {
-    background-color: #f1f1f1;
-    height: 280px;
-    overflow-y: auto;
-    padding: 4px;
+.rooms .room-item.disabled {
+    cursor: not-allowed;
 }
-
 .course {
     padding: 5px;
     font-size: 14px;
@@ -106,4 +101,7 @@ ul.list {
 .conflict {
     color: red;
     text-decoration: line-through;
+}
+.courses .course-item {
+    cursor: move;
 }
