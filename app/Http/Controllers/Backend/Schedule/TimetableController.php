@@ -40,6 +40,7 @@ class TimetableController extends Controller
 
     /**
      * TimetableController constructor.
+     *
      * @param TimetableSlotRepositoryContract $timetableSlotRepository
      * @param TimetableRepositoryContract $timetableRepository
      */
@@ -51,6 +52,7 @@ class TimetableController extends Controller
     {
         $this->timetableSlotRepository = $timetableSlotRepository;
         $this->timetableRepository = $timetableRepository;
+        $this->setRepository($this->timetableRepository, $this->timetableSlotRepository);
     }
 
     /**
@@ -177,10 +179,15 @@ class TimetableController extends Controller
 
             if ($newTimetable instanceof Timetable) {
                 $new_timetable_slot = $this->timetableSlotRepository->create_timetable_slot($newTimetable, $request);
+
             }
         }
         if ($new_timetable_slot) {
-            return Response::json(['status' => true, 'timetable_slot' => \GuzzleHttp\json_decode($new_timetable_slot)]);
+            return Response::json([
+                'status' => true,
+                'timetable_slot' => \GuzzleHttp\json_decode($new_timetable_slot),
+                'is_conflict_course' => $this->timetableSlotRepository->is_conflict_course($new_timetable_slot)
+            ]);
         }
         return Response::json(['status' => false]);
     }

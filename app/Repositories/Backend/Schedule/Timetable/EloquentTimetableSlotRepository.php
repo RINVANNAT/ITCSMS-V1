@@ -4,6 +4,7 @@ namespace App\Repositories\Backend\Schedule\Timetable;
 
 use App\Http\Requests\Backend\Schedule\Timetable\CreateTimetableRequest;
 use App\Models\CourseSession;
+use App\Models\Room;
 use App\Models\Schedule\Timetable\Timetable;
 use App\Models\Schedule\Timetable\TimetableSlot;
 use Carbon\Carbon;
@@ -74,10 +75,9 @@ class EloquentTimetableSlotRepository implements TimetableSlotRepositoryContract
     {
         $start = Carbon::parse($start);
         $end = Carbon::parse($end);
-        if(($end->minute > 0 && $start->minute == 0) || ($end->minute == 0 && $start->minute > 0)){
-            return $start->diffInHours($end)+0.5;
-        }
-        else{
+        if (($end->minute > 0 && $start->minute == 0) || ($end->minute == 0 && $start->minute > 0)) {
+            return $start->diffInHours($end) + 0.5;
+        } else {
             return $start->diffInHours($end);
         }
     }
@@ -104,6 +104,100 @@ class EloquentTimetableSlotRepository implements TimetableSlotRepositoryContract
                 $course_session->update();
             }
             return true;
+        }
+        return false;
+    }
+
+    /**
+     * Define timetable slot hos conflict room.
+     *
+     * @param TimetableSlot $timetableSlot
+     * @param Room $room
+     * @return mixed
+     */
+    public function is_conflict_room(TimetableSlot $timetableSlot, Room $room)
+    {
+        $timetable = $timetableSlot->timetable;
+
+        $timetables = Timetable::where([
+            ['academic_year_id', $timetable->academic_year_id],
+            ['week_id', $timetable->week_id]
+        ])
+            ->where('id', '!=', $timetable->id)
+            ->get();
+
+        if (count($timetables) > 0) {
+            foreach ($timetables as $itemTimetable) {
+                if (count($itemTimetable->timetableSlots) > 0) {
+                    foreach ($itemTimetable->timetableSlots as $itemTimetableSlot) {
+                        if (($itemTimetableSlot->start == $timetableSlot->start) && ($itemTimetableSlot->room_id == $room->id)) {
+                            return true;
+                        }
+                    }
+                }
+            }
+        }
+        return false;
+    }
+
+    /**
+     * Define timetable slot has conflict course.
+     *
+     * @param TimetableSlot $timetableSlot
+     * @return mixed
+     */
+    public function is_conflict_course(TimetableSlot $timetableSlot)
+    {
+        $timetable = $timetableSlot->timetable;
+
+        $timetables = Timetable::where([
+            ['academic_year_id', $timetable->academic_year_id],
+            ['week_id', $timetable->week_id]
+        ])
+            ->where('id', '!=', $timetable->id)
+            ->get();
+
+        if (count($timetables) > 0) {
+            foreach ($timetables as $itemTimetable) {
+                if (count($itemTimetable->timetableSlots) > 0) {
+                    foreach ($itemTimetable->timetableSlots as $itemTimetableSlot) {
+                        if (($itemTimetableSlot->start == $timetableSlot->start) && ($itemTimetableSlot->courseSession->course_annual_id == $timetableSlot->courseSession->course_annual_id)) {
+                            return true;
+                        }
+                    }
+                }
+            }
+        }
+        return false;
+    }
+
+    /**
+     * Define timetable slot has conflict lecturer.
+     *
+     * @param TimetableSlot $timetableSlot
+     * @return mixed
+     */
+    public function is_conflict_lecturer(TimetableSlot $timetableSlot)
+    {
+        $timetable = $timetableSlot->timetable;
+
+        $timetables = Timetable::where([
+            ['academic_year_id', $timetable->academic_year_id],
+            ['week_id', $timetable->week_id]
+        ])
+        ->where('id', '!=', $timetable->id)
+        ->get();
+
+        if (count($timetables) > 0) {
+            foreach ($timetables as $itemTimetable) {
+                if (count($itemTimetable->timetableSlots) > 0) {
+                    foreach ($itemTimetable->timetableSlots as $itemTimetableSlot) {
+                        if (($itemTimetableSlot->start == $timetableSlot->start) && ($itemTimetableSlot->teacher_name == $timetableSlot->teacher_name)) {
+                            return true;
+                        }
+                    }
+                }
+            }
         }
         return false;
     }

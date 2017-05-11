@@ -219,7 +219,7 @@
                         toastr['info']('The course was added.', 'ADDING COURSE');
                         get_timetable_slots();
                     }
-                    else{
+                    else {
                         toastr['error']('The timetable slot was not created.', 'ERROR !');
                         get_timetable();
                     }
@@ -227,7 +227,7 @@
                 error: function () {
                     toastr['error']('The course was not added.', 'ERROR ADDING COURSE');
                 },
-                complete:function () {
+                complete: function () {
                     get_course_sessions();
                 }
             });
@@ -269,11 +269,19 @@
                     if (response.status == true) {
                         toastr["success"]("Timetable slot have been changed.", "Timetable Slot Change");
                     } else {
-                        toastr['error'](response.message, "ERROR RESIZE COURSE");
+                        swal(
+                            'Page need to reload.',
+                            'Your resize timetable slot is limited.',
+                            'error'
+                        );
+                        setTimeout(function () {
+                            location.reload(true)
+                        }, 2500);
                     }
                 },
                 error: function (response) {
                     toastr['error'](response.message, "ERROR RESIZE COURSE");
+
                 },
                 complete: function () {
                     get_course_sessions();
@@ -343,10 +351,18 @@
                     var object = '<a class="fc-time-grid-event fc-v-event fc-event fc-start fc-end course-item  fc-draggable fc-resizable" style="top: 65px; bottom: -153px; z-index: 1; left: 0%; right: 0%;">' +
                         '<div class="fc-content">' +
                         '<div class="container-room">' +
-                        '<div class="side-course" id="' + event.id + '">' +
-                        '<div class="fc-title">' + (event.course_name).substring(0, 10) + '...</div>' +
-                        '<p class="text-primary">' + event.teacher_name + '</p> ' +
-                        '<p class="text-primary">' + event.course_type + '</p> ' +
+                        '<div class="side-course" id="' + event.id + '">';
+                    if (event.is_conflict_course == true) {
+                        object += '<div class="fc-title conflict">' + (event.course_name).substring(0, 10) + '...</div>';
+                    } else {
+                        object += '<div class="fc-title">' + (event.course_name).substring(0, 10) + '...</div>';
+                    }
+                    if (event.is_conflict_lecturer == true) {
+                        object += '<p class="text-primary conflict">' + event.teacher_name + '</p> ';
+                    } else {
+                        object += '<p class="text-primary">' + event.teacher_name + '</p> ';
+                    }
+                    object += '<p class="text-primary">' + event.type + '</p> ' +
                         '</div>' +
                         '<div class="side-room">' +
                         '<div class="room-name">';
@@ -359,7 +375,7 @@
                         '</div>' +
                         '</div>' +
                         '<div class="fc-bgd"></div>' +
-                        '<div class="fc-resizer fc-end-resizer"></div>' +
+                        '<div class="fc-resizer fc-end-resizer"></div>'+
                         '</a>';
 
                     return $(object);

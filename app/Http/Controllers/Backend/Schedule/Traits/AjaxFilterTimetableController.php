@@ -10,7 +10,10 @@ use App\Models\DepartmentOption;
 use App\Models\Schedule\Timetable\Timetable;
 use App\Models\Schedule\Timetable\TimetableSlot;
 use App\Models\Schedule\Timetable\Week;
+use App\Repositories\Backend\Schedule\Timetable\EloquentTimetableRepository;
+use App\Repositories\Backend\Schedule\Timetable\EloquentTimetableSlotRepository;
 use Carbon\Carbon;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Response;
 
@@ -20,6 +23,44 @@ use Illuminate\Support\Facades\Response;
  */
 trait AjaxFilterTimetableController
 {
+    /**
+     * @var EloquentTimetableRepository
+     */
+    public $timetableRepo;
+
+    /**
+     * @var EloquentTimetableSlotRepository
+     */
+    public $timetableSlotRepo;
+
+    /**
+     * AjaxFilterTimetableController constructor.
+     *
+     * @param EloquentTimetableRepository $timetableRepository
+     * @param EloquentTimetableSlotRepository $timetableSlotRepository
+     */
+    public function __construct(
+        EloquentTimetableRepository $timetableRepository,
+        EloquentTimetableSlotRepository $timetableSlotRepository
+    )
+    {
+        $this->timetableRepo = $timetableRepository;
+        $this->timetableSlotRepo = $timetableSlotRepository;
+    }
+
+    /**
+     * @param EloquentTimetableRepository $timetableRepository
+     * @param EloquentTimetableSlotRepository $timetableSlotRepository
+     */
+    public function setRepository(
+        EloquentTimetableRepository $timetableRepository,
+        EloquentTimetableSlotRepository $timetableSlotRepository
+    )
+    {
+        $this->timetableRepo = $timetableRepository;
+        $this->timetableSlotRepo = $timetableSlotRepository;
+    }
+
     /**
      * Filter timetable.
      *
@@ -78,7 +119,7 @@ trait AjaxFilterTimetableController
      */
     public function get_course_sessions()
     {
-        $this->timetableSlotRepository->set_value_into_time_remaining_course_session();
+        $this->timetableSlotRepo->set_value_into_time_remaining_course_session();
         $academic_year_id = request('academicYear');
         $department_id = request('department');
         $degree_id = request('degree');
@@ -216,7 +257,7 @@ trait AjaxFilterTimetableController
      */
     public function get_timetable_slots(CreateTimetableRequest $request)
     {
-        $timetable = $this->timetableRepository->find_timetable_is_existed($request);
+        $timetable = $this->timetableRepo->find_timetable_is_existed($request);
         if ($timetable instanceof Timetable) {
             $timetable_slots = TimetableSlot::where('timetable_id', $timetable->id)
                 ->leftJoin('rooms', 'rooms.id', '=', 'timetable_slots.room_id')
@@ -233,7 +274,31 @@ trait AjaxFilterTimetableController
                     'rooms.name as room'
                 )
                 ->get();
-            return \GuzzleHttp\json_decode($timetable_slots);
+
+            $timetableSlots = new Collection();
+            foreach ($timetable_slots as $timetable_slot)
+            {
+                if(($timetable_slot instanceof  TimetableSlot) && is_object($timetable_slot)){
+
+                    $newTimetableSlot = TimetableSlot::find($timetable_slot->id);
+                    $timetableSlot = new Collection($newTimetableSlot);
+                    if($this->timetableSlotRepo->is_conflict_lecturer($newTimetableSlot) == true){
+                        $timetableSlot->put('is_conflict_lecturer', true);
+                    }
+                    else{
+                        $timetableSlot->put('is_conflict_lecturer', false);
+                    }
+                    if($this->timetableSlotRepo->is_conflict_course($newTimetableSlot) == true){
+                        $timetableSlot->put('is_conflict_course', true);
+                    }
+                    else{
+                        $timetableSlot->put('is_conflict_course', false);
+                    }
+                    $timetableSlots->push($timetableSlot);
+                }
+            }
+
+            return \GuzzleHttp\json_decode($timetableSlots);
         }
     }
 
@@ -271,7 +336,7 @@ trait AjaxFilterTimetableController
             $timetable_slot = TimetableSlot::find($request->timetable_slot_id);
             if ($timetable_slot instanceof TimetableSlot) {
                 $old_durations = $timetable_slot->durations;
-                $new_durations = $this->timetableSlotRepository->durations(new Carbon($timetable_slot->start), new Carbon($request->end));
+                $new_durations = $this->timetableSlotRepo->durations(new Carbon($timetable_slot->start), new Carbon($request->end));
                 $timetable_slot->durations = $new_durations;
                 $timetable_slot->end = new Carbon($request->end);
 
