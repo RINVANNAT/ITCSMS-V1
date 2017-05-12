@@ -80,4 +80,28 @@ interface TimetableSlotRepositoryContract
      * @return mixed
      */
     public function get_conflict_with(TimetableSlot $timetableSlot);
+
+    /**
+     * Get room info with building.
+     *
+     * @param $room_id
+     * @return mixed
+     */
+    public function get_room_info($room_id);
+
+    /**
+     * Get group information.
+     *
+     * @param $group_id
+     * @return mixed
+     */
+    public function get_group_info($group_id);
+
+    /**
+     * Check is already merged.
+     *
+     * @param TimetableSlot $timetableSlot
+     * @return mixed
+     */
+    public function is_merged(TimetableSlot $timetableSlot);
 }

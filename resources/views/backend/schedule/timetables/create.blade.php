@@ -356,6 +356,7 @@
                 eventDrop: function (event, delta, revertFunc) {
                     var start_date = event.start.format();
                     move_timetable_slot(event, start_date);
+                    hide_conflict_information();
                     get_timetable();
                     get_course_sessions();
                 },
@@ -380,13 +381,20 @@
                         '<div class="room-name">';
                     if (event.room != null) {
                         if (event.is_conflict_room == true) {
-                            object += '<p class="fc-room conflict">' + event.building + '-' + event.room + '</p>';
+                            object += '<p class="fc-room bg-danger badge">' + event.building + '-' + event.room + '</p>';
                         } else {
                             object += '<p class="fc-room">' + event.building + '-' + event.room + '</p>';
                         }
                     }
+                    object += '</div>';
+                    if (event.groups != null) {
+                        object += '<p>Gr: ';
+                        for (var i = 0; i < event.groups.length; i++) {
+                            object += event.groups[i].code + ' ';
+                        }
+                        object += '</p>';
+                    }
                     object += '</div> ' +
-                        '</div> ' +
                         '<div class="clearfix"></div> ' +
                         '</div>' +
                         '</div>' +
@@ -403,6 +411,7 @@
                     var end = event.end.format();
                     resize_timetable_slot(event.id, end, revertFunc);
                     $('#timetable').fullCalendar('rerenderEvents');
+                    hide_conflict_information();
                 }
             });
         }
@@ -413,7 +422,7 @@
                 url: '{!! route('get_conflict_info') !!}',
                 data: {timetable_slot_id: timetable_slot_id},
                 success: function (response) {
-                    if (response.status == true) {
+                    if ((response.status == true) && (response.data.is_conflict_room == true || response.data.is_conflict_lecturer == true)) {
                         var panel_conflict = '<div class="box-header with-border bg-danger">' +
                             '<h3 class="box-title"><i class="fa fa-info-circle"></i> CONFLICT INFORMATION</h3>' +
                             '<div class="box-tools pull-right"> ' +
@@ -434,23 +443,41 @@
                             panel_conflict += '</span></li>';
                         }
                         if (response.data.is_conflict_lecturer == true) {
-                            panel_conflict += '<li class="list-group-item"><i class="fa fa-user"></i> Lecturer <span class="badge bg-primary"> ' +
-                                response.data.lecturer_info[0].department + '-' +
-                                response.data.lecturer_info[0].degree +
-                                response.data.lecturer_info[0].grade;
-                            if (response.data.lecturer_info[0].group != null) {
-                                panel_conflict += '(' + response.data.lecturer_info[0].group + ')';
+                            if (response.data.merge == true) {
+                                panel_conflict += '<li class="list-group-item">' +
+                                    '<i class="fa fa-user"></i> Lecturer ' +
+                                    '<i data-toggle="tooltip" data-placement="right" title="Merge" data-original-title="Merge" class="btn btn-info btn-xs fa fa-code-fork pull-right" id="merge"></i>' +
+                                    '<span class="badge bg-primary"> ';
                             }
+                            else {
+                                panel_conflict += '<li class="list-group-item">' +
+                                    '<i class="fa fa-user"></i> Lecturer <span class="badge bg-primary"> ';
+                            }
+                            panel_conflict += response.data.lecturer_info[0].department + '-' +
+                                response.data.lecturer_info[0].degree +
+                                response.data.lecturer_info[0].grade + '(';
+                            if (response.data.info != null) {
+                                for (var i = 0; i < response.data.info.length; i++) {
+                                    if (i == response.data.info.length - 1) {
+                                        panel_conflict += response.data.info[i].code + '';
+                                    }
+                                    else {
+                                        panel_conflict += response.data.info[i].code + ', ';
+                                    }
+                                }
+                            }
+                            if (response.data.lecturer_info[0].group != null && response.data.info == null) {
+                                panel_conflict += '(' + response.data.lecturer_info[0].group;
+                            }
+                            panel_conflict += ')';
                             if (response.data.lecturer_info[0].option != null) {
                                 panel_conflict += '_' + response.data.lecturer_info[0].option;
                             }
                             panel_conflict += '</span></li></ul>';
+
                         }
                         panel_conflict += '</div>';
-                        if (response.data.merge == true) {
-                            panel_conflict += '<div class="box-footer"> <button class="btn btn-primary btn-sm" id="merge">Merge</button> ' +
-                                '<button class="btn btn-default btn-sm btn-conflict-cancel">Cancel</button></div>';
-                        }
+
 
                         $('#conflict').html(panel_conflict);
                         $('#conflict').hide();
@@ -467,6 +494,10 @@
                     //sweetAlert('Completed...');
                 }
             })
+        }
+
+        function hide_conflict_information() {
+            $('#conflict').fadeOut();
         }
 
         $(function () {
@@ -523,8 +554,8 @@
                     },
                     success: function (response) {
                         if (response.status == true) {
-                            var btn_delete = '<button class="btn btn-danger btn-xs remove-room"><i class="fa fa-trash"></i></button>';
-                            $('.container-room').find('.side-course.course-selected').parent().children().eq(1).children().eq(1).html(btn_delete);
+                            // var btn_delete = '<button class="btn btn-danger btn-xs remove-room"><i class="fa fa-trash"></i></button>';
+                            // $('.container-room').find('.side-course.course-selected').parent().children().eq(1).children().eq(1).html(btn_delete);
                             $('.container-room').find('.side-course.course-selected').parent().children().eq(1).children().eq(0).html('<p class="fc-room">' + dom_room.children().eq(1).text() + '</p>');
 
                             dom_room.remove();
@@ -561,7 +592,7 @@
             });
             // get timetable slot by on change grade option.
             $(document).on('change', 'select[name="grade"]', function () {
-                get_weeks($('select[name="semester"] :selected').val());
+                get_groups();
             });
             // get timetable slot by on change group option.
             $(document).on('change', 'select[name="group"]', function () {
@@ -588,15 +619,29 @@
             });
 
             $(document).on('click', '.btn-conflict-cancel', function () {
-                $('#conflict').fadeOut();
+                hide_conflict_information();
             });
 
             $(document).on('change', '#options-filter', function () {
-                $('#conflict').fadeOut();
+                hide_conflict_information();
             });
 
             $(document).on('click', '#merge', function () {
-                console.log($('.side-course.course-selected').attr('id'));
+                $.ajax({
+                    type: 'POST',
+                    url: '{!! route('merge_timetable_slot') !!}',
+                    data: {
+                        timetable_slot_id: $('.side-course.course-selected').attr('id')
+                    },
+                    success: function (response) {
+                        get_timetable();
+                        hide_conflict_information();
+                    },
+                    complete: function () {
+                        $('#timetable').fullCalendar('refresh');
+                        hide_conflict_information();
+                    }
+                });
             })
         });
 

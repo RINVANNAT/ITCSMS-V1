@@ -22,7 +22,6 @@ class CreateTimetableSlotsTable extends Migration
             $table->string('teacher_name');
             $table->string('type');
             $table->double('durations')->unsigned();
-            $table->boolean('is_conflict')->default(false);
 
             $table->dateTime('start');
             $table->dateTime('end');
