@@ -253,6 +253,9 @@
                 },
                 error: function () {
                     toastr["error"]("Something went wrong.", "ERROR MOVING COURSE");
+                },
+                complete: function () {
+                    get_timetable_slots();
                 }
             })
         }
@@ -367,7 +370,11 @@
                         '<div class="side-room">' +
                         '<div class="room-name">';
                     if (event.room != null) {
-                        object += '<p class="fc-room">' + event.building + '-' + event.room + '</p>';
+                        if (event.is_conflict_room == true) {
+                            object += '<p class="fc-room conflict">' + event.building + '-' + event.room + '</p>';
+                        } else {
+                            object += '<p class="fc-room">' + event.building + '-' + event.room + '</p>';
+                        }
                     }
                     object += '</div> ' +
                         '</div> ' +
@@ -375,7 +382,7 @@
                         '</div>' +
                         '</div>' +
                         '<div class="fc-bgd"></div>' +
-                        '<div class="fc-resizer fc-end-resizer"></div>'+
+                        '<div class="fc-resizer fc-end-resizer"></div>' +
                         '</a>';
 
                     return $(object);

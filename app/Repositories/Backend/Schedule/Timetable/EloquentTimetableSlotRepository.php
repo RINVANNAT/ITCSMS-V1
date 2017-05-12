@@ -115,23 +115,25 @@ class EloquentTimetableSlotRepository implements TimetableSlotRepositoryContract
      * @param Room $room
      * @return mixed
      */
-    public function is_conflict_room(TimetableSlot $timetableSlot, Room $room)
+    public function is_conflict_room(TimetableSlot $timetableSlot, Room $room = null)
     {
-        $timetable = $timetableSlot->timetable;
+        if ($room != null) {
+            $timetable = $timetableSlot->timetable;
 
-        $timetables = Timetable::where([
-            ['academic_year_id', $timetable->academic_year_id],
-            ['week_id', $timetable->week_id]
-        ])
-            ->where('id', '!=', $timetable->id)
-            ->get();
+            $timetables = Timetable::where([
+                ['academic_year_id', $timetable->academic_year_id],
+                ['week_id', $timetable->week_id]
+            ])
+                ->where('id', '!=', $timetable->id)
+                ->get();
 
-        if (count($timetables) > 0) {
-            foreach ($timetables as $itemTimetable) {
-                if (count($itemTimetable->timetableSlots) > 0) {
-                    foreach ($itemTimetable->timetableSlots as $itemTimetableSlot) {
-                        if (($itemTimetableSlot->start == $timetableSlot->start) && ($itemTimetableSlot->room_id == $room->id)) {
-                            return true;
+            if (count($timetables) > 0) {
+                foreach ($timetables as $itemTimetable) {
+                    if (count($itemTimetable->timetableSlots) > 0) {
+                        foreach ($itemTimetable->timetableSlots as $itemTimetableSlot) {
+                            if (($itemTimetableSlot->start == $timetableSlot->start) && ($itemTimetableSlot->room_id == $room->id)) {
+                                return true;
+                            }
                         }
                     }
                 }
@@ -185,8 +187,8 @@ class EloquentTimetableSlotRepository implements TimetableSlotRepositoryContract
             ['academic_year_id', $timetable->academic_year_id],
             ['week_id', $timetable->week_id]
         ])
-        ->where('id', '!=', $timetable->id)
-        ->get();
+            ->where('id', '!=', $timetable->id)
+            ->get();
 
         if (count($timetables) > 0) {
             foreach ($timetables as $itemTimetable) {
