@@ -6,17 +6,21 @@ use App\Http\Controllers\Backend\Schedule\Traits\AjaxCloneTimetableController;
 use App\Http\Controllers\Backend\Schedule\Traits\AjaxFilterTimetableController;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Backend\Schedule\Timetable\CreateTimetableRequest;
+use App\Http\Requests\Backend\Schedule\Timetable\DeleteTimetableRequest;
 use App\Models\AcademicYear;
 use App\Models\Degree;
 use App\Models\Department;
 use App\Models\DepartmentOption;
 use App\Models\Grade;
+use App\Models\Room;
 use App\Models\Schedule\Timetable\Timetable;
 use App\Models\Schedule\Timetable\TimetableSlot;
 use App\Models\Schedule\Timetable\Week;
 use App\Models\Semester;
 use App\Repositories\Backend\Schedule\Timetable\TimetableRepositoryContract;
 use App\Repositories\Backend\Schedule\Timetable\TimetableSlotRepositoryContract;
+use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Response;
 use Yajra\Datatables\Datatables;
 
@@ -98,34 +102,40 @@ class TimetableController extends Controller
                 'semesters.name_en as semester',
                 'groups.code as group',
                 'weeks.name_en as weekly',
-                'timetables.completed as status'
+                'timetables.completed as status',
+                'timetables.id as id'
             ])
             ->get();
         return Datatables::of($timetables)
-            ->addColumn('action', function ($timetables) {
-                $view = '<a href="' . route('admin.schedule.timetables.create') . '" class="btn btn-xs btn-primary">'
+            ->addColumn('action', function ($timetable) {
+                $print = ' <a href="#print" class="btn btn-xs btn-info">'
+                    . '<i class="fa fa-print" data-toggle="tooltip"'
+                    . 'data-placement="top" title="Print"'
+                    . 'data-original-title="Print">'
+                    . '</i>'
+                    . '</a> ';
+
+                $view = '<a href="' . route('admin.schedule.timetables.show', $timetable->id) . '" class="btn btn-xs btn-primary">'
                     . '<i class="fa fa-share-square-o" data-toggle="tooltip"'
                     . 'data-placement="top" title="View"'
                     . 'data-original-title="View">'
                     . '</i></a>';
 
-                $delete = ' <a href="' . route('admin.schedule.timetables.create') . '" class="btn btn-xs btn-danger">'
+                $delete = ' <a href="/admin/schedule/timetables/delete/' . $timetable->id . '" class="btn btn-xs btn-danger">'
                     . '<i class="fa fa-trash" data-toggle="tooltip"'
                     . 'data-placement="top" title="Delete"'
                     . 'data-original-title="Delete">'
-
                     . '</i>'
                     . '</a>';
 
                 if (access()->allow('delete-timetable') || access()->allow('view-timetable')) {
-                    return $view . $delete;
+                    return $print . $view . $delete;
                 } else if (access()->allow('view-timetable')) {
                     return $view;
                 }
             })
-            ->editColumn('status', function ($timetables) {
-                $view = '';
-                if ($timetables->completed == false) {
+            ->editColumn('status', function ($timetable) {
+                if ($timetable->status == false) {
                     $view = '<span class="btn btn-danger btn-xs">'
                         . '<i class="fa fa-times-circle"'
                         . 'data-toggle="tooltip"'
@@ -157,11 +167,55 @@ class TimetableController extends Controller
 
     /**
      * Show timetable's details page.
+     * @param $id
      * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View
+     * @internal param Timetable $timetable
      */
-    public function show()
+    public function show($id)
     {
-        return view('backend.schedule.timetables.show');
+        $timetable = Timetable::find($id);
+        if ($timetable instanceof Timetable) {
+            $timetable_slots = TimetableSlot::where('timetable_id', $timetable->id)
+                ->leftJoin('rooms', 'rooms.id', '=', 'timetable_slots.room_id')
+                ->leftJoin('buildings', 'buildings.id', '=', 'rooms.building_id')
+                ->select(
+                    'timetable_slots.id',
+                    'timetable_slots.course_name as title',
+                    'timetable_slots.course_name',
+                    'timetable_slots.teacher_name',
+                    'timetable_slots.type as course_type',
+                    'timetable_slots.start',
+                    'timetable_slots.end',
+                    'buildings.code as building',
+                    'rooms.name as room'
+                )
+                ->get();
+
+            $timetableSlots = new Collection();
+            foreach ($timetable_slots as $timetable_slot) {
+                if (($timetable_slot instanceof TimetableSlot) && is_object($timetable_slot)) {
+
+                    $newTimetableSlot = TimetableSlot::find($timetable_slot->id);
+                    $timetableSlot = new Collection($newTimetableSlot);
+                    if ($this->timetableSlotRepo->is_conflict_lecturer($newTimetableSlot)[0]['status'] == true) {
+                        $timetableSlot->put('is_conflict_lecturer', true);
+                    } else {
+                        $timetableSlot->put('is_conflict_lecturer', false);
+                    }
+                    if ($this->timetableSlotRepo->is_conflict_room($newTimetableSlot, Room::find($newTimetableSlot->room_id))[0]['status'] == true) {
+                        $timetableSlot->put('is_conflict_room', true);
+                    } else {
+                        $timetableSlot->put('is_conflict_room', false);
+                    }
+                    $timetableSlot->put('building', $timetable_slot->building);
+                    $timetableSlot->put('room', $timetable_slot->room);
+                    $timetableSlots->push($timetableSlot);
+                }
+            }
+        }
+
+        dd($timetableSlots->toJson());
+        return view('backend.schedule.timetables.show', compact('timetableSlots'));
     }
 
     /**
@@ -190,5 +244,14 @@ class TimetableController extends Controller
             ]);
         }
         return Response::json(['status' => false]);
+    }
+
+    public function delete(DeleteTimetableRequest $request)
+    {
+        if (Timetable::find($request->id) instanceof Timetable) {
+            DB::table('timetables')->where('id', '=', $request->id)->delete();
+            return redirect()->back()->withFlashSuccess('Timetable is deleted successfully.');
+        }
+        return redirect()->back()->withFlashError('Something went wrong.');
     }
 }
