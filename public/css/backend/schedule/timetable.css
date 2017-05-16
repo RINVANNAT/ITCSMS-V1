@@ -44,7 +44,12 @@
 .room-item > .disabled:hover {
     cursor: help;
 }
-
+.room-item.enabled:hover{
+    background-color: #f1f1f1;
+}
+.room-item.enabled:focus{
+    background: red;
+}
 .box-body .rooms {
     background-color: #f1f1f1;
     height: 280px;
@@ -68,9 +73,11 @@
     -moz-box-sizing: border-box;
     box-sizing: border-box;
 }
+
 .rooms .room-item.disabled {
     cursor: not-allowed;
 }
+
 .course {
     padding: 5px;
     font-size: 14px;
@@ -102,6 +109,24 @@
     color: red;
     text-decoration: line-through;
 }
+
 .courses .course-item {
     cursor: move;
+}
+
+.box.box-success .panel-conflict {
+    position: fixed;
+    bottom: 10px;
+    left: 60px;
+    z-index: 9999999999;
+    width: 350px;
+    display: -webkit-box;
+    display: -webkit-flex;
+    display: -ms-flexbox;
+    display: flex;
+    -webkit-flex-direction: column;
+    -ms-flex-direction: column;
+    flex-direction: column;
+    background-color: #fff;
+    box-shadow: 0 2px 5px 0 rgba(0, 0, 0, .16), 0 2px 10px 0 rgba(0, 0, 0, .12);
 }

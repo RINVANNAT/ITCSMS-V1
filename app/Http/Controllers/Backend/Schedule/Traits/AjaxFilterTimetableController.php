@@ -277,28 +277,25 @@ trait AjaxFilterTimetableController
                 ->get();
 
             $timetableSlots = new Collection();
-            foreach ($timetable_slots as $timetable_slot)
-            {
-                if(($timetable_slot instanceof  TimetableSlot) && is_object($timetable_slot)){
+            foreach ($timetable_slots as $timetable_slot) {
+                if (($timetable_slot instanceof TimetableSlot) && is_object($timetable_slot)) {
 
                     $newTimetableSlot = TimetableSlot::find($timetable_slot->id);
                     $timetableSlot = new Collection($newTimetableSlot);
-                    if($this->timetableSlotRepo->is_conflict_lecturer($newTimetableSlot) == true){
+                    if ($this->timetableSlotRepo->is_conflict_lecturer($newTimetableSlot)[0]['status'] == true) {
                         $timetableSlot->put('is_conflict_lecturer', true);
-                    }
-                    else{
+                    } else {
                         $timetableSlot->put('is_conflict_lecturer', false);
                     }
-                    if($this->timetableSlotRepo->is_conflict_course($newTimetableSlot) == true){
+                    /*if($this->timetableSlotRepo->is_conflict_course($newTimetableSlot) == true){
                         $timetableSlot->put('is_conflict_course', true);
                     }
                     else{
                         $timetableSlot->put('is_conflict_course', false);
-                    }
-                    if($this->timetableSlotRepo->is_conflict_room($newTimetableSlot, Room::find($newTimetableSlot->room_id)) == true){
+                    }*/
+                    if ($this->timetableSlotRepo->is_conflict_room($newTimetableSlot, Room::find($newTimetableSlot->room_id))[0]['status'] == true) {
                         $timetableSlot->put('is_conflict_room', true);
-                    }
-                    else{
+                    } else {
                         $timetableSlot->put('is_conflict_room', false);
                     }
                     $timetableSlot->put('building', $timetable_slot->building);
@@ -328,30 +325,22 @@ trait AjaxFilterTimetableController
                 $timetable_slot->end = $end;
                 $timetable_slot->update();
                 $collectionTimetableSlot = new Collection($timetable_slot);
-                if($this->timetableSlotRepo->is_conflict_course($timetable_slot) == true){
-                    $collectionTimetableSlot->put('is_conflict_course', true);
-                }
-                else{
-                    $collectionTimetableSlot->put('is_conflict_course', false);
-                }
-                if($this->timetableSlotRepo->is_conflict_lecturer($timetable_slot) == true){
+
+                if ($this->timetableSlotRepo->is_conflict_lecturer($timetable_slot)[0]['status'] == true) {
                     $collectionTimetableSlot->put('is_conflict_lecturer', true);
-                }
-                else{
+                } else {
                     $collectionTimetableSlot->put('is_conflict_lecturer', false);
                 }
-                if($timetable_slot->room_id != null){
-                    if($this->timetableSlotRepo->is_conflict_room($timetable_slot, Room::find($timetable_slot->room_id)) == true){
+                if ($timetable_slot->room_id != null) {
+                    if ($this->timetableSlotRepo->is_conflict_room($timetable_slot, Room::find($timetable_slot->room_id))[0]['status'] == true) {
                         $collectionTimetableSlot->put('is_conflict_room', true);
-                    }
-                    else{
+                    } else {
                         $collectionTimetableSlot->put('is_conflict_room', false);
                     }
                 }
                 return Response::json(['status' => true, 'timetable_slot' => $collectionTimetableSlot]);
             }
         }
-        return Response::json(['status' => false]);
     }
 
     /**
@@ -457,6 +446,7 @@ trait AjaxFilterTimetableController
                     ->where(DB::raw("CONCAT(buildings.code, '-', rooms.name)"), 'LIKE', "%" . $query . "%")
                     ->whereNotNull('timetable_slots.room_id')
                     ->select('rooms.id as id', 'rooms.name as name', 'buildings.code as code')
+                    ->distinct('name', 'code')
                     ->get();
 
                 $rooms_tmp = DB::table('timetables')
@@ -492,6 +482,43 @@ trait AjaxFilterTimetableController
                     ]);
                 }
             }
+        }
+    }
+
+    /**
+     * Get conflict information.
+     *
+     * @return mixed
+     */
+    public function get_conflict_info()
+    {
+        $timetableSlot = TimetableSlot::find(request('timetable_slot_id'));
+        $conflicts = array();
+        if ($this->timetableSlotRepo->is_conflict_room($timetableSlot, Room::find($timetableSlot->room_id))[0]['status'] == true) {
+            $conflicts['is_conflict_room'] = true;
+            $with_timetable_slot = TimetableSlot::find($this->timetableSlotRepo->is_conflict_room($timetableSlot, Room::find($timetableSlot->room_id))[0]['conflict_with']->id);
+            $info = $this->timetableSlotRepo->get_conflict_with($with_timetable_slot);
+            $conflicts['room_info'] = $info;
+            $timetableSlot->is_conflict = true;
+            $timetableSlot->update();
+        }
+
+        if ($this->timetableSlotRepo->is_conflict_lecturer($timetableSlot)[0]['status'] == true) {
+            $conflicts['is_conflict_lecturer'] = true;
+            $with_timetable_slot = TimetableSlot::find($this->timetableSlotRepo->is_conflict_lecturer($timetableSlot)[0]['conflict_with']->id);
+            $info = $this->timetableSlotRepo->get_conflict_with($with_timetable_slot);
+            $conflicts['lecturer_info'] = $info;
+            $conflicts['merge'] = $this->timetableSlotRepo->is_conflict_lecturer($timetableSlot)[0]['merge'];
+            $timetableSlot->is_conflict = true;
+            $timetableSlot->update();
+        }
+
+        if (count($conflicts) > 0) {
+            return Response::json(['status' => true, 'data' => $conflicts]);
+        } else {
+            $timetableSlot->is_conflict = false;
+            $timetableSlot->update();
+            return Response::json(['status' => false]);
         }
     }
 }

@@ -23,28 +23,39 @@
 
 @section('content')
     <div class="box box-success">
-        {{--Group buttons action--}}
-        @include('backend.schedule.timetables.includes.partials.buttons-action')
+        <div class="box-header with-border">
+            <div class="mailbox-controls">
+                <div class="pull-right">
+                    @include('backend.schedule.timetables.includes.partials.buttons-action')
+                </div>
+
+                @permission('create-timetable')
+                <div class="pull-left">
+                    <a href="{{ route('admin.schedule.timetables.create') }}">
+                        <button class="btn btn-primary btn-sm" data-toggle="tooltip"
+                                data-placement="top" title="Create a new timetable"
+                                data-original-title="Create a new timetable">
+                            <i class="fa fa-plus-circle"
+                            ></i>
+                            {{ trans('buttons.backend.schedule.timetable.create') }}
+                        </button>
+                    </a>
+                </div>
+                @endauth
+            </div>
+        </div>
 
         <div class="box-body">
             <div class="row">
-                <div class="col-md-9 col-sm-12 col-xs-12" style="overflow-x: auto">
+                <div class="col-md-12 col-sm-12 col-xs-12">
                     {{--Timetable render--}}
-                    <div id="timetable" style="width: 1345px;"></div>
-                </div>
-                <div class="col-md-3 col-sm-12 col-xs-12">
-
-                    @include('backend.schedule.timetables.includes.partials.courses-sessions')
-
-                    @include('backend.schedule.timetables.includes.partials.rooms')
-
+                    <div id="timetable"></div>
                 </div>
             </div>
 
             <div class="clearfix"></div>
         </div>
     </div>
-
 
     @include('backend.schedule.timetables.includes.modals.clone')
 
@@ -63,10 +74,12 @@
     {!! Html::script('js/backend/schedule/timetable.js') !!}
 
     <script type="text/javascript">
-        $(document).ready(function () {
-            // Timetable sections.
+        function get_timetable() {
+            var date = new Date();
+            var d = date.getDate(),
+                m = date.getMonth(),
+                y = date.getFullYear();
             $('#timetable').fullCalendar({
-
                 defaultView: 'timetable',
                 defaultDate: '2017-01-01',
                 header: false,
@@ -85,71 +98,37 @@
                 maxTime: '20:00:00',
                 slotLabelFormat: 'h:mm a',
                 columnFormat: 'dddd',
-                events: [],
                 editable: true,
                 droppable: true,
-                dragRevertDuration: 10,
-                drop: function () {
-                    $(this).addClass('course-selected');
-
-                    setTimeout(function () {
-                        $(this).removeClass('course-selected');
-                    }, 100);
-                },
-                eventDragStart: function (event, jsEvent, ui, view) {
-                    var room = '';
-                    room += '<div class="room-item ui-draggable ui-draggable-handle">';
-                    room += '<i class="fa fa-refresh"></i> Loading...';
-                    room += '</div>';
-                    $('.rooms').html(room);
-                },
-                eventDragStop: function (event, jsEvent, ui, view) {
-                    if(isEventOverDiv(jsEvent.clientX, jsEvent.clientY)) {
-                        $('#timetable').fullCalendar('removeEvents', event._id);
-                        $('#timetable').fullCalendar('removeEvents', event._id);
-                        var course = '';
-                        course += '<li class="course-item drag-course-back">'
-                            + '<span class="handle ui-sortable-handle">'
-                            + '<i class="fa fa-ellipsis-v"></i> '
-                            + '<i class="fa fa-ellipsis-v"></i>'
-                            + '</span>'
-                            + '<span class="text course-name">' + event.title + '</span><br>'
-                            + '<span style="margin-left: 28px;" class="teacher-name">' + event.teacherName + '</span><br/>'
-                            + '<span style="margin-left: 28px;" class="course-type">' + event.typeCourseSession + '</span> :'
-                            + '<span class="times">' + event.times + '</span> H'
-                            + '</li>';
-
-                        $('.courses').prepend(course);
-
-                        setTimeout(function () {
-                            $('.courses').find('.drag-course-back').removeClass('drag-course-back');
-                        }, 300);
-
-                        drag_course_session();
-                    }
-                },
-                eventClick: function (calEvent, jsEvent, view) {
-                    // Trigger when click the event.
-                },
-                eventDrop: function (event, delta, revertFunc) {
-                    // Trigger where move and drop the event on full calendar.
-                },
+                dragRevertDuration: 0,
+                events: '{!! json_encode($timetableSlots) !!}',
                 eventRender: function (event, element, view) {
-                    var object ='<a class="fc-time-grid-event fc-v-event fc-event fc-start fc-end course-item  fc-draggable fc-resizable" style="top: 65px; bottom: -153px; z-index: 1; left: 0%; right: 0%;">' +
-
+                    var object = '<a class="fc-time-grid-event fc-v-event fc-event fc-start fc-end course-item  fc-draggable fc-resizable" style="top: 65px; bottom: -153px; z-index: 1; left: 0%; right: 0%;">' +
                         '<div class="fc-content">' +
                         '<div class="container-room">' +
-                        '<div class="side-course">' +
-                        '<div class="fc-title">'+(event.title).substring(0, 1)+'...</div>' +
-                        '<p class="text-primary">'+event.teacherName+'</p> ' +
-                        '<p class="text-primary">'+event.typeCourseSession+'</p> ' +
+                        '<div class="side-course" id="' + event.id + '">';
+                    if (event.is_conflict_course == true) {
+                        object += '<div class="fc-title conflict">' + (event.course_name).substring(0, 10) + '...</div>';
+                    } else {
+                        object += '<div class="fc-title">' + (event.course_name).substring(0, 10) + '...</div>';
+                    }
+                    if (event.is_conflict_lecturer == true) {
+                        object += '<p class="text-primary conflict">' + event.teacher_name + '</p> ';
+                    } else {
+                        object += '<p class="text-primary">' + event.teacher_name + '</p> ';
+                    }
+                    object += '<p class="text-primary">' + event.type + '</p> ' +
                         '</div>' +
                         '<div class="side-room">' +
-                        '<div class="room-name"><span class="render-room"></span></div> ' +
-                        '<div class="room-action">' +
-//                        '<button class="btn btn-warning btn-xs" id="btn-conflict"><i class="fa fa-question"></i> </button> ' +
-                        '<span class="render-trash"></span> ' +
-                        '</div> ' +
+                        '<div class="room-name">';
+                    if (event.room != null) {
+                        if (event.is_conflict_room == true) {
+                            object += '<p class="fc-room conflict">' + event.building + '-' + event.room + '</p>';
+                        } else {
+                            object += '<p class="fc-room">' + event.building + '-' + event.room + '</p>';
+                        }
+                    }
+                    object += '</div> ' +
                         '</div> ' +
                         '<div class="clearfix"></div> ' +
                         '</div>' +
@@ -159,32 +138,12 @@
                         '</a>';
 
                     return $(object);
-                },
-                eventAfterAllRender: function (view) {
-
-                },
-                eventOverlap: function (stillEvent, movingEvent) {
-                    return stillEvent.allDay && movingEvent.allDay;
                 }
-
             });
+        };
 
-            var isEventOverDiv = function (x, y) {
-
-                var courses = $('.courses');
-                var offset = courses.offset();
-                offset.right = courses.width() + offset.left;
-                offset.bottom = courses.height() + offset.top;
-
-                /** Compare*/
-                return x >= offset.left
-                    && y >= offset.top
-                    && x <= offset.right
-                    && y <= offset.bottom;
-            };
-
-            // Reload courses.
-            $('#timetable').fullCalendar('rerenderEvents');
+        $(function () {
+            get_timetable();
         });
     </script>
 @stop

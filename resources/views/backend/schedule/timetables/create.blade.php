@@ -35,8 +35,21 @@
 @section('content')
 
     <div class="box box-success">
-        {{--Group buttons action--}}
-        @include('backend.schedule.timetables.includes.partials.buttons-action')
+        <div class="box-header with-border">
+            <div class="mailbox-controls">
+                <div class="pull-right">
+                    @include('backend.schedule.timetables.includes.partials.buttons-action')
+                </div>
+
+                <form name="options-filter"
+                      id="options-filter"
+                      method="POST"
+                      action="{{ route('admin.schedule.timetables.filter') }}">
+                    @include('backend.schedule.timetables.includes.partials.option')
+                </form>
+
+            </div>
+        </div>
 
         <div class="box-body">
             <div class="row">
@@ -52,11 +65,10 @@
 
                 </div>
             </div>
-
             <div class="clearfix"></div>
         </div>
+        <div class="panel-conflict box box-danger" id="conflict" style="display: none;"></div>
     </div>
-
 @stop
 
 @section('after-scripts-end')
@@ -229,6 +241,7 @@
                 },
                 complete: function () {
                     get_course_sessions();
+                    $('.panel-conflict').hide();
                 }
             });
 
@@ -260,7 +273,7 @@
             })
         }
         /** resize timetable slot */
-        function resize_timetable_slot(timetable_slot_id, end_date) {
+        function resize_timetable_slot(timetable_slot_id, end_date, revertFunc) {
             $.ajax({
                 type: 'POST',
                 url: '{!! route('resize_timetable_slot') !!}',
@@ -272,21 +285,17 @@
                     if (response.status == true) {
                         toastr["success"]("Timetable slot have been changed.", "Timetable Slot Change");
                     } else {
-                        swal(
-                            'Page need to reload.',
-                            'Your resize timetable slot is limited.',
-                            'error'
-                        );
-                        setTimeout(function () {
-                            location.reload(true)
-                        }, 2500);
+                        toastr['error'](response.message, "ERROR RESIZE COURSE");
+                        revertFunc();
                     }
                 },
                 error: function (response) {
                     toastr['error'](response.message, "ERROR RESIZE COURSE");
-
+                    $('#timetable').fullCalendar('refresh');
+                    get_course_sessions();
                 },
                 complete: function () {
+                    $('#timetable').fullCalendar('refresh');
                     get_course_sessions();
                 }
             })
@@ -392,10 +401,72 @@
                 },
                 eventResize: function (event, delta, revertFunc) {
                     var end = event.end.format();
-                    resize_timetable_slot(event.id, end);
+                    resize_timetable_slot(event.id, end, revertFunc);
                     $('#timetable').fullCalendar('rerenderEvents');
                 }
             });
+        }
+
+        function check_conflict(timetable_slot_id) {
+            $.ajax({
+                type: 'POST',
+                url: '{!! route('get_conflict_info') !!}',
+                data: {timetable_slot_id: timetable_slot_id},
+                success: function (response) {
+                    if (response.status == true) {
+                        var panel_conflict = '<div class="box-header with-border bg-danger">' +
+                            '<h3 class="box-title"><i class="fa fa-info-circle"></i> CONFLICT INFORMATION</h3>' +
+                            '<div class="box-tools pull-right"> ' +
+                            '<button type="button" class="btn-conflict-cancel btn btn-box-tool" data-widget="remove"><i class="fa fa-times"></i>' +
+                            '</button></div></div>' +
+                            '<div class="box-body">';
+                        if (response.data.is_conflict_room == true) {
+                            panel_conflict += '<ul class="list-group"><li class="list-group-item"> <i class="fa fa-building-o"></i> Room <span class="badge bg-primary"> ' +
+                                response.data.room_info[0].department + '-' +
+                                response.data.room_info[0].degree +
+                                response.data.room_info[0].grade;
+                            if (response.data.room_info[0].group != null) {
+                                panel_conflict += '(' + response.data.room_info[0].group + ')';
+                            }
+                            if (response.data.room_info[0].option != null) {
+                                panel_conflict += '_' + response.data.room_info[0].option;
+                            }
+                            panel_conflict += '</span></li>';
+                        }
+                        if (response.data.is_conflict_lecturer == true) {
+                            panel_conflict += '<li class="list-group-item"><i class="fa fa-user"></i> Lecturer <span class="badge bg-primary"> ' +
+                                response.data.lecturer_info[0].department + '-' +
+                                response.data.lecturer_info[0].degree +
+                                response.data.lecturer_info[0].grade;
+                            if (response.data.lecturer_info[0].group != null) {
+                                panel_conflict += '(' + response.data.lecturer_info[0].group + ')';
+                            }
+                            if (response.data.lecturer_info[0].option != null) {
+                                panel_conflict += '_' + response.data.lecturer_info[0].option;
+                            }
+                            panel_conflict += '</span></li></ul>';
+                        }
+                        panel_conflict += '</div>';
+                        if (response.data.merge == true) {
+                            panel_conflict += '<div class="box-footer"> <button class="btn btn-primary btn-sm" id="merge">Merge</button> ' +
+                                '<button class="btn btn-default btn-sm btn-conflict-cancel">Cancel</button></div>';
+                        }
+
+                        $('#conflict').html(panel_conflict);
+                        $('#conflict').hide();
+                        $('#conflict').fadeIn();
+                    }
+                    else {
+                        $('.panel-conflict').hide();
+                    }
+                },
+                error: function () {
+                    //sweetAlert('Error...');
+                },
+                complete: function () {
+                    //sweetAlert('Completed...');
+                }
+            })
         }
 
         $(function () {
@@ -411,6 +482,7 @@
                 var week_id = $('select[name="weekly"] :selected').val();
                 var timetable_slot_id = $(this).attr('id');
                 get_suggest_room(academic_year_id, week_id, timetable_slot_id);
+                check_conflict(timetable_slot_id);
 
             });
 
@@ -514,6 +586,18 @@
                     search_rooms($(this).val());
                 }
             });
+
+            $(document).on('click', '.btn-conflict-cancel', function () {
+                $('#conflict').fadeOut();
+            });
+
+            $(document).on('change', '#options-filter', function () {
+                $('#conflict').fadeOut();
+            });
+
+            $(document).on('click', '#merge', function () {
+                console.log($('.side-course.course-selected').attr('id'));
+            })
         });
 
     </script>

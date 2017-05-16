@@ -72,4 +72,12 @@ interface TimetableSlotRepositoryContract
      * @return mixed
      */
     public function is_conflict_lecturer(TimetableSlot $timetableSlot);
+
+    /**
+     * Get associate with.
+     *
+     * @param TimetableSlot $timetableSlot
+     * @return mixed
+     */
+    public function get_conflict_with(TimetableSlot $timetableSlot);
 }
