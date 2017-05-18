@@ -21,6 +21,8 @@ Route::group(['namespace' => 'Schedule', 'prefix' => 'schedule'], function () {
     Route::post('timetables/get_conflict_info', 'TimetableController@get_conflict_info')->name('get_conflict_info');
     Route::post('timetables/merge_timetable_slot', 'TimetableController@merge_timetable_slot')->name('merge_timetable_slot');
 
+    Route::post('timetables/export_course_session', 'TimetableController@export_course_session')->name('export_course_session');
+
     /** Options controls. */
     Route::post('timetables/get_weeks', 'TimetableController@get_weeks')->name('admin.schedule.timetables.get_weeks');
     Route::post('timetables/get_options', 'TimetableController@get_options')->name('admin.schedule.timetables.get_options');

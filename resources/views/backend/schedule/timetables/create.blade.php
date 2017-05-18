@@ -220,6 +220,7 @@
                     'weekly': $('select[name="weekly"] :selected').val(),
                     'group': $('select[name="group"] :selected').val(),
                     'course_session_id': copiedEventObject.course_session_id,
+                    'slot_id': copiedEventObject.slot_id,
                     'course_name': copiedEventObject.course_name,
                     'teacher_name': copiedEventObject.teacher_name,
                     'course_type': copiedEventObject.course_type,
@@ -640,6 +641,23 @@
                     complete: function () {
                         $('#timetable').fullCalendar('refresh');
                         hide_conflict_information();
+                    }
+                });
+            });
+
+
+            $(document).on('click', '.btn_export_course_session', function () {
+                $.ajax({
+                    type: 'POST',
+                    url: '{!! route('export_course_session') !!}',
+                    success: function (response) {
+                        if (response.status == true) {
+                            get_course_sessions();
+                            toastr['success']('Slots was exported', 'Export Slots');
+                        }
+                        else {
+                            toastr['warning']('Slots was not exported', 'Export Slots');
+                        }
                     }
                 });
             })

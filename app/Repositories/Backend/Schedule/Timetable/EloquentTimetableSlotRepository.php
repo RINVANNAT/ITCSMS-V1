@@ -3,10 +3,13 @@
 namespace App\Repositories\Backend\Schedule\Timetable;
 
 use App\Http\Requests\Backend\Schedule\Timetable\CreateTimetableRequest;
+use App\Models\CourseAnnualClass;
 use App\Models\CourseSession;
 use App\Models\Group;
 use App\Models\Room;
 use App\Models\Schedule\Timetable\MergeTimetableSlot;
+use App\Models\Schedule\Timetable\Slot;
+use App\Models\Schedule\Timetable\SlotClass;
 use App\Models\Schedule\Timetable\Timetable;
 use App\Models\Schedule\Timetable\TimetableSlot;
 use Carbon\Carbon;
@@ -28,10 +31,10 @@ class EloquentTimetableSlotRepository implements TimetableSlotRepositoryContract
      */
     public function create_timetable_slot(Timetable $timetable, CreateTimetableRequest $request)
     {
-        $courseSession = CourseSession::find($request->course_session_id);
-        if ($courseSession instanceof CourseSession) {
+        $slot = Slot::find($request->slot_id);
+        if ($slot instanceof Slot) {
             $duration = $this->durations(new Carbon($request->start), new Carbon($request->end == null ? $request->start : $request->end));
-            if ($courseSession->time_remaining > 0 && $courseSession->time_remaining >= $duration) {
+            if ($slot->time_remaining > 0 && $slot->time_remaining >= $duration) {
                 $newTimetableSlot = new TimetableSlot();
 
                 $newTimetableSlot->timetable_id = $timetable->id;
@@ -47,8 +50,8 @@ class EloquentTimetableSlotRepository implements TimetableSlotRepositoryContract
                 $newTimetableSlot->updated_uid = auth()->user()->id;
 
                 if ($newTimetableSlot->save()) {
-                    $courseSession->time_remaining = $courseSession->time_remaining - $duration;
-                    $courseSession->update();
+                    $slot->time_remaining = $slot->time_remaining - $duration;
+                    $slot->update();
                     return $newTimetableSlot;
                 }
             }
@@ -287,5 +290,155 @@ class EloquentTimetableSlotRepository implements TimetableSlotRepositoryContract
             return true;
         }
         return false;
+    }
+
+    /**
+     * Export course sessions.
+     *
+     * @return mixed
+     */
+    public function export_course_sessions()
+    {
+        $flag = true;
+        $course_sessions = CourseSession::all();
+        foreach ($course_sessions as $course_session) {
+            if (count(Slot::where('course_session_id', $course_session->id)->get()) > 0) {
+                continue;
+            } else {
+                $course_annual_classes = CourseAnnualClass::where('course_session_id', $course_session->id)->get();
+                foreach ($course_annual_classes as $course_annual_class) {
+                    $newSlot = $this->export_slot($course_session);
+                    if ($newSlot instanceof Slot) {
+                        $this->export_slot_class($course_annual_class, $newSlot);
+                        $flag = true;
+                    } else {
+                        $flag = false;
+                    }
+                }
+                if ($flag == false) {
+                    break;
+                }
+            }
+        }
+
+        // Check course session was delete.
+        /*$slots = Slot::all();
+        if (count($slots)) {
+            foreach ($slots as $slot) {
+                if (CourseSession::find($slot->course_session_id) instanceof CourseSession) {
+                    continue;
+                } else {
+                    $slot->delete();
+                    $timetable_slots = TimetableSlot::where('course_session_id', $slot->course_session_id)->get();
+                    if (count($timetable_slots) > 0) {
+                        foreach ($timetable_slots as $timetable_slot) {
+                            TimetableSlot::find($timetable_slot->id)->delete();
+                        }
+                    }
+                }
+            }
+        }*/
+
+        if ($flag) {
+            return true;
+        }
+        return false;
+    }
+
+    /**
+     * Export from course_session to slots.
+     *
+     * @param CourseSession $course_session
+     * @return mixed
+     * @internal param CourseSession $courseSession
+     */
+    public function export_slot(CourseSession $course_session)
+    {
+        $newSlot = new Slot();
+        $newSlot->time_tp = $course_session->time_tp;
+        $newSlot->time_td = $course_session->time_td;
+        $newSlot->time_course = $course_session->time_course;
+        $newSlot->course_annual_id = $course_session->course_annual_id;
+        $newSlot->course_session_id = $course_session->id;
+        $newSlot->lecturer_id = $course_session->lecturer_id;
+        $newSlot->responsible_department_id = $course_session->responsible_department_id;
+        if ($newSlot->time_tp > 0) {
+            $newSlot->time_used = $newSlot->time_tp;
+            $newSlot->time_remaining = $newSlot->time_tp;
+        } else if ($newSlot->time_td > 0) {
+            $newSlot->time_used = $newSlot->time_td;
+            $newSlot->time_remaining = $newSlot->time_td;
+        } else {
+            $newSlot->time_used = $newSlot->time_course;
+            $newSlot->time_remaining = $newSlot->time_course;
+        }
+
+        $newSlot->created_uid = $course_session->create_uid;
+        $newSlot->write_uid = $course_session->write_uid;
+
+        if ($newSlot->save()) {
+            return $newSlot;
+        }
+        return false;
+    }
+
+    /**
+     * Export from course_annual_classes to slot_classes.
+     *
+     * @param CourseAnnualClass $course_annual_class
+     * @param Slot $newSlot
+     * @return mixed
+     */
+    public function export_slot_class(CourseAnnualClass $course_annual_class, Slot $newSlot)
+    {
+        $newSlotClass = new SlotClass();
+        $newSlotClass->group = $course_annual_class->group;
+        $newSlotClass->degree_id = $course_annual_class->degree_id;
+        $newSlotClass->course_annual_id = $course_annual_class->course_annaul_id;
+        $newSlotClass->grade_id = $course_annual_class->grade_id;
+        $newSlotClass->department_id = $course_annual_class->department_id;
+        $newSlotClass->created_uid = auth()->user()->id;
+        $newSlotClass->write_uid = $newSlotClass->created_uid;
+        $newSlotClass->department_option_id = $course_annual_class->department_option_id;
+        $newSlotClass->slot_id = $newSlot->id;
+        $newSlotClass->group_id = $course_annual_class->group_id;
+        return $newSlotClass->save();
+    }
+
+    /**
+     * Update course session and remove timetable slot.
+     *
+     * @param CourseSession $course_session
+     * @return mixed
+     */
+    public function update_course_session(CourseSession $course_session)
+    {
+        $slots = Slot::where('course_session_id', $course_session->id)->get();
+        foreach ($slots as $slot) {
+            $timetable_slots = TimetableSlot::where('course_session_id', $slot->course_session_id)->get();
+            foreach ($timetable_slots as $timetable_slot) {
+                $timetable_slot->delete();
+            }
+            $slot->time_tp = $course_session->time_tp;
+            $slot->time_td = $course_session->time_td;
+            $slot->time_course = $course_session->time_course;
+            $slot->course_annual_id = $course_session->course_annaul_id;
+            $slot->lecturer_id = $course_session->lecturer_id;
+            $slot->responsible_department_id = $course_session->responsible_department_id;
+            if ($slot->time_tp > 0) {
+                $slot->time_used = $slot->time_tp;
+                $slot->time_remaining = $slot->time_tp;
+            } else if ($slot->time_td > 0) {
+                $slot->time_used = $slot->time_td;
+                $slot->time_remaining = $slot->time_td;
+            } else {
+                $slot->time_used = $slot->time_course;
+                $slot->time_remaining = $slot->time_course;
+            }
+            $slot->created_uid = $course_session->create_uid;
+            $slot->write_uid = $course_session->write_uid;
+            $slot->update();
+        }
+
     }
 }

@@ -25,6 +25,7 @@ function drag_course_session() {
 
         // store data so the calendar knows to render an event upon drop
         $(this).data('event', {
+            slot_id: $(this).find('.slot-id').text(),
             course_session_id: $(this).find('.courses-session-id').text(),
             course_name: $(this).find('.course-name').text(),
             class_name: 'course-item',
@@ -148,7 +149,7 @@ function get_course_sessions() {
                         course_session_item += '<span style="margin-left: 28px;" class="course-type">Course</span> : ' +
                             '<span class="times">' + val.remaining + '</span> H'
                     }
-                    course_session_item += '<span class="text courses-session-id" style="display: none;">' + val.id + '</span><br>' + '</li>';
+                    course_session_item += '<span class="text courses-session-id" style="display: none;">' + val.course_session_id + '</span><span class="text slot-id" style="display: none;">' + val.id + '</span><br>' + '</li>';
                 });
 
                 $('.courses.todo-list').html(course_session_item);
