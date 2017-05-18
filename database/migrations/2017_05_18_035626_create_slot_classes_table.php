@@ -20,7 +20,7 @@ class CreateSlotClassesTable extends Migration
             $table->integer('course_annual_id')->unsigned()->index()->nullable();
             $table->integer('grade_id')->unsigned()->index()->nullable();
             $table->integer('department_id')->unsigned()->index()->nullable();
-            $table->integer('creatåed_uid')->unsigned()->index()->nullable();
+            $table->integer('created_uid')->unsigned()->index()->nullable();
             $table->integer('write_uid')->unsigned()->index()->nullable();
             $table->integer('department_option_id')->unsigned()->index()->nullable();
             $table->integer('slot_id')->unsigned()->index()->nullable();

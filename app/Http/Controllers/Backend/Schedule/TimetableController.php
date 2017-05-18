@@ -167,54 +167,49 @@ class TimetableController extends Controller
 
     /**
      * Show timetable's details page.
-     * @param $id
+     *
+     * @param Timetable $timetable
      * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View
-     * @internal param Timetable $timetable
      */
-    public function show($id)
+    public function show(Timetable $timetable)
     {
-        $timetable = Timetable::find($id);
-        if ($timetable instanceof Timetable) {
-            $timetable_slots = TimetableSlot::where('timetable_id', $timetable->id)
-                ->leftJoin('rooms', 'rooms.id', '=', 'timetable_slots.room_id')
-                ->leftJoin('buildings', 'buildings.id', '=', 'rooms.building_id')
-                ->select(
-                    'timetable_slots.id',
-                    'timetable_slots.course_name as title',
-                    'timetable_slots.course_name',
-                    'timetable_slots.teacher_name',
-                    'timetable_slots.type as course_type',
-                    'timetable_slots.start',
-                    'timetable_slots.end',
-                    'buildings.code as building',
-                    'rooms.name as room'
-                )
-                ->get();
+        $timetable_slots = TimetableSlot::where('timetable_id', $timetable->id)
+            ->leftJoin('rooms', 'rooms.id', '=', 'timetable_slots.room_id')
+            ->leftJoin('buildings', 'buildings.id', '=', 'rooms.building_id')
+            ->select(
+                'timetable_slots.id',
+                'timetable_slots.course_name as title',
+                'timetable_slots.course_name',
+                'timetable_slots.teacher_name',
+                'timetable_slots.type as type',
+                'timetable_slots.start',
+                'timetable_slots.end',
+                'buildings.code as building',
+                'rooms.name as room'
+            )
+            ->get();
+        $timetableSlots = new Collection();
+        foreach ($timetable_slots as $timetable_slot) {
+            if (($timetable_slot instanceof TimetableSlot) && is_object($timetable_slot)) {
 
-            $timetableSlots = new Collection();
-            foreach ($timetable_slots as $timetable_slot) {
-                if (($timetable_slot instanceof TimetableSlot) && is_object($timetable_slot)) {
-
-                    $newTimetableSlot = TimetableSlot::find($timetable_slot->id);
-                    $timetableSlot = new Collection($newTimetableSlot);
-                    if ($this->timetableSlotRepo->is_conflict_lecturer($newTimetableSlot)[0]['status'] == true) {
-                        $timetableSlot->put('is_conflict_lecturer', true);
-                    } else {
-                        $timetableSlot->put('is_conflict_lecturer', false);
-                    }
-                    if ($this->timetableSlotRepo->is_conflict_room($newTimetableSlot, Room::find($newTimetableSlot->room_id))[0]['status'] == true) {
-                        $timetableSlot->put('is_conflict_room', true);
-                    } else {
-                        $timetableSlot->put('is_conflict_room', false);
-                    }
-                    $timetableSlot->put('building', $timetable_slot->building);
-                    $timetableSlot->put('room', $timetable_slot->room);
-                    $timetableSlots->push($timetableSlot);
+                $newTimetableSlot = TimetableSlot::find($timetable_slot->id);
+                $timetableSlot = new Collection($newTimetableSlot);
+                if ($this->timetableSlotRepo->is_conflict_lecturer($newTimetableSlot)[0]['status'] == true) {
+                    $timetableSlot->put('is_conflict_lecturer', true);
+                } else {
+                    $timetableSlot->put('is_conflict_lecturer', false);
                 }
+                if ($this->timetableSlotRepo->is_conflict_room($newTimetableSlot, Room::find($newTimetableSlot->room_id))[0]['status'] == true) {
+                    $timetableSlot->put('is_conflict_room', true);
+                } else {
+                    $timetableSlot->put('is_conflict_room', false);
+                }
+                $timetableSlot->put('building', $timetable_slot->building);
+                $timetableSlot->put('room', $timetable_slot->room);
+                $timetableSlots->push($timetableSlot);
             }
         }
-        //dd($timetableSlots->toJson());
-        return view('backend.schedule.timetables.show', compact('timetableSlots'));
+        return view('backend.schedule.timetables.show', compact('timetableSlots', 'timetable'));
     }
 
     /**

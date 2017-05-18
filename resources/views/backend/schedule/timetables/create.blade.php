@@ -17,6 +17,7 @@
     {!! Html::style('plugins/jQueryUI/jquery-ui.css') !!}
     {!! Html::style('plugins/fullcalendar/fullcalendar.css') !!}
     {!! Html::style('plugins/sweetalert2/dist/sweetalert2.css') !!}
+    {!! Html::style('plugins/iCheck/all.css') !!}
     {!! Html::style('plugins/toastr/toastr.min.css') !!}
     {!! Html::style('css/backend/schedule/timetable.css') !!}
     <style type="text/css">
@@ -38,7 +39,49 @@
         <div class="box-header with-border">
             <div class="mailbox-controls">
                 <div class="pull-right">
-                    @include('backend.schedule.timetables.includes.partials.buttons-action')
+                    @permission('generate-timetable')
+                    <a href="#">
+                        <button class="btn btn-primary btn-sm"
+                                data-placement="right"
+                                title="Tooltip on top"
+                                disabled="true">
+                            {{ trans('buttons.backend.schedule.timetable.generate') }}
+                        </button>
+                    </a>
+                    @endauth
+
+                    @permission('clone-timetable')
+                    <button class="btn btn-success btn-sm btn_clone_timetable"
+                            data-toggle="modal"
+                            data-target="#clone-timetable"
+                            data-toggle="tooltip"
+                            data-placement="top"
+                            title="{{ trans('buttons.backend.schedule.timetable.clone') }}">
+                        {{ trans('buttons.backend.schedule.timetable.clone') }}
+                    </button>
+                    @endauth
+
+                    @permission('publish-timetable')
+                    <a href="#">
+                        <button class="btn btn-info btn-sm"
+                                data-toggle="tooltip"
+                                data-placement="top"
+                                title="{{ trans('buttons.backend.schedule.timetable.publish') }}">
+                            {{ trans('buttons.backend.schedule.timetable.publish') }}
+                        </button>
+                    </a>
+                    @endauth
+
+                    @permission('save-change-timetable')
+                    <a href="#">
+                        <button class="btn btn-danger btn-sm"
+                                data-toggle="tooltip"
+                                data-placement="top"
+                                title="{{ trans('buttons.backend.schedule.timetable.save_change') }}">
+                            {{ trans('buttons.backend.schedule.timetable.save_change') }}
+                        </button>
+                    </a>
+                    @endauth
                 </div>
 
                 <form name="options-filter"
@@ -69,16 +112,19 @@
         </div>
         <div class="panel-conflict box box-danger" id="conflict" style="display: none;"></div>
     </div>
+
+    @include('backend.schedule.timetables.includes.modals.clone')
 @stop
 
 @section('after-scripts-end')
-
+    {!! Html::script('plugins/iCheck/icheck.js') !!}
     {!! Html::script('plugins/datatables/jquery.dataTables.min.js') !!}
     {!! Html::script('plugins/datatables/dataTables.bootstrap.min.js') !!}
     {!! Html::script('plugins/moment/moment.min.js') !!}
     {!! Html::script('plugins/fullcalendar/fullcalendar.js') !!}
     {!! Html::script('plugins/sweetalert2/dist/sweetalert2.js') !!}
     {!! Html::script('plugins/toastr/toastr.min.js') !!}
+    {!! Html::script('js/backend/schedule/clone-timetable.js') !!}
     {!! Html::script('js/backend/schedule/timetable.js') !!}
 
     <script type="text/javascript">
