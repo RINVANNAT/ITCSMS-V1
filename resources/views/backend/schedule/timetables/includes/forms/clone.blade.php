@@ -24,7 +24,7 @@
 {{--class="square"--}}
 <div class="form-group">
     <div class="col-md-8 col-md-offset-2">
-        <div class="row">
+        <div class="row render_weeks">
             @for($i=1; $i<=18; $i++)
                 <div class="col-md-3">
                     <label for="{{ $i }}">

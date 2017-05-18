@@ -26,7 +26,29 @@
         <div class="box-header with-border">
             <div class="mailbox-controls">
                 <div class="pull-right">
-                    @include('backend.schedule.timetables.includes.partials.buttons-action')
+                    @if(isset($timetable) && $timetable->completed == true)
+                        @permission('clone-timetable')
+                        <button class="btn btn-success btn-sm"
+                                data-toggle="modal"
+                                data-target="#clone-timetable"
+                                data-toggle="tooltip"
+                                data-placement="top"
+                                title="{{ trans('buttons.backend.schedule.timetable.clone') }}">
+                            {{ trans('buttons.backend.schedule.timetable.clone') }}
+                        </button>
+                        @endauth
+                    @else
+                        @permission('publish-timetable')
+                        <a href="#">
+                            <button class="btn btn-info btn-sm"
+                                    data-toggle="tooltip"
+                                    data-placement="top"
+                                    title="{{ trans('buttons.backend.schedule.timetable.publish') }}">
+                                {{ trans('buttons.backend.schedule.timetable.publish') }}
+                            </button>
+                        </a>
+                        @endauth
+                    @endif
                 </div>
 
                 @permission('create-timetable')
@@ -98,10 +120,8 @@
                 maxTime: '20:00:00',
                 slotLabelFormat: 'h:mm a',
                 columnFormat: 'dddd',
-                editable: true,
-                droppable: true,
                 dragRevertDuration: 0,
-                events: '{!! json_encode($timetableSlots) !!}',
+                events: {!! $timetableSlots !!},
                 eventRender: function (event, element, view) {
                     var object = '<a class="fc-time-grid-event fc-v-event fc-event fc-start fc-end course-item  fc-draggable fc-resizable" style="top: 65px; bottom: -153px; z-index: 1; left: 0%; right: 0%;">' +
                         '<div class="fc-content">' +
@@ -140,7 +160,7 @@
                     return $(object);
                 }
             });
-        };
+        }
 
         $(function () {
             get_timetable();

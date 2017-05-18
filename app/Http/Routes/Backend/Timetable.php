@@ -5,7 +5,7 @@ Route::group(['namespace' => 'Schedule', 'prefix' => 'schedule'], function () {
     /** Http Requesting. */
     Route::get('/timetables', 'TimetableController@index')->name('admin.schedule.timetables.index');
     Route::get('/timetables/create', 'TimetableController@create')->name('admin.schedule.timetables.create');
-    Route::get('/timetables/show/{id}', 'TimetableController@show')->name('admin.schedule.timetables.show');
+    Route::get('/timetables/show/{timetable}', 'TimetableController@show')->name('admin.schedule.timetables.show');
     Route::get('/timetables/delete/{id}', 'TimetableController@delete')->name('admin.schedule.timetables.delete');
     Route::post('/timetables/get_timetables', 'TimetableController@get_timetables')->name('admin.schedule.timetables.get_timetables');
 
@@ -34,6 +34,6 @@ Route::group(['namespace' => 'Schedule', 'prefix' => 'schedule'], function () {
 
     /** Clone route. */
     Route::post('timetables/clone', 'TimetableController@cloneTimetable')->name('admin.schedule.timetables.clone');
-
+    Route::post('timetables/clone/weeks', 'TimetableController@get_all_weeks')->name('clone.weeks');
 });
 
