@@ -3,7 +3,10 @@
 namespace App\Repositories\Backend\Schedule\Timetable;
 
 use App\Http\Requests\Backend\Schedule\Timetable\CreateTimetableRequest;
+use App\Models\CourseAnnualClass;
+use App\Models\CourseSession;
 use App\Models\Room;
+use App\Models\Schedule\Timetable\Slot;
 use App\Models\Schedule\Timetable\Timetable;
 use App\Models\Schedule\Timetable\TimetableSlot;
 use Carbon\Carbon;
@@ -80,4 +83,60 @@ interface TimetableSlotRepositoryContract
      * @return mixed
      */
     public function get_conflict_with(TimetableSlot $timetableSlot);
+
+    /**
+     * Get room info with building.
+     *
+     * @param $room_id
+     * @return mixed
+     */
+    public function get_room_info($room_id);
+
+    /**
+     * Get group information.
+     *
+     * @param $group_id
+     * @return mixed
+     */
+    public function get_group_info($group_id);
+
+    /**
+     * Check is already merged.
+     *
+     * @param TimetableSlot $timetableSlot
+     * @return mixed
+     */
+    public function is_merged(TimetableSlot $timetableSlot);
+
+    /**
+     * Export course sessions.
+     *
+     * @return mixed
+     */
+    public function export_course_sessions();
+
+    /**
+     * Export from course_session to slots.
+     *
+     * @param CourseSession $courseSession
+     * @return mixed
+     */
+    public function export_slot(CourseSession $courseSession);
+
+    /**
+     * Export from course_annual_classes to slot_classes.
+     *
+     * @param CourseAnnualClass $courseAnnualClass
+     * @param Slot $slot
+     * @return mixed
+     */
+    public function export_slot_class(CourseAnnualClass $courseAnnualClass, Slot $slot);
+
+    /**
+     * Update course session and remove timetable slot.
+     *
+     * @param CourseSession $course_session
+     * @return mixed
+     */
+    public function update_course_session(CourseSession $course_session);
 }

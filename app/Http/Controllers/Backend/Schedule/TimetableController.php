@@ -213,8 +213,7 @@ class TimetableController extends Controller
                 }
             }
         }
-
-        dd($timetableSlots->toJson());
+        //dd($timetableSlots->toJson());
         return view('backend.schedule.timetables.show', compact('timetableSlots'));
     }
 
@@ -246,6 +245,12 @@ class TimetableController extends Controller
         return Response::json(['status' => false]);
     }
 
+    /**
+     * Delete timetable.
+     *
+     * @param DeleteTimetableRequest $request
+     * @return mixed
+     */
     public function delete(DeleteTimetableRequest $request)
     {
         if (Timetable::find($request->id) instanceof Timetable) {
