@@ -122,7 +122,6 @@ trait AjaxFilterTimetableController
      */
     public function get_course_sessions()
     {
-        //$this->timetableSlotRepo->set_value_into_time_remaining_course_session();
         $academic_year_id = request('academicYear');
         $department_id = request('department');
         $degree_id = request('degree');
@@ -141,13 +140,8 @@ trait AjaxFilterTimetableController
                 ['course_annuals.department_option_id', $option_id],
             ])
             ->join('slots', 'slots.course_annual_id', '=', 'course_annuals.id')
-            ->whereNotNull('slots.lecturer_id')
-            ->join('employees', 'employees.id', '=', 'slots.lecturer_id')
-            ->where(function ($query) use ($group_id) {
-                $groups = DB::table('slot_classes')->where('slot_classes.group_id', $group_id)
-                    ->lists('slot_classes.slot_id');
-                $query->whereIn('slots.id', $groups == null ? [] : $groups);
-            })
+            ->leftJoin('employees', 'employees.id', '=', 'slots.lecturer_id')
+            ->where('slots.group_id', '=', $group_id)
             ->where('slots.time_remaining', '>', 0)
             ->select(
                 'slots.id as id',

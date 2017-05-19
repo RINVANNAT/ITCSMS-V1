@@ -113,7 +113,12 @@
 .courses .course-item {
     cursor: move;
 }
-
+.course-item.disabled {
+    background-color: #3a87ad;
+    color: #ffffff !important;
+    border-left: 2px solid #d73925;
+    cursor: not-allowed;
+}
 .box.box-success .panel-conflict {
     position: fixed;
     bottom: 10px;
