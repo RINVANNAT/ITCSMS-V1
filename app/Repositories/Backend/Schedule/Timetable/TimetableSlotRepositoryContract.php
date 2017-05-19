@@ -144,8 +144,7 @@ interface TimetableSlotRepositoryContract
      * Course session change group or not.
      *
      * @param CourseSession $course_session
-     * @param Slot $slot
      * @return mixed
      */
-    public function change_group_on_course_session(CourseSession $course_session, Slot $slot);
+    public function change_group_on_course_session(CourseSession $course_session);
 }

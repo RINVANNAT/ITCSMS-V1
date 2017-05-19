@@ -195,10 +195,19 @@ trait AjaxFilterTimetableController
                 ['department_option_id', $option_id]
             ])
             ->join('groups', 'groups.id', '=', 'studentAnnuals.group_id')
-            ->orderBy('groups.code', 'asc')
+            ->orderBy('groups.code', 'desc')
             ->select('studentAnnuals.group_id as id', 'groups.code as name')
             ->distinct('studentAnnuals.group_id')
             ->get();
+
+        // sort groups name.
+        usort($groups, function ($a, $b) {
+            if (is_numeric($a->name)) {
+                return $a->name - $b->name;
+            } else {
+                return strcmp($a->name, $b->name);
+            }
+        });
 
         if (count($groups) > 1) {
             return Response::json(['status' => true, 'groups' => $groups]);

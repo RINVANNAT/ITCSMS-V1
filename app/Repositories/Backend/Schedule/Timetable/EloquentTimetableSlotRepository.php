@@ -414,6 +414,7 @@ class EloquentTimetableSlotRepository implements TimetableSlotRepositoryContract
     public function update_course_session(CourseSession $course_session)
     {
         $slots = Slot::where('course_session_id', $course_session->id)->get();
+
         foreach ($slots as $slot) {
             $timetable_slots = TimetableSlot::where('course_session_id', $slot->course_session_id)->get();
             if (count($timetable_slots) > 0) {
@@ -421,17 +422,55 @@ class EloquentTimetableSlotRepository implements TimetableSlotRepositoryContract
                     $timetable_slot->delete();
                 }
             }
-            if ($this->change_group_on_course_session($course_session, $slot)) {
-                $oldSlots = Slot::where('course_session_id', $course_session->id);
-                if (count($oldSlots->get()) > 0) {
-                    $oldSlots->delete();
+            if ($this->change_group_on_course_session($course_session) == false) {
+
+                $oldSlots = Slot::where('course_session_id', $course_session->id)->get();
+
+                if (count($oldSlots) > 0) {
+                    foreach ($oldSlots as $oldSlot) {
+                        $oldSlot->delete();
+                    }
                 }
-                $course_annual_classes = CourseAnnualClass::where('course_annual_id', $course_session->course_annual_id)->get();
+
+                $course_annual_classes = CourseAnnualClass::where('course_session_id', $course_session->id)
+                    ->whereNull('course_annual_id')->get();
+
                 if (count($course_annual_classes) > 0) {
                     foreach ($course_annual_classes as $course_annual_class) {
-                        $newSlot = $this->export_slot($course_session);
-                        if ($newSlot instanceof Slot) {
-                            $this->export_slot_class($course_annual_class, $newSlot);
+                        $newSlot = new Slot();
+                        $newSlot->time_tp = $course_session->time_tp;
+                        $newSlot->time_td = $course_session->time_td;
+                        $newSlot->time_course = $course_session->time_course;
+                        $newSlot->course_annual_id = $course_session->course_annual_id;
+                        $newSlot->course_session_id = $course_session->id;
+                        $newSlot->lecturer_id = $course_session->lecturer_id;
+                        $newSlot->responsible_department_id = $course_session->responsible_department_id;
+                        if ($newSlot->time_tp > 0) {
+                            $newSlot->time_used = $newSlot->time_tp;
+                            $newSlot->time_remaining = $newSlot->time_tp;
+                        } else if ($newSlot->time_td > 0) {
+                            $newSlot->time_used = $newSlot->time_td;
+                            $newSlot->time_remaining = $newSlot->time_td;
+                        } else {
+                            $newSlot->time_used = $newSlot->time_course;
+                            $newSlot->time_remaining = $newSlot->time_course;
+                        }
+
+                        $newSlot->created_uid = $course_session->create_uid;
+                        $newSlot->write_uid = $course_session->write_uid;
+                        if ($newSlot->save()) {
+                            $newSlotClass = new SlotClass();
+                            $newSlotClass->group = $course_annual_class->group;
+                            $newSlotClass->degree_id = $course_annual_class->degree_id;
+                            $newSlotClass->course_annual_id = $course_annual_class->course_annaul_id;
+                            $newSlotClass->grade_id = $course_annual_class->grade_id;
+                            $newSlotClass->department_id = $course_annual_class->department_id;
+                            $newSlotClass->created_uid = auth()->user()->id;
+                            $newSlotClass->write_uid = $newSlotClass->created_uid;
+                            $newSlotClass->department_option_id = $course_annual_class->department_option_id;
+                            $newSlotClass->slot_id = $newSlot->id;
+                            $newSlotClass->group_id = $course_annual_class->group_id;
+                            $newSlotClass->save();
                         }
                     }
                 }
@@ -464,28 +503,38 @@ class EloquentTimetableSlotRepository implements TimetableSlotRepositoryContract
      * Course session change group or not.
      *
      * @param CourseSession $course_session
-     * @param Slot $slot
      * @return  mixed
      */
-    public function change_group_on_course_session(CourseSession $course_session, Slot $slot)
+    public function change_group_on_course_session(CourseSession $course_session)
     {
-        $course_annual_classes = CourseAnnualClass::where('course_annual_id', $course_session->course_annual_id)->get();
+        $flag = true;
+        $course_annual_classes = CourseAnnualClass::where('course_session_id', $course_session->id)
+            ->whereNull('course_annual_id')->get();
+        $slots = Slot::where('course_session_id', $course_session->id)->get();
+        if (count($slots) > 0) {
+            $array_group_id = array();
+            foreach ($slots as $slot) {
+                $slot_class = SlotClass::where('slot_id', $slot->id)->first();
+                array_push($array_group_id, $slot_class->group_id);
+            }
+        }
         if (count($course_annual_classes) > 0) {
-            $slot_classes = SlotClass::where('course_annual_id', $course_session->course_annual_id)->lists('group_id');
-            if (count($slot_classes) > 0) {
-                if (count($course_annual_classes) == count($slot_classes)) {
+            if (count($array_group_id) > 0) {
+                if (count($course_annual_classes) == count($array_group_id)) {
                     foreach ($course_annual_classes as $course_annual_class) {
-                        if (in_array($course_annual_class->group_id, $slot_classes)) {
+                        if (in_array($course_annual_class->group_id, $array_group_id)) {
+                            $flag = false;
                             continue;
                         } else {
-                            return true;
+                            $flag = true;
+                            break;
                         }
                     }
                 } else {
-                    return true;
+                    $flag = false;
                 }
-                return false;
             }
         }
+        return $flag;
     }
 }

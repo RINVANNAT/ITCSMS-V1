@@ -464,7 +464,13 @@ class CourseAnnualController extends Controller
             ->get();
 
         usort($array_groups, function ($a, $b) {
-            return $a->group_code - $b->group_code;
+
+            if(is_numeric($a->group_code)) {
+                return $a->group_code - $b->group_code;
+            } else {
+                return strcmp($a->group_code, $b->group_code);
+            }
+
         });
 
         $groups = $array_groups;
