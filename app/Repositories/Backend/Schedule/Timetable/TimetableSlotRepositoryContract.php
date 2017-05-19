@@ -6,7 +6,6 @@ use App\Http\Requests\Backend\Schedule\Timetable\CreateTimetableRequest;
 use App\Models\CourseAnnualClass;
 use App\Models\CourseSession;
 use App\Models\Room;
-use App\Models\Schedule\Timetable\Slot;
 use App\Models\Schedule\Timetable\Timetable;
 use App\Models\Schedule\Timetable\TimetableSlot;
 use Carbon\Carbon;
@@ -43,13 +42,6 @@ interface TimetableSlotRepositoryContract
      * @return mixed
      */
     public function durations(Carbon $start, Carbon $end);
-
-    /**
-     * Set value into remaining column course_session.
-     *
-     * @return mixed
-     */
-    public function set_value_into_time_remaining_course_session();
 
     /**
      * Define timetable slot hos conflict room.
@@ -119,18 +111,10 @@ interface TimetableSlotRepositoryContract
      * Export from course_session to slots.
      *
      * @param CourseSession $courseSession
-     * @return mixed
-     */
-    public function export_slot(CourseSession $courseSession);
-
-    /**
-     * Export from course_annual_classes to slot_classes.
-     *
      * @param CourseAnnualClass $courseAnnualClass
-     * @param Slot $slot
      * @return mixed
      */
-    public function export_slot_class(CourseAnnualClass $courseAnnualClass, Slot $slot);
+    public function export_slot(CourseSession $courseSession, CourseAnnualClass $courseAnnualClass);
 
     /**
      * Update course session and remove timetable slot.
@@ -139,13 +123,4 @@ interface TimetableSlotRepositoryContract
      * @return mixed
      */
     public function update_course_session(CourseSession $course_session);
-
-    /**
-     * Course session change group or not.
-     *
-     * @param CourseSession $course_session
-     * @param Slot $slot
-     * @return mixed
-     */
-    public function change_group_on_course_session(CourseSession $course_session, Slot $slot);
 }

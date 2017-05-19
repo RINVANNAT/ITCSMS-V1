@@ -723,7 +723,11 @@ trait CourseSessionTrait
 
 
         usort($group_by_course_annual, function ($a, $b) {
-            return $a->group_code - $b->group_code;
+            if(is_numeric($a->group_code)){
+                return $a->group_code - $b->group_code;
+            }else{
+                return strcmp($a->group_code, $b->group_code);
+            }
         });
         if ($courseAnnual) {
             return view('backend.course.courseAnnual.includes.popup_edit_course_annual', compact('group_by_course_annual', 'course', 'selected_groups'));

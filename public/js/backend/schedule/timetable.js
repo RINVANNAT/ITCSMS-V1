@@ -22,7 +22,6 @@ $(document).ready(function () {
 function drag_course_session() {
 
     $('.courses .course-item').each(function () {
-
         // store data so the calendar knows to render an event upon drop
         $(this).data('event', {
             slot_id: $(this).find('.slot-id').text(),
@@ -33,14 +32,14 @@ function drag_course_session() {
             course_type: $(this).find('.course-type').text(),
             times: $(this).find('.times').text()
         });
-
-        // make the event draggable using jQuery UI
-        $(this).draggable({
-            zIndex: 999,
-            revert: true,      // will cause the event to go back to its
-            revertDuration: 0  //  original position after the drag
-        });
-
+        if ($(this).data('event').teacher_name != 'Unsigned') {
+            // make the event draggable using jQuery UI
+            $(this).draggable({
+                zIndex: 999,
+                revert: true,      // will cause the event to go back to its
+                revertDuration: 0  //  original position after the drag
+            });
+        }
     });
 }
 
@@ -130,13 +129,22 @@ function get_course_sessions() {
             if (response.status == true) {
                 var course_session_item = '';
                 $.each(response.course_sessions, function (key, val) {
-                    course_session_item += '<li class="course-item">' +
-                        '<span class="handle ui-sortable-handle">' +
+                    if (val.teacher_name == null) {
+                        course_session_item += '<li class="course-item disabled">';
+                    }
+                    else {
+                        course_session_item += '<li class="course-item">';
+                    }
+                    course_session_item += '<span class="handle ui-sortable-handle">' +
                         '<i class="fa fa-ellipsis-v"></i> ' +
                         '<i class="fa fa-ellipsis-v"></i>' +
                         '</span>' +
-                        '<span class="text course-name">' + val.course_name + '</span><br>' +
-                        '<span style="margin-left: 28px;" class="teacher-name">' + val.teacher_name + '</span><br/>';
+                        '<span class="text course-name">' + val.course_name + '</span><br>';
+                    if (val.teacher_name == null) {
+                        course_session_item += '<span style="margin-left: 28px;" class="teacher-name">Unsigned</span><br/>';
+                    } else {
+                        course_session_item += '<span style="margin-left: 28px;" class="teacher-name">' + val.teacher_name + '</span><br/>';
+                    }
                     if (val.tp != 0) {
                         course_session_item += '<span style="margin-left: 28px;" class="course-type">TP</span> : ' +
                             '<span class="times">' + val.remaining + '</span> H'

@@ -22,6 +22,7 @@ class CreateSlotsTable extends Migration
             $table->integer('course_session_id')->unsigned();
             $table->integer('lecturer_id')->unsigned()->nullable();
             $table->integer('responsible_department_id')->unsigned()->nullable();
+            $table->integer('group_id')->unsigned()->nullable();
             $table->integer('time_used')->nullable();
             $table->integer('time_remaining')->nullable();
 
@@ -37,6 +38,11 @@ class CreateSlotsTable extends Migration
             $table->foreign('course_session_id')
                 ->references('id')
                 ->on('course_sessions')
+                ->onDelete('cascade');
+
+            $table->foreign('group_id')
+                ->references('id')
+                ->on('groups')
                 ->onDelete('cascade');
 
             $table->timestamps();
