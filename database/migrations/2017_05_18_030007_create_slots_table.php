@@ -20,8 +20,8 @@ class CreateSlotsTable extends Migration
             $table->integer('time_course')->default(0);
             $table->integer('course_annual_id')->unsigned();
             $table->integer('course_session_id')->unsigned();
-            $table->integer('lecturer_id')->unsigned();
-            $table->integer('responsible_department_id')->unsigned()->nullable();;
+            $table->integer('lecturer_id')->unsigned()->nullable();
+            $table->integer('responsible_department_id')->unsigned()->nullable();
             $table->integer('time_used')->nullable();
             $table->integer('time_remaining')->nullable();
 
@@ -43,9 +43,9 @@ class CreateSlotsTable extends Migration
         });
 
         // Remove time_used and time_remaining columns from course_sessions table.
-        Schema::table('course_sessions', function (Blueprint $table) {
+       /* Schema::table('course_sessions', function (Blueprint $table) {
             $table->dropColumn(['time_used', 'time_remaining']);
-        });
+        });*/
     }
 
     /**

@@ -35,6 +35,7 @@ use App\Repositories\Backend\CourseAnnualScore\CourseAnnualScoreRepositoryContra
 use App\Repositories\Backend\CourseSession\CourseSessionRepositoryContract;
 use App\Repositories\Backend\Percentage\PercentageRepositoryContract;
 use App\Repositories\Backend\ResitStudentAnnual\ResitStudentAnnualRepositoryContract;
+use App\Repositories\Backend\Schedule\Timetable\TimetableSlotRepositoryContract;
 use App\Traits\CourseAnnualTrait;
 use App\Traits\CourseSessionTrait;
 use App\Traits\ScoreProp;
@@ -69,6 +70,7 @@ class CourseAnnualController extends Controller
     protected $courseAnnualClasses;
     protected $courseSessions;
     protected $resitStudentAannuals;
+    protected $timetableSlots;
 
     /**
      * @param CourseAnnualRepositoryContract $courseAnnualRepo
@@ -81,7 +83,8 @@ class CourseAnnualController extends Controller
         AverageRepositoryContract $averageRepo,
         CourseAnnualClassRepositoryContract $courseAnnualClassRepo,
         CourseSessionRepositoryContract $courseSessionRepo,
-        ResitStudentAnnualRepositoryContract $resitStudentRepo
+        ResitStudentAnnualRepositoryContract $resitStudentRepo,
+        TimetableSlotRepositoryContract $timetableSlotRepo
 
     )
     {
@@ -93,6 +96,7 @@ class CourseAnnualController extends Controller
         $this->courseAnnualClasses = $courseAnnualClassRepo;
         $this->courseSessions = $courseSessionRepo;
         $this->resitStudentAannuals = $resitStudentRepo;
+        $this->timetableSlots = $timetableSlotRepo;
     }
 
     /**

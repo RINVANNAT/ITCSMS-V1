@@ -416,29 +416,76 @@ class EloquentTimetableSlotRepository implements TimetableSlotRepositoryContract
         $slots = Slot::where('course_session_id', $course_session->id)->get();
         foreach ($slots as $slot) {
             $timetable_slots = TimetableSlot::where('course_session_id', $slot->course_session_id)->get();
-            foreach ($timetable_slots as $timetable_slot) {
-                $timetable_slot->delete();
+            if (count($timetable_slots) > 0) {
+                foreach ($timetable_slots as $timetable_slot) {
+                    $timetable_slot->delete();
+                }
             }
-            $slot->time_tp = $course_session->time_tp;
-            $slot->time_td = $course_session->time_td;
-            $slot->time_course = $course_session->time_course;
-            $slot->course_annual_id = $course_session->course_annaul_id;
-            $slot->lecturer_id = $course_session->lecturer_id;
-            $slot->responsible_department_id = $course_session->responsible_department_id;
-            if ($slot->time_tp > 0) {
-                $slot->time_used = $slot->time_tp;
-                $slot->time_remaining = $slot->time_tp;
-            } else if ($slot->time_td > 0) {
-                $slot->time_used = $slot->time_td;
-                $slot->time_remaining = $slot->time_td;
+            if ($this->change_group_on_course_session($course_session, $slot)) {
+                $oldSlots = Slot::where('course_session_id', $course_session->id);
+                if (count($oldSlots->get()) > 0) {
+                    $oldSlots->delete();
+                }
+                $course_annual_classes = CourseAnnualClass::where('course_annual_id', $course_session->course_annual_id)->get();
+                if (count($course_annual_classes) > 0) {
+                    foreach ($course_annual_classes as $course_annual_class) {
+                        $newSlot = $this->export_slot($course_session);
+                        if ($newSlot instanceof Slot) {
+                            $this->export_slot_class($course_annual_class, $newSlot);
+                        }
+                    }
+                }
             } else {
-                $slot->time_used = $slot->time_course;
-                $slot->time_remaining = $slot->time_course;
+                $slot->time_tp = $course_session->time_tp;
+                $slot->time_td = $course_session->time_td;
+                $slot->time_course = $course_session->time_course;
+                $slot->course_annual_id = $course_session->course_annual_id;
+                $slot->lecturer_id = $course_session->lecturer_id == null ? null : $course_session->lecturer_id;
+                $slot->responsible_department_id = $course_session->responsible_department_id;
+                if ($slot->time_tp > 0) {
+                    $slot->time_used = $slot->time_tp;
+                    $slot->time_remaining = $slot->time_tp;
+                } else if ($slot->time_td > 0) {
+                    $slot->time_used = $slot->time_td;
+                    $slot->time_remaining = $slot->time_td;
+                } else {
+                    $slot->time_used = $slot->time_course;
+                    $slot->time_remaining = $slot->time_course;
+                }
+                $slot->created_uid = $course_session->create_uid;
+                $slot->write_uid = $course_session->write_uid;
+                $slot->update();
             }
-            $slot->created_uid = $course_session->create_uid;
-            $slot->write_uid = $course_session->write_uid;
-            $slot->update();
         }
 
+    }
+
+    /**
+     * Course session change group or not.
+     *
+     * @param CourseSession $course_session
+     * @param Slot $slot
+     * @return  mixed
+     */
+    public function change_group_on_course_session(CourseSession $course_session, Slot $slot)
+    {
+        $course_annual_classes = CourseAnnualClass::where('course_annual_id', $course_session->course_annual_id)->get();
+        if (count($course_annual_classes) > 0) {
+            $slot_classes = SlotClass::where('course_annual_id', $course_session->course_annual_id)->lists('group_id');
+            if (count($slot_classes) > 0) {
+                if (count($course_annual_classes) == count($slot_classes)) {
+                    foreach ($course_annual_classes as $course_annual_class) {
+                        if (in_array($course_annual_class->group_id, $slot_classes)) {
+                            continue;
+                        } else {
+                            return true;
+                        }
+                    }
+                } else {
+                    return true;
+                }
+                return false;
+            }
+        }
     }
 }

@@ -131,8 +131,6 @@ trait AjaxFilterTimetableController
         $option_id = request('option') == null ? null : request('option');
         $group_id = request('group') == null ? null : request('group');
 
-
-        /*dd(request('group'));*/
         $course_sessions = DB::table('course_annuals')
             ->where([
                 ['course_annuals.academic_year_id', $academic_year_id],
@@ -143,8 +141,8 @@ trait AjaxFilterTimetableController
                 ['course_annuals.department_option_id', $option_id],
             ])
             ->join('slots', 'slots.course_annual_id', '=', 'course_annuals.id')
-            ->join('course_sessions', 'slots.course_session_id', '=', 'course_sessions.id')
-            ->leftJoin('employees', 'employees.id', '=', 'slots.lecturer_id')
+            ->whereNotNull('slots.lecturer_id')
+            ->join('employees', 'employees.id', '=', 'slots.lecturer_id')
             ->where(function ($query) use ($group_id) {
                 $groups = DB::table('slot_classes')->where('slot_classes.group_id', $group_id)
                     ->lists('slot_classes.slot_id');
@@ -153,15 +151,15 @@ trait AjaxFilterTimetableController
             ->where('slots.time_remaining', '>', 0)
             ->select(
                 'slots.id as id',
-                'course_sessions.id as course_session_id',
+                'slots.course_session_id as course_session_id',
                 'slots.time_tp as tp',
                 'slots.time_td as td',
                 'slots.time_course as tc',
                 'slots.time_remaining as remaining',
                 'course_annuals.name_en as course_name',
                 'employees.name_latin as teacher_name'
-            )
-            ->get();
+            )->get();
+
         // dd($course_sessions);
         if (count($course_sessions) > 0) {
             return Response::json([
