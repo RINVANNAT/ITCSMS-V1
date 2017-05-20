@@ -98,6 +98,7 @@ function get_weeks(semester_id) {
 
 /** Get options. **/
 function get_options(department_id) {
+    toggleLoading(true);
     $.ajax({
         type: 'POST',
         url: '/admin/schedule/timetables/get_options',
@@ -115,6 +116,7 @@ function get_options(department_id) {
         },
         complete: function () {
             get_groups();
+            toggleLoading(false);
         }
     });
 }
@@ -130,7 +132,7 @@ function get_course_sessions() {
                 var course_session_item = '';
                 $.each(response.course_sessions, function (key, val) {
                     if (val.teacher_name == null) {
-                        course_session_item += '<li class="course-item disabled">';
+                        course_session_item += '<li class="course-item disabled" data-toggle="tooltip" data-placement="left" title="Please assign teacher !">';
                     }
                     else {
                         course_session_item += '<li class="course-item">';

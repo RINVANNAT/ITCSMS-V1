@@ -693,6 +693,7 @@
 
 
             $(document).on('click', '.btn_export_course_session', function () {
+                toggleLoading(true);
                 $.ajax({
                     type: 'POST',
                     url: '{!! route('export_course_session') !!}',
@@ -704,6 +705,9 @@
                         else {
                             toastr['warning']('Slots was not exported', 'Export Slots');
                         }
+                    },
+                    complete:function () {
+                        toggleLoading(false);
                     }
                 });
             })

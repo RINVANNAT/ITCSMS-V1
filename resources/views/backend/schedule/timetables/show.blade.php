@@ -128,9 +128,9 @@
                         '<div class="container-room">' +
                         '<div class="side-course" id="' + event.id + '">';
                     if (event.is_conflict_course == true) {
-                        object += '<div class="fc-title conflict">' + (event.course_name).substring(0, 10) + '...</div>';
+                        object += '<div class="fc-title conflict">' + event.course_name + '...</div>';
                     } else {
-                        object += '<div class="fc-title">' + (event.course_name).substring(0, 10) + '...</div>';
+                        object += '<div class="fc-title">' + event.course_name + '...</div>';
                     }
                     if (event.is_conflict_lecturer == true) {
                         object += '<p class="text-primary conflict">' + event.teacher_name + '</p> ';
