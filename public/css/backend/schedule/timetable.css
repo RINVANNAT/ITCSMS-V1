@@ -44,12 +44,15 @@
 .room-item > .disabled:hover {
     cursor: help;
 }
-.room-item.enabled:hover{
+
+.room-item.enabled:hover {
     background-color: #f1f1f1;
 }
-.room-item.enabled:focus{
+
+.room-item.enabled:focus {
     background: red;
 }
+
 .box-body .rooms {
     background-color: #f1f1f1;
     height: 280px;
@@ -113,12 +116,14 @@
 .courses .course-item {
     cursor: move;
 }
+
 .course-item.disabled {
-    background-color: #3a87ad;
+    background-color: #898b8c;
     color: #ffffff !important;
-    border-left: 2px solid #d73925;
+    border-left: 2px solid #040404;
     cursor: not-allowed;
 }
+
 .box.box-success .panel-conflict {
     position: fixed;
     bottom: 10px;
