@@ -489,44 +489,34 @@
                             }
                             panel_conflict += '</span></li>';
                         }
+
                         if (response.data.is_conflict_lecturer == true) {
-                            if (response.data.merge == true) {
+                            if (response.data.canMerge.length >0) {
                                 panel_conflict += '<li class="list-group-item">' +
                                     '<i class="fa fa-user"></i> Lecturer ' +
-                                    '<i data-toggle="tooltip" data-placement="right" title="Merge" data-original-title="Merge" class="btn btn-info btn-xs fa fa-code-fork pull-right" id="merge"></i>' +
-                                    '<span class="badge bg-primary"> ';
+                                    '<i data-toggle="tooltip" data-placement="right" title="Merge" data-original-title="Merge" class="btn btn-info btn-xs fa fa-code-fork" id="merge"></i>';
+                                for(var i=0; i<response.data.canMerge.length; i++){
+                                    panel_conflict += '<span class="badge bg-primary">' + response.data.canMerge[i][0].department + '-'
+                                                   + response.data.canMerge[i][0].degree
+                                                   + response.data.canMerge[i][0].grade + '('
+                                                   + response.data.canMerge[i][0].group + ')</span>';
+                                }
                             }
-                            else {
+                            panel_conflict += '</li>';
+                            if(response.data.canNotMerge.length >0) {
                                 panel_conflict += '<li class="list-group-item">' +
-                                    '<i class="fa fa-user"></i> Lecturer <span class="badge bg-primary"> ';
-                            }
-                            if(response.data.lecturer_info != null){
-                                panel_conflict += response.data.lecturer_info[0].department + '-' +
-                                    response.data.lecturer_info[0].degree +
-                                    response.data.lecturer_info[0].grade + '(';
-                                if (response.data.info != null) {
-                                    for (var i = 0; i < response.data.info.length; i++) {
-                                        if (i == response.data.info.length - 1) {
-                                            panel_conflict += response.data.info[i].code + '';
-                                        }
-                                        else {
-                                            panel_conflict += response.data.info[i].code + ', ';
-                                        }
-                                    }
-                                }
-                                if (response.data.lecturer_info[0].group != null && response.data.info == null) {
-                                    panel_conflict += response.data.lecturer_info[0].group;
-                                }
-                                panel_conflict += ')';
-                                if (response.data.lecturer_info[0].option != null) {
-                                    panel_conflict += '_' + response.data.lecturer_info[0].option;
+                                    '<i class="fa fa-user"></i> Lecturer';
+                                for(var i=0; i<response.data.canNotMerge.length; i++){
+                                    panel_conflict += '<span class="badge bg-primary">' + response.data.canNotMerge[i][0].department + '-'
+                                        + response.data.canNotMerge[i][0].degree
+                                        + response.data.canNotMerge[i][0].grade + '('
+                                        + response.data.canNotMerge[i][0].group + ')</span>';
                                 }
                             }
-
-                            panel_conflict += '</span></li></ul>';
+                            panel_conflict += '</span></li>';
 
                         }
-                        panel_conflict += '</div>';
+                        panel_conflict += '</ul></div>';
 
 
                         $('#conflict').html(panel_conflict);

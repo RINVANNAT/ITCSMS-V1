@@ -287,10 +287,9 @@ trait AjaxFilterTimetableController
                     $itemTimetableSlot = TimetableSlot::find($timetable_slot->id);
                     $timetableSlot = new Collection($itemTimetableSlot);
 
-                    if(count($this->timetableSlotRepo->is_conflict_lecturer($itemTimetableSlot)[0]['timetableSlots']) >0){
+                    if (count($this->timetableSlotRepo->is_conflict_lecturer($itemTimetableSlot)[0]['timetableSlots']) > 0) {
                         $timetableSlot->put('is_conflict_lecturer', true);
-                    }
-                    else{
+                    } else {
                         $timetableSlot->put('is_conflict_lecturer', false);
                     }
 
@@ -506,31 +505,28 @@ trait AjaxFilterTimetableController
         }
 
         $conflicts_with = $this->timetableSlotRepo->is_conflict_lecturer($timetableSlot)[0]['timetableSlots'];
-        if(count($conflicts_with) > 0)
-        {
+        if (count($conflicts_with) > 0) {
             $conflicts['is_conflict_lecturer'] = true;
+
             $items = new Collection();
-            $items->push($timetableSlot);
-            foreach ($conflicts_with as $item)
-            {
+
+            foreach ($conflicts_with as $item) {
                 $items->push($item);
             }
-            $itemsMerged = new Collection();
-            $itemsNotMerged = new Collection();
-            foreach ($items as $item)
-            {
-                if($this->timetableSlotRepo->is_merged($item)[0]['status'])
-                {
-                    $itemsMerged->push($item);
-                }
-                else{
-                    $itemsNotMerged->push($item);
-                }
+            $canMerge = new Collection();
+            $canNotMerge = new Collection();
+            foreach ($items as $item) {
+               if($this->timetableSlotRepo->can_merge($timetableSlot, $item)[0]['status'])
+               {
+                   $canMerge->push($this->timetableSlotRepo->get_conflict_with($item));
+               }
+               else{
+                   $canNotMerge->push($this->timetableSlotRepo->get_conflict_with($item));
+               }
             }
-
-            dd($itemsNotMerged);
-        }
-        else{
+            $conflicts['canMerge'] = $canMerge;
+            $conflicts['canNotMerge'] = $canNotMerge;
+        } else {
             $conflicts['is_conflict_lecturer'] = false;
             $conflicts['lecturer_info'] = null;
         }

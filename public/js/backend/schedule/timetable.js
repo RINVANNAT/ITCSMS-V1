@@ -45,6 +45,7 @@ function drag_course_session() {
 
 /** Get rooms. **/
 function get_groups() {
+    toggleLoading(true);
     $.ajax({
         type: 'POST',
         url: '/admin/schedule/timetables/get_groups',
@@ -71,12 +72,14 @@ function get_groups() {
         },
         complete: function () {
             get_weeks($('select[name="semester"] :selected').val());
+            toggleLoading(false);
         }
     })
 }
 
 /** Get weeks. **/
 function get_weeks(semester_id) {
+    toggleLoading(true);
     $.ajax({
         type: 'POST',
         url: '/admin/schedule/timetables/get_weeks',
@@ -100,13 +103,14 @@ function get_weeks(semester_id) {
             get_course_sessions();
             get_timetable();
             get_timetable_slots();
+            toggleLoading(false);
         }
     });
 }
 
 /** Get options. **/
 function get_options(department_id) {
-    // toggleLoading(true);
+    toggleLoading(true);
     $.ajax({
         type: 'POST',
         url: '/admin/schedule/timetables/get_options',
@@ -128,14 +132,13 @@ function get_options(department_id) {
         },
         complete: function () {
             get_groups();
-            //  toggleLoading(false);
+            toggleLoading(false);
         }
     });
 }
 
 /** Get course sessions. **/
 function get_course_sessions() {
-    toggleLoading(true);
     $.ajax({
         type: 'POST',
         url: '/admin/schedule/timetables/get_course_sessions',
@@ -190,7 +193,7 @@ function get_course_sessions() {
             );
         },
         complete: function () {
-            toggleLoading(false);
+
         }
     });
 }

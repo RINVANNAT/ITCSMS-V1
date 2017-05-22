@@ -331,9 +331,9 @@ class EloquentTimetableSlotRepository implements TimetableSlotRepositoryContract
      */
     public function can_merge(TimetableSlot $timetableSlot, TimetableSlot $mergedTimetableSlot)
     {
-        if (($mergedTimetableSlot->teacher_name === $timetableSlot->teacher_name) && ($mergedTimetableSlot->courseSession->course_annual_id == $timetableSlot->courseSession->course_annual_id) && ($timetableSlot->type == $mergedTimetableSlot->type) && (strtotime($timetableSlot->start) == strtotime($mergedTimetableSlot->start)) && (strtotime($timetableSlot->end) == strtotime($mergedTimetableSlot->end))) {
+        if (($mergedTimetableSlot->teacher_name == $timetableSlot->teacher_name) && ($mergedTimetableSlot->courseSession->course_annual_id == $timetableSlot->courseSession->course_annual_id) && ($timetableSlot->type == $mergedTimetableSlot->type) && (strtotime($timetableSlot->start) == strtotime($mergedTimetableSlot->start)) && (strtotime($timetableSlot->end) == strtotime($mergedTimetableSlot->end))) {
             return array(['status' => true, 'conflict_with' => $mergedTimetableSlot, 'merge' => true]);
         }
-        return array(['status' => true, 'conflict_with' => $mergedTimetableSlot, 'merge' => false]);
+        return array(['status' => false, 'conflict_with' => $mergedTimetableSlot, 'merge' => false]);
     }
 }
