@@ -12,6 +12,7 @@ use App\Models\Schedule\Timetable\Slot;
 use App\Models\Schedule\Timetable\Timetable;
 use App\Models\Schedule\Timetable\TimetableSlot;
 use Carbon\Carbon;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
 
 /**
@@ -124,37 +125,6 @@ class EloquentTimetableSlotRepository implements TimetableSlotRepositoryContract
     }
 
     /**
-     * Define timetable slot has conflict course.
-     *
-     * @param TimetableSlot $timetableSlot
-     * @return mixed
-     */
-    public function is_conflict_course(TimetableSlot $timetableSlot)
-    {
-        $timetable = $timetableSlot->timetable;
-
-        $timetables = Timetable::where([
-            ['academic_year_id', $timetable->academic_year_id],
-            ['week_id', $timetable->week_id]
-        ])
-            ->where('id', '!=', $timetable->id)
-            ->get();
-
-        if (count($timetables) > 0) {
-            foreach ($timetables as $itemTimetable) {
-                if (count($itemTimetable->timetableSlots) > 0) {
-                    foreach ($itemTimetable->timetableSlots as $itemTimetableSlot) {
-                        if ((strtotime($itemTimetableSlot->start) <= strtotime($timetableSlot->start)) && (strtotime($itemTimetableSlot->end) > strtotime($timetableSlot->start)) && ($itemTimetableSlot->courseSession->course_annual_id == $timetableSlot->courseSession->course_annual_id)) {
-                            return true;
-                        }
-                    }
-                }
-            }
-        }
-        return false;
-    }
-
-    /**
      * Define timetable slot has conflict lecturer.
      *
      * @param TimetableSlot $timetableSlot
@@ -171,6 +141,7 @@ class EloquentTimetableSlotRepository implements TimetableSlotRepositoryContract
             ->where('id', '!=', $timetable->id)
             ->get();
 
+        $timetableSlots = new Collection();
         if (count($timetables) > 0) {
             foreach ($timetables as $itemTimetable) {
                 if (count($itemTimetable->timetableSlots) > 0) {
@@ -179,16 +150,14 @@ class EloquentTimetableSlotRepository implements TimetableSlotRepositoryContract
                                 ((strtotime($timetableSlot->end) > strtotime($itemTimetableSlot->start)) && (strtotime($timetableSlot->end) < strtotime($itemTimetableSlot->end))))
                             && ($itemTimetableSlot->teacher_name == $timetableSlot->teacher_name)
                         ) {
-                            if (($itemTimetableSlot->teacher_name == $timetableSlot->teacher_name) && ($itemTimetableSlot->courseSession->course_annual_id == $timetableSlot->courseSession->course_annual_id) && ($timetableSlot->type == $itemTimetableSlot->type) && (strtotime($timetableSlot->start) == strtotime($itemTimetableSlot->start)) && (strtotime($timetableSlot->end) == strtotime($itemTimetableSlot->end))) {
-                                return array(['status' => true, 'conflict_with' => $itemTimetableSlot, 'merge' => true]);
-                            }
-                            return array(['status' => true, 'conflict_with' => $itemTimetableSlot, 'merge' => false]);
+                            $timetableSlots->push($itemTimetableSlot);
                         }
                     }
                 }
             }
+            return array(['status' => true, 'timetableSlots' => $timetableSlots]);
         }
-        return false;
+        return array(['status' => false, 'timetableSlots' => null]);
     }
 
     /**
@@ -249,20 +218,6 @@ class EloquentTimetableSlotRepository implements TimetableSlotRepositoryContract
     public function get_group_info($group_id)
     {
         return Group::find($group_id);
-    }
-
-    /**
-     * Check is already merged.
-     *
-     * @param TimetableSlot $timetableSlot
-     * @return mixed
-     */
-    public function is_merged(TimetableSlot $timetableSlot)
-    {
-        if (MergeTimetableSlot::where('timetable_slot_id', $timetableSlot->id)->first() instanceof MergeTimetableSlot) {
-            return true;
-        }
-        return false;
     }
 
     /**
@@ -347,5 +302,38 @@ class EloquentTimetableSlotRepository implements TimetableSlotRepositoryContract
             }
         }
         return false;
+    }
+
+    /**
+     * Conflict with timetable slot merged.
+     *
+     * @param TimetableSlot $timetableSlot
+     * @return mixed
+     */
+    public function is_merged(TimetableSlot $timetableSlot)
+    {
+        $mergeTimetableSlot = MergeTimetableSlot::where('timetable_slot_id', $timetableSlot->id)->first();
+        if (count($mergeTimetableSlot) > 0) {
+            $mergeTimetableSlots = MergeTimetableSlot::where('group_timetable_slot_id', $mergeTimetableSlot->group_timetable_slot_id)->get();
+            if (count($mergeTimetableSlots) > 0) {
+                return array(['status' => true, 'mergeTimetableSlots' => $mergeTimetableSlots]);
+            }
+        }
+        return array(['status' => false, 'mergeTimetableSlots' => null]);
+    }
+
+    /**
+     * Check timetable slot can merge.
+     *
+     * @param TimetableSlot $timetableSlot
+     * @param TimetableSlot $mergedTimetableSlot
+     * @return mixed
+     */
+    public function can_merge(TimetableSlot $timetableSlot, TimetableSlot $mergedTimetableSlot)
+    {
+        if (($mergedTimetableSlot->teacher_name === $timetableSlot->teacher_name) && ($mergedTimetableSlot->courseSession->course_annual_id == $timetableSlot->courseSession->course_annual_id) && ($timetableSlot->type == $mergedTimetableSlot->type) && (strtotime($timetableSlot->start) == strtotime($mergedTimetableSlot->start)) && (strtotime($timetableSlot->end) == strtotime($mergedTimetableSlot->end))) {
+            return array(['status' => true, 'conflict_with' => $mergedTimetableSlot, 'merge' => true]);
+        }
+        return array(['status' => true, 'conflict_with' => $mergedTimetableSlot, 'merge' => false]);
     }
 }

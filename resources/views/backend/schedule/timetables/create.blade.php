@@ -500,26 +500,29 @@
                                 panel_conflict += '<li class="list-group-item">' +
                                     '<i class="fa fa-user"></i> Lecturer <span class="badge bg-primary"> ';
                             }
-                            panel_conflict += response.data.lecturer_info[0].department + '-' +
-                                response.data.lecturer_info[0].degree +
-                                response.data.lecturer_info[0].grade + '(';
-                            if (response.data.info != null) {
-                                for (var i = 0; i < response.data.info.length; i++) {
-                                    if (i == response.data.info.length - 1) {
-                                        panel_conflict += response.data.info[i].code + '';
-                                    }
-                                    else {
-                                        panel_conflict += response.data.info[i].code + ', ';
+                            if(response.data.lecturer_info != null){
+                                panel_conflict += response.data.lecturer_info[0].department + '-' +
+                                    response.data.lecturer_info[0].degree +
+                                    response.data.lecturer_info[0].grade + '(';
+                                if (response.data.info != null) {
+                                    for (var i = 0; i < response.data.info.length; i++) {
+                                        if (i == response.data.info.length - 1) {
+                                            panel_conflict += response.data.info[i].code + '';
+                                        }
+                                        else {
+                                            panel_conflict += response.data.info[i].code + ', ';
+                                        }
                                     }
                                 }
+                                if (response.data.lecturer_info[0].group != null && response.data.info == null) {
+                                    panel_conflict += response.data.lecturer_info[0].group;
+                                }
+                                panel_conflict += ')';
+                                if (response.data.lecturer_info[0].option != null) {
+                                    panel_conflict += '_' + response.data.lecturer_info[0].option;
+                                }
                             }
-                            if (response.data.lecturer_info[0].group != null && response.data.info == null) {
-                                panel_conflict += '(' + response.data.lecturer_info[0].group;
-                            }
-                            panel_conflict += ')';
-                            if (response.data.lecturer_info[0].option != null) {
-                                panel_conflict += '_' + response.data.lecturer_info[0].option;
-                            }
+
                             panel_conflict += '</span></li></ul>';
 
                         }
@@ -674,6 +677,7 @@
             });
 
             $(document).on('click', '#merge', function () {
+                //toggleLoading(true);
                 $.ajax({
                     type: 'POST',
                     url: '{!! route('merge_timetable_slot') !!}',
@@ -681,12 +685,13 @@
                         timetable_slot_id: $('.side-course.course-selected').attr('id')
                     },
                     success: function (response) {
-                        get_timetable();
+                        get_timetable_slots();
                         hide_conflict_information();
                     },
                     complete: function () {
-                        $('#timetable').fullCalendar('refresh');
+                        get_timetable_slots();
                         hide_conflict_information();
+                        //toggleLoading(false);
                     }
                 });
             });

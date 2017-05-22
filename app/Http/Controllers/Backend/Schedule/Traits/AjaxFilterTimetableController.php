@@ -7,7 +7,6 @@ use App\Http\Requests\Backend\Schedule\Timetable\MoveTimetableSlotRequest;
 use App\Http\Requests\Backend\Schedule\Timetable\ResizeTimetableSlotRequest;
 use App\Models\CourseSession;
 use App\Models\DepartmentOption;
-use App\Models\Group;
 use App\Models\Room;
 use App\Models\Schedule\Timetable\MergeTimetableSlot;
 use App\Models\Schedule\Timetable\Timetable;
@@ -285,30 +284,17 @@ trait AjaxFilterTimetableController
             foreach ($timetable_slots as $timetable_slot) {
                 if (($timetable_slot instanceof TimetableSlot) && is_object($timetable_slot)) {
 
-                    $newTimetableSlot = TimetableSlot::find($timetable_slot->id);
-                    $timetableSlot = new Collection($newTimetableSlot);
+                    $itemTimetableSlot = TimetableSlot::find($timetable_slot->id);
+                    $timetableSlot = new Collection($itemTimetableSlot);
 
-                    if ($this->timetableSlotRepo->is_merged($newTimetableSlot) == false) {
-                        if ($this->timetableSlotRepo->is_conflict_lecturer($newTimetableSlot)[0]['status'] == true) {
-                            $timetableSlot->put('is_conflict_lecturer', true);
-                        } else {
-                            $timetableSlot->put('is_conflict_lecturer', false);
-                        }
-
-                        $timetableSlot->put('groups', null);
-
-                    } else {
-                        $group_timetable_slot_id = MergeTimetableSlot::where('timetable_slot_id', $newTimetableSlot->id)->first();
-                        $merges = MergeTimetableSlot::where('group_timetable_slot_id', $group_timetable_slot_id->group_timetable_slot_id)->get();
-                        foreach ($merges as $merge) {
-                            $groups->push(Group::find(TimetableSlot::find($merge->timetable_slot_id)->timetable->group_id));
-                        }
+                    if(count($this->timetableSlotRepo->is_conflict_lecturer($itemTimetableSlot)[0]['timetableSlots']) >0){
+                        $timetableSlot->put('is_conflict_lecturer', true);
+                    }
+                    else{
                         $timetableSlot->put('is_conflict_lecturer', false);
-                        $timetableSlot->put('groups', $groups);
-                        $timetableSlot->put('is_conflict_room', false);
                     }
 
-                    if ($this->timetableSlotRepo->is_conflict_room($newTimetableSlot, Room::find($newTimetableSlot->room_id))[0]['status'] == true) {
+                    if ($this->timetableSlotRepo->is_conflict_room($itemTimetableSlot, Room::find($itemTimetableSlot->room_id))[0]['status'] == true) {
                         $timetableSlot->put('is_conflict_room', true);
                     } else {
                         $timetableSlot->put('is_conflict_room', false);
@@ -319,7 +305,7 @@ trait AjaxFilterTimetableController
                     $timetableSlots->push($timetableSlot);
                 }
             }
-            return \GuzzleHttp\json_decode($timetableSlots);
+            return json_decode($timetableSlots);
         }
     }
 
@@ -508,48 +494,49 @@ trait AjaxFilterTimetableController
     {
         $timetableSlot = TimetableSlot::find(request('timetable_slot_id'));
         $conflicts = array();
-        // Start solve conflict room.
+
         if ($this->timetableSlotRepo->is_conflict_room($timetableSlot, Room::find($timetableSlot->room_id))[0]['status'] == true) {
             $conflicts['is_conflict_room'] = true;
             $with_timetable_slot = TimetableSlot::find($this->timetableSlotRepo->is_conflict_room($timetableSlot, Room::find($timetableSlot->room_id))[0]['conflict_with']->id);
             $info = $this->timetableSlotRepo->get_conflict_with($with_timetable_slot);
             $conflicts['room_info'] = $info;
+        } else {
+            $conflicts['is_conflict_room'] = false;
+            $conflicts['room_info'] = null;
         }
 
-        // Start solve conflict Lecturer.
-        /*if($this->timetableSlotRepo->is_conflict_lecturer($timetableSlot)[0]['status'] == true){
-            // Set is_conflict_lecturer is true
+        $conflicts_with = $this->timetableSlotRepo->is_conflict_lecturer($timetableSlot)[0]['timetableSlots'];
+        if(count($conflicts_with) > 0)
+        {
             $conflicts['is_conflict_lecturer'] = true;
-
-            // Find timetable slot that conflict with
-            $conflict_timetable = TimetableSlot::find($this->timetableSlotRepo->is_conflict_lecturer($timetableSlot)[0]['conflict_with']->id);
-
-            // Find timetable slot that conflict with, is already merged or not.
-            if($this->timetableSlotRepo->is_merged($conflict_timetable) == true){
-                $merges = MergeTimetableSlot::where('group_timetable_slot_id', MergeTimetableSlot::where('timetable_slot_id', $conflict_timetable->id)->first()->group_timetable_slot_id)->get();
-                dd($merges);
-                if(count($merges)>0){
-                    $conflict_withs = array();
-                    foreach ($merges as $merge)
-                    {
-                        array_push($conflict_withs, Group::find(TimetableSlot::find($merge->timetable_slot_id)->timetable->group_id));
-                    }
+            $items = new Collection();
+            $items->push($timetableSlot);
+            foreach ($conflicts_with as $item)
+            {
+                $items->push($item);
+            }
+            $itemsMerged = new Collection();
+            $itemsNotMerged = new Collection();
+            foreach ($items as $item)
+            {
+                if($this->timetableSlotRepo->is_merged($item)[0]['status'])
+                {
+                    $itemsMerged->push($item);
                 }
-                $conflicts['info'] = $conflict_withs;
-                $conflicts['lecturer_info'] = $this->timetableSlotRepo->get_conflict_with($conflict_timetable);
-            }
-            else{
-                dd(00);
-                $conflicts['info'] = $this->timetableSlotRepo->is_conflict_lecturer($timetableSlot)[0]['conflict_with'];
-                $conflicts['lecturer_info'] = $this->timetableSlotRepo->get_conflict_with($conflict_timetable);
+                else{
+                    $itemsNotMerged->push($item);
+                }
             }
 
-            // Set mergeable value
-            $conflicts['merge'] = $this->timetableSlotRepo->is_conflict_lecturer($timetableSlot)[0]['merge'];
-        }*/
+            dd($itemsNotMerged);
+        }
+        else{
+            $conflicts['is_conflict_lecturer'] = false;
+            $conflicts['lecturer_info'] = null;
+        }
 
-
-        if ($this->timetableSlotRepo->is_merged($timetableSlot) == false) {
+        //dd($conflicts);
+        /*if ($this->timetableSlotRepo->is_merged($timetableSlot) == false) {
 
             if ($this->timetableSlotRepo->is_conflict_lecturer($timetableSlot)[0]['status'] == true) {
                 $conflicts['is_conflict_lecturer'] = true;
@@ -589,7 +576,7 @@ trait AjaxFilterTimetableController
         } else {
             $conflicts['is_conflict_lecturer'] = false;
             $conflicts['merge'] = false;
-        }
+        }*/
 
         // Return conflict info.
         if (count($conflicts) > 0) {
@@ -606,36 +593,39 @@ trait AjaxFilterTimetableController
      */
     public function merge_timetable_slot()
     {
-        $timetable_slot = TimetableSlot::find(request('timetable_slot_id'));
-        if ($timetable_slot instanceof TimetableSlot) {
-            $another_timetable_slot = $this->timetableSlotRepo->is_conflict_lecturer($timetable_slot);
-            $another_timetable_slot = TimetableSlot::find($another_timetable_slot[0]['conflict_with']->id);
-            $merged_timetable_slot = MergeTimetableSlot::where('timetable_slot_id', $another_timetable_slot->id)->first();
+        $timetableSlot = TimetableSlot::find(request('timetable_slot_id'));
+        if ($timetableSlot instanceof TimetableSlot) {
+            $itemTimetableSlot = $this->timetableSlotRepo->is_conflict_lecturer($timetableSlot)[0]['conflict_with'];
+            if ($itemTimetableSlot instanceof TimetableSlot) {
+                $another_timetable_slot = $this->timetableSlotRepo->is_conflict_lecturer($timetableSlot);
+                $another_timetable_slot = TimetableSlot::find($another_timetable_slot[0]['conflict_with']->id);
+                $merged_timetable_slot = MergeTimetableSlot::where('timetable_slot_id', $another_timetable_slot->id)->first();
 
-            if ($this->timetableSlotRepo->is_merged($another_timetable_slot) == true) {
-                $newMergeTimetableSlot = new MergeTimetableSlot();
-                $newMergeTimetableSlot->group_timetable_slot_id = $merged_timetable_slot->group_timetable_slot_id;
-                $newMergeTimetableSlot->timetable_slot_id = $timetable_slot->id;
-                $newMergeTimetableSlot->save();
-                return Response::json(['status' => true]);
-            } else {
-                $timetable_slots = new Collection();
-                $timetable_slots->push($timetable_slot);
-                $timetable_slots->push($another_timetable_slot);
-                if (MergeTimetableSlot::latest()->first() instanceof MergeTimetableSlot) {
-                    $group_timetable_slot_id = MergeTimetableSlot::latest()->first()->id;
-                } else {
-                    $group_timetable_slot_id = 1;
-                }
-
-                if (count($timetable_slots) > 0) {
-                    foreach ($timetable_slots as $timetable_slot) {
-                        $newMergeTimetableSlot = new MergeTimetableSlot();
-                        $newMergeTimetableSlot->group_timetable_slot_id = $group_timetable_slot_id;
-                        $newMergeTimetableSlot->timetable_slot_id = $timetable_slot->id;
-                        $newMergeTimetableSlot->save();
-                    }
+                if ($this->timetableSlotRepo->is_merged($another_timetable_slot)[0]['status']) {
+                    $newMergeTimetableSlot = new MergeTimetableSlot();
+                    $newMergeTimetableSlot->group_timetable_slot_id = $merged_timetable_slot->group_timetable_slot_id;
+                    $newMergeTimetableSlot->timetable_slot_id = $timetableSlot->id;
+                    $newMergeTimetableSlot->save();
                     return Response::json(['status' => true]);
+                } else {
+                    $timetable_slots = new Collection();
+                    $timetable_slots->push($timetableSlot);
+                    $timetable_slots->push($another_timetable_slot);
+                    if (MergeTimetableSlot::latest()->first() instanceof MergeTimetableSlot) {
+                        $group_timetable_slot_id = MergeTimetableSlot::latest()->first()->id;
+                    } else {
+                        $group_timetable_slot_id = 1;
+                    }
+
+                    if (count($timetable_slots) > 0) {
+                        foreach ($timetable_slots as $timetable_slot) {
+                            $newMergeTimetableSlot = new MergeTimetableSlot();
+                            $newMergeTimetableSlot->group_timetable_slot_id = $group_timetable_slot_id;
+                            $newMergeTimetableSlot->timetable_slot_id = $timetable_slot->id;
+                            $newMergeTimetableSlot->save();
+                        }
+                        return Response::json(['status' => true]);
+                    }
                 }
             }
         }

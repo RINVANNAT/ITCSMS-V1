@@ -118,9 +118,7 @@
 }
 
 .course-item.disabled {
-    background-color: #898b8c;
-    color: #ffffff !important;
-    border-left: 2px solid #040404;
+    border-left: 2px solid red;
     cursor: not-allowed;
 }
 

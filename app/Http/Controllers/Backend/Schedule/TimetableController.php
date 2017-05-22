@@ -224,17 +224,14 @@ class TimetableController extends Controller
             $new_timetable_slot = $this->timetableSlotRepository->create_timetable_slot($findTimetable, $request);
         } else {
             $newTimetable = $this->timetableRepository->create_timetable($request);
-
             if ($newTimetable instanceof Timetable) {
                 $new_timetable_slot = $this->timetableSlotRepository->create_timetable_slot($newTimetable, $request);
-
             }
         }
         if ($new_timetable_slot) {
             return Response::json([
                 'status' => true,
-                'timetable_slot' => \GuzzleHttp\json_decode($new_timetable_slot),
-                'is_conflict_course' => $this->timetableSlotRepository->is_conflict_course($new_timetable_slot)
+                'timetable_slot' => \GuzzleHttp\json_decode($new_timetable_slot)
             ]);
         }
         return Response::json(['status' => false]);

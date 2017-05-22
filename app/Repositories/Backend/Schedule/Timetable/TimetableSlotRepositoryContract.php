@@ -53,20 +53,21 @@ interface TimetableSlotRepositoryContract
     public function is_conflict_room(TimetableSlot $timetableSlot, Room $room);
 
     /**
-     * Define timetable slot has conflict course.
-     *
-     * @param TimetableSlot $timetableSlot
-     * @return mixed
-     */
-    public function is_conflict_course(TimetableSlot $timetableSlot);
-
-    /**
      * Define timetable slot has conflict lecturer.
      *
      * @param TimetableSlot $timetableSlot
      * @return mixed
      */
     public function is_conflict_lecturer(TimetableSlot $timetableSlot);
+
+    /**
+     * Check timetable slot can merge.
+     *
+     * @param TimetableSlot $timetableSlot
+     * @param TimetableSlot $mergedTimetableSlot
+     * @return mixed
+     */
+    public function can_merge(TimetableSlot $timetableSlot, TimetableSlot $mergedTimetableSlot);
 
     /**
      * Get associate with.

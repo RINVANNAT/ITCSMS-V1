@@ -63,7 +63,11 @@ function get_groups() {
             }
         },
         error: function () {
-
+            swal(
+                'Oops...',
+                'Something went wrong!',
+                'error'
+            );
         },
         complete: function () {
             get_weeks($('select[name="semester"] :selected').val());
@@ -86,7 +90,11 @@ function get_weeks(semester_id) {
             $('select[name="weekly"]').html(option);
         },
         error: function () {
-
+            swal(
+                'Oops...',
+                'Something went wrong!',
+                'error'
+            );
         },
         complete: function () {
             get_course_sessions();
@@ -98,7 +106,7 @@ function get_weeks(semester_id) {
 
 /** Get options. **/
 function get_options(department_id) {
-    toggleLoading(true);
+    // toggleLoading(true);
     $.ajax({
         type: 'POST',
         url: '/admin/schedule/timetables/get_options',
@@ -112,17 +120,22 @@ function get_options(department_id) {
             $('select[name="option"]').html(option);
         },
         error: function () {
-
+            swal(
+                'Oops...',
+                'Something went wrong!',
+                'error'
+            );
         },
         complete: function () {
             get_groups();
-            toggleLoading(false);
+            //  toggleLoading(false);
         }
     });
 }
 
 /** Get course sessions. **/
 function get_course_sessions() {
+    toggleLoading(true);
     $.ajax({
         type: 'POST',
         url: '/admin/schedule/timetables/get_course_sessions',
@@ -132,7 +145,7 @@ function get_course_sessions() {
                 var course_session_item = '';
                 $.each(response.course_sessions, function (key, val) {
                     if (val.teacher_name == null) {
-                        course_session_item += '<li class="course-item disabled" data-toggle="tooltip" data-placement="left" title="Please assign teacher !">';
+                        course_session_item += '<li class="course-item disabled">';
                     }
                     else {
                         course_session_item += '<li class="course-item">';
@@ -143,7 +156,7 @@ function get_course_sessions() {
                         '</span>' +
                         '<span class="text course-name">' + val.course_name + '</span><br>';
                     if (val.teacher_name == null) {
-                        course_session_item += '<span style="margin-left: 28px;" class="teacher-name">Unsigned</span><br/>';
+                        course_session_item += '<span style="margin-left: 28px;" class="teacher-name bg-danger badge">Unsigned</span><br/>';
                     } else {
                         course_session_item += '<span style="margin-left: 28px;" class="teacher-name">' + val.teacher_name + '</span><br/>';
                     }
@@ -170,7 +183,14 @@ function get_course_sessions() {
             }
         },
         error: function () {
-
+            swal(
+                'Oops...',
+                'Something went wrong!',
+                'error'
+            );
+        },
+        complete: function () {
+            toggleLoading(false);
         }
     });
 }
