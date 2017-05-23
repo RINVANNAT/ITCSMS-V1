@@ -16,4 +16,14 @@ class MergeTimetableSlot extends Model
      * @var string
      */
     protected $table = 'merge_timetable_slots';
+
+    /**
+     * Get associated with Timetable Slot model.
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
+     */
+    public function timetableSlot()
+    {
+        return $this->belongsTo(TimetableSlot::class);
+    }
 }

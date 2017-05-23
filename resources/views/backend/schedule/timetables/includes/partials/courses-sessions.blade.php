@@ -9,15 +9,11 @@
                             title="Refresh">
                         <i class="fa fa-refresh {{--fa-pulse--}} fa-1x"></i>
                     </button>
-                    {{--<button class="btn btn-info btn-xs btn_refresh_course_session"
-                            data-toggle="tooltip"
-                            data-placement="top"
-                            title="Refresh">
-                        <i class="fa fa-refresh"></i>
-                    </button>--}}
+
                 </div>
-                <h3 class="box-title"><i
-                            class="fa fa-drivers-license-o"></i> {{ trans('labels.backend.schedule.timetable.courses_sessions') }}
+                <h3 class="box-title">
+                    <i class="fa fa-drivers-license-o"></i>
+                    {{ trans('labels.backend.schedule.timetable.courses_sessions') }}
                 </h3>
             </div>
             <div class="box-body courses-sessions">

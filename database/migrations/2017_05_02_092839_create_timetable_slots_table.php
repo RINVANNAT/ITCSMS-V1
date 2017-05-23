@@ -17,7 +17,10 @@ class CreateTimetableSlotsTable extends Migration
 
             $table->integer('timetable_id')->unsigned();
             $table->integer('course_session_id')->unsigned();
+            $table->integer('slot_id')->unsigned();
             $table->integer('room_id')->nullable();
+            $table->integer('group_merge_id')->unsiged();
+
             $table->string('course_name');
             $table->string('teacher_name');
             $table->string('type');
@@ -41,6 +44,16 @@ class CreateTimetableSlotsTable extends Migration
             $table->foreign('room_id')
                 ->references('id')
                 ->on('rooms')
+                ->onDelete('cascade');
+
+            $table->foreign('group_merge_id')
+                ->references('id')
+                ->on('merge_timetable_slots')
+                ->onDelete('cascade');
+
+            $table->foreign('slot_id')
+                ->references('id')
+                ->on('slots')
                 ->onDelete('cascade');
 
             

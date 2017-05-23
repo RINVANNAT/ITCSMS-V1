@@ -9,6 +9,7 @@ use App\Models\Room;
 use App\Models\Schedule\Timetable\Timetable;
 use App\Models\Schedule\Timetable\TimetableSlot;
 use Carbon\Carbon;
+use phpDocumentor\Reflection\Types\Integer;
 
 /**
  * Interface TimetableSlotRepositoryContract
@@ -124,4 +125,37 @@ interface TimetableSlotRepositoryContract
      * @return mixed
      */
     public function update_course_session(CourseSession $course_session);
+
+    /**
+     * Create merge timetable slot.
+     *
+     * @param CreateTimetableRequest $request
+     * @return mixed
+     */
+    public function create_merge_timetable_slot(CreateTimetableRequest $request);
+
+    /**
+     * Update merge timetable slot.
+     *
+     * @param TimetableSlot $timetableSlot
+     * @return mixed
+     */
+    public function update_merge_timetable_slot(TimetableSlot $timetableSlot);
+
+    /**
+     * Check conflict lecturer.
+     *
+     * @param TimetableSlot $timetableSlot
+     * @return mixed
+     */
+    public function check_conflict_lecturer(TimetableSlot $timetableSlot);
+
+    /**
+     * Update Timetable Slot when merge.
+     *
+     * @param TimetableSlot $timetableSlot
+     * @param integer $group_merge_id
+     * @return mixed
+     */
+    public function update_timetable_slot_when_merge(TimetableSlot $timetableSlot, $group_merge_id);
 }

@@ -31,28 +31,40 @@ class EloquentTimetableSlotRepository implements TimetableSlotRepositoryContract
      */
     public function create_timetable_slot(Timetable $timetable, CreateTimetableRequest $request)
     {
-        $slot = Slot::find($request->slot_id);
-        if ($slot instanceof Slot) {
-            $duration = $this->durations(new Carbon($request->start), new Carbon($request->end == null ? $request->start : $request->end));
-            if ($slot->time_remaining > 0 && $slot->time_remaining >= $duration) {
-                $newTimetableSlot = new TimetableSlot();
+        // create new group merge
+        $newMergeTimetableSlot = $this->create_merge_timetable_slot($request);
+        // check new group merge created or not.
+        if ($newMergeTimetableSlot instanceof MergeTimetableSlot) {
+            // find Slot match with request.
+            $slot = Slot::find($request->slot_id);
+            if ($slot instanceof Slot) {
+                // find durations between two start and end date.
+                $duration = $this->durations(new Carbon($request->start), new Carbon($request->end == null ? $request->start : $request->end));
+                if ($slot->time_remaining > 0 && $slot->time_remaining >= $duration) {
+                    // crate new instance
+                    $newTimetableSlot = new TimetableSlot();
 
-                $newTimetableSlot->timetable_id = $timetable->id;
-                $newTimetableSlot->course_session_id = $request->course_session_id;
-                $request->room_id == null ?: $newTimetableSlot->room_id = $request->room_id;
-                $newTimetableSlot->course_name = $request->course_name;
-                $newTimetableSlot->teacher_name = $request->teacher_name;
-                $newTimetableSlot->type = $request->course_type;
-                $newTimetableSlot->start = new Carbon($request->start);
-                $newTimetableSlot->end = new Carbon($request->end == null ? $request->start : $request->end);
-                $newTimetableSlot->durations = $duration;
-                $newTimetableSlot->created_uid = auth()->user()->id;
-                $newTimetableSlot->updated_uid = auth()->user()->id;
-
-                if ($newTimetableSlot->save()) {
-                    $slot->time_remaining = $slot->time_remaining - $duration;
-                    $slot->update();
-                    return $newTimetableSlot;
+                    $newTimetableSlot->timetable_id = $timetable->id;
+                    $newTimetableSlot->course_session_id = $request->course_session_id;
+                    $request->room_id == null ?: $newTimetableSlot->room_id = $request->room_id;
+                    $newTimetableSlot->slot_id = $request->slot_id;
+                    $newTimetableSlot->group_merge_id = $newMergeTimetableSlot->id;
+                    $newTimetableSlot->course_name = $request->course_name;
+                    $newTimetableSlot->teacher_name = $request->teacher_name;
+                    $newTimetableSlot->type = $request->course_type;
+                    $newTimetableSlot->start = new Carbon($request->start);
+                    $newTimetableSlot->end = new Carbon($request->end == null ? $request->start : $request->end);
+                    $newTimetableSlot->durations = $duration;
+                    $newTimetableSlot->created_uid = auth()->user()->id;
+                    $newTimetableSlot->updated_uid = auth()->user()->id;
+                    // check new timetable slot created or not.
+                    if ($newTimetableSlot->save()) {
+                        // update total times of slot
+                        $slot->time_remaining = $slot->time_remaining - $duration;
+                        $slot->updated_at = Carbon::now();
+                        $slot->update();
+                        return $newTimetableSlot;
+                    }
                 }
             }
         }
@@ -335,5 +347,139 @@ class EloquentTimetableSlotRepository implements TimetableSlotRepositoryContract
             return array(['status' => true, 'conflict_with' => $mergedTimetableSlot, 'merge' => true]);
         }
         return array(['status' => false, 'conflict_with' => $mergedTimetableSlot, 'merge' => false]);
+    }
+
+    /**
+     * Create merge timetable slot.
+     *
+     * @param CreateTimetableRequest $request
+     * @return mixed
+     */
+    public function create_merge_timetable_slot(CreateTimetableRequest $request)
+    {
+        if (isset($request->start) || isset($request->end)) {
+            $newMergeTimetableSlot = new MergeTimetableSlot();
+            $newMergeTimetableSlot->start = new Carbon($request->start);
+            $newMergeTimetableSlot->end = new Carbon($request->end == null ? $request->start : $request->end);
+            if ($newMergeTimetableSlot->save()) {
+                return $newMergeTimetableSlot;
+            }
+        }
+        return false;
+    }
+
+    /**
+     * Update merge timetable slot on start and end field.
+     *
+     * @param TimetableSlot $timetableSlot
+     * @return mixed
+     */
+    public function update_merge_timetable_slot(TimetableSlot $timetableSlot)
+    {
+        // find another timetable slot related with
+        $timetableSlots = TimetableSlot::where('group_merge_id', $timetableSlot->group_merge_id)->get();
+
+        if (count($timetableSlots) > 0) {
+            if (count($timetableSlots) == 1) {
+                $mergeTimetableSlot = MergeTimetableSlot::find($timetableSlot->group_merge_id);
+                // just update start and end field.
+                if ($mergeTimetableSlot instanceof MergeTimetableSlot) {
+                    $mergeTimetableSlot->start = $timetableSlot->start;
+                    $mergeTimetableSlot->end = $timetableSlot->end;
+                    $mergeTimetableSlot->updated_at = Carbon::now();
+                    $mergeTimetableSlot->update();
+                    return $mergeTimetableSlot;
+                }
+            } else {
+                // create a new group merge id and update timetable slot.
+                $newMergeTimetableSlot = new MergeTimetableSlot();
+                $newMergeTimetableSlot->start = $timetableSlot->start;
+                $newMergeTimetableSlot->end = $timetableSlot->end;
+                if ($newMergeTimetableSlot->save()) {
+                    $timetableSlot->group_merge_id = $newMergeTimetableSlot->id;
+                    $timetableSlot->update();
+                    return $newMergeTimetableSlot;
+                }
+            }
+        }
+
+        return false;
+    }
+
+    /**
+     * Check conflict lecturer.
+     *
+     * @param TimetableSlot $timetableSlot
+     * @return mixed
+     */
+    public function check_conflict_lecturer(TimetableSlot $timetableSlot)
+    {
+        // find merge timetable match with argument
+        $mergeTimetableSlot = MergeTimetableSlot::find($timetableSlot->group_merge_id);
+        // find timetable match with argument
+        $timetable = $timetableSlot->timetable;
+
+        // find all timetables match with argument
+        $timetables = Timetable::where([
+            ['academic_year_id', $timetable->academic_year_id],
+            ['week_id', $timetable->week_id]
+        ])
+            ->where('id', '!=', $timetable->id)
+            ->get();
+
+        // declare and prepare data
+        $result = array();
+        $canMerge = array();
+        $canNotMerge = array();
+
+        if (count($timetables) > 0) {
+            foreach ($timetables as $itemTimetable) {
+                if (count($itemTimetable->timetableSlots) > 0) {
+                    foreach ($itemTimetable->timetableSlots as $itemTimetableSlot) {
+                        // find merge timetable slot and then compare with input and the other merge timetable slot
+                        $itemMergeTimetableSlot = MergeTimetableSlot::find($itemTimetableSlot->group_merge_id);
+                        // compare start and end date && teacher
+                        if ((((strtotime($itemMergeTimetableSlot->start) <= strtotime($mergeTimetableSlot->start)) && (strtotime($itemMergeTimetableSlot->end) > strtotime($mergeTimetableSlot->start))) ||
+                                ((strtotime($mergeTimetableSlot->end) > strtotime($itemMergeTimetableSlot->start)) && (strtotime($mergeTimetableSlot->end) < strtotime($itemMergeTimetableSlot->end))))
+                            && ($itemTimetableSlot->teacher_name == $timetableSlot->teacher_name)
+                            && ($timetableSlot->group_merge_id != $itemTimetableSlot->group_merge_id)
+                        ) {
+                            // find which timetable slot can merge
+                            // by compare with start, end, course_annual_id and type of timetable slot
+                            if ((strtotime($timetableSlot->start) == strtotime($itemTimetableSlot->start)) && (strtotime($timetableSlot->end) == strtotime($itemTimetableSlot->end)) && ($timetableSlot->type == $itemTimetableSlot->type) && ($timetableSlot->slot->course_annual_id == $itemTimetableSlot->slot->course_annual_id)) {
+                                array_push($canMerge, $itemTimetableSlot);
+                            } // and can not merge
+                            else {
+                                array_push($canNotMerge, $itemTimetableSlot);
+                            }
+                            // if conflict, add into result array.
+                            // array_push($result, $itemTimetableSlot);
+                        }
+                    }
+                }
+            }
+        }
+        // push those two array into result
+        $result['canMerge'] = $canMerge;
+        $result['canNotMerge'] = $canNotMerge;
+
+        // check array result, its has many item.
+        (count($result['canMerge']) > 0 || count($result['canNotMerge']) > 0) ? $result['status'] = true : $result['status'] = false;
+
+        return $result;
+    }
+
+    /**
+     * Update Timetable Slot when merge.
+     *
+     * @param TimetableSlot $timetableSlot
+     * @param integer $group_merge_id
+     * @return mixed
+     */
+    public function update_timetable_slot_when_merge(TimetableSlot $timetableSlot, $group_merge_id)
+    {
+        $timetableSlot->group_merge_id = $group_merge_id;
+        $timetableSlot->updated_at = Carbon::now();
+        return $timetableSlot->update;
     }
 }
