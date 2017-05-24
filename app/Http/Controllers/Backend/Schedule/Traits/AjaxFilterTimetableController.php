@@ -6,8 +6,7 @@ use App\Http\Requests\Backend\Schedule\Timetable\CreateTimetableRequest;
 use App\Http\Requests\Backend\Schedule\Timetable\MoveTimetableSlotRequest;
 use App\Http\Requests\Backend\Schedule\Timetable\ResizeTimetableSlotRequest;
 use App\Models\DepartmentOption;
-use App\Models\Room;
-use App\Models\Schedule\Timetable\MergeTimetableSlot;
+use App\Models\Group;
 use App\Models\Schedule\Timetable\Slot;
 use App\Models\Schedule\Timetable\Timetable;
 use App\Models\Schedule\Timetable\TimetableSlot;
@@ -282,14 +281,49 @@ trait AjaxFilterTimetableController
             $timetableSlots = new Collection();
             foreach ($timetable_slots as $timetable_slot) {
                 if (($timetable_slot instanceof TimetableSlot) && is_object($timetable_slot)) {
-
+                    // convert from array object to collection object.
                     $itemTimetableSlot = TimetableSlot::find($timetable_slot->id);
                     $timetableSlot = new Collection($itemTimetableSlot);
 
-                    $data = $this->timetableSlotRepo->check_conflict_lecturer($itemTimetableSlot);
-                    $timetableSlot->put('conflict_lecturer', $data);
+                    // find and prepare groups to render when timetable slot merge together
+                    $groups = array();
+                    // find all timetable slot has group_merge_id the same
+                    $timetableSlotHasTheSameGroupMergeId = TimetableSlot::where('group_merge_id', $itemTimetableSlot->group_merge_id)->get();
+                    if (count($timetableSlotHasTheSameGroupMergeId) > 0) {
+                        foreach ($timetableSlotHasTheSameGroupMergeId as $item) {
+                            array_push($groups, Group::find($item->slot->group_id));
+                        }
+                    }
+                    else{
+                        $groups = [];
+                    }
+                    // check conflict lecturer.
+                    $dataLecturer = $this->timetableSlotRepo->check_conflict_lecturer($itemTimetableSlot);
+
+                    // check conflict room.
+                    if ($this->timetableSlotRepo->is_conflict_room($itemTimetableSlot)[0]['status'] == true) {
+                        $timetableSlot->put('conflict_room', true);
+                    } else {
+                        $timetableSlot->put('conflict_room', false);
+                    }
+
+
+                    // push data to item timetable slot
+                    $timetableSlot->put('conflict_lecturer', $dataLecturer);
                     $timetableSlot->put('building', $timetable_slot->building);
+                    // sort group before push
+                    usort($groups, function ($a, $b) {
+                        if (is_numeric($a->code)) {
+                            return $a->code - $b->code;
+                        } else {
+                            return strcmp($a->code, $b->code);
+                        }
+                    });
+                    // push groups array into item timetable slot
+                    $timetableSlot->put('groups', $groups);
                     $timetableSlot->put('room', $timetable_slot->room);
+
+                    // push timetable slot to output
                     $timetableSlots->push($timetableSlot);
                 }
             }
@@ -383,12 +417,24 @@ trait AjaxFilterTimetableController
      */
     public function insert_room_into_timetable_slot()
     {
-        $timetable_slot_id = request('timetable_slot_id');
-        $room_id = request('room_id');
-        if (isset($timetable_slot_id) && isset($room_id)) {
-            $timetable_slot = TimetableSlot::find($timetable_slot_id);
-            $timetable_slot->room_id = $room_id;
-            $timetable_slot->update();
+        // find timetable slot by request
+        $timetableSlot = TimetableSlot::find(request('timetable_slot_id'));
+        // check validate
+        if ($timetableSlot instanceof TimetableSlot) {
+            // find another timetables with the same group.
+            $timetableSlots = TimetableSlot::where('group_merge_id', $timetableSlot->group_merge_id)->get();
+            if (count($timetableSlots) > 1) {
+                foreach ($timetableSlots as $item) {
+                    // a new room
+                    $item->room_id = request('room_id');
+                    $item->update();
+                }
+            } else {
+                // set room only itself
+                $timetableSlot->room_id = request('room_id');
+                $timetableSlot->update();
+
+            }
             return Response::json(['status' => true]);
         }
         return Response::json(['status' => false]);
@@ -403,10 +449,21 @@ trait AjaxFilterTimetableController
     {
         $timetable_slot_id = request('timetable_slot_id');
         if (isset($timetable_slot_id)) {
-            $timetable_slot = TimetableSlot::find($timetable_slot_id);
-            $timetable_slot->room_id = null;
-            $timetable_slot->update();
-            return Response::json(['status' => true, 'timetable_slot' => $timetable_slot]);
+            $timetableSlot = TimetableSlot::find($timetable_slot_id);
+            // find all timetable slots in the same group_merge_id
+            $timetableSlots = TimetableSlot::where('group_merge_id', $timetableSlot->group_merge_id)->get();
+            if(count($timetableSlots) >1){
+                // remove room which timetable has the same group_merge_id
+                foreach ($timetableSlots as $timetableSlot)
+                {
+                    $timetableSlot->room_id = null;
+                    $timetableSlot->update();
+                }
+            }else{
+                $timetableSlot->room_id = null;
+                $timetableSlot->update();
+            }
+            return Response::json(['status' => true, 'timetable_slot' => $timetableSlot]);
         }
         return Response::json(['status' => false]);
     }
@@ -486,12 +543,11 @@ trait AjaxFilterTimetableController
     public function get_conflict_info()
     {
         $timetableSlot = TimetableSlot::find(request('timetable_slot_id'));
-        $conflicts = array();
 
         // check conflict room.
-        if ($this->timetableSlotRepo->is_conflict_room($timetableSlot, Room::find($timetableSlot->room_id))[0]['status'] == true) {
+        if ($this->timetableSlotRepo->is_conflict_room($timetableSlot)[0]['status'] == true) {
             $conflicts['is_conflict_room'] = true;
-            $with_timetable_slot = TimetableSlot::find($this->timetableSlotRepo->is_conflict_room($timetableSlot, Room::find($timetableSlot->room_id))[0]['conflict_with']->id);
+            $with_timetable_slot = TimetableSlot::find($this->timetableSlotRepo->is_conflict_room($timetableSlot)[0]['conflict_with']->id);
             $info = $this->timetableSlotRepo->get_conflict_with($with_timetable_slot);
             $conflicts['room_info'] = $info;
         } else {
@@ -540,16 +596,27 @@ trait AjaxFilterTimetableController
         $timetableSlot = TimetableSlot::find(request('timetable_slot_id'));
         // check validate
         if ($timetableSlot instanceof TimetableSlot) {
-            // find all timetable slots conflict with and can merge together.
+            // find all timetable slots conflict with and can merge together
             $canMerge = $this->timetableSlotRepo->check_conflict_lecturer($timetableSlot)['canMerge'];
             // loop for each item
             foreach ($canMerge as $item) {
-                // update group merge id for each item.
+                // remove it from merge timetable slot
+                // @TODO remove item match with
+                // MergeTimetableSlot::find($item->group_merge_id)->delete();
+                // update group merge id for each item
                 $this->timetableSlotRepo->update_timetable_slot_when_merge($item, $timetableSlot->group_merge_id);
-                // remove it from merge timetable slot.
-                MergeTimetableSlot::find($item->group_merge_id)->delete();
             }
         }
+        // add room
+        $room_id = $this->timetableSlotRepo->find_room_existed_merge_timetable_slot($timetableSlot->group_merge_id);
+        if (isset($room_id)) {
+            $timetableSlots = TimetableSlot::where('group_merge_id', $timetableSlot->group_merge_id)->get();
+            foreach ($timetableSlots as $timetableSlot) {
+                $timetableSlot->room_id = $room_id;
+                $timetableSlot->update();
+            }
+        }
+
         return Response::json(['status' => false]);
     }
 

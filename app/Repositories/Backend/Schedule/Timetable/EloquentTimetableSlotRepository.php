@@ -12,7 +12,6 @@ use App\Models\Schedule\Timetable\Slot;
 use App\Models\Schedule\Timetable\Timetable;
 use App\Models\Schedule\Timetable\TimetableSlot;
 use Carbon\Carbon;
-use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
 
 /**
@@ -98,78 +97,6 @@ class EloquentTimetableSlotRepository implements TimetableSlotRepositoryContract
         } else {
             return $start->diffInHours($end);
         }
-    }
-
-    /**
-     * Define timetable slot hos conflict room.
-     *
-     * @param TimetableSlot $timetableSlot
-     * @param Room $room
-     * @return mixed
-     */
-    public function is_conflict_room(TimetableSlot $timetableSlot, Room $room = null)
-    {
-        if ($room != null) {
-            $timetable = $timetableSlot->timetable;
-
-            $timetables = Timetable::where([
-                ['academic_year_id', $timetable->academic_year_id],
-                ['week_id', $timetable->week_id]
-            ])
-                ->where('id', '!=', $timetable->id)
-                ->get();
-
-            if (count($timetables) > 0) {
-                foreach ($timetables as $itemTimetable) {
-                    if (count($itemTimetable->timetableSlots) > 0) {
-                        foreach ($itemTimetable->timetableSlots as $itemTimetableSlot) {
-                            if ((((strtotime($itemTimetableSlot->start) <= strtotime($timetableSlot->start)) && (strtotime($itemTimetableSlot->end) > strtotime($timetableSlot->start))) ||
-                                    ((strtotime($timetableSlot->end) > strtotime($itemTimetableSlot->start)) && (strtotime($timetableSlot->end) < strtotime($itemTimetableSlot->end)))) && ($itemTimetableSlot->room_id == $room->id)
-                            ) {
-                                return array(['status' => true, 'conflict_with' => $itemTimetableSlot]);
-                            }
-                        }
-                    }
-                }
-            }
-        }
-        return false;
-    }
-
-    /**
-     * Define timetable slot has conflict lecturer.
-     *
-     * @param TimetableSlot $timetableSlot
-     * @return mixed
-     */
-    public function is_conflict_lecturer(TimetableSlot $timetableSlot)
-    {
-        $timetable = $timetableSlot->timetable;
-
-        $timetables = Timetable::where([
-            ['academic_year_id', $timetable->academic_year_id],
-            ['week_id', $timetable->week_id]
-        ])
-            ->where('id', '!=', $timetable->id)
-            ->get();
-
-        $timetableSlots = new Collection();
-        if (count($timetables) > 0) {
-            foreach ($timetables as $itemTimetable) {
-                if (count($itemTimetable->timetableSlots) > 0) {
-                    foreach ($itemTimetable->timetableSlots as $itemTimetableSlot) {
-                        if ((((strtotime($itemTimetableSlot->start) <= strtotime($timetableSlot->start)) && (strtotime($itemTimetableSlot->end) > strtotime($timetableSlot->start))) ||
-                                ((strtotime($timetableSlot->end) > strtotime($itemTimetableSlot->start)) && (strtotime($timetableSlot->end) < strtotime($itemTimetableSlot->end))))
-                            && ($itemTimetableSlot->teacher_name == $timetableSlot->teacher_name)
-                        ) {
-                            $timetableSlots->push($itemTimetableSlot);
-                        }
-                    }
-                }
-            }
-            return array(['status' => true, 'timetableSlots' => $timetableSlots]);
-        }
-        return array(['status' => false, 'timetableSlots' => null]);
     }
 
     /**
@@ -480,6 +407,62 @@ class EloquentTimetableSlotRepository implements TimetableSlotRepositoryContract
     {
         $timetableSlot->group_merge_id = $group_merge_id;
         $timetableSlot->updated_at = Carbon::now();
-        return $timetableSlot->update;
+        return $timetableSlot->update();
+    }
+
+    /**
+     * Find room existed merge timetable slot.
+     *
+     * @param $group_merge_id
+     * @return mixed
+     */
+    public function find_room_existed_merge_timetable_slot($group_merge_id)
+    {
+        $group_id = null;
+        // find all timetable slots
+        $timetableSlots = TimetableSlot::where('group_merge_id', $group_merge_id)->get();
+        if (count($timetableSlots) > 1) {
+            foreach ($timetableSlots as $timetableSlot) {
+                if ($timetableSlot->room_id != null) {
+                    $group_id = $timetableSlot->room_id;
+                    break;
+                }
+            }
+        }
+        return $group_id;
+    }
+
+    /**
+     * Define timetable slot hos conflict room.
+     *
+     * @param TimetableSlot $timetableSlot
+     * @return mixed
+     */
+    public function is_conflict_room(TimetableSlot $timetableSlot)
+    {
+        if (isset($timetableSlot->room_id)) {
+            $timetable = $timetableSlot->timetable;
+            $timetables = Timetable::where([
+                ['academic_year_id', $timetable->academic_year_id],
+                ['week_id', $timetable->week_id]
+            ])
+                ->where('id', '!=', $timetable->id)
+                ->get();
+            if (count($timetables) > 0) {
+                foreach ($timetables as $itemTimetable) {
+                    if (count($itemTimetable->timetableSlots) > 0) {
+                        foreach ($itemTimetable->timetableSlots as $itemTimetableSlot) {
+                            if ((((strtotime($itemTimetableSlot->start) <= strtotime($timetableSlot->start)) && (strtotime($itemTimetableSlot->end) > strtotime($timetableSlot->start))) ||
+                                    ((strtotime($timetableSlot->end) > strtotime($itemTimetableSlot->start)) && (strtotime($timetableSlot->end) < strtotime($itemTimetableSlot->end)))) && ($itemTimetableSlot->room_id == $timetableSlot->room_id)
+                                && ($timetableSlot->group_merge_id != $itemTimetableSlot->group_merge_id)
+                            ) {
+                                return array(['status' => true, 'conflict_with' => $itemTimetableSlot]);
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        return false;
     }
 }

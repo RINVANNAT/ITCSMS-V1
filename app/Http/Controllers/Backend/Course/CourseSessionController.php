@@ -154,9 +154,13 @@ class CourseSessionController extends Controller
             ->select('groups.id as group_id', 'groups.code as group_code')
             ->orderBy('groups.code')->get();
 
+
+
         if(count($groups) == 0 ) {
 
-            $groups = DB::table('groups')
+            $groups = [];
+
+            /*$groups = DB::table('groups')
                 ->join('studentAnnuals', function($query) use($course_annual) {
                     $query->on('groups.id', '=', 'studentAnnuals.group_id');
                 })
@@ -168,7 +172,7 @@ class CourseSessionController extends Controller
                 ])
                 ->select('groups.id as group_id', 'groups.code as group_code')
                 ->groupBy('groups.id')
-                ->orderBy('group_code')->get();
+                ->orderBy('group_code')->get();*/
         }
         $course_sessions = CourseSession::leftJoin("employees","employees.id","=","course_sessions.lecturer_id")
             ->leftJoin("course_annuals","course_annuals.id","=","course_sessions.course_annual_id")

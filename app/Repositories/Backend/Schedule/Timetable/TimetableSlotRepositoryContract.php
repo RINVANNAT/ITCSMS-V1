@@ -48,18 +48,9 @@ interface TimetableSlotRepositoryContract
      * Define timetable slot hos conflict room.
      *
      * @param TimetableSlot $timetableSlot
-     * @param Room $room
      * @return mixed
      */
-    public function is_conflict_room(TimetableSlot $timetableSlot, Room $room);
-
-    /**
-     * Define timetable slot has conflict lecturer.
-     *
-     * @param TimetableSlot $timetableSlot
-     * @return mixed
-     */
-    public function is_conflict_lecturer(TimetableSlot $timetableSlot);
+    public function is_conflict_room(TimetableSlot $timetableSlot);
 
     /**
      * Check timetable slot can merge.
@@ -158,4 +149,12 @@ interface TimetableSlotRepositoryContract
      * @return mixed
      */
     public function update_timetable_slot_when_merge(TimetableSlot $timetableSlot, $group_merge_id);
+
+    /**
+     * Find room existed merge timetable slot.
+     *
+     * @param $group_merge_id
+     * @return mixed
+     */
+    public function find_room_existed_merge_timetable_slot($group_merge_id);
 }

@@ -408,7 +408,6 @@
                     get_course_sessions();
                 },
                 eventRender: function (event, element, view) {
-                    console.log(event);
                     var object = '<a class="fc-time-grid-event fc-v-event fc-event fc-start fc-end course-item  fc-draggable fc-resizable" style="top: 65px; bottom: -153px; z-index: 1; left: 0%; right: 0%;">' +
                         '<div class="fc-content">' +
                         '<div class="container-room">' +
@@ -418,8 +417,8 @@
                     object += '<div class="fc-title">' + (event.course_name).substring(0, 10) + '...</div>';
 
                     // check conflict lecturer and render
-                    if(typeof event.conflict_lecturer  !== 'undefined'){
-                        if(event.conflict_lecturer.canMerge.length > 0 || event.conflict_lecturer.canNotMerge.length >0){
+                    if (typeof event.conflict_lecturer !== 'undefined') {
+                        if (event.conflict_lecturer.canMerge.length > 0 || event.conflict_lecturer.canNotMerge.length > 0) {
                             object += '<p class="text-primary conflict">' + event.teacher_name + '</p> ';
                         }
                         else {
@@ -438,7 +437,7 @@
 
                     // check conflict and render room
                     if (event.room != null) {
-                        if (event.is_conflict_room == true) {
+                        if (event.conflict_room == true) {
                             object += '<p class="fc-room bg-danger badge">' + event.building + '-' + event.room + '</p>';
                         } else {
                             object += '<p class="fc-room">' + event.building + '-' + event.room + '</p>';
@@ -447,13 +446,21 @@
                     object += '</div>';
 
                     // render groups
-                    if (event.groups != null) {
-                        object += '<p>Gr: ';
-                        for (var i = 0; i < event.groups.length; i++) {
-                            object += event.groups[i].code + ' ';
+                    if (typeof event.groups !== 'undefined') {
+                        if (event.groups.length > 0) {
+                            var groups = '<p>Gr: ';
+                            for (var i = 0; i < event.groups.length; i++) {
+                                if (event.groups[i] !== null) {
+                                    groups += event.groups[i].code + ' ';
+                                }
+                                else {
+                                    groups = '';
+                                }
+                            }
+                            groups += '</p>';
                         }
-                        object += '</p>';
                     }
+                    object += groups;
                     object += '</div> ' +
                         '<div class="clearfix"></div> ' +
                         '</div>' +
@@ -503,7 +510,7 @@
                             panel_conflict += '</span></li>';
                         }
 
-                        if (response.data.lecturer.canMerge ) {
+                        if (response.data.lecturer.canMerge) {
                             panel_conflict += '<li class="list-group-item">' +
                                 '<i class="fa fa-user"></i> Lecturer ' +
                                 '<i data-toggle="tooltip" data-placement="right" title="Merge" data-original-title="Merge" class="btn btn-info btn-xs fa fa-code-fork pull-right" id="merge"></i>';
@@ -515,7 +522,7 @@
                                     + response.data.lecturer.canMerge[i][0].group + ')</span>';
                             }
                         }
-                        if (response.data.lecturer.canNotMerge ) {
+                        if (response.data.lecturer.canNotMerge) {
                             panel_conflict += '<li class="list-group-item">' +
                                 '<i class="fa fa-user"></i> Lecturer ';
                             for (var i = 0; i < response.data.lecturer.canNotMerge.length; i++) {
@@ -611,8 +618,10 @@
 
                             dom_room.remove();
                             toastr['success']('Room was added.', 'ADDING ROOM');
+                            get_timetable_slots();
                         } else {
                             toastr['warning']('Please select which course.', 'ADDING ROOM ERROR');
+                            get_timetable_slots();
                         }
                     },
                     error: function () {
