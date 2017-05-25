@@ -34,7 +34,7 @@ class Score extends Model
 
 	public function percentageScore()
 	{
-		return $this->belongsToMany('App\Models\Percentage', 'percentage_scores', 'percentage_id', 'score_id');
+		return $this->belongsToMany('App\Models\Percentage', 'percentage_scores', 'score_id', 'percentage_id');
 	}
 
 

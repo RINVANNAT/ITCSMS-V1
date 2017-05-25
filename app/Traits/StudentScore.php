@@ -1,6 +1,7 @@
 <?php
 namespace App\Traits;
 
+use App\Models\CourseAnnual;
 use App\Models\Student;
 use Illuminate\Support\Facades\DB;
 use App\Models\Redouble;
@@ -27,6 +28,35 @@ trait StudentScore {
 
         return number_format((float)$val, 2, '.', '');
     }
+//2040
+    public function arrayIdsOfDeptGradeDegreeDeptOption($courseAnnual)
+    {
+
+        $groups = $courseAnnual->courseAnnualClass()->select('group_id')
+            ->orderBy('group_id')
+            ->whereNotNull('group_id')
+            ->lists('group_id')->toArray();
+
+        $department_ids = [$courseAnnual->department_id];
+        $grade_ids = [$courseAnnual->grade_id];
+        $degree_ids = [$courseAnnual->degree_id];
+        $departmentOptionIds = [$courseAnnual->department_option_id];
+//        $departmentOptionIds = ($courseAnnual->department_option_id !=null)?[$courseAnnual->department_option_id]:null;
+
+        $department_option_ids = [];
+        foreach ($departmentOptionIds as $optionId) {
+            if ($optionId != null) {
+                $department_option_ids[] = $optionId;
+            }
+        }
+        return [
+            'department_id' => $department_ids,
+            'grade_id' => $grade_ids,
+            'degree_id' => $degree_ids,
+            'department_option_id' => $department_option_ids,
+            'group' => $groups
+        ];
+    }
 
     private function averagePropertiesFromDB($array_course_annual_ids) {
         $arrayAverage = [];
@@ -36,13 +66,13 @@ trait StudentScore {
             ->select('average', 'course_annual_id', 'student_annual_id', 'description', 'resit_score')
             ->orderBy('student_annual_id')->get();
 
-        foreach($averageProperties as $average) {
-            $arrayAverage[$average->course_annual_id][$average->student_annual_id]= $average;
-            $arrayScores[$average->course_annual_id][] = $average->average;
-        }
+        $collection = collect($averageProperties)->groupBy('course_annual_id')->toArray();
 
+        foreach($collection as $key  => $collect) {
+            $arrayAverage[$key] = collect($collect)->keyBy('student_annual_id')->toArray();
+        }
         return [
-            'average_score' => $arrayScores,
+
             'average_object'=> $arrayAverage
         ];
     }
@@ -50,8 +80,10 @@ trait StudentScore {
 
         $arrayAbsence=[];
         $absenceProperties = DB::table('absences')->whereIn('course_annual_id', $array_course_annual_ids)->get();
-        foreach($absenceProperties as $absence) {
-            $arrayAbsence[$absence->course_annual_id][$absence->student_annual_id]= $absence;
+        $collection = collect($absenceProperties)->groupBy('course_annual_id')->toArray();
+
+        foreach($collection as $key => $collect) {
+            $arrayAbsence[$key]= collect($collect)->keyBy('student_annual_id')->toArray();
         }
 
         return $arrayAbsence;
@@ -60,10 +92,9 @@ trait StudentScore {
     public function getCourseAnnualWithScore($array_course_annual_ids) {// ---$courseAnnually---collections of all courses by dept, grade, semester ...
 
         $averageProps = $this->averagePropertiesFromDB($array_course_annual_ids);;
-        $averageScore =  $averageProps['average_score'];
         $averageObject = $averageProps['average_object'];
         $absences = $this->absencePropFromDB($array_course_annual_ids);
-        return ['averages'=>$averageObject,'absences'=>$absences, 'arrayCourseScore'=>$averageScore] ;
+        return ['averages'=>$averageObject,'absences'=>$absences] ;
     }
 
     public function getCourseAnnually() {
@@ -245,8 +276,18 @@ trait StudentScore {
         }
 
     }
+    public function findRecordRedouble($idCardPointToStudent) {
 
+        if($idCardPointToStudent->radie == true) {
 
+            return 'Radié';
+        } else {
+            if($idCardPointToStudent->is_changed == true) {
+
+                return $idCardPointToStudent->redouble_name;
+            }
+        }
+    }
 
     public function studentEliminationManager($idCardPointToStudent, $studentRedoubleHistory, $studentIdCard, $check_redouble, $gradeId, $academicYearId, $degreeName) {
 
@@ -415,21 +456,13 @@ trait StudentScore {
         )->groupBy('course_annual_id');
 
         $groups = $selectedGroups->toArray();
+
         foreach($array_course_annual_ids as $annual_id) {
             if(isset($groups[$annual_id])) {
                 $arrayGroups[$annual_id] =array_column( json_decode(json_encode($groups[$annual_id]), true), 'group_id');
             }
         }
         return $arrayGroups;
-
-       /*
-        foreach($selectedGroups as $group) {
-            if($group->group_id != null) {
-                $arrayGroups[$group->course_annual_id][] = $group->group_id;
-            }
-        }
-
-        return $arrayGroups;*/
     }
 
     public function findPassOrFailStudentScore($request) {
@@ -945,6 +978,37 @@ trait StudentScore {
         ];
     }
 
+    public function getCourseAnnualWithProp($props)
+    {
+
+        $courseAnnuals = $this->getCourseAnnually();
+
+        if($props['department_id']) {
+            $courseAnnuals = $courseAnnuals->where('course_annuals.department_id', '=',$props['department_id']);
+        }
+
+        if($props['academic_year_id']) {
+            $courseAnnuals = $courseAnnuals->where('course_annuals.academic_year_id', '=',$props['academic_year_id']);
+        }
+        if($props['degree_id']) {
+            $courseAnnuals = $courseAnnuals->where('course_annuals.degree_id', '=',$props['degree_id']);
+        }
+        if($props['grade_id']) {
+            $courseAnnuals = $courseAnnuals->where('course_annuals.grade_id', '=',$props['grade_id']);
+        }
+        if($props['semester_id']) {
+            $courseAnnuals = $courseAnnuals->where('course_annuals.semester_id', '=',$props['semester_id']);
+        }
+        if($props['dept_option_id']) {
+            $courseAnnuals = $courseAnnuals->where('course_annuals.department_option_id', '=',$props['department_option_id']);
+        }
+
+        $courseAnnuals = $courseAnnuals->orderBy('course_annuals.semester_id')->orderBy('course_annuals.name_en');// note restricted order by semester this is very important to make dynamic table course of each year [if change there would have bugs]
+
+        return $courseAnnuals;
+
+    }
+
     public function hasRattrapages($array_fial_subject, $request ) {
 
         $courseType = $this->getCourseProAndAnnual($request->department_id,$request->academic_year_id, $request->degree_id,$request->grade_id ,$request->semester_id, $request->department_option_id);
@@ -1108,16 +1172,16 @@ trait StudentScore {
 
             if($each_score < ScoreEnum::Under_30) {
 
-                $check_redouble = $this->checkRedouble($stu_dent, $each_course->academic_year_id);//---check this current year if student has been change in redouble
+                //$check_redouble = $this->checkRedouble($stu_dent, $each_course->academic_year_id);//---check this current year if student has been change in redouble
                 /*----create one redouble record for this student ----*/
                 /*---before create redouble record, we have to check if the student has already marked as redouble for this year --then we skip ---*/
-                if($check_redouble === null) {
+                /*if($check_redouble === null) {
                     if($each_course->degree_id == ScoreEnum::Degree_I) {
                         $this->createRedoubleRecord($stu_dent, $redName = trim(ScoreEnum::Red_I.$each_course->grade_id), $each_course->academic_year_id, $isChanged = false);
                     } else {
                         $this->createRedoubleRecord($stu_dent, $redName = trim(ScoreEnum::Red_T.$each_course->grade_id), $each_course->academic_year_id, $isChanged = false);
                     }
-                }
+                }*/
                 $fail_subjects[$stu_dent->id_card]['fail'][] = array('credit'=> $each_course->course_annual_credit, 'score'=> $each_score, 'course_annual_id' => $each_course->course_annual_id, 'student_annual_id' => $stu_dent->student_annual_id);
             } else {
                 $fail_subjects[$stu_dent->id_card]['pass'][] = array('credit'=> $each_course->course_annual_credit, 'score'=> $each_score, 'course_annual_id' => $each_course->course_annual_id, 'student_annual_id' => $stu_dent->student_annual_id);
@@ -1125,6 +1189,90 @@ trait StudentScore {
         }
 
         return $fail_subjects;
+
+    }
+
+    private function createScorePercentage($midterm, $final, $courseAnnualId)
+    {
+
+        $check = 0;
+        $courseAnnual = CourseAnnual::where('id', $courseAnnualId)->first();
+        if ($midterm > 0) {
+            $percentageInput = [
+                [
+                    'name' => 'Midterm-' . $midterm . '%',
+                    'percent' => $midterm,
+                    'percentage_type' => 'normal'
+                ],
+                [
+                    'name' => 'Final-' . $final . '%',
+                    'percent' => $final,
+                    'percentage_type' => 'normal'
+                ]
+            ];
+        } else {
+
+            $percentageInput = [
+                [
+                    'name' => 'Final-' . $final . '%',
+                    'percent' => $final,
+                    'percentage_type' => 'normal'
+                ]
+            ];
+
+        }
+        $propArrayIds = $this->arrayIdsOfDeptGradeDegreeDeptOption($courseAnnual);
+
+        $department_ids = $propArrayIds['department_id'];
+        $degree_ids = $propArrayIds['degree_id'];
+        $grade_ids = $propArrayIds['grade_id'];
+        $department_option_ids = $propArrayIds['department_option_id'];
+        $groups = $propArrayIds['group'];
+
+        $studentByCourse = $this->getStudentByDeptIdGradeIdDegreeId($department_ids, $degree_ids, $grade_ids, $courseAnnual->academic_year_id);
+
+        if (count($department_option_ids) > 0) {
+            $studentByCourse = $studentByCourse->whereIn('studentAnnuals.department_option_id', $department_option_ids);
+        }
+        if ($groups) {
+            $studentAnnualIds = DB::table('group_student_annuals')->whereIn('group_id', $groups)->where('semester_id',$courseAnnual->semester_id )->lists('student_annual_id');
+            $studentByCourse = $studentByCourse->whereIn('studentAnnuals.id', $studentAnnualIds)->get();
+        } else {
+            $studentByCourse = $studentByCourse->where('students.radie', false)->get();
+        }
+
+        foreach ($percentageInput as $input) {
+
+            $savePercentageId = $this->percentages->create($input);// return the percentage id
+
+            if ($studentByCourse) {
+                foreach ($studentByCourse as $studentScore) {
+                    $input = [
+                        'course_annual_id' => $courseAnnualId,
+                        'student_annual_id' => $studentScore->student_annual_id,
+                        'department_id' => $courseAnnual->department_id,
+                        'degree_id' => $courseAnnual->degree_id,
+                        'grade_id' => $courseAnnual->grade_id,
+                        'academic_year_id' => $courseAnnual->academic_year_id,
+                        'semester_id' => $courseAnnual->semester_id,
+                        'socre_absence' => null,
+                        'percentage_id' => [$savePercentageId->id]
+                    ];
+
+                    $saveScoreId = $this->courseAnnualScores->create($input);// return the socreId
+                    //$savePercentageScore = $this->courseAnnualScores->createPercentageScore($saveScoreId->id, $savePercentageId->id);
+                    if ($saveScoreId) {
+                        $check++;
+                    }
+                }
+            }
+        }
+
+        if ($check == (count($studentByCourse) * count($percentageInput))) {
+            return true;
+        } else {
+            return false;
+        }
 
     }
 }

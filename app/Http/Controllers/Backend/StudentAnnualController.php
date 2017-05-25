@@ -27,6 +27,7 @@ use App\Models\PayslipClient;
 use App\Models\Promotion;
 use App\Models\Redouble;
 use App\Models\Scholarship;
+use App\Models\Semester;
 use App\Models\Student;
 use App\Models\StudentAnnual;
 use App\Repositories\Backend\StudentAnnual\StudentAnnualRepositoryContract;
@@ -73,8 +74,9 @@ class StudentAnnualController extends Controller
         $options = DepartmentOption::lists('code','id');
         $academicYears = AcademicYear::orderBy('id','desc')->lists('name_kh','id');
         $origins = Origin::lists('name_kh','id');
+        $semesters = Semester::lists('name_kh','id');
 
-        return view('backend.studentAnnual.index',compact('departments','degrees','grades','genders','options','academicYears','origins'));
+        return view('backend.studentAnnual.index',compact('departments','degrees','grades','genders','options','academicYears','origins','semesters'));
     }
 
     public function popup_index(){
@@ -1046,8 +1048,7 @@ class StudentAnnualController extends Controller
             ->leftJoin('origins', 'students.origin_id', '=', 'origins.id')
             ->leftJoin('origins as pob', 'students.pob', '=', 'pob.id')
             ->leftJoin('histories', 'studentAnnuals.history_id', '=', 'histories.id')
-            ->leftJoin('highSchools', 'students.high_school_id', '=', 'highSchools.id')
-        ;
+            ->leftJoin('highSchools', 'students.high_school_id', '=', 'highSchools.id');
 
         $title = 'បញ្ជីនិស្សិតុ';
 

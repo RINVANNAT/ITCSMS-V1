@@ -17,8 +17,8 @@ trait StudentTrait
 
         $studentAnnual = DB::table('students')
             ->join('studentAnnuals', 'studentAnnuals.student_id', '=', 'students.id')
-            ->leftJoin('redouble_student', 'students.id', '=', 'redouble_student.student_id')
-            ->leftJoin('redoubles', 'redoubles.id', '=', 'redouble_student.redouble_id')
+            //->join('redouble_student', 'students.id', '=', 'redouble_student.student_id')
+            //->join('redoubles', 'redoubles.id', '=', 'redouble_student.redouble_id')
 
             ->join('genders', 'genders.id', '=', 'students.gender_id')
             ->whereIn('studentAnnuals.department_id', $deptId)
@@ -31,15 +31,15 @@ trait StudentTrait
                 'students.name_kh','students.radie',
                 'students.id_card','students.id as student_id',
                 'genders.code',
-                'studentAnnuals.group',
-                'studentAnnuals.group_id',
+                /*'studentAnnuals.group',
+                'studentAnnuals.group_id',*/
                 'studentAnnuals.academic_year_id',
                 'studentAnnuals.department_id',
                 'studentAnnuals.department_option_id',
                 'studentAnnuals.degree_id',
                 'students.observation',
-                'studentAnnuals.remark',
-                'redoubles.name_en as redouble_name'
+                'studentAnnuals.remark'
+                //'redoubles.name_en as redouble_name'
             )
             ->orderBy('students.name_latin');
         return $studentAnnual;
@@ -68,7 +68,7 @@ trait StudentTrait
                 'histories.name_en as history_name',
                 'students.id_card', 'students.id as student_id', 'students.radie',
                 'studentAnnuals.id as student_annual_id',
-                'redouble_student.academic_year_id'
+                'redouble_student.academic_year_id', 'redouble_student.is_changed'
             )
             ->whereIn('id_card', $student_id_cards)
             ->whereIn('studentAnnuals.id', $student_annual_ids)
@@ -126,9 +126,8 @@ trait StudentTrait
 
     public function filtering_student_annual($course_annual, $groups) {
 
+
         $groupByCourseAnnual = isset($groups[$course_annual->course_annual_id])?$groups[$course_annual->course_annual_id]:null;
-
-
 
         if($deptOptionId = $course_annual->department_option_id) {
 
@@ -137,7 +136,9 @@ trait StudentTrait
 
             if($groupByCourseAnnual != null) {
 
-                $filtered_students = $filtered_students->whereIn('studentAnnuals.group_id', $groupByCourseAnnual)->get();
+                $studentAnnualIds = $this->getStudentAnnualByGroupIds($groupByCourseAnnual, $course_annual->semester_id);
+
+                $filtered_students = $filtered_students->whereIn('studentAnnuals.id', $studentAnnualIds)->get();
             } else {
                 $filtered_students =  $filtered_students->get();//->where('studentAnnuals.group', null)->get();
             }
@@ -147,12 +148,13 @@ trait StudentTrait
             $filtered_students =  $this->getStudentByDeptIdGradeIdDegreeId([$course_annual->department_id], [$course_annual->degree_id], [$course_annual->grade_id], $course_annual->academic_year_id);
 
             if($groupByCourseAnnual != null) {
-
-                $filtered_students = $filtered_students->whereIn('studentAnnuals.group_id', $groupByCourseAnnual)->get();
+                $studentAnnualIds = $this->getStudentAnnualByGroupIds($groupByCourseAnnual, $course_annual->semester_id);
+                $filtered_students = $filtered_students->whereIn('studentAnnuals.id', $studentAnnualIds)->get();
             } else {
                 $filtered_students =  $filtered_students->get();//->where('studentAnnuals.group', null)->get();
             }
         }
+
 
         return $filtered_students;
     }
@@ -200,7 +202,7 @@ trait StudentTrait
         }
 
         if(isset($element[$stu_dent->id_card])) {
-            $element[$stu_dent->id_card] = $element[$stu_dent->id_card] + ['Abs'.'_'.htmlspecialchars($each_course->course_id).'_'.$each_course->semester_id =>  isset($absence_by_course)?$absence_by_course->num_absence:"" , 'Credit'.'_'.htmlspecialchars($each_course->course_id).'_'.$each_course->semester_id => $this->format_number($each_score)];
+            $element[$stu_dent->id_card] = $element[$stu_dent->id_card] + ['Abs'.'_'.($each_course->course_id).'_'.$each_course->semester_id =>  isset($absence_by_course)?$absence_by_course->num_absence:"" , 'Credit'.'_'.($each_course->course_id).'_'.$each_course->semester_id => $this->format_number($each_score)];
         } else {
             return false;
         }
@@ -227,6 +229,13 @@ trait StudentTrait
                 $totalMoyenne[$stu_dent->id_card][$semester_id][] =  $this->calculateScoreByCredit($each_course->course_annual_credit, $each_score);
             }
 
+            if($stu_dent->id_card == 'e20150265') {
+
+
+            }
+
+
+
             $totalAbs[$stu_dent->id_card][$semester_id][] = isset($absence_by_course)?$absence_by_course->num_absence:0 ;
             $element[$stu_dent->id_card] = $element[$stu_dent->id_card] + ["S_".$each_course->semester_id => "Total_S_".$each_course->semester_id];
 
@@ -248,8 +257,9 @@ trait StudentTrait
         if(isset($element[$stu_dent->id_card])) {
             $array_student_id_card ['id_card'][] =$stu_dent->id_card;
             $array_student_id_card ['student_annual_id'][] =$stu_dent->student_annual_id;
-            $element[$stu_dent->id_card] = $element[$stu_dent->id_card] + ["Abs_".htmlspecialchars($each_course->course_id)."_".$each_course->semester_id =>  isset($absence_by_course)?$absence_by_course->num_absence:"", "Credit_".htmlspecialchars($each_course->course_id)."_".$each_course->semester_id => $this->floatFormat($each_score)];
+            $element[$stu_dent->id_card] = $element[$stu_dent->id_card] + ["Abs_".($each_course->course_id)."_".$each_course->semester_id =>  isset($absence_by_course)?$absence_by_course->num_absence:"", "Credit_".($each_course->course_id)."_".$each_course->semester_id => $this->floatFormat($each_score)];
         } else {
+
             return false;
         }
 

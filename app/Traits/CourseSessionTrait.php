@@ -492,6 +492,25 @@ trait CourseSessionTrait
         return $groups;
     }
 
+    public function groupStudentAnnual($semesterId) {
+
+
+        $groups = DB::table('studentAnnuals')
+            ->join('group_student_annuals', function ($query) {
+                $query->on('group_student_annuals.student_annual_id', '=', 'studentAnnuals.id');
+            })
+            ->where('group_student_annuals.semester_id', $semesterId)
+            ->join('groups', function ($query) {
+                $query->on('group_student_annuals.group_id', '=', 'groups.id');
+            })
+            ->select('groups.id as group_id', 'groups.code as group_code')
+            ->groupBy('groups.id')
+            ->orderBy('group_code');
+
+        return $groups;
+
+    }
+
     public function deptHasOption($deptId)
     {
 
