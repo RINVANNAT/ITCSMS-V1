@@ -383,6 +383,8 @@
                             cellProperties.readOnly = true;
                     @endif
 
+                } else if (prop === 'General_Remark') {
+                    cellProperties.readOnly = false;
                 }
 
                 if (prop == 'number') {
@@ -527,6 +529,22 @@
                             });
                         }
                         @endauth
+
+                        if (columnIndex == 'General_Remark') {
+                            var remark_rul = '{{route('course_annual.save_each_cell_general_remark')}}';
+                            var baseData_remark = {student_id_card: col_student_id[rowIndex], general_remark: newValue};
+
+                            $.ajax({
+                                type: 'POST',
+                                url: remark_rul,
+                                data: baseData_remark,
+                                dataType: "json",
+                                success: function (resultData) {
+
+                                    //---call back function ....do some stuff
+                                }
+                            });
+                        }
 
 
                     })

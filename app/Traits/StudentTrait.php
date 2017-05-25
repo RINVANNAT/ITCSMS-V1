@@ -38,7 +38,8 @@ trait StudentTrait
                 'studentAnnuals.department_option_id',
                 'studentAnnuals.degree_id',
                 'students.observation',
-                'studentAnnuals.remark'
+                'studentAnnuals.remark',
+                'studentAnnuals.general_remark'
                 //'redoubles.name_en as redouble_name'
             )
             ->orderBy('students.name_latin');

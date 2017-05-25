@@ -1986,6 +1986,7 @@ class CourseAnnualController extends Controller
         $nestedHeaders[0] = array_merge($nestedHeaders[0], ['Rattrapage']);
         //$nestedHeaders[0] = array_merge($nestedHeaders[0], ['Passage']);
         $nestedHeaders[0] = array_merge($nestedHeaders[0], ['Remark']);
+        $nestedHeaders[0] = array_merge($nestedHeaders[0], ['General Remark']);
         $nestedHeaders[0] = array_merge($nestedHeaders[0], ['Observation']);
 
         // Second header
@@ -1994,6 +1995,7 @@ class CourseAnnualController extends Controller
         $nestedHeaders[1] = array_merge($nestedHeaders[1], ['redouble']);
         $nestedHeaders[1] = array_merge($nestedHeaders[1], ['rattrapage']);
         $nestedHeaders[1] = array_merge($nestedHeaders[1], ['remark']);
+        $nestedHeaders[1] = array_merge($nestedHeaders[1], ['']);
         $nestedHeaders[1] = array_merge($nestedHeaders[1], ['observation']);
 
 //        $nestedHeaders[1] = array_merge($nestedHeaders[1], [' ']);
@@ -2005,6 +2007,7 @@ class CourseAnnualController extends Controller
 //        $colWidths[] = 100;//Passage
         $colWidths[] = 200;//observation
         $colWidths[] = 200;// Remark
+        $colWidths[] = 200;// General Remark
         $colWidths[] = 100;//blank header
 
 
@@ -2167,6 +2170,7 @@ class CourseAnnualController extends Controller
 
             // $value['Passage'] = "";
             $value['Remark'] = $array_observation[$key]->remark;
+            $value['General_Remark'] = $array_observation[$key]->general_remark;
 
             $value['Observation'] = isset($array_student_observation[$key]) ? $array_student_observation[$key] : null;
             $value[""] = "";// blank column at last
@@ -3306,6 +3310,18 @@ class CourseAnnualController extends Controller
             return Response::json(['status' => false, 'message' => 'Forbidden!']);
         }
 
+    }
+    public function saveEachGeneralRemark(Request $request)
+    {
+        //----update remark by student id_card in table student_annuals
+        $student = DB::table('students')->where('id_card', $request->student_id_card)->first();
+
+        $student_annual = DB::table('studentAnnuals')
+            ->where('student_id', $student->id)
+            ->update(['general_remark' => $request->general_remark]);
+        if ($student_annual) {
+            return Response::json(['status' => true]);
+        }
     }
 
     public function exportTotalScore(Request $request)
