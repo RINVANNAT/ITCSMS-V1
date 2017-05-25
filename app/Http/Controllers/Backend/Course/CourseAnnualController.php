@@ -1279,10 +1279,16 @@ class CourseAnnualController extends Controller
     private function studentAnnualScores($scores, $courseAnnualId)
     {
         $collect = collect($scores)->groupBy('course_annual_id')->toArray();
-        $secondCollect = collect($collect[$courseAnnualId])->groupBy('student_annual_id')->toArray();
-        $arrayData[$courseAnnualId] = $secondCollect;
+        if(isset($collect[$courseAnnualId])) {
+            $secondCollect = collect($collect[$courseAnnualId])->groupBy('student_annual_id')->toArray();
+            $arrayData[$courseAnnualId] = $secondCollect;
+            return $arrayData;
 
-        return $arrayData;
+        } else {
+            return false;
+        }
+
+
     }
 
     private function handsonTableData($courseAnnualId, $request_group)
@@ -1313,6 +1319,12 @@ class CourseAnnualController extends Controller
 
         $studentByCourse = $this->getStudentByDeptIdGradeIdDegreeId($department_ids, $degree_ids, $grade_ids, $courseAnnual->academic_year_id);
         $allScoreByCourseAnnual = $this->studentAnnualScores($scoreProps, $courseAnnualId);
+        if($allScoreByCourseAnnual == false) {
+            return [
+                'status' => false,
+                'message' => 'This course has not been chosen score for student. Please Update!'
+            ];
+        }
         $allNumberAbsences = $this->getAbsenceFromDB($courseAnnualId);
 
 
@@ -1840,7 +1852,6 @@ class CourseAnnualController extends Controller
             ]);
         }
 
-
         //------get score properties and absence -------
 
         $allProperties = $this->getCourseAnnualWithScore($array_course_annual_ids);
@@ -1872,7 +1883,6 @@ class CourseAnnualController extends Controller
         if ($arrayCourseAnnual) {
 
             $status_info_stu = true; // we want to create element array of student name, id-card,sexe just only a time for one course program
-
             foreach ($arrayCourseAnnual as $course_program_id => $course_Annual) {
 
                 $program = $arrayCourseAnnual[$course_program_id][0];
