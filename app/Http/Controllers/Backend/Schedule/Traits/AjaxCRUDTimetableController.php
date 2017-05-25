@@ -178,7 +178,8 @@ trait AjaxCRUDTimetableController
         $grade_id = request('grade');
         $option_id = request('option') == null ? null : request('option');
 
-        $groups = DB::table('studentAnnuals')
+        // get groups by search on student_annuals table.
+        /*$groups = DB::table('studentAnnuals')
             ->where([
                 ['academic_year_id', $academic_year_id],
                 ['department_id', $department_id],
@@ -193,6 +194,29 @@ trait AjaxCRUDTimetableController
             ->get();
 
         // sort groups name.
+        usort($groups, function ($a, $b) {
+            if (is_numeric($a->name)) {
+                return $a->name - $b->name;
+            } else {
+                return strcmp($a->name, $b->name);
+            }
+        });*/
+
+        // get group by search on slot tables.
+        $groups = DB::table('course_annuals')
+            ->where([
+                ['academic_year_id', $academic_year_id],
+                ['department_id', $department_id],
+                ['degree_id', $degree_id],
+                ['grade_id', $grade_id],
+                ['department_option_id', $option_id]
+            ])
+            ->join('slots', 'slots.course_annual_id', '=', 'course_annuals.id')
+            ->join('groups', 'groups.id', '=', 'slots.group_id')
+            ->distinct('groups.code')
+            ->select('groups.code as name', 'groups.id as id')
+            ->get();
+
         usort($groups, function ($a, $b) {
             if (is_numeric($a->name)) {
                 return $a->name - $b->name;
@@ -620,7 +644,7 @@ trait AjaxCRUDTimetableController
 
         // merge those two to conflicts.
         $conflicts['lecturer'] = $lecturer;
-        count($conflicts['lecturer']) > 0 ? $conflicts['lecturer_conflict'] = true : $conflicts['lecturer_conflict'] = false;
+        (count($resultArrayCanMergeItem) > 0 || count($resultArrayCanNotMergeItem) > 0) ? $conflicts['lecturer_conflict'] = true : $conflicts['lecturer_conflict'] = false;
 
         // Return conflict info.
         return Response::json(['data' => $conflicts]);

@@ -24,20 +24,7 @@
 {{--class="square"--}}
 <div class="form-group">
     <div class="col-md-8 col-md-offset-2">
-        <div class="row render_weeks">
-            @for($i=1; $i<=18; $i++)
-                <div class="col-md-3">
-                    <label for="{{ $i }}">
-                        <input type="checkbox"
-                               data-target="weeks"
-                               name="weeks[]"
-                               value="{{ $i }}"
-                               class="square">
-                        Week {{ $i }}
-                    </label>
-                </div>
-            @endfor
-        </div>
+        <div class="row render_weeks"></div>
     </div>
 </div>
 
@@ -56,28 +43,16 @@
 
 <div class="form-group">
     <div class="col-md-8 col-md-offset-2">
-        <div class="row">
-            @for($i=1; $i<=18; $i++)
-                <div class="col-md-2">
-                    <label for="{{ $i }}">
-                        <input type="checkbox"
-                               data-target="groups"
-                               name="groups[]"
-                               value="{{ $i }}"
-                               class="square"> A
-                    </label>
-                </div>
-            @endfor
-        </div>
+        <div class="row render_groups"></div>
     </div>
 </div>
 
 <hr/>
 <div class="form-group">
     <div class="col-md-offset-2 col-md-8">
-        <input type="submit" class="btn btn-primary btn-sm"
+        <input type="submit" class="btn btn-primary btn-sm button_clone_timetable"
                value="{{ trans('buttons.backend.schedule.timetable.modal_clone.clone') }}">
-        <button type="button" class="btn btn-default btn-sm"
+        <button type="button" class="btn btn-default btn-sm btn_cancel_clone_timetable"
                 data-dismiss="modal">{{ trans('buttons.backend.schedule.timetable.modal_clone.close') }}</button>
     </div>
 </div>

@@ -27,9 +27,12 @@ class CloneTimetableRequest extends Request
      */
     public function rules()
     {
-        return [
+        /*return [
             'weeks' => 'required|array|min:1',
             'groups' => 'required|array|min:1'
+        ];*/
+        return [
+            //
         ];
     }
 
@@ -38,11 +41,11 @@ class CloneTimetableRequest extends Request
      *
      * @return array
      */
-    public function messages()
+    /*public function messages()
     {
         return [
             'weeks.required' => 'At least chose a week field.',
             'groups.required' => 'At least chose a group field.',
         ];
-    }
+    }*/
 }
