@@ -465,4 +465,22 @@ class EloquentTimetableSlotRepository implements TimetableSlotRepositoryContract
         }
         return false;
     }
+
+    /**
+     * Sort groups.
+     *
+     * @param array $groups
+     * @param $field
+     * @return mixed
+     */
+    public function sort_group($groups = array(), $field)
+    {
+        usort($groups, function ($a, $b) {
+            if (is_numeric($a->code)) {
+                return $a->code - $b->code;
+            } else {
+                return strcmp($a->code, $b->code);
+            }
+        });
+    }
 }
