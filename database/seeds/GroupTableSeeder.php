@@ -40,21 +40,21 @@ class GroupTableSeeder extends Seeder
 
 			    		foreach($groups as $group) {
 
-				        	$input = [
-				        		'semester_id' => 1,
-				        		'code' => $group->group,
-				        		'name_en' => '',
-				        		'name_kh' => '',
-				        		'name_fr' => ''
-				        	];
+				        	if($group != null & $group != '') {
 
-				        		$check = DB::table('groups')->where('code', $group->group)->get();
+                                $input = [
+                                    'semester_id' => 1,
+                                    'code' => $group->group,
+                                ];
 
-				        	if(count($check) > 0) {
+                                $check = DB::table('groups')->where('code', $group->group)->get();
 
-				        	} else {
-				        		DB::table('groups')->insert($input);	
-				        	}
+                                if(count($check) > 0) {
+
+                                } else {
+                                    DB::table('groups')->insert($input);
+                                }
+                            }
 			        
 			        	}
 			    	}

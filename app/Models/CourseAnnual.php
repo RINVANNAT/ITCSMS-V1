@@ -72,8 +72,6 @@ class CourseAnnual extends Model
 			$test  = true;
 		}
 
-       
-
 		return $test;
 	}
 

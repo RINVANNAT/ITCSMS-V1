@@ -293,6 +293,35 @@ class AccessServiceProvider extends ServiceProvider
         /*---------------------------------------
             binding For Module score
         ----------------------------------------*/
+
+
+        /*---------------------------------------
+            Binding for module schedule.
+        ----------------------------------------*/
+        $this->app->bind(
+            \App\Repositories\Backend\Schedule\Timetable\TimetableRepositoryContract::class,
+            \App\Repositories\Backend\Schedule\Timetable\EloquentTimetableRepository::class
+        );
+
+        $this->app->bind(
+            \App\Repositories\Backend\Schedule\Timetable\TimetableSlotRepositoryContract::class,
+            \App\Repositories\Backend\Schedule\Timetable\EloquentTimetableSlotRepository::class
+        );
+
+        $this->app->bind(
+            \App\Repositories\Backend\Schedule\Calendar\EventRepositoryContract::class,
+            \App\Repositories\Backend\Schedule\Calendar\EloquentEventRepository::class
+        );
+
+        $this->app->bind(
+            \App\Repositories\Backend\Schedule\Calendar\YearRepositoryContract::class,
+            \App\Repositories\Backend\Schedule\Calendar\EloquentYearRepository::class
+        );
+
+        $this->app->bind(
+            \App\Repositories\Backend\Schedule\Calendar\RepeatRepositoryContract::class,
+            \App\Repositories\Backend\Schedule\Calendar\EloquentRepeatRepository::class
+        );
     }
 
     /**

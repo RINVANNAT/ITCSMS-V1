@@ -622,8 +622,8 @@
 
 
            swal({
-               title: "Confirm",
-               text: "You want to delete this course!!",
+               title: "Attention!",
+               text: "Note: if you delet this course, it will errase your timetable slots!",
                type: "info",
                showCancelButton: true,
                confirmButtonColor: "#DD6B55",

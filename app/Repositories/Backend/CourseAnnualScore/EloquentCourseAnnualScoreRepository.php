@@ -49,6 +49,8 @@ class EloquentCourseAnnualScoreRepository implements CourseAnnualScoreRepository
         $courseAnnualScore->created_at = Carbon::now();
         $courseAnnualScore->create_uid = auth()->id();
         if ($courseAnnualScore->save()) {
+
+            $courseAnnualScore->percentageScore()->attach($input['percentage_id']);
             return $courseAnnualScore;
         }
         throw new GeneralException(trans('exceptions.backend.general.create_error'));

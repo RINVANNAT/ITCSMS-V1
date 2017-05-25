@@ -7,14 +7,15 @@
     <div class="box box-success">
 
         <style>
-            .enlarge-text{
+            .enlarge-text {
                 font-size: 36px;
             }
-            .enlarge-number{
+
+            .enlarge-number {
                 font-size: 22px;
             }
 
-            .enlarge-selection{
+            .enlarge-selection {
                 font-size: 14px;
                 border-radius: 0;
                 background: transparent;
@@ -22,14 +23,13 @@
                 text-indent: 10px;
             }
 
-
             .modal {
                 position: fixed;
                 top: 0;
                 left: 0;
                 right: 0;
                 bottom: 0;
-                background: rgba(0,0,0,0.8);
+                background: rgba(0, 0, 0, 0.8);
                 z-index: 1;
             }
         </style>
@@ -41,92 +41,85 @@
 
             {!! Form::open(['route' => ['admin.course.edit_course_annual',$course->id], 'class' => 'form-horizontal form_edit_course_annual', 'role' => 'form', 'method' => 'put']) !!}
 
-                <table class="table table-hover" id="dev-table">
-                    <thead>
-                    <tr style="background-color: #0a6aa1; color: #00ee00">
-                        <th>Order</th>
-                        <th>Name</th>
-                        <th>Updating</th>
-                    </tr>
-                    </thead>
-                    <tbody>
-                    <tr>
-                        <td width="1cm">1</td>
-                        <td width="20cm"> Khmer</td>
-                        <td><input type="text" name="name_kh" class="form-control inputs_val" value="{{$course->name_kh}}"></td>
+            <table class="table table-hover" id="dev-table">
+                <thead>
+                <tr style="background-color: #0a6aa1; color: #00ee00">
+                    <th>Order</th>
+                    <th>Name</th>
+                    <th>Input Value</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr>
+                    <td>1</td>
+                    <td>Time Course</td>
+                    <td>
+                        {!! Form::text('time_course', ($course->time_course != null)?$course->time_course:0, ['class' => 'form-control number_only inputs_val','required'=>'required']) !!}
+                    </td>
+                </tr>
+                <tr>
+                    <td>1</td>
+                    <td>Time TD</td>
+                    <td>
+                        {!! Form::text('time_td', ($course->time_td != null)?$course->time_td:0, ['class' => 'form-control number_only inputs_val','required'=>'required']) !!}
+                    </td>
+                </tr>
+                <tr>
+                    <td>2</td>
+                    <td>Time TP</td>
+                    <td>
+                        {!! Form::text('time_tp', ($course->time_tp != null)?$course->time_tp:0, ['class' => 'form-control number_only inputs_val','required'=>'required']) !!}
+                    </td>
+                </tr>
 
-                    </tr>
-                    <tr>
-                        <td>2</td>
-                        <td> English</td>
-                        <td><input type="text" name="name_en" class="form-control inputs_val" value="{{$course->name_en}}"></td>
-                    </tr>
-                    <tr>
-                        <td>3</td>
-                        <td> France</td>
-                        <td><input type="text" name="name_fr" class="form-control inputs_val" value="{{$course->name_fr}}"></td>
-                    </tr>
-                    <tr>
-                        <td>4</td>
-                        <td>Time Course</td>
-                        <td>
-                            {!! Form::text('time_course', ($course->time_course != null)?$course->time_course:0, ['class' => 'form-control number_only inputs_val','required'=>'required']) !!}
-                        </td>
-                    </tr>
-                    <tr>
-                        <td>5</td>
-                        <td>Time TD</td>
-                        <td>
-                            {!! Form::text('time_td', ($course->time_td != null)?$course->time_td:0, ['class' => 'form-control number_only inputs_val','required'=>'required']) !!}
-                        </td>
-                    </tr>
-                    <tr>
-                        <td>6</td>
-                        <td>Time TP</td>
-                        <td>
-                            {!! Form::text('time_tp', ($course->time_tp != null)?$course->time_tp:0, ['class' => 'form-control number_only inputs_val','required'=>'required']) !!}
-                        </td>
-                    </tr>
+                </tbody>
+            </table>
 
-                    <tr>
-                        <td>7</td>
-                        <td>Credit</td>
-                        <td>
-                            {!! Form::text('course_annual_credit', ($course->credit != null)?$course->credit:0, ['class' => 'form-control inputs_val','required'=> true]) !!}
-                        </td>
-                    </tr>
+            @if(isset($group_by_course_annual))
 
-                    <tr>
-                        <td>7</td>
-                        <td> Semester </td>
+                <div class="col-md-12 no-padding" style=" text-align: left">
+                    <label style="font-size: 12pt" for="student" class="btn btn-primary btn-xs">
+                        <input type="checkbox" name="student" id="student" value="all">
+                        All Group
+                    </label>
 
-                        <td>
-                            <select name="semester_id" id="select_semester_id" class="enlarge-selection">
-                                @foreach($allSemesters as $semester)
-                                    @if($course->semester_id == $semester->id)
-                                        <option value="{{$semester->id}}" selected>{{$semester->name_en}}</option>
-                                    @else
-                                        <option value="{{$semester->id}}">{{$semester->name_en}}</option>
-
-                                    @endif
-
-                                @endforeach
-
-                            </select>
-                        </td>
-                    </tr>
+                </div>
 
 
-                    <tr>
-                        <td>8</td>
-                        <td> Group </td>
+                <div class="col-md-12">
+                    @foreach($group_by_course_annual as $group)
+                        @if(count($selected_groups) > 0)
 
-                        <td>
-                            {!! Form::select('group',$allGroups,$course->group, array('class'=>'form-control','id'=>'group', 'placeholder' => 'Group')) !!}
-                        </td>
-                    </tr>
-                    </tbody>
-                </table>
+                            @if(in_array($group->group_id, $selected_groups[$course->id]))
+                                <label for="{{$group->group_id}}" style="font-size: 12pt" class="col-md-2 btn btn-xs">
+                                    <input type="checkbox" class="student_group" checked name="group[]"
+                                           id="{{$group->group_id}}" value="{{$group->group_id}}">
+                                    {{$group->group_code}}
+                                </label>
+                            @else
+                                <label for="{{$group->group_id}}" style="font-size: 12pt" class=" col-md-2 btn  btn-xs">
+                                    <input type="checkbox" class="student_group" name="group[]"
+                                           id="{{$group->group_id}}" value="{{$group->group_id}}">
+                                    {{$group->group_code}}
+                                </label>
+
+                            @endif
+                        @else
+
+                            <label for="{{$group->group_id}}" style="font-size: 12pt" class=" col-md-2 btn btn-xs">
+                                <input type="checkbox" name="group[]" class="student_group" id="{{$group->group_id}}"
+                                       value="{{$group->group_id}}">
+                                {{$group->group_code}}
+                            </label>
+                        @endif
+
+
+
+                    @endforeach
+                </div>
+
+            @endif
+
             {!! Form::close() !!}
         </div>
 
@@ -139,7 +132,7 @@
             </div>
 
             <div class="pull-right">
-                <input type="button" id="btn_update_course" class="btn btn-danger btn-xs" value="OK" />
+                <input type="button" id="btn_update_course" class="btn btn-danger btn-xs" value="OK"/>
             </div>
             <div class="clearfix"></div>
         </div><!-- /.box-body -->
@@ -152,23 +145,20 @@
 
     <script>
 
-        function ajaxRequest(method, baseUrl, baseData){
+        function ajaxRequest(method, baseUrl, baseData) {
 
             $.ajax({
                 type: method,
                 url: baseUrl,
                 data: baseData,
-                success: function(result) {
+                success: function (result) {
                     console.log(result);
 
-                    if(result.status== true) {
+                    if (result.status == true) {
                         notify('success', 'info', result.message);
                         window.opener.refresh_course_tree();
-
-//                        window.parent.$("#annual_course");
-
-                        window.setTimeout(function(){
-                          window.close();
+                        window.setTimeout(function () {
+                            window.close();
                         }, 2000);
                     } else {
                         notify('error', 'info', result.message);
@@ -179,34 +169,36 @@
         }
 
 
-        $('#btn_update_course').on('click', function(e) {
+        $('#btn_update_course').on('click', function (e) {
             e.preventDefault();
             var data = $('form.form_edit_course_annual').serialize();
-
             var credit = $('input[name=course_annual_credit]').val();
 
-            if($.isNumeric(credit)) {
-                swal({
-                    title: "Confirm",
-                    text: "Save Edition??",
-                    type: "info",
-                    showCancelButton: true,
-                    confirmButtonColor: "#DD6B55",
-                    confirmButtonText: "Yes,Save it",
-                    closeOnConfirm: true
-                }, function(confirmed) {
-                    if (confirmed) {
-                        ajaxRequest('PUT', $('form.form_edit_course_annual').attr('action'), data);
-                    }
-                });
-
-            } else {
-                notify('error', 'Field Credit is not a valid value')
-            }
+            swal({
+                        title: "Attention!!",
+                        text: "Note: If you make this change, this will errase your timetable which related to this course!",
+                        type: "warning",
+                        showCancelButton: true,
+                        confirmButtonColor: "red",
+                        confirmButtonText: "Yes! Update it",
+                        cancelButtonText: "No",
+                        closeOnConfirm: false,
+                        closeOnCancel: false
+                    },
+                    function(isConfirm) {
+                        if (isConfirm) {
+                            ajaxRequest('PUT', $('form.form_edit_course_annual').attr('action'), data);
+                        } else {
+                            swal("Cancelled", "Your decide not to update the course :)", "error");
+                            window.setTimeout(function () {
+                                window.close();
+                            }, 2000);
+                        }
+                    });
 
         })
 
-        $('#cancel_edit').on('click', function() {
+        $('#cancel_edit').on('click', function () {
             window.close();
         })
 
@@ -224,6 +216,15 @@
                 $('.inputs_val').eq(index).focus().select();
             }
         });
+
+
+        $('input[name=student]').on('change', function () {
+            if ($(this).is(':checked')) {
+                $('.student_group').prop('checked', true);
+            } else {
+                $('.student_group').prop('checked', false);
+            }
+        })
 
 
     </script>

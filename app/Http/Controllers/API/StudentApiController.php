@@ -2,38 +2,38 @@
 
 namespace App\Http\Controllers\API;
 
-use Illuminate\Http\Request;
-
-use App\Http\Requests;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\API\StudentApiRequest;
-use App\Traits\StudentScore;
-use Illuminate\Http\Response;
-use App\Utils\FormParamManager;
-use Illuminate\Support\Facades\DB;
 use App\Models\Student;
+use App\Traits\StudentScore;
+use App\Utils\FormParamManager;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 class StudentApiController extends Controller
 {
 
     use StudentScore; //---trait class
 
-    public function studentScore(StudentApiRequest $request) {
+    public function studentScore(StudentApiRequest $request)
+    {
 
         $dataParams = FormParamManager::getFormParams($request);
 
         $studentAnnualId = $dataParams['student_annual_id'];
         $semesterId = $dataParams['semester_id'];
 
-        if($semesterId) {
+        if ($semesterId) {
             return ['data' => $this->getStudentScoreBySemester($studentAnnualId, $semesterId)];//20486,1
         } else {
 
-            return ['data' => $this->getStudentScoreBySemester($studentAnnualId, $semesterId=null)];
+            return ['data' => $this->getStudentScoreBySemester($studentAnnualId, $semesterId = null)];
         }
 
     }
-    public function studentDataFromDB(StudentApiRequest $request) {
+
+    public function studentDataFromDB(StudentApiRequest $request)
+    {
 
         $students = DB::table('students')
             ->select('students.id_card', 'students.dob', 'students.name_latin')
@@ -42,18 +42,19 @@ class StudentApiController extends Controller
         return $students;
     }
 
-    public function studentObject(StudentApiRequest $request) {
+    public function studentObject(StudentApiRequest $request)
+    {
 
         $dataParams = FormParamManager::getFormParams($request);
-        $studentIdCard = isset($dataParams['student_id_card'])?$dataParams['student_id_card']:null;
-        $academicYearId = isset($dataParams['academic_year_id'])?$dataParams['academic_year_id']:null;
+        $studentIdCard = isset($dataParams['student_id_card']) ? $dataParams['student_id_card'] : null;
+        $academicYearId = isset($dataParams['academic_year_id']) ? $dataParams['academic_year_id'] : null;
         $student = Student::where('id_card', $studentIdCard)->first();
 
-        if($academicYearId) {
+        if ($academicYearId) {
 
             $studentAnnuals = $student->studentAnnuals;//->where('academic_year_id', $academicYearId)->get();
-            foreach($studentAnnuals as $studentAnnual) {
-                if($studentAnnual->academic_year_id == $academicYearId) {
+            foreach ($studentAnnuals as $studentAnnual) {
+                if ($studentAnnual->academic_year_id == $academicYearId) {
                     return $studentAnnual;
                 }
             }
@@ -63,18 +64,19 @@ class StudentApiController extends Controller
         }
     }
 
-    public function studentScoreAnnually(Request $request) {
+    public function studentScoreAnnually(Request $request)
+    {
 
         $dataParams = FormParamManager::getFormParams($request);
-        $studentIdCard = isset($dataParams['student_id_card'])?$dataParams['student_id_card']:null;
-        $academicYearId = isset($dataParams['academic_year_id'])?$dataParams['academic_year_id']:null;
+        $studentIdCard = isset($dataParams['student_id_card']) ? $dataParams['student_id_card'] : null;
+        $academicYearId = isset($dataParams['academic_year_id']) ? $dataParams['academic_year_id'] : null;
         $student = Student::where('id_card', $studentIdCard)->first();
         $courseAnnualByYears = [];
 
-        if($academicYearId) {
+        if ($academicYearId) {
             $studentAnnuals = $student->studentAnnuals;//->where('academic_year_id', $academicYearId)->get();
-            foreach($studentAnnuals as $studentAnnual) {
-                if($studentAnnual->academic_year_id == $academicYearId) {
+            foreach ($studentAnnuals as $studentAnnual) {
+                if ($studentAnnual->academic_year_id == $academicYearId) {
                     $courseAnnualByYear = $this->getStudentScoreBySemester($studentAnnual->id, $semesterId = null);
                     return [
                         'student' => $student,
@@ -87,7 +89,7 @@ class StudentApiController extends Controller
         } else {
             $studentAnnuals = $student->studentAnnuals;
 
-            foreach($studentAnnuals as $studentAnnual) {
+            foreach ($studentAnnuals as $studentAnnual) {
                 $studentScoreEachYear = $this->getStudentScoreBySemester($studentAnnual->id, $semesterId = null);
                 $courseAnnualByYears[$studentAnnual->academic_year_id] = $studentScoreEachYear;
             }
@@ -100,10 +102,11 @@ class StudentApiController extends Controller
         }
     }
 
-    public function student_program(Request $request) {
+    public function student_program(Request $request)
+    {
 
         $dataParams = FormParamManager::getFormParams($request);
-        $studentIdCard = isset($dataParams['student_id_card'])?$dataParams['student_id_card']:null;
+        $studentIdCard = isset($dataParams['student_id_card']) ? $dataParams['student_id_card'] : null;
         if ($studentIdCard != null) {
             return Student::where('id_card', $studentIdCard)->first();
         } else {
@@ -111,13 +114,14 @@ class StudentApiController extends Controller
         }
     }
 
-    public function student_prop(Request $request) {
+    public function student_prop(Request $request)
+    {
 
         $dataParams = FormParamManager::getFormParams($request);
-        $studentIdCard = isset($dataParams['student_id_card'])?$dataParams['student_id_card']:null;
+        $studentIdCard = isset($dataParams['student_id_card']) ? $dataParams['student_id_card'] : null;
 
         $studentProp = Student::where('id_card', $studentIdCard)
-            ->join('genders', function($query) {
+            ->join('genders', function ($query) {
                 $query->on('genders.id', '=', 'students.gender_id');
             })->first();
 
@@ -125,4 +129,28 @@ class StudentApiController extends Controller
 
     }
 
+    /**
+     * @param Request $request
+     * @return array
+     */
+    public function studentByDept(Request $request)
+    {
+
+        $dataParams = FormParamManager::getArrayFormParams($request);
+        $student_id_cards = isset($dataParams['student_id_card']) ? ($dataParams['student_id_card']) : null;
+        $academic_year_id = isset($dataParams['academic_year_id']) ? ($dataParams['academic_year_id']) : null;
+
+        $studentByDept = collect(DB::table('students')
+            ->join('studentAnnuals', function ($query) use ($student_id_cards, $academic_year_id) {
+                $query->on('students.id', '=', 'studentAnnuals.student_id')
+                    ->whereIn('students.id_card', $student_id_cards)
+                    ->where('studentAnnuals.academic_year_id', '=', DB::table('academicYears')->max('id') /*$academic_year_id*/ /*DB::table('academicYears')->max('id')*/);
+            })
+            ->select('students.id_card', 'studentAnnuals.department_id', 'students.name_latin', 'studentAnnuals.academic_year_id')
+            ->get())
+            ->groupBy('department_id')->toArray();
+
+        return ($studentByDept);
+
+    }
 }

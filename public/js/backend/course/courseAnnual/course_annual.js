@@ -2,43 +2,48 @@
 
 
 function load_group(method){
+
     var course_program_id = $('#course_id :selected').val();
     var department_id = $("#department_id").val();
     var academic_year_id = $("#academic_year_id").val();
     var degree_id = $("#degree_id").val();
     var grade_id = $("#grade_id").val();
     var department_option_id = $("#department_option_id").val();
+    var semester_id =  $("#semester_id").val();
 
     // Load group only department, academic year, degree and grade are filled.
-    if(department_id != "" && department_id != null  && academic_year_id != "" && degree_id != "" && grade_id != ""){
-        $.ajax({
-            url : get_group_url,
-            type: 'GET',
-            data: {
-                department_id:$("#department_id").val(),
-                academic_year_id:$("#academic_year_id").val(),
-                degree_id:$("#degree_id").val(),
-                grade_id:$("#grade_id").val(),
-                department_option_id:$("#department_option_id").val(),
-                course_program_id: course_program_id,
-                _method: method
-            },
-            success : function(data){
+    if(semester_id != "" && semester_id != null) {
+        if(department_id != "" && department_id != null  && academic_year_id != "" && degree_id != "" && grade_id != ""){
+            $.ajax({
+                url : get_group_url,
+                type: 'GET',
+                data: {
+                    department_id:$("#department_id").val(),
+                    academic_year_id:$("#academic_year_id").val(),
+                    degree_id:$("#degree_id").val(),
+                    grade_id:$("#grade_id").val(),
+                    department_option_id:$("#department_option_id").val(),
+                    course_program_id: course_program_id,
+                    semester_id: semester_id,
+                    _method: method
+                },
+                success : function(data){
 
-                if(data != null){
-                    var option_text = "";
+                    if(data != null){
+                        var option_text = "";
 
-                    $.each(data, function(key, value){
+                        $.each(data.group_code, function(key, value){
 
-                        option_text = option_text +
+                            option_text = option_text +
 
-                            ' <label><input type="checkbox" class="each_check_box" name="groups[]" value="'+value+'"> '+value+'</label>'
+                                ' <label style="font-size: 12pt" for="'+value+'" class="btn btn-xs"><input  style="font-size: 18pt" type="checkbox" id="'+value+'" class="each_check_box" name="groups[]" value="'+data.group_id[value]+'"> '+value+'</label>'
 
-                    })
-                    $("#group_panel").html(option_text);
+                        })
+                        $("#group_panel").html(option_text);
+                    }
                 }
-            }
-        })
+            })
+        }
     }
 }
 

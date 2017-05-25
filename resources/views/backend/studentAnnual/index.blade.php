@@ -126,8 +126,10 @@
                     '{!! Form::select('department',$departments,null, array('class'=>'form-control','id'=>'filter_department','placeholder'=>'Department')) !!} ' +
                     '{!! Form::select('gender',$genders,null, array('class'=>'form-control','id'=>'filter_gender','placeholder'=>'Gender')) !!} '+
                     '{!! Form::select('option',$options,null, array('class'=>'form-control','id'=>'filter_option','placeholder'=>'Option')) !!} '+
+                    '{!! Form::select('semester',$semesters, null, array('class'=>'form-control','id'=>'filter_semester')) !!} '+
                     '{!! Form::select('origin',$origins,null, array('class'=>'form-control','id'=>'filter_origin','placeholder'=>'Origin')) !!} '+
                     '{!! Form::text('group',null, array('class'=>'form-control','id'=>'filter_group','placeholder'=>'Group')) !!} '
+
             );
 //            $("div.toolbar").html(
 //                    get_filter_box()
@@ -168,6 +170,10 @@
                 e.preventDefault();
             });
             $('#filter_option').on('change', function(e) {
+                oTable.draw();
+                e.preventDefault();
+            });
+            $('#filter_semester').on('change', function(e) {
                 oTable.draw();
                 e.preventDefault();
             });

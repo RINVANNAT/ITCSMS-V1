@@ -42,7 +42,7 @@
 
                                 <?php $status =true;?>
 
-                                    <label for="group"> <input type="checkbox" name="groups[]" class="each-check-box" value="{{$group}}"> {{$group}}</label>
+                                    <label for="group"> <input type="checkbox" name="groups[]" class="each-check-box" value="{{$group->group_id}}"> {{$group->group_code}}</label>
 
                             @endif
 
@@ -88,9 +88,12 @@
             </div>
             <br/>
             <span style="margin-left: 28px;">Groups:
-                @foreach($course_session->groups as $course_session_group)
-                    {{$course_session_group->group}}
-                @endforeach
+                @if(isset($selectedGroups[$course_session->id]))
+                    @foreach($selectedGroups[$course_session->id] as $group)
+                        {{$group->code}}
+                    @endforeach
+                @endif
+
             </span>
         </li>
         @endforeach

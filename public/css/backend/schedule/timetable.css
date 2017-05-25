@@ -1,0 +1,140 @@
+.courses-sessions {
+    margin-bottom: 10px;
+    height: 280px;
+    overflow-y: auto;
+}
+
+.modal-content {
+    background-image: none;
+}
+
+.modal-title {
+    font-family: 'Source Sans Pro', sans-serif !important;
+}
+
+#timetable {
+    border: 1px solid #f1f1f1;
+    padding: 10px;
+}
+
+.box-body .rooms {
+    background-color: #f1f1f1;
+    height: 280px;
+    overflow-y: auto;
+}
+
+.rooms {
+    padding: 10px;
+    margin: 0px;
+    width: 100%;
+    cursor: pointer;
+}
+
+.rooms .room-item {
+    padding: 10px;
+    margin-top: 5px;
+    margin-bottom: 5px;
+    display: inline-block;
+    background-color: #FFF;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, .1);
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
+}
+
+.room-item > .disabled:hover {
+    cursor: help;
+}
+
+.room-item.enabled:hover {
+    background-color: #f1f1f1;
+}
+
+.room-item.enabled:focus {
+    background: red;
+}
+
+.box-body .rooms {
+    background-color: #f1f1f1;
+    height: 280px;
+    overflow-y: auto;
+}
+
+.rooms {
+    padding: 10px;
+    margin: 0px;
+    width: 100%;
+    cursor: pointer;
+}
+
+.rooms .room-item {
+    padding: 10px;
+    margin-top: 5px;
+    margin-bottom: 5px;
+    display: inline-block;
+    background-color: #FFF;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, .1);
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
+}
+
+.rooms .room-item.disabled {
+    cursor: not-allowed;
+}
+
+.course {
+    padding: 5px;
+    font-size: 14px;
+}
+
+.side-course {
+    float: left;
+    background-color: #fff;
+    color: #000;
+    width: 60%;
+}
+
+.side-room {
+    float: right;
+    width: 40%;
+}
+
+.side-course, .side-room {
+    padding: 10px;
+    min-height: 560px;
+    box-sizing: border-box;
+}
+
+.course-selected {
+    background-color: #ddd !important;
+}
+
+.conflict {
+    color: red;
+    text-decoration: line-through;
+}
+
+.courses .course-item {
+    cursor: move;
+}
+
+.course-item.disabled {
+    border-left: 2px solid red;
+    cursor: not-allowed;
+}
+
+.box.box-success .panel-conflict {
+    position: fixed;
+    bottom: 10px;
+    left: 60px;
+    z-index: 9999999999;
+    width: 350px;
+    display: -webkit-box;
+    display: -webkit-flex;
+    display: -ms-flexbox;
+    display: flex;
+    -webkit-flex-direction: column;
+    -ms-flex-direction: column;
+    flex-direction: column;
+    background-color: #fff;
+    box-shadow: 0 2px 5px 0 rgba(0, 0, 0, .16), 0 2px 10px 0 rgba(0, 0, 0, .12);
+}

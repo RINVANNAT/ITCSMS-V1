@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Models\Schedule\Timetable\TimetableSlot;
 use Illuminate\Database\Eloquent\Model;
 
 class CourseSession extends Model
@@ -57,4 +58,14 @@ class CourseSession extends Model
         "time_course" => "required|numeric",
         "time_td" => "required|numeric"
     ];
+
+    /**
+     * Get associated with model TimetableSlot.
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany
+     */
+    public function timetableSlots()
+    {
+        return $this->hasMany(TimetableSlot::class);
+    }
 }

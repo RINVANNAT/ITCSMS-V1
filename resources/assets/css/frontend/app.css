@@ -8760,6 +8760,10 @@ body.stop-scrolling {
   src: url("../fonts/Bayon.ttf"); }
 
 @font-face {
+  font-family: khmersantepheap;
+  src: url("../fonts/khmer-Santepheap.ttf"); }
+
+@font-face {
   font-family: kh-bokor;
   src: url("../fonts/Kh-Bokor.ttf"); }
 

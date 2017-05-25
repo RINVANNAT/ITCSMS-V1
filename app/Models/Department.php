@@ -1,5 +1,6 @@
 <?php namespace App\Models;
 
+use App\Models\Schedule\Calendar\Event\Event;
 use Illuminate\Database\Eloquent\Model as Model;
 
 class Department extends Model
@@ -72,4 +73,11 @@ class Department extends Model
 		"code" => "Required"
 	];
 
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsToMany
+     */
+	public function events()
+    {
+        return $this->belongsToMany(Event::class);
+    }
 }

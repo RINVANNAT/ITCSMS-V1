@@ -11,3 +11,4 @@ Route::get('/data', 'StudentApiController@studentDataFromDB')->name('student.dat
 Route::get('/annual-object', 'StudentApiController@studentObject')->name('student.annual_object');
 Route::get('/program', 'StudentApiController@student_program')->name('student.program');
 Route::get('/prop', 'StudentApiController@student_prop')->name('student.prop');
+Route::post('/dept-by-student', 'StudentApiController@studentByDept')->name('student.department');

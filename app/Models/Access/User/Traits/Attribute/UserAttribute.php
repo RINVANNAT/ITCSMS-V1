@@ -1,6 +1,7 @@
 <?php
 
 namespace App\Models\Access\User\Traits\Attribute;
+use App\Models\Employee;
 
 /**
  * Class UserAttribute
@@ -162,5 +163,22 @@ trait UserAttribute
         $this->getStatusButtonAttribute() .
         $this->getConfirmedButtonAttribute() .
         $this->getDeleteButtonAttribute();
+    }
+
+    /**
+     * Get User's id department.
+     *
+     * @return mixed
+     */
+    public function getDepartment()
+    {
+        $employee = Employee::find(auth()->user()->id);
+        if($employee instanceof Employee)
+        {
+            return $employee->department_id;
+        }
+        else{
+            return 0;
+        }
     }
 }

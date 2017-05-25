@@ -121,11 +121,11 @@
 <div class="form-group">
 
     <div class="col-lg-3">
-        <label for="group" style="float:right" class="control-label"> <input type="checkbox" class="check_all_box"> {{ trans('labels.backend.courseAnnuals.fields.group')}}</label>
+        <label for="group" style="float:right; font-size: 12pt" class="btn btn-xs control-label"> <input id="group" type="checkbox" class="check_all_box"> {{ trans('labels.backend.courseAnnuals.fields.group')}}</label>
     </div>
 
 {{--    {!! Form::label('group','',  ['class' => 'col-lg-3 control-label']) !!}--}}
-    <div class="col-lg-2" id="group_panel">
+    <div class="col-lg-2 no-padding" id="group_panel">
 
         @if(isset($groups))
 
@@ -136,13 +136,13 @@
 
                         <?php $status =true;?>
                         @foreach($courseAnnual->courseAnnualClass as $class)
-                            @if(trim($group) == trim($class->group))
+                            @if(trim($group->group_id) == trim($class->group_id))
                                 <?php $status =false;?>
-                                <label for="{{$class->group}}"> <input id="{{$class->group}}" type="checkbox" name="groups[]" class="each_check_box" value="{{$class->group}}" checked> {{$class->group}}</label>
+                                <label class="btn btn-xs" style="font-size: 12pt" for="{{$class->group_id}}"> <input id="{{$class->group_id}}" type="checkbox" name="groups[]" class="each_check_box" value="{{$class->group_id}}" checked> {{$group->group_code}}</label>
                             @endif
                         @endforeach
                         @if($status == true)
-                            <label for="{{$group}}"> <input id="{{$group}}" type="checkbox" name="groups[]" class="each_check_box" value="{{$group}}"> {{$group}}</label>
+                            <label style="font-size: 12pt" class="btn btn-xs" for="{{$group->group_id}}"> <input id="{{$group->group_id}}" type="checkbox" name="groups[]" class=" each_check_box" value="{{$group->group_id}}"> {{$group->group_code}}</label>
                         @endif
 
                     @endif

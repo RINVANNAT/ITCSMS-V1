@@ -9,18 +9,24 @@ use App\Models\CourseSession;
 use App\Models\School;
 use App\Repositories\Backend\CourseAnnualClass\CourseAnnualClassRepositoryContract;
 use App\Repositories\Backend\CourseSession\CourseSessionRepositoryContract;
-use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Response;
-use Maatwebsite\Excel\Facades\Excel;
 
+/**
+ * Class CourseSessionController
+ * @package App\Http\Controllers\Backend\Course
+ */
 class CourseSessionController extends Controller
 {
     /**
      * @var CourseSessionRepositoryContract
      */
     protected $course_sessions;
+
+    /**
+     * @var CourseAnnualClassRepositoryContract
+     */
     protected $courseAnnualClasses;
 
     /**
@@ -35,7 +41,9 @@ class CourseSessionController extends Controller
         $this->courseAnnualClasses = $courseAnnualClassRepo;
     }
 
-
+    /**
+     * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View
+     */
     public function create()
     {
         return view('backend.configuration.course_session.create');
@@ -44,24 +52,24 @@ class CourseSessionController extends Controller
     /**
      * Store a newly created resource in storage.
      *
-     * @param  StoreCourseSessionRequest  $request
+     * @param  StoreCourseSessionRequest $request
      * @return \Illuminate\Http\Response
      */
     public function store(StoreCourseSessionRequest $request)
     {
-        if($request->ajax()){ // This is passing from course_annual/index
+        if ($request->ajax()) { // This is passing from course_annual/index
             $input = $request->get("data");
             $data = array();
             $data["groups"] = array();
 
-            foreach($input as $key => $ele){
+            foreach ($input as $key => $ele) {
                 $val = $ele["value"];
-                if($val == "") $val = null;
+                if ($val == "") $val = null;
 
-                if($ele["name"] == "employee"){
+                if ($ele["name"] == "employee") {
                     $data["lecturer_id"] = $val;
-                } else if($ele["name"] == "groups[]"){
-                    array_push($data["groups"],$val);
+                } else if ($ele["name"] == "groups[]") {
+                    array_push($data["groups"], $val);
                 } else {
                     $data[$ele["name"]] = $val;
                 }
@@ -69,13 +77,15 @@ class CourseSessionController extends Controller
 
             $storeCourseSession = $this->course_sessions->create($data);
 
-            if($storeCourseSession) {
+            if ($storeCourseSession) {
                 $data = $data + ['course_session_id' => $storeCourseSession->id];
-
+                unset($data['course_annual_id']);/*---we cannot save together of course annual id and course session id */
                 $storeCourseAnnualClass = $this->courseAnnualClasses->create($data);
 
-                if($storeCourseAnnualClass) {
+                if ($storeCourseAnnualClass) {
                     return Response::json(array("success" => true, "message" => "Sessions are created!"));
+                } else {
+                    return Response::json(array("success" => false, "message" => "Sessions are not created!"));
                 }
             }
 
@@ -86,21 +96,21 @@ class CourseSessionController extends Controller
     /**
      * Show the form for editing the specified resource.
      *
-     * @param  int  $id
+     * @param  int $id
      * @return \Illuminate\Http\Response
      */
     public function edit($id)
     {
         $course_session = $this->course_sessions->findOrThrowException($id);
 
-        return view('backend.configuration.course_session.edit',compact('course_session'));
+        return view('backend.configuration.course_session.edit', compact('course_session'));
     }
 
     /**
      * Update the specified resource in storage.
      *
-     * @param  UpdateCourseSessionRequest  $request
-     * @param  int  $id
+     * @param  UpdateCourseSessionRequest $request
+     * @param  int $id
      * @return \Illuminate\Http\Response
      */
     public function update(UpdateCourseSessionRequest $request, $id)
@@ -112,51 +122,58 @@ class CourseSessionController extends Controller
     /**
      * Remove the specified resource from storage.
      *
-     * @param  int  $id
+     * @param  int $id
      * @return \Illuminate\Http\Response
      */
     public function destroy($id, Request $request)
     {
-        if($request->ajax()){
+        if ($request->ajax()) {
             $this->course_sessions->destroy($id);
-            return Response::json(array("success"=> true, "message" => "Session is deleted."));
+            return Response::json(array("success" => true, "message" => "Session is deleted."));
         } else {
             $this->course_sessions->destroy($id);
             return redirect()->route('admin.configuration.course_sessions.index')->withFlashSuccess(trans('alerts.backend.generals.deleted'));
         }
     }
 
-    public function data(Request $request){
+    /**
+     * @param Request $request
+     * @return mixed|null|string
+     */
+    public function data(Request $request)
+    {
         $course_id = $request->get('course_id');
 
         $course_annual = DB::table("course_annuals")
-            ->where("course_annuals.id",$course_id)
+            ->where("course_annuals.id", $course_id)
             ->first();
+        $groups = DB::table('course_annual_classes')
+            ->whereNull('course_session_id')
+            ->where('course_annual_id', $course_id)
+            ->join('groups', 'groups.id', '=', 'course_annual_classes.group_id')
+            ->select('groups.id as group_id', 'groups.code as group_code')
+            ->orderBy('groups.code')->get();
 
-        $groups = DB::table('course_annual_classes')->where([
-            ['course_annual_id', $course_id],
-            ['course_session_id', null]
-        ]);
 
-        if(count($groups->get()) > 1) {
-            $groups = $groups->orderBy('group')->lists('group', 'group');
-        } else {
-            foreach($groups->get() as $group) {
-                if($group->group == null) {
-                    $groups = DB::table('studentAnnuals')->where([
-                        ['department_id', $course_annual->department_id],
-                        ['academic_year_id', $course_annual->academic_year_id],
-                        ['grade_id', $course_annual->grade_id],
-                        ['degree_id', $course_annual->degree_id],
-                    ])->orderBy('group')->lists('group', 'group');
 
-                    break;
-                }
-            }
+        if(count($groups) == 0 ) {
+
+            $groups = [];
+
+            /*$groups = DB::table('groups')
+                ->join('studentAnnuals', function($query) use($course_annual) {
+                    $query->on('groups.id', '=', 'studentAnnuals.group_id');
+                })
+                ->where([
+                    ['department_id', $course_annual->department_id],
+                    ['academic_year_id', $course_annual->academic_year_id],
+                    ['grade_id', $course_annual->grade_id],
+                    ['degree_id', $course_annual->degree_id],
+                ])
+                ->select('groups.id as group_id', 'groups.code as group_code')
+                ->groupBy('groups.id')
+                ->orderBy('group_code')->get();*/
         }
-
-        asort($groups);
-
         $course_sessions = CourseSession::leftJoin("employees","employees.id","=","course_sessions.lecturer_id")
             ->leftJoin("course_annuals","course_annuals.id","=","course_sessions.course_annual_id")
             ->where("course_sessions.course_annual_id",$course_id)
@@ -170,9 +187,17 @@ class CourseSessionController extends Controller
                 'course_sessions.lecturer_id',
                 'course_annuals.name_kh as name',
                 'employees.name_kh as employee'
-            ])->get();
+            ]);
 
-        return view("backend.course.courseSession.index",compact("course_sessions","course_annual", "groups"))->render();
+        $arrayCourseSessionIds = $course_sessions->lists('course_sessions.id')->toArray();
+        $course_sessions = $course_sessions->get();
+
+        $selectedGroups = collect(DB::table('course_annual_classes')
+            ->whereIn('course_annual_classes.course_session_id', $arrayCourseSessionIds)
+            ->join('groups', 'groups.id', '=', 'course_annual_classes.group_id')
+            ->get())->groupBy('course_session_id');
+
+        return view("backend.course.courseSession.index",compact("course_sessions","course_annual", "groups", 'selectedGroups'))->render();
     }
 
 //    public function data()
