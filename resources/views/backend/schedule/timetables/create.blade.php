@@ -231,7 +231,6 @@
                             '</div>';
                         $('.rooms').html(message);
                     }
-
                 },
                 error: function () {
                     toastr['error']('Something went wrong.', 'ERROR SUGGESTION ROOM');
@@ -490,7 +489,7 @@
                 url: '{!! route('get_conflict_info') !!}',
                 data: {timetable_slot_id: timetable_slot_id},
                 success: function (response) {
-                    if (typeof response.data.lecturer_conflict === true || response.data.is_conflict_room == true) {
+                    if (response.data.lecturer_conflict === true || response.data.is_conflict_room === true) {
                         var panel_conflict = '<div class="box-header with-border bg-danger">' +
                             '<h3 class="box-title"><i class="fa fa-info-circle"></i> CONFLICT INFORMATION</h3>' +
                             '<div class="box-tools pull-right"> ' +
@@ -499,20 +498,23 @@
                             '<div class="box-body">';
                         if (response.data.is_conflict_room == true) {
                             panel_conflict += '<ul class="list-group">' +
-                                '<li class="list-group-item"> <i class="fa fa-building-o"></i> Room <span class="badge bg-primary"> ' +
+                                '<li class="list-group-item"> <i class="fa fa-building-o"></i> Room ' +
+                                '<ul class="list-group">' +
+                                '<li class="list-group-item"><i class="fa fa-angle-double-right"></i> ' +
                                 response.data.room_info[0].department + '-' +
                                 response.data.room_info[0].degree +
                                 response.data.room_info[0].grade;
-                            if (response.data.room_info[0].group != null) {
-                                panel_conflict += '(' + response.data.room_info[0].group + ')';
+                            panel_conflict += '<span class="badge bg-primary"> Group: ';
+                            if (response.data.room_info[0].group !== null) {
+                                panel_conflict += response.data.room_info[0].group;
                             }
-                            if (response.data.room_info[0].option != null) {
+                            if (response.data.room_info[0].option !== null) {
                                 panel_conflict += '_' + response.data.room_info[0].option;
                             }
-                            panel_conflict += '</span></li>';
+                            panel_conflict += '</span></li></ul></li>';
                         }
 
-                        if (response.data.lecturer.canMerge.length>0) {
+                        if (response.data.lecturer.canMerge.length > 0) {
                             panel_conflict += '<li class="list-group-item">' +
                                 '<i class="fa fa-user"></i> Lecturer ' +
                                 '<i data-toggle="tooltip" data-placement="right" title="Merge" data-original-title="Merge" class="btn btn-info btn-xs fa fa-code-fork pull-right" id="merge"></i>' +
@@ -526,9 +528,10 @@
                             }
                             panel_conflict += '</ul></li>';
                         }
-                        if (response.data.lecturer.canNotMerge.length>0) {
+                        if (response.data.lecturer.canNotMerge.length > 0) {
+                            console.log(100);
                             panel_conflict += '<li class="list-group-item">' +
-                                '<i class="fa fa-user"></i> Lecturer '+
+                                '<i class="fa fa-user"></i> Lecturer ' +
                                 '<ul class="list-group">';
                             for (var i = 0; i < response.data.lecturer.canNotMerge.length; i++) {
                                 panel_conflict += '<li class="list-group-item"><i class="fa fa-angle-double-right"></i> '
@@ -539,14 +542,8 @@
                             }
                             panel_conflict += '<ul/></li>';
                         }
-
                         panel_conflict += '</ul></div>';
-                        $('#conflict').html(panel_conflict);
-                        $('#conflict').hide();
-                        $('#conflict').fadeIn();
-                    }
-                    else {
-                        $('.panel-conflict').hide();
+                        $('#conflict').html(panel_conflict).hide().fadeIn();
                     }
                 },
                 complete: function () {
@@ -728,7 +725,7 @@
                         toggleLoading(false);
                     }
                 });
-            })
+            });
         });
 
     </script>

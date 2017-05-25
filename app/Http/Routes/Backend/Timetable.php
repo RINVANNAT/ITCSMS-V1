@@ -35,5 +35,7 @@ Route::group(['namespace' => 'Schedule', 'prefix' => 'schedule'], function () {
     /** Clone route. */
     Route::post('timetables/clone', 'TimetableController@cloneTimetable')->name('admin.schedule.timetables.clone');
     Route::post('timetables/clone/weeks', 'TimetableController@get_all_weeks')->name('clone.weeks');
+    Route::post('timetables/clone_timetable_form', 'TimetableController@clone_timetable_form')->name('clone_timetable_form');
+    Route::post('timetables/clone/clone_timetable', 'TimetableController@clone_timetable')->name('clone_timetable');
 });
 

@@ -5,11 +5,11 @@ namespace App\Repositories\Backend\Schedule\Timetable;
 use App\Http\Requests\Backend\Schedule\Timetable\CreateTimetableRequest;
 use App\Models\CourseAnnualClass;
 use App\Models\CourseSession;
-use App\Models\Room;
+use App\Models\Group;
 use App\Models\Schedule\Timetable\Timetable;
 use App\Models\Schedule\Timetable\TimetableSlot;
+use App\Models\Schedule\Timetable\Week;
 use Carbon\Carbon;
-use phpDocumentor\Reflection\Types\Integer;
 
 /**
  * Interface TimetableSlotRepositoryContract
@@ -166,4 +166,33 @@ interface TimetableSlotRepositoryContract
      * @return mixed
      */
     public function sort_group($groups = array(), $field);
+
+    /**
+     * Clone timetable.
+     *
+     * @param Timetable $timetable
+     * @param array $groups
+     * @param array $weeks
+     * @return mixed
+     */
+    public function clone_timetable(Timetable $timetable, $groups = [], $weeks = []);
+
+    /**
+     * Copied timetable.
+     *
+     * @param Timetable $timetable
+     * @param Group|null $group
+     * @param Week $week
+     * @return mixed
+     */
+    public function copied_timetable(Timetable $timetable, Group $group = null, Week $week);
+
+    /**
+     * Copied timetable slot.
+     *
+     * @param Timetable $timetable
+     * @param Timetable $copiedTimetable
+     * @return mixed
+     */
+    public function copied_timetable_slot(Timetable $timetable, Timetable $copiedTimetable);
 }
