@@ -2,6 +2,7 @@
 
 namespace App\Models\Schedule\Timetable;
 
+use App\Models\Schedule\Timetable\Traits\Relationship\SlotRelationship;
 use Illuminate\Database\Eloquent\Model;
 
 /**
@@ -10,5 +11,5 @@ use Illuminate\Database\Eloquent\Model;
  */
 class Slot extends Model
 {
-    //
+    use SlotRelationship;
 }

@@ -14,14 +14,8 @@ class CreateMergeTimetableSlotsTable extends Migration
     {
         Schema::create('merge_timetable_slots', function (Blueprint $table) {
             $table->increments('id');
-            $table->integer('group_timetable_slot_id')->unsigned();
-            $table->integer('timetable_slot_id')->unsigned();
-
-            $table->foreign('timetable_slot_id')
-                ->references('id')
-                ->on('timetable_slots')
-                ->onDelete('cascade');
-
+            $table->dateTime('start')->unsigned();
+            $table->dateTime('end')->unsigned();
             $table->timestamps();
         });
     }

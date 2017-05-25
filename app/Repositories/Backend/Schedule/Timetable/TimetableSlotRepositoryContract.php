@@ -9,6 +9,7 @@ use App\Models\Room;
 use App\Models\Schedule\Timetable\Timetable;
 use App\Models\Schedule\Timetable\TimetableSlot;
 use Carbon\Carbon;
+use phpDocumentor\Reflection\Types\Integer;
 
 /**
  * Interface TimetableSlotRepositoryContract
@@ -47,26 +48,18 @@ interface TimetableSlotRepositoryContract
      * Define timetable slot hos conflict room.
      *
      * @param TimetableSlot $timetableSlot
-     * @param Room $room
      * @return mixed
      */
-    public function is_conflict_room(TimetableSlot $timetableSlot, Room $room);
+    public function is_conflict_room(TimetableSlot $timetableSlot);
 
     /**
-     * Define timetable slot has conflict course.
+     * Check timetable slot can merge.
      *
      * @param TimetableSlot $timetableSlot
+     * @param TimetableSlot $mergedTimetableSlot
      * @return mixed
      */
-    public function is_conflict_course(TimetableSlot $timetableSlot);
-
-    /**
-     * Define timetable slot has conflict lecturer.
-     *
-     * @param TimetableSlot $timetableSlot
-     * @return mixed
-     */
-    public function is_conflict_lecturer(TimetableSlot $timetableSlot);
+    public function can_merge(TimetableSlot $timetableSlot, TimetableSlot $mergedTimetableSlot);
 
     /**
      * Get associate with.
@@ -123,4 +116,45 @@ interface TimetableSlotRepositoryContract
      * @return mixed
      */
     public function update_course_session(CourseSession $course_session);
+
+    /**
+     * Create merge timetable slot.
+     *
+     * @param CreateTimetableRequest $request
+     * @return mixed
+     */
+    public function create_merge_timetable_slot(CreateTimetableRequest $request);
+
+    /**
+     * Update merge timetable slot.
+     *
+     * @param TimetableSlot $timetableSlot
+     * @return mixed
+     */
+    public function update_merge_timetable_slot(TimetableSlot $timetableSlot);
+
+    /**
+     * Check conflict lecturer.
+     *
+     * @param TimetableSlot $timetableSlot
+     * @return mixed
+     */
+    public function check_conflict_lecturer(TimetableSlot $timetableSlot);
+
+    /**
+     * Update Timetable Slot when merge.
+     *
+     * @param TimetableSlot $timetableSlot
+     * @param integer $group_merge_id
+     * @return mixed
+     */
+    public function update_timetable_slot_when_merge(TimetableSlot $timetableSlot, $group_merge_id);
+
+    /**
+     * Find room existed merge timetable slot.
+     *
+     * @param $group_merge_id
+     * @return mixed
+     */
+    public function find_room_existed_merge_timetable_slot($group_merge_id);
 }

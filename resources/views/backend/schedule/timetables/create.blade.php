@@ -338,11 +338,11 @@
                 },
                 error: function (response) {
                     toastr['error'](response.message, "ERROR RESIZE COURSE");
-                    $('#timetable').fullCalendar('refresh');
+                    get_timetable_slots();
                     get_course_sessions();
                 },
                 complete: function () {
-                    $('#timetable').fullCalendar('refresh');
+                    get_timetable_slots();
                     get_course_sessions();
                 }
             })
@@ -412,35 +412,55 @@
                         '<div class="fc-content">' +
                         '<div class="container-room">' +
                         '<div class="side-course" id="' + event.id + '">';
-                    if (event.is_conflict_course == true) {
-                        object += '<div class="fc-title conflict">' + (event.course_name).substring(0, 10) + '...</div>';
-                    } else {
-                        object += '<div class="fc-title">' + (event.course_name).substring(0, 10) + '...</div>';
+
+                    // check conflict room and render
+                    object += '<div class="fc-title">' + (event.course_name).substring(0, 10) + '...</div>';
+
+                    // check conflict lecturer and render
+                    if (typeof event.conflict_lecturer !== 'undefined') {
+                        if (event.conflict_lecturer.canMerge.length > 0 || event.conflict_lecturer.canNotMerge.length > 0) {
+                            object += '<p class="text-primary conflict">' + event.teacher_name + '</p> ';
+                        }
+                        else {
+                            object += '<p class="text-primary">' + event.teacher_name + '</p> ';
+                        }
                     }
-                    if (event.is_conflict_lecturer == true) {
-                        object += '<p class="text-primary conflict">' + event.teacher_name + '</p> ';
-                    } else {
+                    else {
                         object += '<p class="text-primary">' + event.teacher_name + '</p> ';
                     }
+
+
                     object += '<p class="text-primary">' + event.type + '</p> ' +
                         '</div>' +
                         '<div class="side-room">' +
                         '<div class="room-name">';
+
+                    // check conflict and render room
                     if (event.room != null) {
-                        if (event.is_conflict_room == true) {
+                        if (event.conflict_room == true) {
                             object += '<p class="fc-room bg-danger badge">' + event.building + '-' + event.room + '</p>';
                         } else {
                             object += '<p class="fc-room">' + event.building + '-' + event.room + '</p>';
                         }
                     }
                     object += '</div>';
-                    if (event.groups != null) {
-                        object += '<p>Gr: ';
-                        for (var i = 0; i < event.groups.length; i++) {
-                            object += event.groups[i].code + ' ';
+
+                    // render groups
+                    if (typeof event.groups !== 'undefined') {
+                        if (event.groups.length > 0) {
+                            var groups = '<p>Gr: ';
+                            for (var i = 0; i < event.groups.length; i++) {
+                                if (event.groups[i] !== null) {
+                                    groups += event.groups[i].code + ' ';
+                                }
+                                else {
+                                    groups = '';
+                                }
+                            }
+                            groups += '</p>';
                         }
-                        object += '</p>';
                     }
+                    object += groups;
                     object += '</div> ' +
                         '<div class="clearfix"></div> ' +
                         '</div>' +
@@ -469,7 +489,7 @@
                 url: '{!! route('get_conflict_info') !!}',
                 data: {timetable_slot_id: timetable_slot_id},
                 success: function (response) {
-                    if ((response.status == true) && (response.data.is_conflict_room == true || response.data.is_conflict_lecturer == true)) {
+                    if (response.data.lecturer_conflict === true || response.data.is_conflict_room == true) {
                         var panel_conflict = '<div class="box-header with-border bg-danger">' +
                             '<h3 class="box-title"><i class="fa fa-info-circle"></i> CONFLICT INFORMATION</h3>' +
                             '<div class="box-tools pull-right"> ' +
@@ -489,41 +509,32 @@
                             }
                             panel_conflict += '</span></li>';
                         }
-                        if (response.data.is_conflict_lecturer == true) {
-                            if (response.data.merge == true) {
-                                panel_conflict += '<li class="list-group-item">' +
-                                    '<i class="fa fa-user"></i> Lecturer ' +
-                                    '<i data-toggle="tooltip" data-placement="right" title="Merge" data-original-title="Merge" class="btn btn-info btn-xs fa fa-code-fork pull-right" id="merge"></i>' +
-                                    '<span class="badge bg-primary"> ';
-                            }
-                            else {
-                                panel_conflict += '<li class="list-group-item">' +
-                                    '<i class="fa fa-user"></i> Lecturer <span class="badge bg-primary"> ';
-                            }
-                            panel_conflict += response.data.lecturer_info[0].department + '-' +
-                                response.data.lecturer_info[0].degree +
-                                response.data.lecturer_info[0].grade + '(';
-                            if (response.data.info != null) {
-                                for (var i = 0; i < response.data.info.length; i++) {
-                                    if (i == response.data.info.length - 1) {
-                                        panel_conflict += response.data.info[i].code + '';
-                                    }
-                                    else {
-                                        panel_conflict += response.data.info[i].code + ', ';
-                                    }
-                                }
-                            }
-                            if (response.data.lecturer_info[0].group != null && response.data.info == null) {
-                                panel_conflict += '(' + response.data.lecturer_info[0].group;
-                            }
-                            panel_conflict += ')';
-                            if (response.data.lecturer_info[0].option != null) {
-                                panel_conflict += '_' + response.data.lecturer_info[0].option;
-                            }
-                            panel_conflict += '</span></li></ul>';
 
+                        if (response.data.lecturer.canMerge) {
+                            panel_conflict += '<li class="list-group-item">' +
+                                '<i class="fa fa-user"></i> Lecturer ' +
+                                '<i data-toggle="tooltip" data-placement="right" title="Merge" data-original-title="Merge" class="btn btn-info btn-xs fa fa-code-fork pull-right" id="merge"></i>';
+                            for (var i = 0; i < response.data.lecturer.canMerge.length; i++) {
+                                panel_conflict += '<span class="badge bg-primary">'
+                                    + response.data.lecturer.canMerge[i][0].department + '-'
+                                    + response.data.lecturer.canMerge[i][0].degree
+                                    + response.data.lecturer.canMerge[i][0].grade + '('
+                                    + response.data.lecturer.canMerge[i][0].group + ')</span>';
+                            }
                         }
-                        panel_conflict += '</div>';
+                        if (response.data.lecturer.canNotMerge) {
+                            panel_conflict += '<li class="list-group-item">' +
+                                '<i class="fa fa-user"></i> Lecturer ';
+                            for (var i = 0; i < response.data.lecturer.canNotMerge.length; i++) {
+                                panel_conflict += '<span class="badge bg-primary">'
+                                    + response.data.lecturer.canNotMerge[i][0].department + '-'
+                                    + response.data.lecturer.canNotMerge[i][0].degree
+                                    + response.data.lecturer.canNotMerge[i][0].grade + '('
+                                    + response.data.lecturer.canNotMerge[i][0].group + ')</span>';
+                            }
+                        }
+
+                        panel_conflict += '</ul></div>';
 
 
                         $('#conflict').html(panel_conflict);
@@ -607,8 +618,10 @@
 
                             dom_room.remove();
                             toastr['success']('Room was added.', 'ADDING ROOM');
+                            get_timetable_slots();
                         } else {
                             toastr['warning']('Please select which course.', 'ADDING ROOM ERROR');
+                            get_timetable_slots();
                         }
                     },
                     error: function () {
@@ -674,6 +687,7 @@
             });
 
             $(document).on('click', '#merge', function () {
+                //toggleLoading(true);
                 $.ajax({
                     type: 'POST',
                     url: '{!! route('merge_timetable_slot') !!}',
@@ -681,12 +695,13 @@
                         timetable_slot_id: $('.side-course.course-selected').attr('id')
                     },
                     success: function (response) {
-                        get_timetable();
+                        get_timetable_slots();
                         hide_conflict_information();
                     },
                     complete: function () {
-                        $('#timetable').fullCalendar('refresh');
+                        get_timetable_slots();
                         hide_conflict_information();
+                        //toggleLoading(false);
                     }
                 });
             });
@@ -706,7 +721,7 @@
                             toastr['warning']('Slots was not exported', 'Export Slots');
                         }
                     },
-                    complete:function () {
+                    complete: function () {
                         toggleLoading(false);
                     }
                 });

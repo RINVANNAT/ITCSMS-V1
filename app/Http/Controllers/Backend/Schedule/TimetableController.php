@@ -12,7 +12,6 @@ use App\Models\Degree;
 use App\Models\Department;
 use App\Models\DepartmentOption;
 use App\Models\Grade;
-use App\Models\Room;
 use App\Models\Schedule\Timetable\Timetable;
 use App\Models\Schedule\Timetable\TimetableSlot;
 use App\Models\Schedule\Timetable\Week;
@@ -194,16 +193,6 @@ class TimetableController extends Controller
 
                 $newTimetableSlot = TimetableSlot::find($timetable_slot->id);
                 $timetableSlot = new Collection($newTimetableSlot);
-                if ($this->timetableSlotRepo->is_conflict_lecturer($newTimetableSlot)[0]['status'] == true) {
-                    $timetableSlot->put('is_conflict_lecturer', true);
-                } else {
-                    $timetableSlot->put('is_conflict_lecturer', false);
-                }
-                if ($this->timetableSlotRepo->is_conflict_room($newTimetableSlot, Room::find($newTimetableSlot->room_id))[0]['status'] == true) {
-                    $timetableSlot->put('is_conflict_room', true);
-                } else {
-                    $timetableSlot->put('is_conflict_room', false);
-                }
                 $timetableSlot->put('building', $timetable_slot->building);
                 $timetableSlot->put('room', $timetable_slot->room);
                 $timetableSlots->push($timetableSlot);
@@ -224,17 +213,14 @@ class TimetableController extends Controller
             $new_timetable_slot = $this->timetableSlotRepository->create_timetable_slot($findTimetable, $request);
         } else {
             $newTimetable = $this->timetableRepository->create_timetable($request);
-
             if ($newTimetable instanceof Timetable) {
                 $new_timetable_slot = $this->timetableSlotRepository->create_timetable_slot($newTimetable, $request);
-
             }
         }
         if ($new_timetable_slot) {
             return Response::json([
                 'status' => true,
-                'timetable_slot' => \GuzzleHttp\json_decode($new_timetable_slot),
-                'is_conflict_course' => $this->timetableSlotRepository->is_conflict_course($new_timetable_slot)
+                'timetable_slot' => \GuzzleHttp\json_decode($new_timetable_slot)
             ]);
         }
         return Response::json(['status' => false]);

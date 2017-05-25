@@ -2,8 +2,9 @@
 
 namespace App\Models\Schedule\Timetable\Traits\Relationship;
 
-use App\Models\CourseSession;
 use App\Models\Room;
+use App\Models\Schedule\Timetable\MergeTimetableSlot;
+use App\Models\Schedule\Timetable\Slot;
 use App\Models\Schedule\Timetable\Timetable;
 
 /**
@@ -33,12 +34,22 @@ trait TimetableSlotRelationship
     }
 
     /**
-     * Get associated with model CourseSession.
+     * Get associated with model Slot.
      *
      * @return mixed
      */
-    public function courseSession()
+    public function slot()
     {
-        return $this->belongsTo(CourseSession::class);
+        return $this->belongsTo(Slot::class);
+    }
+
+    /**
+     * Get associated with merge timetable slot model.
+     *
+     * @return mixed
+     */
+    public function mergeTimetableSlot()
+    {
+        return $this->belongsTo(MergeTimetableSlot::class);
     }
 }
