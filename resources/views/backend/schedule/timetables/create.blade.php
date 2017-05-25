@@ -484,12 +484,13 @@
         }
 
         function check_conflict(timetable_slot_id) {
+            toggleLoading(true);
             $.ajax({
                 type: 'POST',
                 url: '{!! route('get_conflict_info') !!}',
                 data: {timetable_slot_id: timetable_slot_id},
                 success: function (response) {
-                    if (response.data.lecturer_conflict === true || response.data.is_conflict_room == true) {
+                    if (typeof response.data.lecturer_conflict === true || response.data.is_conflict_room == true) {
                         var panel_conflict = '<div class="box-header with-border bg-danger">' +
                             '<h3 class="box-title"><i class="fa fa-info-circle"></i> CONFLICT INFORMATION</h3>' +
                             '<div class="box-tools pull-right"> ' +
@@ -497,7 +498,8 @@
                             '</button></div></div>' +
                             '<div class="box-body">';
                         if (response.data.is_conflict_room == true) {
-                            panel_conflict += '<ul class="list-group"><li class="list-group-item"> <i class="fa fa-building-o"></i> Room <span class="badge bg-primary"> ' +
+                            panel_conflict += '<ul class="list-group">' +
+                                '<li class="list-group-item"> <i class="fa fa-building-o"></i> Room <span class="badge bg-primary"> ' +
                                 response.data.room_info[0].department + '-' +
                                 response.data.room_info[0].degree +
                                 response.data.room_info[0].grade;
@@ -510,33 +512,35 @@
                             panel_conflict += '</span></li>';
                         }
 
-                        if (response.data.lecturer.canMerge) {
+                        if (response.data.lecturer.canMerge.length>0) {
                             panel_conflict += '<li class="list-group-item">' +
                                 '<i class="fa fa-user"></i> Lecturer ' +
-                                '<i data-toggle="tooltip" data-placement="right" title="Merge" data-original-title="Merge" class="btn btn-info btn-xs fa fa-code-fork pull-right" id="merge"></i>';
+                                '<i data-toggle="tooltip" data-placement="right" title="Merge" data-original-title="Merge" class="btn btn-info btn-xs fa fa-code-fork pull-right" id="merge"></i>' +
+                                '<ul class="list-group">';
                             for (var i = 0; i < response.data.lecturer.canMerge.length; i++) {
-                                panel_conflict += '<span class="badge bg-primary">'
-                                    + response.data.lecturer.canMerge[i][0].department + '-'
-                                    + response.data.lecturer.canMerge[i][0].degree
-                                    + response.data.lecturer.canMerge[i][0].grade + '('
-                                    + response.data.lecturer.canMerge[i][0].group + ')</span>';
+                                panel_conflict += '<li class="list-group-item"><i class="fa fa-angle-double-right"></i> '
+                                    + response.data.lecturer.canMerge[i].department + '-'
+                                    + response.data.lecturer.canMerge[i].degree
+                                    + response.data.lecturer.canMerge[i].grade + '<span class="badge bg-danger pull-right">Group: '
+                                    + response.data.lecturer.canMerge[i].group + '</span></li>';
                             }
+                            panel_conflict += '</ul></li>';
                         }
-                        if (response.data.lecturer.canNotMerge) {
+                        if (response.data.lecturer.canNotMerge.length>0) {
                             panel_conflict += '<li class="list-group-item">' +
-                                '<i class="fa fa-user"></i> Lecturer ';
+                                '<i class="fa fa-user"></i> Lecturer '+
+                                '<ul class="list-group">';
                             for (var i = 0; i < response.data.lecturer.canNotMerge.length; i++) {
-                                panel_conflict += '<span class="badge bg-primary">'
-                                    + response.data.lecturer.canNotMerge[i][0].department + '-'
-                                    + response.data.lecturer.canNotMerge[i][0].degree
-                                    + response.data.lecturer.canNotMerge[i][0].grade + '('
-                                    + response.data.lecturer.canNotMerge[i][0].group + ')</span>';
+                                panel_conflict += '<li class="list-group-item"><i class="fa fa-angle-double-right"></i> '
+                                    + response.data.lecturer.canNotMerge[i].department + '-'
+                                    + response.data.lecturer.canNotMerge[i].degree
+                                    + response.data.lecturer.canNotMerge[i].grade + '<span class="badge bg-primary pull-right">Group: '
+                                    + response.data.lecturer.canNotMerge[i].group + '</span></li>';
                             }
+                            panel_conflict += '<ul/></li>';
                         }
 
                         panel_conflict += '</ul></div>';
-
-
                         $('#conflict').html(panel_conflict);
                         $('#conflict').hide();
                         $('#conflict').fadeIn();
@@ -545,11 +549,8 @@
                         $('.panel-conflict').hide();
                     }
                 },
-                error: function () {
-                    //sweetAlert('Error...');
-                },
                 complete: function () {
-                    //sweetAlert('Completed...');
+                    toggleLoading(false);
                 }
             })
         }
@@ -571,6 +572,7 @@
                 var week_id = $('select[name="weekly"] :selected').val();
                 var timetable_slot_id = $(this).attr('id');
                 get_suggest_room(academic_year_id, week_id, timetable_slot_id);
+                hide_conflict_information();
                 check_conflict(timetable_slot_id);
 
             });
@@ -686,6 +688,7 @@
                 hide_conflict_information();
             });
 
+            // merge timetable slot together in case that those timetable slots are the same condition.
             $(document).on('click', '#merge', function () {
                 //toggleLoading(true);
                 $.ajax({
@@ -706,7 +709,7 @@
                 });
             });
 
-
+            // export course session into slots table.
             $(document).on('click', '.btn_export_course_session', function () {
                 toggleLoading(true);
                 $.ajax({

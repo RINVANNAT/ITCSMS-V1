@@ -157,4 +157,13 @@ interface TimetableSlotRepositoryContract
      * @return mixed
      */
     public function find_room_existed_merge_timetable_slot($group_merge_id);
+
+    /**
+     * Sort groups.
+     *
+     * @param array $groups
+     * @param $field
+     * @return mixed
+     */
+    public function sort_group($groups = array(), $field);
 }
