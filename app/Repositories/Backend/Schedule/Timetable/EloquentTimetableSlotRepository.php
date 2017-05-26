@@ -408,7 +408,7 @@ class EloquentTimetableSlotRepository implements TimetableSlotRepositoryContract
     {
         $timetableSlot->group_merge_id = $group_merge_id;
         $timetableSlot->updated_at = Carbon::now();
-        return $timetableSlot->update();
+        $timetableSlot->update();
     }
 
     /**
@@ -497,12 +497,16 @@ class EloquentTimetableSlotRepository implements TimetableSlotRepositoryContract
     {
         $result = true;
         // check validate timetable object
-        if ($timetable instanceof Timetable) {
-            // if we have groups.
-            if (isset($groups)) {
-                foreach ($groups as $group) {
-                    if (isset($weeks)) {
-                        foreach ($weeks as $week) {
+        // if we have groups.
+        if (isset($groups)) {
+            foreach ($groups as $group) {
+                if (isset($weeks)) {
+                    foreach ($weeks as $week) {
+                        // by this week and group, don't save it again.
+                        if ($timetable->group_id == $group && $timetable->week_id == $week) {
+                            continue;
+                        } else { // otherwise, we need to create a new timetable.
+                            // start clone timetable by timetable object, group and week.
                             $itemTimetable = $this->copied_timetable($timetable, Group::find($group), Week::find($week));
                             if ($itemTimetable instanceof Timetable) {
                                 if ($this->copied_timetable_slot($timetable, $itemTimetable)) {
@@ -515,10 +519,15 @@ class EloquentTimetableSlotRepository implements TimetableSlotRepositoryContract
                         }
                     }
                 }
-            } // no groups.
-            else {
-                if (isset($weeks)) {
-                    foreach ($weeks as $week) {
+            }
+        } // no groups.
+        else {
+            if (isset($weeks)) {
+                foreach ($weeks as $week) {
+                    // by this week, don't save it again.
+                    if ($timetable->week_id == $week) {
+                        continue;
+                    } else {// otherwise, we need to create a new timetable.
                         $itemTimetable = $this->copied_timetable($timetable, null, Week::find($week));
                         if ($itemTimetable instanceof Timetable) {
                             if ($this->copied_timetable_slot($timetable, $itemTimetable)) {
@@ -558,33 +567,29 @@ class EloquentTimetableSlotRepository implements TimetableSlotRepositoryContract
         ])->first();
 
         // timetable is the itself
-        if (($timetable->week_id == $week->id)) {
-            return false;
+        if (($findTimetable instanceof Timetable) && ($timetable->week_id != $week->id)) {
+            if (count($findTimetable->timetableSlots) > 0) {
+                foreach ($findTimetable->timetableSlots as $timetableSlot) {
+                    $timetableSlot->delete();
+                }
+            }
+            return $findTimetable;
         } else {
-            // if timetable already existed, remove all timetable slots and return this timetable.
-            if ($findTimetable instanceof Timetable) {
-                if (count($findTimetable->timetableSlots)>0) {
-                    foreach ($findTimetable->timetableSlots as $timetableSlot){
-                        $timetableSlot->delete();
-                    }
-                }
-                return $findTimetable;
-            } else {
-                // create a new timetable.
-                $newTimetable = new Timetable();
-                $newTimetable->academic_year_id = $timetable->academic_year_id;
-                $newTimetable->department_id = $timetable->department_id;
-                $newTimetable->degree_id = $timetable->degree_id;
-                $newTimetable->option_id = $timetable->option_id;
-                $newTimetable->grade_id = $timetable->grade_id;
-                $newTimetable->semester_id = $timetable->semester_id;
-                $group == null ? $newTimetable->group_id = null : $newTimetable->group_id = $group->id;
-                $newTimetable->week_id = $week->id;
-                $newTimetable->created_uid = auth()->user()->id;
-                $newTimetable->updated_uid = auth()->user()->id;
-                if ($newTimetable->save()) {
-                    return $newTimetable;
-                }
+            // create a new timetable.
+            // check groups, there are any groups
+            $newTimetable = new Timetable();
+            $newTimetable->academic_year_id = $timetable->academic_year_id;
+            $newTimetable->department_id = $timetable->department_id;
+            $newTimetable->degree_id = $timetable->degree_id;
+            $newTimetable->option_id = $timetable->option_id;
+            $newTimetable->grade_id = $timetable->grade_id;
+            $newTimetable->semester_id = $timetable->semester_id;
+            $newTimetable->group_id = $group == null ? null : $group->id;
+            $newTimetable->week_id = $week->id;
+            $newTimetable->created_uid = auth()->user()->id;
+            $newTimetable->updated_uid = auth()->user()->id;
+            if ($newTimetable->save()) {
+                return $newTimetable;
             }
         }
         return false;
@@ -599,6 +604,7 @@ class EloquentTimetableSlotRepository implements TimetableSlotRepositoryContract
      */
     public function copied_timetable_slot(Timetable $timetable, Timetable $copiedTimetable)
     {
+        // dd($copiedTimetable);
         $result = true;
         $timetableSlots = $timetable->timetableSlots;
         if (count($timetableSlots) > 0) {
@@ -608,6 +614,7 @@ class EloquentTimetableSlotRepository implements TimetableSlotRepositoryContract
                 $newMergeTimetableSlot->start = $timetableSlot->start;
                 $newMergeTimetableSlot->end = $timetableSlot->end;
                 if ($newMergeTimetableSlot->save()) {
+                    // check out copiedTimetableSlot
                     $newTimetableSlot = new TimetableSlot();
                     $newTimetableSlot->timetable_id = $copiedTimetable->id;
                     $newTimetableSlot->course_session_id = $timetableSlot->course_session_id;
@@ -617,11 +624,24 @@ class EloquentTimetableSlotRepository implements TimetableSlotRepositoryContract
                     $newTimetableSlot->course_name = $timetableSlot->course_name;
                     $newTimetableSlot->teacher_name = $timetableSlot->teacher_name;
                     $newTimetableSlot->type = $timetableSlot->type;
+
+                    $slot = Slot::find($timetableSlot->slot_id);
+                    dd($slot);
+
+                    if ($slot->time_remaining > $timetableSlot->durations) {
+                        $slot->time_remaining = $slot->time_remaining - $timetableSlot->durations;
+                        $slot->update();
+                        $newTimetableSlot->durations = $timetableSlot->durations;
+                    } else {
+                        $result = false;
+                        break;
+                    }
                     $newTimetableSlot->durations = $timetableSlot->durations;
                     $newTimetableSlot->start = $timetableSlot->start;
                     $newTimetableSlot->end = $timetableSlot->end;
                     $newTimetableSlot->created_uid = auth()->user()->id;
                     $newTimetableSlot->updated_uid = auth()->user()->id;
+
                     if ($newTimetableSlot->save()) {
                         $result = true;
                     } else {

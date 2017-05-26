@@ -130,27 +130,55 @@ $(document).ready(function () {
         });
         i = 0;
 
-        $.ajax({
-            type: 'POST',
-            url: '/admin/schedule/timetables/clone/clone_timetable',
-            data: {
-                weeks: weeks,
-                groups: groups,
-                academic_year_id: $('select[name="academicYear"] :selected').val(),
-                department_id: $('select[name="department"] :selected').val(),
-                degree_id: $('select[name="degree"] :selected').val(),
-                option_id: $('select[name="option"] :selected').val(),
-                grade_id: $('select[name="grade"] :selected').val(),
-                semester_id: $('select[name="semester"] :selected').val(),
-                group_id: $('select[name="group"] :selected').val(),
-                week_id: $('select[name="weekly"] :selected').val()
-            },
-            success: function (response) {
-                //console.log(response);
-            },
-            complete: function () {
-                //toggleLoading(false);
-            }
-        })
+        swal({
+            title: 'Are you sure?',
+            text: "Timetable slots will remove automatic.",
+            type: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#3085d6',
+            cancelButtonColor: '#d33',
+            confirmButtonText: 'Clone'
+        }).then(function () {
+            toggleLoading(true);
+            $.ajax({
+                type: 'POST',
+                url: '/admin/schedule/timetables/clone/clone_timetable',
+                data: {
+                    weeks: weeks,
+                    groups: groups,
+                    academic_year_id: $('select[name="academicYear"] :selected').val(),
+                    department_id: $('select[name="department"] :selected').val(),
+                    degree_id: $('select[name="degree"] :selected').val(),
+                    option_id: $('select[name="option"] :selected').val(),
+                    grade_id: $('select[name="grade"] :selected').val(),
+                    semester_id: $('select[name="semester"] :selected').val(),
+                    group_id: $('select[name="group"] :selected').val(),
+                    week_id: $('select[name="weekly"] :selected').val()
+                },
+                success: function (response) {
+                    if (response.status === true) {
+                        $('#clone-timetable').modal('toggle');
+                        notify('info', 'Cloning timetable successfully', 'Clone Timetable');
+                        get_course_sessions();
+                    } else {
+                        swal(
+                            'Oops...',
+                            response.message,
+                            'error'
+                        );
+                    }
+                },
+                error: function () {
+                    swal(
+                        'Oops...!',
+                        'Please check internet connection.',
+                        'error'
+                    );
+                },
+                complete: function () {
+                    toggleLoading(false);
+                }
+            });
+        });
     })
 });

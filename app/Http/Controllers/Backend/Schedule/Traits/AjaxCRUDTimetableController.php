@@ -7,6 +7,7 @@ use App\Http\Requests\Backend\Schedule\Timetable\MoveTimetableSlotRequest;
 use App\Http\Requests\Backend\Schedule\Timetable\ResizeTimetableSlotRequest;
 use App\Models\DepartmentOption;
 use App\Models\Group;
+use App\Models\Schedule\Timetable\MergeTimetableSlot;
 use App\Models\Schedule\Timetable\Slot;
 use App\Models\Schedule\Timetable\Timetable;
 use App\Models\Schedule\Timetable\TimetableSlot;
@@ -663,12 +664,10 @@ trait AjaxCRUDTimetableController
         if ($timetableSlot instanceof TimetableSlot) {
             // find all timetable slots conflict with and can merge together
             $canMerge = $this->timetableSlotRepo->check_conflict_lecturer($timetableSlot)['canMerge'];
-            // loop for each item
             foreach ($canMerge as $item) {
-                // remove it from merge timetable slot
-                // @TODO remove item match with
-                // MergeTimetableSlot::find($item->group_merge_id)->delete();
+                // array_push($result, $this->timetableSlotRepo->update_timetable_slot_when_merge($item, $timetableSlot->group_merge_id));
                 // update group merge id for each item
+                DB::table('merge_timetable_slots')->where('id', '=', $item->group_merge_id)->delete();
                 $this->timetableSlotRepo->update_timetable_slot_when_merge($item, $timetableSlot->group_merge_id);
             }
         }
@@ -681,7 +680,7 @@ trait AjaxCRUDTimetableController
                 $timetableSlot->update();
             }
         }
-
+        // return result
         return Response::json(['status' => false]);
     }
 
