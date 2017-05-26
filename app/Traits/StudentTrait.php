@@ -156,7 +156,6 @@ trait StudentTrait
             }
         }
 
-
         return $filtered_students;
     }
 
@@ -230,13 +229,6 @@ trait StudentTrait
                 $totalMoyenne[$stu_dent->id_card][$semester_id][] =  $this->calculateScoreByCredit($each_course->course_annual_credit, $each_score);
             }
 
-            if($stu_dent->id_card == 'e20150265') {
-
-
-            }
-
-
-
             $totalAbs[$stu_dent->id_card][$semester_id][] = isset($absence_by_course)?$absence_by_course->num_absence:0 ;
             $element[$stu_dent->id_card] = $element[$stu_dent->id_card] + ["S_".$each_course->semester_id => "Total_S_".$each_course->semester_id];
 
@@ -244,11 +236,9 @@ trait StudentTrait
             foreach($semesters as $semester) {
 
                 if($each_course->semester_id == $semester->id) {
-
                     if($each_course->is_counted_creditability) {
                         $totalMoyenne[$stu_dent->id_card][$semester->id][] =  $this->calculateScoreByCredit($each_course->course_annual_credit, $each_score);
                     }
-
                     $totalAbs[$stu_dent->id_card][$semester->id][] = isset($absence_by_course)?$absence_by_course->num_absence:0 ;
                 }
                 $element[$stu_dent->id_card] = $element[$stu_dent->id_card] + ["S_".$semester->id => "Total_S_".$semester->id];

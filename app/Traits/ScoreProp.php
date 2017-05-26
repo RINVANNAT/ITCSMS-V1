@@ -84,6 +84,19 @@ trait ScoreProp {
         return $percentages;
     }
 
+    public function averageByCourseAnnual($courseAnnualId)
+    {
+        $scoreAverages = DB::table('averages')->where('course_annual_id', $courseAnnualId)->get();
+        if($scoreAverages) {
+            $averages = collect($scoreAverages)->groupBy('course_annual_id')->toArray();
+            $arrayAverages[$courseAnnualId] = collect($averages[$courseAnnualId])->keyBy('student_annual_id')->toArray();
+            return $arrayAverages;
+        } else {
+            return [];
+        }
+
+    }
+
     public function propertiesScores($courseAnnualId)
     {
         $scores = $this->scoreProp($courseAnnualId);
@@ -116,6 +129,40 @@ trait ScoreProp {
         return $each_column_score;
     }
 
+
+
+
+
+    /*---not use but keep if needed nextime ------*/
+    public function storeTotalScoreEachCourseAnnual($input)
+    {
+
+        $courseAnnual = CourseAnnual::where('id', $input['course_annual_id'])->first();
+        if ($courseAnnual->is_allow_scoring || auth()->user()->allow("input-score-without-blocking")) {
+            $totalScore = $this->averages->findAverageByCourseIdAndStudentId($input['course_annual_id'], (int)$input['student_annual_id']);// check if total score existe
+
+            if ($totalScore) {
+
+                //update calcuation total score
+                $UpdateAverage = $this->averages->update($totalScore->id, $input);
+                if ($UpdateAverage) {
+                    return $UpdateAverage;
+                }
+
+            } else {
+                // insert new calculation score
+                $storeAverage = $this->averages->create($input); // store total score then return collection-with ID
+                if ($storeAverage) {
+                    return $storeAverage;
+                }
+            }
+        } else {
+
+            throw new GeneralException("Permission denied.");
+
+        }
+
+    }
 
 
 

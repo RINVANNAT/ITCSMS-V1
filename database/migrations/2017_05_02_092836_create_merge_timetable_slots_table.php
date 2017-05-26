@@ -12,12 +12,17 @@ class CreateMergeTimetableSlotsTable extends Migration
      */
     public function up()
     {
-        Schema::create('merge_timetable_slots', function (Blueprint $table) {
-            $table->increments('id');
-            $table->dateTime('start')->unsigned();
-            $table->dateTime('end')->unsigned();
-            $table->timestamps();
-        });
+
+        if(!Schema::hasTable('merge_timetable_slots')) {
+
+            Schema::create('merge_timetable_slots', function (Blueprint $table) {
+                $table->increments('id');
+                $table->dateTime('start')->unsigned();
+                $table->dateTime('end')->unsigned();
+                $table->timestamps();
+            });
+        }
+
     }
 
     /**

@@ -59,12 +59,14 @@ trait StudentScore {
     }
 
     private function averagePropertiesFromDB($array_course_annual_ids) {
+
         $arrayAverage = [];
         $arrayScores=[];
         $averageProperties = DB::table('averages')
             ->whereIn('course_annual_id', $array_course_annual_ids)
             ->select('average', 'course_annual_id', 'student_annual_id', 'description', 'resit_score')
             ->orderBy('student_annual_id')->get();
+
 
         $collection = collect($averageProperties)->groupBy('course_annual_id')->toArray();
 
@@ -91,10 +93,14 @@ trait StudentScore {
 
     public function getCourseAnnualWithScore($array_course_annual_ids) {// ---$courseAnnually---collections of all courses by dept, grade, semester ...
 
-        $averageProps = $this->averagePropertiesFromDB($array_course_annual_ids);;
+        $averageProps = $this->averagePropertiesFromDB($array_course_annual_ids);
         $averageObject = $averageProps['average_object'];
         $absences = $this->absencePropFromDB($array_course_annual_ids);
         return ['averages'=>$averageObject,'absences'=>$absences] ;
+    }
+
+    public function calculateMoyenneInBothSemster() {
+
     }
 
     public function getCourseAnnually() {
@@ -282,9 +288,13 @@ trait StudentScore {
 
             return 'Radié';
         } else {
+
+
             if($idCardPointToStudent->is_changed == true) {
 
                 return $idCardPointToStudent->redouble_name;
+            } else {
+
             }
         }
     }
@@ -1000,7 +1010,7 @@ trait StudentScore {
             $courseAnnuals = $courseAnnuals->where('course_annuals.semester_id', '=',$props['semester_id']);
         }
         if($props['dept_option_id']) {
-            $courseAnnuals = $courseAnnuals->where('course_annuals.department_option_id', '=',$props['department_option_id']);
+            $courseAnnuals = $courseAnnuals->where('course_annuals.department_option_id', '=',$props['dept_option_id']);
         }
 
         $courseAnnuals = $courseAnnuals->orderBy('course_annuals.semester_id')->orderBy('course_annuals.name_en');// note restricted order by semester this is very important to make dynamic table course of each year [if change there would have bugs]
