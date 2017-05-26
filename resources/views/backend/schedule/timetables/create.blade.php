@@ -135,7 +135,7 @@
                 url: '/admin/schedule/timetables/get_rooms',
                 data: {_token: '{{csrf_token()}}'},
                 success: function (response) {
-                    if (response.status == true) {
+                    if (response.status === true) {
                         var room_item = '';
                         $.each(response.rooms, function (key, val) {
                             room_item += '<div class="room-item enabled" id="' + val.id + '">'
@@ -192,7 +192,7 @@
                     }
                 },
                 error: function () {
-                    toastr['error']('Something went wrong.', 'ERROR SUGGESTION ROOM');
+                    notify('error', 'Something went wrong.', 'Suggestion Room');
                 }
             })
         }
@@ -208,7 +208,7 @@
                     room_number: room_number
                 },
                 success: function (response) {
-                    if (response.status == true) {
+                    if (response.status === true) {
                         var room_item = '';
 
                         $.each(response.roomRemain, function (key, val) {
@@ -233,7 +233,7 @@
                     }
                 },
                 error: function () {
-                    toastr['error']('Something went wrong.', 'ERROR SUGGESTION ROOM');
+                    notify('error', 'Something went wrong.', 'Suggestion Room');
                 }
             })
         }
@@ -273,17 +273,17 @@
                     'end': copiedEventObject.end
                 },
                 success: function (response) {
-                    if (response.status == true) {
-                        toastr['info']('The course was added.', 'ADDING COURSE');
+                    if (response.status === true) {
+                        notify('success', 'Timetable Slot was added.', 'Add Timetable Slot');
                         get_timetable_slots();
                     }
                     else {
-                        toastr['error']('The timetable slot was not created.', 'ERROR !');
+                        notify('error', 'Timetable Slot was not created yet.', 'Add Timetable Slot');
                         get_timetable();
                     }
                 },
                 error: function () {
-                    toastr['error']('The course was not added.', 'ERROR ADDING COURSE');
+                    notify('error', 'Timetable Slot was not created yet.', 'Add Timetable Slot');
                 },
                 complete: function () {
                     get_course_sessions();
@@ -303,15 +303,15 @@
                     start_date: start_date
                 },
                 success: function (response) {
-                    if (response.status == true) {
-                        toastr["success"]("The course was moved.", "MOVING COURSE");
+                    if (response.status === true) {
+                        notify('info', 'Timetable Slot was moved.', 'Move Timetable Slot');
                         $('#timetable').fullCalendar('refresh');
                     } else {
-                        toastr["error"]("Something went wrong.", "ERROR MOVING COURSE");
+                        notify('error', 'Something went wrong.', 'Move Timetable Slot');
                     }
                 },
                 error: function () {
-                    toastr["error"]("Something went wrong.", "ERROR MOVING COURSE");
+                    notify('error', 'Something went wrong.', 'Move Timetable Slot');
                 },
                 complete: function () {
                     get_timetable_slots();
@@ -328,15 +328,15 @@
                     end: end_date
                 },
                 success: function (response) {
-                    if (response.status == true) {
-                        toastr["success"]("Timetable slot have been changed.", "Timetable Slot Change");
+                    if (response.status === true) {
+                        notify('info', 'Timetable slot have been changed.', 'Resize Timetable Slot');
                     } else {
-                        toastr['error'](response.message, "ERROR RESIZE COURSE");
+                        notify('error', 'Something went wrong.', 'Resize Timetable Slot');
                         revertFunc();
                     }
                 },
                 error: function (response) {
-                    toastr['error'](response.message, "ERROR RESIZE COURSE");
+                    notify('error', response.message, "Resize timetable Slot");
                     get_timetable_slots();
                     get_course_sessions();
                 },
@@ -483,7 +483,6 @@
         }
 
         function check_conflict(timetable_slot_id) {
-            toggleLoading(true);
             $.ajax({
                 type: 'POST',
                 url: '{!! route('get_conflict_info') !!}',
@@ -523,7 +522,8 @@
                                 panel_conflict += '<li class="list-group-item"><i class="fa fa-angle-double-right"></i> '
                                     + response.data.lecturer.canMerge[i].department + '-'
                                     + response.data.lecturer.canMerge[i].degree
-                                    + response.data.lecturer.canMerge[i].grade + '<span class="badge bg-danger pull-right">Group: '
+                                    + response.data.lecturer.canMerge[i].grade + '-'
+                                    + response.data.lecturer.canMerge[i].week + '<span class="badge bg-danger pull-right">Group: '
                                     + response.data.lecturer.canMerge[i].group + '</span></li>';
                             }
                             panel_conflict += '</ul></li>';
@@ -537,7 +537,8 @@
                                 panel_conflict += '<li class="list-group-item"><i class="fa fa-angle-double-right"></i> '
                                     + response.data.lecturer.canNotMerge[i].department + '-'
                                     + response.data.lecturer.canNotMerge[i].degree
-                                    + response.data.lecturer.canNotMerge[i].grade + '<span class="badge bg-primary pull-right">Group: '
+                                    + response.data.lecturer.canNotMerge[i].grade + '-'
+                                    + response.data.lecturer.canNotMerge[i].week + '<span class="badge bg-primary pull-right">Group: '
                                     + response.data.lecturer.canNotMerge[i].group + '</span></li>';
                             }
                             panel_conflict += '<ul/></li>';
@@ -546,8 +547,8 @@
                         $('#conflict').html(panel_conflict).hide().fadeIn();
                     }
                 },
-                complete: function () {
-                    toggleLoading(false);
+                error: function () {
+                    notify('error', 'Something went wrong.', 'Check Conflict Info');
                 }
             })
         }
@@ -587,14 +588,10 @@
                     success: function () {
                         dom.parent().parent().children().eq(0).empty();
                         dom.remove();
-                        toastr['info']('The room was removed.', 'REMOVING ROOM');
+                        notify('info', 'Room was removed.', 'Remove Room');
                     },
                     error: function () {
-                        swal(
-                            'Oops...',
-                            'Something went wrong!',
-                            'error'
-                        )
+                        notify('error', 'Something went wrong.', 'Remove Room');
                     }
                 })
             });
@@ -610,21 +607,18 @@
                         room_id: $(this).attr('id')
                     },
                     success: function (response) {
-                        if (response.status == true) {
-                            // var btn_delete = '<button class="btn btn-danger btn-xs remove-room"><i class="fa fa-trash"></i></button>';
-                            // $('.container-room').find('.side-course.course-selected').parent().children().eq(1).children().eq(1).html(btn_delete);
+                        if (response.status === true) {
                             $('.container-room').find('.side-course.course-selected').parent().children().eq(1).children().eq(0).html('<p class="fc-room">' + dom_room.children().eq(1).text() + '</p>');
-
                             dom_room.remove();
-                            toastr['success']('Room was added.', 'ADDING ROOM');
+                            notify('success', 'Room was added', 'Add Room');
                             get_timetable_slots();
                         } else {
-                            toastr['warning']('Please select which course.', 'ADDING ROOM ERROR');
+                            notify('warning', 'Please select which course.', 'Add Room');
                             get_timetable_slots();
                         }
                     },
                     error: function () {
-                        toastr['error']('Something went wrong.', 'ADDING ROOM ERROR');
+                        notify('error', 'Something went wrong.', 'Add Room');
                     }
                 });
             });
@@ -665,7 +659,7 @@
             });
             // search rooms.
             $(document).on('keyup', 'input[name="search_room_query"]', function () {
-                if ($('.container-room').find('.side-course.course-selected').length == 1) {
+                if ($('.container-room').find('.side-course.course-selected').length === 1) {
                     var academic_year_id = $('select[name="academicYear"] :selected').val();
                     var week_id = $('select[name="weekly"] :selected').val();
                     var timetable_slot_id = $('.container-room').find('.side-course.course-selected').attr('id');
@@ -713,12 +707,12 @@
                     type: 'POST',
                     url: '{!! route('export_course_session') !!}',
                     success: function (response) {
-                        if (response.status == true) {
+                        if (response.status === true) {
                             get_course_sessions();
-                            toastr['success']('Slots was exported', 'Export Slots');
+                            notify('info', 'Slots was exported', 'Export Slots');
                         }
                         else {
-                            toastr['warning']('Slots was not exported', 'Export Slots');
+                            notify('warning', 'Slots was not exported', 'Export Slots');
                         }
                     },
                     complete: function () {

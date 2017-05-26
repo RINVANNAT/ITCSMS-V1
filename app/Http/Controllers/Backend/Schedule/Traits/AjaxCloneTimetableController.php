@@ -90,12 +90,13 @@ trait AjaxCloneTimetableController
             ['group_id', $request->group_id == null ? null : $request->group_id]
         ])
             ->first();
-        // start clone.
 
-        if ($this->timetableSlotRepo->clone_timetable($timetable, $request->groups, $request->weeks)) {
-            return Response::json(['status' => true], 200);
-        } else {
-            return Response::json(['status' => false], 500);
+        // start clone.
+        if($timetable instanceof Timetable){
+            if ($this->timetableSlotRepo->clone_timetable($timetable, $request->groups, $request->weeks)) {
+                return Response::json(['status' => true], 200);
+            }
         }
+        return Response::json(['status' => false, 'message' => 'Timetable did not created yet.']);
     }
 }
