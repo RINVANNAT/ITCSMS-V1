@@ -15,26 +15,31 @@ class CreateWeeksTable extends Migration
      */
     public function up()
     {
-        Schema::create('weeks', function (Blueprint $table) {
-            $table->increments('id');
-            $table->integer('semester_id')->unsigned();
 
-            $table->string('name_kh')->nullable();
-            $table->string('name_en')->nullable();
-            $table->string('name_fr')->nullable();
+        if(!Schema::hasTable('weeks')) {
 
-            $table->string('code');
+            Schema::create('weeks', function (Blueprint $table) {
+                $table->increments('id');
+                $table->integer('semester_id')->unsigned();
 
-            $table->integer('created_uid');
-            $table->integer('updated_uid');
+                $table->string('name_kh')->nullable();
+                $table->string('name_en')->nullable();
+                $table->string('name_fr')->nullable();
 
-            $table->foreign('semester_id')
-                ->references('id')
-                ->on('semesters')
-                ->onDelete('cascade');
+                $table->string('code');
 
-            $table->timestamps();
-        });
+                $table->integer('created_uid');
+                $table->integer('updated_uid');
+
+                $table->foreign('semester_id')
+                    ->references('id')
+                    ->on('semesters')
+                    ->onDelete('cascade');
+
+                $table->timestamps();
+            });
+        }
+
     }
 
     /**

@@ -936,9 +936,10 @@
             filter_table();
         });
         $('#filter_semester').on('change', function () {
+            filter_table();
 
 
-            swal({
+            /*swal({
                 title: "Attention",
                 text: "The student record will be chagened....Are you sure?",
                 type: "warning",
@@ -948,9 +949,9 @@
                 closeOnConfirm: true
             }, function (confirmed) {
                 if (confirmed) {
-                    filter_table();
+
                 }
-            });
+            });*/
         })
         $('#filter_degree').on('change', function () {
             filter_table();
