@@ -50,4 +50,11 @@ interface AbsenceRepositoryContract
 
 
     public function findIfExist($courseAnnualID, $studentAnnualID);
+
+    /**
+     * @param $courseAnnualId
+     * @param $studentAnnualId
+     * @return mixed
+     */
+    public function findAbsenceByCourseAndStudent($courseAnnualId, $studentAnnualId);
 }

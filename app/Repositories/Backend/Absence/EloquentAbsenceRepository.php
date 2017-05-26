@@ -4,6 +4,7 @@ use App\Exceptions\GeneralException;
 use App\Models\AcademicYear;
 use App\Models\Absence;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\DB;
 
 /**
  * Class EloquentAbsenceRepository
@@ -74,14 +75,17 @@ class EloquentAbsenceRepository implements AbsenceRepositoryContract
 
         $absence->course_annual_id = $input['course_annual_id'];
         $absence->student_annual_id = $input['student_annual_id'];
-        $absence->num_absence = ($input['num_absence'] == '')?null:$input['num_absence'] ;
+        if(isset($input['num_absence']))
+        {
+            $absence->num_absence = ($input['num_absence'] == '')?null:$input['num_absence'] ;
+        }
+        $absence->notation = isset($input['notation'])?$input['notation']:null;
         $absence->created_at = Carbon::now();
         $absence->create_uid = auth()->id();
 
         if ($absence->save()) {
             return true;
         }
-
         throw new GeneralException(trans('exceptions.backend.configuration.academicYears.create_error'));
     }
 
@@ -97,8 +101,10 @@ class EloquentAbsenceRepository implements AbsenceRepositoryContract
 
         $absence->course_annual_id = isset($input['course_annual_id'])?$input['course_annual_id']:$absence->course_annual_id;
         $absence->student_annual_id = isset($input['student_annual_id'])?$input['student_annual_id']:$absence->student_annual_id;
-        $absence->num_absence = ($input['num_absence'] != null)? ($input['num_absence'] == '')?null:$input['num_absence']:null;
-
+        if(isset($input['num_absence'])) {
+            $absence->num_absence = ($input['num_absence'] != null)? ($input['num_absence'] == '')?null:$input['num_absence']:null;
+        }
+        $absence->notation = isset($input['notation'])?$input['notation']:$absence->notation;
         $absence->updated_at = Carbon::now();
         $absence->write_uid = auth()->id();
 
@@ -130,6 +136,19 @@ class EloquentAbsenceRepository implements AbsenceRepositoryContract
         }
 
         throw new GeneralException(trans('exceptions.backend.general.delete_error'));
+    }
+
+
+    public function findAbsenceByCourseAndStudent($courseAnnualId, $studentAnnualId)
+    {
+        $absence  = DB::table('absences')
+            ->where([
+                ['student_annual_id', $studentAnnualId],
+                ['course_annual_id', $courseAnnualId]
+            ])->first();
+
+        return $absence;
+
     }
 
 
