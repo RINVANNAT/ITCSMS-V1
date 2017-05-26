@@ -17,7 +17,7 @@
         <div class="box box-success">
 
             <div class="box-header with-border">
-                <h3 class="box-title">{{ trans('labels.backend.rooms.sub_import_title') }}</h3>
+                <h3 class="box-title"> Import Score Sheet </h3>
             </div><!-- /.box-header -->
 
             <div class="box-body">
