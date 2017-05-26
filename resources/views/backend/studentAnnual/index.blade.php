@@ -120,7 +120,7 @@
                     { data: 'group' , name: 'group',searchable:false},
                     { data: 'action', name: 'action',orderable: false, searchable: false}
                 ],
-                order: [[5,"asc"],[2,"asc"]]
+                order: [[2,"asc"],[5,"asc"]]
             });
 
             oTable.on( 'xhr', function () {
@@ -233,7 +233,7 @@
                         '&origin='+$('#filter_origin').val()+
                         '&group='+$('#filter_group').val()+
                         '&radie='+$('#filter_radie').val()+
-                        '&redouble='+$('#filter_radouble').val();
+                        '&redouble='+$('#filter_redouble').val();
 
                 PopupCenterDual(url,'Select fields to export','1200','960');
             });

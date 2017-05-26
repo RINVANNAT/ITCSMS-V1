@@ -235,7 +235,7 @@ class StudentAnnualController extends Controller
         }
 
         $studentAnnuals = StudentAnnual::select([
-            'studentAnnuals.id','studentAnnuals.group','students.id_card','students.name_kh','students.dob as dob','students.name_latin', 'genders.code as gender', 'departmentOptions.code as option',
+            'studentAnnuals.id','groups.code as group','students.id_card','students.name_kh','students.dob as dob','students.name_latin', 'genders.code as gender', 'departmentOptions.code as option',
             DB::raw("CONCAT(degrees.code,grades.code,departments.code) as class")
         ])
             ->leftJoin('students','students.id','=','studentAnnuals.student_id')
@@ -243,7 +243,9 @@ class StudentAnnualController extends Controller
             ->leftJoin('grades', 'studentAnnuals.grade_id', '=', 'grades.id')
             ->leftJoin('departmentOptions', 'studentAnnuals.department_option_id', '=', 'departmentOptions.id')
             ->leftJoin('departments', 'studentAnnuals.department_id', '=', 'departments.id')
-            ->leftJoin('degrees', 'studentAnnuals.degree_id', '=', 'degrees.id');
+            ->leftJoin('degrees', 'studentAnnuals.degree_id', '=', 'degrees.id')
+            ->leftJoin('group_student_annuals', 'group_student_annuals.student_annual_id', '=', 'studentAnnuals.id')
+            ->leftJoin('groups','groups.id','=','group_student_annuals.group_id');
 
         if ($scholarship = $request->get('scholarship')) {
             $studentAnnuals->leftJoin('scholarship_student_annual', 'studentAnnuals.id', '=', 'scholarship_student_annual.student_annual_id');
@@ -308,7 +310,11 @@ class StudentAnnualController extends Controller
             });
 
         // additional search
-        $datatables->where('studentAnnuals.academic_year_id', '=', $academic_year);
+        $semester = $datatables->request->get('semester');
+        $datatables->where('studentAnnuals.academic_year_id', '=', $academic_year)
+                    ->where(function($query) use($semester){
+                       $query->where("group_student_annuals.semester_id",$semester)->orWhereNull("group_student_annuals.semester_id");
+                    });
 
         if ($degree = $datatables->request->get('degree')) {
             $datatables->where('studentAnnuals.degree_id', '=', $degree);
@@ -329,7 +335,7 @@ class StudentAnnualController extends Controller
             $datatables->where('students.origin_id', '=', $origin);
         }
         if ($group = $datatables->request->get('group')) {
-            $datatables->where('studentAnnuals.group', '=', $group);
+            $datatables->where('groups.code', '=', $group);
         }
         if ($scholarship = $datatables->request->get('scholarship')) {
             $datatables->where('scholarship_student_annual.scholarship_id', '=', $scholarship);
@@ -1017,11 +1023,15 @@ class StudentAnnualController extends Controller
         $gender = isset($_GET['gender'])?$_GET['gender']:null;
         $option = isset($_GET['option'])?$_GET['option']:null;
         $origin = isset($_GET['origin'])?$_GET['origin']:null;
+        $semester = isset($_GET['semester'])?$_GET['semester']:null;
+        $redouble = isset($_GET['redouble'])?$_GET['redouble']:null;
+        $group = isset($_GET['group'])?$_GET['group']:null;
+        $radie = isset($_GET['radie'])?$_GET['radie']:null;
         // else, from custom list
 
         $student_ids = isset($_GET['student_ids'])?$_GET['student_ids']:null;
 
-        return view('backend.studentAnnual.popup_export',compact('academic_year','department','degree','grade','gender','option','origin','student_ids'));
+        return view('backend.studentAnnual.popup_export',compact('academic_year','department','degree','grade','gender','option','origin','student_ids','semester','group','radie','redouble'));
     }
 
     public function request_export_list_custom(){
@@ -1041,7 +1051,7 @@ class StudentAnnualController extends Controller
             'genders.code as gender_id',
             'origins.name_kh as origin_id',
             'pob.name_kh as pob',
-            'studentAnnuals.group',
+            'groups.code as group',
             'studentAnnuals.promotion_id',
             'academicYears.name_latin as academic_year_id',
             'histories.name_kh as history_id',
@@ -1075,7 +1085,10 @@ class StudentAnnualController extends Controller
             ->leftJoin('origins as pob', 'students.pob', '=', 'pob.id')
             ->leftJoin('histories', 'studentAnnuals.history_id', '=', 'histories.id')
             ->leftJoin('highSchools', 'students.high_school_id', '=', 'highSchools.id')
+            ->leftJoin('group_student_annuals', 'group_student_annuals.student_annual_id', '=', 'studentAnnuals.id')
+            ->leftJoin('groups','groups.id','=','group_student_annuals.group_id');
         ;
+
 
         $title = 'បញ្ជីនិស្សិតុ';
 
@@ -1083,18 +1096,57 @@ class StudentAnnualController extends Controller
             $studentAnnuals = $studentAnnuals->whereIn('studentAnnuals.id',json_decode($ids));
         } else {
             // additional search
-            if ($degree = $_POST['filter_degree']) {
-                $studentAnnuals = $studentAnnuals->where('studentAnnuals.degree_id', $degree);
-
-                $degree_obj = Degree::where('id',$degree)->first();
-                $title .= "ថ្នាក់".$degree_obj->name_kh;
-            }
-
             if ($academic_year = $_POST['filter_academic_year']) {
                 $studentAnnuals = $studentAnnuals->where('studentAnnuals.academic_year_id', $academic_year);
 
                 $academic_year_obj = AcademicYear::where('id',$academic_year)->first();
                 $title .= " ឆ្នាំសិក្សា ".$academic_year_obj->name_kh;
+            }
+
+            if($redouble = $_POST['filter_redouble']){
+                if($redouble == "with") { // with redouble this year
+                    // do nothing here
+                } else if ($redouble == "no"){ // without redouble this year
+                    $studentAnnuals->leftJoin('redouble_student', 'redouble_student.student_id','=','students.id')
+                        ->whereNotIn('students.id',function($query) use ($academic_year){
+                            $query->select('redouble_student.student_id')->from('redouble_student')->where('redouble_student.academic_year_id','=',$academic_year);
+                        });
+                } else {  // only redouble student this year
+                    $studentAnnuals->join('redouble_student', 'redouble_student.student_id','=','students.id')
+                        ->where('redouble_student.academic_year_id','=',$academic_year);
+                }
+            }
+
+            if ($radie = $_POST['filter_radie']) {
+                if($radie == "with") { // return all student include radie
+                    // do nothing here
+                } else if($radie == "no") { // return only student without radie
+                    $studentAnnuals->where(function($query){
+                        $query->where('students.radie','=', false)->orWhereNull('students.radie');
+                    });
+                } else { // only radie
+                    $studentAnnuals->where('students.radie','=', true);
+                }
+            }
+
+            if($semester = $_POST['filter_semester']){
+                $studentAnnuals = $studentAnnuals->where('studentAnnuals.academic_year_id', '=', $academic_year)
+                    ->where(function($query) use($semester){
+                        $query->where("group_student_annuals.semester_id",$semester)->orWhereNull("group_student_annuals.semester_id");
+                    });
+                $title .= " ឆមាសទី  ".$semester;
+            }
+            if ($group = $_POST['filter_group']) {
+                $studentAnnuals = $studentAnnuals->where('groups.code', $group);
+
+                $title .= " ក្រុម ".$group;
+            }
+
+            if ($degree = $_POST['filter_degree']) {
+                $studentAnnuals = $studentAnnuals->where('studentAnnuals.degree_id', $degree);
+
+                $degree_obj = Degree::where('id',$degree)->first();
+                $title .= "ថ្នាក់".$degree_obj->name_kh;
             }
 
             if ($grade = $_POST['filter_grade']) {
