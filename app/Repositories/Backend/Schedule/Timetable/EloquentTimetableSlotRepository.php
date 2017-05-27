@@ -495,46 +495,289 @@ class EloquentTimetableSlotRepository implements TimetableSlotRepositoryContract
      */
     public function clone_timetable(Timetable $timetable, $groups = [], $weeks = [])
     {
-        $result = true;
+        // dd($groups);
+        // dd($weeks);
+        $result = false;
         // check validate timetable object
         // if we have groups.
-        if (isset($groups)) {
+        if (count($groups) > 0 && count($weeks) > 0) {
             foreach ($groups as $group) {
-                if (isset($weeks)) {
-                    foreach ($weeks as $week) {
-                        // by this week and group, don't save it again.
-                        if ($timetable->group_id == $group && $timetable->week_id == $week) {
-                            continue;
-                        } else { // otherwise, we need to create a new timetable.
-                            // start clone timetable by timetable object, group and week.
-                            $itemTimetable = $this->copied_timetable($timetable, Group::find($group), Week::find($week));
-                            if ($itemTimetable instanceof Timetable) {
-                                if ($this->copied_timetable_slot($timetable, $itemTimetable)) {
-                                    $result = true;
-                                } else {
-                                    $result = false;
-                                    break;
+                foreach ($weeks as $week) {
+                    $existed = Timetable::where([
+                        ['academic_year_id', $timetable->academic_year_id],
+                        ['department_id', $timetable->department_id],
+                        ['degree_id', $timetable->degree_id],
+                        ['option_id', $timetable->option_id],
+                        ['grade_id', $timetable->grade_id],
+                        ['semester_id', $timetable->semester_id],
+                        ['group_id', $group],
+                        ['group_id', $timetable->group_id],
+                        ['week_id', $week]
+                    ])->first();
+
+                    if ($existed instanceof Timetable) {
+                        continue;
+                    } else {
+                        // find timetable before create.
+                        // if existed, no create and then delete all TimetableSlot
+                        $findTimetable = Timetable::where([
+                            ['academic_year_id', $timetable->academic_year_id],
+                            ['department_id', $timetable->department_id],
+                            ['degree_id', $timetable->degree_id],
+                            ['option_id', $timetable->option_id],
+                            ['grade_id', $timetable->grade_id],
+                            ['semester_id', $timetable->semester_id],
+                            ['week_id', $week],
+                            ['group_id', $group]
+                        ])->first();
+
+                        if ($findTimetable instanceof Timetable) {
+                            foreach ($findTimetable->timetableSlots as $timetableSlot) {
+                                // by timetable slot can access and update slot
+                                $slot = Slot::find($timetableSlot->slot);
+                                $slot->time_remaining = $slot->time_remaining + $timetableSlot->durations;
+                                $slot->update();
+                                // and then delete timetable slot
+                                $timetableSlot->delete();
+                            }
+                            // add new timetable slots
+                            foreach ($timetable->timetableSlots as $timetableSlot) {
+                                // by course_annual_id, course_session and group_id I can find slot.
+                                $slotTimetableSlot = Slot::find($timetableSlot->slot_id);
+                                $slot = Slot::where([
+                                    ['time_tp', $slotTimetableSlot->time_tp],
+                                    ['time_td', $slotTimetableSlot->time_td],
+                                    ['time_course', $slotTimetableSlot->time_course],
+                                    ['course_annual_id', $slotTimetableSlot->course_annual_id],
+                                    ['course_session_id', $slotTimetableSlot->course_session_id],
+                                    ['group_id', $group],
+                                    ['lecturer_id', $slotTimetableSlot->lecturer_id]
+                                ])->first();
+                                // loop all timetable slot.
+                                // create merge group id before copy timetable slot.
+                                if (($slot instanceof Slot) && ($slot->remaining >= $timetableSlot->durations)) {
+                                    $newMergeTimetableSlot = new MergeTimetableSlot();
+                                    $newMergeTimetableSlot->start = $timetableSlot->start;
+                                    $newMergeTimetableSlot->end = $timetableSlot->end;
+                                    if ($newMergeTimetableSlot->save()) {
+                                        $newTimetableSlot = new TimetableSlot();
+                                        $newTimetableSlot->timetable_id = $findTimetable->id;
+                                        $newTimetableSlot->course_session_id = $slot->course_session_id;
+                                        $newTimetableSlot->slot_id = $slot->id;
+                                        $newTimetableSlot->room_id = $timetableSlot->room_id;
+                                        $newTimetableSlot->group_merge_id = $newMergeTimetableSlot->id;
+                                        $newTimetableSlot->course_name = $slot->course_name;
+                                        $newTimetableSlot->teacher_name = $timetableSlot->teacher_name;
+                                        $newTimetableSlot->type = $timetableSlot->type;
+                                        $newTimetableSlot->durations = $timetableSlot->durations;
+                                        // update time_remaining
+                                        $slot->time_remaining = $slot->time_remaining - $timetableSlot->durations;
+                                        $slot->update();
+
+                                        $newTimetableSlot->start = $timetableSlot->start;
+                                        $newTimetableSlot->end = $timetableSlot->end;
+                                        $newTimetableSlot->created_uid = auth()->user()->id;
+                                        $newTimetableSlot->updated_uid = auth()->user()->id;
+                                        $newTimetableSlot->save();
+                                        $result = true;
+                                    }
+                                }
+                            }
+
+                        } else {
+                            // create timetable
+                            $newTimetable = new Timetable();
+                            $newTimetable->academic_year_id = $timetable->academic_year_id;
+                            $newTimetable->department_id = $timetable->department_id;
+                            $newTimetable->degree_id = $timetable->degree_id;
+                            $newTimetable->option_id = $timetable->option_id;
+                            $newTimetable->grade_id = $timetable->grade_id;
+                            $newTimetable->semester_id = $timetable->semester_id;
+                            $newTimetable->group_id = $group;
+                            $newTimetable->week_id = $week;
+                            $newTimetable->created_uid = auth()->user()->id;
+                            $newTimetable->updated_uid = auth()->user()->id;
+                            if ($newTimetable->save()) {
+                                foreach ($timetable->timetableSlots as $timetableSlot) {
+                                    // find slot match with timetableSlot
+                                    $slotTimetableSlot = Slot::find($timetableSlot->slot_id);
+                                    $slot = Slot::where([
+                                        ['time_tp', $slotTimetableSlot->time_tp],
+                                        ['time_td', $slotTimetableSlot->time_td],
+                                        ['time_course', $slotTimetableSlot->time_course],
+                                        ['course_annual_id', $slotTimetableSlot->course_annual_id],
+                                        ['course_session_id', $slotTimetableSlot->course_session_id],
+                                        ['group_id', $group],
+                                        ['lecturer_id', $slotTimetableSlot->lecturer_id]
+                                    ])->first();
+                                    // loop all timetable slot.
+                                    // create merge group id before copy timetable slot.
+                                    if (($slot instanceof Slot) && ($slot->time_remaining >= $timetableSlot->durations)) {
+                                        $newMergeTimetableSlot = new MergeTimetableSlot();
+                                        $newMergeTimetableSlot->start = $timetableSlot->start;
+                                        $newMergeTimetableSlot->end = $timetableSlot->end;
+                                        if ($newMergeTimetableSlot->save()) {
+                                            $newTimetableSlot = new TimetableSlot();
+                                            $newTimetableSlot->timetable_id = $newTimetable->id;
+                                            $newTimetableSlot->course_session_id = $slot->course_session_id;
+                                            $newTimetableSlot->slot_id = $slot->id;
+                                            $newTimetableSlot->room_id = $timetableSlot->room_id;
+                                            $newTimetableSlot->group_merge_id = $newMergeTimetableSlot->id;
+                                            $newTimetableSlot->course_name = $timetableSlot->course_name;
+                                            $newTimetableSlot->teacher_name = $timetableSlot->teacher_name;
+                                            $newTimetableSlot->type = $timetableSlot->type;
+                                            $newTimetableSlot->durations = $timetableSlot->durations;
+                                            // update time_remaining slot.
+                                            $slot->time_remaining = $slot->time_remaining - $timetableSlot->durations;
+                                            $slot->update();
+
+                                            $newTimetableSlot->start = $timetableSlot->start;
+                                            $newTimetableSlot->end = $timetableSlot->end;
+                                            $newTimetableSlot->created_uid = auth()->user()->id;
+                                            $newTimetableSlot->updated_uid = auth()->user()->id;
+                                            $newTimetableSlot->save();
+                                            $result = true;
+                                        }
+                                    }
                                 }
                             }
                         }
                     }
                 }
             }
-        } // no groups.
-        else {
-            if (isset($weeks)) {
-                foreach ($weeks as $week) {
-                    // by this week, don't save it again.
-                    if ($timetable->week_id == $week) {
-                        continue;
-                    } else {// otherwise, we need to create a new timetable.
-                        $itemTimetable = $this->copied_timetable($timetable, null, Week::find($week));
-                        if ($itemTimetable instanceof Timetable) {
-                            if ($this->copied_timetable_slot($timetable, $itemTimetable)) {
-                                $result = true;
-                            } else {
-                                $result = false;
-                                break;
+        } else {
+            foreach ($weeks as $week) {
+                $existed = Timetable::where([
+                    ['academic_year_id', $timetable->academic_year_id],
+                    ['department_id', $timetable->department_id],
+                    ['degree_id', $timetable->degree_id],
+                    ['option_id', $timetable->option_id],
+                    ['grade_id', $timetable->grade_id],
+                    ['semester_id', $timetable->semester_id],
+                    ['week_id', $week]
+                ])->first();
+
+                if ($existed instanceof Timetable) {
+                    continue;
+                } else {
+                    // find timetable before create.
+                    // if existed, no create and then delete all TimetableSlot
+                    $findTimetable = Timetable::where([
+                        ['academic_year_id', $timetable->academic_year_id],
+                        ['department_id', $timetable->department_id],
+                        ['degree_id', $timetable->degree_id],
+                        ['option_id', $timetable->option_id],
+                        ['grade_id', $timetable->grade_id],
+                        ['semester_id', $timetable->semester_id],
+                        ['week_id', $week]
+                    ])->first();
+
+                    if ($findTimetable instanceof Timetable) {
+                        foreach ($findTimetable->timetableSlots as $timetableSlot) {
+                            // by timetable slot can access and update slot
+                            $slot = Slot::find($timetableSlot->slot);
+                            $slot->time_remaining = $slot->time_remaining + $timetableSlot->durations;
+                            $slot->update();
+                            // and then delete timetable slot
+                            $timetableSlot->delete();
+                        }
+                        // add new timetable slots
+                        foreach ($timetable->timetableSlots as $timetableSlot) {
+                            // find slot match with timetableSlot
+                            $slotTimetableSlot = Slot::find($timetableSlot->slot_id);
+                            $slot = Slot::where([
+                                ['time_tp', $slotTimetableSlot->time_tp],
+                                ['time_td', $slotTimetableSlot->time_td],
+                                ['time_course', $slotTimetableSlot->time_course],
+                                ['course_annual_id', $slotTimetableSlot->course_annual_id],
+                                ['course_session_id', $slotTimetableSlot->course_session_id],
+                                ['lecturer_id', $slotTimetableSlot->lecturer_id]
+                            ])->first();
+                            // loop all timetable slot.
+                            // create merge group id before copy timetable slot.
+                            if (($slot instanceof Slot) && ($slot->time_remaining >= $timetableSlot->durations)) {
+                                $newMergeTimetableSlot = new MergeTimetableSlot();
+                                $newMergeTimetableSlot->start = $timetableSlot->start;
+                                $newMergeTimetableSlot->end = $timetableSlot->end;
+                                if ($newMergeTimetableSlot->save()) {
+                                    $newTimetableSlot = new TimetableSlot();
+                                    $newTimetableSlot->timetable_id = $findTimetable->id;
+                                    $newTimetableSlot->course_session_id = $slot->course_session_id;
+                                    $newTimetableSlot->slot_id = $slot->id;
+                                    $newTimetableSlot->room_id = $timetableSlot->room_id;
+                                    $newTimetableSlot->group_merge_id = $newMergeTimetableSlot->id;
+                                    $newTimetableSlot->course_name = $timetableSlot->course_name;
+                                    $newTimetableSlot->teacher_name = $timetableSlot->teacher_name;
+                                    $newTimetableSlot->type = $timetableSlot->type;
+                                    $newTimetableSlot->durations = $timetableSlot->durations;
+                                    // update time_remaining slot.
+                                    $slot->time_remaining = $slot->time_remaining - $timetableSlot->durations;
+                                    $slot->update();
+
+                                    $newTimetableSlot->start = $timetableSlot->start;
+                                    $newTimetableSlot->end = $timetableSlot->end;
+                                    $newTimetableSlot->created_uid = auth()->user()->id;
+                                    $newTimetableSlot->updated_uid = auth()->user()->id;
+                                    $newTimetableSlot->save();
+                                    $result = true;
+                                }
+                            }
+                        }
+
+                    } else {
+                        // create timetable
+                        $newTimetable = new Timetable();
+                        $newTimetable->academic_year_id = $timetable->academic_year_id;
+                        $newTimetable->department_id = $timetable->department_id;
+                        $newTimetable->degree_id = $timetable->degree_id;
+                        $newTimetable->option_id = $timetable->option_id;
+                        $newTimetable->grade_id = $timetable->grade_id;
+                        $newTimetable->semester_id = $timetable->semester_id;
+                        $newTimetable->week_id = $week;
+                        $newTimetable->created_uid = auth()->user()->id;
+                        $newTimetable->updated_uid = auth()->user()->id;
+                        if ($newTimetable->save()) {
+                            foreach ($timetable->timetableSlots as $timetableSlot) {
+
+                                $slotTimetableSlot = Slot::find($timetableSlot->slot_id);
+                                $slot = Slot::where([
+                                    ['time_tp', $slotTimetableSlot->time_tp],
+                                    ['time_td', $slotTimetableSlot->time_td],
+                                    ['time_course', $slotTimetableSlot->time_course],
+                                    ['course_annual_id', $slotTimetableSlot->course_annual_id],
+                                    ['course_session_id', $slotTimetableSlot->course_session_id],
+                                    ['lecturer_id', $slotTimetableSlot->lecturer_id]
+                                ])->first();
+
+                                // loop all timetable slot.
+                                // create merge group id before copy timetable slot.
+                                if (($slot instanceof Slot) && ($slot->time_remaining >= $timetableSlot->durations)) {
+                                    $newMergeTimetableSlot = new MergeTimetableSlot();
+                                    $newMergeTimetableSlot->start = $timetableSlot->start;
+                                    $newMergeTimetableSlot->end = $timetableSlot->end;
+                                    if ($newMergeTimetableSlot->save()) {
+                                        $newTimetableSlot = new TimetableSlot();
+                                        $newTimetableSlot->timetable_id = $newTimetable->id;
+                                        $newTimetableSlot->course_session_id = $slot->course_session_id;
+                                        $newTimetableSlot->slot_id = $slot->id;
+                                        $newTimetableSlot->room_id = $timetableSlot->room_id;
+                                        $newTimetableSlot->group_merge_id = $newMergeTimetableSlot->id;
+                                        $newTimetableSlot->course_name = $timetableSlot->course_name;
+                                        $newTimetableSlot->teacher_name = $timetableSlot->teacher_name;
+                                        $newTimetableSlot->type = $timetableSlot->type;
+                                        
+                                        $newTimetableSlot->durations = $timetableSlot->durations;
+                                        $slot->time_remaining = $slot->time_remaining - $timetableSlot->durations;
+                                        $slot->update();
+
+                                        $newTimetableSlot->start = $timetableSlot->start;
+                                        $newTimetableSlot->end = $timetableSlot->end;
+                                        $newTimetableSlot->created_uid = auth()->user()->id;
+                                        $newTimetableSlot->updated_uid = auth()->user()->id;
+                                        $newTimetableSlot->save();
+                                        $result = true;
+                                    }
+                                }
                             }
                         }
                     }
@@ -626,7 +869,6 @@ class EloquentTimetableSlotRepository implements TimetableSlotRepositoryContract
                     $newTimetableSlot->type = $timetableSlot->type;
 
                     $slot = Slot::find($timetableSlot->slot_id);
-                    dd($slot);
 
                     if ($slot->time_remaining > $timetableSlot->durations) {
                         $slot->time_remaining = $slot->time_remaining - $timetableSlot->durations;

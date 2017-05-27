@@ -1,3 +1,35 @@
+function checkInternetConnection() {
+    if (!navigator.onLine) {
+        swal(
+            'Oops...',
+            'Your internet connection is fail.',
+            'error'
+        );
+        return false;
+    }
+}
+
+// preparing checkbox weeks and groups.
+function checkBoxComponents() {
+    $('input[type="checkbox"].square').iCheck({
+        checkboxClass: 'icheckbox_square-blue'
+    });
+
+    // Checked or Unchecked weeks.
+    $('#all-weeks').iCheck('unchecked');
+    $('#all-groups').iCheck('unchecked');
+
+    $('#all-weeks').on('ifToggled', function () {
+        $('input[data-target="weeks"]:checkbox').iCheck('toggle');
+    });
+
+    // Checked or Unchecked groups.
+    $('#all-groups').on('ifToggled', function () {
+        $('input[data-target="groups"]:checkbox').iCheck('toggle');
+    });
+}
+
+// rendering form for clone timetable.
 function clone_timetable_form() {
     $.ajax({
         type: 'POST',
@@ -35,17 +67,15 @@ function clone_timetable_form() {
             $('.render_weeks').html(weeks);
             $('.render_groups').html(groups);
 
-            $('input[type="checkbox"].square').iCheck({
-                checkboxClass: 'icheckbox_square-blue'
-            });
-            $('#all-weeks').on('ifToggled', function () {
-                $('input[data-target="weeks"]:checkbox').iCheck('toggle');
-            });
-
-            // Checked or Unchecked groups.
-            $('#all-groups').on('ifToggled', function () {
-                $('input[data-target="groups"]:checkbox').iCheck('toggle');
-            });
+            $('#academic_year_id').val($('select[name="academicYear"] :selected').val());
+            $('#department_id').val($('select[name="department"] :selected').val());
+            $('#degree_id').val($('select[name="degree"] :selected').val());
+            $('#option_id').val($('select[name="option"] :selected').val());
+            $('#grade_id').val($('select[name="grade"] :selected').val());
+            $('#semester_id').val($('select[name="semester"] :selected').val());
+            $('#group_id').val($('select[name="group"] :selected').val());
+            $('#week_id').val($('select[name="weekly"] :selected').val());
+            checkBoxComponents();
         },
         error: function () {
             swal(
@@ -59,77 +89,23 @@ function clone_timetable_form() {
         }
     })
 }
-$(document).ready(function () {
-    /** Clone timetable **/
-    /** iCheckbox */
-    $('input[type="checkbox"].square').iCheck({
-        checkboxClass: 'icheckbox_square-blue'
-    });
 
-    // Checked or Unchecked weeks.
-    $('#all-weeks').on('ifToggled', function () {
-        $('input[data-target="weeks"]:checkbox').iCheck('toggle');
-    });
 
-    // Checked or Unchecked groups.
-    $('#all-groups').on('ifToggled', function () {
-        $('input[data-target="groups"]:checkbox').iCheck('toggle');
-    });
 
+// document ready
+$(function () {
+    // show checkbox groups and weeks
+    checkBoxComponents();
+
+    // click btn clone timetable to show form.
     $(document).on('click', '.btn_clone_timetable', function () {
         clone_timetable_form();
     });
-    /** Form submit clone */
-    $('#form-clone-timetable').on('submit', function (event) {
-        event.preventDefault();
-        $.ajax({
-            type: 'POST',
-            url: '/admin/schedule/timetables/clone',
-            data: $('#form-clone-timetable').serialize(),
-            success: function (response) {
-                console.log(response);
-                $('#clone-timetable').modal('toggle');
-                $('#form-clone-timetable')[0].reset();
-                // Reset selected checkbox.
-                $('input[type="checkbox"].square').iCheck('update');
-                swal(
-                    'Success',
-                    'You have been cloned timetable.',
-                    'success'
-                );
-            },
-            error: function (response) {
-                var message = '';
-                $.each(response.responseJSON, function (key, val) {
-                    message += val + '<br/>';
-                });
-
-                swal(
-                    'Form submission is failed',
-                    message,
-                    'error'
-                );
-            }
-        })
-    });
 
     // click clone timetable
-
     $(document).on('click', '.button_clone_timetable', function (event) {
+        $('#clone-timetable').modal('show');
         event.preventDefault();
-        var i = 0;
-        var weeks = [];
-        $('.weeks_value:checked').each(function () {
-            weeks[i++] = $(this).val();
-        });
-        i = 0;
-
-        var groups = [];
-        $('.groups_value:checked').each(function () {
-            groups[i++] = $(this).val();
-        });
-        i = 0;
-
         swal({
             title: 'Are you sure?',
             text: "Timetable slots will remove automatic.",
@@ -139,25 +115,14 @@ $(document).ready(function () {
             cancelButtonColor: '#d33',
             confirmButtonText: 'Clone'
         }).then(function () {
+            $('#clone-timetable').modal('hide');
             toggleLoading(true);
             $.ajax({
                 type: 'POST',
                 url: '/admin/schedule/timetables/clone/clone_timetable',
-                data: {
-                    weeks: weeks,
-                    groups: groups,
-                    academic_year_id: $('select[name="academicYear"] :selected').val(),
-                    department_id: $('select[name="department"] :selected').val(),
-                    degree_id: $('select[name="degree"] :selected').val(),
-                    option_id: $('select[name="option"] :selected').val(),
-                    grade_id: $('select[name="grade"] :selected').val(),
-                    semester_id: $('select[name="semester"] :selected').val(),
-                    group_id: $('select[name="group"] :selected').val(),
-                    week_id: $('select[name="weekly"] :selected').val()
-                },
+                data: $('#form-clone-timetable').serialize(),
                 success: function (response) {
                     if (response.status === true) {
-                        $('#clone-timetable').modal('toggle');
                         notify('info', 'Cloning timetable successfully', 'Clone Timetable');
                         get_course_sessions();
                     } else {
@@ -169,16 +134,13 @@ $(document).ready(function () {
                     }
                 },
                 error: function () {
-                    swal(
-                        'Oops...!',
-                        'Please check internet connection.',
-                        'error'
-                    );
+                    $('#clone-timetable').modal('hide');
+                    notify('error', 'Something went wrong.', 'Clone timetable');
                 },
                 complete: function () {
                     toggleLoading(false);
                 }
             });
         });
-    })
+    });
 });

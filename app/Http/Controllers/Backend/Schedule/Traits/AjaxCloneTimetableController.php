@@ -78,7 +78,7 @@ trait AjaxCloneTimetableController
      */
     public function clone_timetable(CloneTimetableRequest $request)
     {
-        // find timetable by requesting.
+        // dd($request->all());
         $timetable = Timetable::where([
             ['academic_year_id', $request->academic_year_id],
             ['department_id', $request->department_id],
@@ -90,7 +90,7 @@ trait AjaxCloneTimetableController
             ['group_id', $request->group_id == null ? null : $request->group_id]
         ])
             ->first();
-
+        // dd($timetable);
         // start clone.
         if($timetable instanceof Timetable){
             if ($this->timetableSlotRepo->clone_timetable($timetable, $request->groups, $request->weeks)) {
