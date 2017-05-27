@@ -3,7 +3,7 @@
 namespace App\Http\Controllers\Backend\Schedule;
 
 use App\Http\Controllers\Backend\Schedule\Traits\AjaxCloneTimetableController;
-use App\Http\Controllers\Backend\Schedule\Traits\AjaxFilterTimetableController;
+use App\Http\Controllers\Backend\Schedule\Traits\AjaxCRUDTimetableController;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Backend\Schedule\Timetable\CreateTimetableRequest;
 use App\Http\Requests\Backend\Schedule\Timetable\DeleteTimetableRequest;
@@ -29,7 +29,7 @@ use Yajra\Datatables\Datatables;
  */
 class TimetableController extends Controller
 {
-    use AjaxFilterTimetableController, AjaxCloneTimetableController;
+    use AjaxCRUDTimetableController, AjaxCloneTimetableController;
 
     /**
      * @var TimetableRepositoryContract

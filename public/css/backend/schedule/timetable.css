@@ -126,7 +126,7 @@
     position: fixed;
     bottom: 10px;
     left: 60px;
-    z-index: 9999999999;
+    z-index: 998;
     width: 350px;
     display: -webkit-box;
     display: -webkit-flex;

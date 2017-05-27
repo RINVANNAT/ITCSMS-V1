@@ -7,6 +7,7 @@ use App\Http\Requests\Backend\Schedule\Timetable\MoveTimetableSlotRequest;
 use App\Http\Requests\Backend\Schedule\Timetable\ResizeTimetableSlotRequest;
 use App\Models\DepartmentOption;
 use App\Models\Group;
+use App\Models\Schedule\Timetable\MergeTimetableSlot;
 use App\Models\Schedule\Timetable\Slot;
 use App\Models\Schedule\Timetable\Timetable;
 use App\Models\Schedule\Timetable\TimetableSlot;
@@ -19,10 +20,10 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Response;
 
 /**
- * Class AjaxFilterTimetableController
+ * Class AjaxCRUDTimetableController
  * @package App\Http\Controllers\Backend\Schedule\Traits
  */
-trait AjaxFilterTimetableController
+trait AjaxCRUDTimetableController
 {
     /**
      * @var EloquentTimetableRepository
@@ -35,7 +36,7 @@ trait AjaxFilterTimetableController
     public $timetableSlotRepo;
 
     /**
-     * AjaxFilterTimetableController constructor.
+     * AjaxCRUDTimetableController constructor.
      *
      * @param EloquentTimetableRepository $timetableRepository
      * @param EloquentTimetableSlotRepository $timetableSlotRepository
@@ -178,7 +179,8 @@ trait AjaxFilterTimetableController
         $grade_id = request('grade');
         $option_id = request('option') == null ? null : request('option');
 
-        $groups = DB::table('studentAnnuals')
+        // get groups by search on student_annuals table.
+        /*$groups = DB::table('studentAnnuals')
             ->where([
                 ['academic_year_id', $academic_year_id],
                 ['department_id', $department_id],
@@ -193,6 +195,29 @@ trait AjaxFilterTimetableController
             ->get();
 
         // sort groups name.
+        usort($groups, function ($a, $b) {
+            if (is_numeric($a->name)) {
+                return $a->name - $b->name;
+            } else {
+                return strcmp($a->name, $b->name);
+            }
+        });*/
+
+        // get group by search on slot tables.
+        $groups = DB::table('course_annuals')
+            ->where([
+                ['academic_year_id', $academic_year_id],
+                ['department_id', $department_id],
+                ['degree_id', $degree_id],
+                ['grade_id', $grade_id],
+                ['department_option_id', $option_id]
+            ])
+            ->join('slots', 'slots.course_annual_id', '=', 'course_annuals.id')
+            ->join('groups', 'groups.id', '=', 'slots.group_id')
+            ->distinct('groups.code')
+            ->select('groups.code as name', 'groups.id as id')
+            ->get();
+
         usort($groups, function ($a, $b) {
             if (is_numeric($a->name)) {
                 return $a->name - $b->name;
@@ -293,8 +318,7 @@ trait AjaxFilterTimetableController
                         foreach ($timetableSlotHasTheSameGroupMergeId as $item) {
                             array_push($groups, Group::find($item->slot->group_id));
                         }
-                    }
-                    else{
+                    } else {
                         $groups = [];
                     }
                     // check conflict lecturer.
@@ -452,14 +476,13 @@ trait AjaxFilterTimetableController
             $timetableSlot = TimetableSlot::find($timetable_slot_id);
             // find all timetable slots in the same group_merge_id
             $timetableSlots = TimetableSlot::where('group_merge_id', $timetableSlot->group_merge_id)->get();
-            if(count($timetableSlots) >1){
+            if (count($timetableSlots) > 1) {
                 // remove room which timetable has the same group_merge_id
-                foreach ($timetableSlots as $timetableSlot)
-                {
+                foreach ($timetableSlots as $timetableSlot) {
                     $timetableSlot->room_id = null;
                     $timetableSlot->update();
                 }
-            }else{
+            } else {
                 $timetableSlot->room_id = null;
                 $timetableSlot->update();
             }
@@ -558,28 +581,71 @@ trait AjaxFilterTimetableController
         // check conflict lecturer.
         $lecturer = new Collection();
 
-        $canMergeCollection = new Collection();
-        $canNoMergeCollection = new Collection();
         $canMerge = $this->timetableSlotRepo->check_conflict_lecturer($timetableSlot)['canMerge'];
         $canNotMerge = $this->timetableSlotRepo->check_conflict_lecturer($timetableSlot)['canNotMerge'];
-
+        $arrayCanMerge = array();
+        $arrayCanNotMerge = array();
         // check each can merge item to get conflict details.
         if (count($canMerge) > 0) {
             foreach ($canMerge as $item) {
-                $canMergeCollection->push($this->timetableSlotRepo->get_conflict_with(TimetableSlot::find($item->id)));
+                array_push($arrayCanMerge, $this->timetableSlotRepo->get_conflict_with(TimetableSlot::find($item->id)));
             }
-            $lecturer->put('canMerge', $canMergeCollection);
         }
+
         // check each can not merge item to get conflict details.
         if (count($canNotMerge) > 0) {
             foreach ($canNotMerge as $item) {
-                $canNoMergeCollection->push($this->timetableSlotRepo->get_conflict_with(TimetableSlot::find($item->id)));
+                array_push($arrayCanNotMerge, $this->timetableSlotRepo->get_conflict_with(TimetableSlot::find($item->id)));
             }
-            $lecturer->put('canNotMerge', $canNoMergeCollection);
         }
+
+        // declare Can or Can't merge result item.
+        $resultArrayCanNotMergeItem = array();
+        $resultArrayCanMergeItem = array();
+
+        // add arrayCanNotMerge into resultArrayCanNotMergeItem
+        if (count($arrayCanNotMerge) > 0) {
+            for ($i = 0; $i < count($arrayCanNotMerge); $i++) {
+                array_push($resultArrayCanNotMergeItem, $arrayCanNotMerge[$i][0]);
+            }
+        }
+
+        // add arrayCanMerge into resultArrayCanMergeItem
+        if (count($arrayCanMerge) > 0) {
+            for ($i = 0; $i < count($arrayCanMerge); $i++) {
+                array_push($resultArrayCanMergeItem, $arrayCanMerge[$i][0]);
+            }
+        }
+
+        // sort result can not merge item
+        if (count($resultArrayCanNotMergeItem) > 1) {
+            usort($resultArrayCanNotMergeItem, function ($a, $b) {
+                if (is_numeric($a->group)) {
+                    return $a->group - $b->group;
+                } else {
+                    return strcmp($a->group, $b->group);
+                }
+            });
+        }
+
+        // sort result can merge item
+        if (count($resultArrayCanMergeItem) > 1) {
+            usort($resultArrayCanMergeItem, function ($a, $b) {
+                if (is_numeric($a->group)) {
+                    return $a->group - $b->group;
+                } else {
+                    return strcmp($a->group, $b->group);
+                }
+            });
+        }
+
+        // put can or can't merge to lecturer collection.
+        $lecturer->put('canNotMerge', $resultArrayCanNotMergeItem);
+        $lecturer->put('canMerge', $resultArrayCanMergeItem);
+
         // merge those two to conflicts.
         $conflicts['lecturer'] = $lecturer;
-        count($conflicts['lecturer']) > 0 ? $conflicts['lecturer_conflict'] = true : $conflicts['lecturer_conflict'] = false;
+        (count($resultArrayCanMergeItem) > 0 || count($resultArrayCanNotMergeItem) > 0) ? $conflicts['lecturer_conflict'] = true : $conflicts['lecturer_conflict'] = false;
 
         // Return conflict info.
         return Response::json(['data' => $conflicts]);
@@ -598,12 +664,10 @@ trait AjaxFilterTimetableController
         if ($timetableSlot instanceof TimetableSlot) {
             // find all timetable slots conflict with and can merge together
             $canMerge = $this->timetableSlotRepo->check_conflict_lecturer($timetableSlot)['canMerge'];
-            // loop for each item
             foreach ($canMerge as $item) {
-                // remove it from merge timetable slot
-                // @TODO remove item match with
-                // MergeTimetableSlot::find($item->group_merge_id)->delete();
+                // array_push($result, $this->timetableSlotRepo->update_timetable_slot_when_merge($item, $timetableSlot->group_merge_id));
                 // update group merge id for each item
+                DB::table('merge_timetable_slots')->where('id', '=', $item->group_merge_id)->delete();
                 $this->timetableSlotRepo->update_timetable_slot_when_merge($item, $timetableSlot->group_merge_id);
             }
         }
@@ -616,7 +680,7 @@ trait AjaxFilterTimetableController
                 $timetableSlot->update();
             }
         }
-
+        // return result
         return Response::json(['status' => false]);
     }
 
