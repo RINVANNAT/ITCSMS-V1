@@ -1,13 +1,11 @@
-<div class="form-group">
-    {{ csrf_field() }}
-</div>
-
-<input type="hidden" name="academicYeas" value="2017">
-<input type="hidden" name="degree" value="23">
-<input type="hidden" name="grade" value="2">
-<input type="hidden" name="semester" value="1">
-<input type="hidden" name="group" value="a">
-<input type="hidden" name="option" value="_ee">
+<input type="hidden" name="academic_year_id" id="academic_year_id"/>
+<input type="hidden" name="department_id" id="department_id"/>
+<input type="hidden" name="degree_id" id="degree_id"/>
+<input type="hidden" name="option_id" id="option_id"/>
+<input type="hidden" name="grade_id" id="grade_id"/>
+<input type="hidden" name="semester_id" id="semester_id"/>
+<input type="hidden" name="group_id" id="group_id"/>
+<input type="hidden" name="week_id" id="week_id"/>
 
 <div class="form-group">
     <div class="col-md-10 col-md-offset-2">
