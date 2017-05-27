@@ -5,10 +5,9 @@ namespace App\Repositories\Backend\Schedule\Timetable;
 use App\Http\Requests\Backend\Schedule\Timetable\CreateTimetableRequest;
 use App\Models\CourseAnnualClass;
 use App\Models\CourseSession;
-use App\Models\Group;
+use App\Models\Schedule\Timetable\Slot;
 use App\Models\Schedule\Timetable\Timetable;
 use App\Models\Schedule\Timetable\TimetableSlot;
-use App\Models\Schedule\Timetable\Week;
 use Carbon\Carbon;
 
 /**
@@ -181,18 +180,58 @@ interface TimetableSlotRepositoryContract
      * Copied timetable.
      *
      * @param Timetable $timetable
-     * @param Group|null $group
-     * @param Week $week
+     * @param null $group
+     * @param $week
      * @return mixed
      */
-    public function copied_timetable(Timetable $timetable, Group $group = null, Week $week);
+    public function copied_timetable(Timetable $timetable, $group = null, $week);
 
     /**
      * Copied timetable slot.
      *
+     * @param Slot $slot
      * @param Timetable $timetable
-     * @param Timetable $copiedTimetable
+     * @param TimetableSlot $timetableSlot
      * @return mixed
      */
-    public function copied_timetable_slot(Timetable $timetable, Timetable $copiedTimetable);
+    public function copied_timetable_slot(Slot $slot, Timetable $timetable, TimetableSlot $timetableSlot);
+
+    /**
+     * Find timetable by references the other timetable, group and week
+     * @param Timetable $timetable
+     * @param null $group
+     * @param $week
+     * @return mixed
+     */
+    public function find_timetable_by_reference_group_and_week(Timetable $timetable, $group = null, $week);
+
+    /**
+     * Find slot by timetable slot.
+     *
+     * @param TimetableSlot $timetableSlot
+     * @param null|$group
+     * @return mixed
+     */
+    public function find_slot_by_reference_timetable_slot(TimetableSlot $timetableSlot, $group = null);
+
+    /**
+     * find timetable, if itself.
+     *
+     * @param Timetable $timetable
+     * @param null $group
+     * @param $week
+     * @return mixed
+     */
+    public function is_timetable_self(Timetable $timetable, $group = null, $week);
+
+    /**
+     * Start cloning.
+     *
+     * @param Timetable $timetable
+     * @param null $group
+     * @param $week
+     * @param $result
+     * @return mixed
+     */
+    public function is_cloning(Timetable $timetable, $group = null, $week, $result);
 }

@@ -495,53 +495,90 @@
                             '<button type="button" class="btn-conflict-cancel btn btn-box-tool" data-widget="remove"><i class="fa fa-times"></i>' +
                             '</button></div></div>' +
                             '<div class="box-body">';
+                        /*if (response.data.is_conflict_room == true) {
+                         panel_conflict += '<ul class="list-group">' +
+                         '<li class="list-group-item"> <i class="fa fa-building-o"></i> Room ' +
+                         '<ul class="list-group">' +
+                         '<li class="list-group-item"><i class="fa fa-angle-double-right"></i> ' +
+                         response.data.room_info[0].department + '-' +
+                         response.data.room_info[0].degree +
+                         response.data.room_info[0].grade;
+                         panel_conflict += '<span class="badge bg-primary"> Group: ';
+                         if (response.data.room_info[0].group !== null) {
+                         panel_conflict += response.data.room_info[0].group;
+                         }
+                         if (response.data.room_info[0].option !== null) {
+                         panel_conflict += '_' + response.data.room_info[0].option;
+                         }
+                         panel_conflict += '</span></li></ul></li>';
+                         }*/
+
                         if (response.data.is_conflict_room == true) {
                             panel_conflict += '<ul class="list-group">' +
                                 '<li class="list-group-item"> <i class="fa fa-building-o"></i> Room ' +
-                                '<ul class="list-group">' +
-                                '<li class="list-group-item"><i class="fa fa-angle-double-right"></i> ' +
+                                '<div class="rooms" style="height: 70px !important; overflow: hidden;margin-top: 10px; border-radius: 4px;">' +
+                                '<div class="room-item" style="width: 100%;"><i class="fa fa-angle-double-right"></i> ' +
                                 response.data.room_info[0].department + '-' +
                                 response.data.room_info[0].degree +
                                 response.data.room_info[0].grade;
-                            panel_conflict += '<span class="badge bg-primary"> Group: ';
+                            panel_conflict += '<span class="badge bg-primary pull-right"> Group: ';
                             if (response.data.room_info[0].group !== null) {
-                                panel_conflict += response.data.room_info[0].group;
+                                panel_conflict += response.data.room_info[0].group + ', ';
                             }
                             if (response.data.room_info[0].option !== null) {
-                                panel_conflict += '_' + response.data.room_info[0].option;
+                                panel_conflict += '_' + response.data.room_info[0].option + ', ';
                             }
-                            panel_conflict += '</span></li></ul></li>';
+                            panel_conflict += response.data.room_info[0].week;
+                            panel_conflict += '</span></div></div></li>';
                         }
 
+                        /*if (response.data.lecturer.canMerge.length > 0) {
+                         panel_conflict += '<li class="list-group-item">' +
+                         '<i class="fa fa-user"></i> Lecturer ' +
+                         '<i data-toggle="tooltip" data-placement="right" title="Merge" data-original-title="Merge" class="btn btn-info btn-xs fa fa-code-fork pull-right" id="merge"></i>' +
+                         '<ul class="list-group">';
+                         for (var i = 0; i < response.data.lecturer.canMerge.length; i++) {
+                         panel_conflict += '<li class="list-group-item"><i class="fa fa-angle-double-right"></i> '
+                         + response.data.lecturer.canMerge[i].department + '-'
+                         + response.data.lecturer.canMerge[i].degree
+                         + response.data.lecturer.canMerge[i].grade + '-'
+                         + response.data.lecturer.canMerge[i].week + '<span class="badge bg-danger pull-right">Group: '
+                         + response.data.lecturer.canMerge[i].group + '</span></li>';
+                         }
+                         panel_conflict += '</ul></li>';
+                         }*/
                         if (response.data.lecturer.canMerge.length > 0) {
                             panel_conflict += '<li class="list-group-item">' +
                                 '<i class="fa fa-user"></i> Lecturer ' +
                                 '<i data-toggle="tooltip" data-placement="right" title="Merge" data-original-title="Merge" class="btn btn-info btn-xs fa fa-code-fork pull-right" id="merge"></i>' +
-                                '<ul class="list-group">';
+                                '<div class="rooms" style="margin-top: 10px; border-radius: 4px; min-height: 70px; max-height: 100px;">';
                             for (var i = 0; i < response.data.lecturer.canMerge.length; i++) {
-                                panel_conflict += '<li class="list-group-item"><i class="fa fa-angle-double-right"></i> '
+                                panel_conflict += '<div class="room-item" style="width: 100%;"><i class="fa fa-angle-double-right"></i> '
                                     + response.data.lecturer.canMerge[i].department + '-'
                                     + response.data.lecturer.canMerge[i].degree
-                                    + response.data.lecturer.canMerge[i].grade + '-'
-                                    + response.data.lecturer.canMerge[i].week + '<span class="badge bg-danger pull-right">Group: '
-                                    + response.data.lecturer.canMerge[i].group + '</span></li>';
+                                    + response.data.lecturer.canMerge[i].grade
+                                    + '<span class="badge bg-primary pull-right">Group: '
+                                    + response.data.lecturer.canMerge[i].group + ', '
+                                    + response.data.lecturer.canMerge[i].week
+                                    + '</span></div>';
                             }
-                            panel_conflict += '</ul></li>';
+                            panel_conflict += '</div></li>';
                         }
+
                         if (response.data.lecturer.canNotMerge.length > 0) {
                             console.log(100);
                             panel_conflict += '<li class="list-group-item">' +
                                 '<i class="fa fa-user"></i> Lecturer ' +
-                                '<ul class="list-group">';
+                                '<div class="rooms" style="margin-top: 10px; border-radius: 4px; min-height: 70px; max-height: 100px;">';
                             for (var i = 0; i < response.data.lecturer.canNotMerge.length; i++) {
-                                panel_conflict += '<li class="list-group-item"><i class="fa fa-angle-double-right"></i> '
+                                panel_conflict += '<div class="room-item" style="width: 100%;"><i class="fa fa-angle-double-right"></i> '
                                     + response.data.lecturer.canNotMerge[i].department + '-'
                                     + response.data.lecturer.canNotMerge[i].degree
                                     + response.data.lecturer.canNotMerge[i].grade + '-'
                                     + response.data.lecturer.canNotMerge[i].week + '<span class="badge bg-primary pull-right">Group: '
-                                    + response.data.lecturer.canNotMerge[i].group + '</span></li>';
+                                    + response.data.lecturer.canNotMerge[i].group + '</span></div>';
                             }
-                            panel_conflict += '<ul/></li>';
+                            panel_conflict += '<div/></li>';
                         }
                         panel_conflict += '</ul></div>';
                         $('#conflict').html(panel_conflict).hide().fadeIn();

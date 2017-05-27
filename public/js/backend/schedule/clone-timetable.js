@@ -95,6 +95,9 @@ function clone_timetable_form() {
 // document ready
 $(function () {
     // show checkbox groups and weeks
+    setTimeout(function () {
+        $('body').find('.fc-axis.fc-widget-header').html('<i class="fa fa-calendar"></i>');
+    }, 1000);
     checkBoxComponents();
 
     // click btn clone timetable to show form.
@@ -139,6 +142,8 @@ $(function () {
                 },
                 complete: function () {
                     toggleLoading(false);
+                    get_timetable_slots();
+                    get_course_sessions();
                 }
             });
         });
