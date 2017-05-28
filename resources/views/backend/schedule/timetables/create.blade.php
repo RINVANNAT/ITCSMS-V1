@@ -34,7 +34,6 @@
 @stop
 
 @section('content')
-
     <div class="box box-success">
         <div class="box-header with-border">
             <div class="mailbox-controls">
@@ -410,10 +409,10 @@
                     var object = '<a class="fc-time-grid-event fc-v-event fc-event fc-start fc-end course-item  fc-draggable fc-resizable" style="top: 65px; bottom: -153px; z-index: 1; left: 0%; right: 0%;">' +
                         '<div class="fc-content">' +
                         '<div class="container-room">' +
-                        '<div class="side-course" id="' + event.id + '">';
+                        '<div class="side-course" id="' + event.id + '"​​​>';
 
                     // check conflict room and render
-                    object += '<div class="fc-title">' + (event.course_name).substring(0, 10) + '...</div>';
+                    object += '<div class="fc-title">' + event.course_name + '</div>';
 
                     // check conflict lecturer and render
                     if (typeof event.conflict_lecturer !== 'undefined') {
@@ -435,8 +434,8 @@
                         '<div class="room-name">';
 
                     // check conflict and render room
-                    if (event.room != null) {
-                        if (event.conflict_room == true) {
+                    if (event.room !== null) {
+                        if (event.conflict_room === true) {
                             object += '<p class="fc-room bg-danger badge">' + event.building + '-' + event.room + '</p>';
                         } else {
                             object += '<p class="fc-room">' + event.building + '-' + event.room + '</p>';
@@ -467,7 +466,6 @@
                         '<div class="fc-bgd"></div>' +
                         '<div class="fc-resizer fc-end-resizer"></div>' +
                         '</a>';
-
                     return $(object);
                 },
                 eventOverlap: function (stillEvent, movingEvent) {
@@ -495,25 +493,8 @@
                             '<button type="button" class="btn-conflict-cancel btn btn-box-tool" data-widget="remove"><i class="fa fa-times"></i>' +
                             '</button></div></div>' +
                             '<div class="box-body">';
-                        /*if (response.data.is_conflict_room == true) {
-                         panel_conflict += '<ul class="list-group">' +
-                         '<li class="list-group-item"> <i class="fa fa-building-o"></i> Room ' +
-                         '<ul class="list-group">' +
-                         '<li class="list-group-item"><i class="fa fa-angle-double-right"></i> ' +
-                         response.data.room_info[0].department + '-' +
-                         response.data.room_info[0].degree +
-                         response.data.room_info[0].grade;
-                         panel_conflict += '<span class="badge bg-primary"> Group: ';
-                         if (response.data.room_info[0].group !== null) {
-                         panel_conflict += response.data.room_info[0].group;
-                         }
-                         if (response.data.room_info[0].option !== null) {
-                         panel_conflict += '_' + response.data.room_info[0].option;
-                         }
-                         panel_conflict += '</span></li></ul></li>';
-                         }*/
 
-                        if (response.data.is_conflict_room == true) {
+                        if (response.data.is_conflict_room === true) {
                             panel_conflict += '<ul class="list-group">' +
                                 '<li class="list-group-item"> <i class="fa fa-building-o"></i> Room ' +
                                 '<div class="rooms" style="height: 70px !important; overflow: hidden;margin-top: 10px; border-radius: 4px;">' +
@@ -532,21 +513,6 @@
                             panel_conflict += '</span></div></div></li>';
                         }
 
-                        /*if (response.data.lecturer.canMerge.length > 0) {
-                         panel_conflict += '<li class="list-group-item">' +
-                         '<i class="fa fa-user"></i> Lecturer ' +
-                         '<i data-toggle="tooltip" data-placement="right" title="Merge" data-original-title="Merge" class="btn btn-info btn-xs fa fa-code-fork pull-right" id="merge"></i>' +
-                         '<ul class="list-group">';
-                         for (var i = 0; i < response.data.lecturer.canMerge.length; i++) {
-                         panel_conflict += '<li class="list-group-item"><i class="fa fa-angle-double-right"></i> '
-                         + response.data.lecturer.canMerge[i].department + '-'
-                         + response.data.lecturer.canMerge[i].degree
-                         + response.data.lecturer.canMerge[i].grade + '-'
-                         + response.data.lecturer.canMerge[i].week + '<span class="badge bg-danger pull-right">Group: '
-                         + response.data.lecturer.canMerge[i].group + '</span></li>';
-                         }
-                         panel_conflict += '</ul></li>';
-                         }*/
                         if (response.data.lecturer.canMerge.length > 0) {
                             panel_conflict += '<li class="list-group-item">' +
                                 '<i class="fa fa-user"></i> Lecturer ' +
@@ -595,6 +561,12 @@
         }
 
         $(function () {
+            // popup export course session btn.
+            $('.btn_export_course_session').popover({
+                trigger: 'hover'
+            });
+
+            // filter options
             get_options($('select[name="department"] :selected').val());
             drag_course_session();
             get_rooms();
@@ -609,7 +581,6 @@
                 get_suggest_room(academic_year_id, week_id, timetable_slot_id);
                 hide_conflict_information();
                 check_conflict(timetable_slot_id);
-
             });
 
             // remove room from timetable slot.

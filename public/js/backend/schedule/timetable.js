@@ -105,18 +105,46 @@ function get_options(department_id) {
         },
         error: function () {
             swal(
-                'Oops...',
+                'Get Options',
+                'Something went wrong!',
+                'error'
+            );
+        },
+        complete: function () {
+            get_grades(department_id);
+            toggleLoading(false);
+        }
+    });
+}
+
+
+function get_grades(department_id) {
+    $.ajax({
+        type: 'POST',
+        url: '/admin/schedule/timetables/get_grades',
+        data: {department_id: department_id},
+        success: function (response) {
+            if (response.status === true) {
+                var grades = '';
+                $.each(response.grades, function (key, val) {
+                    console.log
+                    grades += '<option value="' + val.id + '">' + val.name_en + '</option>';
+                });
+                $('select[name="grade"]').html(grades);
+            }
+        },
+        error: function () {
+            swal(
+                'Get Grades',
                 'Something went wrong!',
                 'error'
             );
         },
         complete: function () {
             get_groups();
-            toggleLoading(false);
         }
-    });
+    })
 }
-
 /** Get course sessions. **/
 function get_course_sessions() {
     $.ajax({

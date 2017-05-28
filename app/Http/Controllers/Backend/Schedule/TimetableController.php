@@ -127,11 +127,17 @@ class TimetableController extends Controller
                     . '</i>'
                     . '</a>';
 
-                if (access()->allow('delete-timetable') || access()->allow('view-timetable')) {
-                    return $print . $view . $delete;
-                } else if (access()->allow('view-timetable')) {
-                    return $view;
+                $result = '';
+                if (access()->allow('edit-timetable')) {
+                    $result .= $print;
                 }
+                if (access()->allow('view-timetable')) {
+                    $result .= $view;
+                }
+                if (access()->allow('delete-timetable')) {
+                    $result .= $delete;
+                }
+                return $result;
             })
             ->editColumn('status', function ($timetable) {
                 if ($timetable->status == false) {

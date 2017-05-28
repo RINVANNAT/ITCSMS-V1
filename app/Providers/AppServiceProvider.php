@@ -6,10 +6,7 @@ use App\Models\AcademicYear;
 use App\Models\Degree;
 use App\Models\Department;
 use App\Models\DepartmentOption;
-use App\Models\Employee;
 use App\Models\Grade;
-use App\Models\Room;
-use App\Models\Schedule\Calendar\Year\Year;
 use App\Models\Schedule\Timetable\Week;
 use App\Models\Semester;
 use Carbon\Carbon;
@@ -57,7 +54,7 @@ class AppServiceProvider extends ServiceProvider
             } else {
                 $view->with([
                     'academicYears' => AcademicYear::latest()->get(),
-                    'department' => Department::find(auth()->user()->getDepartment()),
+                    'department' => Department::getDepartmentIdByAuthentication(),
                     'grades' => Grade::all(),
                     'semesters' => Semester::all(),
                     'weeks' => Week::all()

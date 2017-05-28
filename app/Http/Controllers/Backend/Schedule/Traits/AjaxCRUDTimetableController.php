@@ -6,8 +6,8 @@ use App\Http\Requests\Backend\Schedule\Timetable\CreateTimetableRequest;
 use App\Http\Requests\Backend\Schedule\Timetable\MoveTimetableSlotRequest;
 use App\Http\Requests\Backend\Schedule\Timetable\ResizeTimetableSlotRequest;
 use App\Models\DepartmentOption;
+use App\Models\Grade;
 use App\Models\Group;
-use App\Models\Schedule\Timetable\MergeTimetableSlot;
 use App\Models\Schedule\Timetable\Slot;
 use App\Models\Schedule\Timetable\Timetable;
 use App\Models\Schedule\Timetable\TimetableSlot;
@@ -110,6 +110,29 @@ trait AjaxCRUDTimetableController
 
         if (isset($department_id)) {
             return Response::json(['status' => true, 'options' => DepartmentOption::where('department_id', $department_id)->get()]);
+        }
+        return Response::json(['status' => false]);
+    }
+
+    /**
+     * Get grades by department.
+     *
+     * @return mixed
+     */
+    public function get_grades()
+    {
+        $department_id = request('department_id');
+
+        if (isset($department_id)) {
+            if ($department_id == 8) {
+                return Response::json(['status' => true, 'grades' => Grade::where('id', '<=', 2)->get()]);
+            } else if ($department_id == 12) {
+                return Response::json(['status' => true, 'grades' => Grade::where('id', '>', 1)->get()]);
+            } else if ($department_id == 13) {
+                return Response::json(['status' => true, 'grades' => Grade::all()]);
+            } else {
+                return Response::json(['status' => true, 'grades' => Grade::where('id', '>', 2)->get()]);
+            }
         }
         return Response::json(['status' => false]);
     }

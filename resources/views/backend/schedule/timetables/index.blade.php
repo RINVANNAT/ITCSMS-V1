@@ -113,14 +113,16 @@
                     {data: 'group', name: 'group', searchable: true},
                     {data: 'weekly', name: 'weekly', searchable: true},
                     {data: 'status', name: 'status', searchable: false, orderable: false},
+                    @if(access()->allow('view-timetable') || access()->allow('delete-timetable') || access()->allow('edit-timetable'))
                     {data: 'action', name: 'action', searchable: false, orderable: false}
+                    @endif
                 ],
                 initComplete: function () {
                     var td_level = 0;
                     this.api().columns().every(function () {
                         var column = this;
                         var select = '';
-                        if (td_level == 0) {
+                        if (td_level === 0) {
                             select = '<select class="form-control">';
                             select += '<option selected disabled>{{ trans('labels.backend.schedule.timetable.table.academic_year') }}</option>';
                             @foreach($academicYears as $academicYear)
@@ -128,7 +130,7 @@
                             @endforeach
                                 select += '</select>';
                         }
-                        else if (td_level == 1) {
+                        else if (td_level === 1) {
                             select = '<select class="form-control">';
                             select += '<option selected disabled>{{ trans('labels.backend.schedule.timetable.table.department') }}</option>';
                             @foreach($departments as $department)
@@ -137,7 +139,7 @@
                                 select += '</select>';
                         }
 
-                        else if (td_level == 2) {
+                        else if (td_level === 2) {
                             select = '<select class="form-control">';
                             select += '<option selected disabled>{{ trans('labels.backend.schedule.timetable.table.degree') }}</option>';
                             @foreach($degrees as $degree)
@@ -146,7 +148,7 @@
                                 select += '</select>';
                         }
 
-                        else if (td_level == 3) {
+                        else if (td_level === 3) {
                             select = '<select class="form-control">';
                             select += '<option selected disabled>{{ trans('labels.backend.schedule.timetable.table.grade') }}</option>';
                             @foreach($grades as $grade)
@@ -155,7 +157,7 @@
                                 select += '</select>';
                         }
 
-                        else if (td_level == 5) {
+                        else if (td_level === 5) {
                             select = '<select class="form-control">';
                             select += '<option selected disabled>{{ trans('labels.backend.schedule.timetable.table.semester') }}</option>';
                             @foreach($semesters as $semester)
@@ -163,7 +165,7 @@
                             @endforeach
                                 select += '</select>';
                         }
-                        else if (td_level == 7) {
+                        else if (td_level === 7) {
                             select = '<select class="form-control">';
                             select += '<option selected disabled>{{ trans('labels.backend.schedule.timetable.table.week') }}</option>';
                             @foreach($weeks as $week)

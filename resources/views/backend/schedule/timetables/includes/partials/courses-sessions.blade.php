@@ -4,9 +4,12 @@
             <div class="box-header with-border">
                 <div class="box-tools pull-right">
                     <button class="btn btn-primary btn-xs btn_export_course_session"
-                            data-toggle="tooltip"
-                            data-placement="top"
-                            title="Refresh">
+                            data-container="body"
+                            data-toggle="popover"
+                            data-placement="left"
+                            data-trigger="hover"
+                            title="Export Course Session"
+                            data-content="After you clicked, your course session will exported.">
                         <i class="fa fa-refresh {{--fa-pulse--}} fa-1x"></i>
                     </button>
 

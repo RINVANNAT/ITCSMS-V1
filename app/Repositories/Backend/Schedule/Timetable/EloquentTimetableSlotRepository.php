@@ -499,99 +499,11 @@ class EloquentTimetableSlotRepository implements TimetableSlotRepositoryContract
             foreach ($groups as $group) {
                 foreach ($weeks as $week) {
                     $result = $this->is_cloning($timetable, $group, $week, $result);
-                    // check itself timetable ?
-                    /*$itself_timetable = $this->is_timetable_self($timetable, $group, $week);
-                    if ($itself_timetable instanceof Timetable) {
-                        $result = true;
-                        continue;
-                    } else {
-                        // if existed, no create a new timetable and then delete all timetable slots
-                        $findTimetable = $this->find_timetable_by_reference_group_and_week($timetable, $group, $week);
-                        if ($findTimetable instanceof Timetable) {
-                            foreach ($findTimetable->timetableSlots as $timetableSlot) {
-                                // by timetable slot can access and update slot
-                                $slot = Slot::find($timetableSlot->slot_id);
-                                $slot->time_remaining = $slot->time_remaining + $timetableSlot->durations;
-                                $slot->update();
-                                // and then delete timetable slot
-                                $timetableSlot->delete();
-                            }
-                            // add new timetable slots
-                            foreach ($timetable->timetableSlots as $timetableSlot) {
-                                // by course_annual_id, course_session and group_id I can find slot.
-                                $slot = $this->find_slot_by_reference_timetable_slot($timetableSlot, $group);
-                                // loop all timetable slot.
-                                // create merge group id before copy timetable slot.
-                                if (($slot instanceof Slot) && ($slot->time_remaining >= $timetableSlot->durations)) {
-                                    $result = $this->copied_timetable_slot($slot, $findTimetable, $timetableSlot);
-                                }
-                            }
-
-                        } else {
-                            // create timetable
-                            $newTimetable = $this->copied_timetable($timetable, $group, $week);
-                            if ($newTimetable instanceof Timetable) {
-                                foreach ($timetable->timetableSlots as $timetableSlot) {
-                                    // find slot match with timetableSlot
-                                    $slot = $this->find_slot_by_reference_timetable_slot($timetableSlot, $group);
-                                    // loop all timetable slot.
-                                    // create merge group id before copy timetable slot.
-                                    if (($slot instanceof Slot) && ($slot->time_remaining >= $timetableSlot->durations)) {
-                                        $result = $this->copied_timetable_slot($slot, $newTimetable, $timetableSlot);
-                                    }
-                                }
-                            }
-                        }
-                    }*/
                 }
             }
         } else {
             foreach ($weeks as $week) {
                 $result = $this->is_cloning($timetable, null, $week, $result);
-                // check itself or not.
-                /*$itself_timetable = $this->is_timetable_self($timetable, null, $week);
-                if ($itself_timetable instanceof Timetable) {
-                    $result = true;
-                    continue;
-                } else {
-                    // find timetable before create.
-                    // if existed, no create and then delete all TimetableSlot
-                    $findTimetable = $this->find_timetable_by_reference_group_and_week($timetable, null, $week);
-                    if ($findTimetable instanceof Timetable) {
-                        foreach ($findTimetable->timetableSlots as $timetableSlot) {
-                            // by timetable slot can access and update slot
-                            $slot = Slot::find($timetableSlot->slot_id);
-                            $slot->time_remaining = $slot->time_remaining + $timetableSlot->durations;
-                            $slot->update();
-                            // and then delete timetable slot
-                            $timetableSlot->delete();
-                        }
-                        // add new timetable slots
-                        foreach ($timetable->timetableSlots as $timetableSlot) {
-                            // find slot match with timetableSlot
-                            $slot = $this->find_slot_by_reference_timetable_slot($timetableSlot, null);
-                            // loop all timetable slot.
-                            // create merge group id before copy timetable slot.
-                            if (($slot instanceof Slot) && ($slot->time_remaining >= $timetableSlot->durations)) {
-                                $result = $this->copied_timetable_slot($slot, $findTimetable, $timetableSlot);
-                            }
-                        }
-
-                    } else {
-                        // create timetable
-                        $newTimetable = $this->copied_timetable($timetable, null, $week);
-                        if ($newTimetable instanceof Timetable) {
-                            foreach ($timetable->timetableSlots as $timetableSlot) {
-                                $slot = $this->find_slot_by_reference_timetable_slot($timetableSlot, null);
-                                // loop all timetable slot.
-                                // create merge group id before copy timetable slot.
-                                if (($slot instanceof Slot) && ($slot->time_remaining >= $timetableSlot->durations)) {
-                                    $result = $this->copied_timetable_slot($slot, $newTimetable, $timetableSlot);
-                                }
-                            }
-                        }
-                    }
-                }*/
             }
         }
         return $result;
