@@ -127,6 +127,33 @@
     {!! Html::script('js/backend/schedule/timetable.js') !!}
 
     <script type="text/javascript">
+        /*Drag course session into timetable.*/
+        function drag_course_session() {
+
+            @if(access()->allow('drag-course-session'))
+            $('.courses .course-item').each(function () {
+                // store data so the calendar knows to render an event upon drop
+                $(this).data('event', {
+                    slot_id: $(this).find('.slot-id').text(),
+                    course_session_id: $(this).find('.courses-session-id').text(),
+                    course_name: $(this).find('.course-name').text(),
+                    class_name: 'course-item',
+                    teacher_name: $(this).find('.teacher-name').text(),
+                    course_type: $(this).find('.course-type').text(),
+                    times: $(this).find('.times').text()
+                });
+                if ($(this).data('event').teacher_name !== 'Unsigned') {
+                    // make the event draggable using jQuery UI
+                    $(this).draggable({
+                        zIndex: 9999,
+                        revert: true,      // will cause the event to go back to its
+                        revertDuration: 0  //  original position after the drag
+                    });
+                }
+            });
+            @endif
+        }
+
         /** init rooms */
         function get_rooms() {
             $.ajax({
@@ -281,8 +308,12 @@
                         get_timetable();
                     }
                 },
-                error: function () {
-                    notify('error', 'Timetable Slot was not created yet.', 'Add Timetable Slot');
+                error: function (response) {
+                    if (response.status === 403) {
+                        notify('error', 'You are not allowed to drag.', 'Unauthorized');
+                    } else {
+                        notify('error', 'Timetable Slot was not created yet.', 'Add Timetable Slot');
+                    }
                 },
                 complete: function () {
                     get_course_sessions();
@@ -309,8 +340,13 @@
                         notify('error', 'Something went wrong.', 'Move Timetable Slot');
                     }
                 },
-                error: function () {
-                    notify('error', 'Something went wrong.', 'Move Timetable Slot');
+                error: function (response) {
+                    if (response.status === 403) {
+                        notify('error', 'You are not allowed to move  timetable slot.', 'Unauthorized');
+                    }
+                    else {
+                        notify('error', 'Something went wrong.', 'Move Timetable Slot');
+                    }
                 },
                 complete: function () {
                     get_timetable_slots();
@@ -335,7 +371,11 @@
                     }
                 },
                 error: function (response) {
-                    notify('error', response.message, "Resize timetable Slot");
+                    if (response.status === 403) {
+                        notify('error', 'You are not allowed to resize timetable slot.', 'Unauthorized');
+                    } else {
+                        notify('error', response.message, "Resize timetable Slot");
+                    }
                     get_timetable_slots();
                     get_course_sessions();
                 },
@@ -345,6 +385,34 @@
                 }
             })
         }
+
+        var remove_timetable_sltos = function (event) {
+            toggleLoading(true);
+            $.ajax({
+                type: 'POST',
+                url: '{!! route('remove_timetable_slot') !!}',
+                data: {timetable_slot_id: event.id},
+                success: function (response) {
+                    if (response.status === true) {
+                        notify('info', 'Timetable slot remove from timetable.', 'Remove Timetable Slot');
+                    }
+                },
+                error: function (response) {
+                    if (response.status === 403) {
+                        notify('error', 'You are not allowed to remove timetable slot.', 'Unauthorized');
+                    } else {
+                        notify('error', 'Timetable slot can not remove from timetable.', 'Remove Timetable Slot');
+                    }
+
+                },
+                complete: function () {
+                    get_timetable_slots();
+                    get_course_sessions();
+                    toggleLoading(false);
+                }
+            })
+        };
+
         /** get timetable */
         function get_timetable() {
             var date = new Date();
@@ -392,9 +460,6 @@
                 eventDragStart: function (event, jsEvent, ui, view) {
                     get_rooms();
                 },
-                eventDragStop: function (event, jsEvent, ui, view) {
-                    //$('#timetable').fullCalendar('rerenderEvents');
-                },
                 eventClick: function (calEvent, jsEvent, view) {
                     // Trigger when click the event.
                 },
@@ -406,6 +471,7 @@
                     get_course_sessions();
                 },
                 eventRender: function (event, element, view) {
+                    console.log(event);
                     var object = '<a class="fc-time-grid-event fc-v-event fc-event fc-start fc-end course-item  fc-draggable fc-resizable" style="top: 65px; bottom: -153px; z-index: 1; left: 0%; right: 0%;">' +
                         '<div class="fc-content">' +
                         '<div class="container-room">' +
@@ -428,13 +494,15 @@
                     }
 
 
-                    object += '<p class="text-primary">' + event.type + '</p> ' +
-                        '</div>' +
+                    if (typeof event.type !== 'undefined') {
+                        object += '<p class="text-primary">' + event.type + '</p> ';
+                    }
+                    object += '</div>' +
                         '<div class="side-room">' +
                         '<div class="room-name">';
 
                     // check conflict and render room
-                    if (event.room !== null) {
+                    if (event.room !== null && event.building !== null) {
                         if (event.conflict_room === true) {
                             object += '<p class="fc-room bg-danger badge">' + event.building + '-' + event.room + '</p>';
                         } else {
@@ -457,8 +525,8 @@
                             }
                             groups += '</p>';
                         }
+                        object += groups;
                     }
-                    object += groups;
                     object += '</div> ' +
                         '<div class="clearfix"></div> ' +
                         '</div>' +
@@ -476,9 +544,30 @@
                     resize_timetable_slot(event.id, end, revertFunc);
                     $('#timetable').fullCalendar('rerenderEvents');
                     hide_conflict_information();
+                },
+                eventDragStop: function (event, jsEvent, ui, view) {
+                    get_timetable_slots();
+                    if (isEventOverDiv(jsEvent.clientX, jsEvent.clientY)) {
+                        remove_timetable_sltos(event);
+                    }
                 }
             });
         }
+
+        var isEventOverDiv = function (x, y) {
+
+            var rooms = $('.box-body.courses-sessions');
+            var offset = rooms.offset();
+            offset.right = rooms.width() + offset.left;
+            offset.bottom = rooms.height() + offset.top;
+
+            // Compare
+            return (x >= offset.left
+            && y >= offset.top
+            && x <= offset.right
+            && y <= offset.bottom);
+
+        };
 
         function check_conflict(timetable_slot_id) {
             $.ajax({
@@ -598,8 +687,13 @@
                         dom.remove();
                         notify('info', 'Room was removed.', 'Remove Room');
                     },
-                    error: function () {
-                        notify('error', 'Something went wrong.', 'Remove Room');
+                    error: function (response) {
+                        if (response.status === 403) {
+                            notify('error', 'You are not allow to remove room.', 'Unauthorized');
+                        }
+                        else {
+                            notify('error', 'Something went wrong.', 'Remove Room');
+                        }
                     }
                 })
             });
@@ -625,8 +719,12 @@
                             get_timetable_slots();
                         }
                     },
-                    error: function () {
-                        notify('error', 'Something went wrong.', 'Add Room');
+                    error: function (response) {
+                        if (response.status === 403) {
+                            notify('error', 'You can not add room.', 'Unauthorized');
+                        } else {
+                            notify('error', 'Something went wrong.', 'Add Room');
+                        }
                     }
                 });
             });

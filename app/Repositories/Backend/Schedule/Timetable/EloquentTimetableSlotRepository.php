@@ -3,6 +3,7 @@
 namespace App\Repositories\Backend\Schedule\Timetable;
 
 use App\Http\Requests\Backend\Schedule\Timetable\CreateTimetableRequest;
+use App\Http\Requests\Backend\Schedule\Timetable\CreateTimetableSlotRequest;
 use App\Models\CourseAnnualClass;
 use App\Models\CourseSession;
 use App\Models\Group;
@@ -24,11 +25,11 @@ class EloquentTimetableSlotRepository implements TimetableSlotRepositoryContract
      * Create timetable slot.
      *
      * @param Timetable $timetable
-     * @param CreateTimetableRequest $request
+     * @param CreateTimetableSlotRequest $request
      * @return mixed
      * @internal param CourseSession $courseSession
      */
-    public function create_timetable_slot(Timetable $timetable, CreateTimetableRequest $request)
+    public function create_timetable_slot(Timetable $timetable, CreateTimetableSlotRequest $request)
     {
         // create new group merge
         $newMergeTimetableSlot = $this->create_merge_timetable_slot($request);
@@ -279,10 +280,10 @@ class EloquentTimetableSlotRepository implements TimetableSlotRepositoryContract
     /**
      * Create merge timetable slot.
      *
-     * @param CreateTimetableRequest $request
+     * @param CreateTimetableSlotRequest $request
      * @return mixed
      */
-    public function create_merge_timetable_slot(CreateTimetableRequest $request)
+    public function create_merge_timetable_slot(CreateTimetableSlotRequest $request)
     {
         if (isset($request->start) || isset($request->end)) {
             $newMergeTimetableSlot = new MergeTimetableSlot();

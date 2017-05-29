@@ -20,6 +20,7 @@ Route::group(['namespace' => 'Schedule', 'prefix' => 'schedule'], function () {
     Route::post('timetables/get_suggest_room', 'TimetableController@get_suggest_room')->name('get_suggest_room');
     Route::post('timetables/get_conflict_info', 'TimetableController@get_conflict_info')->name('get_conflict_info');
     Route::post('timetables/merge_timetable_slot', 'TimetableController@merge_timetable_slot')->name('merge_timetable_slot');
+    Route::post('timetables/remove_timetable_slot', 'TimetableController@remove_timetable_slot')->name('remove_timetable_slot');
 
     Route::post('timetables/export_course_session', 'TimetableController@export_course_session')->name('export_course_session');
 

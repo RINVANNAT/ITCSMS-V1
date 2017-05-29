@@ -6,6 +6,7 @@ use App\Http\Controllers\Backend\Schedule\Traits\AjaxCloneTimetableController;
 use App\Http\Controllers\Backend\Schedule\Traits\AjaxCRUDTimetableController;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Backend\Schedule\Timetable\CreateTimetableRequest;
+use App\Http\Requests\Backend\Schedule\Timetable\CreateTimetableSlotRequest;
 use App\Http\Requests\Backend\Schedule\Timetable\DeleteTimetableRequest;
 use App\Models\AcademicYear;
 use App\Models\Degree;
@@ -167,7 +168,10 @@ class TimetableController extends Controller
      */
     public function create()
     {
-        return view('backend.schedule.timetables.create');
+        if(access()->allow('create-timetable')){
+            return view('backend.schedule.timetables.create');
+        }
+        return abort(404);
     }
 
     /**
@@ -208,17 +212,18 @@ class TimetableController extends Controller
     }
 
     /**
-     * @param CreateTimetableRequest $request
+     * @param CreateTimetableSlotRequest $request
+     * @param CreateTimetableRequest $requestTimetable
      * @return int
      */
-    public function store(CreateTimetableRequest $request)
+    public function store(CreateTimetableSlotRequest $request, CreateTimetableRequest $requestTimetable)
     {
-        $findTimetable = $this->timetableRepository->find_timetable_is_existed($request);
+        $findTimetable = $this->timetableRepository->find_timetable_is_existed($requestTimetable);
         $new_timetable_slot = new TimetableSlot();
         if ($findTimetable instanceof Timetable) {
             $new_timetable_slot = $this->timetableSlotRepository->create_timetable_slot($findTimetable, $request);
         } else {
-            $newTimetable = $this->timetableRepository->create_timetable($request);
+            $newTimetable = $this->timetableRepository->create_timetable($requestTimetable);
             if ($newTimetable instanceof Timetable) {
                 $new_timetable_slot = $this->timetableSlotRepository->create_timetable_slot($newTimetable, $request);
             }

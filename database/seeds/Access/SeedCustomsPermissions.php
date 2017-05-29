@@ -1814,7 +1814,7 @@ class SeedCustomsPermissions extends Seeder
             ]
         ];
 
-        /*--schedule permission management--*/
+        /* Schedule Permission */
         $roots[] = [
             'name' => 'Schedule Management',
             'groups' => [
@@ -1956,6 +1956,48 @@ class SeedCustomsPermissions extends Seeder
                         [
                             'name' => 'save-change-timetable',
                             'display_name' => 'Save Change Timetable',
+                            'dependency' => [
+                                'view-backend', 'view-schedule-management', 'view-timetable-management'
+                            ]
+                        ],
+                        [
+                            'name' => 'drag-course-session',
+                            'display_name' => 'Drag Course Session',
+                            'dependency' => [
+                                'view-backend', 'view-schedule-management', 'view-timetable-management'
+                            ]
+                        ],
+                        [
+                            'name' => 'remove-timetable-slot',
+                            'display_name' => 'Remove Timetable Slot',
+                            'dependency' => [
+                                'view-backend', 'view-schedule-management', 'view-timetable-management'
+                            ]
+                        ],
+                        [
+                            'name' => 'resize-timetable-slot',
+                            'display_name' => 'Resize Timetable Slot',
+                            'dependency' => [
+                                'view-backend', 'view-schedule-management', 'view-timetable-management'
+                            ]
+                        ],
+                        [
+                            'name' => 'move-timetable-slot',
+                            'display_name' => 'Move Timetable Slot',
+                            'dependency' => [
+                                'view-backend', 'view-schedule-management', 'view-timetable-management'
+                            ]
+                        ],
+                        [
+                            'name' => 'add-room',
+                            'display_name' => 'Add Room',
+                            'dependency' => [
+                                'view-backend', 'view-schedule-management', 'view-timetable-management'
+                            ]
+                        ],
+                        [
+                            'name' => 'remove-room',
+                            'display_name' => 'Remove Room',
                             'dependency' => [
                                 'view-backend', 'view-schedule-management', 'view-timetable-management'
                             ]

@@ -1,28 +1,3 @@
-/*Drag course session into timetable.*/
-function drag_course_session() {
-
-    $('.courses .course-item').each(function () {
-        // store data so the calendar knows to render an event upon drop
-        $(this).data('event', {
-            slot_id: $(this).find('.slot-id').text(),
-            course_session_id: $(this).find('.courses-session-id').text(),
-            course_name: $(this).find('.course-name').text(),
-            class_name: 'course-item',
-            teacher_name: $(this).find('.teacher-name').text(),
-            course_type: $(this).find('.course-type').text(),
-            times: $(this).find('.times').text()
-        });
-        if ($(this).data('event').teacher_name !== 'Unsigned') {
-            // make the event draggable using jQuery UI
-            $(this).draggable({
-                zIndex: 999,
-                revert: true,      // will cause the event to go back to its
-                revertDuration: 0  //  original position after the drag
-            });
-        }
-    });
-}
-
 /** Get rooms. **/
 function get_groups() {
     toggleLoading(true);

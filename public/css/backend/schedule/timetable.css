@@ -148,3 +148,7 @@
     text-align: center;
     font-size: 14px;
 }
+
+.fc-time-grid-event {
+    margin-bottom: 2px !important;
+}

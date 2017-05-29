@@ -2,8 +2,11 @@
 
 namespace App\Http\Controllers\Backend\Schedule\Traits;
 
+use App\Http\Requests\Backend\Schedule\Timetable\AddRoomIntoTimetableSlotRequest;
 use App\Http\Requests\Backend\Schedule\Timetable\CreateTimetableRequest;
 use App\Http\Requests\Backend\Schedule\Timetable\MoveTimetableSlotRequest;
+use App\Http\Requests\Backend\Schedule\Timetable\RemoveRoomFromTimetableSlot;
+use App\Http\Requests\Backend\Schedule\Timetable\RemoveTimetableSlotRequest;
 use App\Http\Requests\Backend\Schedule\Timetable\ResizeTimetableSlotRequest;
 use App\Models\DepartmentOption;
 use App\Models\Grade;
@@ -460,12 +463,13 @@ trait AjaxCRUDTimetableController
     /**
      * Insert room into timetable slot.
      *
+     * @param AddRoomIntoTimetableSlotRequest $request
      * @return mixed
      */
-    public function insert_room_into_timetable_slot()
+    public function insert_room_into_timetable_slot(AddRoomIntoTimetableSlotRequest $request)
     {
         // find timetable slot by request
-        $timetableSlot = TimetableSlot::find(request('timetable_slot_id'));
+        $timetableSlot = TimetableSlot::find($request->timetable_slot_id);
         // check validate
         if ($timetableSlot instanceof TimetableSlot) {
             // find another timetables with the same group.
@@ -490,11 +494,12 @@ trait AjaxCRUDTimetableController
     /**
      * Remove room.
      *
+     * @param RemoveRoomFromTimetableSlot $removeRoomFromTimetableSlot
      * @return mixed
      */
-    public function remove_room()
+    public function remove_room(RemoveRoomFromTimetableSlot $removeRoomFromTimetableSlot)
     {
-        $timetable_slot_id = request('timetable_slot_id');
+        $timetable_slot_id = $removeRoomFromTimetableSlot->timetable_slot_id;
         if (isset($timetable_slot_id)) {
             $timetableSlot = TimetableSlot::find($timetable_slot_id);
             // find all timetable slots in the same group_merge_id
@@ -716,6 +721,31 @@ trait AjaxCRUDTimetableController
     {
         if ($this->timetableSlotRepo->export_course_sessions() == true) {
             return Response::json(['status' => true]);
+        }
+        return Response::json(['status' => false]);
+    }
+
+    /**
+     * Remove timetable slot.
+     *
+     * @param RemoveTimetableSlotRequest $removeTimetableSlotRequest
+     * @return mixed
+     */
+    public function remove_timetable_slot(RemoveTimetableSlotRequest $removeTimetableSlotRequest)
+    {
+        $timetable_slot_id = $removeTimetableSlotRequest->timetable_slot_id;
+
+        if (isset($timetable_slot_id)) {
+            $timetableSlot = TimetableSlot::find($timetable_slot_id);
+            // take duration and slot_id field
+            $slot = Slot::find($timetableSlot->slot_id);
+            // update time_remaining field
+            $slot->time_remaining = $slot->time_remaining + $timetableSlot->durations;
+            $slot->updated_at = Carbon::now();
+            $slot->write_uid = auth()->user()->id;
+            if ($slot->update() && $timetableSlot->delete()) {
+                return Response::json(['status' => true]);
+            }
         }
         return Response::json(['status' => false]);
     }
