@@ -8,6 +8,7 @@ use App\Http\Requests\Backend\Schedule\Timetable\MoveTimetableSlotRequest;
 use App\Http\Requests\Backend\Schedule\Timetable\RemoveRoomFromTimetableSlot;
 use App\Http\Requests\Backend\Schedule\Timetable\RemoveTimetableSlotRequest;
 use App\Http\Requests\Backend\Schedule\Timetable\ResizeTimetableSlotRequest;
+use App\Models\Configuration;
 use App\Models\DepartmentOption;
 use App\Models\Grade;
 use App\Models\Group;
@@ -748,5 +749,34 @@ trait AjaxCRUDTimetableController
             }
         }
         return Response::json(['status' => false]);
+    }
+
+    /**
+     * Assign department can create tiemtable.
+     *
+     * @return mixed
+     */
+    public function assign_turn_create_timetable()
+    {
+        $start = new Carbon(request('start'));
+        $end = new Carbon(request('end'));
+        $arrayDepartments = json_encode(request('departments'));
+        $key = request('key');
+
+        if (!Configuration::where('key', $key)->first() instanceof Configuration) {
+            $newAssignCreateTimetable = new Configuration();
+            $newAssignCreateTimetable->key = $key;
+            $newAssignCreateTimetable->value = $arrayDepartments;
+            $newAssignCreateTimetable->created_at = $start;
+            $newAssignCreateTimetable->updated_at = $end;
+            if ($newAssignCreateTimetable->save()) {
+                return Response::json(['status' => true, 'message' => 'All those department are assigned.']);
+            }
+            return Response::json(['status' => false]);
+        } else {
+            return Response::json(['status' => false, 'message' => 'The key value already existed']);
+        }
+
+        //$department = Configuration::where('key', '_timetable_assign_3')->first();
     }
 }

@@ -11,8 +11,13 @@
 @endsection
 
 @section('after-styles-end')
+
     {!! Html::style('plugins/datatables/dataTables.bootstrap.css') !!}
+    {!! Html::style('plugins/select2/select2.min.css') !!}
     {!! Html::style('plugins/sweetalert2/dist/sweetalert2.css') !!}
+    {!! Html::style('plugins/datetimepicker/bootstrap-datetimepicker.min.css') !!}
+    {!! Html::style('css/backend/schedule/timetable.css') !!}
+
     <style>
         .toolbar {
             float: left;
@@ -36,8 +41,18 @@
                             {{ trans('buttons.backend.schedule.timetable.create') }}
                         </button>
                     </a>
+                    <a href="{{ route('timetables.assign') }}"
+                       class="btn btn-primary btn-sm"
+                       data-toggle="tooltip"
+                       data-placement="top" title="Timetable Assignment"
+                       data-original-title="Timetable Assignment">
+                        <i class="fa fa-plus-circle"></i> Timetable Assignment
+                    </a>
                 </div>
                 @endauth
+                <div class="box-tools pull-right">
+
+                </div>
             </div>
         </div>
 
@@ -89,6 +104,9 @@
     {!! Html::script('plugins/datatables/jquery.dataTables.min.js') !!}
     {!! Html::script('plugins/datatables/dataTables.bootstrap.min.js') !!}
     {!! Html::script('plugins/sweetalert2/dist/sweetalert2.js') !!}
+    {!! Html::script('plugins/select2/select2.full.min.js') !!}
+    {!! Html::script('plugins/moment/moment.min.js') !!}
+    {!! Html::script('plugins/datetimepicker/bootstrap-datetimepicker.min.js') !!}
     {!! Html::script('js/backend/schedule/timetable.js') !!}
 
     <script type="text/javascript">
@@ -113,8 +131,10 @@
                     {data: 'group', name: 'group', searchable: true},
                     {data: 'weekly', name: 'weekly', searchable: true},
                     {data: 'status', name: 'status', searchable: false, orderable: false},
-                    @if(access()->allow('view-timetable') || access()->allow('delete-timetable') || access()->allow('edit-timetable'))
-                    {data: 'action', name: 'action', searchable: false, orderable: false}
+                        @if(access()->allow('view-timetable') || access()->allow('delete-timetable') || access()->allow('edit-timetable'))
+                    {
+                        data: 'action', name: 'action', searchable: false, orderable: false
+                    }
                     @endif
                 ],
                 initComplete: function () {

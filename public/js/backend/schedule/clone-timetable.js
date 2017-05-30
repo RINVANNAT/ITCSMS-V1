@@ -16,8 +16,8 @@ function checkBoxComponents() {
     });
 
     // Checked or Unchecked weeks.
-    $('#all-weeks').iCheck('unchecked');
-    $('#all-groups').iCheck('unchecked');
+    $('#all-weeks').iCheck('uncheck');
+    $('#all-groups').iCheck('uncheck');
 
     $('#all-weeks').on('ifToggled', function () {
         $('input[data-target="weeks"]:checkbox').iCheck('toggle');
@@ -89,7 +89,6 @@ function clone_timetable_form() {
         }
     })
 }
-
 
 
 // document ready

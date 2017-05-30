@@ -17,7 +17,7 @@ class AddRoomIntoTimetableSlotRequest extends Request
      */
     public function authorize()
     {
-        return access()->allow('add-room');
+        return access()->allow('add-room-timetable-slot');
     }
 
     /**

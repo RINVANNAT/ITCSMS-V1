@@ -1,7 +1,7 @@
 <?php
 
-use Illuminate\Database\Seeder;
 use Carbon\Carbon;
+use Illuminate\Database\Seeder;
 
 class SeedCustomsPermissions extends Seeder
 {
@@ -1901,7 +1901,7 @@ class SeedCustomsPermissions extends Seeder
                     ]
                 ],
                 [
-                    'name' => 'Timetable',
+                    'name' => 'Timetable Management',
                     'groups' => [],
                     'permissions' => [
                         [
@@ -1959,45 +1959,51 @@ class SeedCustomsPermissions extends Seeder
                             'dependency' => [
                                 'view-backend', 'view-schedule-management', 'view-timetable-management'
                             ]
-                        ],
+                        ]
+                    ]
+                ],
+                [
+                    'name' => 'Timetable Slot Management',
+                    'groups' => [],
+                    'permissions' => [
                         [
                             'name' => 'drag-course-session',
                             'display_name' => 'Drag Course Session',
                             'dependency' => [
-                                'view-backend', 'view-schedule-management', 'view-timetable-management'
+                                'view-backend', 'view-schedule-management', 'view-timetable-management', 'create-timetable'
                             ]
                         ],
                         [
                             'name' => 'remove-timetable-slot',
                             'display_name' => 'Remove Timetable Slot',
                             'dependency' => [
-                                'view-backend', 'view-schedule-management', 'view-timetable-management'
+                                'view-backend', 'view-schedule-management', 'view-timetable-management', 'edit-timetable'
                             ]
                         ],
                         [
                             'name' => 'resize-timetable-slot',
                             'display_name' => 'Resize Timetable Slot',
                             'dependency' => [
-                                'view-backend', 'view-schedule-management', 'view-timetable-management'
+                                'view-backend', 'view-schedule-management', 'view-timetable-management', 'edit-timetable'
                             ]
                         ],
                         [
                             'name' => 'move-timetable-slot',
                             'display_name' => 'Move Timetable Slot',
                             'dependency' => [
-                                'view-backend', 'view-schedule-management', 'view-timetable-management'
+                                'view-backend', 'view-schedule-management', 'view-timetable-management', 'edit-timetable'
                             ]
                         ],
                         [
-                            'name' => 'add-room',
-                            'display_name' => 'Add Room',
+                            'name' => 'add-room-timetable-slot',
+                            'display_name' => 'Add Room To Timetable Slot',
                             'dependency' => [
                                 'view-backend', 'view-schedule-management', 'view-timetable-management'
                             ]
                         ],
                         [
-                            'name' => 'remove-room',
-                            'display_name' => 'Remove Room',
+                            'name' => 'remove-room-timetable-slot',
+                            'display_name' => 'Remove Room From Timetable Slot',
                             'dependency' => [
                                 'view-backend', 'view-schedule-management', 'view-timetable-management'
                             ]
@@ -2005,21 +2011,21 @@ class SeedCustomsPermissions extends Seeder
                     ]
                 ],
                 [
-                    'name' => 'General Timetable Management',
+                    'name' => 'Type Timetable Management',
                     'groups' => [],
                     'permissions' => [
                         [
-                            'name' => 'global-timetable-management',
-                            'display_name' => 'Global Timetable Management',
+                            'name' => 'global-timetable',
+                            'display_name' => 'Global Timetable',
                             'dependency' => [
-                                'view-backend', 'view-schedule-management', 'view-timetable-management'
+                                'view-backend', 'view-schedule-management', 'view-timetable-management', 'create-timetable'
                             ]
                         ],
                         [
-                            'name' => 'personal-timetable-management',
-                            'display_name' => 'Personal Timetable Management',
+                            'name' => 'personal-timetable',
+                            'display_name' => 'Personal Timetable',
                             'dependency' => [
-                                'view-backend', 'view-schedule-management', 'view-timetable-management'
+                                'view-backend', 'view-schedule-management', 'view-timetable-management', 'create-timetable'
                             ]
                         ]
                     ]

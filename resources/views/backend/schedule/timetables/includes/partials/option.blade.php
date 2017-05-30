@@ -14,7 +14,7 @@
     </select>
 @endif
 {{--admin--}}
-@if(access()->allow('global-timetable-management'))
+@if(access()->allow('global-timetable'))
     @if(isset($departments))
         <select name="department"
                 data-toggle="tooltip"
@@ -54,7 +54,7 @@
         </select>
     @endif
 @else
-
+{{--end of global timetable--}}
     @if(isset($department))
         <select name="department"
                 data-toggle="tooltip"

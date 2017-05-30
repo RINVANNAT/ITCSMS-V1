@@ -438,7 +438,7 @@
                 maxTime: '20:00:00',
                 slotLabelFormat: 'h:mm a',
                 columnFormat: 'dddd',
-                editable: true,
+                @if(access()->allow('edit-timetable')) editable: true, @endif
                 droppable: true,
                 dragRevertDuration: 0,
                 drop: function (date) {

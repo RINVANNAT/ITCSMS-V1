@@ -17,16 +17,24 @@
                 </div>
             </div>
             <div class="box-body">
-                <div class="rooms">
-                    @if(isset($rooms))
-                        @foreach($rooms as $room)
-                            <div class="room-item">
-                                <i class="fa fa-building-o"></i>
-                                {{ $room->name }}
-                            </div>
-                        @endforeach
-                    @endif
-                </div>
+                @if(access()->allow('remove-room-timetable-slot'))
+                    <div class="rooms">
+                        @if(isset($rooms))
+                            @foreach($rooms as $room)
+                                <div class="room-item">
+                                    <i class="fa fa-building-o"></i>
+                                    {{ $room->name }}
+                                </div>
+                            @endforeach
+                        @endif
+                    </div>
+                @else
+                    <div class="alert alert-danger {{--alert-dismissible--}}">
+                        {{--<button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>--}}
+                        <h4><i class="icon fa fa-info"></i>Adding room is blocked</h4>
+                        <p>You are not allow to add room. Please contact to Study Office to get more information.</p>
+                    </div>
+                @endif
             </div>
         </div>
     </div>

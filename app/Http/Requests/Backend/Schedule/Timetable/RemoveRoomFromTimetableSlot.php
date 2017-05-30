@@ -13,7 +13,7 @@ class RemoveRoomFromTimetableSlot extends Request
      */
     public function authorize()
     {
-        return access()->allow('remove-room');
+        return access()->allow('remove-room-timetable-slot');
     }
 
     /**

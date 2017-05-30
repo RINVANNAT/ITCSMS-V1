@@ -168,7 +168,7 @@ class TimetableController extends Controller
      */
     public function create()
     {
-        if(access()->allow('create-timetable')){
+        if (access()->allow('create-timetable')) {
             return view('backend.schedule.timetables.create');
         }
         return abort(404);
@@ -250,5 +250,15 @@ class TimetableController extends Controller
             return redirect()->back()->withFlashSuccess('Timetable is deleted successfully.');
         }
         return redirect()->back()->withFlashError('Something went wrong.');
+    }
+
+    /**
+     * Access settings page.
+     *
+     * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View
+     */
+    public function assign()
+    {
+        return view('backend.schedule.timetables.assign')->with('departments', Department::where('parent_id', 11)->get());
     }
 }

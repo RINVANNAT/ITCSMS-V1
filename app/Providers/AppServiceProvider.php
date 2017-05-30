@@ -41,7 +41,7 @@ class AppServiceProvider extends ServiceProvider
          * Passing academicYears, Degree,... to option partials (Timetable).
          */
         view()->composer('backend.schedule.timetables.includes.partials.option', function ($view) {
-            if (access()->allow('global-timetable-management')) {
+            if (access()->allow('global-timetable')) {
                 $view->with([
                     'academicYears' => AcademicYear::latest()->get(),
                     'departments' => Department::where('parent_id', 11)->get(),

@@ -20,7 +20,15 @@
                 </h3>
             </div>
             <div class="box-body courses-sessions">
+                @if(access()->allow('drag-course-session'))
                 <ul class="courses todo-list"></ul>
+                @else
+                    <div class="alert alert-danger {{--alert-dismissible--}}">
+                        {{--<button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>--}}
+                        <h4><i class="icon fa fa-info"></i>Dragging course session is blocked</h4>
+                        <p>You are not allow to drag course session. Please contact to Study Office to get more information.</p>
+                    </div>
+                @endif
             </div>
         </div>
     </div>
