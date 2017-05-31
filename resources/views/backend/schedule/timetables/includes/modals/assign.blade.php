@@ -1,13 +1,13 @@
-<div class="modal fade" id="settings-create-timetable" role="dialog">
+<div class="modal fade" id="modal-timetable-assignment" role="dialog">
     <div class="modal-dialog" role="document">
         <div class="modal-content">
             <div class="modal-header">
                 <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span>
                 </button>
-                <h4 class="modal-title">Settings Create Timetable</h4>
+                <h4 class="modal-title">Timetable Assignment</h4>
             </div>
             <div class="modal-body">
-                <form class="form-horizontal" id="assign">
+                <form class="form-horizontal" id="form-assign">
                     <div class="form-group">
                         <label class="control-label col-sm-3">Department:</label>
                         <div class="col-md-9">
@@ -15,17 +15,6 @@
                                 @foreach($departments as $department)
                                     <option value="{{ $department->id }}">{{ $department->code }}</option>
                                 @endforeach
-                            </select>
-                        </div>
-                    </div>
-
-                    <div class="form-group">
-                        <label class="control-label col-sm-3">Key:</label>
-                        <div class="col-md-9">
-                            <select name="key" class="form-control">
-                                <option value="_timetable_assign_1">Assign 01</option>
-                                <option value="_timetable_assign_2">Assign 02</option>
-                                <option value="_timetable_assign_3">Assign 03</option>
                             </select>
                         </div>
                     </div>

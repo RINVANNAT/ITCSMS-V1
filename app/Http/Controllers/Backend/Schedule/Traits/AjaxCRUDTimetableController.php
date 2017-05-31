@@ -9,6 +9,7 @@ use App\Http\Requests\Backend\Schedule\Timetable\RemoveRoomFromTimetableSlot;
 use App\Http\Requests\Backend\Schedule\Timetable\RemoveTimetableSlotRequest;
 use App\Http\Requests\Backend\Schedule\Timetable\ResizeTimetableSlotRequest;
 use App\Models\Configuration;
+use App\Models\Department;
 use App\Models\DepartmentOption;
 use App\Models\Grade;
 use App\Models\Group;
@@ -22,6 +23,7 @@ use Carbon\Carbon;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Response;
+use Yajra\Datatables\Datatables;
 
 /**
  * Class AjaxCRUDTimetableController
@@ -758,25 +760,82 @@ trait AjaxCRUDTimetableController
      */
     public function assign_turn_create_timetable()
     {
-        $start = new Carbon(request('start'));
-        $end = new Carbon(request('end'));
-        $arrayDepartments = json_encode(request('departments'));
-        $key = request('key');
+        $result = false;
+        /** key format: timetable_department_id. Example: key: timetable_1 */
 
-        if (!Configuration::where('key', $key)->first() instanceof Configuration) {
-            $newAssignCreateTimetable = new Configuration();
-            $newAssignCreateTimetable->key = $key;
-            $newAssignCreateTimetable->value = $arrayDepartments;
-            $newAssignCreateTimetable->created_at = $start;
-            $newAssignCreateTimetable->updated_at = $end;
-            if ($newAssignCreateTimetable->save()) {
-                return Response::json(['status' => true, 'message' => 'All those department are assigned.']);
+        if (count(request('departments')) > 0) {
+            foreach (request('departments') as $item) {
+                if (Configuration::where('key', 'timetable_' . $item)->first() instanceof Configuration) {
+                    return Response::json(['status' => $result, 'The key: \"timetable_' . $item . '\" value already existed']);
+                }
             }
-            return Response::json(['status' => false]);
+
+            $start = new Carbon(request('start'));
+            $end = new Carbon(request('end'));
+
+            foreach (request('departments') as $item) {
+                $newAssignCreateTimetable = new Configuration();
+                $newAssignCreateTimetable->key = 'timetable_' . $item;
+                $newAssignCreateTimetable->value = $item;
+                $newAssignCreateTimetable->created_at = $start;
+                $newAssignCreateTimetable->updated_at = $end;
+                $newAssignCreateTimetable->description = 'true';
+                $newAssignCreateTimetable->create_uid = auth()->user()->id;
+                $newAssignCreateTimetable->write_uid = auth()->user()->id;
+                if ($newAssignCreateTimetable->save()) {
+                    $result = true;
+                } else {
+                    $result = false;
+                    break;
+                }
+            }
+            if ($result) {
+                return Response::json(['status' => $result, 'message' => 'All those department are assigned.']);
+            }
         } else {
-            return Response::json(['status' => false, 'message' => 'The key value already existed']);
+            return Response::json(['status' => $result, 'message' => 'Something went wrong.']);
+        }
+    }
+
+    /**
+     * Get timetable assignment.
+     *
+     * @return mixed
+     */
+    public function get_timetable_assignment()
+    {
+        $timetable_assignments = Configuration::where('key', 'like', 'timetable_%')->select('value', 'key', 'description', 'created_at', 'updated_at')->get();
+
+        $departments = new Collection();
+        if (count($timetable_assignments) > 0) {
+            foreach ($timetable_assignments as $assignment) {
+                $department = new Collection(Department::where('id', $assignment->value)->select('code')->first());
+                $department->put('start', $assignment->created_at);
+                $department->put('end', $assignment->updated_at);
+                $department->put('description', $assignment->description);
+                $departments->push($department);
+            }
         }
 
-        //$department = Configuration::where('key', '_timetable_assign_3')->first();
+        return Datatables::of($departments)
+            ->editColumn('start', function ($department) {
+                return (new Carbon($department['start']))->toFormattedDateString();
+            })
+            ->editColumn('end', function ($department) {
+                return (new Carbon($department['end']))->toFormattedDateString();
+            })
+            ->addColumn('status', function ($department) {
+                if($department['description'] == 'true'){
+                    return '<button class="btn btn-info btn-xs"><i class="fa fa-refresh fa-pulse"></i></button>';
+                }else{
+                    return '<button class="btn btn-danger btn-xs"><i class="fa fa-circle-thin fa-pulse"></i></button>';
+                }
+            })
+            ->addColumn('action', function ($department) {
+                return '<button class="btn btn-primary btn-xs"><i class="fa fa-edit"></i></button> ' .
+                    '<button class="btn btn-danger btn-xs"><i class="fa fa-trash"></i></button>';
+            })
+            ->editColumn('did', 1)
+            ->make(true);
     }
 }

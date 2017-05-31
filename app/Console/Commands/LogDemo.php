@@ -2,10 +2,14 @@
 
 namespace App\Console\Commands;
 
+use App\Models\Configuration;
 use Carbon\Carbon;
 use Illuminate\Console\Command;
-use Illuminate\Support\Facades\Log;
 
+/**
+ * Class LogDemo
+ * @package App\Console\Commands
+ */
 class LogDemo extends Command
 {
     /**
@@ -39,6 +43,20 @@ class LogDemo extends Command
      */
     public function handle()
     {
-        Log::info('I was here @: ' . Carbon::now());
+        $now = Carbon::now();
+        $departments = Configuration::where('key', 'like', 'timetable_%')->get();
+        foreach ($departments as $department) {
+            if (strtotime($now) == strtotime($department->created_at)) {
+                $department->description = 'true';
+                Log:
+                info('This department id=' . $department->value . 'can create timetable');
+                $department->update();
+            } else {
+                if ($department->description == 'true') {
+                    $department->description = 'false';
+                    $department->update();
+                }
+            }
+        }
     }
 }

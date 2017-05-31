@@ -27,76 +27,17 @@
 
 @section('content')
 
-    <div class="box box-success">
-        <div class="box-header with-border">
-            <div class="mailbox-controls">
-                @permission('create-timetable')
-                <div class="pull-left">
-                    <a href="{{ route('admin.schedule.timetables.create') }}">
-                        <button class="btn btn-primary btn-sm" data-toggle="tooltip"
-                                data-placement="top" title="Create a new timetable"
-                                data-original-title="Create a new timetable">
-                            <i class="fa fa-plus-circle"
-                            ></i>
-                            {{ trans('buttons.backend.schedule.timetable.create') }}
-                        </button>
-                    </a>
-                    <a href="{{ route('timetables.assign') }}"
-                       class="btn btn-primary btn-sm"
-                       data-toggle="tooltip"
-                       data-placement="top" title="Timetable Assignment"
-                       data-original-title="Timetable Assignment">
-                        <i class="fa fa-plus-circle"></i> Timetable Assignment
-                    </a>
-                </div>
-                @endauth
-                <div class="box-tools pull-right">
-
-                </div>
-            </div>
+    <div class="row">
+        <div class="col-md-4">
+            @include('backend.schedule.timetables.includes.partials.timetable-assignment')
         </div>
-
-        <div class="box-body">
-            <div class="tables-responsive">
-                <table class="table table-striped table-bordered table-hover dt-responsive nowrap"
-                       id="timetables-table">
-                    <thead>
-                    <tr>
-                        <th>{{ trans('labels.backend.schedule.timetable.table.academic_year') }}</th>
-                        <th>{{ trans('labels.backend.schedule.timetable.table.department') }}</th>
-                        <th>{{ trans('labels.backend.schedule.timetable.table.degree') }}</th>
-                        <th>{{ trans('labels.backend.schedule.timetable.table.grade') }}</th>
-                        <th>{{ trans('labels.backend.schedule.timetable.table.option') }}</th>
-                        <th>{{ trans('labels.backend.schedule.timetable.table.semester') }}</th>
-                        <th>{{ trans('labels.backend.schedule.timetable.table.group') }}</th>
-                        <th>{{ trans('labels.backend.schedule.timetable.table.week') }}</th>
-                        <th>{{ trans('labels.backend.schedule.timetable.table.status') }}</th>
-                        @if(access()->allow('view-timetable') || access()->allow('delete-timetable'))
-                            <th>{{ trans('labels.general.actions') }}</th>
-                        @endif
-                    </tr>
-                    </thead>
-                    <tbody>
-                    </tbody>
-                    <tfoot>
-                    <tr>
-                        <td></td>
-                        <td></td>
-                        <td></td>
-                        <td></td>
-                        <td></td>
-                        <td></td>
-                        <td></td>
-                        <td></td>
-                    </tr>
-                    </tfoot>
-                </table>
-            </div>
-
-            <div class="clearfix"></div>
+        <div class="col-md-8">
+            @include('backend.schedule.timetables.includes.partials.timetable-viewer')
         </div>
     </div>
 
+    {{--modal timetable assignment--}}
+    @include('backend.schedule.timetables.includes.modals.assign')
 @stop
 
 @section('after-scripts-end')
@@ -109,6 +50,7 @@
     {!! Html::script('plugins/datetimepicker/bootstrap-datetimepicker.min.js') !!}
     {!! Html::script('js/backend/schedule/timetable.js') !!}
 
+    {{--timetable management--}}
     <script type="text/javascript">
         $(function () {
             $('#timetables-table').DataTable({
@@ -224,6 +166,69 @@
 
             });
         })
+    </script>
+
+    {{--timetable assignment--}}
+    <script type="text/javascript">
+        var get_timetable_assignment = $('#display-assign').DataTable({
+                processing: true,
+                serverSide: true,
+                ajax: {
+                    url: '{!! route('get_timetable_assignment') !!}',
+                    method: 'POST',
+                    data: {
+                        _token: '{{ csrf_token() }}'
+                    }
+                },
+                columns: [
+                    {data: 'code', name: 'code', searchable: true},
+                    {data: 'start', name: 'start', searchable: false, orderable: false},
+                    {data: 'end', name: 'end', searchable: false, orderable: false},
+                    {data: 'status', name: 'status', searchable: false, orderable: false},
+                    {data: 'action', name: 'action', searchable: false, orderable: false}
+                ]
+            });
+
+        $(function () {
+            get_timetable_assignment.draw();
+
+            $('#start').datetimepicker({
+                format: 'YYYY-MM-DD hh:mm:ss'
+            });
+            $('#end').datetimepicker({
+                format: 'YYYY-MM-DD hh:mm:ss'
+            });
+
+            $('select[name="departments[]"]').select2({
+                placeholder: 'Chose Department'
+            });
+
+            $(document).on('click', '#btn_assign', function (event) {
+                event.preventDefault();
+                $.ajax({
+                    type: 'POST',
+                    url: '{!! route('assign_turn_create_timetable') !!}',
+                    data: $('form[id="form-assign"]').serialize(),
+                    success: function (response) {
+                        if (response.status === true) {
+                            $('#modal-timetable-assignment').modal('toggle');
+                            notify('info', response.message, 'Successfully');
+                            $('#form-assign').trigger('reset');
+                        }
+                        if (response.status === false) {
+                            notify('error', response.message, 'Oops...');
+                        }
+                    },
+                    error: function () {
+                        notify('error', 'Something went wrong.', 'Oops...');
+                    },
+                    complete: function () {
+                        $('#form-assign').trigger('reset');
+                        get_timetable_assignment.draw();
+                    }
+                })
+            });
+        });
     </script>
 
 @stop
