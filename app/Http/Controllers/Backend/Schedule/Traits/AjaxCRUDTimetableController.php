@@ -22,6 +22,7 @@ use App\Repositories\Backend\Schedule\Timetable\EloquentTimetableSlotRepository;
 use Carbon\Carbon;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Response;
 use Yajra\Datatables\Datatables;
 
@@ -770,15 +771,12 @@ trait AjaxCRUDTimetableController
                 }
             }
 
-            $start = new Carbon(request('start'));
-            $end = new Carbon(request('end'));
-
             foreach (request('departments') as $item) {
                 $newAssignCreateTimetable = new Configuration();
                 $newAssignCreateTimetable->key = 'timetable_' . $item;
                 $newAssignCreateTimetable->value = $item;
-                $newAssignCreateTimetable->created_at = $start;
-                $newAssignCreateTimetable->updated_at = $end;
+                $newAssignCreateTimetable->created_at = request('start');
+                $newAssignCreateTimetable->updated_at = request('end');
                 $newAssignCreateTimetable->description = 'true';
                 $newAssignCreateTimetable->create_uid = auth()->user()->id;
                 $newAssignCreateTimetable->write_uid = auth()->user()->id;
@@ -789,6 +787,24 @@ trait AjaxCRUDTimetableController
                     break;
                 }
             }
+
+            $now = Carbon::now('Asia/Phnom_Penh');
+            $departments = Configuration::where('key', 'like', 'timetable_%')->get();
+            foreach ($departments as $department) {
+                Log::info('now:' . $now . 'start:' . $department->created_at . 'end:' . $department->updated_at);
+                if (strtotime($now) >= strtotime($department->created_at) && strtotime($now) <= strtotime($department->updated_at)) {
+                    $department->description = 'true';
+                    $department->timestamps = false;
+                    $department->update();
+                } else {
+                    if ($department->description == 'true') {
+                        $department->description = 'false';
+                        $department->timestamps = false;
+                        $department->update();
+                    }
+                }
+            }
+
             if ($result) {
                 return Response::json(['status' => $result, 'message' => 'All those department are assigned.']);
             }
@@ -822,13 +838,19 @@ trait AjaxCRUDTimetableController
                 return (new Carbon($department['start']))->toFormattedDateString();
             })
             ->editColumn('end', function ($department) {
+                $now = Carbon::now('Asia/Phnom_Penh');
                 return (new Carbon($department['end']))->toFormattedDateString();
             })
             ->addColumn('status', function ($department) {
-                if($department['description'] == 'true'){
-                    return '<button class="btn btn-info btn-xs"><i class="fa fa-refresh fa-pulse"></i></button>';
-                }else{
-                    return '<button class="btn btn-danger btn-xs"><i class="fa fa-circle-thin fa-pulse"></i></button>';
+                if ($department['description'] == 'true') {
+                    // return '<button class="btn btn-info btn-xs"><i class="fa fa-refresh fa-pulse"></i></button>';
+                    return '<label class="label label-info">IN PROGRESS</label>';
+                } else if ($department['description'] == 'finished') {
+                    // return '<button class="btn btn-success btn-xs"><i class="fa fa-check-circle"></i></button>';
+                    return '<label class="label label-success">FINISHED</label>';
+                } else {
+                    //return '<button class="btn btn-danger btn-xs"><i class="fa fa-circle-thin fa-pulse"></i></button>';
+                    return '<label class="label label-danger">WAITING</label>';
                 }
             })
             ->addColumn('action', function ($department) {

@@ -471,7 +471,6 @@
                     get_course_sessions();
                 },
                 eventRender: function (event, element, view) {
-                    console.log(event);
                     var object = '<a class="fc-time-grid-event fc-v-event fc-event fc-start fc-end course-item  fc-draggable fc-resizable" style="top: 65px; bottom: -153px; z-index: 1; left: 0%; right: 0%;">' +
                         '<div class="fc-content">' +
                         '<div class="container-room">' +
@@ -556,7 +555,7 @@
 
         var isEventOverDiv = function (x, y) {
 
-            var rooms = $('.box-body.courses-sessions');
+            var rooms = $('.courses.todo-list');
             var offset = rooms.offset();
             offset.right = rooms.width() + offset.left;
             offset.bottom = rooms.height() + offset.top;

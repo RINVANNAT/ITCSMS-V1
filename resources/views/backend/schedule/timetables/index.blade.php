@@ -38,6 +38,7 @@
 
     {{--modal timetable assignment--}}
     @include('backend.schedule.timetables.includes.modals.assign')
+    @include('backend.schedule.timetables.includes.modals.update-assign')
 @stop
 
 @section('after-scripts-end')
@@ -193,10 +194,10 @@
             get_timetable_assignment.draw();
 
             $('#start').datetimepicker({
-                format: 'YYYY-MM-DD hh:mm:ss'
+                format: 'YYYY-MM-DD'
             });
             $('#end').datetimepicker({
-                format: 'YYYY-MM-DD hh:mm:ss'
+                format: 'YYYY-MM-DD'
             });
 
             $('select[name="departments[]"]').select2({

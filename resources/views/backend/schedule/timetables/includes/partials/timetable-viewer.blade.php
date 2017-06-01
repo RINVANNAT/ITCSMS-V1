@@ -18,7 +18,7 @@
     </div>
 
     <div class="box-body">
-        <div class="tables-responsive">
+        <div class="table-responsive">
             <table class="table table-striped table-bordered table-hover dt-responsive nowrap"
                    id="timetables-table">
                 <thead>

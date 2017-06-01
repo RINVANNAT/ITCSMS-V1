@@ -43,19 +43,21 @@ class LogDemo extends Command
      */
     public function handle()
     {
-        $now = Carbon::now();
+        $now = Carbon::now('Asia/Phnom_Penh');
         $departments = Configuration::where('key', 'like', 'timetable_%')->get();
         foreach ($departments as $department) {
-            if (strtotime($now) == strtotime($department->created_at)) {
+            if (strtotime($now) >= strtotime($department->created_at) && strtotime($now) <= strtotime($department->updated_at)) {
                 $department->description = 'true';
-                Log:
-                info('This department id=' . $department->value . 'can create timetable');
+                $department->timestamps = false;
+                $department->update();
+            } elseif (strtotime($now) > strtotime($department->updated_at)) {
+                $department->description = 'finished';
+                $department->timestamps = false;
                 $department->update();
             } else {
-                if ($department->description == 'true') {
-                    $department->description = 'false';
-                    $department->update();
-                }
+                $department->description = 'false';
+                $department->timestamps = false;
+                $department->update();
             }
         }
     }
