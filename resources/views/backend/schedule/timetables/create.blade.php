@@ -545,9 +545,9 @@
                     hide_conflict_information();
                 },
                 eventDragStop: function (event, jsEvent, ui, view) {
-                    get_timetable_slots();
                     if (isEventOverDiv(jsEvent.clientX, jsEvent.clientY)) {
                         remove_timetable_sltos(event);
+                        $('#timetable').fullCalendar('removeEvent', event.id);
                     }
                 }
             });
@@ -555,7 +555,7 @@
 
         var isEventOverDiv = function (x, y) {
 
-            var rooms = $('.courses.todo-list');
+            var rooms = $('.box-body.courses-sessions');
             var offset = rooms.offset();
             offset.right = rooms.width() + offset.left;
             offset.bottom = rooms.height() + offset.top;

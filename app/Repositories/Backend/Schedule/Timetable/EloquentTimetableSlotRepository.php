@@ -2,8 +2,8 @@
 
 namespace App\Repositories\Backend\Schedule\Timetable;
 
-use App\Http\Requests\Backend\Schedule\Timetable\CreateTimetableRequest;
 use App\Http\Requests\Backend\Schedule\Timetable\CreateTimetableSlotRequest;
+use App\Models\Configuration;
 use App\Models\CourseAnnualClass;
 use App\Models\CourseSession;
 use App\Models\Group;
@@ -14,6 +14,7 @@ use App\Models\Schedule\Timetable\Timetable;
 use App\Models\Schedule\Timetable\TimetableSlot;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 
 /**
  * Class EloquentTimetableSlotRepository
@@ -694,5 +695,32 @@ class EloquentTimetableSlotRepository implements TimetableSlotRepositoryContract
             }
         }
         return $result;
+    }
+
+    /**
+     * Cron job set permission.
+     *
+     * @return mixed
+     */
+    public function set_permission_create_timetable()
+    {
+        $now = Carbon::now('Asia/Phnom_Penh');
+        $departments = Configuration::where('key', 'like', 'timetable_%')->get();
+        foreach ($departments as $department) {
+            Log::info('now:' . $now . 'start:' . $department->created_at . 'end:' . $department->updated_at);
+            if (strtotime($now) >= strtotime($department->created_at) && strtotime($now) <= strtotime($department->updated_at)) {
+                $department->description = 'true';
+                $department->timestamps = false;
+                $department->update();
+            } elseif (strtotime($now) > strtotime($department->updated_at)) {
+                $department->description = 'finished';
+                $department->timestamps = false;
+                $department->update();
+            } else {
+                $department->description = 'false';
+                $department->timestamps = false;
+                $department->update();
+            }
+        }
     }
 }

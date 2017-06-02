@@ -152,3 +152,8 @@
 .fc-time-grid-event {
     margin-bottom: 2px !important;
 }
+
+.box-smis {
+    border: 1px solid #f1f1f1;
+    margin: 5px;
+}

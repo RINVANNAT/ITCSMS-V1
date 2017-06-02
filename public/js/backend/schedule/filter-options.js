@@ -32,34 +32,7 @@ function get_groups() {
     })
 }
 
-/** Get weeks. **/
-function get_weeks(semester_id) {
-    toggleLoading(true);
-    $.ajax({
-        type: 'POST',
-        url: '/admin/schedule/timetables/get_weeks',
-        data: {semester_id: semester_id},
-        success: function (response) {
-            var option = '';
-            $.each(response.weeks, function (key, val) {
-                option += '<option value="' + val.id + '">' + val.name_en + '</option>';
-            });
 
-            $('select[name="weekly"]').html(option);
-        },
-        error: function () {
-            swal(
-                'Oops...',
-                'Something went wrong!',
-                'error'
-            );
-        },
-        complete: function () {
-
-            toggleLoading(false);
-        }
-    });
-}
 
 /** Get options. **/
 function get_options(department_id) {
@@ -100,7 +73,6 @@ function get_grades(department_id) {
             if (response.status === true) {
                 var grades = '';
                 $.each(response.grades, function (key, val) {
-                    console.log
                     grades += '<option value="' + val.id + '">' + val.name_en + '</option>';
                 });
                 $('select[name="grade"]').html(grades);

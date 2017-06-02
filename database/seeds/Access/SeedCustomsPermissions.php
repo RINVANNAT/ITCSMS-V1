@@ -1919,6 +1919,13 @@ class SeedCustomsPermissions extends Seeder
                             ]
                         ],
                         [
+                            'name' => 'create-timetable-assignment',
+                            'display_name' => 'Create Timetable Assignment',
+                            'dependency' => [
+                                'view-backend', 'view-schedule-management', 'view-timetable-management'
+                            ]
+                        ],
+                        [
                             'name' => 'clone-timetable',
                             'display_name' => 'Clone Timetable',
                             'dependency' => [

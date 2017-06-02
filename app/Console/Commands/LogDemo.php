@@ -2,9 +2,8 @@
 
 namespace App\Console\Commands;
 
-use App\Models\Configuration;
-use Carbon\Carbon;
 use Illuminate\Console\Command;
+use Illuminate\Support\Facades\Log;
 
 /**
  * Class LogDemo
@@ -43,22 +42,6 @@ class LogDemo extends Command
      */
     public function handle()
     {
-        $now = Carbon::now('Asia/Phnom_Penh');
-        $departments = Configuration::where('key', 'like', 'timetable_%')->get();
-        foreach ($departments as $department) {
-            if (strtotime($now) >= strtotime($department->created_at) && strtotime($now) <= strtotime($department->updated_at)) {
-                $department->description = 'true';
-                $department->timestamps = false;
-                $department->update();
-            } elseif (strtotime($now) > strtotime($department->updated_at)) {
-                $department->description = 'finished';
-                $department->timestamps = false;
-                $department->update();
-            } else {
-                $department->description = 'false';
-                $department->timestamps = false;
-                $department->update();
-            }
-        }
+        Log::info('Hello, Welcome to Demo Log Console.');
     }
 }

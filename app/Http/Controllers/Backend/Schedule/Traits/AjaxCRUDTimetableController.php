@@ -22,9 +22,7 @@ use App\Repositories\Backend\Schedule\Timetable\EloquentTimetableSlotRepository;
 use Carbon\Carbon;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Response;
-use Yajra\Datatables\Datatables;
 
 /**
  * Class AjaxCRUDTimetableController
@@ -767,7 +765,7 @@ trait AjaxCRUDTimetableController
         if (count(request('departments')) > 0) {
             foreach (request('departments') as $item) {
                 if (Configuration::where('key', 'timetable_' . $item)->first() instanceof Configuration) {
-                    return Response::json(['status' => $result, 'The key: \"timetable_' . $item . '\" value already existed']);
+                    return Response::json(['status' => $result, 'message' => 'The key: timetable_' . $item . ' value already existed']);
                 }
             }
 
@@ -775,8 +773,8 @@ trait AjaxCRUDTimetableController
                 $newAssignCreateTimetable = new Configuration();
                 $newAssignCreateTimetable->key = 'timetable_' . $item;
                 $newAssignCreateTimetable->value = $item;
-                $newAssignCreateTimetable->created_at = request('start');
-                $newAssignCreateTimetable->updated_at = request('end');
+                $newAssignCreateTimetable->created_at = new Carbon(request('start'));
+                $newAssignCreateTimetable->updated_at = new Carbon(request('end'));
                 $newAssignCreateTimetable->description = 'true';
                 $newAssignCreateTimetable->create_uid = auth()->user()->id;
                 $newAssignCreateTimetable->write_uid = auth()->user()->id;
@@ -788,22 +786,7 @@ trait AjaxCRUDTimetableController
                 }
             }
 
-            $now = Carbon::now('Asia/Phnom_Penh');
-            $departments = Configuration::where('key', 'like', 'timetable_%')->get();
-            foreach ($departments as $department) {
-                Log::info('now:' . $now . 'start:' . $department->created_at . 'end:' . $department->updated_at);
-                if (strtotime($now) >= strtotime($department->created_at) && strtotime($now) <= strtotime($department->updated_at)) {
-                    $department->description = 'true';
-                    $department->timestamps = false;
-                    $department->update();
-                } else {
-                    if ($department->description == 'true') {
-                        $department->description = 'false';
-                        $department->timestamps = false;
-                        $department->update();
-                    }
-                }
-            }
+            $this->timetableSlotRepo->set_permission_create_timetable();
 
             if ($result) {
                 return Response::json(['status' => $result, 'message' => 'All those department are assigned.']);
@@ -820,44 +803,57 @@ trait AjaxCRUDTimetableController
      */
     public function get_timetable_assignment()
     {
-        $timetable_assignments = Configuration::where('key', 'like', 'timetable_%')->select('value', 'key', 'description', 'created_at', 'updated_at')->get();
+        $timetable_assignments = Configuration::where('key', 'like', 'timetable_%')->select('id', 'value', 'key', 'description', 'created_at', 'updated_at')->get();
 
         $departments = new Collection();
         if (count($timetable_assignments) > 0) {
             foreach ($timetable_assignments as $assignment) {
                 $department = new Collection(Department::where('id', $assignment->value)->select('code')->first());
-                $department->put('start', $assignment->created_at);
-                $department->put('end', $assignment->updated_at);
+                $department->put('start', (new Carbon($assignment->created_at))->toDateString());
+                $department->put('end', (new Carbon($assignment->updated_at))->toDateString());
                 $department->put('description', $assignment->description);
+                $department->put('key_id', $assignment->id);
                 $departments->push($department);
             }
+            return Response::json(['status' => true, 'departments' => $departments]);
         }
+        return Response::json(['status' => false]);
+    }
 
-        return Datatables::of($departments)
-            ->editColumn('start', function ($department) {
-                return (new Carbon($department['start']))->toFormattedDateString();
-            })
-            ->editColumn('end', function ($department) {
-                $now = Carbon::now('Asia/Phnom_Penh');
-                return (new Carbon($department['end']))->toFormattedDateString();
-            })
-            ->addColumn('status', function ($department) {
-                if ($department['description'] == 'true') {
-                    // return '<button class="btn btn-info btn-xs"><i class="fa fa-refresh fa-pulse"></i></button>';
-                    return '<label class="label label-info">IN PROGRESS</label>';
-                } else if ($department['description'] == 'finished') {
-                    // return '<button class="btn btn-success btn-xs"><i class="fa fa-check-circle"></i></button>';
-                    return '<label class="label label-success">FINISHED</label>';
-                } else {
-                    //return '<button class="btn btn-danger btn-xs"><i class="fa fa-circle-thin fa-pulse"></i></button>';
-                    return '<label class="label label-danger">WAITING</label>';
-                }
-            })
-            ->addColumn('action', function ($department) {
-                return '<button class="btn btn-primary btn-xs"><i class="fa fa-edit"></i></button> ' .
-                    '<button class="btn btn-danger btn-xs"><i class="fa fa-trash"></i></button>';
-            })
-            ->editColumn('did', 1)
-            ->make(true);
+    /**
+     * Delete timetable assignment.
+     *
+     * @return mixed
+     */
+    public function assign_delete()
+    {
+        $id = request('id');
+
+        if (isset($id)) {
+            $configuration = Configuration::find($id);
+            if ($configuration instanceof Configuration) {
+                $configuration->delete();
+                return Response::json(['status' => true]);
+            }
+        }
+        return Response::json(['status' => false]);
+    }
+
+    /**
+     * Update Timetable Assignment.
+     *
+     * @return mixed
+     */
+    public function assign_update()
+    {
+        $configuration = Configuration::find(request('configuration_id'));
+        if ($configuration instanceof Configuration) {
+            $configuration->created_at = new Carbon(request('start'));
+            $configuration->updated_at = new Carbon(request('end'));
+            $configuration->update();
+            $this->timetableSlotRepo->set_permission_create_timetable();
+            return Response::json(['status' => true]);
+        }
+        return Response::json(['status' => false]);
     }
 }

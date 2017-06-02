@@ -20,22 +20,10 @@
                     </div>
 
                     <div class="form-group">
-                        <label class="control-label col-sm-3">Start Date:</label>
+                        <label class="control-label col-sm-3">Datetime:</label>
                         <div class="col-md-9">
-                            <div class='input-group date' id='start'>
-                                <input type='text' class="form-control" placeholder="Start Date" name="start"/>
-                                <span class="input-group-addon">
-                                    <span class="glyphicon glyphicon-calendar"></span>
-                                </span>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="form-group">
-                        <label class="control-label col-sm-3">End Date:</label>
-                        <div class="col-md-9">
-                            <div class='input-group date' id='end'>
-                                <input type='text' class="form-control" placeholder="End Date" name="end"/>
+                            <div class='input-group date' id='datetime'>
+                                <input type='text' class="form-control" placeholder="Datetime" name="datetime" id="datetime"/>
                                 <span class="input-group-addon">
                                     <span class="glyphicon glyphicon-calendar"></span>
                                 </span>

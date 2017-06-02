@@ -235,4 +235,11 @@ interface TimetableSlotRepositoryContract
      * @return mixed
      */
     public function is_cloning(Timetable $timetable, $group = null, $week, $result);
+
+    /**
+     * Cron job set permission.
+     *
+     * @return mixed
+     */
+    public function set_permission_create_timetable();
 }
