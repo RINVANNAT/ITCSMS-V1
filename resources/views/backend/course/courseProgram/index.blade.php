@@ -42,7 +42,7 @@
                 </a>
                 @endauth
 
-                <a href="{!! route('course_program.export_list') !!}" id="export_file">
+                <a href="{!! route('course_program.export_list') !!}" id="export_file" class="pull-right">
                     <button class="btn btn-info btn-sm" ><i class="fa fa-download"></i> Export </button>
                 </a>
 

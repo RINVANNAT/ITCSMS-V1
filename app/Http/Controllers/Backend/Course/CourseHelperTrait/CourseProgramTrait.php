@@ -25,6 +25,8 @@ trait CourseProgramTrait
         $degree = DB::table('degrees')->where('id', $request->degree_id)->first();
         $grade = DB::table('grades')->where('id', $request->grade_id)->first();
 
+        $header = "Course Program - Department: ".$department->code." , Degree: ".$degree->name_en." ,Grade: ".$grade->code;
+
         $coursePrograms = DB::table('courses')
             ->where([
                 ['department_id', $request->department_id],
@@ -32,15 +34,19 @@ trait CourseProgramTrait
                 ['grade_id', $request->grade_id]
             ]);
 
-        if(isset($request->semester_id)) {
+        if(isset($request->semester_id) && $request->semester_id != '') {
             $coursePrograms = $coursePrograms->where('semester_id', $request->semester_id);
+            $header = $header." , Semester: ".$request->semester_id;
         }
-        if(isset($request->department_option_id)) {
+        if(isset($request->department_option_id) && $request->department_option_id != '') {
+
             $coursePrograms = $coursePrograms->where('department_option_id', $request->department_option_id);
             $departmentOption = DB::table('departmentOptions')->where('id', $request->department_option_id)->first();
+
+            $header = $header." ,Option: ".$departmentOption->name_en;
         }
 
-        $coursePrograms = $coursePrograms->get();
+        $coursePrograms = $coursePrograms->orderBy('semester_id')->get();
 
         foreach ($coursePrograms as $program) {
             $element = [
@@ -60,14 +66,26 @@ trait CourseProgramTrait
         }
 
         $title = 'List Course Program';
+
         $colHeaders = [
             'Name Khmer', 'Name French', 'Name English', 'Code', 'Class', 'Semester', 'Time Course', 'Time TD', 'Time TP', 'Creadit'
         ];
 
-        Excel::create($title, function ($excel) use ($arrayData, $title, $colHeaders) {
+        Excel::create($title, function ($excel) use ($arrayData, $title, $colHeaders, $header) {
 
-            $excel->sheet($title, function ($sheet) use ($arrayData, $title, $colHeaders) {
-                $sheet->fromArray($arrayData);
+            $excel->sheet($title, function ($sheet) use ($arrayData, $title, $colHeaders, $header) {
+
+
+
+                $sheet->row(1, [ $header]);
+                $sheet->row(2, $colHeaders);
+                foreach ($arrayData as $data) {
+                    $sheet->appendRow($data);
+                }
+                $sheet->mergeCells('A1:J1');
+                $sheet->cells('A1:J1', function($cell) {
+                    $cell->setAlignment('center');
+                });
             });
 
         })->download('xls');
