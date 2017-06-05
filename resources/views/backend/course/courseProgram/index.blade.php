@@ -38,10 +38,13 @@
             <div class="mailbox-controls">
                 @permission("create-coursePrograms")
                 <a href="{!! route('admin.course.course_program.create') !!}">
-                    <button class="btn btn-primary btn-sm"><i class="fa fa-plus-circle"></i> Add
-                    </button>
+                    <button class="btn btn-primary btn-sm"><i class="fa fa-plus-circle"></i> Add </button>
                 </a>
                 @endauth
+
+                <a href="{!! route('course_program.export_list') !!}" id="export_file">
+                    <button class="btn btn-info btn-sm" ><i class="fa fa-download"></i> Export </button>
+                </a>
 
                 {{--<button class="btn btn-default btn-sm"><i class="fa fa-refresh"></i></button>--}}
 
@@ -200,6 +203,52 @@
             });
 
         }
+
+
+        $('#export_file').on('click', function (e) {
+            e.preventDefault();
+
+            var url= $(this).attr('href');
+            var department_id = $('#filter_department :selected').val();
+            var degree_id = $('#filter_degree :selected').val();
+            var grade_id = $('#filter_grade :selected').val();
+            var semester_id = $('#filter_semester :selected').val();
+            var department_option_id = $('#filter_dept_option :selected').val();
+
+
+            if(department_id != null && department_id != '') {
+
+                if(degree_id != null && degree_id != '') {
+
+                    if(grade_id != null && grade_id != '') {
+
+                        window.open(
+                                url+'?department_id=' + department_id +
+                                        '&degree_id='+ degree_id +
+                                        '&grade_id=' + grade_id+
+                                        '&semester_id=' + semester_id+
+                                        '&department_option_id=' + department_option_id
+                                , '_blank'
+                        )
+
+
+
+                    } else {
+                        notify('error', 'Attention! Please Select Grade!')
+                    }
+                } else {
+                    notify('error', 'Attention! Please Select Degree!')
+                }
+
+            } else {
+                notify('error', 'Attention! Please Select Department!')
+            }
+
+
+        });
+
+
+
     </script>
 @stop
 
