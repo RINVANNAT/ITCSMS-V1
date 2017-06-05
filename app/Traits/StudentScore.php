@@ -478,6 +478,7 @@ trait StudentScore {
     public function findPassOrFailStudentScore($request) {
 
         $courseAnnuals = $this->getCourseAnnually();
+
         $deptId = $request->department_id;
         $academicYearID = $request->academic_year_id;
         $degreeId = $request->degree_id;
@@ -489,7 +490,6 @@ trait StudentScore {
         if($deptId) {
             $courseAnnuals = $courseAnnuals->where('course_annuals.department_id', '=',$deptId);
         }
-
         if($academicYearID) {
             $courseAnnuals = $courseAnnuals->where('course_annuals.academic_year_id', '=',$academicYearID);
         }
@@ -505,50 +505,25 @@ trait StudentScore {
         if($deptOptionId) {
             $courseAnnuals = $courseAnnuals->where('course_annuals.department_option_id', '=',$deptOptionId);
         }
-
         $array_course_annual_ids = $courseAnnuals->lists('course_annual_id');
 
         $courseAnnuals = $courseAnnuals->orderBy('course_annuals.semester_id')->orderBy('course_annuals.name_en')->get();// note restricted order by semester this is very important to make dynamic table course of each year [if change there would have bugs]
+
         $groups = $this-> selectedGroupByCourseAnnual($array_course_annual_ids);
+
         $allProperties = $this->getCourseAnnualWithScore($array_course_annual_ids);
         $eachCourseAnnualScores = $allProperties['averages'];
 
 
         foreach($courseAnnuals as $courseAnnual) {
 
-            $groupByCourseAnnual = isset($groups[$courseAnnual->course_annual_id])?$groups[$courseAnnual->course_annual_id]:null;
+            //$groupByCourseAnnual = isset($groups[$courseAnnual->course_annual_id])?$groups[$courseAnnual->course_annual_id]:null;
 
-            if($deptOptionId = $courseAnnual->department_option_id) {
-
-                $filtered_students =  $this->getStudentByDeptIdGradeIdDegreeId([$courseAnnual->department_id], [$courseAnnual->degree_id], [$courseAnnual->grade_id], $courseAnnual->academic_year_id);
-                $filtered_students = $filtered_students->whereIn('studentAnnuals.department_option_id', [$deptOptionId]);
-
-                if($groupByCourseAnnual != null) {
-                    $filtered_students = $filtered_students->whereIn('group', $groupByCourseAnnual)->get();
-                } else {
-                    $filtered_students =  $filtered_students->get();//->where('studentAnnuals.group', null)->get();
-                }
-
-            } else {
-
-                $filtered_students =  $this->getStudentByDeptIdGradeIdDegreeId([$courseAnnual->department_id], [$courseAnnual->degree_id], [$courseAnnual->grade_id], $courseAnnual->academic_year_id);
-
-                if($groupByCourseAnnual != null) {
-                    $filtered_students = $filtered_students->whereIn('group', $groupByCourseAnnual)->get();
-                } else {
-                    $filtered_students =  $filtered_students->get();//->where('studentAnnuals.group', null)->get();
-                }
-
-            }
-
+            $filtered_students = $this->filtering_student_annual($courseAnnual, $groups); /*--public function in StudentTrait Class--*/
 
             foreach($filtered_students as $stu_dent) {
 
                 $each_score = isset($eachCourseAnnualScores[$courseAnnual->course_annual_id])?(isset($eachCourseAnnualScores[$courseAnnual->course_annual_id][$stu_dent->student_annual_id])?$eachCourseAnnualScores[$courseAnnual->course_annual_id][$stu_dent->student_annual_id]->average:0):0;
-
-                if($each_score > ScoreEnum::Zero) {
-                    $each_column_score[$courseAnnual->course_id][$stu_dent->id_card] = $each_score;
-                }
 
                 if($courseAnnual->is_counted_creditability) {
 
@@ -561,9 +536,13 @@ trait StudentScore {
 
             }
         }
+
         return [
             'fail_or_pass' => $fail_subjects,
-            'score_properties' => $allProperties
+            'score_properties' => $allProperties,
+            'course_annual' => $courseAnnuals,
+            'course_annual_ids' => $array_course_annual_ids,
+            'groups' => $groups
         ];
     }
 
@@ -578,13 +557,15 @@ trait StudentScore {
         $courseAnnualIds = [];
         $courseAnnualByProgram = [];
         $arrayCourseAnnualIds = [];
+
         $studentDataProperties = $this->findPassOrFailStudentScore($request);/*--this method is implemented in StudentScore Trait Class--*/
+        $courseAnnuals = $studentDataProperties['course_annual'];
+
         $academic_year_id = $request->academic_year_id;
         $academicYear = DB::table('academicYears')->where('id', $academic_year_id)->first();
 
 
-
-        $resitStudentAnnualFromDB = $this->hasRattrapages($studentDataProperties['fail_or_pass'], $request);
+        $resitStudentAnnualFromDB =['resit_student' => []]; //$this->hasRattrapages($studentDataProperties['fail_or_pass'], $course_annual_ids= $studentDataProperties['course_annual_ids']);
 
         if(count($resitStudentAnnualFromDB['resit_student']) > 0) {//count($resitStudentAnnualFromDB['resit_student']) > 0
 
@@ -693,9 +674,12 @@ trait StudentScore {
 
             $studentResitExam = $this->findResitStudentAutomatic($studentDataProperties['fail_or_pass']);
 
+            //dd($studentResitExam);
+
+
             /*dd($studentResitExam['e20130014']);*/
 
-            foreach($studentResitExam as $student_id => $resit) {
+            /*foreach($studentResitExam as $student_id => $resit) {
 
                 if(isset($resit['resit_subject']['fail'])) {
 
@@ -712,7 +696,6 @@ trait StudentScore {
                                 $studentRattrapages[$student_id][$keyPOrF][] = $val['course_annual_id'];
                                 $studentRattrapagesByStudentAnnualId[$val['student_annual_id']][$keyPOrF][] = $val['course_annual_id'];
                             }
-
                         }
                         $studentIdCards[] = $student_id;
                     } else {
@@ -721,6 +704,7 @@ trait StudentScore {
                         //---calculate moyenne again if the score is upper than 30 student will be allowed to resit the exam else they must be redouble
 
                         $average = $this->calculateMoyenne($subjects);
+
                         if($average >= ScoreEnum::Under_30) {
 
                             //--allow student to resit
@@ -735,14 +719,14 @@ trait StudentScore {
                         /// else ---do not count these student
                     }
                 }
-            }
+            }*/
 
 
-            $arrayCourseAnnualIds = array_unique($arrayCourseAnnualIds);
-            $arrayCourseAnnualIds = array_merge($arrayCourseAnnualIds);
+            /*$arrayCourseAnnualIds = array_unique($arrayCourseAnnualIds);
+            $arrayCourseAnnualIds = array_values($arrayCourseAnnualIds);
 
             $students = $this->getStudentByIdCardYearly($studentIdCards, $academic_year_id);
-            $courseAnnuals = $resitStudentAnnualFromDB['course_annual'];
+
             $objectCourseAnnualByIds = [];
 
             foreach($courseAnnuals as $courseAnnual) {
@@ -766,11 +750,11 @@ trait StudentScore {
             $courseProgramIds = array_unique($courseProgramIds);
             $courseProgramIds = array_values($courseProgramIds);
             $coursePrograms = Course::whereIn('courses.id', $courseProgramIds)->get();
-            $averages = $studentDataProperties['score_properties']['averages'];
+            $averages = $studentDataProperties['score_properties']['averages'];*/
 
 
             /*------save student rattrapaer automatic-----*/
-            $this->saveStudentResitAutomatic($studentRattrapagesByStudentAnnualId, $objectCourseAnnualByIds);
+            //$this->saveStudentResitAutomatic($studentRattrapagesByStudentAnnualId, $objectCourseAnnualByIds);
             /*----end saving ----*/
 
 
@@ -1019,15 +1003,10 @@ trait StudentScore {
 
     }
 
-    public function hasRattrapages($array_fial_subject, $request ) {
+    public function hasRattrapages($array_fial_subject, $coursenAnnualIds ) {
 
-        $courseType = $this->getCourseProAndAnnual($request->department_id,$request->academic_year_id, $request->degree_id,$request->grade_id ,$request->semester_id, $request->department_option_id);
-        $courseAnnuals = $courseType['course_annual'];
 
-        $coursenAnnualIds = [];
-        foreach($courseAnnuals as $courseAnnual) {
-            $coursenAnnualIds[$courseAnnual->semester_id][] = $courseAnnual->course_annual_id;
-        }
+
         $idCardPointToIdAnnual = [];
         $studentAnnualIds = [];
         $resitStudentAnnualIDs = [];
@@ -1075,28 +1054,24 @@ trait StudentScore {
 
         /*----resit student course annuals from database=------ */
 
+        $findResit = DB::table('resit_student_annuals')
+            ->where(function($query) use ($studentAnnualIds, $coursenAnnualIds) {
+                $query ->whereIn('student_annual_id', $studentAnnualIds)
+                    ->whereIn('course_annual_id', $coursenAnnualIds)
+                    ->OrwhereNull('course_annual_id');
+            })->get();
+
+        $findResit = collect($findResit)->groupBy('semester_id')->toArray();
+
         $status = false;
         $allResitStudentAnnuals =[];
-        $semsters = Semester::get();
-        foreach($semsters as $semster) {
-            if(isset($coursenAnnualIds[$semster->id])) {
 
-                $findResit = DB::table('resit_student_annuals')
-                    ->whereIn('student_annual_id', $studentAnnualIds)
-                    ->Orwhere('course_annual_id', null)
-                    ->whereIn('course_annual_id', $coursenAnnualIds[$semster->id])
-                    ->where('semester_id', $semster->id)
-                    ->get();
-
-                if(count($findResit) > 0) {
-                    $allResitStudentAnnuals= array_merge($allResitStudentAnnuals , $findResit);
-                    $status = true;
-                } else {
-                    $status = false;
-                }
-            }
+        if(count($findResit) > 0) {
+            $allResitStudentAnnuals= array_merge($allResitStudentAnnuals , $findResit);
+            $status = true;
+        } else {
+            $status = false;
         }
-
 
         if($status) {
             $studentAnnualWithResitCourseAnnuals = [];
@@ -1129,7 +1104,6 @@ trait StudentScore {
         return [
             'resit_course_annual' => $onlyResitSubjects,
             'student_annual_id' => $resitStudentAnnualIDs,
-            'course_annual' => $courseAnnuals,
             'resit_student' => $resitStudents
         ];
     }
