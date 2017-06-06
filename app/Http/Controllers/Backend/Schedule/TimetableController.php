@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Backend\Schedule;
 
 use App\Http\Controllers\Backend\Schedule\Traits\AjaxCloneTimetableController;
 use App\Http\Controllers\Backend\Schedule\Traits\AjaxCRUDTimetableController;
+use App\Http\Controllers\Backend\Schedule\Traits\PrintTimetableController;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Backend\Schedule\Timetable\CreateTimetableRequest;
 use App\Http\Requests\Backend\Schedule\Timetable\CreateTimetableSlotRequest;
@@ -33,7 +34,7 @@ use Yajra\Datatables\Datatables;
  */
 class TimetableController extends Controller
 {
-    use AjaxCRUDTimetableController, AjaxCloneTimetableController;
+    use AjaxCRUDTimetableController, AjaxCloneTimetableController, PrintTimetableController;
 
     /**
      * @var TimetableRepositoryContract
@@ -122,38 +123,24 @@ class TimetableController extends Controller
                 'timetables.completed as status',
                 'timetables.id as id'
             ]);
-        //dd(request()->all());
-        $timetables = $timetables->where([
-            ['academicYears.id', request('academicYear')],
-            ['departments.id', request('department')],
-            ['degrees.id', request('degree')],
-            //['departmentOptions.id', (request('option') == 'Option' || request('option') == null) ? null : request('option') ],
-            ['grades.id', request('grade')],
-            ['semesters.id', request('semester')],
-            //['groups.id', (request('group') == 'Group' || request('group') == null) ? null : request('group')],
-            //['weeks.id', (request('weekly') == 'Weekly' || request('option') == null) ? null : request('option')]
-        ])->get();
-
-        //dd($timetables);
-
-        /*if ($employee instanceof Employee) {
-            $timetables = $timetables->where([
-                ['departments.id', $employee->department_id]
-            ])->get();
-        } else {
-            $timetables = $timetables->get();
-        }*/
 
         return Datatables::of($timetables)
             ->addColumn('action', function ($timetable) {
-                $print = ' <a href="#print" class="btn btn-xs btn-info">'
+                $export = ' <a href="#export" class="btn btn-xs btn-primary">'
+                    . '<i class="fa fa-download" data-toggle="tooltip"'
+                    . 'data-placement="top" title="Export"'
+                    . 'data-original-title="Export">'
+                    . '</i>'
+                    . '</a> ';
+
+                $print = ' <button id="print-timetable" rel="external"  href="'.route('timetables.print', $timetable->id).'" class="btn btn-xs btn-success">'
                     . '<i class="fa fa-print" data-toggle="tooltip"'
                     . 'data-placement="top" title="Print"'
                     . 'data-original-title="Print">'
                     . '</i>'
-                    . '</a> ';
+                    . '</button> ';
 
-                $view = '<a href="' . route('admin.schedule.timetables.show', $timetable->id) . '" class="btn btn-xs btn-primary">'
+                $view = '<a href="' . route('admin.schedule.timetables.show', $timetable->id) . '" class="btn btn-xs btn-info">'
                     . '<i class="fa fa-share-square-o" data-toggle="tooltip"'
                     . 'data-placement="top" title="View"'
                     . 'data-original-title="View">'
@@ -167,6 +154,9 @@ class TimetableController extends Controller
                     . '</a>';
 
                 $result = '';
+                if (access()->allow('export-timetable')) {
+                    $result .= $export;
+                }
                 if (access()->allow('edit-timetable')) {
                     $result .= $print;
                 }

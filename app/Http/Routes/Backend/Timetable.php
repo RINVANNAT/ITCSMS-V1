@@ -43,5 +43,9 @@ Route::group(['namespace' => 'Schedule', 'prefix' => 'schedule'], function () {
     Route::post('timetables/clone/weeks', 'TimetableController@get_all_weeks')->name('clone.weeks');
     Route::post('timetables/clone_timetable_form', 'TimetableController@clone_timetable_form')->name('clone_timetable_form');
     Route::post('timetables/clone/clone_timetable', 'TimetableController@clone_timetable')->name('clone_timetable');
+
+    /** Print */
+    Route::get('timetables/print/{id}', 'TimetableController@print_timetable')->name('timetables.print');
+    Route::get('timetables/template-print', 'TimetableController@get_template_print')->name('timetables.template_print');
 });
 

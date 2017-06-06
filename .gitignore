@@ -27,3 +27,4 @@ error.log
 /.vagrant
 Todo.rtf
 bin/
+!/public/img/timetable/logo-print.jpg

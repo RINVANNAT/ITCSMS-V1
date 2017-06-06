@@ -91,6 +91,7 @@
     {!! Html::script('plugins/daterangepicker/moment.js') !!}
     {!! Html::script('plugins/daterangepicker/daterangepicker.js') !!}
     {!! Html::script('js/backend/schedule/filter-options.js') !!}
+    {!! Html::script('js/backend/schedule/timetable-print.js') !!}
 
     {{--timetable management--}}
     <script type="text/javascript">
