@@ -39,6 +39,10 @@
                     <input type="hidden" name="filter_gender" id="filter_gender" value="{{$gender==null?"":$gender}}" />
                     <input type="hidden" name="filter_option" id="filter_option" value="{{$option==null?"":$option}}" />
                     <input type="hidden" name="filter_origin" id="filter_origin" value="{{$origin==null?"":$origin}}" />
+                    <input type="hidden" name="filter_semester" id="filter_semester" value="{{$semester==null?"":$semester}}" />
+                    <input type="hidden" name="filter_group" id="filter_group" value="{{$group==null?"":$group}}" />
+                    <input type="hidden" name="filter_redouble" id="filter_redouble" value="{{$redouble==null?"":$redouble}}" />
+                    <input type="hidden" name="filter_radie" id="filter_radie" value="{{$radie==null?"":$radie}}" />
                 </div>
             </div>
 

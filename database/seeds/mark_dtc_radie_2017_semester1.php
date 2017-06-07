@@ -14,6 +14,7 @@ class mark_dtc_radie_2017_semester1 extends Seeder
     {
         // I2 student semester 1
         $id_card_from_dtc_i2_to_radie = [
+            ["e20150007","ឈប់រៀន"],
             ["e20150011","VN"  ],
             ["e20150022","ឈប់រៀន"  ],
             ["e20150033","ឈប់រៀន"  ],
@@ -86,6 +87,7 @@ class mark_dtc_radie_2017_semester1 extends Seeder
             ["e20150838","Bourse"  ]
         ];
         $id_card_from_dtc_i2_to_redouble = [
+            ["e20150081","Suspendu"],
             ["e20150165","Suspendu"  ],
             ["e20150383","Suspendu"  ],
             ["e20150447","Suspendu"  ],
@@ -102,6 +104,7 @@ class mark_dtc_radie_2017_semester1 extends Seeder
 
         // I1 student semsester 1
         $id_card_from_dtc_i1_to_radie = [
+            ["e20160008","រៀនពេទ្យ"],
             ["e20160011","មិនដែលមករៀន"  ],
             ["e20160013","រៀនពេទ្យ"  ],
             ["e20160039","គ្រូបឋម"  ],
@@ -208,8 +211,7 @@ class mark_dtc_radie_2017_semester1 extends Seeder
             $student = \App\Models\Student::where('id_card',$arr[0])->first();
 
             if($student){
-                $student->radie = true;
-                $student->save();
+                \App\Models\Student::where('id_card',$arr[0])->update(["radie"=>true]);
 
                 \App\Models\StudentAnnual::where("student_id",$student->id)
                     ->where('degree_id',1)
@@ -225,8 +227,7 @@ class mark_dtc_radie_2017_semester1 extends Seeder
         foreach($id_card_from_dtc_i1_to_radie as $arr){
             $student = \App\Models\Student::where('id_card',$arr[0])->first();
             if($student) {
-                $student->radie = true;
-                $student->save();
+                \App\Models\Student::where('id_card',$arr[0])->update(["radie"=>true]);
 
                 \App\Models\StudentAnnual::where("student_id",$student->id)
                     ->where('degree_id',1)
@@ -257,7 +258,7 @@ class mark_dtc_radie_2017_semester1 extends Seeder
 
         }
 
-        foreach($id_card_from_dtc_i1_to_redouble as $id){
+        foreach($id_card_from_dtc_i1_to_redouble as $arr){
             $student = \App\Models\Student::where('id_card',$arr[0])->first();
             if($student) {
                 DB::table('redouble_student')->insert(

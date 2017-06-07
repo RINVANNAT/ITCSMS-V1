@@ -5,6 +5,7 @@ namespace App\Http\Controllers\API;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\API\StudentApiRequest;
 use App\Models\Student;
+use App\Models\StudentAnnual;
 use App\Traits\StudentScore;
 use App\Utils\FormParamManager;
 use Illuminate\Http\Request;
@@ -151,6 +152,34 @@ class StudentApiController extends Controller
             ->groupBy('department_id')->toArray();
 
         return ($studentByDept);
+
+    }
+
+
+    public function studentClassmate(Request $request)
+    {
+
+        $dataParams = FormParamManager::getFormParams($request);
+        $studentIdCard = isset($dataParams['student_id_card']) ? $dataParams['student_id_card'] : null;
+
+        $student = DB::table('students AS s')
+            ->join(DB::raw('(SELECT * FROM '.'"studentAnnuals"'.' A WHERE academic_year_id = (SELECT MAX(academic_year_id) FROM '.'"studentAnnuals"'.')) AS sa'), function($join) use ($studentIdCard) {
+                $join->on('s.id', '=', 'sa.student_id')
+                    ->where('s.id_card', '=',$studentIdCard );
+            })->first();
+
+        $classmates = DB::table('studentAnnuals')
+            ->join('students', function($query) use($student){
+                $query->on('students.id', '=', 'studentAnnuals.student_id')
+                    ->where('studentAnnuals.department_id', '=', $student->department_id)
+                    ->where('studentAnnuals.degree_id', '=', $student->degree_id)
+                    ->where('studentAnnuals.grade_id', '=', $student->grade_id)
+                    ->where('studentAnnuals.academic_year_id', '=', $student->academic_year_id);
+            })->select([
+                'students.name_latin', 'students.address', 'students.dob', 'students.email', 'students.id_card'
+            ])->orderBy('name_latin')->get();
+
+        return $classmates;
 
     }
 }
