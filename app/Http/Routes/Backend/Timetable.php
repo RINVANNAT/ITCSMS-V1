@@ -47,5 +47,8 @@ Route::group(['namespace' => 'Schedule', 'prefix' => 'schedule'], function () {
     /** Print */
     Route::get('timetables/print/{id}', 'TimetableController@print_timetable')->name('timetables.print');
     Route::post('timetables/template-print', 'TimetableController@get_template_print')->name('timetables.template_print');
-});
 
+    /** Export Excel */
+    Route::get('timetables/export/{id}', 'TimetableController@export_timetable')->name('timetables.export');
+    Route::post('timetables/export/file', 'TimetableController@export_file')->name('timetables.export_file');
+});

@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Backend\Schedule;
 
 use App\Http\Controllers\Backend\Schedule\Traits\AjaxCloneTimetableController;
 use App\Http\Controllers\Backend\Schedule\Traits\AjaxCRUDTimetableController;
+use App\Http\Controllers\Backend\Schedule\Traits\ExportTimetableController;
 use App\Http\Controllers\Backend\Schedule\Traits\PrintTimetableController;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Backend\Schedule\Timetable\CreateTimetableRequest;
@@ -34,7 +35,7 @@ use Yajra\Datatables\Datatables;
  */
 class TimetableController extends Controller
 {
-    use AjaxCRUDTimetableController, AjaxCloneTimetableController, PrintTimetableController;
+    use AjaxCRUDTimetableController, AjaxCloneTimetableController, PrintTimetableController, ExportTimetableController;
 
     /**
      * @var TimetableRepositoryContract
@@ -126,14 +127,13 @@ class TimetableController extends Controller
 
         return Datatables::of($timetables)
             ->addColumn('action', function ($timetable) {
-                $export = ' <a href="#export" class="btn btn-xs btn-primary">'
+                $export = ' <button id="export-timetable"  href="'.route('timetables.export', $timetable->id).'" class="btn btn-xs btn-primary">'
                     . '<i class="fa fa-download" data-toggle="tooltip"'
                     . 'data-placement="top" title="Export"'
                     . 'data-original-title="Export">'
                     . '</i>'
-                    . '</a> ';
-
-                $print = ' <button id="print-timetable" rel="external"  href="' . route('timetables.print', $timetable->id) . '" class="btn btn-xs btn-success">'
+                    . '</button> ';
+                $print = ' <button id="print-timetable" href="' . route('timetables.print', $timetable->id) . '" class="btn btn-xs btn-success">'
                     . '<i class="fa fa-print" data-toggle="tooltip"'
                     . 'data-placement="top" title="Print"'
                     . 'data-original-title="Print">'

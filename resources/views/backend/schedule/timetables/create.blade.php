@@ -265,6 +265,7 @@
         }
         /** get timetable slots */
         function get_timetable_slots() {
+            toggleLoading(true);
             $.ajax({
                 type: 'POST',
                 url: '{!! route('get_timetable_slots') !!}',
@@ -273,6 +274,12 @@
                     $('#timetable').fullCalendar('removeEvents');
                     $('#timetable').fullCalendar('renderEvents', response, true);
                     $('#timetable').fullCalendar('rerenderEvents');
+                },
+                error: function () {
+                    notify('error', 'error load timetable slot');
+                },
+                completed: function () {
+                    toggleLoading(false);
                 }
             });
         }
