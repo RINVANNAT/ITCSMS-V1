@@ -317,3 +317,61 @@
     </script>
 
 @stop
+<td>
+    <p style="text-align: right;">{{ $timetableSlot->type }}</p>
+    <p style="text-align: center; font-weight: bold;">{{ $timetableSlot->course_name }}</p>
+    <p style="text-align: center;">{{ $timetableSlot->teacher_name }}</p>
+    <p style="text-align: right">404-F</p>
+</td>
+
+<tr style="height: 30px !important;">
+    <td colspan="7"></td>
+</tr>
+
+<tr>
+    <td align="center" valign="middle">7:00 - 8:00</td>
+    <td>
+        <p style="text-align: right;">Course</p>
+        <p style="text-align: center; font-weight: bold;">Algorithm</p>
+        <p style="text-align: center;">CHUN Thavorac</p>
+        <p style="text-align: right">404-F</p>
+    </td>
+    <td>
+        <p style="text-align: right;">Course</p>
+        <p style="text-align: center; font-weight: bold;">Algorithm</p>
+        <p style="text-align: center;">CHUN Thavorac</p>
+        <p style="text-align: right">404-F</p>
+    </td>
+    <td>
+        <p style="text-align: right;">Course</p>
+        <p style="text-align: center; font-weight: bold;">Algorithm</p>
+        <p style="text-align: center;">CHUN Thavorac</p>
+        <p style="text-align: right">404-F</p>
+    </td>
+    <td>
+        <p style="text-align: right;">Course</p>
+        <p style="text-align: center; font-weight: bold;">Algorithm</p>
+        <p style="text-align: center;">CHUN Thavorac</p>
+        <p style="text-align: right">404-F</p>
+    </td>
+    <td>
+        <p style="text-align: right;">Course</p>
+        <p style="text-align: center; font-weight: bold;">Algorithm</p>
+        <p style="text-align: center;">CHUN Thavorac</p>
+        <p style="text-align: right">404-F</p>
+    </td>
+    <td>
+        <p style="text-align: right;">Course</p>
+        <p style="text-align: center; font-weight: bold;">Algorithm</p>
+        <p style="text-align: center;">CHUN Thavorac</p>
+        <p style="text-align: right">404-F</p>
+    </td>
+</tr>
+
+
+<td rowspan="2" style="position: relative !important;">
+    <p style="text-align: right;position: absolute;top: 0; right: 0;">{{ $timetableSlot->type }}</p>
+    <p style="text-align: center; font-weight: bold;">{{ $timetableSlot->course_name }}</p>
+    <p style="text-align: center;">{{ $timetableSlot->teacher_name }}</p>
+    <p style="text-align: right;position: absolute;bottom: 0; right: 0;">@if($timetableSlot->room != null) {{ $timetableSlot->room->name }}-{{ $timetableSlot->room->building->code }} @else NULL @endif</p>
+</td>

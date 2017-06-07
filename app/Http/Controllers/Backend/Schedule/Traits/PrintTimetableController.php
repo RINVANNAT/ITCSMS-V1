@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Backend\Schedule\Traits;
 use App\Models\Group;
 use App\Models\Schedule\Timetable\Timetable;
 use App\Models\Schedule\Timetable\Week;
+use Illuminate\Support\Collection;
 
 /**
  * Class PrintTimetableController
@@ -77,6 +78,59 @@ trait PrintTimetableController
 
     public function get_template_print()
     {
-        return view('backend.schedule.timetables.popup-template-print');
+        // dd(request()->all());
+        $groups = request('groups');
+        $weeks = request('weeks');
+        $baseTimetableId = request('timetable');
+
+        // find timetable info related with $baseTimetableId
+        $infoTimetable = Timetable::find($baseTimetableId);
+
+        // declare set of timetables for return
+        $timetables = new Collection();
+
+        // find table by group for each weeks
+
+        if (count($groups) > 0) {
+            foreach ($groups as $group) {
+                foreach ($weeks as $week) {
+                    $itemTimetable = $this->find_timetable($infoTimetable, $group, $week);
+                    if ($itemTimetable instanceof Timetable) {
+                        $timetables->push($itemTimetable);
+                    }
+                }
+            }
+        } else {
+            foreach ($weeks as $week) {
+                $itemTimetable = $this->find_timetable($infoTimetable, null, $week);
+                if ($itemTimetable instanceof Timetable) {
+                    $timetables->push($itemTimetable);
+                }
+            }
+        }
+
+        return view('backend.schedule.timetables.popup-template-print', compact('timetables'));
+    }
+
+    /** Custom Function. */
+
+    /**
+     * @param Timetable $timetable
+     * @param null $group
+     * @param $week
+     * @return mixed
+     */
+    public function find_timetable(Timetable $timetable, $group = null, $week)
+    {
+        return Timetable::where([
+            ['academic_year_id', $timetable->academic_year_id],
+            ['department_id', $timetable->department_id],
+            ['degree_id', $timetable->degree_id],
+            ['option_id', $timetable->option_id],
+            ['semester_id', $timetable->semester_id],
+            ['group_id', $group],
+            ['grade_id', $timetable->grade_id],
+            ['week_id', $week]
+        ])->first();
     }
 }

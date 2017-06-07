@@ -112,12 +112,12 @@ class TimetableController extends Controller
             ->leftJoin('groups', 'groups.id', '=', 'timetables.group_id')
             ->orderBy('timetables.created_at', 'desc')
             ->select([
-               /* 'academicYears.name_latin as academic_year',
-                'departments.code as department',
-                'degrees.name_en as degree',
-                'grades.code as grade',
-                'departmentOptions.name_en as option',
-                'semesters.name_en as semester',*/
+                /* 'academicYears.name_latin as academic_year',
+                 'departments.code as department',
+                 'degrees.name_en as degree',
+                 'grades.code as grade',
+                 'departmentOptions.name_en as option',
+                 'semesters.name_en as semester',*/
                 /*'groups.code as group',*/
                 'weeks.name_en as weekly',
                 'timetables.completed as status',
@@ -133,7 +133,7 @@ class TimetableController extends Controller
                     . '</i>'
                     . '</a> ';
 
-                $print = ' <button id="print-timetable" rel="external"  href="'.route('timetables.print', $timetable->id).'" class="btn btn-xs btn-success">'
+                $print = ' <button id="print-timetable" rel="external"  href="' . route('timetables.print', $timetable->id) . '" class="btn btn-xs btn-success">'
                     . '<i class="fa fa-print" data-toggle="tooltip"'
                     . 'data-placement="top" title="Print"'
                     . 'data-original-title="Print">'

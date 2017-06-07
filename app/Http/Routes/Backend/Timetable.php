@@ -46,6 +46,6 @@ Route::group(['namespace' => 'Schedule', 'prefix' => 'schedule'], function () {
 
     /** Print */
     Route::get('timetables/print/{id}', 'TimetableController@print_timetable')->name('timetables.print');
-    Route::get('timetables/template-print', 'TimetableController@get_template_print')->name('timetables.template_print');
+    Route::post('timetables/template-print', 'TimetableController@get_template_print')->name('timetables.template_print');
 });
 
