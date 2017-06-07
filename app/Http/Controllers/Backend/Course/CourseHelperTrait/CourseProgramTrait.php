@@ -75,8 +75,6 @@ trait CourseProgramTrait
 
             $excel->sheet($title, function ($sheet) use ($arrayData, $title, $colHeaders, $header) {
 
-
-
                 $sheet->row(1, [ $header]);
                 $sheet->row(2, $colHeaders);
                 foreach ($arrayData as $data) {
