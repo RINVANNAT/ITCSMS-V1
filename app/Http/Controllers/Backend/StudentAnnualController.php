@@ -107,9 +107,9 @@ class StudentAnnualController extends Controller
         $grades = Grade::lists('name_kh','id');
         $scholarships = Scholarship::lists('code','id');
         $origins = Origin::lists('name_kh','id');
-        
+
         $genders = Gender::lists('name_kh','id');
-        
+
         $highSchools = HighSchool::lists('name_kh','id');
         $promotions = Promotion::orderBy('name','DESC')->lists('name','id');
         $histories = History::lists('name_en','id');
@@ -228,20 +228,41 @@ class StudentAnnualController extends Controller
     public function data(Request $request)
     {
         $scholarship_id = Input::get('scholarship_id');
+        if ($academic_year = $request->get('academic_year')) {
+            // do nothing here
+        } else {
+            $academic_year =AcademicYear::orderBy('id','desc')->first()->id;
+        }
 
         $studentAnnuals = StudentAnnual::select([
-                'studentAnnuals.id','studentAnnuals.group','students.id_card','students.name_kh','students.dob as dob','students.name_latin', 'genders.code as gender', 'departmentOptions.code as option',
-                DB::raw("CONCAT(degrees.code,grades.code,departments.code) as class")
-            ])
+            'studentAnnuals.id','groups.code as group','students.id_card','students.name_kh','students.dob as dob','students.name_latin', 'genders.code as gender', 'departmentOptions.code as option',
+            DB::raw("CONCAT(degrees.code,grades.code,departments.code) as class")
+        ])
             ->leftJoin('students','students.id','=','studentAnnuals.student_id')
             ->leftJoin('genders', 'students.gender_id', '=', 'genders.id')
             ->leftJoin('grades', 'studentAnnuals.grade_id', '=', 'grades.id')
             ->leftJoin('departmentOptions', 'studentAnnuals.department_option_id', '=', 'departmentOptions.id')
             ->leftJoin('departments', 'studentAnnuals.department_id', '=', 'departments.id')
-            ->leftJoin('degrees', 'studentAnnuals.degree_id', '=', 'degrees.id');
+            ->leftJoin('degrees', 'studentAnnuals.degree_id', '=', 'degrees.id')
+            ->leftJoin('group_student_annuals', 'group_student_annuals.student_annual_id', '=', 'studentAnnuals.id')
+            ->leftJoin('groups','groups.id','=','group_student_annuals.group_id');
 
         if ($scholarship = $request->get('scholarship')) {
-            $studentAnnuals = $studentAnnuals->leftJoin('scholarship_student_annual', 'studentAnnuals.id', '=', 'scholarship_student_annual.student_annual_id');
+            $studentAnnuals->leftJoin('scholarship_student_annual', 'studentAnnuals.id', '=', 'scholarship_student_annual.student_annual_id');
+        }
+
+        if($redouble = $request->get('redouble')){
+            if($redouble == "with") { // with redouble this year
+                // do nothing here
+            } else if ($redouble == "no"){ // without redouble this year
+                $studentAnnuals->leftJoin('redouble_student', 'redouble_student.student_id','=','students.id')
+                        ->whereNotIn('students.id',function($query) use ($academic_year){
+                            $query->select('redouble_student.student_id')->from('redouble_student')->where('redouble_student.academic_year_id','=',$academic_year);
+                        });
+            } else {  // only redouble student this year
+                $studentAnnuals->join('redouble_student', 'redouble_student.student_id','=','students.id')
+                        ->where('redouble_student.academic_year_id','=',$academic_year);
+            }
         }
 
         $datatables = app('datatables')->of($studentAnnuals)
@@ -282,19 +303,19 @@ class StudentAnnualController extends Controller
 
 
                 $actions = $actions.' <button class="btn btn-xs btn-info btn-show" data-remote="' . route('admin.studentAnnuals.show', $studentAnnual->id) . '"><i class="fa fa-eye" data-toggle="tooltip" data-placement="top" title="' . trans('buttons.general.view') . '"></i></button>' .
-                                    " <button class='btn btn-xs btn-export' style='display:none' data-remote='" .
-                                    json_encode($data)  .
-                                    "'><i class='fa fa-external-link-square' data-toggle='tooltip' data-placement='top' title='" . 'export' . "'></i></button>" ;
+                    " <button class='btn btn-xs btn-export' style='display:none' data-remote='" .
+                    json_encode($data)  .
+                    "'><i class='fa fa-external-link-square' data-toggle='tooltip' data-placement='top' title='" . 'export' . "'></i></button>" ;
                 return $actions;
             });
 
         // additional search
-        if ($academic_year = $datatables->request->get('academic_year')) {
-            $datatables->where('studentAnnuals.academic_year_id', '=', $academic_year);
-        } else {
-            $last_academic_year_id =AcademicYear::orderBy('id','desc')->first()->id;
-            $datatables->where('studentAnnuals.academic_year_id', '=', $last_academic_year_id);
-        }
+        $semester = $datatables->request->get('semester');
+        $datatables->where('studentAnnuals.academic_year_id', '=', $academic_year)
+                    ->where(function($query) use($semester){
+                       $query->where("group_student_annuals.semester_id",$semester)->orWhereNull("group_student_annuals.semester_id");
+                    });
+
         if ($degree = $datatables->request->get('degree')) {
             $datatables->where('studentAnnuals.degree_id', '=', $degree);
         }
@@ -314,10 +335,21 @@ class StudentAnnualController extends Controller
             $datatables->where('students.origin_id', '=', $origin);
         }
         if ($group = $datatables->request->get('group')) {
-            $datatables->where('studentAnnuals.group', '=', $group);
+            $datatables->where('groups.code', '=', $group);
         }
         if ($scholarship = $datatables->request->get('scholarship')) {
             $datatables->where('scholarship_student_annual.scholarship_id', '=', $scholarship);
+        }
+        if ($radie = $datatables->request->get('radie')) {
+            if($radie == "with") { // return all student include radie
+                // do nothing here
+            } else if($radie == "no") { // return only student without radie
+                $datatables->where(function($query){
+                    $query->where('students.radie','=', false)->orWhereNull('students.radie');
+                });
+            } else { // only radie
+                $datatables->where('students.radie','=', true);
+            }
         }
 
 
@@ -533,7 +565,7 @@ class StudentAnnualController extends Controller
                     ->whereBetween('students.dob',[$minDate,$maxDate])
                     ->where('students.gender_id','=',2)->count(); // 2 is female
 
-                                ;
+                ;
                 $scholarship_total =  DB::table('studentAnnuals')
                     ->join('scholarship_student_annual','studentAnnuals.id','=','scholarship_student_annual.student_annual_id')
                     ->join('students','studentAnnuals.student_id','=','students.id')
@@ -739,12 +771,12 @@ class StudentAnnualController extends Controller
         foreach($departments as &$department) {
 
             $empty_option = array(
-                                'id'=>null,
-                                'name_kh'=>$department['name_kh'],
-                                'name_en'=>$department['name_en'],
-                                'name_fr'=>$department['name_fr'],
-                                'code'=>$department['code']
-                            );
+                'id'=>null,
+                'name_kh'=>$department['name_kh'],
+                'name_en'=>$department['name_en'],
+                'name_fr'=>$department['name_fr'],
+                'code'=>$department['code']
+            );
 
             if($department['department_options'] == null || count($department['department_options']) == 0){
                 $department['department_options'] = [$empty_option];
@@ -991,11 +1023,15 @@ class StudentAnnualController extends Controller
         $gender = isset($_GET['gender'])?$_GET['gender']:null;
         $option = isset($_GET['option'])?$_GET['option']:null;
         $origin = isset($_GET['origin'])?$_GET['origin']:null;
+        $semester = isset($_GET['semester'])?$_GET['semester']:null;
+        $redouble = isset($_GET['redouble'])?$_GET['redouble']:null;
+        $group = isset($_GET['group'])?$_GET['group']:null;
+        $radie = isset($_GET['radie'])?$_GET['radie']:null;
         // else, from custom list
 
         $student_ids = isset($_GET['student_ids'])?$_GET['student_ids']:null;
 
-        return view('backend.studentAnnual.popup_export',compact('academic_year','department','degree','grade','gender','option','origin','student_ids'));
+        return view('backend.studentAnnual.popup_export',compact('academic_year','department','degree','grade','gender','option','origin','student_ids','semester','group','radie','redouble'));
     }
 
     public function request_export_list_custom(){
@@ -1015,7 +1051,7 @@ class StudentAnnualController extends Controller
             'genders.code as gender_id',
             'origins.name_kh as origin_id',
             'pob.name_kh as pob',
-            'studentAnnuals.group',
+            'groups.code as group',
             'studentAnnuals.promotion_id',
             'academicYears.name_latin as academic_year_id',
             'histories.name_kh as history_id',
@@ -1048,7 +1084,11 @@ class StudentAnnualController extends Controller
             ->leftJoin('origins', 'students.origin_id', '=', 'origins.id')
             ->leftJoin('origins as pob', 'students.pob', '=', 'pob.id')
             ->leftJoin('histories', 'studentAnnuals.history_id', '=', 'histories.id')
-            ->leftJoin('highSchools', 'students.high_school_id', '=', 'highSchools.id');
+            ->leftJoin('highSchools', 'students.high_school_id', '=', 'highSchools.id')
+            ->leftJoin('group_student_annuals', 'group_student_annuals.student_annual_id', '=', 'studentAnnuals.id')
+            ->leftJoin('groups','groups.id','=','group_student_annuals.group_id');
+        ;
+
 
         $title = 'បញ្ជីនិស្សិតុ';
 
@@ -1056,18 +1096,57 @@ class StudentAnnualController extends Controller
             $studentAnnuals = $studentAnnuals->whereIn('studentAnnuals.id',json_decode($ids));
         } else {
             // additional search
-            if ($degree = $_POST['filter_degree']) {
-                $studentAnnuals = $studentAnnuals->where('studentAnnuals.degree_id', $degree);
-
-                $degree_obj = Degree::where('id',$degree)->first();
-                $title .= "ថ្នាក់".$degree_obj->name_kh;
-            }
-
             if ($academic_year = $_POST['filter_academic_year']) {
                 $studentAnnuals = $studentAnnuals->where('studentAnnuals.academic_year_id', $academic_year);
 
                 $academic_year_obj = AcademicYear::where('id',$academic_year)->first();
                 $title .= " ឆ្នាំសិក្សា ".$academic_year_obj->name_kh;
+            }
+
+            if($redouble = $_POST['filter_redouble']){
+                if($redouble == "with") { // with redouble this year
+                    // do nothing here
+                } else if ($redouble == "no"){ // without redouble this year
+                    $studentAnnuals->leftJoin('redouble_student', 'redouble_student.student_id','=','students.id')
+                        ->whereNotIn('students.id',function($query) use ($academic_year){
+                            $query->select('redouble_student.student_id')->from('redouble_student')->where('redouble_student.academic_year_id','=',$academic_year);
+                        });
+                } else {  // only redouble student this year
+                    $studentAnnuals->join('redouble_student', 'redouble_student.student_id','=','students.id')
+                        ->where('redouble_student.academic_year_id','=',$academic_year);
+                }
+            }
+
+            if ($radie = $_POST['filter_radie']) {
+                if($radie == "with") { // return all student include radie
+                    // do nothing here
+                } else if($radie == "no") { // return only student without radie
+                    $studentAnnuals->where(function($query){
+                        $query->where('students.radie','=', false)->orWhereNull('students.radie');
+                    });
+                } else { // only radie
+                    $studentAnnuals->where('students.radie','=', true);
+                }
+            }
+
+            if($semester = $_POST['filter_semester']){
+                $studentAnnuals = $studentAnnuals->where('studentAnnuals.academic_year_id', '=', $academic_year)
+                    ->where(function($query) use($semester){
+                        $query->where("group_student_annuals.semester_id",$semester)->orWhereNull("group_student_annuals.semester_id");
+                    });
+                $title .= " ឆមាសទី  ".$semester;
+            }
+            if ($group = $_POST['filter_group']) {
+                $studentAnnuals = $studentAnnuals->where('groups.code', $group);
+
+                $title .= " ក្រុម ".$group;
+            }
+
+            if ($degree = $_POST['filter_degree']) {
+                $studentAnnuals = $studentAnnuals->where('studentAnnuals.degree_id', $degree);
+
+                $degree_obj = Degree::where('id',$degree)->first();
+                $title .= "ថ្នាក់".$degree_obj->name_kh;
             }
 
             if ($grade = $_POST['filter_grade']) {
@@ -1412,7 +1491,7 @@ class StudentAnnualController extends Controller
                         $sheet->mergeCells('Q24:Y24');
 
                         $sheet->cells('A1:X2', function($cells) {
-                           $cells->setAlignment('center');
+                            $cells->setAlignment('center');
                             $cells->setValignment('middle');
                         });
                         $sheet->cells('A5:X21', function($cells) {
@@ -1765,57 +1844,57 @@ class StudentAnnualController extends Controller
         }
 
         $remainder = $allStudents % $numberStudentInGroup;
-            $numGroup = (int)($allStudents / $numberStudentInGroup);// number of group
-            $afterAddedRemainder = $remainder - (int)round($numGroup / 2); //after added the remain student into an odd group but still remain student
+        $numGroup = (int)($allStudents / $numberStudentInGroup);// number of group
+        $afterAddedRemainder = $remainder - (int)round($numGroup / 2); //after added the remain student into an odd group but still remain student
 
-            $index = 0;
-            $check =0;
+        $index = 0;
+        $check =0;
 
-            foreach ($studentAnnual as $student) {
+        foreach ($studentAnnual as $student) {
 
-                $index++;
-                $studentListByGroup[$prefix.$key.$postfix][] = $student;
+            $index++;
+            $studentListByGroup[$prefix.$key.$postfix][] = $student;
 
-                $update = DB::table('studentAnnuals')
-                    ->where('id', $student->id)
-                    ->update(['group' => $prefix.$key.$postfix]);
+            $update = DB::table('studentAnnuals')
+                ->where('id', $student->id)
+                ->update(['group' => $prefix.$key.$postfix]);
 
-                if($update) {
-                    $check++;
-                }
+            if($update) {
+                $check++;
+            }
 
-                if ($index == $numberStudentInGroup) {
+            if ($index == $numberStudentInGroup) {
 
-                    if ($remainder > 0) {
+                if ($remainder > 0) {
 
-                        //add the remain student to the odd group first
+                    //add the remain student to the odd group first
 
-                        if (count($studentListByGroup) % 2 != 0) {// check if the student in the group is paire or odd
-                            $remainder--;
-
-                        } else {
-
-                            //if the remain student added to the odd group of student but still remaining some student so we have to add the student to the paire group
-
-                            if($afterAddedRemainder <= 0) {
-                                $key++;
-                                $index = 0;
-                            } else {
-                                $afterAddedRemainder--;
-                            }
-                        }
+                    if (count($studentListByGroup) % 2 != 0) {// check if the student in the group is paire or odd
+                        $remainder--;
 
                     } else {
-                        $key++;
-                        $index = 0;
+
+                        //if the remain student added to the odd group of student but still remaining some student so we have to add the student to the paire group
+
+                        if($afterAddedRemainder <= 0) {
+                            $key++;
+                            $index = 0;
+                        } else {
+                            $afterAddedRemainder--;
+                        }
                     }
 
-                } elseif ($index > $numberStudentInGroup) {
+                } else {
                     $key++;
                     $index = 0;
                 }
 
+            } elseif ($index > $numberStudentInGroup) {
+                $key++;
+                $index = 0;
             }
+
+        }
 
         if($check == $allStudents) {
             return Response::json(['status'=> true, 'message'=> 'Group Generated!']);
@@ -1868,62 +1947,62 @@ class StudentAnnualController extends Controller
 
         $index =0;
         $check =0;
-            $last_academic_year = AcademicYear::orderBy('id','desc')->first();
-            $studentAnnualEngineers = StudentAnnual::leftJoin('students','studentAnnuals.student_id','=','students.id')
-                ->where([
-                    ['academic_year_id',$last_academic_year->id],
-                    ['studentAnnuals.grade_id',1],
-                    ['studentAnnuals.degree_id', 1]
+        $last_academic_year = AcademicYear::orderBy('id','desc')->first();
+        $studentAnnualEngineers = StudentAnnual::leftJoin('students','studentAnnuals.student_id','=','students.id')
+            ->where([
+                ['academic_year_id',$last_academic_year->id],
+                ['studentAnnuals.grade_id',1],
+                ['studentAnnuals.degree_id', 1]
 
-                ])
-                ->whereNotIn('students.id', $redoubleStudents)
-                ->orderBy('students.name_latin','ASC')->get();
+            ])
+            ->whereNotIn('students.id', $redoubleStudents)
+            ->orderBy('students.name_latin','ASC')->get();
 
-            $studentAnnualDUTs = StudentAnnual::leftJoin('students','studentAnnuals.student_id','=','students.id')
-                ->where([
-                    ['academic_year_id',$last_academic_year->id],
-                    ['studentAnnuals.grade_id',1],
-                    ['studentAnnuals.degree_id', 2]
+        $studentAnnualDUTs = StudentAnnual::leftJoin('students','studentAnnuals.student_id','=','students.id')
+            ->where([
+                ['academic_year_id',$last_academic_year->id],
+                ['studentAnnuals.grade_id',1],
+                ['studentAnnuals.degree_id', 2]
 
-                ])
-                ->whereNotIn('students.id', $redoubleStudents)
-                ->orderBy('students.name_latin','ASC')->get();
+            ])
+            ->whereNotIn('students.id', $redoubleStudents)
+            ->orderBy('students.name_latin','ASC')->get();
 
-            if($studentAnnualEngineers) {
+        if($studentAnnualEngineers) {
 
-                foreach($studentAnnualEngineers as $studentEngineer) {
-                    $index++;
-                    $idCard = 'e'.($last_academic_year->id -1).str_pad($index, 4, '0', STR_PAD_LEFT);
-                    $update = DB::table('students')
-                        ->where('id', $studentEngineer->student_id)
-                        ->update(['id_card' => $idCard]);
+            foreach($studentAnnualEngineers as $studentEngineer) {
+                $index++;
+                $idCard = 'e'.($last_academic_year->id -1).str_pad($index, 4, '0', STR_PAD_LEFT);
+                $update = DB::table('students')
+                    ->where('id', $studentEngineer->student_id)
+                    ->update(['id_card' => $idCard]);
 
-                    if( $update ) {
-                        $check++;
-                    }
+                if( $update ) {
+                    $check++;
                 }
             }
+        }
 
-            if($studentAnnualDUTs) {
+        if($studentAnnualDUTs) {
 
-                foreach ($studentAnnualDUTs as $studentDUT) {
-                    $index++;
-                    $idCard = 'e'.($last_academic_year->id - 1).str_pad($index, 4, '0', STR_PAD_LEFT);
-                    $update = DB::table('students')
-                        ->where('id', $studentDUT->student_id)
-                        ->update(['id_card' => $idCard]);
+            foreach ($studentAnnualDUTs as $studentDUT) {
+                $index++;
+                $idCard = 'e'.($last_academic_year->id - 1).str_pad($index, 4, '0', STR_PAD_LEFT);
+                $update = DB::table('students')
+                    ->where('id', $studentDUT->student_id)
+                    ->update(['id_card' => $idCard]);
 
-                    if( $update ) {
-                        $check++;
-                    }
+                if( $update ) {
+                    $check++;
                 }
             }
+        }
 
-            if($check == count($studentAnnualEngineers) + count($studentAnnualDUTs)) {
-                return Response::json(array('success'=>true, 'message'=>  'IDs Generated!!'));
-            } else {
-                return Response::json(array('success'=>false, 'message' => 'Generate Errors'));
-            }
+        if($check == count($studentAnnualEngineers) + count($studentAnnualDUTs)) {
+            return Response::json(array('success'=>true, 'message'=>  'IDs Generated!!'));
+        } else {
+            return Response::json(array('success'=>false, 'message' => 'Generate Errors'));
+        }
 
     }
 
@@ -1977,8 +2056,8 @@ class StudentAnnualController extends Controller
         if ($search = $request->get('search')) {
             $studentAnnuals = $studentAnnuals->where(function($q) use ($search){
                 $q->where('students.id_card', 'ilike', '%'.$search.'%')
-                  ->orWhere('students.name_kh','ilike', '%'.$search.'%')
-                  ->orWhere('students.name_latin','ilike', '%'.$search.'%');
+                    ->orWhere('students.name_kh','ilike', '%'.$search.'%')
+                    ->orWhere('students.name_latin','ilike', '%'.$search.'%');
             });
         }
 
@@ -2029,7 +2108,7 @@ class StudentAnnualController extends Controller
 
     public function print_inform_success(PrintStudentIDCardRequest $request){
         $ids = json_decode($request->get('ids'));
-        
+
         DB::beginTransaction();
         try {
             foreach($ids as $id){
@@ -2048,37 +2127,37 @@ class StudentAnnualController extends Controller
 
     public function print_transcript(PrintTranscriptRequest $request){
         $student  = StudentAnnual::select([
-                        'students.id_card',
-                        'students.name_kh',
-                        'students.name_latin',
-                        'departments.name_kh as department',
-                        'students.photo',
-                        'studentAnnuals.department_id',
-                        'studentAnnuals.degree_id',
-                        'studentAnnuals.grade_id',
-                        'studentAnnuals.academic_year_id',
-                        'studentAnnuals.id',
-                        'departments.name_kh as department_kh',
-                        'departments.name_en as department_en',
-                        'departments.name_fr as department_fr',
-                        'degrees.name_en as degree_en',
-                        'degrees.name_fr as degree_fr',
-                        'degrees.name_kh as degree_kh',
-                        'grades.name_en as grade_en',
-                        'grades.name_fr as grade_fr',
-                        'grades.name_kh as grade_kh',
-                        'academicYears.name_kh as academic_year_kh',
-                        'academicYears.name_latin as academic_year_latin'
-                    ])
-                        ->leftJoin('students','students.id','=','studentAnnuals.student_id')
-                        ->leftJoin('academicYears', 'studentAnnuals.academic_year_id', '=', 'academicYears.id')
-                        ->leftJoin('genders', 'students.gender_id', '=', 'genders.id')
-                        ->leftJoin('grades', 'studentAnnuals.grade_id', '=', 'grades.id')
-                        ->leftJoin('departmentOptions', 'studentAnnuals.department_option_id', '=', 'departmentOptions.id')
-                        ->leftJoin('departments', 'studentAnnuals.department_id', '=', 'departments.id')
-                        ->leftJoin('degrees', 'studentAnnuals.degree_id', '=', 'degrees.id')
-                        ->where('studentAnnuals.id',$request->get("student_annual_id"))
-                        ->first();
+            'students.id_card',
+            'students.name_kh',
+            'students.name_latin',
+            'departments.name_kh as department',
+            'students.photo',
+            'studentAnnuals.department_id',
+            'studentAnnuals.degree_id',
+            'studentAnnuals.grade_id',
+            'studentAnnuals.academic_year_id',
+            'studentAnnuals.id',
+            'departments.name_kh as department_kh',
+            'departments.name_en as department_en',
+            'departments.name_fr as department_fr',
+            'degrees.name_en as degree_en',
+            'degrees.name_fr as degree_fr',
+            'degrees.name_kh as degree_kh',
+            'grades.name_en as grade_en',
+            'grades.name_fr as grade_fr',
+            'grades.name_kh as grade_kh',
+            'academicYears.name_kh as academic_year_kh',
+            'academicYears.name_latin as academic_year_latin'
+        ])
+            ->leftJoin('students','students.id','=','studentAnnuals.student_id')
+            ->leftJoin('academicYears', 'studentAnnuals.academic_year_id', '=', 'academicYears.id')
+            ->leftJoin('genders', 'students.gender_id', '=', 'genders.id')
+            ->leftJoin('grades', 'studentAnnuals.grade_id', '=', 'grades.id')
+            ->leftJoin('departmentOptions', 'studentAnnuals.department_option_id', '=', 'departmentOptions.id')
+            ->leftJoin('departments', 'studentAnnuals.department_id', '=', 'departments.id')
+            ->leftJoin('degrees', 'studentAnnuals.degree_id', '=', 'degrees.id')
+            ->where('studentAnnuals.id',$request->get("student_annual_id"))
+            ->first();
 
         $semester = $request->get("semester_id");
         $scores = $this->getStudentScoreBySemester($request->get("student_annual_id"),$request->get("semester_id"));

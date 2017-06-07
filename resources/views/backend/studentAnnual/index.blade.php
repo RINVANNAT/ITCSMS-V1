@@ -33,6 +33,10 @@
             z-index: 999;
         }
 
+        .filter{
+            margin-bottom: 5px;
+        }
+
     </style>
 @stop
 
@@ -85,7 +89,7 @@
                 dom: 'l<"toolbar">frtip',
                 processing: true,
                 serverSide: true,
-                pageLength: {!! config('app.records_per_page')!!},
+                pageLength: 100,
                 deferLoading: 0,
                 ajax: {
                     url:"{!! route('admin.student.data') !!}",
@@ -100,6 +104,9 @@
                         d.option = $('#filter_option').val();
                         d.origin = $('#filter_origin').val();
                         d.group = $('#filter_group').val();
+                        d.semester = $('#filter_semester').val();
+                        d.radie = $('#filter_radie').val();
+                        d.redouble = $('#filter_redouble').val();
                     }
                 },
                 columns: [
@@ -112,7 +119,8 @@
                     { data: 'option' , name: 'option',searchable:false},
                     { data: 'group' , name: 'group',searchable:false},
                     { data: 'action', name: 'action',orderable: false, searchable: false}
-                ]
+                ],
+                order: [[2,"asc"],[5,"asc"]]
             });
 
             oTable.on( 'xhr', function () {
@@ -120,16 +128,17 @@
             } );
 
             $("div.toolbar").html(
-                    '{!! Form::select('academic_year',$academicYears,null, array('class'=>'form-control','id'=>'filter_academic_year')) !!} '+
-                    '{!! Form::select('degree',$degrees,null, array('class'=>'form-control','id'=>'filter_degree','placeholder'=>'Degree')) !!} '+
-                    '{!! Form::select('grade',$grades,null, array('class'=>'form-control','id'=>'filter_grade','placeholder'=>'Grade')) !!} '+
-                    '{!! Form::select('department',$departments,null, array('class'=>'form-control','id'=>'filter_department','placeholder'=>'Department')) !!} ' +
-                    '{!! Form::select('gender',$genders,null, array('class'=>'form-control','id'=>'filter_gender','placeholder'=>'Gender')) !!} '+
-                    '{!! Form::select('option',$options,null, array('class'=>'form-control','id'=>'filter_option','placeholder'=>'Option')) !!} '+
-                    '{!! Form::select('semester',$semesters, null, array('class'=>'form-control','id'=>'filter_semester')) !!} '+
-                    '{!! Form::select('origin',$origins,null, array('class'=>'form-control','id'=>'filter_origin','placeholder'=>'Origin')) !!} '+
-                    '{!! Form::text('group',null, array('class'=>'form-control','id'=>'filter_group','placeholder'=>'Group')) !!} '
-
+                    '{!! Form::select('academic_year',$academicYears,null, array('class'=>'form-control filter','id'=>'filter_academic_year')) !!} '+
+                    '{!! Form::select('degree',$degrees,null, array('class'=>'form-control filter','id'=>'filter_degree','placeholder'=>'Degree')) !!} '+
+                    '{!! Form::select('grade',$grades,null, array('class'=>'form-control filter','id'=>'filter_grade','placeholder'=>'Grade')) !!} '+
+                    '{!! Form::select('department',$departments,null, array('class'=>'form-control filter','id'=>'filter_department','placeholder'=>'Department')) !!} ' +
+                    '{!! Form::select('gender',$genders,null, array('class'=>'form-control filter','id'=>'filter_gender','placeholder'=>'Gender')) !!} '+
+                    '{!! Form::select('option',$options,null, array('class'=>'form-control filter','id'=>'filter_option','placeholder'=>'Option')) !!} '+
+                    '{!! Form::select('semester',$semesters,null, array('class'=>'form-control filter','id'=>'filter_semester')) !!} '+
+                    '{!! Form::select('origin',$origins,null, array('class'=>'form-control filter','id'=>'filter_origin','placeholder'=>'Origin')) !!} '+
+                    '{!! Form::text('group',null, array('class'=>'form-control filter','id'=>'filter_group','placeholder'=>'Group')) !!} '+
+                    '{!! Form::select('radie',['with'=>'With radié','no'=>'No radié','only'=>'Only radié'],null, array('class'=>'form-control filter','id'=>'filter_radie')) !!} '+
+                    '{!! Form::select('redouble',['with'=>'With redouble','no'=>'No redouble','only'=>'Only redouble'],null, array('class'=>'form-control filter','id'=>'filter_redouble')) !!} '
             );
 //            $("div.toolbar").html(
 //                    get_filter_box()
@@ -184,8 +193,16 @@
             $('#filter_group').on('input', function(e) {
                 oTable.draw();
                 e.preventDefault();
-
                 //alert($('#filter_group').val());
+            });
+
+            $('#filter_radie').on('change', function(e) {
+                oTable.draw();
+                e.preventDefault();
+            });
+            $('#filter_redouble').on('change', function(e) {
+                oTable.draw();
+                e.preventDefault();
             });
 
             enableDeleteRecord($('#students-table'));
@@ -212,8 +229,11 @@
                         '&department=' + $('#filter_department').val()+
                         '&gender='+$('#filter_gender').val()+
                         '&option='+$('#filter_option').val()+
+                        '&semester='+$('#filter_semester').val()+
                         '&origin='+$('#filter_origin').val()+
-                        '&group='+$('#filter_group').val();
+                        '&group='+$('#filter_group').val()+
+                        '&radie='+$('#filter_radie').val()+
+                        '&redouble='+$('#filter_redouble').val();
 
                 PopupCenterDual(url,'Select fields to export','1200','960');
             });
@@ -251,8 +271,11 @@
                         + '&department='+current_filtering.department
                         + '&gender='+current_filtering.gender
                         + '&option='+current_filtering.option
+                        + '&semester='+current_filtering.semester
                         + '&origin='+current_filtering.origin
                         + '&group='+current_filtering.group
+                        + '&radie='+current_filtering.radie
+                        + '&redouble='+current_filtering.redouble
                         + '&search='+current_filtering.search.value,
                         'Print ID Card','900','800');
             });

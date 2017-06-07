@@ -27,6 +27,8 @@ Route::group([
 
         Route::get('/course-program/dept-has-option', 'CourseController@getDeptOption')->name('course_program.dept_option');
 
+        Route::get('/course-program/export-list', 'CourseController@exportList')->name('course_program.export_list');
+
     });
 
     Route::group([], function() {

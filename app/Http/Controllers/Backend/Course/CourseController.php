@@ -1,5 +1,6 @@
 <?php namespace App\Http\Controllers\Backend\Course;
 
+use App\Http\Controllers\Backend\Course\CourseHelperTrait\CourseProgramTrait;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Backend\Course\CourseProgram\CreateCourseProgramRequest;
 use App\Http\Requests\Backend\Course\CourseProgram\DeleteCourseProgramRequest;
@@ -32,6 +33,8 @@ use Maatwebsite\Excel\Facades\Excel;
  */
 class CourseController extends Controller
 {
+
+    use CourseProgramTrait;
     /**
      * @var CourseProgramRepositoryContract
      */
