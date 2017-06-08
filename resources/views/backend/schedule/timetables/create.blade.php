@@ -278,6 +278,7 @@
         }
         /** create timetable slot */
         function create_timetable_slots(copiedEventObject) {
+            toggleLoading(true);
             $.ajax({
                 type: 'POST',
                 url: '{{ route('admin.schedule.timetables.store') }}',
@@ -316,6 +317,7 @@
                     }
                 },
                 complete: function () {
+                    toggleLoading(false);
                     get_course_sessions();
                     $('.panel-conflict').hide();
                 }
