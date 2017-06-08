@@ -282,20 +282,19 @@ trait StudentScore {
         }
 
     }
-    public function findRecordRedouble($idCardPointToStudent) {
+    public function findRecordRedouble($student, $redouble) {
 
-        if($idCardPointToStudent->radie == true) {
+        if($student->radie == true) {
 
             return 'Radié';
         } else {
 
-
-            if($idCardPointToStudent->is_changed == true) {
-
-                return $idCardPointToStudent->redouble_name;
-            } else {
-
+            if($redouble) {
+                if($redouble->is_changed == true) {
+                    return $redouble->name_en;
+                }
             }
+
         }
     }
 
