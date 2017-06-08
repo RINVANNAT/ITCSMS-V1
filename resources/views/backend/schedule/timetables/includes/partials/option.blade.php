@@ -14,7 +14,7 @@
     </select>
 @endif
 {{--admin--}}
-@if(access()->allow('global-timetable-management'))
+@if(access()->allow('global-timetable'))
     @if(isset($departments))
         <select name="department"
                 data-toggle="tooltip"
@@ -54,6 +54,15 @@
         </select>
     @endif
 @else
+{{--end of global timetable--}}
+    @if(isset($department))
+        <select name="department"
+                data-toggle="tooltip"
+                data-placement="top"
+                title="Department">
+            <option value="{{ $department->id }}">{{ $department->code }}</option>
+        </select>
+    @endif
 
     @if(isset($department))
         <select name="degree"
@@ -61,8 +70,12 @@
                 data-placement="top"
                 title="{{ trans('inputs.backend.schedule.timetable.options.degree') }}">
             <option selected disabled>{{ trans('inputs.backend.schedule.timetable.options.degree') }}</option>
-            @foreach($department->degrees as $degree)
-                <option value="{{ $degree->id }}">{{ $degree->name_en }}</option>
+            @foreach($department->degrees as $index => $degree)
+                @if($index==0)
+                    <option value="{{ $degree->id }}" selected>{{ $degree->name_en }}</option>
+                @else
+                    <option value="{{ $degree->id }}">{{ $degree->name_en }}</option>
+                @endif
             @endforeach
         </select>
     @endif

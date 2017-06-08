@@ -13,7 +13,7 @@ class DeleteTimetableRequest extends Request
      */
     public function authorize()
     {
-        return true;
+        return access()->allow('clone-timetable');
     }
 
     /**

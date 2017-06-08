@@ -13,7 +13,7 @@ class CreateTimetableRequest extends Request
      */
     public function authorize()
     {
-        return true;
+        return access()->allow('create-timetable');
     }
 
     /**
