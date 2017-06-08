@@ -266,6 +266,7 @@ class TimetableController extends Controller
      */
     public function store(CreateTimetableSlotRequest $request, CreateTimetableRequest $requestTimetable)
     {
+        dd($requestTimetable);
         $findTimetable = $this->timetableRepository->find_timetable_is_existed($requestTimetable);
         $new_timetable_slot = new TimetableSlot();
         if ($findTimetable instanceof Timetable) {
