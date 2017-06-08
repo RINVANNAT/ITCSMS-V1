@@ -266,7 +266,6 @@ class TimetableController extends Controller
      */
     public function store(CreateTimetableSlotRequest $request, CreateTimetableRequest $requestTimetable)
     {
-        dd(new Carbon($requestTimetable->start))->setTimezone('Asia/Phnom_Penh');
         $findTimetable = $this->timetableRepository->find_timetable_is_existed($requestTimetable);
         $new_timetable_slot = new TimetableSlot();
         if ($findTimetable instanceof Timetable) {

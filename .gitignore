@@ -28,3 +28,5 @@ error.log
 Todo.rtf
 bin/
 !/public/img/timetable/logo-print.jpg
+!/public/img/profiles/avatar.png
+!/public/img/profiles/
