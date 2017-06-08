@@ -2036,12 +2036,17 @@ class CourseAnnualController extends Controller
         }
 
         $array_tmp_rank = [];
-        $function_data = $this->student_hisory($array_student_id_card['id_card'], $array_student_id_card['student_annual_id'], $academicYearID);
-        $array_student_observation = $function_data['student_observation'];
-        $idCardPointToStudent = $function_data['id_card_to_student'];
-        $studentRedoubleHistory = $function_data['history'];
+        $objectStudents = $array_student_id_card['object_student'];/*--this object is retrieve from manageArrayHandSontableData function -- */
+        $studentProps = $this->student_properties($array_student_id_card['id_card'], $array_student_id_card['student_annual_id'], $academicYearID, $objectStudents);
+
+        $redoubles = $studentProps['redouble'];
+        $scholarships = $studentProps['scholarship'];
+        $idCardPointToStudent = $studentProps['id_card_to_student'];
+        $histories = $studentProps['history'];
 
         foreach ($element as $key => $value) {
+
+            $string_observatoin = '';
             $index++;
             $total_number_absences = 0;
             $both_semester = 0;
@@ -2162,14 +2167,18 @@ class CourseAnnualController extends Controller
                 }
             }*/
 
-            $value['Redouble'] = $this->findRecordRedouble($idCardPointToStudent[$key]);
+            $value['Redouble'] = $this->findRecordRedouble($idCardPointToStudent[$key], $redouble = isset($redoubles[$key])?$redoubles[$key]:null);
             //---assign number of rattrapage
             $value['Rattrapage'] = '';
 
             $value['Remark'] = $array_observation[$key]->remark;
             $value['General_Remark'] = $array_observation[$key]->general_remark;
 
-            $value['Observation'] = isset($array_student_observation[$key]) ? $array_student_observation[$key] : null;
+            $string_observatoin .= isset($redoubles[$key]) ? $redoubles[$key]->name_en. ', ' : '';
+            $string_observatoin .= isset($scholarships[$key]) ? $scholarships[$key]->code. ', ' : '';
+            $string_observatoin .= isset($histories[$key]) ? $histories[$key]->name_en : '';
+
+            $value['Observation'] = rtrim($string_observatoin, ", ");
             $value[""] = "";// blank column at last
             $value["number"] = $index;
             $element[$key] = $value;
