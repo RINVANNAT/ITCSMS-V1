@@ -327,6 +327,7 @@
         }
         /** move timetable slot */
         function move_timetable_slot(event, start_date) {
+            toggleLoading(true);
             $.ajax({
                 type: 'POST',
                 url: '{!! route('move_timetable_slot') !!}',
@@ -351,6 +352,7 @@
                     }
                 },
                 complete: function () {
+                    toggleLoading(false);
                     get_timetable_slots();
                 }
             })
