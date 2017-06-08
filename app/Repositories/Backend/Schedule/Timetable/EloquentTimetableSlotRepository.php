@@ -286,7 +286,7 @@ class EloquentTimetableSlotRepository implements TimetableSlotRepositoryContract
      */
     public function create_merge_timetable_slot(CreateTimetableSlotRequest $request)
     {
-        dd($request);
+        dd($request->all());
         if (isset($request->start) || isset($request->end)) {
             $newMergeTimetableSlot = new MergeTimetableSlot();
             $newMergeTimetableSlot->start = new Carbon($request->start);
