@@ -322,6 +322,7 @@
             // update timetable assignment
             $(document).on('click', '#btn_form_update_assign', function (e) {
                 e.preventDefault();
+                toggleLoading(true);
                 var start = $('input[name="update-datetime"]').data('daterangepicker').startDate.format('YYYY-MM-DD');
                 var end = $('input[name="update-datetime"]').data('daterangepicker').endDate.format('YYYY-MM-DD');
                 var configuration_id = $('#display-assign').find('.info').children().eq(0).text();
@@ -348,6 +349,7 @@
                         notify('error', 'Something went wrong.', 'Update Timetable Assignment');
                     },
                     complete: function () {
+                        toggleLoading(false);
                         get_assign_table();
                     }
                 });
@@ -356,6 +358,7 @@
             // set permission timetable assignment
             $(document).on('click', '#btn_assign', function (event) {
                 event.preventDefault();
+                toggleLoading(true);
                 var start = $('input[name="datetime"]').data('daterangepicker').startDate.format('YYYY-MM-DD');
                 var end = $('input[name="datetime"]').data('daterangepicker').endDate.format('YYYY-MM-DD');
                 $.ajax({
@@ -380,6 +383,7 @@
                         notify('error', 'Something went wrong.', 'Oops...');
                     },
                     complete: function () {
+                        toggleLoading(false);
                         $('#form-assign').trigger('reset');
                         get_assign_table();
                     }
@@ -401,6 +405,7 @@
                     cancelButtonColor: '#d33',
                     confirmButtonText: 'Yes, delete it!'
                 }).then(function () {
+                    toggleLoading(true);
                     $.ajax({
                         type: 'POST',
                         url: '{!! route('assign.delete') !!}',
@@ -416,6 +421,7 @@
 
                         },
                         complete: function () {
+                            toggleLoading(false);
                             swal("Deleted!", "The record has been deleted.", "success");
                         }
                     });
