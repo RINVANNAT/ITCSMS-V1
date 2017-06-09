@@ -1872,7 +1872,11 @@ class CourseAnnualController extends Controller
         //------get score properties and absence -------
 
         $allProperties = $this->getCourseAnnualWithScore($array_course_annual_ids);
+
+
         $eachCourseAnnualScores = $allProperties['averages'];
+
+
         $absences = $allProperties['absences'];
 
         //---get Selected Group by course annual-----
@@ -2060,6 +2064,7 @@ class CourseAnnualController extends Controller
             return count($item);
         })->max();
 
+
         foreach ($element as $key => $value) {
 
             $string_observatoin = '';
@@ -2068,7 +2073,11 @@ class CourseAnnualController extends Controller
             $both_semester = 0;
 
             if(count($value) < $countElement) {
-                $value = array_merge($value, $propertiesSemester2);
+                foreach($propertiesSemester2 as $str_index => $prop2) {
+                   if(!isset($value[$str_index])) {
+                       $value = array_merge($value, [$str_index => $prop2]);
+                   }
+                }
             }
 
             //$check_redouble = $this->checkRedouble($idCardPointToStudent[$key], $academicYearID);//---check this current year if student has been change in redouble
