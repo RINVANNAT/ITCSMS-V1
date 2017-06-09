@@ -196,13 +196,19 @@ function enableDeleteRecord(datatable){
                     }
                 });
 
-                console.log('elete');
                 // confirm then
                 $.ajax({
                     url: url,
                     type: 'DELETE',
                     dataType: 'json',
                     data: {method: '_DELETE'},
+                    success:function(result) {
+                        if(result.status == true) {
+                            notify('success', result.message);
+                            datatable.DataTable().draw(false);
+
+                        }
+                    }
                 }).always(function (data) {
                     datatable.DataTable().draw(false);
                 });

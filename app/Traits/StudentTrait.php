@@ -151,25 +151,37 @@ trait StudentTrait
 
 
         $idCardToStudentIds = collect($idCardToStudentIds)->flip()->toArray();
+        $arrayRedoubles = [];
 
-        $idCardToRedoubles = collect($redoubles)->map(function($item) use($idCardToStudentIds, $academicYearId) {
+        foreach($redoubles as $redouble) {
+
+            if(isset($idCardToStudentIds[$redouble->student_id])) {
+
+                $arrayRedoubles[$idCardToStudentIds[$redouble->student_id] ][] = $redouble;
+            }
+        }
+
+       /* $idCardToRedoubles = collect($redoubles)->map(function($item) use($idCardToStudentIds, $academicYearId) {
             if(isset($idCardToStudentIds[$item->student_id])) {
+
+                return [ $idCardToStudentIds[$item->student_id ] => $item];
                 if($item->academic_year_id != $academicYearId) {
-                    return [ $idCardToStudentIds[$item->student_id ] => $item];
+
                 }
             }
 
-        })->collapse()->toArray();
+        })->collapse()->toArray();*/
 
 
         return [
             'scholarship' => $idCardToScholarships,
             'id_card_to_student' => $idCardPointToStudent,
             'history'            => $idCardToHistories,
-            'redouble' => $idCardToRedoubles
+            'redouble' => $arrayRedoubles
 
         ];
     }
+
 
 
     public function student_hisory($student_id_cards, $student_annual_ids, $academic_year_id) {
@@ -224,12 +236,13 @@ trait StudentTrait
         if($deptOptionId = $course_annual->department_option_id) {
 
             $filtered_students =  $this->getStudentByDeptIdGradeIdDegreeId([$course_annual->department_id], [$course_annual->degree_id], [$course_annual->grade_id], $course_annual->academic_year_id);
+
+
             $filtered_students = $filtered_students->whereIn('studentAnnuals.department_option_id', [$deptOptionId]);
 
             if($groupByCourseAnnual != null) {
 
                 $studentAnnualIds = $this->getStudentAnnualByGroupIds($groupByCourseAnnual, $course_annual->semester_id);
-
                 $filtered_students = $filtered_students->whereIn('studentAnnuals.id', $studentAnnualIds)->get();
             } else {
                 $filtered_students =  $filtered_students->get();//->where('studentAnnuals.group', null)->get();
@@ -374,8 +387,48 @@ trait StudentTrait
 
     public function find_student_id_card($element, $stu_dent, $each_course, $each_score) {
 
+    }
+
+    public function redoubleByStudentIds ($studentIds, $academic_year_id)
+    {
+
+        $redoubles = DB::table('redoubles')
+            ->join('redouble_student', function($query) use($studentIds, $academic_year_id) {
+                $query->on('redouble_student.redouble_id', '=', 'redoubles.id')
+                    ->where('redouble_student.academic_year_id', '=', $academic_year_id)
+                    ->whereIn('redouble_student.student_id', $studentIds);
+            })->get();
 
 
+        if(count($redoubles) >0 ) {
+            return collect($redoubles)->keyBy('student_id')->toArray();
+        } else {
+            return [];
+        }
+
+    }
+
+    private function gradingStudentSemester($courseAnnual, $studentByCourse, $studentAnnualIds){
+
+
+        $studentByCourse = $studentByCourse->whereIn('studentAnnuals.id', $studentAnnualIds)
+            ->orderBy('students.name_latin');
+
+        if($courseAnnual->semester_id >  1) {
+
+            $studentByCourse = $studentByCourse
+                ->where(function($query) {
+                    $query->where('students.radie','=',  false)
+                        ->orWhereNull('students.radie');
+                })
+                ->orderBy('students.name_latin')->get();
+
+        } else {
+            $studentByCourse = $studentByCourse->orderBy('students.name_latin')->get();
+        }
+
+
+        return $studentByCourse;
     }
 
 }
