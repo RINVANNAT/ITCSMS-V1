@@ -174,9 +174,6 @@ function get_course_sessions() {
                 'Something went wrong!',
                 'error'
             );
-        },
-        complete: function () {
-
         }
     });
 }

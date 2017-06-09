@@ -278,7 +278,7 @@
                 error: function () {
                     notify('error', 'error load timetable slot');
                 },
-                completed: function () {
+                complete: function () {
                     toggleLoading(false);
                 }
             });
