@@ -122,6 +122,7 @@ function get_grades(department_id) {
 }
 /** Get course sessions. **/
 function get_course_sessions() {
+    toggleLoading(true);
     $.ajax({
         type: 'POST',
         url: '/admin/schedule/timetables/get_course_sessions',
@@ -174,6 +175,9 @@ function get_course_sessions() {
                 'Something went wrong!',
                 'error'
             );
+        },
+        complete:function () {
+            toggleLoading(false);
         }
     });
 }
