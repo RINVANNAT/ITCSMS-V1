@@ -335,6 +335,10 @@
         /** move timetable slot */
         function move_timetable_slot(event, start_date) {
             toggleLoading(true);
+            alert(100);
+            $('#timetable').fullCalendar({
+                eventDurationEditable: false
+            });
             $.ajax({
                 type: 'POST',
                 url: '{!! route('move_timetable_slot') !!}',
@@ -366,6 +370,7 @@
         }
         /** resize timetable slot */
         function resize_timetable_slot(timetable_slot_id, end_date, revertFunc) {
+            alert('Resize');
             $.ajax({
                 type: 'POST',
                 url: '{!! route('resize_timetable_slot') !!}',
@@ -393,6 +398,9 @@
                 complete: function () {
                     get_timetable_slots();
                     get_course_sessions();
+                    $('#timetable').fullCalendar({
+                        eventDurationEditable: true
+                    });
                 }
             })
         }
@@ -449,6 +457,7 @@
                 maxTime: '20:00:00',
                 slotLabelFormat: 'h:mm a',
                 columnFormat: 'dddd',
+                timezone: 'Asia/Phnom_Penh',
                 @if(access()->allow('edit-timetable')) editable: true, @endif
                 droppable: true,
                 dragRevertDuration: 0,

@@ -96,7 +96,7 @@
     {{--timetable management--}}
     <script type="text/javascript">
 
-        var oTable = $('#timetables-tables').DataTable({
+        var oTable = $('#timetables-table').DataTable({
             processing: true,
             serverSide: true,
             ajax: {
@@ -107,23 +107,17 @@
                     d.academicYear = $('select[name="academicYear"] :selected').val();
                     d.department = $('select[name="department"] :selected').val();
                     d.option = $('select[name="option"] :selected').val();
-                    d.degree=$('select[name="degree"] :selected').val();
+                    d.degree = $('select[name="degree"] :selected').val();
                     d.grade = $('select[name="grade"] :selected').val();
                     d.semester = $('select[name="semester"] :selected').val();
-                    d.weekly =$('select[name="weekly"] :selected').val();
+                    d.weekly = $('select[name="weekly"] :selected').val();
                     d.group = $('select[name="group"] :selected').val();
-                    d._token  = '{!! csrf_token() !!}';
+                    d._token = '{!! csrf_token() !!}';
+
                 }
             },
             columns: [
-                /*{data: 'academic_year', name: 'academic_year', searchable: true},
-                 {data: 'department', name: 'department', searchable: true},
-                 {data: 'degree', name: 'degree', searchable: true},
-                 {data: 'grade', name: 'grade', searchable: true},
-                 {data: 'option', name: 'option', searchable: true},
-                 {data: 'semester', name: 'semester', searchable: true},*/
-                /*{data: 'group', name: 'group', searchable: true},*/
-                {data: 'weekly', name: 'weekly', searchable: true},
+                {data: 'week', name: 'week', searchable: true, orderable: true},
                 {data: 'status', name: 'status', searchable: false, orderable: false},
                     @if(access()->allow('view-timetable') || access()->allow('delete-timetable') || access()->allow('edit-timetable'))
                 {
@@ -194,7 +188,8 @@
                 get_weeks($('select[name="semester"] :selected').val());
             });
             // get timetable slots by on change weekly option.
-            $(document).on('change', 'select[name="weekly"]', function () {
+            $(document).on('change', 'select[name="weekly"]', function (e) {
+                e.preventDefault();
                 oTable.draw();
             });
         })

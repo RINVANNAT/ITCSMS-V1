@@ -100,17 +100,13 @@ class TimetableController extends Controller
      */
     public function get_timetables()
     {
-        //dd(request('academicYear'));
         $academic_year_id = request('academicYear');
         $department_id = request('department');
         $degree_id = request('degree');
         $grade_id = request('grade');
         $option_id = request('option');
         $semester_id = request('semester');
-        $week_id = request('weekly');
         $group_id = request('group');
-
-        //$employee = Employee::where('user_id', auth()->user()->id)->first();
 
         $timetables = Timetable::join('weeks', 'weeks.id', '=', 'timetables.week_id')
             ->join('academicYears', 'academicYears.id', '=', 'timetables.academic_year_id')
@@ -127,18 +123,16 @@ class TimetableController extends Controller
                 ['grades.id', $grade_id],
                 ['semesters.id', $semester_id]
             ]);
-        if ($week_id !== 'Weekly') {
-            $timetables->where('weeks.id', $week_id);
-        }
-        if ($option_id !== 'Option') {
+
+        if ($option_id !== 'Option' && $option_id != null) {
             $timetables->where('departmentOptions.id', $option_id);
         }
-        if ($group_id !== 'Group') {
+        if ($group_id !== 'Group' && $group_id != null) {
             $timetables->where('groups.id', $group_id);
         }
-        $timetables->orderBy('timetables.created_at', 'desc')
+        $timetables->orderBy('weeks.id', 'asc')
             ->select([
-                'weeks.name_en as weekly',
+                'weeks.name_en as week',
                 'timetables.completed as status',
                 'timetables.id as id'
             ]);
