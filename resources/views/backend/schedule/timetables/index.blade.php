@@ -102,16 +102,17 @@
             ajax: {
                 url: '{!! route('admin.schedule.timetables.get_timetables') !!}',
                 method: 'POST',
-                data: {
-                    'academicYear': $('select[name="academicYear"] :selected').val(),
-                    'department': $('select[name="department"] :selected').val(),
-                    'option': $('select[name="option"] :selected').val(),
-                    'degree': $('select[name="degree"] :selected').val(),
-                    'grade': $('select[name="grade"] :selected').val(),
-                    'semester': $('select[name="semester"] :selected').val(),
-                    'weekly': $('select[name="weekly"] :selected').val(),
-                    'group': $('select[name="group"] :selected').val(),
-                    '_token': '{!! csrf_token() !!}'
+                data: function (d) {
+
+                    d.academicYear = $('select[name="academicYear"] :selected').val();
+                    d.department = $('select[name="department"] :selected').val();
+                    d.option = $('select[name="option"] :selected').val();
+                    d.degree=$('select[name="degree"] :selected').val();
+                    d.grade = $('select[name="grade"] :selected').val();
+                    d.semester = $('select[name="semester"] :selected').val();
+                    d.weekly =$('select[name="weekly"] :selected').val();
+                    d.group = $('select[name="group"] :selected').val();
+                    d._token  = '{!! csrf_token() !!}';
                 }
             },
             columns: [
@@ -155,8 +156,7 @@
                     );
                 },
                 complete: function () {
-                    // oTableTimetables.draw();
-
+                    oTable.draw();
                     toggleLoading(false);
                 }
             });
@@ -165,43 +165,6 @@
         $(function () {
 
             get_options($('select[name="department"] :selected').val());
-            {{--var oTableTimetables = $('#timetables-tables').DataTable({--}}
-                {{--processing: true,--}}
-                {{--serverSide: true,--}}
-                {{--ajax: {--}}
-                    {{--url: '{!! route('admin.schedule.timetables.get_timetables') !!}',--}}
-                    {{--method: 'POST',--}}
-                    {{--data: {--}}
-                        {{--'academicYear': $('select[name="academicYear"] :selected').val(),--}}
-                        {{--'department': $('select[name="department"] :selected').val(),--}}
-                        {{--'option': $('select[name="option"] :selected').val(),--}}
-                        {{--'degree': $('select[name="degree"] :selected').val(),--}}
-                        {{--'grade': $('select[name="grade"] :selected').val(),--}}
-                        {{--'semester': $('select[name="semester"] :selected').val(),--}}
-                        {{--'weekly': $('select[name="weekly"] :selected').val(),--}}
-                        {{--'group': $('select[name="group"] :selected').val(),--}}
-                        {{--'_token': '{!! csrf_token() !!}'--}}
-                    {{--}--}}
-                {{--},--}}
-                {{--columns: [--}}
-                    {{--{data: 'academic_year', name: 'academic_year', searchable: true},--}}
-                    {{--{data: 'department', name: 'department', searchable: true},--}}
-                    {{--{data: 'degree', name: 'degree', searchable: true},--}}
-                    {{--{data: 'grade', name: 'grade', searchable: true},--}}
-                    {{--{data: 'option', name: 'option', searchable: true},--}}
-                    {{--{data: 'semester', name: 'semester', searchable: true},--}}
-                    {{--{data: 'group', name: 'group', searchable: true},--}}
-                    {{--{data: 'weekly', name: 'weekly', searchable: true},--}}
-                    {{--{data: 'status', name: 'status', searchable: false, orderable: false},--}}
-                        {{--@if(access()->allow('view-timetable') || access()->allow('delete-timetable') || access()->allow('edit-timetable'))--}}
-                    {{--{--}}
-                        {{--data: 'action', name: 'action', searchable: false, orderable: false--}}
-                    {{--}--}}
-                    {{--@endif--}}
-                {{--]--}}
-            {{--});--}}
-
-
 
             $(document).on('change', 'select[name="semester"]', function () {
                 get_weeks($(this).val());
@@ -232,7 +195,7 @@
             });
             // get timetable slots by on change weekly option.
             $(document).on('change', 'select[name="weekly"]', function () {
-                // oTableTimetables.draw();
+                oTable.draw();
             });
         })
     </script>
