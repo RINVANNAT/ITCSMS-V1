@@ -52,7 +52,7 @@
             margin: 8px !important;
             padding: 0 !important;
             line-height: 1 !important;
-            height: 15px !important;
+            height: 30px !important;
         }
 
         th {
