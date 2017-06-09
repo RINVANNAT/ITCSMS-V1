@@ -322,14 +322,16 @@
             // update timetable assignment
             $(document).on('click', '#btn_form_update_assign', function (e) {
                 e.preventDefault();
+                var start = $('input[name="update-datetime"]').data('daterangepicker').startDate.format('YYYY-MM-DD');
+                var end = $('input[name="update-datetime"]').data('daterangepicker').endDate.format('YYYY-MM-DD');
                 var configuration_id = $('#display-assign').find('.info').children().eq(0).text();
                 $.ajax({
                     type: 'POST',
                     url: '{!! route('assign.update') !!}',
                     data: {
                         configuration_id: configuration_id,
-                        start: startDateUpdate.format('YYYY-MM-DD'),
-                        end: endDateUpdate.format('YYYY-MM-DD')
+                        start: start,
+                        end: end
                     },
                     success: function (response) {
                         $('#modal-update-assign').modal('hide');
@@ -355,7 +357,7 @@
             $(document).on('click', '#btn_assign', function (event) {
                 event.preventDefault();
                 var start = $('input[name="datetime"]').data('daterangepicker').startDate.format('YYYY-MM-DD');
-                var end = $('input[name="datetime"]').data('daterangepicker').startDate.format('YYYY-MM-DD');
+                var end = $('input[name="datetime"]').data('daterangepicker').endDate.format('YYYY-MM-DD');
                 $.ajax({
                     type: 'POST',
                     url: '{!! route('assign_turn_create_timetable') !!}',

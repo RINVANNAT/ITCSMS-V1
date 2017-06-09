@@ -6,7 +6,6 @@ use App\Models\Group;
 use App\Models\Schedule\Timetable\Timetable;
 use App\Models\Schedule\Timetable\Week;
 use Maatwebsite\Excel\Facades\Excel;
-use Maatwebsite\Excel\Files\ExcelFile;
 
 /**
  * Class ExportTimetableController
@@ -79,80 +78,178 @@ trait ExportTimetableController
 
     public function export_file()
     {
-        Excel::create('timetable-', function ($excel){
+        Excel::create('timetable-', function ($excel) {
             $excel->setTitle('week1');
-            foreach (request('weeks') as $item){
-                $excel->sheet(Week::find($item)->name_en, function ($sheet){
+            foreach (request('weeks') as $item) {
+                $excel->sheet(Week::find($item)->name_en, function ($sheet) use ($item) {
                     $sheet->setOrientation('landscape');
+
+                    $sheet->mergeCells('C1:I1');
+                    $sheet->mergeCells('C2:I2');
+                    $sheet->cells('C1:I2', function ($cells) {
+                        $cells->setAlignment('center');
+                        $cells->setValignment('center');
+                        $cells->setFontSize(14);
+                        $cells->setFontWeight('bold');
+
+                    });
+
+                    // header sheet
+                    $sheet->row(1, array('', '', 'EMPLOI DU TEMPS 2016 - 2017', '', '', '', '', '', '', 'Semester I', '', '', ''));
+                    $sheet->row(2, array('', '', 'Groupe: I1 (1) -TC', '', '', '', '', '', '', 'Week ' . $item, '', '', ''));
+
+                    // header table
+                    $sheet->row(5, array('Horaire', 'Lundi', '', 'Mardi', '', 'Mercredi', '', 'Jeudi', '', 'Vendredi', '', 'Samedi', ''));
+                    $sheet->setHeight(5, 20);
+
+                    // set width header
                     $sheet->setWidth(array(
                         'A' => 20,
-                        'B' => 20,
-                        'C' => 20,
-                        'D' => 20,
-                        'E' => 20,
-                        'F' => 20,
-                        'G' => 20
+                        'B' => 15,
+                        'C' => 15,
+                        'D' => 15,
+                        'E' => 15,
+                        'F' => 15,
+                        'G' => 15,
+                        'H' => 15,
+                        'I' => 15,
+                        'J' => 15,
+                        'K' => 15,
+                        'L' => 15,
+                        'M' => 15
                     ));
 
-
-
-
-                    $sheet->mergeCells('C1:E1');
-                    $sheet->mergeCells('C2:E2');
-                    $sheet->cells('C1:E1', function ($cells){
-                        $cells->setAlignment('center');
-                        $cells->setValignment('middle');
-                    });
-                    $sheet->cells('C2:E2', function ($cells){
-                        $cells->setAlignment('center');
-                        $cells->setValignment('middle');
+                    // semester header
+                    $sheet->mergeCells('J1:L1');
+                    $sheet->mergeCells('J2:L2');
+                    $sheet->cells('J1:L2', function ($cells) {
+                        $cells->setFontSize(12);
                     });
 
+                    // merge header
+                    $sheet->mergeCells('B5:C5');
+                    $sheet->mergeCells('D5:E5');
+                    $sheet->mergeCells('F5:G5');
+                    $sheet->mergeCells('H5:I5');
+                    $sheet->mergeCells('J5:K5');
+                    $sheet->mergeCells('L5:M5');
 
-                    $sheet->row(1, array('','','EMPLOI DU TEMPS', '', '', '', 'Semester I'));
-                    $sheet->row(2, array('', '', 'Groupe: I1 (1) -TC', '', '', '', 'Week 1'));
-                    $sheet->row(5, array('Horaire', 'Lundi', 'Mardi', 'Mercredi', 'Jeudi', 'Vendredi', 'Samedi'));
+                    $sheet->setBorder('A5:M5', 'thin');
+                    $sheet->cells('A5:M5', function ($cells) {
+                        $cells->setFontSize(12);
+                        $cells->setFontWeight('bold');
+                        $cells->setAlignment('center');
+                        $cells->setValignment('center');
+                    });
 
                     $sheet->row(6, array('07h00 - 08h00'));
-                    $sheet->mergeCells('A6:A9', function ($cells){
-                        $cells->setAlignment('center');
-                        $cells->setValignment('middle');
-                    });
-
-
+                    $sheet->mergeCells('A6:A9');
 
                     $sheet->row(10, array('08h00 - 09h00'));
-                    $sheet->mergeCells('A10:A13', function ($cells){
+                    $sheet->mergeCells('A10:A13');
+
+                    $sheet->row(14, array('09h00 - 10h00'));
+                    $sheet->mergeCells('A14:A17');
+
+                    $sheet->row(18, array('10h00 - 11h00'));
+                    $sheet->mergeCells('A18:A21');
+
+                    // 11h - 1h
+                    $sheet->mergeCells('A22:M22');
+
+                    $sheet->row(23, array('13h00 - 14h00'));
+                    $sheet->mergeCells('A23:A26');
+
+                    $sheet->row(27, array('14h00 - 15h00'));
+                    $sheet->mergeCells('A27:A30');
+
+                    $sheet->row(31, array('15h00 - 16h00'));
+                    $sheet->mergeCells('A31:A34');
+
+                    $sheet->row(35, array('16h00 - 17h00'));
+                    $sheet->mergeCells('A35:A38');
+
+
+                    $sheet->setBorder('A5:A38', 'thin');
+                    $sheet->cells('A5:A38', function ($cells) {
+                        $cells->setFontSize(12);
                         $cells->setAlignment('center');
-                        $cells->setValignment('middle');
+                        $cells->setValignment('center');
                     });
 
-                    $sheet->row(14, array('08h00 - 09h00'));
-                    $sheet->mergeCells('A14:A17', function ($cells){
-                        $cells->setAlignment('center');
-                        $cells->setValignment('middle');
+                    // border each cells for morning
+                    for ($i = 6; $i <= 18; $i = $i + 4) {
+                        $sheet->cells('B' . $i . ':C' . ($i + 3) . '', function ($cells) {
+                            $cells->setBorder('none', 'thin', 'thin', 'none');
+                        });
+                    }
+                    for ($i = 6; $i <= 18; $i = $i + 4) {
+                        $sheet->cells('D' . $i . ':E' . ($i + 3) . '', function ($cells) {
+                            $cells->setBorder('none', 'thin', 'thin', 'none');
+                        });
+                    }
+                    for ($i = 6; $i <= 18; $i = $i + 4) {
+                        $sheet->cells('F' . $i . ':G' . ($i + 3) . '', function ($cells) {
+                            $cells->setBorder('none', 'thin', 'thin', 'none');
+                        });
+                    }
+                    for ($i = 6; $i <= 18; $i = $i + 4) {
+                        $sheet->cells('H' . $i . ':I' . ($i + 3) . '', function ($cells) {
+                            $cells->setBorder('none', 'thin', 'thin', 'none');
+                        });
+                    }
+                    for ($i = 6; $i <= 18; $i = $i + 4) {
+                        $sheet->cells('J' . $i . ':K' . ($i + 3) . '', function ($cells) {
+                            $cells->setBorder('none', 'thin', 'thin', 'none');
+                        });
+                    }
+                    for ($i = 6; $i <= 18; $i = $i + 4) {
+                        $sheet->cells('L' . $i . ':M' . ($i + 3) . '', function ($cells) {
+                            $cells->setBorder('none', 'thin', 'thin', 'none');
+                        });
+                    }
+
+                    // border each cells for evening
+                    for ($i = 23; $i <= 35; $i = $i + 4) {
+                        $sheet->cells('B' . $i . ':C' . ($i + 3) . '', function ($cells) {
+                            $cells->setBorder('none', 'thin', 'thin', 'none');
+                        });
+                    }
+                    for ($i = 23; $i <= 35; $i = $i + 4) {
+                        $sheet->cells('D' . $i . ':E' . ($i + 3) . '', function ($cells) {
+                            $cells->setBorder('none', 'thin', 'thin', 'none');
+                        });
+                    }
+                    for ($i = 23; $i <= 35; $i = $i + 4) {
+                        $sheet->cells('F' . $i . ':G' . ($i + 3) . '', function ($cells) {
+                            $cells->setBorder('none', 'thin', 'thin', 'none');
+                        });
+                    }
+                    for ($i = 23; $i <= 35; $i = $i + 4) {
+                        $sheet->cells('H' . $i . ':I' . ($i + 3) . '', function ($cells) {
+                            $cells->setBorder('none', 'thin', 'thin', 'none');
+                        });
+                    }
+                    for ($i = 23; $i <= 35; $i = $i + 4) {
+                        $sheet->cells('J' . $i . ':K' . ($i + 3) . '', function ($cells) {
+                            $cells->setBorder('none', 'thin', 'thin', 'none');
+                        });
+                    }
+                    for ($i = 23; $i <= 35; $i = $i + 4) {
+                        $sheet->cells('L' . $i . ':M' . ($i + 3) . '', function ($cells) {
+                            $cells->setBorder('none', 'thin', 'thin', 'none');
+                        });
+                    }
+
+
+                    // border bottom cells
+                    // Set all borders (top, right, bottom, left)
+                    $sheet->cells('A38:M38', function ($cells) {
+                        $cells->setBorder('none', 'none', 'thin', 'none');
                     });
 
-                    $sheet->row(14, array('08h00 - 09h00'));
-                    $sheet->mergeCells('A14:A17', function ($cells){
-                        $cells->setAlignment('center');
-                        $cells->setValignment('middle');
-                    });
-
-                    $sheet->row(18, array('08h00 - 09h00'));
-                    $sheet->mergeCells('A18:A21', function ($cells){
-                        $cells->setAlignment('center');
-                        $cells->setValignment('middle');
-                    });
-
-
-                    $sheet->cells('A5:A16', function ($cells){
-                        $cells->setAlignment('center');
-                    });
-
-                    $sheet->cells('A5:G5', function ($cells){
-                        $cells->setAlignment('center');
-                        $cells->setValignment('middle');
+                    $sheet->cells('M6:M38', function ($cells) {
+                        $cells->setBorder('none', 'thin', 'thin', 'none');
                     });
                 });
             }

@@ -28,7 +28,8 @@
                             <div class="row">
                                 <div class="col-md-12">
                                     <label for="all-weeks">
-                                        <input type="checkbox" id="all-weeks"
+                                        <input type="checkbox"
+                                               id="all-weeks"
                                                class="square"> {{ trans('labels.backend.schedule.timetable.modal_clone.body.all_weeks') }}
                                     </label>
                                 </div>
@@ -60,7 +61,8 @@
                             <div class="row">
                                 <div class="col-xs-12">
                                     <label for="all-groups">
-                                        <input type="checkbox" id="all-groups"
+                                        <input type="checkbox"
+                                               id="all-groups"
                                                class="square"> {{ trans('labels.backend.schedule.timetable.modal_clone.body.all_groups') }}
                                     </label>
                                 </div>
