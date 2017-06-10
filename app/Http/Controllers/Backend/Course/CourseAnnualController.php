@@ -748,17 +748,25 @@ class CourseAnnualController extends Controller
                 ->whereIn('percentage_scores.score_id', $scoreByCourseAnnualId->lists('id'))
                 ->distinct('percentage_id')->lists('percentage_id');
 
-            $scoreByCourseAnnualId->delete();
-            $percentages = DB::table('percentages')->whereIn('id', $percentageIds);
+            $deleteScore = $scoreByCourseAnnualId->delete();
 
-            if($percentages->get()) {
+            if($deleteScore) {
+                $percentages = DB::table('percentages')->whereIn('id', $percentageIds);
 
-                $percentages->delete();
-               $deleteCourse =  $this->courseAnnuals->destroy($id);
+                if($percentages->get()) {
 
+                    $percentages->delete();
+                    $deleteCourse =  $this->courseAnnuals->destroy($id);
+
+                } else {
+                    $deleteCourse = $this->courseAnnuals->destroy($id);
+                }
             } else {
-                $deleteCourse = $this->courseAnnuals->destroy($id);
+                return Response::json(['status' => false, 'message' => 'Deleted Error!']);
             }
+
+
+
 
         } else {
             $deleteCourse = $this->courseAnnuals->destroy($id);
