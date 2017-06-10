@@ -173,7 +173,7 @@
                             @endif
                         @endforeach
                         @if($status == true)
-                            <label style="font-size: 12pt" class="btn btn-xs" for="{{$group->group_id}}"> <input id="{{$group->group_id}}" type="checkbox" name="groups[]" class=" each_check_box" value="{{$group->group_id}}"> {{$group->group_code}}</label>
+                            <label style="font-size: 12pt" class="btn btn-xs" for="{{$group->group_id}}"> <input id="{{$group->group_id}}" type="checkbox" name="groups[]" class="each_check_box" value="{{$group->group_id}}"> {{$group->group_code}}</label>
                         @endif
 
                     @endif

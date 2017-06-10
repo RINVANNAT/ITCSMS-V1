@@ -406,8 +406,6 @@ class CourseAnnualController extends Controller
         }
 
         return redirect()->back()->withFlashSuccess('Create Error!');
-
-
     }
 
     /**
@@ -1339,9 +1337,10 @@ class CourseAnnualController extends Controller
         $colWidths = $headers['colWidth'];
 
         $studentByCourse = $this->getStudentByDeptIdGradeIdDegreeId($department_ids, $degree_ids, $grade_ids, $courseAnnual->academic_year_id);
+
+
         $allScoreByCourseAnnual = $this->studentAnnualScores($scoreProps, $courseAnnualId);
 
-        dd($allScoreByCourseAnnual);
 
         if($allScoreByCourseAnnual == false) {
             return json_encode([
