@@ -738,19 +738,24 @@ class CourseAnnualController extends Controller
      */
     public function destroy(DeleteCourseAnnualRequest $request, $id)
     {
-        $scoreByCourseAnnualId = DB::table('scores')->where('course_annual_id', $id);
+        $scoreByCourseAnnualId = DB::table('scores')->where('course_annual_id', $id)->get();
+
+        if (count($scoreByCourseAnnualId) > 0 ) {
+            $check = 0;
 
 
-        if ($scoreByCourseAnnualId->get()) {
+            foreach($scoreByCourseAnnualId as $score) {
+                $deleletScore = DB::table('scores')->where('id', $score->id)->delete();
+                if($deleletScore) {
+                    $check++;
+                }
+            }
+            if($check == count($scoreByCourseAnnualId) ) {
 
+                $percentageIds = DB::table('percentage_scores')
+                    ->whereIn('percentage_scores.score_id', $scoreByCourseAnnualId->lists('id'))
+                    ->distinct('percentage_id')->lists('percentage_id');
 
-            $percentageIds = DB::table('percentage_scores')
-                ->whereIn('percentage_scores.score_id', $scoreByCourseAnnualId->lists('id'))
-                ->distinct('percentage_id')->lists('percentage_id');
-
-            $deleteScore = $scoreByCourseAnnualId->delete();
-
-            if($deleteScore) {
                 $percentages = DB::table('percentages')->whereIn('id', $percentageIds);
 
                 if($percentages->get()) {
@@ -761,12 +766,10 @@ class CourseAnnualController extends Controller
                 } else {
                     $deleteCourse = $this->courseAnnuals->destroy($id);
                 }
+
             } else {
                 return Response::json(['status' => false, 'message' => 'Deleted Error!']);
             }
-
-
-
 
         } else {
             $deleteCourse = $this->courseAnnuals->destroy($id);
