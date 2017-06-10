@@ -389,6 +389,7 @@ class CourseAnnualController extends Controller
     public function store(StoreCourseAnnualRequest $request)
     {
 
+
         $data = $request->all();
         $storeCourseAnnual = $this->courseAnnuals->create($data);
 
@@ -741,22 +742,38 @@ class CourseAnnualController extends Controller
     {
         $scoreByCourseAnnualId = DB::table('scores')->where('course_annual_id', $id);
 
+
         if ($scoreByCourseAnnualId->get()) {
+
 
             $percentageIds = DB::table('percentage_scores')
                 ->whereIn('percentage_scores.score_id', $scoreByCourseAnnualId->lists('id'))
                 ->distinct('percentage_id')->lists('percentage_id');
 
+            $scoreByCourseAnnualId->delete();
             $percentages = DB::table('percentages')->whereIn('id', $percentageIds);
 
             if($percentages->get()) {
-                $percentages->delete();
-            }
-            $scoreByCourseAnnualId->delete();
-        }
-        $this->courseAnnuals->destroy($id);
 
-        return Response::json(['status' => true, 'message' => 'Deleted!']);
+                $percentages->delete();
+               $deleteCourse =  $this->courseAnnuals->destroy($id);
+
+            } else {
+                $deleteCourse = $this->courseAnnuals->destroy($id);
+            }
+
+        } else {
+            $deleteCourse = $this->courseAnnuals->destroy($id);
+        }
+
+        if($deleteCourse) {
+            return Response::json(['status' => true, 'message' => 'Deleted!']);
+        } else {
+            return Response::json(['status' => false, 'message' => 'Deleted Error!']);
+        }
+
+
+
         //return redirect()->route('admin.course.academicYears.index')->withFlashSuccess(trans('alerts.backend.generals.deleted'));
     }
 
@@ -1323,6 +1340,8 @@ class CourseAnnualController extends Controller
 
         $studentByCourse = $this->getStudentByDeptIdGradeIdDegreeId($department_ids, $degree_ids, $grade_ids, $courseAnnual->academic_year_id);
         $allScoreByCourseAnnual = $this->studentAnnualScores($scoreProps, $courseAnnualId);
+
+        dd($allScoreByCourseAnnual);
 
         if($allScoreByCourseAnnual == false) {
             return json_encode([
