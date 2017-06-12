@@ -2,12 +2,17 @@
 
 namespace App\Http\Controllers\Backend\Schedule\Traits;
 
+use App\Http\Requests\Backend\Schedule\Timetable\AddRoomIntoTimetableSlotRequest;
 use App\Http\Requests\Backend\Schedule\Timetable\CreateTimetableRequest;
 use App\Http\Requests\Backend\Schedule\Timetable\MoveTimetableSlotRequest;
+use App\Http\Requests\Backend\Schedule\Timetable\RemoveRoomFromTimetableSlot;
+use App\Http\Requests\Backend\Schedule\Timetable\RemoveTimetableSlotRequest;
 use App\Http\Requests\Backend\Schedule\Timetable\ResizeTimetableSlotRequest;
+use App\Models\Configuration;
+use App\Models\Department;
 use App\Models\DepartmentOption;
+use App\Models\Grade;
 use App\Models\Group;
-use App\Models\Schedule\Timetable\MergeTimetableSlot;
 use App\Models\Schedule\Timetable\Slot;
 use App\Models\Schedule\Timetable\Timetable;
 use App\Models\Schedule\Timetable\TimetableSlot;
@@ -110,6 +115,29 @@ trait AjaxCRUDTimetableController
 
         if (isset($department_id)) {
             return Response::json(['status' => true, 'options' => DepartmentOption::where('department_id', $department_id)->get()]);
+        }
+        return Response::json(['status' => false]);
+    }
+
+    /**
+     * Get grades by department.
+     *
+     * @return mixed
+     */
+    public function get_grades()
+    {
+        $department_id = request('department_id');
+
+        if (isset($department_id)) {
+            if ($department_id == 8) {
+                return Response::json(['status' => true, 'grades' => Grade::where('id', '<=', 2)->get()]);
+            } else if ($department_id == 12) {
+                return Response::json(['status' => true, 'grades' => Grade::where('id', '>', 1)->get()]);
+            } else if ($department_id == 13) {
+                return Response::json(['status' => true, 'grades' => Grade::all()]);
+            } else {
+                return Response::json(['status' => true, 'grades' => Grade::where('id', '>', 2)->get()]);
+            }
         }
         return Response::json(['status' => false]);
     }
@@ -437,12 +465,13 @@ trait AjaxCRUDTimetableController
     /**
      * Insert room into timetable slot.
      *
+     * @param AddRoomIntoTimetableSlotRequest $request
      * @return mixed
      */
-    public function insert_room_into_timetable_slot()
+    public function insert_room_into_timetable_slot(AddRoomIntoTimetableSlotRequest $request)
     {
         // find timetable slot by request
-        $timetableSlot = TimetableSlot::find(request('timetable_slot_id'));
+        $timetableSlot = TimetableSlot::find($request->timetable_slot_id);
         // check validate
         if ($timetableSlot instanceof TimetableSlot) {
             // find another timetables with the same group.
@@ -467,11 +496,12 @@ trait AjaxCRUDTimetableController
     /**
      * Remove room.
      *
+     * @param RemoveRoomFromTimetableSlot $removeRoomFromTimetableSlot
      * @return mixed
      */
-    public function remove_room()
+    public function remove_room(RemoveRoomFromTimetableSlot $removeRoomFromTimetableSlot)
     {
-        $timetable_slot_id = request('timetable_slot_id');
+        $timetable_slot_id = $removeRoomFromTimetableSlot->timetable_slot_id;
         if (isset($timetable_slot_id)) {
             $timetableSlot = TimetableSlot::find($timetable_slot_id);
             // find all timetable slots in the same group_merge_id
@@ -692,6 +722,136 @@ trait AjaxCRUDTimetableController
     public function export_course_session()
     {
         if ($this->timetableSlotRepo->export_course_sessions() == true) {
+            return Response::json(['status' => true]);
+        }
+        return Response::json(['status' => false]);
+    }
+
+    /**
+     * Remove timetable slot.
+     *
+     * @param RemoveTimetableSlotRequest $removeTimetableSlotRequest
+     * @return mixed
+     */
+    public function remove_timetable_slot(RemoveTimetableSlotRequest $removeTimetableSlotRequest)
+    {
+        $timetable_slot_id = $removeTimetableSlotRequest->timetable_slot_id;
+
+        if (isset($timetable_slot_id)) {
+            $timetableSlot = TimetableSlot::find($timetable_slot_id);
+            // take duration and slot_id field
+            $slot = Slot::find($timetableSlot->slot_id);
+            // update time_remaining field
+            $slot->time_remaining = $slot->time_remaining + $timetableSlot->durations;
+            $slot->updated_at = Carbon::now();
+            $slot->write_uid = auth()->user()->id;
+            if ($slot->update() && $timetableSlot->delete()) {
+                return Response::json(['status' => true]);
+            }
+        }
+        return Response::json(['status' => false]);
+    }
+
+    /**
+     * Assign department can create tiemtable.
+     *
+     * @return mixed
+     */
+    public function assign_turn_create_timetable()
+    {
+        $result = false;
+        /** key format: timetable_department_id. Example: key: timetable_1 */
+
+        if (count(request('departments')) > 0) {
+            foreach (request('departments') as $item) {
+                if (Configuration::where('key', 'timetable_' . $item)->first() instanceof Configuration) {
+                    return Response::json(['status' => $result, 'message' => 'The key: timetable_' . $item . ' value already existed']);
+                }
+            }
+
+            foreach (request('departments') as $item) {
+                $newAssignCreateTimetable = new Configuration();
+                $newAssignCreateTimetable->key = 'timetable_' . $item;
+                $newAssignCreateTimetable->value = $item;
+                $newAssignCreateTimetable->created_at = new Carbon(request('start'));
+                $newAssignCreateTimetable->updated_at = new Carbon(request('end'));
+                $newAssignCreateTimetable->description = 'true';
+                $newAssignCreateTimetable->create_uid = auth()->user()->id;
+                $newAssignCreateTimetable->write_uid = auth()->user()->id;
+                if ($newAssignCreateTimetable->save()) {
+                    $result = true;
+                } else {
+                    $result = false;
+                    break;
+                }
+            }
+
+            $this->timetableSlotRepo->set_permission_create_timetable();
+
+            if ($result) {
+                return Response::json(['status' => $result, 'message' => 'All those department are assigned.']);
+            }
+        } else {
+            return Response::json(['status' => $result, 'message' => 'Something went wrong.']);
+        }
+    }
+
+    /**
+     * Get timetable assignment.
+     *
+     * @return mixed
+     */
+    public function get_timetable_assignment()
+    {
+        $timetable_assignments = Configuration::where('key', 'like', 'timetable_%')->select('id', 'value', 'key', 'description', 'created_at', 'updated_at')->get();
+
+        $departments = new Collection();
+        if (count($timetable_assignments) > 0) {
+            foreach ($timetable_assignments as $assignment) {
+                $department = new Collection(Department::where('id', $assignment->value)->select('code')->first());
+                $department->put('start', (new Carbon($assignment->created_at))->toDateString());
+                $department->put('end', (new Carbon($assignment->updated_at))->toDateString());
+                $department->put('description', $assignment->description);
+                $department->put('key_id', $assignment->id);
+                $departments->push($department);
+            }
+            return Response::json(['status' => true, 'departments' => $departments]);
+        }
+        return Response::json(['status' => false]);
+    }
+
+    /**
+     * Delete timetable assignment.
+     *
+     * @return mixed
+     */
+    public function assign_delete()
+    {
+        $id = request('id');
+
+        if (isset($id)) {
+            $configuration = Configuration::find($id);
+            if ($configuration instanceof Configuration) {
+                $configuration->delete();
+                return Response::json(['status' => true]);
+            }
+        }
+        return Response::json(['status' => false]);
+    }
+
+    /**
+     * Update Timetable Assignment.
+     *
+     * @return mixed
+     */
+    public function assign_update()
+    {
+        $configuration = Configuration::find(request('configuration_id'));
+        if ($configuration instanceof Configuration) {
+            $configuration->created_at = new Carbon(request('start'));
+            $configuration->updated_at = new Carbon(request('end'));
+            $configuration->update();
+            $this->timetableSlotRepo->set_permission_create_timetable();
             return Response::json(['status' => true]);
         }
         return Response::json(['status' => false]);

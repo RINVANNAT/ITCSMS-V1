@@ -17,7 +17,7 @@ class ResizeTimetableSlotRequest extends Request
      */
     public function authorize()
     {
-        return true;
+        return access()->allow('resize-timetable-slot');
     }
 
     /**

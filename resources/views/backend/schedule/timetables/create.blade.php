@@ -34,7 +34,6 @@
 @stop
 
 @section('content')
-
     <div class="box box-success">
         <div class="box-header with-border">
             <div class="mailbox-controls">
@@ -128,6 +127,33 @@
     {!! Html::script('js/backend/schedule/timetable.js') !!}
 
     <script type="text/javascript">
+        /*Drag course session into timetable.*/
+        function drag_course_session() {
+
+            @if(access()->allow('drag-course-session'))
+            $('.courses .course-item').each(function () {
+                // store data so the calendar knows to render an event upon drop
+                $(this).data('event', {
+                    slot_id: $(this).find('.slot-id').text(),
+                    course_session_id: $(this).find('.courses-session-id').text(),
+                    course_name: $(this).find('.course-name').text(),
+                    class_name: 'course-item',
+                    teacher_name: $(this).find('.teacher-name').text(),
+                    course_type: $(this).find('.course-type').text(),
+                    times: $(this).find('.times').text()
+                });
+                if ($(this).data('event').teacher_name !== 'Unsigned') {
+                    // make the event draggable using jQuery UI
+                    $(this).draggable({
+                        zIndex: 9999,
+                        revert: true,      // will cause the event to go back to its
+                        revertDuration: 0  //  original position after the drag
+                    });
+                }
+            });
+            @endif
+        }
+
         /** init rooms */
         function get_rooms() {
             $.ajax({
@@ -239,6 +265,7 @@
         }
         /** get timetable slots */
         function get_timetable_slots() {
+            toggleLoading(true);
             $.ajax({
                 type: 'POST',
                 url: '{!! route('get_timetable_slots') !!}',
@@ -247,11 +274,18 @@
                     $('#timetable').fullCalendar('removeEvents');
                     $('#timetable').fullCalendar('renderEvents', response, true);
                     $('#timetable').fullCalendar('rerenderEvents');
+                },
+                error: function () {
+                    notify('error', 'error load timetable slot');
+                },
+                complete: function () {
+                    toggleLoading(false);
                 }
             });
         }
         /** create timetable slot */
         function create_timetable_slots(copiedEventObject) {
+            toggleLoading(true);
             $.ajax({
                 type: 'POST',
                 url: '{{ route('admin.schedule.timetables.store') }}',
@@ -282,10 +316,15 @@
                         get_timetable();
                     }
                 },
-                error: function () {
-                    notify('error', 'Timetable Slot was not created yet.', 'Add Timetable Slot');
+                error: function (response) {
+                    if (response.status === 403) {
+                        notify('error', 'You are not allowed to drag.', 'Unauthorized');
+                    } else {
+                        notify('error', 'Timetable Slot was not created yet.', 'Add Timetable Slot');
+                    }
                 },
                 complete: function () {
+                    toggleLoading(false);
                     get_course_sessions();
                     $('.panel-conflict').hide();
                 }
@@ -295,6 +334,7 @@
         }
         /** move timetable slot */
         function move_timetable_slot(event, start_date) {
+            toggleLoading(true);
             $.ajax({
                 type: 'POST',
                 url: '{!! route('move_timetable_slot') !!}',
@@ -310,10 +350,16 @@
                         notify('error', 'Something went wrong.', 'Move Timetable Slot');
                     }
                 },
-                error: function () {
-                    notify('error', 'Something went wrong.', 'Move Timetable Slot');
+                error: function (response) {
+                    if (response.status === 403) {
+                        notify('error', 'You are not allowed to move  timetable slot.', 'Unauthorized');
+                    }
+                    else {
+                        notify('error', 'Something went wrong.', 'Move Timetable Slot');
+                    }
                 },
                 complete: function () {
+                    toggleLoading(false);
                     get_timetable_slots();
                 }
             })
@@ -336,7 +382,11 @@
                     }
                 },
                 error: function (response) {
-                    notify('error', response.message, "Resize timetable Slot");
+                    if (response.status === 403) {
+                        notify('error', 'You are not allowed to resize timetable slot.', 'Unauthorized');
+                    } else {
+                        notify('error', response.message, "Resize timetable Slot");
+                    }
                     get_timetable_slots();
                     get_course_sessions();
                 },
@@ -346,6 +396,34 @@
                 }
             })
         }
+
+        var remove_timetable_sltos = function (event) {
+            toggleLoading(true);
+            $.ajax({
+                type: 'POST',
+                url: '{!! route('remove_timetable_slot') !!}',
+                data: {timetable_slot_id: event.id},
+                success: function (response) {
+                    if (response.status === true) {
+                        notify('info', 'Timetable slot remove from timetable.', 'Remove Timetable Slot');
+                    }
+                },
+                error: function (response) {
+                    if (response.status === 403) {
+                        notify('error', 'You are not allowed to remove timetable slot.', 'Unauthorized');
+                    } else {
+                        notify('error', 'Timetable slot can not remove from timetable.', 'Remove Timetable Slot');
+                    }
+
+                },
+                complete: function () {
+                    get_timetable_slots();
+                    get_course_sessions();
+                    toggleLoading(false);
+                }
+            })
+        };
+
         /** get timetable */
         function get_timetable() {
             var date = new Date();
@@ -371,7 +449,7 @@
                 maxTime: '20:00:00',
                 slotLabelFormat: 'h:mm a',
                 columnFormat: 'dddd',
-                editable: true,
+                @if(access()->allow('edit-timetable')) editable: true, @endif
                 droppable: true,
                 dragRevertDuration: 0,
                 drop: function (date) {
@@ -393,9 +471,6 @@
                 eventDragStart: function (event, jsEvent, ui, view) {
                     get_rooms();
                 },
-                eventDragStop: function (event, jsEvent, ui, view) {
-                    //$('#timetable').fullCalendar('rerenderEvents');
-                },
                 eventClick: function (calEvent, jsEvent, view) {
                     // Trigger when click the event.
                 },
@@ -410,10 +485,10 @@
                     var object = '<a class="fc-time-grid-event fc-v-event fc-event fc-start fc-end course-item  fc-draggable fc-resizable" style="top: 65px; bottom: -153px; z-index: 1; left: 0%; right: 0%;">' +
                         '<div class="fc-content">' +
                         '<div class="container-room">' +
-                        '<div class="side-course" id="' + event.id + '">';
+                        '<div class="side-course" id="' + event.id + '"​​​>';
 
                     // check conflict room and render
-                    object += '<div class="fc-title">' + (event.course_name).substring(0, 10) + '...</div>';
+                    object += '<div class="fc-title">' + event.course_name + '</div>';
 
                     // check conflict lecturer and render
                     if (typeof event.conflict_lecturer !== 'undefined') {
@@ -429,14 +504,16 @@
                     }
 
 
-                    object += '<p class="text-primary">' + event.type + '</p> ' +
-                        '</div>' +
+                    if (typeof event.type !== 'undefined') {
+                        object += '<p class="text-primary">' + event.type + '</p> ';
+                    }
+                    object += '</div>' +
                         '<div class="side-room">' +
                         '<div class="room-name">';
 
                     // check conflict and render room
-                    if (event.room != null) {
-                        if (event.conflict_room == true) {
+                    if (event.room !== null && event.building !== null) {
+                        if (event.conflict_room === true) {
                             object += '<p class="fc-room bg-danger badge">' + event.building + '-' + event.room + '</p>';
                         } else {
                             object += '<p class="fc-room">' + event.building + '-' + event.room + '</p>';
@@ -458,8 +535,8 @@
                             }
                             groups += '</p>';
                         }
+                        object += groups;
                     }
-                    object += groups;
                     object += '</div> ' +
                         '<div class="clearfix"></div> ' +
                         '</div>' +
@@ -467,7 +544,6 @@
                         '<div class="fc-bgd"></div>' +
                         '<div class="fc-resizer fc-end-resizer"></div>' +
                         '</a>';
-
                     return $(object);
                 },
                 eventOverlap: function (stillEvent, movingEvent) {
@@ -478,9 +554,30 @@
                     resize_timetable_slot(event.id, end, revertFunc);
                     $('#timetable').fullCalendar('rerenderEvents');
                     hide_conflict_information();
+                },
+                eventDragStop: function (event, jsEvent, ui, view) {
+                    if (isEventOverDiv(jsEvent.clientX, jsEvent.clientY)) {
+                        remove_timetable_sltos(event);
+                        $('#timetable').fullCalendar('removeEvent', event.id);
+                    }
                 }
             });
         }
+
+        var isEventOverDiv = function (x, y) {
+
+            var rooms = $('.box-body.courses-sessions');
+            var offset = rooms.offset();
+            offset.right = rooms.width() + offset.left;
+            offset.bottom = rooms.height() + offset.top;
+
+            // Compare
+            return (x >= offset.left
+            && y >= offset.top
+            && x <= offset.right
+            && y <= offset.bottom);
+
+        };
 
         function check_conflict(timetable_slot_id) {
             $.ajax({
@@ -495,53 +592,58 @@
                             '<button type="button" class="btn-conflict-cancel btn btn-box-tool" data-widget="remove"><i class="fa fa-times"></i>' +
                             '</button></div></div>' +
                             '<div class="box-body">';
-                        if (response.data.is_conflict_room == true) {
+
+                        if (response.data.is_conflict_room === true) {
                             panel_conflict += '<ul class="list-group">' +
                                 '<li class="list-group-item"> <i class="fa fa-building-o"></i> Room ' +
-                                '<ul class="list-group">' +
-                                '<li class="list-group-item"><i class="fa fa-angle-double-right"></i> ' +
+                                '<div class="rooms" style="height: 70px !important; overflow: hidden;margin-top: 10px; border-radius: 4px;">' +
+                                '<div class="room-item" style="width: 100%;"><i class="fa fa-angle-double-right"></i> ' +
                                 response.data.room_info[0].department + '-' +
                                 response.data.room_info[0].degree +
                                 response.data.room_info[0].grade;
-                            panel_conflict += '<span class="badge bg-primary"> Group: ';
+                            panel_conflict += '<span class="badge bg-primary pull-right"> Group: ';
                             if (response.data.room_info[0].group !== null) {
-                                panel_conflict += response.data.room_info[0].group;
+                                panel_conflict += response.data.room_info[0].group + ', ';
                             }
                             if (response.data.room_info[0].option !== null) {
-                                panel_conflict += '_' + response.data.room_info[0].option;
+                                panel_conflict += '_' + response.data.room_info[0].option + ', ';
                             }
-                            panel_conflict += '</span></li></ul></li>';
+                            panel_conflict += response.data.room_info[0].week;
+                            panel_conflict += '</span></div></div></li>';
                         }
 
                         if (response.data.lecturer.canMerge.length > 0) {
                             panel_conflict += '<li class="list-group-item">' +
                                 '<i class="fa fa-user"></i> Lecturer ' +
                                 '<i data-toggle="tooltip" data-placement="right" title="Merge" data-original-title="Merge" class="btn btn-info btn-xs fa fa-code-fork pull-right" id="merge"></i>' +
-                                '<ul class="list-group">';
+                                '<div class="rooms" style="margin-top: 10px; border-radius: 4px; min-height: 70px; max-height: 100px;">';
                             for (var i = 0; i < response.data.lecturer.canMerge.length; i++) {
-                                panel_conflict += '<li class="list-group-item"><i class="fa fa-angle-double-right"></i> '
+                                panel_conflict += '<div class="room-item" style="width: 100%;"><i class="fa fa-angle-double-right"></i> '
                                     + response.data.lecturer.canMerge[i].department + '-'
                                     + response.data.lecturer.canMerge[i].degree
-                                    + response.data.lecturer.canMerge[i].grade + '-'
-                                    + response.data.lecturer.canMerge[i].week + '<span class="badge bg-danger pull-right">Group: '
-                                    + response.data.lecturer.canMerge[i].group + '</span></li>';
+                                    + response.data.lecturer.canMerge[i].grade
+                                    + '<span class="badge bg-primary pull-right">Group: '
+                                    + response.data.lecturer.canMerge[i].group + ', '
+                                    + response.data.lecturer.canMerge[i].week
+                                    + '</span></div>';
                             }
-                            panel_conflict += '</ul></li>';
+                            panel_conflict += '</div></li>';
                         }
+
                         if (response.data.lecturer.canNotMerge.length > 0) {
                             console.log(100);
                             panel_conflict += '<li class="list-group-item">' +
                                 '<i class="fa fa-user"></i> Lecturer ' +
-                                '<ul class="list-group">';
+                                '<div class="rooms" style="margin-top: 10px; border-radius: 4px; min-height: 70px; max-height: 100px;">';
                             for (var i = 0; i < response.data.lecturer.canNotMerge.length; i++) {
-                                panel_conflict += '<li class="list-group-item"><i class="fa fa-angle-double-right"></i> '
+                                panel_conflict += '<div class="room-item" style="width: 100%;"><i class="fa fa-angle-double-right"></i> '
                                     + response.data.lecturer.canNotMerge[i].department + '-'
                                     + response.data.lecturer.canNotMerge[i].degree
                                     + response.data.lecturer.canNotMerge[i].grade + '-'
                                     + response.data.lecturer.canNotMerge[i].week + '<span class="badge bg-primary pull-right">Group: '
-                                    + response.data.lecturer.canNotMerge[i].group + '</span></li>';
+                                    + response.data.lecturer.canNotMerge[i].group + '</span></div>';
                             }
-                            panel_conflict += '<ul/></li>';
+                            panel_conflict += '<div/></li>';
                         }
                         panel_conflict += '</ul></div>';
                         $('#conflict').html(panel_conflict).hide().fadeIn();
@@ -558,6 +660,12 @@
         }
 
         $(function () {
+            // popup export course session btn.
+            $('.btn_export_course_session').popover({
+                trigger: 'hover'
+            });
+
+            // filter options
             get_options($('select[name="department"] :selected').val());
             drag_course_session();
             get_rooms();
@@ -572,7 +680,6 @@
                 get_suggest_room(academic_year_id, week_id, timetable_slot_id);
                 hide_conflict_information();
                 check_conflict(timetable_slot_id);
-
             });
 
             // remove room from timetable slot.
@@ -590,8 +697,13 @@
                         dom.remove();
                         notify('info', 'Room was removed.', 'Remove Room');
                     },
-                    error: function () {
-                        notify('error', 'Something went wrong.', 'Remove Room');
+                    error: function (response) {
+                        if (response.status === 403) {
+                            notify('error', 'You are not allow to remove room.', 'Unauthorized');
+                        }
+                        else {
+                            notify('error', 'Something went wrong.', 'Remove Room');
+                        }
                     }
                 })
             });
@@ -617,8 +729,12 @@
                             get_timetable_slots();
                         }
                     },
-                    error: function () {
-                        notify('error', 'Something went wrong.', 'Add Room');
+                    error: function (response) {
+                        if (response.status === 403) {
+                            notify('error', 'You can not add room.', 'Unauthorized');
+                        } else {
+                            notify('error', 'Something went wrong.', 'Add Room');
+                        }
                     }
                 });
             });

@@ -309,6 +309,11 @@ class AccessServiceProvider extends ServiceProvider
         );
 
         $this->app->bind(
+            \App\Repositories\Backend\Schedule\Timetable\PrintTimetableRepositoryContract::class,
+            \App\Repositories\Backend\Schedule\Timetable\EloquentPrintTimetableRepository::class
+        );
+
+        $this->app->bind(
             \App\Repositories\Backend\Schedule\Calendar\EventRepositoryContract::class,
             \App\Repositories\Backend\Schedule\Calendar\EloquentEventRepository::class
         );
@@ -322,6 +327,7 @@ class AccessServiceProvider extends ServiceProvider
             \App\Repositories\Backend\Schedule\Calendar\RepeatRepositoryContract::class,
             \App\Repositories\Backend\Schedule\Calendar\EloquentRepeatRepository::class
         );
+
     }
 
     /**

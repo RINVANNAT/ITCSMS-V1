@@ -3933,7 +3933,7 @@ class CourseAnnualController extends Controller
                 $sheet->cells('A6:' . $alpha[$count - 1] . '6', function ($cells) {
                     $cells->setBackground('#C0C0C0 ');
                     $cells->setAlignment('left');
-                    $cells->setValignment('center');
+                    $cells->setValignment('middle');
                     $cells->setTextRotation(-90);
                     $cells->setFont(array(
                         'size' => '12',

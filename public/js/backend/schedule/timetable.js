@@ -1,28 +1,3 @@
-/*Drag course session into timetable.*/
-function drag_course_session() {
-
-    $('.courses .course-item').each(function () {
-        // store data so the calendar knows to render an event upon drop
-        $(this).data('event', {
-            slot_id: $(this).find('.slot-id').text(),
-            course_session_id: $(this).find('.courses-session-id').text(),
-            course_name: $(this).find('.course-name').text(),
-            class_name: 'course-item',
-            teacher_name: $(this).find('.teacher-name').text(),
-            course_type: $(this).find('.course-type').text(),
-            times: $(this).find('.times').text()
-        });
-        if ($(this).data('event').teacher_name !== 'Unsigned') {
-            // make the event draggable using jQuery UI
-            $(this).draggable({
-                zIndex: 999,
-                revert: true,      // will cause the event to go back to its
-                revertDuration: 0  //  original position after the drag
-            });
-        }
-    });
-}
-
 /** Get rooms. **/
 function get_groups() {
     toggleLoading(true);
@@ -105,20 +80,49 @@ function get_options(department_id) {
         },
         error: function () {
             swal(
-                'Oops...',
+                'Get Options',
+                'Something went wrong!',
+                'error'
+            );
+        },
+        complete: function () {
+            get_grades(department_id);
+            toggleLoading(false);
+        }
+    });
+}
+
+
+function get_grades(department_id) {
+    $.ajax({
+        type: 'POST',
+        url: '/admin/schedule/timetables/get_grades',
+        data: {department_id: department_id},
+        success: function (response) {
+            if (response.status === true) {
+                var grades = '';
+                $.each(response.grades, function (key, val) {
+                    console.log
+                    grades += '<option value="' + val.id + '">' + val.name_en + '</option>';
+                });
+                $('select[name="grade"]').html(grades);
+            }
+        },
+        error: function () {
+            swal(
+                'Get Grades',
                 'Something went wrong!',
                 'error'
             );
         },
         complete: function () {
             get_groups();
-            toggleLoading(false);
         }
-    });
+    })
 }
-
 /** Get course sessions. **/
 function get_course_sessions() {
+    toggleLoading(true);
     $.ajax({
         type: 'POST',
         url: '/admin/schedule/timetables/get_course_sessions',
@@ -172,8 +176,8 @@ function get_course_sessions() {
                 'error'
             );
         },
-        complete: function () {
-
+        complete:function () {
+            toggleLoading(false);
         }
     });
 }

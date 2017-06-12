@@ -51,19 +51,32 @@
                     @endif
                 </div>
 
-                @permission('create-timetable')
-                <div class="pull-left">
-                    <a href="{{ route('admin.schedule.timetables.create') }}">
-                        <button class="btn btn-primary btn-sm" data-toggle="tooltip"
-                                data-placement="top" title="Create a new timetable"
-                                data-original-title="Create a new timetable">
-                            <i class="fa fa-plus-circle"
-                            ></i>
+                @if(isset($createTimetablePermissionConfiguration))
+                    @if(((strtotime($now) >= strtotime($createTimetablePermissionConfiguration->created_at) && strtotime($now) <= strtotime($createTimetablePermissionConfiguration->updated_at)) && access()->allow('create-timetable')))
+                        <div class="pull-left">
+                            <a class="btn btn-primary btn-sm"
+                               data-toggle="tooltip"
+                               data-placement="top" title="Create a new timetable"
+                               data-original-title="Create a new timetable"
+                               href="{{ route('admin.schedule.timetables.create') }}">
+                                <i class="fa fa-plus-circle"></i>
+                                {{ trans('buttons.backend.schedule.timetable.create') }}
+                            </a>
+                        </div>
+                    @endif
+                @else
+                    <div class="pull-left">
+                        <a class="btn btn-primary btn-sm"
+                           data-toggle="tooltip"
+                           data-placement="top" title="Create a new timetable"
+                           data-original-title="Create a new timetable"
+                           href="{{ route('admin.schedule.timetables.create') }}">
+                            <i class="fa fa-plus-circle"></i>
                             {{ trans('buttons.backend.schedule.timetable.create') }}
-                        </button>
-                    </a>
-                </div>
-                @endauth
+                        </a>
+                    </div>
+                @endif
+
             </div>
         </div>
 
@@ -128,9 +141,9 @@
                         '<div class="container-room">' +
                         '<div class="side-course" id="' + event.id + '">';
                     if (event.is_conflict_course == true) {
-                        object += '<div class="fc-title conflict">' + event.course_name + '...</div>';
+                        object += '<div class="fc-title conflict">' + event.course_name + '</div>';
                     } else {
-                        object += '<div class="fc-title">' + event.course_name + '...</div>';
+                        object += '<div class="fc-title">' + event.course_name + '</div>';
                     }
                     if (event.is_conflict_lecturer == true) {
                         object += '<p class="text-primary conflict">' + event.teacher_name + '</p> ';
