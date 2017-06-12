@@ -1886,6 +1886,15 @@ class CourseAnnualController extends Controller
         $average_moyenne_by_semester = [];
         $finalMoynne = []; // get both semesters
 
+        $semesters = DB::table('semesters')->orderBy('semesters.id')->get();
+
+        //-----get headers------
+
+        $headers = $this->getHeadersHandsonTableData($semesterId, $semesters);
+        $nestedHeaders = $headers['nested_header'];
+        $colWidths = $headers['col_width'];
+
+
         //------get course type -------
 
         $courseAnnuals = $this->getCourseAnnualWithProp($request->all());
@@ -1893,8 +1902,12 @@ class CourseAnnualController extends Controller
         $arrayCourseAnnual = collect($courseAnnuals->get())->groupBy('course_id')->toArray();
         if (count($array_course_annual_ids) == 0) {
             return json_encode([
-                'message' => 'No courses!',
-                'status' => false
+                'status' => false,
+                'data' => [],
+                'nestedHeaders' => $nestedHeaders,
+                'colWidths' => [],
+                'message' =>  'The options which you are selected, are not match with the record please check agian!',
+                'type' => 'warning'
             ]);
         }
 
@@ -1912,13 +1925,6 @@ class CourseAnnualController extends Controller
 
         $groups = $this->selectedGroupByCourseAnnual($array_course_annual_ids);
 
-        $semesters = DB::table('semesters')->orderBy('semesters.id')->get();
-
-        //-----get headers------
-
-        $headers = $this->getHeadersHandsonTableData($semesterId, $semesters);
-        $nestedHeaders = $headers['nested_header'];
-        $colWidths = $headers['col_width'];
 
         $element = [];
         $totalAbs = [];
@@ -1928,7 +1934,6 @@ class CourseAnnualController extends Controller
 
         $array_observation = [];
         $array_student_id_card = [];
-
 
         if ($arrayCourseAnnual) {
 
@@ -1975,8 +1980,10 @@ class CourseAnnualController extends Controller
                     return json_encode([
                         'status' => false,
                         'data' => [],
-                        'nestedHeaders' => [],
-                        'colWidths' => []
+                        'nestedHeaders' => $nestedHeaders,
+                        'colWidths' => [],
+                        'message' => $dataHandSontable['message'],
+                        'type' => $dataHandSontable['type']
                     ]);
                 }
 
@@ -2092,7 +2099,6 @@ class CourseAnnualController extends Controller
         $countElement = collect($element)->map(function($item, $key) {
             return count($item);
         })->max();
-
 
         foreach ($element as $key => $value) {
 
@@ -2241,7 +2247,6 @@ class CourseAnnualController extends Controller
             $element[$key] = $value;
         }
 
-
         //-----find student classement
 
         $array_data = collect($element)->sortByDesc('Moyenne')->toArray();
@@ -2251,6 +2256,7 @@ class CourseAnnualController extends Controller
                             $data['Rank'] = $key +1;
                             return $data;
                         })->toArray();
+
 
         //------assign max min average for column s1_moyenne, s2_moyenne and total moyenne
 
@@ -2283,7 +2289,6 @@ class CourseAnnualController extends Controller
             $array_data[] = $emptyData['average'];
             $array_data[] = $emptyData['data_empty'];
         }
-
 
         return json_encode([
             'array_fail_subject' => $fail_subjects,
@@ -2520,29 +2525,37 @@ class CourseAnnualController extends Controller
 
                     $filtered_students = $this->filtering_student_annual($eachCourse, $groups);
 
-                    foreach ($filtered_students as $stu_dent) {
+                    if(count($filtered_students) > 0) {
 
-                        $array_observation[$stu_dent->id_card] = $stu_dent;
-                       $each_score = isset($eachCourseAnnualScores[$eachCourse->course_annual_id]) ? (isset($eachCourseAnnualScores[$eachCourse->course_annual_id][$stu_dent->student_annual_id]) ? $this->compareResitScore($eachCourseAnnualScores[$eachCourse->course_annual_id][$stu_dent->student_annual_id]) : 0) : 0;
+                        foreach ($filtered_students as $stu_dent) {
 
-                        $each_column_score = $this->score_constraint($each_score, $eachCourse, $stu_dent, $each_column_score);
-                        $element = $this->init_element($stu_dent, $element);
+                            $array_observation[$stu_dent->id_card] = $stu_dent;
+                            $each_score = isset($eachCourseAnnualScores[$eachCourse->course_annual_id]) ? (isset($eachCourseAnnualScores[$eachCourse->course_annual_id][$stu_dent->student_annual_id]) ? $this->compareResitScore($eachCourseAnnualScores[$eachCourse->course_annual_id][$stu_dent->student_annual_id]) : 0) : 0;
 
-                        //--------request for only one semester ------
-                        $absence_by_course = isset($absences[$eachCourse->course_annual_id]) ? (isset($absences[$eachCourse->course_annual_id][$stu_dent->student_annual_id]) ? $absences[$eachCourse->course_annual_id][$stu_dent->student_annual_id] : null) : null;
-                        $each_element_semester = $this->add_element_by_semester($each_score, $semesterId, $semesters, $eachCourse, $stu_dent, $element, $absence_by_course, $totalMoyenne, $totalAbs, $array_student_id_card);
+                            $each_column_score = $this->score_constraint($each_score, $eachCourse, $stu_dent, $each_column_score);
+                            $element = $this->init_element($stu_dent, $element);
 
-                        if ($each_element_semester != false) {
-                            $totalMoyenne = $each_element_semester['total_moyenne'];
-                            $totalAbs = $each_element_semester['abs'];
-                            $element = $each_element_semester['element'];
-                            $array_student_id_card = $each_element_semester['student_id_card'];
+                            //--------request for only one semester ------
+                            $absence_by_course = isset($absences[$eachCourse->course_annual_id]) ? (isset($absences[$eachCourse->course_annual_id][$stu_dent->student_annual_id]) ? $absences[$eachCourse->course_annual_id][$stu_dent->student_annual_id] : null) : null;
+                            $each_element_semester = $this->add_element_by_semester($each_score, $semesterId, $semesters, $eachCourse, $stu_dent, $element, $absence_by_course, $totalMoyenne, $totalAbs, $array_student_id_card);
 
-                        } else {
-                            return $this->empty_data();
+                            if ($each_element_semester != false) {
+                                $totalMoyenne = $each_element_semester['total_moyenne'];
+                                $totalAbs = $each_element_semester['abs'];
+                                $element = $each_element_semester['element'];
+                                $array_student_id_card = $each_element_semester['student_id_card'];
+
+                            } else {
+
+                                return $this->empty_data(trans('strings.backend.course_annual.wrong_option'), $type='warning');
+                            }
+                            $fail_subjects = $this->generating_student_redouble($eachCourse, $stu_dent, $each_score, $fail_subjects);
+
                         }
-                        $fail_subjects = $this->generating_student_redouble($eachCourse, $stu_dent, $each_score, $fail_subjects);
 
+                    } else {
+                        $message = '<span style=" font-size: 14pt; color: red;"> '. $eachCourse->name_en.'</span>'. trans('strings.backend.course_annual.no_student_record');
+                        return $this->empty_data($message, $type='warning');
                     }
                 }
 
@@ -2555,29 +2568,37 @@ class CourseAnnualController extends Controller
                     $filtered_students = $this->filtering_student_annual($course, $groups);
                 }
 
-                foreach ($filtered_students as $stu_dent) {
-                    $array_observation[$stu_dent->id_card] = $stu_dent;
-                    //-----$annualCourses[0] this array contains only one course annual that which this course is the same withe course program
-                    $absence_by_course = isset($absences[$tmpCourse->course_annual_id]) ? (isset($absences[$tmpCourse->course_annual_id][$stu_dent->student_annual_id]) ? $absences[$tmpCourse->course_annual_id][$stu_dent->student_annual_id] : null) : null;
-                    $each_score = isset($eachCourseAnnualScores[$tmpCourse->course_annual_id]) ? (isset($eachCourseAnnualScores[$tmpCourse->course_annual_id][$stu_dent->student_annual_id]) ? $this->compareResitScore($eachCourseAnnualScores[$tmpCourse->course_annual_id][$stu_dent->student_annual_id]) : 0) : 0;
-                    $each_column_score = $this->score_constraint($each_score, $tmpCourse, $stu_dent, $each_column_score);
-                    $element = $this->init_element($stu_dent, $element);
+                if(count($filtered_students) > 0) {
 
-                    //--------request for only one semester ------
+                    foreach ($filtered_students as $stu_dent) {
+                        $array_observation[$stu_dent->id_card] = $stu_dent;
+                        //-----$annualCourses[0] this array contains only one course annual that which this course is the same withe course program
+                        $absence_by_course = isset($absences[$tmpCourse->course_annual_id]) ? (isset($absences[$tmpCourse->course_annual_id][$stu_dent->student_annual_id]) ? $absences[$tmpCourse->course_annual_id][$stu_dent->student_annual_id] : null) : null;
+                        $each_score = isset($eachCourseAnnualScores[$tmpCourse->course_annual_id]) ? (isset($eachCourseAnnualScores[$tmpCourse->course_annual_id][$stu_dent->student_annual_id]) ? $this->compareResitScore($eachCourseAnnualScores[$tmpCourse->course_annual_id][$stu_dent->student_annual_id]) : 0) : 0;
+                        $each_column_score = $this->score_constraint($each_score, $tmpCourse, $stu_dent, $each_column_score);
+                        $element = $this->init_element($stu_dent, $element);
 
-                    $each_element_semester = $this->add_element_by_semester($each_score, $semesterId, $semesters, $tmpCourse, $stu_dent, $element, $absence_by_course, $totalMoyenne, $totalAbs, $array_student_id_card);
-                    if ($each_element_semester != false) {
-                        $totalMoyenne = $each_element_semester['total_moyenne'];
-                        $totalAbs = $each_element_semester['abs'];
-                        $element = $each_element_semester['element'];
-                        $array_student_id_card = $each_element_semester['student_id_card'];
+                        //--------request for only one semester ------
 
-                    } else {
-                        return $this->empty_data();
+                        $each_element_semester = $this->add_element_by_semester($each_score, $semesterId, $semesters, $tmpCourse, $stu_dent, $element, $absence_by_course, $totalMoyenne, $totalAbs, $array_student_id_card);
+                        if ($each_element_semester != false) {
+                            $totalMoyenne = $each_element_semester['total_moyenne'];
+                            $totalAbs = $each_element_semester['abs'];
+                            $element = $each_element_semester['element'];
+                            $array_student_id_card = $each_element_semester['student_id_card'];
+
+                        } else {
+                            return $this->empty_data(trans('strings.backend.course_annual.wrong_option'), $type='warning');
+                        }
+                        $fail_subjects = $this->generating_student_redouble($tmpCourse, $stu_dent, $each_score, $fail_subjects);
+
                     }
-                    $fail_subjects = $this->generating_student_redouble($tmpCourse, $stu_dent, $each_score, $fail_subjects);
-
+                } else {
+                    $message = '<span style=" font-size: 14pt; color: red;"> '. $tmpCourse->name_en.'</span>'. trans('strings.backend.course_annual.no_student_record');
+                    return $this->empty_data($message, $type='warning');
                 }
+
+
             }
         } else {
 
@@ -2585,27 +2606,37 @@ class CourseAnnualController extends Controller
 
                 foreach ($annualCourses as $eachCourse) {
 
+
                     $filtered_students = $this->filtering_student_annual($eachCourse, $groups);
 
-                    foreach ($filtered_students as $stu_dent) {
+                    if(count($filtered_students) > 0) {
 
-                        $array_observation[$stu_dent->id_card] = $stu_dent;
-                        $absence_by_course = isset($absences[$eachCourse->course_annual_id]) ? (isset($absences[$eachCourse->course_annual_id][$stu_dent->student_annual_id]) ? $absences[$eachCourse->course_annual_id][$stu_dent->student_annual_id] : null) : null;
-                        $each_score = isset($eachCourseAnnualScores[$eachCourse->course_annual_id]) ? (isset($eachCourseAnnualScores[$eachCourse->course_annual_id][$stu_dent->student_annual_id]) ? $this->compareResitScore($eachCourseAnnualScores[$eachCourse->course_annual_id][$stu_dent->student_annual_id]) : 0) : 0;
-                        $each_column_score = $this->score_constraint($each_score, $eachCourse, $stu_dent, $each_column_score);
+                        foreach ($filtered_students as $stu_dent) {
 
-                        $each_element_semester = $this->concate_element_by_semester($each_score, $semesterId, $semesters, $eachCourse, $stu_dent, $element, $absence_by_course, $totalMoyenne, $totalAbs);
-                        if ($each_element_semester == false) {
-                            return $this->empty_data();
-                        } else {
-                            $totalMoyenne = $each_element_semester['total_moyenne'];
-                            $totalAbs = $each_element_semester['abs'];
-                            $element = $each_element_semester['element'];
+                            $array_observation[$stu_dent->id_card] = $stu_dent;
+                            $absence_by_course = isset($absences[$eachCourse->course_annual_id]) ? (isset($absences[$eachCourse->course_annual_id][$stu_dent->student_annual_id]) ? $absences[$eachCourse->course_annual_id][$stu_dent->student_annual_id] : null) : null;
+                            $each_score = isset($eachCourseAnnualScores[$eachCourse->course_annual_id]) ? (isset($eachCourseAnnualScores[$eachCourse->course_annual_id][$stu_dent->student_annual_id]) ? $this->compareResitScore($eachCourseAnnualScores[$eachCourse->course_annual_id][$stu_dent->student_annual_id]) : 0) : 0;
+                            $each_column_score = $this->score_constraint($each_score, $eachCourse, $stu_dent, $each_column_score);
+
+                            $each_element_semester = $this->concate_element_by_semester($each_score, $semesterId, $semesters, $eachCourse, $stu_dent, $element, $absence_by_course, $totalMoyenne, $totalAbs);
+                            if ($each_element_semester == false) {
+                                return $this->empty_data(trans('strings.backend.course_annual.wrong_option'), $type='warning');
+                            } else {
+                                $totalMoyenne = $each_element_semester['total_moyenne'];
+                                $totalAbs = $each_element_semester['abs'];
+                                $element = $each_element_semester['element'];
+                            }
+
+                            $fail_subjects = $this->generating_student_redouble($eachCourse, $stu_dent, $each_score, $fail_subjects);
+
                         }
+                    } else {
 
-                        $fail_subjects = $this->generating_student_redouble($eachCourse, $stu_dent, $each_score, $fail_subjects);
-
+                        $message = '<span style=" font-size: 14pt; color: red;"> '. $eachCourse->name_en.'</span>'. trans('strings.backend.course_annual.no_student_record');
+                        return $this->empty_data($message, $type='warning');
                     }
+
+
                 }
 
             } else {
@@ -2617,28 +2648,36 @@ class CourseAnnualController extends Controller
                     $filtered_students = $this->filtering_student_annual($eachCourse, $groups);
                 }
 
-                foreach ($filtered_students as $stu_dent) {
-                    //-----$annualCourses[0] this array contains only one course annual that which this course is the same withe course program
+                if(count($filtered_students) > 0) {
 
-                    $array_observation[$stu_dent->id_card] = $stu_dent;
-                    $absence_by_course = isset($absences[$tmpCourse->course_annual_id]) ? (isset($absences[$tmpCourse->course_annual_id][$stu_dent->student_annual_id]) ? $absences[$tmpCourse->course_annual_id][$stu_dent->student_annual_id] : null) : null;
-                    $each_score = isset($eachCourseAnnualScores[$tmpCourse->course_annual_id]) ? (isset($eachCourseAnnualScores[$tmpCourse->course_annual_id][$stu_dent->student_annual_id]) ? $this->compareResitScore($eachCourseAnnualScores[$tmpCourse->course_annual_id][$stu_dent->student_annual_id]) : 0) : 0;
+                    foreach ($filtered_students as $stu_dent) {
+                        //-----$annualCourses[0] this array contains only one course annual that which this course is the same withe course program
 
-                    $each_column_score = $this->score_constraint($each_score, $tmpCourse, $stu_dent, $each_column_score);
+                        $array_observation[$stu_dent->id_card] = $stu_dent;
+                        $absence_by_course = isset($absences[$tmpCourse->course_annual_id]) ? (isset($absences[$tmpCourse->course_annual_id][$stu_dent->student_annual_id]) ? $absences[$tmpCourse->course_annual_id][$stu_dent->student_annual_id] : null) : null;
+                        $each_score = isset($eachCourseAnnualScores[$tmpCourse->course_annual_id]) ? (isset($eachCourseAnnualScores[$tmpCourse->course_annual_id][$stu_dent->student_annual_id]) ? $this->compareResitScore($eachCourseAnnualScores[$tmpCourse->course_annual_id][$stu_dent->student_annual_id]) : 0) : 0;
+
+                        $each_column_score = $this->score_constraint($each_score, $tmpCourse, $stu_dent, $each_column_score);
 
 
-                    $each_element_semester = $this->concate_element_by_semester($each_score, $semesterId, $semesters, $tmpCourse, $stu_dent, $element, $absence_by_course, $totalMoyenne, $totalAbs);
-                    if ($each_element_semester == false) {
-                        return $this->empty_data();
-                    } else {
-                        $totalMoyenne = $each_element_semester['total_moyenne'];
-                        $totalAbs = $each_element_semester['abs'];
-                        $element = $each_element_semester['element'];
+                        $each_element_semester = $this->concate_element_by_semester($each_score, $semesterId, $semesters, $tmpCourse, $stu_dent, $element, $absence_by_course, $totalMoyenne, $totalAbs);
+                        if ($each_element_semester == false) {
+                            return $this->empty_data(trans('strings.backend.course_annual.wrong_option'), $type='warning');
+                        } else {
+                            $totalMoyenne = $each_element_semester['total_moyenne'];
+                            $totalAbs = $each_element_semester['abs'];
+                            $element = $each_element_semester['element'];
+                        }
+
+                        $fail_subjects = $this->generating_student_redouble($tmpCourse, $stu_dent, $each_score, $fail_subjects);
+
                     }
-
-                    $fail_subjects = $this->generating_student_redouble($tmpCourse, $stu_dent, $each_score, $fail_subjects);
-
+                } else {
+                    $message =  '<span style=" font-size: 14pt; color: red;"> '. $tmpCourse->name_en.'</span>'. trans('strings.backend.course_annual.no_student_record');
+                    return $this->empty_data($message, $type='info');
                 }
+
+
             }
         }
         return [

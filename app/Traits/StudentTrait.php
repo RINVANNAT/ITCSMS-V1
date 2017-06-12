@@ -373,7 +373,7 @@ trait StudentTrait
         return $score_by_course * $credit;
     }
 
-    public function empty_data() {
+    public function empty_data($message, $type) {
 
         return [
             'status' => false,
@@ -381,7 +381,9 @@ trait StudentTrait
             'absence' => [],
             'moyenne' => [],
             'each_column_score' => [],
-            'fail_subject' => []
+            'fail_subject' => [],
+            'message' => $message,
+            'type' => $type
         ];
     }
 

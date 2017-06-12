@@ -1305,6 +1305,7 @@ trait StudentScore {
             }
         }
         $studentByCourse = $studentByCourse->get();
+
         $listStudentIds  = collect($studentByCourse)->pluck('student_id')->toArray();
         $redoubleStudents = $this->redoubleByStudentIds($listStudentIds, $courseAnnual->academic_year_id);
 
