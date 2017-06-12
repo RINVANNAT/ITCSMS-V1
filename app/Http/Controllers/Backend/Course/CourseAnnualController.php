@@ -168,7 +168,6 @@ class CourseAnnualController extends Controller
     public function filteringStudentGroup(Request $request)
     {
 
-
         $groups = $this->groupStudentAnnual($request->semester_id);
         $department = Department::where('id', $request->department_id)->first();
 
@@ -1330,7 +1329,7 @@ class CourseAnnualController extends Controller
 
         $arrayData = [];
         $courseAnnual = CourseAnnual::where('id', $courseAnnualId)->first();
-
+        $department = Department::where('id', $courseAnnual->department_id)->first();
         $propArrayIds = $this->arrayIdsOfDeptGradeDegreeDeptOption($courseAnnual);
 
         $department_ids = $propArrayIds['department_id'];
@@ -1382,8 +1381,16 @@ class CourseAnnualController extends Controller
         if ($request_group != null) {
 
             $studentAnnualIds = DB::table('group_student_annuals')->whereIn('group_id', [$request_group])
-                ->where('semester_id', $courseAnnual->semester_id)
-                ->lists('student_annual_id');
+                ->where('semester_id', $courseAnnual->semester_id);
+
+            if($department->is_vocational) {
+                $studentAnnualIds = $studentAnnualIds->where('group_student_annuals.department_id', $department->id)->lists('student_annual_id');
+            } else {
+                $studentAnnualIds = $studentAnnualIds->lists('student_annual_id');
+            }
+
+            $studentByCourse = $studentByCourse->whereIn('studentAnnuals.id', $studentAnnualIds)
+                ->orderBy('students.name_latin');
 
             if ($courseAnnual->semester_id > 1) {
 
@@ -1403,8 +1410,13 @@ class CourseAnnualController extends Controller
             if (count($groups) > 0) {
 
                 $studentAnnualIds = DB::table('group_student_annuals')->whereIn('group_id', $groups)
-                    ->where('semester_id', $courseAnnual->semester_id)
-                    ->lists('student_annual_id');
+                    ->where('semester_id', $courseAnnual->semester_id);
+
+                if($department->is_vocational) {
+                    $studentAnnualIds = $studentAnnualIds->where('group_student_annuals.department_id', $department->id)->lists('student_annual_id');
+                } else {
+                    $studentAnnualIds = $studentAnnualIds->lists('student_annual_id');
+                }
 
                 $studentByCourse = $studentByCourse->whereIn('studentAnnuals.id', $studentAnnualIds)
                     ->orderBy('students.name_latin');
@@ -1423,6 +1435,8 @@ class CourseAnnualController extends Controller
                 }
 
             } else {
+
+
 
                 if($courseAnnual->semester_id >  1) {
 
@@ -2747,6 +2761,7 @@ class CourseAnnualController extends Controller
         $studentListScore = [];
         $colHeaders = explode(',', $request->col_headers);
         $courseAnnual = $this->courseAnnuals->findOrThrowException($request->course_annual_id);
+        $department = Department::where('id', $courseAnnual->department_id)->first();
         $allScoreByCourseAnnual = $this->studentScoreCourseAnnually($courseAnnual);
 
         $propArrayIds = $this->arrayIdsOfDeptGradeDegreeDeptOption($courseAnnual);
@@ -2768,13 +2783,42 @@ class CourseAnnualController extends Controller
 
         if ($group = $request->group_id) {
 
-            $studentAnnualIds = $studentAnnualIds = $this->getStudentAnnualByGroupIds([$request->group_id], $courseAnnual->semester_id);
-            $students = $students->whereIn('studentAnnuals.id', $studentAnnualIds)->get();
+            $studentAnnualIds = DB::table('group_student_annuals')
+                ->whereIn('group_id', [$group])
+                ->where('semester_id', $courseAnnual->semester_id);
 
+            if($department->is_vocational) {
+                $studentAnnualIds = $studentAnnualIds->where('group_student_annuals.department_id', '=', $courseAnnual->department_id)->lists('student_annual_id');
+            } else {
+                $studentAnnualIds = $studentAnnualIds->lists('student_annual_id');
+            }
+
+            $students = $students->whereIn('studentAnnuals.id', $studentAnnualIds);
+
+            if($courseAnnual->semester_id >  1) {
+
+                $students = $students
+                    ->where(function($query) {
+                        $query->where('students.radie','=',  false)
+                            ->orWhereNull('students.radie');
+                    })
+                    ->orderBy('students.name_latin')->get();
+
+            } else {
+                $students = $students->orderBy('students.name_latin')->get();
+            }
         } else {
             if ($groups) {
 
-                $studentAnnualIds = $this->getStudentAnnualByGroupIds($groups, $courseAnnual->semester_id);
+                $studentAnnualIds = DB::table('group_student_annuals')
+                    ->whereIn('group_id', $groups)
+                    ->where('semester_id', $courseAnnual->semester_id);
+
+                if($department->is_vocational) {
+                    $studentAnnualIds = $studentAnnualIds->where('group_student_annuals.department_id', '=', $courseAnnual->department_id)->lists('student_annual_id');
+                } else {
+                    $studentAnnualIds = $studentAnnualIds->lists('student_annual_id');
+                }
                 $students = $students->whereIn('studentAnnuals.id', $studentAnnualIds)->orderBy('students.name_latin');
 
                 if($courseAnnual->semester_id >  1) {
@@ -3262,6 +3306,7 @@ class CourseAnnualController extends Controller
                 ['course_session_id', null]
             ]);
 
+
         if (count($allGroups->get()) > 1) {
 
             $allGroups = $allGroups->join('groups', function ($groupQuery) {
@@ -3275,16 +3320,20 @@ class CourseAnnualController extends Controller
 
                 if ($group->group_id == null) {
 
-                    $allGroups = $this->groupStudentAnnual($courseAnnual->semester_id)->get();
 
-                    /* ->where([
-                                 ['department_id', $courseAnnual->department_id],
-                                 ['academic_year_id', $courseAnnual->academic_year_id],
-                                 ['grade_id', $courseAnnual->grade_id],
-                                 ['degree_id', $courseAnnual->degree_id],
-                             ])
-                     ->distinct('group_id')->groupBy('group_id')->lists('group_id')
-                     ->select('groups.code', 'groups.id')->get();*/
+                    $allGroups = DB::table('studentAnnuals')
+                        ->join('group_student_annuals', function ($query) use($courseAnnual) {
+                            $query->on('group_student_annuals.student_annual_id', '=', 'studentAnnuals.id')
+                                ->where('group_student_annuals.semester_id','=', $courseAnnual->semester_id)
+                                ->where('studentAnnuals.department_id', '=', $courseAnnual->department_id)
+                                ->where('studentAnnuals.department_option_id', '=', $courseAnnual->department_option_id);
+                        })
+                        ->join('groups', function ($query) {
+                            $query->on('group_student_annuals.group_id', '=', 'groups.id');
+                        })
+                        ->select('groups.id as id', 'groups.code as code', 'group_student_annuals.department_id as group_department_id')
+                        ->groupBy('groups.id', 'group_department_id')
+                        ->orderBy('code')->get();
 
                     break;
                 }

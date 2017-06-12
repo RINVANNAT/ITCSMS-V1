@@ -283,7 +283,7 @@ trait StudentScore {
         }
 
     }
-    public function findRecordRedouble($student, $redouble, $academicYearId = 2017) {
+    public function findRecordRedouble($student, $redouble, $academicYearId) {
 
         $redouble_name_history = '';
         $redouble_name_this_year = '';
@@ -1308,6 +1308,139 @@ trait StudentScore {
 
                         $input = [
                             'course_annual_id' => $courseAnnualId,
+                            'student_annual_id' => $studentScore->student_annual_id,
+                            'department_id' => $courseAnnual->department_id,
+                            'degree_id' => $courseAnnual->degree_id,
+                            'grade_id' => $courseAnnual->grade_id,
+                            'academic_year_id' => $courseAnnual->academic_year_id,
+                            'semester_id' => $courseAnnual->semester_id,
+                            'socre_absence' => null,
+                            'percentage_id' => [$savePercentageId->id]
+                        ];
+
+                        $saveScoreId = $this->courseAnnualScores->create($input);// return the socreId
+                        //$savePercentageScore = $this->courseAnnualScores->createPercentageScore($saveScoreId->id, $savePercentageId->id);
+                        if ($saveScoreId) {
+                            $check++;
+                        }
+
+                    }
+
+                }
+            }
+        }
+
+        if ($check == (count($studentByCourse) * count($percentageInput))) {
+            return true;
+        } else {
+            return false;
+        }
+
+    }
+
+
+
+    private function initScoreRecord($courseAnnual, $groupIds, $midterm, $final) {
+
+
+
+        $check = 0;
+        if ($midterm > 0) {
+            $percentageInput = [
+                [
+                    'name' => 'Midterm-' . $midterm . '%',
+                    'percent' => $midterm,
+                    'percentage_type' => 'normal'
+                ],
+                [
+                    'name' => 'Final-' . $final . '%',
+                    'percent' => $final,
+                    'percentage_type' => 'normal'
+                ]
+            ];
+        } else {
+
+            $percentageInput = [
+                [
+                    'name' => 'Final-' . $final . '%',
+                    'percent' => $final,
+                    'percentage_type' => 'normal'
+                ]
+            ];
+
+        }
+
+        $groups = $groupIds;
+        $department = Department::whereIn('id', [$courseAnnual->department_id])->first();
+
+        $studentByCourse = $this->getStudentByDeptIdGradeIdDegreeId([$courseAnnual->department_id], [$courseAnnual->degree_id], [$courseAnnual->grade_id], $courseAnnual->academic_year_id);
+
+        if ($courseAnnual->department_option_id) {
+            $studentByCourse = $studentByCourse->whereIn('studentAnnuals.department_option_id', $courseAnnual->department_option_id);
+        }
+        if ($groups) {
+
+            $studentAnnualIds = DB::table('group_student_annuals')->whereIn('group_id', $groups)
+                ->where('semester_id', $courseAnnual->semester_id);
+
+            /*--case to find student in another group of the Session Anglai and french ---*/
+
+            if($department->is_vocational) {
+                $studentAnnualIds = $studentAnnualIds->where('department_id', $department->id)->lists('student_annual_id');
+            } else {
+                $studentAnnualIds = $studentAnnualIds->lists('student_annual_id');
+            }
+
+            $studentByCourse = $studentByCourse->whereIn('studentAnnuals.id', $studentAnnualIds)
+                ->orderBy('students.name_latin');
+
+            if($courseAnnual->semester_id >  1) {
+
+                $studentByCourse = $studentByCourse
+                    ->where(function($query) {
+                        $query->where('students.radie','=',  false)
+                            ->orWhereNull('students.radie');
+                    })
+                    ->orderBy('students.name_latin');
+
+            } else {
+                $studentByCourse = $studentByCourse->orderBy('students.name_latin');
+
+            }
+        } else {
+
+            /*---here the session anglai and french must have student in group --otherwise it is a department of specialist ---*/
+            if(!$department->is_vocational) {
+                if($courseAnnual->semester_id >  1) {
+
+                    $studentByCourse = $studentByCourse
+                        ->where(function($query) {
+                            $query->where('students.radie','=',  false)
+                                ->orWhereNull('students.radie');
+                        })
+                        ->orderBy('students.name_latin');
+
+                } else {
+                    $studentByCourse = $studentByCourse->orderBy('students.name_latin');
+                }
+
+            }
+        }
+        $studentByCourse = $studentByCourse->get();
+
+        $listStudentIds  = collect($studentByCourse)->pluck('student_id')->toArray();
+        $redoubleStudents = $this->redoubleByStudentIds($listStudentIds, $courseAnnual->academic_year_id);
+
+        foreach ($percentageInput as $input) {
+
+            $savePercentageId = $this->percentages->create($input);// return the percentage id
+
+            if ($studentByCourse) {
+                foreach ($studentByCourse as $studentScore) {
+                    if(!isset($redoubleStudents[$studentScore->student_id])) {
+
+                        $input = [
+                            'course_annual_id' => $courseAnnual->id,
                             'student_annual_id' => $studentScore->student_annual_id,
                             'department_id' => $courseAnnual->department_id,
                             'degree_id' => $courseAnnual->degree_id,
