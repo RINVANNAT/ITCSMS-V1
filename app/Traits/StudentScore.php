@@ -2,6 +2,7 @@
 namespace App\Traits;
 
 use App\Models\CourseAnnual;
+use App\Models\Department;
 use App\Models\Student;
 use Illuminate\Support\Facades\DB;
 use App\Models\Redouble;
@@ -282,20 +283,19 @@ trait StudentScore {
         }
 
     }
-    public function findRecordRedouble($idCardPointToStudent) {
+    public function findRecordRedouble($student, $redouble) {
 
-        if($idCardPointToStudent->radie == true) {
+        if($student->radie == true) {
 
             return 'Radié';
         } else {
 
-
-            if($idCardPointToStudent->is_changed == true) {
-
-                return $idCardPointToStudent->redouble_name;
-            } else {
-
+            if($redouble) {
+                if($redouble->is_changed == true) {
+                    return $redouble->name_en;
+                }
             }
+
         }
     }
 
@@ -1212,14 +1212,25 @@ trait StudentScore {
         $grade_ids = $propArrayIds['grade_id'];
         $department_option_ids = $propArrayIds['department_option_id'];
         $groups = $propArrayIds['group'];
+        $department = Department::whereIn('id', $department_ids)->first();
 
         $studentByCourse = $this->getStudentByDeptIdGradeIdDegreeId($department_ids, $degree_ids, $grade_ids, $courseAnnual->academic_year_id);
+
 
         if (count($department_option_ids) > 0) {
             $studentByCourse = $studentByCourse->whereIn('studentAnnuals.department_option_id', $department_option_ids);
         }
         if ($groups) {
-            $studentAnnualIds = DB::table('group_student_annuals')->whereIn('group_id', $groups)->where('semester_id',$courseAnnual->semester_id )->lists('student_annual_id');
+
+            $studentAnnualIds = DB::table('group_student_annuals')
+                ->whereIn('group_id', $groups)
+                ->where('semester_id',$courseAnnual->semester_id );
+
+            if($department->is_vocational) {
+                $studentAnnualIds = $studentAnnualIds->where('department_id', $department->id)->lists('student_annual_id');
+            } else {
+                $studentAnnualIds = $studentAnnualIds->lists('student_annual_id');
+            }
             $studentByCourse = $studentByCourse->whereIn('studentAnnuals.id', $studentAnnualIds)->get();
         } else {
             $studentByCourse = $studentByCourse->where('students.radie', false)->get();

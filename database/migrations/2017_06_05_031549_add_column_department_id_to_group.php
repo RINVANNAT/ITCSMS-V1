@@ -12,6 +12,7 @@ class AddColumnDepartmentIdToGroup extends Migration
      */
     public function up()
     {
+
         Schema::table('group_student_annuals', function (Blueprint $table) {
             $table->integer('department_id')->unsigned()->index()->nullable();
         });

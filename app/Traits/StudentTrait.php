@@ -8,6 +8,7 @@
 
 namespace App\Traits;
 
+use App\Models\Department;
 use Illuminate\Support\Facades\DB;
 
 trait StudentTrait
@@ -15,13 +16,14 @@ trait StudentTrait
 
     public function getStudentByDeptIdGradeIdDegreeId($deptId, $degreeId, $gradeId, $academicYearID) {
 
+        $department = Department::where('id', $deptId)->first();
+
         $studentAnnual = DB::table('students')
             ->join('studentAnnuals', 'studentAnnuals.student_id', '=', 'students.id')
             //->join('redouble_student', 'students.id', '=', 'redouble_student.student_id')
             //->join('redoubles', 'redoubles.id', '=', 'redouble_student.redouble_id')
 
             ->join('genders', 'genders.id', '=', 'students.gender_id')
-            ->whereIn('studentAnnuals.department_id', $deptId)
             ->whereIn('studentAnnuals.degree_id', $degreeId)
             ->whereIn('studentAnnuals.grade_id', $gradeId)
             ->where('studentAnnuals.academic_year_id', $academicYearID)
@@ -36,13 +38,18 @@ trait StudentTrait
                 'studentAnnuals.academic_year_id',
                 'studentAnnuals.department_id',
                 'studentAnnuals.department_option_id',
-                'studentAnnuals.degree_id',
+                'studentAnnuals.degree_id','studentAnnuals.grade_id',
                 'students.observation',
                 'studentAnnuals.remark',
-                'studentAnnuals.general_remark'
+                'studentAnnuals.general_remark', 'studentAnnuals.history_id'
                 //'redoubles.name_en as redouble_name'
             )
             ->orderBy('students.name_latin');
+
+        if(!$department->is_vocational) {
+            $studentAnnual = $studentAnnual->whereIn('studentAnnuals.department_id', $deptId);
+        }
+
         return $studentAnnual;
     }
 
@@ -53,31 +60,114 @@ trait StudentTrait
      *
      * */
 
-    public function student_properties($student_id_cards, $student_annual_ids) {
+    public function student_properties($student_id_cards, $student_annual_ids, $academicYearId, $objectStudent) {
 
-        $students = DB::table('students')
-            ->leftJoin('studentAnnuals', 'studentAnnuals.student_id', '=', 'students.id')
-            ->leftJoin('redouble_student', 'students.id', '=', 'redouble_student.student_id')
+       /* $students = DB::table('students')
+            ->join('studentAnnuals', function ($query) use($student_id_cards, $student_annual_ids) {
+                $query->on('studentAnnuals.student_id', '=', 'students.id')
+                    ->whereIn('students.id_card', $student_id_cards)
+                    ->whereIn('studentAnnuals.id', $student_annual_ids);
+            })
+            ->select([
+                'students.*', 'studentAnnuals.history_id', 'studentAnnuals.id as student_annual_id', 'studentAnnuals.academic_year_id'
+            ])
+            ->get();*/
 
-            ->leftJoin('redoubles', 'redoubles.id', '=', 'redouble_student.redouble_id')
-            ->leftJoin('histories', 'histories.id', '=', 'studentAnnuals.history_id')
-            ->leftJoin('scholarship_student_annual', 'studentAnnuals.id', '=', 'scholarship_student_annual.student_annual_id')
-            ->leftJoin('scholarships', 'scholarships.id', '=', 'scholarship_student_annual.scholarship_id')
-            ->select(
-                'scholarships.name_en as scholarship_name',
-                'redoubles.name_en as redouble_name',
-                'histories.name_en as history_name',
-                'students.id_card', 'students.id as student_id', 'students.radie',
-                'studentAnnuals.id as student_annual_id',
-                'redouble_student.academic_year_id', 'redouble_student.is_changed'
-            )
-            ->whereIn('id_card', $student_id_cards)
-            ->whereIn('studentAnnuals.id', $student_annual_ids)
-            ->orderBy('studentAnnuals.id')
-            ->get();
+        $students = $objectStudent;
+
+        $studentCollection = collect($students);
+        $studentIds = $studentCollection->pluck('student_id')->toArray();
+
+        $idCardToAnnualIds = $studentCollection->map(function($item) {
+            return [  $item->id_card => $item->student_annual_id];
+        })->collapse()->toArray();
+
+        $idCardToStudentIds = $studentCollection->map(function($item) {
+            return [  $item->id_card => $item->student_id];
+        })->collapse()->toArray();
+
+        $idCardPointToStudent = $studentCollection->map(function($item) {
+            return [  $item->id_card => $item];
+        })->collapse()->toArray();
+
+        /*--history--*/
+
+        $historyIds = $studentCollection->pluck('history_id')->filter()->all();
+        $histories = collect( DB::table('histories')->whereIn('id', $historyIds)->get())->keyBy('id')->toArray();
+        $idCardToHistories = $studentCollection->filter(function($item, $key) {
+            if($item->history_id != null) {
+                return $item;
+            }
+        })->map(function($item)  use($histories){
+            return [$item->id_card => $histories[$item->history_id]];
+        })->collapse()->toArray();
+
+        /*--end history---*/
 
 
-        return $students;
+        /*--scholarship info----*/
+
+        $scholarships = DB::table('scholarships')
+            ->join('scholarship_student_annual', function($join) use($student_annual_ids){
+                $join->on('scholarship_student_annual.scholarship_id', '=', 'scholarships.id')
+                    ->whereIn('scholarship_student_annual.student_annual_id',$student_annual_ids);
+            })->get();
+        $idCardToAnnualIds = collect($idCardToAnnualIds)->flip()->toArray();
+
+        /*$array_scholarships = [];
+        foreach($scholarships as $scholarship) {
+
+            if(isset($idCardToAnnualIds[$scholarship->student_annual_id])) {
+                $array_scholarships[$idCardToAnnualIds[$scholarship->student_annual_id]][] =$scholarship ;
+            }
+        }*/
+
+        /*----end scholarship info---*/
+
+
+        $idCardToScholarships = collect($scholarships)->map(function($item) use($idCardToAnnualIds) {
+
+            if(isset($idCardToAnnualIds[$item->student_annual_id])) {
+
+                if($item->code != 'Boursier Partielle') {
+                    return [ $idCardToAnnualIds[$item->student_annual_id ] => $item];
+                }
+            }
+
+        })->collapse()->toArray();
+
+
+
+        /*--redouble info here---*/
+
+        $redoubles =  DB::table('redoubles')
+            ->join('redouble_student', function ($query) use($studentIds) {
+                $query->on('redouble_student.redouble_id', '=', 'redoubles.id')
+                    ->whereIn('redouble_student.student_id', $studentIds);
+
+            })->get();
+
+
+        $idCardToStudentIds = collect($idCardToStudentIds)->flip()->toArray();
+
+        $idCardToRedoubles = collect($redoubles)->map(function($item) use($idCardToStudentIds, $academicYearId) {
+            if(isset($idCardToStudentIds[$item->student_id])) {
+                if($item->academic_year_id != $academicYearId) {
+                    return [ $idCardToStudentIds[$item->student_id ] => $item];
+                }
+            }
+
+
+        })->collapse()->toArray();
+
+
+        return [
+            'scholarship' => $idCardToScholarships,
+            'id_card_to_student' => $idCardPointToStudent,
+            'history'            => $idCardToHistories,
+            'redouble' => $idCardToRedoubles
+
+        ];
     }
 
 
@@ -248,6 +338,7 @@ trait StudentTrait
         if(isset($element[$stu_dent->id_card])) {
             $array_student_id_card ['id_card'][] =$stu_dent->id_card;
             $array_student_id_card ['student_annual_id'][] =$stu_dent->student_annual_id;
+            $array_student_id_card['object_student'][] = $stu_dent;
             $element[$stu_dent->id_card] = $element[$stu_dent->id_card] + ["Abs_".($each_course->course_id)."_".$each_course->semester_id =>  isset($absence_by_course)?$absence_by_course->num_absence:"", "Credit_".($each_course->course_id)."_".$each_course->semester_id => $this->floatFormat($each_score)];
         } else {
 
