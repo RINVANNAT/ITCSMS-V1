@@ -283,17 +283,39 @@ trait StudentScore {
         }
 
     }
-    public function findRecordRedouble($student, $redouble) {
+    public function findRecordRedouble($student, $redouble, $academicYearId = 2017) {
+
+        $redouble_name_history = '';
+        $redouble_name_this_year = '';
 
         if($student->radie == true) {
 
-            return 'Radié';
+            return [
+                'current_redouble' =>'radié',
+                'history_redouble' => ''
+            ];
         } else {
 
             if($redouble) {
-                if($redouble->is_changed == true) {
-                    return $redouble->name_en;
+
+                foreach($redouble as $double) {
+
+                    if($double->academic_year_id != $academicYearId) {
+                        $redouble_name_history .= $double->name_en;
+                    }
+
+                    if($double->academic_year_id == $academicYearId) {
+                        if($double->is_changed == true) {
+                            $redouble_name_this_year .=$double->name_en;
+                        }
+                    }
                 }
+
+                return [
+                    'current_redouble' => $redouble_name_this_year,
+                    'history_redouble' => $redouble_name_history
+                ];
+
             }
 
         }
@@ -1214,6 +1236,8 @@ trait StudentScore {
         $groups = $propArrayIds['group'];
         $department = Department::whereIn('id', $department_ids)->first();
 
+
+
         $studentByCourse = $this->getStudentByDeptIdGradeIdDegreeId($department_ids, $degree_ids, $grade_ids, $courseAnnual->academic_year_id);
 
 
@@ -1222,19 +1246,57 @@ trait StudentScore {
         }
         if ($groups) {
 
-            $studentAnnualIds = DB::table('group_student_annuals')
-                ->whereIn('group_id', $groups)
-                ->where('semester_id',$courseAnnual->semester_id );
+            $studentAnnualIds = DB::table('group_student_annuals')->whereIn('group_id', $groups)
+                ->where('semester_id', $courseAnnual->semester_id);
+
+
+            /*--case to find student in another group of the Session Anglai and french ---*/
 
             if($department->is_vocational) {
                 $studentAnnualIds = $studentAnnualIds->where('department_id', $department->id)->lists('student_annual_id');
             } else {
                 $studentAnnualIds = $studentAnnualIds->lists('student_annual_id');
             }
-            $studentByCourse = $studentByCourse->whereIn('studentAnnuals.id', $studentAnnualIds)->get();
+
+            $studentByCourse = $studentByCourse->whereIn('studentAnnuals.id', $studentAnnualIds)
+                ->orderBy('students.name_latin');
+
+            if($courseAnnual->semester_id >  1) {
+
+                $studentByCourse = $studentByCourse
+                    ->where(function($query) {
+                        $query->where('students.radie','=',  false)
+                            ->orWhereNull('students.radie');
+                    })
+                    ->orderBy('students.name_latin');
+
+            } else {
+                $studentByCourse = $studentByCourse->orderBy('students.name_latin');
+
+            }
         } else {
-            $studentByCourse = $studentByCourse->where('students.radie', false)->get();
+
+            /*---here the session anglai and french must have student in group --otherwise it is a department of specialist ---*/
+            if(!$department->is_vocational) {
+                if($courseAnnual->semester_id >  1) {
+
+                    $studentByCourse = $studentByCourse
+                        ->where(function($query) {
+                            $query->where('students.radie','=',  false)
+                                ->orWhereNull('students.radie');
+                        })
+                        ->orderBy('students.name_latin');
+
+                } else {
+                    $studentByCourse = $studentByCourse->orderBy('students.name_latin');
+                }
+
+            }
         }
+        $studentByCourse = $studentByCourse->get();
+
+        $listStudentIds  = collect($studentByCourse)->pluck('student_id')->toArray();
+        $redoubleStudents = $this->redoubleByStudentIds($listStudentIds, $courseAnnual->academic_year_id);
 
         foreach ($percentageInput as $input) {
 
@@ -1242,23 +1304,28 @@ trait StudentScore {
 
             if ($studentByCourse) {
                 foreach ($studentByCourse as $studentScore) {
-                    $input = [
-                        'course_annual_id' => $courseAnnualId,
-                        'student_annual_id' => $studentScore->student_annual_id,
-                        'department_id' => $courseAnnual->department_id,
-                        'degree_id' => $courseAnnual->degree_id,
-                        'grade_id' => $courseAnnual->grade_id,
-                        'academic_year_id' => $courseAnnual->academic_year_id,
-                        'semester_id' => $courseAnnual->semester_id,
-                        'socre_absence' => null,
-                        'percentage_id' => [$savePercentageId->id]
-                    ];
+                    if(!isset($redoubleStudents[$studentScore->student_id])) {
 
-                    $saveScoreId = $this->courseAnnualScores->create($input);// return the socreId
-                    //$savePercentageScore = $this->courseAnnualScores->createPercentageScore($saveScoreId->id, $savePercentageId->id);
-                    if ($saveScoreId) {
-                        $check++;
+                        $input = [
+                            'course_annual_id' => $courseAnnualId,
+                            'student_annual_id' => $studentScore->student_annual_id,
+                            'department_id' => $courseAnnual->department_id,
+                            'degree_id' => $courseAnnual->degree_id,
+                            'grade_id' => $courseAnnual->grade_id,
+                            'academic_year_id' => $courseAnnual->academic_year_id,
+                            'semester_id' => $courseAnnual->semester_id,
+                            'socre_absence' => null,
+                            'percentage_id' => [$savePercentageId->id]
+                        ];
+
+                        $saveScoreId = $this->courseAnnualScores->create($input);// return the socreId
+                        //$savePercentageScore = $this->courseAnnualScores->createPercentageScore($saveScoreId->id, $savePercentageId->id);
+                        if ($saveScoreId) {
+                            $check++;
+                        }
+
                     }
+
                 }
             }
         }

@@ -811,7 +811,10 @@ return [
                 'department_option_id' => 'Option',
                 'group' => 'Group',
                 'credit' => "Credit",
-                'code' => "Code"
+                'code' => "Code",
+                'for_transcript' => "If you checked this option, It means the course you created will be count in calculating score and to include for student's transcript!",
+                '10_absece' => "Check this option, if the course require to count the score of student's absences!",
+                'allow_resit' => "When you allow student to take supplementary of this course. You must check this option for enabling the inputing score of this subject!"
             ]
         ],
 

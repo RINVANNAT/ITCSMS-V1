@@ -651,7 +651,10 @@
                     toggleLoading(false);
                     if (resultData.status == false) {
 
-                        swal({
+
+                        notify('error', '<h2> Hello</h2>');
+
+                        /*swal({
                             title: "Attention",
                             text: 'Please Check Incase Yours Department Option Is Not Select!!',
                             type: "warning",
@@ -661,8 +664,9 @@
                         }, function (confirmed) {
                             if (confirmed) {
                                 // do some staff if you want ---
+
                             }
-                        });
+                        });*/
 
                     } else {
 
@@ -856,29 +860,23 @@
                     success: function (resultData) {
                         toggleLoading(false);
                         if (resultData.status == false) {
-                            swal({
-                                title: "Attention",
-                                text: 'Please Check Incase Yours Department Option Is Not Select!!',
-                                type: "warning",
-                                confirmButtonColor: "red",
-                                confirmButtonText: "Close",
-                                closeOnConfirm: true
-                            }, function (confirmed) {
-                                if (confirmed) {
-                                    // do some staff if you want ---
-                                }
-                            });
+
+                            console.log(resultData);
+
+                            totalScoreNotification(resultData.type, resultData.message, 'No Course Score Record')
+                            updateSettingHandsontable(resultData);
                         } else {
+
+
+                            console.log(resultData)
                             updateSettingHandsontable(resultData);
                             assignNumberRattrapage();
                         }
-
                     }
                 });
             } else {
 
                 initTable();
-
             }
         }
 
@@ -889,7 +887,6 @@
             setting.nestedHeaders = resultData.nestedHeaders;
             setting.colWidths = resultData.colWidths;
             setting.array_fail_subject = resultData.array_fail_subject;
-//            hotInstance = new Handsontable(jQuery("#all_score_course_annual_table")[0], setting)
             hotInstance.updateSettings({
                 data: resultData['data'],
                 nestedHeaders: resultData['nestedHeaders'],

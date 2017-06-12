@@ -120,6 +120,34 @@ function notify(type, message, title){
     toastr[type](message, title);
 }
 
+function totalScoreNotification(type, message, title) {
+
+
+    toastr.options = {
+        "closeButton": true,
+        "debug": false,
+        "newestOnTop": false,
+        "progressBar": false,
+        "positionClass": "toast-bottom-right",
+        "preventDuplicates": false,
+        "onclick": null,
+        "showDuration": "300",
+        "hideDuration": "1000",
+        "timeOut": "5000",
+        "extendedTimeOut": "1000",
+        "showEasing": "swing",
+        "hideEasing": "linear",
+        "showMethod": "fadeIn",
+        "hideMethod": "fadeOut"
+    }
+
+    toastr[type](message+ '<br /><br /><button type="button" class="btn btn-xs clear">close</button>', title)
+}
+
+$(document).on('click','.clear', function (e) {
+    $('.toast').hide();
+})
+
 function PopupCenterDual(url, title, w, h) {
     // Fixes dual-screen position Most browsers Firefox
     var dualScreenLeft = window.screenLeft != undefined ? window.screenLeft : screen.left;
@@ -196,13 +224,19 @@ function enableDeleteRecord(datatable){
                     }
                 });
 
-                console.log('elete');
                 // confirm then
                 $.ajax({
                     url: url,
                     type: 'DELETE',
                     dataType: 'json',
                     data: {method: '_DELETE'},
+                    success:function(result) {
+                        if(result.status == true) {
+                            notify('success', result.message);
+                            datatable.DataTable().draw(false);
+
+                        }
+                    }
                 }).always(function (data) {
                     datatable.DataTable().draw(false);
                 });
