@@ -8,7 +8,10 @@
 
 namespace App\Traits;
 
+use App\Models\CourseAnnual;
+use App\Models\Department;
 use App\Models\Employee;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 
@@ -211,6 +214,40 @@ trait CourseAnnualTrait
             'course_annual' => $courseAnnual,
             'available_course' => $selectedCourses
         ];
+    }
+
+
+
+    public function cloneScore(Request $request)
+    {
+
+
+       /* if($request->group_id != null && $request->group_id != '') {
+
+        } else {
+
+        }*/
+        $courseAnnual = CourseAnnual::where('id', $request->course_annual_id)->first();
+        $courseAnnualClass = DB::table('course_annual_classes')
+            ->where(function($query) use($courseAnnual){
+                $query->where('course_annual_id', '=', $courseAnnual->id)
+                    ->whereNull('course_session_id');
+            })->get();
+
+
+        $studentByCourse = $this->getStudentByDeptIdGradeIdDegreeId([$courseAnnual->department_id], [$courseAnnual->degree_id], [$courseAnnual->grade_id], $courseAnnual->academic_year_id);
+
+
+
+        dd($studentByCourse->get());
+
+        dd($courseAnnualClass);
+        $resDepartment = Department::where('id', $courseAnnual->responsible_department_id)->first();
+
+        if($resDepartment->is_vocational) {
+
+        }
+
     }
 
 }

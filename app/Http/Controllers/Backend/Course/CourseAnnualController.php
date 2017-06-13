@@ -432,6 +432,7 @@ class CourseAnnualController extends Controller
     {
         $groups = [];
         $courseAnnual = $this->courseAnnuals->findOrThrowException($id);
+        $ownerCourseDeparment = Department::where('id', $courseAnnual->department_id)->first();
         $scores = $this->getPropertiesFromScoreTable($courseAnnual);
 
 
@@ -452,14 +453,33 @@ class CourseAnnualController extends Controller
             }
         }
 
-        $array_groups = $this->groupStudentAnnual($courseAnnual->semester_id)
-            ->where('studentAnnuals.department_id', '=', $courseAnnual->department_id)
-            ->where('studentAnnuals.academic_year_id', '=', $courseAnnual->academic_year_id)
-            ->where('studentAnnuals.degree_id', '=', $courseAnnual->degree_id)
-            ->where('studentAnnuals.grade_id', '=', $courseAnnual->grade_id)
-            ->where('studentAnnuals.department_option_id', '=', $courseAnnual->department_option_id)
-            ->orderBy('group_code')
-            ->get();
+
+        $array_groups = $this->groupStudentAnnual($courseAnnual->semester_id);
+
+
+        if($ownerCourseDeparment->is_vocational) {
+
+            $array_groups =  $array_groups
+                ->where('studentAnnuals.academic_year_id', '=', $courseAnnual->academic_year_id)
+                ->where('studentAnnuals.degree_id', '=', $courseAnnual->degree_id)
+                ->where('studentAnnuals.grade_id', '=', $courseAnnual->grade_id)
+                ->where('studentAnnuals.department_option_id', '=', $courseAnnual->department_option_id)
+                ->where('group_student_annuals.department_id', '=', $courseAnnual->department_id)
+                ->orderBy('group_code')
+                ->get();
+
+        } else {
+
+            $array_groups = $array_groups
+                ->where('studentAnnuals.department_id', '=', $courseAnnual->department_id)
+                ->where('studentAnnuals.academic_year_id', '=', $courseAnnual->academic_year_id)
+                ->where('studentAnnuals.degree_id', '=', $courseAnnual->degree_id)
+                ->where('studentAnnuals.grade_id', '=', $courseAnnual->grade_id)
+                ->where('studentAnnuals.department_option_id', '=', $courseAnnual->department_option_id)
+                ->whereNull('group_student_annuals.department_id')
+                ->orderBy('group_code')
+                ->get();
+        }
 
         usort($array_groups, function ($a, $b) {
             if(is_numeric($a->group_code)) {
@@ -551,6 +571,8 @@ class CourseAnnualController extends Controller
         $degrees = Degree::lists('name_kh', 'id')->toArray();
         $grades = Grade::lists('name_kh', 'id')->toArray();
         $semesters = Semester::lists("name_kh", "id");
+
+
 
         return view('backend.course.courseAnnual.edit', compact('courseAnnual', 'departments', 'academicYears', 'degrees', 'grades', 'courses', 'options', 'semesters', 'groups', 'midterm', 'final', 'other_departments'));
     }
@@ -1164,12 +1186,11 @@ class CourseAnnualController extends Controller
     public function getFormScoreByCourse(Request $request, $courseAnnualId)
     {
 
-//        $courseAnnual = CourseAnnual::find($courseAnnualId);
-
         $properties = $this->dataSendToView($courseAnnualId);
         $courseAnnual = $properties['course_annual'];
         $availableCourses = $properties['available_course'];
         $mode = null;
+        $allowCloningScore = false;
 
         if (access()->hasRole("Administrator")) {
             $mode = "edit";
@@ -1186,18 +1207,21 @@ class CourseAnnualController extends Controller
                 // This course is not belong to current user, and user don't have permission to view score
                 return view('backend.course.courseAnnual.includes.no_permission_to_score');
             }
-
-
         }
 
-        return view('backend.course.courseAnnual.includes.form_input_score_course_annual', compact('courseAnnualId', 'courseAnnual', 'availableCourses', 'mode'));
+        if($courseAnnual->responsible_department_id) {
+            $resDepartment = Department::where('id', $courseAnnual->responsible_department_id)->first();
+            if($resDepartment->is_vocational) {
+                $allowCloningScore = true;
+            }
+        }
+
+        return view('backend.course.courseAnnual.includes.form_input_score_course_annual', compact('courseAnnualId', 'courseAnnual', 'availableCourses', 'mode', 'allowCloningScore'));
 
     }
 
     public function getCourseAnnualScoreByAjax(Request $request)
     {
-
-        //-----this is a default columns and columnHeader
 
         return $this->handsonTableData($request->course_annual_id, $request_group = null);
     }
@@ -1347,14 +1371,35 @@ class CourseAnnualController extends Controller
 
         $columnHeader = $headers['colHeader'];
         $columns = $headers['column'];
+
+
+        if(!$courseAnnual->is_allow_scoring) {
+
+            /*---set readonly true foreach column of the score ---*/
+            $columns = collect($columns)->map(function($item, $key) {
+                $item['readOnly'] = true;
+                return $item;
+            })->toArray();
+        } else {
+
+            /*---check if the selected course is assiged for the responsible department ----*/
+            /*---we set readonly for each cell inputed score -----*/
+            if($courseAnnual->responsible_department_id) {
+                $resDepartment = Department::where('id', $courseAnnual->responsible_department_id)->first();
+                if($resDepartment->is_vocational) {
+
+                    $columns = collect($columns)->map(function($item, $key) {
+                        $item['readOnly'] = true;
+                        return $item;
+                    })->toArray();
+
+                }
+            }
+        }
+
         $colWidths = $headers['colWidth'];
-
         $studentByCourse = $this->getStudentByDeptIdGradeIdDegreeId($department_ids, $degree_ids, $grade_ids, $courseAnnual->academic_year_id);
-
-
         $allScoreByCourseAnnual = $this->studentAnnualScores($scoreProps, $courseAnnualId);
-
-
         if($allScoreByCourseAnnual == false) {
             return json_encode([
                 'status' => false,
@@ -1376,8 +1421,6 @@ class CourseAnnualController extends Controller
         }
 
         //----if has reqest selection groups in one course annual ----
-
-
         if ($request_group != null) {
 
             $studentAnnualIds = DB::table('group_student_annuals')->whereIn('group_id', [$request_group])
@@ -1465,18 +1508,21 @@ class CourseAnnualController extends Controller
         //----------------find student score if they have inserted
 
 
-
         if ($studentByCourse) {
 
             foreach ($studentByCourse as $student) {
 
                 if(!isset($redoubleStudentObjects[$student->student_id])) {
+
+
+
                     $totalScore = 0;
                     $checkPercent = 0;
                     $scoreIds = []; // there are many score type for one subject and one student :example TP, Midterm, Final-exam
                     $checkFraudAbsScore = 0;// to find if student has both absence and fraud in each score
 
                     $studentScore = isset($allScoreByCourseAnnual[$courseAnnual->id][$student->student_annual_id]) ? $allScoreByCourseAnnual[$courseAnnual->id][$student->student_annual_id] : [];
+
 
                     if ($courseAnnual->is_counted_absence) {
 
@@ -1508,6 +1554,7 @@ class CourseAnnualController extends Controller
                         $scoreData = [];
                     }
 
+
                     //----check if every student has the score equal or upper then 90 then we set status to true..then we will not allow teacher to add any score
 //                if($checkPercent >= 90 ) {
 //                    $checkScoreReachHundredPercent++;
@@ -1532,17 +1579,28 @@ class CourseAnnualController extends Controller
                     }
 
 
+
                     if(count($averageByCourseAnnual) > 0) {
 
                         $allStudentScores = $averageByCourseAnnual[$courseAnnualId];
 
                         if(isset($allStudentScores[$student->student_annual_id])) {
                             $storeTotalScore = $this->createOrUpdateTotalScoreCourseAnnual($input, $allStudentScores[$student->student_annual_id], $courseAnnual);
+                            /*if(!$storeTotalScore) {
+                                return Response::json(['status' => false, 'message' => 'You Dont have permission to view the score. Please ask administrator to allow the permission!']);
+                            }*/
                         } else {
                             $storeTotalScore = $this->createOrUpdateTotalScoreCourseAnnual($input, [], $courseAnnual);
+                            /*if(!$storeTotalScore) {
+                                return Response::json(['status' => false, 'message' => 'You Dont have permission to view the score. Please ask administrator to allow the permission!']);
+                            }*/
                         }
                     } else {
                         $storeTotalScore = $this->createOrUpdateTotalScoreCourseAnnual($input, [], $courseAnnual);
+
+                        /*if(!$storeTotalScore) {
+                            return Response::json(['status' => false, 'message' => 'You Dont have permission to view the score. Please ask administrator to allow the permission!']);
+                        }*/
                     }
 
                     /*------------end of insert of update total score -------------*/
@@ -1779,6 +1837,7 @@ class CourseAnnualController extends Controller
     public function createOrUpdateTotalScoreCourseAnnual($input, $averageByCourse, $courseAnnual)
     {
 
+
         if ($courseAnnual->is_allow_scoring || auth()->user()->allow("input-score-without-blocking")) {
 
             if ($averageByCourse) {
@@ -1800,7 +1859,9 @@ class CourseAnnualController extends Controller
 
         } else {
 
-            throw new GeneralException("Permission denied.");
+            return false;
+
+            //throw new GeneralException("Permission denied.");
         }
     }
 

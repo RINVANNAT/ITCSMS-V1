@@ -84,7 +84,12 @@
                 </select>
 
             </div>
-{{--            <label for="description" class="label label-success">{{$courseAnnual->academic_year->name_latin}} </label>--}}
+
+            @if($courseAnnual->is_allow_scoring)
+                @if($allowCloningScore)
+                    <button class="btn btn-success btn-xs pull-left" id="clone_score" data-toggle="tooltip" data-placement="top" title=" The action is to allow you to clone score of this course from responsible department!"  style="margin-left:5px"> Clone-Score </button>
+                @endif
+            @endif
             @if(access()->user()->allow("input-score-without-blocking") || ($courseAnnual->is_allow_scoring && $mode == "edit"))
             <button class="btn btn-primary btn-xs pull-right" id="save_editted_score" style="margin-left:5px">Save Changes!</button>
             @endif
@@ -142,8 +147,6 @@
     {{--myscript--}}
 
     <script>
-
-
 
         @if($courseAnnual->is_counted_absence)
                 var is_counted_absence = parseInt('{{\App\Models\Enum\ScoreEnum::is_counted_absence}}')
@@ -311,6 +314,7 @@
             className: "htLeft",
             cells: function (row, col, prop) {
 
+                var cellProperties = {};
                 if( ((prop != 'student_id_card')&& (prop != 'student_name')) && ((prop != 'student_gender')&& (prop != 'absence')) && (((prop != 'average')&& (prop != 'notation'))) ) {
                     this.renderer = colorRenderer;
                 }
@@ -321,6 +325,7 @@
                 if(prop == 'resit') {
                     this.renderer = colorRenderer;
                 }
+
             },
 
             beforeOnCellMouseDown: function (event,coord, TD) {
@@ -589,6 +594,7 @@
                 data: {course_annual_id: '{{$courseAnnualId}}' },
                 dataType: "json",
                 success: function(resultData) {
+
 
                     if(resultData.status) {
 
@@ -1110,6 +1116,32 @@
          @if(session('status'))
             notify('success', '{{session('status')}}', 'Info')
         @endif
+
+
+
+
+        $(document).on('click', '#clone_score', function(e) {
+
+            var baseData = {
+                course_annual_id : $('select#available_course :selected').val(),
+                group_id: $('select#group_name :selected').val()
+            }
+
+            $.ajax({
+                type: 'GET',
+                url: '{{route('course_annual.clone_score')}}',
+                data: baseData,
+                dataType: "JSON",
+                success: function(resultData) {
+                    console.log(resultData)
+                },
+                error:function(error) {
+
+                }
+            });
+
+
+        });
 
     </script>
 @stop

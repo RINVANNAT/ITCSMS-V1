@@ -97,6 +97,8 @@ Route::group([
 
     Route::get('/course-annual/is-allow-scoring', 'CourseAnnualController@isAllowScoring')->name('course_annual.is_allow_scoring');
 
+    Route::get('/course-annual/clone-score', 'CourseAnnualController@cloneScore')->name('course_annual.clone_score');
+
 
 
 

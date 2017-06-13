@@ -16,8 +16,8 @@ class FakeStudentLanguageGroup extends Seeder
         $students = \App\Models\StudentAnnual::where('academic_year_id',2017)
             ->join("students","students.id","=","studentAnnuals.student_id")
             ->where('degree_id',1)
-            ->where('grade_id',2)
-            ->where('department_id',8)
+            ->where('grade_id',3)
+            //->where('department_id',4)//gic
             ->select("studentAnnuals.*","students.dob")
             ->orderBy("students.dob","DESC")
             ->get();
@@ -25,7 +25,7 @@ class FakeStudentLanguageGroup extends Seeder
         $j=1;
         $group = \App\Models\Group::where('code',$j)->first();
         foreach($students as $student){
-            if($i>30){
+            if($i>25){
                 $j++;
                 $i=1;
                 $group = \App\Models\Group::where('code',$j)->first();
