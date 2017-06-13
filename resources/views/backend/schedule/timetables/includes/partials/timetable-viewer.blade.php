@@ -3,7 +3,7 @@
           id="options-filter"
           method="POST"
           action="{{ route('admin.schedule.timetables.filter') }}">
-        @include('backend.schedule.timetables.includes.partials.option')
+        @include('backend.schedule.timetables.includes.partials.option-index')
     </form> <br/>
 
     @if(isset($createTimetablePermissionConfiguration))
@@ -39,16 +39,9 @@
     @endif
 
     <table class="table table-striped table-bordered table-hover dt-responsive nowrap"
-           id="timetables-tables">
+           id="timetables-table">
         <thead>
         <tr>
-            {{--<th>{{ trans('labels.backend.schedule.timetable.table.academic_year') }}</th>
-            <th>{{ trans('labels.backend.schedule.timetable.table.department') }}</th>
-            <th>{{ trans('labels.backend.schedule.timetable.table.degree') }}</th>
-            <th>{{ trans('labels.backend.schedule.timetable.table.grade') }}</th>
-            <th>{{ trans('labels.backend.schedule.timetable.table.option') }}</th>
-            <th>{{ trans('labels.backend.schedule.timetable.table.semester') }}</th>--}}
-            {{--<th>{{ trans('labels.backend.schedule.timetable.table.group') }}</th>--}}
             <th>{{ trans('labels.backend.schedule.timetable.table.week') }}</th>
             <th>{{ trans('labels.backend.schedule.timetable.table.status') }}</th>
             @if(access()->allow('view-timetable') || access()->allow('delete-timetable'))

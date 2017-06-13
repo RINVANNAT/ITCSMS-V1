@@ -100,8 +100,13 @@ class TimetableController extends Controller
      */
     public function get_timetables()
     {
-        // dd(request()->all());
-        $employee = Employee::where('user_id', auth()->user()->id)->first();
+        $academic_year_id = request('academicYear');
+        $department_id = request('department');
+        $degree_id = request('degree');
+        $grade_id = request('grade');
+        $option_id = request('option');
+        $semester_id = request('semester');
+        $group_id = request('group');
 
         $timetables = Timetable::join('weeks', 'weeks.id', '=', 'timetables.week_id')
             ->join('academicYears', 'academicYears.id', '=', 'timetables.academic_year_id')
@@ -111,23 +116,30 @@ class TimetableController extends Controller
             ->leftJoin('departmentOptions', 'departmentOptions.id', '=', 'timetables.option_id')
             ->join('semesters', 'semesters.id', '=', 'timetables.semester_id')
             ->leftJoin('groups', 'groups.id', '=', 'timetables.group_id')
-            ->orderBy('timetables.created_at', 'desc')
+            ->where([
+                ['academicYears.id', $academic_year_id],
+                ['departments.id', $department_id],
+                ['degrees.id', $degree_id],
+                ['grades.id', $grade_id],
+                ['semesters.id', $semester_id]
+            ]);
+
+        if ($option_id !== 'Option' && $option_id != null) {
+            $timetables->where('departmentOptions.id', $option_id);
+        }
+        if ($group_id !== 'Group' && $group_id != null) {
+            $timetables->where('groups.id', $group_id);
+        }
+        $timetables->orderBy('weeks.id', 'asc')
             ->select([
-                /* 'academicYears.name_latin as academic_year',
-                 'departments.code as department',
-                 'degrees.name_en as degree',
-                 'grades.code as grade',
-                 'departmentOptions.name_en as option',
-                 'semesters.name_en as semester',*/
-                /*'groups.code as group',*/
-                'weeks.name_en as weekly',
+                'weeks.name_en as week',
                 'timetables.completed as status',
                 'timetables.id as id'
             ]);
 
         return Datatables::of($timetables)
             ->addColumn('action', function ($timetable) {
-                $export = ' <button id="export-timetable"  href="'.route('timetables.export', $timetable->id).'" class="btn btn-xs btn-primary">'
+                $export = ' <button id="export-timetable"  href="' . route('timetables.export', $timetable->id) . '" class="btn btn-xs btn-primary">'
                     . '<i class="fa fa-download" data-toggle="tooltip"'
                     . 'data-placement="top" title="Export"'
                     . 'data-original-title="Export">'
