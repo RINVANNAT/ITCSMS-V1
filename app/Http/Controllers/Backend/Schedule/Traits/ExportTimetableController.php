@@ -149,9 +149,21 @@ trait ExportTimetableController
             $degree = $findTimetable->degree->code;
             $grade = $findTimetable->grade->code;
             $display_group = $group == null ? '' : '(' . Group::find($group)->code . ')';
+            $semester = $findTimetable->semester->id == 1 ? 'I' : 'II';
             $week = Week::find($week);
             $timetableSlots = $findTimetable->timetableSlots;
+
+            // insert logo
+            $logo = new \PHPExcel_Worksheet_Drawing();
+            $logo->setPath(public_path('img/timetable/logo-print.jpg'));
+            $logo->setWidth(80);
+            $logo->setHeight(60);
+            $logo->setOffsetX(25);
+            $logo->setCoordinates('A1');
+            $logo->setWorksheet($sheet);
+
             $sheet->setOrientation('landscape');
+            $sheet->setFontFamily('Arial Narrow');
 
             $sheet->mergeCells('C1:I1');
             $sheet->mergeCells('C2:I2');
@@ -159,14 +171,14 @@ trait ExportTimetableController
             $sheet->cells('C1:I2', function ($cells) {
                 $cells->setAlignment('center');
                 $cells->setValignment('center');
-                $cells->setFontSize(14);
+                $cells->setFontSize(12);
                 $cells->setFontWeight('bold');
 
             });
 
             // header sheet
-            $sheet->row(1, array('', '', 'EMPLOI DU TEMPS ' . $academicYear, '', '', '', '', '', '', 'Semester I', '', '', ''));
-            $sheet->row(2, array('', '', 'Groupe: ' . $department . '-' . $degree . $grade . ($group == null ? '' : $display_group), '', '', '', '', '', '', 'Week ' . $week->id, '', '', ''));
+            $sheet->row(1, array('', '', 'EMPLOI DU TEMPS ' . $academicYear, '', '', '', '', '', '', 'Semestre - '.$semester, '', '', ''));
+            $sheet->row(2, array('', '', 'Groupe: ' . $department . '-' . $degree . $grade . ($group == null ? '' : $display_group), '', '', '', '', '', '', 'Semaines ' . $week->id, '', '', ''));
 
             // header table
             $sheet->row(5, array('Horaire', 'Lundi', '', 'Mardi', '', 'Mercredi', '', 'Jeudi', '', 'Vendredi', '', 'Samedi', ''));
@@ -176,17 +188,17 @@ trait ExportTimetableController
             $sheet->setWidth(array(
                 'A' => 20,
                 'B' => 15,
-                'C' => 15,
+                'C' => 18,
                 'D' => 15,
-                'E' => 15,
+                'E' => 18,
                 'F' => 15,
-                'G' => 15,
+                'G' => 18,
                 'H' => 15,
-                'I' => 15,
+                'I' => 18,
                 'J' => 15,
-                'K' => 15,
+                'K' => 18,
                 'L' => 15,
-                'M' => 15
+                'M' => 18
             ));
 
             // semester header
@@ -212,31 +224,31 @@ trait ExportTimetableController
                 $cells->setValignment('center');
             });
 
-            $sheet->row(6, array('07h00 - 08h00'));
+            $sheet->row(6, array('7h00-7h55'));
             $sheet->mergeCells('A6:A9');
 
-            $sheet->row(10, array('08h00 - 09h00'));
+            $sheet->row(10, array('8h00-8h55'));
             $sheet->mergeCells('A10:A13');
 
-            $sheet->row(14, array('09h00 - 10h00'));
+            $sheet->row(14, array('9h10-10h05'));
             $sheet->mergeCells('A14:A17');
 
-            $sheet->row(18, array('10h00 - 11h00'));
+            $sheet->row(18, array('10h10-11h05'));
             $sheet->mergeCells('A18:A21');
 
-            // 11h - 1h
+            // 11h-1h
             $sheet->mergeCells('A22:M22');
 
-            $sheet->row(23, array('13h00 - 14h00'));
+            $sheet->row(23, array('13h00-13h55'));
             $sheet->mergeCells('A23:A26');
 
-            $sheet->row(27, array('14h00 - 15h00'));
+            $sheet->row(27, array('14h00-14h55'));
             $sheet->mergeCells('A27:A30');
 
-            $sheet->row(31, array('15h00 - 16h00'));
+            $sheet->row(31, array('15h10-16h05'));
             $sheet->mergeCells('A31:A34');
 
-            $sheet->row(35, array('16h00 - 17h00'));
+            $sheet->row(35, array('16h10-17h05'));
             $sheet->mergeCells('A35:A38');
 
 
@@ -257,7 +269,7 @@ trait ExportTimetableController
                 if ($timesRow == 4) {
                     $sheet->row(22, function ($row) {
                         // call cell manipulation methods
-                        $row->setBackground('#f39c12');
+                        $row->setBackground('#f1f1f1');
                     });
                     $countRows = 23;
                     continue;
@@ -323,15 +335,15 @@ trait ExportTimetableController
                 $countRows += 4;
             }
 
-            /*// border bottom cells
+            // border bottom cells
             // Set all borders (top, right, bottom, left)
             $sheet->cells('A38:M38', function ($cells) {
-                $cells->setBorder('none', 'none', 'thin', 'none');
+                $cells->setFontSize(10);
             });
 
             $sheet->cells('M6:M38', function ($cells) {
-                $cells->setBorder('none', 'thin', 'thin', 'none');
-            });*/
+                $cells->setFontSize(10);
+            });
         });
     }
 
@@ -392,9 +404,10 @@ trait ExportTimetableController
             if ($timetableSlot->room !== null) {
                 $cell->setValue(($timetableSlot->room !== null ? $timetableSlot->room->building->code . '-' . $timetableSlot->room->name : 'NULL'));
             } else {
-                $cell->setBackground('#dd4b39');
-                $cell->setFontColor('#ffffff');
+                /*$cell->setBackground('#dd4b39');*/
+                $cell->setFontColor('#dd4b39');
                 $cell->setValue('NO ROOM');
+
             }
             $cell->setAlignment('right');
             // Set all borders (top, right, bottom, left)
