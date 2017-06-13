@@ -201,6 +201,7 @@ trait AjaxCRUDTimetableController
      */
     public function get_groups()
     {
+        dd(request()->all());
         $academic_year_id = request('academicYear');
         $department_id = request('department');
         $degree_id = request('degree');
