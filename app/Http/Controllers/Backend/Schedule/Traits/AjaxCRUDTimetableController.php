@@ -207,31 +207,51 @@ trait AjaxCRUDTimetableController
         $grade_id = request('grade');
         $option_id = request('option') == null ? null : request('option');
 
-        // get group by search on slot tables.
-        $groups = DB::table('course_annuals')
+        $courseAnnualsIds = DB::table('course_annuals')
             ->where([
                 ['academic_year_id', $academic_year_id],
                 ['department_id', $department_id],
                 ['degree_id', $degree_id],
                 ['grade_id', $grade_id],
                 ['department_option_id', $option_id]
-            ])
-            ->join('slots', 'slots.course_annual_id', '=', 'course_annuals.id')
-            ->join('groups', 'groups.id', '=', 'slots.group_id')
-            ->distinct('groups.code')
-            ->select('groups.code as name', 'groups.id as id')
-            ->get();
+            ])->lists('id');
 
-        usort($groups, function ($a, $b) {
-            if (is_numeric($a->name)) {
-                return $a->name - $b->name;
-            } else {
-                return strcmp($a->name, $b->name);
+        if(count($courseAnnualsIds)>0){
+            $groups = DB::table('slots')
+                ->join('groups', function ($query) use ($courseAnnualsIds){
+                    $query->on('groups.id', '=', 'slots.group_id')
+                        ->whereIn('slots.course_annual_id', $courseAnnualsIds);
+                })
+                ->distinct('groups.code')
+                ->select('groups.code as name', 'groups.id as id')
+                ->get();
+
+            // get group by search on slot tables.
+            /*$groups = DB::table('course_annuals')
+                ->where([
+                    ['academic_year_id', $academic_year_id],
+                    ['department_id', $department_id],
+                    ['degree_id', $degree_id],
+                    ['grade_id', $grade_id],
+                    ['department_option_id', $option_id]
+                ])
+                ->join('slots', 'slots.course_annual_id', '=', 'course_annuals.id')
+                ->join('groups', 'groups.id', '=', 'slots.group_id')
+                ->distinct('groups.code')
+                ->select('groups.code as name', 'groups.id as id')
+                ->get();*/
+
+            usort($groups, function ($a, $b) {
+                if (is_numeric($a->name)) {
+                    return $a->name - $b->name;
+                } else {
+                    return strcmp($a->name, $b->name);
+                }
+            });
+
+            if (count($groups) > 1) {
+                return Response::json(['status' => true, 'groups' => $groups]);
             }
-        });
-
-        if (count($groups) > 1) {
-            return Response::json(['status' => true, 'groups' => $groups]);
         }
         return Response::json(['status' => false]);
     }
