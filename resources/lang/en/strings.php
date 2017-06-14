@@ -62,6 +62,11 @@ return [
                 'tasks' => '{0} You don\'t have tasks|{1} You have 1 task|[2,Inf] You have :number tasks',
             ],
         ],
+
+        'course_annual' => [
+            'no_student_record' => ' This course is not yet created for any students please check your course again if something go wrong!',
+            'wrong_option' => 'Please Choose the correct departemnt -> option-> degree -> grade ! Then click the button refresh!'
+        ]
     ],
 
     'emails' => [

@@ -288,8 +288,8 @@ class EloquentTimetableSlotRepository implements TimetableSlotRepositoryContract
     {
         if (isset($request->start) || isset($request->end)) {
             $newMergeTimetableSlot = new MergeTimetableSlot();
-            $newMergeTimetableSlot->start = (new Carbon($request->start));
-            $newMergeTimetableSlot->end = (new Carbon($request->end == null ? $request->start : $request->end));
+            $newMergeTimetableSlot->start = (new Carbon($request->start))->setTimezone('Asia/Phnom_Penh');
+            $newMergeTimetableSlot->end = (new Carbon($request->end == null ? $request->start : $request->end))->setTimezone('Asia/Phnom_Penh');
             if ($newMergeTimetableSlot->save()) {
                 return $newMergeTimetableSlot;
             }

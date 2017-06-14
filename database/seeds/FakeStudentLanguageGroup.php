@@ -1,13 +1,14 @@
 <?php
 
 use Illuminate\Database\Seeder;
+use Illuminate\Support\Facades\DB;
 
 class FakeStudentLanguageGroup extends Seeder
 {
     /**
      * This is just to fake student group for SA/SF department. It is for testing only
      * Run the database seeds.
-     *
+     * php artisan db:seed --class=FakeStudentLanguageGroup
      * @return void
      */
     public function run()
@@ -15,7 +16,7 @@ class FakeStudentLanguageGroup extends Seeder
         $students = \App\Models\StudentAnnual::where('academic_year_id',2017)
             ->join("students","students.id","=","studentAnnuals.student_id")
             ->where('degree_id',1)
-            ->where('grade_id',1)
+            ->where('grade_id',2)
             ->where('department_id',8)
             ->select("studentAnnuals.*","students.dob")
             ->orderBy("students.dob","DESC")
@@ -41,5 +42,6 @@ class FakeStudentLanguageGroup extends Seeder
             );
             $i++;
         }
+
     }
 }

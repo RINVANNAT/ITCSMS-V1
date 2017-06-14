@@ -11,12 +11,7 @@
 
 @section('after-styles-end')
     {!! Html::style('plugins/select2/select2.min.css') !!}
-    <style>
-        .boolean_input{
-            width: 20px;
-            height: 20px;
-        }
-    </style>
+
 
 @stop
 

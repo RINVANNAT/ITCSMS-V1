@@ -335,6 +335,9 @@
         /** move timetable slot */
         function move_timetable_slot(event, start_date) {
             toggleLoading(true);
+            $('#timetable').fullCalendar({
+                eventDurationEditable: false
+            });
             $.ajax({
                 type: 'POST',
                 url: '{!! route('move_timetable_slot') !!}',
@@ -392,11 +395,14 @@
                 complete: function () {
                     get_timetable_slots();
                     get_course_sessions();
+                    $('#timetable').fullCalendar({
+                        eventDurationEditable: true
+                    });
                 }
             })
         }
 
-        var remove_timetable_sltos = function (event) {
+        var remove_timetable_slots = function (event) {
             toggleLoading(true);
             $.ajax({
                 type: 'POST',
@@ -404,6 +410,7 @@
                 data: {timetable_slot_id: event.id},
                 success: function (response) {
                     if (response.status === true) {
+                        $('#timetable').fullCalendar('removeEvent', event.id);
                         notify('info', 'Timetable slot remove from timetable.', 'Remove Timetable Slot');
                     }
                 },
@@ -416,7 +423,6 @@
 
                 },
                 complete: function () {
-                    get_timetable_slots();
                     get_course_sessions();
                     toggleLoading(false);
                 }
@@ -448,10 +454,12 @@
                 maxTime: '20:00:00',
                 slotLabelFormat: 'h:mm a',
                 columnFormat: 'dddd',
+                timezone: 'Asia/Phnom_Penh',
                 @if(access()->allow('edit-timetable')) editable: true, @endif
                 droppable: true,
                 dragRevertDuration: 0,
                 drop: function (date) {
+
                     var originalEventObject = $(this).data('event');
                     var copiedEventObject = $.extend({}, originalEventObject);
 
@@ -556,7 +564,7 @@
                 },
                 eventDragStop: function (event, jsEvent, ui, view) {
                     if (isEventOverDiv(jsEvent.clientX, jsEvent.clientY)) {
-                        remove_timetable_sltos(event);
+                        remove_timetable_slots(event);
                         $('#timetable').fullCalendar('removeEvent', event.id);
                     }
                 }

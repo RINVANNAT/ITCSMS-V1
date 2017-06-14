@@ -496,15 +496,15 @@ trait CourseSessionTrait
 
 
         $groups = DB::table('studentAnnuals')
-            ->join('group_student_annuals', function ($query) {
-                $query->on('group_student_annuals.student_annual_id', '=', 'studentAnnuals.id');
+            ->join('group_student_annuals', function ($query) use($semesterId) {
+                $query->on('group_student_annuals.student_annual_id', '=', 'studentAnnuals.id')
+                    ->where('group_student_annuals.semester_id','=', $semesterId);
             })
-            ->where('group_student_annuals.semester_id', $semesterId)
             ->join('groups', function ($query) {
                 $query->on('group_student_annuals.group_id', '=', 'groups.id');
             })
-            ->select('groups.id as group_id', 'groups.code as group_code')
-            ->groupBy('groups.id')
+            ->select('groups.id as group_id', 'groups.code as group_code', 'group_student_annuals.department_id as group_department_id')
+            ->groupBy('groups.id', 'group_department_id')
             ->orderBy('group_code');
 
         return $groups;
