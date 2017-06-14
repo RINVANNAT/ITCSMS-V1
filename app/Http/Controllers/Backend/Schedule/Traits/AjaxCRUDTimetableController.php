@@ -221,16 +221,6 @@ trait AjaxCRUDTimetableController
             ->select('groups.code as name', 'groups.id as id')
             ->get();
 
-        $groups = DB::table('course_annuals')
-            ->where([
-                ['academic_year_id', $academic_year_id],
-                ['department_id', $department_id],
-                ['degree_id', $degree_id],
-                ['grade_id', $grade_id],
-                ['department_option_id', $option_id]
-            ])->lists('id');
-
-
         usort($groups, function ($a, $b) {
             if (is_numeric($a->name)) {
                 return $a->name - $b->name;
