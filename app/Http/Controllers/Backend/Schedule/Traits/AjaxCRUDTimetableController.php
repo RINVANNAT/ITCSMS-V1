@@ -207,30 +207,6 @@ trait AjaxCRUDTimetableController
         $grade_id = request('grade');
         $option_id = request('option') == null ? null : request('option');
 
-        // get groups by search on student_annuals table.
-        /*$groups = DB::table('studentAnnuals')
-            ->where([
-                ['academic_year_id', $academic_year_id],
-                ['department_id', $department_id],
-                ['degree_id', $degree_id],
-                ['grade_id', $grade_id],
-                ['department_option_id', $option_id]
-            ])
-            ->join('groups', 'groups.id', '=', 'studentAnnuals.group_id')
-            ->orderBy('groups.code', 'desc')
-            ->select('studentAnnuals.group_id as id', 'groups.code as name')
-            ->distinct('studentAnnuals.group_id')
-            ->get();
-
-        // sort groups name.
-        usort($groups, function ($a, $b) {
-            if (is_numeric($a->name)) {
-                return $a->name - $b->name;
-            } else {
-                return strcmp($a->name, $b->name);
-            }
-        });*/
-
         // get group by search on slot tables.
         $groups = DB::table('course_annuals')
             ->where([

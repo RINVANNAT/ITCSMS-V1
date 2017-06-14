@@ -489,6 +489,7 @@
                     get_course_sessions();
                 },
                 eventRender: function (event, element, view) {
+                    toggleLoading(true);
                     var object = '<a class="fc-time-grid-event fc-v-event fc-event fc-start fc-end course-item  fc-draggable fc-resizable" style="top: 65px; bottom: -153px; z-index: 1; left: 0%; right: 0%;">' +
                         '<div class="fc-content">' +
                         '<div class="container-room">' +
@@ -551,6 +552,7 @@
                         '<div class="fc-bgd"></div>' +
                         '<div class="fc-resizer fc-end-resizer"></div>' +
                         '</a>';
+                    toggleLoading(false);
                     return $(object);
                 },
                 eventOverlap: function (stillEvent, movingEvent) {
