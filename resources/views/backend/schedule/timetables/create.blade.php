@@ -454,15 +454,15 @@
                 dragRevertDuration: 0,
                 drop: function (date) {
                     var originalEventObject = $(this).data('event');
-
                     var copiedEventObject = $.extend({}, originalEventObject);
 
-                    var tempDate = new Date(Date.UTC(date._d.getFullYear(), date._d.getMonth(), date._d.getDay(), date._d.getHours(), date._d.getMinutes(), date._d.getSeconds()));
+                    var datetime = moment(date, 'YYYY-MM-DD HH:mm:ss');
+                    var start = datetime.format('YYYY-MM-DD HH:mm:ss');
+                    var end = datetime.hour(parseInt(datetime.hour())+2).format('YYYY-MM-DD HH:mm:ss');
+
                     copiedEventObject.id = Math.floor(Math.random() * 1800) + 1;
-                    copiedEventObject.start = tempDate;
-                    copiedEventObject.start.setHours(copiedEventObject.start.getHours() - 7);
-                    copiedEventObject.end = new Date(copiedEventObject.start);
-                    copiedEventObject.end.setHours(copiedEventObject.start.getHours() + 1);
+                    copiedEventObject.start = start;
+                    copiedEventObject.end = end;
                     copiedEventObject.allDay = true;
 
                     create_timetable_slots(copiedEventObject);
