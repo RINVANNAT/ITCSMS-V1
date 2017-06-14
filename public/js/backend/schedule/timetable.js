@@ -176,7 +176,7 @@ function get_course_sessions() {
                 'error'
             );
         },
-        complete:function () {
+        complete: function () {
             toggleLoading(false);
         }
     });

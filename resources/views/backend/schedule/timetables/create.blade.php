@@ -360,7 +360,6 @@
                 },
                 complete: function () {
                     toggleLoading(false);
-                    get_timetable_slots();
                 }
             })
         }
