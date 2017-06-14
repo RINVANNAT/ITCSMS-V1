@@ -738,48 +738,26 @@ class CourseAnnualController extends Controller
      */
     public function destroy(DeleteCourseAnnualRequest $request, $id)
     {
-        $scoreByCourseAnnualId = DB::table('scores')->where('course_annual_id', $id)->get();
+        $scoreByCourseAnnualId = DB::table('scores')->where('course_annual_id', $id);
 
-        if (count($scoreByCourseAnnualId) > 0 ) {
-            $check = 0;
+        if (count($scoreByCourseAnnualId->get()) > 0 ) {
 
-
-            foreach($scoreByCourseAnnualId as $score) {
-                $deleletScore = DB::table('scores')->where('id', $score->id)->delete();
-                if($deleletScore) {
-                    $check++;
-                }
+            $percentageIds = DB::table('percentage_scores')
+                ->whereIn('percentage_scores.score_id', $scoreByCourseAnnualId->lists('id'))
+                ->distinct('percentage_id')->lists('percentage_id');
+            $percentages = DB::table('percentages')->whereIn('id', $percentageIds);
+            if($percentages->get()) {
+                $percentages->delete();
             }
-            if($check == count($scoreByCourseAnnualId) ) {
-
-                $percentageIds = DB::table('percentage_scores')
-                    ->whereIn('percentage_scores.score_id', $scoreByCourseAnnualId->lists('id'))
-                    ->distinct('percentage_id')->lists('percentage_id');
-
-                $percentages = DB::table('percentages')->whereIn('id', $percentageIds);
-
-                if($percentages->get()) {
-
-                    $percentages->delete();
-                    $deleteCourse =  $this->courseAnnuals->destroy($id);
-
-                } else {
-                    $deleteCourse = $this->courseAnnuals->destroy($id);
-                }
-
-            } else {
-                return Response::json(['status' => false, 'message' => 'Deleted Error!']);
-            }
-
-        } else {
-            $deleteCourse = $this->courseAnnuals->destroy($id);
-        }
-
-        if($deleteCourse) {
+            $scoreByCourseAnnualId->delete();
+            $this->courseAnnuals->destroy($id);
             return Response::json(['status' => true, 'message' => 'Deleted!']);
+
         } else {
-            return Response::json(['status' => false, 'message' => 'Deleted Error!']);
+            $this->courseAnnuals->destroy($id);
+            return Response::json(['status' => true, 'message' => 'Deleted!']);
         }
+        return Response::json(['status' => false, 'message' => 'Deleted Error!']);
 
 
 
@@ -1440,7 +1418,9 @@ class CourseAnnualController extends Controller
 
         if ($studentByCourse) {
 
+
             foreach ($studentByCourse as $student) {
+                $scoreData = [];
 
                 if(!isset($redoubleStudentObjects[$student->student_id])) {
                     $totalScore = 0;
@@ -1479,6 +1459,7 @@ class CourseAnnualController extends Controller
                     } else {
                         $scoreData = [];
                     }
+
 
                     //----check if every student has the score equal or upper then 90 then we set status to true..then we will not allow teacher to add any score
 //                if($checkPercent >= 90 ) {
@@ -1601,22 +1582,83 @@ class CourseAnnualController extends Controller
 
         $checkUpdate = 0;
         $checkNotUpdated = 0;
-
         if ($inputs) {
 
-            foreach ($inputs as $input) {
-                if ($input['score_id'] != null) {
-                    $updateScore = $this->courseAnnualScores->update($input['score_id'], $input);
+            $scores = DB::table('scores')->where('course_annual_id', $inputs[0]['course_annual_id'])->lists('scores.id');
+            $courseAnnual = CourseAnnual::where('id', $inputs[0]['course_annual_id'])->first();
+            $percentages = DB::table('percentages')
+                ->join('percentage_scores', function($query) use ($scores) {
+                    $query->on('percentage_scores.percentage_id', '=', 'percentages.id')
+                        ->whereIn('percentage_scores.score_id', $scores);
+                })->select('percentages.*')->groupBy('percentages.id')->get();
 
-                    if ($updateScore) {
-                        $checkUpdate++;
+            foreach ($inputs as $input) {
+
+                if(isset($input['score_id'])) {
+
+                    if ($input['score_id'] != null) {
+                        $updateScore = $this->courseAnnualScores->update($input['score_id'], $input);
+
+                        if ($updateScore) {
+                            $checkUpdate++;
+                        }
+
+                    } else {
+                        $checkNotUpdated++;
+                    }
+                } else {
+
+                    /*---create new record score---*/
+                    /*---check if student have score ----*/
+
+                    $studentScore = DB::table('scores')->where([
+                        ['course_annual_id', $input['course_annual_id']],
+                        ['student_annual_id' , $input['student_annual_id']]
+                    ])->get();
+
+
+                    if(count($studentScore) <= 2) {
+                        $explode = explode('-',$request->percentage);
+                        $percent = trim($explode[1], '%');
+
+                        foreach($percentages as $percentage) {
+                            if($percentage->percent == (int)$percent) {
+                                $percentId = $percentage->id;
+                            }
+                        }
+
+                        $inputScore = [
+
+                            'course_annual_id' => $input['course_annual_id'],
+                            'student_annual_id' => $input['student_annual_id'],
+                            'academic_year_id' => $courseAnnual->academic_year_id,
+                            'semester_id' => $courseAnnual->semester_id,
+                            'grade_id' => $courseAnnual->grade_id,
+                            'degree_id' => $courseAnnual->degree_id,
+                            'department_id' => $courseAnnual->department_id,
+                            'score' => $input['score'],
+                            'percentage_id' => $percentId
+
+                        ];
+
+                        $createScore = $this->courseAnnualScores->create($inputScore);
+
+                        if($createScore) {
+                            $checkUpdate++;
+                        } else {
+                            $checkNotUpdated++;
+                        }
                     }
 
-                } else {
-                    $checkNotUpdated++;
+
                 }
+
             }
         }
+
+
+        //dd($checkUpdate .'=='. (count($inputs) - $checkNotUpdated));
+
 
         if ($checkUpdate == count($inputs) - $checkNotUpdated) {
 
@@ -4333,7 +4375,9 @@ class CourseAnnualController extends Controller
             $studentIdCard = $request->student_id_card;
             $redouble = $request->redouble;
 
-            $student = Student::where('id_card', $studentIdCard)->select('students.id as student_id')->first();
+
+            $student = Student::where('id_card', $studentIdCard)->select('students.id as student_id', 'students.radie')->first();
+
             $studentAnnual = StudentAnnual::where([
                 ['student_id', $student->student_id],
                 ['academic_year_id', $academicYearId]
@@ -4349,14 +4393,45 @@ class CourseAnnualController extends Controller
             }
 
             if ($redouble == ScoreEnum::RADIE) {
-
                 $update = $this->updateStatusStudent($studentIdCard, $status = true);
                 if ($update) {
                     return Response::json(['status' => true, 'message' => 'updated']);
                 }
+            } else if ($redouble == 'P') {
+
+
+                /*---set student redouble to pass in this year ---*/
+
+                $redouble_students = DB::table('redouble_student')
+                    ->where([
+                        ['student_id', $student->student_id],
+                        ['academic_year_id', $academicYearId]
+                    ]);
+
+                if (count($redouble_students->get()) > 0) {
+                    $delete = $redouble_students->delete();
+                    if($delete) {
+
+                        /*--check if student has set to be radie ----then update not to be radie --*/
+
+                        if($student->radie) {
+                            $update = $this->updateStatusStudent($studentIdCard, $status = false);
+                        }
+                        return Response::json(['status' => true, 'message' => 'changed!']);
+                    }
+                } else {
+
+
+
+                    if($student->radie) {
+                        $update = $this->updateStatusStudent($studentIdCard, $status = false);
+                    }
+
+                    return Response::json(['status' => true, 'message' => 'This student is not fail in this year!']);
+                }
+
+
             } else {
-
-
                 /*---student Redouble not Radie ---*/
                 $update = $this->updateStatusStudent($studentIdCard, $status = false);
 

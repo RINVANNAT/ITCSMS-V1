@@ -372,7 +372,6 @@
                             if(($.isNumeric(newValue) || (newValue == '')) || ((newValue == '{{\App\Models\Enum\ScoreEnum::Fraud}}') || (newValue == '{{\App\Models\Enum\ScoreEnum::Absence}}'))) {
 
 
-
                                 if((newValue <= percentage) ||  (newValue >= parseInt('{{\App\Models\Enum\ScoreEnum::Zero}}') ) || (newValue == '') || ((newValue == '{{\App\Models\Enum\ScoreEnum::Fraud}}') || (newValue == '{{\App\Models\Enum\ScoreEnum::Absence}}'))) {
 
                                     var rowData = hotInstance.getData();
@@ -389,7 +388,8 @@
                                                         score_id: tableData[keyIndex][score_id],
                                                         score: newValue,
                                                         score_absence: tableData[keyIndex]['absence'],
-                                                        course_annual_id: $('select[name=available_course] :selected').val()
+                                                        course_annual_id: $('select[name=available_course] :selected').val(),
+                                                        student_annual_id: tableData[keyIndex]['student_annual_id']
                                                     };
 
                                                 } else if(!$.isNumeric(newValue))  {
@@ -399,14 +399,16 @@
                                                         score_id: tableData[keyIndex][score_id],
                                                         score: newValue,
                                                         score_absence: tableData[keyIndex]['absence'],
-                                                        course_annual_id: $('select[name=available_course] :selected').val()
+                                                        course_annual_id: $('select[name=available_course] :selected').val(),
+                                                        student_annual_id: tableData[keyIndex]['student_annual_id']
                                                     };
                                                 } else {
                                                     element = {
                                                         score_id: tableData[keyIndex][score_id],
                                                         score: 0,
                                                         score_absence: tableData[keyIndex]['absence'],
-                                                        course_annual_id: $('select[name=available_course] :selected').val()
+                                                        course_annual_id: $('select[name=available_course] :selected').val(),
+                                                        student_annual_id: tableData[keyIndex]['student_annual_id']
                                                     };
                                                 }
                                             }
@@ -414,9 +416,12 @@
 
                                     }
 
-                                    colDataArray[columnIndex].push(element) // cell changes data by each column score use to pass data to server
-                                    cellScoreChanges.push(element); // use this cell score change to test if user has made any changes
-//                                    console.log(colDataArray);
+                                    if(oldValue != newValue) {
+                                        colDataArray[columnIndex].push(element) // cell changes data by each column score use to pass data to server
+                                        cellScoreChanges.push(element); // use this cell score change to test if user has made any changes
+                                    }
+
+//
                                 }
                             }
 
@@ -804,32 +809,38 @@
                             confirmButtonText: "Yes",
                             closeOnConfirm: true
                         }, function(confirmed) {
+
                             if (confirmed) {
 
                                 if(cellScoreChanges.length > 0) {// save each score
 
                                     //recursive function fo send the request by the column data array
+
                                     function sendRequest (index, message) {
 
                                         var saveBaseUrl = '{{route('admin.course.save_score_course_annual')}}';
 
-
                                         if(index < setting.colHeaders.length -1) {
 
                                             if(colDataArray[setting.colHeaders[index]].length > 0 ) {
+
                                                 $.ajax({
                                                     type: 'POST',
                                                     url: saveBaseUrl,
-                                                    data: {data:colDataArray[setting.colHeaders[index]]},
+                                                    data: {data:colDataArray[setting.colHeaders[index]], percentage: setting.colHeaders[index] },
                                                     dataType: "json",
                                                     success: function(resultData) {
                                                         if(resultData.status) {
+                                                            colDataArray[setting.colHeaders[index]] = [];
                                                             index++;
                                                             updateSettingHandsontable(resultData.handsontableData);
                                                             sendRequest(index);
                                                         } else {
                                                             notify('error', resultData.message, 'Alert');
                                                         }
+                                                    },
+                                                    error: function(error) {
+                                                        colDataArray[setting.colHeaders[index]] = [];
                                                     }
                                                 })
                                             } else {
