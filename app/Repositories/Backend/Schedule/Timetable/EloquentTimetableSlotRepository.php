@@ -290,7 +290,7 @@ class EloquentTimetableSlotRepository implements TimetableSlotRepositoryContract
         // convert date.
         $start = new \DateTime($request->start);
         $end = new \DateTime($request->end == null ? $request->start : $request->end);
-        
+        dd($end);
         if (isset($request->start) || isset($request->end)) {
             $newMergeTimetableSlot = new MergeTimetableSlot();
             $newMergeTimetableSlot->start = $start;
