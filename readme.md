@@ -63,3 +63,14 @@ The Laravel framework is open-sourced software licensed under the MIT license
     php artisan db:seed --class=mark_dtc_radie_2017_semester1
     php artisan db:seed --class=AbsenceNotationTableSeeder
     ```
+- Deploy Timetable
+    - Run migrate table
+    - Run command Seeder
+    ```
+    php artisan db:seed --class=GroupStudentAnnualSeeder
+    php artisan db:seed --class=TimetableAssignmentSeeder
+    php artisan db:seed --class=FakeStudentLanguageGroup
+    php artisan db:seed --class=TimetableWeekSeeder
+    
+    ```
+    

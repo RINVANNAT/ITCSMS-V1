@@ -13,28 +13,28 @@ class FakeStudentLanguageGroup extends Seeder
      */
     public function run()
     {
-        $students = \App\Models\StudentAnnual::where('academic_year_id',2017)
-            ->join("students","students.id","=","studentAnnuals.student_id")
-            ->where('degree_id',1)
-            ->where('grade_id',2)
-            ->where('department_id',8)
-            ->select("studentAnnuals.*","students.dob")
-            ->orderBy("students.dob","DESC")
+        $students = \App\Models\StudentAnnual::where('academic_year_id', 2017)
+            ->join("students", "students.id", "=", "studentAnnuals.student_id")
+            ->where('degree_id', 1)
+            ->where('grade_id', 3)
+            //->where('department_id', 4)
+            ->select("studentAnnuals.*", "students.dob")
+            ->orderBy("students.dob", "DESC")
             ->get();
-        $i=1;
-        $j=1;
-        $group = \App\Models\Group::where('code',$j)->first();
-        foreach($students as $student){
-            if($i>30){
+        $i = 1;
+        $j = 1;
+        $group = \App\Models\Group::where('code', $j)->first();
+        foreach ($students as $student) {
+            if ($i > 30) {
                 $j++;
-                $i=1;
-                $group = \App\Models\Group::where('code',$j)->first();
+                $i = 1;
+                $group = \App\Models\Group::where('code', $j)->first();
             }
             \Illuminate\Support\Facades\DB::table('group_student_annuals')->insert(
                 array(
                     "student_annual_id" => $student->id,
                     "group_id" => $group->id,
-                    "semester_id" => 2,
+                    "semester_id" => 1,
                     "created_at" => \Carbon\Carbon::now(),
                     "updated_at" => \Carbon\Carbon::now(),
                     "department_id" => 12
