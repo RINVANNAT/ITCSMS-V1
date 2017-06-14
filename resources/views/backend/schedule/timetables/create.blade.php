@@ -457,12 +457,12 @@
 
                     var copiedEventObject = $.extend({}, originalEventObject);
 
-                    var tempDate = new Date(date);
+                    var tempDate = new Date(Date.UTC(date._d.getFullYear(), date._d.getMonth(), date._d.getDay(), date._d.getHours(), date._d.getMinutes(), date._d.getSeconds()));
                     copiedEventObject.id = Math.floor(Math.random() * 1800) + 1;
                     copiedEventObject.start = tempDate;
                     copiedEventObject.start.setHours(copiedEventObject.start.getHours() - 7);
                     copiedEventObject.end = new Date(copiedEventObject.start);
-                    copiedEventObject.end.setHours(copiedEventObject.start.getHours() + 2);
+                    copiedEventObject.end.setHours(copiedEventObject.start.getHours() + 1);
                     copiedEventObject.allDay = true;
 
                     create_timetable_slots(copiedEventObject);
