@@ -288,6 +288,7 @@ class EloquentTimetableSlotRepository implements TimetableSlotRepositoryContract
     public function create_merge_timetable_slot(CreateTimetableSlotRequest $request)
     {
         // convert date.
+        dd($request->start);
         $start = new \DateTime($request->start);
         $end = new \DateTime($request->end == null ? $request->start : $request->end);
         dd($end);
