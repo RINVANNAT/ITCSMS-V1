@@ -163,7 +163,7 @@ class StudentApiController extends Controller
         $studentIdCard = isset($dataParams['student_id_card']) ? $dataParams['student_id_card'] : null;
 
         $student = DB::table('students AS s')
-            ->join(DB::raw('(SELECT * FROM '.'"studentAnnuals"'.' A WHERE academic_year_id = (SELECT MAX(academic_year_id) FROM '.'"studentAnnuals"'.')) AS sa'), function($join) use ($studentIdCard) {
+            ->join(DB::raw('(SELECT * FROM '.'"studentAnnuals"'.' WHERE academic_year_id = (SELECT MAX(academic_year_id) FROM '.'"studentAnnuals"'.')) AS sa'), function($join) use ($studentIdCard) {
                 $join->on('s.id', '=', 'sa.student_id')
                     ->where('s.id_card', '=',$studentIdCard );
             })->first();

@@ -121,13 +121,20 @@
 <div class="form-group">
 
     <div class="col-lg-3">
-        <label for="group" style="float:right; font-size: 12pt" class="btn btn-xs control-label"> <input id="group" type="checkbox" class="check_all_box"> {{ trans('labels.backend.courseAnnuals.fields.group')}}</label>
+        @if(isset($courseAnnual))
+            <label for="group" style="float:right; font-size: 12pt" class="btn btn-xs control-label"> <input id="group" type="checkbox" disabled class="check_all_box"> {{ trans('labels.backend.courseAnnuals.fields.group')}}</label>
+        @else
+            <label for="group" style="float:right; font-size: 12pt" class="btn btn-xs control-label"> <input id="group" type="checkbox" class="check_all_box"> {{ trans('labels.backend.courseAnnuals.fields.group')}}</label>
+
+        @endif
+
     </div>
 
 {{--    {!! Form::label('group','',  ['class' => 'col-lg-3 control-label']) !!}--}}
-    <div class="col-lg-2 no-padding" id="group_panel">
+    <div class="col-lg-8 no-padding" style="padding-top: 5px !important; padding-left: 5px !important;" id="group_panel">
 
-        @if(isset($groups))
+        @if(isset($courseAnnual))
+            @if(isset($groups))
 
                 @foreach($groups as $group)
                     <?php $index =0;?>
@@ -138,31 +145,87 @@
                         @foreach($courseAnnual->courseAnnualClass as $class)
                             @if(trim($group->group_id) == trim($class->group_id))
                                 <?php $status =false;?>
-                                <label class="btn btn-xs" style="font-size: 12pt" for="{{$class->group_id}}"> <input id="{{$class->group_id}}" type="checkbox" name="groups[]" class="each_check_box" value="{{$class->group_id}}" checked> {{$group->group_code}}</label>
+                                <label class="btn btn-xs" style="font-size: 12pt; color: green" for="{{$class->group_id}}"> <input id="{{$class->group_id}}" type="checkbox" disabled name="groups[]" class="each_check_box" value="{{$class->group_id}}" checked> {{$group->group_code}}</label>
                             @endif
                         @endforeach
                         @if($status == true)
-                            <label style="font-size: 12pt" class="btn btn-xs" for="{{$group->group_id}}"> <input id="{{$group->group_id}}" type="checkbox" name="groups[]" class=" each_check_box" value="{{$group->group_id}}"> {{$group->group_code}}</label>
+                            <label style="font-size: 12pt" class="btn btn-xs" for="{{$group->group_id}}"> <input id="{{$group->group_id}}" disabled type="checkbox" name="groups[]" class=" each_check_box" value="{{$group->group_id}}"> {{$group->group_code}}</label>
                         @endif
 
                     @endif
 
                 @endforeach
+            @endif
+        @else
+
+            @if(isset($groups))
+
+                @foreach($groups as $group)
+                    <?php $index =0;?>
+
+                    @if($group != null)
+
+                        <?php $status =true;?>
+                        @foreach($courseAnnual->courseAnnualClass as $class)
+                            @if(trim($group->group_id) == trim($class->group_id))
+                                <?php $status =false;?>
+                                <label class="btn btn-xs" style="font-size: 12pt" for="{{$class->group_id}}"> <input id="{{$class->group_id}}" type="checkbox"  name="groups[]" class="each_check_box" value="{{$class->group_id}}" checked> {{$group->group_code}}</label>
+                            @endif
+                        @endforeach
+                        @if($status == true)
+                            <label style="font-size: 12pt" class="btn btn-xs" for="{{$group->group_id}}"> <input id="{{$group->group_id}}" type="checkbox" name="groups[]" class="each_check_box" value="{{$group->group_id}}"> {{$group->group_code}}</label>
+                        @endif
+
+                    @endif
+
+                @endforeach
+            @endif
+
         @endif
 
     </div>
+</div>
 
-      @if(isset($courseAnnual))
-          @if($courseAnnual->is_having_resitted)
-            <label for="having_resitted" class="col-lg-2 control-label required"> Allow Resit <input id="having_resitted" type="checkbox" name="is_having_resitted"  value="{{\App\Models\Enum\ScoreEnum::is_having_resitted}}" checked>  </label>
-          @else
-            <label for="having_resitted" class="col-lg-2 control-label required"> Allow Resit <input id="having_resitted" type="checkbox" name="is_having_resitted"  value="{{\App\Models\Enum\ScoreEnum::is_having_resitted}}">  </label>
-          @endif
+<div class="form-group">
 
-      @else
-        <label for="having_resitted" class="col-lg-2 control-label required"> Allow Resit <input id="having_resitted" type="checkbox" name="is_having_resitted"  value="{{\App\Models\Enum\ScoreEnum::is_having_resitted}}">  </label>
-      @endif
+    @if(isset($courseAnnual))
+        @if($courseAnnual->is_having_resitted)
+            <label for="having_resitted" data-toggle="tooltip" data-placement="top" title="{{trans('labels.backend.courseAnnuals.fields.allow_resit')}}" class="col-lg-3 control-label required"> Allow Resit <input id="having_resitted" type="checkbox" name="is_having_resitted"  style="font-size: 18pt" value="{{\App\Models\Enum\ScoreEnum::is_having_resitted}}" checked>  </label>
+        @else
+            <label for="having_resitted" data-toggle="tooltip" data-placement="top" title="{{trans('labels.backend.courseAnnuals.fields.allow_resit')}}" class="col-lg-3 control-label required"> Allow Resit <input id="having_resitted" type="checkbox" name="is_having_resitted" style="font-size: 18pt"  value="{{\App\Models\Enum\ScoreEnum::is_having_resitted}}">  </label>
+        @endif
 
+    @else
+        <label for="having_resitted" data-toggle="tooltip" data-placement="top" title="{{trans('labels.backend.courseAnnuals.fields.allow_resit')}}" class="col-lg-3 control-label required"> Allow Resit <input id="having_resitted" type="checkbox" name="is_having_resitted"  style="font-size: 18pt" value="{{\App\Models\Enum\ScoreEnum::is_having_resitted}}">  </label>
+    @endif
+
+        @if(isset($courseAnnual))
+            @if($courseAnnual->is_counted_creditability)
+
+                <label for="count_creditability" data-toggle="tooltip" data-placement="top" title=" {{trans('labels.backend.courseAnnuals.fields.for_transcript')}}" class="col-lg-3 control-label required" > Credit For Transcript <input type="checkbox" name="is_counted_creditability" style="font-size: 18pt" id="count_creditability" class="boolean_input" value="{{\App\Models\Enum\ScoreEnum::is_counted_creditability}}" checked> </label>
+
+            @else
+
+                <label for="count_creditability" data-toggle="tooltip" data-placement="top" title="{{trans('labels.backend.courseAnnuals.fields.for_transcript')}}" class="col-lg-3 control-label required" > Credit For Transcript <input type="checkbox" name="is_counted_creditability" style="font-size: 18pt" id="count_creditability" class="boolean_input" value="{{\App\Models\Enum\ScoreEnum::is_counted_creditability}}" > </label>
+
+            @endif
+        @else
+
+            <label for="count_creditability" class="col-lg-3 control-label required" data-toggle="tooltip" data-placement="top" title="{{trans('labels.backend.courseAnnuals.fields.for_transcript')}}"> Credit For Transcript <input type="checkbox" name="is_counted_creditability" style="font-size: 18pt" id="count_creditability" class="boolean_input" value="{{\App\Models\Enum\ScoreEnum::is_counted_creditability}}" checked> </label>
+
+        @endif
+
+        @if(isset($courseAnnual))
+            @if($courseAnnual->is_counted_absence)
+                <label for="count_absence" class="col-lg-3 control-label required" data-toggle="tooltip" data-placement="top" title="{{trans('labels.backend.courseAnnuals.fields.10_absece')}}"> 10%-Absence <input type="checkbox" name="is_counted_absence" id="count_absence" style="font-size: 18pt" class="boolean_input" value="{{\App\Models\Enum\ScoreEnum::is_counted_absence}}" checked></label>
+
+            @else
+                <label for="count_absence" data-toggle="tooltip" data-placement="top" title="{{trans('labels.backend.courseAnnuals.fields.10_absece')}}" class="col-lg-3 control-label required"> 10%-Absence <input type="checkbox" name="is_counted_absence" id="count_absence" style="font-size: 18pt" class="boolean_input" value="{{\App\Models\Enum\ScoreEnum::is_counted_absence}}"></label>
+
+            @endif
+        @else
+            <label for="count_absence" data-toggle="tooltip" data-placement="top" title="{{trans('labels.backend.courseAnnuals.fields.10_absece')}}"  class="col-lg-3 control-label required"> 10%-Absence <input type="checkbox" name="is_counted_absence" id="count_absence"  style="font-size: 18pt" class="boolean_input" value="{{\App\Models\Enum\ScoreEnum::is_counted_absence}}" checked></label>
+        @endif
 
 </div>
 
@@ -171,40 +234,6 @@
     <div class="col-lg-7">
         {{ Form::text('credit',  isset($courseAnnual)?$courseAnnual->credit:null, ['class' => 'form-control' , 'id'=> 'credit', 'required' => 'required']) }}
     </div>
-</div>
-
-
-<div class="form-group">
-
-    {!! Form::label('count_creditability', "Creditability For Transcript", ['class' => 'col-lg-3 control-label required']) !!}
-    <div class="col-lg-2">
-        @if(isset($courseAnnual))
-            @if($courseAnnual->is_counted_creditability)
-                <input type="checkbox" name="is_counted_creditability" id="count_credit" class="boolean_input" value="{{\App\Models\Enum\ScoreEnum::is_counted_creditability}}" checked>
-            @else
-                <input type="checkbox" name="is_counted_creditability" id="count_credit" class="boolean_input" value="{{\App\Models\Enum\ScoreEnum::is_counted_creditability}}" >
-            @endif
-        @else
-            <input type="checkbox" name="is_counted_creditability" id="count_credit" class="boolean_input" value="{{\App\Models\Enum\ScoreEnum::is_counted_creditability}}" checked>
-        @endif
-
-    </div>
-
-    {!! Form::label('count_absence', " 10%-Absence", ['class' => 'col-lg-2 control-label required']) !!}
-
-    <div class="col-lg-3">
-        @if(isset($courseAnnual))
-            @if($courseAnnual->is_counted_absence)
-                <input type="checkbox" name="is_counted_absence" id="count_absence" class="boolean_input" value="{{\App\Models\Enum\ScoreEnum::is_counted_absence}}" checked>
-            @else
-                <input type="checkbox" name="is_counted_absence" id="count_absence" class="boolean_input" value="{{\App\Models\Enum\ScoreEnum::is_counted_absence}}">
-            @endif
-        @else
-            <input type="checkbox" name="is_counted_absence" id="count_absence" class="boolean_input" value="{{\App\Models\Enum\ScoreEnum::is_counted_absence}}" checked>
-        @endif
-
-    </div>
-
 </div>
 
 @if(isset($midterm) || isset($final))

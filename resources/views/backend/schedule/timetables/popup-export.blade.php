@@ -94,8 +94,10 @@
             <div class="box-footer">
                 <div class="form-group">
                     <div class="col-md-offset-2 col-md-8">
-                        <button type="submit" href="{{ route('timetables.template_print') }}" class="btn btn-primary btn-sm btn-sm"><i class="fa fa-download"></i></button>
-                        <button class="btn btn-danger btn-sm" id="clone-window-print"><i class="fa fa-times-circle-o"></i></button>
+                        <button type="submit" href="{{ route('timetables.template_print') }}"
+                                class="btn btn-primary btn-sm btn-sm"><i class="fa fa-download"></i></button>
+                        <button class="btn btn-danger btn-sm" id="clone-window-print"><i
+                                    class="fa fa-times-circle-o"></i></button>
                     </div>
                 </div>
             </div>
@@ -109,5 +111,26 @@
     {!! Html::script('plugins/iCheck/icheck.js') !!}
     {!! Html::script('js/backend/schedule/clone-timetable.js') !!}
     {!! Html::script('js/backend/schedule/timetable-print.js') !!}
-@stop
 
+    <script type="text/javascript">
+        $(function () {
+            $('#form_export_timetable').submit(function () {
+                toggleLoading(true);
+                $.ajax({
+                    type: 'POST',
+                    url: '{{ route('timetables.export_file') }}',
+                    data: $(this).serialize(),
+                    success: function () {
+                        notify('info', 'Timetable is exported as format excel.', 'Export Timetable');
+                    },
+                    error: function () {
+                        notify('danger', 'Something went wrong', 'Export Timetable');
+                    },
+                    complete: function () {
+                        toggleLoading(false);
+                    }
+                });
+            });
+        });
+    </script>
+@stop

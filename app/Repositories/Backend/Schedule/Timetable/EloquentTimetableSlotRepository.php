@@ -13,7 +13,6 @@ use App\Models\Schedule\Timetable\Slot;
 use App\Models\Schedule\Timetable\Timetable;
 use App\Models\Schedule\Timetable\TimetableSlot;
 use Carbon\Carbon;
-use Faker\Provider\DateTime;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 
@@ -287,15 +286,10 @@ class EloquentTimetableSlotRepository implements TimetableSlotRepositoryContract
      */
     public function create_merge_timetable_slot(CreateTimetableSlotRequest $request)
     {
-        // convert date.
-        dd($request->start);
-        $start = new \DateTime($request->start);
-        $end = new \DateTime($request->end == null ? $request->start : $request->end);
-        dd($end);
         if (isset($request->start) || isset($request->end)) {
             $newMergeTimetableSlot = new MergeTimetableSlot();
-            $newMergeTimetableSlot->start = $start;
-            $newMergeTimetableSlot->end = $end;
+            $newMergeTimetableSlot->start = (new Carbon($request->start))->setTimezone('Asia/Phnom_Penh');
+            $newMergeTimetableSlot->end = (new Carbon($request->end == null ? $request->start : $request->end))->setTimezone('Asia/Phnom_Penh');
             if ($newMergeTimetableSlot->save()) {
                 return $newMergeTimetableSlot;
             }
