@@ -12,7 +12,6 @@ use App\Models\Configuration;
 use App\Models\Department;
 use App\Models\DepartmentOption;
 use App\Models\Grade;
-use App\Models\Group;
 use App\Models\Schedule\Timetable\Slot;
 use App\Models\Schedule\Timetable\Timetable;
 use App\Models\Schedule\Timetable\TimetableSlot;
@@ -293,7 +292,7 @@ trait AjaxCRUDTimetableController
         $timetable_languages = new Collection();
         $timetableSlots = new Collection();
         // get student annuals.
-        if($request->department < 12){
+        if ($request->department < 12) {
             $student_annual_ids = DB::table('group_student_annuals')
                 ->leftJoin('studentAnnuals', 'studentAnnuals.id', '=', 'group_student_annuals.student_annual_id')
                 ->where([
@@ -320,7 +319,7 @@ trait AjaxCRUDTimetableController
                 ->lists('group_id');
 
             // get timetable from language section
-            foreach ($group_languages as $group_language){
+            foreach ($group_languages as $group_language) {
                 $getTimetableLanguage = Timetable::where([
                     ['academic_year_id', $request->academicYear],
                     ['department_id', 12],
@@ -332,26 +331,24 @@ trait AjaxCRUDTimetableController
                     ['group_id', $group_language]
                 ])->first();
 
-                if($getTimetableLanguage instanceof Timetable){
+                if ($getTimetableLanguage instanceof Timetable) {
                     $timetable_languages->push($getTimetableLanguage);
                 }
             }
 
         }
 
-        if(count($timetable_languages)>0){
-            foreach ($timetable_languages as $timetable_language){
-                if(($timetable_language instanceof Timetable) && (count($timetable_language->timetableSlots) >0)){
+        if (count($timetable_languages) > 0) {
+            foreach ($timetable_languages as $timetable_language) {
+                if (($timetable_language instanceof Timetable) && (count($timetable_language->timetableSlots) > 0)) {
                     $this->timetableSlotRepo->get_timetable_slot_with_conflict_info($timetable_language, $timetableSlots);
                 }
             }
         }
-        //dd($timetableSlots);
-
 
         // $group_student_annual_classes = DB::table('group_student_annual')
         $timetable = $this->timetableRepo->find_timetable_is_existed($request);
-        if($timetable instanceof  Timetable){
+        if ($timetable instanceof Timetable) {
             $this->timetableSlotRepo->get_timetable_slot_with_conflict_info($timetable, $timetableSlots);
         }
         return json_decode($timetableSlots);
