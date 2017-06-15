@@ -55,6 +55,7 @@
                             data-target="#clone-timetable"
                             data-toggle="tooltip"
                             data-placement="top"
+                            id="btn_clone"
                             title="{{ trans('buttons.backend.schedule.timetable.clone') }}">
                         {{ trans('buttons.backend.schedule.timetable.clone') }}
                     </button>
@@ -65,6 +66,7 @@
                         <button class="btn btn-info btn-sm"
                                 data-toggle="tooltip"
                                 data-placement="top"
+                                id="btn_publish"
                                 title="{{ trans('buttons.backend.schedule.timetable.publish') }}">
                             {{ trans('buttons.backend.schedule.timetable.publish') }}
                         </button>
@@ -271,15 +273,22 @@
                 url: '{!! route('get_timetable_slots') !!}',
                 data: $('#options-filter').serialize(),
                 success: function (response) {
+                    if (response.timetable !== null) {
+                        if (response.timetable.completed === false) {
+                            $("#btn_clone").attr('disabled', true);
+                            $('#btn_publish').attr('disabled', false);
+                        } else {
+                            $("#btn_clone").attr('disabled', false);
+                            $('#btn_publish').attr('disabled', true);
+                        }
+                    }
                     $('#timetable').fullCalendar('removeEvents');
-                    $('#timetable').fullCalendar('renderEvents', response, true);
+                    $('#timetable').fullCalendar('renderEvents', response.timetableSlots, true);
                     $('#timetable').fullCalendar('rerenderEvents');
+                    toggleLoading(false);
                 },
                 error: function () {
                     notify('error', 'error load timetable slot');
-                },
-                complete: function () {
-                    toggleLoading(false);
                 }
             });
         }
@@ -465,7 +474,7 @@
 
                     var datetime = moment(date, 'YYYY-MM-DD HH:mm:ss');
                     var start = datetime.format('YYYY-MM-DD HH:mm:ss');
-                    var end = datetime.hour(parseInt(datetime.hour())+2).format('YYYY-MM-DD HH:mm:ss');
+                    var end = datetime.hour(parseInt(datetime.hour()) + 2).format('YYYY-MM-DD HH:mm:ss');
 
                     copiedEventObject.id = Math.floor(Math.random() * 1800) + 1;
                     copiedEventObject.start = start;
@@ -845,6 +854,38 @@
                     }
                 });
             });
+
+            // publish timetable
+            $(document).on('click', '#btn_publish', function (e) {
+                e.preventDefault();
+                swal({
+                    title: 'Publish Timetable',
+                    text: "Do you want to publish timetable?",
+                    type: 'warning',
+                    showCancelButton: true,
+                    confirmButtonColor: '#3085d6',
+                    cancelButtonColor: '#d33',
+                    cancelButtonText: 'No',
+                    confirmButtonText: 'Yes'
+                }).then(function () {
+                    toggleLoading(true);
+                    $.ajax({
+                        type: 'POST',
+                        url: '{{ route('admin.schedule.timetables.publish') }}',
+                        data: $('#options-filter').serialize(),
+                        success: function () {
+                            notify('info', 'Timetable was published.', 'Publish Timetable');
+                        },
+                        error: function () {
+                            notify('error', 'Something went wrong', 'Publish Timetable');
+                        },
+                        complete: function () {
+                            get_timetable_slots();
+                        }
+                    })
+                })
+
+            })
         });
 
     </script>

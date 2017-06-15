@@ -307,6 +307,20 @@ trait AjaxCRUDTimetableController
                 ->distinct('studentAnnuals.id')
                 ->lists('studentAnnuals.id');
 
+            $groupsStudentEnglishSection = DB::table('group_student_annuals')
+                ->whereIn('student_annual_id', $student_annual_ids)
+                ->orWhere('department_id', 12)
+                ->orderBy('group_id')
+                ->distinct('group_id')
+                ->lists('group_id');
+
+            $groupsStudentFrenchSection = DB::table('group_student_annuals')
+                ->whereIn('student_annual_id', $student_annual_ids)
+                ->orWhere('department_id', 13)
+                ->orderBy('group_id')
+                ->distinct('group_id')
+                ->lists('group_id');
+
             // take studentAnnuals to find group in language section.
             $group_languages = DB::table('group_student_annuals')
                 ->whereIn('student_annual_id', $student_annual_ids)
@@ -319,17 +333,32 @@ trait AjaxCRUDTimetableController
                 ->lists('group_id');
 
             // get timetable from language section
+            $timetableForEnglishs = new Collection();
+            $timetableForFrenchs = new Collection();
+
+
             foreach ($group_languages as $group_language) {
                 $getTimetableLanguage = Timetable::where([
                     ['academic_year_id', $request->academicYear],
-                    ['department_id', 12],
+                    ['department_id', 12], // English section
                     ['degree_id', $request->degree],
                     ['option_id', $request->option == null ? null : $request->option],
                     ['grade_id', $request->grade],
                     ['semester_id', $request->semester],
                     ['week_id', $request->weekly],
                     ['group_id', $group_language]
-                ])->first();
+                ])
+                    ->orWhere([
+                        ['academic_year_id', $request->academicYear],
+                        ['department_id', 13], // French section
+                        ['degree_id', $request->degree],
+                        ['option_id', $request->option == null ? null : $request->option],
+                        ['grade_id', $request->grade],
+                        ['semester_id', $request->semester],
+                        ['week_id', $request->weekly],
+                        ['group_id', $group_language]
+                    ])
+                    ->first();
 
                 if ($getTimetableLanguage instanceof Timetable) {
                     $timetable_languages->push($getTimetableLanguage);
@@ -351,7 +380,7 @@ trait AjaxCRUDTimetableController
         if ($timetable instanceof Timetable) {
             $this->timetableSlotRepo->get_timetable_slot_with_conflict_info($timetable, $timetableSlots);
         }
-        return json_decode($timetableSlots);
+        return Response::json(['status' => true, 'timetable' => $timetable == null ? null : $timetable, 'timetableSlots' => $timetableSlots]);
     }
 
     /**
@@ -826,5 +855,29 @@ trait AjaxCRUDTimetableController
             return Response::json(['status' => true]);
         }
         return Response::json(['status' => false]);
+    }
+
+    /**
+     * Public Timetable.
+     *
+     * @return mixed
+     */
+    public function publish()
+    {
+        // find timetable.
+        $timetable = Timetable::where([
+            ['academic_year_id', request('academicYear')],
+            ['department_id', request('department')],
+            ['degree_id', request('degree')],
+            ['option_id', request('option') == null ? null : request('option')],
+            ['group_id', request('group') == null ? null : request('group')],
+            ['semester_id', request('semester')],
+            ['week_id', request('weekly')]
+        ])->first();
+        if ($timetable instanceof Timetable) {
+            $timetable->completed = true;
+            $timetable->update();
+            return Response::json([200]);
+        }
     }
 }
