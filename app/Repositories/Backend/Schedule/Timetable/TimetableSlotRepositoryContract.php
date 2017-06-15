@@ -10,6 +10,7 @@ use App\Models\Schedule\Timetable\Slot;
 use App\Models\Schedule\Timetable\Timetable;
 use App\Models\Schedule\Timetable\TimetableSlot;
 use Carbon\Carbon;
+use Illuminate\Support\Collection;
 
 /**
  * Interface TimetableSlotRepositoryContract
@@ -242,4 +243,21 @@ interface TimetableSlotRepositoryContract
      * @return mixed
      */
     public function set_permission_create_timetable();
+
+    /**
+     * Get timetable slot with details info.
+     *
+     * @param Timetable $timetable
+     * @return mixed
+     */
+    public function get_timetable_slot_details(Timetable $timetable);
+
+    /**
+     * Get Timetable Slot with Conflict Info.
+     *
+     * @param Timetable $timetable
+     * @param Collection $timetableSlots
+     * @return mixed
+     */
+    public function get_timetable_slot_with_conflict_info(Timetable $timetable, Collection $timetableSlots);
 }

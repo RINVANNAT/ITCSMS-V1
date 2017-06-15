@@ -13,6 +13,7 @@ use App\Models\Schedule\Timetable\Slot;
 use App\Models\Schedule\Timetable\Timetable;
 use App\Models\Schedule\Timetable\TimetableSlot;
 use Carbon\Carbon;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 
@@ -722,5 +723,91 @@ class EloquentTimetableSlotRepository implements TimetableSlotRepositoryContract
                 $department->update();
             }
         }
+    }
+
+    /**
+     * Get timetable slot with details info.
+     *
+     * @param Timetable $timetable
+     * @return mixed
+     */
+    public function get_timetable_slot_details(Timetable $timetable)
+    {
+        return $timetable_slots = TimetableSlot::where('timetable_id', $timetable->id)
+            ->leftJoin('rooms', 'rooms.id', '=', 'timetable_slots.room_id')
+            ->leftJoin('buildings', 'buildings.id', '=', 'rooms.building_id')
+            ->select(
+                'timetable_slots.id',
+                'timetable_slots.course_name as title',
+                'timetable_slots.course_name',
+                'timetable_slots.teacher_name',
+                'timetable_slots.type as course_type',
+                'timetable_slots.start',
+                'timetable_slots.end',
+                'buildings.code as building',
+                'rooms.name as room'
+            )
+            ->get();
+    }
+
+    /**
+     * Get Timetable Slot with Conflict Info.
+     *
+     * @param Timetable $timetable
+     * @param Collection $timetableSlots
+     * @return mixed
+     */
+    public function get_timetable_slot_with_conflict_info(Timetable $timetable, Collection $timetableSlots)
+    {
+        $timetable_slots = $this->get_timetable_slot_details($timetable);
+
+        foreach ($timetable_slots as $timetable_slot) {
+            if (($timetable_slot instanceof TimetableSlot) && is_object($timetable_slot)) {
+                // convert from array object to collection object.
+                $itemTimetableSlot = TimetableSlot::find($timetable_slot->id);
+                $timetableSlot = new Collection($itemTimetableSlot);
+
+                // find and prepare groups to render when timetable slot merge together
+                $groups = array();
+                // find all timetable slot has group_merge_id the same
+                $timetableSlotHasTheSameGroupMergeId = TimetableSlot::where('group_merge_id', $itemTimetableSlot->group_merge_id)->get();
+                if (count($timetableSlotHasTheSameGroupMergeId) > 0) {
+                    foreach ($timetableSlotHasTheSameGroupMergeId as $item) {
+                        array_push($groups, Group::find($item->slot->group_id));
+                    }
+                } else {
+                    $groups = [];
+                }
+                // check conflict lecturer.
+                $dataLecturer = $this->check_conflict_lecturer($itemTimetableSlot);
+
+                // check conflict room.
+                if ($this->is_conflict_room($itemTimetableSlot)[0]['status'] == true) {
+                    $timetableSlot->put('conflict_room', true);
+                } else {
+                    $timetableSlot->put('conflict_room', false);
+                }
+
+
+                // push data to item timetable slot
+                $timetableSlot->put('conflict_lecturer', $dataLecturer);
+                $timetableSlot->put('building', $timetable_slot->building);
+                // sort group before push
+                usort($groups, function ($a, $b) {
+                    if (is_numeric($a->code)) {
+                        return $a->code - $b->code;
+                    } else {
+                        return strcmp($a->code, $b->code);
+                    }
+                });
+                // push groups array into item timetable slot
+                $timetableSlot->put('groups', $groups);
+                $timetableSlot->put('room', $timetable_slot->room);
+
+                // push timetable slot to output
+                $timetableSlots->push($timetableSlot);
+            }
+        }
+        return $timetableSlots;
     }
 }

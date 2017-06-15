@@ -290,73 +290,71 @@ trait AjaxCRUDTimetableController
      */
     public function get_timetable_slots(CreateTimetableRequest $request)
     {
-        $timetable = $this->timetableRepo->find_timetable_is_existed($request);
-        if ($timetable instanceof Timetable) {
-            $timetable_slots = TimetableSlot::where('timetable_id', $timetable->id)
-                ->leftJoin('rooms', 'rooms.id', '=', 'timetable_slots.room_id')
-                ->leftJoin('buildings', 'buildings.id', '=', 'rooms.building_id')
-                ->select(
-                    'timetable_slots.id',
-                    'timetable_slots.course_name as title',
-                    'timetable_slots.course_name',
-                    'timetable_slots.teacher_name',
-                    'timetable_slots.type as course_type',
-                    'timetable_slots.start',
-                    'timetable_slots.end',
-                    'buildings.code as building',
-                    'rooms.name as room'
-                )
-                ->get();
-            $timetableSlots = new Collection();
-            foreach ($timetable_slots as $timetable_slot) {
-                if (($timetable_slot instanceof TimetableSlot) && is_object($timetable_slot)) {
-                    // convert from array object to collection object.
-                    $itemTimetableSlot = TimetableSlot::find($timetable_slot->id);
-                    $timetableSlot = new Collection($itemTimetableSlot);
+        $timetable_languages = new Collection();
+        $timetableSlots = new Collection();
+        // get student annuals.
+        if($request->department < 12){
+            $student_annual_ids = DB::table('group_student_annuals')
+                ->leftJoin('studentAnnuals', 'studentAnnuals.id', '=', 'group_student_annuals.student_annual_id')
+                ->where([
+                    ['studentAnnuals.academic_year_id', $request->academicYear],
+                    ['studentAnnuals.department_id', $request->department],
+                    ['studentAnnuals.degree_id', $request->degree],
+                    ['studentAnnuals.grade_id', $request->grade],
+                    ['studentAnnuals.department_option_id', $request->option == null ? null : $request->option],
+                    ['group_student_annuals.group_id', $request->group == null ? null : $request->group]
+                ])
+                ->orderBy('studentAnnuals.id')
+                ->distinct('studentAnnuals.id')
+                ->lists('studentAnnuals.id');
 
-                    // find and prepare groups to render when timetable slot merge together
-                    $groups = array();
-                    // find all timetable slot has group_merge_id the same
-                    $timetableSlotHasTheSameGroupMergeId = TimetableSlot::where('group_merge_id', $itemTimetableSlot->group_merge_id)->get();
-                    if (count($timetableSlotHasTheSameGroupMergeId) > 0) {
-                        foreach ($timetableSlotHasTheSameGroupMergeId as $item) {
-                            array_push($groups, Group::find($item->slot->group_id));
-                        }
-                    } else {
-                        $groups = [];
-                    }
-                    // check conflict lecturer.
-                    $dataLecturer = $this->timetableSlotRepo->check_conflict_lecturer($itemTimetableSlot);
+            // take studentAnnuals to find group in language section.
+            $group_languages = DB::table('group_student_annuals')
+                ->whereIn('student_annual_id', $student_annual_ids)
+                ->orWhere([
+                    ['department_id', 12],
+                    ['department_id', 13]
+                ])
+                ->orderBy('group_id')
+                ->distinct('group_id')
+                ->lists('group_id');
 
-                    // check conflict room.
-                    if ($this->timetableSlotRepo->is_conflict_room($itemTimetableSlot)[0]['status'] == true) {
-                        $timetableSlot->put('conflict_room', true);
-                    } else {
-                        $timetableSlot->put('conflict_room', false);
-                    }
+            // get timetable from language section
+            foreach ($group_languages as $group_language){
+                $getTimetableLanguage = Timetable::where([
+                    ['academic_year_id', $request->academicYear],
+                    ['department_id', 12],
+                    ['degree_id', $request->degree],
+                    ['option_id', $request->option == null ? null : $request->option],
+                    ['grade_id', $request->grade],
+                    ['semester_id', $request->semester],
+                    ['week_id', $request->weekly],
+                    ['group_id', $group_language]
+                ])->first();
 
-
-                    // push data to item timetable slot
-                    $timetableSlot->put('conflict_lecturer', $dataLecturer);
-                    $timetableSlot->put('building', $timetable_slot->building);
-                    // sort group before push
-                    usort($groups, function ($a, $b) {
-                        if (is_numeric($a->code)) {
-                            return $a->code - $b->code;
-                        } else {
-                            return strcmp($a->code, $b->code);
-                        }
-                    });
-                    // push groups array into item timetable slot
-                    $timetableSlot->put('groups', $groups);
-                    $timetableSlot->put('room', $timetable_slot->room);
-
-                    // push timetable slot to output
-                    $timetableSlots->push($timetableSlot);
+                if($getTimetableLanguage instanceof Timetable){
+                    $timetable_languages->push($getTimetableLanguage);
                 }
             }
-            return json_decode($timetableSlots);
+
         }
+
+        if(count($timetable_languages)>0){
+            foreach ($timetable_languages as $timetable_language){
+                if(($timetable_language instanceof Timetable) && (count($timetable_language->timetableSlots) >0)){
+                    $this->timetableSlotRepo->get_timetable_slot_with_conflict_info($timetable_language, $timetableSlots);
+                }
+            }
+        }
+        //dd($timetableSlots);
+
+
+        // $group_student_annual_classes = DB::table('group_student_annual')
+        $timetable = $this->timetableRepo->find_timetable_is_existed($request);
+        if($timetable instanceof  Timetable){
+            $this->timetableSlotRepo->get_timetable_slot_with_conflict_info($timetable, $timetableSlots);
+        }
+        return json_decode($timetableSlots);
     }
 
     /**
