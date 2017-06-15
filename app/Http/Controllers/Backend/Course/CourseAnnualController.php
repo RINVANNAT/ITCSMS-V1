@@ -204,6 +204,7 @@ class CourseAnnualController extends Controller
 
             $groups = $groups->where('group_student_annuals.department_id', $department->id);
         } else {
+
             if ($deptId = $request->department_id) {
                 $groups = $groups->where('studentAnnuals.department_id', '=', $deptId);
             }
@@ -434,8 +435,6 @@ class CourseAnnualController extends Controller
         $courseAnnual = $this->courseAnnuals->findOrThrowException($id);
         $ownerCourseDeparment = Department::where('id', $courseAnnual->department_id)->first();
         $scores = $this->getPropertiesFromScoreTable($courseAnnual);
-
-
         $arrayPercentages = collect($scores)->groupBy('percentage_id')->toArray();
 
         foreach ($arrayPercentages as $key => $percentage) {
@@ -1361,7 +1360,6 @@ class CourseAnnualController extends Controller
         $grade_ids = $propArrayIds['grade_id'];
         $department_option_ids = $propArrayIds['department_option_id'];
         $groups = $propArrayIds['group'];// lists of group_ids
-
         $scoreProps = $this->scoreAnnualProp($courseAnnualId);
 
         $averageByCourseAnnual = $this->averageByCourseAnnual($courseAnnualId);
@@ -1400,6 +1398,7 @@ class CourseAnnualController extends Controller
         $colWidths = $headers['colWidth'];
         $studentByCourse = $this->getStudentByDeptIdGradeIdDegreeId($department_ids, $degree_ids, $grade_ids, $courseAnnual->academic_year_id);
         $allScoreByCourseAnnual = $this->studentAnnualScores($scoreProps, $courseAnnualId);
+
         if($allScoreByCourseAnnual == false) {
             return json_encode([
                 'status' => false,
@@ -1723,12 +1722,26 @@ class CourseAnnualController extends Controller
     public function getAbsenceFromDB($courseAnnualId)
     {
         $arrayData = [];
-        $absences = DB::table('absences')->where('course_annual_id', $courseAnnualId)->get();
 
-        if ($absences) {
-            $collection = collect($absences)->groupBy('course_annual_id')->toArray();
-            $arrayData[$courseAnnualId] = collect($collection[$courseAnnualId])->keyBy('student_annual_id')->toArray();
+        if(is_array($courseAnnualId)) {
+
+            /*--this case we use only for cloning absence to student of Department SA or SF--*/
+
+            $absences = DB::table('absences')->whereIn('course_annual_id',  $courseAnnualId)->get();
+
+            if ($absences) {
+                $arrayData = collect($absences)->keyBy('student_annual_id')->toArray();
+            }
+        } else {
+
+            $absences = DB::table('absences')->whereIn('course_annual_id',  [$courseAnnualId])->get();
+            if ($absences) {
+                $collection = collect($absences)->groupBy('course_annual_id')->toArray();
+                $arrayData[$courseAnnualId] = collect($collection[$courseAnnualId])->keyBy('student_annual_id')->toArray();
+            }
+
         }
+
         return $arrayData;
     }
 

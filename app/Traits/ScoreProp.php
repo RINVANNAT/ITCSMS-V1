@@ -1,6 +1,8 @@
 <?php
 namespace App\Traits;
 
+use App\Models\CourseAnnual;
+use App\Models\Department;
 use App\Models\Student;
 use Illuminate\Support\Facades\DB;
 use App\Models\Redouble;

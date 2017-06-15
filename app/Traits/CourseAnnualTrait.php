@@ -14,6 +14,7 @@ use App\Models\Employee;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Response;
 
 trait CourseAnnualTrait
 {
@@ -216,37 +217,213 @@ trait CourseAnnualTrait
         ];
     }
 
-
-
     public function cloneScore(Request $request)
     {
 
+        $count = 0;
+        $countUpdate = 0;
+        $select = [
+            'scores.course_annual_id', 'scores.student_annual_id',
+            'scores.score', 'scores.score_absence', 'percentages.name',
+            'percentages.percent', 'percentages.id as percentage_id',
+            'scores.id as score_id'
+        ];
+        $courseAnnual = CourseAnnual::where('id', $request->course_annual_id)->first();
 
-       /* if($request->group_id != null && $request->group_id != '') {
+        if($courseAnnual->responsible_department_id) {
+
+            $scoreCourseAnnualProp =DB::table('scores')
+                ->join('percentage_scores', function($query) use($courseAnnual) {
+                    $query->on('percentage_scores.score_id', '=', 'scores.id')
+                        ->where('scores.course_annual_id','=', $courseAnnual->id);
+                })
+                ->join('percentages', 'percentages.id', '=', 'percentage_scores.percentage_id')
+                ->select($select)
+                ->orderBy('percentages.id')
+                ->get();
+
+            $scoreAbsence = $this->getAbsenceFromDB($courseAnnual->id);// the absence of student for the course of thier department
+
+            $scoreCourseAnnualProp = collect($scoreCourseAnnualProp)->groupBy('student_annual_id')->toArray();
+            $resDepartment = Department::where('id', $courseAnnual->responsible_department_id)->first();
+
+            if($resDepartment->is_vocational) {
+
+                /*---these are score that inputted from the SA or SF. and we need these score to update for student in each department ---*/
+                $courseAnnualIds = CourseAnnual::where([
+                    ['department_id', $resDepartment->id],
+                    ['academic_year_id', $courseAnnual->academic_year_id],
+                    ['degree_id', $courseAnnual->degree_id],
+                    ['grade_id' ,  $courseAnnual->grade_id],
+                    ['semester_id' ,  $courseAnnual->semester_id]
+                ])->lists('id')->toArray();
+
+                $absenceByCourses = $this->getAbsenceFromDB($courseAnnualIds); //---student absence key student annual id
+
+                $percentages = DB::table('scores')
+                    ->join('percentage_scores', function($query) use($courseAnnualIds) {
+                        $query->on('percentage_scores.score_id', '=', 'scores.id')
+                            ->whereIn('scores.course_annual_id', $courseAnnualIds);
+                    })
+                    ->join('percentages', 'percentages.id', '=', 'percentage_scores.percentage_id')
+                    ->select($select)
+                    ->orderBy('percentages.id')
+                    ->get();
+
+                $collection = collect($percentages);
+                $toCloneScoreProps = $collection->groupBy('student_annual_id')->toArray();
+
+                /*----end score from depatment SA or SF----*/
+
+
+                /*---loop course score that we need to update for student (consit of student annual id ) ----*/
+                foreach($scoreCourseAnnualProp as $studentAnnualId =>  $scoreProp) {
+                    /*--there are two type of score. 1 midterm and 2 final score --*/
+
+                    //check if the score is inputed by SA or SF---
+                    if(isset($toCloneScoreProps[$studentAnnualId])) {
+
+                        $scoreToCopies = $toCloneScoreProps[$studentAnnualId];
+
+                        foreach($scoreProp as $index =>  $prop) {
+
+                            $scoreItem = collect($scoreToCopies)->filter(function($item) use($index, $prop) {
+                                if($item->percent == $prop->percent) {
+                                    return $item;
+                                }
+                            })->toArray();
+
+                            /*---ScoreItem has only one vlaue but the index is not 0----*/
+
+                            foreach($scoreItem as $item) {
+                                $scoreItem = $item;
+                            }
+                            /*--end--*/
+
+
+                            $input = [
+                                'score' =>$scoreItem->score,
+                                'score_absence' => $scoreItem->score_absence
+                            ];
+                            $update =  $this->courseAnnualScores->update($prop->score_id, $input);
+
+                            if($update) {
+                                $countUpdate++;
+                            }
+                        }
+
+                    } else {
+                        $count++;
+                    }
+
+                    /*---end cloning the score record ---*/
+
+                    //--start cloning score absence and notation
+                    /*----clone absence and notation for the student annual ---*/
+
+                    if(count($scoreAbsence) > 0) {
+                        if(isset($scoreAbsence[$courseAnnual->id])) {
+
+                            $absence = $scoreAbsence[$courseAnnual->id];
+
+                            if(isset($absence[$studentAnnualId])) {
+
+                                /*--there is an absence record for this student so we need to update the absence ---*/
+                                $input = [
+                                    'num_absence' => isset($absenceByCourses[$studentAnnualId])?$absenceByCourses[$studentAnnualId]->num_absence:null,
+                                    'notation' => isset($absenceByCourses[$studentAnnualId])?$absenceByCourses[$studentAnnualId]->notation:null
+                                ];
+                                 $this->absences->update($absence[$studentAnnualId]->id, $input);
+
+                            } else {
+
+                                /*---there is no record absence of this student so we need to check if we should clone from Absence by course inputted from SA or SF--*/
+
+                                $input = [
+                                    'course_annual_id' => $courseAnnual->id,
+                                    'student_annual_id' => $studentAnnualId,
+                                    'num_absence' => isset($absenceByCourses[$studentAnnualId])?$absenceByCourses[$studentAnnualId]->num_absence:null,
+                                    'notation' => isset($absenceByCourses[$studentAnnualId])?$absenceByCourses[$studentAnnualId]->notation:null
+                                ];
+                                if(isset($absenceByCourses[$studentAnnualId])) {
+                                    /*---create absence record ----*/
+                                    $this->absences->create($input);
+                                    /*--end create number absence ---*/
+                                }
+                            }
+                        }
+                    } else {
+
+                        $input = [
+                            'course_annual_id' => $courseAnnual->id,
+                            'student_annual_id' => $studentAnnualId,
+                            'num_absence' => isset($absenceByCourses[$studentAnnualId])?$absenceByCourses[$studentAnnualId]->num_absence:null,
+                            'notation' => isset($absenceByCourses[$studentAnnualId])?$absenceByCourses[$studentAnnualId]->notation:null
+                        ];
+
+                        if(isset($absenceByCourses[$studentAnnualId])) {
+                            /*---create absence record ----*/
+                            $this->absences->create($input);
+                            /*--end create number absence ---*/
+                        }
+                    }
+                }
+
+                /*---end loop of the student that we need to update score ----*/
+
+                if(($countUpdate/2) == count($scoreCourseAnnualProp)) {
+
+                    return Response::json(['status' => true, 'message' => ' Score Successfully Cloned !']);
+
+                } else if($countUpdate > 0) {
+
+                    return Response::json(['status' => true, 'message' => 'Some Student Score are successfully clone! Please ask responsible person to input score to all students!']);
+                }
+
+                /*---check if the score  is not inputted from SA or SF. */
+                if($count == count($scoreCourseAnnualProp)) {
+                    return Response::json(['status' => false, 'message' => 'Sorry the score is depending on Department:' . $resDepartment->name_en.'. Please ask the teacher who responsible for this course to input the scores. Then you will be able to clone them :)']);
+                }
+            } else {
+                return Response::json(['status' => false, 'message' => 'This is a wrong action! You cannot make a clone score request because your department course is not in Vocational']);
+            }
 
         } else {
-
-        }*/
-        $courseAnnual = CourseAnnual::where('id', $request->course_annual_id)->first();
-        $courseAnnualClass = DB::table('course_annual_classes')
-            ->where(function($query) use($courseAnnual){
-                $query->where('course_annual_id', '=', $courseAnnual->id)
-                    ->whereNull('course_session_id');
-            })->get();
-
-
-        $studentByCourse = $this->getStudentByDeptIdGradeIdDegreeId([$courseAnnual->department_id], [$courseAnnual->degree_id], [$courseAnnual->grade_id], $courseAnnual->academic_year_id);
-
-
-
-        dd($studentByCourse->get());
-
-        dd($courseAnnualClass);
-        $resDepartment = Department::where('id', $courseAnnual->responsible_department_id)->first();
-
-        if($resDepartment->is_vocational) {
-
+            return Response::json(['status' => false, 'message' => 'This is a wrong action! You cannot make a clone score request because your department course is not in Vocational']);
         }
+    }
+
+
+    public function isAllowCloningCourse(Request $request)
+    {
+        $courseAnnual = CourseAnnual::where('id', $request->course_annual_id)->first();
+
+        if($courseAnnual->is_allow_scoring) {
+            if($courseAnnual->responsible_department_id) {
+
+                $resDepartment = Department::where('id', $courseAnnual->responsible_department_id)->first();
+                if($resDepartment->is_vocational) {
+                    return Response::json(['status' => true, 'message' => 'Allow','allow_scoring'=> true, 'code' => 200]);
+                } else {
+                    return Response::json(['status' => false, 'message' => 'Not allow!', 'allow_scoring'=> true, 'code' => 201]);
+                }
+            } else {
+                return Response::json(['status' => false, 'message' => 'Not allow!', 'allow_scoring'=> true, 'code' => 202]);
+            }
+        } else {
+            if($courseAnnual->responsible_department_id) {
+
+                $resDepartment = Department::where('id', $courseAnnual->responsible_department_id)->first();
+                if($resDepartment->is_vocational) {
+                    return Response::json(['status' => true, 'message' => 'Allow', 'allow_scoring'=> false, 'code' => 200]);
+                } else {
+                    return Response::json(['status' => false, 'message' => 'Not allow!', 'allow_scoring'=> false, 'code' => 201]);
+                }
+            } else {
+                return Response::json(['status' => false, 'message' => 'Not allow!', 'allow_scoring'=> false, 'code' => 202]);
+            }
+        }
+
 
     }
 

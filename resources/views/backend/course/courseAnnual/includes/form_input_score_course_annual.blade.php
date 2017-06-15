@@ -76,27 +76,34 @@
                     @foreach($availableCourses as $course_annual_id => $course)
                         @if($course_annual_id == $courseAnnual->id)
 
-                            <option value="{{$course_annual_id}}" selected> {{$courseAnnual->name_en.' /'.$course[0]->department_code.'/'.$course[0]->grade_id}}</option>
+                            <option value="{{$course_annual_id}}" selected> {{$course[0]->name_en}} {{ '|'.$course[0]->department_code.'-'.(($course[0]->degree_id ==1)?'I':'T').$course[0]->grade_id }} {{' |S_'.$course[0]->semester_id}}</option>
                         @else
-                            <option value="{{$course_annual_id}}"> {{$course[0]->name_en. '/'.$course[0]->department_code.'/'.$course[0]->grade_id}}</option>
+                            <option value="{{$course_annual_id}}"> {{$course[0]->name_en}} {{'|'.$course[0]->department_code.'-'.(($course[0]->degree_id ==1)?'I':'T').$course[0]->grade_id }} {{' |S_'.$course[0]->semester_id}}</option>
                         @endif
                     @endforeach
                 </select>
 
             </div>
 
-            @if($courseAnnual->is_allow_scoring)
-                @if($allowCloningScore)
-                    <button class="btn btn-success btn-xs pull-left" id="clone_score" data-toggle="tooltip" data-placement="top" title=" The action is to allow you to clone score of this course from responsible department!"  style="margin-left:5px"> Clone-Score </button>
+            <div id="blog_button">
+                <a class="btn btn-primary btn-xs pull-right" id="export_score" href="{{route('course_annual.export_course_score_annual')}}" target="_blank" style="margin-left:5px">Export Score</a>
+                @if($courseAnnual->is_allow_scoring)
+                    @if($allowCloningScore)
+                        <button class="btn btn-success btn-xs pull-right" id="clone_score" data-toggle="tooltip" data-placement="top" title=" The action is to allow you to clone score of this course from responsible department!"  style="margin-left:5px"> Clone-Score </button>
+                    @else
+                        @if(access()->user()->allow("input-score-without-blocking") || ($courseAnnual->is_allow_scoring && $mode == "edit"))
+                            <button class="btn btn-primary btn-xs pull-right" id="save_editted_score" style="margin-left:5px">Save Changes!</button>
+                        @endif
+                        @if(access()->user()->allow("input-score-without-blocking") || ($courseAnnual->is_allow_scoring && $mode == "edit"))
+                            <a href="{{route('course_annual.form_import_score')}}" target="_self" class="btn btn-info btn-xs pull-right" id="import_score" style="margin-left: 5px"> Import Score</a>
+                        @endif
+
+                    @endif
                 @endif
-            @endif
-            @if(access()->user()->allow("input-score-without-blocking") || ($courseAnnual->is_allow_scoring && $mode == "edit"))
-            <button class="btn btn-primary btn-xs pull-right" id="save_editted_score" style="margin-left:5px">Save Changes!</button>
-            @endif
-            <a class="btn btn-primary btn-xs pull-right" id="export_score" href="{{route('course_annual.export_course_score_annual')}}" target="_blank" style="margin-left:5px">Export Score</a>
-            @if(access()->user()->allow("input-score-without-blocking") || ($courseAnnual->is_allow_scoring && $mode == "edit"))
-            <a href="{{route('course_annual.form_import_score')}}" target="_self" class="btn btn-info btn-xs pull-right" id="import_score" style="margin-left: 5px"> Import Score</a>
-            @endif
+
+            </div>
+
+
             {{--<div class="btn-group pull-right btn_action_group">--}}
 
                 {{--<button type="button" class="btn btn-warning btn-xs dropdown-toggle" data-toggle="dropdown" aria-expanded="false">--}}
@@ -112,21 +119,25 @@
 
         <div class="box-body">
 
-            @if($mode == "view")
-            <div class="alert alert-info">
-                <h4><i class="icon fa fa-info"></i> Viewing mode!</h4>
-                <p>
-                    This is in viewing mode. You cannot delete or modify this course.
-                </p>
+            <div id="view_message">
+
+                @if($mode == "view")
+                    <div class="alert alert-info">
+                        <h4><i class="icon fa fa-info"></i> Viewing mode!</h4>
+                        <p>
+                            This is in viewing mode. You cannot delete or modify this course.
+                        </p>
+                    </div>
+                @elseif(!$courseAnnual->is_allow_scoring)
+                    <div class="alert alert-danger">
+                        <h4><i class="icon fa fa-info"></i> Scoring is blocked!</h4>
+                        <p>
+                            This course is blocked for scoring. Please contact student & study affair office if you wish to make change.
+                        </p>
+                    </div>
+                @endif
+
             </div>
-            @elseif(!$courseAnnual->is_allow_scoring)
-            <div class="alert alert-danger">
-                <h4><i class="icon fa fa-info"></i> Scoring is blocked!</h4>
-                <p>
-                    This course is blocked for scoring. Please contact student & study affair office if you wish to make change.
-                </p>
-            </div>
-            @endif
 
             <div id="score_table" class="handsontable htColumnHeaders">
 
@@ -783,7 +794,8 @@
             });
         });
 
-        $('#save_editted_score').on('click', function() {
+        $(document).on('click','#save_editted_score', function() {
+
 
             var course_annual_id = $('#available_course :selected').val();
 
@@ -987,10 +999,91 @@
             var baseData = {
                 course_annual_id: $(this).val()
             }
+
+            checkCourse($(this).val());
             switch_course(baseData);
             list_group($(this).val());
 
         });
+
+        function checkCourse(course_id)
+        {
+            $.ajax({
+                type: 'POST',
+                url: '{{route('course_annual.is_allow_cloning_course')}}',
+                data: {_token:'{{csrf_token()}}', course_annual_id: course_id},
+                dataType: "json",
+                success: function(resultData) {
+                    if(resultData.allow_scoring) {
+
+                        if($('div#view_message').is(':visible')) {
+                            $('div#view_message').html('')
+                        }
+
+                        if(resultData.status) {// check if the course of department vocational SA or SF
+
+                            if(!$('#clone_score').is(':visible')) {
+                                $('#blog_button').append('<button class="btn btn-success btn-xs pull-right" id="clone_score" data-toggle="tooltip" data-placement="top" title=" The action is to allow you to clone score of this course from responsible department!"  style="margin-left:5px"> Clone-Score </button>')
+                            }
+
+                            @if(access()->user()->allow("input-score-without-blocking") || ($courseAnnual->is_allow_scoring && $mode == "edit"))
+                                if($('#save_editted_score').is(':visible')) {
+                                   $('#blog_button').find('#save_editted_score').remove();
+                                }
+                            @endif
+
+                            @if(access()->user()->allow("input-score-without-blocking") || ($courseAnnual->is_allow_scoring && $mode == "edit"))//import_score
+                                if($('#import_score').is(':visible')) {
+                                    $('#blog_button').find('#import_score').remove();
+                                }
+                            @endif
+
+                        } else {
+
+                            if($('#clone_score').is(':visible')) {
+                                $('#blog_button').find('#clone_score').remove();
+                            }
+
+                            @if(access()->user()->allow("input-score-without-blocking") || ($courseAnnual->is_allow_scoring && $mode == "edit"))
+                            if(!$('#save_editted_score').is(':visible')) {
+                                $('#blog_button').append('<button class="btn btn-primary btn-xs pull-right" id="save_editted_score" style="margin-left:5px">Save Changes!</button>')
+                            }
+                            @endif
+                            @if(access()->user()->allow("input-score-without-blocking") || ($courseAnnual->is_allow_scoring && $mode == "edit"))//import_score
+                            if(!$('#import_score').is(':visible')) {
+                                $('#blog_button').append('<a href="{{route('course_annual.form_import_score')}}" target="_self" class="btn btn-info btn-xs pull-right" id="import_score" style="margin-left: 5px"> Import Score</a>')
+                            }
+                            @endif
+
+                        }
+                    } else{
+
+
+                        var div = '<div class="alert alert-danger">' +
+                                '<h4><i class="icon fa fa-info"></i> Scoring is blocked!</h4>' +
+                                'This course is blocked for scoring. Please contact student & study affair office if you wish to make change.'+
+                                '</p>' +
+                                '</div>';
+
+                        $('div#view_message').html(div)
+                        if($('#save_editted_score').is(':visible')) {
+                            $('#blog_button').find('#save_editted_score').remove();
+                        }
+                        if($('#import_score').is(':visible')) {
+                            $('#blog_button').find('#import_score').remove();
+                        }
+
+                        if($('#clone_score').is(':visible')) {
+                            $('#blog_button').find('#clone_score').remove();
+                        }
+                    }
+                },
+                error:function(error) {
+                    notify('error', 'Something went wrong', 'Server Error')
+                }
+            });
+
+        }
 
         $(document).ready(function() {
             if(val = $('select[name=available_course] :selected').val()) {
@@ -1000,12 +1093,16 @@
 
         function switch_course(baseData) {
 
+            toggleLoading(true);
+
             $.ajax({
                 type: 'POST',
                 url: '{{route('course_annual.ajax_switch_course_annual')}}',
                 data: baseData,
                 dataType: "json",
                 success: function(resultData) {
+
+                    toggleLoading(false);
 
                     updateSettingHandsontable(resultData);
                     declareColumnHeaderDataEmpty()
@@ -1069,7 +1166,7 @@
 
         });
 
-        $('#import_score').on('click', function(e) {
+        $(document).on('click','#import_score', function(e) {
             e.preventDefault();
             var url = $(this).attr('href');
             var colHeaders = setting.colHeaders
@@ -1118,8 +1215,6 @@
         @endif
 
 
-
-
         $(document).on('click', '#clone_score', function(e) {
 
             var baseData = {
@@ -1133,7 +1228,16 @@
                 data: baseData,
                 dataType: "JSON",
                 success: function(resultData) {
-                    console.log(resultData)
+                    if(resultData.status) {
+                        notify('success', resultData.message, 'Clone Score!')
+                        var baseData = {
+                            course_annual_id: $('select[name=available_course] :selected').val()
+                        }
+                        switch_course(baseData);
+                    } else {
+                        notify('error', resultData.message, 'Clone Score!')
+                    }
+
                 },
                 error:function(error) {
 
