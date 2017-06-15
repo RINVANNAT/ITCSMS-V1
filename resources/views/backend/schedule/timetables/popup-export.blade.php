@@ -120,7 +120,7 @@
                     type: 'POST',
                     url: '{{ route('timetables.export_file') }}',
                     data: $(this).serialize(),
-                    success: function (response) {
+                    success: function () {
                         notify('info', 'Timetable is exported as format excel.', 'Export Timetable');
                     },
                     error: function () {
@@ -134,4 +134,3 @@
         });
     </script>
 @stop
-

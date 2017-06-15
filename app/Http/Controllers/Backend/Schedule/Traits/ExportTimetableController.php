@@ -177,7 +177,7 @@ trait ExportTimetableController
             });
 
             // header sheet
-            $sheet->row(1, array('', '', 'EMPLOI DU TEMPS ' . $academicYear, '', '', '', '', '', '', 'Semestre - '.$semester, '', '', ''));
+            $sheet->row(1, array('', '', 'EMPLOI DU TEMPS ' . $academicYear, '', '', '', '', '', '', 'Semestre - ' . $semester, '', '', ''));
             $sheet->row(2, array('', '', 'Groupe: ' . $department . '-' . $degree . $grade . ($group == null ? '' : $display_group), '', '', '', '', '', '', 'Semaines ' . $week->id, '', '', ''));
 
             // header table
@@ -188,17 +188,17 @@ trait ExportTimetableController
             $sheet->setWidth(array(
                 'A' => 20,
                 'B' => 15,
-                'C' => 18,
+                'C' => 15,
                 'D' => 15,
-                'E' => 18,
+                'E' => 15,
                 'F' => 15,
-                'G' => 18,
+                'G' => 15,
                 'H' => 15,
-                'I' => 18,
+                'I' => 15,
                 'J' => 15,
-                'K' => 18,
+                'K' => 15,
                 'L' => 15,
-                'M' => 18
+                'M' => 15
             ));
 
             // semester header
@@ -369,6 +369,15 @@ trait ExportTimetableController
         ])->first();
     }
 
+    /**
+     * Append data into each row.
+     *
+     * @param $sheet
+     * @param $columns
+     * @param $countColumns
+     * @param $countRows
+     * @param TimetableSlot $timetableSlot
+     */
     public function append_data($sheet, $columns, $countColumns, $countRows, TimetableSlot $timetableSlot)
     {
         //dd($timetableSlot->room->building);

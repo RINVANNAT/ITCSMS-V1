@@ -230,7 +230,7 @@ trait AjaxCRUDTimetableController
             }
         });
 
-        if (count($groups) > 1) {
+        if (count($groups) > 0) {
             return Response::json(['status' => true, 'groups' => $groups]);
         }
         return Response::json(['status' => false]);
