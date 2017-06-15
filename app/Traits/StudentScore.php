@@ -996,7 +996,6 @@ trait StudentScore {
 
     public function getCourseAnnualWithProp($props)
     {
-
         $courseAnnuals = $this->getCourseAnnually();
 
         if($props['department_id']) {
@@ -1020,6 +1019,7 @@ trait StudentScore {
         }
 
         $courseAnnuals = $courseAnnuals->orderBy('course_annuals.semester_id')->orderBy('course_annuals.name_en');// note restricted order by semester this is very important to make dynamic table course of each year [if change there would have bugs]
+
 
         return $courseAnnuals;
 

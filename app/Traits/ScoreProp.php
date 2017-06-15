@@ -57,12 +57,27 @@ trait ScoreProp {
         return ($arrayData);
     }
 
-    public function getStudentAnnualByGroupIds(array $groupIds = array(), $semesterId)
+    public function getStudentAnnualByGroupIds(array $groupIds = array(), $semesterId, $departmentId)
     {
-        return DB::table('group_student_annuals')
-            ->whereIn('group_id', $groupIds)
-            ->where('semester_id', $semesterId)
-            ->lists('student_annual_id');
+
+        $department = Department::where('id', $departmentId)->first();
+
+        if($department->is_vocational) {
+
+            $studentAnnualIds =  DB::table('group_student_annuals')
+                ->whereIn('group_id', $groupIds)
+                ->where('semester_id', $semesterId)
+                ->where('department_id', $department->id)
+                ->lists('student_annual_id');
+
+            return ($studentAnnualIds);
+        } else {
+            return DB::table('group_student_annuals')
+                ->whereIn('group_id', $groupIds)
+                ->where('semester_id', $semesterId)
+                ->lists('student_annual_id');
+        }
+
 
     }
 

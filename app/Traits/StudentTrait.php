@@ -212,10 +212,12 @@ trait StudentTrait
 
             if($groupByCourseAnnual != null) {
 
-                $studentAnnualIds = $this->getStudentAnnualByGroupIds($groupByCourseAnnual, $course_annual->semester_id);
+                $studentAnnualIds = $this->getStudentAnnualByGroupIds($groupByCourseAnnual, $course_annual->semester_id, $department_id = $course_annual->department_id);
                 $filtered_students = $filtered_students->whereIn('studentAnnuals.id', $studentAnnualIds)->get();
+
             } else {
                 $filtered_students =  $filtered_students->get();//->where('studentAnnuals.group', null)->get();
+
             }
 
         } else {
@@ -223,8 +225,10 @@ trait StudentTrait
             $filtered_students =  $this->getStudentByDeptIdGradeIdDegreeId([$course_annual->department_id], [$course_annual->degree_id], [$course_annual->grade_id], $course_annual->academic_year_id);
 
             if($groupByCourseAnnual != null) {
-                $studentAnnualIds = $this->getStudentAnnualByGroupIds($groupByCourseAnnual, $course_annual->semester_id);
+                $studentAnnualIds = $this->getStudentAnnualByGroupIds($groupByCourseAnnual, $course_annual->semester_id, $department_id = $course_annual->department_id);
+
                 $filtered_students = $filtered_students->whereIn('studentAnnuals.id', $studentAnnualIds)->get();
+
             } else {
                 $filtered_students =  $filtered_students->get();//->where('studentAnnuals.group', null)->get();
             }

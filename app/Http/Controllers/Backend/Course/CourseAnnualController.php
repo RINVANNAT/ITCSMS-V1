@@ -1352,7 +1352,7 @@ class CourseAnnualController extends Controller
 
         $arrayData = [];
         $courseAnnual = CourseAnnual::where('id', $courseAnnualId)->first();
-        $department = Department::where('id', $courseAnnual->department_id)->first();
+        $department = Department::where('id', $courseAnnual->department_id)->first(); // owner of the department course
         $propArrayIds = $this->arrayIdsOfDeptGradeDegreeDeptOption($courseAnnual);
 
         $department_ids = $propArrayIds['department_id'];
@@ -1478,8 +1478,6 @@ class CourseAnnualController extends Controller
 
             } else {
 
-
-
                 if($courseAnnual->semester_id >  1) {
 
                     $studentByCourse = $studentByCourse
@@ -1553,12 +1551,6 @@ class CourseAnnualController extends Controller
                         $scoreData = [];
                     }
 
-
-                    //----check if every student has the score equal or upper then 90 then we set status to true..then we will not allow teacher to add any score
-//                if($checkPercent >= 90 ) {
-//                    $checkScoreReachHundredPercent++;
-//                }
-
                     /*------store average(a total score of each courseannual in table averages)-----------*/
 
                     if (count($studentScore) == $checkFraudAbsScore) {
@@ -1576,8 +1568,6 @@ class CourseAnnualController extends Controller
                         ];
 
                     }
-
-
 
                     if(count($averageByCourseAnnual) > 0) {
 
@@ -1777,19 +1767,34 @@ class CourseAnnualController extends Controller
                 }
             }
 
-
             if ($status == count($baseData)) {
+
+                $courseAnnualId = $baseData[0]['course_annual_id'];
+                $absenceByCourse = $this->getStudentAbsence($courseAnnualId);
+
                 foreach ($baseData as $data) {
 
                     if ($data['student_annual_id'] != null) {
 
-                        $absence = $this->absences->findIfExist($data['course_annual_id'], $data['student_annual_id']);
-                        if ($absence) {
-                            //update absence
-                            $update = $this->absences->update($absence->id, $data);
-                            if ($update) {
-                                $checkUpdate++;
+                        if(count($absenceByCourse) > 0) {
+                            $absences = $absenceByCourse;
+
+                            if(isset($absences[$data['student_annual_id']])) {
+                                //update absence
+                                $studentAbsence = $absences[$data['student_annual_id']];
+                                $update = $this->absences->update($studentAbsence->id, $data);
+                                if ($update) {
+                                    $checkUpdate++;
+                                }
+                            } else {
+
+                                // store absence
+                                $store = $this->absences->create($data);
+                                if ($store) {
+                                    $checkStore++;
+                                }
                             }
+
                         } else {
                             // store absence
                             $store = $this->absences->create($data);
@@ -1797,6 +1802,7 @@ class CourseAnnualController extends Controller
                                 $checkStore++;
                             }
                         }
+
                     } else {
                         $checkNOTUpdatOrStore++;
                     }
@@ -2020,18 +2026,13 @@ class CourseAnnualController extends Controller
         //------get score properties and absence -------
 
         $allProperties = $this->getCourseAnnualWithScore($array_course_annual_ids);
-
-
         $eachCourseAnnualScores = $allProperties['averages'];
-
 
         $absences = $allProperties['absences'];
 
         //---get Selected Group by course annual-----
 
         $groups = $this->selectedGroupByCourseAnnual($array_course_annual_ids);
-
-
         $element = [];
         $totalAbs = [];
         $totalMoyenne = [];

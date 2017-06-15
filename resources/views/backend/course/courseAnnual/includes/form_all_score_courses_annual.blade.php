@@ -652,7 +652,7 @@
                     if (resultData.status == false) {
 
 
-                        notify('error', '<h2> Hello</h2>');
+                        notify('error',resultData.message );
 
                         /*swal({
                             title: "Attention",
