@@ -2,7 +2,6 @@
 
 namespace App\Http\Controllers\Backend\Schedule\Traits;
 
-use App\Http\Requests\Backend\Accounting\Outcome\CreateOutcomeRequest;
 use App\Http\Requests\Backend\Schedule\Timetable\AddRoomIntoTimetableSlotRequest;
 use App\Http\Requests\Backend\Schedule\Timetable\CreateTimetableRequest;
 use App\Http\Requests\Backend\Schedule\Timetable\MoveTimetableSlotRequest;
@@ -13,7 +12,6 @@ use App\Models\Configuration;
 use App\Models\Department;
 use App\Models\DepartmentOption;
 use App\Models\Grade;
-use App\Models\Group;
 use App\Models\Schedule\Timetable\Slot;
 use App\Models\Schedule\Timetable\Timetable;
 use App\Models\Schedule\Timetable\TimetableSlot;
@@ -291,87 +289,27 @@ trait AjaxCRUDTimetableController
      */
     public function get_timetable_slots(CreateTimetableRequest $request)
     {
-        $timetable_languages = new Collection();
         $timetableSlots = new Collection();
-
         // get student annuals.
         if ($request->department < 12) {
             // get student annuals id
             $student_annual_ids = $this->timetableSlotRepo->find_student_annual_ids($request);
-            // get group english by student annual id to get timetable slot english
+
+            // get group language
             $groupEnglishArray = $this->timetableSlotRepo->get_group_student_annual_form_language(12, $student_annual_ids, $request);
-            // get group english by student annual id to get timetable slot french
             $groupFrenchArray = $this->timetableSlotRepo->get_group_student_annual_form_language(13, $student_annual_ids, $request);
 
+            // get timetable language
+            $timetablesEnglish = $this->timetableSlotRepo->get_timetables_form_language_by_student_annual($groupEnglishArray[0], $request, 12);
+            $timetablesFrench = $this->timetableSlotRepo->get_timetables_form_language_by_student_annual($groupFrenchArray[0], $request, 13);
 
-            // get timetable english.
-            $timetablesEnglish = $this->timetableSlotRepo->get_timetables_form_language_by_student_annual($groupEnglishArray, $request, 12);
-            $timetablesFrench = $this->timetableSlotRepo->get_timetables_form_language_by_student_annual($groupFrenchArray, $request, 13);
+            // get timetable slots
+            $timetableSlotsEnglish = $this->timetableSlotRepo->get_timetable_slot_language_dept($timetablesEnglish);
+            $timetableSlotsFrench = $this->timetableSlotRepo->get_timetable_slot_language_dept($timetablesFrench);
 
-
-
-            $tmpTimetableSlotsEnglish = new Collection();
-            if (count($timetablesEnglish) > 0) {
-                foreach ($timetablesEnglish as $timetableEnglish) {
-                    $getTimetableSlotsEnglish = $this->timetableSlotRepo->get_timetable_slot_details($timetableEnglish);
-                    if(count($getTimetableSlotsEnglish)>0){
-                        foreach ($getTimetableSlotsEnglish as $item){
-                            $tmpTimetableSlotsEnglish->push($item);
-                        }
-                    }
-                }
-            }
-
-            dd(collect($tmpTimetableSlotsEnglish->toArray())->keyBy('start'));
-
-
-            // take studentAnnuals to find group in language section.
-            $group_languages = DB::table('group_student_annuals')
-                ->whereIn('student_annual_id', $student_annual_ids)
-                ->where(function ($query) {
-                    $query->where('department_id', 12)
-                        ->orWhere('department_id', 13);
-                })
-                ->orderBy('group_id')
-                ->distinct('group_id')
-                ->lists('group_id');
-
-            // remove it next time.
-            foreach ($group_languages as $group_language) {
-                $getTimetableLanguage = Timetable::where([
-                    ['academic_year_id', $request->academicYear],
-                    ['department_id', 12], // English section
-                    ['degree_id', $request->degree],
-                    ['option_id', $request->option == null ? null : $request->option],
-                    ['grade_id', $request->grade],
-                    ['semester_id', $request->semester],
-                    ['week_id', $request->weekly],
-                    ['group_id', $group_language]
-                ])
-                    ->orWhere([
-                        ['academic_year_id', $request->academicYear],
-                        ['department_id', 13], // French section
-                        ['degree_id', $request->degree],
-                        ['option_id', $request->option == null ? null : $request->option],
-                        ['grade_id', $request->grade],
-                        ['semester_id', $request->semester],
-                        ['week_id', $request->weekly],
-                        ['group_id', $group_language]
-                    ])
-                    ->first();
-
-                if ($getTimetableLanguage instanceof Timetable) {
-                    $timetable_languages->push($getTimetableLanguage);
-                }
-            }
-        }
-
-        if (count($timetable_languages) > 0) {
-            foreach ($timetable_languages as $timetable_language) {
-                if (($timetable_language instanceof Timetable) && (count($timetable_language->timetableSlots) > 0)) {
-                    $this->timetableSlotRepo->get_timetable_slot_with_conflict_info($timetable_language, $timetableSlots);
-                }
-            }
+            // set timetable slots language to view.
+            $this->timetableSlotRepo->set_timetable_slot_language($timetableSlots, $groupEnglishArray[1], $timetableSlotsEnglish);
+            $this->timetableSlotRepo->set_timetable_slot_language($timetableSlots, $groupFrenchArray[1], $timetableSlotsFrench);
         }
 
         // $group_student_annual_classes = DB::table('group_student_annual')
@@ -419,7 +357,8 @@ trait AjaxCRUDTimetableController
      * @param ResizeTimetableSlotRequest $request
      * @return mixed
      */
-    public function resize_timetable_slot(ResizeTimetableSlotRequest $request){
+    public function resize_timetable_slot(ResizeTimetableSlotRequest $request)
+    {
         if (isset($request->timetable_slot_id)) {
             // find timetable slot
             $timetable_slot = TimetableSlot::find($request->timetable_slot_id);

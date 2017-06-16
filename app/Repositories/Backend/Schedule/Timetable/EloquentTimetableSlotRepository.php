@@ -845,7 +845,7 @@ class EloquentTimetableSlotRepository implements TimetableSlotRepositoryContract
      */
     public function get_group_student_annual_form_language($department_id, array $student_annual_ids, CreateTimetableRequest $request)
     {
-        $groupStudentsArray = array();
+        $groups = array();
         $groupStudentsLanguage = DB::table('group_student_annuals')
             ->whereIn('student_annual_id', $student_annual_ids)
             ->where([
@@ -855,7 +855,13 @@ class EloquentTimetableSlotRepository implements TimetableSlotRepositoryContract
             ->orderBy('group_id')
             ->distinct('group_id')
             ->lists('group_id');
-        return $groupStudentsLanguage;
+        foreach ($groupStudentsLanguage as $item) {
+            $group = Group::find($item);
+            if ($group instanceof Group) {
+                array_push($groups, $group);
+            }
+        }
+        return array($groupStudentsLanguage, $groups);
     }
 
     /**
@@ -887,5 +893,52 @@ class EloquentTimetableSlotRepository implements TimetableSlotRepositoryContract
             }
         }
         return $timetables;
+    }
+
+    /**
+     * Get timetable slots from language dept.
+     *
+     * @param Collection $timetables
+     * @return mixed
+     */
+    public function get_timetable_slot_language_dept(Collection $timetables)
+    {
+        $timetableSlots = new Collection();
+        foreach ($timetables as $timetable) {
+            $getTimetableSlotsEnglish = $this->get_timetable_slot_details($timetable);
+            if (count($getTimetableSlotsEnglish) > 0) {
+                foreach ($getTimetableSlotsEnglish as $item) {
+                    $timetableSlots->push($item);
+                }
+            }
+        }
+        return collect($timetableSlots)->keyBy('start');
+    }
+
+    /**
+     * Set language timetable slot into TimetableSlots.
+     *
+     * @param Collection $timetableSlots
+     * @param array $groups
+     * @param Collection $languageTimetableSlots
+     * @return mixed
+     */
+    public function set_timetable_slot_language(Collection $timetableSlots, array $groups, Collection $languageTimetableSlots)
+    {
+        usort($groups, function ($a, $b) {
+            if (is_numeric($a->code)) {
+                return $a->code - $b->code;
+            } else {
+                return strcmp($a->code, $b->code);
+            }
+        });
+        // pass timetable slots.
+        foreach ($languageTimetableSlots as $item) {
+            $item->teacher_name = '';
+            $timetableSlot = new Collection($item->toArray());
+            $timetableSlot->put('groups', $groups);
+            $timetableSlots->push($timetableSlot);
+        }
+        return $timetableSlots;
     }
 }
