@@ -260,4 +260,32 @@ interface TimetableSlotRepositoryContract
      * @return mixed
      */
     public function get_timetable_slot_with_conflict_info(Timetable $timetable, Collection $timetableSlots);
+
+    /**
+     * Get all student annuals.
+     *
+     * @param CreateTimetableRequest $request
+     * @return mixed
+     */
+    public function find_student_annual_ids(CreateTimetableRequest $request);
+
+    /**
+     * Get group student annual from language.
+     *
+     * @param $department_id
+     * @param array $student_annual_ids
+     * @param CreateTimetableRequest $request
+     * @return mixed
+     */
+    public function get_group_student_annual_form_language($department_id, array $student_annual_ids, CreateTimetableRequest $request);
+
+    /**
+     * Get timetables from dept language.
+     *
+     * @param array $group_students
+     * @param CreateTimetableRequest $request
+     * @param $department_id
+     * @return mixed
+     */
+    public function get_timetables_form_language_by_student_annual(array $group_students, CreateTimetableRequest $request, $department_id);
 }

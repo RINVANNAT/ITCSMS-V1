@@ -2,6 +2,7 @@
 
 namespace App\Repositories\Backend\Schedule\Timetable;
 
+use App\Http\Requests\Backend\Schedule\Timetable\CreateTimetableRequest;
 use App\Http\Requests\Backend\Schedule\Timetable\CreateTimetableSlotRequest;
 use App\Models\Configuration;
 use App\Models\CourseAnnualClass;
@@ -809,5 +810,82 @@ class EloquentTimetableSlotRepository implements TimetableSlotRepositoryContract
             }
         }
         return $timetableSlots;
+    }
+
+    /**
+     * Get all student annuals.
+     *
+     * @param CreateTimetableRequest $request
+     * @return mixed
+     */
+    public function find_student_annual_ids(CreateTimetableRequest $request)
+    {
+        return DB::table('group_student_annuals')
+            ->leftJoin('studentAnnuals', 'studentAnnuals.id', '=', 'group_student_annuals.student_annual_id')
+            ->where([
+                ['studentAnnuals.academic_year_id', $request->academicYear],
+                ['studentAnnuals.department_id', $request->department],
+                ['studentAnnuals.degree_id', $request->degree],
+                ['studentAnnuals.grade_id', $request->grade],
+                ['studentAnnuals.department_option_id', $request->option == null ? null : $request->option],
+                ['group_student_annuals.group_id', $request->group == null ? null : $request->group]
+            ])
+            ->orderBy('studentAnnuals.id')
+            ->distinct('studentAnnuals.id')
+            ->lists('studentAnnuals.id');
+    }
+
+    /**
+     * Get group student annual from language.
+     *
+     * @param $department_id
+     * @param array $student_annual_ids
+     * @param CreateTimetableRequest $request
+     * @return mixed
+     */
+    public function get_group_student_annual_form_language($department_id, array $student_annual_ids, CreateTimetableRequest $request)
+    {
+        $groupStudentsArray = array();
+        $groupStudentsLanguage = DB::table('group_student_annuals')
+            ->whereIn('student_annual_id', $student_annual_ids)
+            ->where([
+                ['department_id', $department_id],
+                ['semester_id', $request->semester]
+            ])
+            ->orderBy('group_id')
+            ->distinct('group_id')
+            ->lists('group_id');
+        return $groupStudentsLanguage;
+    }
+
+    /**
+     * Get timetable slot from dept language.
+     *
+     * @param array $group_students
+     * @param CreateTimetableRequest $request
+     * @param $department_id
+     * @return mixed
+     */
+    public function get_timetables_form_language_by_student_annual(array $group_students, CreateTimetableRequest $request, $department_id)
+    {
+        //dd($group_students);
+        $timetables = new Collection();
+        foreach ($group_students as $group_student) {
+            $getTimetable = Timetable::where([
+                ['academic_year_id', $request->academicYear],
+                ['department_id', $department_id],
+                ['degree_id', $request->degree],
+                ['option_id', $request->option == null ? null : $request->option],
+                ['grade_id', $request->grade],
+                ['semester_id', $request->semester],
+                ['week_id', $request->weekly],
+                ['group_id', $group_student]
+            ])->first();
+
+            if ($getTimetable instanceof Timetable) {
+                $timetables->push($getTimetable);
+            }
+        }
+        return $timetables;
     }
 }

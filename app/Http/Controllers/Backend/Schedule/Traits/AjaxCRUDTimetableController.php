@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Backend\Schedule\Traits;
 
+use App\Http\Requests\Backend\Accounting\Outcome\CreateOutcomeRequest;
 use App\Http\Requests\Backend\Schedule\Timetable\AddRoomIntoTimetableSlotRequest;
 use App\Http\Requests\Backend\Schedule\Timetable\CreateTimetableRequest;
 use App\Http\Requests\Backend\Schedule\Timetable\MoveTimetableSlotRequest;
@@ -12,6 +13,7 @@ use App\Models\Configuration;
 use App\Models\Department;
 use App\Models\DepartmentOption;
 use App\Models\Grade;
+use App\Models\Group;
 use App\Models\Schedule\Timetable\Slot;
 use App\Models\Schedule\Timetable\Timetable;
 use App\Models\Schedule\Timetable\TimetableSlot;
@@ -291,52 +293,50 @@ trait AjaxCRUDTimetableController
     {
         $timetable_languages = new Collection();
         $timetableSlots = new Collection();
+
         // get student annuals.
         if ($request->department < 12) {
-            $student_annual_ids = DB::table('group_student_annuals')
-                ->leftJoin('studentAnnuals', 'studentAnnuals.id', '=', 'group_student_annuals.student_annual_id')
-                ->where([
-                    ['studentAnnuals.academic_year_id', $request->academicYear],
-                    ['studentAnnuals.department_id', $request->department],
-                    ['studentAnnuals.degree_id', $request->degree],
-                    ['studentAnnuals.grade_id', $request->grade],
-                    ['studentAnnuals.department_option_id', $request->option == null ? null : $request->option],
-                    ['group_student_annuals.group_id', $request->group == null ? null : $request->group]
-                ])
-                ->orderBy('studentAnnuals.id')
-                ->distinct('studentAnnuals.id')
-                ->lists('studentAnnuals.id');
+            // get student annuals id
+            $student_annual_ids = $this->timetableSlotRepo->find_student_annual_ids($request);
+            // get group english by student annual id to get timetable slot english
+            $groupEnglishArray = $this->timetableSlotRepo->get_group_student_annual_form_language(12, $student_annual_ids, $request);
+            // get group english by student annual id to get timetable slot french
+            $groupFrenchArray = $this->timetableSlotRepo->get_group_student_annual_form_language(13, $student_annual_ids, $request);
 
-            $groupsStudentEnglishSection = DB::table('group_student_annuals')
-                ->whereIn('student_annual_id', $student_annual_ids)
-                ->orWhere('department_id', 12)
-                ->orderBy('group_id')
-                ->distinct('group_id')
-                ->lists('group_id');
 
-            $groupsStudentFrenchSection = DB::table('group_student_annuals')
-                ->whereIn('student_annual_id', $student_annual_ids)
-                ->orWhere('department_id', 13)
-                ->orderBy('group_id')
-                ->distinct('group_id')
-                ->lists('group_id');
+            // get timetable english.
+            $timetablesEnglish = $this->timetableSlotRepo->get_timetables_form_language_by_student_annual($groupEnglishArray, $request, 12);
+            $timetablesFrench = $this->timetableSlotRepo->get_timetables_form_language_by_student_annual($groupFrenchArray, $request, 13);
+
+
+
+            $tmpTimetableSlotsEnglish = new Collection();
+            if (count($timetablesEnglish) > 0) {
+                foreach ($timetablesEnglish as $timetableEnglish) {
+                    $getTimetableSlotsEnglish = $this->timetableSlotRepo->get_timetable_slot_details($timetableEnglish);
+                    if(count($getTimetableSlotsEnglish)>0){
+                        foreach ($getTimetableSlotsEnglish as $item){
+                            $tmpTimetableSlotsEnglish->push($item);
+                        }
+                    }
+                }
+            }
+
+            dd(collect($tmpTimetableSlotsEnglish->toArray())->keyBy('start'));
+
 
             // take studentAnnuals to find group in language section.
             $group_languages = DB::table('group_student_annuals')
                 ->whereIn('student_annual_id', $student_annual_ids)
-                ->orWhere([
-                    ['department_id', 12],
-                    ['department_id', 13]
-                ])
+                ->where(function ($query) {
+                    $query->where('department_id', 12)
+                        ->orWhere('department_id', 13);
+                })
                 ->orderBy('group_id')
                 ->distinct('group_id')
                 ->lists('group_id');
 
-            // get timetable from language section
-            $timetableForEnglishs = new Collection();
-            $timetableForFrenchs = new Collection();
-
-
+            // remove it next time.
             foreach ($group_languages as $group_language) {
                 $getTimetableLanguage = Timetable::where([
                     ['academic_year_id', $request->academicYear],
@@ -364,7 +364,6 @@ trait AjaxCRUDTimetableController
                     $timetable_languages->push($getTimetableLanguage);
                 }
             }
-
         }
 
         if (count($timetable_languages) > 0) {
@@ -420,8 +419,7 @@ trait AjaxCRUDTimetableController
      * @param ResizeTimetableSlotRequest $request
      * @return mixed
      */
-    public function resize_timetable_slot(ResizeTimetableSlotRequest $request)
-    {
+    public function resize_timetable_slot(ResizeTimetableSlotRequest $request){
         if (isset($request->timetable_slot_id)) {
             // find timetable slot
             $timetable_slot = TimetableSlot::find($request->timetable_slot_id);
@@ -719,7 +717,8 @@ trait AjaxCRUDTimetableController
      *
      * @return mixed
      */
-    public function export_course_session()
+    public
+    function export_course_session()
     {
         if ($this->timetableSlotRepo->export_course_sessions() == true) {
             return Response::json(['status' => true]);
