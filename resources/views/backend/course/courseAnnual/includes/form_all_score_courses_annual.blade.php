@@ -409,9 +409,9 @@
                     this.type = 'autocomplete';
                     this.filter = false;
                     if ($.trim($('#filter_degree :selected').text().toUpperCase()) == 'ENGINEER') {
-                        this.source = ['Red. ' + 'I' + $('#filter_grade :selected').val(), 'Radié'] // to add to the beginning do this.source.unshift(val) instead
+                        this.source = ['Red. ' + 'I' + $('#filter_grade :selected').val(), 'Radié', 'P'] // to add to the beginning do this.source.unshift(val) instead
                     } else {
-                        this.source = ['Red. ' + "T" + $('#filter_grade :selected').val(), 'Radié'] // to add to the beginning do this.source.unshift(val) instead
+                        this.source = ['Red. ' + "T" + $('#filter_grade :selected').val(), 'Radié', 'P'] // to add to the beginning do this.source.unshift(val) instead
                     }
 
                 }
@@ -452,6 +452,7 @@
             afterChange: function (changes, source) {
 
                 if (changes) {
+
                     $.each(changes, function (index, element) {
 
                         var change = element;
@@ -466,6 +467,12 @@
                         if (columnIndex == 'Redouble') {
 
                             if (oldValue != newValue) {
+
+                                /*if(newValue == 'P') {
+                                    var colInt = setting.nestedHeaders;
+                                    //hotInstance.setDataAtCell(rowIndex, colInt[1].indexOf("redouble"), '');
+                                }*/
+
                                 var remark_rul = '{{route('student.update_status')}}';
                                 var baseData_redouble = {
                                     student_id_card: col_student_id[rowIndex],
@@ -474,39 +481,24 @@
                                     old_value: oldValue
                                 };
 
-                                swal({
-                                    title: "Attention",
-                                    text: "Student will be " + newValue + ' Are you sure?',
-                                    type: "warning",
-                                    showCancelButton: true,
-                                    confirmButtonColor: "#DD6B55",
-                                    confirmButtonText: "Skip",
-                                    closeOnConfirm: true
-                                }, function (confirmed) {
-                                    if (confirmed) {
+                                if(newValue != '' && newValue != null) {
+                                    $.ajax({
+                                        type: 'POST',
+                                        url: remark_rul,
+                                        data: baseData_redouble,
+                                        dataType: "json",
+                                        success: function (resultData) {
 
-                                        $.ajax({
-                                            type: 'POST',
-                                            url: remark_rul,
-                                            data: baseData_redouble,
-                                            dataType: "json",
-                                            success: function (resultData) {
+                                            if (resultData.status) {
+                                                notify('success', resultData.message, 'Info');
+                                                //filter_table()
+                                            } else {
 
-                                                if (resultData.status) {
-                                                    notify('success', resultData.message, 'Info');
-                                                    //filter_table()
-                                                } else {
-
-                                                    notify('error', resultData.message, 'Attention');
-                                                }
+                                                notify('error', resultData.message, 'Attention');
                                             }
-                                        });
-
-                                    } else {
-                                        filter_table()
-                                    }
-                                });
-
+                                        }
+                                    });
+                                }
                             }
                         }
 
@@ -651,9 +643,7 @@
                     toggleLoading(false);
                     if (resultData.status == false) {
 
-
-                        notify('error',resultData.message );
-
+                        notify('error', resultData.message);
                         /*swal({
                             title: "Attention",
                             text: 'Please Check Incase Yours Department Option Is Not Select!!',
@@ -836,7 +826,6 @@
             });
         }
 
-
         function filter_table() {
 
             toggleLoading(true);
@@ -861,14 +850,10 @@
                         toggleLoading(false);
                         if (resultData.status == false) {
 
-                            console.log(resultData);
-
                             totalScoreNotification(resultData.type, resultData.message, 'No Course Score Record')
                             updateSettingHandsontable(resultData);
                         } else {
 
-
-                            console.log(resultData)
                             updateSettingHandsontable(resultData);
                             assignNumberRattrapage();
                         }

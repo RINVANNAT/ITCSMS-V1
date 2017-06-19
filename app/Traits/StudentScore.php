@@ -291,7 +291,7 @@ trait StudentScore {
         if($student->radie == true) {
 
             return [
-                'current_redouble' =>'radié',
+                'current_redouble' =>'Radié',
                 'history_redouble' => ''
             ];
         } else {
@@ -360,8 +360,6 @@ trait StudentScore {
         }
 
     }
-
-
     public function updateStatusStudent($studentIdCard, $status) {
         $student = DB::table('students')->where('id_card', $studentIdCard)
             ->update(
