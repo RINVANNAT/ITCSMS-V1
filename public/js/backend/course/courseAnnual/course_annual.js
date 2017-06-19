@@ -30,13 +30,15 @@ function load_group(method){
                 success : function(data){
 
                     if(data != null){
+
+                        $('.check_all_box').prop('checked', true);
                         var option_text = "";
 
                         $.each(data.group_code, function(key, value){
 
                             option_text = option_text +
 
-                                ' <label style="font-size: 12pt" for="'+value+'" class="btn btn-xs"><input  style="font-size: 18pt" type="checkbox" id="'+value+'" class="each_check_box" name="groups[]" value="'+data.group_id[value]+'"> '+value+'</label>'
+                                ' <label style="font-size: 12pt" for="'+value+'" class="btn btn-xs"><input checked  style="font-size: 18pt" type="checkbox" id="'+value+'" class="each_check_box" name="groups[]" value="'+data.group_id[value]+'"> '+value+'</label>'
 
                         })
                         $("#group_panel").html(option_text);
@@ -127,6 +129,79 @@ $(".check_all_box").change(function() {
         $('.each_check_box').prop('checked', false);
     }
 });
+
+
+function loadReferenceCourse(route, token, selected_course_annual_id)
+{
+    var baseData ;
+
+    if($('select#responsible_department_id :selected').val()) {
+
+        if(selected_course_annual_id != null && selected_course_annual_id!= '') {
+            baseData = {department_id : $('select#responsible_department_id :selected').val(), _token:token, degree_id: $('select#degree_id :selected').val(), grade_id:$('select#grade_id :selected').val(), course_annual_id: selected_course_annual_id}
+        } else {
+            baseData = {department_id : $('select#responsible_department_id :selected').val(), _token:token, degree_id: $('select#degree_id :selected').val(), grade_id:$('select#grade_id :selected').val()}
+        }
+        $.ajax({
+            method: 'POST',
+            url: route,
+            data:baseData ,
+            dataType: 'JSON',
+            success:function (result) {
+                clearOption();
+                $('#reference_course_id').select2({
+                    data: result.data
+                });
+
+            },
+            error: function() {
+
+                notify('error', 'Something went wrong!')
+            }
+        })
+    }
+
+
+
+    $(document).on('change', 'select#responsible_department_id', function() {
+
+        if(selected_course_annual_id != null && selected_course_annual_id!= '') {
+            baseData = {department_id : $(this).val(), _token:token, degree_id: $('select#degree_id :selected').val(), grade_id:$('select#grade_id :selected').val(), course_annual_id: selected_course_annual_id}
+        } else {
+
+            baseData = {department_id : $(this).val(), _token:token, degree_id: $('select#degree_id :selected').val(), grade_id:$('select#grade_id :selected').val()}
+        }
+        $.ajax({
+            method: 'POST',
+            url: route,
+            data:baseData ,
+            dataType: 'JSON',
+            success:function (result) {
+                clearOption();
+                $('#reference_course_id').select2({
+                    data: result.data
+                });
+
+            },
+            error: function() {
+
+                notify('error', 'Something went wrong!')
+            }
+        })
+
+    });
+
+}
+
+
+function  clearOption() {
+    var html ='<optgroup label="Course Name">' +
+        '<option>Select Program</option>' +
+        '</optgroup>';
+    $('#reference_course_id').html(html);
+}
+
+
 
 
 

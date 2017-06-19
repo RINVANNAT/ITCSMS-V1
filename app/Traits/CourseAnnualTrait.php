@@ -8,9 +8,14 @@
 
 namespace App\Traits;
 
+use App\Models\AcademicYear;
+use App\Models\Course;
 use App\Models\CourseAnnual;
+use App\Models\Degree;
 use App\Models\Department;
 use App\Models\Employee;
+use App\Models\Enum\ScoreEnum;
+use App\Models\Grade;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -217,8 +222,57 @@ trait CourseAnnualTrait
         ];
     }
 
+
+    public function cloneScorePanel(Request $request)
+    {
+
+        $courseAnnual = CourseAnnual::where('id', $request->course_annual_id)->first();
+        $department = Department::where('id', $courseAnnual->department_id)->first();
+        $degree = Degree::where('id', $courseAnnual->degree_id)->first();
+        $grade = Grade::where('id', $courseAnnual->grade_id)->first();
+        $academicYear = AcademicYear::where('id', $courseAnnual->academic_year_id)->first();
+
+        $groups = $courseAnnual->courseAnnualClass()->join('groups', function ($query) {
+            $query->on('course_annual_classes.group_id', '=', 'groups.id');
+        })
+            ->select('groups.*')
+            ->orderBy('groups.code', 'ASC')
+            ->get()->toArray();
+
+        usort($groups, function ($a, $b) {
+            if(is_numeric($a['code'])) {
+                return $a['code'] - $b['code'];
+            } else {
+                return strcmp($a['code'], $b['code']);
+            }
+        });
+        $groups = array_chunk($groups, 8);
+
+        if($courseAnnual->responsible_department_id) {
+
+            $coursePrograms = DB::table('course_annuals')->join('courses', function ($query) use($courseAnnual) {
+                $query->on('courses.id', '=', 'course_annuals.course_id')
+                    ->where('course_annuals.department_id', '=', $courseAnnual->responsible_department_id)
+                    ->where('course_annuals.degree_id', '=', $courseAnnual->degree_id)
+                    ->where('course_annuals.grade_id', '=', $courseAnnual->grade_id)
+                    ->where('course_annuals.semester_id', '=', $courseAnnual->semester_id)
+                    ->where('course_annuals.academic_year_id', '=', $courseAnnual->academic_year_id);
+
+            })->get();
+
+            //dd($coursePrograms);
+
+        }
+        return view('backend.course.courseAnnual.includes.popup_clone_score_panel', compact(
+            'groups', 'courseAnnual', 'department', 'degree', 'grade', 'academicYear', 'coursePrograms'
+        ));
+
+    }
+
     public function cloneScore(Request $request)
     {
+
+        $groups = $request->group_id;
 
         $count = 0;
         $countUpdate = 0;
@@ -228,19 +282,47 @@ trait CourseAnnualTrait
             'percentages.percent', 'percentages.id as percentage_id',
             'scores.id as score_id'
         ];
+
+
         $courseAnnual = CourseAnnual::where('id', $request->course_annual_id)->first();
 
         if($courseAnnual->responsible_department_id) {
 
-            $scoreCourseAnnualProp =DB::table('scores')
-                ->join('percentage_scores', function($query) use($courseAnnual) {
-                    $query->on('percentage_scores.score_id', '=', 'scores.id')
-                        ->where('scores.course_annual_id','=', $courseAnnual->id);
-                })
-                ->join('percentages', 'percentages.id', '=', 'percentage_scores.percentage_id')
-                ->select($select)
-                ->orderBy('percentages.id')
-                ->get();
+
+            if(isset($groups) && $groups != '') {
+                $studentAnnualIdByGroups = DB::table('group_student_annuals')
+                    ->where('semester_id', $courseAnnual->semester_id)
+                    ->where('department_id', $courseAnnual->responsible_department_id)
+                    ->whereIn('group_id', is_array($groups) ?$groups:[$groups])
+                    ->lists('student_annual_id');
+            } else {
+                $studentAnnualIdByGroups = [];
+            }
+
+            if(count($studentAnnualIdByGroups) > 0) {
+
+                $scoreCourseAnnualProp =DB::table('scores')
+                    ->join('percentage_scores', function($query) use($courseAnnual, $studentAnnualIdByGroups) {
+                        $query->on('percentage_scores.score_id', '=', 'scores.id')
+                            ->where('scores.course_annual_id','=', $courseAnnual->id)
+                            ->whereIn('scores.student_annual_id', $studentAnnualIdByGroups);
+                    })
+                    ->join('percentages', 'percentages.id', '=', 'percentage_scores.percentage_id')
+                    ->select($select)
+                    ->orderBy('percentages.id')
+                    ->get();
+
+            } else {
+                $scoreCourseAnnualProp =DB::table('scores')
+                    ->join('percentage_scores', function($query) use($courseAnnual, $studentAnnualIdByGroups) {
+                        $query->on('percentage_scores.score_id', '=', 'scores.id')
+                            ->where('scores.course_annual_id','=', $courseAnnual->id);
+                    })
+                    ->join('percentages', 'percentages.id', '=', 'percentage_scores.percentage_id')
+                    ->select($select)
+                    ->orderBy('percentages.id')
+                    ->get();
+            }
 
             $scoreAbsence = $this->getAbsenceFromDB($courseAnnual->id);// the absence of student for the course of thier department
 
@@ -293,22 +375,35 @@ trait CourseAnnualTrait
                                 }
                             })->toArray();
 
-                            /*---ScoreItem has only one vlaue but the index is not 0----*/
+                            if(count($scoreItem) > 0) {
 
-                            foreach($scoreItem as $item) {
-                                $scoreItem = $item;
-                            }
-                            /*--end--*/
+                                /*---ScoreItem has only one vlaue but the index is not 0----*/
 
+                                foreach($scoreItem as $item) {
+                                    $scoreItem = $item;
+                                }
+                                /*--end--*/
 
-                            $input = [
-                                'score' =>$scoreItem->score,
-                                'score_absence' => $scoreItem->score_absence
-                            ];
-                            $update =  $this->courseAnnualScores->update($prop->score_id, $input);
+                                if($scoreItem->score != null && $scoreItem->score != '') {
 
-                            if($update) {
-                                $countUpdate++;
+                                    $input = [
+                                        'score' =>$scoreItem->score,
+                                        'score_absence' => $scoreItem->score_absence
+                                    ];
+                                    $update =  $this->courseAnnualScores->update($prop->score_id, $input);
+
+                                    if($update) {
+                                        $countUpdate++;
+
+                                    }
+
+                                } else {
+                                    $count += (1/2);
+                                }
+
+                            } else {
+
+                                return Response::json(['status' => false, 'message' => 'Danger!!! Your course score is not martch with the targetted course! Please check your percentage of the course before you can clone!']);
                             }
                         }
 
@@ -369,13 +464,17 @@ trait CourseAnnualTrait
                     }
                 }
 
+
+
                 /*---end loop of the student that we need to update score ----*/
 
                 if(($countUpdate/2) == count($scoreCourseAnnualProp)) {
 
                     return Response::json(['status' => true, 'message' => ' Score Successfully Cloned !']);
 
-                } else if($countUpdate > 0) {
+                }
+
+                if($countUpdate > 0) {
 
                     return Response::json(['status' => true, 'message' => 'Some Student Score are successfully clone! Please ask responsible person to input score to all students!']);
                 }
@@ -385,6 +484,7 @@ trait CourseAnnualTrait
                     return Response::json(['status' => false, 'message' => 'Sorry the score is depending on Department:' . $resDepartment->name_en.'. Please ask the teacher who responsible for this course to input the scores. Then you will be able to clone them :)']);
                 }
             } else {
+
                 return Response::json(['status' => false, 'message' => 'This is a wrong action! You cannot make a clone score request because your department course is not in Vocational']);
             }
 
@@ -423,8 +523,53 @@ trait CourseAnnualTrait
                 return Response::json(['status' => false, 'message' => 'Not allow!', 'allow_scoring'=> false, 'code' => 202]);
             }
         }
+    }
 
+    public function loadReferenceCourse(Request $request)
+    {
 
+        if(isset($request->course_annual_id)) {
+            $courseAnnual = CourseAnnual::where('id', $request->course_annual_id)->first();
+        } else{
+            $courseAnnual = null;
+        }
+
+        $data = [];
+        if($request->department_id != null && $request->department_id != '') {
+            $department = Department::where('id', $request->department_id)->first();
+
+            $courses = Course::where('department_id', $request->department_id);
+
+            if($request->degree_id != null && $request->degree_id != '') {
+                $courses = $courses->where('degree_id', $request->degree_id);
+            }
+
+            if($request->grade_id != null && $request->grade_id != '') {
+
+                $courses = $courses->where('grade_id', $request->grade_id);
+            }
+            $courses = $courses->get();
+
+            $element = [
+                'text'=>  $department->code,
+            ];
+            foreach($courses as $course) {
+                $childrens = [
+                    'id'=> $course->id,
+                    'text'=> (($course->degree_id == ScoreEnum::Degree_I)?'I':'T').$course->grade_id."-S".$course->semester_id." | ".$course->name_en,
+                    'selected' => isset($courseAnnual->reference_course_id) ? (($course->id == $courseAnnual->course_id) ? true:false ) :false
+                ];
+
+                $element['children'][] = $childrens;
+
+            }
+            $data[] = $element;
+
+            return Response::json(['status' => true, 'data' => $data]);
+
+        } else {
+            return Response::json(['status' => false, 'message' => 'No selected responsible department!']);
+        }
     }
 
 }

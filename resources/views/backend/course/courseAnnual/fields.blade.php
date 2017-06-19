@@ -377,8 +377,24 @@
 
 <div class="form-group">
     {!! Form::label('responsible_department_id', trans('labels.backend.coursePrograms.fields.responsible_department_id'), ['class' => 'col-lg-3 control-label']) !!}
-    <div class="col-lg-3">
+    <div class="col-lg-2">
         {{ Form::select('responsible_department_id', $other_departments, isset($courseAnnual)?$courseAnnual->responsible_department_id:null, ['class' => 'form-control','placeholder' => "Department"]) }}
+    </div>
+
+
+
+    {!! Form::label('reference_course_id', trans('labels.backend.coursePrograms.fields.reference_course_id'), ['class' => 'col-lg-2 control-label']) !!}
+    <div class="col-lg-3">
+
+        <select  name="reference_course_id"
+                 id="reference_course_id"
+                 class="form-control"
+                {{-- {{$disabled}}--}}
+                 required >
+            {{--<optgroup label="Course Name">
+                <option>Course option</option>
+            </optgroup>--}}
+        </select>
     </div>
 </div>
 

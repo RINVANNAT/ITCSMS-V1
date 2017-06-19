@@ -850,6 +850,9 @@ return [
                 'degree_id' => 'Degree',
                 'grade_id' => 'Grade',
                 'employee_id' => 'Lecturer'
+            ],
+            'clone_score' => [
+                'group_info' => ''
             ]
         ],
         'coursePrograms' => [
@@ -874,7 +877,9 @@ return [
                 'department' => "Department",
                 'department_option' => "Option",
                 'semester' => "Semester",
-                'responsible_department_id' => "Permit responsibility to"
+                'responsible_department_id' => "Permit responsibility to",
+                'reference_course_id' => 'Reference Course',
+                'reference_course_id_title' => 'This is a course program from SA/SF. This action will allow you to copy the score to the course you are creating!'
             ]
         ],
         'scholarships' => [

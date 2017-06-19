@@ -596,6 +596,8 @@
 
         $(document).ready(function() {
 
+            toggleLoading(true);
+
             var getDataBaseUrl = '{{route('admin.course.get_data_course_annual_score')}}';
 
             //--------------- when document ready call ajax
@@ -605,6 +607,8 @@
                 data: {course_annual_id: '{{$courseAnnualId}}' },
                 dataType: "json",
                 success: function(resultData) {
+
+                    toggleLoading(false);
 
 
                     if(resultData.status) {
@@ -824,6 +828,8 @@
                         }, function(confirmed) {
                             if (confirmed) {
 
+                                toggleLoading(true);
+
                                 if(cellScoreChanges.length > 0) {// save each score
 
                                     //recursive function fo send the request by the column data array
@@ -848,6 +854,10 @@
                                                         } else {
                                                             notify('error', resultData.message, 'Alert');
                                                         }
+                                                    },
+
+                                                    error:function(error){
+                                                        notify('error', 'Something went wrong!');
                                                     }
                                                 })
                                             } else {
@@ -855,6 +865,8 @@
                                                 sendRequest(index, message);
                                             }
                                         } else {
+
+                                            toggleLoading(false);
                                             notify('success', 'Score Saved!', 'Info');
                                         }
                                     }
@@ -881,16 +893,20 @@
                                         dataType: "json",
                                         success: function(resultData) {
 
+                                            toggleLoading(false);
+
                                             if(resultData.status) {
                                                 notify('success', resultData.message, 'Info')
-
-                                                updateSettingHandsontable(resultData.handsonData);
+                                                //updateSettingHandsontable(resultData.handsonData);
 
                                             } else {
                                                 notify('error', resultData.message, 'Attention')
-                                                updateSettingHandsontable(resultData.handsonData);
+                                                //updateSettingHandsontable(resultData.handsonData);
                                             }
                                             cellChanges=[];
+                                        },
+                                        error:function(error) {
+                                            notify('error', 'Something went wrong!')
                                         }
                                     });
                                 }
@@ -904,6 +920,7 @@
                                         data: {baseData:resitScoreChange},
                                         dataType: "json",
                                         success: function(resultData) {
+                                            toggleLoading(false);
 
                                             if(resultData.status) {
                                                 notify('success', resultData.message, 'Info')
@@ -1103,7 +1120,6 @@
                 success: function(resultData) {
 
                     toggleLoading(false);
-
                     updateSettingHandsontable(resultData);
                     declareColumnHeaderDataEmpty()
                 }
@@ -1217,10 +1233,28 @@
 
         $(document).on('click', '#clone_score', function(e) {
 
-            var baseData = {
-                course_annual_id : $('select#available_course :selected').val(),
-                group_id: $('select#group_name :selected').val()
+            var count_group = $('select[name=group_name] option').length;
+            var url = '{{route('course_annual.popup_clone_score_panel')}}'
+
+            if(count_group >= parseInt('{{\App\Models\Enum\GroupEnum::TEN}}')) {
+                PopupCenterDual(url+'?course_annual_id='+$('select#available_course :selected').val(),'Popup Clone Score','730','450');
+            } else {
+
+                var baseData = {
+                    course_annual_id: $('select#available_course :selected').val(),
+                    group_id: $('select#group_name :selected').val()
+                }
+
+                toggleLoading(true);
+                cloning(baseData, status = false);
+
+
             }
+        });
+
+
+        function cloning(baseData, status ) {
+
 
             $.ajax({
                 type: 'GET',
@@ -1229,23 +1263,18 @@
                 dataType: "JSON",
                 success: function(resultData) {
                     if(resultData.status) {
+                        toggleLoading(status)
                         notify('success', resultData.message, 'Clone Score!')
-                        var baseData = {
-                            course_annual_id: $('select[name=available_course] :selected').val()
-                        }
                         switch_course(baseData);
                     } else {
                         notify('error', resultData.message, 'Clone Score!')
                     }
-
                 },
                 error:function(error) {
 
                 }
             });
-
-
-        });
+        }
 
     </script>
 @stop

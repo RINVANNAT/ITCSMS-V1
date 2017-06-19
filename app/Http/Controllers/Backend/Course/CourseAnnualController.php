@@ -207,6 +207,7 @@ class CourseAnnualController extends Controller
 
             if ($deptId = $request->department_id) {
                 $groups = $groups->where('studentAnnuals.department_id', '=', $deptId);
+                $groups = $groups->whereNull('group_student_annuals.department_id');
             }
         }
 
@@ -216,6 +217,7 @@ class CourseAnnualController extends Controller
 
         asort($groupCodes);
         $array_group = array_values($groupCodes);
+
 
         if ($request->course_program_id) {
             if ($request->_method == CourseAnnualEnum::CREATE) {
@@ -392,7 +394,7 @@ class CourseAnnualController extends Controller
     public function store(StoreCourseAnnualRequest $request)
     {
 
-
+        dd($request->all());
         $data = $request->all();
         $storeCourseAnnual = $this->courseAnnuals->create($data);
 
@@ -1422,14 +1424,15 @@ class CourseAnnualController extends Controller
         //----if has reqest selection groups in one course annual ----
         if ($request_group != null) {
 
-            $studentAnnualIds = DB::table('group_student_annuals')->whereIn('group_id', [$request_group])
+            $studentAnnualIds = DB::table('group_student_annuals')->whereIn('group_id', (is_array($request_group)?$request_group:[$request_group]))
                 ->where('semester_id', $courseAnnual->semester_id);
 
             if($department->is_vocational) {
                 $studentAnnualIds = $studentAnnualIds->where('group_student_annuals.department_id', $department->id)->lists('student_annual_id');
             } else {
-                $studentAnnualIds = $studentAnnualIds->lists('student_annual_id');
+                $studentAnnualIds = $studentAnnualIds->whereNull('group_student_annuals.department_id')->lists('student_annual_id');
             }
+
 
             $studentByCourse = $studentByCourse->whereIn('studentAnnuals.id', $studentAnnualIds)
                 ->orderBy('students.name_latin');
@@ -1455,9 +1458,10 @@ class CourseAnnualController extends Controller
                     ->where('semester_id', $courseAnnual->semester_id);
 
                 if($department->is_vocational) {
+
                     $studentAnnualIds = $studentAnnualIds->where('group_student_annuals.department_id', $department->id)->lists('student_annual_id');
                 } else {
-                    $studentAnnualIds = $studentAnnualIds->lists('student_annual_id');
+                    $studentAnnualIds = $studentAnnualIds->whereNull('group_student_annuals.department_id')->lists('student_annual_id');
                 }
 
                 $studentByCourse = $studentByCourse->whereIn('studentAnnuals.id', $studentAnnualIds)
@@ -1607,7 +1611,7 @@ class CourseAnnualController extends Controller
                                 'student_gender' => $student->code,
                                 'absence' => (string)(($scoreAbsenceByCourse >= 0) ? $scoreAbsenceByCourse : 10),
                                 'num_absence' => isset($scoreAbsence) ? $scoreAbsence->num_absence : null,
-                                'resit' => $resitScores[$student->student_annual_id]->resit_score,
+                                'resit' => isset($resitScores[$student->student_annual_id])?$resitScores[$student->student_annual_id]->resit_score:null,
                                 'average' => $this->floatFormat($totalScore),
                                 'notation' => isset($scoreAbsence) ? $scoreAbsence->notation : null//$storeTotalScore->description
                             );
@@ -1633,7 +1637,7 @@ class CourseAnnualController extends Controller
                                 'student_id_card' => $student->id_card,
                                 'student_name' => strtoupper($student->name_latin),
                                 'student_gender' => $student->code,
-                                'resit' => $resitScores[$student->student_annual_id]->resit_score,
+                                'resit' => isset($resitScores[$student->student_annual_id])?$resitScores[$student->student_annual_id]->resit_score:null,
                                 'average' => $totalScore,
                                 'notation' => isset($scoreAbsence) ? $scoreAbsence->notation : null//$storeTotalScore->description
                             );
@@ -3382,7 +3386,7 @@ class CourseAnnualController extends Controller
             ]);
 
 
-        if (count($allGroups->get()) > 1) {
+        if (count($allGroups->get()) > 0) {
 
             $allGroups = $allGroups->join('groups', function ($groupQuery) {
                 $groupQuery->on('course_annual_classes.group_id', '=', 'groups.id');

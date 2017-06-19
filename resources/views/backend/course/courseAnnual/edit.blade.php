@@ -249,11 +249,21 @@
                         previous_score = $(this).val();
 
                     }).on('change', function() {
-
                         swal_alert($('select[name=midterm_score]'), $(this).val(), previous_score, '{{\App\Models\Enum\ScoreEnum::Highest_Score}}');
-
                     });
             }
+
+
+
+
+
+            @if($courseAnnual)
+                loadReferenceCourse('{{route('course_annual.load_reference_course')}}', '{{csrf_token()}}', '{{$courseAnnual->id}}');
+            @else
+                 loadReferenceCourse('{{route('course_annual.load_reference_course')}}', '{{csrf_token()}}', '');
+            @endif
+
+
 
         })
     </script>

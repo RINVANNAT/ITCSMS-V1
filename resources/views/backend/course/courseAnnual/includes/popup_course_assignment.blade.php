@@ -485,7 +485,7 @@
 
                 if(resultData.status == true) {
 
-                  notify('success', 'info', resultData.message); 
+                  notify('success', 'info', resultData.message);
 
                   $('#annual_course').jstree("refresh");
                   $('#annual_teacher').jstree("refresh");
