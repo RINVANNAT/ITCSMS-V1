@@ -150,7 +150,9 @@ function loadReferenceCourse(route, token, selected_course_annual_id)
             success:function (result) {
                 clearOption();
                 $('#reference_course_id').select2({
-                    data: result.data
+                    data: result.data,
+                    allowClear: true,
+                    placeholder: " Select Program"
                 });
 
             },
@@ -179,7 +181,9 @@ function loadReferenceCourse(route, token, selected_course_annual_id)
             success:function (result) {
                 clearOption();
                 $('#reference_course_id').select2({
-                    data: result.data
+                    data: result.data,
+                    allowClear: true,
+                    placeholder: "Select Program"
                 });
 
             },
@@ -195,10 +199,11 @@ function loadReferenceCourse(route, token, selected_course_annual_id)
 
 
 function  clearOption() {
-    var html ='<optgroup label="Course Name">' +
-        '<option>Select Program</option>' +
-        '</optgroup>';
-    $('#reference_course_id').html(html);
+    $('#reference_course_id').select2({
+        data:[{}],
+        allowClear: true,
+        placeholder: " Select Program"
+    });
 }
 
 

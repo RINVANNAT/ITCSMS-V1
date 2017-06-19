@@ -16,8 +16,8 @@ class FakeStudentLanguageGroup extends Seeder
         $students = \App\Models\StudentAnnual::where('academic_year_id', 2017)
             ->join("students", "students.id", "=", "studentAnnuals.student_id")
             ->where('degree_id', 1)
-            ->where('grade_id', 1)
-            ->where('department_id', 8)
+            ->where('grade_id', 4)
+            //->where('department_id', 8)
             ->select("studentAnnuals.*", "students.dob")
             ->orderBy("students.dob", "DESC")
             ->get();

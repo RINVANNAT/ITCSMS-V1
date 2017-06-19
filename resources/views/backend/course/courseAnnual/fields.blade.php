@@ -386,14 +386,8 @@
     {!! Form::label('reference_course_id', trans('labels.backend.coursePrograms.fields.reference_course_id'), ['class' => 'col-lg-2 control-label']) !!}
     <div class="col-lg-3">
 
-        <select  name="reference_course_id"
-                 id="reference_course_id"
-                 class="form-control"
-                {{-- {{$disabled}}--}}
-                 required >
-            {{--<optgroup label="Course Name">
-                <option>Course option</option>
-            </optgroup>--}}
+        <select  name="reference_course_id" id="reference_course_id" class="form-control" >
+
         </select>
     </div>
 </div>

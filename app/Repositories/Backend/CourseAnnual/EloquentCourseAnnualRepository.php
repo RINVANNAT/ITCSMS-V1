@@ -106,6 +106,14 @@ class EloquentCourseAnnualRepository implements CourseAnnualRepositoryContract
         }
         $courseAnnual->department_option_id = $input['department_option_id'];
 
+        if(isset($input['reference_course_id']) && $input['reference_course_id'] != '' &&  is_numeric($input['reference_course_id'])) {
+            $courseAnnual->reference_course_id = $input['reference_course_id'];
+        } else{
+            $courseAnnual->reference_course_id = null;
+        }
+
+
+
         $courseAnnual->name_kh = isset($input['name_kh'])?$input['name_kh']:null;
         $courseAnnual->name_en = isset($input['name_en'])?$input['name_en']:null;
         $courseAnnual->name_fr = isset($input['name_fr'])?$input['name_fr']:null;
@@ -192,6 +200,11 @@ class EloquentCourseAnnualRepository implements CourseAnnualRepositoryContract
         }
         if(isset($input["credit"]) && $input["credit"] != '') {
             $courseAnnual->credit = $input['credit'];
+        }
+        if(isset($input['reference_course_id']) && $input['reference_course_id'] != '' &&  is_numeric($input['reference_course_id'])) {
+            $courseAnnual->reference_course_id = $input['reference_course_id'];
+        } else{
+            $courseAnnual->reference_course_id = null;
         }
 
         if(isset($input["is_counted_absence"])){

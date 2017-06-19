@@ -148,6 +148,7 @@
                 setNameKhEnFr();
                 setSelectedField();
                 load_group('{{\App\Models\Enum\CourseAnnualEnum::CREATE}}');
+                loadReferenceCourse('{{route('course_annual.load_reference_course')}}', '{{csrf_token()}}', '');
             });
 
 

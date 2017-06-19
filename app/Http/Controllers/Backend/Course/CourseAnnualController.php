@@ -393,8 +393,6 @@ class CourseAnnualController extends Controller
 
     public function store(StoreCourseAnnualRequest $request)
     {
-
-        dd($request->all());
         $data = $request->all();
         $storeCourseAnnual = $this->courseAnnuals->create($data);
 
