@@ -176,6 +176,28 @@
                     <button class="btn btn-primary btn-xs col-sm-1" id="refresh_score_sheet" style="margin-left: -50px">
                         <i class="fa fa-refresh"></i></button>
 
+                    {{--<button class="btn-u" data-toggle="modal" data-target="#responsive">Modal Form Sample</button>
+                    <div class="modal fade" id="responsive" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+                        <div class="modal-dialog">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                                    <h4 class="modal-title" id="myModalLabel4">Responsive Modal</h4>
+                                </div>
+                                <div class="modal-body">
+                                    <div class="row">
+
+                                    </div>
+                                    <div class="modal-footer">
+                                        <button type="button" class="btn-u btn-u-default" data-dismiss="modal">Close</button>
+                                        <button type="button" class="btn-u btn-u-primary">Save changes</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>--}}
+
                     <select name="academic_year" id="filter_academic_year" style="width: 100px;" class=" col-sm-1">
                         @foreach($academicYears as $key=>$year)
                             <option value="{{$key}}"> {{$year}}</option>

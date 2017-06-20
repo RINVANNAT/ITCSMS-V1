@@ -285,6 +285,7 @@ trait CourseAnnualTrait
 
 
             if(isset($groups) && $groups != '') {
+                dump($request->all());
                 $studentAnnualIdByGroups = DB::table('group_student_annuals')
                     ->where('semester_id', $courseAnnual->semester_id)
                     ->where('department_id', $courseAnnual->responsible_department_id)
@@ -297,6 +298,8 @@ trait CourseAnnualTrait
 
             if(count($studentAnnualIdByGroups) > 0) {
 
+                dump($studentAnnualIdByGroups);
+
                 $scoreCourseAnnualProp =DB::table('scores')
                     ->join('percentage_scores', function($query) use($courseAnnual, $studentAnnualIdByGroups) {
                         $query->on('percentage_scores.score_id', '=', 'scores.id')
@@ -308,7 +311,11 @@ trait CourseAnnualTrait
                     ->orderBy('percentages.id')
                     ->get();
 
+                dump('not');
+
             } else {
+
+                dump('error here');
                 $scoreCourseAnnualProp =DB::table('scores')
                     ->join('percentage_scores', function($query) use($courseAnnual, $studentAnnualIdByGroups) {
                         $query->on('percentage_scores.score_id', '=', 'scores.id')
@@ -319,6 +326,8 @@ trait CourseAnnualTrait
                     ->orderBy('percentages.id')
                     ->get();
             }
+
+            dd(12);
 
             $scoreAbsence = $this->getAbsenceFromDB($courseAnnual->id);// the absence of student for the course of thier department
 
