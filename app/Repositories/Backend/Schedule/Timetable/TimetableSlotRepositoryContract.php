@@ -10,6 +10,7 @@ use App\Models\Schedule\Timetable\Slot;
 use App\Models\Schedule\Timetable\Timetable;
 use App\Models\Schedule\Timetable\TimetableSlot;
 use Carbon\Carbon;
+use Illuminate\Support\Collection;
 
 /**
  * Interface TimetableSlotRepositoryContract
@@ -242,4 +243,67 @@ interface TimetableSlotRepositoryContract
      * @return mixed
      */
     public function set_permission_create_timetable();
+
+    /**
+     * Get timetable slot with details info.
+     *
+     * @param Timetable $timetable
+     * @return mixed
+     */
+    public function get_timetable_slot_details(Timetable $timetable);
+
+    /**
+     * Get Timetable Slot with Conflict Info.
+     *
+     * @param Timetable $timetable
+     * @param Collection $timetableSlots
+     * @return mixed
+     */
+    public function get_timetable_slot_with_conflict_info(Timetable $timetable, Collection $timetableSlots);
+
+    /**
+     * Get all student annuals.
+     *
+     * @param CreateTimetableRequest $request
+     * @return mixed
+     */
+    public function find_student_annual_ids(CreateTimetableRequest $request);
+
+    /**
+     * Get group student annual from language.
+     *
+     * @param $department_id
+     * @param array $student_annual_ids
+     * @param CreateTimetableRequest $request
+     * @return mixed
+     */
+    public function get_group_student_annual_form_language($department_id, array $student_annual_ids, CreateTimetableRequest $request);
+
+    /**
+     * Get timetables from dept language.
+     *
+     * @param array $group_students
+     * @param CreateTimetableRequest $request
+     * @param $department_id
+     * @return mixed
+     */
+    public function get_timetables_form_language_by_student_annual(array $group_students, CreateTimetableRequest $request, $department_id);
+
+    /**
+     * Get timetable slots from language dept.
+     *
+     * @param Collection $timetables
+     * @return mixed
+     */
+    public function get_timetable_slot_language_dept(Collection $timetables);
+
+    /**
+     * Set language timetable slot into TimetableSlots.
+     *
+     * @param Collection $timetableSlots
+     * @param array $groups
+     * @param Collection $languageTimetableSlots
+     * @return mixed
+     */
+    public function set_timetable_slot_language(Collection $timetableSlots, array $groups, Collection $languageTimetableSlots);
 }

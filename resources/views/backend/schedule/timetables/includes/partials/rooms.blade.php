@@ -12,12 +12,12 @@
                         <input type="text"
                                class="form-control input-sm"
                                name="search_room_query"
-                               placeholder="SEARCH ROOMS..."/>
+                               placeholder="{{ trans('strings.backend.timetable.search_room') }}"/>
                     </form>
                 </div>
             </div>
             <div class="box-body">
-                @if(access()->allow('remove-room-timetable-slot'))
+                @if(access()->allow('add-room-timetable-slot') && access()->allow('remove-room-timetable-slot'))
                     <div class="rooms">
                         @if(isset($rooms))
                             @foreach($rooms as $room)
@@ -31,8 +31,8 @@
                 @else
                     <div class="alert alert-danger {{--alert-dismissible--}}">
                         {{--<button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>--}}
-                        <h4><i class="icon fa fa-info"></i>Adding room is blocked</h4>
-                        <p>You are not allow to add room. Please contact to Study Office to get more information.</p>
+                        <h4><i class="icon fa fa-info"></i>{{ trans('strings.backend.timetable.block_add_room') }}</h4>
+                        <p>{{ trans('strings.backend.timetable.desc_block_add_room') }}</p>
                     </div>
                 @endif
             </div>

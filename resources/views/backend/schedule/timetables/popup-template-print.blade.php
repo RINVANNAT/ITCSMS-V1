@@ -7,75 +7,8 @@
     {!! Html::style('plugins/iCheck/all.css') !!}
     {!! Html::style('plugins/toastr/toastr.min.css') !!}
     {!! Html::style('css/backend/schedule/timetable.css') !!}
+    {!! Html::style('css/backend/schedule/print.css') !!}
 
-    <style type="text/css">
-        body {
-            margin: 0 auto;
-            line-height: 0.8 !important;
-        }
-
-        .content-wrapper {
-            background-image: none !important;
-            background-color: #fff;
-        }
-
-        * {
-            box-sizing: border-box !important;
-        }
-
-        .row {
-            page-break-after: always;
-        }
-
-        table.timetable {
-            width: 100%;
-        }
-
-        table.timetable tr td {
-            margin: 0 !important;
-            border: 1px solid #c7c7c7;
-            border-collapse: collapse;
-        }
-
-        table.timetable th {
-            padding: 10px !important;
-        }
-
-        table.timetable p, table.timetable tr td {
-            font-size: 14px !important;
-            margin: 8px !important;
-            padding: 0 !important;
-            line-height: 1 !important;
-            height: 30px !important;
-        }
-
-        th {
-            height: 50px !important;
-        }
-
-        img.image-logo {
-            margin: 0;
-            padding: 0 !important;
-            width: 50px;
-            height: 50px;
-            text-align: left !important;
-            float: left;
-        }
-
-        @media print {
-            .row {
-                page-break-after: always !important;
-            }
-
-            .row:last-child {
-                page-break-after: auto !important;
-            }
-
-            table.timetable tr td {
-                border: 0.1px solid #c7c7c7;
-            }
-        }
-    </style>
 @stop
 
 @section('content')
@@ -89,25 +22,30 @@
                         <th rowspan="3" style="text-align: center;border: none !important;">
                             <img src="{{ asset('img/timetable/logo-print.jpg') }}" class="image-logo"/>
                         </th>
-                        <th colspan="5" rowspan="2"style="border: none !important;text-align: center;line-height: 1.5;">
-                            EMPLOI DU TEMPS {{ $timetable->academicYear->name_latin }}<br/>
-                            Groupe: {{ $timetable->degree->code }}{{ $timetable->grade->code }}@if($timetable->group != null)
+                        <th colspan="5" rowspan="2"
+                            style="border: none !important;text-align: center;line-height: 1.5;">
+                            {{ trans('labels.backend.schedule.timetable.popup_print_template.title') }} {{ $timetable->academicYear->name_latin }}
+                            <br/>
+                            {{ trans('labels.backend.schedule.timetable.popup_print_template.group') }}
+                            : {{ $timetable->degree->code }}{{ $timetable->grade->code }}@if($timetable->group != null)
                                 ({{ $timetable->group->code }}) @endif-{{ $timetable->department->code }}
                         </th>
-                        <th rowspan="2" style="line-height: 1.5;border: none !important;">Semestre - @if($timetable->semester->id==1) I @else II @endif
-                            <br/>Semaine {{ $timetable->week->id }}
+                        <th rowspan="2"
+                            style="line-height: 1.5;border: none !important;">{{ trans('labels.backend.schedule.timetable.popup_print_template.semester') }}
+                            - @if($timetable->semester->id==1) I @else II @endif
+                            <br/>{{ trans('labels.backend.schedule.timetable.popup_print_template.week') }} {{ $timetable->week->id }}
                         </th>
                     </tr>
                     </thead>
                     <tbody>
                     <tr align="center" style="height: 30px !important;">
-                        <td style="font-weight: bold;">Horaire</td>
-                        <td style="font-weight: bold; width: 15% !important;">Lundi</td>
-                        <td style="font-weight: bold; width: 15% !important;">Mardi</td>
-                        <td style="font-weight: bold; width: 15% !important;">Mercredi</td>
-                        <td style="font-weight: bold; width: 15% !important;">Jeudi</td>
-                        <td style="font-weight: bold; width: 15% !important;">Vendredi</td>
-                        <td style="font-weight: bold; width: 15% !important;">Samedi</td>
+                        <td style="font-weight: bold;">{{ trans('labels.backend.schedule.timetable.popup_print_template.days.hours') }}</td>
+                        <td style="font-weight: bold; width: 15% !important;">{{ trans('labels.backend.schedule.timetable.popup_print_template.days.monday') }}</td>
+                        <td style="font-weight: bold; width: 15% !important;">{{ trans('labels.backend.schedule.timetable.popup_print_template.days.tuesday') }}</td>
+                        <td style="font-weight: bold; width: 15% !important;">{{ trans('labels.backend.schedule.timetable.popup_print_template.days.wednesday') }}</td>
+                        <td style="font-weight: bold; width: 15% !important;">{{ trans('labels.backend.schedule.timetable.popup_print_template.days.thursday') }}</td>
+                        <td style="font-weight: bold; width: 15% !important;">{{ trans('labels.backend.schedule.timetable.popup_print_template.days.friday') }}</td>
+                        <td style="font-weight: bold; width: 15% !important;">{{ trans('labels.backend.schedule.timetable.popup_print_template.days.saturday') }}</td>
                     </tr>
                     {{--7 to 8--}}
                     {{--@php echo "<pre>"; var_dump($timetable->timetableSlots); echo "</pre>"; @endphp--}}
@@ -119,11 +57,13 @@
                             @foreach($timetable->timetableSlots as $timetableSlot)
                                 @if( $i == ((new \Carbon\Carbon($timetableSlot->start))->day) )
                                     @if( ((new \Carbon\Carbon($timetableSlot->start))->hour) == 7)
-                                        <td rowspan="{{ ( (new \Carbon\Carbon($timetableSlot->end))->hour - (new \Carbon\Carbon($timetableSlot->start))->hour) }}" style="position: relative !important;">
+                                        <td rowspan="{{ ( (new \Carbon\Carbon($timetableSlot->end))->hour - (new \Carbon\Carbon($timetableSlot->start))->hour) }}"
+                                            style="position: relative !important;">
                                             <p style="text-align: right;">{{ $timetableSlot->type }}</p>
                                             <p style="text-align: center; font-weight: bold;">{{ $timetableSlot->course_name }}</p>
                                             <p style="text-align: center;">{{ $timetableSlot->teacher_name }}</p>
-                                            <p style="text-align: right;">@if($timetableSlot->room != null) {{ $timetableSlot->room->name }}-{{ $timetableSlot->room->building->code }} @else NULL @endif</p>
+                                            <p style="text-align: right;">@if($timetableSlot->room != null) {{ $timetableSlot->room->name }}
+                                                -{{ $timetableSlot->room->building->code }} @else NULL @endif</p>
                                         </td>
                                         @php $tmp = false; @endphp
                                         @break
@@ -156,7 +96,8 @@
                                             <p style="text-align: right;">{{ $timetableSlot->type }}</p>
                                             <p style="text-align: center; font-weight: bold;">{{ $timetableSlot->course_name }}</p>
                                             <p style="text-align: center;">{{ $timetableSlot->teacher_name }}</p>
-                                            <p style="text-align: right;">@if($timetableSlot->room != null) {{ $timetableSlot->room->name }}-{{ $timetableSlot->room->building->code }} @else NULL @endif</p>
+                                            <p style="text-align: right;">@if($timetableSlot->room != null) {{ $timetableSlot->room->name }}
+                                                -{{ $timetableSlot->room->building->code }} @else NULL @endif</p>
                                         </td>
                                         @php $tmp = false; @endphp
                                         @break
@@ -189,7 +130,8 @@
                                             <p style="text-align: right;">{{ $timetableSlot->type }}</p>
                                             <p style="text-align: center; font-weight: bold;">{{ $timetableSlot->course_name }}</p>
                                             <p style="text-align: center;">{{ $timetableSlot->teacher_name }}</p>
-                                            <p style="text-align: right;">@if($timetableSlot->room != null) {{ $timetableSlot->room->name }}-{{ $timetableSlot->room->building->code }} @else NULL @endif</p>
+                                            <p style="text-align: right;">@if($timetableSlot->room != null) {{ $timetableSlot->room->name }}
+                                                -{{ $timetableSlot->room->building->code }} @else NULL @endif</p>
                                         </td>
                                         @php $tmp = false; @endphp
                                         @break
@@ -220,7 +162,8 @@
                                             <p style="text-align: right;">{{ $timetableSlot->type }}</p>
                                             <p style="text-align: center; font-weight: bold;">{{ $timetableSlot->course_name }}</p>
                                             <p style="text-align: center;">{{ $timetableSlot->teacher_name }}</p>
-                                            <p style="text-align: right;">@if($timetableSlot->room != null) {{ $timetableSlot->room->name }}-{{ $timetableSlot->room->building->code }} @else NULL @endif</p>
+                                            <p style="text-align: right;">@if($timetableSlot->room != null) {{ $timetableSlot->room->name }}
+                                                -{{ $timetableSlot->room->building->code }} @else NULL @endif</p>
                                         </td>
                                         @php $tmp = false; @endphp
                                         @break
@@ -252,7 +195,8 @@
                                             <p style="text-align: right;">{{ $timetableSlot->type }}</p>
                                             <p style="text-align: center; font-weight: bold;">{{ $timetableSlot->course_name }}</p>
                                             <p style="text-align: center;">{{ $timetableSlot->teacher_name }}</p>
-                                            <p style="text-align: right;">@if($timetableSlot->room != null) {{ $timetableSlot->room->name }}-{{ $timetableSlot->room->building->code }} @else NULL @endif</p>
+                                            <p style="text-align: right;">@if($timetableSlot->room != null) {{ $timetableSlot->room->name }}
+                                                -{{ $timetableSlot->room->building->code }} @else NULL @endif</p>
                                         </td>
                                         @php $tmp = false; @endphp
                                         @break
@@ -285,7 +229,8 @@
                                             <p style="text-align: right;">{{ $timetableSlot->type }}</p>
                                             <p style="text-align: center; font-weight: bold;">{{ $timetableSlot->course_name }}</p>
                                             <p style="text-align: center;">{{ $timetableSlot->teacher_name }}</p>
-                                            <p style="text-align: right;">@if($timetableSlot->room != null) {{ $timetableSlot->room->name }}-{{ $timetableSlot->room->building->code }} @else NULL @endif</p>
+                                            <p style="text-align: right;">@if($timetableSlot->room != null) {{ $timetableSlot->room->name }}
+                                                -{{ $timetableSlot->room->building->code }} @else NULL @endif</p>
                                         </td>
                                         @php $tmp = false; @endphp
                                         @break
@@ -318,7 +263,8 @@
                                             <p style="text-align: right;">{{ $timetableSlot->type }}</p>
                                             <p style="text-align: center; font-weight: bold;">{{ $timetableSlot->course_name }}</p>
                                             <p style="text-align: center;">{{ $timetableSlot->teacher_name }}</p>
-                                            <p style="text-align: right;">@if($timetableSlot->room != null) {{ $timetableSlot->room->name }}-{{ $timetableSlot->room->building->code }} @else NULL @endif</p>
+                                            <p style="text-align: right;">@if($timetableSlot->room != null) {{ $timetableSlot->room->name }}
+                                                -{{ $timetableSlot->room->building->code }} @else NULL @endif</p>
                                         </td>
                                         @php $tmp = false; @endphp
                                         @break
@@ -350,7 +296,8 @@
                                             <p style="text-align: right;">{{ $timetableSlot->type }}</p>
                                             <p style="text-align: center; font-weight: bold;">{{ $timetableSlot->course_name }}</p>
                                             <p style="text-align: center;">{{ $timetableSlot->teacher_name }}</p>
-                                            <p style="text-align: right;">@if($timetableSlot->room != null) {{ $timetableSlot->room->name }}-{{ $timetableSlot->room->building->code }} @else NULL @endif</p>
+                                            <p style="text-align: right;">@if($timetableSlot->room != null) {{ $timetableSlot->room->name }}
+                                                -{{ $timetableSlot->room->building->code }} @else NULL @endif</p>
                                         </td>
                                         @php $tmp = false; @endphp
                                         @break

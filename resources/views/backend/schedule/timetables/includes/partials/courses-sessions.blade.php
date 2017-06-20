@@ -25,8 +25,8 @@
                 @else
                     <div class="alert alert-danger {{--alert-dismissible--}}">
                         {{--<button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>--}}
-                        <h4><i class="icon fa fa-info"></i>Dragging course session is blocked</h4>
-                        <p>You are not allow to drag course session. Please contact to Study Office to get more information.</p>
+                        <h4><i class="icon fa fa-info"></i>{{ trans('strings.backend.timetable.block_drag_course_session') }}</h4>
+                        <p>{{ trans('strings.backend.timetable.block_drag_course_session') }}</p>
                     </div>
                 @endif
             </div>

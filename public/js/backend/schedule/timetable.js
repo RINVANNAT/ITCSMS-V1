@@ -1,7 +1,6 @@
 /** Get rooms. **/
 function get_groups() {
     toggleLoading(true);
-    alert('Group');
     $.ajax({
         type: 'POST',
         url: '/admin/schedule/timetables/get_groups',

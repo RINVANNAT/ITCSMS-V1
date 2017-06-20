@@ -140,12 +140,12 @@
                         '<div class="fc-content">' +
                         '<div class="container-room">' +
                         '<div class="side-course" id="' + event.id + '">';
-                    if (event.is_conflict_course == true) {
+                    if (event.is_conflict_course === true) {
                         object += '<div class="fc-title conflict">' + event.course_name + '</div>';
                     } else {
                         object += '<div class="fc-title">' + event.course_name + '</div>';
                     }
-                    if (event.is_conflict_lecturer == true) {
+                    if (event.is_conflict_lecturer === true) {
                         object += '<p class="text-primary conflict">' + event.teacher_name + '</p> ';
                     } else {
                         object += '<p class="text-primary">' + event.teacher_name + '</p> ';
@@ -154,8 +154,8 @@
                         '</div>' +
                         '<div class="side-room">' +
                         '<div class="room-name">';
-                    if (event.room != null) {
-                        if (event.is_conflict_room == true) {
+                    if (event.room !== null) {
+                        if (event.is_conflict_room === true) {
                             object += '<p class="fc-room conflict">' + event.building + '-' + event.room + '</p>';
                         } else {
                             object += '<p class="fc-room">' + event.building + '-' + event.room + '</p>';

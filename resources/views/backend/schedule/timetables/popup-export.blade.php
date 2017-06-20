@@ -16,7 +16,7 @@
         <form action="{{ route('timetables.export_file') }}" method="POST" id="form_export_timetable">
             {{ csrf_field() }}
             <div class="box-header with-border">
-                <h3 class="box-title">Export Timetable</h3>
+                <h3 class="box-title">{{ trans('labels.backend.schedule.timetable.popup_export.box_title') }}</h3>
             </div>
 
             <div class="box-body">
