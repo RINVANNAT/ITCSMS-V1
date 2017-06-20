@@ -285,7 +285,7 @@ trait CourseAnnualTrait
 
 
             if(isset($groups) && $groups != '') {
-                dump($request->all());
+
                 $studentAnnualIdByGroups = DB::table('group_student_annuals')
                     ->where('semester_id', $courseAnnual->semester_id)
                     ->where('department_id', $courseAnnual->responsible_department_id)
@@ -298,7 +298,6 @@ trait CourseAnnualTrait
 
             if(count($studentAnnualIdByGroups) > 0) {
 
-                dump($studentAnnualIdByGroups);
 
                 $scoreCourseAnnualProp =DB::table('scores')
                     ->join('percentage_scores', function($query) use($courseAnnual, $studentAnnualIdByGroups) {
@@ -311,20 +310,20 @@ trait CourseAnnualTrait
                     ->orderBy('percentages.id')
                     ->get();
 
-                dump('not');
-
             } else {
 
-                dump('error here');
-                $scoreCourseAnnualProp =DB::table('scores')
-                    ->join('percentage_scores', function($query) use($courseAnnual, $studentAnnualIdByGroups) {
+
+                $scoreCourseAnnualProp = DB::table('scores')
+                    ->join('percentage_scores', function($query) use($courseAnnual) {
                         $query->on('percentage_scores.score_id', '=', 'scores.id')
                             ->where('scores.course_annual_id','=', $courseAnnual->id);
-                    })
-                    ->join('percentages', 'percentages.id', '=', 'percentage_scores.percentage_id')
+                    })->get();
+                    /*->join('percentages', 'percentages.id', '=', 'percentage_scores.percentage_id')
                     ->select($select)
                     ->orderBy('percentages.id')
-                    ->get();
+                    ->get();*/
+
+                dump($scoreCourseAnnualProp);
             }
 
             dd(12);
