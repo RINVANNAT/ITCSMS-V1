@@ -336,10 +336,12 @@ trait CourseAnnualTrait
                     /*---these are score that inputted from the SA or SF. and we need these score to update for student in each department ---*/
                     $courseAnnualIds = CourseAnnual::where('course_id', $courseAnnual->reference_course_id)->lists('id')->toArray();
 
+                    dump($courseAnnualIds);
+
                     $absenceByCourses = $this->getAbsenceFromDB($courseAnnualIds); //---student absence key student annual id
 
                     $percentages = DB::table('scores')
-                        ->join('percentage_scores', function($query) use($courseAnnualIds) {
+                        ->join('percentage_scores', function($query) use ($courseAnnualIds) {
                             $query->on('percentage_scores.score_id', '=', 'scores.id')
                                 ->whereIn('scores.course_annual_id', $courseAnnualIds);
                         })->get();
