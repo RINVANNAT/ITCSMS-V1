@@ -59,7 +59,8 @@ return [
                     'no_respsonsible_dept' =>  'This is a wrong action! You cannot make a clone score request because your department course is not in Vocational'.'<br>'.'Please set the Right Responsibility Department to your course!!',
                     'not_a_vocational' => 'This is a wrong action! You cannot make a clone score request because your department course is not in Vocational',
                     'success' => ' Score Successfully Cloned !',
-                    'different_percentage' => 'Danger!!! Your course score is not martch with the targetted course! ('. ':percent'.') Please check your percentage of the course before you can clone!'
+                    'different_percentage' => 'Danger!!! Your course score is not martch with the targetted course! ('. ':percent'.') Please check your percentage of the course before you can clone!',
+                    'no_score_applied' => 'Sorry! There are no scores for cloning. Please wait unitil the responsible department :dept complete them!!'
                 ]
             ]
         ]
