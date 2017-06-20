@@ -312,7 +312,6 @@ trait CourseAnnualTrait
 
             } else {
 
-
                 $scoreCourseAnnualProp = DB::table('scores')
                     ->join('percentage_scores', function($query) use($courseAnnual) {
                         $query->on('percentage_scores.score_id', '=', 'scores.id')
@@ -322,11 +321,8 @@ trait CourseAnnualTrait
                     ->select($select)
                     ->orderBy('percentages.id')
                     ->get();
-
-                dump($scoreCourseAnnualProp);
             }
 
-            dd(12);
 
             $scoreAbsence = $this->getAbsenceFromDB($courseAnnual->id);// the absence of student for the course of thier department
 
@@ -351,6 +347,8 @@ trait CourseAnnualTrait
                         ->select($select)
                         ->orderBy('percentages.id')
                         ->get();
+
+                    dd($percentages);
 
                     $collection = collect($percentages);
                     $toCloneScoreProps = $collection->groupBy('student_annual_id')->toArray();
