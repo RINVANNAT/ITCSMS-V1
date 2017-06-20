@@ -1045,6 +1045,32 @@ return [
                     'semester' => 'Semester',
                     'week' => 'Week',
                     'status' => 'Status'
+                ],
+                'status' => [
+                    'finished' => 'FINISHED',
+                    'in_progress' => 'IN PROGRESS',
+                    'waiting' => 'WAITING'
+                ],
+                'popup_export' => [
+                    'box_title' => 'Export Timetable'
+                ],
+                'popup_print' => [
+                    'box_title' => 'Print Timetable'
+                ],
+                'popup_print_template' => [
+                    'title' => 'EMPLOI DU TEMPS',
+                    'group' => 'Groupe',
+                    'semester' => 'Semestre',
+                    'week' => 'Semaine',
+                    'days' => [
+                        'hours' => 'Horaire',
+                        'monday' => 'Lundi',
+                        'tuesday' => 'Mardi',
+                        'wednesday' => 'Mercredi',
+                        'thursday' => 'Jeudi',
+                        'friday' => 'Vendredi',
+                        'saturday' => 'Samedi'
+                    ]
                 ]
             ]
         ]

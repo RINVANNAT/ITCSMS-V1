@@ -29,14 +29,14 @@
 
     <div class="box box-success">
         <div class="box-header with-border">
-            <h3 class="box-title">Timetable Management</h3>
+            <h3 class="box-title">{{ trans('labels.backend.schedule.timetable.sub_index_title') }}</h3>
             <div class="box-tools pull-right">
                 @if(isset($createTimetablePermissionConfiguration))
                     @if(((strtotime($now) >= strtotime($createTimetablePermissionConfiguration->created_at) && strtotime($now) <= strtotime($createTimetablePermissionConfiguration->updated_at)) && access()->allow('create-timetable')))
                         <a class="btn btn-primary btn-sm"
                            data-toggle="tooltip"
-                           data-placement="top" title="Create a new timetable"
-                           data-original-title="Create a new timetable"
+                           data-placement="top" title="{{ trans('tooltrips.backend.timetable.create_timetable') }}"
+                           data-original-title="{{ trans('tooltrips.backend.timetable.create_timetable') }}"
                            href="{{ route('admin.schedule.timetables.create') }}">
                             <i class="fa fa-plus-circle"></i>
                             {{ trans('buttons.backend.schedule.timetable.create') }}
@@ -45,8 +45,8 @@
                 @else
                     <a class="btn btn-primary btn-sm"
                        data-toggle="tooltip"
-                       data-placement="top" title="Create a new timetable"
-                       data-original-title="Create a new timetable"
+                       data-placement="top" title="{{ trans('tooltrips.backend.timetable.create_timetable') }}"
+                       data-original-title="{{ trans('tooltrips.backend.timetable.create_timetable') }}"
                        href="{{ route('admin.schedule.timetables.create') }}">
                         <i class="fa fa-plus-circle"></i>
                         {{ trans('buttons.backend.schedule.timetable.create') }}
@@ -56,7 +56,7 @@
                 <button class="btn btn-primary btn-sm"
                         data-toggle="modal"
                         data-target="#modal-timetable-assignment">
-                    <i class="fa fa-plus-circle"></i> Assign Permission
+                    <i class="fa fa-plus-circle"></i> {{ trans('buttons.backend.schedule.timetable.assignment_permission') }}
                 </button>
                 @endauth
             </div>
@@ -215,15 +215,16 @@
                         row += val.code;
                         row += '</td>';
                         row += '<td>';
-                        row += '<span class="start_date"> ' + val.start + '</span> - <span class="start_date">' + val.end + '</span>';
+                        //row += //*<span class="start_date"> ' + moment(val.start, 'YYYY-MM-DD').fromNow() + '</span> -*// '<span class="start_date">' + moment(val.end, 'YYYY-MM-DD').fromNow() + '</span>';
+                        row += '<span class="start_date">' + moment(val.end, 'YYYY-MM-DD').fromNow() + '</span>';
                         row += '</td>';
                         row += '<td>';
                         if (val.description === 'true') {
-                            row += '<span class="label label-info">IN PROGRESS</span>';
+                            row += '<span class="label label-info">{{ trans('labels.backend.schedule.timetable.status.in_progress') }}</span>';
                         } else if (val.description === 'false') {
-                            row += '<span class="label label-danger">WAITING</span>';
+                            row += '<span class="label label-danger">{{ trans('labels.backend.schedule.timetable.status.waiting') }}</span>';
                         } else {
-                            row += '<span class="label label-success">FINISHED</span>';
+                            row += '<span class="label label-success">{{ trans('labels.backend.schedule.timetable.status.finished') }}</span>';
                         }
                         row += '</td>';
                         row += '<td>';
@@ -257,7 +258,7 @@
             );
 
             $('select[name="departments[]"]').select2({
-                placeholder: 'Chose Department'
+                placeholder: '{{ trans('modals.backend.timetable.assignment_permission.modal_body.form.department.placeholder') }}'
             });
 
             $(document).on('click', '#btn_assign_update', function () {

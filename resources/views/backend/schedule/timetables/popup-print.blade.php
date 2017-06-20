@@ -16,7 +16,7 @@
         <form action="{{ route('timetables.template_print') }}" method="POST" id="form_print_timetable">
             {{ csrf_field() }}
             <div class="box-header with-border">
-                <h3 class="box-title">Print Timetable</h3>
+                <h3 class="box-title">{{ trans('labels.backend.schedule.timetable.popup_print.box_title') }}</h3>
                 <div class="box-tools pull-right">
                     <button type="submit" href="{{ route('timetables.template_print') }}" class="btn btn-primary btn-sm btn-sm"><i class="fa fa-print"></i></button>
                     <button class="btn btn-danger btn-sm" id="clone-window-print"><i class="fa fa-times-circle-o"></i></button>

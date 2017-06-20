@@ -49,7 +49,8 @@ return [
                 'modal_clone' => [
                     'clone' => 'Clone',
                     'close' => 'Close'
-                ]
+                ],
+                'assignment_permission' => 'Assignment Permission'
             ]
         ]
     ],
