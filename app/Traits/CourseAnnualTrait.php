@@ -342,11 +342,12 @@ trait CourseAnnualTrait
                         ->join('percentage_scores', function($query) use($courseAnnualIds) {
                             $query->on('percentage_scores.score_id', '=', 'scores.id')
                                 ->whereIn('scores.course_annual_id', $courseAnnualIds);
-                        })
+                        })->get();
+                    /*
                         ->join('percentages', 'percentages.id', '=', 'percentage_scores.percentage_id')
                         ->select($select)
                         ->orderBy('percentages.id')
-                        ->get();
+                        ->get();*/
 
                     dd($percentages);
 
