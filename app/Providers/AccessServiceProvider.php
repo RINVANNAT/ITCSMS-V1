@@ -328,6 +328,11 @@ class AccessServiceProvider extends ServiceProvider
             \App\Repositories\Backend\Schedule\Calendar\EloquentRepeatRepository::class
         );
 
+        $this->app->bind(
+            \App\Repositories\Backend\Group\GroupRepositoryContract::class,
+            \App\Repositories\Backend\Group\EloquentGroupRepository::class
+        );
+
     }
 
     /**

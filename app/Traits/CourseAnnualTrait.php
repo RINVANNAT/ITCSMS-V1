@@ -225,7 +225,6 @@ trait CourseAnnualTrait
 
     public function cloneScorePanel(Request $request)
     {
-
         $courseAnnual = CourseAnnual::where('id', $request->course_annual_id)->first();
         $department = Department::where('id', $courseAnnual->department_id)->first();
         $degree = Degree::where('id', $courseAnnual->degree_id)->first();
@@ -268,7 +267,6 @@ trait CourseAnnualTrait
 
     public function cloneScore(Request $request)
     {
-
         $groups = $request->group_id;
         $count = 0;
         $countUpdate = 0;
@@ -283,7 +281,6 @@ trait CourseAnnualTrait
 
         if($courseAnnual->responsible_department_id) {
 
-
             if(isset($groups) && $groups != '') {
 
                 $studentAnnualIdByGroups = DB::table('group_student_annuals')
@@ -295,9 +292,7 @@ trait CourseAnnualTrait
                 $studentAnnualIdByGroups = [];
             }
 
-
             if(count($studentAnnualIdByGroups) > 0) {
-
 
                 $scoreCourseAnnualProp =DB::table('scores')
                     ->join('percentage_scores', function($query) use($courseAnnual, $studentAnnualIdByGroups) {

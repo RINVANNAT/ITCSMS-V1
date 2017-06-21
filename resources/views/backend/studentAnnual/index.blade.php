@@ -336,18 +336,18 @@
                  department = $('#filter_department').val(),
                  department_name = $('#filter_department option:selected').text();
 
-                var url = "{{ route('admin.student.form_generate_student_group',1) }}";
+                var url = "{{ route('admin.student.form_generate_student_group') }}";
                 var window_generate_group = PopupCenterDual(
-                                                url
-                                                + '?academic_year_id='+academic_year
+                                                url,
+                                               /* + '?academic_year_id='+academic_year
                                                 + '&academic_year_name='+academic_year_name
                                                 + '&degree_id='+degree
                                                 + '&degree_name='+degree_name
                                                 + '&grade_id='+grade
                                                 + '&grade_name='+grade_name
                                                 + '&department_id='+department
-                                                + '&department_name='+department_name,
-                                                'Generate Group','750','300');
+                                                + '&department_name='+department_name,*/
+                                                'Generate Group','900','550');
 
             });
 

@@ -84,6 +84,10 @@ return [
                 'not_found' => 'That grade does not exist.',
                 'already_exists' => 'That grade already exists. You can not add the same grade.',
             ],
+            'group' => [
+                'no_found' => 'That group does not exist.',
+                'already_exists' => 'That group already exists. You can not add the same group.',
+            ],
             'academicYears' => [
                 'create_error' => 'There was a problem creating this academic year. Please try again.',
                 'delete_error' => 'There was a problem deleting this academic year. Please try again.',

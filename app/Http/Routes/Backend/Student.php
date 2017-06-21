@@ -39,12 +39,17 @@
 
         Route::post('student/{id}/generate_student_id_card', 'StudentAnnualController@generate_id_card')->name('admin.student.generate_student_id_card');
 
-        Route::get('student/{id}/form_generate_student_group', 'StudentAnnualController@formGenerateGroup')->name('admin.student.form_generate_student_group');
+        Route::get('student/form_generate_student_group', 'StudentAnnualController@formGenerateGroup')->name('admin.student.form_generate_student_group');
 
         Route::post('student/{id}/generate_student_group', 'StudentAnnualController@generate_group')->name('admin.student.generate_student_group');
 
 
         Route::get('student/print_transcript', 'StudentAnnualController@print_transcript')->name('admin.student.print_transcript');
+
+
+        Route::get('student/annual/export-lists-format', 'StudentAnnualController@exportFormatLists')->name('admin.student_annual.export_format_lists');
+
+        Route::post('student/annual/import', 'StudentAnnualController@importStudentGroup')->name('student_annual.import');
 
     });
 

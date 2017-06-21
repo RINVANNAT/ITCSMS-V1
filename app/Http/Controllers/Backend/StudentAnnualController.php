@@ -30,6 +30,7 @@ use App\Models\Scholarship;
 use App\Models\Semester;
 use App\Models\Student;
 use App\Models\StudentAnnual;
+use App\Repositories\Backend\Group\GroupRepositoryContract;
 use App\Repositories\Backend\StudentAnnual\StudentAnnualRepositoryContract;
 use App\Traits\StudentScore;
 use Carbon\Carbon;
@@ -49,15 +50,18 @@ class StudentAnnualController extends Controller
      * @var StudentAnnualRepositoryContract
      */
     protected $students;
+    protected $groups;
 
     /**
      * @param StudentAnnualRepositoryContract $studentAnnualRepo
      */
     public function __construct(
-        StudentAnnualRepositoryContract $studentAnnualRepo
+        StudentAnnualRepositoryContract $studentAnnualRepo,
+        GroupRepositoryContract $groupRepo
     )
     {
         $this->students = $studentAnnualRepo;
+        $this->groups = $groupRepo;
     }
 
     /**
@@ -1903,31 +1907,175 @@ class StudentAnnualController extends Controller
         }
     }
 
-    public function formGenerateGroup(GenerateStudentGroupRequest $request, $id) {
+
+    public function exportFormatLists(Request $request)
+    {
+        $data = [];
+
+        $j = 0;
+
+        $group = ['A', 'B', 'C', 'D', 'E'];
+
+        for($i=0; $i< 5 ; $i++) {
+
+            for ($index = 0; $index < 27; $index++) {
+
+                $idCard = 20140001 + $j;
+
+                $element = [
+                    "Student ID" => 'e'.$idCard,
+                    "Department-Code" => 'SA',
+                    "Academic Year" => '2017',
+                    "Semester" => '2',
+                    "Group-Code" => $group[$i]
+                ];
+
+                $data[] = $element;
+
+                $j++;
+
+            }
+
+        }
+
+        Excel::create('Sample-Student-Group-Lists', function ($excel) use ($data) {
+
+            $excel->sheet('Sample-Student-Group-Lists', function ($sheet) use ($data) {
+                $sheet->fromArray($data);
+            });
+
+        })->download('xls');
+
+    }
 
 
-        $degreeId = $request->degree_id;
-        $degreeName = $request->degree_name;
-        $gradeId = $request->grade_id;
-        $gradeName = $request->grade_name;
-        $departmentId = $request->department_id;
-        $departmentName = $request->department_name;
-        $academic = $request->academic_year_name;
-        $academicId = $request->academic_year_id;
 
-        if($degreeId) {
 
-            if($gradeId) {
+    protected $idCard = array();
 
-                return view('backend.studentAnnual.includes.form_generate_student_group', compact('degreeId', 'degreeName', 'gradeId', 'gradeName', 'departmentId', 'departmentName', 'academic', 'academicId'));
+    public static $idCards = array();
+
+
+
+    public function importStudentGroup(Request $request)
+    {
+
+        ini_set('max_execution_time', 3600);
+
+        if ($request->file('import') != null) {
+
+            $import = "student_group" . '.' . $request->file('import')->getClientOriginalExtension();
+            $request->file('import')->move(
+                base_path() . '/public/assets/uploaded_file/group_student_annual/', $import
+            );
+            $storage_path = base_path() . '/public/assets/uploaded_file/group_student_annual/' . $import;
+            $groups = collect(DB::table('groups')->get())->keyBy('code')->toArray();
+
+            $departments = Department::all()->keyBy('code')->toArray();
+
+            $dataUploaded = [];
+            $studentIdCards = [];
+            $academicYear = 0;
+            $isValidFile = true;
+
+            Excel::load($storage_path, function($results) use($groups, &$dataUploaded, &$studentIdCards, &$academicYear, &$isValidFile) {
+
+
+                $allData = $results->get();
+                $firstRow = $results->first()->toArray();
+
+                if(isset($firstRow['student_id']) && isset($firstRow['department_code']) && isset($firstRow['semester']) && isset($firstRow['academic_year']) && isset($firstRow['group_code'])) {
+
+                    $academicYear = $firstRow['academic_year'];
+
+                    $dataUploaded = collect($allData)->groupBy('group_code')->toArray();
+                    $studentIdCards = collect($allData)->map(function($item, $key) {
+                        return [$key => $item['student_id']];
+                    })->collapse()->toArray();
+                } else {
+                    $isValidFile = false;
+                }
+
+            });
+
+
+            if($isValidFile) {
+
+                $studentAnnuals = DB::table('studentAnnuals')
+                    ->join('students', function($query) use($studentIdCards, $academicYear) {
+                        $query->on('students.id','=', 'studentAnnuals.student_id')
+                            ->where('studentAnnuals.academic_year_id', '=', (int)$academicYear)
+                            ->whereIn('students.id_card', $studentIdCards);
+
+                    })
+                    ->select('studentAnnuals.*', 'students.id_card')->get();
+
+                $studentAnnuals = collect($studentAnnuals)->keyBy('id_card')->toArray();
+
+                $checkStoreGroupStudentAnnual = [];
+                $count = 0;
+
+                DB::beginTransaction();
+
+                foreach($dataUploaded as $groupItem => $studentProp) {
+
+                    if(isset($groups[trim($groupItem)])) {
+
+                       $toCreateGroup =  $this->groups->toCreateGroup($studentProp, $studentAnnuals,$departments, $groups[trim($groupItem)]);
+
+                        if($toCreateGroup['status']) {
+
+                            $checkStoreGroupStudentAnnual = $toCreateGroup;
+                            $count++;
+                        } else {
+                            return redirect()->back()->with($toCreateGroup);
+                        }
+
+                    } else {
+
+                        $newGroup = [
+                            'code' => $groupItem
+                        ];
+                        $group = $this->groups->create($newGroup);
+                        $toCreateNewGroup = $this->groups->toCreateGroup($studentProp, $studentAnnuals, $departments, $group);
+
+                        if($toCreateNewGroup['status']) {
+                            $count++;
+                            $checkStoreGroupStudentAnnual = $toCreateNewGroup;
+                        } else {
+                            return redirect()->back()->with($toCreateNewGroup);
+                        }
+
+                    }
+                }
+
+                if($count == count($dataUploaded)) {
+                    return redirect()->back()->with($checkStoreGroupStudentAnnual);
+                } else {
+                    return redirect()->back()->with(['status' => false, 'message' => 'Something went wrong!!']);
+                }
 
             } else {
-                return Response::json(['status'=>false, 'message' => 'Please Select Grade!!']);
+
+                return redirect()->back()->with(['status' => false, 'message' => 'Error! File format is not acceptable!']);
+
             }
 
         } else {
-            return Response::json(['status'=>false, 'message' => 'Please Select Degree!!']);
+            return redirect()->back()->with(['status' => false, 'message' => 'Please Select File!']);
         }
+
+
+    }
+
+    public function formGenerateGroup(GenerateStudentGroupRequest $request) {
+
+
+        $degrees = Degree::lists('name_en','id');
+        $grades = Grade::lists('name_en', 'id');
+        $departments = Department::where('parent_id', 11)->orderBy('id')->get();//lists('code', 'id');
+        $academicYears = AcademicYear::orderBy('id', 'DESC')->lists('name_latin', 'id');
+        return view('backend.studentAnnual.includes.form_generate_student_group', compact('academicYears', 'departments', 'grades', 'degrees'));
 
 
     }
