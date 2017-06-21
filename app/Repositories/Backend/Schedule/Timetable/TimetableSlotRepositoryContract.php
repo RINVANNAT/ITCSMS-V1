@@ -293,17 +293,18 @@ interface TimetableSlotRepositoryContract
      * Get timetable slots from language dept.
      *
      * @param Collection $timetables
+     * @param array $groupStudentsLanguage
      * @return mixed
      */
-    public function get_timetable_slot_language_dept(Collection $timetables);
+    public function get_timetable_slot_language_dept(Collection $timetables, array $groupStudentsLanguage);
 
     /**
      * Set language timetable slot into TimetableSlots.
      *
      * @param Collection $timetableSlots
-     * @param array $groups
+     * @param Collection $groupsRoom
      * @param Collection $languageTimetableSlots
      * @return mixed
      */
-    public function set_timetable_slot_language(Collection $timetableSlots, array $groups, Collection $languageTimetableSlots);
+    public function set_timetable_slot_language(Collection $timetableSlots, Collection $groupsRoom, Collection $languageTimetableSlots);
 }

@@ -295,21 +295,23 @@ trait AjaxCRUDTimetableController
             // get student annuals id
             $student_annual_ids = $this->timetableSlotRepo->find_student_annual_ids($request);
 
-            // get group language
+            // get group language, [@return array(Collection $groups, Array $groups)]
             $groupEnglishArray = $this->timetableSlotRepo->get_group_student_annual_form_language(12, $student_annual_ids, $request);
             $groupFrenchArray = $this->timetableSlotRepo->get_group_student_annual_form_language(13, $student_annual_ids, $request);
 
-            // get timetable language
+            // get timetable language,
             $timetablesEnglish = $this->timetableSlotRepo->get_timetables_form_language_by_student_annual($groupEnglishArray[0], $request, 12);
             $timetablesFrench = $this->timetableSlotRepo->get_timetables_form_language_by_student_annual($groupFrenchArray[0], $request, 13);
 
-            // get timetable slots
-            $timetableSlotsEnglish = $this->timetableSlotRepo->get_timetable_slot_language_dept($timetablesEnglish);
-            $timetableSlotsFrench = $this->timetableSlotRepo->get_timetable_slot_language_dept($timetablesFrench);
+
+            // get timetable slots [@return array(timetableSlots, groupsRoom)]
+            $timetableSlotsEnglish = $this->timetableSlotRepo->get_timetable_slot_language_dept($timetablesEnglish, $groupEnglishArray[0]);
+            $timetableSlotsFrench = $this->timetableSlotRepo->get_timetable_slot_language_dept($timetablesFrench, $groupFrenchArray[0]);
+
 
             // set timetable slots language to view.
-            $this->timetableSlotRepo->set_timetable_slot_language($timetableSlots, $groupEnglishArray[1], $timetableSlotsEnglish);
-            $this->timetableSlotRepo->set_timetable_slot_language($timetableSlots, $groupFrenchArray[1], $timetableSlotsFrench);
+            $this->timetableSlotRepo->set_timetable_slot_language($timetableSlots, $timetableSlotsEnglish[1], $timetableSlotsEnglish[0]);
+            $this->timetableSlotRepo->set_timetable_slot_language($timetableSlots, $timetableSlotsEnglish[1], $timetableSlotsFrench[0]);
         }
 
         // $group_student_annual_classes = DB::table('group_student_annual')
