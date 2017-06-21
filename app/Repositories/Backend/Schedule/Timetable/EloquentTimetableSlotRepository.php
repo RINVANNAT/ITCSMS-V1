@@ -820,6 +820,7 @@ class EloquentTimetableSlotRepository implements TimetableSlotRepositoryContract
      */
     public function find_student_annual_ids(CreateTimetableRequest $request)
     {
+        $group = $request->group == null ? null : $request->group;
         return DB::table('group_student_annuals')
             ->leftJoin('studentAnnuals', 'studentAnnuals.id', '=', 'group_student_annuals.student_annual_id')
             ->where([
@@ -827,9 +828,13 @@ class EloquentTimetableSlotRepository implements TimetableSlotRepositoryContract
                 ['studentAnnuals.department_id', $request->department],
                 ['studentAnnuals.degree_id', $request->degree],
                 ['studentAnnuals.grade_id', $request->grade],
-                ['studentAnnuals.department_option_id', $request->option == null ? null : $request->option],
-                ['group_student_annuals.group_id', $request->group == null ? null : $request->group]
+                ['studentAnnuals.department_option_id', $request->option == null ? null : $request->option]
             ])
+            ->where(function ($query) use ($group) {
+                if ($group != null) {
+                    $query->where('group_student_annuals.group_id', $group);
+                }
+            })
             ->orderBy('studentAnnuals.id')
             ->distinct('studentAnnuals.id')
             ->lists('studentAnnuals.id');
@@ -885,7 +890,8 @@ class EloquentTimetableSlotRepository implements TimetableSlotRepositoryContract
                 ['grade_id', $request->grade],
                 ['semester_id', $request->semester],
                 ['week_id', $request->weekly],
-                ['group_id', $group_student]
+                ['group_id', $group_student],
+                ['completed', true]
             ])->first();
 
             if ($getTimetable instanceof Timetable) {
@@ -899,44 +905,70 @@ class EloquentTimetableSlotRepository implements TimetableSlotRepositoryContract
      * Get timetable slots from language dept.
      *
      * @param Collection $timetables
+     * @param array $groupStudentsLanguage
      * @return mixed
      */
-    public function get_timetable_slot_language_dept(Collection $timetables)
+    public function get_timetable_slot_language_dept(Collection $timetables, array $groupStudentsLanguage)
     {
         $timetableSlots = new Collection();
+        $groupAndRoom = new Collection();
+        $tmp = new Collection();
+        //$groupsHasCreatedTimetable = array();
+
         foreach ($timetables as $timetable) {
-            $getTimetableSlotsEnglish = $this->get_timetable_slot_details($timetable);
-            if (count($getTimetableSlotsEnglish) > 0) {
-                foreach ($getTimetableSlotsEnglish as $item) {
+            $getTimetableSlotsLanguage = $this->get_timetable_slot_details($timetable);
+            if (count($getTimetableSlotsLanguage) > 0) {
+                foreach ($getTimetableSlotsLanguage as $item) {
+                    $newGroupAndRoom = array();
+
+                    $newGroupAndRoom['room'] = $item->room;
+                    $newGroupAndRoom['building'] = $item->building;
+                    $newGroupAndRoom['group'] = Group::find($timetable->group_id)->code;
+
+                    //array_push($groupsHasCreatedTimetable, $timetable->group_id);
+                    $tmp->push($newGroupAndRoom);
                     $timetableSlots->push($item);
                 }
             }
         }
-        return collect($timetableSlots)->keyBy('start');
+
+        /*$groupsHasNoCreatedTimetable = collect($groupStudentsLanguage)->diff($groupsHasCreatedTimetable);
+
+        // set those properties to above groups.
+        foreach ($groupsHasNoCreatedTimetable as $item){
+            $newGroupAndRoom = array();
+            $newGroupAndRoom['room'] = null;
+            $newGroupAndRoom['building'] = null;
+            $newGroupAndRoom['group'] = Group::find($item)->code;
+
+            $tmp->push($newGroupAndRoom);
+        }*/
+
+        foreach (collect($tmp)->sortBy('group') as $item) {
+            $groupAndRoom->push($item);
+        }
+
+        // find group language has not create timetable yet.
+
+
+        return array(collect($timetableSlots)->keyBy('start'), $groupAndRoom);
     }
 
     /**
      * Set language timetable slot into TimetableSlots.
      *
      * @param Collection $timetableSlots
-     * @param array $groups
+     * @param Collection $groupsRoom
      * @param Collection $languageTimetableSlots
      * @return mixed
      */
-    public function set_timetable_slot_language(Collection $timetableSlots, array $groups, Collection $languageTimetableSlots)
+    public function set_timetable_slot_language(Collection $timetableSlots, Collection $groupsRoom, Collection $languageTimetableSlots)
     {
-        usort($groups, function ($a, $b) {
-            if (is_numeric($a->code)) {
-                return $a->code - $b->code;
-            } else {
-                return strcmp($a->code, $b->code);
-            }
-        });
         // pass timetable slots.
         foreach ($languageTimetableSlots as $item) {
             $item->teacher_name = '';
             $timetableSlot = new Collection($item->toArray());
-            $timetableSlot->put('groups', $groups);
+            $timetableSlot->put('slotsForLanguage', $groupsRoom);
             $timetableSlots->push($timetableSlot);
         }
         return $timetableSlots;
