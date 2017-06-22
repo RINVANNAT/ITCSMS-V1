@@ -6,7 +6,7 @@ Route::group(['namespace' => 'Schedule', 'prefix' => 'schedule'], function () {
     Route::get('/timetables', 'TimetableController@index')->name('admin.schedule.timetables.index');
     Route::get('/timetables/create', 'TimetableController@create')->name('admin.schedule.timetables.create');
     Route::get('/timetables/show/{timetable}', 'TimetableController@show')->name('admin.schedule.timetables.show');
-    Route::get('/timetables/delete/{id}', 'TimetableController@delete')->name('admin.schedule.timetables.delete');
+    Route::post('/timetables/delete', 'TimetableController@delete')->name('admin.schedule.timetables.delete');
     Route::post('/timetables/publish', 'TimetableController@publish')->name('admin.schedule.timetables.publish');
     Route::post('/timetables/get_timetables', 'TimetableController@get_timetables')->name('admin.schedule.timetables.get_timetables');
 

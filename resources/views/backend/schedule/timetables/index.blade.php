@@ -390,6 +390,49 @@
                     });
                 });
             });
+
+            $(document).on('click', '.btn_delete_timetable', function (e) {
+                e.preventDefault();
+                toggleLoading(true);
+                var self = $(this);
+                swal({
+                    title: 'Are you sure?',
+                    text: "Do want to delete this timetable?",
+                    type: 'warning',
+                    showCancelButton: true,
+                    confirmButtonColor: '#3085d6',
+                    cancelButtonColor: '#d33',
+                    confirmButtonText: 'Yes, delete it!'
+                }).then(function () {
+                    $.ajax({
+                        type: 'POST',
+                        url: '{{ route('admin.schedule.timetables.delete') }}',
+                        data: {
+                            'id': self.attr('id')
+                        },
+                        success:function () {
+                            swal(
+                                'Deleted!',
+                                'Your timetable has been deleted.',
+                                'success'
+                            );
+                        },
+                        error: function () {
+                            swal(
+                                'Deleting timetable',
+                                'Something went wrong!',
+                                'error'
+                            );
+                        },
+                        complete: function () {
+                            toggleLoading(false);
+                            oTable.draw();
+                        }
+                    });
+
+                });
+                toggleLoading(false);
+            });
         });
     </script>
 @stop
