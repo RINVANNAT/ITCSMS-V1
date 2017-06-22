@@ -23,6 +23,7 @@
         .toolbar {
             float: left;
         }
+        .dataTables_filter, .dataTables_info { display: none; }
     </style>
 @stop
 

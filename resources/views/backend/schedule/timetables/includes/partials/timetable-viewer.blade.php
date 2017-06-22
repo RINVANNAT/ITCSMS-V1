@@ -15,8 +15,9 @@
                         <h3 class="smis-notification-title">
                             Progress{{--{{ trans('strings.backend.timetable.in_progress') }}--}}
                             ({{ (new \Carbon\Carbon($createTimetablePermissionConfiguration->created_at))->toFormattedDateString() }}
-                            <i class="fa fa-arrow-right"></i>
-                            {{ (new \Carbon\Carbon($createTimetablePermissionConfiguration->updated_at))->toFormattedDateString() }})
+                            <i class="fa fa-long-arrow-right"></i>
+                            {{ (new \Carbon\Carbon($createTimetablePermissionConfiguration->updated_at))->toFormattedDateString() }}
+                            )
                         </h3>
                     </div>
                     <div class="smis-notification-body">
@@ -30,8 +31,9 @@
                         <h3 class="smis-notification-title">
                             Waiting{{--{{ trans('strings.backend.timetable.waiting') }}--}}
                             ({{ (new \Carbon\Carbon($createTimetablePermissionConfiguration->created_at))->toFormattedDateString() }}
-                            <i class="fa fa-arrow-right"></i>
-                            {{ (new \Carbon\Carbon($createTimetablePermissionConfiguration->updated_at))->toFormattedDateString() }})
+                            <i class="fa fa-long-arrow-right"></i>
+                            {{ (new \Carbon\Carbon($createTimetablePermissionConfiguration->updated_at))->toFormattedDateString() }}
+                            )
                         </h3>
                     </div>
                     <div class="smis-notification-body">
@@ -42,7 +44,8 @@
                 <div class="smis-notification info">
                     <div class="smis-notification-heading">
                         <span class="smis-close-icon">&times;</span>
-                        <h3 class="smis-notification-title">Finished{{--{{ trans('strings.backend.timetable.finished') }}--}}</h3>
+                        <h3 class="smis-notification-title">
+                            Finished{{--{{ trans('strings.backend.timetable.finished') }}--}}</h3>
                     </div>
                     <div class="smis-notification-body">
                         <p>{{ trans('strings.backend.timetable.message_finished') }}<a href="#">STUDY OFFICE</a>.</p>
