@@ -113,38 +113,80 @@
                 eventRender: function (event, element, view) {
                     var object = '<a class="fc-time-grid-event fc-v-event fc-event fc-start fc-end course-item  fc-draggable fc-resizable" style="top: 65px; bottom: -153px; z-index: 1; left: 0%; right: 0%;">' +
                         '<div class="fc-content">' +
-                        '<div class="container-room">' +
-                        '<div class="side-course" id="' + event.id + '">';
-                    if (event.is_conflict_course === true) {
-                        object += '<div class="fc-title conflict">' + event.course_name + '</div>';
-                    } else {
-                        object += '<div class="fc-title">' + event.course_name + '</div>';
-                    }
-                    if (event.is_conflict_lecturer === true) {
-                        object += '<p class="text-primary conflict">' + event.teacher_name + '</p> ';
-                    } else {
-                        object += '<p class="text-primary">' + event.teacher_name + '</p> ';
-                    }
-                    object += '<p class="text-primary">' + event.type + '</p> ' +
-                        '</div>' +
-                        '<div class="side-room">' +
-                        '<div class="room-name">';
-                    if (event.room !== null) {
-                        if (event.is_conflict_room === true) {
-                            object += '<p class="fc-room conflict">' + event.building + '-' + event.room + '</p>';
-                        } else {
-                            object += '<p class="fc-room">' + event.building + '-' + event.room + '</p>';
+                        '<div class="container-room">';
+                    if (typeof event.slotsForLanguage !== 'undefined') {
+                        object += '<div class="side-courses" id="' + event.id + '" style="width: 100% !important;padding: 2px;" ​​​>';
+                        // check conflict room and render
+                        object += '<div class="row"> <div class="col-md-12"><div class="fc-title">' + event.course_name + '</div></div>';
+                        event.editable = false;
+                        for (var i = 0; i < event.slotsForLanguage.length; i++) {
+                            object += '<div class="col-xs-4 col-sm-4 col-md-4"> Gr: ' + event.slotsForLanguage[i].group + ' (' + event.slotsForLanguage[i].building + '-' + event.slotsForLanguage[i].room + ')</div>';
                         }
+                        object += '</div></div>';
+                    } else {
+                        object += '<div class="side-course" id="' + event.id + '"​​​>';
+
+                        // check conflict room and render
+                        object += '<div class="fc-title">' + event.course_name + '</div>';
+
+                        // check conflict lecturer and render
+                        if (typeof event.conflict_lecturer !== 'undefined') {
+                            if (event.conflict_lecturer.canMerge.length > 0 || event.conflict_lecturer.canNotMerge.length > 0) {
+                                object += '<p class="text-primary conflict">' + event.teacher_name + '</p> ';
+                            }
+                            else {
+                                object += '<p class="text-primary">' + event.teacher_name + '</p> ';
+                            }
+                        }
+                        else {
+                            object += '<p class="text-primary">' + event.teacher_name + '</p> ';
+                        }
+
+
+                        if (typeof event.type !== 'undefined') {
+                            object += '<p class="text-primary">' + event.type + '</p> ';
+                        }
+                        object += '</div>';
                     }
-                    object += '</div> ' +
-                        '</div> ' +
-                        '<div class="clearfix"></div> ' +
+
+                    if (typeof event.slotsForLanguage === 'undefined') {
+                        object += '<div class="side-room">' +
+                            '<div class="room-name">';
+
+                        // check conflict and render room
+                        if (event.room !== null && event.building !== null) {
+                            if (event.conflict_room === true) {
+                                object += '<p class="fc-room bg-danger badge">' + event.building + '-' + event.room + '</p>';
+                            } else {
+                                object += '<p class="fc-room">' + event.building + '-' + event.room + '</p>';
+                            }
+                        }
+                        object += '</div>';
+
+                        // render groups
+                        if (typeof event.groups !== 'undefined') {
+                            if (event.groups.length > 0) {
+                                var groups = '<p>Gr: ';
+                                for (var i = 0; i < event.groups.length; i++) {
+                                    if (event.groups[i] !== null) {
+                                        groups += event.groups[i].code + ' ';
+                                    }
+                                    else {
+                                        groups = '';
+                                    }
+                                }
+                                groups += '</p>';
+                            }
+                            object += groups;
+                        }
+                        object += '</div> ';
+                    }
+                    object += '<div class="clearfix"></div> ' +
                         '</div>' +
                         '</div>' +
                         '<div class="fc-bgd"></div>' +
                         '<div class="fc-resizer fc-end-resizer"></div>' +
                         '</a>';
-
                     return $(object);
                 }
             });

@@ -122,7 +122,7 @@ class TimetableController extends Controller
                 ['departments.id', $department_id],
                 ['degrees.id', $degree_id],
                 ['grades.id', $grade_id],
-                ['semesters.id', $semester_id]
+                ['semesters.id', $semester_id],
             ]);
 
         if ($option_id !== 'Option' && $option_id != null) {
@@ -130,6 +130,9 @@ class TimetableController extends Controller
         }
         if ($group_id !== 'Group' && $group_id != null) {
             $timetables->where('groups.id', $group_id);
+        }
+        if (request('week') != null) {
+            $timetables->where('weeks.name_en', request('week'));
         }
         $timetables->orderBy('weeks.id', 'asc')
             ->select([
@@ -159,7 +162,7 @@ class TimetableController extends Controller
                     . 'data-original-title="View">'
                     . '</i></a>';
 
-                $delete = ' <button id="'.$timetable->id.'" class="btn btn-xs btn-danger btn_delete_timetable">'
+                $delete = ' <button id="' . $timetable->id . '" class="btn btn-xs btn-danger btn_delete_timetable">'
                     . '<i class="fa fa-trash" data-toggle="tooltip"'
                     . 'data-placement="top" title="Delete"'
                     . 'data-original-title="Delete">'
@@ -259,6 +262,26 @@ class TimetableController extends Controller
             )
             ->get();
         $timetableSlots = new Collection();
+
+        if ($timetable->department_id < 12 && ($timetable instanceof Timetable)) {
+            // get student annuals id
+            $student_annual_ids = $this->timetableSlotRepo->find_student_annual_ids($timetable);
+            $department_languages = array(12, 13); // (english, french)
+            foreach ($department_languages as $department_language) {
+                // get group language, [@return array(Collection $groups, Array $groups)]
+                $groups = $this->timetableSlotRepo->get_group_student_annual_form_language($department_language, $student_annual_ids, $timetable);
+
+                // get timetable language,
+                $timetables = $this->timetableSlotRepo->get_timetables_form_language_by_student_annual($groups[0], $timetable, $department_language);
+
+                // get timetable slots [@return array(timetableSlots, groupsRoom)]
+                $timetableSlotsLang = $this->timetableSlotRepo->get_timetable_slot_language_dept($timetables, $groups[0]);
+
+                // set timetable slots language to view.
+                $this->timetableSlotRepo->set_timetable_slot_language($timetableSlots, $timetableSlotsLang[1], $timetableSlotsLang[0]);
+            }
+        }
+
         foreach ($timetable_slots as $timetable_slot) {
             if (($timetable_slot instanceof TimetableSlot) && is_object($timetable_slot)) {
 
@@ -308,7 +331,7 @@ class TimetableController extends Controller
     {
         if (Timetable::find($request->id) instanceof Timetable) {
             DB::table('timetables')->where('id', '=', $request->id)->delete();
-            return Response::json(['status'=>true], 200);
+            return Response::json(['status' => true], 200);
         }
     }
 }
