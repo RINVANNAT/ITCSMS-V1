@@ -11,7 +11,7 @@
 
         .form-control_ {
             display: block;
-            width: 32%;
+            width: 24%;
             height: 34px;
             padding: 6px 12px;
             font-size: 14px;
@@ -94,7 +94,7 @@
                             </div>
 
                             <div class="pull-left">
-                                <a href="#" id="btn_cancel" class="btn btn-default btn-xs">Cancel</a>
+                                <a href="#"  class=" btn_cancel btn btn-danger btn-xs">Cancel</a>
                             </div>
 
 
@@ -124,7 +124,7 @@
                     <div class="box-header with-border text_font">
                         <h1 class="box-title"> <span class="text_font">ការចែកក្រុម របស់កូនសិស្ស នៃ ដេបា៉តឺម៉ង់ <strong id="dept_name"> </strong> </span></h1>
                         <h1 class="box-title">សំរាប់ ថ្នាក់ <strong id="class_name"> </strong>  </h1>
-                        <h1 class="box-title">ក្នុងឆ្នាំសិក្សា <strong id="year_title"></strong></h1>
+                        <h1 class="box-title">ក្នុងឆ្នាំសិក្សា <strong id="year_title"></strong> ឆមាសទី <strong id="semester_title"> </strong></h1>
                     </div>
                     <!-- /.box-header -->
 
@@ -140,37 +140,40 @@
 
                                 {!! Form::select('grade_id',$grades,null, array('class'=>'form-control_ col-sm-3','id'=>'grade')) !!}
 
-                            </div>
-
-                            <div class="col-sm-12 no-padding text_font ">
-
-                                <label for="fomart_text" class="col-sm-3 sm-3"> Fomart: Prefix </label>
-                                <div class="col-sm-2 no-padding">
-                                    <input type="text" name="prefix" class="form-control input_text">
-                                </div>
-
-                                <label for="suffix" class="col-sm-1" style="margin-right: 10px"> Suffix  </label>
-
-                                {!! Form::select('suffix',['number' => 'Number', 'alphabet'=> 'Alphabet'],null, array('class'=>'control-form col-sm-4','id'=>'grade')) !!}
-
-                                <label for="post_fix" class="col-sm-1" style="margin-right: 20px"> Result </label>
-                                <div class="col-sm-3 no-padding">
-                                    <input type="text" name="post_fix" class="form-control input_text" style="width: 100%; color: green">
-                                </div>
+                                {!! Form::select('semester_id',$semesters,null, array('class'=>'form-control_ col-sm-3','id'=>'semester')) !!}
 
                             </div>
+
+
 
                             <div class="col-sm-12 buttom-10 no-padding" style="margin-left: 5px; margin-top: 10px">
 
-                                <p style="font-size: 12pt"> Select Owner Student's Group Department</p>
+                                <p style="font-size: 12pt"> Group Department</p>
 
                                 @foreach($departments as $department)
                                     <label for="{{$department->code}}" class="btn btn-sm btn-warning" style="width: 78px; font-size: 12pt">
-                                        <input type="checkbox" name="department_id" class="department" style="font-size: 12pt" id="{{$department->code}}" value="{{$department->id}}">
+
+                                        <?php $checked = ($department->id == config('access.departments.department_tc'))?'checked':''; ?>
+                                        <input type="checkbox" name="department_id" class="department" style="font-size: 12pt" id="{{$department->code}}" value="{{$department->id}}" {{$checked}}>
                                         {{$department->code}}
                                     </label>
                                 @endforeach
                             </div>
+
+
+                            <div class="col-sm-12 buttom-10 no-padding" style="margin-left: 5px; margin-top: 10px">
+
+                                <p style="font-size: 12pt"> Options: </p>
+
+                                @foreach($options as $option)
+                                    <label for="{{$option->code}}" class="btn btn-sm btn-primary" style="width: 78px; font-size: 12pt">
+
+                                        <input type="checkbox" name="department_option_id" class="department_option {{$option->department_id}}" style="font-size: 12pt" id="{{$option->code}}" value="{{$option->id}}">
+                                        {{$option->code}}
+                                    </label>
+                                @endforeach
+                            </div>
+
 
                             <div class="col-sm-12 no-padding" style="margin-top: 10px">
 
@@ -182,19 +185,70 @@
 
                                 <label for=" student_pergroup" class="col-sm-2"  style="margin-top: 5px"> Total Student </label>
                                 <div class="col-sm-3 no-padding pull-right">
-                                    <input disabled type="text" name="total_student" class="form-control input_text pull-right" style="width: 100%; color: green" value="1000" >
+                                    <input disabled type="text" name="total_student" class="form-control input_text pull-right" style="width: 100%; color: green; font-size: 14pt" value="" >
                                 </div>
 
                             </div>
 
+
+                            <div class="col-sm-12 no-padding" style="margin-top: 10px;">
+
+                                <div class="box-header with-border text_font" style="border-top: 1px solid #f5eeee">
+                                    <h1 class="box-title"> Rule to Generate Group </h1>
+                                </div>
+
+                                <div class="box-body">
+
+                                    <label for="alphabet_rule" class="btn btn-sm btn-info" style="width: 160px; font-size: 12pt">
+
+                                        <input type="checkbox" name="alphabet_rule" class="rule" style="font-size: 10pt" id="alphabet_rule" value="alphabet" checked>
+                                        Name Latin
+                                    </label>
+
+
+                                    <label for="id_card_rule" class="btn btn-sm btn-info" style="width: 160px; font-size: 12pt">
+
+                                        <input type="checkbox" name="id_card_rule" class="rule" style="font-size: 10pt" id="id_card_rule" value="id_card_rule" >
+                                       ID Card
+                                    </label>
+
+                                </div>
+
+
+                                <div class="col-sm-12 no-padding" style="margin-top: 10px">
+
+
+                                    <div class="col-sm-12 no-padding text_font ">
+
+                                        <label for="fomart_text" class="col-sm-3 sm-3"> Fomart: Prefix </label>
+                                        <div class="col-sm-2 no-padding">
+                                            <input type="text" name="prefix" class="form-control input_text">
+                                        </div>
+
+                                        <label for="suffix" class="col-sm-1" style="margin-right: 10px"> Suffix  </label>
+
+                                        {!! Form::select('suffix',['number' => 'Number', 'alphabet'=> 'Alphabet'],null, array('class'=>'control-form col-sm-4','id'=>'grade')) !!}
+
+                                        <label for="post_fix" class="col-sm-1" style="margin-right: 20px"> Result </label>
+                                        <div class="col-sm-3 no-padding">
+                                            <input type="text" name="post_fix" class="form-control input_text" style="width: 100%; color: green">
+                                        </div>
+
+                                    </div>
+                                </div>
+
+                            </div>
+
+
+
                         </form>
                     </div>
 
-                    <div class="box-body">
+                    <div class="box-body with-border">
                        <div class="col-sm-12">
 
                            <div class="pull-left">
-                               <a href="#" id="btn_cancel" class="btn btn-default btn-xs">Cancel</a>
+                               <a href="#" class=" btn_cancel btn btn-danger btn-xs">Cancel</a>
                            </div>
 
                            <div class="pull-right">
@@ -232,21 +286,42 @@
     {{--here where i need to write the js script --}}
     <script>
 
-
-
         $(document).ready(function() {
             setTitle();
+            getStudents();
             $(document).on('change', 'select[name=academic_year_id]', function (e) {
                 setTitle();
+                getStudents();
             });
             $(document).on('change', 'select[name=degree_id]', function (e) {
                 setTitle();
+                getStudents();
             });
             $(document).on('change', 'select[name=grade_id]', function (e) {
                 setTitle();
+                getStudents();
+            });
+            $(document).on('change', 'select[name=semester_id]', function (e) {
+                setTitle();
+                getStudents();
+            });
+
+            $(document).on('change', '.department', function (e) {
+
+                if($(this).is(':checked')) {
+                    var current_object = $(this);
+                    $('input.department').each(function(key, checkbox) {
+                        if($(checkbox).attr('id') != current_object.attr('id')) {
+                          $(checkbox).prop('checked', false);
+                        }
+                    });
+
+                    getStudents();
+                }
+                setTitle();
             });
         });
-        $('#btn_cancel').on('click', function() {
+        $('.btn_cancel').on('click', function() {
             window.close();
         });
 
@@ -267,7 +342,40 @@
             } else {
                 notify('error', 'info', 'Input Number of Student');
             }
-        })
+        });
+
+        function getStudents() {
+
+            var department_id = '';
+            $('input.department').each(function(key, checkbox) {
+                if($(checkbox).is(':checked')) {
+                    department_id = $(this).val();
+                }
+            })
+
+            var baseData = {
+                academic_year_id : $('select[name=academic_year_id] :selected').val(),
+                degree_id : $('select[name=degree_id] :selected').val(),
+                grade_id : $('select[name=grade_id] :selected').val(),
+                semester_id : $('select[name=semester_id] :selected').val(),
+                department_id:department_id
+            };
+
+            $.ajax({
+                type: 'GET',
+                url: '{{route('admin.student.number_student_annual')}}',
+                dataType: "json",
+                data: baseData,
+                success: function(resultData) {
+
+                    if(resultData.status) {
+                        $('input[name=total_student]').val(resultData.count)
+                    }
+
+                }
+            });
+
+        }
 
         function ajaxRequest(method, baseUrl, baseData) {
             $.ajax({
@@ -303,26 +411,27 @@
             }
             var grade = $('select[name=grade_id] :selected').val();
             var class_name= degree_code + grade;
+            var semester_title = $('select[name=semester_id] :selected').val();
+            var Dept_name = '';
 
-
+            $('input.department').each(function(key, checkbox) {
+               if($(checkbox).is(':checked')) {
+                   Dept_name = $(this).attr('id');
+               }
+            })
 
             $('#year_title').html(year)
             $('#class_name').html(class_name);
-            $('#dept_name').html('GIC');
+            $('#dept_name').html(Dept_name);
+            $('#semester_title').html(semester_title);
         }
 
-
-
         @if(Session::has('status'))
-
             @if(Session::get('status') == true)
                 notify('success', '{{Session::get('message')}}', 'Import-Group')
             @else
-
                  notify('error', '{{Session::get('message')}}', 'Import-Group')
             @endif
-
-
         @endif
 
 

@@ -1,5 +1,6 @@
 <?php namespace App\Http\Controllers\Backend;
 
+use App\Http\Controllers\Backend\StudentTrait\StudentAnnualTrait;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Backend\Student\CreateStudentRequest;
 use App\Http\Requests\Backend\Student\DeleteStudentRequest;
@@ -45,7 +46,7 @@ use Illuminate\Support\Facades\Response;
 
 class StudentAnnualController extends Controller
 {
-    use StudentScore;
+    use StudentScore; use StudentAnnualTrait;
     /**
      * @var StudentAnnualRepositoryContract
      */
@@ -1948,15 +1949,6 @@ class StudentAnnualController extends Controller
 
     }
 
-
-
-
-    protected $idCard = array();
-
-    public static $idCards = array();
-
-
-
     public function importStudentGroup(Request $request)
     {
 
@@ -2064,18 +2056,6 @@ class StudentAnnualController extends Controller
         } else {
             return redirect()->back()->with(['status' => false, 'message' => 'Please Select File!']);
         }
-
-
-    }
-
-    public function formGenerateGroup(GenerateStudentGroupRequest $request) {
-
-
-        $degrees = Degree::lists('name_en','id');
-        $grades = Grade::lists('name_en', 'id');
-        $departments = Department::where('parent_id', 11)->orderBy('id')->get();//lists('code', 'id');
-        $academicYears = AcademicYear::orderBy('id', 'DESC')->lists('name_latin', 'id');
-        return view('backend.studentAnnual.includes.form_generate_student_group', compact('academicYears', 'departments', 'grades', 'degrees'));
 
 
     }
