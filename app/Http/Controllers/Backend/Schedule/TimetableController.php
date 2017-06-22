@@ -159,12 +159,12 @@ class TimetableController extends Controller
                     . 'data-original-title="View">'
                     . '</i></a>';
 
-                $delete = ' <a href="/admin/schedule/timetables/delete/' . $timetable->id . '" class="btn btn-xs btn-danger">'
+                $delete = ' <button id="'.$timetable->id.'" class="btn btn-xs btn-danger btn_delete_timetable">'
                     . '<i class="fa fa-trash" data-toggle="tooltip"'
                     . 'data-placement="top" title="Delete"'
                     . 'data-original-title="Delete">'
                     . '</i>'
-                    . '</a>';
+                    . '</button>';
 
                 $result = '';
                 if (access()->allow('export-timetable')) {
@@ -308,8 +308,7 @@ class TimetableController extends Controller
     {
         if (Timetable::find($request->id) instanceof Timetable) {
             DB::table('timetables')->where('id', '=', $request->id)->delete();
-            return redirect()->back()->withFlashSuccess('Timetable is deleted successfully.');
+            return Response::json(['status'=>true], 200);
         }
-        return redirect()->back()->withFlashError('Something went wrong.');
     }
 }

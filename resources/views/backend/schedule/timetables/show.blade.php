@@ -25,31 +25,6 @@
     <div class="box box-success">
         <div class="box-header with-border">
             <div class="mailbox-controls">
-                {{--<div class="pull-right">
-                    @if(isset($timetable) && $timetable->completed == true)
-                        @permission('clone-timetable')
-                        <button class="btn btn-success btn-sm"
-                                data-toggle="modal"
-                                data-target="#clone-timetable"
-                                data-toggle="tooltip"
-                                data-placement="top"
-                                title="{{ trans('buttons.backend.schedule.timetable.clone') }}">
-                            {{ trans('buttons.backend.schedule.timetable.clone') }}
-                        </button>
-                        @endauth
-                    @else
-                        @permission('publish-timetable')
-                        <a href="#">
-                            <button class="btn btn-info btn-sm"
-                                    data-toggle="tooltip"
-                                    data-placement="top"
-                                    title="{{ trans('buttons.backend.schedule.timetable.publish') }}">
-                                {{ trans('buttons.backend.schedule.timetable.publish') }}
-                            </button>
-                        </a>
-                        @endauth
-                    @endif
-                </div>--}}
 
                 @if(isset($createTimetablePermissionConfiguration))
                     @if(((strtotime($now) >= strtotime($createTimetablePermissionConfiguration->created_at) && strtotime($now) <= strtotime($createTimetablePermissionConfiguration->updated_at)) && access()->allow('create-timetable')))
