@@ -129,19 +129,22 @@ trait PrintTimetableController
         // get timetable from languages
         // get student annual id
         $student_annual_ids = $this->timetableSlotRepos->find_student_annual_ids($infoTimetable);
-        // (english, french)
-        $department_languages = array(12, 13);
 
-        // get all timetable slot language
-        foreach ($department_languages as $department_language) {
-            // get group languages.
-            $groups = $this->timetableSlotRepos->find_group_student_annual_form_language($department_language, $student_annual_ids, $infoTimetable);
-            // get timetables language
-            $timetablesLang = $this->timetableSlotRepos->get_timetables_form_language_by_student_annual($groups[0], $infoTimetable, $department_language);
-            // get timetable slot language.
-            $timetableSlotsLang = $this->timetableSlotRepos->get_timetable_slot_language_dept($timetablesLang, $groups[0]);
-            // set all timetable slot into
-            $this->timetableSlotRepos->set_timetable_slot_language($timetablesSlotsLang, $timetableSlotsLang[1], $timetableSlotsLang[0]);
+        if(count($student_annual_ids)>0){
+            // (english, french)
+            $department_languages = array(12, 13);
+
+            // get all timetable slot language
+            foreach ($department_languages as $department_language) {
+                // get group languages.
+                $groups = $this->timetableSlotRepos->find_group_student_annual_form_language($department_language, $student_annual_ids, $infoTimetable);
+                // get timetables language
+                $timetablesLang = $this->timetableSlotRepos->get_timetables_form_language_by_student_annual($groups[0], $infoTimetable, $department_language);
+                // get timetable slot language.
+                $timetableSlotsLang = $this->timetableSlotRepos->get_timetable_slot_language_dept($timetablesLang, $groups[0]);
+                // set all timetable slot into
+                $this->timetableSlotRepos->set_timetable_slot_language($timetablesSlotsLang, $timetableSlotsLang[1], $timetableSlotsLang[0]);
+            }
         }
 
         return view('backend.schedule.timetables.popup-template-print', compact('timetables', 'timetablesSlotsLang'));

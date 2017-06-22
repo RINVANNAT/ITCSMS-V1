@@ -6,40 +6,52 @@
         @include('backend.schedule.timetables.includes.partials.option-index')
     </form>
     <br/>
-
     @if(isset($createTimetablePermissionConfiguration))
-        @if(!((strtotime($now) >= strtotime($createTimetablePermissionConfiguration->created_at) && strtotime($now) <= strtotime($createTimetablePermissionConfiguration->updated_at)) && access()->allow('create-timetable')))
+        @if(access()->allow('create-timetable'))
             @if($createTimetablePermissionConfiguration->description === 'true')
-                <div class="alert alert-info alert-dismissible">
-                    <button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>
-                    <h4><i class="icon fa fa-info"></i> {{ trans('strings.backend.timetable.in_progress') }}</h4>
-                    <p>{{ trans('strings.backend.timetable.start_at') }} :
-                        <span class="label label-primary">{{ (new \Carbon\Carbon($createTimetablePermissionConfiguration->created_at))->toDateString() }}</span>
-                        {{ trans('strings.backend.timetable.to') }}
-                        <span class="label label-primary">{{ (new \Carbon\Carbon($createTimetablePermissionConfiguration->updated_at))->toDateString() }}</span>
-                        {{ trans('strings.backend.timetable.status') }} :
-                    </p>
+                <div class="smis-notification success" style="display: block;">
+                    <div class="smis-notification-heading">
+                        <span class="smis-close-icon">&times;</span>
+                        <h3 class="smis-notification-title">
+                            Progress{{--{{ trans('strings.backend.timetable.in_progress') }}--}}
+                            ({{ (new \Carbon\Carbon($createTimetablePermissionConfiguration->created_at))->toFormattedDateString() }}
+                            <i class="fa fa-arrow-right"></i>
+                            {{ (new \Carbon\Carbon($createTimetablePermissionConfiguration->updated_at))->toFormattedDateString() }})
+                        </h3>
+                    </div>
+                    <div class="smis-notification-body">
+                        <p>{{ trans('strings.backend.timetable.message_progress') }}.</p>
+                    </div>
                 </div>
             @elseif($createTimetablePermissionConfiguration->description === 'false')
-                <div class="alert alert-info alert-dismissible">
-                    <button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>
-                    <h4><i class="icon fa fa-info"></i> {{ trans('strings.backend.timetable.waiting') }}</h4>
-                    <p>{{ trans('strings.backend.timetable.start_from') }} :
-                        <span class="label label-primary">{{ (new \Carbon\Carbon($createTimetablePermissionConfiguration->created_at))->toDateString() }}</span>
-                        {{ trans('strings.backend.timetable.to') }}
-                        <span class="label label-primary">{{ (new \Carbon\Carbon($createTimetablePermissionConfiguration->updated_at))->toDateString() }}</span>
-                        {{ trans('strings.backend.timetable.status') }} :
-                    </p>
+                <div class="smis-notification danger">
+                    <div class="smis-notification-heading">
+                        <span class="smis-close-icon">&times;</span>
+                        <h3 class="smis-notification-title">
+                            Waiting{{--{{ trans('strings.backend.timetable.waiting') }}--}}
+                            ({{ (new \Carbon\Carbon($createTimetablePermissionConfiguration->created_at))->toFormattedDateString() }}
+                            <i class="fa fa-arrow-right"></i>
+                            {{ (new \Carbon\Carbon($createTimetablePermissionConfiguration->updated_at))->toFormattedDateString() }})
+                        </h3>
+                    </div>
+                    <div class="smis-notification-body">
+                        <p>{{ trans('strings.backend.timetable.message_waiting') }}.</p>
+                    </div>
                 </div>
             @else
-                <div class="alert alert-info alert-dismissible">
-                    <button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>
-                    <h4><i class="icon fa fa-info"></i> {{ trans('strings.backend.timetable.finished') }}</h4>
-                    <p>{{ trans('strings.backend.timetable.message_finished') }}<a href="#">STUDY OFFICE</a>.</p>
+                <div class="smis-notification info">
+                    <div class="smis-notification-heading">
+                        <span class="smis-close-icon">&times;</span>
+                        <h3 class="smis-notification-title">Finished{{--{{ trans('strings.backend.timetable.finished') }}--}}</h3>
+                    </div>
+                    <div class="smis-notification-body">
+                        <p>{{ trans('strings.backend.timetable.message_finished') }}<a href="#">STUDY OFFICE</a>.</p>
+                    </div>
                 </div>
             @endif
         @endif
     @endif
+
 
     <table class="table table-striped table-bordered table-hover dt-responsive nowrap"
            id="timetables-table">

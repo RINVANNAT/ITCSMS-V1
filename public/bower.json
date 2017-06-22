@@ -1,0 +1,24 @@
+{
+  "name": "smis",
+  "authors": [
+    "Hel Mab <mabhelitc@gmail.com>"
+  ],
+  "description": "School Information Management System",
+  "main": "hack.laravel",
+  "keywords": [
+    "smis"
+  ],
+  "license": "MIT",
+  "homepage": "https://192.168.51.82",
+  "private": true,
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "animate.css": "^3.5.2"
+  }
+}
