@@ -264,30 +264,40 @@ interface TimetableSlotRepositoryContract
     /**
      * Get all student annuals.
      *
-     * @param CreateTimetableRequest $request
+     * @param Timetable $timetable
      * @return mixed
      */
-    public function find_student_annual_ids(CreateTimetableRequest $request);
+    public function find_student_annual_ids(Timetable $timetable);
 
     /**
      * Get group student annual from language.
      *
      * @param $department_id
      * @param array $student_annual_ids
-     * @param CreateTimetableRequest $request
+     * @param Timetable $timetable
      * @return mixed
      */
-    public function get_group_student_annual_form_language($department_id, array $student_annual_ids, CreateTimetableRequest $request);
+    public function get_group_student_annual_form_language($department_id, array $student_annual_ids, Timetable $timetable);
+
+    /**
+     * Get group student annual from language.
+     *
+     * @param $department_id
+     * @param array $student_annual_ids
+     * @param Timetable $timetable
+     * @return mixed
+     */
+    public function find_group_student_annual_form_language($department_id, array $student_annual_ids, Timetable $timetable);
 
     /**
      * Get timetables from dept language.
      *
      * @param array $group_students
-     * @param CreateTimetableRequest $request
+     * @param Timetable $timetable
      * @param $department_id
      * @return mixed
      */
-    public function get_timetables_form_language_by_student_annual(array $group_students, CreateTimetableRequest $request, $department_id);
+    public function get_timetables_form_language_by_student_annual(array $group_students, Timetable $timetable, $department_id);
 
     /**
      * Get timetable slots from language dept.

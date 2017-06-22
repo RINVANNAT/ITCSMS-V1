@@ -25,7 +25,7 @@
     <div class="box box-success">
         <div class="box-header with-border">
             <div class="mailbox-controls">
-                <div class="pull-right">
+                {{--<div class="pull-right">
                     @if(isset($timetable) && $timetable->completed == true)
                         @permission('clone-timetable')
                         <button class="btn btn-success btn-sm"
@@ -49,7 +49,7 @@
                         </a>
                         @endauth
                     @endif
-                </div>
+                </div>--}}
 
                 @if(isset($createTimetablePermissionConfiguration))
                     @if(((strtotime($now) >= strtotime($createTimetablePermissionConfiguration->created_at) && strtotime($now) <= strtotime($createTimetablePermissionConfiguration->updated_at)) && access()->allow('create-timetable')))

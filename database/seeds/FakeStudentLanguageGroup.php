@@ -1,7 +1,6 @@
 <?php
 
 use Illuminate\Database\Seeder;
-use Illuminate\Support\Facades\DB;
 
 class FakeStudentLanguageGroup extends Seeder
 {
@@ -16,7 +15,7 @@ class FakeStudentLanguageGroup extends Seeder
         $students = \App\Models\StudentAnnual::where('academic_year_id', 2017)
             ->join("students", "students.id", "=", "studentAnnuals.student_id")
             ->where('degree_id', 1)
-            ->where('grade_id', 4)
+            ->where('grade_id', 3)
             //->where('department_id', 8)
             ->select("studentAnnuals.*", "students.dob")
             ->orderBy("students.dob", "DESC")
@@ -34,10 +33,10 @@ class FakeStudentLanguageGroup extends Seeder
                 array(
                     "student_annual_id" => $student->id,
                     "group_id" => $group->id,
-                    "semester_id" => 2,
+                    "semester_id" => 1,
                     "created_at" => \Carbon\Carbon::now(),
                     "updated_at" => \Carbon\Carbon::now(),
-                    "department_id" => 12
+                    "department_id" => 13
                 )
             );
             $i++;

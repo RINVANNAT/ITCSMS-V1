@@ -290,35 +290,32 @@ trait AjaxCRUDTimetableController
     public function get_timetable_slots(CreateTimetableRequest $request)
     {
         $timetableSlots = new Collection();
-        // get student annuals.
-        if ($request->department < 12) {
-            // get student annuals id
-            $student_annual_ids = $this->timetableSlotRepo->find_student_annual_ids($request);
 
-            // get group language, [@return array(Collection $groups, Array $groups)]
-            $groupEnglishArray = $this->timetableSlotRepo->get_group_student_annual_form_language(12, $student_annual_ids, $request);
-            $groupFrenchArray = $this->timetableSlotRepo->get_group_student_annual_form_language(13, $student_annual_ids, $request);
-
-            // get timetable language,
-            $timetablesEnglish = $this->timetableSlotRepo->get_timetables_form_language_by_student_annual($groupEnglishArray[0], $request, 12);
-            $timetablesFrench = $this->timetableSlotRepo->get_timetables_form_language_by_student_annual($groupFrenchArray[0], $request, 13);
-
-
-            // get timetable slots [@return array(timetableSlots, groupsRoom)]
-            $timetableSlotsEnglish = $this->timetableSlotRepo->get_timetable_slot_language_dept($timetablesEnglish, $groupEnglishArray[0]);
-            $timetableSlotsFrench = $this->timetableSlotRepo->get_timetable_slot_language_dept($timetablesFrench, $groupFrenchArray[0]);
-
-
-            // set timetable slots language to view.
-            $this->timetableSlotRepo->set_timetable_slot_language($timetableSlots, $timetableSlotsEnglish[1], $timetableSlotsEnglish[0]);
-            $this->timetableSlotRepo->set_timetable_slot_language($timetableSlots, $timetableSlotsEnglish[1], $timetableSlotsFrench[0]);
-        }
-
-        // $group_student_annual_classes = DB::table('group_student_annual')
         $timetable = $this->timetableRepo->find_timetable_is_existed($request);
         if ($timetable instanceof Timetable) {
             $this->timetableSlotRepo->get_timetable_slot_with_conflict_info($timetable, $timetableSlots);
         }
+
+        // get student annuals.
+        if ($request->department < 12 && ($timetable instanceof Timetable)) {
+            // get student annuals id
+            $student_annual_ids = $this->timetableSlotRepo->find_student_annual_ids($timetable);
+            $department_languages = array(12, 13); // (english, french)
+            foreach ($department_languages as $department_language) {
+                // get group language, [@return array(Collection $groups, Array $groups)]
+                $groups = $this->timetableSlotRepo->get_group_student_annual_form_language($department_language, $student_annual_ids, $timetable);
+
+                // get timetable language,
+                $timetables = $this->timetableSlotRepo->get_timetables_form_language_by_student_annual($groups[0], $timetable, $department_language);
+
+                // get timetable slots [@return array(timetableSlots, groupsRoom)]
+                $timetableSlotsLang = $this->timetableSlotRepo->get_timetable_slot_language_dept($timetables, $groups[0]);
+
+                // set timetable slots language to view.
+                $this->timetableSlotRepo->set_timetable_slot_language($timetableSlots, $timetableSlotsLang[1], $timetableSlotsLang[0]);
+            }
+        }
+
         return Response::json(['status' => true, 'timetable' => $timetable == null ? null : $timetable, 'timetableSlots' => $timetableSlots]);
     }
 
