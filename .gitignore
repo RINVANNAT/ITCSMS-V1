@@ -30,3 +30,4 @@ bin/
 !/public/img/timetable/logo-print.jpg
 !/public/img/profiles/avatar.png
 !/public/img/profiles/
+/public/bower_components/

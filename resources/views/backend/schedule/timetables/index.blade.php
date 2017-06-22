@@ -16,6 +16,7 @@
     {!! Html::style('plugins/select2/select2.min.css') !!}
     {!! Html::style('plugins/sweetalert2/dist/sweetalert2.css') !!}
     {!! Html::style('plugins/daterangepicker/daterangepicker-bs3.css') !!}
+    {!! Html::style('bower_components/animate.css/animate.min.css') !!}
     {!! Html::style('css/backend/schedule/timetable.css') !!}
 
     <style>
@@ -157,7 +158,10 @@
         }
 
         $(function () {
-
+            $('.smis-notification').addClass('animated slideInRight');
+            $('.smis-close-icon').click(function () {
+                $('.smis-notification').addClass('animated slideOutRight');
+            });
             get_options($('select[name="department"] :selected').val());
 
             $(document).on('change', 'select[name="semester"]', function () {

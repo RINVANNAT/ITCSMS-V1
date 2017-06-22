@@ -6,7 +6,9 @@ use App\Models\Group;
 use App\Models\Schedule\Timetable\Timetable;
 use App\Models\Schedule\Timetable\TimetableSlot;
 use App\Models\Schedule\Timetable\Week;
+use App\Repositories\Backend\Schedule\Timetable\EloquentTimetableSlotRepository;
 use Carbon\Carbon;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Response;
 use Maatwebsite\Excel\Facades\Excel;
 
@@ -16,6 +18,28 @@ use Maatwebsite\Excel\Facades\Excel;
  */
 trait ExportTimetableController
 {
+    /**
+     * @var EloquentTimetableSlotRepository
+     */
+    protected $timetableSlotRepository;
+
+    /**
+     * ExportTimetableController constructor.
+     * @param EloquentTimetableSlotRepository $timetableSlotRepository
+     */
+    public function __construct(EloquentTimetableSlotRepository $timetableSlotRepository)
+    {
+        $this->timetableSlotRepository = $timetableSlotRepository;
+    }
+
+    /**
+     * @param EloquentTimetableSlotRepository $timetableSlotRepository
+     */
+    public function setTimetableSlotRepository($timetableSlotRepository)
+    {
+        $this->timetableSlotRepository = $timetableSlotRepository;
+    }
+
     /**
      * Get template export file.
      *
@@ -143,7 +167,7 @@ trait ExportTimetableController
     {
         $filename = ($group == null ? '' : 'Group(' . Group::find($group)->code . ')-') . Week::find($week)->name_en;
         return $excel->sheet($filename, function ($sheet) use ($findTimetable, $group, $week) {
-            // prepare header data.
+            // prepare header data
             $academicYear = $findTimetable->academicYear->name_latin;
             $department = $findTimetable->department->code;
             $degree = $findTimetable->degree->code;
@@ -152,6 +176,21 @@ trait ExportTimetableController
             $semester = $findTimetable->semester->id == 1 ? 'I' : 'II';
             $week = Week::find($week);
             $timetableSlots = $findTimetable->timetableSlots;
+            $timetableSlotsLanguages = new Collection();
+            // find student annual ids
+            $student_annual_ids = $this->timetableSlotRepository->find_student_annual_ids($findTimetable);
+            // have many student annual ids
+            if (count($student_annual_ids) > 0) {
+                // init array of dept language
+                $department_languages = array(12, 13); // (english, french)
+
+                foreach ($department_languages as $department_language) {
+                    $groups = $this->timetableSlotRepository->find_group_student_annual_form_language($department_language, $student_annual_ids, $findTimetable);
+                    $timetables = $this->timetableSlotRepository->get_timetables_form_language_by_student_annual($groups[0], $findTimetable, $department_language);
+                    $timetableSlotsLang = $this->timetableSlotRepository->get_timetable_slot_language_dept($timetables, $groups[0]);
+                    $this->timetableSlotRepository->set_timetable_slot_language($timetableSlotsLanguages, $timetableSlotsLang[1], $timetableSlotsLang[0]);
+                }
+            }
 
             // insert logo
             $logo = new \PHPExcel_Worksheet_Drawing();
@@ -261,10 +300,11 @@ trait ExportTimetableController
 
             $columns = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M'];
 
-            // start 7h00-8h00
             $countRows = 6;
             // $countColumns = 1;
             for ($timesRow = 0; $timesRow < 9; $timesRow++) {
+                // timesRow = 0 => row = timesRow + countRows = 6;
+                // we start from 6 to [...] row.
                 $countColumns = 1;
                 if ($timesRow == 4) {
                     $sheet->row(22, function ($row) {
@@ -279,10 +319,67 @@ trait ExportTimetableController
                         // Set all borders (top, right, bottom, left)
                         $cells->setBorder('thin', 'thin', 'thin', 'thin');
                     });
+                    // timetable slot language
+                    /*if(count($student_annual_ids)>0){
+                        foreach ($timetableSlotsLanguages as $timetableSlotsLanguage) {
+                            $start = (new Carbon($timetableSlotsLanguage['start']))->hour;
+                            $end = (new Carbon($timetableSlotsLanguage['end']))->hour;
+                            $day = (new Carbon($timetableSlotsLanguage['start']))->day;
+
+                            if ($columnDay == $day) {
+                                if ($timesRow == 0) {
+                                    if ($start == 7 && $end >= 8) {
+                                        dd($timetableSlotsLanguage['room']);
+                                        break;
+                                    }
+                                } else if ($timesRow == 1) {
+                                    if ($start <= 8 && $end >= 9) {
+                                        dd($timetableSlotsLanguage['group']);
+                                        break;
+                                    }
+                                } else if ($timesRow == 2) {
+                                    if ($start <= 9 && $end >= 10) {
+                                        dd($timetableSlotsLanguage['building']);
+                                        break;
+                                    }
+                                } else if ($timesRow == 3) {
+                                    if ($start <= 10 && $end >= 11) {
+                                        dd($timetableSlotsLanguage['room']);
+                                        break;
+                                    }
+                                } else if ($timesRow == 5) {
+                                    if ($start == 13 && $end >= 14) {
+                                        dd($timetableSlotsLanguage['room']);
+                                        break;
+                                    }
+                                } else if ($timesRow == 6) {
+                                    if ($start <= 14 && $end >= 15) {
+                                        dd($timetableSlotsLanguage['room']);
+                                        break;
+                                    }
+                                } else if ($timesRow == 7) {
+                                    if ($start <= 15 && $end >= 16) {
+                                        dd($timetableSlotsLanguage['room']);
+                                        break;
+                                    }
+                                } else if ($timesRow == 8) {
+                                    if ($start <= 16 && $end >= 17) {
+                                        dd($timetableSlotsLanguage['room']);
+                                        break;
+                                    }
+                                } else {
+                                    continue;
+                                }
+
+                            }
+                        }
+                    }*/
+                    // timetable slot of dept
                     foreach ($timetableSlots as $timetableSlot) {
                         $start = (new Carbon($timetableSlot->start))->hour;
                         $end = (new Carbon($timetableSlot->end))->hour;
                         $day = (new Carbon($timetableSlot->start))->day;
+
                         if ($columnDay == $day) {
                             if ($timesRow == 0) {
                                 if ($start == 7 && $end >= 8) {
