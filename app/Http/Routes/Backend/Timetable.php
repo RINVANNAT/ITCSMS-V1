@@ -23,11 +23,13 @@ Route::group(['namespace' => 'Schedule', 'prefix' => 'schedule'], function () {
     Route::post('timetables/merge_timetable_slot', 'TimetableController@merge_timetable_slot')->name('merge_timetable_slot');
     Route::post('timetables/remove_timetable_slot', 'TimetableController@remove_timetable_slot')->name('remove_timetable_slot');
 
+    /** timetable assignment */
     Route::post('timetables/export_course_session', 'TimetableController@export_course_session')->name('export_course_session');
     Route::post('timetables/assign_turn_create_timetable', 'TimetableController@assign_turn_create_timetable')->name('assign_turn_create_timetable');
     Route::post('timetables/get_timetable_assignment', 'TimetableController@get_timetable_assignment')->name('get_timetable_assignment');
     Route::post('timetables/assign/delete', 'TimetableController@assign_delete')->name('assign.delete');
     Route::post('timetables/timetables/assign/update', 'TimetableController@assign_update')->name('assign.update');
+    Route::post('timetables/timetables/update/assign', 'TimetableController@update_assign_timetable')->name('update_assign_timetable');
 
     /** Options controls. */
     Route::post('timetables/get_weeks', 'TimetableController@get_weeks')->name('admin.schedule.timetables.get_weeks');

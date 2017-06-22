@@ -196,12 +196,55 @@
                 e.preventDefault();
                 oTable.draw();
             });
+            $(document).on('click', '.btn_delete_timetable', function (e) {
+                e.preventDefault();
+                toggleLoading(true);
+                var self = $(this);
+                swal({
+                    title: 'Are you sure?',
+                    text: "Do want to delete this timetable?",
+                    type: 'warning',
+                    showCancelButton: true,
+                    confirmButtonColor: '#3085d6',
+                    cancelButtonColor: '#d33',
+                    confirmButtonText: 'Yes, delete it!'
+                }).then(function () {
+                    $.ajax({
+                        type: 'POST',
+                        url: '{{ route('admin.schedule.timetables.delete') }}',
+                        data: {
+                            'id': self.attr('id')
+                        },
+                        success: function () {
+                            swal(
+                                'Deleted!',
+                                'Your timetable has been deleted.',
+                                'success'
+                            );
+                        },
+                        error: function () {
+                            swal(
+                                'Deleting timetable',
+                                'Something went wrong!',
+                                'error'
+                            );
+                        },
+                        complete: function () {
+                            toggleLoading(false);
+                            oTable.draw();
+                        }
+                    });
+
+                });
+                toggleLoading(false);
+            });
         })
     </script>
 
     {{--timetable assignment--}}
     <script type="text/javascript">
         function get_assign_table() {
+            toggleLoading(true);
             $.ajax({
                 type: 'POST',
                 url: '{!! route('get_timetable_assignment') !!}',
@@ -240,17 +283,21 @@
                     $('#display-assign').find('tbody').html(row);
                 },
                 error: function () {
-
+                    swal(
+                        'Get Assignment Table',
+                        'Something went wrong!',
+                        'error'
+                    );
                 },
                 complete: function () {
-
+                    toggleLoading(false);
                 }
             });
         }
         var startDate, endDate, startDateUpdate, endDateUpdate;
+
         $(function () {
             get_assign_table();
-
             $('input[name="datetime"]').daterangepicker(
                 {
                     format: 'DD/MM/YYYY'
@@ -265,20 +312,40 @@
                 placeholder: '{{ trans('modals.backend.timetable.assignment_permission.modal_body.form.department.placeholder') }}'
             });
 
+            // click edit timetable assignment
             $(document).on('click', '#btn_assign_update', function () {
+                toggleLoading(true);
                 $('#display-assign').find('.info').removeClass();
+                $('#display-assign').find('.danger').removeClass();
                 var dom = $(this).parent().parent();
                 dom.addClass('info');
-                $('#modal-update-assign').modal('show');
-                var startDate = dom.children().eq(2).find('.start_date').text();
-                var endDate = dom.children().eq(2).find('.end_date').text();
-                $('#modal-update-assign').find('input[name="update-datetime"]').val(startDate + endDate);
-                $('input[name="update-datetime"]').daterangepicker({
-                    timeZone: 'Asia/Phnom_Penh',
-                    format: 'YYYY-MM-DD'
-                }, function (start, end) {
-                    startDateUpdate = start;
-                    endDateUpdate = end;
+                $.ajax({
+                    type: 'POST',
+                    url: '{{ route('update_assign_timetable') }}',
+                    data: {
+                        'id': dom.children().eq(0).text()
+                    },
+                    success: function (response) {
+                        $('#modal-update-assign').modal('show');
+                        $('#modal-update-assign').find('input[name="update-datetime"]').val(response.start + ' - ' + response.end);
+                        $('input[name="update-datetime"]').daterangepicker({
+                            timeZone: 'Asia/Phnom_Penh',
+                            format: 'YYYY-MM-DD'
+                        }, function (start, end) {
+                            startDateUpdate = start;
+                            endDateUpdate = end;
+                        });
+                    },
+                    error: function () {
+                        swal(
+                            'Update Assignment Timetable',
+                            'Something went wrong!',
+                            'error'
+                        );
+                    },
+                    complete: function () {
+                        toggleLoading(false);
+                    }
                 });
             });
 
@@ -356,6 +423,7 @@
             // when click on delete button
             $(document).on('click', '#btn_assign_delete', function () {
                 $('#display-assign').find('.danger').removeClass();
+                $('#display-assign').find('.info').removeClass();
                 var dom = $(this).parent().parent();
                 dom.addClass('danger');
 
@@ -389,49 +457,6 @@
                         }
                     });
                 });
-            });
-
-            $(document).on('click', '.btn_delete_timetable', function (e) {
-                e.preventDefault();
-                toggleLoading(true);
-                var self = $(this);
-                swal({
-                    title: 'Are you sure?',
-                    text: "Do want to delete this timetable?",
-                    type: 'warning',
-                    showCancelButton: true,
-                    confirmButtonColor: '#3085d6',
-                    cancelButtonColor: '#d33',
-                    confirmButtonText: 'Yes, delete it!'
-                }).then(function () {
-                    $.ajax({
-                        type: 'POST',
-                        url: '{{ route('admin.schedule.timetables.delete') }}',
-                        data: {
-                            'id': self.attr('id')
-                        },
-                        success:function () {
-                            swal(
-                                'Deleted!',
-                                'Your timetable has been deleted.',
-                                'success'
-                            );
-                        },
-                        error: function () {
-                            swal(
-                                'Deleting timetable',
-                                'Something went wrong!',
-                                'error'
-                            );
-                        },
-                        complete: function () {
-                            toggleLoading(false);
-                            oTable.draw();
-                        }
-                    });
-
-                });
-                toggleLoading(false);
             });
         });
     </script>

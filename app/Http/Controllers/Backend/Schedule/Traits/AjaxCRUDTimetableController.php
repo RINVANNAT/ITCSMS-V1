@@ -817,4 +817,15 @@ trait AjaxCRUDTimetableController
             return Response::json([200]);
         }
     }
+
+    /**
+     * Get configuration back to frontend.
+     *
+     * @return mixed
+     */
+    public function update_assign_timetable()
+    {
+        $configuration = Configuration::find(request('id'));
+        return Response::json(['status' => true, 'start' => (new Carbon($configuration->created_at))->toDateString(), 'end' => (new Carbon($configuration->updated_at))->toDateString()]);
+    }
 }
