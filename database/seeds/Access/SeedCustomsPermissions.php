@@ -1966,6 +1966,20 @@ class SeedCustomsPermissions extends Seeder
                             'dependency' => [
                                 'view-backend', 'view-schedule-management', 'view-timetable-management'
                             ]
+                        ],
+                        [
+                            'name' => 'print-timetable',
+                            'display_name' => 'Print Timetable',
+                            'dependency' => [
+                                'view-backend', 'view-schedule-management', 'view-timetable-management'
+                            ]
+                        ],
+                        [
+                            'name' => 'export-timetable',
+                            'display_name' => 'Export Timetable',
+                            'dependency' => [
+                                'view-backend', 'view-schedule-management', 'view-timetable-management'
+                            ]
                         ]
                     ]
                 ],
