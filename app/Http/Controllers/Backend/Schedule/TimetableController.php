@@ -173,7 +173,7 @@ class TimetableController extends Controller
                 if (access()->allow('export-timetable')) {
                     $result .= $export;
                 }
-                if (access()->allow('edit-timetable')) {
+                if (access()->allow('print-timetable')) {
                     $result .= $print;
                 }
                 if (access()->allow('view-timetable')) {
