@@ -27,6 +27,7 @@ use App\Models\Score;
 use App\Models\Semester;
 use App\Models\Student;
 use App\Models\StudentAnnual;
+use App\Models\UserLog;
 use App\Repositories\Backend\Absence\AbsenceRepositoryContract;
 use App\Repositories\Backend\Average\AverageRepositoryContract;
 use App\Repositories\Backend\CourseAnnual\CourseAnnualRepositoryContract;
@@ -770,9 +771,15 @@ class CourseAnnualController extends Controller
                 ->distinct('percentage_id')->lists('percentage_id');
             $percentages = DB::table('percentages')->whereIn('id', $percentageIds);
             if($percentages->get()) {
+                $this->courseAnnualScores->getUserLog($percentages->get(), 'Percentage', 'Delete');
                 $percentages->delete();
             }
+
+            $this->courseAnnualScores->getUserLog($scoreByCourseAnnualId->get(), 'Score', 'Delete');
             $scoreByCourseAnnualId->delete();
+
+
+
             $this->courseAnnuals->destroy($id);
             return Response::json(['status' => true, 'message' => 'Deleted!']);
 
@@ -1016,6 +1023,7 @@ class CourseAnnualController extends Controller
                         $courseAnnual_data["created_at"] = Carbon::now();
                         $courseAnnual_data["create_uid"] = auth()->id();
                         $courseAnnual = CourseAnnual::create($courseAnnual_data);
+                        $this->courseAnnualScores->getUserLog($courseAnnual_data, 'CourseAnnual', 'Import');
                         $first = false;
                     });
                 });
@@ -3626,6 +3634,8 @@ class CourseAnnualController extends Controller
             ->where('id_card', $request->student_id_card)
             ->update(['observation' => $request->observation]);
         if ($student) {
+
+            $this->courseAnnualScores->getUserLog($student, 'Student', 'Update-Observation');
             return Response::json(['status' => true]);
         }
     }
@@ -3635,13 +3645,16 @@ class CourseAnnualController extends Controller
         //----update remark by student id_card in table student_annuals
 
 
+        dd($request->all());
         if (Auth::user()->allow('write-student-remark')) {
             $student = DB::table('students')->where('id_card', $request->student_id_card)->first();
 
             $student_annual = DB::table('studentAnnuals')
                 ->where('student_id', $student->id)
+                ->where('academic_year_id', $request->academic_year_id)
                 ->update(['remark' => $request->remark]);
             if ($student_annual) {
+                $this->courseAnnualScores->getUserLog($student_annual, 'StudentAnnual', 'Update-Remak');
                 return Response::json(['status' => true]);
             }
         } else {
@@ -3657,8 +3670,11 @@ class CourseAnnualController extends Controller
 
         $student_annual = DB::table('studentAnnuals')
             ->where('student_id', $student->id)
+            ->where('academic_year_id', $request->academic_year_id)
             ->update(['general_remark' => $request->general_remark]);
         if ($student_annual) {
+
+            $this->courseAnnualScores->getUserLog($student_annual, 'StudentAnnual', 'Update-General-Remark');
             return Response::json(['status' => true]);
         }
     }
@@ -4591,6 +4607,8 @@ class CourseAnnualController extends Controller
                     ]);
 
                 if (count($redouble_students->get()) > 0) {
+
+                    $this->courseAnnualScores->getUserLog($redouble_students->get(), 'Redouble', 'Delete');
                     $delete = $redouble_students->delete();
                     if($delete) {
 
@@ -4625,7 +4643,10 @@ class CourseAnnualController extends Controller
                     ]);
 
                 if (count($redouble_students->get()) > 0) {
+
+                    $this->courseAnnualScores->getUserLog($redouble_students->get(), 'Redouble-Student', 'Update');
                     $redouble_students->update(['is_changed' => true]);
+
 
                     return Response::json(['status' => true, 'message' => 'changed!']);
                 } else {
@@ -4996,6 +5017,9 @@ class CourseAnnualController extends Controller
         foreach ($resitScores as $score) {
             $courseAnnualId = $score['course_annual_id'];
             $store = $this->averages->updateResitScore($score);
+
+            $this->courseAnnualScores->getUserLog($store, 'Average', 'Create-Resit-Score');
+
             if ($store) {
                 $count++;
             }

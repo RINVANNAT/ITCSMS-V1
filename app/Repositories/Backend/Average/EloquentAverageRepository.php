@@ -53,9 +53,9 @@ class EloquentAverageRepository implements AverageRepositoryContract
     }
 
     /**
-     * @param  $input
+     * @param $input
+     * @return Average
      * @throws GeneralException
-     * @return bool
      */
     public function create($input)
     {

@@ -23,20 +23,6 @@ use Response;
 
 trait CourseAnnualTrait
 {
-    /* protected $course_annual_repo;
-     protected $course_session_repo;
-     protected $course_annual_class_repo;
-     public function __construct(
-         CourseAnnualRepositoryContract $courseAnnualContract,
-         CourseSessionRepositoryContract $courseSessionContract,
-         CourseAnnualClassRepositoryContract $courseAnnualClassContract
-         )
-     {
-         $this->course_annual_repo = $courseAnnualContract;
-         $this->course_session_repo = $courseSessionContract;
-         $this->course_annual_class_repo = $courseAnnualClassContract;
-
-     }*/
 
     public function generate_course_annual($request)
     {

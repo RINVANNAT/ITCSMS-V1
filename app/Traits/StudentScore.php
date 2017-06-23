@@ -365,6 +365,8 @@ trait StudentScore {
             ->update(
                 ['radie' => $status]
             );
+
+        $this->courseAnnualScores->getUserLog($student, 'Student', 'Update');
         return $student;
     }
 

@@ -2,6 +2,10 @@
 
 @section ('title', trans('labels.backend.exams.title') . ' | ' . 'Form Generating Group')
 
+@section('after-styles-end')
+    {!! Html::style('plugins/select2/select2.min.css') !!}
+@endsection
+
 @section('content')
     <style>
         .text_font{
@@ -52,7 +56,7 @@
         }
 
         .sm-3 {
-            width: 20% !important;
+            width: 10% !important;
         }
 
         .c-sm-3 {
@@ -130,7 +134,7 @@
 
                     <div class="box-body">
 
-                        <form action="{{route('admin.student.generate_student_group',1)}}" id="form_generate_group">
+                        <form action="{{route('admin.student.generate_student_group')}}" id="form_generate_group">
 
                             <div class="col-sm-12 no-padding buttom-10" >
 
@@ -163,12 +167,12 @@
 
                             <div class="col-sm-12 buttom-10 no-padding" style="margin-left: 5px; margin-top: 10px">
 
-                                <p style="font-size: 12pt"> Options: </p>
+                                <label for="title_option" style="font-size: 12pt; margin-right: 10px"> Options: </label>
 
                                 @foreach($options as $option)
-                                    <label for="{{$option->code}}" class="btn btn-sm btn-primary" style="width: 78px; font-size: 12pt">
+                                    <label for="{{$option->code}}" class="btn btn-sm btn-primary dept_option {{$option->department_id}} " style="width: 78px; font-size: 12pt">
 
-                                        <input type="checkbox" name="department_option_id" class="department_option {{$option->department_id}}" style="font-size: 12pt" id="{{$option->code}}" value="{{$option->id}}">
+                                        <input type="checkbox" name="department_option_id" class="department_option " style="font-size: 12pt" id="{{$option->code}}" value="{{$option->id}}">
                                         {{$option->code}}
                                     </label>
                                 @endforeach
@@ -183,9 +187,10 @@
                                 </div>
 
 
-                                <label for=" student_pergroup" class="col-sm-2"  style="margin-top: 5px"> Total Student </label>
+                                <label for=" student_pergroup" class="col-sm-5"  style="margin-top: 5px"> Total Student:  <strong id="total_stdent" style="color: green; font-size: 16pt">  </strong> </label>
                                 <div class="col-sm-3 no-padding pull-right">
-                                    <input disabled type="text" name="total_student" class="form-control input_text pull-right" style="width: 100%; color: green; font-size: 14pt" value="" >
+
+                                    <input disabled type="hidden" name="total_student" class="form-control input_text pull-right" style="width: 100%; color: green; font-size: 14pt" value="" >
                                 </div>
 
                             </div>
@@ -194,35 +199,51 @@
                             <div class="col-sm-12 no-padding" style="margin-top: 10px;">
 
                                 <div class="box-header with-border text_font" style="border-top: 1px solid #f5eeee">
-                                    <h1 class="box-title"> Rule to Generate Group </h1>
+                                    <h1 class="box-title"> Generate Group BY: </h1>
                                 </div>
 
                                 <div class="box-body">
 
-                                    <label for="alphabet_rule" class="btn btn-sm btn-info" style="width: 160px; font-size: 12pt">
+                                    <label for="name_latin_rul" class="btn btn-sm btn-info" style="width: 160px;margin-right: 5px; font-size: 12pt" data-toggle="tooltip" data-position="top" title="If you choose this option, it will automatically generate groups of students by their name in latin">
 
-                                        <input type="checkbox" name="alphabet_rule" class="rule" style="font-size: 10pt" id="alphabet_rule" value="alphabet" checked>
+                                        <input type="radio" name="rule" class="rule" style="font-size: 10pt" id="name_latin_rul" value="by_name" checked>
                                         Name Latin
                                     </label>
 
 
-                                    <label for="id_card_rule" class="btn btn-sm btn-info" style="width: 160px; font-size: 12pt">
+                                    <label for="id_card_rule" class="btn btn-sm btn-info" style="width: 160px; font-size: 12pt; margin-right: 5px;" data-toggle="tooltip" data-position="top" title="If you choose this option, it will automatically generate groups of students by ID Card.">
 
-                                        <input type="checkbox" name="id_card_rule" class="rule" style="font-size: 10pt" id="id_card_rule" value="id_card_rule" >
+                                        <input type="radio" name="rule" class="rule" style="font-size: 10pt" id="id_card_rule" value="by_id_card" >
                                        ID Card
                                     </label>
+
+                                    {{--<label for="score_rule" class="btn btn-sm btn-info" style="width: 160px; font-size: 12pt" data-toggle="tooltip" data-position="top" title="For this option you have to select one of the course program to generate group!">
+
+                                        <input type="radio" name="rule" class="rule" style="font-size: 10pt" id="score_rule" value="by_score" >
+                                       Score Course
+                                    </label>--}}
+
+
+                                   {{-- <div class="col-sm-4 no-padding pull-right" style="margin-top: 5px" id="div_load_course">
+
+                                        <select  name="reference_course_id" id="reference_course_id" style="width: 100%; height: 100%"  data-placeholder="Course Program" class="form-control" >
+
+
+                                        </select>
+                                    </div>--}}
 
                                 </div>
 
 
                                 <div class="col-sm-12 no-padding" style="margin-top: 10px">
 
+                                    <label for="fomart_text" class="col-sm-6 text_font"> Fomart: Group Code </label>
 
-                                    <div class="col-sm-12 no-padding text_font ">
+                                    <div class="col-sm-12 no-padding text_font buttom-10">
 
-                                        <label for="fomart_text" class="col-sm-3 sm-3"> Fomart: Prefix </label>
+                                        <label for="fomart_text" class="col-sm-3 sm-3"> Prefix </label>
                                         <div class="col-sm-2 no-padding">
-                                            <input type="text" name="prefix" class="form-control input_text">
+                                            <input type="text" name="prefix" readonly class="form-control input_text">
                                         </div>
 
                                         <label for="suffix" class="col-sm-1" style="margin-right: 10px"> Suffix  </label>
@@ -231,7 +252,7 @@
 
                                         <label for="post_fix" class="col-sm-1" style="margin-right: 20px"> Result </label>
                                         <div class="col-sm-3 no-padding">
-                                            <input type="text" name="post_fix" class="form-control input_text" style="width: 100%; color: green">
+                                            <input type="text" name="result" readonly class="form-control input_text" style="width: 100%; color: green">
                                         </div>
 
                                     </div>
@@ -284,30 +305,62 @@
 
 @section('after-scripts-end')
     {{--here where i need to write the js script --}}
+    {!! HTML::script('plugins/select2/select2.full.min.js') !!}
     <script>
 
         $(document).ready(function() {
+
+
+            initSelect2();
+
+            $('.dept_option').hide();
+            $('#div_load_course').hide()
             setTitle();
             getStudents();
+
+            $(document).on('change', 'select[name=suffix]', function() {
+                setTitle();
+            });
             $(document).on('change', 'select[name=academic_year_id]', function (e) {
                 setTitle();
                 getStudents();
+                loadCourse()
             });
             $(document).on('change', 'select[name=degree_id]', function (e) {
                 setTitle();
                 getStudents();
+                loadCourse()
             });
             $(document).on('change', 'select[name=grade_id]', function (e) {
                 setTitle();
                 getStudents();
+                loadCourse()
             });
             $(document).on('change', 'select[name=semester_id]', function (e) {
                 setTitle();
                 getStudents();
+                loadCourse()
+            });
+
+            $(document).on('change', 'input[name=department_option_id]', function() {
+               if($(this).is(':checked')) {
+
+                   var current_object = $(this);
+                   $('input[name=department_option_id]').each(function(key, value) {
+                       if($(value).attr('id') != current_object.attr('id')) {
+                           $(value).prop('checked', false);
+                       }
+                   });
+                   getStudents();
+                   loadCourse();
+               } else {
+                   getStudents();
+                   loadCourse();
+               }
             });
 
             $(document).on('change', '.department', function (e) {
-
+                clearChecked();
                 if($(this).is(':checked')) {
                     var current_object = $(this);
                     $('input.department').each(function(key, checkbox) {
@@ -317,10 +370,48 @@
                     });
 
                     getStudents();
+                    loadCourse();
+                } else {
+                    getStudents();
+                    loadCourse();
                 }
                 setTitle();
             });
+
+            var totalStudent = function(object) {
+                return $(object).val();
+            };
+
+            $(document).on('keyup', 'input[name=number_student]', function (e) {
+                if($(this).val() != null && $(this).val() != '') {
+
+                    var group = '';
+                    if(totalStudent != null && totalStudent('input[name=total_student]') != '') {
+                         group = (parseInt(parseInt(totalStudent('input[name=total_student]')) / parseInt($(this).val())))
+
+                        $('#total_stdent').html(totalStudent('input[name=total_student]')+ ' |~ '+ 'Groups: ' + group)
+                    }
+                }
+
+            });
+
+
+            $(document).on('change', 'input[name=rule]', function (e) {
+                if($(this).is(':checked')) {
+                    if($(this).val() == 'by_score') {
+                        $('#div_load_course').show();
+
+                    } else {
+                        if($('#div_load_course').is(':visible')) {
+                            $('#div_load_course').hide();
+                        }
+                    }
+                }
+            })
         });
+
+
+
         $('.btn_cancel').on('click', function() {
             window.close();
         });
@@ -329,49 +420,101 @@
 
             var baseUrl = $('#form_generate_group').attr('action');
             var baseData = $('#form_generate_group').serialize();
-            var number_studetn = $('#number_student').val();
-            var filter_format = $('#filter_format option:selected').val();
+            var number_studetn = $('input[name=number_student]').val();
+            var group_by = $('input[name=rule] :checked').val();
+            var prefix = $('input[name=prefix]').val();
+
 
             if(number_studetn) {
-                if(filter_format) {
-                    ajaxRequest('POST', baseUrl, baseData);
-                } else {
-                    notify('error', 'info', 'select suffix');
-                }
+                $.ajax({
+                    type: 'GET',
+                    url: baseUrl,
+                    dataType: "json",
+                    data: baseData,
+                    success: function(resultData) {
+
+                        if(resultData.status) {
+                            notify('success', 'info', resultData.message);
+                            var url = '{{route('student.annual.export_generated_group')}}';
+                            var new_url = url+
+                                    '?academic_year_id='+ resultData.request.academic_year_id+
+                                    '&degree_id='+ resultData.request.degree_id+
+                                    '&grade_id='+ resultData.request.grade_id+
+                                    '&semester_id='+ resultData.request.semester_id+
+                                    '&number_student='+ resultData.request.number_student+
+                                    '&result='+ resultData.request.result+
+                                    '&rule='+ resultData.request.rule+
+                                    '&suffix='+ resultData.request.suffix+
+                                    '&prefix='+ resultData.request.prefix;
+
+                            if(resultData.request.department_id ) {
+                                if(resultData.request.department_id != 'undefined' && resultData.request.department_id  != '') {
+                                    new_url += '&department_id='+ resultData.request.department_id;
+
+                                    if(resultData.request.department_option_id) {
+                                        if(resultData.request.department_option_id != 'undefined' && resultData.request.department_option_id  != '') {
+
+                                            new_url += '&department_option_id=' + resultData.request.department_option_id;
+                                        }
+                                    }
+
+
+                                }
+
+                            }
+                           window.open(new_url, '_self')
+                        }
+
+                    }
+                });
 
             } else {
-                notify('error', 'info', 'Input Number of Student');
+                notify('error', 'Input Number of Student', 'Attention!');
             }
         });
 
-        function getStudents() {
+
+        var getBaseData = function () {
 
             var department_id = '';
+            var departmentOptionId = '';
             $('input.department').each(function(key, checkbox) {
                 if($(checkbox).is(':checked')) {
                     department_id = $(this).val();
                 }
-            })
+            });
 
+            $('input[name=department_option_id]').each(function(key, value) {
+                if($(value).is(':checked')) {
+                    departmentOptionId = $(this).val();
+                }
+            });
             var baseData = {
                 academic_year_id : $('select[name=academic_year_id] :selected').val(),
                 degree_id : $('select[name=degree_id] :selected').val(),
                 grade_id : $('select[name=grade_id] :selected').val(),
                 semester_id : $('select[name=semester_id] :selected').val(),
-                department_id:department_id
+                department_id:department_id,
+                department_option_id :departmentOptionId
             };
 
+            return baseData;
+        }
+
+        function getStudents() {
+
+            var baseData = getBaseData();
             $.ajax({
                 type: 'GET',
                 url: '{{route('admin.student.number_student_annual')}}',
                 dataType: "json",
                 data: baseData,
-                success: function(resultData) {
+                success: function(resultData)  {
 
                     if(resultData.status) {
+                        $('#total_stdent').html(resultData.count)
                         $('input[name=total_student]').val(resultData.count)
                     }
-
                 }
             });
 
@@ -388,14 +531,57 @@
 
                     if(resultData.status) {
                         notify('success', 'info', resultData.message);
+                        addSelect_2_option(resultData.data);
 
-                        setTimeout(function(){
+                       /* setTimeout(function(){
                             window.close();
-                        },2000);
+                        },2000);*/
                     }
 
                 }
             });
+        }
+
+
+        function clearChecked()
+        {
+            $('input[name=department_option_id]').each(function(key, checkbox) {
+                if($(checkbox).is(':checked')) {
+                    department_id = $(this).prop('checked', false);
+                }
+            });
+        }
+
+        function loadCourse() {
+            var baseData = getBaseData();
+            //ajaxRequest('GET', '{{route('student.annual.load_course')}}', baseData);
+        }
+
+        function initSelect2()
+        {
+            $("#reference_course_id").select2({
+                placeholder: "Select a reference course program",
+                allowClear: true
+
+            });
+        }
+
+        function addSelect_2_option(data)
+        {
+
+            clearOption();
+            $('#reference_course_id').select2({
+                allowClear: true,
+                placeholder: " Select Course Program",
+                data: data
+
+            });
+        }
+
+        function  clearOption() {
+
+            $('#reference_course_id').html('');
+            initSelect2();
         }
 
 
@@ -417,14 +603,37 @@
             $('input.department').each(function(key, checkbox) {
                if($(checkbox).is(':checked')) {
                    Dept_name = $(this).attr('id');
+                   if(!$('.'+$(this).val()).is(':visible')) {
+                       $('.'+$(this).val()).show();
+                   }
+               } else {
+                   if($('.'+$(this).val()).is(':visible')) {
+                       $('.'+$(this).val()).hide();
+                   }
                }
             })
-
             $('#year_title').html(year)
             $('#class_name').html(class_name);
             $('#dept_name').html(Dept_name);
             $('#semester_title').html(semester_title);
+
+
+            /*--set prefix value---*/
+
+            var suffix = '';
+            if($('select[name=suffix] :selected').val() == 'number') {
+                suffix = '1';
+            } else {
+                suffix = 'A'
+            }
+
+            $('input[name=prefix]').val(degree_code+grade);
+
+            $('input[name=result]').val(degree_code+grade+'-'+suffix)
         }
+
+
+        /*---session message of the page----*/
 
         @if(Session::has('status'))
             @if(Session::get('status') == true)

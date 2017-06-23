@@ -529,7 +529,7 @@
 
                         if (columnIndex == 'Remark') {
                             var remark_rul = '{{route('course_annual.save_each_cell_remark')}}';
-                            var baseData_remark = {student_id_card: col_student_id[rowIndex], remark: newValue};
+                            var baseData_remark = {student_id_card: col_student_id[rowIndex], remark: newValue,  academic_year_id: $('#filter_academic_year :selected').val()};
 
                             $.ajax({
                                 type: 'POST',
@@ -546,7 +546,7 @@
 
                         if (columnIndex == 'General_Remark') {
                             var remark_rul = '{{route('course_annual.save_each_cell_general_remark')}}';
-                            var baseData_remark = {student_id_card: col_student_id[rowIndex], general_remark: newValue};
+                            var baseData_remark = {student_id_card: col_student_id[rowIndex], general_remark: newValue,  academic_year_id: $('#filter_academic_year :selected').val()};
 
                             $.ajax({
                                 type: 'POST',

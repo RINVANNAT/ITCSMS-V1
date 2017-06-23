@@ -6,6 +6,7 @@ namespace App\Repositories\Backend\CourseAnnualClass;
 use App\Exceptions\GeneralException;
 use App\Models\CourseAnnualClass;
 use Carbon\Carbon;
+use App\Models\UserLog;
 
 /**
  * Class EloquentCourseAnnualRepository
@@ -78,9 +79,15 @@ class EloquentCourseAnnualClassRepository implements CourseAnnualClassRepository
                 $courseAnnualClass->created_at = Carbon::now();
                 $courseAnnualClass->create_uid = auth()->id();
                 if(!$courseAnnualClass->save()){
-
                     return false;
                 }
+
+                $storeData = json_encode($courseAnnualClass);
+                UserLog::log([
+                    'model' => 'CourseAnnualClass',
+                    'action'   => 'Create', // Import, Create, Delete, Update
+                    'data'     => $storeData // if it is create action, store only the new id.
+                ]);
             }
         } else { // if group is not passed, store as well. Just without group
             $courseAnnualClass = new CourseAnnualClass();
@@ -99,6 +106,13 @@ class EloquentCourseAnnualClassRepository implements CourseAnnualClassRepository
             if(!$courseAnnualClass->save()){
                 return false;
             }
+
+            $storeData = json_encode($courseAnnualClass);
+            UserLog::log([
+                'model' => 'CourseAnnualClass',
+                'action'   => 'Create', // Import, Create, Delete, Update
+                'data'     => $storeData // if it is create action, store only the new id.
+            ]);
         }
 
 
@@ -130,6 +144,13 @@ class EloquentCourseAnnualClassRepository implements CourseAnnualClassRepository
         $courseAnnualClass->write_uid = auth()->id();
 
         if ($courseAnnualClass->save()) {
+
+            $storeData = json_encode($courseAnnualClass);
+            UserLog::log([
+                'model' => 'CourseAnnualClass',
+                'action'   => 'Update', // Import, Create, Delete, Update
+                'data'     => $storeData // if it is create action, store only the new id.
+            ]);
             return true;
         }
 
@@ -149,6 +170,13 @@ class EloquentCourseAnnualClassRepository implements CourseAnnualClassRepository
         $model = $this->findOrThrowException($id);
 
         if ($model->delete()) {
+
+            $storeData = json_encode($model);
+            UserLog::log([
+                'model' => 'CourseAnnualClass',
+                'action'   => 'Destroy', // Import, Create, Delete, Update
+                'data'     => $storeData // if it is create action, store only the new id.
+            ]);
             return true;
         }
 

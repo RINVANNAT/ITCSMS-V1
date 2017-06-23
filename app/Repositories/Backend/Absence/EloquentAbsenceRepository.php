@@ -3,6 +3,7 @@
 use App\Exceptions\GeneralException;
 use App\Models\AcademicYear;
 use App\Models\Absence;
+use App\Models\UserLog;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
 
@@ -84,6 +85,14 @@ class EloquentAbsenceRepository implements AbsenceRepositoryContract
         $absence->create_uid = auth()->id();
 
         if ($absence->save()) {
+
+            UserLog::log(
+                [
+                    'data' => $absence,
+                    'model' => 'Absence',
+                    'action' => 'Create'
+                ]
+            );
             return true;
         }
         throw new GeneralException(trans('exceptions.backend.configuration.academicYears.create_error'));
@@ -109,6 +118,14 @@ class EloquentAbsenceRepository implements AbsenceRepositoryContract
         $absence->write_uid = auth()->id();
 
         if ($absence->save()) {
+
+            UserLog::log(
+                [
+                    'data' => $absence,
+                    'model' => 'Absence',
+                    'action' => 'Update'
+                ]
+            );
             return true;
         }
 
@@ -132,6 +149,14 @@ class EloquentAbsenceRepository implements AbsenceRepositoryContract
 //        }
 
         if ($absence->delete()) {
+
+            UserLog::log(
+                [
+                    'data' => $absence,
+                    'model' => 'Absence',
+                    'action' => 'Delete'
+                ]
+            );
             return true;
         }
 

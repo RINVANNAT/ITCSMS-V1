@@ -148,7 +148,7 @@ function loadReferenceCourse(route, token, selected_course_annual_id)
             data:baseData ,
             dataType: 'JSON',
             success:function (result) {
-                clearOption();
+
                 $('#reference_course_id').select2({
                     data: result.data,
                     allowClear: true,
@@ -162,7 +162,6 @@ function loadReferenceCourse(route, token, selected_course_annual_id)
             }
         })
     }
-
 
 
     $(document).on('change', 'select#responsible_department_id', function() {
@@ -179,11 +178,11 @@ function loadReferenceCourse(route, token, selected_course_annual_id)
             data:baseData ,
             dataType: 'JSON',
             success:function (result) {
-                clearOption();
-                $('#reference_course_id').select2({
+
+                $('#reference_course_id').html('').select2({
+                    placeholder: " Select Program",
                     data: result.data,
-                    allowClear: true,
-                    placeholder: "Select Program"
+                    allowClear: true
                 });
 
             },
@@ -195,15 +194,6 @@ function loadReferenceCourse(route, token, selected_course_annual_id)
 
     });
 
-}
-
-
-function  clearOption() {
-    $('#reference_course_id').select2({
-        data:[{}],
-        allowClear: true,
-        placeholder: " Select Program"
-    });
 }
 
 

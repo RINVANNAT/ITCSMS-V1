@@ -42,11 +42,18 @@
 
         Route::post('student/{id}/generate_student_id_card', 'StudentAnnualController@generate_id_card')->name('admin.student.generate_student_id_card');
 
+        /*--generate group---*/
+
+
         Route::get('student/form_generate_student_group', 'StudentAnnualController@formGenerateGroup')->name('admin.student.form_generate_student_group');
+        Route::get('student/generate_student_group', 'StudentAnnualController@generatGroup')->name('admin.student.generate_student_group');
 
-        Route::post('student/{id}/generate_student_group', 'StudentAnnualController@generate_group')->name('admin.student.generate_student_group');
+        Route::get('student/export-generated-group', 'StudentAnnualController@generate_group')->name('student.annual.export_generated_group');
+
+        Route::get('/student-annual/load-course', 'StudentAnnualController@loadCourse')->name('student.annual.load_course');
 
 
+        /*--end generate group---*/
         Route::get('student/print_transcript', 'StudentAnnualController@print_transcript')->name('admin.student.print_transcript');
 
 

@@ -5,6 +5,7 @@ namespace App\Repositories\Backend\CourseAnnual;
 
 use App\Exceptions\GeneralException;
 use App\Models\CourseAnnual;
+use App\Models\UserLog;
 use Carbon\Carbon;
 
 /**
@@ -51,9 +52,9 @@ class EloquentCourseAnnualRepository implements CourseAnnualRepositoryContract
     }
 
     /**
-     * @param  $input
+     * @param $input
+     * @return CourseAnnual
      * @throws GeneralException
-     * @return bool
      */
     public function create($input)
     {
@@ -125,6 +126,13 @@ class EloquentCourseAnnualRepository implements CourseAnnualRepositoryContract
         $courseAnnual->create_uid = auth()->id();
 
         if ($courseAnnual->save()) {
+
+            $storeData = json_encode($courseAnnual);
+            UserLog::log([
+                'model' => 'CourseAnnual',
+                'action'   => 'Create', // Import, Create, Delete, Update
+                'data'     => $storeData // if it is create action, store only the new id.
+            ]);
             return $courseAnnual;
         }
 
@@ -229,6 +237,13 @@ class EloquentCourseAnnualRepository implements CourseAnnualRepositoryContract
         $courseAnnual->write_uid = auth()->id();
 
         if ($courseAnnual->save()) {
+
+            $storeData = json_encode($courseAnnual);
+            UserLog::log([
+                'model' => 'CourseAnnual',
+                'action'   => 'Update', // Import, Create, Delete, Update
+                'data'     => $storeData // if it is create action, store only the new id.
+            ]);
             return $courseAnnual;
         }
 
@@ -271,6 +286,13 @@ class EloquentCourseAnnualRepository implements CourseAnnualRepositoryContract
         }
 
         if ($model->delete()) {
+
+            $storeData = json_encode($model);
+            UserLog::log([
+                'model' => 'CourseAnnual',
+                'action'   => 'Destroy', // Import, Create, Delete, Update
+                'data'     => $storeData // if it is create action, store only the new id.
+            ]);
             return true;
         }
 
