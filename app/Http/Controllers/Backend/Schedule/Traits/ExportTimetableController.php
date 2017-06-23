@@ -183,7 +183,6 @@ trait ExportTimetableController
             if (count($student_annual_ids) > 0) {
                 // init array of dept language
                 $department_languages = array(12, 13); // (english, french)
-
                 foreach ($department_languages as $department_language) {
                     $groups = $this->timetableSlotRepository->find_group_student_annual_form_language($department_language, $student_annual_ids, $findTimetable);
                     $timetables = $this->timetableSlotRepository->get_timetables_form_language_by_student_annual($groups[0], $findTimetable, $department_language);
@@ -319,61 +318,6 @@ trait ExportTimetableController
                         // Set all borders (top, right, bottom, left)
                         $cells->setBorder('thin', 'thin', 'thin', 'thin');
                     });
-                    // timetable slot language
-                    /*if(count($student_annual_ids)>0){
-                        foreach ($timetableSlotsLanguages as $timetableSlotsLanguage) {
-                            $start = (new Carbon($timetableSlotsLanguage['start']))->hour;
-                            $end = (new Carbon($timetableSlotsLanguage['end']))->hour;
-                            $day = (new Carbon($timetableSlotsLanguage['start']))->day;
-
-                            if ($columnDay == $day) {
-                                if ($timesRow == 0) {
-                                    if ($start == 7 && $end >= 8) {
-                                        dd($timetableSlotsLanguage['room']);
-                                        break;
-                                    }
-                                } else if ($timesRow == 1) {
-                                    if ($start <= 8 && $end >= 9) {
-                                        dd($timetableSlotsLanguage['group']);
-                                        break;
-                                    }
-                                } else if ($timesRow == 2) {
-                                    if ($start <= 9 && $end >= 10) {
-                                        dd($timetableSlotsLanguage['building']);
-                                        break;
-                                    }
-                                } else if ($timesRow == 3) {
-                                    if ($start <= 10 && $end >= 11) {
-                                        dd($timetableSlotsLanguage['room']);
-                                        break;
-                                    }
-                                } else if ($timesRow == 5) {
-                                    if ($start == 13 && $end >= 14) {
-                                        dd($timetableSlotsLanguage['room']);
-                                        break;
-                                    }
-                                } else if ($timesRow == 6) {
-                                    if ($start <= 14 && $end >= 15) {
-                                        dd($timetableSlotsLanguage['room']);
-                                        break;
-                                    }
-                                } else if ($timesRow == 7) {
-                                    if ($start <= 15 && $end >= 16) {
-                                        dd($timetableSlotsLanguage['room']);
-                                        break;
-                                    }
-                                } else if ($timesRow == 8) {
-                                    if ($start <= 16 && $end >= 17) {
-                                        dd($timetableSlotsLanguage['room']);
-                                        break;
-                                    }
-                                } else {
-                                    continue;
-                                }
-
-                            }
-                        }
-                    }*/
                     // timetable slot of dept
                     foreach ($timetableSlots as $timetableSlot) {
                         $start = (new Carbon($timetableSlot->start))->hour;
@@ -430,6 +374,79 @@ trait ExportTimetableController
                     $countColumns += 2;
                 }
                 $countRows += 4;
+            }
+
+            // export language course
+            if (count($student_annual_ids) > 0 && count($timetableSlotsLanguages)) {
+
+                for ($timesRow = 7; $timesRow <= 15; $timesRow++) {
+                    $countColumns = 1;
+
+                    for ($columnDay = 2; $columnDay <= 7; $columnDay++) {
+
+                        foreach ($timetableSlotsLanguages as $timetableSlotsLanguage) {
+
+                            if ($timesRow == 7) {
+                                $countRows = 6;
+                            } elseif ($timesRow == 8) {
+                                $countRows = 10;
+                            } elseif ($timesRow == 9) {
+                                $countRows = 14;
+                            } elseif ($timesRow == 13) {
+                                $countRows = 23;
+                            } elseif ($timesRow == 14) {
+                                $countRows = 27;
+                            } elseif ($timesRow == 15) {
+                                $countRows = 31;
+                            } else {
+                                continue;
+                            }
+
+                            $startDay = (new Carbon($timetableSlotsLanguage['start']))->day;
+                            $startHour = (new Carbon($timetableSlotsLanguage['start']))->hour;
+
+                            if (($startDay == $columnDay) && ($startHour == $timesRow)) {
+
+                                $sheet->mergeCells($columns[$countColumns] . $countRows . ':' . $columns[$countColumns + 1] . $countRows);
+                                $sheet->cell($columns[$countColumns] . $countRows, function ($cell) use ($timetableSlotsLanguage) {
+                                    $cell->setValue($timetableSlotsLanguage['course_name']);
+                                    $cell->setAlignment('center');
+                                    $cell->setFontWeight('bold');
+                                });
+
+                                for ($i = $countRows + 1; $i <= $countRows + 7; $i++) {
+                                    $sheet->mergeCells($columns[$countColumns] . $i . ':' . $columns[$countColumns + 1] . $i);
+                                }
+
+                                $i = $countRows + 1;
+
+                                for ($k = 0; $k < count($timetableSlotsLanguage['slotsForLanguage']); $k += 2) {
+                                    $sheet->cell($columns[$countColumns] . $i, function ($cell) use ($timetableSlotsLanguage, $k) {
+                                        // Set all borders (top, right, bottom, left)
+                                        $cell->setBorder('none', 'none', 'none', 'none');
+                                        $cell->setFontWeight('bold');
+                                        $a = '';
+                                        $b = '';
+                                        if (isset($timetableSlotsLanguage['slotsForLanguage'][$k])) {
+                                            $a = 'Gr.' . $timetableSlotsLanguage['slotsForLanguage'][$k]['group'] . ':' . $timetableSlotsLanguage['slotsForLanguage'][$k]['room'] . '-' . $timetableSlotsLanguage['slotsForLanguage'][$k]['building'];
+                                        }
+                                        if (isset($timetableSlotsLanguage['slotsForLanguage'][$k + 1])) {
+                                            $b = 'Gr.' . $timetableSlotsLanguage['slotsForLanguage'][$k + 1]['group'] . ':' . $timetableSlotsLanguage['slotsForLanguage'][$k + 1]['room'] . '-' . $timetableSlotsLanguage['slotsForLanguage'][$k + 1]['building'];
+                                        }
+                                        if ($a != '' && $b != '') {
+                                            $cell->setValue($a . ', ' . $b);
+                                        } else if ($a != '' && $b == '') {
+                                            $cell->setValue($a);
+                                        }
+                                        $cell->setAlignment('center');
+                                    });
+                                    $i++;
+                                }
+                            }
+                        }
+                        $countColumns += 2;
+                    }
+                }
             }
 
             // border bottom cells
