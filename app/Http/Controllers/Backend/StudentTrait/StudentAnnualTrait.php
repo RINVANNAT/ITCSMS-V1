@@ -222,33 +222,42 @@ trait StudentAnnualTrait
                 $check++;
             }*/
 
-
-
             if ($index == $numberStudentPerGroup) {
 
-                if ($remainder > 0) {
 
-                    //add the remain student to the odd group first
-
-                    if (count($studentListByGroup) % 2 != 0) {// check if the student in the group is paire or odd
-                        $remainder--;
-
-                    } else {
-
-                        //if the remain student added to the odd group of student but still remaining some student so we have to add the student to the paire group
-
-                        if($afterAddedRemainder <= 0) {
-                            $key++;
-                            $index = 0;
-                        } else {
-                            $afterAddedRemainder--;
-                        }
-                    }
+                if($remainder > $numGroup) {
+                    $numberStudentPerGroup++;
+                    $remainder = $allStudents % $numberStudentPerGroup;
+                    $afterAddedRemainder = $remainder - (int)round($numGroup / 2);
 
                 } else {
-                    $key++;
-                    $index = 0;
+
+                    if ($remainder > 0) {
+
+                        //add the remain student to the odd group first
+
+                        if (count($studentListByGroup) % 2 != 0) {// check if the student in the group is paire or odd
+                            $remainder--;
+
+                        } else {
+
+                            //if the remain student added to the odd group of student but still remaining some student so we have to add the student to the paire group
+
+                            if($afterAddedRemainder <= 0) {
+                                $key++;
+                                $index = 0;
+                            } else {
+                                $afterAddedRemainder--;
+                            }
+                        }
+
+                    } else {
+                        $key++;
+                        $index = 0;
+                    }
+
                 }
+
 
             } elseif ($index > $numberStudentPerGroup) {
                 $key++;
@@ -283,7 +292,6 @@ trait StudentAnnualTrait
 
             $dataToDownload = array_merge($dataToDownload, $studentGroup);
         }
-
 
         Excel::create('Generated-Group', function ($excel) use ($dataToDownload) {
 

@@ -154,7 +154,6 @@ function loadReferenceCourse(route, token, selected_course_annual_id)
                     allowClear: true,
                     placeholder: " Select Program"
                 });
-
             },
             error: function() {
 
@@ -178,16 +177,13 @@ function loadReferenceCourse(route, token, selected_course_annual_id)
             data:baseData ,
             dataType: 'JSON',
             success:function (result) {
-
                 $('#reference_course_id').html('').select2({
                     placeholder: " Select Program",
                     data: result.data,
                     allowClear: true
                 });
-
             },
             error: function() {
-
                 notify('error', 'Something went wrong!')
             }
         })

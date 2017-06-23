@@ -308,11 +308,12 @@
     {!! HTML::script('plugins/select2/select2.full.min.js') !!}
     <script>
 
+        var totalStudent = function(object) {
+            return $(object).val();
+        };
+
         $(document).ready(function() {
-
-
             initSelect2();
-
             $('.dept_option').hide();
             $('#div_load_course').hide()
             setTitle();
@@ -324,22 +325,26 @@
             $(document).on('change', 'select[name=academic_year_id]', function (e) {
                 setTitle();
                 getStudents();
-                loadCourse()
+                loadCourse();
+
             });
             $(document).on('change', 'select[name=degree_id]', function (e) {
                 setTitle();
                 getStudents();
-                loadCourse()
+                loadCourse();
+
             });
             $(document).on('change', 'select[name=grade_id]', function (e) {
                 setTitle();
                 getStudents();
-                loadCourse()
+                loadCourse();
+
             });
             $(document).on('change', 'select[name=semester_id]', function (e) {
                 setTitle();
                 getStudents();
-                loadCourse()
+                loadCourse();
+
             });
 
             $(document).on('change', 'input[name=department_option_id]', function() {
@@ -353,9 +358,11 @@
                    });
                    getStudents();
                    loadCourse();
+
                } else {
                    getStudents();
                    loadCourse();
+
                }
             });
 
@@ -371,26 +378,18 @@
 
                     getStudents();
                     loadCourse();
+
                 } else {
                     getStudents();
                     loadCourse();
+
                 }
                 setTitle();
             });
 
-            var totalStudent = function(object) {
-                return $(object).val();
-            };
-
             $(document).on('keyup', 'input[name=number_student]', function (e) {
                 if($(this).val() != null && $(this).val() != '') {
-
-                    var group = '';
-                    if(totalStudent != null && totalStudent('input[name=total_student]') != '') {
-                         group = (parseInt(parseInt(totalStudent('input[name=total_student]')) / parseInt($(this).val())))
-
-                        $('#total_stdent').html(totalStudent('input[name=total_student]')+ ' |~ '+ 'Groups: ' + group)
-                    }
+                    setGroupLabel($(this).val());
                 }
 
             });
@@ -407,72 +406,78 @@
                         }
                     }
                 }
-            })
-        });
+            });
 
 
+            $('.btn_cancel').on('click', function() {
+                window.close();
+            });
 
-        $('.btn_cancel').on('click', function() {
-            window.close();
-        });
+            $('#btn_ok_generate_group').on('click', function() {
 
-        $('#btn_ok_generate_group').on('click', function() {
+                var baseUrl = $('#form_generate_group').attr('action');
+                var baseData = $('#form_generate_group').serialize();
+                var number_studetn = $('input[name=number_student]').val();
+                var group_by = $('input[name=rule] :checked').val();
+                var prefix = $('input[name=prefix]').val();
+                if(number_studetn) {
+                    $.ajax({
+                        type: 'GET',
+                        url: baseUrl,
+                        dataType: "json",
+                        data: baseData,
+                        success: function(resultData) {
 
-            var baseUrl = $('#form_generate_group').attr('action');
-            var baseData = $('#form_generate_group').serialize();
-            var number_studetn = $('input[name=number_student]').val();
-            var group_by = $('input[name=rule] :checked').val();
-            var prefix = $('input[name=prefix]').val();
+                            if(resultData.status) {
+                                notify('success', 'info', resultData.message);
+                                var url = '{{route('student.annual.export_generated_group')}}';
+                                var new_url = url+
+                                        '?academic_year_id='+ resultData.request.academic_year_id+
+                                        '&degree_id='+ resultData.request.degree_id+
+                                        '&grade_id='+ resultData.request.grade_id+
+                                        '&semester_id='+ resultData.request.semester_id+
+                                        '&number_student='+ resultData.request.number_student+
+                                        '&result='+ resultData.request.result+
+                                        '&rule='+ resultData.request.rule+
+                                        '&suffix='+ resultData.request.suffix+
+                                        '&prefix='+ resultData.request.prefix;
 
+                                if(resultData.request.department_id ) {
+                                    if(resultData.request.department_id != 'undefined' && resultData.request.department_id  != '') {
+                                        new_url += '&department_id='+ resultData.request.department_id;
 
-            if(number_studetn) {
-                $.ajax({
-                    type: 'GET',
-                    url: baseUrl,
-                    dataType: "json",
-                    data: baseData,
-                    success: function(resultData) {
+                                        if(resultData.request.department_option_id) {
+                                            if(resultData.request.department_option_id != 'undefined' && resultData.request.department_option_id  != '') {
 
-                        if(resultData.status) {
-                            notify('success', 'info', resultData.message);
-                            var url = '{{route('student.annual.export_generated_group')}}';
-                            var new_url = url+
-                                    '?academic_year_id='+ resultData.request.academic_year_id+
-                                    '&degree_id='+ resultData.request.degree_id+
-                                    '&grade_id='+ resultData.request.grade_id+
-                                    '&semester_id='+ resultData.request.semester_id+
-                                    '&number_student='+ resultData.request.number_student+
-                                    '&result='+ resultData.request.result+
-                                    '&rule='+ resultData.request.rule+
-                                    '&suffix='+ resultData.request.suffix+
-                                    '&prefix='+ resultData.request.prefix;
-
-                            if(resultData.request.department_id ) {
-                                if(resultData.request.department_id != 'undefined' && resultData.request.department_id  != '') {
-                                    new_url += '&department_id='+ resultData.request.department_id;
-
-                                    if(resultData.request.department_option_id) {
-                                        if(resultData.request.department_option_id != 'undefined' && resultData.request.department_option_id  != '') {
-
-                                            new_url += '&department_option_id=' + resultData.request.department_option_id;
+                                                new_url += '&department_option_id=' + resultData.request.department_option_id;
+                                            }
                                         }
                                     }
 
-
                                 }
-
+                                window.open(new_url, '_self')
                             }
-                           window.open(new_url, '_self')
                         }
+                    });
 
-                    }
-                });
-
-            } else {
-                notify('error', 'Input Number of Student', 'Attention!');
-            }
+                } else {
+                    notify('error', 'Input Number of Student', 'Attention!');
+                }
+            });
         });
 
+
+        function setGroupLabel(inputVal) {
+
+            if(inputVal != null && inputVal != '') {
+
+                if(totalStudent('input[name=total_student]') != null && totalStudent('input[name=total_student]') != '') {
+                    var group = parseInt(parseInt(totalStudent('input[name=total_student]')) / parseInt(inputVal ))
+
+                    $('#total_stdent').html(totalStudent('input[name=total_student]')+ ' |~ '+ 'Groups: ' + group);
+                }
+            }
+        }
 
         var getBaseData = function () {
 
@@ -514,6 +519,8 @@
                     if(resultData.status) {
                         $('#total_stdent').html(resultData.count)
                         $('input[name=total_student]').val(resultData.count)
+
+                        setGroupLabel($('input[name=number_student]').val());
                     }
                 }
             });
