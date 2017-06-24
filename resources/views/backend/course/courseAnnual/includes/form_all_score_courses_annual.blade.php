@@ -290,8 +290,6 @@
     {{--myscript--}}
 
     <script>
-
-
         function setSelectedRow() {
 
             var current_rows = $(document).find(".current_row");
@@ -559,8 +557,6 @@
                                 }
                             });
                         }
-
-
                     })
                 }
             }
@@ -666,19 +662,6 @@
                     if (resultData.status == false) {
 
                         notify('error', resultData.message);
-                        /*swal({
-                            title: "Attention",
-                            text: 'Please Check Incase Yours Department Option Is Not Select!!',
-                            type: "warning",
-                            confirmButtonColor: "red",
-                            confirmButtonText: "Close",
-                            closeOnConfirm: true
-                        }, function (confirmed) {
-                            if (confirmed) {
-                                // do some staff if you want ---
-
-                            }
-                        });*/
 
                     } else {
 
@@ -836,7 +819,6 @@
                 }
             });
 
-
             $(window).resize(function () {
 
                 var table_width = $('.box-body').width();
@@ -889,7 +871,7 @@
 
         function updateSettingHandsontable(resultData) {
 
-//            console.log(resultData)
+
             setting.data = resultData.data;
             setting.nestedHeaders = resultData.nestedHeaders;
             setting.colWidths = resultData.colWidths;
@@ -941,21 +923,6 @@
         });
         $('#filter_semester').on('change', function () {
             filter_table();
-
-
-            /*swal({
-                title: "Attention",
-                text: "The student record will be chagened....Are you sure?",
-                type: "warning",
-                showCancelButton: true,
-                confirmButtonColor: "#DD6B55",
-                confirmButtonText: "Skip",
-                closeOnConfirm: true
-            }, function (confirmed) {
-                if (confirmed) {
-
-                }
-            });*/
         })
         $('#filter_degree').on('change', function () {
             filter_table();
@@ -1100,9 +1067,7 @@
                     delete  val['score'];
                     delete val['credit'];
                 })
-
             }
-
             return student_exam_subjects;
 
         }
@@ -1319,10 +1284,6 @@
 
 
         $('#get_radie').on('click', function () {
-
-            /*var academic_year_id = $('#filter_academic_year :selected').val();
-             var department_id = $('#filter_dept :selected').val();*/
-
 
             var pop_url = '{{route('student.dismiss')}}';
             var BaseData = {
