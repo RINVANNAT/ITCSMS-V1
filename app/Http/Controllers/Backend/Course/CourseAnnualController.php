@@ -2070,7 +2070,7 @@ class CourseAnnualController extends Controller
                 'nestedHeaders' => $nestedHeaders,
                 'colWidths' => [],
                 'message' =>  'The options which you are selected, are not match with the record please check agian!',
-                'type' => 'warning'
+                'type' => 'error'
             ]);
         }
 

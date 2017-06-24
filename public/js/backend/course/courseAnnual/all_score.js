@@ -49,26 +49,22 @@ var colorRenderer = function (instance, td, row, col, prop, value, cellPropertie
     }
 };
 
-    $('#refresh_score_sheet').on('click', function () {
-        filter_table();
-        assignNumberRattrapage();
-    });
 
     $('#filter_academic_year').on('change', function () {
-        filter_table();
+        //filter_table();
     })
     $('#filter_grade').on('change', function () {
-        filter_table();
+        //filter_table();
     });
     $('#filter_semester').on('change', function () {
-        filter_table();
+        //filter_table();
     })
     $('#filter_degree').on('change', function () {
-        filter_table();
+        //filter_table();
     });
 
     $('#filter_group').on('change', function () {
-        filter_table();
+        //filter_table();
     });
 
     var getBaseData = function() {
@@ -87,6 +83,22 @@ var colorRenderer = function (instance, td, row, col, prop, value, cellPropertie
         return BaseData;
     };
 
+    var getSelectedText = function() {
+
+        var objectText = {
+            department: $('#filter_dept :selected').text(),
+            degree: $('#filter_degree :selected').val(),
+            grade: $('#filter_grade :selected').val(),
+            academic_year: $('#filter_academic_year :selected').text(),
+            semester_id: $('#filter_semester :selected').val(),
+            dept_option: $('#filter_dept_option :selected').text(),
+            group_name: $('#filter_group :selected').val()
+
+        }
+
+    return objectText;
+};
+
     if ($('.message').is(':visible')) {
         setTimeout(function () {
             $(".message").fadeOut("slow");
@@ -104,8 +116,6 @@ var colorRenderer = function (instance, td, row, col, prop, value, cellPropertie
             notify('info', 'Please select a year!')
         }
     });
-
-
 
 
 /*-----Assign rattrapage on frontend -----(number of subject that student should re-exam)---*/

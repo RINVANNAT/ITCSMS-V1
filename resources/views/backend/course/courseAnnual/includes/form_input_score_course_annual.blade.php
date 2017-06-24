@@ -103,18 +103,6 @@
 
             </div>
 
-
-            {{--<div class="btn-group pull-right btn_action_group">--}}
-
-                {{--<button type="button" class="btn btn-warning btn-xs dropdown-toggle" data-toggle="dropdown" aria-expanded="false">--}}
-                    {{--Actions <span class="caret"></span>--}}
-                {{--</button>--}}
-                {{--<ul class="dropdown-menu" role="menu">--}}
-
-                    {{--<li class="drop-menu"> <a href="#"  id="add_column"> <i class="fa fa-plus"> Add Score</i></a></li>--}}
-                    {{--<li class="drop-menu"> <a href="#"  id="get_average"> <i class="fa fa-circle-o-notch"> Generate Average</i></a></li>--}}
-                {{--</ul>--}}
-            {{--</div><!--btn group-->--}}
         </div><!-- /.box-header -->
 
         <div class="box-body">

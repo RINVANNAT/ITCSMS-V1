@@ -56,10 +56,10 @@
 
             .selection {
 
-                width: 80px;
+                /*width: 80px;
                 font-size: 10pt;
                 height: 23px;
-                margin-left: 5px;
+                margin-left: 5px;*/
             }
 
             /*@-moz-document url-prefix() { !* targets Firefox only *!
@@ -68,17 +68,6 @@
 
                 }
             }*/
-            #filter_academic_year {
-                font-size: 10pt;
-                height: 23px;
-                margin-left: 5px;
-            }
-
-            #filter_semester {
-                font-size: 10pt;
-                height: 23px;
-                margin-left: 5px;
-            }
 
             .h4 {
                 text-align: left;
@@ -145,8 +134,16 @@
             .top a {
                 color: black;
             }
+
+            .col-sm-3 {
+                width:15%;
+
+            }
+            .left-margin {
+                margin-left: 5px;
+            }
         </style>
-        <div class="box-header with-border">
+        <div class="box-header with-border" style="margin-bottom: 0px">
 
             <div class=" no-paddingcol-sm-12">
 
@@ -169,97 +166,100 @@
                         </li>
 
                     </ul>
+
                 </div>
+
+
 
                 <div class="pull-right">
 
-                    <button class="btn btn-primary btn-xs col-sm-1" id="refresh_score_sheet" style="margin-left: -50px">
-                        <i class="fa fa-refresh"></i></button>
+                    <button class="btn btn-primary" data-toggle="tooltip" style="margin-left: 5px" data-placement="left"  title="Refresh-Table" id="refresh_score_sheet" >
+                        <i class="fa fa-refresh" ></i>
+                    </button>
 
-                    {{--<button class="btn-u" data-toggle="modal" data-target="#responsive">Modal Form Sample</button>
-                    <div class="modal fade" id="responsive" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
-                        <div class="modal-dialog">
-                            <div class="modal-content">
-                                <div class="modal-header">
-                                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-                                    <h4 class="modal-title" id="myModalLabel4">Responsive Modal</h4>
-                                </div>
-                                <div class="modal-body">
-                                    <div class="row">
+                    <button class="btn btn-success" data-toggle="tooltip" data-placement="left"  title="Change Option" id="change_option" >
+                        <i class="fa fa-stack-exchange" ></i>
+                    </button>
 
-                                    </div>
-                                    <div class="modal-footer">
-                                        <button type="button" class="btn-u btn-u-default" data-dismiss="modal">Close</button>
-                                        <button type="button" class="btn-u btn-u-primary">Save changes</button>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
-                    </div>--}}
-
-                    <select name="academic_year" id="filter_academic_year" style="width: 100px;" class=" col-sm-1">
-                        @foreach($academicYears as $key=>$year)
-                            <option value="{{$key}}"> {{$year}}</option>
-                        @endforeach
-                    </select>
-
-                    <select name="department" id="filter_dept" class="selection col-sm-1">
-                        @foreach($departments as $key=>$departmentName)
-                            <option value="{{$key}}"> {{$departmentName}}</option>
-                        @endforeach
-                    </select>
-
-                    <select name="dept_option" id="filter_dept_option" class="selection col-sm-1">
-                        <option value="">Option</option>
-                        @foreach($departmentOptions as $option)
-                            <option value="{{$option->id}}"
-                                    class="dept_option department_{{$option->department_id}}">{{$option->code}}</option>
-                        @endforeach
-                    </select>
-
-                    <select name="semester" id="filter_semester" style="width: 90px;" class=" col-sm-1">
-                        @foreach($semesters as $key=>$semester)
-                            <option value="{{$key}}"> {{$semester}}</option>
-                        @endforeach
-                        <option value=""> Semesters</option>
-                    </select>
-
-                    <select name="degree" id="filter_degree" class="selection  col-sm-1">
-                        @foreach($degrees as $key=>$degreeName)
-                            <option value="{{$key}}"> {{$degreeName}}</option>
-                        @endforeach
-                    </select>
-
-
-                    <select name="grade" id="filter_grade" class="selection col-sm-1">
-                        @foreach($grades as $key=>$gradeName)
-
-                            @if($department_id = \App\Models\Enum\ScoreEnum::Dept_TC)
-
-                                @if($key == \App\Models\Enum\ScoreEnum::Year_1)
-
-                                    <option id="{{$key}}" value="{{$key}}" selected> {{$gradeName}}</option>
-                                @else
-                                    <option id="{{$key}}" value="{{$key}}"> {{$gradeName}}</option>
-                                @endif
-
-                            @else
-                                @if($key == \App\Models\Enum\ScoreEnum::Year_3)
-
-                                    <option id="{{$key}}" value="{{$key}}" selected> {{$gradeName}}</option>
-                                @else
-                                    <option id=" {{$key}}" value="{{$key}}"> {{$gradeName}}</option>
-                                @endif
-
-                            @endif
-
-                        @endforeach
-                    </select>
 
                 </div>
             </div>
 
+            <div class="text-center" style="margin-bottom: 0px">
+                <label  style="font-size: 12pt; margin-bottom: -20px">
+                    RELEVE DES NOTE CONTROLE: <Strong style="color: darkgreen; font-size: 14pt; font-weight: bold" id="class_title"> GEE-I3 |~EAT </Strong>
+                <p  style="font-size: 10pt" class="text-center">Année Scolaire <strong style="color: darkgreen; font-weight: bold; font-size: 12pt" id="year_name_latin"> 2016-2017 </strong></p>
+
+                </label>
+
+            </div>
+
+        </div>
+
+        <div class="selection_blog col-sm-12 box" style="padding-right: 0px; margin-bottom: 10px; margin-top: 5px; border-top: 0px!important;">
+
+            <select name="academic_year" id="filter_academic_year"  class=" form-control col-sm-3">
+                @foreach($academicYears as $key=>$year)
+                    <option value="{{$key}}"> {{$year}}</option>
+                @endforeach
+            </select>
+
+            <select name="department" id="filter_dept" class="left-margin form-control col-sm-3">
+                @foreach($departments as $key=>$departmentName)
+                    <option value="{{$key}}"> {{$departmentName}}</option>
+                @endforeach
+            </select>
+
+            <select name="dept_option" id="filter_dept_option" class="left-margin form-control col-sm-3">
+                <option value="">Option</option>
+                @foreach($departmentOptions as $option)
+                    <option value="{{$option->id}}"
+                            class="dept_option department_{{$option->department_id}}">{{$option->code}}</option>
+                @endforeach
+            </select>
+
+            <select name="semester" id="filter_semester"  class="left-margin form-control col-sm-3">
+                @foreach($semesters as $key=>$semester)
+                    <option value="{{$key}}"> {{$semester}}</option>
+                @endforeach
+                <option value=""> Semesters</option>
+            </select>
+
+            <select name="degree" id="filter_degree" class="left-margin form-control  col-sm-3">
+                @foreach($degrees as $key=>$degreeName)
+                    <option value="{{$key}}"> {{$degreeName}}</option>
+                @endforeach
+            </select>
+
+
+            <select name="grade" id="filter_grade" class="left-margin form-control col-sm-3" style="margin-bottom: 5px">
+                @foreach($grades as $key=>$gradeName)
+
+                    @if($department_id = \App\Models\Enum\ScoreEnum::Dept_TC)
+
+                        @if($key == \App\Models\Enum\ScoreEnum::Year_1)
+
+                            <option id="{{$key}}" value="{{$key}}" selected> {{$gradeName}}</option>
+                        @else
+                            <option id="{{$key}}" value="{{$key}}"> {{$gradeName}}</option>
+                        @endif
+
+                    @else
+                        @if($key == \App\Models\Enum\ScoreEnum::Year_3)
+
+                            <option id="{{$key}}" value="{{$key}}" selected> {{$gradeName}}</option>
+                        @else
+                            <option id=" {{$key}}" value="{{$key}}"> {{$gradeName}}</option>
+                        @endif
+
+                    @endif
+
+                @endforeach
+            </select>
+
+            {{--<button class="btn btn-primary pull-right" style="margin-right: 10px" id="ok_option" >
+                Ok
+            </button>--}}
         </div>
         <!-- /.box-header -->
         @if (session('status'))
@@ -273,6 +273,9 @@
             </div>
         @endif
         <div class="box-body panel">
+            <div id="blog_message">
+
+            </div>
             <div id="all_score_course_annual_table" class="table table-striped handsontable htColumnHeaders">
 
             </div>
@@ -562,6 +565,7 @@
 
         function initTable() {
 
+            setTitle();
             toggleLoading(true);
             var BaseUrl = '{{route('admin.course.get_all_handsontable_data')}}';
             var BaseData = getBaseData();
@@ -579,11 +583,8 @@
                     toggleLoading(false);
                     if (resultData.status == false) {
 
-                        notify('error', resultData.message);
-
+                        showMessage( resultData, true);
                     } else {
-
-
                         setting.data = resultData.data;
                         setting.nestedHeaders = resultData.nestedHeaders;
                         setting.colWidths = resultData.colWidths;
@@ -600,7 +601,9 @@
 
                         setting.height = tab_height;
 
-                        hotInstance = new Handsontable(jQuery("#all_score_course_annual_table")[0], setting);
+                        showMessage( resultData, false);
+
+                        hotInstance = new Handsontable(jQuery("div#all_score_course_annual_table")[0], setting);
                         assignNumberRattrapage();// ---after initial handsontable
                         hotInstance.updateSettings({
                             contextMenu: {
@@ -731,7 +734,7 @@
                                     }
                                 }
                             }
-                        })
+                        });
                     }
 
                 }
@@ -740,11 +743,14 @@
             $(window).resize(function () {
 
                 var table_width = $('.box-body').width();
-//                alert(table_width);
-                setting.width = table_width;
-                hotInstance.updateSettings({
-                    width: table_width
-                });
+
+                if(hotInstance) {
+                    setting.width = table_width;
+                    hotInstance.updateSettings({
+                        width: table_width
+                    });
+                }
+
             });
         }
 
@@ -763,17 +769,19 @@
                         toggleLoading(false);
                         if (resultData.status == false) {
 
-                            totalScoreNotification(resultData.type, resultData.message, 'No Course Score Record')
+                            //totalScoreNotification(resultData.type, resultData.message, 'No Course Score Record')
+
+                            showMessage(resultData, true);
                             updateSettingHandsontable(resultData);
                         } else {
-
+                            setTitle();
+                            showMessage(resultData, false);
                             updateSettingHandsontable(resultData);
                             assignNumberRattrapage();
                         }
                     }
                 });
             } else {
-
                 initTable();
             }
         }
@@ -816,7 +824,7 @@
                 });
             }
 
-            filter_table();
+            //filter_table();
         });
 
 
@@ -838,23 +846,25 @@
 
         function assignNumberRattrapage() {
 
-            var array_fail_subject = setting.array_fail_subject;
-            var table_data = setting.data;
+           if(hotInstance) {
+               var array_fail_subject = setting.array_fail_subject;
+               var table_data = setting.data;
 
-            $.each(table_data, function (i, student) {
+               $.each(table_data, function (i, student) {
 
-                if (student['student_id_card'] != null && student['student_id_card'] != '') {
-                    var number_rattrapage = numberSubjectRattrapage(array_fail_subject[student['student_id_card']], '{{\App\Models\Enum\ScoreEnum::Pass_Moyenne}}', '{{\App\Models\Enum\ScoreEnum::Aproximation_Moyenne}}');
-                    student['Rattrapage'] = number_rattrapage;
-                }
-            });
+                   if (student['student_id_card'] != null && student['student_id_card'] != '') {
+                       var number_rattrapage = numberSubjectRattrapage(array_fail_subject[student['student_id_card']], '{{\App\Models\Enum\ScoreEnum::Pass_Moyenne}}', '{{\App\Models\Enum\ScoreEnum::Aproximation_Moyenne}}');
+                       student['Rattrapage'] = number_rattrapage;
+                   }
+               });
 
-            setting.data = table_data;
-            hotInstance.updateSettings({
-                data: table_data,
-                colWidths: setting.colWidths
+               setting.data = table_data;
+               hotInstance.updateSettings({
+                   data: table_data,
+                   colWidths: setting.colWidths
 
-            });
+               });
+           }
         }
 
 
@@ -888,6 +898,67 @@
                     '&dept_option_id=' + BaseData.dept_option_id +
                     '&academic_year_id=' + BaseData.academic_year_id, '_blank');
 
+        });
+
+
+        $('.selection_blog').hide();
+
+        $('#change_option').on('click', function() {
+            $('.selection_blog').slideToggle( "fast" )
+        });
+        $('#ok_option').on('click', function() {
+            filter_table();
+            $('.selection_blog').slideToggle( "fast" )
+        });
+
+
+
+        function setTitle() {
+
+            var seletedText = getSelectedText();
+
+            var title = seletedText.department.trim(' ') +
+                    '-'+((seletedText.degree == parseInt('{{\App\Models\Enum\ScoreEnum::Degree_I}}'))? 'I':'T')+
+                    seletedText.grade;
+            var subTitle = seletedText.academic_year;
+
+            if(seletedText.dept_option != 'Option' && seletedText.dept_option != '') {
+                title +=' |'+seletedText.dept_option;
+            }
+
+            if(seletedText.semester_id != null && seletedText.semester_id != '') {
+                subTitle += ' |~S'+seletedText.semester_id
+            }
+            $('#class_title').html(title);
+            $('#year_name_latin').html(subTitle);
+
+        }
+
+        function showMessage(response, status)
+        {
+
+            if(status == true) {
+
+                var div_message = '<div class="alert alert-'+response.type+'">' +
+                        '<h4><i class="icon fa fa-info"></i> Total Score Warning!</h4>' +
+                        '<p>' +
+                        response.message +
+                        '</p>' +
+                        '</div>';
+                $('div#blog_message').html(div_message);
+                $('div#all_score_course_annual_table').hide();
+
+            } else {
+
+                $('div#blog_message').html('');
+                if(!$('div#all_score_course_annual_table').is(':visible')) {
+                    $('div#all_score_course_annual_table').show()
+                }
+            }
+        }
+        $('#refresh_score_sheet').on('click', function () {
+            filter_table();
+            $('.selection_blog').slideToggle( "fast" )
         });
 
     </script>
