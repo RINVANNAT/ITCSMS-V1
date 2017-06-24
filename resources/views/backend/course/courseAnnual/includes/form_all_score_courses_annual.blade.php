@@ -136,7 +136,7 @@
             }
 
             .col-sm-3 {
-                width:15%;
+                width:16.2%;
 
             }
             .left-margin {
