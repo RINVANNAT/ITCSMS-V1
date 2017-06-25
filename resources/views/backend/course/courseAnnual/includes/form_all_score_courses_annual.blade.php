@@ -159,8 +159,8 @@
                                         class="fa fa-download"></i> Export</a></li>
                         <li class="top"><a href="#" class="btn btn-xs" id="get_redouble"><i class="fa fa-download"></i>
                                 Redouble</a></li>
-                        {{--<li class="top"><a href="#" class="btn btn-xs" id="generate_rattrapage"> <i
-                                        class="fa fa-circle-o"></i> Rattrapage</a></li>--}}
+                        <li class="top"><a href="#" class="btn btn-xs" id="generate_rattrapage"> <i
+                                        class="fa fa-circle-o"></i> Rattrapage</a></li>
                         <li class="top"><a href="{{route('student.statistic_radie')}}" class="btn btn-xs"
                                            id="print_total_radie"> <i class="fa fa-bar-chart"> </i>Statistic Radie</a>
                         </li>

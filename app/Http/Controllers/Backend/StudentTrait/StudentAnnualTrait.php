@@ -5,6 +5,8 @@ use App\Http\Requests\Backend\Student\GenerateStudentGroupRequest;
 use App\Models\Department;
 use App\Models\DepartmentOption;
 use App\Models\Enum\SemesterEnum;
+use App\Models\Group;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use App\Models\Degree;
@@ -114,7 +116,9 @@ trait StudentAnnualTrait
                             ->orWhere('students.radie', '=', false);
                     });
                 }
-                $studentAnnuals = $studentAnnuals->orderBy('students.name_latin')->get();
+                $studentAnnuals = $studentAnnuals
+                    ->select('studentAnnuals.*', 'students.id_card', 'students.name_latin','students.radie')
+                    ->orderBy('students.name_latin')->get();
             } else {
 
                 if($semester_id > SemesterEnum::SEMESTER_ONE) {
@@ -124,7 +128,9 @@ trait StudentAnnualTrait
                             ->orWhere('students.radie', '=', false);
                     });
                 }
-                $studentAnnuals = $studentAnnuals->where('studentAnnuals.department_id', $department->id)->orderBy('students.name_latin')->get();
+                $studentAnnuals = $studentAnnuals->where('studentAnnuals.department_id', $department->id)
+                    ->select('studentAnnuals.*', 'students.id_card', 'students.name_latin','students.radie')
+                    ->orderBy('students.name_latin')->get();
             }
         } else {
 
@@ -135,7 +141,9 @@ trait StudentAnnualTrait
                         ->orWhere('students.radie', '=', false);
                 });
             }
-            $studentAnnuals = $studentAnnuals->orderBy('students.name_latin')->get();
+            $studentAnnuals = $studentAnnuals
+                ->select('studentAnnuals.*', 'students.id_card', 'students.name_latin','students.radie')
+                ->orderBy('students.name_latin')->get();
         }
 
         return $studentAnnuals;
@@ -178,6 +186,13 @@ trait StudentAnnualTrait
         $rule = $request->rule;
         $prefix = $request->prefix;
 
+        if($department_id) {
+            $department = Department::where('id', $department_id)->first();
+        } else {
+            $department = null;
+        }
+
+        $groups = Group::all()->keyBy('code')->toArray();
 
         $studentAnnual =  $this->getStudents($department_id, $academic_year_id, $degree_id, $grade_id, $semester_id, $department_option_id);
 
@@ -209,18 +224,27 @@ trait StudentAnnualTrait
         $index = 0;
         $check =0;
 
+        $isGenerated = $this->isGerneratedGroup($studentAnnual, $request, $numGroup, $key, $department);
+
+        if($isGenerated) {
+
+            return redirect()->back()->with([
+                'status' => false,
+                'message' => 'With your selected option, Group students are already generated!!'
+            ]);
+        }
+
         foreach ($studentAnnual as $student) {
 
+
+            $code = $prefix.'-'.$key;
+
+            /* --store or update group student annual----*/
+
+            $groups = $this->storeOrUpdateGroup($groups, $student,$academic_year_id,$code, $semester_id, $department, $studentListByGroup);
+            /*--end store or update ----*/
             $index++;
-            $studentListByGroup[$prefix.'-'.$key][] = $student;//($rule == 'by_name')? strtoupper($student->name_latin):strtoupper($student->id_card);
-
-            /*$update = DB::table('studentAnnuals')
-                ->where('id', $student->id)
-                ->update(['group' => $prefix.$key]);*/
-
-            /*if($update) {
-                $check++;
-            }*/
+            $studentListByGroup[$code][] = $student;//($rule == 'by_name')? strtoupper($student->name_latin):strtoupper($student->id_card);
 
             if ($index == $numberStudentPerGroup) {
 
@@ -265,7 +289,6 @@ trait StudentAnnualTrait
             }
         }
 
-
         foreach($studentListByGroup as $group => $students)  {
 
            $studentGroup = collect($students)->map(function($item)use($department_id, $department_option_id, $group) {
@@ -300,6 +323,97 @@ trait StudentAnnualTrait
             });
 
         })->download('xls');
+
+    }
+
+
+    private function storeOrUpdateGroup($groups, $student, $academicYearId, $groupCode, $semesterId, $department, $studentListByGroup)
+    {
+
+
+        if(isset($groups[$groupCode])) {
+            /*--store only group_student_annual---*/
+
+            $groupStudentAnnualInput = [
+                'department_id' => isset($department)?$department->id:null,
+                'semester_id' => $semesterId,
+                'student_annual_id' => $student->id,
+                'group_id' => $groups[$groupCode]['id'],
+                'created_at' => Carbon::now()
+            ];
+
+            $this->groups->storeGroupStudentAnnual($groupStudentAnnualInput);
+
+        } else {
+            /*---create new record for groups table and store in a groups student annual table--*/
+
+
+            if(!isset($studentListByGroup[$groupCode])) {
+
+                $newGroupInput = [
+                    'code' => $groupCode,
+                    'created_at' => Carbon::now()
+                ];
+                $newGroup = $this->groups->create($newGroupInput);
+                $groups[$newGroup->code] = collect($newGroup)->toArray();
+
+                $groupStudentAnnualInput = [
+                    'department_id' => isset($department)?$department->id:null,
+                    'semester_id' => $semesterId,
+                    'student_annual_id' => $student->id,
+                    'group_id' => $newGroup->id,
+                    'created_at' => Carbon::now()
+                ];
+                $this->groups->storeGroupStudentAnnual($groupStudentAnnualInput);
+            }
+        }
+
+        return $groups;
+
+    }
+
+    function isGerneratedGroup($students,$request, $numGroup, $key, $department)
+    {
+
+        $requestGroupCodes = [];
+        for($int = 0; $int < $numGroup ; $int++) {
+            $requestGroupCodes[] = $request->prefix.'-'.($key++);
+        }
+        $groups = Group::whereIn('code', $requestGroupCodes)->get();
+
+        if(count($groups) == 0) {
+            /*--allow generating group--*/
+            return false;
+        } else {
+
+            if(count($groups) >= $numGroup) {
+
+                $groupIds = collect($groups)->pluck('id')->toArray();
+                $studentAnnualIds = collect($students)->pluck('id')->toArray();
+                $groupStudentAnnuals = $this->groupStudentAnnual($groupIds, $studentAnnualIds, $request->semester_id, isset($department)?$department->id:null);
+                if(count($groupStudentAnnuals) >= count($students)) {
+                    return true;
+                } else {
+                    return false;
+                }
+
+            } else {
+
+                return false;
+            }
+        }
+    }
+
+    function groupStudentAnnual($groupIds, $studentAnnualIds, $semesterId, $departmentId)
+    {
+
+        $groupStudentAnnuals = DB::table('group_student_annuals')
+            ->whereIn('student_annual_id', $studentAnnualIds)
+            ->where('semester_id', $semesterId)
+            ->where('department_id', $departmentId)
+            ->whereIn('group_id', $groupIds)->get();
+
+        return $groupStudentAnnuals;
 
     }
 

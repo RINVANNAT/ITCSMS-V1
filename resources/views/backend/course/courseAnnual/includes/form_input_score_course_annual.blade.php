@@ -681,11 +681,11 @@
 
                                             if(resultData.status) {
                                                 notify('success', resultData.message, 'Info')
-                                                //updateSettingHandsontable(resultData.handsonData);
+                                                updateSettingHandsontable(resultData.handsonData);
 
                                             } else {
                                                 notify('error', resultData.message, 'Attention')
-                                                //updateSettingHandsontable(resultData.handsonData);
+                                                updateSettingHandsontable(resultData.handsonData);
                                             }
                                             cellChanges=[];
                                         },
@@ -707,9 +707,7 @@
                                             toggleLoading(false);
 
                                             if(resultData.status) {
-                                                notify('success', resultData.message, 'Info')
-
-                                                console.log(resultData);
+                                                notify('success', resultData.message, 'Info');
 
                                                 updateSettingHandsontable(resultData.handsontableData);
 

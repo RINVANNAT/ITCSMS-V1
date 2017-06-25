@@ -581,6 +581,7 @@ trait StudentScore {
         $arrayCourseAnnualIds = [];
 
         $studentDataProperties = $this->findPassOrFailStudentScore($request);/*--this method is implemented in StudentScore Trait Class--*/
+
         $courseAnnuals = $studentDataProperties['course_annual'];
 
         $academic_year_id = $request->academic_year_id;
@@ -696,12 +697,9 @@ trait StudentScore {
 
             $studentResitExam = $this->findResitStudentAutomatic($studentDataProperties['fail_or_pass']);
 
-            //dd($studentResitExam);
+            dd($studentResitExam);
 
-
-            /*dd($studentResitExam['e20130014']);*/
-
-            /*foreach($studentResitExam as $student_id => $resit) {
+            foreach($studentResitExam as $student_id => $resit) {
 
                 if(isset($resit['resit_subject']['fail'])) {
 
@@ -741,10 +739,10 @@ trait StudentScore {
                         /// else ---do not count these student
                     }
                 }
-            }*/
+            }
 
 
-            /*$arrayCourseAnnualIds = array_unique($arrayCourseAnnualIds);
+            $arrayCourseAnnualIds = array_unique($arrayCourseAnnualIds);
             $arrayCourseAnnualIds = array_values($arrayCourseAnnualIds);
 
             $students = $this->getStudentByIdCardYearly($studentIdCards, $academic_year_id);
@@ -772,7 +770,7 @@ trait StudentScore {
             $courseProgramIds = array_unique($courseProgramIds);
             $courseProgramIds = array_values($courseProgramIds);
             $coursePrograms = Course::whereIn('courses.id', $courseProgramIds)->get();
-            $averages = $studentDataProperties['score_properties']['averages'];*/
+            $averages = $studentDataProperties['score_properties']['averages'];
 
 
             /*------save student rattrapaer automatic-----*/
@@ -785,6 +783,7 @@ trait StudentScore {
         }
 
 
+
         return [
             'resit_course_annual' => $onlyResitCourseAnnuals,
             'student' => $students,
@@ -795,6 +794,11 @@ trait StudentScore {
             'average' => $averages,
             'full_url' => $fullUrl
         ];
+
+    }
+
+    private function findResitSubject()
+    {
 
     }
 
@@ -856,7 +860,7 @@ trait StudentScore {
     }
 
 
-    public function findResitStudentAutomatic($array_fial_subject ) {
+    public function findResitStudentAutomatic($array_fial_subject) {
 
         $studentResitExam = [];
         foreach($array_fial_subject as $studentIdCard =>  $array) {
@@ -932,7 +936,6 @@ trait StudentScore {
 
             }
         } else {
-
 
             /*--check if the moyenne of student is under 50 and all subject are bigger than 30*/
 

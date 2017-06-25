@@ -52,9 +52,9 @@ class EloquentGroupRepository implements GroupRepositoryContract
     }
 
     /**
-     * @param  $input
+     * @param $input
+     * @return Grade
      * @throws GeneralException
-     * @return bool
      */
     public function create($input)
     {
@@ -62,7 +62,7 @@ class EloquentGroupRepository implements GroupRepositoryContract
             throw new GeneralException(trans('exceptions.backend.configuration.group.already_exists'));
         }*/
 
-        $group = new Grade();
+        $group = new Group();
         $group->code = $input['code'];
         $group->created_at = Carbon::now();
 

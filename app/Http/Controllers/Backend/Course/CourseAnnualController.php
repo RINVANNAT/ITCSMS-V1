@@ -11,7 +11,9 @@ use App\Http\Requests\Backend\Course\CourseAnnual\ImportCourseAnnualRequest;
 use App\Http\Requests\Backend\Course\CourseAnnual\StoreCourseAnnualRequest;
 use App\Http\Requests\Backend\Course\CourseAnnual\ToggleScoringCourseAnnualRequest;
 use App\Http\Requests\Backend\Course\CourseAnnual\UpdateCourseAnnualRequest;
+use App\Models\Absence;
 use App\Models\AcademicYear;
+use App\Models\Average;
 use App\Models\Course;
 use App\Models\CourseAnnual;
 use App\Models\Degree;
@@ -764,6 +766,18 @@ class CourseAnnualController extends Controller
     {
         $scoreByCourseAnnualId = DB::table('scores')->where('course_annual_id', $id);
 
+        $averages = Average::where('course_annual_id', $id);
+        if($totalScore = $averages->get()) {
+            $averages->delete();
+            $this->courseAnnualScores->getUserLog($totalScore, 'Average', 'Delete');
+        }
+
+        $absences = Absence::where('course_annual_id', $id);
+        if($scoreAbsence = $absences->get()) {
+            $absences->delete();
+            $this->courseAnnualScores->getUserLog($scoreAbsence, 'Absence', 'Delete');
+        }
+
         if (count($scoreByCourseAnnualId->get()) > 0 ) {
 
             $percentageIds = DB::table('percentage_scores')
@@ -777,8 +791,6 @@ class CourseAnnualController extends Controller
 
             $this->courseAnnualScores->getUserLog($scoreByCourseAnnualId->get(), 'Score', 'Delete');
             $scoreByCourseAnnualId->delete();
-
-
 
             $this->courseAnnuals->destroy($id);
             return Response::json(['status' => true, 'message' => 'Deleted!']);
