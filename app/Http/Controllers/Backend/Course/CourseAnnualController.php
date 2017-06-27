@@ -1490,7 +1490,6 @@ class CourseAnnualController extends Controller
                 } else {
                     $studentByCourse = $studentByCourse->orderBy('students.name_latin')->get();
                 }
-
             }
         }
         $listStudentIds = collect($studentByCourse)->pluck('student_id')->toArray();
@@ -1512,8 +1511,6 @@ class CourseAnnualController extends Controller
                 $scoreData = [];
 
                 if(!isset($redoubleStudentObjects[$student->student_id])) {
-
-
 
                     $totalScore = 0;
                     $checkPercent = 0;
