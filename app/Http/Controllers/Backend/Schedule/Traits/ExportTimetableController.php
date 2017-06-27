@@ -21,23 +21,23 @@ trait ExportTimetableController
     /**
      * @var EloquentTimetableSlotRepository
      */
-    protected $timetableSlotRepository;
+    protected $exportTimetableSlotRepository;
 
     /**
      * ExportTimetableController constructor.
-     * @param EloquentTimetableSlotRepository $timetableSlotRepository
+     * @param EloquentTimetableSlotRepository $exportTimetableSlotRepository
      */
-    public function __construct(EloquentTimetableSlotRepository $timetableSlotRepository)
+    public function __construct(EloquentTimetableSlotRepository $exportTimetableSlotRepository)
     {
-        $this->timetableSlotRepository = $timetableSlotRepository;
+        $this->exportTimetableSlotRepository = $exportTimetableSlotRepository;
     }
 
     /**
-     * @param EloquentTimetableSlotRepository $timetableSlotRepository
+     * @param EloquentTimetableSlotRepository $exportTimetableSlotRepository
      */
-    public function setTimetableSlotRepository($timetableSlotRepository)
+    public function setTimetableSlotRepository($exportTimetableSlotRepository)
     {
-        $this->timetableSlotRepository = $timetableSlotRepository;
+        $this->exportTimetableSlotRepository = $exportTimetableSlotRepository;
     }
 
     /**
@@ -178,16 +178,16 @@ trait ExportTimetableController
             $timetableSlots = $findTimetable->timetableSlots;
             $timetableSlotsLanguages = new Collection();
             // find student annual ids
-            $student_annual_ids = $this->timetableSlotRepository->find_student_annual_ids($findTimetable);
+            $student_annual_ids = $this->exportTimetableSlotRepository->find_student_annual_ids($findTimetable);
             // have many student annual ids
             if (count($student_annual_ids) > 0) {
                 // init array of dept language
                 $department_languages = array(12, 13); // (english, french)
                 foreach ($department_languages as $department_language) {
-                    $groups = $this->timetableSlotRepository->find_group_student_annual_form_language($department_language, $student_annual_ids, $findTimetable);
-                    $timetables = $this->timetableSlotRepository->get_timetables_form_language_by_student_annual($groups[0], $findTimetable, $department_language);
-                    $timetableSlotsLang = $this->timetableSlotRepository->get_timetable_slot_language_dept($timetables, $groups[0]);
-                    $this->timetableSlotRepository->set_timetable_slot_language($timetableSlotsLanguages, $timetableSlotsLang[1], $timetableSlotsLang[0]);
+                    $groups = $this->exportTimetableSlotRepository->find_group_student_annual_form_language($department_language, $student_annual_ids, $findTimetable);
+                    $timetables = $this->exportTimetableSlotRepository->get_timetables_form_language_by_student_annual($groups[0], $findTimetable, $department_language);
+                    $timetableSlotsLang = $this->exportTimetableSlotRepository->get_timetable_slot_language_dept($timetables, $groups[0]);
+                    $this->exportTimetableSlotRepository->set_timetable_slot_language($timetableSlotsLanguages, $timetableSlotsLang[1], $timetableSlotsLang[0]);
                 }
             }
 
