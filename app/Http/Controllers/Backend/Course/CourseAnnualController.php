@@ -634,6 +634,7 @@ class CourseAnnualController extends Controller
                         if ($midterm['percent'] > 0) {//---score midterm requested from user---
                             //----make change the record ---
                             $scores = DB::table('scores')->where('course_annual_id', $id);//---prevent if percentage created but score record was not created
+
                             if ($scores->get()) {
 
                                 $check_percentage = DB::table('percentages')->where('id', $midterm_id)->first();
@@ -644,6 +645,20 @@ class CourseAnnualController extends Controller
                                     $this->percentages->update($final_id, $final);
                                     //--delete scores from table scores
                                     $scores->update(['score' => null]);
+                                } else {
+
+                                    if(isset($final_id)) {
+                                        $check_final_percentage = DB::table('percentages')->where('id', $final_id)->first();
+
+                                        if($check_final_percentage->percent != $final['percent']) {
+                                            //---update percentage
+                                            $this->percentages->update($final_id, $final);
+                                            $this->percentages->update($midterm_id, $midterm);
+                                            //--delete scores from table scores
+                                            $scores->update(['score' => null]);
+                                        }
+
+                                    }
                                 }
 
                             } else {
@@ -1505,7 +1520,6 @@ class CourseAnnualController extends Controller
 
 
         if ($studentByCourse) {
-
 
             foreach ($studentByCourse as $student) {
                 $scoreData = [];
