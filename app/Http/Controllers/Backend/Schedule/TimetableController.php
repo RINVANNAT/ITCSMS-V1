@@ -63,6 +63,7 @@ class TimetableController extends Controller
         $this->timetableRepository = $timetableRepository;
         $this->setRepository($this->timetableRepository, $this->timetableSlotRepository);
         $this->setTimetableSlotRepo($timetableSlotRepository);
+        $this->setTimetableSlotRepository($timetableSlotRepository);
     }
 
     /**
