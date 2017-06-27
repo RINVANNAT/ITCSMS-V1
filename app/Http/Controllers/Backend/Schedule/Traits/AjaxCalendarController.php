@@ -52,6 +52,29 @@ trait AjaxCalendarController
     }
 
     /**
+     * @param EloquentRepeatRepository $repeatRepository
+     */
+    public function setRepeatRepository($repeatRepository)
+    {
+        $this->repeatRepository = $repeatRepository;
+    }
+
+    /**
+     * @param EloquentYearRepository $yearRepository
+     */
+    public function setYearRepository($yearRepository)
+    {
+        $this->yearRepository = $yearRepository;
+    }
+
+    /**
+     * @param EloquentEventRepository $eventRepository
+     */
+    public function setEventRepository($eventRepository)
+    {
+        $this->eventRepository = $eventRepository;
+    }
+    /**
      * Get all departments.
      *
      * @return mixed
