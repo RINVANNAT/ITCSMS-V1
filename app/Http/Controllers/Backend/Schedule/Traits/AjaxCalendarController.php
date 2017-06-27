@@ -35,23 +35,6 @@ trait AjaxCalendarController
     protected $repeatRepository;
 
     /**
-     * AjaxCalendarController constructor.
-     * @param EloquentYearRepository $eloquentYearRepository
-     * @param EloquentEventRepository $eloquentEventRepository
-     * @param EloquentRepeatRepository $eloquentRepeatRepository
-     */
-    public function __construct(
-        EloquentYearRepository $eloquentYearRepository,
-        EloquentEventRepository $eloquentEventRepository,
-        EloquentRepeatRepository $eloquentRepeatRepository
-    )
-    {
-        $this->yearRepository = $eloquentYearRepository;
-        $this->eventRepository = $eloquentEventRepository;
-        $this->repeatRepository = $eloquentRepeatRepository;
-    }
-
-    /**
      * @param EloquentRepeatRepository $repeatRepository
      */
     public function setRepeatRepository($repeatRepository)
