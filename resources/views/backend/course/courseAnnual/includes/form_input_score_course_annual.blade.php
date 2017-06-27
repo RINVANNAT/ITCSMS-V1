@@ -76,56 +76,66 @@
                     @foreach($availableCourses as $course_annual_id => $course)
                         @if($course_annual_id == $courseAnnual->id)
 
-                            <option value="{{$course_annual_id}}" selected> {{$courseAnnual->name_en.' /'.$course[0]->department_code.'/'.$course[0]->grade_id}}</option>
+                            <option value="{{$course_annual_id}}" selected> {{$course[0]->name_en}} {{ '|'.$course[0]->department_code.'-'.(($course[0]->degree_id ==1)?'I':'T').$course[0]->grade_id }} {{' |S_'.$course[0]->semester_id}}</option>
                         @else
-                            <option value="{{$course_annual_id}}"> {{$course[0]->name_en. '/'.$course[0]->department_code.'/'.$course[0]->grade_id}}</option>
+                            <option value="{{$course_annual_id}}"> {{$course[0]->name_en}} {{'|'.$course[0]->department_code.'-'.(($course[0]->degree_id ==1)?'I':'T').$course[0]->grade_id }} {{' |S_'.$course[0]->semester_id}}</option>
                         @endif
                     @endforeach
                 </select>
 
             </div>
-{{--            <label for="description" class="label label-success">{{$courseAnnual->academic_year->name_latin}} </label>--}}
-            @if(access()->user()->allow("input-score-without-blocking") || ($courseAnnual->is_allow_scoring && $mode == "edit"))
-            <button class="btn btn-primary btn-xs pull-right" id="save_editted_score" style="margin-left:5px">Save Changes!</button>
-            @endif
-            <a class="btn btn-primary btn-xs pull-right" id="export_score" href="{{route('course_annual.export_course_score_annual')}}" target="_blank" style="margin-left:5px">Export Score</a>
-            @if(access()->user()->allow("input-score-without-blocking") || ($courseAnnual->is_allow_scoring && $mode == "edit"))
-            <a href="{{route('course_annual.form_import_score')}}" target="_self" class="btn btn-info btn-xs pull-right" id="import_score" style="margin-left: 5px"> Import Score</a>
-            @endif
-            {{--<div class="btn-group pull-right btn_action_group">--}}
 
-                {{--<button type="button" class="btn btn-warning btn-xs dropdown-toggle" data-toggle="dropdown" aria-expanded="false">--}}
-                    {{--Actions <span class="caret"></span>--}}
-                {{--</button>--}}
-                {{--<ul class="dropdown-menu" role="menu">--}}
+            <div id="blog_button">
+                <a class="btn btn-primary btn-xs pull-right" id="export_score" href="{{route('course_annual.export_course_score_annual')}}" target="_blank" style="margin-left:5px">Export Score</a>
+                @if($courseAnnual->is_allow_scoring)
+                    @if($allowCloningScore)
+                        <button class="btn btn-success btn-xs pull-right" id="clone_score" data-toggle="tooltip" data-placement="top" title=" The action is to allow you to clone score of this course from responsible department!"  style="margin-left:5px"> Clone-Score </button>
+                    @else
+                        @if(access()->user()->allow("input-score-without-blocking") || ($courseAnnual->is_allow_scoring && $mode == "edit"))
+                            <button class="btn btn-primary btn-xs pull-right" id="save_editted_score" style="margin-left:5px">Save Changes!</button>
+                        @endif
+                        @if(access()->user()->allow("input-score-without-blocking") || ($courseAnnual->is_allow_scoring && $mode == "edit"))
+                            <a href="{{route('course_annual.form_import_score')}}" target="_self" class="btn btn-info btn-xs pull-right" id="import_score" style="margin-left: 5px"> Import Score</a>
+                        @endif
 
-                    {{--<li class="drop-menu"> <a href="#"  id="add_column"> <i class="fa fa-plus"> Add Score</i></a></li>--}}
-                    {{--<li class="drop-menu"> <a href="#"  id="get_average"> <i class="fa fa-circle-o-notch"> Generate Average</i></a></li>--}}
-                {{--</ul>--}}
-            {{--</div><!--btn group-->--}}
+                    @endif
+                @endif
+
+            </div>
+
         </div><!-- /.box-header -->
 
         <div class="box-body">
 
-            @if($mode == "view")
-            <div class="alert alert-info">
-                <h4><i class="icon fa fa-info"></i> Viewing mode!</h4>
-                <p>
-                    This is in viewing mode. You cannot delete or modify this course.
-                </p>
+            <div id="view_message">
+
+                @if($mode == "view")
+                    <div class="alert alert-info">
+                        <h4><i class="icon fa fa-info"></i> Viewing mode!</h4>
+                        <p>
+                            This is in viewing mode. You cannot delete or modify this course.
+                        </p>
+                    </div>
+                @elseif(!$courseAnnual->is_allow_scoring)
+                    <div class="alert alert-danger">
+                        <h4><i class="icon fa fa-info"></i> Scoring is blocked!</h4>
+                        <p>
+                            This course is blocked for scoring. Please contact student & study affair office if you wish to make change.
+                        </p>
+                    </div>
+                @endif
+
             </div>
-            @elseif(!$courseAnnual->is_allow_scoring)
-            <div class="alert alert-danger">
-                <h4><i class="icon fa fa-info"></i> Scoring is blocked!</h4>
-                <p>
-                    This course is blocked for scoring. Please contact student & study affair office if you wish to make change.
-                </p>
+
+            <div class="blog_body">
+
             </div>
-            @endif
 
             <div id="score_table" class="handsontable htColumnHeaders">
 
             </div>
+
+
         </div>
 
     </div><!--box-->
@@ -137,13 +147,9 @@
     {!! Html::style('plugins/handsontable-test/handsontable.full.min.css') !!}
     {!! Html::script('plugins/handsontable-test/handsontable.full.min.js') !!}
     {!! Html::script('plugins/jpopup/jpopup.js') !!}
-
-
-    {{--myscript--}}
+    {!! Html::script('score/js/input_score.js') !!}
 
     <script>
-
-
 
         @if($courseAnnual->is_counted_absence)
                 var is_counted_absence = parseInt('{{\App\Models\Enum\ScoreEnum::is_counted_absence}}')
@@ -151,36 +157,6 @@
                 var is_counted_absence = 0;
         @endif
 
-        function setSelectedRow() {
-
-            var current_rows = $(document).find(".current_row");
-            if(current_rows != null){
-                current_rows.removeClass("current_row");
-            }
-            $(".current").closest("tr").addClass("current_row");
-        }
-        function ajaxRequest (method, baseUrl, baseData) {
-            var result=null;
-            var ajax = $.ajax(result,{
-                type: method,
-                url: baseUrl,
-                data: baseData,
-                dataType: "json",
-                done: function(resultData) {
-                    result = resultData;
-                    if(resultData.status == true) {
-                        cellScoreChanges=[];
-//                        notify('success', 'info', resultData.message);
-
-                    } else {
-                        return resultData;
-//                        notify('error', 'info', resultData.message);
-                    }
-                }
-
-            });
-
-        }
 
         var objectStatus={};
         var array_col_status = {};
@@ -203,27 +179,8 @@
             for(var i = 0; i < setting.colHeaders.length -1 ; i++) {
                 colDataArray[setting.colHeaders[i]] = [];
 
-//                console.log(colDataArray);
             }
 
-
-        }
-        // use this function to update the table when success of ajax request
-        function updateSettingHandsontable(resultData) {
-            setting.data = resultData.data;
-            setting.colHeaders = resultData.columnHeader;
-            setting.columns = resultData.columns;
-
-            if(!resultData.should_add_score) {
-                $('.btn_action_group').hide();
-            } else {
-                $('.btn_action_group').show();
-            }
-            hotInstance.updateSettings({
-                data: resultData['data'],
-                colHeaders:resultData['columnHeader'],
-                columns:resultData['columns']
-            });
         }
 
         // this global variable is to tie each cell of the value the has over the limitted we will render them with specific color...this function will call by cell function
@@ -311,6 +268,7 @@
             className: "htLeft",
             cells: function (row, col, prop) {
 
+                var cellProperties = {};
                 if( ((prop != 'student_id_card')&& (prop != 'student_name')) && ((prop != 'student_gender')&& (prop != 'absence')) && (((prop != 'average')&& (prop != 'notation'))) ) {
                     this.renderer = colorRenderer;
                 }
@@ -321,6 +279,7 @@
                 if(prop == 'resit') {
                     this.renderer = colorRenderer;
                 }
+
             },
 
             beforeOnCellMouseDown: function (event,coord, TD) {
@@ -585,6 +544,8 @@
 
         $(document).ready(function() {
 
+            toggleLoading(true);
+
             var getDataBaseUrl = '{{route('admin.course.get_data_course_annual_score')}}';
 
             //--------------- when document ready call ajax
@@ -594,174 +555,10 @@
                 data: {course_annual_id: '{{$courseAnnualId}}' },
                 dataType: "json",
                 success: function(resultData) {
-
+                    toggleLoading(false);
                     if(resultData.status) {
 
-                        setting.data = resultData.data;
-                        setting.colHeaders = resultData.columnHeader;
-                        setting.columns = resultData.columns;
-//                        if(!resultData.should_add_score) {
-//                            $('.btn_action_group').hide();
-//                        }
-//                    setting.colWidths = resultData.colWidths;
-                        // loop for declaring array key of columns score with empty value ---> then we will push the cell score change for updating score value--> this idea is to reduce the amount of parametter that pass to the server
-                        declareColumnHeaderDataEmpty();
-
-                        var table_size = $('.box-body').width();
-                        var mainHeaderHeight = $('.main-header').height();
-                        var mainFooterHeight = $('.main-footer').height();
-                        var boxHeaderHeight = $('.box-header').height();
-                        var height = $(document).height();
-
-                        var tab_height = height - (mainHeaderHeight + mainFooterHeight + boxHeaderHeight + 70);
-
-                        setting.height=tab_height;
-                        setting.width=table_size;
-
-                        hotInstance = new Handsontable(jQuery("#score_table")[0], setting);
-
-                        $(window).on('resize', function(){
-                            var table_size = $('.box-body').width();
-                            setting.width=table_size;
-                            hotInstance.updateSettings({
-                                width:table_size
-                            });
-                        })
-
-                        hotInstance.updateSettings({
-                            contextMenu: {
-                                callback: function (key, options) {
-
-                                    if (key === 'deletecol') {
-
-                                        if(hotInstance.getSelected()) {
-
-                                            var colIndex = hotInstance.getSelected()[1]; //console.log(hotInstance.getSelected()[1]);// return index of column header count from 0 index
-
-                                            // check not allow to delete on the specific columns
-                                            if(((colIndex != 0) && (colIndex != 1)) && ((colIndex != 2) && (colIndex != 3)) && ((colIndex != 4) && (colIndex != setting.colHeaders.length-1)) && (colIndex != setting.colHeaders.length-2)) {
-
-                                                var colNmae = setting.colHeaders[colIndex];
-                                                var percentageId = setting.data[0]['percentage_id_'+colNmae];
-                                                var courseAnnualId = setting.data[0]['course_annual_id'];
-                                                var deleteUrl = '{{route('admin.course.delete-score')}}';
-                                                var baseData = {
-                                                    percentage_id: percentageId,
-                                                    percentage_name: colNmae,
-                                                    course_annual_id: $('select[name=available_course] :selected').val()
-                                                };
-
-
-                                                swal({
-                                                    title: "Confirm",
-                                                    text: "Delete Score??",
-                                                    type: "info",
-                                                    showCancelButton: true,
-                                                    confirmButtonColor: "#DD6B55",
-                                                    confirmButtonText: "Yes",
-                                                    closeOnConfirm: true
-                                                }, function(confirmed) {
-                                                    if (confirmed) {
-
-                                                        $.ajax({
-                                                            type: 'DELETE',
-                                                            url: deleteUrl,
-                                                            data: baseData,
-                                                            dataType: "json",
-                                                            success: function(resultData) {
-                                                                notify('success', 'info', 'Score Deleted!!');
-                                                                updateSettingHandsontable(resultData);
-                                                            },
-                                                            error:function(e) {
-                                                                notify('error', 'Delete Error!', 'Attention');
-                                                            }
-                                                        });
-
-                                                    }
-                                                });
-                                            } else {
-                                                notify('error', 'info', 'This Column is not Deletable');
-                                            }
-
-                                        } else {
-                                            notify('error', 'info', 'Column Score Not Selected!!')
-                                        }
-
-                                    }
-                                    if(key == 'freeze_column') {
-
-                                        if(hotInstance.getSelected()) {
-
-                                            var selectedColumn = hotInstance.getSelected()[1];
-
-                                            if(setting.fixedColumnsLeft) {
-
-                                                if (selectedColumn > setting.fixedColumnsLeft - 1) {
-
-                                                    freezeColumn(selectedColumn);
-                                                } else {
-                                                    unfreezeColumn(selectedColumn);
-                                                }
-
-                                            } else {
-
-                                                freezeColumn(selectedColumn);
-                                            }
-
-                                        }
-
-                                    }
-
-                                    function freezeColumn(column) {
-                                        setting.fixedColumnsLeft = column+1;
-                                        setting.manualColumnFreeze = true;
-                                        hotInstance.updateSettings({
-                                            fixedColumnsLeft: column + 1,
-                                            manualColumnFreeze: true
-                                        });
-                                    }
-
-                                    function unfreezeColumn(column) {
-
-
-                                        if (column > setting.fixedColumnsLeft - 1) {
-                                            return; // not fixed
-                                        }
-                                        removeFixedColumn(column+1);
-                                    }
-
-                                    function removeFixedColumn(column) {
-                                        hotInstance.updateSettings({
-                                            fixedColumnsLeft: column - 1
-                                        });
-                                        setting.fixedColumnsLeft--;
-                                    }
-                                },
-                                items: {
-
-//                                    "deletecol": {
-//                                        name: '<span><i class="fa fa-trash"> Delete Column</i></span>'
-//                                    },
-
-                                    "freeze_column": {
-                                        name: function() {
-                                            var selectedColumn = hotInstance.getSelected()[1];
-                                            if(setting.fixedColumnsLeft) {
-                                                if (selectedColumn > setting.fixedColumnsLeft - 1) {
-                                                    return '<span><i class="fa fa-fire"> Freeze This Column </i></span>';
-                                                } else {
-                                                    return '<span><i class="fa fa-leaf"> Unfreeze This Column </i></span>';
-                                                }
-                                            } else {
-                                                return '<span><i class="fa fa-fire"> Freeze This Column </i></span>';
-                                            }
-
-                                        }
-                                    }
-                                }
-                            }
-                        })
-
+                        init_input_score_table(resultData);
                     } else {
 
                         swal({
@@ -782,7 +579,8 @@
             });
         });
 
-        $('#save_editted_score').on('click', function() {
+        $(document).on('click','#save_editted_score', function() {
+
 
             var course_annual_id = $('#available_course :selected').val();
 
@@ -812,6 +610,8 @@
 
                             if (confirmed) {
 
+                                toggleLoading(true);
+
                                 if(cellScoreChanges.length > 0) {// save each score
 
                                     //recursive function fo send the request by the column data array
@@ -840,7 +640,8 @@
                                                         }
                                                     },
                                                     error: function(error) {
-                                                        colDataArray[setting.colHeaders[index]] = [];
+                                                            colDataArray[setting.colHeaders[index]] = [];
+                                                            notify('error', 'Something went wrong!');
                                                     }
                                                 })
                                             } else {
@@ -848,6 +649,8 @@
                                                 sendRequest(index, message);
                                             }
                                         } else {
+
+                                            toggleLoading(false);
                                             notify('success', 'Score Saved!', 'Info');
                                         }
                                     }
@@ -874,9 +677,10 @@
                                         dataType: "json",
                                         success: function(resultData) {
 
+                                            toggleLoading(false);
+
                                             if(resultData.status) {
                                                 notify('success', resultData.message, 'Info')
-
                                                 updateSettingHandsontable(resultData.handsonData);
 
                                             } else {
@@ -884,6 +688,9 @@
                                                 updateSettingHandsontable(resultData.handsonData);
                                             }
                                             cellChanges=[];
+                                        },
+                                        error:function(error) {
+                                            notify('error', 'Something went wrong!')
                                         }
                                     });
                                 }
@@ -897,11 +704,10 @@
                                         data: {baseData:resitScoreChange},
                                         dataType: "json",
                                         success: function(resultData) {
+                                            toggleLoading(false);
 
                                             if(resultData.status) {
-                                                notify('success', resultData.message, 'Info')
-
-                                                console.log(resultData);
+                                                notify('success', resultData.message, 'Info');
 
                                                 updateSettingHandsontable(resultData.handsontableData);
 
@@ -992,10 +798,91 @@
             var baseData = {
                 course_annual_id: $(this).val()
             }
+
+            checkCourse($(this).val());
             switch_course(baseData);
             list_group($(this).val());
 
         });
+
+        function checkCourse(course_id)
+        {
+            $.ajax({
+                type: 'POST',
+                url: '{{route('course_annual.is_allow_cloning_course')}}',
+                data: {_token:'{{csrf_token()}}', course_annual_id: course_id},
+                dataType: "json",
+                success: function(resultData) {
+                    if(resultData.allow_scoring) {
+
+                        if($('div#view_message').is(':visible')) {
+                            $('div#view_message').html('')
+                        }
+
+                        if(resultData.status) {// check if the course of department vocational SA or SF
+
+                            if(!$('#clone_score').is(':visible')) {
+                                $('#blog_button').append('<button class="btn btn-success btn-xs pull-right" id="clone_score" data-toggle="tooltip" data-placement="top" title=" The action is to allow you to clone score of this course from responsible department!"  style="margin-left:5px"> Clone-Score </button>')
+                            }
+
+                            @if(access()->user()->allow("input-score-without-blocking") || ($courseAnnual->is_allow_scoring && $mode == "edit"))
+                                if($('#save_editted_score').is(':visible')) {
+                                   $('#blog_button').find('#save_editted_score').remove();
+                                }
+                            @endif
+
+                            @if(access()->user()->allow("input-score-without-blocking") || ($courseAnnual->is_allow_scoring && $mode == "edit"))//import_score
+                                if($('#import_score').is(':visible')) {
+                                    $('#blog_button').find('#import_score').remove();
+                                }
+                            @endif
+
+                        } else {
+
+                            if($('#clone_score').is(':visible')) {
+                                $('#blog_button').find('#clone_score').remove();
+                            }
+
+                            @if(access()->user()->allow("input-score-without-blocking") || ($courseAnnual->is_allow_scoring && $mode == "edit"))
+                            if(!$('#save_editted_score').is(':visible')) {
+                                $('#blog_button').append('<button class="btn btn-primary btn-xs pull-right" id="save_editted_score" style="margin-left:5px">Save Changes!</button>')
+                            }
+                            @endif
+                            @if(access()->user()->allow("input-score-without-blocking") || ($courseAnnual->is_allow_scoring && $mode == "edit"))//import_score
+                            if(!$('#import_score').is(':visible')) {
+                                $('#blog_button').append('<a href="{{route('course_annual.form_import_score')}}" target="_self" class="btn btn-info btn-xs pull-right" id="import_score" style="margin-left: 5px"> Import Score</a>')
+                            }
+                            @endif
+
+                        }
+                    } else{
+
+
+                        var div = '<div class="alert alert-danger">' +
+                                '<h4><i class="icon fa fa-info"></i> Scoring is blocked!</h4>' +
+                                'This course is blocked for scoring. Please contact student & study affair office if you wish to make change.'+
+                                '</p>' +
+                                '</div>';
+
+                        $('div#view_message').html(div)
+                        if($('#save_editted_score').is(':visible')) {
+                            $('#blog_button').find('#save_editted_score').remove();
+                        }
+                        if($('#import_score').is(':visible')) {
+                            $('#blog_button').find('#import_score').remove();
+                        }
+
+                        if($('#clone_score').is(':visible')) {
+                            $('#blog_button').find('#clone_score').remove();
+                        }
+                    }
+                },
+                error:function(error) {
+                    notify('error', 'Something went wrong', 'Server Error')
+                }
+            });
+
+        }
 
         $(document).ready(function() {
             if(val = $('select[name=available_course] :selected').val()) {
@@ -1005,6 +892,8 @@
 
         function switch_course(baseData) {
 
+            toggleLoading(true);
+
             $.ajax({
                 type: 'POST',
                 url: '{{route('course_annual.ajax_switch_course_annual')}}',
@@ -1012,8 +901,9 @@
                 dataType: "json",
                 success: function(resultData) {
 
-                    updateSettingHandsontable(resultData);
-                    declareColumnHeaderDataEmpty()
+                    toggleLoading(false);
+                    init_input_score_table(resultData);
+
                 }
             });
         }
@@ -1074,7 +964,7 @@
 
         });
 
-        $('#import_score').on('click', function(e) {
+        $(document).on('click','#import_score', function(e) {
             e.preventDefault();
             var url = $(this).attr('href');
             var colHeaders = setting.colHeaders
@@ -1121,6 +1011,80 @@
          @if(session('status'))
             notify('success', '{{session('status')}}', 'Info')
         @endif
+
+
+        $(document).on('click', '#clone_score', function(e) {
+
+            var count_group = $('select[name=group_name] option').length;
+            var url = '{{route('course_annual.popup_clone_score_panel')}}'
+
+           /* if(count_group >= parseInt('{{\App\Models\Enum\GroupEnum::TEN}}')) {
+                PopupCenterDual(url+'?course_annual_id='+$('select#available_course :selected').val(),'Popup Clone Score','730','450');
+            } else {
+
+
+            }*/
+
+            var baseData = {
+                course_annual_id: $('select#available_course :selected').val(),
+                group_id: $('select#group_name :selected').val()
+            }
+
+            toggleLoading(true);
+            cloning(baseData, status = false);
+        });
+
+
+        function cloning(baseData, status ) {
+
+            $.ajax({
+                type: 'GET',
+                url: '{{route('course_annual.clone_score')}}',
+                data: baseData,
+                dataType: "JSON",
+                success: function(resultData) {
+
+                    var div_message = '<div class="alert alert-warning">' +
+                            '<h4><i class="icon fa fa-info"></i> Clone Score Warning!</h4>' +
+                            '<p>' +
+                            resultData.message +
+                            '</p>' +
+                            '</div>';
+
+
+                    if(resultData.status) {
+                        toggleLoading(status)
+
+                        notify('success', resultData.message, 'Clone Score!')
+                        switch_course(baseData);
+                        $('div.blog_body').html('');
+                        if(!$('div#score_table').is(':visible')) {
+                            $('div#score_table').show()
+                        }
+                    } else {
+                        //notify('error', resultData.message, 'Clone Score!')
+
+                        $('div#score_table').hide()
+                        toggleLoading(status)
+                        if(resultData.edit_url) {
+
+                            var btn_back = '<a href="' +resultData.edit_url+'" class="btn btn-xs btn-danger">'+
+                                    'Update Course Panel' +
+                                    '</a>';
+                            $('div.blog_body').html(div_message + btn_back);
+                        } else {
+                            var btn_back = '<a href="/admin/course/course_annual" class="btn btn-xs btn-danger">'+
+                                    'Close' +
+                                    '</a>';
+                            $('div.blog_body').html(div_message + btn_back);
+                        }
+                    }
+                },
+                error:function(error) {
+
+                }
+            });
+        }
 
     </script>
 @stop

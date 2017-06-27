@@ -5,6 +5,7 @@ namespace App\Repositories\Backend\CourseAnnual;
 
 use App\Exceptions\GeneralException;
 use App\Models\CourseAnnual;
+use App\Models\UserLog;
 use Carbon\Carbon;
 
 /**
@@ -51,9 +52,9 @@ class EloquentCourseAnnualRepository implements CourseAnnualRepositoryContract
     }
 
     /**
-     * @param  $input
+     * @param $input
+     * @return CourseAnnual
      * @throws GeneralException
-     * @return bool
      */
     public function create($input)
     {
@@ -106,6 +107,14 @@ class EloquentCourseAnnualRepository implements CourseAnnualRepositoryContract
         }
         $courseAnnual->department_option_id = $input['department_option_id'];
 
+        if(isset($input['reference_course_id']) && $input['reference_course_id'] != '' &&  is_numeric($input['reference_course_id'])) {
+            $courseAnnual->reference_course_id = $input['reference_course_id'];
+        } else{
+            $courseAnnual->reference_course_id = null;
+        }
+
+
+
         $courseAnnual->name_kh = isset($input['name_kh'])?$input['name_kh']:null;
         $courseAnnual->name_en = isset($input['name_en'])?$input['name_en']:null;
         $courseAnnual->name_fr = isset($input['name_fr'])?$input['name_fr']:null;
@@ -117,6 +126,13 @@ class EloquentCourseAnnualRepository implements CourseAnnualRepositoryContract
         $courseAnnual->create_uid = auth()->id();
 
         if ($courseAnnual->save()) {
+
+            $storeData = json_encode($courseAnnual);
+            UserLog::log([
+                'model' => 'CourseAnnual',
+                'action'   => 'Create', // Import, Create, Delete, Update
+                'data'     => $storeData // if it is create action, store only the new id.
+            ]);
             return $courseAnnual;
         }
 
@@ -193,6 +209,11 @@ class EloquentCourseAnnualRepository implements CourseAnnualRepositoryContract
         if(isset($input["credit"]) && $input["credit"] != '') {
             $courseAnnual->credit = $input['credit'];
         }
+        if(isset($input['reference_course_id']) && $input['reference_course_id'] != '' &&  is_numeric($input['reference_course_id'])) {
+            $courseAnnual->reference_course_id = $input['reference_course_id'];
+        } else{
+            $courseAnnual->reference_course_id = null;
+        }
 
         if(isset($input["is_counted_absence"])){
             $courseAnnual->is_counted_absence = true;
@@ -216,6 +237,13 @@ class EloquentCourseAnnualRepository implements CourseAnnualRepositoryContract
         $courseAnnual->write_uid = auth()->id();
 
         if ($courseAnnual->save()) {
+
+            $storeData = json_encode($courseAnnual);
+            UserLog::log([
+                'model' => 'CourseAnnual',
+                'action'   => 'Update', // Import, Create, Delete, Update
+                'data'     => $storeData // if it is create action, store only the new id.
+            ]);
             return $courseAnnual;
         }
 
@@ -258,6 +286,13 @@ class EloquentCourseAnnualRepository implements CourseAnnualRepositoryContract
         }
 
         if ($model->delete()) {
+
+            $storeData = json_encode($model);
+            UserLog::log([
+                'model' => 'CourseAnnual',
+                'action'   => 'Destroy', // Import, Create, Delete, Update
+                'data'     => $storeData // if it is create action, store only the new id.
+            ]);
             return true;
         }
 

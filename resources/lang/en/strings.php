@@ -65,7 +65,27 @@ return [
 
         'course_annual' => [
             'no_student_record' => ' This course is not yet created for any students please check your course again if something go wrong!',
-            'wrong_option' => 'Please Choose the correct departemnt -> option-> degree -> grade ! Then click the button refresh!'
+            'wrong_option' => 'Please Choose the correct department -> option-> degree -> grade ! Then click the button refresh!'
+        ],
+        'timetable' => [
+            'in_progress' => 'You can start create timetable.',
+            'waiting' => 'You\'re not allowed to create timetable yet',
+            'finished' => 'You have no more time to create timetable.',
+            'start_at' => 'You can start at ',
+            'start_from' => 'You can start from ',
+            'message_waiting' => 'From now, you can\'t create timetable. Please wait till your turn',
+            'message_finished' => 'If you want to create timetable, please contact to ',
+            'message_progress' => 'Now, you can create timetable. Please make sure that you finish your work on time.',
+            'status' => 'Status',
+            'to' => 'To',
+            'from' => 'Form',
+            // create timetable, course section.
+            'block_drag_course_session' => 'Dragging course session is blocked',
+            'desc_block_drag_course_session' => 'You are not allow to drag course session. Please contact to Study Office to get more information.',
+            // create timetable, room section
+            'block_add_room' => 'Adding room is blocked',
+            'desc_block_add_room' => 'You are not allow to add room. Please contact to Study Office to get more information.',
+            'search_room' => 'SEARCH ROOM'
         ]
     ],
 

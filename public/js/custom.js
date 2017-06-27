@@ -122,7 +122,6 @@ function notify(type, message, title){
 
 function totalScoreNotification(type, message, title) {
 
-
     toastr.options = {
         "closeButton": true,
         "debug": false,

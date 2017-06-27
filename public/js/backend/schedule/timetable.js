@@ -1,48 +1,3 @@
-$(document).ready(function () {
-    toastr.options = {
-        "closeButton": true,
-        "debug": false,
-        "newestOnTop": true,
-        "progressBar": false,
-        "positionClass": "toast-bottom-right",
-        "preventDuplicates": false,
-        "onclick": null,
-        "showDuration": "300",
-        "hideDuration": "1000",
-        "timeOut": "5000",
-        "extendedTimeOut": "1000",
-        "showEasing": "swing",
-        "hideEasing": "linear",
-        "showMethod": "fadeIn",
-        "hideMethod": "fadeOut"
-    };
-});
-
-/*Drag course session into timetable.*/
-function drag_course_session() {
-
-    $('.courses .course-item').each(function () {
-        // store data so the calendar knows to render an event upon drop
-        $(this).data('event', {
-            slot_id: $(this).find('.slot-id').text(),
-            course_session_id: $(this).find('.courses-session-id').text(),
-            course_name: $(this).find('.course-name').text(),
-            class_name: 'course-item',
-            teacher_name: $(this).find('.teacher-name').text(),
-            course_type: $(this).find('.course-type').text(),
-            times: $(this).find('.times').text()
-        });
-        if ($(this).data('event').teacher_name != 'Unsigned') {
-            // make the event draggable using jQuery UI
-            $(this).draggable({
-                zIndex: 999,
-                revert: true,      // will cause the event to go back to its
-                revertDuration: 0  //  original position after the drag
-            });
-        }
-    });
-}
-
 /** Get rooms. **/
 function get_groups() {
     toggleLoading(true);
@@ -51,7 +6,7 @@ function get_groups() {
         url: '/admin/schedule/timetables/get_groups',
         data: $('#options-filter').serialize(),
         success: function (response) {
-            if (response.status == true) {
+            if (response.status === true) {
                 var group_item = '';
                 $.each(response.groups, function (key, val) {
                     group_item += '<option value="' + val.id + '">' + val.name + '</option>';
@@ -125,29 +80,58 @@ function get_options(department_id) {
         },
         error: function () {
             swal(
-                'Oops...',
+                'Get Options',
+                'Something went wrong!',
+                'error'
+            );
+        },
+        complete: function () {
+            get_grades(department_id);
+            toggleLoading(false);
+        }
+    });
+}
+
+
+function get_grades(department_id) {
+    $.ajax({
+        type: 'POST',
+        url: '/admin/schedule/timetables/get_grades',
+        data: {department_id: department_id},
+        success: function (response) {
+            if (response.status === true) {
+                var grades = '';
+                $.each(response.grades, function (key, val) {
+                    console.log
+                    grades += '<option value="' + val.id + '">' + val.name_en + '</option>';
+                });
+                $('select[name="grade"]').html(grades);
+            }
+        },
+        error: function () {
+            swal(
+                'Get Grades',
                 'Something went wrong!',
                 'error'
             );
         },
         complete: function () {
             get_groups();
-            toggleLoading(false);
         }
-    });
+    })
 }
-
 /** Get course sessions. **/
 function get_course_sessions() {
+    toggleLoading(true);
     $.ajax({
         type: 'POST',
         url: '/admin/schedule/timetables/get_course_sessions',
         data: $('#options-filter').serialize(),
         success: function (response) {
-            if (response.status == true) {
+            if (response.status === true) {
                 var course_session_item = '';
                 $.each(response.course_sessions, function (key, val) {
-                    if (val.teacher_name == null) {
+                    if (val.teacher_name === null) {
                         course_session_item += '<li class="course-item disabled">';
                     }
                     else {
@@ -158,16 +142,16 @@ function get_course_sessions() {
                         '<i class="fa fa-ellipsis-v"></i>' +
                         '</span>' +
                         '<span class="text course-name">' + val.course_name + '</span><br>';
-                    if (val.teacher_name == null) {
+                    if (val.teacher_name === null) {
                         course_session_item += '<span style="margin-left: 28px;" class="teacher-name bg-danger badge">Unsigned</span><br/>';
                     } else {
                         course_session_item += '<span style="margin-left: 28px;" class="teacher-name">' + val.teacher_name + '</span><br/>';
                     }
-                    if (val.tp != 0) {
+                    if (val.tp !== 0) {
                         course_session_item += '<span style="margin-left: 28px;" class="course-type">TP</span> : ' +
                             '<span class="times">' + val.remaining + '</span> H'
                     }
-                    else if (val.td != 0) {
+                    else if (val.td !== 0) {
                         course_session_item += '<span style="margin-left: 28px;" class="course-type">TD</span> : ' +
                             '<span class="times">' + val.remaining + '</span> H'
                     }
@@ -192,8 +176,8 @@ function get_course_sessions() {
                 'error'
             );
         },
-        complete: function () {
-
+        complete:function () {
+            toggleLoading(false);
         }
     });
 }
@@ -205,7 +189,7 @@ function search_rooms(query) {
         url: '/admin/schedule/timetables/search_rooms',
         data: {query: query},
         success: function (response) {
-            if (response.status == true) {
+            if (response.status === true) {
                 var room_item = '';
                 $.each(response.rooms, function (key, val) {
                     room_item += '<div class="room-item" id="' + val.id + '">'

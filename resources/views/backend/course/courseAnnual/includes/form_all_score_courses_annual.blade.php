@@ -56,10 +56,10 @@
 
             .selection {
 
-                width: 80px;
+                /*width: 80px;
                 font-size: 10pt;
                 height: 23px;
-                margin-left: 5px;
+                margin-left: 5px;*/
             }
 
             /*@-moz-document url-prefix() { !* targets Firefox only *!
@@ -68,17 +68,6 @@
 
                 }
             }*/
-            #filter_academic_year {
-                font-size: 10pt;
-                height: 23px;
-                margin-left: 5px;
-            }
-
-            #filter_semester {
-                font-size: 10pt;
-                height: 23px;
-                margin-left: 5px;
-            }
 
             .h4 {
                 text-align: left;
@@ -145,8 +134,16 @@
             .top a {
                 color: black;
             }
+
+            .col-sm-3 {
+                width:16.2%;
+
+            }
+            .left-margin {
+                margin-left: 5px;
+            }
         </style>
-        <div class="box-header with-border">
+        <div class="box-header with-border" style="margin-bottom: 0px">
 
             <div class=" no-paddingcol-sm-12">
 
@@ -169,75 +166,100 @@
                         </li>
 
                     </ul>
+
                 </div>
+
+
 
                 <div class="pull-right">
 
-                    <button class="btn btn-primary btn-xs col-sm-1" id="refresh_score_sheet" style="margin-left: -50px">
-                        <i class="fa fa-refresh"></i></button>
+                    <button class="btn btn-primary" data-toggle="tooltip" style="margin-left: 5px" data-placement="left"  title="Refresh-Table" id="refresh_score_sheet" >
+                        <i class="fa fa-refresh" ></i>
+                    </button>
 
-                    <select name="academic_year" id="filter_academic_year" style="width: 100px;" class=" col-sm-1">
-                        @foreach($academicYears as $key=>$year)
-                            <option value="{{$key}}"> {{$year}}</option>
-                        @endforeach
-                    </select>
+                    <button class="btn btn-success" data-toggle="tooltip" data-placement="left"  title="Change Option" id="change_option" >
+                        <i class="fa fa-stack-exchange" ></i>
+                    </button>
 
-                    <select name="department" id="filter_dept" class="selection col-sm-1">
-                        @foreach($departments as $key=>$departmentName)
-                            <option value="{{$key}}"> {{$departmentName}}</option>
-                        @endforeach
-                    </select>
-
-                    <select name="dept_option" id="filter_dept_option" class="selection col-sm-1">
-                        <option value="">Option</option>
-                        @foreach($departmentOptions as $option)
-                            <option value="{{$option->id}}"
-                                    class="dept_option department_{{$option->department_id}}">{{$option->code}}</option>
-                        @endforeach
-                    </select>
-
-                    <select name="semester" id="filter_semester" style="width: 90px;" class=" col-sm-1">
-                        @foreach($semesters as $key=>$semester)
-                            <option value="{{$key}}"> {{$semester}}</option>
-                        @endforeach
-                        <option value=""> Semesters</option>
-                    </select>
-
-                    <select name="degree" id="filter_degree" class="selection  col-sm-1">
-                        @foreach($degrees as $key=>$degreeName)
-                            <option value="{{$key}}"> {{$degreeName}}</option>
-                        @endforeach
-                    </select>
-
-
-                    <select name="grade" id="filter_grade" class="selection col-sm-1">
-                        @foreach($grades as $key=>$gradeName)
-
-                            @if($department_id = \App\Models\Enum\ScoreEnum::Dept_TC)
-
-                                @if($key == \App\Models\Enum\ScoreEnum::Year_1)
-
-                                    <option id="{{$key}}" value="{{$key}}" selected> {{$gradeName}}</option>
-                                @else
-                                    <option id="{{$key}}" value="{{$key}}"> {{$gradeName}}</option>
-                                @endif
-
-                            @else
-                                @if($key == \App\Models\Enum\ScoreEnum::Year_3)
-
-                                    <option id="{{$key}}" value="{{$key}}" selected> {{$gradeName}}</option>
-                                @else
-                                    <option id=" {{$key}}" value="{{$key}}"> {{$gradeName}}</option>
-                                @endif
-
-                            @endif
-
-                        @endforeach
-                    </select>
 
                 </div>
             </div>
 
+            <div class="text-center" style="margin-bottom: 0px">
+                <label  style="font-size: 12pt; margin-bottom: -20px">
+                    RELEVE DES NOTE CONTROLE: <Strong style="color: darkgreen; font-size: 14pt; font-weight: bold" id="class_title"> GEE-I3 |~EAT </Strong>
+                <p  style="font-size: 10pt" class="text-center">Année Scolaire <strong style="color: darkgreen; font-weight: bold; font-size: 12pt" id="year_name_latin"> 2016-2017 </strong></p>
+
+                </label>
+
+            </div>
+
+        </div>
+
+        <div class="selection_blog col-sm-12 box" style="padding-right: 0px; margin-bottom: 10px; margin-top: 5px; border-top: 0px!important;">
+
+            <select name="academic_year" id="filter_academic_year"  class=" form-control col-sm-3">
+                @foreach($academicYears as $key=>$year)
+                    <option value="{{$key}}"> {{$year}}</option>
+                @endforeach
+            </select>
+
+            <select name="department" id="filter_dept" class="left-margin form-control col-sm-3">
+                @foreach($departments as $key=>$departmentName)
+                    <option value="{{$key}}"> {{$departmentName}}</option>
+                @endforeach
+            </select>
+
+            <select name="dept_option" id="filter_dept_option" class="left-margin form-control col-sm-3">
+                <option value="">Option</option>
+                @foreach($departmentOptions as $option)
+                    <option value="{{$option->id}}"
+                            class="dept_option department_{{$option->department_id}}">{{$option->code}}</option>
+                @endforeach
+            </select>
+
+            <select name="semester" id="filter_semester"  class="left-margin form-control col-sm-3">
+                @foreach($semesters as $key=>$semester)
+                    <option value="{{$key}}"> {{$semester}}</option>
+                @endforeach
+                <option value=""> Semesters</option>
+            </select>
+
+            <select name="degree" id="filter_degree" class="left-margin form-control  col-sm-3">
+                @foreach($degrees as $key=>$degreeName)
+                    <option value="{{$key}}"> {{$degreeName}}</option>
+                @endforeach
+            </select>
+
+
+            <select name="grade" id="filter_grade" class="left-margin form-control col-sm-3" style="margin-bottom: 5px">
+                @foreach($grades as $key=>$gradeName)
+
+                    @if($department_id = \App\Models\Enum\ScoreEnum::Dept_TC)
+
+                        @if($key == \App\Models\Enum\ScoreEnum::Year_1)
+
+                            <option id="{{$key}}" value="{{$key}}" selected> {{$gradeName}}</option>
+                        @else
+                            <option id="{{$key}}" value="{{$key}}"> {{$gradeName}}</option>
+                        @endif
+
+                    @else
+                        @if($key == \App\Models\Enum\ScoreEnum::Year_3)
+
+                            <option id="{{$key}}" value="{{$key}}" selected> {{$gradeName}}</option>
+                        @else
+                            <option id=" {{$key}}" value="{{$key}}"> {{$gradeName}}</option>
+                        @endif
+
+                    @endif
+
+                @endforeach
+            </select>
+
+            {{--<button class="btn btn-primary pull-right" style="margin-right: 10px" id="ok_option" >
+                Ok
+            </button>--}}
         </div>
         <!-- /.box-header -->
         @if (session('status'))
@@ -251,6 +273,9 @@
             </div>
         @endif
         <div class="box-body panel">
+            <div id="blog_message">
+
+            </div>
             <div id="all_score_course_annual_table" class="table table-striped handsontable htColumnHeaders">
 
             </div>
@@ -265,84 +290,11 @@
     {!! Html::style('plugins/handsontable-test/handsontable.full.min.css') !!}
     {!! Html::script('plugins/handsontable-test/handsontable.full.min.js') !!}
     {!! Html::script('plugins/jpopup/jpopup.js') !!}
+    {!! Html::script('js/backend/course/courseAnnual/all_score.js') !!}
     {{--myscript--}}
 
     <script>
 
-
-        function setSelectedRow() {
-
-            var current_rows = $(document).find(".current_row");
-            if (current_rows != null) {
-                current_rows.removeClass("current_row");
-            }
-            $(".current").closest("tr").addClass("current_row");
-        }
-
-        function ajaxRequest(method, baseUrl, baseData) {
-            $.ajax({
-                type: method,
-                url: baseUrl,
-                data: baseData,
-                dataType: "json",
-                success: function (resultData) {
-                    if (resultData.status == true) {
-                        notify('success', 'info', resultData.message);
-
-                    } else {
-                        notify('error', 'info', resultData.message);
-                    }
-                }
-            });
-        }
-        var colorRenderer = function (instance, td, row, col, prop, value, cellProperties) {
-
-            Handsontable.renderers.TextRenderer.apply(this, arguments);
-
-            if (prop == 'Redouble') {
-//                td.textContent = '<div class="htAutocompleteArrow"> ▼ </div>'
-//                td.div =
-            }
-
-            if (jQuery.isNumeric(value)) {
-                if (value < parseInt('{{\App\Models\Enum\ScoreEnum::Pass_Moyenne}}')) {
-                    if (prop != 'number') {
-                        if (prop != 'Rank' && prop != 'Rattrapage') {
-                            var check = prop.split('_');
-                            if (check[0] != 'Abs') {
-
-                                if (prop != 'total') {
-                                    var colSemester = prop.split('_');
-                                    if (colSemester[0] != 'S') {
-
-                                        if (value < parseInt('{{\App\Models\Enum\ScoreEnum::Under_30}}')) {
-
-                                            if (value <= parseInt('{{\App\Models\Enum\ScoreEnum::Score_10}}')) {
-                                                td.style.backgroundColor = '#A41C00';
-                                            } else {
-                                                td.style.backgroundColor = '#F76A4D';
-                                            }
-
-                                        } else {
-                                            td.style.backgroundColor = '#D2B500';
-                                        }
-
-                                    }
-                                }
-                            }
-
-                        }
-                    }
-
-                }
-                var check = prop.split('_');
-
-                if (check[0] == 'Abs') {
-                    td.style.backgroundColor = '#E6E6E8'
-                }
-            }
-
-        };
         var table_width;
         var hotInstance;
         var print_url = "{{route('admin.course.print_total_score')}}";
@@ -469,9 +421,9 @@
                             if (oldValue != newValue) {
 
                                 /*if(newValue == 'P') {
-                                    var colInt = setting.nestedHeaders;
-                                    //hotInstance.setDataAtCell(rowIndex, colInt[1].indexOf("redouble"), '');
-                                }*/
+                                 var colInt = setting.nestedHeaders;
+                                 //hotInstance.setDataAtCell(rowIndex, colInt[1].indexOf("redouble"), '');
+                                 }*/
 
                                 var remark_rul = '{{route('student.update_status')}}';
                                 var baseData_redouble = {
@@ -481,7 +433,7 @@
                                     old_value: oldValue
                                 };
 
-                                if(newValue != '' && newValue != null) {
+                                if (newValue != '' && newValue != null) {
                                     $.ajax({
                                         type: 'POST',
                                         url: remark_rul,
@@ -503,11 +455,15 @@
                         }
 
                         @endauth
-                        @permission('write-student-remark')
+                                @permission('write-student-remark')
 
                         if (columnIndex == 'Remark') {
                             var remark_rul = '{{route('course_annual.save_each_cell_remark')}}';
-                            var baseData_remark = {student_id_card: col_student_id[rowIndex], remark: newValue};
+                            var baseData_remark = {
+                                student_id_card: col_student_id[rowIndex],
+                                remark: newValue,
+                                academic_year_id: $('#filter_academic_year :selected').val()
+                            };
 
                             $.ajax({
                                 type: 'POST',
@@ -524,7 +480,11 @@
 
                         if (columnIndex == 'General_Remark') {
                             var remark_rul = '{{route('course_annual.save_each_cell_general_remark')}}';
-                            var baseData_remark = {student_id_card: col_student_id[rowIndex], general_remark: newValue};
+                            var baseData_remark = {
+                                student_id_card: col_student_id[rowIndex],
+                                general_remark: newValue,
+                                academic_year_id: $('#filter_academic_year :selected').val()
+                            };
 
                             $.ajax({
                                 type: 'POST',
@@ -537,8 +497,6 @@
                                 }
                             });
                         }
-
-
                     })
                 }
             }
@@ -550,20 +508,15 @@
 
             $("#btn-print").on("click", function () {
 
-                var department_id = $('#filter_dept :selected').val();
-                var degree_id = $('#filter_degree :selected').val();
-                var grade_id = $('#filter_grade').val();
-                var academic_year_id = $('#filter_academic_year :selected').val();
-                var semester_id = $('#filter_semester :selected').val();
-                var dept_option_id = $('#filter_dept_option :selected').val();
+                var baseData = getBaseData();
 
                 var win = window.open(print_url +
-                        "?department_id=" + department_id +
-                        "&degree_id=" + degree_id +
-                        "&grade_id=" + grade_id +
-                        "&academic_year_id=" + academic_year_id +
-                        "&semester_id=" + semester_id +
-                        "&dept_option_id=" + dept_option_id
+                        "?department_id=" + baseData.department_id +
+                        "&degree_id=" + baseData.degree_id +
+                        "&grade_id=" + baseData.grade_id +
+                        "&academic_year_id=" + baseData.academic_year_id +
+                        "&semester_id=" + baseData.semester_id +
+                        "&dept_option_id=" + baseData.dept_option_id
                         , '_blank');
                 win.focus();
             });
@@ -572,14 +525,7 @@
             $('#btn_export_score').on('click', function () {
 
                 var route_export = '{{route('course_annual.export_view_total_score')}}'
-                var D = {
-                    department_id: $('#filter_dept :selected').val(),
-                    degree_id: $('#filter_degree :selected').val(),
-                    grade_id: $('#filter_grade :selected').val(),
-                    academic_year_id: $('#filter_academic_year :selected').val(),
-                    semester_id: $('#filter_semester :selected').val(),
-                    dept_option_id: $('#filter_dept_option :selected').val()
-                }
+                var D = getBaseData();
 
                 window.open(route_export + '?department_id=' + D.department_id +
                         '&degree_id=' + D.degree_id +
@@ -619,16 +565,10 @@
 
         function initTable() {
 
+            setTitle();
             toggleLoading(true);
             var BaseUrl = '{{route('admin.course.get_all_handsontable_data')}}';
-            var BaseData = {
-                department_id: $('#filter_dept :selected').val(),
-                degree_id: $('#filter_degree :selected').val(),
-                grade_id: $('#filter_grade').val(),
-                academic_year_id: $('#filter_academic_year :selected').val(),
-                semester_id: $('#filter_semester :selected').val(),
-                dept_option_id: $('#filter_dept_option :selected').val(),
-            }
+            var BaseData = getBaseData();
 
             //--------------- when document ready call ajax
 
@@ -643,25 +583,8 @@
                     toggleLoading(false);
                     if (resultData.status == false) {
 
-
-                        notify('error', resultData.message);
-                        /*swal({
-                            title: "Attention",
-                            text: 'Please Check Incase Yours Department Option Is Not Select!!',
-                            type: "warning",
-                            confirmButtonColor: "red",
-                            confirmButtonText: "Close",
-                            closeOnConfirm: true
-                        }, function (confirmed) {
-                            if (confirmed) {
-                                // do some staff if you want ---
-
-                            }
-                        });*/
-
+                        showMessage( resultData, true);
                     } else {
-
-
                         setting.data = resultData.data;
                         setting.nestedHeaders = resultData.nestedHeaders;
                         setting.colWidths = resultData.colWidths;
@@ -678,7 +601,9 @@
 
                         setting.height = tab_height;
 
-                        hotInstance = new Handsontable(jQuery("#all_score_course_annual_table")[0], setting);
+                        showMessage( resultData, false);
+
+                        hotInstance = new Handsontable(jQuery("div#all_score_course_annual_table")[0], setting);
                         assignNumberRattrapage();// ---after initial handsontable
                         hotInstance.updateSettings({
                             contextMenu: {
@@ -709,7 +634,7 @@
                                                 }
                                             }
 
-                                            if (col > 3 && col < (hotInstance.countCols() - 5)) {
+                                            if (col > 3 && col < (hotInstance.countCols() - 6)) {
 
                                                 arrayData.sort(SortByScore);
                                                 var sortedData = [];
@@ -809,39 +734,32 @@
                                     }
                                 }
                             }
-                        })
+                        });
                     }
 
                 }
             });
 
-
             $(window).resize(function () {
 
                 var table_width = $('.box-body').width();
-//                alert(table_width);
-                setting.width = table_width;
-                hotInstance.updateSettings({
-                    width: table_width
-                });
+
+                if(hotInstance) {
+                    setting.width = table_width;
+                    hotInstance.updateSettings({
+                        width: table_width
+                    });
+                }
+
             });
         }
 
         function filter_table() {
 
             toggleLoading(true);
-            var BaseData = {
-                department_id: $('#filter_dept :selected').val(),
-                degree_id: $('#filter_degree :selected').val(),
-                grade_id: $('#filter_grade :selected').val(),
-                academic_year_id: $('#filter_academic_year :selected').val(),
-                semester_id: $('#filter_semester :selected').val(),
-                dept_option_id: $('#filter_dept_option :selected').val(),
-                group_name: $('#filter_group :selected').val()
-            }
+            var BaseData = getBaseData();
 
             if (hotInstance) {
-
                 $.ajax({
                     type: 'GET',
                     url: '{{route('admin.course.filter_course_annual_scores')}}',
@@ -851,24 +769,26 @@
                         toggleLoading(false);
                         if (resultData.status == false) {
 
-                            totalScoreNotification(resultData.type, resultData.message, 'No Course Score Record')
+                            //totalScoreNotification(resultData.type, resultData.message, 'No Course Score Record')
+
+                            showMessage(resultData, true);
                             updateSettingHandsontable(resultData);
                         } else {
-
+                            setTitle();
+                            showMessage(resultData, false);
                             updateSettingHandsontable(resultData);
                             assignNumberRattrapage();
                         }
                     }
                 });
             } else {
-
                 initTable();
             }
         }
 
         function updateSettingHandsontable(resultData) {
 
-//            console.log(resultData)
+
             setting.data = resultData.data;
             setting.nestedHeaders = resultData.nestedHeaders;
             setting.colWidths = resultData.colWidths;
@@ -880,11 +800,6 @@
 
             });
         }
-
-        $('#refresh_score_sheet').on('click', function () {
-            filter_table();
-            assignNumberRattrapage();
-        });
 
         $('#filter_dept').on('change', function () {
             $('.dept_option').hide();
@@ -909,56 +824,14 @@
                 });
             }
 
-            filter_table();
-        });
-
-        $('#filter_academic_year').on('change', function () {
-            filter_table();
-        })
-        $('#filter_grade').on('change', function () {
-            filter_table();
-        });
-        $('#filter_semester').on('change', function () {
-            filter_table();
-
-
-            /*swal({
-                title: "Attention",
-                text: "The student record will be chagened....Are you sure?",
-                type: "warning",
-                showCancelButton: true,
-                confirmButtonColor: "#DD6B55",
-                confirmButtonText: "Skip",
-                closeOnConfirm: true
-            }, function (confirmed) {
-                if (confirmed) {
-
-                }
-            });*/
-        })
-        $('#filter_degree').on('change', function () {
-            filter_table();
-        });
-
-        $('#filter_group').on('change', function () {
-            filter_table();
+            //filter_table();
         });
 
 
         $('#generate_rattrapage').on('click', function () {
 
-
             var pop_url = '{{route('course_annual.student_redouble_exam')}}';
-            var BaseData = {
-                department_id: $('#filter_dept :selected').val(),
-                degree_id: $('#filter_degree :selected').val(),
-                grade_id: $('#filter_grade :selected').val(),
-                academic_year_id: $('#filter_academic_year :selected').val(),
-                semester_id: $('#filter_semester :selected').val(),
-                dept_option_id: $('#filter_dept_option :selected').val(),
-
-            }
-
+            var BaseData =getBaseData();
             student_reexam_lists = window.open(
                     pop_url +
                     '?department_id=' + BaseData.department_id +
@@ -971,348 +844,34 @@
         })
 
 
-        //----this one is not use----
-        $('#generate_redouble').on('click', function () {
-
-            var pop_url = '{{route('course_annual.student_redouble_exam')}}';
-            var array_fail_subject = setting.array_fail_subject;
-            var table_data = setting.data;
-            var academic_year_id = $('#filter_academic_year :selected').val();
-
-            var base_data = {};
-            var count = 0;
-
-            $.each(table_data, function (i, student) {
-
-                if (count < table_data.length - 5) {
-
-                    if (student['student_id_card'] != null && student['student_id_card'] != '') {
-
-                        var student_id_card = student['student_id_card'];
-                        var student_exam_subjects = getStudentReExam(array_fail_subject[student_id_card]);
-
-                        if ('fail' in student_exam_subjects) {
-
-                            if (student_exam_subjects['fail'].length > 0) {
-
-                                if ('pass' in student_exam_subjects) {
-
-                                    //----here if we want to set that ..only student who obtain the final moyenne upper than 30 %, will be allowed to take re-exam
-                                    //---then we should not check the subjects['pass'] length we check only the finally moyenne
-                                    if (student_exam_subjects['pass'].length == 0) {
-                                        var average = calculate_moyenne(student_exam_subjects);
-                                        if (average > parseFloat('{{\App\Models\Enum\ScoreEnum::Under_30}}')) {
-
-                                            base_data[student_id_card] = removeElement(student_exam_subjects);
-                                        }
-                                    } else {
-
-                                        base_data[student_id_card] = removeElement(student_exam_subjects);
-                                    }
-
-                                    //------end checking moyenne upper then 30
-
-                                } else {
-
-                                    //----student have to re-exam for all subject ---but we have to check if their final moyenne is upper than 30, or he will be redouble
-
-                                    var average = calculate_moyenne(student_exam_subjects);
-                                    if (average > parseFloat('{{\App\Models\Enum\ScoreEnum::Under_30}}')) {
-
-                                        base_data[student_id_card] = removeElement(student_exam_subjects);
-                                    }
-                                }
-
-                            }
-                        }
-                    }
-                }
-                count++;
-            });
-
-            var data = dataToSend(base_data);
-            student_reexam_lists = PopupCenterDual(pop_url + '?data=' + data + '&academic_year_id=' + academic_year_id, 'Student Redouble Lists', '1500', '900');
-        });
-
-        function dataToSend(base_data) {
-
-            var array_data = [];
-
-            $.each(base_data, function (student_id_card, object) {
-                var fail = '';
-                var pass = '';
-
-                fail = fail + student_id_card + ':F_';
-
-                if ('fail' in object) {
-
-                    $.each(object['fail'], function (f_key, f_val) {
-
-                        fail = fail + f_val['course_annual_id'] + '_'
-                    })
-                }
-                fail = fail + ':P_';
-                if ('pass' in object) {
-
-                    $.each(object['pass'], function (p_key, p_val) {
-                        pass = pass + p_val['course_annual_id'] + '_'
-                    })
-                }
-
-                array_data.push(fail + pass);
-            })
-
-            return array_data;
-
-        }
-        function removeElement(student_exam_subjects) {
-
-            if ('pass' in student_exam_subjects) {
-                $.each(student_exam_subjects['pass'], function (index, value) {
-                    delete  value['score'];
-                    delete value['credit'];
-                })
-            }
-            if ('fail' in student_exam_subjects) {
-
-                $.each(student_exam_subjects['fail'], function (key, val) {
-                    delete  val['score'];
-                    delete val['credit'];
-                })
-
-            }
-
-            return student_exam_subjects;
-
-        }
-
-
         function assignNumberRattrapage() {
 
-            var array_fail_subject = setting.array_fail_subject;
-            var table_data = setting.data;
+           if(hotInstance) {
+               var array_fail_subject = setting.array_fail_subject;
+               var table_data = setting.data;
 
-            $.each(table_data, function (i, student) {
+               $.each(table_data, function (i, student) {
 
-                if (student['student_id_card'] != null && student['student_id_card'] != '') {
-                    var number_rattrapage = numberSubjectRattrapage(array_fail_subject[student['student_id_card']]);
-                    student['Rattrapage'] = number_rattrapage;
-                }
-            });
+                   if (student['student_id_card'] != null && student['student_id_card'] != '') {
+                       var number_rattrapage = numberSubjectRattrapage(array_fail_subject[student['student_id_card']], '{{\App\Models\Enum\ScoreEnum::Pass_Moyenne}}', '{{\App\Models\Enum\ScoreEnum::Aproximation_Moyenne}}');
+                       student['Rattrapage'] = number_rattrapage;
+                   }
+               });
 
-            setting.data = table_data;
-            hotInstance.updateSettings({
-                data: table_data,
-                colWidths: setting.colWidths
+               setting.data = table_data;
+               hotInstance.updateSettings({
+                   data: table_data,
+                   colWidths: setting.colWidths
 
-            });
-        }
-
-        function numberSubjectRattrapage(subjects) {
-
-            var number_subject = getStudentReExam(subjects);
-
-            if ('fail' in number_subject) {
-                return number_subject['fail'].length;
-            } else {
-                return 0;
-            }
-        }
-
-        function calculate_moyenne(subjects) {
-
-            var credit = 0;
-            var score = 0;
-            if ('fail' in subjects) {
-                if ('pass' in subjects) {
-
-                    $.each(subjects['fail'], function (f_index, f_value) {
-                        credit = credit + parseFloat(f_value['credit']);
-                        score = score + (parseFloat(f_value['score']) * parseFloat(f_value['credit']));
-                    });
-
-                    $.each(subjects['pass'], function (p_index, p_value) {
-                        credit = credit + parseFloat(p_value['credit']);
-                        score = score + (parseFloat(p_value['score']) * parseFloat(p_value['credit']));
-                    });
-
-                    return parseFloat(parseFloat(score) / parseFloat(credit));
-
-                } else {
-
-                    $.each(subjects['fail'], function (f_index, f_value) {
-                        credit = credit + parseFloat(f_value['credit']);
-                        score = score + (parseFloat(f_value['score']) * parseFloat(f_value['credit']));
-                    });
-
-                    return parseFloat(parseFloat(score) / parseFloat(credit));
-                }
-
-            } else {
-
-                $.each(subjects['pass'], function (index, value) {
-                    credit = credit + parseFloat(value['credit']);
-                    score = score + (parseFloat(value['score']) * parseFloat(value['credit']));
-                });
-
-                return parseFloat(parseFloat(score) / parseFloat(credit));
-            }
-        }
-
-
-        function getStudentReExam(subjects) {
-
-            var total_credit = 0;
-            if ('fail' in subjects) {//=== isset() in php
-                if ('pass' in subjects) {
-
-                    var validate_score = 0;
-                    $.each(subjects['fail'], function (f_key, f_val) {
-
-                        //console.log(validate_score +'=='+ validate_score +'++'+ parseFloat('{{\App\Models\Enum\ScoreEnum::Pass_Moyenne}}') +'*'+ f_val['credit']);
-                        total_credit = total_credit + parseFloat(f_val['credit']);
-                        validate_score = validate_score + parseFloat('{{\App\Models\Enum\ScoreEnum::Pass_Moyenne}}') * f_val['credit'];
-                        //console.log(validate_score);
-                    });
-
-                    $.each(subjects['pass'], function (p_key, p_val) {
-                        //console.log(validate_score +'=='+ validate_score +'++'+ parseFloat(p_val['score']) +'*'+ p_val['credit']);
-                        total_credit = total_credit + parseFloat(p_val['credit']);
-                        validate_score = validate_score + (parseFloat(p_val['score']) * p_val['credit']);
-                        //console.log(validate_score);
-                    });
-
-                    var approximation_moyenne = parseFloat((parseFloat(validate_score) / parseFloat(total_credit)));
-
-                    //console.log(approximation_moyenne +'=='+ (parseFloat(validate_score) +'/'+ parseFloat(total_credit)));
-
-                    if (approximation_moyenne < parseFloat('{{\App\Models\Enum\ScoreEnum::Aproximation_Moyenne}}')) {//----55
-
-                        if (subjects['pass'].length > 0) {
-
-                            var find_min = findMinScore(subjects['pass']);
-
-                            if (find_min['element']['score'] < parseFloat('{{\App\Models\Enum\ScoreEnum::Pass_Moyenne}}')) {//--count couse score for only less than 50
-
-                                subjects['fail'].push(find_min['element'])
-                                delete subjects['pass'][find_min['index']];
-
-                                var tmp_subject_pass = [];
-
-                                $.each(subjects['pass'], function (key, obj_subject) {
-                                    if (!$.isEmptyObject(obj_subject)) {
-                                        tmp_subject_pass.push(obj_subject);
-                                    }
-                                });
-                                subjects['pass'] = tmp_subject_pass;
-
-                                return getStudentReExam(subjects); //---recuring this function again
-                            } else {
-
-                                //---if approximation  moyenne is bigger than 50 allow him
-                                if (approximation_moyenne > parseFloat('{{\App\Models\Enum\ScoreEnum::Pass_Moyenne}}')) {
-                                    return subjects;
-                                } else {
-                                    return subjects;
-                                }
-                            }
-                        } else {
-
-                            return subjects;
-                        }
-                    } else {
-                        return subjects;
-                    }
-                } else {
-                    return subjects; //---student fail all subject
-                }
-            } else {
-
-                /*--check if the moyenne of student is under 50 and all subject are bigger than 30*/
-
-                var approximation_moyenne = calculate_moyenne(subjects);
-
-                if (approximation_moyenne < parseFloat('{{\App\Models\Enum\ScoreEnum::Pass_Moyenne}}')) {
-
-                    subjects['fail'] = [];
-                    if (subjects['pass'].length > 0) {
-
-                        var find_min = findMinScore(subjects['pass']);
-
-                        if (find_min['element']['score'] < parseFloat('{{\App\Models\Enum\ScoreEnum::Pass_Moyenne}}')) {
-
-                            subjects['fail'].push(find_min['element'])
-                            delete subjects['pass'][find_min['index']];
-                            var tmp_subject_pass = [];
-                            $.each(subjects['pass'], function (key, obj_subject) {
-                                if (!$.isEmptyObject(obj_subject)) {
-                                    tmp_subject_pass.push(obj_subject);
-                                }
-                            });
-                            subjects['pass'] = tmp_subject_pass;
-                            return getStudentReExam(subjects); //---recuring this function again
-
-                        } else {
-
-                            return subjects;
-                        }
-                    } else {
-                        return subjects;
-                    }
-
-                } else {
-
-                    return subjects;
-                }
-            }
-        }
-
-        function findMinScore(subjects_pass) {
-
-            var min = subjects_pass[0]['score'];
-            var credit = subjects_pass[0]['credit'];
-            var course_annual_id = subjects_pass[0]['course_annual_id'];
-            var index = 0;
-
-            for (var int = 1; int < subjects_pass.length; int++) {
-                if (min > subjects_pass[int]['score']) {
-
-                    index = int;
-                    min = subjects_pass[int]['score'];
-                    credit = subjects_pass[int]['credit'];
-                    course_annual_id = subjects_pass[int]['course_annual_id'];
-                }
-            }
-            return {
-                element: {score: min, credit: credit, course_annual_id: course_annual_id},
-                index: index
-            }
-        }
-
-
-        if ($('.message').is(':visible')) {
-            setTimeout(function () {
-                $(".message").fadeOut("slow");
-            }, 3000);
+               });
+           }
         }
 
 
         $('#get_radie').on('click', function () {
 
-            /*var academic_year_id = $('#filter_academic_year :selected').val();
-             var department_id = $('#filter_dept :selected').val();*/
-
-
             var pop_url = '{{route('student.dismiss')}}';
-            var BaseData = {
-                department_id: $('#filter_dept :selected').val(),
-                degree_id: $('#filter_degree :selected').val(),
-                grade_id: $('#filter_grade :selected').val(),
-                academic_year_id: $('#filter_academic_year :selected').val(),
-                semester_id: $('#filter_semester :selected').val(),
-                dept_option_id: $('#filter_dept_option :selected').val(),
-
-            }
+            var BaseData =getBaseData()
 
             student_reexam_lists = window.open(
                     pop_url +
@@ -1328,15 +887,7 @@
         $('#get_redouble').on('click', function () {
 
             var pop_url = '{{route('student.redouble')}}';
-            var BaseData = {
-                department_id: $('#filter_dept :selected').val(),
-                degree_id: $('#filter_degree :selected').val(),
-                grade_id: $('#filter_grade :selected').val(),
-                academic_year_id: $('#filter_academic_year :selected').val(),
-                semester_id: $('#filter_semester :selected').val(),
-                dept_option_id: $('#filter_dept_option :selected').val(),
-
-            }
+            var BaseData = getBaseData();
 
             student_reexam_lists = window.open(
                     pop_url +
@@ -1349,17 +900,66 @@
 
         });
 
-        $('#print_total_radie').on('click', function (e) {
-            e.preventDefault();
-            var remote_url = $(this).attr('href');
-            var academic_year_id = $('select[name=academic_year] :selected').val()
-            var semester_id = $('select[name=semester] :selected').val();
-            if (academic_year_id) {
-                window.open(remote_url + '?academic_year_id=' + academic_year_id + '&semester_id=' + semester_id, '_blank')
-            } else {
-                notify('info', 'Please select a year!')
+
+        $('.selection_blog').hide();
+
+        $('#change_option').on('click', function() {
+            $('.selection_blog').slideToggle( "fast" )
+        });
+        $('#ok_option').on('click', function() {
+            filter_table();
+            $('.selection_blog').slideToggle( "fast" )
+        });
+
+
+
+        function setTitle() {
+
+            var seletedText = getSelectedText();
+
+            var title = seletedText.department.trim(' ') +
+                    '-'+((seletedText.degree == parseInt('{{\App\Models\Enum\ScoreEnum::Degree_I}}'))? 'I':'T')+
+                    seletedText.grade;
+            var subTitle = seletedText.academic_year;
+
+            if(seletedText.dept_option != 'Option' && seletedText.dept_option != '') {
+                title +=' |'+seletedText.dept_option;
             }
-        })
+
+            if(seletedText.semester_id != null && seletedText.semester_id != '') {
+                subTitle += ' |~S'+seletedText.semester_id
+            }
+            $('#class_title').html(title);
+            $('#year_name_latin').html(subTitle);
+
+        }
+
+        function showMessage(response, status)
+        {
+
+            if(status == true) {
+
+                var div_message = '<div class="alert alert-'+response.type+'">' +
+                        '<h4><i class="icon fa fa-info"></i> Total Score Warning!</h4>' +
+                        '<p>' +
+                        response.message +
+                        '</p>' +
+                        '</div>';
+                $('div#blog_message').html(div_message);
+                $('div#all_score_course_annual_table').hide();
+
+            } else {
+
+                $('div#blog_message').html('');
+                if(!$('div#all_score_course_annual_table').is(':visible')) {
+                    $('div#all_score_course_annual_table').show()
+                }
+            }
+        }
+        $('#refresh_score_sheet').on('click', function () {
+            filter_table();
+            $('.selection_blog').slideToggle( "fast" )
+        });
 
     </script>
 

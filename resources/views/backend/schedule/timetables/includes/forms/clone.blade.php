@@ -1,13 +1,11 @@
-<div class="form-group">
-    {{ csrf_field() }}
-</div>
-
-<input type="hidden" name="academicYeas" value="2017">
-<input type="hidden" name="degree" value="23">
-<input type="hidden" name="grade" value="2">
-<input type="hidden" name="semester" value="1">
-<input type="hidden" name="group" value="a">
-<input type="hidden" name="option" value="_ee">
+<input type="hidden" name="academic_year_id" id="academic_year_id"/>
+<input type="hidden" name="department_id" id="department_id"/>
+<input type="hidden" name="degree_id" id="degree_id"/>
+<input type="hidden" name="option_id" id="option_id"/>
+<input type="hidden" name="grade_id" id="grade_id"/>
+<input type="hidden" name="semester_id" id="semester_id"/>
+<input type="hidden" name="group_id" id="group_id"/>
+<input type="hidden" name="week_id" id="week_id"/>
 
 <div class="form-group">
     <div class="col-md-10 col-md-offset-2">
@@ -24,20 +22,7 @@
 {{--class="square"--}}
 <div class="form-group">
     <div class="col-md-8 col-md-offset-2">
-        <div class="row render_weeks">
-            @for($i=1; $i<=18; $i++)
-                <div class="col-md-3">
-                    <label for="{{ $i }}">
-                        <input type="checkbox"
-                               data-target="weeks"
-                               name="weeks[]"
-                               value="{{ $i }}"
-                               class="square">
-                        Week {{ $i }}
-                    </label>
-                </div>
-            @endfor
-        </div>
+        <div class="row render_weeks"></div>
     </div>
 </div>
 
@@ -56,28 +41,16 @@
 
 <div class="form-group">
     <div class="col-md-8 col-md-offset-2">
-        <div class="row">
-            @for($i=1; $i<=18; $i++)
-                <div class="col-md-2">
-                    <label for="{{ $i }}">
-                        <input type="checkbox"
-                               data-target="groups"
-                               name="groups[]"
-                               value="{{ $i }}"
-                               class="square"> A
-                    </label>
-                </div>
-            @endfor
-        </div>
+        <div class="row render_groups"></div>
     </div>
 </div>
 
 <hr/>
 <div class="form-group">
     <div class="col-md-offset-2 col-md-8">
-        <input type="submit" class="btn btn-primary btn-sm"
+        <input type="submit" class="btn btn-primary btn-sm button_clone_timetable"
                value="{{ trans('buttons.backend.schedule.timetable.modal_clone.clone') }}">
-        <button type="button" class="btn btn-default btn-sm"
+        <button type="button" class="btn btn-default btn-sm btn_cancel_clone_timetable"
                 data-dismiss="modal">{{ trans('buttons.backend.schedule.timetable.modal_clone.close') }}</button>
     </div>
 </div>

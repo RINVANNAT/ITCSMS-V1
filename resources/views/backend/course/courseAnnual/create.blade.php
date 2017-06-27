@@ -65,6 +65,12 @@
                 allowClear: true
             });
 
+            $("#reference_course_id").select2({
+                placeholder: "Select a reference course program",
+                allowClear: true,
+
+            });
+
             // Search lecturer
             var employee_search_box = $(".select_employee").select2({
                 placeholder: 'Enter name ...',
@@ -142,6 +148,7 @@
                 setNameKhEnFr();
                 setSelectedField();
                 load_group('{{\App\Models\Enum\CourseAnnualEnum::CREATE}}');
+                loadReferenceCourse('{{route('course_annual.load_reference_course')}}', '{{csrf_token()}}', '');
             });
 
 
@@ -188,8 +195,11 @@
                     });
                 }
 
-            })
+            });
+
+            loadReferenceCourse('{{route('course_annual.load_reference_course')}}', '{{csrf_token()}}', '');
 
         })
+
     </script>
 @stop

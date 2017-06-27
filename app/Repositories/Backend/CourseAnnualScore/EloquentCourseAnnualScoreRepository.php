@@ -8,6 +8,7 @@ use App\Models\CourseAnnual;
 use App\Models\Score;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
+use App\Models\UserLog;
 
 /**
  * Class EloquentCourseAnnualScoreRepository
@@ -49,8 +50,10 @@ class EloquentCourseAnnualScoreRepository implements CourseAnnualScoreRepository
         $courseAnnualScore->created_at = Carbon::now();
         $courseAnnualScore->create_uid = auth()->id();
         if ($courseAnnualScore->save()) {
-
             $courseAnnualScore->percentageScore()->attach($input['percentage_id']);
+
+            /*--get User log--*/
+            $this->getUserLog($courseAnnualScore,'Score', 'Create' );
             return $courseAnnualScore;
         }
         throw new GeneralException(trans('exceptions.backend.general.create_error'));
@@ -96,6 +99,8 @@ class EloquentCourseAnnualScoreRepository implements CourseAnnualScoreRepository
 
         if ($courseAnnualScore->save()) {
 
+            $this->getUserLog($courseAnnualScore,'Score', 'Update' );
+
 //            $courseAnnualScore->percentageScore()->sync($input['percentage_score']);
             return true;
         }
@@ -105,6 +110,7 @@ class EloquentCourseAnnualScoreRepository implements CourseAnnualScoreRepository
 
 
     public function findScoreId($courseAnnualId, $studentAnnualId) {
+
 
         $score = Score::where([
             ['course_annual_id', $courseAnnualId],
@@ -136,9 +142,28 @@ class EloquentCourseAnnualScoreRepository implements CourseAnnualScoreRepository
         $model = $this->findOrThrowException($id);
 
         if ($model->delete()) {
+
+            $this->getUserLog($model,'Score', 'Delete' );
             return true;
         }
 
         throw new GeneralException(trans('exceptions.backend.general.delete_error'));
+    }
+
+
+    /**
+     * @param $data
+     * @param $model
+     * @param $action
+     */
+    public function getUserLog($data, $model, $action) {
+
+        $storeData = json_encode($data);
+        UserLog::log([
+            'model' => $model,
+            'action'   => $action, // Import, Create, Delete, Update
+            'data'     => $storeData // if it is create action, store only the new id.
+        ]);
+
     }
 }

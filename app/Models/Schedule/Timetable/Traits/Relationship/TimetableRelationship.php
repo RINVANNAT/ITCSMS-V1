@@ -7,6 +7,7 @@ use App\Models\Degree;
 use App\Models\Department;
 use App\Models\DepartmentOption;
 use App\Models\Grade;
+use App\Models\Group;
 use App\Models\Schedule\Timetable\TimetableSlot;
 use App\Models\Schedule\Timetable\Week;
 use App\Models\Semester;
@@ -75,6 +76,16 @@ trait TimetableRelationship
     public function semester()
     {
         return $this->belongsTo(Semester::class);
+    }
+
+    /**
+     * Get associated with model Group.
+     *
+     * @return mixed
+     */
+    public function group()
+    {
+        return $this->belongsTo(Group::class);
     }
 
     /**

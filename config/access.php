@@ -160,4 +160,14 @@ return [
      * Makes it so social logins can not change passwords, etc.
      */
     'socialite_session_name' => 'socialite_provider',
+
+    /**
+     * Timetable Constants
+     */
+    'timetable' => [
+        'department_id' => [
+            'sa' => 12,
+            'sf' => 13
+        ]
+    ],
 ];

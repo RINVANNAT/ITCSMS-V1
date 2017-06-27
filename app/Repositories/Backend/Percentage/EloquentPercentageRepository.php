@@ -5,6 +5,7 @@ namespace App\Repositories\Backend\Percentage;
 
 use App\Exceptions\GeneralException;
 use App\Models\Percentage;
+use App\Models\UserLog;
 use Carbon\Carbon;
 
 /**
@@ -56,6 +57,12 @@ class EloquentPercentageRepository implements PercentageRepositoryContract
         $percentage->create_uid = auth()->id();
 
         if ($percentage->save()) {
+
+            UserLog::log([
+               'data'=> $percentage,
+                'model' => 'Percentage',
+                'action' => 'Create'
+            ]);
             return $percentage;
         }
 
@@ -81,6 +88,12 @@ class EloquentPercentageRepository implements PercentageRepositoryContract
 
         if ($percentage->save()) {
 
+            UserLog::log([
+                'data'=> $percentage,
+                'model' => 'Percentage',
+                'action' => 'Update'
+            ]);
+
             return $percentage;
         }
 
@@ -98,6 +111,12 @@ class EloquentPercentageRepository implements PercentageRepositoryContract
         $model = $this->findOrThrowException($id);
         if($model) {
             if ($model->delete()) {
+                UserLog::log([
+                    'data'=> $model,
+                    'model' => 'Percentage',
+                    'action' => 'Delete'
+                ]);
+
                 return true;
             }
         } else {

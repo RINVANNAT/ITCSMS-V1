@@ -1,0 +1,69 @@
+/** Print timetable **/
+body {
+    margin: 0 auto;
+    line-height: 0.8 !important;
+}
+
+.content-wrapper {
+    background-image: none !important;
+    background-color: #fff;
+}
+
+* {
+    box-sizing: border-box !important;
+}
+
+.row {
+    page-break-after: always;
+}
+
+table.timetable {
+    width: 100%;
+}
+
+table.timetable tr td {
+    margin: 0 !important;
+    border: 1px solid #c7c7c7;
+    border-collapse: collapse;
+}
+
+table.timetable th {
+    padding: 10px !important;
+}
+
+table.timetable p, table.timetable tr td {
+    font-size: 14px !important;
+    margin: 8px !important;
+    padding: 0 !important;
+    line-height: 1 !important;
+    height: 30px !important;
+}
+
+th {
+    height: 50px !important;
+}
+
+img.image-logo {
+    margin: 0;
+    padding: 0 !important;
+    width: 50px;
+    height: 50px;
+    text-align: left !important;
+    float: left;
+}
+
+@media print {
+    .row {
+        page-break-after: always !important;
+    }
+
+    .row:last-child {
+        page-break-after: auto !important;
+    }
+
+    table.timetable tr td {
+        border: 0.1px solid #c7c7c7;
+    }
+}
+
+/** end print timetable **/

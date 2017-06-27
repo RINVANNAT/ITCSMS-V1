@@ -42,4 +42,6 @@ interface CourseAnnualScoreRepositoryContract
 
 
     public function findScoreId($courseAnnualId, $studentAnnualId);
+
+    public function getUserLog($data, $model, $action);
 }

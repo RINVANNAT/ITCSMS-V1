@@ -3,14 +3,19 @@
 namespace App\Http\Controllers\Backend\Schedule;
 
 use App\Http\Controllers\Backend\Schedule\Traits\AjaxCloneTimetableController;
-use App\Http\Controllers\Backend\Schedule\Traits\AjaxFilterTimetableController;
+use App\Http\Controllers\Backend\Schedule\Traits\AjaxCRUDTimetableController;
+use App\Http\Controllers\Backend\Schedule\Traits\ExportTimetableController;
+use App\Http\Controllers\Backend\Schedule\Traits\PrintTimetableController;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Backend\Schedule\Timetable\CreateTimetableRequest;
+use App\Http\Requests\Backend\Schedule\Timetable\CreateTimetableSlotRequest;
 use App\Http\Requests\Backend\Schedule\Timetable\DeleteTimetableRequest;
 use App\Models\AcademicYear;
+use App\Models\Configuration;
 use App\Models\Degree;
 use App\Models\Department;
 use App\Models\DepartmentOption;
+use App\Models\Employee;
 use App\Models\Grade;
 use App\Models\Schedule\Timetable\Timetable;
 use App\Models\Schedule\Timetable\TimetableSlot;
@@ -18,6 +23,7 @@ use App\Models\Schedule\Timetable\Week;
 use App\Models\Semester;
 use App\Repositories\Backend\Schedule\Timetable\TimetableRepositoryContract;
 use App\Repositories\Backend\Schedule\Timetable\TimetableSlotRepositoryContract;
+use Carbon\Carbon;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Response;
@@ -29,7 +35,7 @@ use Yajra\Datatables\Datatables;
  */
 class TimetableController extends Controller
 {
-    use AjaxFilterTimetableController, AjaxCloneTimetableController;
+    use AjaxCRUDTimetableController, AjaxCloneTimetableController, PrintTimetableController, ExportTimetableController;
 
     /**
      * @var TimetableRepositoryContract
@@ -56,6 +62,8 @@ class TimetableController extends Controller
         $this->timetableSlotRepository = $timetableSlotRepository;
         $this->timetableRepository = $timetableRepository;
         $this->setRepository($this->timetableRepository, $this->timetableSlotRepository);
+        $this->setTimetableSlotRepo($timetableSlotRepository);
+        $this->setTimetableSlotRepository($timetableSlotRepository);
     }
 
     /**
@@ -65,6 +73,15 @@ class TimetableController extends Controller
      */
     public function index()
     {
+        $now = Carbon::now('Asia/Phnom_Penh');
+        $employee = Employee::where('user_id', auth()->user()->id)->first();
+
+        if ($employee instanceof Employee) {
+            $createTimetablePermissionConfiguration = Configuration::where('key', 'timetable_' . $employee->department_id)->first();
+        } else {
+            $createTimetablePermissionConfiguration = null;
+        }
+
         return view('backend.schedule.timetables.index')->with([
             'academicYears' => AcademicYear::latest()->get(),
             'departments' => Department::where('parent_id', 11)->get(),
@@ -72,7 +89,9 @@ class TimetableController extends Controller
             'grades' => Grade::all(),
             'options' => DepartmentOption::all(),
             'semesters' => Semester::all(),
-            'weeks' => Week::all()
+            'weeks' => Week::all(),
+            'createTimetablePermissionConfiguration' => $createTimetablePermissionConfiguration,
+            'now' => $now
         ]);
     }
 
@@ -83,6 +102,14 @@ class TimetableController extends Controller
      */
     public function get_timetables()
     {
+        $academic_year_id = request('academicYear');
+        $department_id = request('department');
+        $degree_id = request('degree');
+        $grade_id = request('grade');
+        $option_id = request('option');
+        $semester_id = request('semester');
+        $group_id = request('group');
+
         $timetables = Timetable::join('weeks', 'weeks.id', '=', 'timetables.week_id')
             ->join('academicYears', 'academicYears.id', '=', 'timetables.academic_year_id')
             ->join('departments', 'departments.id', '=', 'timetables.department_id')
@@ -91,47 +118,72 @@ class TimetableController extends Controller
             ->leftJoin('departmentOptions', 'departmentOptions.id', '=', 'timetables.option_id')
             ->join('semesters', 'semesters.id', '=', 'timetables.semester_id')
             ->leftJoin('groups', 'groups.id', '=', 'timetables.group_id')
-            ->orderBy('timetables.created_at', 'desc')
+            ->where([
+                ['academicYears.id', $academic_year_id],
+                ['departments.id', $department_id],
+                ['degrees.id', $degree_id],
+                ['grades.id', $grade_id],
+                ['semesters.id', $semester_id],
+            ]);
+
+        if ($option_id !== 'Option' && $option_id != null) {
+            $timetables->where('departmentOptions.id', $option_id);
+        }
+        if ($group_id !== 'Group' && $group_id != null) {
+            $timetables->where('groups.id', $group_id);
+        }
+        if (request('week') != null) {
+            $timetables->where('weeks.name_en', request('week'));
+        }
+        $timetables->orderBy('weeks.id', 'asc')
             ->select([
-                'academicYears.name_latin as academic_year',
-                'departments.code as department',
-                'degrees.name_en as degree',
-                'grades.code as grade',
-                'departmentOptions.name_en as option',
-                'semesters.name_en as semester',
-                'groups.code as group',
-                'weeks.name_en as weekly',
+                'weeks.name_en as week',
                 'timetables.completed as status',
                 'timetables.id as id'
-            ])
-            ->get();
+            ]);
+
         return Datatables::of($timetables)
             ->addColumn('action', function ($timetable) {
-                $print = ' <a href="#print" class="btn btn-xs btn-info">'
+                $export = ' <button id="export-timetable"  href="' . route('timetables.export', $timetable->id) . '" class="btn btn-xs btn-primary">'
+                    . '<i class="fa fa-download" data-toggle="tooltip"'
+                    . 'data-placement="top" title="Export"'
+                    . 'data-original-title="Export">'
+                    . '</i>'
+                    . '</button> ';
+                $print = ' <button id="print-timetable" href="' . route('timetables.print', $timetable->id) . '" class="btn btn-xs btn-success">'
                     . '<i class="fa fa-print" data-toggle="tooltip"'
                     . 'data-placement="top" title="Print"'
                     . 'data-original-title="Print">'
                     . '</i>'
-                    . '</a> ';
+                    . '</button> ';
 
-                $view = '<a href="' . route('admin.schedule.timetables.show', $timetable->id) . '" class="btn btn-xs btn-primary">'
+                $view = '<a href="' . route('admin.schedule.timetables.show', $timetable->id) . '" class="btn btn-xs btn-info">'
                     . '<i class="fa fa-share-square-o" data-toggle="tooltip"'
                     . 'data-placement="top" title="View"'
                     . 'data-original-title="View">'
                     . '</i></a>';
 
-                $delete = ' <a href="/admin/schedule/timetables/delete/' . $timetable->id . '" class="btn btn-xs btn-danger">'
+                $delete = ' <button id="' . $timetable->id . '" class="btn btn-xs btn-danger btn_delete_timetable">'
                     . '<i class="fa fa-trash" data-toggle="tooltip"'
                     . 'data-placement="top" title="Delete"'
                     . 'data-original-title="Delete">'
                     . '</i>'
-                    . '</a>';
+                    . '</button>';
 
-                if (access()->allow('delete-timetable') || access()->allow('view-timetable')) {
-                    return $print . $view . $delete;
-                } else if (access()->allow('view-timetable')) {
-                    return $view;
+                $result = '';
+                if (access()->allow('export-timetable')) {
+                    $result .= $export;
                 }
+                if (access()->allow('print-timetable')) {
+                    $result .= $print;
+                }
+                if (access()->allow('view-timetable')) {
+                    $result .= $view;
+                }
+                if (access()->allow('delete-timetable')) {
+                    $result .= $delete;
+                }
+                return $result;
             })
             ->editColumn('status', function ($timetable) {
                 if ($timetable->status == false) {
@@ -161,7 +213,23 @@ class TimetableController extends Controller
      */
     public function create()
     {
-        return view('backend.schedule.timetables.create');
+        $now = Carbon::now('Asia/Phnom_Penh');
+        $employee = Employee::where('user_id', auth()->user()->id)->first();
+        if ($employee instanceof Employee) {
+            $createTimetablePermissionConfiguration = Configuration::where('key', 'timetable_' . $employee->department_id)->first();
+        } else {
+            $createTimetablePermissionConfiguration = null;
+        }
+
+        if (isset($createTimetablePermissionConfiguration)) {
+            if (access()->allow('create-timetable') && (strtotime($now) >= strtotime($createTimetablePermissionConfiguration->created_at) && strtotime($now) <= strtotime($createTimetablePermissionConfiguration->updated_at))) {
+                return view('backend.schedule.timetables.create');
+            }
+        } else {
+            return view('backend.schedule.timetables.create');
+        }
+
+        return abort(404);
     }
 
     /**
@@ -172,6 +240,13 @@ class TimetableController extends Controller
      */
     public function show(Timetable $timetable)
     {
+        $now = Carbon::now('Asia/Phnom_Penh');
+        $employee = Employee::where('user_id', auth()->user()->id)->first();
+        if ($employee instanceof Employee) {
+            $createTimetablePermissionConfiguration = Configuration::where('key', 'timetable_' . $employee->department_id)->first();
+        } else {
+            $createTimetablePermissionConfiguration = null;
+        }
         $timetable_slots = TimetableSlot::where('timetable_id', $timetable->id)
             ->leftJoin('rooms', 'rooms.id', '=', 'timetable_slots.room_id')
             ->leftJoin('buildings', 'buildings.id', '=', 'rooms.building_id')
@@ -188,6 +263,26 @@ class TimetableController extends Controller
             )
             ->get();
         $timetableSlots = new Collection();
+
+        if ($timetable->department_id < 12 && ($timetable instanceof Timetable)) {
+            // get student annuals id
+            $student_annual_ids = $this->timetableSlotRepo->find_student_annual_ids($timetable);
+            $department_languages = array(12, 13); // (english, french)
+            foreach ($department_languages as $department_language) {
+                // get group language, [@return array(Collection $groups, Array $groups)]
+                $groups = $this->timetableSlotRepo->get_group_student_annual_form_language($department_language, $student_annual_ids, $timetable);
+
+                // get timetable language,
+                $timetables = $this->timetableSlotRepo->get_timetables_form_language_by_student_annual($groups[0], $timetable, $department_language);
+
+                // get timetable slots [@return array(timetableSlots, groupsRoom)]
+                $timetableSlotsLang = $this->timetableSlotRepo->get_timetable_slot_language_dept($timetables, $groups[0]);
+
+                // set timetable slots language to view.
+                $this->timetableSlotRepo->set_timetable_slot_language($timetableSlots, $timetableSlotsLang[1], $timetableSlotsLang[0]);
+            }
+        }
+
         foreach ($timetable_slots as $timetable_slot) {
             if (($timetable_slot instanceof TimetableSlot) && is_object($timetable_slot)) {
 
@@ -198,21 +293,22 @@ class TimetableController extends Controller
                 $timetableSlots->push($timetableSlot);
             }
         }
-        return view('backend.schedule.timetables.show', compact('timetableSlots', 'timetable'));
+        return view('backend.schedule.timetables.show', compact('timetableSlots', 'timetable', 'now', 'createTimetablePermissionConfiguration'));
     }
 
     /**
-     * @param CreateTimetableRequest $request
+     * @param CreateTimetableSlotRequest $request
+     * @param CreateTimetableRequest $requestTimetable
      * @return int
      */
-    public function store(CreateTimetableRequest $request)
+    public function store(CreateTimetableSlotRequest $request, CreateTimetableRequest $requestTimetable)
     {
-        $findTimetable = $this->timetableRepository->find_timetable_is_existed($request);
+        $findTimetable = $this->timetableRepository->find_timetable_is_existed($requestTimetable);
         $new_timetable_slot = new TimetableSlot();
         if ($findTimetable instanceof Timetable) {
             $new_timetable_slot = $this->timetableSlotRepository->create_timetable_slot($findTimetable, $request);
         } else {
-            $newTimetable = $this->timetableRepository->create_timetable($request);
+            $newTimetable = $this->timetableRepository->create_timetable($requestTimetable);
             if ($newTimetable instanceof Timetable) {
                 $new_timetable_slot = $this->timetableSlotRepository->create_timetable_slot($newTimetable, $request);
             }
@@ -236,8 +332,7 @@ class TimetableController extends Controller
     {
         if (Timetable::find($request->id) instanceof Timetable) {
             DB::table('timetables')->where('id', '=', $request->id)->delete();
-            return redirect()->back()->withFlashSuccess('Timetable is deleted successfully.');
+            return Response::json(['status' => true], 200);
         }
-        return redirect()->back()->withFlashError('Something went wrong.');
     }
 }

@@ -4,6 +4,7 @@
 use App\Exceptions\GeneralException;
 use App\Models\CourseAnnualClass;
 use App\Models\CourseSession;
+use App\Models\UserLog;
 use Carbon\Carbon;
 
 /**
@@ -61,6 +62,12 @@ class EloquentCourseSessionRepository implements CourseSessionRepositoryContract
         $input['created_at'] = Carbon::now();
 
         if ($courseSession = CourseSession::create($input)) {
+
+            UserLog::log([
+                'data' => $courseSession,
+                'model' => 'CourseSession',
+                'action' => 'Create'
+            ]);
             return $courseSession;
         }
         throw new GeneralException(trans('exceptions.backend.general.create_error'));
@@ -80,6 +87,11 @@ class EloquentCourseSessionRepository implements CourseSessionRepositoryContract
         $input['write_uid'] = auth()->id();
 
         if ($courseSession->update($input)) {
+            UserLog::log([
+                'data' => $courseSession,
+                'model' => 'CourseSession',
+                'action' => 'Update'
+            ]);
             return $courseSession;
         }
 
@@ -97,6 +109,7 @@ class EloquentCourseSessionRepository implements CourseSessionRepositoryContract
         $status = true;
         $model = $this->findOrThrowException($id);
         $courseAnnualClasses = CourseAnnualClass::where("course_session_id",$model->id)->get();
+
         foreach($courseAnnualClasses as $class){
             if($class->delete()){
                 $status = true;
@@ -106,6 +119,19 @@ class EloquentCourseSessionRepository implements CourseSessionRepositoryContract
         }
 
         if($status && $model->delete()){
+
+            UserLog::log([
+                'data' => $courseAnnualClasses,
+                'model' => 'CourseAnnualClass',
+                'action' => 'Destroy'
+            ]);
+
+            UserLog::log([
+                'data' => $model,
+                'model' => 'CourseSession',
+                'action' => 'Destroy'
+            ]);
+
             return true;
         }
 

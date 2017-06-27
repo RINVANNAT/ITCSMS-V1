@@ -17,7 +17,7 @@ class MoveTimetableSlotRequest extends Request
      */
     public function authorize()
     {
-        return true;
+        return access()->allow('move-timetable-slot');
     }
 
     /**

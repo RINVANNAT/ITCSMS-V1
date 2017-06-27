@@ -6,6 +6,8 @@ Route::group([
     'namespace' => 'Course'
 ], function() {
 
+
+
     Route::group([], function() {
         Route::any('update_score_per/{id}/', 'CourseAnnualController@update_score_per')->name('admin.course.course_annual.update_score_per');
         Route::resource('course_annual', 'CourseAnnualController');
@@ -15,6 +17,7 @@ Route::group([
         Route::get('course-disable-enable-scoring/{id}', 'CourseAnnualController@toggle_scoring')->name('admin.course.course_annual.toggle_scoring');
         Route::post('course-mass-disable-scoring', 'CourseAnnualController@disable_scoring')->name('admin.course.course_annual.disable_scoring');
         Route::post('course-mass-enable-scoring', 'CourseAnnualController@enable_scoring')->name('admin.course.course_annual.enable_scoring');
+        Route::post('/course-annual/load-reference-course', 'CourseAnnualController@loadReferenceCourse')->name('course_annual.load_reference_course');
     });
 
     Route::group([], function() {
@@ -88,14 +91,14 @@ Route::group([
     Route::get('/export-course-score-annual', 'CourseAnnualController@exportCourseScore')->name('course_annual.export_course_score_annual');
     Route::get('/course-annual-import-score', 'CourseAnnualController@formImportScore')->name('course_annual.form_import_score');
     Route::post('/course-annual/{id}/import-score', 'CourseAnnualController@importScore')->name('course_annual.import_file');
-
     Route::get('/course-annual/get-other-dept', 'CourseAnnualController@getDepts')->name('course_annual.get_other_dept');
-
     Route::get('/course-annual/get-other-lecturer', 'CourseAnnualController@getOtherLecturer')->name('course_annual.get_other_lecturer');
-
     Route::get('/list-group-by-course-annual-id', 'CourseAnnualController@getGroupByCourseAnnual')->name('course.list_group_by_course_annual_id');
-
     Route::get('/course-annual/is-allow-scoring', 'CourseAnnualController@isAllowScoring')->name('course_annual.is_allow_scoring');
+    Route::get('/course-annual/clone-score', 'CourseAnnualController@cloneScore')->name('course_annual.clone_score');
+    Route::get('/course-annual/popup-clone-score-panel', 'CourseAnnualController@cloneScorePanel')->name('course_annual.popup_clone_score_panel');
+
+    Route::post('/course-annual/is-allow-cloning-course', 'CourseAnnualController@isAllowCloningCourse')->name('course_annual.is_allow_cloning_course');
 
 
 

@@ -6,10 +6,7 @@ use App\Models\AcademicYear;
 use App\Models\Degree;
 use App\Models\Department;
 use App\Models\DepartmentOption;
-use App\Models\Employee;
 use App\Models\Grade;
-use App\Models\Room;
-use App\Models\Schedule\Calendar\Year\Year;
 use App\Models\Schedule\Timetable\Week;
 use App\Models\Semester;
 use Carbon\Carbon;
@@ -44,7 +41,7 @@ class AppServiceProvider extends ServiceProvider
          * Passing academicYears, Degree,... to option partials (Timetable).
          */
         view()->composer('backend.schedule.timetables.includes.partials.option', function ($view) {
-            if (access()->allow('global-timetable-management')) {
+            if (access()->allow('global-timetable')) {
                 $view->with([
                     'academicYears' => AcademicYear::latest()->get(),
                     'departments' => Department::where('parent_id', 11)->get(),
@@ -57,7 +54,28 @@ class AppServiceProvider extends ServiceProvider
             } else {
                 $view->with([
                     'academicYears' => AcademicYear::latest()->get(),
-                    'department' => Department::find(auth()->user()->getDepartment()),
+                    'department' => Department::getDepartmentIdByAuthentication(),
+                    'grades' => Grade::all(),
+                    'semesters' => Semester::all(),
+                    'weeks' => Week::all()
+                ]);
+            }
+        });
+        view()->composer('backend.schedule.timetables.includes.partials.option-index', function ($view) {
+            if (access()->allow('global-timetable')) {
+                $view->with([
+                    'academicYears' => AcademicYear::latest()->get(),
+                    'departments' => Department::where('parent_id', 11)->get(),
+                    'degrees' => Degree::all(),
+                    'grades' => Grade::all(),
+                    'options' => DepartmentOption::all(),
+                    'semesters' => Semester::all(),
+                    'weeks' => Week::all()
+                ]);
+            } else {
+                $view->with([
+                    'academicYears' => AcademicYear::latest()->get(),
+                    'department' => Department::getDepartmentIdByAuthentication(),
                     'grades' => Grade::all(),
                     'semesters' => Semester::all(),
                     'weeks' => Week::all()
