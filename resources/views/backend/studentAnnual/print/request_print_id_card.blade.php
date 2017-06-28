@@ -11,6 +11,7 @@
 
 @section('after-styles-end')
     {!! Html::style('plugins/iCheck/square/red.css') !!}
+    {!! Html::style('plugins/select2/select2.min.css') !!}
     <style>
         .page {
             width: 2.125in;
@@ -171,6 +172,22 @@
         }
 
 
+        .search_student{
+            border-top: 0px solid #d2d6de;
+            border-top-width: 2px;
+            border-top-style: solid;
+            border-top-color: rgb(210, 214, 222);
+
+
+            border-bottom: 0px solid #d2d6de;
+            border-bottom-width: 2px;
+            border-bottom-style: solid;
+            border-bottom-color: rgb(210, 214, 222);
+        }
+
+        .btn-xs {
+            font-size: 15px;
+        }
 
     </style>
 @stop
@@ -179,12 +196,14 @@
 
     <div class="box box-success">
         @if(sizeof($studentAnnuals_front) > 100)
-        <div class="alert alert-danger alert-dismissible">
-            <button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>
-            <h4><i class="icon fa fa-ban"></i> Error!</h4>
-            You are printing more than 100 students, this will cause memory over used and many more errors might be occurred. <br/>
-            Please filter more to get less than 100 students.
-        </div>
+        {{--<div class="alert alert-danger alert-dismissible">--}}
+            {{--<button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>--}}
+            {{--<h4><i class="icon fa fa-ban"></i> Error!</h4>--}}
+            {{--You are printing more than 100 students, this will cause memory over used and many more errors might be occurred. <br/>--}}
+            {{--Please filter more to get less than 100 students.--}}
+        {{--</div>--}}
+
+            @include('backend.studentAnnual.print.patial.blog_print')
         @else
         <div class="box-header with-border">
             <h3 class="box-title">Printing Student ID Card</h3>
@@ -207,12 +226,28 @@
                 <button type="button" class="btn btn-default btn-sm checkbox-toggle">
                     <i class="fa fa-check-square-o"></i>
                 </button>
+
+                <button type="button" class="btn btn-success btn-sm" id="add_student" >
+                    <i class="fa fa-plus"></i>
+                </button>
+
             </div>
+
         </div><!-- /.box-header -->
 
+        <div class="pull-right box search_student" style="margin-bottom: 20%;" >
+
+            {!! Form::select('student_id_card',[],null,['id'=>'select_student_id_card','class'=>"form-control col-sm-10",'style'=>'width:100%;']) !!}
+            {{ Form::hidden('student_id', null, ['class' => 'form-control', 'id'=>'student_lists']) }}
+
+
+        </div>
+
         <div class="box-body id_card_table">
+
             <div class="row">
                 @foreach($studentAnnuals_front as $front)
+
                         <div class="col-sm-3" style="margin-bottom: 15px;">
                             <div class="page">
                                 <div class="background">
@@ -232,6 +267,7 @@
                                     </div>
 
                                     <span class="name_kh">{{$front->name_kh}}</span>
+
                                     @if(strlen($front->name_latin) < 25)
                                         <span class="name_latin">{{strtoupper($front->name_latin)}}</span>
                                     @else
@@ -246,7 +282,6 @@
                             <input type="checkbox" checked class="checkbox" data-id="{{$front->id}}">
                         </div>
 
-
                 @endforeach
             </div>
         </div>
@@ -257,12 +292,20 @@
 
 @section('after-scripts-end')
     {!! Html::script('plugins/iCheck/icheck.min.js') !!}
+    {!! HTML::script('plugins/select2/select2.full.min.js') !!}
+    {!! HTML::script('js/backend/student/student.js') !!}
     <script>
         var selected_ids = null;
-        $('.id_card_table input[type="checkbox"]').iCheck({
-            checkboxClass: 'icheckbox_square-red',
-            radioClass: 'iradio_square-red'
-        });
+
+
+        function initIcheker() {
+
+            $('.id_card_table input[type="checkbox"]').iCheck({
+                checkboxClass: 'icheckbox_square-red',
+                radioClass: 'iradio_square-red'
+            });
+        }
+        initIcheker();
 
 
         //Enable check and uncheck all functionality
@@ -329,6 +372,112 @@
                 }
             });
         });
+
+
+        $('div.search_student').hide()
+        $('#add_student').on('click', function (e) {
+            $('div.search_student').slideToggle('fast');
+
+
+        });
+
+        var $search_url = "{{route('admin.student.search')}}";
+        var base_url = '{{$smis_server->value.'/img/profiles/'}}';
+        var student_search_box = $('select#select_student_id_card').select2({
+            placeholder: 'Enter id card ...',
+            allowClear: true,
+            tags: true,
+            createTag: function (params) {
+
+                return {
+                    id: params.term,
+                    name: params.term,
+                    group: 'customer',
+                    newOption: true
+                }
+            },
+            ajax: {
+                method:'GET',
+                url: $search_url,
+                dataType: 'json',
+                delay: 250,
+                data: function (params) {
+                    return {
+                        term: params.term || '', // search term
+                        page: params.page || 1
+                    };
+                },
+                cache: true,
+
+            },
+            escapeMarkup: function (markup) {
+                return markup;
+            }, // let our custom formatter work
+            minimumInputLength: 3,
+            templateResult: formatRepoStudent, // omitted for brevity, see the source of this page
+            templateSelection: formatRepoSelectionStudent // omitted for brevity, see the source of this page
+        });
+
+        $('#select_student_id_card').on("select2:select", function(e) {
+
+            var attrs = getAttr();
+
+            var new_id = new_id_card_photo(
+                    '{{url('img/id_card/front_id_card.png')}}',
+                    attrs.id_card,
+                    attrs.name_kh,
+                    attrs.name_latin,
+                    attrs.student_annual_id,
+                    '{{$smis_server->value.'/img/profiles/'}}'+attrs.photo
+            );
+            var check = is_added_student(attrs.student_annual_id)
+            if(!check) {
+                $('.id_card_table').children('.row').prepend(new_id);
+                initIcheker();
+
+            } else {
+                notify('error', 'Student already added!', 'Attention!')
+            }
+
+            $('div.search_student').slideToggle('fast');
+
+        })
+
+
+        function getAttr()
+        {
+
+            var attrs = {
+                id_card: $('#student_lists').attr('id_card'),
+                name_kh: $('#student_lists').attr('name_kh'),
+                name_latin: $('#student_lists').attr('name_latin'),
+                student_annual_id: $('#student_lists').attr('student_annual_id'),
+                photo: $('#student_lists').attr('photo')
+            }
+
+            return attrs;
+
+        }
+
+         function is_added_student (student_annual_id) {
+
+            var check= 0;
+             $(document).find('div.id_card_table input:checked').each(function () {
+
+                 if(parseInt(student_annual_id) == parseInt($(this).data('id'))) {
+                     check++;
+
+                 }
+             });
+
+             if(check > 0)  {
+                 return true;
+             } else {
+                 return false;
+             }
+
+
+        }
 
     </script>
 @stop

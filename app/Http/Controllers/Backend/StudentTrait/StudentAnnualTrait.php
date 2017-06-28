@@ -6,6 +6,7 @@ use App\Models\Department;
 use App\Models\DepartmentOption;
 use App\Models\Enum\SemesterEnum;
 use App\Models\Group;
+use App\Models\StudentAnnual;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -439,6 +440,76 @@ trait StudentAnnualTrait
 
 
         return $groupStudentAnnuals;
+
+    }
+
+
+    public function search(Request $request)
+    {
+
+        $page = $request->page;
+        $resultCount = 25;
+        $offset = ($page - 1) * $resultCount;
+
+        $students = DB::table('students')
+            ->where('students.id_card', 'ilike', "%".$request->term . "%")
+            ->select([
+                'students.id as student_id',
+                'students.id_card',
+                'students.name_kh as text',
+                'students.name_latin',
+                'students.photo',
+                'genders.code as gender',
+                //'departments.code as department'
+            ])
+            //->leftJoin('departments','departments.id','=','studentAnnuals.department_id')
+            ->leftJoin('genders','genders.id','=','students.gender_id');
+
+        $client = $students
+            ->orderBy('name_latin')
+            ->skip($offset)
+            ->take($resultCount)
+            ->get();
+
+        $studentIds = collect($client)->pluck('student_id')->toArray();
+
+        $studentAnnuals = StudentAnnual::join('departments', function($query) use($studentIds) {
+            $query->on('departments.id', '=', 'studentAnnuals.department_id')
+                ->where('academic_year_id','=', AcademicYear::max('id'))
+                ->whereIn('studentAnnuals.student_id', $studentIds);
+            })
+            ->select(
+                'departments.code as department',
+                'studentAnnuals.degree_id',
+                'studentAnnuals.grade_id',
+                'studentAnnuals.student_id as student_id_',
+                'studentAnnuals.id as id'
+            )->get();
+
+        $studentAnnuals = collect($studentAnnuals)->keyBy('student_id_')->toArray();
+
+        $arrayData= [];
+        collect($client)->filter(function($item) use($studentAnnuals, &$arrayData) {
+            if(isset($studentAnnuals[$item->student_id])) {
+                $item = (object) array_merge((array)$item, $studentAnnuals[$item->student_id]);
+                $arrayData[]= $item;
+                return $arrayData;
+            }
+        })->toArray();
+
+
+        $count = Count($students->get());
+        $resultCount = count($arrayData);
+        $endCount = $offset + $resultCount;
+        $morePages = $count > $endCount;
+
+        $results = array(
+            'results' => $arrayData,
+            'pagination' => array(
+                "more" => $morePages
+            )
+        );
+        return response()->json($results);
 
     }
 

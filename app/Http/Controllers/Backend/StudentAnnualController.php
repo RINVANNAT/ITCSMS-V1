@@ -2045,7 +2045,6 @@ class StudentAnnualController extends Controller
             'studentAnnuals.grade_id',
             'studentAnnuals.academic_year_id',
             'studentAnnuals.id'
-
         ])
             ->leftJoin('students','students.id','=','studentAnnuals.student_id')
             ->leftJoin('genders', 'students.gender_id', '=', 'genders.id')
@@ -2189,5 +2188,6 @@ class StudentAnnualController extends Controller
 
         return view('backend.studentAnnual.print.transcript_semester',compact('scores','student','semester'));
     }
+
 
 }
