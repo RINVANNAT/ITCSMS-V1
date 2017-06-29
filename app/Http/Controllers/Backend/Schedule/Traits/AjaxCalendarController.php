@@ -22,33 +22,40 @@ trait AjaxCalendarController
     /**
      * @var EloquentYearRepository
      */
-    protected $yearRepository;
+    protected $ajaxYearRepository;
 
     /**
      * @var EloquentEventRepository
      */
-    protected $eventRepository;
+    protected $ajaxEventRepository;
 
     /**
      * @var EloquentRepeatRepository
      */
-    protected $repeatRepository;
+    protected $ajaxRepeatRepository;
 
     /**
-     * AjaxCalendarController constructor.
-     * @param EloquentYearRepository $eloquentYearRepository
-     * @param EloquentEventRepository $eloquentEventRepository
-     * @param EloquentRepeatRepository $eloquentRepeatRepository
+     * @param EloquentRepeatRepository $repeatRepository
      */
-    public function __construct(
-        EloquentYearRepository $eloquentYearRepository,
-        EloquentEventRepository $eloquentEventRepository,
-        EloquentRepeatRepository $eloquentRepeatRepository
-    )
+    public function setRepeatRepository($repeatRepository)
     {
-        $this->yearRepository = $eloquentYearRepository;
-        $this->eventRepository = $eloquentEventRepository;
-        $this->repeatRepository = $eloquentRepeatRepository;
+        $this->ajaxRepeatRepository = $repeatRepository;
+    }
+
+    /**
+     * @param EloquentYearRepository $yearRepository
+     */
+    public function setYearRepository($yearRepository)
+    {
+        $this->ajaxYearRepository = $yearRepository;
+    }
+
+    /**
+     * @param EloquentEventRepository $eventRepository
+     */
+    public function setEventRepository($eventRepository)
+    {
+        $this->ajaxEventRepository = $eventRepository;
     }
 
     /**
@@ -83,7 +90,7 @@ trait AjaxCalendarController
     {
         //dd(request()->all());
         $year = Carbon::parse(request('start'))->year;
-        $objectYear = $this->yearRepository->findByYear($year);
+        $objectYear = $this->ajaxYearRepository->findByYear($year);
 
         if ($objectYear == false) {
             $newYear = new Year();
@@ -95,8 +102,8 @@ trait AjaxCalendarController
             $year_id = $objectYear->id;
         }
 
-        $objEvent = $this->eventRepository->find(request('event_id'));
-        $objYear = $this->yearRepository->find($year_id);
+        $objEvent = $this->ajaxRepeatRepository->find(request('event_id'));
+        $objYear = $this->ajaxYearRepository->find($year_id);
 
         $findEventYear = DB::table('event_year')
             ->where([
@@ -231,7 +238,7 @@ trait AjaxCalendarController
         $objYear = Year::where('name', $year)->first();
 
         if ($objYear instanceof Year) {
-            $events = $this->eventRepository->findEventsByYearAndAuthor($objYear->id, auth()->user()->id, auth()->user()->getDepartment());
+            $events = $this->ajaxRepeatRepository->findEventsByYearAndAuthor($objYear->id, auth()->user()->id, auth()->user()->getDepartment());
             return Response::json(['status' => true, 'events' => $events]);
         }
         return Response::json(['status' => true, 'events' => Event::latest()->get()]);
@@ -260,12 +267,12 @@ trait AjaxCalendarController
 
         if ($repeatEvents != null) {
             foreach ($repeatEvents as $event) {
-                if ($this->eventRepository->findEventYear($event->id, $objYear->id) instanceof EventYear) {
+                if ($this->ajaxRepeatRepository->findEventYear($event->id, $objYear->id) instanceof EventYear) {
                     continue;
                 } else {
                     /** @var Event $event */
                     /** @var Year $objYear */
-                    $this->repeatRepository->copiedObjectRepeatEvent($event, $objYear);
+                    $this->ajaxRepeatRepository->copiedObjectRepeatEvent($event, $objYear);
                 }
             }
         }

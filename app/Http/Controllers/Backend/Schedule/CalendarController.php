@@ -50,6 +50,9 @@ class CalendarController extends Controller
         $this->eventRepository = $eloquentEventRepository;
         $this->yearRepository = $eloquentYearRepository;
         $this->repeatRepository = $eloquentRepeatRepository;
+        $this->setEventRepository($eloquentEventRepository);
+        $this->setRepeatRepository($eloquentRepeatRepository);
+        $this->setYearRepository($eloquentYearRepository);
     }
 
     /**

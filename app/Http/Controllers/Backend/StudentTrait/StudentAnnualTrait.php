@@ -30,7 +30,6 @@ trait StudentAnnualTrait
 
     public function formGenerateGroup(GenerateStudentGroupRequest $request) {
 
-
         $degrees = Degree::lists('name_en','id');
         $grades = Grade::lists('name_en', 'id');
         $departments = Department::where('parent_id', 11)->orderBy('id')->get();//lists('code', 'id');
@@ -40,8 +39,6 @@ trait StudentAnnualTrait
 
         return view('backend.studentAnnual.includes.form_generate_student_group', compact('academicYears', 'departments', 'grades', 'degrees', 'semesters', 'options'));
     }
-
-
 
     public function loadCourse(Request $request)
     {
@@ -171,10 +168,7 @@ trait StudentAnnualTrait
         return Response::json(['status'=>true, 'request' =>$dataRequest, 'message' => 'Generating !!!', 'type'=>'info' ]);
     }
 
-
-
     public function generate_group(GenerateStudentGroupRequest $request){
-
 
         $studentListByGroup = [];
         $numberStudentPerGroup = $request->number_student;
@@ -325,7 +319,6 @@ trait StudentAnnualTrait
         })->download('xls');
 
     }
-
 
     private function storeOrUpdateGroup($groups, $student, $academicYearId, $groupCode, $semesterId, $department, $studentListByGroup)
     {

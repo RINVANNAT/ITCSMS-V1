@@ -71,7 +71,7 @@
 
     <div class="box-body">
 
-        <div class="box-group" id="accordion">
+        <div class="box-group import_miss_student" id="accordion">
             <!-- we are adding the .panel class so bootstrap.js collapse plugin detects it -->
             <div class="panel box box-primary">
                 <div class="box-header with-border">
@@ -644,7 +644,21 @@
 
         @if(Session::has('status'))
             @if(Session::get('status') == true)
+                @if(Session::has('missed_id'))
+                    var new_div = '<div class="alert alert-info">' +
+                '<h4><i class="icon fa fa-info"></i> Special Notification</h4>' +
+                '<p>' +
+                'Student Lists is imported but there are some Student Id which are not imported ' + '{{Session::get('message')}}'+
+                '</p>' +
+                '</div>'+
+                '<button class="btn_cancel btn btn-xs btn-danger" > Close</button>';
+
+                $('div.import_miss_student').html(new_div)
+
+                @else
                 notify('success', '{{Session::get('message')}}', 'Import-Group')
+                @endif
+
             @else
                  notify('error', '{{Session::get('message')}}', 'Import-Group')
             @endif
