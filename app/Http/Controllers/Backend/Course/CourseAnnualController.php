@@ -2934,9 +2934,6 @@ class CourseAnnualController extends Controller
 
         if ($group = $request->group_id) {
 
-
-            dd($group);
-
             $studentAnnualIds = DB::table('group_student_annuals')
                 ->whereIn('group_id', [$group])
                 ->where('semester_id', $courseAnnual->semester_id);

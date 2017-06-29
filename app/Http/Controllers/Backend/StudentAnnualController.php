@@ -18,6 +18,8 @@ use App\Models\Configuration;
 use App\Models\Degree;
 use App\Models\Department;
 use App\Models\DepartmentOption;
+use App\Models\Enum\ScoreEnum;
+use App\Models\Enum\SemesterEnum;
 use App\Models\Gender;
 use App\Models\Grade;
 use App\Models\HighSchool;
@@ -112,9 +114,7 @@ class StudentAnnualController extends Controller
         $grades = Grade::lists('name_kh','id');
         $scholarships = Scholarship::lists('code','id');
         $origins = Origin::lists('name_kh','id');
-
         $genders = Gender::lists('name_kh','id');
-
         $highSchools = HighSchool::lists('name_kh','id');
         $promotions = Promotion::orderBy('name','DESC')->lists('name','id');
         $histories = History::lists('name_en','id');
@@ -1858,37 +1858,55 @@ class StudentAnnualController extends Controller
                 base_path() . '/public/assets/uploaded_file/group_student_annual/', $import
             );
             $storage_path = base_path() . '/public/assets/uploaded_file/group_student_annual/' . $import;
-            $groups = collect(DB::table('groups')->get())->keyBy('code')->toArray();
-
             $departments = Department::all()->keyBy('code')->toArray();
-
             $dataUploaded = [];
             $studentIdCards = [];
             $academicYear = 0;
             $isValidFile = true;
+            $departmentCode = '';
+            $semester = '';
+            $groupCode = [];
 
-            Excel::load($storage_path, function($results) use($groups, &$dataUploaded, &$studentIdCards, &$academicYear, &$isValidFile) {
-
+            Excel::load($storage_path, function($results) use(&$groupCode, &$dataUploaded, &$studentIdCards, &$academicYear, &$isValidFile, &$departmentCode, &$semester) {
 
                 $allData = $results->get();
                 $firstRow = $results->first()->toArray();
 
                 if(isset($firstRow['student_id']) && isset($firstRow['department_code']) && isset($firstRow['semester']) && isset($firstRow['academic_year']) && isset($firstRow['group_code'])) {
 
+                    $departmentCode = $firstRow['department_code'];
+                    $semester = $firstRow['semester'];
                     $academicYear = $firstRow['academic_year'];
+                    $dataCollection = collect($allData);
 
-                    $dataUploaded = collect($allData)->groupBy('group_code')->toArray();
-                    $studentIdCards = collect($allData)->map(function($item, $key) {
+
+                    $dataUploaded = $dataCollection->groupBy(function($item) use (&$groupCode) {
+
+                        if(is_numeric($item['group_code'])) {
+                            $item['group_code'] = (string)((int)$item['group_code']) ;
+                        }
+                        if($item['group_code'] != '' && $item['group_code'] !=null) {
+
+                            $groupCode[$item['group_code']] = $item['group_code'];
+                            return  $item['group_code'];
+                        }
+
+                    })->toArray();
+
+                    $studentIdCards = $dataCollection->map(function($item, $key) {
                         return [$key => $item['student_id']];
                     })->collapse()->toArray();
                 } else {
+
                     $isValidFile = false;
                 }
-
             });
 
-
             if($isValidFile) {
+
+                $checkStoreGroupStudentAnnual = [];
+                $count = 0;
+
 
                 $studentAnnuals = DB::table('studentAnnuals')
                     ->join('students', function($query) use($studentIdCards, $academicYear) {
@@ -1899,47 +1917,112 @@ class StudentAnnualController extends Controller
                     })
                     ->select('studentAnnuals.*', 'students.id_card')->get();
 
-                $studentAnnuals = collect($studentAnnuals)->keyBy('id_card')->toArray();
 
-                $checkStoreGroupStudentAnnual = [];
-                $count = 0;
+                $studentAnnualCollection = collect($studentAnnuals);
+
+                $studentAnnuals = $studentAnnualCollection->keyBy('id_card')->toArray();
+
+                $studentAnnualIds = $studentAnnualCollection->pluck('id')->toArray();
+
+                $requestGroups = DB::table('groups')->whereIn('code', array_values($groupCode))->orderBy('code')->get();
+                $groupCollection = collect($requestGroups);
+                $groupIds = [];
+                $groups = $groupCollection->keyBy(function($item) use(&$groupIds) {
+                    $groupIds[] =  $item->id;
+                    return $item->code;
+                })->toArray();
+
+                $department = Department::where('code', $departmentCode)->first();
+
+                if(is_numeric($semester) && $semester <= SemesterEnum::SEMESTER_TWO) {
+
+                    if(count($groupIds) > 0) {
+                        $grouptStudentAnnuals = $this->groupStudentAnnual($groupIds, $studentAnnualIds, $semester, $department);
+
+                        if(count($grouptStudentAnnuals) >= count($studentAnnualIds)) {
+
+
+                            return redirect()->back()->with(['status' => false, 'message' => 'Student groups are already generated!!']);
+                        }
+                    }
+
+                } else {
+                    return redirect()->back()->with(['status' => false, 'message' => 'Semester Id is not correct']);
+                }
+
+
 
                 DB::beginTransaction();
 
+                $uncount = 0;
+
+                $array_missedIds = [];
+
                 foreach($dataUploaded as $groupItem => $studentProp) {
 
-                    if(isset($groups[trim($groupItem)])) {
+                    if($groupItem != null && $groupItem != '') {
 
-                       $toCreateGroup =  $this->groups->toCreateGroup($studentProp, $studentAnnuals,$departments, $groups[trim($groupItem)]);
+                        if(isset($groups[trim($groupItem)])) {
 
-                        if($toCreateGroup['status']) {
+                            $toCreateGroup =  $this->groups->toCreateGroup($studentProp, $studentAnnuals,$departments, $groups[trim($groupItem)]);
 
-                            $checkStoreGroupStudentAnnual = $toCreateGroup;
-                            $count++;
+                            if($toCreateGroup['status']) {
+
+                                $count++;
+                                $checkStoreGroupStudentAnnual = $toCreateGroup;
+
+                                if(isset($toCreateGroup['missed_id'])) {
+                                    $array_missedIds = array_merge($array_missedIds, $toCreateGroup['missed_id']);
+                                }
+
+                            } else {
+                                return redirect()->back()->with($toCreateGroup);
+                            }
+
                         } else {
-                            return redirect()->back()->with($toCreateGroup);
-                        }
 
+                            $newGroup = [
+                                'code' => $groupItem
+                            ];
+                            $group = $this->groups->create($newGroup);
+                            $toCreateNewGroup = $this->groups->toCreateGroup($studentProp, $studentAnnuals, $departments, $group);
+
+                            if($toCreateNewGroup['status']) {
+                                $count++;
+                                $checkStoreGroupStudentAnnual = $toCreateNewGroup;
+
+                                if(isset($toCreateGroup['missed_id'])) {
+                                    $array_missedIds = array_merge($array_missedIds, $toCreateGroup['missed_id']);
+                                }
+                            } else {
+                                return redirect()->back()->with($toCreateNewGroup);
+                            }
+                        }
                     } else {
-
-                        $newGroup = [
-                            'code' => $groupItem
-                        ];
-                        $group = $this->groups->create($newGroup);
-                        $toCreateNewGroup = $this->groups->toCreateGroup($studentProp, $studentAnnuals, $departments, $group);
-
-                        if($toCreateNewGroup['status']) {
-                            $count++;
-                            $checkStoreGroupStudentAnnual = $toCreateNewGroup;
-                        } else {
-                            return redirect()->back()->with($toCreateNewGroup);
-                        }
-
+                        $uncount++;
                     }
                 }
 
-                if($count == count($dataUploaded)) {
+                if(($count + $uncount) == count($dataUploaded)) {
+
+                    if(count($array_missedIds) > 0) {
+
+                        $new_message = '';
+                        foreach($array_missedIds as $id) {
+                            $new_message .= $id.', ';
+                        }
+                        $new_message = rtrim($new_message, ', ');
+                        if(count($array_missedIds) > 1) {
+                            $checkStoreGroupStudentAnnual['message'] = 'Missing Student: ( '. $new_message.' )'. ' Please check!';
+                        } else {
+                            $checkStoreGroupStudentAnnual['message'] = 'Missing Students: ( '. $new_message.' )'. ' Please check!';
+                        }
+
+                        $checkStoreGroupStudentAnnual['missed_id'] = true;
+                    }
+
                     return redirect()->back()->with($checkStoreGroupStudentAnnual);
+
                 } else {
                     return redirect()->back()->with(['status' => false, 'message' => 'Something went wrong!!']);
                 }

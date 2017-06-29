@@ -140,6 +140,7 @@ class EloquentGroupRepository implements GroupRepositoryContract
         $count = 0;
 
         $missedIds = '';
+        $missed_id = [];
         $missed = false;
         $checkDept = false;
 
@@ -158,7 +159,6 @@ class EloquentGroupRepository implements GroupRepositoryContract
                         $newGroupStudentAnnual = [
                             'student_annual_id' => $student_annual->id,
                             'semester_id' => $stu['semester'],
-                            'academic_year_id' => $stu['academic_year'],
                             'department_id' => $department['id'],
                             'group_id' => $groupItem->id,
                             'created_at' => Carbon::now()
@@ -169,7 +169,6 @@ class EloquentGroupRepository implements GroupRepositoryContract
                         $newGroupStudentAnnual = [
                             'student_annual_id' => $student_annual->id,
                             'semester_id' => $stu['semester'],
-                            'academic_year_id' => $stu['academic_year'],
                             'department_id' => null,
                             'group_id' => $groupItem->id,
                             'created_at' => Carbon::now()
@@ -193,7 +192,8 @@ class EloquentGroupRepository implements GroupRepositoryContract
             } else {
                 /*---some student are not in our database -----*/
 
-                $missedIds =$missedIds.', ' .$stu['student_id'];
+                $missedIds .=$stu['student_id'].',';
+                $missed_id[] = $stu['student_id'];
                 $missed = true;
             }
         }
@@ -202,7 +202,8 @@ class EloquentGroupRepository implements GroupRepositoryContract
 
             return [
                 'status' => true,
-                'message' => 'Missing Student: ( '. $missedIds.' )'. ' Please check!'
+                'message' => 'Missing Student: ( '. $missedIds.' )'. ' Please check!',
+                'missed_id' => $missed_id
             ];
         }
 
