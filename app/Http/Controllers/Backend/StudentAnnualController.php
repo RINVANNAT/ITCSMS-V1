@@ -1887,7 +1887,7 @@ class StudentAnnualController extends Controller
                         }
                         if($item['group_code'] != '' && $item['group_code'] !=null) {
 
-                            $groupCode[$item['group_code']] = $item['group_code'];
+                            $groupCode[$item['group_code']] = strtoupper($item['group_code']);
                             return  $item['group_code'];
                         }
 
@@ -1906,8 +1906,6 @@ class StudentAnnualController extends Controller
 
                 $checkStoreGroupStudentAnnual = [];
                 $count = 0;
-
-
                 $studentAnnuals = DB::table('studentAnnuals')
                     ->join('students', function($query) use($studentIdCards, $academicYear) {
                         $query->on('students.id','=', 'studentAnnuals.student_id')
@@ -1933,26 +1931,29 @@ class StudentAnnualController extends Controller
                 })->toArray();
 
                 $department = Department::where('code', $departmentCode)->first();
+                $grouptStudentAnnuals = [];
 
                 if(is_numeric($semester) && $semester <= SemesterEnum::SEMESTER_TWO) {
 
                     if(count($groupIds) > 0) {
+
                         $grouptStudentAnnuals = $this->groupStudentAnnual($groupIds, $studentAnnualIds, $semester, $department);
 
                         if(count($grouptStudentAnnuals) >= count($studentAnnualIds)) {
 
-
                             return redirect()->back()->with(['status' => false, 'message' => 'Student groups are already generated!!']);
+
+                        } else {
+
+                            if (count($grouptStudentAnnuals) > 0) {
+                                $grouptStudentAnnuals = collect($grouptStudentAnnuals)->keyBy('student_annual_id')->toArray();
+                            }
                         }
                     }
 
                 } else {
                     return redirect()->back()->with(['status' => false, 'message' => 'Semester Id is not correct']);
                 }
-
-
-
-                DB::beginTransaction();
 
                 $uncount = 0;
 
@@ -1962,9 +1963,10 @@ class StudentAnnualController extends Controller
 
                     if($groupItem != null && $groupItem != '') {
 
+
                         if(isset($groups[trim($groupItem)])) {
 
-                            $toCreateGroup =  $this->groups->toCreateGroup($studentProp, $studentAnnuals,$departments, $groups[trim($groupItem)]);
+                            $toCreateGroup =  $this->groups->toCreateGroup($studentProp, $studentAnnuals,$departments, $groups[trim($groupItem)], $grouptStudentAnnuals);
 
                             if($toCreateGroup['status']) {
 
@@ -1985,7 +1987,7 @@ class StudentAnnualController extends Controller
                                 'code' => $groupItem
                             ];
                             $group = $this->groups->create($newGroup);
-                            $toCreateNewGroup = $this->groups->toCreateGroup($studentProp, $studentAnnuals, $departments, $group);
+                            $toCreateNewGroup = $this->groups->toCreateGroup($studentProp, $studentAnnuals, $departments, $group, $grouptStudentAnnuals);
 
                             if($toCreateNewGroup['status']) {
                                 $count++;

@@ -2819,7 +2819,6 @@ class CourseAnnualController extends Controller
                         return $this->empty_data($message, $type='warning');
                     }
 
-
                 }
 
             } else {
@@ -2925,8 +2924,6 @@ class CourseAnnualController extends Controller
         $studentNotations = $allNumberAbsences;
 
         $students = $this->getStudentByDeptIdGradeIdDegreeId($department_ids, $degree_ids, $grade_ids, $courseAnnual->academic_year_id);
-
-
 
         if (count($department_option_ids) > 0) {
             $students = $students->whereIn('studentAnnuals.department_option_id', $department_option_ids);
@@ -3953,8 +3950,6 @@ class CourseAnnualController extends Controller
 
         //dd($studentDataProperties);
 
-
-
         $students = $studentDataProperties['student'];
         $coursePrograms = $studentDataProperties['courseprogram'];
         $studentRattrapages = $studentDataProperties['student_rattrapage'];
@@ -4005,6 +4000,7 @@ class CourseAnnualController extends Controller
 //        $studentDataProperties = $this->studentResitData($request);
 
         $studentDataProperties = $this->studentResitData($request);
+
         $students = $studentDataProperties['student'];
         $coursePrograms = $studentDataProperties['courseprogram'];
         $studentRattrapages = $studentDataProperties['student_rattrapage'];

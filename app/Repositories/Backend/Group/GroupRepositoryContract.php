@@ -64,5 +64,5 @@ interface GroupRepositoryContract
      * @return mixed
      */
 
-    public function toCreateGroup($studentProp, $studentAnnuals, $departments, $groupItem);
+    public function toCreateGroup($studentProp, $studentAnnuals, $departments, $groupItem, $grouptStudentAnnuals);
 }

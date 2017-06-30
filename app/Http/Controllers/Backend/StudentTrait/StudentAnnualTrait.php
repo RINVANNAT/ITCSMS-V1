@@ -406,6 +406,7 @@ trait StudentAnnualTrait
     {
 
         if (isset($department)) {
+
             if ($department->is_vocational) {
 
                 $groupStudentAnnuals = DB::table('group_student_annuals')
@@ -413,7 +414,6 @@ trait StudentAnnualTrait
                     ->where('semester_id', $semesterId)
                     ->where('department_id', $department->id)
                     ->whereIn('group_id', $groupIds)->get();
-
             } else {
 
                 $groupStudentAnnuals = DB::table('group_student_annuals')
