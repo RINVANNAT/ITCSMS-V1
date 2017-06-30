@@ -3,6 +3,7 @@
       margin-bottom: 5px;
       margin-left: 5px;
   }
+
 </style>
 
 <input type="hidden" name="academic_year_id" value="{{$academicYear->id}}">
@@ -11,17 +12,17 @@
     <tr>
         <th>No</th>
         <th>ID-Card</th>
-        <th>Name</th>
+        <th><div style="width: 150px;">Name</div></th>
         <?php $totalCredit=0?>
         @foreach($coursePrograms as $program)
             <?php $course = $program->courseAnnual()->first()?>
             <?php
             $totalCredit = $totalCredit + $course->credit;
             ?>
-            <th><div class="vertical">{{$program->name_en}}<br>{{$course->credit}}  </div> </th>
+            <th><div class="vertical" style="width: 70px;">{{$program->name_en}}<br>{{$course->credit}}  </div> </th>
 
         @endforeach
-        <th>Moyenne <br>{{$totalCredit}} </th>
+        <th> <div style="width: 120px"> Moyenne </div> <br>{{$totalCredit}} </th>
     </tr>
     </thead>
     <tbody>
@@ -36,7 +37,7 @@
         <tr>
             <td>{{$index}}</td>
             <td>{{$student->id_card}}</td>
-            <td >{{$student->name_latin}}</td>
+            <td>{{$student->name_latin}}</td>
             <?php $count_label=1;?>
             @foreach($coursePrograms as $program)
                 <?php $count_label++;?>
@@ -52,12 +53,10 @@
                 }
                 ?>
                 @if(count($courseAnnualFailId)> 0)
-
                     <?php
-
                     //---this array have only one element of exact course annual of the student who must take the resit
                     foreach($courseAnnualFailId as $courseAnnualId) {// loop only one time
-                        $studentScore = isset($averages[$courseAnnualId])?$averages[$courseAnnualId][$student->student_annual_id]:null;
+                        $studentScore = isset($averages[$courseAnnualId])?(isset($averages[$courseAnnualId][$student->student_annual_id]) ? $averages[$courseAnnualId][$student->student_annual_id]:null):null;
                     }
                     //---we need to find the course annual credit not course program credit
                     $totalScore = $totalScore + ( (($studentScore != null)?$studentScore->average:0) * $courseAnnual->credit);
@@ -65,7 +64,7 @@
                     ?>
                     <td>
                         {{--set checked--}}
-                        <label for="{{$student->id_card}}_{{$count_label}}"><input id="{{$student->id_card}}_{{$count_label}}" credit="{{$courseAnnual->credit}}" student_id="{{$student->id_card}}" class="{{$student->id_card}} input_value" type="checkbox" onchange="calculateScore($(this))" name="{{$student->id_card}}[]" value="{{$courseAnnualId}}" checked score="{{($studentScore!=null)?$studentScore->average:0}}"> {{number_format((float)(($studentScore!=null)?$studentScore->average:0), 2, '.', '')}}</label>
+                        <label for="{{$student->id_card}}_{{$count_label}}" style=" font-size: 12pt;" class="btn btn-xs btn-primary"><input id="{{$student->id_card}}_{{$count_label}}" credit="{{$courseAnnual->credit}}" student_id="{{$student->id_card}}" class="{{$student->id_card}} input_value" type="checkbox" onchange="calculateScore($(this))" name="{{$student->id_card}}[]" value="{{$courseAnnualId}}" checked score="{{($studentScore!=null)?$studentScore->average:0}}"> {{number_format((float)(($studentScore!=null)?$studentScore->average:0), 2, '.', '')}}</label>
 
                     </td>
                 @else
@@ -87,8 +86,8 @@
 
                         @if(count($courseAnnualPassId) >0)
 
-                                <td width="">
-                                    <label for="{{$student->id_card}}_{{$count_label}}"><input id="{{$student->id_card}}_{{$count_label}}" type="checkbox" credit="{{$courseAnnual->credit}}" student_id="{{$student->id_card}}" class="{{$student->id_card}} input_value" onchange="calculateScore($(this))" name="{{$student->id_card}}[]" value="{{$courseAnnualId}}" score="{{($studentScore!=null)?$studentScore->average:0}}"> {{number_format((float)(($studentScore!=null)?$studentScore->average:0), 2, '.', '')}}</label>
+                                <td>
+                                    <label for="{{$student->id_card}}_{{$count_label}}" style=" font-size: 12pt;" class="btn btn-xs btn-primary"><input id="{{$student->id_card}}_{{$count_label}}" type="checkbox" credit="{{$courseAnnual->credit}}" student_id="{{$student->id_card}}" class="{{$student->id_card}} input_value" onchange="calculateScore($(this))" name="{{$student->id_card}}[]" value="{{$courseAnnualId}}" score="{{($studentScore!=null)?$studentScore->average:0}}"> {{number_format((float)(($studentScore!=null)?$studentScore->average:0), 2, '.', '')}}</label>
 
                                 </td>
                         @endif
@@ -104,7 +103,7 @@
             $moyenne = number_format((float)($totalScore/(($totalCredit >0)?$totalCredit:1)), 2, '.', '');
             $approximation_moyenne = number_format((float)($approximation_score/(($totalCredit >0)?$totalCredit:1)), 2, '.', '');
             ?>
-            <td><label for="moyenne" class=" label label-warning">{{$moyenne}} </label> <label id="{{$student->id_card}}" for="approximation_score" class="label label-success">  {{$approximation_moyenne}}</label></td>
+            <td><label for="moyenne" class=" label label-warning" >{{$moyenne}} </label> <label id="{{$student->id_card}}" for="approximation_score" class="label label-success">  {{$approximation_moyenne}}</label></td>
         </tr>
 
         <?php $index++;?>

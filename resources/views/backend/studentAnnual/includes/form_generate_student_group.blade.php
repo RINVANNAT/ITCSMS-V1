@@ -584,13 +584,11 @@
 
             });
         }
-
         function  clearOption() {
 
             $('#reference_course_id').html('');
             initSelect2();
         }
-
 
         function setTitle()
         {
@@ -640,9 +638,13 @@
         }
 
 
+        $('form#import_form_student').on('submit', function() {
+            toggleLoading(true);
+        })
         /*---session message of the page----*/
 
         @if(Session::has('status'))
+                 toggleLoading(false);
             @if(Session::get('status') == true)
                 @if(Session::has('missed_id'))
                     var new_div = '<div class="alert alert-info">' +
@@ -650,6 +652,8 @@
                 '<p>' +
                 'Student Lists is imported but there are some Student Id which are not imported ' + '{{Session::get('message')}}'+
                 '</p>' +
+                        '<br>'+
+                        '<p>Please Note: <span style="color:red; font-size:14pt;">you can imported back for only Unimported Student! </span></p>'+
                 '</div>'+
                 '<button class="btn_cancel btn btn-xs btn-danger" > Close</button>';
 
@@ -660,10 +664,10 @@
                 @endif
 
             @else
+             toggleLoading(false);
                  notify('error', '{{Session::get('message')}}', 'Import-Group')
             @endif
         @endif
-
 
 
     </script>

@@ -530,12 +530,70 @@ trait StudentScore {
         $array_course_annual_ids = $courseAnnuals->lists('course_annual_id');
 
         $courseAnnuals = $courseAnnuals->orderBy('course_annuals.semester_id')->orderBy('course_annuals.name_en')->get();// note restricted order by semester this is very important to make dynamic table course of each year [if change there would have bugs]
+        $courseAnnuals = collect($courseAnnuals)->keyBy('course_annual_id')->toArray();
 
         $groups = $this-> selectedGroupByCourseAnnual($array_course_annual_ids);
+
+
+        $studentScores = DB::table('averages')
+            ->whereIn('course_annual_id', $array_course_annual_ids)->get();
+        $studentScoreCollections = collect($studentScores);
+        $studentAnnualIds = $studentScoreCollections->pluck('student_annual_id')->toArray();
+
+
+        $studentScoresKeyByIds = $studentScoreCollections->groupBy('student_annual_id')->toArray();
+
+
+        $studentPassOrFail = [];
+        foreach($studentScoresKeyByIds as $studentAnnualId => $studentAnnual) {
+
+            $validateScore = 0;
+            collect($studentAnnual)->map(function($item)  use($courseAnnuals, &$validateScore, &$studentPassOrFail) {
+
+                $course_annual = $courseAnnuals[$item->course_annual_id];
+                $credit = $course_annual->credit;
+
+                if($item->average < ScoreEnum::Under_30) {
+
+                    $studentPassOrFail['fail'][] = array('credit'=> $course_annual->course_annual_credit, 'score'=> $item->average, 'course_annual_id' => $course_annual->course_annual_id, 'student_annual_id' => $item->student_annual_id);
+
+
+
+                } else {
+
+
+                }
+
+                $validateScore += ($credit * $item->average);
+
+            })->toArray();
+        }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        dd($studentScoresKeyByIds['19798']);
+
+
 
         $allProperties = $this->getCourseAnnualWithScore($array_course_annual_ids);
         $eachCourseAnnualScores = $allProperties['averages'];
 
+
+        $fail_subjects = [];
 
         foreach($courseAnnuals as $courseAnnual) {
 
@@ -543,21 +601,22 @@ trait StudentScore {
 
             $filtered_students = $this->filtering_student_annual($courseAnnual, $groups); /*--public function in StudentTrait Class--*/
 
-            foreach($filtered_students as $stu_dent) {
+            collect($filtered_students)->map(function($stu_dent) use($courseAnnual, $eachCourseAnnualScores, &$fail_subjects) {
 
                 $each_score = isset($eachCourseAnnualScores[$courseAnnual->course_annual_id])?(isset($eachCourseAnnualScores[$courseAnnual->course_annual_id][$stu_dent->student_annual_id])?$eachCourseAnnualScores[$courseAnnual->course_annual_id][$stu_dent->student_annual_id]->average:0):0;
-
                 if($courseAnnual->is_counted_creditability) {
 
                     if($each_score < ScoreEnum::Under_30) {
-                        $fail_subjects[$stu_dent->id_card]['fail'][] = array('credit'=> $courseAnnual->course_annual_credit, 'score'=> $each_score, 'course_annual_id' => $courseAnnual->course_annual_id, 'student_annual_id' => $stu_dent->student_annual_id);
+                        $fail_subjects[$stu_dent->id_card]['fail'][] = array('credit'=> $courseAnnual->course_annual_credit, 'score'=> $each_score, 'course_annual_id' => $courseAnnual->course_annual_id, 'student_annual_id' => $stu_dent->student_annual_id, 'name_latin' => $stu_dent->name_latin);
                     } else {
-                        $fail_subjects[$stu_dent->id_card]['pass'][] = array('credit'=> $courseAnnual->course_annual_credit, 'score'=> $each_score, 'course_annual_id' => $courseAnnual->course_annual_id, 'student_annual_id' => $stu_dent->student_annual_id);
+                        $fail_subjects[$stu_dent->id_card]['pass'][] = array('credit'=> $courseAnnual->course_annual_credit, 'score'=> $each_score, 'course_annual_id' => $courseAnnual->course_annual_id, 'student_annual_id' => $stu_dent->student_annual_id, 'name_latin' => $stu_dent->name_latin);
                     }
                 }
 
-            }
+            })->toArray();
+
         }
+
 
         return [
             'fail_or_pass' => $fail_subjects,
@@ -696,8 +755,6 @@ trait StudentScore {
         } else {
 
             $studentResitExam = $this->findResitStudentAutomatic($studentDataProperties['fail_or_pass']);
-
-            dd($studentResitExam);
 
             foreach($studentResitExam as $student_id => $resit) {
 

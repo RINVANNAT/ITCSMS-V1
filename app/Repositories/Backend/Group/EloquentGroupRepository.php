@@ -117,11 +117,22 @@ class EloquentGroupRepository implements GroupRepositoryContract
 
     public function storeGroupStudentAnnual($input)
     {
-       $insert =  DB::table('group_student_annuals')->insert($input);
 
-        if($insert) {
+        DB::beginTransaction();
+
+        try {
+
+            DB::table('group_student_annuals')->insert($input);
+            DB::commit();
             return true;
+
+        } catch (\Exception $e) {
+
+            DB::rollback();
+
+           return false;
         }
+
 
     }
 
@@ -133,11 +144,12 @@ class EloquentGroupRepository implements GroupRepositoryContract
      * @return array
      */
 
-    public function toCreateGroup($studentProp, $studentAnnuals, $departments, $groupItem)
+    public function toCreateGroup($studentProp, $studentAnnuals, $departments, $groupItem, $grouptStudentAnnuals)
     {
         // TODO: Implement toCreateGroup() method.
 
         $count = 0;
+        $unCount = 0;
 
         $missedIds = '';
         $missed_id = [];
@@ -148,44 +160,47 @@ class EloquentGroupRepository implements GroupRepositoryContract
 
             if(isset($studentAnnuals[$stu['student_id']])) {
 
-                $student_annual = $studentAnnuals[$stu['student_id']];
+                if(!isset($grouptStudentAnnuals[ $studentAnnuals[$stu['student_id']]->id ])) {
 
-                if(isset($departments[$stu['department_code']])) {
+                    $student_annual = $studentAnnuals[$stu['student_id']];
 
-                    $department = $departments[$stu['department_code']];
+                    if(isset($departments[$stu['department_code']])) {
 
-                    if($department['is_vocational']) {
+                        $department = $departments[$stu['department_code']];
 
-                        $newGroupStudentAnnual = [
-                            'student_annual_id' => $student_annual->id,
-                            'semester_id' => $stu['semester'],
-                            'department_id' => $department['id'],
-                            'group_id' => $groupItem->id,
-                            'created_at' => Carbon::now()
-                        ];
+                        if($department['is_vocational']) {
+
+                            $newGroupStudentAnnual = [
+                                'student_annual_id' => $student_annual->id,
+                                'semester_id' => $stu['semester'],
+                                'department_id' => $department['id'],
+                                'group_id' => $groupItem->id,
+                                'created_at' => Carbon::now()
+                            ];
+
+                        } else {
+
+                            $newGroupStudentAnnual = [
+                                'student_annual_id' => $student_annual->id,
+                                'semester_id' => $stu['semester'],
+                                'department_id' => null,
+                                'group_id' => $groupItem->id,
+                                'created_at' => Carbon::now()
+                            ];
+
+                        }
+                        $store =  $this->storeGroupStudentAnnual($newGroupStudentAnnual);
+
+                        if($store) {
+                            $count++;
+                        }
 
                     } else {
-
-                        $newGroupStudentAnnual = [
-                            'student_annual_id' => $student_annual->id,
-                            'semester_id' => $stu['semester'],
-                            'department_id' => null,
-                            'group_id' => $groupItem->id,
-                            'created_at' => Carbon::now()
-                        ];
-
+                        $checkDept = true;
                     }
-                   $store =  $this->storeGroupStudentAnnual($newGroupStudentAnnual);
-
-                    if($store) {
-                        $count++;
-                    }
-
                 } else {
-                    /*---missing record of the department code  -----*/
 
-                    $checkDept = true;
-                    DB::rollback();
+                    $unCount++;
 
                 }
 
@@ -217,12 +232,20 @@ class EloquentGroupRepository implements GroupRepositoryContract
 
         if($count == count($studentProp)) {
 
-            DB::commit();
             return [
                 'status' => true,
                 'message' => 'Group student saved!'
             ];
         } else {
+
+            if($unCount > 0) {
+
+                return [
+                    'status' => true,
+                    'message' => 'Some students are already have groups!'
+                ];
+
+            }
             return [
                 'status' => false,
                 'message' => 'Cannot Save Group Student!'
