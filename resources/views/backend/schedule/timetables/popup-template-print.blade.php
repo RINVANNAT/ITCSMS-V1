@@ -12,10 +12,10 @@
 @stop
 
 @section('content')
-    {{--    {{ dd($timetablesSlotsLang[0]['slotsForLanguage']) }}--}}
+
     @if(isset($timetables))
         @foreach($timetables as $timetable)
-            <div class="row">
+            <page size="A4" layout="portrait" class="each-page">
                 <table class="timetable">
                     <thead>
                     <tr style="border: none !important; margin-bottom: 200px !important;">
@@ -503,7 +503,7 @@
                     </tr>
                     </tbody>
                 </table>
-            </div>
+            </page>
         @endforeach
     @endif
 
@@ -515,5 +515,10 @@
     {!! Html::script('js/backend/schedule/clone-timetable.js') !!}
     {!! Html::script('js/backend/schedule/timetable-print.js') !!}
 
+    <script type="text/javascript">
+        $(function () {
+            window.print();
+        })
+    </script>
 @stop
 

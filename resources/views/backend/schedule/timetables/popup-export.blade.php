@@ -17,6 +17,12 @@
             {{ csrf_field() }}
             <div class="box-header with-border">
                 <h3 class="box-title">{{ trans('labels.backend.schedule.timetable.popup_export.box_title') }}</h3>
+                <div class="box-tools pull-right">
+                    <button type="submit" href="{{ route('timetables.template_print') }}"
+                            class="btn btn-primary btn-sm btn-sm"><i class="fa fa-download"></i></button>
+                    <button class="btn btn-danger btn-sm" id="clone-window-print"><i
+                                class="fa fa-times-circle-o"></i></button>
+                </div>
             </div>
 
             <div class="box-body">
@@ -89,17 +95,6 @@
                     </div>
                 @endif
 
-            </div>
-
-            <div class="box-footer">
-                <div class="form-group">
-                    <div class="col-md-offset-2 col-md-8">
-                        <button type="submit" href="{{ route('timetables.template_print') }}"
-                                class="btn btn-primary btn-sm btn-sm"><i class="fa fa-download"></i></button>
-                        <button class="btn btn-danger btn-sm" id="clone-window-print"><i
-                                    class="fa fa-times-circle-o"></i></button>
-                    </div>
-                </div>
             </div>
         </form>
 
