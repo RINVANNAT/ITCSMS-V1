@@ -40,8 +40,6 @@ class Kernel extends ConsoleKernel
             ->dailyAt('06:00');
 
         /** Testing Simple Console */
-        $schedule->command('log:demo')
-            ->timezone('Asia/Phnom_Penh')
-            ->dailyAt('20:55');
+        $schedule->command('log:demo')->everyMinute();
     }
 }

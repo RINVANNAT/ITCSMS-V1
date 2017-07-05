@@ -132,3 +132,22 @@ page[size="A5"][layout="portrait"] {
         page-break-after: auto !important;
     }
 }
+
+.lang-info {
+    margin: 0;
+    padding: 0;
+    width: 100%;
+    position: relative;
+}
+
+.lang-info-left, .lang-info-right {
+    width: 50%;
+}
+
+.lang-info-left {
+    float: left;
+}
+
+.lang-info-right {
+    float: right;
+}
