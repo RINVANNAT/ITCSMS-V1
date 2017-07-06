@@ -53,20 +53,20 @@
     background: red;
 }
 
-.box-body .rooms {
+.box-body .rooms, .box-conflict {
     background-color: #f1f1f1;
     height: 280px;
     overflow-y: auto;
 }
 
-.rooms {
+.rooms, .box-conflict {
     padding: 10px;
     margin: 0px;
     width: 100%;
     cursor: pointer;
 }
 
-.rooms .room-item {
+.rooms .room-item, .box-conflict .box-conflict-item {
     padding: 10px;
     margin-top: 5px;
     margin-bottom: 5px;

@@ -12,10 +12,10 @@
 @stop
 
 @section('content')
-    {{--    {{ dd($timetablesSlotsLang[0]['slotsForLanguage']) }}--}}
+
     @if(isset($timetables))
         @foreach($timetables as $timetable)
-            <div class="row">
+            <page size="A4" layout="portrait" class="each-page">
                 <table class="timetable">
                     <thead>
                     <tr style="border: none !important; margin-bottom: 200px !important;">
@@ -61,11 +61,20 @@
                                         <td rowspan="{{ ( (new \Carbon\Carbon($timetableSlot['end']))->hour - (new \Carbon\Carbon($timetableSlot['start']))->hour) }}">
                                             <div class="col-md-12 text-center text-bold"
                                                  style="margin-bottom: 10px;">{{ $timetableSlot['course_name'] }}</div>
-                                            @foreach($timetableSlot['slotsForLanguage'] as $item)
-                                                <div class="col-md-6 col-sm-6 col-xs-6">Gr: {{ $item['group'] }}
+                                            <div class="lang-info">
+                                            @foreach($timetableSlot['slotsForLanguage'] as $key => $item)
+                                                @if($key % 2 !== 0)
+                                                <div class="lang-info-right">Gr: {{ $item['group'] }}
                                                     ({{ $item['building'] }}-{{$item['room']}})
                                                 </div>
+                                                @else
+                                                    <div class="lang-info-left">Gr: {{ $item['group'] }}
+                                                        ({{ $item['building'] }}-{{$item['room']}})
+                                                    </div>
+                                                @endif
+                                                <div class="clearfix"></div>
                                             @endforeach
+                                            </div>
                                         </td>
                                         @php $tmp = false; @endphp
                                         @break
@@ -81,8 +90,7 @@
                                             <p style="text-align: right;">{{ $timetableSlot->type }}</p>
                                             <p style="text-align: center; font-weight: bold;">{{ $timetableSlot->course_name }}</p>
                                             <p style="text-align: center;">{{ $timetableSlot->teacher_name }}</p>
-                                            <p style="text-align: right;">@if($timetableSlot->room != null) {{ $timetableSlot->room->name }}
-                                                -{{ $timetableSlot->room->building->code }} @else NULL @endif</p>
+                                            <p style="text-align: right;">@if($timetableSlot->room != null) {{ $timetableSlot->room->name }}-{{ $timetableSlot->room->building->code }} @else NULL @endif</p>
                                         </td>
                                         @php $tmp = false; @endphp
                                         @break
@@ -113,10 +121,16 @@
                                         <td rowspan="{{ ( (new \Carbon\Carbon($timetableSlot['end']))->hour - (new \Carbon\Carbon($timetableSlot['start']))->hour) }}">
                                             <div class="col-md-12 text-center text-bold"
                                                  style="margin-bottom: 10px;">{{ $timetableSlot['course_name'] }}</div>
-                                            @foreach($timetableSlot['slotsForLanguage'] as $item)
-                                                <div class="col-md-6 col-sm-6 col-xs-6">Gr: {{ $item['group'] }}
-                                                    ({{ $item['building'] }}-{{$item['room']}})
-                                                </div>
+                                            @foreach($timetableSlot['slotsForLanguage'] as $key => $item)
+                                                @if($key % 2 !== 0)
+                                                    <div class="lang-info-right">Gr: {{ $item['group'] }}
+                                                        ({{ $item['building'] }}-{{$item['room']}})
+                                                    </div>
+                                                @else
+                                                    <div class="lang-info-left">Gr: {{ $item['group'] }}
+                                                        ({{ $item['building'] }}-{{$item['room']}})
+                                                    </div>
+                                                @endif
                                             @endforeach
                                         </td>
                                         @php $tmp = false; @endphp
@@ -140,8 +154,7 @@
                                             <p style="text-align: right;">{{ $timetableSlot->type }}</p>
                                             <p style="text-align: center; font-weight: bold;">{{ $timetableSlot->course_name }}</p>
                                             <p style="text-align: center;">{{ $timetableSlot->teacher_name }}</p>
-                                            <p style="text-align: right;">@if($timetableSlot->room != null) {{ $timetableSlot->room->name }}
-                                                -{{ $timetableSlot->room->building->code }} @else NULL @endif</p>
+                                            <p style="text-align: right;">@if($timetableSlot->room != null) {{ $timetableSlot->room->name }}-{{ $timetableSlot->room->building->code }} @else NULL @endif</p>
                                         </td>
                                         @php $tmp = false; @endphp
                                         @break
@@ -174,10 +187,16 @@
                                         <td rowspan="{{ ( (new \Carbon\Carbon($timetableSlot['end']))->hour - (new \Carbon\Carbon($timetableSlot['start']))->hour) }}">
                                             <div class="col-md-12 text-center text-bold"
                                                  style="margin-bottom: 10px;">{{ $timetableSlot['course_name'] }}</div>
-                                            @foreach($timetableSlot['slotsForLanguage'] as $item)
-                                                <div class="col-md-6 col-sm-6 col-xs-6">Gr: {{ $item['group'] }}
-                                                    ({{ $item['building'] }}-{{$item['room']}})
-                                                </div>
+                                            @foreach($timetableSlot['slotsForLanguage'] as $key => $item)
+                                                @if($key % 2 !== 0)
+                                                    <div class="lang-info-right">Gr: {{ $item['group'] }}
+                                                        ({{ $item['building'] }}-{{$item['room']}})
+                                                    </div>
+                                                @else
+                                                    <div class="lang-info-left">Gr: {{ $item['group'] }}
+                                                        ({{ $item['building'] }}-{{$item['room']}})
+                                                    </div>
+                                                @endif
                                             @endforeach
                                         </td>
                                         @php $tmp = false; @endphp
@@ -199,8 +218,7 @@
                                             <p style="text-align: right;">{{ $timetableSlot->type }}</p>
                                             <p style="text-align: center; font-weight: bold;">{{ $timetableSlot->course_name }}</p>
                                             <p style="text-align: center;">{{ $timetableSlot->teacher_name }}</p>
-                                            <p style="text-align: right;">@if($timetableSlot->room != null) {{ $timetableSlot->room->name }}
-                                                -{{ $timetableSlot->room->building->code }} @else NULL @endif</p>
+                                            <p style="text-align: right;">@if($timetableSlot->room != null) {{ $timetableSlot->room->name }}-{{ $timetableSlot->room->building->code }} @else NULL @endif</p>
                                         </td>
                                         @php $tmp = false; @endphp
                                         @break
@@ -231,10 +249,16 @@
                                         <td rowspan="{{ ( (new \Carbon\Carbon($timetableSlot['end']))->hour - (new \Carbon\Carbon($timetableSlot['start']))->hour) }}">
                                             <div class="col-md-12 text-center text-bold"
                                                  style="margin-bottom: 10px;">{{ $timetableSlot['course_name'] }}</div>
-                                            @foreach($timetableSlot['slotsForLanguage'] as $item)
-                                                <div class="col-md-6 col-sm-6 col-xs-6">Gr: {{ $item['group'] }}
-                                                    ({{ $item['building'] }}-{{$item['room']}})
-                                                </div>
+                                            @foreach($timetableSlot['slotsForLanguage'] as $key => $item)
+                                                @if($key % 2 !== 0)
+                                                    <div class="lang-info-right">Gr: {{ $item['group'] }}
+                                                        ({{ $item['building'] }}-{{$item['room']}})
+                                                    </div>
+                                                @else
+                                                    <div class="lang-info-left">Gr: {{ $item['group'] }}
+                                                        ({{ $item['building'] }}-{{$item['room']}})
+                                                    </div>
+                                                @endif
                                             @endforeach
                                         </td>
                                         @php $tmp = false; @endphp
@@ -255,8 +279,7 @@
                                             <p style="text-align: right;">{{ $timetableSlot->type }}</p>
                                             <p style="text-align: center; font-weight: bold;">{{ $timetableSlot->course_name }}</p>
                                             <p style="text-align: center;">{{ $timetableSlot->teacher_name }}</p>
-                                            <p style="text-align: right;">@if($timetableSlot->room != null) {{ $timetableSlot->room->name }}
-                                                -{{ $timetableSlot->room->building->code }} @else NULL @endif</p>
+                                            <p style="text-align: right;">@if($timetableSlot->room != null) {{ $timetableSlot->room->name }}-{{ $timetableSlot->room->building->code }} @else NULL @endif</p>
                                         </td>
                                         @php $tmp = false; @endphp
                                         @break
@@ -288,10 +311,16 @@
                                         <td rowspan="{{ $end-$start }}">
                                             <div class="col-md-12 text-center text-bold"
                                                  style="margin-bottom: 10px;">{{ $timetableSlot['course_name'] }}</div>
-                                            @foreach($timetableSlot['slotsForLanguage'] as $item)
-                                                <div class="col-md-6 col-sm-6 col-xs-6">Gr: {{ $item['group'] }}
-                                                    ({{ $item['building'] }}-{{$item['room']}})
-                                                </div>
+                                            @foreach($timetableSlot['slotsForLanguage'] as $key => $item)
+                                                @if($key % 2 !== 0)
+                                                    <div class="lang-info-right">Gr: {{ $item['group'] }}
+                                                        ({{ $item['building'] }}-{{$item['room']}})
+                                                    </div>
+                                                @else
+                                                    <div class="lang-info-left">Gr: {{ $item['group'] }}
+                                                        ({{ $item['building'] }}-{{$item['room']}})
+                                                    </div>
+                                                @endif
                                             @endforeach
                                         </td>
                                         @php $tmp = false; @endphp
@@ -310,8 +339,7 @@
                                             <p style="text-align: right;">{{ $timetableSlot->type }}</p>
                                             <p style="text-align: center; font-weight: bold;">{{ $timetableSlot->course_name }}</p>
                                             <p style="text-align: center;">{{ $timetableSlot->teacher_name }}</p>
-                                            <p style="text-align: right;">@if($timetableSlot->room != null) {{ $timetableSlot->room->name }}
-                                                -{{ $timetableSlot->room->building->code }} @else NULL @endif</p>
+                                            <p style="text-align: right;">@if($timetableSlot->room != null) {{ $timetableSlot->room->name }}-{{ $timetableSlot->room->building->code }} @else NULL @endif</p>
                                         </td>
                                         @php $tmp = false; @endphp
                                         @break
@@ -344,10 +372,16 @@
                                         <td rowspan="{{ $end-$start }}">
                                             <div class="col-md-12 text-center text-bold"
                                                  style="margin-bottom: 10px;">{{ $timetableSlot['course_name'] }}</div>
-                                            @foreach($timetableSlot['slotsForLanguage'] as $item)
-                                                <div class="col-md-6 col-sm-6 col-xs-6">Gr: {{ $item['group'] }}
-                                                    ({{ $item['building'] }}-{{$item['room']}})
-                                                </div>
+                                            @foreach($timetableSlot['slotsForLanguage'] as $key => $item)
+                                                @if($key % 2 !== 0)
+                                                    <div class="lang-info-right">Gr: {{ $item['group'] }}
+                                                        ({{ $item['building'] }}-{{$item['room']}})
+                                                    </div>
+                                                @else
+                                                    <div class="lang-info-left">Gr: {{ $item['group'] }}
+                                                        ({{ $item['building'] }}-{{$item['room']}})
+                                                    </div>
+                                                @endif
                                             @endforeach
                                         </td>
                                         @php $tmp = false; @endphp
@@ -370,8 +404,7 @@
                                             <p style="text-align: right;">{{ $timetableSlot->type }}</p>
                                             <p style="text-align: center; font-weight: bold;">{{ $timetableSlot->course_name }}</p>
                                             <p style="text-align: center;">{{ $timetableSlot->teacher_name }}</p>
-                                            <p style="text-align: right;">@if($timetableSlot->room != null) {{ $timetableSlot->room->name }}
-                                                -{{ $timetableSlot->room->building->code }} @else NULL @endif</p>
+                                            <p style="text-align: right;">@if($timetableSlot->room != null) {{ $timetableSlot->room->name }}-{{ $timetableSlot->room->building->code }} @else NULL @endif</p>
                                         </td>
                                         @php $tmp = false; @endphp
                                         @break
@@ -404,10 +437,16 @@
                                         <td rowspan="{{ $end-$start }}">
                                             <div class="col-md-12 text-center text-bold"
                                                  style="margin-bottom: 10px;">{{ $timetableSlot['course_name'] }}</div>
-                                            @foreach($timetableSlot['slotsForLanguage'] as $item)
-                                                <div class="col-md-6 col-sm-6 col-xs-6">Gr: {{ $item['group'] }}
-                                                    ({{ $item['building'] }}-{{$item['room']}})
-                                                </div>
+                                            @foreach($timetableSlot['slotsForLanguage'] as $key => $item)
+                                                @if($key % 2 !== 0)
+                                                    <div class="lang-info-right">Gr: {{ $item['group'] }}
+                                                        ({{ $item['building'] }}-{{$item['room']}})
+                                                    </div>
+                                                @else
+                                                    <div class="lang-info-left">Gr: {{ $item['group'] }}
+                                                        ({{ $item['building'] }}-{{$item['room']}})
+                                                    </div>
+                                                @endif
                                             @endforeach
                                         </td>
                                         @php $tmp = false; @endphp
@@ -431,8 +470,7 @@
                                             <p style="text-align: right;">{{ $timetableSlot->type }}</p>
                                             <p style="text-align: center; font-weight: bold;">{{ $timetableSlot->course_name }}</p>
                                             <p style="text-align: center;">{{ $timetableSlot->teacher_name }}</p>
-                                            <p style="text-align: right;">@if($timetableSlot->room != null) {{ $timetableSlot->room->name }}
-                                                -{{ $timetableSlot->room->building->code }} @else NULL @endif</p>
+                                            <p style="text-align: right;">@if($timetableSlot->room != null) {{ $timetableSlot->room->name }}-{{ $timetableSlot->room->building->code }} @else NULL @endif</p>
                                         </td>
                                         @php $tmp = false; @endphp
                                         @break
@@ -463,10 +501,16 @@
                                         <td rowspan="{{ $end-$start }}">
                                             <div class="col-md-12 text-center text-bold"
                                                  style="margin-bottom: 10px;">{{ $timetableSlot['course_name'] }}</div>
-                                            @foreach($timetableSlot['slotsForLanguage'] as $item)
-                                                <div class="col-md-6 col-sm-6 col-xs-6">Gr: {{ $item['group'] }}
-                                                    ({{ $item['building'] }}-{{$item['room']}})
-                                                </div>
+                                            @foreach($timetableSlot['slotsForLanguage'] as $key => $item)
+                                                @if($key % 2 !== 0)
+                                                    <div class="lang-info-right">Gr: {{ $item['group'] }}
+                                                        ({{ $item['building'] }}-{{$item['room']}})
+                                                    </div>
+                                                @else
+                                                    <div class="lang-info-left">Gr: {{ $item['group'] }}
+                                                        ({{ $item['building'] }}-{{$item['room']}})
+                                                    </div>
+                                                @endif
                                             @endforeach
                                         </td>
                                         @php $tmp = false; @endphp
@@ -488,8 +532,7 @@
                                             <p style="text-align: right;">{{ $timetableSlot->type }}</p>
                                             <p style="text-align: center; font-weight: bold;">{{ $timetableSlot->course_name }}</p>
                                             <p style="text-align: center;">{{ $timetableSlot->teacher_name }}</p>
-                                            <p style="text-align: right;">@if($timetableSlot->room != null) {{ $timetableSlot->room->name }}
-                                                -{{ $timetableSlot->room->building->code }} @else NULL @endif</p>
+                                            <p style="text-align: right;">@if($timetableSlot->room != null) {{ $timetableSlot->room->name }}-{{ $timetableSlot->room->building->code }} @else NULL @endif</p>
                                         </td>
                                         @php $tmp = false; @endphp
                                         @break
@@ -503,7 +546,7 @@
                     </tr>
                     </tbody>
                 </table>
-            </div>
+            </page>
         @endforeach
     @endif
 
@@ -515,5 +558,10 @@
     {!! Html::script('js/backend/schedule/clone-timetable.js') !!}
     {!! Html::script('js/backend/schedule/timetable-print.js') !!}
 
+    <script type="text/javascript">
+        $(function () {
+            window.print();
+        })
+    </script>
 @stop
 
