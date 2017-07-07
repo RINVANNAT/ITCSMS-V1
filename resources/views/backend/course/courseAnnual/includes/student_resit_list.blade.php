@@ -7,7 +7,7 @@
 </style>
 
 <input type="hidden" name="academic_year_id" value="{{$academicYear->id}}">
-<table class="table table-bordered">
+<table class="table table-bordered" id="student_resit_subject">
     <thead>
     <tr>
         <th>No</th>

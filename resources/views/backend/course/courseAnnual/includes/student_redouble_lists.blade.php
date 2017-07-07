@@ -2,16 +2,6 @@
 
 @section ('title', 'Student Redouble Lists' . ' | ' . 'Redouble Courses')
 
-@section('after-style-end')
-
-    <style>
-
-    </style>
-
-@endsection
-
-
-
 @section('content')
 
     <div class="box box-success">
@@ -34,6 +24,11 @@
 
             th, td.center {
                 text-align: center;
+            }
+
+
+            #student_resit_subject tr:hover {
+                background-color: #00a157;
             }
 
         </style>
