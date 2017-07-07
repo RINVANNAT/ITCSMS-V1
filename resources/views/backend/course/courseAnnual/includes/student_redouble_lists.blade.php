@@ -332,7 +332,7 @@
 
             var div_to_append = function(student_name, student_annual_id, course_annual_id, color) {
 
-                var div =  '<label for="name" class="label" style="width: 100%; color: #0A0A0A; font-size: 10pt; color: '+color+'">' + student_name +
+                var div =  '<label for="name" class="label" style="width: 100%; font-size: 10pt; color: '+color+'">' + student_name +
                         '<input type="hidden" class="student_annual_id" name="student_annual_id[]" value="'+student_annual_id+'">'+
                         '<input type="hidden" name="course['+course_annual_id+'][]" value="'+student_annual_id+'">'+
                         '</label>'
@@ -362,14 +362,14 @@
 
                     if(status === true) {
 
-                        var new_tr_to_append = function(course_annual_id, course_annual_name, student_annual_name, student_annual_id, count_row, number_student, row_color) {
+                        var new_tr_to_append = function(course_annual_id, course_annual_name, student_annual_name, student_annual_id, count_row, number_student, row_color, color) {
 
                             var new_tr = '<tr course_annual_id="1676" course_annual_name="'+course_annual_name+'" class="'+row_color+'">' +
                                     '<input type="hidden" name="course_annual_id[]" value="'+course_annual_id+'">' +
                                     '<td>'+count_row+'</td>' +
                                     '<td>'+course_annual_name+'</td>' +
                                     '<td class="td_student_name">' +
-                                    '<label for="name" class="label label-default" style="width: 100%">' + student_annual_name +
+                                    '<label for="name" class="label" style="width: 100%; font-size: 10pt; color: '+color+'">' + student_annual_name +
                                     '<input type="hidden" class="student_annual_id" name="student_annual_id[]" value="'+student_annual_id+'">' +
                                     '<input type="hidden" name="course['+course_annual_id+'][]" value="'+student_annual_id+'">' +
                                     '</label>' +
@@ -395,7 +395,7 @@
                         }
 
                         $('form#supplementary_subject_lists').find('table').find('tbody').append(
-                                new_tr_to_append(course_annual_id, courseName, studentName, studentAnnualId, (count_tr), 1, '')
+                                new_tr_to_append(course_annual_id, courseName, studentName, studentAnnualId, (count_tr), 1, '', '#0A0A0A')
                         )
                     }
                 }
