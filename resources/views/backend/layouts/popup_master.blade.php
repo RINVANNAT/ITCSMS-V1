@@ -17,6 +17,7 @@
         @yield('before-styles-end')
         {!! Html::style(elixir('css/backend.css')) !!}
         <link rel="stylesheet" href="{{url('plugins/toastr/toastr.min.css')}}">
+        {!! Html::style('plugins/daterangepicker/daterangepicker-bs3.css') !!}
         <style>
             .content-wrapper{
                 background-image: url("/img/bg_contit.gif"); !important;

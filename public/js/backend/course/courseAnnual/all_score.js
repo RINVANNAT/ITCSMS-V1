@@ -121,29 +121,21 @@ var colorRenderer = function (instance, td, row, col, prop, value, cellPropertie
 /*-----Assign rattrapage on frontend -----(number of subject that student should re-exam)---*/
 
 
-function numberSubjectRattrapage(subjects, pass_moyenne, approximate_moyenne) {
-
-    var number_subject = getStudentReExam(subjects, pass_moyenne, approximate_moyenne);
-
-    if ('fail' in number_subject) {
-        return number_subject['fail'].length;
-    } else {
-        return 0;
-    }
-}
-
 function getStudentReExam(subjects, pass_moyenn, approximate_moyenne) {
 
     var total_credit = 0;
     if ('fail' in subjects) {//=== isset() in php
+
+
         if ('pass' in subjects) {
 
             var validate_score = 0;
+
             $.each(subjects['fail'], function (f_key, f_val) {
 
                 //console.log(validate_score +'=='+ validate_score +'++'+ parseFloat('{{\App\Models\Enum\ScoreEnum::Pass_Moyenne}}') +'*'+ f_val['credit']);
-                total_credit = total_credit + parseFloat(f_val['credit']);
-                validate_score = validate_score + parseFloat(pass_moyenn) * f_val['credit']; /*{{\App\Models\Enum\ScoreEnum::Pass_Moyenne}}*/
+                total_credit  += parseFloat(f_val['credit']);
+                validate_score +=  parseFloat(pass_moyenn) * f_val['credit']; /*{{\App\Models\Enum\ScoreEnum::Pass_Moyenne}}*/
                 //console.log(validate_score);
             });
 
@@ -178,7 +170,7 @@ function getStudentReExam(subjects, pass_moyenn, approximate_moyenne) {
                         });
                         subjects['pass'] = tmp_subject_pass;
 
-                        return getStudentReExam(subjects); //---recuring this function again
+                        return getStudentReExam(subjects, pass_moyenn, approximate_moyenne); //---recuring this function again
                     } else {
 
                         //---if approximation  moyenne is bigger than 50 allow him
@@ -222,7 +214,7 @@ function getStudentReExam(subjects, pass_moyenn, approximate_moyenne) {
                         }
                     });
                     subjects['pass'] = tmp_subject_pass;
-                    return getStudentReExam(subjects); //---recuring this function again
+                    return getStudentReExam(subjects, pass_moyenn, approximate_moyenne); //---recuring this function again
 
                 } else {
 

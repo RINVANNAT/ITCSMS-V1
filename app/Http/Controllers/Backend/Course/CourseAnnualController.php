@@ -44,6 +44,7 @@ use App\Traits\CourseSessionTrait;
 use App\Traits\ScoreProp;
 use App\Traits\StudentScore;
 use App\Traits\StudentTrait;
+use App\Utils\DateTimeManager;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -3945,51 +3946,44 @@ class CourseAnnualController extends Controller
         $academicYearId = $request->academic_year_id;
         $departmentOptionId = $request->dept_option_id;
         $departmentId = $request->department_id;
+        $academicYear = AcademicYear::where('id', $academicYearId)->first();
 
         $studentDataProperties = $this->studentResitData($request);
+        $status = true;
 
-        //dd($studentDataProperties);
+        if(!$studentDataProperties['status']) {
 
-        $students = $studentDataProperties['student'];
-        $coursePrograms = $studentDataProperties['courseprogram'];
+            $status = $studentDataProperties['status'];
+
+            return view('backend.course.courseAnnual.includes.student_redouble_lists',
+                ['status' => false,
+                    'message'=> $studentDataProperties['message'],
+                    'academicYear' => $academicYear,
+                    'semesterId' => $semesterId,
+                    'degreeId' => $degreeId,
+                    'gradeId' => $gradeId,
+                    'departmentOptionId' => $departmentOptionId,
+                    'departmentId' =>$departmentId,
+                    'academicYearId'=>$academicYearId
+                ]);
+        }
+
         $studentRattrapages = $studentDataProperties['student_rattrapage'];
-        $courseAnnualByProgram = $studentDataProperties['course_annual_by_program'];
-        $academicYear = $studentDataProperties['academic_year'];
-        $averages = $studentDataProperties['average'];
+        $failCourseAnnuals = $studentDataProperties['all_fail_subject'];
+
+
         $fullUrl = $studentDataProperties['full_url'];
-        $onlyResitCourseAnnuals = $studentDataProperties['resit_course_annual'];
-
-        /*foreach($students as $student) {
-            foreach($coursePrograms as $program) {
-                $courseAnnualFailId = array_intersect($studentRattrapages[$student->id_card]['fail'], $courseAnnualByProgram[$program->id]);
-                dump($courseAnnualFailId);
-
-                if(count($courseAnnualFailId) > 0) {
-                    dump($courseAnnualFailId);
-                } else {
-                    $courseAnnualPassId = array_intersect($studentRattrapages[$student->id_card]['pass'], $courseAnnualByProgram[$program->id]);
-
-                    if(count($courseAnnualPassId) > 0) {
-                        dump($student->id_card);
-                        dump($courseAnnualPassId);
-                    } else {
-                        dd($student->id_card);
-                        dd($courseAnnualPassId);
-                    }
-
-                }
-            }
-        }*/
-
+        $courseAnnuals = $studentDataProperties['course_annual'];
 
         return view('backend.course.courseAnnual.includes.student_redouble_lists',
             compact(
-                'students',
-                'coursePrograms',
-                'courseAnnualByProgram',
-                'academicYear', 'averages',
+                'status',
+                'courseAnnuals',
                 'studentRattrapages',
-                'fullUrl', 'onlyResitCourseAnnuals',
+                'academicYear',
+                'studentRattrapages',
+                'fullUrl',
+                'failCourseAnnuals',
                 'semesterId', 'degreeId', 'gradeId', 'departmentOptionId', 'departmentId', 'academicYearId'
             )
         );
@@ -4207,149 +4201,61 @@ class CourseAnnualController extends Controller
     }
 
 
-    /*
-     * $request-> [
-     *                  "course_program_id" --->[course_program_id]
-     *                 course_program_id ---> [student_annual_id]
-     *                  student_annual_id ---> [course_annual_id]
-     *                  "date_".course_program_id---> date
-     *                  "start_time_".course_program_id---> time
-     *                  "end_time_".course_program_id---> time
-     *
-     *             ]
-     *
-     * */
-
+    /**
+     * @param Request $request
+     */
     public function exportSupplementarySubjects(Request $request)
     {
 
-        $data = $request->all();
-
-        $index = 1;
-        $resverseStudenPointToProgram = [];
-        $dateTimeCourseAnnual = [];
-        $str_course_program = 'course_program_id_';
-        $data_array = [];
-        $courseProgramIds = $request->course_program_id;
         $academicYearId = $request->academic_year_id;
         $studentAnnualIds = $request->student_annual_id;
-        $coursePrograms = DB::table('courses')->whereIn('id', $courseProgramIds)->get();
+        $courseAnnualIds = $request->course_annual_id;
+        $studentFailByCourses = $request->course;
+        $rooms = $request->room;
+        $dateStartEnd = $request->date_start_end;
+
+        foreach($dateStartEnd as $date) {
+            if($date == null || $date == '') {
+                return redirect()->back()->with(['error' => 'Please complete all Date Time Field!']);
+            }
+        }
+        foreach($rooms as $room) {
+            if($room == null || $room == '') {
+                return redirect()->back()->with(['error' => 'Please complete all Room Field!']);
+            }
+        }
+
+        $courseAnnuals = CourseAnnual::whereIn('id', $courseAnnualIds)->get();
+        $courseAnnuals = collect($courseAnnuals)->keyBy('id')->toArray();
+        $studentAnnuals = StudentAnnual::join('students', function($query) use($studentAnnualIds) {
+            $query->on('studentAnnuals.student_id', '=', 'students.id')
+                ->whereIn('studentAnnuals.id', $studentAnnualIds);
+        })->select('studentAnnuals.*', 'students.name_latin', 'students.name_kh', 'students.id_card')
+            ->get();
+
+        $studentAnnuals = collect($studentAnnuals)->keyBy('id')->toArray();
 
         $tableHeader = [
             'No',
             'Subjects',
             'student',
-            'Date',
-            'Time',
+            'Date Time Start',
+            'Date Time End',
             'Room'
         ];
 
-        $studentAnnualIds = array_unique($studentAnnualIds);
-        $studentAnnualIds = array_values($studentAnnualIds);
-
-        $array_student_annuals = [];
-
-        $students = DB::table('students')
-            ->join('studentAnnuals', 'studentAnnuals.student_id', '=', 'students.id')
-            ->whereIn('studentAnnuals.id', $studentAnnualIds)
-            ->select(
-                'students.name_latin', 'students.id_card', 'students.id as student_id',
-                'studentAnnuals.id as student_annual_id'
-            )->orderBy('students.name_latin', 'ASC')
-            ->get();
-
-        foreach ($students as $student) {
-            $array_student_annuals[$student->student_annual_id] = $student;
-        }
-
-        foreach ($coursePrograms as $program) {
-
-            $str = $str_course_program . $program->id;
-
-            if (isset($data[$program->id])) {
-
-                if (isset($data[$str])) {
-
-                    foreach ($data[$str] as $course_annual_id) {
-
-                        if (isset($data['date_' . $program->id])) {
-                            $dateTimeCourseAnnual[$course_annual_id]['date'] = $data['date_' . $program->id];
-                            $date = $data['date_' . $program->id];//---this will replace the same value
-                        }
-                        if (isset($data['start_time_' . $program->id])) {
-                            $dateTimeCourseAnnual[$course_annual_id]['start_time'] = $data['start_time_' . $program->id];
-                            $startTime = $data['start_time_' . $program->id];////---this will replace the same value
-                        }
-                        if (isset($data['end_time_' . $program->id])) {
-                            $dateTimeCourseAnnual[$course_annual_id]['end_time'] = $data['end_time_' . $program->id];
-                            $end_time = $data['end_time_' . $program->id];//---this will replace the same value
-                        }
-                        if (isset($data['room_' . $program->id])) {
-                            $dateTimeCourseAnnual[$course_annual_id]['room'] = $data['room_' . $program->id];
-                            $room = $data['room_' . $program->id];//--this value will replace the save value
-                        }
-                    }
-
-                    foreach ($data[$program->id] as $student_annual_id) {
-                        $resverseStudenPointToProgram[$student_annual_id][] = $program->id;
-                    }
-
-
-                    $studentResitCourse = $data[$program->id];//---one course program has many student to re-exam course_program_id--> [student_annual_id]
-
-
-                    $firstTime = true;
-                    foreach ($studentResitCourse as $resitStudent) {//---resitStudent===student_annual_id
-                        if ($firstTime) {
-
-                            $element = [
-                                $index,
-                                $program->name_en,
-                                $array_student_annuals[$resitStudent]->name_latin,//--student value
-                                $date,
-                                $startTime . ' - ' . $end_time,
-                                $room
-
-                            ];
-                            $firstTime = false;
-                        } else {
-                            $element = [
-                                '',
-                                '',
-                                $array_student_annuals[$resitStudent]->name_latin,//--student value
-                                '',
-                                '',
-                                ''
-                            ];
-                        }
-
-                        $data_array[] = $element;
-                    }
-                    $index++;
-                }
-            }
-        }
-
-        //-----update resit student annual record
-
-        $studentResits = ResitStudentAnnual::whereIn('student_annual_id', $studentAnnualIds)->get();
-
-
-        foreach ($studentResits as $resit) {
-
-            $resit->date_resit = $dateTimeCourseAnnual[$resit->course_annual_id]['date'];
-            $resit->start_time = $dateTimeCourseAnnual[$resit->course_annual_id]['start_time'];
-            $resit->end_time = $dateTimeCourseAnnual[$resit->course_annual_id]['end_time'];
-            $resit->resit_room = $dateTimeCourseAnnual[$resit->course_annual_id]['room'];
-            $resit->save();
-        }
-
-        //----end updating student annual record ----
-
         $academicYear = DB::table('academicYears')->where('id', $academicYearId)->first();
-        $department = DB::table('departments')->where('id', $program->department_id)->first();
-        $degree = DB::table('degrees')->where('id', $program->degree_id)->first();
-        $grade = DB::table('grades')->where('id', $program->grade_id)->first();
+        $department = DB::table('departments')->where('id', $request->department_id)->first();
+        $degree = DB::table('degrees')->where('id', $request->degree_id)->first();
+        $grade = DB::table('grades')->where('id', $request->grade_id)->first();
+        if($request->department_option_id != null && $request->department_option_id != '') {
+
+            $departmentOption = DB::table('departmentOptions')->where('id', $request->department_option_id)->first();
+        } else {
+
+            $departmentOption = null;
+        }
+
         $header = 'Student Supplementary Exam Lists';
         $sub_header = 'Academic Year: ' . $academicYear->name_latin;
         $schoolTitle = 'Institute of Technology of Cambodia';
@@ -4361,13 +4267,14 @@ class CourseAnnualController extends Controller
             $alpha[] = $letter++;
         }
 
-        Excel::create('Supplementary Course Schedule', function ($excel) use ($coursePrograms, $data, $array_student_annuals, $data_array, $alpha, $header, $sub_header, $schoolTitle, $class, $tableHeader, $department) {
+        Excel::create('Supplementary Course Schedule', function ($excel) use ($courseAnnuals, $studentAnnuals, $studentFailByCourses, $rooms, $dateStartEnd, $alpha, $header, $sub_header, $schoolTitle, $class, $tableHeader, $department) {
 
-            $excel->sheet('Supplementary Course Schedule', function ($sheet) use ($coursePrograms, $data, $array_student_annuals, $data_array, $alpha, $header, $sub_header, $schoolTitle, $class, $tableHeader, $department) {
+            $excel->sheet('Supplementary Course Schedule', function ($sheet) use ($courseAnnuals, $studentAnnuals, $studentFailByCourses, $rooms, $dateStartEnd, $alpha, $header, $sub_header, $schoolTitle, $class, $tableHeader, $department) {
 
                 $count = count($tableHeader);
                 $sheet->setOrientation('portrait');
                 // Set top, right, bottom, left
+
                 $sheet->setPageMargin(array(0.25, 0.30, 0.25, 0.30));
 
                 // Set all margins
@@ -4424,10 +4331,19 @@ class CourseAnnualController extends Controller
 
                     ));
                 });
+
+
                 for ($key = 0; $key < $count; $key++) {
 
                     $sheet->setWidth([$alpha[$key] => 20]);
                 }
+
+                $sheet->setWidth(array(
+                    'B'     =>  30,
+                    'C'     => 25
+                ));
+
+
                 $sheet->row(1, []);
                 $sheet->row(2, []);
                 $sheet->row(3, [$schoolTitle]);
@@ -4438,34 +4354,135 @@ class CourseAnnualController extends Controller
                 $sheet->setCellValue($alpha[$count / 2] . '1', $header);
                 $sheet->setCellValue($alpha[$count / 2] . '2', $sub_header);
 
-                foreach ($data_array as $data_row) {
-                    $sheet->appendRow($data_row);
+                $index = 0;
+                $countMerge=0;
+                $i = 7;
+                foreach ($studentFailByCourses as $course_annual_id => $student_annual_ids) {
 
+
+
+                    $date = explode('-', $dateStartEnd[$course_annual_id]);
+
+                    $start = DateTimeManager::fullDateWithTime(trim(' ', $date[0]));
+
+                    $end = DateTimeManager::fullDateWithTime(trim(' ', $date[1]));
+
+                    $courseAnnual = $courseAnnuals[$course_annual_id];
+
+                    $index++;
+                    $row = ['No' => $index, 'Subject' => $courseAnnual['name_en'], 'Student'=> '', 'Date-time-start' => $start,'Date-time-end'=>$end, 'Room' => $rooms[$course_annual_id]  ];
+                    foreach($student_annual_ids as $id) {
+
+                       $student = $studentAnnuals[$id];
+                       $row['Student'] = $student['name_latin'];
+                        $sheet->row($i++, $row);
+                        $sheet->setHeight([$i-1 =>  20]);
+                    }
+
+                    if(count($student_annual_ids) > 1) {
+
+
+                        $sheet->mergeCells('A'.(6 + ($countMerge + 1)).':'.'A'.((6 + ($countMerge)) + count($student_annual_ids)))->setCellValue('A'.(6 + ($countMerge + 1)), $index);
+                        $sheet->mergeCells('B'.(6 + ($countMerge + 1)).':'.'B'.((6 + ($countMerge)) + count($student_annual_ids)));
+                        $sheet->mergeCells('D'.(6 + ($countMerge + 1)).':'.'D'.((6 + ($countMerge)) + count($student_annual_ids)));
+                        $sheet->mergeCells('E'.(6 + ($countMerge + 1)).':'.'E'.((6 + ($countMerge)) + count($student_annual_ids)));
+                        $sheet->mergeCells('F'.(6 + ($countMerge + 1)).':'.'F'.((6 + ($countMerge)) + count($student_annual_ids)));
+
+
+                        $sheet->cells('A'.(6 + ($countMerge + 1)).':'.'A'.((6 + ($countMerge)) + count($student_annual_ids)), function ($cells) {
+
+                            $cells->setFont(array(
+                                'name' => 'Times New Roman',
+                                'size' => 12,
+                                'bold' => true
+                            ));
+                            $cells->setFontColor("#4d4d4d");
+                            $cells->setAlignment('center');
+                            $cells->setValignment('center');
+                        });
+
+
+                        $sheet->cells('B'.(6 + ($countMerge + 1)).':'.'B'.((6 + ($countMerge)) + count($student_annual_ids)), function ($cells) {
+
+                            $cells->setFont(array(
+                                'name' => 'Times New Roman',
+                                'size' => 12,
+                                'bold' => true
+                            ));
+                            $cells->setFontColor("#4d4d4d");
+                            $cells->setAlignment('center');
+                            $cells->setValignment('center');
+                        });
+
+                        $sheet->cells('D'.(6 + ($countMerge + 1)).':'.'D'.((6 + ($countMerge)) + count($student_annual_ids)), function ($cells) {
+
+                            $cells->setFont(array(
+                                'name' => 'Times New Roman',
+                                'size' => 12,
+                                'bold' => true
+                            ));
+                            $cells->setFontColor("#4d4d4d");
+                            $cells->setAlignment('center');
+                            $cells->setValignment('center');
+                        });
+
+                        $sheet->cells('E'.(6 + ($countMerge + 1)).':'.'E'.((6 + ($countMerge)) + count($student_annual_ids)), function ($cells) {
+
+                            $cells->setFont(array(
+                                'name' => 'Times New Roman',
+                                'size' => 12,
+                                'bold' => true
+                            ));
+                            $cells->setFontColor("#4d4d4d");
+                            $cells->setAlignment('center');
+                            $cells->setValignment('center');
+                        });
+
+                        $sheet->cells('F'.(6 + ($countMerge + 1)).':'.'F'.((6 + ($countMerge)) + count($student_annual_ids)), function ($cells) {
+
+                            $cells->setFont(array(
+                                'name' => 'Times New Roman',
+                                'size' => 12,
+                                'bold' => true
+                            ));
+                            $cells->setFontColor("#4d4d4d");
+                            $cells->setAlignment('center');
+                            $cells->setValignment('center');
+                        });
+
+                        $countMerge += count($student_annual_ids);
+                    } else {
+
+
+                        $sheet->cells('A'.(6 + ($countMerge + 1)).':'.'A'.((6 + ($countMerge)) + count($student_annual_ids)), function ($cells) {
+
+                            $cells->setFont(array(
+                                'name' => 'Times New Roman',
+                                'size' => 12,
+                                'bold' => true
+                            ));
+                            $cells->setBorder(array(
+                                'top', 'right', 'bottom', 'left'
+                            ));
+                            $cells->setFontColor("#4d4d4d");
+                            $cells->setAlignment('center');
+                            $cells->setValignment('center');
+                        });
+
+                        $sheet->cells('B'.(6 + ($countMerge + 1)).':'.'B'.((6 + ($countMerge)) + count($student_annual_ids)), function ($cells) {
+
+                            $cells->setFont(array(
+                                'name' => 'Times New Roman',
+                                'size' => 12,
+                                'bold' => true
+                            ));
+                            $cells->setFontColor("#4d4d4d");
+                            $cells->setAlignment('center');
+                            $cells->setValignment('center');
+                        });
+                        $countMerge += count($student_annual_ids);
+                    }
                 }
-
-
-                /* $row_number =0;
-                 foreach($coursePrograms as $courseProgram) {
-
-                     if(isset($data[$courseProgram->id])) {
-
-                         $student_annual_ids = $data[$courseProgram->id];
-
-                         for($int=0; $int< $count; $int++) {
-
-                             if($alpha[$int] != 'C') {
-
-                                 $sheet->mergeCells($alpha[$int].(7 +$row_number).':'.$alpha[$int].((7 +$row_number) + (count($student_annual_ids) )));
-
-                                 $sheet->cells($alpha[$int].(7 +$row_number).':'.$alpha[$int].((7 +$row_number) + (count($student_annual_ids) )), function($cells) {
-                                     $cells->setAlignment('center');
-                                     $cells->setValignment('center');
-                                 });
-                             }
-                         }
-                         $row_number = (count($student_annual_ids));
-                     }
-                 }*/
             });
 
         })->download('xls');
