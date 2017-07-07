@@ -28,7 +28,7 @@
 
 
             #student_resit_subject tr:hover {
-                background-color: #00a157;
+                background-color: #e8f2eb;
             }
 
         </style>
