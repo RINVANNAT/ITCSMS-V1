@@ -365,30 +365,30 @@
                         var new_tr_to_append = function(course_annual_id, course_annual_name, student_annual_name, student_annual_id, count_row, number_student, row_color, color) {
 
                             var new_tr = '<tr course_annual_id="1676" course_annual_name="'+course_annual_name+'" class="'+row_color+'">' +
-                                    '<input type="hidden" name="course_annual_id[]" value="'+course_annual_id+'">' +
-                                    '<td>'+count_row+'</td>' +
-                                    '<td>'+course_annual_name+'</td>' +
-                                    '<td class="td_student_name">' +
-                                    '<label for="name" class="label" style="width: 100%; font-size: 10pt; color: '+color+'">' + student_annual_name +
-                                    '<input type="hidden" class="student_annual_id" name="student_annual_id[]" value="'+student_annual_id+'">' +
-                                    '<input type="hidden" name="course['+course_annual_id+'][]" value="'+student_annual_id+'">' +
-                                    '</label>' +
-                                    '<br>' +
-                                    '</td>' +
-                                    '<td>' +
-                                    '<div class="input-group">' +
-                                    '<div class="input-group-addon">' +
-                                    '<i class="fa fa-calendar"></i>' +
-                                    '</div>' +
-                                    '<input type="text" name="date_start_end['+course_annual_id+']" class="form-control pull-right date_start_end">' +
-                                    '</div>' +
-                                    '</td>' +
-                                    '<td>' +
-                                    '<input type="text" class="form-control" name="room['+course_annual_id+']">' +
-                                    '</td>' +
-                                    '<td class="count_resit" style="text-align:center; vertical-align:middle;">' +
-                                    '<label for="count_resit" class="label label-success" style="font-size: 14pt"> '+number_student+'</label>' +
-                                    '</td>' +
+                                        '<input type="hidden" name="course_annual_id[]" value="'+course_annual_id+'">' +
+                                        '<td>'+count_row+'</td>' +
+                                        '<td>'+course_annual_name+'</td>' +
+                                        '<td class="td_student_name" style="text-align:center; vertical-align:middle;" >' +
+                                            '<label for="name" class="label" style="width: 100%; font-size: 10pt; color: '+color+'">' + student_annual_name +
+                                            '<input type="hidden" class="student_annual_id" name="student_annual_id[]" value="'+student_annual_id+'">' +
+                                            '<input type="hidden" name="course['+course_annual_id+'][]" value="'+student_annual_id+'">' +
+                                            '</label>' +
+                                            '<br>' +
+                                        '</td>' +
+                                        '<td style="text-align:center; vertical-align:middle;">' +
+                                            '<div class="input-group">' +
+                                                '<div class="input-group-addon">' +
+                                                '<i class="fa fa-calendar"></i>' +
+                                                '</div>' +
+                                                '<input type="text" name="date_start_end['+course_annual_id+']" class="form-control pull-right date_start_end">' +
+                                            '</div>' +
+                                        '</td>' +
+                                        '<td style="text-align:center; vertical-align:middle;">' +
+                                            '<input type="text" class="form-control" name="room['+course_annual_id+']">' +
+                                        '</td>' +
+                                        '<td class="count_resit" style="text-align:center; vertical-align:middle;">' +
+                                            '<label for="count_resit" class="label label-success" style="font-size: 14pt"> '+number_student+'</label>' +
+                                        '</td>' +
                                     '</tr>';
 
                             return new_tr;
