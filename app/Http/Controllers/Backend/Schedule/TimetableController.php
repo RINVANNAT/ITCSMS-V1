@@ -10,6 +10,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\Backend\Schedule\Timetable\CreateTimetableRequest;
 use App\Http\Requests\Backend\Schedule\Timetable\CreateTimetableSlotRequest;
 use App\Http\Requests\Backend\Schedule\Timetable\DeleteTimetableRequest;
+use App\Http\Requests\Backend\Schedule\Timetable\ShowTimetableRequest;
 use App\Models\AcademicYear;
 use App\Models\Configuration;
 use App\Models\Degree;
@@ -236,9 +237,10 @@ class TimetableController extends Controller
      * Show timetable's details page.
      *
      * @param Timetable $timetable
+     * @param ShowTimetableRequest $showTimetableRequest
      * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View
      */
-    public function show(Timetable $timetable)
+    public function show(Timetable $timetable, ShowTimetableRequest $showTimetableRequest)
     {
         $now = Carbon::now('Asia/Phnom_Penh');
         $employee = Employee::where('user_id', auth()->user()->id)->first();

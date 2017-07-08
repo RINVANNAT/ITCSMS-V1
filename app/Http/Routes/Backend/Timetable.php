@@ -1,6 +1,6 @@
 <?php
 
-Route::group(['namespace' => 'Schedule', 'prefix' => 'schedule'], function () {
+Route::group(['namespace' => 'Schedule', 'prefix' => 'schedule', 'middleware' => ['access.timetable']], function () {
 
     /** Http Requesting. */
     Route::get('/timetables', 'TimetableController@index')->name('admin.schedule.timetables.index');
