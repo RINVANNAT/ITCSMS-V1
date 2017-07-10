@@ -29,6 +29,10 @@ class ScoreEnum
 
     const Name_Mid = 'midterm';
     const Name_Fin = 'final';
+    const STR_MID_30 = 'Midterm_30';
+    const STR_MID_40 = 'Midterm_40';
+    const STR_FIN_90 = 'Midterm_90';
+    const STR_FIN_100 = 'Midterm_100';
     const is_counted_creditability = 1;
     const is_counted_absence = 1;
     const is_having_resitted = 1;

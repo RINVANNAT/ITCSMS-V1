@@ -569,4 +569,10 @@ trait CourseAnnualTrait
         }
     }
 
+
+    public function successImportedScore(Request $request, $course_annual_id)
+    {
+        return view('backend.course.courseAnnual.includes.success_imported_score', ['courseAnnualId'=>$course_annual_id]);
+
+    }
 }
