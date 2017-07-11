@@ -92,7 +92,7 @@
                         <button class="btn btn-success btn-xs pull-right" id="clone_score" data-toggle="tooltip" data-placement="top" title=" The action is to allow you to clone score of this course from responsible department!"  style="margin-left:5px"> Clone-Score </button>
                     @else
                         @if(access()->user()->allow("input-score-without-blocking") || ($courseAnnual->is_allow_scoring && $mode == "edit"))
-                            <button class="btn btn-primary btn-xs pull-right" id="save_editted_score" style="margin-left:5px">Save Changes!</button>
+                            <button class="btn btn-warning btn-xs pull-right" id="save_editted_score" style="margin-left:5px">Save Changes!</button>
                         @endif
                         @if(access()->user()->allow("input-score-without-blocking") || ($courseAnnual->is_allow_scoring && $mode == "edit"))
                             <a href="{{route('course_annual.form_import_score')}}" target="_self" class="btn btn-info btn-xs pull-right" id="import_score" style="margin-left: 5px"> Import Score</a>

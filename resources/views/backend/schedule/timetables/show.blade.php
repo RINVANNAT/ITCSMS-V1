@@ -19,6 +19,27 @@
     {!! Html::style('plugins/iCheck/all.css') !!}
     {!! Html::style('css/backend/schedule/timetable.css') !!}
 
+    <style type="text/css">
+        .lang-info {
+            margin: 0;
+            padding: 13px;
+            width: 100%;
+            position: relative;
+        }
+
+        .lang-info-left, .lang-info-right {
+            width: 50%;
+        }
+
+        .lang-info-left {
+            float: left;
+        }
+
+        .lang-info-right {
+            float: right;
+        }
+    </style>
+
 @stop
 
 @section('content')
@@ -119,10 +140,15 @@
                         // check conflict room and render
                         object += '<div class="row"> <div class="col-md-12"><div class="fc-title">' + event.course_name + '</div></div>';
                         event.editable = false;
+                        object += '<div class="lang-info">';
                         for (var i = 0; i < event.slotsForLanguage.length; i++) {
-                            object += '<div class="col-xs-4 col-sm-4 col-md-4"> Gr: ' + event.slotsForLanguage[i].group + ' (' + event.slotsForLanguage[i].building + '-' + event.slotsForLanguage[i].room + ')</div>';
+                            if(i%2 !== 0){
+                                object += '<div class="lang-info-left"> Gr: ' + event.slotsForLanguage[i].group + ' (' + event.slotsForLanguage[i].building + '-' + event.slotsForLanguage[i].room + ')</div>';
+                            }else{
+                                object += '<div class="lang-info-right"> Gr: ' + event.slotsForLanguage[i].group + ' (' + event.slotsForLanguage[i].building + '-' + event.slotsForLanguage[i].room + ')</div>';
+                            }
                         }
-                        object += '</div></div>';
+                        object += '</div></div></div>';
                     } else {
                         object += '<div class="side-course" id="' + event.id + '"​​​>';
 

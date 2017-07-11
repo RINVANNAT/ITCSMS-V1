@@ -10,6 +10,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\Backend\Schedule\Timetable\CreateTimetableRequest;
 use App\Http\Requests\Backend\Schedule\Timetable\CreateTimetableSlotRequest;
 use App\Http\Requests\Backend\Schedule\Timetable\DeleteTimetableRequest;
+use App\Http\Requests\Backend\Schedule\Timetable\ShowTimetableRequest;
 use App\Models\AcademicYear;
 use App\Models\Configuration;
 use App\Models\Degree;
@@ -158,7 +159,7 @@ class TimetableController extends Controller
                     . '</button> ';
 
                 $view = '<a href="' . route('admin.schedule.timetables.show', $timetable->id) . '" class="btn btn-xs btn-info">'
-                    . '<i class="fa fa-share-square-o" data-toggle="tooltip"'
+                    . '<i class="fa fa-eye" data-toggle="tooltip"'
                     . 'data-placement="top" title="View"'
                     . 'data-original-title="View">'
                     . '</i></a>';
@@ -168,7 +169,7 @@ class TimetableController extends Controller
                     . 'data-placement="top" title="Delete"'
                     . 'data-original-title="Delete">'
                     . '</i>'
-                    . '</button>';
+                    . '</button> ';
 
                 $result = '';
                 if (access()->allow('export-timetable')) {
@@ -177,11 +178,11 @@ class TimetableController extends Controller
                 if (access()->allow('print-timetable')) {
                     $result .= $print;
                 }
-                if (access()->allow('view-timetable')) {
-                    $result .= $view;
-                }
                 if (access()->allow('delete-timetable')) {
                     $result .= $delete;
+                }
+                if (access()->allow('view-timetable')) {
+                    $result .= $view;
                 }
                 return $result;
             })
@@ -190,15 +191,15 @@ class TimetableController extends Controller
                     $view = '<span class="btn btn-danger btn-xs">'
                         . '<i class="fa fa-times-circle"'
                         . 'data-toggle="tooltip"'
-                        . 'data-placement="top" title="Uncompleted"'
-                        . 'data-original-title="Uncompleted"></i>'
+                        . 'data-placement="top" title="Unpublished"'
+                        . 'data-original-title="Unpublished"></i>'
                         . '</span>';
                 } else {
-                    $view = '<span class="btn btn-info btn-xs">'
-                        . '<i class="fa fa-times-circle"'
+                    $view = '<span class="btn btn-success btn-xs">'
+                        . '<i class="fa fa-check"'
                         . 'data-toggle="tooltip"'
-                        . 'data-placement="top" title="Completed"'
-                        . 'data-original-title="Uncompleted"></i>'
+                        . 'data-placement="top" title="Published"'
+                        . 'data-original-title="Published"></i>'
                         . '</span>';
                 }
                 return $view;
@@ -236,9 +237,10 @@ class TimetableController extends Controller
      * Show timetable's details page.
      *
      * @param Timetable $timetable
+     * @param ShowTimetableRequest $showTimetableRequest
      * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View
      */
-    public function show(Timetable $timetable)
+    public function show(Timetable $timetable, ShowTimetableRequest $showTimetableRequest)
     {
         $now = Carbon::now('Asia/Phnom_Penh');
         $employee = Employee::where('user_id', auth()->user()->id)->first();

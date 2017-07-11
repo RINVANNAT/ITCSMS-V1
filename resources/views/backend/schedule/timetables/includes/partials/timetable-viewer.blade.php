@@ -9,7 +9,7 @@
     @if(isset($createTimetablePermissionConfiguration))
         @if(access()->allow('create-timetable'))
             @if($createTimetablePermissionConfiguration->description === 'true')
-                <div class="smis-notification success" style="display: block;">
+                <div class="smis-notification info" style="display: block;">
                     <div class="smis-notification-heading">
                         <span class="smis-close-icon">&times;</span>
                         <h3 class="smis-notification-title">
@@ -41,7 +41,7 @@
                     </div>
                 </div>
             @else
-                <div class="smis-notification info">
+                <div class="smis-notification success">
                     <div class="smis-notification-heading">
                         <span class="smis-close-icon">&times;</span>
                         <h3 class="smis-notification-title">

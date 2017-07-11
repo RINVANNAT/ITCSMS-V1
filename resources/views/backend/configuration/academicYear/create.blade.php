@@ -46,9 +46,10 @@
     <script>
         $(function(){
             //$('#date_start').datetimepicker();
-            $('#date_start_end').daterangepicker({
+           $('#date_start_end').daterangepicker({
                 format: 'DD/MM/YYYY',
             });
+
 
             $("#code").keydown(function (e) {
                 allowNumberOnly(e);

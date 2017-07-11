@@ -627,8 +627,8 @@
                         if (response.data.is_conflict_room === true) {
                             panel_conflict += '<ul class="list-group">' +
                                 '<li class="list-group-item"> <i class="fa fa-building-o"></i> Room ' +
-                                '<div class="rooms" style="height: 70px !important; overflow: hidden;margin-top: 10px; border-radius: 4px;">' +
-                                '<div class="room-item" style="width: 100%;"><i class="fa fa-angle-double-right"></i> ' +
+                                '<div class="box-conflict" style="height: 70px !important; overflow: hidden;margin-top: 10px; border-radius: 4px;">' +
+                                '<div class="box-conflict-item" style="width: 100%;"><i class="fa fa-angle-double-right"></i> ' +
                                 response.data.room_info[0].department + '-' +
                                 response.data.room_info[0].degree +
                                 response.data.room_info[0].grade;
@@ -647,9 +647,9 @@
                             panel_conflict += '<li class="list-group-item">' +
                                 '<i class="fa fa-user"></i> Lecturer ' +
                                 '<i data-toggle="tooltip" data-placement="right" title="Merge" data-original-title="Merge" class="btn btn-info btn-xs fa fa-code-fork pull-right" id="merge"></i>' +
-                                '<div class="rooms" style="margin-top: 10px; border-radius: 4px; min-height: 70px; max-height: 100px;">';
+                                '<div class="box-conflict" style="margin-top: 10px; border-radius: 4px; min-height: 70px; max-height: 100px;">';
                             for (var i = 0; i < response.data.lecturer.canMerge.length; i++) {
-                                panel_conflict += '<div class="room-item" style="width: 100%;"><i class="fa fa-angle-double-right"></i> '
+                                panel_conflict += '<div class="box-conflict-item" style="width: 100%;"><i class="fa fa-angle-double-right"></i> '
                                     + response.data.lecturer.canMerge[i].department + '-'
                                     + response.data.lecturer.canMerge[i].degree
                                     + response.data.lecturer.canMerge[i].grade
@@ -665,9 +665,9 @@
                             console.log(100);
                             panel_conflict += '<li class="list-group-item">' +
                                 '<i class="fa fa-user"></i> Lecturer ' +
-                                '<div class="rooms" style="margin-top: 10px; border-radius: 4px; min-height: 70px; max-height: 100px;">';
+                                '<div class="box-conflict" style="margin-top: 10px; border-radius: 4px; min-height: 70px; max-height: 100px;">';
                             for (var i = 0; i < response.data.lecturer.canNotMerge.length; i++) {
-                                panel_conflict += '<div class="room-item" style="width: 100%;"><i class="fa fa-angle-double-right"></i> '
+                                panel_conflict += '<div class="box-conflict-item" style="width: 100%;"><i class="fa fa-angle-double-right"></i> '
                                     + response.data.lecturer.canNotMerge[i].department + '-'
                                     + response.data.lecturer.canNotMerge[i].degree
                                     + response.data.lecturer.canNotMerge[i].grade + '-'

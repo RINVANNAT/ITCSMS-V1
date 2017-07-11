@@ -159,8 +159,8 @@
                                         class="fa fa-download"></i> Export</a></li>
                         <li class="top"><a href="#" class="btn btn-xs" id="get_redouble"><i class="fa fa-download"></i>
                                 Redouble</a></li>
-                        {{--<li class="top"><a href="#" class="btn btn-xs" id="generate_rattrapage"> <i
-                                        class="fa fa-circle-o"></i> Rattrapage</a></li>--}}
+                        <li class="top"><a href="#" class="btn btn-xs" id="generate_rattrapage"> <i
+                                        class="fa fa-circle-o"></i> Rattrapage</a></li>
                         <li class="top"><a href="{{route('student.statistic_radie')}}" class="btn btn-xs"
                                            id="print_total_radie"> <i class="fa fa-bar-chart"> </i>Statistic Radie</a>
                         </li>
@@ -846,6 +846,7 @@
         function assignNumberRattrapage() {
 
            if(hotInstance) {
+
                var array_fail_subject = setting.array_fail_subject;
                var table_data = setting.data;
 
@@ -853,6 +854,7 @@
 
                    if (student['student_id_card'] != null && student['student_id_card'] != '') {
                        var number_rattrapage = numberSubjectRattrapage(array_fail_subject[student['student_id_card']], '{{\App\Models\Enum\ScoreEnum::Pass_Moyenne}}', '{{\App\Models\Enum\ScoreEnum::Aproximation_Moyenne}}');
+
                        student['Rattrapage'] = number_rattrapage;
                    }
                });
@@ -864,6 +866,17 @@
 
                });
            }
+        }
+
+
+        function numberSubjectRattrapage(subjects, pass_moyenne, approximate_moyenne) {
+
+            var number_subject = getStudentReExam(subjects, pass_moyenne, approximate_moyenne);
+            if ('fail' in number_subject) {
+                return number_subject['fail'].length;
+            } else {
+                return 0;
+            }
         }
 
 
@@ -957,7 +970,11 @@
         }
         $('#refresh_score_sheet').on('click', function () {
             filter_table();
-            $('.selection_blog').slideToggle( "fast" )
+
+            if($('.selection_blog').is(':visible')) {
+                $('.selection_blog').slideToggle( "fast" )
+            }
+
         });
 
     </script>

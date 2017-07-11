@@ -6,6 +6,7 @@
  * Time: 2:37 PM
  */
 
+use Carbon\Carbon;
 class DateTimeManager{
 
 
@@ -21,5 +22,26 @@ class DateTimeManager{
         $endTimeInSecond = $totalSecond % 60;
 
 
+    }
+
+
+    public static function dbDate($date)
+    {
+        return Carbon::parse($date)->format('Y-m-d');
+    }
+
+    public static function viewDate($date)
+    {
+        return Carbon::parse($date)->format('d-m-Y H:i');
+    }
+
+    public static function fullDate($date)
+    {
+        return Carbon::parse($date)->format('M-d-Y');
+    }
+
+    public static function fullDateWithTime($date)
+    {
+        return Carbon::parse($date)->format('M-d-Y H:i');
     }
 }

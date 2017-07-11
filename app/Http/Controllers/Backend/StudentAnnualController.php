@@ -1878,8 +1878,6 @@ class StudentAnnualController extends Controller
                     $semester = $firstRow['semester'];
                     $academicYear = $firstRow['academic_year'];
                     $dataCollection = collect($allData);
-
-
                     $dataUploaded = $dataCollection->groupBy(function($item) use (&$groupCode) {
 
                         if(is_numeric($item['group_code'])) {
@@ -1915,7 +1913,6 @@ class StudentAnnualController extends Controller
                     })
                     ->select('studentAnnuals.*', 'students.id_card')->get();
 
-
                 $studentAnnualCollection = collect($studentAnnuals);
 
                 $studentAnnuals = $studentAnnualCollection->keyBy('id_card')->toArray();
@@ -1936,13 +1933,9 @@ class StudentAnnualController extends Controller
                 if(is_numeric($semester) && $semester <= SemesterEnum::SEMESTER_TWO) {
 
                     if(count($groupIds) > 0) {
-
                         $grouptStudentAnnuals = $this->groupStudentAnnual($groupIds, $studentAnnualIds, $semester, $department);
-
                         if(count($grouptStudentAnnuals) >= count($studentAnnualIds)) {
-
                             return redirect()->back()->with(['status' => false, 'message' => 'Student groups are already generated!!']);
-
                         } else {
 
                             if (count($grouptStudentAnnuals) > 0) {
@@ -1956,13 +1949,10 @@ class StudentAnnualController extends Controller
                 }
 
                 $uncount = 0;
-
                 $array_missedIds = [];
-
                 foreach($dataUploaded as $groupItem => $studentProp) {
 
                     if($groupItem != null && $groupItem != '') {
-
 
                         if(isset($groups[trim($groupItem)])) {
 
@@ -2019,27 +2009,19 @@ class StudentAnnualController extends Controller
                         } else {
                             $checkStoreGroupStudentAnnual['message'] = 'Missing Students: ( '. $new_message.' )'. ' Please check!';
                         }
-
                         $checkStoreGroupStudentAnnual['missed_id'] = true;
                     }
-
                     return redirect()->back()->with($checkStoreGroupStudentAnnual);
-
                 } else {
                     return redirect()->back()->with(['status' => false, 'message' => 'Something went wrong!!']);
                 }
-
             } else {
-
                 return redirect()->back()->with(['status' => false, 'message' => 'Error! File format is not acceptable!']);
-
             }
 
         } else {
             return redirect()->back()->with(['status' => false, 'message' => 'Please Select File!']);
         }
-
-
     }
 
 
@@ -2048,13 +2030,10 @@ class StudentAnnualController extends Controller
 
         //we have to query the redouble student in year one then query all fresh student in year one without the redouble student: where not IN
 
-
         $redoubleStudents = DB::table('students')
             ->join('redouble_student', 'redouble_student.student_id', '=', 'students.id')
             ->join('redoubles', 'redoubles.id', '=',  'redouble_student.redouble_id')
             ->lists('students.id');
-
-
         $index =0;
         $check =0;
         $last_academic_year = AcademicYear::orderBy('id','desc')->first();
@@ -2113,7 +2092,6 @@ class StudentAnnualController extends Controller
         } else {
             return Response::json(array('success'=>false, 'message' => 'Generate Errors'));
         }
-
     }
 
 
