@@ -2699,7 +2699,6 @@ class CourseAnnualController extends Controller
 
         //-----loop arrange table from column to row ---
 
-
         if ($status) {
 
             if (count($annualCourses) > 1) {
@@ -2741,7 +2740,6 @@ class CourseAnnualController extends Controller
                         return $this->empty_data($message, $type='warning');
                     }
                 }
-
 
             } else {
                 //---course-program and course-annual are the same (one to one)
@@ -3096,19 +3094,19 @@ class CourseAnnualController extends Controller
     {
 
         $isError = false;
+        $errorNumberAbsence = false;
+        $isStringAllowed =  false;
+        $isNotAceptedScore = false;
         $countStudentScoreType= 1;
         $ifScoreImported = 0;
-        $isNotAceptedScore = false;
         $headerPercentage = 0;
-        $colHeader = '';
-        $isStringAllowed =  false;
         $ifAbsenceUpdated = 0;
         $ifAbsenceCreated = 0;
         $studentAbsenceIdError = [];
         $isFileHasColumnScoreType = [];
-        $errorNumberAbsence = false;
         $arrayMissedStudent = [];
         $arrayDataUploaded = [];
+        $colHeader = '';
 
         $courseAnnual = CourseAnnual::where('id', $courseAnnualId)->first();
 
@@ -3119,17 +3117,13 @@ class CourseAnnualController extends Controller
                 base_path() . '/public/assets/uploaded_file/course_annuals/', $import
             );
             $storage_path = base_path() . '/public/assets/uploaded_file/course_annuals/' . $import;
-
             $score_property = $this->getScoreId($courseAnnualId);
-
             $students = $this->getStudentByNameAndIdCard($courseAnnual, $request->group_id, $score_property['student_annual_id'] );
-
             $scoreIds = $score_property['score_by_student'];
             $percentage = $this->getPercentage($score_property['score_id']);
             $notations = $this->getStudentAbsence($courseAnnualId); // there is a field notation in table absence
 
             //$averageByCourse =  $this->averageByCourseAnnual($courseAnnualId);
-
 
 //            ----if count not count 10% absence
             if ($courseAnnual->is_counted_absence) {
@@ -3153,6 +3147,9 @@ class CourseAnnualController extends Controller
 
                // $totalCourseHours = $courseAnnual->time_td + $courseAnnual->time_tp + $courseAnnual->time_course;
                 foreach($arrayDataUploaded as $row) {
+
+
+                    /*----here if we want to calculate score and store in average table ----*/
                   /*
                     $totalScore =0;
                     $scoreAbsence = $this->floatFormat(((($totalCourseHours) - (isset($row['abs']) ? $row['abs'] : 0)) * ScoreEnum::Score_10) / ((($totalCourseHours != 0) ? $totalCourseHours : 1)));
@@ -3189,6 +3186,7 @@ class CourseAnnualController extends Controller
                     }*/
 
 
+                  /*----end calculate total score of each course and storing ------*/
 
 
                     if (isset($students[$row['student_id']])) {
@@ -3209,16 +3207,17 @@ class CourseAnnualController extends Controller
 
                         foreach ($studentScoreIds as $scoreId) {
 
-                            if (array_key_exists(strtolower($percentage[$scoreId->id]), $row)) { // check the array key of score name
+                            $colName = $this->convertColumnName($percentage[$scoreId->id]);
+                            if (array_key_exists($colName, $row)) { // check the array key of score name
 
-                                if ((($row[strtolower($percentage[$scoreId->id])] == null) || is_numeric($row[strtolower($percentage[$scoreId->id])])) || (($row[strtolower($percentage[$scoreId->id])] == ScoreEnum::Absence) || ($row[strtolower($percentage[$scoreId->id])] == ScoreEnum::Fraud))) {
+                                if ((($row[$colName] == null) || is_numeric($row[$colName])) || (($row[$colName] == ScoreEnum::Absence) || ($row[$colName] == ScoreEnum::Fraud))) {
 
-                                    $explode = explode('_', strtolower($percentage[$scoreId->id]));
+                                    $explode = explode('_', $colName);
                                     $percent = $explode[count($explode) - 1];
 
-                                    if ((((float)$row[strtolower($percentage[$scoreId->id])] <= (float)$percent) && ((float)$row[strtolower($percentage[$scoreId->id])] >= 0))) {
+                                    if ((((float)$row[$colName] <= (float)$percent) && ((float)$row[$colName] >= 0))) {
                                         $input = [
-                                            'score' => $row[strtolower($percentage[$scoreId->id])]
+                                            'score' => $row[$colName]
                                         ];
                                         $score = $this->courseAnnualScores->update($scoreId->id, $input);
 
@@ -3228,7 +3227,7 @@ class CourseAnnualController extends Controller
                                     } else {
                                         $isNotAceptedScore = true;
                                         $headerPercentage = $percent;
-                                        $colHeader = $percentage[$scoreId->id];
+                                        $colHeader = $colName;
                                         DB::rollback();
                                         break;
                                     }
@@ -3238,7 +3237,7 @@ class CourseAnnualController extends Controller
                                     $isStringAllowed = true;
                                 }
                             } else {
-                               $isFileHasColumnScoreType[$percentage[$scoreId->id]] = $percentage[$scoreId->id];
+                               $isFileHasColumnScoreType[$colName] = $colName;
                             }
                         }
 
@@ -3467,19 +3466,20 @@ class CourseAnnualController extends Controller
 
     private function getPercentage($scoreIds)
     {
-
-        $arrayPercentage = [];
-
         $percentages = DB::table('percentages')
             ->join('percentage_scores', 'percentage_scores.percentage_id', '=', 'percentages.id')
             ->whereIn('percentage_scores.score_id', $scoreIds)->get();
-        foreach ($percentages as $percentage) {
-            $trim = trim($percentage->name, '%');
-            $strReplace = str_replace("-", "_", $trim);
-            $arrayPercentage[$percentage->score_id] = $strReplace;
-        }
-        return ($arrayPercentage);
 
+        $percentages = collect($percentages)->keyBy('score_id')->toArray();
+
+        return ($percentages);
+    }
+
+    private function convertColumnName($object)
+    {
+        $trim = trim($object->name, '%');
+        $strReplace = str_replace("-", "_", $trim);
+        return strtolower($strReplace);
     }
 
     private function getStudentAbsence($courseAnnualId)
