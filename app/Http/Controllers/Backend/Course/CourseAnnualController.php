@@ -3138,8 +3138,6 @@ class CourseAnnualController extends Controller
 
             DB::beginTransaction();
             try {
-
-
                 Excel::load($storage_path, function($reader) use(&$isError) {
                     $firstrow = $reader->first()->toArray();
 
