@@ -298,12 +298,12 @@
         var table_width;
         var hotInstance;
         var print_url = "{{route('admin.course.print_total_score')}}";
+
         var setting = {
             readOnly: true,
             rowHeaders: false,
             manualColumnMove: true,
             manualColumnResize: true,
-
             manualRowResize: false,
             minSpareRows: false,
             fixedColumnsLeft: 3,
@@ -312,10 +312,7 @@
             className: "htRight",
             cells: function (row, col, prop) {
 
-
                 this.renderer = colorRenderer;
-
-//                console.log(row+'------'+col+'----'+prop);
 
                 var cellProperties = {};
                 if (prop === 'Redouble') {
@@ -976,6 +973,7 @@
             }
 
         });
+
 
     </script>
 

@@ -1,6 +1,7 @@
 <?php namespace App\Http\Controllers\Backend\Course;
 
 use App\Exceptions\GeneralException;
+use App\Http\Controllers\Backend\Course\CourseHelperTrait\ProficencyScoreTrait;
 use App\Http\Controllers\Backend\Course\CourseHelperTrait\StudentStatisticTrait;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Backend\Course\CourseAnnual\CourseAnnualAssignmentRequest;
@@ -62,6 +63,7 @@ class CourseAnnualController extends Controller
     use CourseSessionTrait;
     use CourseAnnualTrait;
     use StudentStatisticTrait;
+    use ProficencyScoreTrait;
 
     /**
      * @var CourseAnnualRepositoryContract

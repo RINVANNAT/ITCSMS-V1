@@ -107,7 +107,9 @@ return [
         'department_tc'=> 8,
         'department_finance' => 9,
         'department_study_affair'=>10,
-        'department_academic'=>11
+        'department_academic'=>11,
+        'sa'=> 12,
+        'sf'=> 13
     ],
     'genders' => [
         'gender_male'=> 1,

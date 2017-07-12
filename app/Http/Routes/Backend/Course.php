@@ -132,6 +132,13 @@ Route::group([
     Route::get('/course/{id}/import-score-success', 'CourseAnnualController@successImportedScore')->name('admin.score.success_imported');
 
 
+    Route::get('/course/get-form-proficency', 'CourseAnnualController@proficencyFormScore')->name('course.proficency_form_score');
+
+    Route::post('/course-annual/proficency/score-data', 'CourseAnnualController@proficencyData')->name('course_annual.proficency_score_data');
+
+
+
+
     /*
      * ---student statistic----
      * */
