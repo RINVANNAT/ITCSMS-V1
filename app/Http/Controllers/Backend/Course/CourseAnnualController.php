@@ -3133,18 +3133,30 @@ class CourseAnnualController extends Controller
                 $absences = null;
             }
 
+
             DB::beginTransaction();
             try {
-                Excel::load($storage_path, function($results)
-                    use(&$isError, &$arrayDataUploaded,  $percentage, $students, $courseAnnualId, $scoreIds, $courseAnnual, $absences, $notations) {
 
-                    $arrayDataUploaded = $results->get()->toArray();
-                    $firstrow = $results->first()->toArray();
+
+                Excel::load($storage_path, function($reader) use(&$isError) {
+                    $firstrow = $reader->first()->toArray();
+
                     if ((!isset($firstrow['student_id'])) || (!isset($firstrow['student_name'])) || (count($firstrow) < 3)) {
                         $isError = true;
+                    } else {
+                        $rows = $reader->all();
                     }
                 });
 
+                if ($isError) {
+                    return redirect()->back()->with(['status' => 'Problem with no data in the first row, or your file misses some fields. To make file corrected please export the template!!']);
+                }
+
+                Excel::load($storage_path, function($results)
+                    use(&$isError, &$arrayDataUploaded,  $percentage, $students, $courseAnnualId, $scoreIds, $courseAnnual, $absences, $notations) {
+                    $arrayDataUploaded = $results->all()->toArray();
+
+                });
                // $totalCourseHours = $courseAnnual->time_td + $courseAnnual->time_tp + $courseAnnual->time_course;
                 foreach($arrayDataUploaded as $row) {
 
@@ -3334,11 +3346,6 @@ class CourseAnnualController extends Controller
 
                 if(file_exists($storage_path)) {
                     unlink($storage_path);
-                }
-
-                if ($isError) {
-
-                    return redirect()->back()->with(['status' => 'Problem with no data in the first row, or your file misses some fields. To make file corrected please export the template!!']);
                 }
                 if ($isNotAceptedScore) {
                     return redirect()->back()->with(['status' => $colHeader . ' score must be between 0 and ' . $headerPercentage . ', no string allowed!']);
