@@ -325,6 +325,8 @@ class EmployeeController extends Controller
             $page = Input::get('page');
             $resultCount = 25;
             $offset = ($page - 1) * $resultCount;
+
+
             $employees = Employee::where('employees.name_latin', 'ilike', "%".Input::get("term") . "%")
                 ->orWhere('employees.name_kh', 'ilike', "%".Input::get("term") . "%")
                 ->select([
@@ -337,6 +339,8 @@ class EmployeeController extends Controller
                 ])
                 ->leftJoin('departments','departments.id','=','employees.department_id')
                 ->leftJoin('genders','genders.id','=','employees.gender_id');
+
+
             //Filter employee by office
 //            if($this->users->office_id != 0 || $this->users->office_id != null){
 //                $employees->whereIn('office_id', $this->users->office_id);
