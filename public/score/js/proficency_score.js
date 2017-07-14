@@ -1,197 +1,71 @@
-var hotInstance;
-var colWidth = function() {
+var hotInstance, setting,
+    colDataArray = [],
+    array_col_status = {},
+    objectStatus ={},
+    CELL_CHANGE = [];
 
-    return [
-        50,
-        100,
-        150,
-        50,
-        80,
-        80,
-        120,
-        120,
-        120,
-        120,
-        120,
-        180
-    ]
-};
+setting =  {
 
-var EN_HEADER = function()
-{
-    var EN_SECTION_HEADER = [
-
-                [
-                    '',
-                    'Student ID',
-                    'Student Name',
-                    'Sexe',
-
-                    { label: 'Absence', colspan :3 },
-
-                    { label : 'Competency', colspan :4 },
-
-                    'Toal Score'
-                ],
-                [
-                    '',
-                    '',
-                    '',
-                    '',
-                    { label : 'Total', colspan: 1 },
-                    { label :'S_1', colspan : 1 },
-                    { label : 'S_2', colspan : 1 },
-
-                    { label : 'Speaking', colspan : 1 },
-                    { label : 'Writing', colspan : 1 },
-                    { label : 'Listening', colspan : 1 },
-                    { label : 'Reading', colspan : 1 } ,
-                    ''
-                ]
-    ];
-
-    return EN_SECTION_HEADER;
-
-};
-var FR_HEADER = function()
-{
-    var FR_SECTION_HEADER = [
-
-        [
-            'N.o',
-            'Student ID',
-            'Student Name',
-            'Sexe',
-            'Department',
-            'Group',
-
-            { label : 'Comprehension De 4 Competent', colspan :4 },
-
-            'Toal Score',
-            'ADMISSION'
-        ],
-        [
-            '',
-            '',
-            '',
-            '',
-            '',
-            '',
-            { label : 'CO | (25/25)', colspan : 1 },
-            { label : 'CE | (25/25)', colspan : 1 },
-            { label : 'PO | (25/25)', colspan : 1 },
-            { label : 'PE | (25/25)', colspan : 1 } ,
-            '',
-            ''
-        ]
-    ];
-
-    return FR_SECTION_HEADER;
-
-}
-var setting =  {
-
-    rowHeaders: false,
-    colHeaders: false,
-    // performance tip: set constant size
-    rowHeights: 10,
-    // performance tip: turn off calculations
-    autoRowSize: false,
-    autoColSize: false,
-    colWidths:colWidth(),
-    minSpareRows: 1,
     readOnly: true,
+    rowHeaders: true,
+    columnHeaders:true,
     manualColumnMove: true,
     manualColumnResize: true,
     manualRowResize: false,
+    minSpareRows: 1,
     filters: true,
+    autoWrapRow: true,
     dropdownMenu: ['filter_by_condition', 'filter_action_bar'],
     className: "htCenter",
-    cells: function (row, col, prop) {
-        var cellProperties = {};
-
-        if (prop === 'co') {
-            cellProperties.readOnly = false;
-        } else if (prop === 'ce') {
-            cellProperties.readOnly = false;
-        } else if (prop === 'po') {
-            cellProperties.readOnly = false;
-        } else if (prop === 'pe') {
-            cellProperties.readOnly = false;
-        }
-        return cellProperties;
+    stretchH: 'last',
+    beforeOnCellMouseDown: function (event, coord, TD) {
+        return true;
     },
-    afterGetCellMeta: function (prop) {
-
+    afterOnCellMouseDown: function (event, coord, TD) {
+        return true;
     },
-    afterSelectionEnd: function (prop) {
-
-        setSelectedRow()
+    afterCellMetaReset: function () {
+        return true;
     },
-    afterChange: function (changes, source) {
-        if(changes) {
+    afterRowMove: function () {
+        return true;
+    },
 
-            $.each(changes, function (index, element) {
+    afterSelectionEnd: function () {
+        setSelectedRow();
+        return true;
+    },
+    beforeTouchScroll: function () {
 
-                var change = element;
-                var rowIndex = change[0];
-                var columnIndex = change[1];
-                var oldValue = change[2];
-                var newValue = change[3];
-                var col_student_id = hotInstance.getDataAtProp('student_id_card'); //---array data of column student_id
+        return false;
+    },
+    afterScrollHorizontally: function () {
+        setSelectedRow();
+        return true;
+    },
 
+    afterScrollVertically:function () {
+        setSelectedRow();
+        return true;
+    },
 
-                if(columnIndex == 'co') {
-
-                    alert(newValue);
-                }
-
-                if(columnIndex == 'ce') {
-
-                }
-                if(columnIndex == 'po') {
-
-                }
-
-                if(columnIndex == 'pe') {
-
-                }
-
-
-            });
-
-        }
+    afterColumnResize: function () {
+        return false;
     }
 }
 
-function calculateSite(hotInstance)
+function calculateSite(setting)
 {
 
-    if(hotInstance) {
+    var table_size = $('.box-body').width();
+    var mainFooterHeight = $('#box_footer').height();
+    var boxHeaderHeight = $('.box-header').height();
+    var height = $(document).height();
+    var tab_height = (parseInt(height) * 0.8);
+    setting.height=tab_height;
+    setting.width=table_size;
 
-        var table_size = $('.box-body').width();
-        var mainFooterHeight = $('#box_footer').height();
-        var boxHeaderHeight = $('.box-header').height();
-        var height = $(document).height();
-        var tab_height = (height/2) + (10) ;
-
-        setting.height=tab_height;
-        setting.width=table_size;
-        hotInstance.updateSettings({
-            height:tab_height,
-            width:table_size
-        });
-
-        $(window).on('resize', function(){
-            var table_size = $('.box-body').width();
-            setting.width=table_size;
-            hotInstance.updateSettings({
-                width:table_size
-            });
-        });
-
-    }
-
+    return setting;
 }
 
 function updateHeader(headers, hotInstance)
@@ -217,4 +91,158 @@ function setSelectedRow() {
         current_rows.removeClass("current_row");
     }
     $(".current").closest("tr").addClass("current_row");
+
+}
+
+function onInputScoreChange(newValue, cellMaxValue, Fraud, Absence, student_annual_id, oldValue)
+{
+    var element={};
+    if(($.isNumeric(newValue) || (newValue == '')) || ((newValue == Fraud) || (newValue == Absence))) {
+
+        if((newValue <= cellMaxValue) ||  (newValue >= parseInt(0) ) || (newValue == '') || ((newValue == Fraud) || (newValue == Absence))) {
+
+            if(newValue <= cellMaxValue) {
+                element = {
+                    score: newValue,
+                    course_annual_id: $('input[name=course_annual_id]').val(),
+                    student_annual_id: student_annual_id
+                };
+
+            } else if(!$.isNumeric(newValue))  {
+                element = {
+                    score: newValue,
+                    course_annual_id: $('input[name=course_annual_id]').val(),
+                    student_annual_id: student_annual_id
+                };
+            } else {
+                if(newValue > cellMaxValue) {
+                   return {};
+                } else {
+                    element = {
+                        score: 0,
+                        course_annual_id: $('input[name=course_annual_id]').val(),
+                        student_annual_id: student_annual_id
+                    };
+                }
+            }
+
+            if(oldValue != newValue) {
+
+                return element;
+            } else {
+                return {};
+            }
+
+        } else {
+            return {};
+        }
+    } else {
+        return {};
+    }
+
+}
+
+function checkIfStringValExist(colData, colName, valToCompare, Fraud, Absence) {
+
+    var arrayNull=[];
+    var count = 0, overRattedScore = 0;
+    for(var check =0; check < colData.length; check++) {
+
+        if($.isNumeric(colData[check]) && (parseInt(colData[check]) >= 0)) {
+            count++;
+            if((colData[check] <= valToCompare) ) {
+                overRattedScore++;
+            }
+        } else if( ((colData[check] == null) || (colData[check] == ''))  || ((colData[check] == Fraud) || (colData[check] == Absence))) {// to check if he/she deose not input any value or input only empty string
+            arrayNull.push(colData[check])
+        }
+    }
+
+    if((parseInt(count) + arrayNull.length) == colData.length) {
+
+        if((parseInt(overRattedScore) + arrayNull.length) == colData.length) {
+            objectStatus.status = true;
+        } else {
+            objectStatus.status = false;
+            objectStatus.val_to_compare = valToCompare;
+            objectStatus.colName = colName;
+        }
+    } else {
+        objectStatus.status = false;
+        objectStatus.val_to_compare = valToCompare;
+        objectStatus.colName = colName;
+    }
+    array_col_status[colName] = objectStatus.status;
+
+}
+
+
+function declareColumnHeaderDataEmpty(array_col) {
+
+    for(var i = 0; i < array_col.length ; i++) {
+        colDataArray[array_col[i]] = [];
+    }
+
+}
+function getHeader()
+{
+    $.ajax({
+        type: 'GET',
+        url: '/admin/course/course-annual/header-competency-score',
+        data: {course_annual_id: $('input[name=course_annual_id]').val(), _token:$('input[name=token]').val()},
+        dataType: "json",
+        success: function (resultData) {
+            /*setNestedHeader(resultData);*/
+        },
+        error:function(response) {
+            notify('error', 'SomeThing Went Wrong!', 'Attention!')
+        }
+    });
+}
+
+var setNestedHeader =   function (param)
+{
+    setting.nestedHeaders = param
+};
+
+
+
+function sendRequest (col_array) {
+
+    var saveBaseUrl = '/admin/course/course-annual/save-competency-score';
+
+    $.each(col_array, function(key, val) {
+
+        if(colDataArray[val].length > 0) {
+
+            var DATA = {
+                data:colDataArray[val],
+                key: val
+            };
+            saveScoreViaAjax(saveBaseUrl, 'POST', DATA, val);
+        }
+    });
+}
+
+function resetColDataArray(key) {
+    colDataArray[key] = [];
+}
+
+function saveScoreViaAjax(saveBaseUrl, method, baseData, key)
+{
+    $.ajax({
+        type: method,
+        url: saveBaseUrl,
+        data: baseData,//{data:colDataArray[setting.colHeaders[index]], percentage: setting.colHeaders[index] },
+        dataType: "json",
+        success: function(resultData) {
+            resetColDataArray(key);
+            notify('success', 'Saved!', 'Info');
+
+        },
+        error: function(error) {
+            resetColDataArray(key);
+            notify('error', 'Something went wrong!');
+        }
+    })
 }

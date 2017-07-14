@@ -373,7 +373,7 @@
                 return true;
             },
             afterOnCellMouseDown: function (event, coord, TD) {
-                return true;
+                return false;
             },
             afterCellMetaReset: function () {
                 return true;
@@ -387,11 +387,16 @@
             },
             beforeTouchScroll: function () {
 
-                return true;
+                return false;
             },
             afterScrollHorizontally: function () {
 
-                return true;
+                return false;
+            },
+
+            afterScrollVertically:function () {
+
+                return false;
             },
 
             afterColumnResize: function () {

@@ -192,6 +192,7 @@
 
         // this function is to declare global empty array and we use these empty arrays to store the data when user make change of each cell score value to pass to the sever
         // the main purpose is to get col-change-data and to send them to server by each col
+
         function declareColumnHeaderDataEmpty() {
             // create empty array by the columns score which user created
             // because we want to store data cell changes by column and send them to the server by one column ...not all columns at once

@@ -20,6 +20,10 @@
                 background-color: #fff !important;
         }
 
+        .handsontable td{
+            color: #000 !important;
+        }
+
     </style>
     {!! Html::style('plugins/handsontable-test/handsontable.full.min.css') !!}
 
@@ -44,9 +48,14 @@
                 Import
             </button>
 
-            <button class="btn btn-warning btn-xs pull-right" style="margin-right: 5px" id="export">
+            <button class="btn btn-info btn-xs pull-right" style="margin-right: 5px" id="export">
                 <i class="fa fa-download"> </i>
                 Export
+            </button>
+
+            <button class="btn btn-warning btn-xs pull-right" style="margin-right: 5px" id="save">
+                <i class="fa fa-submit"> </i>
+                Save Change
             </button>
 
 
@@ -79,8 +88,97 @@
     <script>
 
         $(document).ready(function() {
+
+            var Fraud = '{{\App\Models\Enum\ScoreEnum::Fraud}}';
+            var Absence = '{{\App\Models\Enum\ScoreEnum::Absence}}';
             var container = document.getElementById('score_table');
-            toggleLoading(true)
+            var colProperties = JSON.parse('<?php echo  json_encode($competencies);?>');
+            var propRenderer =  JSON.parse('<?php echo  json_encode($renderer);?>');
+            var cellMaxValue =  JSON.parse('<?php echo  json_encode($cellMaxValue);?>');
+            setting.nestedHeaders = JSON.parse('<?php echo  json_encode($headers);?>');
+
+            setting. hiddenColumns =  {
+
+                columns: [parseInt('{{count($headers[1]) }}')],
+                indicators: false
+
+            };
+
+            setting.colWidths = JSON.parse('<?php echo  json_encode($colWidths);?>');
+
+            declareColumnHeaderDataEmpty(colProperties);
+
+            var colorRenderer = function (instance, td, row, col, prop, value, cellProperties) {
+
+                Handsontable.renderers.TextRenderer.apply(this, arguments);
+                $.each(propRenderer, function (index, object) {
+
+                    if(prop == object.index) {
+
+                        if (jQuery.isNumeric(value)) {
+                            if( value < parseInt(object.min)) {
+
+                                if(value != 0 && value != null && value != '') {
+
+                                    td.style.backgroundColor = object.color;
+                                }
+                            } else if (value > parseInt(object.max)) {
+                                td.style.backgroundColor = object.color;
+                            }
+                        } else {
+
+                            if(value == Fraud || value == Absence) {
+                                td.style.backgroundColor = 'gray';
+                            } else {
+                                td.style.backgroundColor = '#A41C00';
+                            }
+                        }
+
+                    }
+                })
+            };
+
+            setting.cells = function (row, col, prop) {
+
+                var cellProperties = {};
+
+                $.each(propRenderer, function (index, object) {
+                    if(prop == object.index) {
+                        cellProperties.readOnly = object.readOnly;
+                    }
+                });
+
+                this.renderer = colorRenderer;
+                return cellProperties;
+            };
+
+            setting.afterChange =  function (changes, source) {
+
+                    if(changes) {
+
+                        $.each(changes, function (index, element) {
+
+                            var change = element;
+                            var rowIndex = change[0];
+                            var columnIndex = change[1];
+                            var oldValue = change[2];
+                            var newValue = change[3];
+                            var col_student_id = hotInstance.getDataAtProp('student_id_card'); //---array data of column student_id
+                            var current_table_data = hotInstance.getData();
+                            var currentColDataChange = hotInstance.getDataAtProp(columnIndex)
+                            var currentRowDataChange = hotInstance.getDataAtRow(rowIndex);
+                            var maxValue = cellMaxValue[columnIndex];
+                            var student_annual_id = currentRowDataChange[currentRowDataChange.length -1];
+
+                            var element_change = onInputScoreChange(newValue, maxValue, Fraud, Absence, student_annual_id, oldValue);
+                            if(!$.isEmptyObject(element_change)) {
+                                colDataArray[columnIndex].push(element_change)
+                                CELL_CHANGE.push(element_change);
+                            }
+                            checkIfStringValExist(currentColDataChange, columnIndex, maxValue, Fraud, Absence)
+                        });
+                    }
+            };
 
              $.ajax({
                 type: 'POST',
@@ -89,19 +187,9 @@
                 dataType: "json",
                 success: function (resultData) {
 
-                    @if($courseAnnual->department_id == config('access.departments.sa'))
-
-                            setting.nestedHeaders = EN_HEADER();
-                            setting.data = resultData;
-                            calculateSite(hotInstance);
-                            hotInstance = new Handsontable(container, setting);
-                    @else
-                            setting.data = resultData;
-                            setting.nestedHeaders = FR_HEADER();
-                            calculateSite(hotInstance);
-                            hotInstance = new Handsontable(container, setting);
-                    @endif
-
+                    setting.data = resultData;
+                    setting = calculateSite(setting)
+                    hotInstance = new Handsontable(container, setting);
                     toggleLoading(false)
                 },
 
@@ -109,6 +197,64 @@
                     toggleLoading(false)
                 }
             });
+
+            $(window).on('resize', function(){
+                var table_size = $('.box-body').width();
+                setting.width=table_size;
+                hotInstance.updateSettings({
+                    width:table_size
+                });
+            });
+
+            $('#save').on('click', function(e) {
+
+                sendRequest(colProperties);
+
+                $.each(array_col_status, function(key, val) {
+                    if(val === false) {
+                        objectStatus.status = val;
+                        objectStatus.colName = key;
+                    }
+                });
+
+                if(CELL_CHANGE.length > 0 ) {
+
+                    if(objectStatus.status == true) {
+
+                        swal({
+                            title: "Confirm",
+                            text: "Save Changes?",
+                            type: "info",
+                            showCancelButton: true,
+                            confirmButtonColor: "#DD6B55",
+                            confirmButtonText: "Yes",
+                            closeOnConfirm: true
+                        }, function(confirmed) {
+
+                            if (confirmed) {
+
+                            }
+                        });
+                    } else {
+
+                        swal({
+                            title: "Attention",
+                            text: objectStatus.colName+" value must be: 0 <= X <= "+ objectStatus.val_to_compare + ', No String Allowed!' ,
+                            type: "warning",
+                            confirmButtonColor: "red",
+                            confirmButtonText: "Close",
+                            closeOnConfirm: true
+                        }, function(confirmed) {
+                            if (confirmed) {
+
+                            }
+                        });
+                    }
+
+                } else {
+                    notify('error', 'There are no changes!!', 'Info');
+                }
+            })
 
         });
 

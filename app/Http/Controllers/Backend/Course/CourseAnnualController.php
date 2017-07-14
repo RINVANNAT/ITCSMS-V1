@@ -3143,8 +3143,6 @@ class CourseAnnualController extends Controller
 
                     if ((!isset($firstrow['student_id'])) || (!isset($firstrow['student_name'])) || (count($firstrow) < 3)) {
                         $isError = true;
-                    } else {
-                        $rows = $reader->all();
                     }
                 });
 

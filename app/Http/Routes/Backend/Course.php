@@ -136,6 +136,9 @@ Route::group([
 
     Route::post('/course-annual/proficency/score-data', 'CourseAnnualController@proficencyData')->name('course_annual.proficency_score_data');
 
+    Route::get('/course-annual/header-competency-score', 'CourseAnnualController@competencyHeader')->name('course_annual.competency_header');
+    /* name --> admin.course....*/
+
 
 
 
