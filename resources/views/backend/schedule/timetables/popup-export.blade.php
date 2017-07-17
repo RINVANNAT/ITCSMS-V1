@@ -1,6 +1,6 @@
 @extends ('backend.layouts.popup_master')
 
-@section ('title', 'Print Timetable | Timetable Management')
+@section ('title', 'Export Timetable | Timetable Management')
 
 @section('after-styles-end')
 
@@ -130,7 +130,7 @@
                         notify('info', 'Timetable is exported as format excel.', 'Export Timetable');
                     },
                     error: function () {
-                        notify('danger', 'Something went wrong', 'Export Timetable');
+                        notify('info', 'Timetable is exported as format excel.', 'Export Timetable');
                     },
                     complete: function () {
                         toggleLoading(false);

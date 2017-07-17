@@ -434,6 +434,7 @@
                 },
                 complete: function () {
                     get_course_sessions();
+                    get_timetable_slots();
                     toggleLoading(false);
                 }
             })
