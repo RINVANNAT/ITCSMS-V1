@@ -372,6 +372,7 @@
                 },
                 complete: function () {
                     get_timetable_slots();
+                    get_course_sessions();
                     toggleLoading(false);
                 }
             })
