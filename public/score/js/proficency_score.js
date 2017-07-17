@@ -12,7 +12,7 @@ setting =  {
     manualColumnMove: true,
     manualColumnResize: true,
     manualRowResize: false,
-    minSpareRows: 1,
+    minSpareRows: false,
     filters: true,
     autoWrapRow: true,
     dropdownMenu: ['filter_by_condition', 'filter_action_bar'],
@@ -74,16 +74,6 @@ function updateHeader(headers, hotInstance)
             nestedHeaders: headers
         });
 }
-
-function updateSettingData(resultData, hotInstance) {
-
-    setting.data = resultData;
-
-    hotInstance.updateSettings({
-        data: resultData,
-    });
-}
-
 function setSelectedRow() {
 
     var current_rows = $(document).find(".current_row");
@@ -104,14 +94,12 @@ function onInputScoreChange(newValue, cellMaxValue, Fraud, Absence, student_annu
             if(newValue <= cellMaxValue) {
                 element = {
                     score: newValue,
-                    course_annual_id: $('input[name=course_annual_id]').val(),
                     student_annual_id: student_annual_id
                 };
 
             } else if(!$.isNumeric(newValue))  {
                 element = {
                     score: newValue,
-                    course_annual_id: $('input[name=course_annual_id]').val(),
                     student_annual_id: student_annual_id
                 };
             } else {
@@ -120,7 +108,6 @@ function onInputScoreChange(newValue, cellMaxValue, Fraud, Absence, student_annu
                 } else {
                     element = {
                         score: 0,
-                        course_annual_id: $('input[name=course_annual_id]').val(),
                         student_annual_id: student_annual_id
                     };
                 }
@@ -206,30 +193,32 @@ var setNestedHeader =   function (param)
 };
 
 
-
-function sendRequest (col_array) {
+function sendRequest (propRenderer) {
 
     var saveBaseUrl = '/admin/course/course-annual/save-competency-score';
 
-    $.each(col_array, function(key, val) {
+    $.each(propRenderer, function(key, object) {
 
-        if(colDataArray[val].length > 0) {
-
+        if(colDataArray[object.index].length > 0) {
             var DATA = {
-                data:colDataArray[val],
-                key: val
+                data:colDataArray[object.index],
+                key: object.index,
+                id:object.id,
+                course_annual_id: $('input[name=course_annual_id]').val()
             };
-            saveScoreViaAjax(saveBaseUrl, 'POST', DATA, val);
+            saveScoreViaAjax(saveBaseUrl, 'POST', DATA, object.index);
         }
     });
 }
 
 function resetColDataArray(key) {
+
     colDataArray[key] = [];
 }
 
 function saveScoreViaAjax(saveBaseUrl, method, baseData, key)
 {
+    toggleLoading(true);
     $.ajax({
         type: method,
         url: saveBaseUrl,
@@ -237,12 +226,46 @@ function saveScoreViaAjax(saveBaseUrl, method, baseData, key)
         dataType: "json",
         success: function(resultData) {
             resetColDataArray(key);
-            notify('success', 'Saved!', 'Info');
+            notify('success', resultData.message, 'Info');
+            toggleLoading(false);
 
         },
         error: function(error) {
             resetColDataArray(key);
             notify('error', 'Something went wrong!');
+            toggleLoading(false);
         }
     })
+}
+
+function calcuateScore(method, calculateBaseUrl) {
+
+    var student_annual_ids = hotInstance.getDataAtProp('student_annual_id');
+    var course_annual_id = $('input[name=course_annual_id]').val();
+
+    toggleLoading(true);
+
+    $.ajax({
+        type: method,
+        url: calculateBaseUrl,
+        data: {
+            course_annual_id: course_annual_id,
+            student_annual_id:student_annual_ids
+        },
+        dataType: "json",
+        success: function(resultData) {
+
+            notify('success', resultData.message, 'Info');
+            toggleLoading(false);
+
+            initTale();
+
+        },
+        error: function(error) {
+
+            notify('error', 'Something went wrong!');
+            toggleLoading(false);
+        }
+    })
+
 }

@@ -58,6 +58,11 @@
                 Save Change
             </button>
 
+            <button class="btn btn-success btn-xs pull-right" style="margin-right: 5px" id="calculate">
+                <i class="fa fa-refresh"> </i>
+                Calculate
+            </button>
+
 
         </div>
         <!-- /.box-header -->
@@ -91,17 +96,15 @@
 
             var Fraud = '{{\App\Models\Enum\ScoreEnum::Fraud}}';
             var Absence = '{{\App\Models\Enum\ScoreEnum::Absence}}';
-            var container = document.getElementById('score_table');
             var colProperties = JSON.parse('<?php echo  json_encode($competencies);?>');
             var propRenderer =  JSON.parse('<?php echo  json_encode($renderer);?>');
             var cellMaxValue =  JSON.parse('<?php echo  json_encode($cellMaxValue);?>');
+            var additionalProp = JSON.parse('<?php echo  json_encode($additionalCols);?>');
             setting.nestedHeaders = JSON.parse('<?php echo  json_encode($headers);?>');
 
             setting. hiddenColumns =  {
-
                 columns: [parseInt('{{count($headers[1]) }}')],
                 indicators: false
-
             };
 
             setting.colWidths = JSON.parse('<?php echo  json_encode($colWidths);?>');
@@ -111,6 +114,8 @@
             var colorRenderer = function (instance, td, row, col, prop, value, cellProperties) {
 
                 Handsontable.renderers.TextRenderer.apply(this, arguments);
+
+
                 $.each(propRenderer, function (index, object) {
 
                     if(prop == object.index) {
@@ -135,6 +140,31 @@
                         }
 
                     }
+                });
+
+                $.each(additionalProp, function(key, js_object) {
+
+                    if(prop == js_object.index) {
+
+                        if( value < parseInt(js_object.min)) {
+
+                            if(value != 0 && value != null && value != '') {
+
+                                if(js_object.color != null) {
+
+                                    td.style.backgroundColor = js_object.color;
+                                } else {
+
+                                    td.style.backgroundColor = 'red';
+                                }
+
+                            }
+                        } else if (value > parseInt(js_object.max)) {
+                            td.style.backgroundColor = js_object.color;
+                        }
+
+                    }
+
                 })
             };
 
@@ -146,9 +176,12 @@
                     if(prop == object.index) {
                         cellProperties.readOnly = object.readOnly;
                     }
+
+
                 });
 
                 this.renderer = colorRenderer;
+
                 return cellProperties;
             };
 
@@ -173,30 +206,17 @@
                             var element_change = onInputScoreChange(newValue, maxValue, Fraud, Absence, student_annual_id, oldValue);
                             if(!$.isEmptyObject(element_change)) {
                                 colDataArray[columnIndex].push(element_change)
-                                CELL_CHANGE.push(element_change);
+
                             }
+                            CELL_CHANGE.push(element_change);
                             checkIfStringValExist(currentColDataChange, columnIndex, maxValue, Fraud, Absence)
                         });
                     }
             };
 
-             $.ajax({
-                type: 'POST',
-                url: '/admin/course/course-annual/proficency/score-data',
-                data: {course_annual_id: $('input[name=course_annual_id]').val(), _token:$('input[name=token]').val()},
-                dataType: "json",
-                success: function (resultData) {
 
-                    setting.data = resultData;
-                    setting = calculateSite(setting)
-                    hotInstance = new Handsontable(container, setting);
-                    toggleLoading(false)
-                },
 
-                error:function(response) {
-                    toggleLoading(false)
-                }
-            });
+            initTale()
 
             $(window).on('resize', function(){
                 var table_size = $('.box-body').width();
@@ -207,8 +227,6 @@
             });
 
             $('#save').on('click', function(e) {
-
-                sendRequest(colProperties);
 
                 $.each(array_col_status, function(key, val) {
                     if(val === false) {
@@ -232,7 +250,7 @@
                         }, function(confirmed) {
 
                             if (confirmed) {
-
+                                sendRequest(propRenderer);
                             }
                         });
                     } else {
@@ -254,9 +272,52 @@
                 } else {
                     notify('error', 'There are no changes!!', 'Info');
                 }
+            });
+
+            $(document).on('click', '#calculate', function (e) {
+                calcuateScore('POST',  '{{route('course_annual.competency_score.calculate')}}');
             })
 
         });
+
+
+
+        function initTale()
+        {
+
+            /*---ajax load to get data---*/
+
+            toggleLoading(true);
+            $.ajax({
+                type: 'POST',
+                url: '/admin/course/course-annual/proficency/score-data',
+                data: {course_annual_id: $('input[name=course_annual_id]').val(), _token:$('input[name=token]').val()},
+                dataType: "json",
+                success: function (resultData) {
+
+                    setting.data = resultData;
+                    if(hotInstance) {
+                        hotInstance.updateSettings({
+                            data: resultData,
+                        });
+                    } else {
+                        setting = calculateSite(setting)
+                        hotInstance = new Handsontable(document.getElementById('score_table'), setting);
+                    }
+
+                    notify('info', 'Data Loaded!', 'Info')
+                    toggleLoading(false)
+                },
+
+                error:function(response) {
+                    toggleLoading(false)
+                    notify('warning', 'No Data Loaded!', 'Warning')
+                }
+            });
+
+            /*---end ajax load to get data---*/
+
+        }
 
 
     </script>

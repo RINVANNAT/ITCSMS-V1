@@ -9,31 +9,43 @@
 namespace App\Http\Controllers\Backend\Course\CourseHelperTrait;
 
 
+use App\Models\CompetencyScore;
 use App\Models\CourseAnnual;
 use App\Models\Department;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Response;
 use Illuminate\Support\Facades\DB;
+use App\Repositories\Backend\CompetencyScore\EloquentCompetencyScoreRepository;
 
 trait ProficencyScoreTrait
 {
 
+    protected  $competencyScores;
+
+    public function instance()
+    {
+        $competencyScoreRepository = new EloquentCompetencyScoreRepository();
+        return $this->competencyScores = $competencyScoreRepository;
+    }
+
     public function proficencyFormScore( Request $request)
     {
 
+        $tes = json_encode([
+            ['min' => 35, 'max'=> 40, 'color' => 'green', 'readOnly' => true, 'value' => 'Advance'],
+            ['min' => 30, 'max'=> 35, 'color' => '#d1fff7', 'readOnly' => true, 'value' => 'Upper-Level'],
+            ['min' => 25, 'max'=> 30, 'color' => '#a4f9f1', 'readOnly' => true, 'value' => 'InterMediat-Level'],
+            ['min' => 20, 'max'=> 25, 'color' => '#f9f2a4', 'readOnly' => true, 'value' => 'Pre-Level'],
+            ['min' => 15, 'max'=> 20, 'color' => '#f9f2a4', 'readOnly' => true, 'value' => 'Element-Level'],
+            ['min' => 10, 'max'=> 15, 'color' => '#f9f2a4', 'readOnly' => true, 'value' => 'Beginner-Level'],
+            ['min' => 0, 'max'=> 10, 'color' => '#ffe1d1', 'readOnly' => true, 'value' => 'Starter-Level'],
+
+        ]);
+
+
+
         /*$ma = "((co*2)+(ce*4)+(po*10))/3";
-
-        $co = 25;
-        $ce = 15;
-        $po = 5;
-
-
-        $rule = '(('.$co.'*5)+('.$ce.'*5)+('.$po.'*10))/5';
-        $p = eval('return '.$rule.';');
-
-        dd($p);
-
-
         dump(preg_match('/(\d+)(?:\s*)([\+\-\*\/])(?:\s*)(\d+)(?:\s*)([\+\-\*\/])(?:\s*)(\d+)/', $ma, $matches));
 
         if(preg_match('/(\d+)(?:\s*)([\+\-\*\/])(?:\s*)(\d+)(?:\s*)([\+\-\*\/])(?:\s*)(\d+)/', $ma, $matches)!== FALSE){
@@ -72,7 +84,6 @@ trait ProficencyScoreTrait
         $cellMaxValue = [];
         $courseAnnual = CourseAnnual::where('id', $request->course_annual_id)->first();
 
-
         $competencies = DB::table('competencies')
             ->where('competency_type_id', $courseAnnual->competency_type_id)
             ->where('is_competency', true)
@@ -83,6 +94,8 @@ trait ProficencyScoreTrait
             ->where('competency_type_id', $courseAnnual->competency_type_id)
             ->where('is_competency', false)
             ->orderBy('id')->get();
+
+
         $headers = [
             [
                 'Student ID',
@@ -125,7 +138,8 @@ trait ProficencyScoreTrait
                 'min' => $properties->min,
                 'max' => $properties->max,
                 'color' => $properties->color,
-                'readOnly' => $properties->readOnly
+                'readOnly' => $properties->readOnly,
+                'id' => $competency->id
 
             ];
 
@@ -134,7 +148,21 @@ trait ProficencyScoreTrait
         }
 
 
+
+
+        $arrayAdditionalCols = [];
         foreach ($additionalColumns as $column) {
+
+            $additionalProperties = json_decode($column->properties);
+            $arrayAdditionalCols[] = [
+                'index' => $column->name,
+                'min' => $additionalProperties->min,
+                'max' => $additionalProperties->max,
+                'color' => $additionalProperties->color,
+                'readOnly' => $additionalProperties->readOnly,
+                'id' => $column->id
+
+            ];
             $headers[0][] =  $column->name;
             $headers[1][] = '';
             $colWidths[] =  130;
@@ -150,7 +178,8 @@ trait ProficencyScoreTrait
             'competencies'=> $comp,
             'colWidths' => $colWidths,
             'renderer' => $renderer,
-            'cellMaxValue' => $cellMaxValue
+            'cellMaxValue' => $cellMaxValue,
+            'additionalCols' => $arrayAdditionalCols
         ]);
     }
 
@@ -246,7 +275,10 @@ trait ProficencyScoreTrait
     public function proficencyData(Request $request)
     {
 
+        $competencyScoreKeyByIds = [];
+
         $courseAnnual = CourseAnnual::where('id', $request->course_annual_id)->first();
+
         $competencies = DB::table('competencies')
             ->where('competency_type_id', $courseAnnual->competency_type_id)
             ->where('is_competency', true)
@@ -264,7 +296,22 @@ trait ProficencyScoreTrait
         $index = 0;
         $array_data = [];
 
-        collect($studentData['student_data'])->filter(function ($item) use(&$index, &$array_data, $departments, $studentGroups, $groups, $courseAnnual, $competencies, $additionalColumns) {
+        $arrayStudentAnnualIds = collect($studentData['student_data'])->pluck('student_annual_id')->toArray();
+
+        $competencyScores = DB::table('competency_scores')->where(function ($query) use($courseAnnual, $arrayStudentAnnualIds) {
+            $query->where('course_annual_id', '=', $courseAnnual->id)
+                ->whereIn('student_annual_id', $arrayStudentAnnualIds);
+        })->get();
+
+        $competencyScoresCollection = collect($competencyScores);
+
+        $competencyScoresCollection->map(function($item) use( &$competencyScoreKeyByIds){
+
+            $competencyScoreKeyByIds[$item->student_annual_id][$item->competency_id] = $item;
+        })->toArray();
+
+
+        collect($studentData['student_data'])->filter(function ($item) use(&$index, &$array_data, $departments, $studentGroups, $groups, $courseAnnual, $competencies, $additionalColumns, $competencyScoreKeyByIds) {
 
             $index++;
             $groupCode = $groups[$studentGroups[$item->student_annual_id]->group_id]->code;
@@ -276,21 +323,247 @@ trait ProficencyScoreTrait
                 'department_code' => $departments[$item->department_id]['code'],
                 'group_code'=> $degreeCode.$item->grade_id.'-'.$groupCode,
             ];
+            $studentCompetencyScores = isset($competencyScoreKeyByIds[$item->student_annual_id])?$competencyScoreKeyByIds[$item->student_annual_id]:null;
 
+
+            /*--assign each competency score----*/
             foreach ($competencies as $competency) {
 
-                $properties = json_decode($competency->properties);
-                $element[strtolower($competency->name)] = $this->floatFormat(0);
+                //$properties = json_decode($competency->properties);
+                $competencyScore = isset($studentCompetencyScores[$competency->id])?$studentCompetencyScores[$competency->id]:null;
+                $element[strtolower($competency->name)] = isset($competencyScore)?$this->floatFormat($competencyScore->score):'0.00';
             }
+
+            /*--end assign each competency score----*/
+
+            /*--assign total competency score base on rule----*/
+
             foreach($additionalColumns as $column) {
-                $element[$column->name] = $this->floatFormat(99.99);
+
+                $notCompetencyScore = isset($studentCompetencyScores[$column->id])?$studentCompetencyScores[$column->id]:null;
+                $element[$column->name] = isset($notCompetencyScore)?$this->floatFormat($notCompetencyScore->score):'0.00';
             }
+
+            /*--assign total competency score base on rule----*/
             $element['student_annual_id'] = $item->student_annual_id;
 
             $array_data[] = $element;
         });
         return  \Illuminate\Support\Facades\Response::json($array_data);
 
+    }
+
+    public function storeCompetencyScore(Request $request)
+    {
+        $competencyId = $request->id;
+        $courseAnnualId = $request->course_annual_id;
+        $colData = $request->data;
+        $studentAnnualIds = collect($colData)->pluck('student_annual_id')->toArray();
+        $competencyScores = $this->instance()->getCompetencyScore($studentAnnualIds, $courseAnnualId, $competencyId);
+
+        $input= [];
+
+        if(count($competencyScores) > 0) {
+
+            $count = 0;
+
+            foreach($colData as $data) {
+
+                $eachInput = [
+                    'course_annual_id' => $courseAnnualId,
+                    'student_annual_id' => $data['student_annual_id'],
+                    'competency_id' => $competencyId,
+                    'score'=> $data['score'],
+                    'created_at' => Carbon::now(),
+                    'create_uid' => auth()->id()
+                ];
+
+                if(isset($competencyScores[$data['student_annual_id']])) {
+
+                    $scoreProp = $competencyScores[$data['student_annual_id']];
+                    $update = $this->instance()->update($scoreProp->id, $eachInput);
+                    if($update) {
+                        $count++;
+                    }
+
+                } else {
+
+                    $store = $this->instance()->create($eachInput);
+                    if($store) {
+                        $count++;
+                    }
+                }
+            }
+
+            if($count == count($colData)) {
+
+                return Response::json(['status' => true, 'message' => 'Updated!']);
+            }
+
+        } else {
+
+            foreach($colData as $data) {
+                $input[] = [
+                    'course_annual_id' => $courseAnnualId,
+                    'student_annual_id' => $data['student_annual_id'],
+                    'competency_id' => $competencyId,
+                    'score'=> $data['score'],
+                    'created_at' => Carbon::now(),
+                    'create_uid' => auth()->id()
+                ];
+            }
+
+            $store = $this->instance()->create($input);
+            if($store) {
+                return Response::json(['status' => true, 'message' => 'Saved!']);
+            }
+        }
+
+    }
+
+    public function calculate(Request $request)
+    {
+        $updation =0;
+        $creation = 0;
+        $countRule = 0;
+        $competencyScoresKeyByIds = [];
+        $courseAnnualId = $request->course_annual_id;
+        $studentAnnualIds = $request->student_annual_id;
+        $studentAnnualIds = collect($studentAnnualIds)->filter(function($item) {
+
+            if($item != '' && $item !=null) {
+                return $item;
+            }
+        })->toArray();
+
+        $courseAnnual = CourseAnnual::find($courseAnnualId)->toArray();
+
+        $competencies = DB::table('competencies')
+            ->where(function ($query) use($courseAnnual) {
+                $query->whereIn('competency_type_id', DB::table('competency_types')->where('id', '=', $courseAnnual['competency_type_id'])->lists('id'));
+            })
+            ->get();
+
+        $competencyName = [];
+        $notCompetencyName = [];
+
+        $competencyIds = collect($competencies)
+
+            ->filter(function($item) use(&$competencyName, &$notCompetencyName) {
+                if($item->is_competency) {
+                    $competencyName[strtolower($item->name)] = $item->id;
+                    return $item;
+                } else {
+                    $notCompetencyName[] = $item;
+                }
+            })->pluck('id')->toArray();
+
+
+        $competencyScores = DB::table('competency_scores')
+            ->where('course_annual_id', '=', $courseAnnualId)
+            ->whereIn('student_annual_id', array_values($studentAnnualIds))
+           /* ->whereIn('competency_id', $competencyIds)*/
+            ->get();
+
+
+        collect($competencyScores)->filter(function ($item) use(&$competencyScoresKeyByIds){
+            $competencyScoresKeyByIds[$item->student_annual_id][$item->competency_id] = $item;
+        })->toArray();
+
+        foreach($notCompetencyName as $competency) {
+
+            $arrayInput = [];
+
+            if($competency->rule != null) {
+                $countRule++;
+
+                /*---loop all student to store data ---*/
+
+                foreach($competencyScoresKeyByIds as $studentAnnualId => $scores) {
+
+                    $constructNewRule = $this->getExpression($competency->rule, $competencyName, $scores);
+                    $score =  eval('return '.$constructNewRule.';');
+
+
+                    if($competency->base_level_type != null) {
+
+                        $baseLevelType = json_decode($competency->base_level_type);
+                        $new_score = null;
+                        foreach($baseLevelType as $levelType) {
+
+                            if($score > $levelType->min && $score < $levelType->max) {
+                                $new_score = $levelType->value;
+                                break;
+                            }
+                        }
+
+                        $input = [
+                            'course_annual_id' => $courseAnnualId,
+                            'student_annual_id' => $studentAnnualId,
+                            'competency_id' => $competency->id,
+                            'score'=> $new_score,
+                            'created_at' => Carbon::now(),
+                            'create_uid' => auth()->id()
+                        ];
+
+                    } else {
+
+                        $input = [
+                            'course_annual_id' => $courseAnnualId,
+                            'student_annual_id' => $studentAnnualId,
+                            'competency_id' => $competency->id,
+                            'score'=> $this->floatFormat($score),
+                            'created_at' => Carbon::now(),
+                            'create_uid' => auth()->id()
+                        ];
+                    }
+                    if(isset($scores[$competency->id])) {
+                        /*--- update record -- */
+
+                        $update = $this->instance()->update($scores[$competency->id]->id, $input);
+                        if($update) {
+                            $updation++;
+                        }
+
+                    } else {
+                        /*--- create new record for array input ---*/
+                        $arrayInput[] = $input;
+                        $creation++;
+                    }
+                }
+                /*----end of loop student ----*/
+
+
+                /*---insert into database*/
+
+                if($creation > 0) {
+                    $this->instance()->create($arrayInput);
+                }
+            }
+        }
+
+        if((($updation + $creation)/$countRule) == count($competencyScoresKeyByIds)) {
+
+            return Response::json(['status' => true, 'message' => 'Data Calculated!']);
+        }
+
+    }
+
+
+    private function getExpression($originalRule, $competencies, $scores)
+    {
+
+        foreach($competencies as $key => $id) {
+
+            if(isset($scores[$id])) {
+                $originalRule = str_replace(strtolower($key),$scores[$id]->score, $originalRule);
+            } else {
+                $originalRule = str_replace(strtolower($key),0, $originalRule);
+            }
+
+        }
+
+        return $originalRule;
     }
 
 

@@ -106,7 +106,7 @@ function notify(type, message, title){
         "newestOnTop": false,
         "progressBar": false,
         "positionClass": "toast-bottom-right",
-        "preventDuplicates": false,
+        "preventDuplicates": true,
         "onclick": null,
         "showDuration": "300",
         "hideDuration": "1000",

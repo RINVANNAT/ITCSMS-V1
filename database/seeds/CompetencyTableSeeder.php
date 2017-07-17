@@ -48,6 +48,7 @@ class CompetencyTableSeeder extends Seeder
                 'properties' => json_encode(['min' => 9, 'max'=> 50, 'color' => 'yellow', 'readOnly' => false]),
                 'rule' => null,
                 'is_competency' => true,
+                'base_level_type' => null,
                 'created_at' => Carbon::now(),
                 'create_uid' => 1
             ],
@@ -57,6 +58,7 @@ class CompetencyTableSeeder extends Seeder
                 'properties' => json_encode($enProperties),
                 'rule' => null,
                 'is_competency' => true,
+                'base_level_type' => null,
                 'created_at' => Carbon::now(),
                 'create_uid' => 1
             ],
@@ -66,6 +68,7 @@ class CompetencyTableSeeder extends Seeder
                 'rule' => null,
                 'is_competency' => true,
                 'competency_type_id' => 1,
+                'base_level_type' => null,
                 'created_at' => Carbon::now(),
                 'create_uid' => 1
             ],
@@ -75,6 +78,7 @@ class CompetencyTableSeeder extends Seeder
                 'rule' => null,
                 'is_competency' => true,
                 'competency_type_id' => 1,
+                'base_level_type' => null,
                 'created_at' => Carbon::now(),
                 'create_uid' => 1
             ],
@@ -85,6 +89,7 @@ class CompetencyTableSeeder extends Seeder
                 'rule' => '((ls/4)+(rd/4)+(sp/5)+(wr/4))',
                 'is_competency' => false,
                 'competency_type_id' => 1,
+                'base_level_type' => null,
                 'created_at' => Carbon::now(),
                 'create_uid' => 1
             ],
@@ -94,14 +99,25 @@ class CompetencyTableSeeder extends Seeder
                 'rule' => '(9*(ls+rd+sp+wr))/40',
                 'is_competency' => false,
                 'competency_type_id' => 1,
+                'base_level_type' => null,
                 'created_at' => Carbon::now(),
                 'create_uid' => 1
             ],
             [
                 'name' => 'Level',
                 'properties' => json_encode(['min' => null, 'max'=> null, 'color' => null, 'readOnly' => true]),
-                'rule' => null,
+                'rule' => '((ls/4)+(rd/4)+(sp/5)+(wr/4))',
                 'is_competency' => false,
+                'base_level_type' => json_encode([
+                    ['min' => 35, 'max'=> 40, 'color' => 'green', 'readOnly' => true, 'value' => 'Advance'],
+                    ['min' => 30, 'max'=> 35, 'color' => '#d1fff7', 'readOnly' => true, 'value' => 'Upper-Level'],
+                    ['min' => 25, 'max'=> 30, 'color' => '#a4f9f1', 'readOnly' => true, 'value' => 'InterMediat-Level'],
+                    ['min' => 20, 'max'=> 25, 'color' => '#f9f2a4', 'readOnly' => true, 'value' => 'Pre-Level'],
+                    ['min' => 15, 'max'=> 20, 'color' => '#f9f2a4', 'readOnly' => true, 'value' => 'Element-Level'],
+                    ['min' => 10, 'max'=> 15, 'color' => '#f9f2a4', 'readOnly' => true, 'value' => 'Beginner-Level'],
+                    ['min' => 0, 'max'=> 10, 'color' => '#ffe1d1', 'readOnly' => true, 'value' => 'Starter-Level'],
+
+                ]),
                 'competency_type_id' => 1,
                 'created_at' => Carbon::now(),
                 'create_uid' => 1
@@ -115,6 +131,7 @@ class CompetencyTableSeeder extends Seeder
                 'competency_type_id' => 2,
                 'rule' => null,
                 'is_competency' => false,
+                'base_level_type' => null,
                 'created_at' => Carbon::now(),
                 'create_uid' => 1
             ],
@@ -124,6 +141,7 @@ class CompetencyTableSeeder extends Seeder
                 'competency_type_id' => 2,
                 'rule' => null,
                 'is_competency' => false,
+                'base_level_type' => null,
                 'created_at' => Carbon::now(),
                 'create_uid' => 1
             ],
@@ -133,6 +151,7 @@ class CompetencyTableSeeder extends Seeder
                 'competency_type_id' => 2,
                 'rule' => null,
                 'is_competency' => false,
+                'base_level_type' => null,
                 'created_at' => Carbon::now(),
                 'create_uid' => 1
             ],
@@ -142,6 +161,7 @@ class CompetencyTableSeeder extends Seeder
                 'competency_type_id' => 2,
                 'rule' => null,
                 'is_competency' => false,
+                'base_level_type' => null,
                 'created_at' => Carbon::now(),
                 'create_uid' => 1
             ],
@@ -153,6 +173,7 @@ class CompetencyTableSeeder extends Seeder
                 'competency_type_id' => 2,
                 'rule' => '(ce+co+pe+po)',
                 'is_competency' => false,
+                'base_level_type' => null,
                 'created_at' => Carbon::now(),
                 'create_uid' => 1
             ],
@@ -160,7 +181,11 @@ class CompetencyTableSeeder extends Seeder
                 'name' => 'ADMISSION',
                 'properties' => json_encode(['min' => null, 'max' => null, 'color' => null, 'readOnly' => true]),
                 'competency_type_id' => 2,
-                'rule' => null,
+                'rule' => '(ce+co+pe+po)',
+                'base_level_type' => json_encode([
+                    ['min' => 25, 'max'=> 40, 'color' => 'green', 'readOnly' => true, 'value' => 'ADMIS', 'gender' => 'M'],
+                    ['min' => 25, 'max'=> 40, 'color' => 'green', 'readOnly' => true, 'value' => 'ADMISE', 'gender' => 'F'],
+                ]),
                 'is_competency' => false,
                 'created_at' => Carbon::now(),
                 'create_uid' => 1

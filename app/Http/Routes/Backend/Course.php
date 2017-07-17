@@ -137,6 +137,10 @@ Route::group([
     Route::post('/course-annual/proficency/score-data', 'CourseAnnualController@proficencyData')->name('course_annual.proficency_score_data');
 
     Route::get('/course-annual/header-competency-score', 'CourseAnnualController@competencyHeader')->name('course_annual.competency_header');
+
+    Route::post('/course-annual/save-competency-score','CourseAnnualController@storeCompetencyScore' )->name('admin.course.course_annual_store_competency_score');
+
+    Route::post('/course-annual/competency-score/calculate', 'CourseAnnualController@calculate' )->name('course_annual.competency_score.calculate');
     /* name --> admin.course....*/
 
 

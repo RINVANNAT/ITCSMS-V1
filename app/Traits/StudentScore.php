@@ -27,7 +27,12 @@ trait StudentScore {
 
     public function floatFormat($val) {
 
-        return number_format((float)$val, 2, '.', '');
+        if(is_numeric($val)) {
+            return number_format((float)$val, 2, '.', '');
+        }
+
+        return $val;
+
     }
 //2040
     public function arrayIdsOfDeptGradeDegreeDeptOption($courseAnnual)
