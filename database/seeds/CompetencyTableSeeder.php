@@ -181,10 +181,12 @@ class CompetencyTableSeeder extends Seeder
                 'name' => 'ADMISSION',
                 'properties' => json_encode(['min' => null, 'max' => null, 'color' => null, 'readOnly' => true]),
                 'competency_type_id' => 2,
-                'rule' => '(ce+co+pe+po)',
+                'rule' => '((ce/5)+(co/5)+(pe/5)+(po/5))',
                 'base_level_type' => json_encode([
                     ['min' => 25, 'max'=> 40, 'color' => 'green', 'readOnly' => true, 'value' => 'ADMIS', 'gender' => 'M'],
                     ['min' => 25, 'max'=> 40, 'color' => 'green', 'readOnly' => true, 'value' => 'ADMISE', 'gender' => 'F'],
+                    ['min' => 0, 'max'=> 25, 'color' => 'green', 'readOnly' => true, 'value' => 'NON-ADMISE', 'gender' => 'F'],
+                    ['min' => 0, 'max'=> 25, 'color' => 'green', 'readOnly' => true, 'value' => 'NON-ADMIS', 'gender' => 'M'],
                 ]),
                 'is_competency' => false,
                 'created_at' => Carbon::now(),
@@ -192,7 +194,10 @@ class CompetencyTableSeeder extends Seeder
             ]
         ];
 
-        //\Illuminate\Support\Facades\DB::table('competency_types')->insert($competency_type);
-         \Illuminate\Support\Facades\DB::table('competencies')->insert($competencies);
+        $insertCompetencyType = \Illuminate\Support\Facades\DB::table('competency_types')->insert($competency_type);
+        if($insertCompetencyType) {
+            \Illuminate\Support\Facades\DB::table('competencies')->insert($competencies);
+        }
+
     }
 }
