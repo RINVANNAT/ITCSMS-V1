@@ -256,4 +256,16 @@
     .side-course {
         min-height: 80% !important;
     }
+
+    .fc-time-grid-event {
+        overflow-y: scroll;
+    }
+
+    .fc-time-grid-event::-webkit-scrollbar * {
+        background: transparent;
+    }
+
+    .fc-time-grid-event::-webkit-scrollbar-thumb {
+        background: #999 !important;
+    }
 }
