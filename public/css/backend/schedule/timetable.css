@@ -153,6 +153,10 @@
     margin-bottom: 2px !important;
 }
 
+.fc-time-grid-event {
+    overflow: scroll;
+}
+
 .box-smis {
     border: 1px solid #dcdcdc;
     margin: 5px;
@@ -235,17 +239,20 @@
     float: right;
 }
 
-@media screen and (max-width: 1440px){
-    .side-room, .side-course{
+@media screen and (max-width: 1440px) {
+    .side-room, .side-course {
         clear: both;
         width: 100%;
     }
+
     .side-room > p {
         display: inline;
     }
+
     .side-room {
         min-height: 20% !important;
     }
+
     .side-course {
         min-height: 80% !important;
     }
