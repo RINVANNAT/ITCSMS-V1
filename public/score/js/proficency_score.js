@@ -52,6 +52,29 @@ setting =  {
     afterColumnResize: function () {
         return false;
     }
+};
+
+
+function notification_me(type, message, title){
+    toastr.options = {
+        "closeButton": true,
+        /*"closeHtml" : '<button><i class="icon-off"></i></button>',*/
+        "debug": false,
+        "newestOnTop": false,
+        "progressBar": false,
+        "positionClass": "toast-bottom-right",
+        "preventDuplicates": true,
+        "onclick": null,
+        "showDuration": "300",
+        "hideDuration": "1000",
+        "timeOut": "5000",
+        "extendedTimeOut": "1000",
+        "showEasing": "swing",
+        "hideEasing": "linear",
+        "showMethod": "fadeIn",
+        "hideMethod": "fadeOut"
+    }
+    toastr[type](message, title);
 }
 
 function calculateSite(setting)
@@ -257,9 +280,7 @@ function calcuateScore(method, calculateBaseUrl) {
 
             notify('success', resultData.message, 'Info');
             toggleLoading(false);
-
             initTale();
-
         },
         error: function(error) {
 
@@ -267,5 +288,5 @@ function calcuateScore(method, calculateBaseUrl) {
             toggleLoading(false);
         }
     })
-
 }
+

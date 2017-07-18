@@ -42,16 +42,18 @@
                 </span>
             </strong>
 
+            {{--<h1 class="animated infinite bounce">Example</h1>--}}
 
-            <button class="btn btn-primary btn-xs pull-right" id="import">
+
+            <button class="btn btn-primary btn-xs pull-right" id="import" type="button" data-toggle="modal" data-target="#modal-default">
                 <i class="fa fa-upload"></i>
                 Import
             </button>
 
-            <button class="btn btn-info btn-xs pull-right" style="margin-right: 5px" id="export">
+            <a href="{{route('course_annual.competency_score.export', $courseAnnual->id)}}" class="btn btn-info btn-xs pull-right" style="margin-right: 5px" id="export">
                 <i class="fa fa-download"> </i>
                 Export
-            </button>
+            </a>
 
             <button class="btn btn-warning btn-xs pull-right" style="margin-right: 5px" id="save">
                 <i class="fa fa-submit"> </i>
@@ -71,10 +73,22 @@
             <input type="hidden" name="token" value="{{csrf_token()}}">
             {{--here what i need to write --}}
 
+            @if(session('status') === false)
+                <div class="alert alert-danger">
+                    <h4><i class="icon fa fa-info"></i> Import Score Error</h4>
+                    <p>
+                        {{session('message')}}
+                    </p>
+                </div>
+            @endif
+
+
             <div id="score_table" class="handsontable htColumnHeaders">
 
             </div>
         </div>
+
+        @include('backend.course.courseAnnual.formScore.partials.modal_import')
     </div>
 
     <div class="box box-success" id="box_footer">
@@ -93,6 +107,7 @@
     <script>
 
         $(document).ready(function() {
+            $('div.toast-container').addClass('slideInRight')
 
             var Fraud = '{{\App\Models\Enum\ScoreEnum::Fraud}}';
             var Absence = '{{\App\Models\Enum\ScoreEnum::Absence}}';
@@ -284,7 +299,6 @@
 
         function initTale()
         {
-
             /*---ajax load to get data---*/
 
             toggleLoading(true);
@@ -305,7 +319,8 @@
                         hotInstance = new Handsontable(document.getElementById('score_table'), setting);
                     }
 
-                    notify('info', 'Data Loaded!', 'Info')
+                    notification_me('info', 'Data Loaded!', 'Info');
+                    /*notify('info', 'Data Loaded!', 'Info')*/
                     toggleLoading(false)
                 },
 
@@ -318,6 +333,11 @@
             /*---end ajax load to get data---*/
 
         }
+
+        @if(session('status') === true)
+            notify('success', '{{session('message')}}')
+            initTale();
+        @endif
 
 
     </script>

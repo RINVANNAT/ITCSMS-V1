@@ -17,6 +17,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Response;
 use Illuminate\Support\Facades\DB;
 use App\Repositories\Backend\CompetencyScore\EloquentCompetencyScoreRepository;
+use Maatwebsite\Excel\Facades\Excel;
 
 trait ProficencyScoreTrait
 {
@@ -31,54 +32,6 @@ trait ProficencyScoreTrait
 
     public function proficencyFormScore( Request $request)
     {
-
-        $tes = json_encode([
-            ['min' => 35, 'max'=> 40, 'color' => 'green', 'readOnly' => true, 'value' => 'Advance'],
-            ['min' => 30, 'max'=> 35, 'color' => '#d1fff7', 'readOnly' => true, 'value' => 'Upper-Level'],
-            ['min' => 25, 'max'=> 30, 'color' => '#a4f9f1', 'readOnly' => true, 'value' => 'InterMediat-Level'],
-            ['min' => 20, 'max'=> 25, 'color' => '#f9f2a4', 'readOnly' => true, 'value' => 'Pre-Level'],
-            ['min' => 15, 'max'=> 20, 'color' => '#f9f2a4', 'readOnly' => true, 'value' => 'Element-Level'],
-            ['min' => 10, 'max'=> 15, 'color' => '#f9f2a4', 'readOnly' => true, 'value' => 'Beginner-Level'],
-            ['min' => 0, 'max'=> 10, 'color' => '#ffe1d1', 'readOnly' => true, 'value' => 'Starter-Level'],
-
-        ]);
-
-
-
-        /*$ma = "((co*2)+(ce*4)+(po*10))/3";
-        dump(preg_match('/(\d+)(?:\s*)([\+\-\*\/])(?:\s*)(\d+)(?:\s*)([\+\-\*\/])(?:\s*)(\d+)/', $ma, $matches));
-
-        if(preg_match('/(\d+)(?:\s*)([\+\-\*\/])(?:\s*)(\d+)(?:\s*)([\+\-\*\/])(?:\s*)(\d+)/', $ma, $matches)!== FALSE){
-            $operator = $matches[2];
-
-            $position = 0;
-            $operand = $matches[1];
-            foreach($matches as $match) {
-
-                $operator = $match;
-
-                switch($operator){
-                    case '+':
-                        $operand = $operand + $matches[$position+1];
-                        break;
-                    case '-':
-                        $operand =  $operand - $matches[$position+1];
-                        break;
-                    case '*':
-                        $operand =  $operand * $matches[$position+1];
-                        break;
-                    case '/':
-                        $operand =  $operand / $matches[$position+1];
-                        break;
-                }
-
-                $position++;
-            }
-
-            dd($operand) ;
-        }*/
-
-
 
         $renderer = [];
         $cellMaxValue = [];
@@ -224,8 +177,6 @@ trait ProficencyScoreTrait
 
     }
 
-
-
     private function studentData($courseAnnual)
     {
 
@@ -274,10 +225,19 @@ trait ProficencyScoreTrait
 
     public function proficencyData(Request $request)
     {
+        $courseAnnual = CourseAnnual::where('id', $request->course_annual_id)->first();
+        $array_data = $this->getCompetencyData($courseAnnual);
+        return  \Illuminate\Support\Facades\Response::json($array_data);
 
+    }
+
+    private function getCompetencyData($courseAnnual)
+    {
+        $index = 0;
+        $array_data = [];
         $competencyScoreKeyByIds = [];
 
-        $courseAnnual = CourseAnnual::where('id', $request->course_annual_id)->first();
+        //$courseAnnual = CourseAnnual::where('id', $request->course_annual_id)->first();
 
         $competencies = DB::table('competencies')
             ->where('competency_type_id', $courseAnnual->competency_type_id)
@@ -293,8 +253,6 @@ trait ProficencyScoreTrait
         $groups = collect(DB::table('groups')->get())->keyBy('id')->toArray();
         $studentGroups = $studentData['student_group'];
         $departments = Department::all()->keyBy('id')->toArray();
-        $index = 0;
-        $array_data = [];
 
         $arrayStudentAnnualIds = collect($studentData['student_data'])->pluck('student_annual_id')->toArray();
 
@@ -349,9 +307,9 @@ trait ProficencyScoreTrait
 
             $array_data[] = $element;
         });
-        return  \Illuminate\Support\Facades\Response::json($array_data);
-
+        return $array_data;
     }
+
 
     public function storeCompetencyScore(Request $request)
     {
@@ -564,6 +522,212 @@ trait ProficencyScoreTrait
         }
 
         return $originalRule;
+    }
+
+
+    public function export(Request $request, $courseAnnualId)
+    {
+
+        $courseAnnual = CourseAnnual::find($courseAnnualId);
+        $data = $this->getCompetencyData($courseAnnual);
+        Excel::create($courseAnnual->name_en, function ($excel) use ($data, $courseAnnual) {
+
+            $excel->sheet($courseAnnual->name_en, function ($sheet) use ($data) {
+                $sheet->fromArray($data);
+            });
+
+        })->download('xls');
+    }
+
+    public function importCompetencyScore(Request $request, $courseAnnualId)
+    {
+
+        $updatation = 0;
+        $creation = 0;
+        $checkIfStringExist = 0;
+        $isScoreUpperThanMax = 0;
+
+        $arrayDataUploaded = [];
+        $competencyScoresKeyByIds = [];
+
+        $courseAnnual = CourseAnnual::find($courseAnnualId);
+        $competencies = DB::table('competencies')
+            ->where([
+                ['competency_type_id', '=', $courseAnnual->competency_type_id],
+                ['is_competency', '=', true]
+            ])->get();
+        $competencyIds = collect($competencies)->pluck('id')->toArray();
+
+        if ($request->file('import') != null) {
+
+            $import = "score" . '_' . Carbon::now()->getTimestamp() . '.' . $request->file('import')->getClientOriginalExtension();
+            $request->file('import')->move(
+                base_path() . '/public/assets/uploaded_file/course_annuals/', $import
+            );
+            $storage_path = base_path() . '/public/assets/uploaded_file/course_annuals/' . $import;
+        } else {
+            return redirect()->back()->with(['status' => false, 'message' => 'No File Choosen!']);
+        }
+
+        if($this->isValidFile($storage_path, $competencies)) {
+            return redirect()->back()->with(['status' => false, 'message'=> 'Please check your inputed file! It maybe wrong.']);
+        }
+
+        Excel::load($storage_path, function($results) use(&$arrayDataUploaded) {
+            $arrayDataUploaded = $results->all()->toArray();
+        });
+
+        $competencyScores = DB::table('competency_scores')
+            ->where('course_annual_id', '=', $courseAnnualId)
+            ->whereIn('competency_id', $competencyIds)
+            ->get();
+
+        collect($competencyScores)->filter(function ($item) use(&$competencyScoresKeyByIds){
+            $competencyScoresKeyByIds[$item->student_annual_id][$item->competency_id] = $item;
+        })->toArray();
+
+        $arrayInput = [];
+        foreach($arrayDataUploaded as $studentData ) {
+
+            collect($competencies)->map(function($item) use($studentData, &$arrayInput, $competencyScoresKeyByIds, $courseAnnual, &$creation, &$updatation, &$checkIfStringExist, &$isScoreUpperThanMax) {
+
+                $properties = json_decode($item->properties);
+
+                if(isset($competencyScoresKeyByIds[(int)$studentData['student_annual_id']])) {
+
+                    $competencyScore = $competencyScoresKeyByIds[(int)$studentData['student_annual_id']];
+
+                    if(isset($competencyScore[$item->id])) {
+
+                        if($studentData[strtolower($item->name)] == null || is_numeric($studentData[strtolower($item->name)])) {
+
+                            if( $studentData[strtolower($item->name)] <= $properties->max) {
+
+                                /*---update record -----*/
+                                $input = [
+                                    'course_annual_id' => $courseAnnual->id,
+                                    'student_annual_id' => (int)$studentData['student_annual_id'],
+                                    'competency_id' => $item->id,
+                                    'score'=> $this->floatFormat(is_numeric($studentData[strtolower($item->name)])?$studentData[strtolower($item->name)]:0),
+                                    'updated_at' => Carbon::now(),
+                                    'write_uid' => auth()->id()
+                                ];
+
+                                $updatation++;
+                                $score = $competencyScore[$item->id];
+                                $this->instance()->update($score->id, $input);
+
+                            } else {
+                                $isScoreUpperThanMax++;
+                            }
+
+                        } else {
+
+                            $checkIfStringExist++;
+
+                        }
+                    } else {
+
+                        if($studentData[strtolower($item->name)] == null || is_numeric($studentData[strtolower($item->name)])) {
+                            if($studentData[strtolower($item->name)] <= $properties->max) {
+
+                                $input = [
+                                    'course_annual_id' => $courseAnnual->id,
+                                    'student_annual_id' => (int)$studentData['student_annual_id'],
+                                    'competency_id' => $item->id,
+                                    'score'=> $this->floatFormat(is_numeric($studentData[strtolower($item->name)])?$studentData[strtolower($item->name)]:0),
+                                    'created_at' => Carbon::now(),
+                                    'create_uid' => auth()->id()
+                                ];
+                                /* --create record --*/
+
+                                $creation++;
+                                $arrayInput[] = $input;
+                            } else{
+
+                                $isScoreUpperThanMax++;
+                            }
+                        } else {
+                            $checkIfStringExist++;
+                        }
+                    }
+                } else {
+
+                    /*---create record ----*/
+
+                    if($studentData[strtolower($item->name)] == null || is_numeric($studentData[strtolower($item->name)])) {
+                        if($studentData[strtolower($item->name)] <= $properties->max) {
+
+                            $input = [
+                                'course_annual_id' => $courseAnnual->id,
+                                'student_annual_id' => (int)$studentData['student_annual_id'],
+                                'competency_id' => $item->id,
+                                'score'=> $this->floatFormat(is_numeric($studentData[strtolower($item->name)])?$studentData[strtolower($item->name)]:0),
+                                'created_at' => Carbon::now(),
+                                'create_uid' => auth()->id()
+                            ];
+
+                            $creation++;
+                            $arrayInput[] = $input;
+                        } else{
+
+                            $isScoreUpperThanMax++;
+
+                        }
+                    } else {
+
+                        $checkIfStringExist++;
+                    }
+                }
+
+            });
+        }
+
+        if($checkIfStringExist > 0) {
+            return redirect()->back()->with(['status' => false, 'message' => 'Error! Please find value in cell there maybe wrong!']);
+        }
+        if($isScoreUpperThanMax > 0) {
+            return redirect()->back()->with(['status' => false, 'message' => 'Wrong Value In Cell File!']);
+        }
+
+        if(file_exists($storage_path)) {
+            unlink($storage_path);
+        }
+        $this->instance()->create($arrayInput);
+
+        if(($creation + $updatation)/count($competencies) === count($arrayDataUploaded)) {
+            return redirect()->back()->with(['status' => true, 'message' => 'Score Uploaded']);
+        } else {
+
+        }
+
+    }
+
+    private function isValidFile($storage_path, $competencies)
+    {
+
+        $isError = false;
+        Excel::load($storage_path, function($reader) use(&$isError, $competencies) {
+
+            $check = 0;
+            $firstrow = $reader->first()->toArray();
+
+            foreach($competencies as $competency) {
+                if(isset($firstrow[ strtolower($competency->name) ])) {
+                    $check++;
+                }
+            }
+            if ((!isset($firstrow['student_id_card'])) || (!isset($firstrow['student_name'])) ) {
+                if($check != count($competencies)) {
+                    $isError = true;
+                }
+            }
+        });
+
+        if($isError) {
+            return true;
+        }
+        return false;
     }
 
 
