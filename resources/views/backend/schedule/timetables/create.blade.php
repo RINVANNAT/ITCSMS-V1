@@ -97,9 +97,12 @@
 
         <div class="box-body">
             <div class="row">
-                <div class="col-md-9 col-sm-12 col-xs-12" style="overflow-x: auto">
-                    {{--Timetable render--}}
+                {{--<div class="col-md-9 col-sm-12 col-xs-12" style="overflow-x: auto">
+                    --}}{{--Timetable render--}}{{--
                     <div id="timetable" style="width: 1345px;"></div>
+                </div>--}}
+                <div class="col-md-9 col-sm-12 col-xs-12">
+                    <div id="timetable"></div>
                 </div>
                 <div class="col-md-3 col-sm-12 col-xs-12">
 
@@ -509,15 +512,24 @@
                             // check conflict room and render
                             object += '<div class="row"> <div class="col-md-12"><div class="fc-title">' + event.course_name + '</div></div>';
                             event.editable = false;
+                            object += '<div class="lang-info">';
                             for(var i=0; i<event.slotsForLanguage.length; i++){
-                                object += '<div class="col-xs-4 col-sm-4 col-md-4"> Gr: ' + event.slotsForLanguage[i].group +' ('+ event.slotsForLanguage[i].building + '-'+event.slotsForLanguage[i].room + ')</div>';
+                                if(i%2===0){
+                                    object += '<div class="lang-info-left"> Gr: ' + event.slotsForLanguage[i].group +' ('+ event.slotsForLanguage[i].building + '-'+event.slotsForLanguage[i].room + ')</div>';
+                                }else{
+                                    object += '<div class="lang-info-right"> Gr: ' + event.slotsForLanguage[i].group +' ('+ event.slotsForLanguage[i].building + '-'+event.slotsForLanguage[i].room + ')</div>';
+                                }
                             }
-                        object += '</div></div>';
+                        object += '</div></div></div>';
                     }else{
                         object += '<div class="side-course" id="' + event.id + '"​​​>';
 
                         // check conflict room and render
-                        object += '<div class="fc-title">' + event.course_name + '</div>';
+                        object += '<div class="fc-title">' + (event.course_name).substr(0, 20)+'...';
+                        if (typeof event.type !== 'undefined') {
+                            object += '<span class="text-primary"> (' + event.type + ')</span> ';
+                        }
+                        object += '</div>';
 
                         // check conflict lecturer and render
                         if (typeof event.conflict_lecturer !== 'undefined') {
@@ -532,10 +544,6 @@
                             object += '<p class="text-primary">' + event.teacher_name + '</p> ';
                         }
 
-
-                        if (typeof event.type !== 'undefined') {
-                            object += '<p class="text-primary">' + event.type + '</p> ';
-                        }
                         object += '</div>';
                     }
 
