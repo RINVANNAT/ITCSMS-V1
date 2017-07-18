@@ -132,6 +132,13 @@
     {!! Html::script('js/backend/schedule/timetable.js') !!}
 
     <script type="text/javascript">
+        /** set background color slot not allow */
+        function set_background_color_slot_not_allow(){
+            $('#timetable').find('[data-time="11:00:00"]').addClass('slot-not-allow');
+            $('#timetable').find('[data-time="11:30:00"]').addClass('slot-not-allow');
+            $('#timetable').find('[data-time="12:00:00"]').addClass('slot-not-allow');
+            $('#timetable').find('[data-time="12:30:00"]').addClass('slot-not-allow');
+        }
         /*Drag course session into timetable.*/
         function drag_course_session() {
 
@@ -504,6 +511,7 @@
                     get_course_sessions();
                 },
                 eventRender: function (event, element, view) {
+                    set_background_color_slot_not_allow();
                     var object = '<a class="fc-time-grid-event fc-v-event fc-event fc-start fc-end course-item  fc-draggable fc-resizable" style="top: 65px; bottom: -153px; z-index: 1; left: 0%; right: 0%;">' +
                         '<div class="fc-content">' +
                         '<div class="container-room">';
@@ -588,7 +596,7 @@
                     return $(object);
                 },
                 eventOverlap: function (stillEvent, movingEvent) {
-                    return stillEvent.allDay && movingEvent.allDay;
+                    return stillEvent.allDay && movingEvent.allDay
                 },
                 eventResize: function (event, delta, revertFunc) {
                     var end = event.end.format();
@@ -601,6 +609,9 @@
                         remove_timetable_slots(event);
                         $('#timetable').fullCalendar('removeEvent', event.id);
                     }
+                },
+                dayRender: function( date, cell ) {
+                    console.log(date);
                 }
             });
         }

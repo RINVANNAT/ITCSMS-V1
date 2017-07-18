@@ -1,3 +1,6 @@
+.slot-not-allow {
+    background-color: #f4f4f4;
+}
 .courses-sessions {
     margin-bottom: 10px;
     height: 280px;
@@ -154,7 +157,7 @@
 }
 
 .fc-time-grid-event {
-    overflow: scroll;
+    /*overflow-y: scroll;*/
 }
 
 .box-smis {
