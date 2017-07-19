@@ -17,8 +17,6 @@ trait StudentStatisticTrait
 
     public function student_statistic_radie(Request $request) {
 
-
-
         $year = AcademicYear::where('id', $request->academic_year_id)->first();
 
         $studentPassIds = $this->studentProp($request->academic_year_id)->where('students.radie', false)->lists('student_annual_id');
@@ -31,9 +29,6 @@ trait StudentStatisticTrait
         $f_student_pass = collect($this->studentScholarshipProp($f_student_pass_ids))->groupBy('student_annual_id')->toArray();
         $f_student_fail_ids = $this->studentProp($request->academic_year_id)->where([['students.radie', true], ['gender_id', GenderEnum::F_ID]])->lists('student_annual_id');
         $f_student_fail = collect($this->studentScholarshipProp($f_student_fail_ids))->groupBy('student_annual_id')->toArray();
-
-
-
 
 
         $scholarshipStudentPass = $this->studentScholarshipProp($studentPassIds);//->groupBy('scholarship_id')->toArray();

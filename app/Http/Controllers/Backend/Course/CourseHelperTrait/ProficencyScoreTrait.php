@@ -101,8 +101,6 @@ trait ProficencyScoreTrait
         }
 
 
-
-
         $arrayAdditionalCols = [];
         foreach ($additionalColumns as $column) {
 
@@ -256,10 +254,10 @@ trait ProficencyScoreTrait
 
         $arrayStudentAnnualIds = collect($studentData['student_data'])->pluck('student_annual_id')->toArray();
 
-        $competencyScores = DB::table('competency_scores')->where(function ($query) use($courseAnnual, $arrayStudentAnnualIds) {
-            $query->where('course_annual_id', '=', $courseAnnual->id)
-                ->whereIn('student_annual_id', $arrayStudentAnnualIds);
-        })->get();
+        $competencyScores = DB::table('competency_scores')
+            ->where('course_annual_id', '=', $courseAnnual->id)
+            ->whereIn('student_annual_id', $arrayStudentAnnualIds)
+            ->get();
 
         $competencyScoresCollection = collect($competencyScores);
 
@@ -267,7 +265,6 @@ trait ProficencyScoreTrait
 
             $competencyScoreKeyByIds[$item->student_annual_id][$item->competency_id] = $item;
         })->toArray();
-
 
         collect($studentData['student_data'])->filter(function ($item) use(&$index, &$array_data, $departments, $studentGroups, $groups, $courseAnnual, $competencies, $additionalColumns, $competencyScoreKeyByIds) {
 
@@ -299,14 +296,16 @@ trait ProficencyScoreTrait
             foreach($additionalColumns as $column) {
 
                 $notCompetencyScore = isset($studentCompetencyScores[$column->id])?$studentCompetencyScores[$column->id]:null;
-                $element[$column->name] = isset($notCompetencyScore)?$this->floatFormat($notCompetencyScore->score):'0.00';
+                $element[$column->name] = (isset($notCompetencyScore)) ? $this->floatFormat($notCompetencyScore->score):'';
             }
 
             /*--assign total competency score base on rule----*/
             $element['student_annual_id'] = $item->student_annual_id;
 
+
             $array_data[] = $element;
         });
+
         return $array_data;
     }
 
@@ -506,7 +505,6 @@ trait ProficencyScoreTrait
         }
 
     }
-
 
     private function getExpression($originalRule, $competencies, $scores)
     {
@@ -728,6 +726,13 @@ trait ProficencyScoreTrait
             return true;
         }
         return false;
+    }
+
+
+    public function printCertificate(Request $request)
+    {
+        return view('backend.course.courseAnnual.formScore.prints.certificate');
+
     }
 
 

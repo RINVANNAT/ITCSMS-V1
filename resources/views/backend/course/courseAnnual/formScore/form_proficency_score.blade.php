@@ -44,8 +44,12 @@
 
             {{--<h1 class="animated infinite bounce">Example</h1>--}}
 
+            <button class="btn btn-danger btn-xs pull-right"  id="print">
+                <i class="fa fa-print"> </i>
+                Print
+            </button>
 
-            <button class="btn btn-primary btn-xs pull-right" id="import" type="button" data-toggle="modal" data-target="#modal-default">
+            <button class="btn btn-primary btn-xs pull-right" id="import" style="margin-right: 5px" type="button" data-toggle="modal" data-target="#modal-default">
                 <i class="fa fa-upload"></i>
                 Import
             </button>
@@ -117,7 +121,7 @@
             var additionalProp = JSON.parse('<?php echo  json_encode($additionalCols);?>');
             setting.nestedHeaders = JSON.parse('<?php echo  json_encode($headers);?>');
 
-            setting. hiddenColumns =  {
+            setting.hiddenColumns =  {
                 columns: [parseInt('{{count($headers[1]) }}')],
                 indicators: false
             };
@@ -129,7 +133,6 @@
             var colorRenderer = function (instance, td, row, col, prop, value, cellProperties) {
 
                 Handsontable.renderers.TextRenderer.apply(this, arguments);
-
 
                 $.each(propRenderer, function (index, object) {
 
@@ -191,12 +194,9 @@
                     if(prop == object.index) {
                         cellProperties.readOnly = object.readOnly;
                     }
-
-
                 });
 
                 this.renderer = colorRenderer;
-
                 return cellProperties;
             };
 
@@ -221,7 +221,6 @@
                             var element_change = onInputScoreChange(newValue, maxValue, Fraud, Absence, student_annual_id, oldValue);
                             if(!$.isEmptyObject(element_change)) {
                                 colDataArray[columnIndex].push(element_change)
-
                             }
                             CELL_CHANGE.push(element_change);
                             checkIfStringValExist(currentColDataChange, columnIndex, maxValue, Fraud, Absence)
@@ -230,8 +229,7 @@
             };
 
 
-
-            initTale()
+            initTale();
 
             $(window).on('resize', function(){
                 var table_size = $('.box-body').width();
@@ -291,11 +289,16 @@
 
             $(document).on('click', '#calculate', function (e) {
                 calcuateScore('POST',  '{{route('course_annual.competency_score.calculate')}}');
+            });
+
+            $(document).on('click', '#print', function(e) {
+                var url = '{{route('course_annual.competency.print_certificate')}}'
+
+                PopupCenterDual(url+'?course_annual_id='+$('input[name=course_annual_id]').val(),'Print Certificate','1200','900');
+
             })
 
         });
-
-
 
         function initTale()
         {
@@ -338,7 +341,6 @@
             notify('success', '{{session('message')}}')
             initTale();
         @endif
-
 
     </script>
 @stop

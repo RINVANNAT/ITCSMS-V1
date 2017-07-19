@@ -148,8 +148,15 @@
             <div class=" no-paddingcol-sm-12">
 
                 <div class="dropdown pull-left">
+
                     <button class="btn btn-primary dropdown-toggle" type="button" data-toggle="dropdown">Action
-                        <span class="caret"></span></button>
+                        <span class="caret"></span>
+                    </button>
+
+                    {{--<button class="btn btn-warning" data-toggle="tooltip" data-placement="right"  title="Generate student for next year" id="generate_student" >
+                        <i class="fa fa-circle-o-notch" aria-hidden="true"></i>
+                    </button>--}}
+
                     <ul class="dropdown-menu">
                         <li class="top"><a href="#" class="btn btn-xs" id="btn-print"><i class="fa fa-print"></i> Print</a>
                         </li>
@@ -972,12 +979,49 @@
         }
         $('#refresh_score_sheet').on('click', function () {
             filter_table();
-
             if($('.selection_blog').is(':visible')) {
                 $('.selection_blog').slideToggle( "fast" )
             }
 
         });
+
+        $('#generate_student').on('click', function(e) {
+
+            var baseData  = getBaseData();
+
+            swal({
+                title: "Attention!",
+                text: "Do you really want to generate student for next year?",
+                type: "warning",
+                showCancelButton: true,
+                confirmButtonClass: "btn-danger",
+                confirmButtonText: "Yes!",
+                cancelButtonText: "No!",
+                closeOnConfirm: false,
+                closeOnCancel: false
+            },
+            function(isConfirm) {
+                if (isConfirm) {
+                    
+                    $.ajax({
+                        method:'POST',
+                        url: '{{route('evaluation.student.generate_next_academic')}}',
+                        dataType:'JSON',
+                        data:baseData,
+                        success:function (result) {
+
+                            swal("Generated", "Students have been successfully graded for next year.", "success");
+                        },
+                        error:function (response) {
+
+                        }
+                    })
+
+                } else {
+                    swal("Cancelled", "Students have not been graded for next yeat  :)", "error");
+                }
+            });
+        })
 
 
     </script>
