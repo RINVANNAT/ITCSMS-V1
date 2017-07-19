@@ -10,7 +10,6 @@
         <div class="timeline-body">
             <div class="panel panel-default">
                 <div class="panel-heading">
-
                     <form action="/admin/dashboard/get_teacher_timetable" method="POST" id="form_teacher_timetable">
                         <div class="pull-left">
 
@@ -142,15 +141,17 @@
                         <div class="pull-right"
                              data-toggle="tooltip"
                              data-placement="top"
-                             title="Filter">
+                             title="Mode">
                             <input type="checkbox"
                                    name="filter_by"
                                    checked data-toggle="toggle"
                                    class="form-control"
-                                   data-on="Only mine"
-                                   data-off="All"
+                                   data-on="View"
+                                   data-off="Edit"
                                    data-width="100"
                                    data-height="25"
+                                   data-onstyle="primary"
+                                   data-offstyle="warning"
                                    data-style="ios">
                         </div>
                     </form>
