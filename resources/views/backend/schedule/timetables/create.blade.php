@@ -102,7 +102,7 @@
                     <div id="timetable" style="width: 1345px;"></div>
                 </div>--}}
                 <div class="col-md-9 col-sm-12 col-xs-12">
-                    <div id="timetable"></div>
+                    <div id="timetable" class="view-timetable"></div>
                 </div>
                 <div class="col-md-3 col-sm-12 col-xs-12">
 
@@ -609,10 +609,10 @@
                     }
                 },
                 loading: function (isLoading, view) {
-                    if(isLoading){
+                    if (isLoading) {
                         toggleLoading(isLoading);
                     }
-                    else{
+                    else {
                         toggleLoading(false);
                     }
                 },

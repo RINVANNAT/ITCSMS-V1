@@ -730,13 +730,19 @@ class EloquentTimetableSlotRepository implements TimetableSlotRepositoryContract
      * Get timetable slot with details info.
      *
      * @param Timetable $timetable
+     * @param null $by_teacher
      * @return mixed
      */
-    public function get_timetable_slot_details(Timetable $timetable)
+    public function get_timetable_slot_details(Timetable $timetable, $by_teacher = null)
     {
-        return $timetable_slots = TimetableSlot::where('timetable_id', $timetable->id)
+        $timetable_slots = TimetableSlot::where('timetable_id', $timetable->id)
             ->leftJoin('rooms', 'rooms.id', '=', 'timetable_slots.room_id')
             ->leftJoin('buildings', 'buildings.id', '=', 'rooms.building_id')
+            ->where(function ($query) use ($by_teacher) {
+                if ($by_teacher != null) {
+                    $query->where('timetable_slots.teacher_name', '=', $by_teacher);
+                }
+            })
             ->select(
                 'timetable_slots.id',
                 'timetable_slots.course_name as title',
@@ -747,8 +753,9 @@ class EloquentTimetableSlotRepository implements TimetableSlotRepositoryContract
                 'timetable_slots.end',
                 'buildings.code as building',
                 'rooms.name as room'
-            )
-            ->get();
+            )->get();
+
+        return $timetable_slots;
     }
 
     /**
@@ -758,9 +765,9 @@ class EloquentTimetableSlotRepository implements TimetableSlotRepositoryContract
      * @param Collection $timetableSlots
      * @return mixed
      */
-    public function get_timetable_slot_with_conflict_info(Timetable $timetable, Collection $timetableSlots)
+    public function get_timetable_slot_with_conflict_info(Timetable $timetable, Collection $timetableSlots, $by_teacher = null)
     {
-        $timetable_slots = $this->get_timetable_slot_details($timetable);
+        $timetable_slots = $this->get_timetable_slot_details($timetable, $by_teacher);
 
         foreach ($timetable_slots as $timetable_slot) {
             if (($timetable_slot instanceof TimetableSlot) && is_object($timetable_slot)) {
@@ -1002,5 +1009,10 @@ class EloquentTimetableSlotRepository implements TimetableSlotRepositoryContract
             }
         }
         return array($groupStudentsLanguage, $groups);
+    }
+
+    public function test()
+    {
+        return 100;
     }
 }

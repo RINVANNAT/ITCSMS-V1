@@ -80,7 +80,7 @@
             <div class="row">
                 <div class="col-md-12 col-sm-12 col-xs-12">
                     {{--Timetable render--}}
-                    <div id="timetable"></div>
+                    <div id="timetable" class="view-timetable"></div>
                 </div>
             </div>
 
@@ -147,9 +147,9 @@
                         event.editable = false;
                         object += '<div class="lang-info">';
                         for (var i = 0; i < event.slotsForLanguage.length; i++) {
-                            if(i%2 !== 0){
+                            if (i % 2 !== 0) {
                                 object += '<div class="lang-info-left"> Gr: ' + event.slotsForLanguage[i].group + ' (' + event.slotsForLanguage[i].building + '-' + event.slotsForLanguage[i].room + ')</div>';
-                            }else{
+                            } else {
                                 object += '<div class="lang-info-right"> Gr: ' + event.slotsForLanguage[i].group + ' (' + event.slotsForLanguage[i].building + '-' + event.slotsForLanguage[i].room + ')</div>';
                             }
                         }
