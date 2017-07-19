@@ -331,7 +331,6 @@ trait AjaxCRUDTimetableController
 
             // find timetable slot
             $timetable_slot = TimetableSlot::find($request->timetable_slot_id);
-
             // update timetable slot
             if ($timetable_slot instanceof TimetableSlot) {
                 $start = new Carbon($request->start_date);

@@ -176,7 +176,7 @@ function get_course_sessions() {
                 'error'
             );
         },
-        complete:function () {
+        complete: function () {
             toggleLoading(false);
         }
     });
@@ -215,4 +215,12 @@ function search_rooms(query) {
             );
         }
     });
+}
+
+/** set background color slot not allow */
+function set_background_color_slot_not_allow() {
+    $('#timetable').find('[data-time="11:00:00"]').addClass('slot-not-allow').attr('disabled');
+    $('#timetable').find('[data-time="11:30:00"]').addClass('slot-not-allow').attr('disabled');
+    $('#timetable').find('[data-time="12:00:00"]').addClass('slot-not-allow').attr('disabled');
+    $('#timetable').find('[data-time="12:30:00"]').addClass('slot-not-allow').attr('disabled');
 }
