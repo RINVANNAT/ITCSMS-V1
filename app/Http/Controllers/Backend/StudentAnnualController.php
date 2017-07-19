@@ -250,7 +250,8 @@ class StudentAnnualController extends Controller
             ->leftJoin('departments', 'studentAnnuals.department_id', '=', 'departments.id')
             ->leftJoin('degrees', 'studentAnnuals.degree_id', '=', 'degrees.id')
             ->leftJoin('group_student_annuals', 'group_student_annuals.student_annual_id', '=', 'studentAnnuals.id')
-            ->leftJoin('groups','groups.id','=','group_student_annuals.group_id');
+            ->leftJoin('groups','groups.id','=','group_student_annuals.group_id')
+            ->whereNull('group_student_annuals.department_id');
 
         if ($scholarship = $request->get('scholarship')) {
             $studentAnnuals->leftJoin('scholarship_student_annual', 'studentAnnuals.id', '=', 'scholarship_student_annual.student_annual_id');
