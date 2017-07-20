@@ -6,6 +6,7 @@ use App\Http\Controllers\Backend\Schedule\Traits\AjaxCloneTimetableController;
 use App\Http\Controllers\Backend\Schedule\Traits\AjaxCRUDTimetableController;
 use App\Http\Controllers\Backend\Schedule\Traits\ExportTimetableController;
 use App\Http\Controllers\Backend\Schedule\Traits\PrintTimetableController;
+use App\Http\Controllers\Backend\Schedule\Traits\ViewTimetableByTeacherController;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Backend\Schedule\Timetable\CreateTimetableRequest;
 use App\Http\Requests\Backend\Schedule\Timetable\CreateTimetableSlotRequest;
@@ -37,7 +38,7 @@ use Yajra\Datatables\Datatables;
 class TimetableController extends Controller
 {
     use AjaxCRUDTimetableController, AjaxCloneTimetableController, PrintTimetableController, ExportTimetableController;
-
+    use ViewTimetableByTeacherController;
     /**
      * @var TimetableRepositoryContract
      */
@@ -242,13 +243,6 @@ class TimetableController extends Controller
      */
     public function show(Timetable $timetable, ShowTimetableRequest $showTimetableRequest)
     {
-        $now = Carbon::now('Asia/Phnom_Penh');
-        $employee = Employee::where('user_id', auth()->user()->id)->first();
-        if ($employee instanceof Employee) {
-            $createTimetablePermissionConfiguration = Configuration::where('key', 'timetable_' . $employee->department_id)->first();
-        } else {
-            $createTimetablePermissionConfiguration = null;
-        }
         $timetable_slots = TimetableSlot::where('timetable_id', $timetable->id)
             ->leftJoin('rooms', 'rooms.id', '=', 'timetable_slots.room_id')
             ->leftJoin('buildings', 'buildings.id', '=', 'rooms.building_id')
