@@ -11,8 +11,6 @@
                 </h4>
             </div>
             <div class="modal-body">
-
-                {!! Form::open(['route' => ['course_annual.competency_score.import', $courseAnnual->id],'id' => 'import_course_annual_score', 'role'=>'form','files' => true])!!}
                 <div class="box box-success no-padding">
 
                     <div class="box-body ">
@@ -28,7 +26,7 @@
                                 </select>
                             </div>
 
-                            <div class="col-sm-1  space_">
+                            <div class="col-sm-2  space_">
 
                                 <select name="filter_dept" id="filter_dept" class="form-control">
                                     @foreach($departments as $key=>$departmentName)
@@ -101,15 +99,6 @@
 
                             </div>
 
-                            <div class="col-sm-1  space_">
-
-                                <select name="group" id="filter_group" class="left-margin form-control " style="margin-bottom: 5px">
-                                    <option value="sdf">G1</option>
-                                    <option value="sdf">G2</option>
-                                </select>
-
-                            </div>
-
                         </div>
 
                         <div class="col-sm-12 blog_course">
@@ -127,12 +116,11 @@
                         </div>
 
                         <div class="pull-right">
-                            <input type="submit" class="btn btn-success btn-xs" id = "publish_score" value="{{ 'Publish' }}"/>
+                            <input type="submit" class="btn btn-success btn-xs" id = "publish_score_record" value="{{ 'Publish' }}"/>
                         </div>
                         <div class="clearfix"></div>
                     </div><!-- /.box-body -->
                 </div><!--box-->
-                {!! Form::close() !!}
 
             </div>
 

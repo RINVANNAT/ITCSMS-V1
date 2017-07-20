@@ -179,14 +179,13 @@
 
     <script>
 
-        $('#publish_score').hide();
+        getCourseAnnuals();
 
         @if($courseAnnual->is_counted_absence)
                 var is_counted_absence = parseInt('{{\App\Models\Enum\ScoreEnum::is_counted_absence}}')
         @else
                 var is_counted_absence = 0;
         @endif
-
 
         var objectStatus={};
         var array_col_status = {};

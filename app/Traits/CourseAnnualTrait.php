@@ -253,7 +253,14 @@ trait CourseAnnualTrait
 
     public function cloneScore(Request $request)
     {
-        $groups = $request->group_id;
+        return $this->copyCloneScore($request->group_id, $request->course_annual_id);
+    }
+
+
+    private function copyCloneScore ($groupIds, $course_annual_id)
+    {
+
+        $groups = $groupIds;
         $count = 0;
         $countUpdate = 0;
         $select = [
@@ -263,7 +270,7 @@ trait CourseAnnualTrait
             'scores.id as score_id'
         ];
 
-        $courseAnnual = CourseAnnual::where('id', $request->course_annual_id)->first();
+        $courseAnnual = CourseAnnual::where('id', $course_annual_id)->first();
 
         if($courseAnnual->responsible_department_id) {
 
@@ -580,15 +587,15 @@ trait CourseAnnualTrait
     {
 
         $courseAnnuals = $this->getCourseAnnualWithProp($request->all());
-        //$array_course_annual_ids = $courseAnnuals->lists('course_annual_id');
-        //$arrayCourseAnnual = collect($courseAnnuals->get())->groupBy('course_id')->toArray();
+        $courseAnnual = CourseAnnual::find($request->course_annual_id);
+        $courseAnnuals = $courseAnnuals->where('course_annuals.reference_course_id', '=', $courseAnnual->course_id);
         $courseAnnuals = $courseAnnuals->get();
         $courses = array_chunk($courseAnnuals, 3);
         return view('backend.course.courseAnnual.includes.partials.blog_course', ['courses'=> (count($courses) > 0)?$courses : null]);
 
     }
 
-    public function validateResponsibleCourse (Request $request)
+    public function publishScore (Request $request)
     {
 
         $courseAnnual = CourseAnnual::find($request->course_annual_id); // this is the current owner course
@@ -602,7 +609,8 @@ trait CourseAnnualTrait
 
                     if($responsibleCourseAnnual->semester_id == $courseAnnual->semester_id) {
 
-                        return Response::json(['status' => true, 'message' => 'Allowed!']);
+                        return   $this->copyCloneScore($groups = [], $request->selected_course_annual_id);
+
                     }
                 }
             } else {

@@ -132,7 +132,7 @@ Route::group([
     Route::get('/course/{id}/import-score-success', 'CourseAnnualController@successImportedScore')->name('admin.score.success_imported');
 
     Route::get('/directed-course-annual', 'CourseAnnualController@directedCourseAnnuals')->name('coursen_annual.get_directed_course');
-    Route::post('/course-annual/validate-responsible-course', 'CourseAnnualController@validateResponsibleCourse')->name('coursen_annual.validate_responsibility');
+    Route::post('/course-annual/publish-score', 'CourseAnnualController@publishScore')->name('coursen_annual.publish_score');
 
 
     /*----competency-url---*/

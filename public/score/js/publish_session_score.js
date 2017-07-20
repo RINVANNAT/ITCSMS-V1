@@ -1,3 +1,5 @@
+var selected_course_annual = null;
+
 var getBaseData = function(){
     var data = {
         academic_year_id: $('select#filter_academic_year :selected').val(),
@@ -6,6 +8,7 @@ var getBaseData = function(){
         degree_id: $('select#filter_degree :selected').val(),
         semester_id: $('select#filter_semester :selected').val(),
         grade_id: $('select#filter_grade :selected').val(),
+        course_annual_id: $('select[name=available_course] :selected').val()
     };
     return data;
 };
@@ -61,60 +64,10 @@ function getCourseAnnuals ()
 $(document).on( 'change','input.course_annual_radio', function (e) {
 
     if($(this).is(':checked')) {
-
-        $.ajax({
-            method:'POST',
-            url: '/admin/course/course-annual/validate-responsible-course',
-            data:{selected_course_annual_id: $(this).val(), course_annual_id: $('select[name=available_course] :selected').val()},
-            success:function (result) {
-
-                if(result.status) {
-
-                    showNotify('success' , result.message, 'Notification')
-                    $('#publish_score').show();
-
-
-                } else {
-
-                    showNotify('warning' , result.message, 'Attention')
-                    $('#publish_score').hide();
-                }
-                
-            },
-            error: function (response) {
-                
-            }
-        })
+        selected_course_annual = $(this).val();
     }
 });
 
-
-function filterGroup () {
-
-
-    $.ajax({
-        method:'POST',
-        url: '/admin/course/course-annual/validate-responsible-course',
-        data:{selected_course_annual_id: $(this).val(), course_annual_id: $('select[name=available_course] :selected').val()},
-        success:function (result) {
-
-            if(result.status) {
-
-                showNotify('success' , result.message, 'Notification')
-
-
-
-            } else {
-
-                showNotify('warning' , result.message, 'Attention')
-            }
-
-        },
-        error: function (response) {
-
-        }
-    })
-}
 
 function showNotify(type, message, title){
     toastr.options = {
@@ -136,3 +89,35 @@ function showNotify(type, message, title){
     }
     toastr[type](message, title);
 }
+
+
+$(document).on('click', '#publish_score_record', function (e) {
+
+    var newData = getBaseData();
+    newData.selected_course_annual_id = selected_course_annual;
+    $.ajax({
+        method:'POST',
+        url: '/admin/course/course-annual/publish-score',
+        data:newData,
+        success:function (result) {
+
+            if(result.status) {
+
+                showNotify('success' , result.message, 'Notification')
+
+            } else {
+
+                showNotify('warning' , result.message, 'Attention')
+
+            }
+
+        },
+        error: function (response) {
+
+        }
+    })
+
+})
+
+
+
