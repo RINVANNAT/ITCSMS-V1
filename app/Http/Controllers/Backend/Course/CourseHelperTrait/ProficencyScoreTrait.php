@@ -749,7 +749,7 @@ trait ProficencyScoreTrait
 
         $departments = Department::lists("code","id")->toArray();
         $degrees = Degree::lists("code","id")->toArray();
-        return view('backend.vocational_student.print.request_print_certificate_fr',compact("students","departments","degrees"));
+        return view('backend.vocational_student.print.request_print_certificate_fr',compact("students","departments","degrees","course_annual_id"));
     }
     public function printCertificate(Request $request)
     {

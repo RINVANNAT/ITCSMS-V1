@@ -15,6 +15,7 @@ class PrintedCertificate extends Migration
         Schema::create('printed_certificate', function (Blueprint $table) {
 
             $table->increments('id');
+            $table->timestamp("date");
             $table->integer('student_annual_id')->index();
             $table->foreign('student_annual_id')
                 ->references('id')

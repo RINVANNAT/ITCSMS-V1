@@ -79,6 +79,7 @@
     <script>
         var selected_ids = null;
         var print_url = "{{ route('course_annual.competency.print_certificate') }}";
+        var course_annual_id = "{{$course_annual_id}}";
 
 
         function initIcheker() {
@@ -113,16 +114,15 @@
             });
             PopupCenterDual(
                     print_url
-                    + '?ids='+JSON.stringify(selected_ids),
+                    +"?course_annual_id="+course_annual_id+'&ids='+JSON.stringify(selected_ids),
                     'Printing','1200','800');
-
         });
 
         $(".btn-single-print").on("click", function(){
             var id = $(this).data('id');
             PopupCenterDual(
                     print_url
-                    + '?ids='+JSON.stringify([id]),
+                    +"?course_annual_id="+course_annual_id+'&ids='+JSON.stringify([id]),
                     'Printing','1200','800');
         });
 
