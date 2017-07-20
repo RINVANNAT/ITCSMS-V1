@@ -753,7 +753,41 @@ trait ProficencyScoreTrait
     }
     public function printCertificate(Request $request)
     {
-        return view('backend.course.courseAnnual.formScore.prints.certificate');
+
+        $studentAnnualIds = json_decode($request->ids);
+        $courseAnnual = CourseAnnual::find($request->course_annual_id);
+        $students  = DB::table('students')
+            ->join('studentAnnuals', function($query) use($studentAnnualIds) {
+                $query->on('studentAnnuals.student_id', '=', 'students.id')
+                    ->whereIn('studentAnnuals.id', $studentAnnualIds);
+            })->get();
+
+        $competencies = DB::table('competencies')
+            ->join('competency_types', function($query) use ($courseAnnual) {
+                $query->on('competency_types.id', '=', 'competencies.competency_type_id')
+                    ->where('competency_types.id', '=', $courseAnnual->competency_type_id);
+            })
+            ->where('type', '=', 'value')
+            ->select('competencies.*')
+            ->get();
+
+        $competencies = collect($competencies)->keyBy('name')->toArray();
+        $competencyIds = collect($competencies)->pluck('id')->toArray();
+        $competencyScores = DB::table('competency_scores')
+            ->where('course_annual_id', '=', $request->course_annual_id)
+            ->whereIn('competency_id', $competencyIds)
+            ->whereIn('student_annual_id', $studentAnnualIds)
+            ->get();
+
+        $arrayScores = [];
+
+        collect($competencyScores)->filter(function($item) use(&$arrayScores) {
+           $arrayScores[$item->student_annual_id][$item->competency_id]  = $item;
+
+        });
+
+
+        return view('backend.course.courseAnnual.formScore.prints.certificate', ['scores' => $arrayScores, 'competencies' => $competencies, 'students'=> $students]);
     }
 
 

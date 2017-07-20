@@ -116,7 +116,7 @@
                         </div>
 
                         <div class="pull-right">
-                            <input type="submit" class="btn btn-success btn-xs" id = "publish_score_record" value="{{ 'Publish' }}"/>
+                            <input type="submit" class="btn btn-success btn-xs" data-dismiss="modal" id = "publish_score_record" value="{{ 'Publish' }}"/>
                         </div>
                         <div class="clearfix"></div>
                     </div><!-- /.box-body -->
