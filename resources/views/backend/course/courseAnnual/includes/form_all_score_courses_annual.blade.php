@@ -264,9 +264,6 @@
                 @endforeach
             </select>
 
-            {{--<button class="btn btn-primary pull-right" style="margin-right: 10px" id="ok_option" >
-                Ok
-            </button>--}}
         </div>
         <!-- /.box-header -->
         @if (session('status'))

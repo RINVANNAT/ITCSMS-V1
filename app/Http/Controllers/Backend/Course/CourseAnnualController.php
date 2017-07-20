@@ -1209,6 +1209,27 @@ class CourseAnnualController extends Controller
         $mode = null;
         $allowCloningScore = false;
 
+        if (auth()->user()->allow("view-all-score-in-all-department")) {
+
+            $departments = Department::where("parent_id", config('access.departments.department_academic'))->orderBy("code")->lists("code", "id");
+            $department_id = null;
+
+        } else {
+
+            $employee = Employee::where('user_id', Auth::user()->id)->first();
+            $departments = $employee->department()->lists("code", "id");
+            $department_id = $employee->department->id;
+
+        }
+
+        $academicYears = AcademicYear::orderBy("id", "desc")->lists('name_latin', 'id')->toArray();
+        $degrees = Degree::lists('name_en', 'id')->toArray();
+        $grades = Grade::lists('name_en', 'id')->toArray();
+
+        $semesters = Semester::orderBy('id')->lists('name_en', 'id')->toArray();
+        $departmentOptions = DB::table('departmentOptions')->get();
+
+
         if (access()->hasRole("Administrator")) {
             $mode = "edit";
 
@@ -1233,7 +1254,11 @@ class CourseAnnualController extends Controller
             }
         }
 
-        return view('backend.course.courseAnnual.includes.form_input_score_course_annual', compact('courseAnnualId', 'courseAnnual', 'availableCourses', 'mode', 'allowCloningScore'));
+        return view('backend.course.courseAnnual.includes.form_input_score_course_annual',
+            compact(
+                'courseAnnualId', 'courseAnnual', 'availableCourses', 'mode', 'allowCloningScore',
+                'departments', 'academicYears', 'degrees', 'grades', 'semesters', 'departmentOptions', 'department_id'
+            ));
 
     }
 

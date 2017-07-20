@@ -575,4 +575,50 @@ trait CourseAnnualTrait
         return view('backend.course.courseAnnual.includes.success_imported_score', ['courseAnnualId'=>$course_annual_id]);
 
     }
+
+    public function directedCourseAnnuals(Request $request)
+    {
+
+        $courseAnnuals = $this->getCourseAnnualWithProp($request->all());
+        //$array_course_annual_ids = $courseAnnuals->lists('course_annual_id');
+        //$arrayCourseAnnual = collect($courseAnnuals->get())->groupBy('course_id')->toArray();
+        $courseAnnuals = $courseAnnuals->get();
+        $courses = array_chunk($courseAnnuals, 3);
+        return view('backend.course.courseAnnual.includes.partials.blog_course', ['courses'=> (count($courses) > 0)?$courses : null]);
+
+    }
+
+    public function validateResponsibleCourse (Request $request)
+    {
+
+        $courseAnnual = CourseAnnual::find($request->course_annual_id); // this is the current owner course
+        $responsibleCourseAnnual = CourseAnnual::find($request->selected_course_annual_id);// this is a course annual which we want to publish the socre for
+
+        if($responsibleCourseAnnual->responsible_department_id == $courseAnnual->department_id) {
+
+            if($responsibleCourseAnnual->reference_course_id != null) {
+
+                if($responsibleCourseAnnual->reference_course_id == $courseAnnual->course_id) {
+
+                    if($responsibleCourseAnnual->semester_id == $courseAnnual->semester_id) {
+
+                        return Response::json(['status' => true, 'message' => 'Allowed!']);
+                    }
+                }
+            } else {
+
+                return Response::json(['status' => false, 'message' => 'The selected course is not assigned to any responsible department. So you cannot publish score to this course.']);
+            }
+
+        }
+
+            return Response::json(['status' => false, 'message' => 'Not Allow!']);
+    }
+
+    public function getGroupByProp( Request $request)
+    {
+
+        $studentByCourse = $this->getStudentByDeptIdGradeIdDegreeId([$request->department_id], [$request->degree_id], [$request->grade_id], $request->academic_year_id);
+
+    }
 }

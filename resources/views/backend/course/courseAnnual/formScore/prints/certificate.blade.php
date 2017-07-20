@@ -81,16 +81,13 @@
             </span>
         </div>
 
-
         <div class="row" style="margin-top: 3%">
-
 
             <div class="col-md-5 no-padding text-center">
 
                  <span>
                     Bulletin de notes
                 </span>
-
                 <table class="table">
                     <thead>
                     <tr class="set_border">

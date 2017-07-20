@@ -10,12 +10,26 @@
             margin-left: 5px;
         }
 
+        .space_{
+            padding-right: 5px !important;
+            padding-left: 5px !important;
+        }
+
+
         .popupdiv{
             height:200px;
             width: 600px;
             background-color: #AED6F1;
             opacity: 60;
 
+        }
+
+        .blog_course{
+            border-top-left-radius: 0;
+            border-top-right-radius: 0;
+            border-bottom-right-radius: 3px;
+            border-bottom-left-radius: 3px;
+            padding: 10px;
         }
 
         .drop-menu {
@@ -32,16 +46,6 @@
             height: 23px;
             margin-bottom: 5px;
 
-        }
-        #filter_academic_year {
-            font-size: 10pt;
-            height: 23px;
-            margin-left: 5px;
-        }
-        #filter_semester{
-            font-size: 10pt;
-            height: 23px;
-            margin-left: 5px;
         }
         .current_row td{
 
@@ -76,6 +80,8 @@
 
 @section('content')
 
+
+    @include('backend.course.courseAnnual.includes.partials.modal_publish')
     <div class="box box-success">
         <div class="box-header with-border">
             <div class="pull-left drop_selection">
@@ -94,6 +100,10 @@
             </div>
 
             <div id="blog_button">
+
+                @if($courseAnnual->department_id == config('access.departments.sa') || $courseAnnual->department_id == config('access.departments.sf'))
+                    <button class="btn btn-success btn-xs pull-right" id="publish_score" style="margin-left:5px" data-toggle="modal" data-target="#modal-default"> publish </button>
+                @endif
 
                 <a class="btn btn-primary btn-xs pull-right" id="export_score" href="{{route('course_annual.export_course_score_annual')}}" target="_blank" style="margin-left:5px">Export Score</a>
 
@@ -114,9 +124,7 @@
                     @endif
 
                     @if($courseAnnual->department_id == config('access.departments.sa') || $courseAnnual->department_id == config('access.departments.sf'))
-
                         <button class="btn btn_success_custom btn-xs pull-right" id="proficency_score_form" data-toggle="tooltip" data-placement="top" title=" The action is to allow you to input score in the special format"  style="margin-left:5px"> Proficency Score </button>
-
                     @endif
                 @endif
 
@@ -167,8 +175,11 @@
     {!! Html::script('plugins/handsontable-test/handsontable.full.min.js') !!}
     {!! Html::script('plugins/jpopup/jpopup.js') !!}
     {!! Html::script('score/js/input_score.js') !!}
+    {!! Html::script('score/js/publish_session_score.js') !!}
 
     <script>
+
+        $('#publish_score').hide();
 
         @if($courseAnnual->is_counted_absence)
                 var is_counted_absence = parseInt('{{\App\Models\Enum\ScoreEnum::is_counted_absence}}')
@@ -779,7 +790,6 @@
                 if(cellChanges.length > 0 || cellScoreChanges.length > 0) {
                     notify('error', 'info', 'Please Save Your Changes Before Getting Average!!!')
                 } else {
-
 
                     var getAverageBaseurl = '{{route('admin.course.get_average_score', $courseAnnualId)}}';
 
