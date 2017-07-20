@@ -83,7 +83,7 @@
 
     @yield('before-scripts-end')
     {!! HTML::script(elixir('js/backend.js')) !!}
-    <script src="{{url('js/custom.js')}}"></script>
+    <script src="{{url('js/custom_v1.js')}}"></script>
 
     <script>
         var needConfirm = false;

@@ -16,6 +16,7 @@ use App\Http\Requests\Backend\Course\CourseAnnual\UpdateCourseAnnualRequest;
 use App\Models\Absence;
 use App\Models\AcademicYear;
 use App\Models\Average;
+use App\Models\CompetencyType;
 use App\Models\Course;
 use App\Models\CourseAnnual;
 use App\Models\Degree;
@@ -359,7 +360,8 @@ class CourseAnnualController extends Controller
         $degrees = Degree::lists('name_kh', 'id')->toArray();
         $grades = Grade::lists('name_kh', 'id')->toArray();
         $semesters = Semester::lists("name_kh", "id");
-        return view('backend.course.courseAnnual.create', compact('departments', 'academicYears', 'degrees', 'grades', 'courses', "semesters", 'options', 'other_departments'));
+        $competency_types = CompetencyType::lists('name','id')->toArray();
+        return view('backend.course.courseAnnual.create', compact('competency_types','departments', 'academicYears', 'degrees', 'grades', 'courses', "semesters", 'options', 'other_departments'));
     }
 
     public function getDepts()
@@ -408,8 +410,12 @@ class CourseAnnualController extends Controller
 
             $data = $data + ['course_annual_id' => $storeCourseAnnual->id];
             $storeCourseAnnualClass = $this->courseAnnualClasses->create($data);
-            //----create score percentage ----
-            $this->createScorePercentage($request->midterm_score, $request->final_score, $storeCourseAnnual->id);
+
+            // Only normal scoring (midterm+final) need to generate empty score
+            if(isset($data["normal_scoring"]) and $data["normal_scoring"] == "checked"){
+                //----create score percentage ----
+                $this->createScorePercentage($request->midterm_score, $request->final_score, $storeCourseAnnual->id);
+            }
 
             if ($storeCourseAnnualClass) {
                 return redirect()->route('admin.course.course_annual.index')->withFlashSuccess(trans('alerts.backend.generals.created'));
@@ -578,10 +584,10 @@ class CourseAnnualController extends Controller
         $degrees = Degree::lists('name_kh', 'id')->toArray();
         $grades = Grade::lists('name_kh', 'id')->toArray();
         $semesters = Semester::lists("name_kh", "id");
+        $competency_types = CompetencyType::lists('name','id')->toArray();
 
 
-
-        return view('backend.course.courseAnnual.edit', compact('courseAnnual', 'departments', 'academicYears', 'degrees', 'grades', 'courses', 'options', 'semesters', 'groups', 'midterm', 'final', 'other_departments'));
+        return view('backend.course.courseAnnual.edit', compact('competency_types','courseAnnual', 'departments', 'academicYears', 'degrees', 'grades', 'courses', 'options', 'semesters', 'groups', 'midterm', 'final', 'other_departments'));
     }
 
     /**
@@ -1204,6 +1210,9 @@ class CourseAnnualController extends Controller
     {
 
         $properties = $this->dataSendToView($courseAnnualId);
+        if(($properties['course_annual']->competency_type_id != null) and ($properties['course_annual']->normal_scoring == false)) {
+          return redirect("/admin/course/course/get-form-proficency?course_annual_id=".$courseAnnualId);
+        }
         $courseAnnual = $properties['course_annual'];
         $availableCourses = $properties['available_course'];
         $mode = null;

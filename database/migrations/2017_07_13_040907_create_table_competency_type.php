@@ -3,7 +3,7 @@
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
 
-class CreateTableCompetencies extends Migration
+class CreateTableCompetencyType extends Migration
 {
     /**
      * Run the migrations.
@@ -12,24 +12,10 @@ class CreateTableCompetencies extends Migration
      */
     public function up()
     {
-
-        Schema::create('competencies', function (Blueprint $table) {
-
+        Schema::create('competency_types', function (Blueprint $table) {
             $table->increments('id');
-            $table->string('name')->index();
-
-            $table->integer('competency_type_id')->unsigned()->index();
-            $table->foreign('competency_type_id')
-                ->references('id')
-                ->on('competency_types')
-                ->onDelete('cascade');
-
-            $table->text('properties')->nullable();
-            $table->enum('type',["value","condition","calculation"])->default("value");
-            $table->text('calculation_rule')->nullable();
-            $table->text('condition_rule')->nullable();
-
-
+            $table->string('name');
+            $table->string('description')->nullable();
             $table->integer('create_uid')->unsigned()->index();
             $table->foreign('create_uid')
                 ->references('id')
@@ -41,6 +27,7 @@ class CreateTableCompetencies extends Migration
                 ->references('id')
                 ->on('users')
                 ->onDelete('NO ACTION');
+
             $table->timestamps();
         });
     }
@@ -52,6 +39,6 @@ class CreateTableCompetencies extends Migration
      */
     public function down()
     {
-        Schema::drop('competencies');
+        Schema::drop('competency_types');
     }
 }

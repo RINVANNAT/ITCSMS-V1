@@ -3,7 +3,7 @@
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
 
-class AlterTableCompetencyScore extends Migration
+class AddColumnNormalScoringToCourseAnnual extends Migration
 {
     /**
      * Run the migrations.
@@ -12,9 +12,8 @@ class AlterTableCompetencyScore extends Migration
      */
     public function up()
     {
-        Schema::table('competency_scores', function (Blueprint $table) {
-
-            $table->string('score', '100')->change();
+        Schema::table('course_annuals', function (Blueprint $table) {
+            $table->boolean('normal_scoring')->default(true);
         });
     }
 
@@ -25,8 +24,8 @@ class AlterTableCompetencyScore extends Migration
      */
     public function down()
     {
-        Schema::table('competency_scores', function (Blueprint $table) {
-            //
+        Schema::table('course_annuals', function (Blueprint $table) {
+            $table->dropColumn('normal_scoring');
         });
     }
 }

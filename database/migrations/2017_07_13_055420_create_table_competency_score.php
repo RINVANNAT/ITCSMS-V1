@@ -36,7 +36,7 @@ class CreateTableCompetencyScore extends Migration
                 ->on('competencies')
                 ->onDelete('CASCADE');
 
-            $table->string('score', 5)->nullable();
+            $table->string('score', 100)->nullable();
             $table->integer('create_uid')->unsigned()->index();
             $table->foreign('create_uid')
                 ->references('id')

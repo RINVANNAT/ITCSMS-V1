@@ -113,9 +113,13 @@
         $(document).ready(function() {
             $('div.toast-container').addClass('slideInRight')
 
+            // Character represent Fraud -> F
             var Fraud = '{{\App\Models\Enum\ScoreEnum::Fraud}}';
+            // Absence -> A
             var Absence = '{{\App\Models\Enum\ScoreEnum::Absence}}';
+            // Column properties
             var colProperties = JSON.parse('<?php echo  json_encode($competencies);?>');
+            //
             var propRenderer =  JSON.parse('<?php echo  json_encode($renderer);?>');
             var cellMaxValue =  JSON.parse('<?php echo  json_encode($cellMaxValue);?>');
             var additionalProp = JSON.parse('<?php echo  json_encode($additionalCols);?>');
@@ -292,7 +296,7 @@
             });
 
             $(document).on('click', '#print', function(e) {
-                var url = '{{route('course_annual.competency.print_certificate')}}'
+                var url = '{{route('course_annual.competency.request_print_certificate')}}'
 
                 PopupCenterDual(url+'?course_annual_id='+$('input[name=course_annual_id]').val(),'Print Certificate','1200','900');
 

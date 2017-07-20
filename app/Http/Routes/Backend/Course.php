@@ -144,6 +144,7 @@ Route::group([
     Route::post('/course-annual/competency-score/calculate', 'CourseAnnualController@calculate' )->name('course_annual.competency_score.calculate');
     Route::get('/course-annual/competency-score/{id}/export', 'CourseAnnualController@export' )->name('course_annual.competency_score.export');
     Route::post('/course-annual/competency-score/{id}/import-score', 'CourseAnnualController@importCompetencyScore' )->name('course_annual.competency_score.import');
+    Route::get('/course-annual/competency/request-print-certificate','CourseAnnualController@requestPrintCertificate' )->name('course_annual.competency.request_print_certificate');
     Route::get('/course-annual/competency/print-certificate','CourseAnnualController@printCertificate' )->name('course_annual.competency.print_certificate');
 
     /*---end competency url ---*/

@@ -11,7 +11,9 @@ namespace App\Http\Controllers\Backend\Course\CourseHelperTrait;
 
 use App\Models\CompetencyScore;
 use App\Models\CourseAnnual;
+use App\Models\Degree;
 use App\Models\Department;
+use App\Models\DepartmentOption;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Response;
@@ -39,13 +41,13 @@ trait ProficencyScoreTrait
 
         $competencies = DB::table('competencies')
             ->where('competency_type_id', $courseAnnual->competency_type_id)
-            ->where('is_competency', true)
+            ->where('type', "value")
             ->orderBy('name')->get();
 
 
         $additionalColumns = DB::table('competencies')
             ->where('competency_type_id', $courseAnnual->competency_type_id)
-            ->where('is_competency', false)
+            ->whereNotIn('type', ["value"])
             ->orderBy('id')->get();
 
 
@@ -177,7 +179,6 @@ trait ProficencyScoreTrait
 
     private function studentData($courseAnnual)
     {
-
         $groups = DB::table('course_annual_classes')
             ->where('course_annual_id', '=', $courseAnnual->id)
             ->whereNull('course_session_id')
@@ -239,12 +240,12 @@ trait ProficencyScoreTrait
 
         $competencies = DB::table('competencies')
             ->where('competency_type_id', $courseAnnual->competency_type_id)
-            ->where('is_competency', true)
+            ->where('type', "value")
             ->orderBy('name')->get();
 
         $additionalColumns = DB::table('competencies')
             ->where('competency_type_id', $courseAnnual->competency_type_id)
-            ->where('is_competency', false)
+            ->whereNotIn('type', ["value"])
             ->orderBy('id')->get();
 
         $studentData = $this->studentData($courseAnnual);
@@ -254,10 +255,10 @@ trait ProficencyScoreTrait
 
         $arrayStudentAnnualIds = collect($studentData['student_data'])->pluck('student_annual_id')->toArray();
 
-        $competencyScores = DB::table('competency_scores')
-            ->where('course_annual_id', '=', $courseAnnual->id)
-            ->whereIn('student_annual_id', $arrayStudentAnnualIds)
-            ->get();
+        $competencyScores = DB::table('competency_scores')->where(function ($query) use($courseAnnual, $arrayStudentAnnualIds) {
+            $query->where('course_annual_id', '=', $courseAnnual->id)
+                ->whereIn('student_annual_id', $arrayStudentAnnualIds);
+        })->get();
 
         $competencyScoresCollection = collect($competencyScores);
 
@@ -310,6 +311,7 @@ trait ProficencyScoreTrait
     }
 
 
+    // Save 1 by 1
     public function storeCompetencyScore(Request $request)
     {
         $competencyId = $request->id;
@@ -378,6 +380,12 @@ trait ProficencyScoreTrait
 
     }
 
+    /**
+     * Calculate the result
+     * @param Request $request
+     * @return mixed
+     * @throws \App\Exceptions\GeneralException
+     */
     public function calculate(Request $request)
     {
         $updation =0;
@@ -404,10 +412,11 @@ trait ProficencyScoreTrait
         $competencyName = [];
         $notCompetencyName = [];
 
-        $competencyIds = collect($competencies)
+        // to get competency name and not competency
+        collect($competencies)
 
             ->filter(function($item) use(&$competencyName, &$notCompetencyName) {
-                if($item->is_competency) {
+                if($item->type == "value") {
                     $competencyName[strtolower($item->name)] = $item->id;
                     return $item;
                 } else {
@@ -431,20 +440,20 @@ trait ProficencyScoreTrait
 
             $arrayInput = [];
 
-            if($competency->rule != null) {
+            if($competency->calculation_rule != null) {
                 $countRule++;
 
                 /*---loop all student to store data ---*/
 
                 foreach($competencyScoresKeyByIds as $studentAnnualId => $scores) {
 
-                    $constructNewRule = $this->getExpression($competency->rule, $competencyName, $scores);
+                    $constructNewRule = $this->getExpression($competency->calculation_rule, $competencyName, $scores);
                     $score =  eval('return '.$constructNewRule.';');
 
 
-                    if($competency->base_level_type != null) {
+                    if($competency->condition_rule != null) {
 
-                        $baseLevelType = json_decode($competency->base_level_type);
+                        $baseLevelType = json_decode($competency->condition_rule);
                         $new_score = null;
                         foreach($baseLevelType as $levelType) {
 
@@ -506,6 +515,8 @@ trait ProficencyScoreTrait
 
     }
 
+
+    // replace competency with real score value
     private function getExpression($originalRule, $competencies, $scores)
     {
 
@@ -514,6 +525,7 @@ trait ProficencyScoreTrait
             if(isset($scores[$id])) {
                 $originalRule = str_replace(strtolower($key),$scores[$id]->score, $originalRule);
             } else {
+                // Some score is empty, replace with 0
                 $originalRule = str_replace(strtolower($key),0, $originalRule);
             }
 
@@ -552,7 +564,7 @@ trait ProficencyScoreTrait
         $competencies = DB::table('competencies')
             ->where([
                 ['competency_type_id', '=', $courseAnnual->competency_type_id],
-                ['is_competency', '=', true]
+                ['type', '=', "value"]
             ])->get();
         $competencyIds = collect($competencies)->pluck('id')->toArray();
 
@@ -729,10 +741,19 @@ trait ProficencyScoreTrait
     }
 
 
+    public function requestPrintCertificate(Request $request)
+    {
+        $course_annual_id = $request->get("course_annual_id");
+        $course_annual = CourseAnnual::find($course_annual_id);
+        $students = $this->studentData($course_annual)["student_data"];
+
+        $departments = Department::lists("code","id")->toArray();
+        $degrees = Degree::lists("code","id")->toArray();
+        return view('backend.vocational_student.print.request_print_certificate_fr',compact("students","departments","degrees"));
+    }
     public function printCertificate(Request $request)
     {
         return view('backend.course.courseAnnual.formScore.prints.certificate');
-
     }
 
 

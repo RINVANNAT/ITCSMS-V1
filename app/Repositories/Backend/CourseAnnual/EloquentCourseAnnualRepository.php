@@ -102,6 +102,8 @@ class EloquentCourseAnnualRepository implements CourseAnnualRepositoryContract
         $courseAnnual->time_tp = isset($input['time_tp'])?$input['time_tp']:0;
 //        $courseAnnual->group = isset($input['group'])?$input['group']:null;
         $courseAnnual->credit = isset($input['credit'])?$input['credit']:null;
+        $courseAnnual->competency_type_id = isset($input['competency_type_id'])?$input['competency_type_id']:null;
+        $courseAnnual->normal_scoring = isset($input['normal_scoring']) and $input['normal_scoring']=="checked"?true:false;
         if(!isset($input['department_option_id']) || $input['department_option_id'] == ""){
             $input['department_option_id'] = null;
         }
@@ -209,6 +211,16 @@ class EloquentCourseAnnualRepository implements CourseAnnualRepositoryContract
         if(isset($input["credit"]) && $input["credit"] != '') {
             $courseAnnual->credit = $input['credit'];
         }
+        if(isset($input["competency_type_id"]) && $input["competency_type_id"] != '') {
+            $courseAnnual->competency_type_id = $input['competency_type_id'];
+        }
+
+        if(isset($input["normal_scoring"]) && $input["normal_scoring"] == "checked") {
+            $courseAnnual->normal_scoring = true;
+        } else {
+            $courseAnnual->normal_scoring = false;
+        }
+
         if(isset($input['reference_course_id']) && $input['reference_course_id'] != '' &&  is_numeric($input['reference_course_id'])) {
             $courseAnnual->reference_course_id = $input['reference_course_id'];
         } else{
