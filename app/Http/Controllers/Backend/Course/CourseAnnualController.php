@@ -790,8 +790,23 @@ class CourseAnnualController extends Controller
      */
     public function destroy(DeleteCourseAnnualRequest $request, $id)
     {
-        $scoreByCourseAnnualId = DB::table('scores')->where('course_annual_id', $id);
 
+
+        /*---delete competency score--*/
+
+        $competencyScores = DB::table('competency_scores')
+            ->where('course_annual_id', $id);
+
+        if(count($competencyScores->get()) > 0) {
+
+            $this->courseAnnualScores->getUserLog($competencyScores->get(), 'CompetencyScore', 'Delete');
+            $competencyScores->delete();
+        }
+
+        /*---end delete competency---*/
+
+
+        $scoreByCourseAnnualId = DB::table('scores')->where('course_annual_id', $id);
         $averages = Average::where('course_annual_id', $id);
         if($totalScore = $averages->get()) {
             $averages->delete();
