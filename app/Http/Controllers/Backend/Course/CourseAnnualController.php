@@ -2938,8 +2938,10 @@ class CourseAnnualController extends Controller
                 $studentAnnualIds = $studentAnnualIds->where('group_student_annuals.department_id', '=', $courseAnnual->department_id)->lists('student_annual_id');
             } else {
 
-                $studentAnnualIds = $studentAnnualIds->lists('student_annual_id')
-                    ->whereNull('group_student_annuals.department_id');
+                $studentAnnualIds = $studentAnnualIds
+                    ->whereNull('group_student_annuals.department_id')
+                    ->lists('student_annual_id');
+
             }
 
             $students = $students->whereIn('studentAnnuals.id', $studentAnnualIds);
