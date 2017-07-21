@@ -2934,9 +2934,12 @@ class CourseAnnualController extends Controller
                 ->where('semester_id', $courseAnnual->semester_id);
 
             if($department->is_vocational) {
+
                 $studentAnnualIds = $studentAnnualIds->where('group_student_annuals.department_id', '=', $courseAnnual->department_id)->lists('student_annual_id');
             } else {
-                $studentAnnualIds = $studentAnnualIds->lists('student_annual_id');
+
+                $studentAnnualIds = $studentAnnualIds->lists('student_annual_id')
+                    ->whereNull('group_student_annuals.department_id');
             }
 
             $students = $students->whereIn('studentAnnuals.id', $studentAnnualIds);
@@ -2962,8 +2965,11 @@ class CourseAnnualController extends Controller
                     ->where('semester_id', $courseAnnual->semester_id);
 
                 if($department->is_vocational) {
+
                     $studentAnnualIds = $studentAnnualIds->where('group_student_annuals.department_id', '=', $courseAnnual->department_id)->lists('student_annual_id');
+
                 } else {
+
                     $studentAnnualIds = $studentAnnualIds
                         ->whereNull('group_student_annuals.department_id')
                         ->lists('student_annual_id');
