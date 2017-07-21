@@ -10,6 +10,9 @@
     {!! Html::style('bower_components/bootstrap-toggle/css/bootstrap2-toggle.min.css') !!}
 
     <style type="text/css">
+        .not-mine {
+            border: 4px solid red;
+        }
         .bg-primary {
             background-color: #337ab7 !important;
         }
@@ -324,8 +327,13 @@
                 },
                 eventRender: function (event, element, view) {
                     set_background_color_slot_not_allow();
-                    if ('{{ auth()->user()->name }}' !== event.teacher_name) {
+                    var isFilter = $('input[name="filter_by"]:checked').val();
+                    if (isFilter === 'on') {
                         event.editable = false;
+                    } else {
+                        if ('{{ auth()->user()->name }}' !== event.teacher_name) {
+                            event.editable = false;
+                        }
                     }
                     var object = '<a class="fc-time-grid-event fc-v-event fc-event fc-start fc-end course-item  fc-draggable fc-resizable" style="top: 65px; bottom: -153px; z-index: 1; left: 0%; right: 0%;">' +
                         '<div class="fc-content">' +
@@ -427,8 +435,16 @@
                         toggleLoading(false);
                     }
                 },
-                dayRender: function (date, cell) {
-                    cell.css("background-color", "red");
+                eventAfterRender: function (event, element, view) {
+                    var isFilter = $('input[name="filter_by"]:checked').val();
+                    if (isFilter === 'on') {
+                        event.editable = false;
+                    } else {
+                        if ('{{ auth()->user()->name }}' !== event.teacher_name) {
+                            event.editable = false;
+                            element.find('.fc-content').parent().addClass('not-mine');
+                        }
+                    }
                 }
             });
         }
@@ -463,7 +479,6 @@
         $(function () {
             show_timetable();
             get_teacher_timetable();
-
             $('#form_teacher_timetable').on('change', function () {
                 get_teacher_timetable();
             });

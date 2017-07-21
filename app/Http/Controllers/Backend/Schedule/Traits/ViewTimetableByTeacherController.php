@@ -49,9 +49,9 @@ trait ViewTimetableByTeacherController
 
         if ($timetable instanceof Timetable) {
             if ($timetable instanceof Timetable) {
-                if($self != null){
+                if ($self != null) {
                     $this->viewTimetableSlotRepoByTeacher->get_timetable_slot_with_conflict_info($timetable, $timetableSlots, auth()->user()->name);
-                }else{
+                } else {
                     $this->viewTimetableSlotRepoByTeacher->get_timetable_slot_with_conflict_info($timetable, $timetableSlots);
                 }
             }
