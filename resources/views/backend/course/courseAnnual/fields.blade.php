@@ -387,7 +387,7 @@
                         <div class="form-group">
                             {!! Form::label('competency_type_id', "Competency Type", ['class' => 'col-lg-5 control-label required']) !!}
                             <div class="col-lg-7">
-                                {{ Form::select('competency_type_id', $competency_types, isset($courseAnnual)?$courseAnnual->competency_type_id:null, ['class' => 'form-control','placeholder' => "",'required'=>'required']) }}
+                                {{ Form::select('competency_type_id', $competency_types, isset($courseAnnual)?$courseAnnual->competency_type_id:null, ['class' => 'form-control','placeholder' => ""]) }}
                                 <div class="callout callout-danger">
                                     <h4>Info!</h4>
 

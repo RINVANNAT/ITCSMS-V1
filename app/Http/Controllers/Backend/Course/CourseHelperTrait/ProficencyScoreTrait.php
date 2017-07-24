@@ -142,7 +142,7 @@ trait ProficencyScoreTrait
     public function competencyHeader(Request $request)
     {
         $courseAnnual = CourseAnnual::where('id', $request->course_annual_id)->first();
-        $competencies = DB::table('competencies')->where('competency_type_id', $courseAnnual->competency_type_id)->orderBy('id')->get();
+        $competencies = DB::table('competencies')->where('competency_type_id', $courseAnnual->competency_type_id)->orderBy('name')->get();
         $additionalColumns = DB::table('additional_columns')->where('competency_type_id', $courseAnnual->competency_type_id)->get();
         $headers = [
 
