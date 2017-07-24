@@ -25,6 +25,7 @@ use App\Models\DepartmentOption;
 use App\Models\Employee;
 use App\Models\Enum\CourseAnnualEnum;
 use App\Models\Enum\ScoreEnum;
+use App\Models\Enum\SemesterEnum;
 use App\Models\Gender;
 use App\Models\Grade;
 use App\Models\ResitStudentAnnual;
@@ -2956,7 +2957,6 @@ class CourseAnnualController extends Controller
 
     public function exportCourseScore(Request $request)
     {
-
         $studentListScore = [];
         $colHeaders = explode(',', $request->col_headers);
         $courseAnnual = $this->courseAnnuals->findOrThrowException($request->course_annual_id);
@@ -2980,16 +2980,21 @@ class CourseAnnualController extends Controller
             $students = $students->whereIn('studentAnnuals.department_option_id', $department_option_ids);
         }
 
-        if ($group = $request->group_id) {
+        if (($group = $request->group_id) && $request->group_id != 'undefined') {
 
             $studentAnnualIds = DB::table('group_student_annuals')
                 ->whereIn('group_id', [$group])
                 ->where('semester_id', $courseAnnual->semester_id);
 
             if($department->is_vocational) {
+
                 $studentAnnualIds = $studentAnnualIds->where('group_student_annuals.department_id', '=', $courseAnnual->department_id)->lists('student_annual_id');
             } else {
-                $studentAnnualIds = $studentAnnualIds->lists('student_annual_id');
+
+                $studentAnnualIds = $studentAnnualIds
+                    ->whereNull('group_student_annuals.department_id')
+                    ->lists('student_annual_id');
+
             }
 
             $students = $students->whereIn('studentAnnuals.id', $studentAnnualIds);
@@ -3019,12 +3024,15 @@ class CourseAnnualController extends Controller
                     $studentAnnualIds = $studentAnnualIds->where('group_student_annuals.department_id', '=', $courseAnnual->department_id)->lists('student_annual_id');
 
                 } else {
-
-                    $studentAnnualIds = $studentAnnualIds->lists('student_annual_id');
+                    $studentAnnualIds = $studentAnnualIds
+                        ->whereNull('group_student_annuals.department_id')
+                        ->lists('student_annual_id');
                 }
+
+
                 $students = $students->whereIn('studentAnnuals.id', $studentAnnualIds)->orderBy('students.name_latin');
 
-                if($courseAnnual->semester_id >  1) {
+                if($courseAnnual->semester_id >  SemesterEnum::SEMESTER_ONE) {
 
                     $students = $students
                         ->where(function($query) {
@@ -3039,7 +3047,7 @@ class CourseAnnualController extends Controller
 
             } else {
 
-                if($courseAnnual->semester_id >  1) {
+                if($courseAnnual->semester_id >  SemesterEnum::SEMESTER_ONE) {
 
                     $students = $students
                         ->where(function($query) {
