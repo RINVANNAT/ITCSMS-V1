@@ -254,6 +254,7 @@ trait ExportTimetableController
             $sheet->mergeCells('J5:K5');
             $sheet->mergeCells('L5:M5');
 
+            /** set border header */
             $sheet->setBorder('A5:M5', 'thin');
             $sheet->cells('A5:M5', function ($cells) {
                 $cells->setFontSize(12);
@@ -289,9 +290,18 @@ trait ExportTimetableController
             $sheet->row(35, array('16h10-17h05'));
             $sheet->mergeCells('A35:A38');
 
+            /** Timetable for T */
+            $sheet->mergeCells('A39:M39');
 
-            $sheet->setBorder('A5:A38', 'thin');
-            $sheet->cells('A5:A38', function ($cells) {
+            $sheet->row(40, array('17h30-18h05'));
+            $sheet->mergeCells('A40:A43');
+
+            $sheet->row(44, array('18h10-19h05'));
+            $sheet->mergeCells('A44:A47');
+
+            /** set border block time cells */
+            $sheet->setBorder('A5:A47', 'thin');
+            $sheet->cells('A5:A47', function ($cells) {
                 $cells->setFontSize(12);
                 $cells->setAlignment('center');
                 $cells->setValignment('center');
@@ -301,21 +311,27 @@ trait ExportTimetableController
 
             $countRows = 6;
             // $countColumns = 1;
-            for ($timesRow = 0; $timesRow < 9; $timesRow++) {
+            for ($timesRow = 0; $timesRow < 12; $timesRow++) {
                 // timesRow = 0 => row = timesRow + countRows = 6;
                 // we start from 6 to [...] row.
                 $countColumns = 1;
                 if ($timesRow == 4) {
                     $sheet->row(22, function ($row) {
-                        // call cell manipulation methods
                         $row->setBackground('#f1f1f1');
                     });
                     $countRows = 23;
                     continue;
+                } else if ($timesRow == 9) {
+                    $sheet->row(39, function ($row) {
+                        $row->setBackground('#f1f1f1');
+                    });
+                    $countRows = 40;
+                    continue;
                 }
+
                 for ($columnDay = 2; $columnDay <= 7; $columnDay++) {
                     $sheet->cells($columns[$countColumns] . $countRows . ':' . $columns[$countColumns + 1] . ($countRows + 3), function ($cells) {
-                        // Set all borders (top, right, bottom, left)
+                        // set border to empty cell.
                         $cells->setBorder('thin', 'thin', 'thin', 'thin');
                     });
                     // timetable slot of dept
@@ -362,6 +378,16 @@ trait ExportTimetableController
                                 }
                             } else if ($timesRow == 8) {
                                 if ($start <= 16 && $end >= 17) {
+                                    $this->append_data($sheet, $columns, $countColumns, $countRows, $timetableSlot);
+                                    break;
+                                }
+                            } else if ($timesRow == 10) {
+                                if ($start <= 17 && $end >= 18) {
+                                    $this->append_data($sheet, $columns, $countColumns, $countRows, $timetableSlot);
+                                    break;
+                                }
+                            } else if ($timesRow == 11) {
+                                if ($start <= 18 && $end >= 19) {
                                     $this->append_data($sheet, $columns, $countColumns, $countRows, $timetableSlot);
                                     break;
                                 }
@@ -423,7 +449,7 @@ trait ExportTimetableController
                                 for ($k = 0; $k < count($timetableSlotsLanguage['slotsForLanguage']); $k += 2) {
                                     $sheet->cell($columns[$countColumns] . $i, function ($cell) use ($timetableSlotsLanguage, $k) {
                                         // Set all borders (top, right, bottom, left)
-                                        $cell->setBorder('none', 'none', 'none', 'none');
+                                        // $cell->setBorder('none', 'none', 'none', 'none');
                                         $cell->setFontWeight('bold');
                                         $a = '';
                                         $b = '';
@@ -451,11 +477,11 @@ trait ExportTimetableController
 
             // border bottom cells
             // Set all borders (top, right, bottom, left)
-            $sheet->cells('A38:M38', function ($cells) {
+            $sheet->cells('A47:M47', function ($cells) {
                 $cells->setFontSize(10);
             });
 
-            $sheet->cells('M6:M38', function ($cells) {
+            $sheet->cells('M6:M47', function ($cells) {
                 $cells->setFontSize(10);
             });
         });
