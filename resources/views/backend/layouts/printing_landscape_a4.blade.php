@@ -65,10 +65,11 @@
                 -moz-box-sizing: border-box;
             }
             .page {
-                width: 297mm;
-                min-height: 210mm;
-                padding: 20mm;
-                margin: 10mm auto;
+                width: 290mm;
+                height: 200mm;
+                padding: 25mm;
+                margin: 0 auto;
+                margin-top:10mm;
                 border: 1px #D3D3D3 solid;
                 border-radius: 5px;
                 background: white;
@@ -76,18 +77,8 @@
                 position: relative;
             }
 
-
-            @media screen{
-                .footer{
-                    position: absolute;
-                    bottom: 10px;
-                    width: 100%;
-                    padding-right:40mm;
-                }
-            }
-
             @page {
-                size: 297mm 210mm;
+                size: 290mm 200mm;
                 margin: 0;
             }
             @media print {
@@ -100,27 +91,21 @@
                     font: 12pt "Tahoma";
                 }
                 .page {
-                    padding: 10mm;
-                    margin: 10mm auto;
+                    padding: 15mm;
+                    margin: 0 auto;
                     border: initial;
                     border-radius: initial;
-                    width: 297mm;
-                    min-height: 210mm;
+                    width: 290mm;
+                    height: 200mm;
                     box-shadow: initial;
-                    background: initial;
                     page-break-after: always;
                     position: relative;
                 }
-                .footer{
-                    position: absolute;
-                    bottom: 10px;
-                    width: 100%;
-                    padding-right:20mm;
-                }
+
             }
 
         </style>
-
+        {{--<link rel="stylesheet" media="print, screen" href="{{ url('css/backend/printing_landscape_a4.css') }}">--}}
         @yield('after-styles-end')
 
     </head>

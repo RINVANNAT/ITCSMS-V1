@@ -59,7 +59,7 @@
 
     @yield('before-scripts-end')
     {!! HTML::script(elixir('js/backend.js')) !!}
-    {!! HTML::script('js/custom.js') !!}
+    {!! HTML::script('js/custom_v1.js') !!}
 
     <script>
         var needConfirm = false;

@@ -148,8 +148,15 @@
             <div class=" no-paddingcol-sm-12">
 
                 <div class="dropdown pull-left">
+
                     <button class="btn btn-primary dropdown-toggle" type="button" data-toggle="dropdown">Action
-                        <span class="caret"></span></button>
+                        <span class="caret"></span>
+                    </button>
+
+                    {{--<button class="btn btn-warning" data-toggle="tooltip" data-placement="right"  title="Generate student for next year" id="generate_student" >
+                        <i class="fa fa-circle-o-notch" aria-hidden="true"></i>
+                    </button>--}}
+
                     <ul class="dropdown-menu">
                         <li class="top"><a href="#" class="btn btn-xs" id="btn-print"><i class="fa fa-print"></i> Print</a>
                         </li>
@@ -257,9 +264,6 @@
                 @endforeach
             </select>
 
-            {{--<button class="btn btn-primary pull-right" style="margin-right: 10px" id="ok_option" >
-                Ok
-            </button>--}}
         </div>
         <!-- /.box-header -->
         @if (session('status'))
@@ -298,12 +302,12 @@
         var table_width;
         var hotInstance;
         var print_url = "{{route('admin.course.print_total_score')}}";
+
         var setting = {
             readOnly: true,
             rowHeaders: false,
             manualColumnMove: true,
             manualColumnResize: true,
-
             manualRowResize: false,
             minSpareRows: false,
             fixedColumnsLeft: 3,
@@ -312,10 +316,7 @@
             className: "htRight",
             cells: function (row, col, prop) {
 
-
                 this.renderer = colorRenderer;
-
-//                console.log(row+'------'+col+'----'+prop);
 
                 var cellProperties = {};
                 if (prop === 'Redouble') {
@@ -376,7 +377,7 @@
                 return true;
             },
             afterOnCellMouseDown: function (event, coord, TD) {
-                return true;
+                return false;
             },
             afterCellMetaReset: function () {
                 return true;
@@ -390,11 +391,16 @@
             },
             beforeTouchScroll: function () {
 
-                return true;
+                return false;
             },
             afterScrollHorizontally: function () {
 
-                return true;
+                return false;
+            },
+
+            afterScrollVertically:function () {
+
+                return false;
             },
 
             afterColumnResize: function () {
@@ -970,12 +976,50 @@
         }
         $('#refresh_score_sheet').on('click', function () {
             filter_table();
-
             if($('.selection_blog').is(':visible')) {
                 $('.selection_blog').slideToggle( "fast" )
             }
 
         });
+
+        $('#generate_student').on('click', function(e) {
+
+            var baseData  = getBaseData();
+
+            swal({
+                title: "Attention!",
+                text: "Do you really want to generate student for next year?",
+                type: "warning",
+                showCancelButton: true,
+                confirmButtonClass: "btn-danger",
+                confirmButtonText: "Yes!",
+                cancelButtonText: "No!",
+                closeOnConfirm: false,
+                closeOnCancel: false
+            },
+            function(isConfirm) {
+                if (isConfirm) {
+                    
+                    $.ajax({
+                        method:'POST',
+                        url: '{{route('evaluation.student.generate_next_academic')}}',
+                        dataType:'JSON',
+                        data:baseData,
+                        success:function (result) {
+
+                            swal("Generated", "Students have been successfully graded for next year.", "success");
+                        },
+                        error:function (response) {
+
+                        }
+                    })
+
+                } else {
+                    swal("Cancelled", "Students have not been graded for next yeat  :)", "error");
+                }
+            });
+        })
+
 
     </script>
 

@@ -293,7 +293,7 @@ trait AjaxCRUDTimetableController
 
         $timetable = $this->timetableRepo->find_timetable_is_existed($request);
         if ($timetable instanceof Timetable) {
-            $this->timetableSlotRepo->get_timetable_slot_with_conflict_info($timetable, $timetableSlots);
+            $this->timetableSlotRepo->get_timetable_slot_with_conflict_info($timetable, $timetableSlots, null);
         }
 
         // get student annuals.
@@ -331,7 +331,6 @@ trait AjaxCRUDTimetableController
 
             // find timetable slot
             $timetable_slot = TimetableSlot::find($request->timetable_slot_id);
-
             // update timetable slot
             if ($timetable_slot instanceof TimetableSlot) {
                 $start = new Carbon($request->start_date);

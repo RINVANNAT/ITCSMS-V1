@@ -97,9 +97,12 @@
 
         <div class="box-body">
             <div class="row">
-                <div class="col-md-9 col-sm-12 col-xs-12" style="overflow-x: auto">
-                    {{--Timetable render--}}
+                {{--<div class="col-md-9 col-sm-12 col-xs-12" style="overflow-x: auto">
+                    --}}{{--Timetable render--}}{{--
                     <div id="timetable" style="width: 1345px;"></div>
+                </div>--}}
+                <div class="col-md-9 col-sm-12 col-xs-12">
+                    <div id="timetable" class="view-timetable"></div>
                 </div>
                 <div class="col-md-3 col-sm-12 col-xs-12">
 
@@ -372,6 +375,7 @@
                 },
                 complete: function () {
                     get_timetable_slots();
+                    get_course_sessions();
                     toggleLoading(false);
                 }
             })
@@ -434,6 +438,7 @@
                 },
                 complete: function () {
                     get_course_sessions();
+                    get_timetable_slots();
                     toggleLoading(false);
                 }
             })
@@ -468,6 +473,10 @@
                 @if(access()->allow('edit-timetable')) editable: true, @endif
                 droppable: true,
                 dragRevertDuration: 0,
+                eventConstraint: {
+                    start: '07:00:00',
+                    end: '20:00:00'
+                },
                 drop: function (date) {
 
                     var originalEventObject = $(this).data('event');
@@ -496,26 +505,37 @@
                     move_timetable_slot(event, start_date);
                     hide_conflict_information();
                     get_timetable();
+                    set_background_color_slot_not_allow();
                     get_course_sessions();
                 },
                 eventRender: function (event, element, view) {
+                    set_background_color_slot_not_allow();
                     var object = '<a class="fc-time-grid-event fc-v-event fc-event fc-start fc-end course-item  fc-draggable fc-resizable" style="top: 65px; bottom: -153px; z-index: 1; left: 0%; right: 0%;">' +
                         '<div class="fc-content">' +
                         '<div class="container-room">';
-                    if(typeof event.slotsForLanguage !== 'undefined') {
+                    if (typeof event.slotsForLanguage !== 'undefined') {
                         object += '<div class="side-courses" id="' + event.id + '" style="width: 100% !important;padding: 2px;" ​​​>';
-                            // check conflict room and render
-                            object += '<div class="row"> <div class="col-md-12"><div class="fc-title">' + event.course_name + '</div></div>';
-                            event.editable = false;
-                            for(var i=0; i<event.slotsForLanguage.length; i++){
-                                object += '<div class="col-xs-4 col-sm-4 col-md-4"> Gr: ' + event.slotsForLanguage[i].group +' ('+ event.slotsForLanguage[i].building + '-'+event.slotsForLanguage[i].room + ')</div>';
+                        // check conflict room and render
+                        object += '<div class="row"> <div class="col-md-12"><div class="fc-title">' + event.course_name + '</div></div>';
+                        event.editable = false;
+                        object += '<div class="lang-info">';
+                        for (var i = 0; i < event.slotsForLanguage.length; i++) {
+                            if (i % 2 === 0) {
+                                object += '<div class="lang-info-left"> Gr: ' + event.slotsForLanguage[i].group + ' (' + event.slotsForLanguage[i].building + '-' + event.slotsForLanguage[i].room + ')</div>';
+                            } else {
+                                object += '<div class="lang-info-right"> Gr: ' + event.slotsForLanguage[i].group + ' (' + event.slotsForLanguage[i].building + '-' + event.slotsForLanguage[i].room + ')</div>';
                             }
-                        object += '</div></div>';
-                    }else{
+                        }
+                        object += '</div></div></div>';
+                    } else {
                         object += '<div class="side-course" id="' + event.id + '"​​​>';
 
                         // check conflict room and render
-                        object += '<div class="fc-title">' + event.course_name + '</div>';
+                        object += '<div class="fc-title">' + (event.course_name).substr(0, 20) + '...';
+                        if (typeof event.type !== 'undefined') {
+                            object += '<span class="text-primary"> (' + event.type + ')</span> ';
+                        }
+                        object += '</div>';
 
                         // check conflict lecturer and render
                         if (typeof event.conflict_lecturer !== 'undefined') {
@@ -530,55 +550,51 @@
                             object += '<p class="text-primary">' + event.teacher_name + '</p> ';
                         }
 
-
-                        if (typeof event.type !== 'undefined') {
-                            object += '<p class="text-primary">' + event.type + '</p> ';
-                        }
                         object += '</div>';
                     }
 
-                        if(typeof event.slotsForLanguage === 'undefined'){
-                            object += '<div class="side-room">' +
-                                '<div class="room-name">';
+                    if (typeof event.slotsForLanguage === 'undefined') {
+                        object += '<div class="side-room">' +
+                            '<div class="room-name">';
 
-                            // check conflict and render room
-                            if (event.room !== null && event.building !== null) {
-                                if (event.conflict_room === true) {
-                                    object += '<p class="fc-room bg-danger badge">' + event.building + '-' + event.room + '</p>';
-                                } else {
-                                    object += '<p class="fc-room">' + event.building + '-' + event.room + '</p>';
-                                }
+                        // check conflict and render room
+                        if (event.room !== null && event.building !== null) {
+                            if (event.conflict_room === true) {
+                                object += '<p class="fc-room bg-danger badge">' + event.building + '-' + event.room + '</p>';
+                            } else {
+                                object += '<p class="fc-room">' + event.building + '-' + event.room + '</p>';
                             }
-                            object += '</div>';
-
-                            // render groups
-                            if (typeof event.groups !== 'undefined') {
-                                if (event.groups.length > 0) {
-                                    var groups = '<p>Gr: ';
-                                    for (var i = 0; i < event.groups.length; i++) {
-                                        if (event.groups[i] !== null) {
-                                            groups += event.groups[i].code + ' ';
-                                        }
-                                        else {
-                                            groups = '';
-                                        }
-                                    }
-                                    groups += '</p>';
-                                }
-                                object += groups;
-                            }
-                            object += '</div> ';
                         }
-                            object += '<div class="clearfix"></div> ' +
-                            '</div>' +
-                            '</div>' +
-                            '<div class="fc-bgd"></div>' +
-                            '<div class="fc-resizer fc-end-resizer"></div>' +
+                        object += '</div>';
+
+                        // render groups
+                        if (typeof event.groups !== 'undefined') {
+                            if (event.groups.length > 0) {
+                                var groups = '<p>Gr: ';
+                                for (var i = 0; i < event.groups.length; i++) {
+                                    if (event.groups[i] !== null) {
+                                        groups += event.groups[i].code + ' ';
+                                    }
+                                    else {
+                                        groups = '';
+                                    }
+                                }
+                                groups += '</p>';
+                            }
+                            object += groups;
+                        }
+                        object += '</div> ';
+                    }
+                    object += '<div class="clearfix"></div> ' +
+                        '</div>' +
+                        '</div>' +
+                        '<div class="fc-bgd"></div>' +
+                        '<div class="fc-resizer fc-end-resizer"></div>' +
                         '</a>';
                     return $(object);
                 },
                 eventOverlap: function (stillEvent, movingEvent) {
-                    return stillEvent.allDay && movingEvent.allDay;
+                    return stillEvent.allDay && movingEvent.allDay
                 },
                 eventResize: function (event, delta, revertFunc) {
                     var end = event.end.format();
@@ -591,6 +607,17 @@
                         remove_timetable_slots(event);
                         $('#timetable').fullCalendar('removeEvent', event.id);
                     }
+                },
+                loading: function (isLoading, view) {
+                    if (isLoading) {
+                        toggleLoading(isLoading);
+                    }
+                    else {
+                        toggleLoading(false);
+                    }
+                },
+                dayRender: function (date, cell) {
+                    cell.css("background-color", "red");
                 }
             });
         }
@@ -842,7 +869,6 @@
                     complete: function () {
                         get_timetable_slots();
                         hide_conflict_information();
-                        //toggleLoading(false);
                     }
                 });
             });

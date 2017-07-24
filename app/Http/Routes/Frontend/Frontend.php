@@ -4,6 +4,7 @@
  * Frontend Controllers
  */
 Route::get('/', 'FrontendController@index')->name('frontend.index');
+Route::get('/students', 'FrontendController@export_students');
 
 /**
  * These frontend controllers require the user to be logged in

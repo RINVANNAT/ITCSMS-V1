@@ -148,7 +148,7 @@ trait ExportTimetableController
                     }
                 }
 
-            })->export('xls');
+            })->export('xlsx');
             return Response::json(['status' => true]);
         }
         return Response::json(['status' => false]);

@@ -187,152 +187,11 @@
 </div>
 
 <div class="form-group">
-
-    @if(isset($courseAnnual))
-        @if($courseAnnual->is_having_resitted)
-            <label for="having_resitted" data-toggle="tooltip" data-placement="top" title="{{trans('labels.backend.courseAnnuals.fields.allow_resit')}}" class="col-lg-3 control-label required"> Allow Resit <input id="having_resitted" type="checkbox" name="is_having_resitted"  style="font-size: 18pt" value="{{\App\Models\Enum\ScoreEnum::is_having_resitted}}" checked>  </label>
-        @else
-            <label for="having_resitted" data-toggle="tooltip" data-placement="top" title="{{trans('labels.backend.courseAnnuals.fields.allow_resit')}}" class="col-lg-3 control-label required"> Allow Resit <input id="having_resitted" type="checkbox" name="is_having_resitted" style="font-size: 18pt"  value="{{\App\Models\Enum\ScoreEnum::is_having_resitted}}">  </label>
-        @endif
-
-    @else
-        <label for="having_resitted" data-toggle="tooltip" data-placement="top" title="{{trans('labels.backend.courseAnnuals.fields.allow_resit')}}" class="col-lg-3 control-label required"> Allow Resit <input id="having_resitted" type="checkbox" name="is_having_resitted"  style="font-size: 18pt" value="{{\App\Models\Enum\ScoreEnum::is_having_resitted}}">  </label>
-    @endif
-
-        @if(isset($courseAnnual))
-            @if($courseAnnual->is_counted_creditability)
-
-                <label for="count_creditability" data-toggle="tooltip" data-placement="top" title=" {{trans('labels.backend.courseAnnuals.fields.for_transcript')}}" class="col-lg-3 control-label required" > Credit For Transcript <input type="checkbox" name="is_counted_creditability" style="font-size: 18pt" id="count_creditability" class="boolean_input" value="{{\App\Models\Enum\ScoreEnum::is_counted_creditability}}" checked> </label>
-
-            @else
-
-                <label for="count_creditability" data-toggle="tooltip" data-placement="top" title="{{trans('labels.backend.courseAnnuals.fields.for_transcript')}}" class="col-lg-3 control-label required" > Credit For Transcript <input type="checkbox" name="is_counted_creditability" style="font-size: 18pt" id="count_creditability" class="boolean_input" value="{{\App\Models\Enum\ScoreEnum::is_counted_creditability}}" > </label>
-
-            @endif
-        @else
-
-            <label for="count_creditability" class="col-lg-3 control-label required" data-toggle="tooltip" data-placement="top" title="{{trans('labels.backend.courseAnnuals.fields.for_transcript')}}"> Credit For Transcript <input type="checkbox" name="is_counted_creditability" style="font-size: 18pt" id="count_creditability" class="boolean_input" value="{{\App\Models\Enum\ScoreEnum::is_counted_creditability}}" checked> </label>
-
-        @endif
-
-        @if(isset($courseAnnual))
-            @if($courseAnnual->is_counted_absence)
-                <label for="count_absence" class="col-lg-3 control-label required" data-toggle="tooltip" data-placement="top" title="{{trans('labels.backend.courseAnnuals.fields.10_absece')}}"> 10%-Absence <input type="checkbox" name="is_counted_absence" id="count_absence" style="font-size: 18pt" class="boolean_input" value="{{\App\Models\Enum\ScoreEnum::is_counted_absence}}" checked></label>
-
-            @else
-                <label for="count_absence" data-toggle="tooltip" data-placement="top" title="{{trans('labels.backend.courseAnnuals.fields.10_absece')}}" class="col-lg-3 control-label required"> 10%-Absence <input type="checkbox" name="is_counted_absence" id="count_absence" style="font-size: 18pt" class="boolean_input" value="{{\App\Models\Enum\ScoreEnum::is_counted_absence}}"></label>
-
-            @endif
-        @else
-            <label for="count_absence" data-toggle="tooltip" data-placement="top" title="{{trans('labels.backend.courseAnnuals.fields.10_absece')}}"  class="col-lg-3 control-label required"> 10%-Absence <input type="checkbox" name="is_counted_absence" id="count_absence"  style="font-size: 18pt" class="boolean_input" value="{{\App\Models\Enum\ScoreEnum::is_counted_absence}}" checked></label>
-        @endif
-
-</div>
-
-<div class="form-group">
     {!! Form::label('credit', 'Credit', ['class' => 'col-lg-3 control-label required']) !!}
     <div class="col-lg-7">
         {{ Form::text('credit',  isset($courseAnnual)?$courseAnnual->credit:null, ['class' => 'form-control' , 'id'=> 'credit', 'required' => 'required']) }}
     </div>
 </div>
-
-@if(isset($midterm) || isset($final))
-    @if(isset($midterm))
-        <div class="form-group">
-            {!! Form::label('midterm_score', "Midterm Score", ['class' => 'col-lg-3 control-label required']) !!}
-            <div class="col-lg-2">
-                <select name="midterm_score" id="midterm_score_id" class="form-control">
-
-                    @if($midterm['percentage'] == \App\Models\Enum\ScoreEnum::Midterm_30)
-                        <option value="{{\App\Models\Enum\ScoreEnum::Midterm_0}}" > 0% </option>
-                        <option value="{{\App\Models\Enum\ScoreEnum::Midterm_30}}" selected > 30% </option>
-                        <option value="{{\App\Models\Enum\ScoreEnum::Midterm_40}}"> 40%</option>
-
-                        <input type="hidden" name="midterm_percentage_id" value="{{$midterm['percentage_id']}}">
-                        <input type="hidden" name="final_percentage_id" value="{{$final['percentage_id']}}">
-
-
-
-                    @elseif($midterm['percentage'] == \App\Models\Enum\ScoreEnum::Midterm_0)
-
-                        <option value="{{\App\Models\Enum\ScoreEnum::Midterm_0}}" selected> 0% </option>
-                        <option value="{{\App\Models\Enum\ScoreEnum::Midterm_30}}"> 30% </option>
-                        <option value="{{\App\Models\Enum\ScoreEnum::Midterm_40}}"> 40% </option>
-
-                        <input type="hidden" name="midterm_percentage_id" value="{{$midterm['percentage_id']}}">
-                        <input type="hidden" name="final_percentage_id" value="{{$final['percentage_id']}}">
-
-                    @else
-
-                        <option value="{{\App\Models\Enum\ScoreEnum::Midterm_0}}"> 0% </option>
-                        <option value="{{\App\Models\Enum\ScoreEnum::Midterm_30}}"> 30% </option>
-                        <option value="{{\App\Models\Enum\ScoreEnum::Midterm_40}}" selected> 40% </option>
-
-                        <input type="hidden" name="midterm_percentage_id" value="{{$midterm['percentage_id']}}">
-                        <input type="hidden" name="final_percentage_id" value="{{$final['percentage_id']}}">
-
-                    @endif
-                </select>
-            </div>
-
-            {!! Form::label('final_score', "Final Score", ['class' => 'col-lg-2 control-label required']) !!}
-
-            <div class="col-lg-3">
-                {{ Form::text('final_score',  null, ['class' => 'form-control' , 'id'=> 'final_score_id', 'required' => 'required', 'readonly']) }}
-            </div>
-        </div>
-
-    @else
-
-        <div class="form-group">
-            {!! Form::label('midterm_score', "Midterm Score", ['class' => 'col-lg-3 control-label required']) !!}
-            <div class="col-lg-2">
-                <select name="midterm_score" id="midterm_score_id" class="form-control">
-
-                    <option value="{{\App\Models\Enum\ScoreEnum::Midterm_0}}" selected> 0% </option>
-                    <option value="{{\App\Models\Enum\ScoreEnum::Midterm_30}}"> 30% </option>
-                    <option value="{{\App\Models\Enum\ScoreEnum::Midterm_40}}"> 40% </option>
-
-                    <input type="hidden" name="final_percentage_id" value="{{$final['percentage_id']}}">
-
-                </select>
-            </div>
-
-            {!! Form::label('final_score', "Final Score", ['class' => 'col-lg-2 control-label required']) !!}
-
-            <div class="col-lg-3">
-                {{ Form::text('final_score',  null, ['class' => 'form-control' , 'id'=> 'final_score_id', 'required' => 'required', 'readonly']) }}
-            </div>
-        </div>
-
-
-
-    @endif
-
-
-@else
-    <div class="form-group">
-        {!! Form::label('midterm_score', "Midterm Score", ['class' => 'col-lg-3 control-label required']) !!}
-        <div class="col-lg-2">
-            <select name="midterm_score" id="midterm_score_id" class="form-control">
-                <option value="{{\App\Models\Enum\ScoreEnum::Midterm_0}}">  0% </option>
-                <option value="{{\App\Models\Enum\ScoreEnum::Midterm_30}}"> 30% </option>
-                <option value="{{\App\Models\Enum\ScoreEnum::Midterm_40}}"> 40%</option>
-            </select>
-        </div>
-
-        {!! Form::label('final_score', "Final Score", ['class' => 'col-lg-2 control-label required']) !!}
-
-        <div class="col-lg-3">
-            {{ Form::text('final_score',  null, ['class' => 'form-control' , 'id'=> 'final_score_id', 'required' => 'required', 'readonly']) }}
-        </div>
-    </div>
-@endif
-
-
-
-
-
 <div class="form-group">
     {!! Form::label('time_course', "Time Course", ['class' => 'col-lg-3 control-label required']) !!}
     <div class="col-lg-2">
@@ -361,19 +220,188 @@
 </div>
 
 <div class="form-group">
-    {!! Form::label('time_tp', "Time TP", ['class' => 'col-lg-3 control-label required']) !!}
-    <div class="col-lg-2">
-        {{ Form::number('time_tp',  null, ['class' => 'form-control', 'id'=>'time_tp', 'required' => 'required']) }}
-    </div>
+    {!! Form::label('Scoring', "Scoring", ['class' => 'col-lg-3 control-label required']) !!}
+    <div class="col-lg-9">
+        <div class="box box-solid" style="border-top: 1px solid #d2d6de" id="scoring_panel">
+            <div class="box-header with-border">
+                <div class="col-md-6">
+                    @if((isset($courseAnnual) and $courseAnnual->normal_scoring == true) or (!isset($courseAnnual)))
+                        <label for="normal_scoring_panel" style="float:left; font-size: 12pt" class="control-label">Normal Scoring <input onclick="toggleVisible('#normal_scoring_panel', this)"  id="normal_scoring" name="normal_scoring" value="checked" type="checkbox" checked></label>
+                    @else
+                        <label for="normal_scoring_panel" style="float:left; font-size: 12pt" class="control-label">Normal Scoring <input onclick="toggleVisible('#normal_scoring_panel', this)"  id="normal_scoring" name="normal_scoring" value="checked" type="checkbox"></label>
+                    @endif
+                </div>
+                <div class="col-md-6">
+                    @if(isset($courseAnnual) and $courseAnnual->competency_type_id != null)
+                        <label for="normal_scoring_panel" style="float:left; font-size: 12pt" class="control-label">Competency Scoring (SA/SF Section) <input onclick="toggleVisible('#competency_scoring_panel', this)" name="competency_scoring" value="checked"  id="competency_scoring" type="checkbox" checked></label>
+                    @else
+                        <label for="normal_scoring_panel" style="float:left; font-size: 12pt" class="control-label">Competency Scoring (SA/SF Section) <input onclick="toggleVisible('#competency_scoring_panel', this)" name="competency_scoring" value="checked"  id="competency_scoring" type="checkbox"></label>
+                    @endif
+                </div>
+            </div>
+            <div class="box-body" style="padding: 10px 0 0 0">
+                <div class="col-md-6">
+                @if((isset($courseAnnual) and $courseAnnual->normal_scoring == true) or (!isset($courseAnnual)))
+                    <div id="normal_scoring_panel">
+                @else
+                    <div id="normal_scoring_panel" style="display: none">
+                @endif
 
-    {!! Form::label('name_fr', "Name France", ['class' => 'col-lg-2 control-label']) !!}
+                    <div class="form-group">
+                        @if(isset($courseAnnual))
+                            @if($courseAnnual->is_having_resitted)
+                                <label for="having_resitted" data-toggle="tooltip" data-placement="top" title="{{trans('labels.backend.courseAnnuals.fields.allow_resit')}}" class="col-lg-12 control-label required"> Allow Resit <input id="having_resitted" type="checkbox" name="is_having_resitted"  style="font-size: 18pt" value="{{\App\Models\Enum\ScoreEnum::is_having_resitted}}" checked>  </label>
+                            @else
+                                <label for="having_resitted" data-toggle="tooltip" data-placement="top" title="{{trans('labels.backend.courseAnnuals.fields.allow_resit')}}" class="col-lg-12 control-label required"> Allow Resit <input id="having_resitted" type="checkbox" name="is_having_resitted" style="font-size: 18pt"  value="{{\App\Models\Enum\ScoreEnum::is_having_resitted}}">  </label>
+                            @endif
 
-    <div class="col-lg-3">
-        {{ Form::text('name_fr',  null, ['class' => 'form-control' , 'id'=> 'name_fr', 'required' => 'required']) }}
+                        @else
+                            <label for="having_resitted" data-toggle="tooltip" data-placement="top" title="{{trans('labels.backend.courseAnnuals.fields.allow_resit')}}" class="col-lg-12 control-label required"> Allow Resit <input id="having_resitted" type="checkbox" name="is_having_resitted"  style="font-size: 18pt" value="{{\App\Models\Enum\ScoreEnum::is_having_resitted}}">  </label>
+                        @endif
+
+                        @if(isset($courseAnnual))
+                            @if($courseAnnual->is_counted_creditability)
+
+                                <label for="count_creditability" data-toggle="tooltip" data-placement="top" title=" {{trans('labels.backend.courseAnnuals.fields.for_transcript')}}" class="col-lg-12 control-label required" > Credit For Transcript <input type="checkbox" name="is_counted_creditability" style="font-size: 18pt" id="count_creditability" class="boolean_input" value="{{\App\Models\Enum\ScoreEnum::is_counted_creditability}}" checked> </label>
+
+                            @else
+
+                                <label for="count_creditability" data-toggle="tooltip" data-placement="top" title="{{trans('labels.backend.courseAnnuals.fields.for_transcript')}}" class="col-lg-12 control-label required" > Credit For Transcript <input type="checkbox" name="is_counted_creditability" style="font-size: 18pt" id="count_creditability" class="boolean_input" value="{{\App\Models\Enum\ScoreEnum::is_counted_creditability}}" > </label>
+
+                            @endif
+                        @else
+
+                            <label for="count_creditability" class="col-lg-12 control-label required" data-toggle="tooltip" data-placement="top" title="{{trans('labels.backend.courseAnnuals.fields.for_transcript')}}"> Credit For Transcript <input type="checkbox" name="is_counted_creditability" style="font-size: 18pt" id="count_creditability" class="boolean_input" value="{{\App\Models\Enum\ScoreEnum::is_counted_creditability}}" checked> </label>
+
+                        @endif
+
+                        @if(isset($courseAnnual))
+                            @if($courseAnnual->is_counted_absence)
+                                <label for="count_absence" class="col-lg-12 control-label required" data-toggle="tooltip" data-placement="top" title="{{trans('labels.backend.courseAnnuals.fields.10_absece')}}"> 10%-Absence <input type="checkbox" name="is_counted_absence" id="count_absence" style="font-size: 18pt" class="boolean_input" value="{{\App\Models\Enum\ScoreEnum::is_counted_absence}}" checked> </label>
+
+                            @else
+                                <label for="count_absence" data-toggle="tooltip" data-placement="top" title="{{trans('labels.backend.courseAnnuals.fields.10_absece')}}" class="col-lg-12 control-label required"> 10%-Absence <input type="checkbox" name="is_counted_absence" id="count_absence" style="font-size: 18pt" class="boolean_input" value="{{\App\Models\Enum\ScoreEnum::is_counted_absence}}"> </label>
+
+                            @endif
+                        @else
+                            <label for="count_absence" data-toggle="tooltip" data-placement="top" title="{{trans('labels.backend.courseAnnuals.fields.10_absece')}}"  class="col-lg-12 control-label required"> 10%-Absence <input type="checkbox" name="is_counted_absence" id="count_absence"  style="font-size: 18pt" class="boolean_input" value="{{\App\Models\Enum\ScoreEnum::is_counted_absence}}" checked> </label>
+                        @endif
+
+                    </div>
+                    @if(isset($midterm) || isset($final))
+                        @if(isset($midterm))
+                            <div class="form-group">
+                                {!! Form::label('midterm_score', "Midterm Score", ['class' => 'col-lg-5 control-label required']) !!}
+                                <div class="col-lg-7">
+                                    <select name="midterm_score" id="midterm_score_id" class="form-control">
+
+                                        @if($midterm['percentage'] == \App\Models\Enum\ScoreEnum::Midterm_30)
+                                            <option value="{{\App\Models\Enum\ScoreEnum::Midterm_0}}" > 0% </option>
+                                            <option value="{{\App\Models\Enum\ScoreEnum::Midterm_30}}" selected > 30% </option>
+                                            <option value="{{\App\Models\Enum\ScoreEnum::Midterm_40}}"> 40%</option>
+
+                                            <input type="hidden" name="midterm_percentage_id" value="{{$midterm['percentage_id']}}">
+                                            <input type="hidden" name="final_percentage_id" value="{{$final['percentage_id']}}">
+
+
+
+                                        @elseif($midterm['percentage'] == \App\Models\Enum\ScoreEnum::Midterm_0)
+
+                                            <option value="{{\App\Models\Enum\ScoreEnum::Midterm_0}}" selected> 0% </option>
+                                            <option value="{{\App\Models\Enum\ScoreEnum::Midterm_30}}"> 30% </option>
+                                            <option value="{{\App\Models\Enum\ScoreEnum::Midterm_40}}"> 40% </option>
+
+                                            <input type="hidden" name="midterm_percentage_id" value="{{$midterm['percentage_id']}}">
+                                            <input type="hidden" name="final_percentage_id" value="{{$final['percentage_id']}}">
+
+                                        @else
+
+                                            <option value="{{\App\Models\Enum\ScoreEnum::Midterm_0}}"> 0% </option>
+                                            <option value="{{\App\Models\Enum\ScoreEnum::Midterm_30}}"> 30% </option>
+                                            <option value="{{\App\Models\Enum\ScoreEnum::Midterm_40}}" selected> 40% </option>
+
+                                            <input type="hidden" name="midterm_percentage_id" value="{{$midterm['percentage_id']}}">
+                                            <input type="hidden" name="final_percentage_id" value="{{$final['percentage_id']}}">
+
+                                        @endif
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                {!! Form::label('final_score', "Final Score", ['class' => 'col-lg-5 control-label required']) !!}
+
+                                <div class="col-lg-7">
+                                    {{ Form::text('final_score',  null, ['class' => 'form-control' , 'id'=> 'final_score_id', 'required' => 'required', 'readonly']) }}
+                                </div>
+                            </div>
+                        @else
+
+                            <div class="form-group">
+                                {!! Form::label('midterm_score', "Midterm Score", ['class' => 'col-lg-5 control-label required']) !!}
+                                <div class="col-lg-7">
+                                    <select name="midterm_score" id="midterm_score_id" class="form-control">
+
+                                        <option value="{{\App\Models\Enum\ScoreEnum::Midterm_0}}" selected> 0% </option>
+                                        <option value="{{\App\Models\Enum\ScoreEnum::Midterm_30}}"> 30% </option>
+                                        <option value="{{\App\Models\Enum\ScoreEnum::Midterm_40}}"> 40% </option>
+
+                                        <input type="hidden" name="final_percentage_id" value="{{$final['percentage_id']}}">
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                {!! Form::label('final_score', "Final Score", ['class' => 'col-lg-5 control-label required']) !!}
+
+                                <div class="col-lg-7">
+                                    {{ Form::text('final_score',  null, ['class' => 'form-control' , 'id'=> 'final_score_id', 'required' => 'required', 'readonly']) }}
+                                </div>
+                            </div>
+                        @endif
+                    @else
+                        <div class="form-group">
+                            {!! Form::label('midterm_score', "Midterm Score", ['class' => 'col-lg-5 control-label required']) !!}
+                            <div class="col-lg-7">
+                                <select name="midterm_score" id="midterm_score_id" class="form-control">
+                                    <option value="{{\App\Models\Enum\ScoreEnum::Midterm_0}}">  0% </option>
+                                    <option value="{{\App\Models\Enum\ScoreEnum::Midterm_30}}"> 30% </option>
+                                    <option value="{{\App\Models\Enum\ScoreEnum::Midterm_40}}"> 40%</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            {!! Form::label('final_score', "Final Score", ['class' => 'col-lg-5 control-label required']) !!}
+
+                            <div class="col-lg-7">
+                                {{ Form::text('final_score',  null, ['class' => 'form-control' , 'id'=> 'final_score_id', 'required' => 'required', 'readonly']) }}
+                            </div>
+                        </div>
+                    @endif
+                </div>
+                </div>
+                @if(isset($courseAnnual) and $courseAnnual->competency_type_id != null)
+                <div class="col-md-6">
+                    <div id="competency_scoring_panel">
+                    @else
+                    <div id="competency_scoring_panel" style="display: none;">
+                    @endif
+                        <div class="form-group">
+                            {!! Form::label('competency_type_id', "Competency Type", ['class' => 'col-lg-5 control-label required']) !!}
+                            <div class="col-lg-7">
+                                {{ Form::select('competency_type_id', $competency_types, isset($courseAnnual)?$courseAnnual->competency_type_id:null, ['class' => 'form-control','placeholder' => "",'required'=>'required']) }}
+                                <div class="callout callout-danger">
+                                    <h4>Info!</h4>
+
+                                    <p>Competency scoring is not editable. In case you want to change, please recreate this course</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
     </div>
 </div>
-
-<hr/>
 
 <div class="form-group">
     {!! Form::label('responsible_department_id', trans('labels.backend.coursePrograms.fields.responsible_department_id'), ['class' => 'col-lg-3 control-label']) !!}

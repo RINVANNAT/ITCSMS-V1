@@ -1,3 +1,6 @@
+.slot-not-allow {
+    background-color: #f4f4f4;
+}
 .courses-sessions {
     margin-bottom: 10px;
     height: 280px;
@@ -140,7 +143,7 @@
 }
 
 .fc-time-grid .fc-slats td {
-    height: 2.1em !important;
+    height: 2.3em !important;
     border-bottom: 0;
 }
 
@@ -151,6 +154,10 @@
 
 .fc-time-grid-event {
     margin-bottom: 2px !important;
+}
+
+.fc-time-grid-event {
+    /*overflow-y: scroll;*/
 }
 
 .box-smis {
@@ -214,4 +221,54 @@
     cursor: pointer;
     font-weight: 900;
     font-size: 18px;
+}
+
+.lang-info {
+    margin: 0;
+    padding: 13px;
+    width: 100%;
+    position: relative;
+}
+
+.lang-info-left, .lang-info-right {
+    width: 50%;
+}
+
+.lang-info-left {
+    float: left;
+}
+
+.lang-info-right {
+    float: right;
+}
+
+@media screen and (max-width: 1440px) {
+    .side-room, .side-course {
+        clear: both;
+        width: 100%;
+    }
+
+    .side-room > p {
+        display: inline;
+    }
+
+    .side-room {
+        min-height: 20% !important;
+    }
+
+    .side-course {
+        min-height: 80% !important;
+    }
+
+    .fc-time-grid-event {
+        overflow-y: scroll;
+    }
+
+    .fc-time-grid-event::-webkit-scrollbar * {
+        background: transparent;
+    }
+
+    .fc-time-grid-event::-webkit-scrollbar-thumb {
+        background: #999 !important;
+    }
 }

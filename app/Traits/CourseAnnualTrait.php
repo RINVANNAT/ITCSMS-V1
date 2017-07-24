@@ -253,7 +253,14 @@ trait CourseAnnualTrait
 
     public function cloneScore(Request $request)
     {
-        $groups = $request->group_id;
+        return $this->copyCloneScore($request->group_id, $request->course_annual_id);
+    }
+
+
+    private function copyCloneScore ($groupIds, $course_annual_id)
+    {
+
+        $groups = $groupIds;
         $count = 0;
         $countUpdate = 0;
         $select = [
@@ -263,7 +270,7 @@ trait CourseAnnualTrait
             'scores.id as score_id'
         ];
 
-        $courseAnnual = CourseAnnual::where('id', $request->course_annual_id)->first();
+        $courseAnnual = CourseAnnual::where('id', $course_annual_id)->first();
 
         if($courseAnnual->responsible_department_id) {
 
@@ -573,6 +580,53 @@ trait CourseAnnualTrait
     public function successImportedScore(Request $request, $course_annual_id)
     {
         return view('backend.course.courseAnnual.includes.success_imported_score', ['courseAnnualId'=>$course_annual_id]);
+
+    }
+
+    public function directedCourseAnnuals(Request $request)
+    {
+
+        $courseAnnuals = $this->getCourseAnnualWithProp($request->all());
+        $courseAnnual = CourseAnnual::find($request->course_annual_id);
+        $courseAnnuals = $courseAnnuals->where('course_annuals.reference_course_id', '=', $courseAnnual->course_id);
+        $courseAnnuals = $courseAnnuals->get();
+        $courses = array_chunk($courseAnnuals, 3);
+        return view('backend.course.courseAnnual.includes.partials.blog_course', ['courses'=> (count($courses) > 0)?$courses : null]);
+
+    }
+
+    public function publishScore (Request $request)
+    {
+
+        $courseAnnual = CourseAnnual::find($request->course_annual_id); // this is the current owner course
+        $responsibleCourseAnnual = CourseAnnual::find($request->selected_course_annual_id);// this is a course annual which we want to publish the socre for
+
+        if($responsibleCourseAnnual->responsible_department_id == $courseAnnual->department_id) {
+
+            if($responsibleCourseAnnual->reference_course_id != null) {
+
+                if($responsibleCourseAnnual->reference_course_id == $courseAnnual->course_id) {
+
+                    if($responsibleCourseAnnual->semester_id == $courseAnnual->semester_id) {
+
+                        return   $this->copyCloneScore($groups = [], $request->selected_course_annual_id);
+
+                    }
+                }
+            } else {
+
+                return Response::json(['status' => false, 'message' => 'The selected course is not assigned to any responsible department. So you cannot publish score to this course.']);
+            }
+
+        }
+
+            return Response::json(['status' => false, 'message' => 'Not Allow!']);
+    }
+
+    public function getGroupByProp( Request $request)
+    {
+
+        $studentByCourse = $this->getStudentByDeptIdGradeIdDegreeId([$request->department_id], [$request->degree_id], [$request->grade_id], $request->academic_year_id);
 
     }
 }

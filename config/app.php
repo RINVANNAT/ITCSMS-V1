@@ -201,6 +201,8 @@ return [
         Laravel\Socialite\SocialiteServiceProvider::class,
         Yajra\Datatables\DatatablesServiceProvider::class,
         Maatwebsite\Excel\ExcelServiceProvider::class,
+        Jenssegers\Date\DateServiceProvider::class,
+
 
         /*
          * Has to override the Collective\Html\HtmlServiceProvider form singleton
@@ -281,7 +283,7 @@ return [
         'Datatables' => Yajra\Datatables\Datatables::class,
         'Excel' => Maatwebsite\Excel\Facades\Excel::class,
 
-        'Form'      => Collective\Html\FormFacade::class,
+        'Date' => Jenssegers\Date\Date::class,
         'Flash'     => Laracasts\Flash\Flash::class,
         'JsValidator' => Proengsoft\JsValidation\Facades\JsValidatorFacade::class,
         'DNS1D' => Milon\Barcode\Facades\DNS1DFacade::class,

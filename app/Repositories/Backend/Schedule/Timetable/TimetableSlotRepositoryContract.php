@@ -248,18 +248,20 @@ interface TimetableSlotRepositoryContract
      * Get timetable slot with details info.
      *
      * @param Timetable $timetable
+     * @param null $by_teacher
      * @return mixed
      */
-    public function get_timetable_slot_details(Timetable $timetable);
+    public function get_timetable_slot_details(Timetable $timetable, $by_teacher = null);
 
     /**
      * Get Timetable Slot with Conflict Info.
      *
      * @param Timetable $timetable
      * @param Collection $timetableSlots
+     * @param null $by_teacher
      * @return mixed
      */
-    public function get_timetable_slot_with_conflict_info(Timetable $timetable, Collection $timetableSlots);
+    public function get_timetable_slot_with_conflict_info(Timetable $timetable, Collection $timetableSlots, $by_teacher = null);
 
     /**
      * Get all student annuals.

@@ -80,7 +80,7 @@
             <div class="row">
                 <div class="col-md-12 col-sm-12 col-xs-12">
                     {{--Timetable render--}}
-                    <div id="timetable"></div>
+                    <div id="timetable" class="view-timetable"></div>
                 </div>
             </div>
 
@@ -127,11 +127,16 @@
                 fixedWeekCount: false,
                 minTime: '07:00:00',
                 maxTime: '20:00:00',
+                eventConstraint: {
+                    start: '07:00:00',
+                    end: '20:00:00'
+                },
                 slotLabelFormat: 'h:mm a',
                 columnFormat: 'dddd',
                 dragRevertDuration: 0,
                 events: {!! $timetableSlots !!},
                 eventRender: function (event, element, view) {
+                    set_background_color_slot_not_allow();
                     var object = '<a class="fc-time-grid-event fc-v-event fc-event fc-start fc-end course-item  fc-draggable fc-resizable" style="top: 65px; bottom: -153px; z-index: 1; left: 0%; right: 0%;">' +
                         '<div class="fc-content">' +
                         '<div class="container-room">';
@@ -142,9 +147,9 @@
                         event.editable = false;
                         object += '<div class="lang-info">';
                         for (var i = 0; i < event.slotsForLanguage.length; i++) {
-                            if(i%2 !== 0){
+                            if (i % 2 !== 0) {
                                 object += '<div class="lang-info-left"> Gr: ' + event.slotsForLanguage[i].group + ' (' + event.slotsForLanguage[i].building + '-' + event.slotsForLanguage[i].room + ')</div>';
-                            }else{
+                            } else {
                                 object += '<div class="lang-info-right"> Gr: ' + event.slotsForLanguage[i].group + ' (' + event.slotsForLanguage[i].building + '-' + event.slotsForLanguage[i].room + ')</div>';
                             }
                         }
@@ -214,6 +219,12 @@
                         '<div class="fc-resizer fc-end-resizer"></div>' +
                         '</a>';
                     return $(object);
+                },
+                loading: function (isLoading, view) {
+                    toggleLoading(isLoading);
+                },
+                eventAfterAllRender: function (view) {
+                    toggleLoading(false);
                 }
             });
         }

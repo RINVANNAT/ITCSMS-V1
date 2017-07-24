@@ -1,0 +1,23 @@
+* {
+    box-sizing: border-box;
+    -moz-box-sizing: border-box;
+}
+.page {
+
+    padding: 0 10mm 0 10mm;
+    margin: 0 auto;
+    border: initial;
+    border-radius: initial;
+    width: 297mm;
+    height: 210mm;
+    box-shadow: initial;
+    background: initial;
+    page-break-after: always;
+    position: relative;
+}
+.footer{
+    position: absolute;
+    bottom: 10px;
+    width: 100%;
+    padding-right:40mm;
+}

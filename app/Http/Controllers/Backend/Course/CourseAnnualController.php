@@ -1,6 +1,8 @@
 <?php namespace App\Http\Controllers\Backend\Course;
 
 use App\Exceptions\GeneralException;
+use App\Http\Controllers\Backend\Course\CourseHelperTrait\GenerateStudentTrait;
+use App\Http\Controllers\Backend\Course\CourseHelperTrait\ProficencyScoreTrait;
 use App\Http\Controllers\Backend\Course\CourseHelperTrait\StudentStatisticTrait;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Backend\Course\CourseAnnual\CourseAnnualAssignmentRequest;
@@ -14,6 +16,7 @@ use App\Http\Requests\Backend\Course\CourseAnnual\UpdateCourseAnnualRequest;
 use App\Models\Absence;
 use App\Models\AcademicYear;
 use App\Models\Average;
+use App\Models\CompetencyType;
 use App\Models\Course;
 use App\Models\CourseAnnual;
 use App\Models\Degree;
@@ -63,6 +66,8 @@ class CourseAnnualController extends Controller
     use CourseSessionTrait;
     use CourseAnnualTrait;
     use StudentStatisticTrait;
+    use ProficencyScoreTrait;
+    use GenerateStudentTrait;
 
     /**
      * @var CourseAnnualRepositoryContract
@@ -356,7 +361,8 @@ class CourseAnnualController extends Controller
         $degrees = Degree::lists('name_kh', 'id')->toArray();
         $grades = Grade::lists('name_kh', 'id')->toArray();
         $semesters = Semester::lists("name_kh", "id");
-        return view('backend.course.courseAnnual.create', compact('departments', 'academicYears', 'degrees', 'grades', 'courses', "semesters", 'options', 'other_departments'));
+        $competency_types = CompetencyType::lists('name','id')->toArray();
+        return view('backend.course.courseAnnual.create', compact('competency_types','departments', 'academicYears', 'degrees', 'grades', 'courses', "semesters", 'options', 'other_departments'));
     }
 
     public function getDepts()
@@ -405,8 +411,12 @@ class CourseAnnualController extends Controller
 
             $data = $data + ['course_annual_id' => $storeCourseAnnual->id];
             $storeCourseAnnualClass = $this->courseAnnualClasses->create($data);
-            //----create score percentage ----
-            $this->createScorePercentage($request->midterm_score, $request->final_score, $storeCourseAnnual->id);
+
+            // Only normal scoring (midterm+final) need to generate empty score
+            if(isset($data["normal_scoring"]) and $data["normal_scoring"] == "checked"){
+                //----create score percentage ----
+                $this->createScorePercentage($request->midterm_score, $request->final_score, $storeCourseAnnual->id);
+            }
 
             if ($storeCourseAnnualClass) {
                 return redirect()->route('admin.course.course_annual.index')->withFlashSuccess(trans('alerts.backend.generals.created'));
@@ -575,10 +585,10 @@ class CourseAnnualController extends Controller
         $degrees = Degree::lists('name_kh', 'id')->toArray();
         $grades = Grade::lists('name_kh', 'id')->toArray();
         $semesters = Semester::lists("name_kh", "id");
+        $competency_types = CompetencyType::lists('name','id')->toArray();
 
 
-
-        return view('backend.course.courseAnnual.edit', compact('courseAnnual', 'departments', 'academicYears', 'degrees', 'grades', 'courses', 'options', 'semesters', 'groups', 'midterm', 'final', 'other_departments'));
+        return view('backend.course.courseAnnual.edit', compact('competency_types','courseAnnual', 'departments', 'academicYears', 'degrees', 'grades', 'courses', 'options', 'semesters', 'groups', 'midterm', 'final', 'other_departments'));
     }
 
     /**
@@ -781,8 +791,23 @@ class CourseAnnualController extends Controller
      */
     public function destroy(DeleteCourseAnnualRequest $request, $id)
     {
-        $scoreByCourseAnnualId = DB::table('scores')->where('course_annual_id', $id);
 
+
+        /*---delete competency score--*/
+
+        $competencyScores = DB::table('competency_scores')
+            ->where('course_annual_id', $id);
+
+        if(count($competencyScores->get()) > 0) {
+
+            $this->courseAnnualScores->getUserLog($competencyScores->get(), 'CompetencyScore', 'Delete');
+            $competencyScores->delete();
+        }
+
+        /*---end delete competency---*/
+
+
+        $scoreByCourseAnnualId = DB::table('scores')->where('course_annual_id', $id);
         $averages = Average::where('course_annual_id', $id);
         if($totalScore = $averages->get()) {
             $averages->delete();
@@ -1201,10 +1226,34 @@ class CourseAnnualController extends Controller
     {
 
         $properties = $this->dataSendToView($courseAnnualId);
+        if(($properties['course_annual']->competency_type_id != null) and ($properties['course_annual']->normal_scoring == false)) {
+          return redirect("/admin/course/course/get-form-proficency?course_annual_id=".$courseAnnualId);
+        }
         $courseAnnual = $properties['course_annual'];
         $availableCourses = $properties['available_course'];
         $mode = null;
         $allowCloningScore = false;
+
+        if (auth()->user()->allow("view-all-score-in-all-department")) {
+
+            $departments = Department::where("parent_id", config('access.departments.department_academic'))->orderBy("code")->lists("code", "id");
+            $department_id = null;
+
+        } else {
+
+            $employee = Employee::where('user_id', Auth::user()->id)->first();
+            $departments = $employee->department()->lists("code", "id");
+            $department_id = $employee->department->id;
+
+        }
+
+        $academicYears = AcademicYear::orderBy("id", "desc")->lists('name_latin', 'id')->toArray();
+        $degrees = Degree::lists('name_en', 'id')->toArray();
+        $grades = Grade::lists('name_en', 'id')->toArray();
+
+        $semesters = Semester::orderBy('id')->lists('name_en', 'id')->toArray();
+        $departmentOptions = DB::table('departmentOptions')->get();
+
 
         if (access()->hasRole("Administrator")) {
             $mode = "edit";
@@ -1230,7 +1279,11 @@ class CourseAnnualController extends Controller
             }
         }
 
-        return view('backend.course.courseAnnual.includes.form_input_score_course_annual', compact('courseAnnualId', 'courseAnnual', 'availableCourses', 'mode', 'allowCloningScore'));
+        return view('backend.course.courseAnnual.includes.form_input_score_course_annual',
+            compact(
+                'courseAnnualId', 'courseAnnual', 'availableCourses', 'mode', 'allowCloningScore',
+                'departments', 'academicYears', 'degrees', 'grades', 'semesters', 'departmentOptions', 'department_id'
+            ));
 
     }
 
@@ -2971,7 +3024,6 @@ class CourseAnnualController extends Controller
                     $studentAnnualIds = $studentAnnualIds->where('group_student_annuals.department_id', '=', $courseAnnual->department_id)->lists('student_annual_id');
 
                 } else {
-
                     $studentAnnualIds = $studentAnnualIds
                         ->whereNull('group_student_annuals.department_id')
                         ->lists('student_annual_id');
@@ -3149,15 +3201,11 @@ class CourseAnnualController extends Controller
 
             DB::beginTransaction();
             try {
-
-
                 Excel::load($storage_path, function($reader) use(&$isError) {
                     $firstrow = $reader->first()->toArray();
 
                     if ((!isset($firstrow['student_id'])) || (!isset($firstrow['student_name'])) || (count($firstrow) < 3)) {
                         $isError = true;
-                    } else {
-                        $rows = $reader->all();
                     }
                 });
 

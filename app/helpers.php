@@ -81,3 +81,75 @@ if (! function_exists('getLanguageBlock')) {
         }
     }
 }
+
+if (! function_exists('month_mois')) {
+    /**
+     * Convert english month to french
+     *
+     * @param $month
+     * @return String
+     */
+    function month_mois($month)
+    {
+        $month = strtolower($month);
+        switch ($month) {
+            case "january":
+                return "Janvier";
+            case "february":
+                return "Février";
+            case "march":
+                return "Mars";
+            case "april":
+                return "Avril";
+            case "may":
+                return "Mai";
+            case "june":
+                return "Juin";
+            case "july":
+                return "Juillet";
+            case "august":
+                return "Août";
+            case "september":
+                return "Septembre";
+            case "october":
+                return "Octobre";
+            case "november":
+                return "Novembre";
+            case "december":
+                return "Décembre";
+            default:
+                return null;
+        }
+    }
+}
+
+if (! function_exists('day_jour')) {
+    /**
+     * Convert english day to french
+     *
+     * @param $day
+     * @return String
+     */
+    function day_jour($day)
+    {
+        $day = strtolower($day);
+        switch ($day) {
+            case "monday":
+                return "Lundi";
+            case "tuesday":
+                return "Mardi";
+            case "wednesday":
+                return "Mercredi";
+            case "thursday":
+                return "Jeudi";
+            case "friday":
+                return "Vendredi";
+            case "saturday":
+                return "Samedi";
+            case "sunday":
+                return "Dimanche";
+            default:
+                return null;
+        }
+    }
+}

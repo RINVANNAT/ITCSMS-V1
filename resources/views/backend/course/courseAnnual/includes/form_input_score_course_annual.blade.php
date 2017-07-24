@@ -10,12 +10,26 @@
             margin-left: 5px;
         }
 
+        .space_{
+            padding-right: 5px !important;
+            padding-left: 5px !important;
+        }
+
+
         .popupdiv{
             height:200px;
             width: 600px;
             background-color: #AED6F1;
             opacity: 60;
 
+        }
+
+        .blog_course{
+            border-top-left-radius: 0;
+            border-top-right-radius: 0;
+            border-bottom-right-radius: 3px;
+            border-bottom-left-radius: 3px;
+            padding: 10px;
         }
 
         .drop-menu {
@@ -33,29 +47,27 @@
             margin-bottom: 5px;
 
         }
-        #filter_academic_year {
-            font-size: 10pt;
-            height: 23px;
-            margin-left: 5px;
-        }
-        #filter_semester{
-            font-size: 10pt;
-            height: 23px;
-            margin-left: 5px;
-        }
         .current_row td{
 
-        gradient(to bottom,rgba(181,209,255,0.34) 0,rgba(181,209,255,0.34) 100%);
-            background-image: linear-gradient(rgba(181, 209, 255, 0.5) 0px, rgba(181, 209, 255, 0.341176) 100%);
-            background-position-x: initial;
-            background-position-y: initial;
-            background-size: initial;
-            background-repeat-x: initial;
-            background-repeat-y: initial;
-            background-attachment: initial;
-            background-origin: initial;
-            background-clip: initial;
-            background-color: #fff !important;
+            gradient(to bottom,rgba(181,209,255,0.34) 0,rgba(181,209,255,0.34) 100%);
+                background-image: linear-gradient(rgba(181, 209, 255, 0.5) 0px, rgba(181, 209, 255, 0.341176) 100%);
+                background-position-x: initial;
+                background-position-y: initial;
+                background-size: initial;
+                background-repeat-x: initial;
+                background-repeat-y: initial;
+                background-attachment: initial;
+                background-origin: initial;
+                background-clip: initial;
+                background-color: #fff !important;
+        }
+
+        .btn_success_custom {
+            background-color: #ff9999;
+            border-color: #ffffcc;
+            border-radius: 3px;
+            box-shadow: none;
+            border: 1px solid transparent;
         }
     </style>
 
@@ -68,6 +80,8 @@
 
 @section('content')
 
+
+    @include('backend.course.courseAnnual.includes.partials.modal_publish')
     <div class="box box-success">
         <div class="box-header with-border">
             <div class="pull-left drop_selection">
@@ -86,10 +100,19 @@
             </div>
 
             <div id="blog_button">
+
+                @if($courseAnnual->department_id == config('access.departments.sa') || $courseAnnual->department_id == config('access.departments.sf'))
+                    <button class="btn btn-success btn-xs pull-right" id="publish_score" style="margin-left:5px" data-toggle="modal" data-target="#modal-default"> publish </button>
+                @endif
+
                 <a class="btn btn-primary btn-xs pull-right" id="export_score" href="{{route('course_annual.export_course_score_annual')}}" target="_blank" style="margin-left:5px">Export Score</a>
+
                 @if($courseAnnual->is_allow_scoring)
+
                     @if($allowCloningScore)
+
                         <button class="btn btn-success btn-xs pull-right" id="clone_score" data-toggle="tooltip" data-placement="top" title=" The action is to allow you to clone score of this course from responsible department!"  style="margin-left:5px"> Clone-Score </button>
+
                     @else
                         @if(access()->user()->allow("input-score-without-blocking") || ($courseAnnual->is_allow_scoring && $mode == "edit"))
                             <button class="btn btn-warning btn-xs pull-right" id="save_editted_score" style="margin-left:5px">Save Changes!</button>
@@ -98,6 +121,10 @@
                             <a href="{{route('course_annual.form_import_score')}}" target="_self" class="btn btn-info btn-xs pull-right" id="import_score" style="margin-left: 5px"> Import Score</a>
                         @endif
 
+                    @endif
+
+                    @if($courseAnnual->department_id == config('access.departments.sa') || $courseAnnual->department_id == config('access.departments.sf'))
+                        <button class="btn btn_success_custom btn-xs pull-right" id="proficency_score_form" data-toggle="tooltip" data-placement="top" title=" The action is to allow you to input score in the special format"  style="margin-left:5px"> Proficency Score </button>
                     @endif
                 @endif
 
@@ -148,15 +175,17 @@
     {!! Html::script('plugins/handsontable-test/handsontable.full.min.js') !!}
     {!! Html::script('plugins/jpopup/jpopup.js') !!}
     {!! Html::script('score/js/input_score.js') !!}
+    {!! Html::script('score/js/publish_session_score.js') !!}
 
     <script>
+
+        getCourseAnnuals();
 
         @if($courseAnnual->is_counted_absence)
                 var is_counted_absence = parseInt('{{\App\Models\Enum\ScoreEnum::is_counted_absence}}')
         @else
                 var is_counted_absence = 0;
         @endif
-
 
         var objectStatus={};
         var array_col_status = {};
@@ -173,6 +202,7 @@
 
         // this function is to declare global empty array and we use these empty arrays to store the data when user make change of each cell score value to pass to the sever
         // the main purpose is to get col-change-data and to send them to server by each col
+
         function declareColumnHeaderDataEmpty() {
             // create empty array by the columns score which user created
             // because we want to store data cell changes by column and send them to the server by one column ...not all columns at once
@@ -261,7 +291,7 @@
             manualColumnMove: true,
             filters: true,
             autoWrapRow: true,
-            minSpareRows: false,
+            minSpareRows: 1,
             stretchH: 'last',
             filters: true,
             dropdownMenu: ['filter_by_condition', 'filter_action_bar'],
@@ -760,7 +790,6 @@
                     notify('error', 'info', 'Please Save Your Changes Before Getting Average!!!')
                 } else {
 
-
                     var getAverageBaseurl = '{{route('admin.course.get_average_score', $courseAnnualId)}}';
 
                     swal({
@@ -1085,6 +1114,23 @@
                 }
             });
         }
+
+
+        console.log(setting)
+
+
+        $(document).on('click', '#proficency_score_form', function(e) {
+
+            var course_annual_id = $('select[name=available_course] :selected').val();
+            var url = '{{route('course.proficency_form_score')}}';
+            var width = $(document).width();
+
+            PopupCenterDual(url+'?course_annual_id='+course_annual_id,'New Input Form Score Fomart',width,'800');
+
+
+
+
+        });
 
     </script>
 @stop
