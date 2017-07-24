@@ -187,15 +187,19 @@
 </div>
 
 <div class="form-group">
-    {!! Form::label('credit', 'Credit', ['class' => 'col-lg-3 control-label required']) !!}
-    <div class="col-lg-7">
+    {!! Form::label('time_course', "Time Course", ['class' => 'col-lg-3 control-label required']) !!}
+    <div class="col-lg-2">
+        {{ Form::number('time_course',  null, ['class' => 'form-control', 'id'=>'time_course', 'required' => 'required']) }}
+    </div>
+    {!! Form::label('credit', 'Credit', ['class' => 'col-lg-2 control-label required']) !!}
+    <div class="col-lg-3">
         {{ Form::text('credit',  isset($courseAnnual)?$courseAnnual->credit:null, ['class' => 'form-control' , 'id'=> 'credit', 'required' => 'required']) }}
     </div>
 </div>
 <div class="form-group">
-    {!! Form::label('time_course', "Time Course", ['class' => 'col-lg-3 control-label required']) !!}
+    {!! Form::label('time_tp', "Time TP", ['class' => 'col-lg-3 control-label required']) !!}
     <div class="col-lg-2">
-        {{ Form::number('time_course',  null, ['class' => 'form-control', 'id'=>'time_course', 'required' => 'required']) }}
+        {{ Form::number('time_tp',  null, ['class' => 'form-control', 'id'=>'time_tp', 'required' => 'required']) }}
     </div>
 
     {!! Form::label('name_kh', "Name Khmer", ['class' => 'col-lg-2 control-label']) !!}
@@ -377,7 +381,7 @@
                         </div>
                     @endif
                 </div>
-                </div>
+
                 @if(isset($courseAnnual) and $courseAnnual->competency_type_id != null)
                 <div class="col-md-6">
                     <div id="competency_scoring_panel">
@@ -402,6 +406,7 @@
         </div>
     </div>
 </div>
+
 
 <div class="form-group">
     {!! Form::label('responsible_department_id', trans('labels.backend.coursePrograms.fields.responsible_department_id'), ['class' => 'col-lg-3 control-label']) !!}
