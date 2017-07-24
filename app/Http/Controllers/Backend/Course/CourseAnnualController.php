@@ -3314,6 +3314,7 @@ class CourseAnnualController extends Controller
                             }
                         }
 
+                        // Absence score is included
                         if ($courseAnnual->is_counted_absence) {
 
                             if (is_numeric($row['abs']) || ((trim($row['abs']) == null) || (trim($row['abs']) == ''))) { // ---absence column

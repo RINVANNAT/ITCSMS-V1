@@ -476,6 +476,9 @@ trait ProficencyScoreTrait
                     //$score =  eval('return '.$constructNewRule.';');
 
                     $score = JsonLogic::apply(json_decode($competency->calculation_rule),$basic_scores);
+                    if($competency->type == "calculation"){
+                        $score = $this->floatFormat($score);
+                    }
 
                     $input = [
                         'course_annual_id' => $courseAnnualId,
