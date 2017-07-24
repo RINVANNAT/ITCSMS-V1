@@ -3007,6 +3007,7 @@ class CourseAnnualController extends Controller
                 $students = $students->orderBy('students.name_latin')->get();
             }
         } else {
+
             if ($groups) {
 
                 $studentAnnualIds = DB::table('group_student_annuals')
@@ -3014,8 +3015,11 @@ class CourseAnnualController extends Controller
                     ->where('semester_id', $courseAnnual->semester_id);
 
                 if($department->is_vocational) {
+
                     $studentAnnualIds = $studentAnnualIds->where('group_student_annuals.department_id', '=', $courseAnnual->department_id)->lists('student_annual_id');
+
                 } else {
+
                     $studentAnnualIds = $studentAnnualIds->lists('student_annual_id');
                 }
                 $students = $students->whereIn('studentAnnuals.id', $studentAnnualIds)->orderBy('students.name_latin');
