@@ -222,7 +222,7 @@
 <div class="form-group">
     {!! Form::label('Scoring', "Scoring", ['class' => 'col-lg-3 control-label required']) !!}
     <div class="col-lg-9">
-        <div class="box box-solid" style="border-top: 1px solid #d2d6de">
+        <div class="box box-solid" style="border-top: 1px solid #d2d6de" id="scoring_panel">
             <div class="box-header with-border">
                 <div class="col-md-6">
                     @if((isset($courseAnnual) and $courseAnnual->normal_scoring == true) or (!isset($courseAnnual)))
@@ -346,7 +346,6 @@
                                         <option value="{{\App\Models\Enum\ScoreEnum::Midterm_40}}"> 40% </option>
 
                                         <input type="hidden" name="final_percentage_id" value="{{$final['percentage_id']}}">
-
                                     </select>
                                 </div>
                             </div>
@@ -389,9 +388,15 @@
                             {!! Form::label('competency_type_id', "Competency Type", ['class' => 'col-lg-5 control-label required']) !!}
                             <div class="col-lg-7">
                                 {{ Form::select('competency_type_id', $competency_types, isset($courseAnnual)?$courseAnnual->competency_type_id:null, ['class' => 'form-control','placeholder' => "",'required'=>'required']) }}
+                                <div class="callout callout-danger">
+                                    <h4>Info!</h4>
+
+                                    <p>Competency scoring is not editable. In case you want to change, please recreate this course</p>
+                                </div>
                             </div>
                         </div>
                     </div>
+
                 </div>
             </div>
         </div>

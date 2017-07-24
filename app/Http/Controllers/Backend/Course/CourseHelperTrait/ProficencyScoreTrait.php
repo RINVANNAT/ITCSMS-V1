@@ -14,11 +14,13 @@ use App\Models\CourseAnnual;
 use App\Models\Degree;
 use App\Models\Department;
 use App\Models\DepartmentOption;
+use App\Models\PrintedCertificate;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Response;
 use Illuminate\Support\Facades\DB;
 use App\Repositories\Backend\CompetencyScore\EloquentCompetencyScoreRepository;
+use JWadhams\JsonLogic;
 use Maatwebsite\Excel\Facades\Excel;
 
 trait ProficencyScoreTrait
@@ -380,6 +382,7 @@ trait ProficencyScoreTrait
 
     }
 
+
     /**
      * Calculate the result
      * @param Request $request
@@ -403,21 +406,35 @@ trait ProficencyScoreTrait
 
         $courseAnnual = CourseAnnual::find($courseAnnualId)->toArray();
 
+        $student_infos = DB::table("studentAnnuals")
+            ->join("students","students.id","=","studentAnnuals.student_id")
+            ->join("genders","students.gender_id","=","genders.id")
+            ->whereIN("studentAnnuals.id",$studentAnnualIds)
+            ->select([
+                "studentAnnuals.id",
+                "genders.code"
+            ])
+            ->get();
+        $student_infos = collect($student_infos)->keyBy("id")->toArray();
         $competencies = DB::table('competencies')
             ->where(function ($query) use($courseAnnual) {
                 $query->whereIn('competency_type_id', DB::table('competency_types')->where('id', '=', $courseAnnual['competency_type_id'])->lists('id'));
             })
             ->get();
 
+        // Normal scoring field
         $competencyName = [];
+        $competencyById = [];
+        // Result base on calculation & condition
         $notCompetencyName = [];
 
         // to get competency name and not competency
         collect($competencies)
 
-            ->filter(function($item) use(&$competencyName, &$notCompetencyName) {
+            ->filter(function($item) use(&$competencyName, &$competencyById, &$notCompetencyName, &$conditionName) {
                 if($item->type == "value") {
                     $competencyName[strtolower($item->name)] = $item->id;
+                    $competencyById[$item->id] =strtolower($item->name);
                     return $item;
                 } else {
                     $notCompetencyName[] = $item;
@@ -444,45 +461,31 @@ trait ProficencyScoreTrait
                 $countRule++;
 
                 /*---loop all student to store data ---*/
-
                 foreach($competencyScoresKeyByIds as $studentAnnualId => $scores) {
-
-                    $constructNewRule = $this->getExpression($competency->calculation_rule, $competencyName, $scores);
-                    $score =  eval('return '.$constructNewRule.';');
-
-
-                    if($competency->condition_rule != null) {
-
-                        $baseLevelType = json_decode($competency->condition_rule);
-                        $new_score = null;
-                        foreach($baseLevelType as $levelType) {
-
-                            if($score > $levelType->min && $score < $levelType->max) {
-                                $new_score = $levelType->value;
-                                break;
-                            }
+                    // The basic score will be used for calculation in calculation/condition field
+                    $basic_scores = [];
+                    foreach($scores as $basic_score){
+                        if(isset($competencyById[$basic_score->competency_id])){
+                            $basic_scores[$competencyById[$basic_score->competency_id]] = $basic_score->score;
                         }
-
-                        $input = [
-                            'course_annual_id' => $courseAnnualId,
-                            'student_annual_id' => $studentAnnualId,
-                            'competency_id' => $competency->id,
-                            'score'=> $new_score,
-                            'created_at' => Carbon::now(),
-                            'create_uid' => auth()->id()
-                        ];
-
-                    } else {
-
-                        $input = [
-                            'course_annual_id' => $courseAnnualId,
-                            'student_annual_id' => $studentAnnualId,
-                            'competency_id' => $competency->id,
-                            'score'=> $this->floatFormat($score),
-                            'created_at' => Carbon::now(),
-                            'create_uid' => auth()->id()
-                        ];
                     }
+                    $basic_scores["gender"] = $student_infos[$studentAnnualId]->code;
+
+                    // We first use eval to calculate result, but now we move to use jsonlogic instead
+                    //$constructNewRule = $this->getExpression($competency->calculation_rule, $competencyName, $scores);
+                    //$score =  eval('return '.$constructNewRule.';');
+
+                    $score = JsonLogic::apply(json_decode($competency->calculation_rule),$basic_scores);
+
+                    $input = [
+                        'course_annual_id' => $courseAnnualId,
+                        'student_annual_id' => $studentAnnualId,
+                        'competency_id' => $competency->id,
+                        'score'=> $score,
+                        'created_at' => Carbon::now(),
+                        'create_uid' => auth()->id()
+                    ];
+
                     if(isset($scores[$competency->id])) {
                         /*--- update record -- */
 
@@ -756,10 +759,16 @@ trait ProficencyScoreTrait
         $course_annual_id = $request->get("course_annual_id");
         $course_annual = CourseAnnual::find($course_annual_id);
 
+        // Necessary data to prepare data source
         $students = $this->studentData($course_annual);
         $departments = Department::lists("code","id")->toArray();
         $degrees = Degree::lists("code","id")->toArray();
 
+        // Get printed certificate date
+        $printed_certificates = DB::table("printed_certificates")
+            ->where("course_annual_id",$course_annual_id)
+            ->get();
+        $printed_certificates = collect($printed_certificates)->groupBy("student_annual_id")->toArray();
         // All competencies
         $competencies = DB::table('competencies')
             ->join('competency_types', function($query) use ($course_annual) {
@@ -777,7 +786,7 @@ trait ProficencyScoreTrait
         $competencyScores = collect($competencyScores)->groupBy('student_annual_id')->toArray();
 
         $score_collection = [];
-        collect($students['student_data'])->filter(function($item) use (&$score_collection, $competencyScores, $competencies, $degrees, $departments){
+        collect($students['student_data'])->filter(function($item) use (&$score_collection, $competencyScores, $competencies, $degrees, $departments,$printed_certificates){
 
             $eachScoreProp = isset($competencyScores[$item->student_annual_id])?$competencyScores[$item->student_annual_id]:[];
             $strScore = '';
@@ -785,33 +794,36 @@ trait ProficencyScoreTrait
 
             $eachItem['class'] = $degrees[$item->degree_id].$item->grade_id.$departments[$item->department_id];
             $eachItem['gender'] = $item->code;
+            $eachItem['printed_certificate'] = "";
+
+            if(isset($printed_certificates[$item->student_annual_id])){
+                $eachItem['printed_certificate'] = "";
+
+                foreach($printed_certificates[$item->student_annual_id] as $printed_certificate){
+                    $eachItem['printed_certificate'] = $eachItem['printed_certificate']." <span class='text-10'>".Carbon::createFromFormat("Y-m-d H:i:s",$printed_certificate->created_at)->toDayDateTimeString()."</span><br/>";
+                }
+            }
 
             if(count($eachScoreProp) >0) {
-                dump($eachScoreProp);
                 foreach($eachScoreProp as $prop) {
 
                     $competency = $competencies[$prop->competency_id];
 
                     if($competency->type == 'condition') {
-
-                        $strScore .= $competencies[$prop->competency_id]->name. ':'. '<span class="text-red">'.$prop->score.'</span><br/>';
-
+                        $strScore .= '<br/><span class="text-10">'.$competencies[$prop->competency_id]->name. ':'. '<span class="text-red">'.$prop->score.'</span></span>';
+                    } else if($competency->type == 'value') {
+                        $strScore .= '<span class="text-10">'.$competencies[$prop->competency_id]->name. ':'. '<span class="text-red">'.$prop->score.'</span> / </span>';
                     } else {
-
-                        $strScore .= $competencies[$prop->competency_id]->name. ':'. '<span >'.$prop->score.'</span><br/>';
+                        $strScore .= '<br/><span class="text-10">'.$competencies[$prop->competency_id]->name. ':'. '<span class="text-red">'.$prop->score.'</span></span>';
                     }
-
-
                 }
                 $eachItem['score_prop'] = $strScore;
                 //$score_collection[$item->student_annual_id][$item->competency_id] = $item;
                 $score_collection[] = $eachItem;
             } else {
-                $eachItem['score_prop'] = 'No_data';
+                $eachItem['score_prop'] = '';
                 $score_collection[] = $eachItem;
             }
-
-
         });
 
         $score_collection = collect($score_collection);
@@ -822,7 +834,7 @@ trait ProficencyScoreTrait
                 return '<input type="checkbox" checked class="checkbox" data-id='.$student['student_annual_id'].'>';
             })
             ->addColumn('name', function($student) {
-                return $student['name_kh']."<br/>".$student['name_latin'];
+                return $student['name_kh']."<br/>".$student['name_latin']."<br/>".$student['code'];
             })
             ->addColumn('printed_date', function($student) {
                 return "";
@@ -837,9 +849,9 @@ trait ProficencyScoreTrait
 
     public function printCertificate(Request $request)
     {
-
         $studentAnnualIds = json_decode($request->ids);
         $courseAnnual = CourseAnnual::find($request->course_annual_id);
+        $departments = Department::lists("code","id")->toArray();
         $students  = DB::table('students')
             ->join('studentAnnuals', function($query) use($studentAnnualIds) {
                 $query->on('studentAnnuals.student_id', '=', 'students.id')
@@ -851,7 +863,6 @@ trait ProficencyScoreTrait
                 $query->on('competency_types.id', '=', 'competencies.competency_type_id')
                     ->where('competency_types.id', '=', $courseAnnual->competency_type_id);
             })
-            ->where('type', '=', 'value')
             ->select('competencies.*')
             ->get();
 
@@ -859,7 +870,6 @@ trait ProficencyScoreTrait
         $competencyIds = collect($competencies)->pluck('id')->toArray();
         $competencyScores = DB::table('competency_scores')
             ->where('course_annual_id', '=', $request->course_annual_id)
-            ->whereIn('competency_id', $competencyIds)
             ->whereIn('student_annual_id', $studentAnnualIds)
             ->get();
 
@@ -868,11 +878,45 @@ trait ProficencyScoreTrait
         collect($competencyScores)->filter(function($item) use(&$arrayScores) {
            $arrayScores[$item->student_annual_id][$item->competency_id]  = $item;
         });
+        if(strtolower($departments[$courseAnnual->department_id]) == "sa"){
+            $view = "backend.course.courseAnnual.formScore.prints.certificate_en";
+        } else {
+            $view = "backend.course.courseAnnual.formScore.prints.certificate_fr";
+        }
+        return view($view,
+            [
+                'scores' => $arrayScores,
+                'competencies' => $competencies,
+                'students'=> $students,
+                'exam_start'=>$request->exam_start,
+                'exam_end'=>$request->exam_end
+            ]
+        );
+    }
 
-        dump($arrayScores);
-        dump($competencies);
-        dump($students);
-        return view('backend.course.courseAnnual.formScore.prints.certificate', ['scores' => $arrayScores, 'competencies' => $competencies, 'students'=> $students]);
+    public function markPrintedCertificate(Request $request){
+        $studentAnnualIds = json_decode($request->ids);
+        $course_annual_id = $request->course_annual_id;
+
+        $date = Carbon::now()->addHours(7);
+
+        $success = true;
+        foreach($studentAnnualIds as $student_id) {
+            if(!PrintedCertificate::create([
+                "student_annual_id"=> $student_id,
+                "course_annual_id" => $course_annual_id,
+                "create_uid" => auth()->user()->id,
+                "created_at" => $date
+            ])){
+                $success = false;
+            };
+        }
+
+        if($success){
+            return response()->json(['status' => 'success', 'message' => 'All printed certificates are marked']);
+        } else {
+            return response()->json(['status' => 'fail', 'state' => 'Something went wrong! please try again or contact administrator']);
+        }
     }
 
 

@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "content-hash": "0ded785861a2e93b0e7246997edecc6d",
+    "content-hash": "c59c51aef6a8c7d35db97879aca92bdd",
     "packages": [
         {
             "name": "arcanedev/log-viewer",
@@ -1400,6 +1400,71 @@
             "time": "2015-04-20T18:58:01+00:00"
         },
         {
+            "name": "jenssegers/date",
+            "version": "v3.2.12",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/jenssegers/date.git",
+                "reference": "1db4d580d1d45085a48fd4a332697619b9a3851c"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/jenssegers/date/zipball/1db4d580d1d45085a48fd4a332697619b9a3851c",
+                "reference": "1db4d580d1d45085a48fd4a332697619b9a3851c",
+                "shasum": ""
+            },
+            "require": {
+                "nesbot/carbon": "^1.0",
+                "php": ">=5.4",
+                "symfony/translation": "^2.7|^3.0"
+            },
+            "require-dev": {
+                "phpunit/phpunit": "^4.0|^5.0|^6.0",
+                "satooshi/php-coveralls": "^1.0"
+            },
+            "type": "library",
+            "extra": {
+                "branch-alias": {
+                    "dev-master": "3.1-dev"
+                },
+                "laravel": {
+                    "providers": [
+                        "Jenssegers\\Date\\DateServiceProvider"
+                    ],
+                    "aliases": {
+                        "Date": "Jenssegers\\Date\\Date"
+                    }
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "Jenssegers\\Date\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Jens Segers",
+                    "homepage": "https://jenssegers.com"
+                }
+            ],
+            "description": "A date library to help you work with dates in different languages",
+            "homepage": "https://github.com/jenssegers/date",
+            "keywords": [
+                "carbon",
+                "date",
+                "datetime",
+                "i18n",
+                "laravel",
+                "time",
+                "translation"
+            ],
+            "time": "2017-06-30T11:51:03+00:00"
+        },
+        {
             "name": "jeremeamia/SuperClosure",
             "version": "2.3.0",
             "source": {
@@ -1501,6 +1566,42 @@
                 "swagger"
             ],
             "time": "2016-01-25T15:38:17+00:00"
+        },
+        {
+            "name": "jwadhams/json-logic-php",
+            "version": "1.3.8",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/jwadhams/json-logic-php.git",
+                "reference": "589cb85fd80528303ffb7908069985c9c80d17f2"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/jwadhams/json-logic-php/zipball/589cb85fd80528303ffb7908069985c9c80d17f2",
+                "reference": "589cb85fd80528303ffb7908069985c9c80d17f2",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=5.4.0"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-0": {
+                    "JWadhams": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Jeremy Wadhams",
+                    "email": "jwadhams@dealerinspire.com"
+                }
+            ],
+            "description": "Build rules with complex comparisons and boolean operators, serialized as JSON, and execute them in PHP",
+            "time": "2017-07-14T22:29:50+00:00"
         },
         {
             "name": "laracasts/flash",

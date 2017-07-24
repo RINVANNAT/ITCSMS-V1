@@ -25,7 +25,9 @@
         "barryvdh/laravel-ide-helper": "^2.1",
         "proengsoft/laravel-jsvalidation": "~1.1",
         "felixkiss/uniquewith-validator": "2.*",
-        "milon/barcode": "^5.3"
+        "milon/barcode": "^5.3",
+        "jenssegers/date": "^3.2",
+        "jwadhams/json-logic-php": "^1.3"
     },
     "require-dev": {
         "fzaninotto/faker": "~1.4",

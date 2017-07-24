@@ -63,6 +63,9 @@
 
         $(document).ready(function() {
 
+            $("#competency_scoring_panel").find('input, textarea, button, select').attr('disabled','disabled');
+            $("#competency_scoring").attr('disabled','disabled');
+            $("#normal_scoring").attr('disabled','disabled');
             $('.create_course_annual').submit(function() {
                 toggleLoading(true);
             });

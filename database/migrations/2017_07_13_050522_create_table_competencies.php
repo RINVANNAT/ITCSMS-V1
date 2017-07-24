@@ -27,8 +27,6 @@ class CreateTableCompetencies extends Migration
             $table->text('properties')->nullable();
             $table->enum('type',["value","condition","calculation"])->default("value");
             $table->text('calculation_rule')->nullable();
-            $table->text('condition_rule')->nullable();
-
 
             $table->integer('create_uid')->unsigned()->index();
             $table->foreign('create_uid')

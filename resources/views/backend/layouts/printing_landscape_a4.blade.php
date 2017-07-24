@@ -68,7 +68,8 @@
                 width: 290mm;
                 height: 200mm;
                 padding: 25mm;
-                margin: 0mm auto;
+                margin: 0 auto;
+                margin-top:10mm;
                 border: 1px #D3D3D3 solid;
                 border-radius: 5px;
                 background: white;

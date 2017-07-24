@@ -1,3 +1,80 @@
+function alert_error(title,message,todo){
+    swal({
+        title: title,
+        text: message,
+        type: "error",
+        showCancelButton: false,
+        confirmButtonColor: "#DD6B55",
+        confirmButtonText: "OK",
+        closeOnConfirm: true
+    }, function(confirmed) {
+        if (confirmed) {
+            try {
+                todo();
+            } catch (e){
+                // No need to do anythign here
+            }
+        }
+    });
+    return false;
+}
+function alert_warning(title,message,todo){
+    swal({
+        title: title,
+        text: message,
+        type: "warning",
+        showCancelButton: false,
+        confirmButtonColor: "#DD6B55",
+        confirmButtonText: "OK",
+        closeOnConfirm: true
+    }, function(confirmed) {
+        if (confirmed) {
+            try {
+                todo();
+            } catch (e){
+                // No need to do anythign here
+            }
+        }
+    });
+}
+function alert_info(title,message,todo){
+    swal({
+        title: title,
+        text: message,
+        type: "info",
+        showCancelButton: false,
+        confirmButtonColor: "#DD6B55",
+        confirmButtonText: "OK",
+        closeOnConfirm: true
+    }, function(confirmed) {
+        if (confirmed) {
+            try {
+                todo();
+            } catch (e){
+                // No need to do anythign here
+            }
+        }
+    });
+}
+function alert_confirm(title,message,todo){
+    swal({
+        title: title,
+        text: message,
+        type: "warning",
+        showCancelButton: true,
+        confirmButtonColor: "#DD6B55",
+        confirmButtonText: "OK",
+        closeOnConfirm: true
+    }, function(confirmed) {
+        if (confirmed) {
+            try {
+                todo();
+            } catch (e){
+                // No need to do anythign here
+            }
+        }
+    });
+}
 function toggleVisible(className, obj) {
     var $input = $(obj);
     if ($input.prop('checked')) $(className).show();

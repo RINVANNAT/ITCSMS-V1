@@ -12,10 +12,10 @@ class PrintedCertificate extends Migration
      */
     public function up()
     {
-        Schema::create('printed_certificate', function (Blueprint $table) {
+        Schema::create('printed_certificates', function (Blueprint $table) {
 
             $table->increments('id');
-            $table->timestamp("date");
+            $table->timestamps();
             $table->integer('student_annual_id')->index();
             $table->foreign('student_annual_id')
                 ->references('id')
@@ -28,6 +28,18 @@ class PrintedCertificate extends Migration
                 ->on('course_annuals')
                 ->onDelete('cascade');
 
+            $table->integer('create_uid')->unsigned()->index();
+            $table->foreign('create_uid')
+                ->references('id')
+                ->on('users')
+                ->onDelete('NO ACTION');
+
+            $table->integer('write_uid')->unsigned()->index()->nullable();
+            $table->foreign('write_uid')
+                ->references('id')
+                ->on('users')
+                ->onDelete('NO ACTION');
+
         });
     }
 
@@ -38,6 +50,6 @@ class PrintedCertificate extends Migration
      */
     public function down()
     {
-        Schema::drop('printed_certificate');
+        Schema::drop('printed_certificates');
     }
 }
