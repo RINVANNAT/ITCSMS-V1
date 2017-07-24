@@ -223,4 +223,5 @@ function set_background_color_slot_not_allow() {
     $('.view-timetable').find('[data-time="11:30:00"]').addClass('slot-not-allow');
     $('.view-timetable').find('[data-time="12:00:00"]').addClass('slot-not-allow');
     $('.view-timetable').find('[data-time="12:30:00"]').addClass('slot-not-allow');
+    $('.view-timetable').find('[data-time="17:00:00"]').addClass('slot-not-allow');
 }
