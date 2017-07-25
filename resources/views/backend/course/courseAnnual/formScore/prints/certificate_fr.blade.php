@@ -341,7 +341,7 @@
                             </div>
                         </div>
                     </div>
-                    <div style="width: 175mm; float: left; margin-left: 8mm; margin-top: 3mm; text-align: justify">
+                    <div style="width: 175mm; float: left; margin-left: 7mm; margin-top: 3mm; text-align: justify">
                         <?php
                         $exam_day = "";
                         $start = \Carbon\Carbon::createFromFormat("d/m/Y",$exam_start);
@@ -372,15 +372,15 @@
                         <span class="blue" style="font-size: 21pt;">
                             <?php
                             if($student->grade_id == 1) {
-                                echo " A1";
+                                echo " &nbsp;A1";
                             } else if($student->grade_id == 2){
-                                echo "  A2";
+                                echo "  &nbsp;A2";
                             } else if($student->grade_id == 3){
-                                echo "  B1";
+                                echo "  &nbsp;B1";
                             } else if($student->grade_id == 4){
-                                echo "  B2";
+                                echo "  &nbsp;B2";
                             } else if($student->grade_id == 5){
-                                echo "  C1";
+                                echo "  &nbsp;C1";
                             }
                             ?>
                         </span>du Cadre Européen Commun de Référence pour les Langues (CECRL) à la session de l’examen de niveau à l’Institut {{$exam_day}}.
