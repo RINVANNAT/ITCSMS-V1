@@ -2337,6 +2337,9 @@ class CourseAnnualController extends Controller
             return count($item);
         })->max();
 
+        //dump($element['e20160930']);
+        //dd($element);//e20160930
+
         foreach ($element as $key => $value) {
 
             $string_observatoin = '';
@@ -2461,6 +2464,9 @@ class CourseAnnualController extends Controller
             $array_data[] = $emptyData['average'];
             $array_data[] = $emptyData['data_empty'];
         }
+
+
+        //dd($fail_subjects['e20160930']);
 
         return json_encode([
             'array_fail_subject' => $fail_subjects,

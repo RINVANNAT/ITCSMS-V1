@@ -894,6 +894,7 @@ trait ProficencyScoreTrait
     }
 
     public function markPrintedCertificate(Request $request){
+
         $studentAnnualIds = json_decode($request->ids);
         $course_annual_id = $request->course_annual_id;
 
