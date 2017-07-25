@@ -190,18 +190,20 @@
 
                 <div class="row description" style="margin-top: 5%;line-height: 3mm;">
 
-                    <p class="description">
-                        *Note minimale requise par épreuve : 05/25 <br/>
-                        *Seuil de réussite pour obtenir le niveau : 50/100
-                    </p>
-                    <p class="description-small">
-                        <span class="blue">Le niveau A1 :</span> niveau introductif ou de découverte
-                    </p>
+                    <div class="col-md-12 col-xs-12">
+                        <p class="description">
+                            *Note minimale requise par épreuve : 05/25 <br/>
+                            *Seuil de réussite pour obtenir le niveau : 50/100
+                        </p>
+                        <p class="description-small">
+                            <span class="blue">Le niveau A1 :</span> niveau introductif ou de découverte
+                        </p>
 
-                    <p class="description-extra-small">
-                        Cette originale attestation est délivrée en un seul exemplaire. Aucun double ne pourra être refait.
-                        Cette attestation est accompagnée par le bulletin de notes de l’étudiant (e) intéressé(e).
-                    </p>
+                        <p class="description-extra-small">
+                            Cette originale attestation est délivrée en un seul exemplaire. Aucun double ne pourra être refait. <br/>
+                            Cette attestation est accompagnée par le bulletin de notes de l’étudiant (e) intéressé(e).
+                        </p>
+                    </div>
                 </div>
             </div>
         @else
@@ -215,7 +217,7 @@
                     </p>
                 </div>
                 <div class="row">
-                    <span class="text-12" style="font-style: italic">NoRéf.: .............ITC</span>
+                    <span class="text-12" style="font-style: italic">N<sup>o</sup>Réf.: .............ITC</span>
                 </div>
 
                 <div class="row text-center attestation_title text-21">
@@ -240,7 +242,7 @@
                 <?php
                 $day = \Carbon\Carbon::createFromFormat("Y-m-d H:i:s",$student->dob)->formatLocalized('%d');
                 $month = \Carbon\Carbon::createFromFormat("Y-m-d H:i:s",$student->dob)->formatLocalized('%B');
-                $month = month_mois($month);
+                $month = strtolower(month_mois($month));
                 $year = \Carbon\Carbon::createFromFormat("Y-m-d H:i:s",$student->dob)->formatLocalized('%Y');
                 ?>
                 {{strtoupper($student->name_latin)}},
@@ -321,23 +323,21 @@
 
 
                         <div class="row" style="margin-top: 5%;line-height: 3mm;">
+                            <div class="col-md-12 col-xs-12">
+                                <p class="description">
+                                    *Note minimale requise par épreuve : 05/25 <br/>
+                                    *Seuil de réussite pour obtenir le niveau : 50/100
+                                </p>
+                                <p class="description-small">
+                                    <span class="blue">Le niveau A1 :</span> niveau introductif ou de découverte
+                                </p>
 
-                            <p class="description">
-                                *Note minimale requise par épreuve : 05/25 <br/>
-                                *Seuil de réussite pour obtenir le niveau : 50/100
-                            </p>
-                            <p class="description-small">
-                                <span class="blue">Le niveau A1 :</span> niveau introductif ou de découverte
-                            </p>
-
-                            <p class="description-extra-small">
-                                Cette originale attestation est délivrée en un seul exemplaire. Aucun double ne pourra être refait.
-                                Cette attestation est accompagnée par le bulletin de notes de l’étudiant (e) intéressé(e).
-                            </p>
+                                <p class="description-extra-small">
+                                    Cette originale attestation est délivrée en un seul exemplaire. Aucun double ne pourra être refait. <br/>
+                                    Cette attestation est accompagnée par le bulletin de notes de l’étudiant (e) intéressé(e).
+                                </p>
+                            </div>
                         </div>
-
-
-
                     </div>
                     <div style="width: 173mm; float: left; margin-left: 4mm; text-align: justify">
                         <?php
@@ -345,13 +345,13 @@
                         $start = \Carbon\Carbon::createFromFormat("d/m/Y",$exam_start);
                         $exam_start_day = $start->formatLocalized('%d');
                         $exam_start_month = $start->formatLocalized('%B');
-                        $exam_start_month = month_mois($exam_start_month);
+                        $exam_start_month = strtolower(month_mois($exam_start_month));
                         $exam_start_year = $start->formatLocalized('%Y');
 
                         $end = \Carbon\Carbon::createFromFormat("d/m/Y",$exam_end);
                         $exam_end_day = $end->formatLocalized('%d');
                         $exam_end_month = $end->formatLocalized('%B');
-                        $exam_end_month = month_mois($exam_end_month);
+                        $exam_end_month = strtolower(month_mois($exam_end_month));
                         $exam_end_year = $end->formatLocalized('%Y');
 
 
@@ -392,9 +392,13 @@
                         <div class="pull-right" style="margin-top: 8mm; margin-right: 26mm">
                             <p class="text-center title" style="font-size: 12pt">
                                 <?php
-                                $now = \Carbon\Carbon::now();
+                                if(($issued_date == null) or ($issued_date == "")){
+                                    $now = \Carbon\Carbon::now();
+                                } else {
+                                    $now = \Carbon\Carbon::createFromFormat("d/m/Y",$issued_date);
+                                }
                                 $c_day = $now->formatLocalized('%d');
-                                $c_month = month_mois($now->formatLocalized('%B'));
+                                $c_month = strtolower(month_mois($now->formatLocalized('%B')));
                                 $c_year = $now->formatLocalized('%Y');
                                 ?>
                                 <b>Phnom Penh, ITC, le {{$c_day." ".$c_month." ".$c_year}}</b>

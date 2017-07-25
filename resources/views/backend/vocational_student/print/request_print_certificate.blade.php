@@ -13,6 +13,8 @@
     {!! Html::style('plugins/iCheck/square/red.css') !!}
     {!! Html::style('plugins/DataTables-1.10.15/media/css/dataTables.bootstrap.min.css') !!}
     {!! Html::style('plugins/daterangepicker/daterangepicker-bs3.css') !!}
+    {!! Html::style('plugins/datetimepicker/bootstrap-datetimepicker.min.css') !!}
+
     <style>
         .text-10{
             font-size: 10px !important;
@@ -49,8 +51,10 @@
             </div>
 
             <div class="pull-right">
-                <label>Issued by: </label>
-                <input type="text" name="issued_by" class="form-control" placeholder="Empty if director"/>
+                <input type="text" name="issued_by" class="form-control"  placeholder="Issued by"/>
+            </div>
+            <div class="pull-right" style="margin-right: 5px;">
+                <input type="text" name="issued_date" class="form-control"  placeholder="Issued date"/>
             </div>
 
         </div><!-- /.box-header -->
@@ -80,6 +84,7 @@
     {!! Html::script('plugins/DataTables-1.10.15/media/js/dataTables.bootstrap.min.js') !!}
     {!! Html::script('plugins/daterangepicker/moment.min.js') !!}
     {!! Html::script('plugins/daterangepicker/daterangepicker.js') !!}
+    {!! Html::script('plugins/datetimepicker/bootstrap-datetimepicker.min.js') !!}
     <script>
         var selected_ids = null;
         var print_url = "{{ route('course_annual.competency.print_certificate') }}";
@@ -106,11 +111,13 @@
                 var exam_start = $('input[name="daterange"]').data('daterangepicker').startDate;
                 var exam_end = $('input[name="daterange"]').data('daterangepicker').endDate;
                 var issued_by = $('input[name="issued_by"]').val();
+                var issued_date = $('input[name="issued_date"]').val();
                 // Open new window to print
                 PopupCenterDual(
                         print_url
                         +"?course_annual_id="+course_annual_id
                         +"&issued_by="+issued_by
+                        +"&issued_date="+issued_date
                         +'&ids='+JSON.stringify(selected_ids)
                         +'&exam_start='+ exam_start.format("DD/MM/YYYY")
                         +'&exam_end='+ exam_end.format("DD/MM/YYYY"),
@@ -137,6 +144,9 @@
         $(function() {
             $('input[name="daterange"]').daterangepicker({
                 format: 'DD MMM YYYY'
+            });
+            $('input[name="issued_date"]').datetimepicker({
+                format: 'DD/MM/YYYY'
             });
             oTable = $('#student-table').DataTable({
                 processing: true,
