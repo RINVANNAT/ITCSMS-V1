@@ -140,7 +140,7 @@
                     <tbody>
 
                     <tr class="set_border">
-                        <td rowspan="2" style="text-align:center; vertical-align:middle;" > ÉCRIT </td>
+                        <td rowspan="2" class="td_result" style="text-align:center; vertical-align:middle;" > ÉCRIT </td>
                         <td>Compréhension</td>
                         <td class="td_result">
                             {!! $ce !!}
@@ -155,7 +155,7 @@
                     </tr>
 
                     <tr class="set_border">
-                        <td rowspan="2" style="text-align:center; vertical-align:middle;"  > ORAL </td>
+                        <td rowspan="2" class="td_result" style="text-align:center; vertical-align:middle;"  > ORAL </td>
                         <td>Compréhension</td>
                         <td class="td_result">
                             {!! $co !!}
@@ -217,7 +217,7 @@
                     </p>
                 </div>
                 <div class="row">
-                    <span class="text-12" style="font-style: italic">N<sup>o</sup>Réf.: .............ITC</span>
+                    <span class="text-12" style="font-style: italic; margin-left: 5mm">N<sup>o</sup>Réf.: .............ITC</span>
                 </div>
 
                 <div class="row text-center attestation_title text-21">
@@ -256,14 +256,14 @@
             </span>
                 </div>
 
-                <div class="row" style="margin-top: 7mm">
+                <div class="row" style="margin-top: 4mm">
 
                     <div class="no-padding text-center" style="width: 63mm;float: left">
 
-                <span>
-                    Bulletin de notes
-                </span>
-                        <table class="table pass-result" style="width: 100%;font-size: 12px; line-height: 3mm">
+                        <span>
+                            Bulletin de notes
+                        </span>
+                        <table class="table pass-result" style="width: 100%;font-size: 12px; line-height: 3mm; margin-left: 5mm">
                             <thead>
                             <tr class="set_border">
                                 <th colspan="2" rowspan="2">Compétences évaluées comblées</th>
@@ -273,7 +273,7 @@
                             <tbody>
 
                             <tr class="set_border">
-                                <td rowspan="2" style="text-align:center; vertical-align:middle;" > ÉCRIT </td>
+                                <td rowspan="2" class="td_result" style="text-align:center; vertical-align:middle;" > ÉCRIT </td>
                                 <td>Compréhension</td>
                                 <td class="td_result">
                                     {!! $ce !!}
@@ -288,7 +288,7 @@
                             </tr>
 
                             <tr class="set_border">
-                                <td rowspan="2" style="text-align:center; vertical-align:middle;"  > ORAL </td>
+                                <td rowspan="2" class="td_result" style="text-align:center; vertical-align:middle;"  > ORAL </td>
                                 <td>Compréhension</td>
                                 <td class="td_result">
                                     {!! $co !!}
@@ -323,7 +323,7 @@
 
 
                         <div class="row" style="margin-top: 5%;line-height: 3mm;">
-                            <div class="col-md-12 col-xs-12">
+                            <div class="col-md-12 col-xs-12" style="margin-left: 5mm">
                                 <p class="description">
                                     *Note minimale requise par épreuve : 05/25 <br/>
                                     *Seuil de réussite pour obtenir le niveau : 50/100
@@ -339,7 +339,7 @@
                             </div>
                         </div>
                     </div>
-                    <div style="width: 173mm; float: left; margin-left: 4mm; text-align: justify">
+                    <div style="width: 173mm; float: left; margin-left: 9mm; text-align: justify">
                         <?php
                         $exam_day = "";
                         $start = \Carbon\Carbon::createFromFormat("d/m/Y",$exam_start);
