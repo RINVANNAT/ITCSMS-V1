@@ -313,15 +313,13 @@
             fixedColumnsLeft: 3,
             filters: true,
             dropdownMenu: ['filter_by_condition', 'filter_action_bar'],
-            className: "htRight",
+            className: "htRight 4",
             cells: function (row, col, prop) {
 
                 this.renderer = colorRenderer;
 
                 var cellProperties = {};
                 if (prop === 'Redouble') {
-                    cellProperties.readOnly = false;
-                } else if (prop === 'Observation') {
                     cellProperties.readOnly = false;
                 } else if (prop === 'Rattrapage') {
                     cellProperties.readOnly = false;
@@ -341,19 +339,19 @@
                 }
 
                 if (prop == 'number') {
-                    cellProperties.className = 'htLeft';
+                    cellProperties.className = 'htLeft'+' row_'+row;
                 } else if (prop == 'student_name') {
-                    cellProperties.className = 'htLeft';
+                    cellProperties.className = 'htLeft'+' row_'+row;
 
                 } else if (prop == 'student_gender') {
-                    cellProperties.className = 'htLeft';
+                     cellProperties.className = 'htLeft'+' row_'+row;
 
                 } else if (prop == 'student_id_card') {
-                    cellProperties.className = 'htLeft';
+                     cellProperties.className = 'htLeft'+' row_'+row;
                 } else if (prop == 'Observation') {
-                    cellProperties.className = 'htLeft';
+                     cellProperties.className = 'htLeft'+' row_'+row;
                 } else if (prop == 'Remark') {
-                    cellProperties.className = 'htLeft';
+                    cellProperties.className = 'htLeft'+' row_'+row;
                 }
 
                 @permission('evaluate-student')
@@ -394,12 +392,12 @@
                 return false;
             },
             afterScrollHorizontally: function () {
-
+                setSelectedRow();
                 return false;
             },
 
             afterScrollVertically:function () {
-
+                setSelectedRow();
                 return false;
             },
 

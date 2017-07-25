@@ -75,6 +75,7 @@ trait ScoreProp {
             return DB::table('group_student_annuals')
                 ->whereIn('group_id', $groupIds)
                 ->where('semester_id', $semesterId)
+                ->whereNULL('department_id')
                 ->lists('student_annual_id');
         }
 
