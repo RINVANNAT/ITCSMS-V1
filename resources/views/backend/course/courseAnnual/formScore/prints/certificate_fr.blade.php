@@ -178,7 +178,7 @@
                             Note Finale
                         </td>
 
-                        <td style="border-bottom: 0px !important; border-left: none !important; border-right: none !important;">
+                        <td style="border-bottom: 0px !important; border-left: none !important; border-right: none !important; font-style: normal">
                             {!! $total !!}
                         </td>
 
@@ -312,7 +312,7 @@
                                     Note Finale
                                 </td>
 
-                                <td style="border-bottom: 0px !important; border-left: none !important; border-right: none !important;">
+                                <td style="border-bottom: 0px !important; border-left: none !important; border-right: none !important; font-style: normal">
                                     {!! $total !!}
                                 </td>
 
