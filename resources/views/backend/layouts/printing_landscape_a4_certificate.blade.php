@@ -95,7 +95,7 @@
                     font: 12pt "Tahoma";
                 }
                 .page {
-                    padding: 15mm;
+                    padding: 15mm 15mm 15mm 27mm;
                     margin: 0 auto;
                     border: initial;
                     border-radius: initial;

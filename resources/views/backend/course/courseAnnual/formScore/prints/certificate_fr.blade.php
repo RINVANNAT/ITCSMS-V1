@@ -1,4 +1,4 @@
-@extends('backend.layouts.printing_landscape_a4')
+@extends('backend.layouts.printing_landscape_a4_certificate')
 @section('title')
     ITC-SMS | Certificate
 @stop
@@ -13,7 +13,6 @@
             font-family: "Calibri Light" !important;
         }
         .title {
-            font-weight: bold;
             line-height: 4mm;
         }
 
@@ -36,17 +35,23 @@
 
         .attestation_title {
             margin-top: 10mm;
-            font-size: 24pt;
+            font-size: 23pt;
         }
         .description{
             font-size: 9pt; font-family: 'Calibri Light (Headings)'; text-align: left
+        }
+        .description-small{
+            font-size: 8pt; font-family: 'Calibri Light (Headings)'; text-align: left
+        }
+        .description-extra-small{
+            font-size: 6pt; font-family: 'Calibri Light (Headings)'; text-align: left
         }
 
         .panel_top_8{
             margin-top: 5%;
         }
         .red_col {
-            color: red;
+            color: red !important;
         }
         .set_border_ {
             border: 1px solid black !important;
@@ -60,6 +65,7 @@
         }
         table tr td {
             border: 1px solid black !important;
+            font-style: italic;
             font-family: "Calibri Light";
         }
         table.pass-result, table.pass-result tr, table.pass-result td{
@@ -67,6 +73,10 @@
         }
         table.fail-result, table.fail-result tr, table.fail-result td {
             font-size: 12pt;
+        }
+
+        .td_result{
+            font-style: normal !important;
         }
 
     </style>
@@ -132,14 +142,14 @@
                     <tr class="set_border">
                         <td rowspan="2" style="text-align:center; vertical-align:middle;" > ÉCRIT </td>
                         <td>Compréhension</td>
-                        <td >
+                        <td class="td_result">
                             {!! $ce !!}
                         </td>
                     </tr>
                     <tr class="set_border">
 
                         <td >Production</td>
-                        <td>
+                        <td class="td_result">
                             {!! $pe !!}
                         </td>
                     </tr>
@@ -147,14 +157,14 @@
                     <tr class="set_border">
                         <td rowspan="2" style="text-align:center; vertical-align:middle;"  > ORAL </td>
                         <td>Compréhension</td>
-                        <td>
+                        <td class="td_result">
                             {!! $co !!}
                         </td>
                     </tr>
                     <tr class="set_border">
 
                         <td >Production</td>
-                        <td>
+                        <td class="td_result">
                             {!! $po !!}
                         </td>
                     </tr>
@@ -180,15 +190,15 @@
 
                 <div class="row description" style="margin-top: 5%;line-height: 3mm;">
 
-                    <p>
+                    <p class="description">
                         *Note minimale requise par épreuve : 05/25 <br/>
                         *Seuil de réussite pour obtenir le niveau : 50/100
                     </p>
-                    <p>
-                        <span class="blue">Le niveau A1d :</span> niveau introductif ou de découverte
+                    <p class="description-small">
+                        <span class="blue">Le niveau A1 :</span> niveau introductif ou de découverte
                     </p>
 
-                    <p>
+                    <p class="description-extra-small">
                         Cette originale attestation est délivrée en un seul exemplaire. Aucun double ne pourra être refait.
                         Cette attestation est accompagnée par le bulletin de notes de l’étudiant (e) intéressé(e).
                     </p>
@@ -214,13 +224,13 @@
                    </span>
                 </div>
 
-                <div class="row text-center" style="font-family: 'Calibri Light'; font-size: 12pt; margin-top: 15mm">
+                <div class="row text-center" style="font-family: 'Calibri Light'; font-size: 12pt; margin-top: 10mm">
             <span>
                 Le Directeur de l’Institut de Technologie du Cambodge atteste que 
             </span>
                 </div>
 
-                <div class="row text-center panel_top_8" style="font-family: 'Calibri Light'; font-size: 12pt; margin-top: 12mm; font-weight: bold">
+                <div class="row text-center panel_top_8" style="font-family: 'Calibri Light'; font-size: 12pt; margin-top: 10mm; font-weight: bold">
             <span>
                 @if($student->gender_id == 1)
                     M.
@@ -246,7 +256,7 @@
 
                 <div class="row" style="margin-top: 7mm">
 
-                    <div class="no-padding text-center" style="width: 70mm;float: left">
+                    <div class="no-padding text-center" style="width: 63mm;float: left">
 
                 <span>
                     Bulletin de notes
@@ -263,14 +273,14 @@
                             <tr class="set_border">
                                 <td rowspan="2" style="text-align:center; vertical-align:middle;" > ÉCRIT </td>
                                 <td>Compréhension</td>
-                                <td >
+                                <td class="td_result">
                                     {!! $ce !!}
                                 </td>
                             </tr>
                             <tr class="set_border">
 
                                 <td >Production</td>
-                                <td>
+                                <td class="td_result">
                                     {!! $pe !!}
                                 </td>
                             </tr>
@@ -278,14 +288,14 @@
                             <tr class="set_border">
                                 <td rowspan="2" style="text-align:center; vertical-align:middle;"  > ORAL </td>
                                 <td>Compréhension</td>
-                                <td>
+                                <td class="td_result">
                                     {!! $co !!}
                                 </td>
                             </tr>
                             <tr class="set_border">
 
                                 <td >Production</td>
-                                <td>
+                                <td class="td_result">
                                     {!! $po !!}
                                 </td>
                             </tr>
@@ -310,17 +320,17 @@
                         {!! $admission !!}
 
 
-                        <div class="row description" style="margin-top: 5%;line-height: 3mm;">
+                        <div class="row" style="margin-top: 5%;line-height: 3mm;">
 
-                            <p>
+                            <p class="description">
                                 *Note minimale requise par épreuve : 05/25 <br/>
                                 *Seuil de réussite pour obtenir le niveau : 50/100
                             </p>
-                            <p>
+                            <p class="description-small">
                                 <span class="blue">Le niveau A1 :</span> niveau introductif ou de découverte
                             </p>
 
-                            <p>
+                            <p class="description-extra-small">
                                 Cette originale attestation est délivrée en un seul exemplaire. Aucun double ne pourra être refait.
                                 Cette attestation est accompagnée par le bulletin de notes de l’étudiant (e) intéressé(e).
                             </p>
@@ -329,7 +339,7 @@
 
 
                     </div>
-                    <div style="width: 170mm; float: left; margin-left: 5mm; text-align: justify">
+                    <div style="width: 173mm; float: left; margin-left: 4mm; text-align: justify">
                         <?php
                         $exam_day = "";
                         $start = \Carbon\Carbon::createFromFormat("d/m/Y",$exam_start);
@@ -379,7 +389,7 @@
                             Pour valoir ce que de droit.
                         </p>
 
-                        <div class="pull-right" style="margin-top: 8mm">
+                        <div class="pull-right" style="margin-top: 8mm; margin-right: 26mm">
                             <p class="text-center title" style="font-size: 12pt">
                                 <?php
                                 $now = \Carbon\Carbon::now();
