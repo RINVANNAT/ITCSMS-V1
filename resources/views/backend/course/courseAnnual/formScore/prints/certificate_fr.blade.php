@@ -44,6 +44,7 @@
             font-size: 8pt; font-family: 'Calibri Light (Headings)'; text-align: left
         }
         .description-extra-small{
+            font-style: italic;
             font-size: 6pt; font-family: 'Calibri Light (Headings)'; text-align: left
         }
 
@@ -173,7 +174,7 @@
 
                         <td style="border-bottom: 0px !important; border-left: none !important; border-right: none !important;"> </td>
 
-                        <td style="border-bottom: 0px !important; border-left: none !important; border-right: none !important;">
+                        <td style="border-bottom: 0px !important; border-left: none !important; border-right: none !important; font-style: normal">
                             Note Finale
                         </td>
 
