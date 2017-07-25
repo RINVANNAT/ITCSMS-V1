@@ -264,7 +264,7 @@
                 <div class="row">
 
                     <div class="no-padding text-center" style="width: 63mm;float: left">
-                        <table class="table pass-result" style="width: 100%;font-size: 12px; line-height: 3mm; margin-top: 5mm; margin-left: 5mm;">
+                        <table class="table pass-result" style="width: 100%;font-size: 12px; line-height: 3mm; margin: 5mm 0 3mm 5mm;">
                             <thead>
                             <tr class="set_border">
                                 <th colspan="2" rowspan="2">Compétences évaluées comblées</th>
@@ -340,7 +340,7 @@
                             </div>
                         </div>
                     </div>
-                    <div style="width: 173mm; float: left; margin-left: 9mm; text-align: justify">
+                    <div style="width: 175mm; float: left; margin-left: 8mm; margin-top: 3mm; text-align: justify">
                         <?php
                         $exam_day = "";
                         $start = \Carbon\Carbon::createFromFormat("d/m/Y",$exam_start);
