@@ -2935,7 +2935,6 @@ class CourseAnnualController extends Controller
                 $studentAnnualIds = $studentAnnualIds
                     ->whereNull('group_student_annuals.department_id')
                     ->lists('student_annual_id');
-
             }
 
             $students = $students->whereIn('studentAnnuals.id', $studentAnnualIds);
@@ -3720,8 +3719,6 @@ class CourseAnnualController extends Controller
     {
         //----update remark by student id_card in table student_annuals
 
-
-        dd($request->all());
         if (Auth::user()->allow('write-student-remark')) {
             $student = DB::table('students')->where('id_card', $request->student_id_card)->first();
 
@@ -4657,13 +4654,11 @@ class CourseAnnualController extends Controller
     public function updateStudentStatus(Request $request)
     {
 
-
         if (auth()->user()->allow("evaluate-student")) {
 
             $academicYearId = $request->academic_year_id;
             $studentIdCard = $request->student_id_card;
             $redouble = $request->redouble;
-
 
             $student = Student::where('id_card', $studentIdCard)->select('students.id as student_id', 'students.radie')->first();
 

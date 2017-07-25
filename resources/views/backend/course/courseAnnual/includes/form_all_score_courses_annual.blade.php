@@ -424,44 +424,62 @@
 
                         if (columnIndex == 'Redouble') {
 
-                            if (oldValue != newValue) {
 
-                                /*if(newValue == 'P') {
-                                 var colInt = setting.nestedHeaders;
-                                 //hotInstance.setDataAtCell(rowIndex, colInt[1].indexOf("redouble"), '');
-                                 }*/
+                            if (newValue != '' && newValue != null) {
 
-                                var remark_rul = '{{route('student.update_status')}}';
-                                var baseData_redouble = {
-                                    student_id_card: col_student_id[rowIndex],
-                                    redouble: newValue,
-                                    academic_year_id: $('#filter_academic_year :selected').val(),
-                                    old_value: oldValue
-                                };
-
-                                if (newValue != '' && newValue != null) {
-                                    $.ajax({
-                                        type: 'POST',
-                                        url: remark_rul,
-                                        data: baseData_redouble,
-                                        dataType: "json",
-                                        success: function (resultData) {
-
-                                            if (resultData.status) {
-                                                notify('success', resultData.message, 'Info');
-                                                //filter_table()
-                                            } else {
-
-                                                notify('error', resultData.message, 'Attention');
-                                            }
-                                        }
-                                    });
+                                var check_val = true;
+                                var array_val = [];
+                                if ($.trim($('#filter_degree :selected').text().toUpperCase()) == 'ENGINEER') {
+                                    array_val = ['Red. ' + 'I' + $('#filter_grade :selected').val(), 'Radié', 'P'] ;
+                                } else {
+                                    array_val = ['Red. ' + "T" + $('#filter_grade :selected').val(), 'Radié', 'P'];
                                 }
+
+                                $.each(array_val, function (key, arrayValue) {
+
+                                    if(newValue != arrayValue) {
+                                        check_val = false;
+                                    }
+                                });
+
+                                if (oldValue != newValue) {
+
+                                    if(check_val) {
+
+                                        var remark_rul = '{{route('student.update_status')}}';
+                                        var baseData_redouble = {
+                                            student_id_card: col_student_id[rowIndex],
+                                            redouble: newValue,
+                                            academic_year_id: $('#filter_academic_year :selected').val(),
+                                            old_value: oldValue
+                                        };
+
+                                        $.ajax({
+                                            type: 'POST',
+                                            url: remark_rul,
+                                            data: baseData_redouble,
+                                            dataType: "json",
+                                            success: function (resultData) {
+
+                                                if (resultData.status) {
+                                                    notify('success', resultData.message, 'Info');
+                                                    //filter_table()
+                                                } else {
+
+                                                    notify('error', resultData.message, 'Attention');
+                                                }
+                                            }
+                                        });
+                                    } else {
+                                        notify('error', 'Please choose value by double click on cell', 'Danger')
+                                    }
+                                }
+
                             }
                         }
 
                         @endauth
-                                @permission('write-student-remark')
+                        @permission('write-student-remark')
 
                         if (columnIndex == 'Remark') {
                             var remark_rul = '{{route('course_annual.save_each_cell_remark')}}';
@@ -478,7 +496,11 @@
                                 dataType: "json",
                                 success: function (resultData) {
 
-                                    //---call back function ....do some stuff
+                                    notify('success', 'Marked!', 'Info');
+                                },
+                                error: function (response) {
+                                    console.log(response);
+                                    notify('error', 'Something went wrong!', 'Info');
                                 }
                             });
                         }
