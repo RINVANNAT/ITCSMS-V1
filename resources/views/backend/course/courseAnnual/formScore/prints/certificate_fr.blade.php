@@ -209,7 +209,7 @@
             </div>
         @else
             <div class="page">
-                <div class="row text-center title" style="margin-top: 10mm;">
+                <div class="row text-center title" style="margin-top: 10mm; margin-left: -17mm">
                     <p class="text-20">
                         Institut de Technologie du Cambodge
                     </p>
@@ -218,22 +218,22 @@
                     </p>
                 </div>
                 <div class="row">
-                    <span class="text-12" style="font-style: italic; margin-left: 5mm">N<sup>o</sup>Réf.: .............ITC</span>
+                    <span class="text-13" style="font-style: italic; margin-left: 5mm">N<sup>o</sup>Réf.: .................ITC</span>
                 </div>
 
-                <div class="row text-center attestation_title text-21">
+                <div class="row text-center attestation_title text-21" style="margin-left: -17mm">
                    <span class="blue">
                        ATTESTATION de NIVEAU de LANGUE FRANÇAISE
                    </span>
                 </div>
 
-                <div class="row text-center" style="font-family: 'Calibri Light'; font-size: 12pt; margin-top: 10mm">
-            <span>
-                Le Directeur de l’Institut de Technologie du Cambodge atteste que 
-            </span>
+                <div class="row text-center" style="font-family: 'Calibri Light'; font-size: 12pt; margin-top: 10mm;margin-left: -17mm">
+                    <span>
+                        Le Directeur de l’Institut de Technologie du Cambodge atteste que 
+                    </span>
                 </div>
 
-                <div class="row text-center panel_top_8" style="font-family: 'Calibri Light'; font-size: 12pt; margin-top: 10mm; font-weight: bold">
+                <div class="row text-center panel_top_8" style="font-family: 'Calibri Light'; font-size: 12pt; margin-top: 10mm; font-weight: bold;margin-left: -17mm">
             <span>
                 @if($student->gender_id == 1)
                     M.
@@ -335,7 +335,7 @@
                                 </p>
 
                                 <p class="description-extra-small">
-                                    Cette originale attestation est délivrée en un seul exemplaire. Aucun double ne pourra être refait. <br/>
+                                    Cette originale attestation est délivrée en un seul exemplaire. <br/>Aucun double ne pourra être refait. <br/>
                                     Cette attestation est accompagnée par le bulletin de notes de l’étudiant (e) intéressé(e).
                                 </p>
                             </div>
