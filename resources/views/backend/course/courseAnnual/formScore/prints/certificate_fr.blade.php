@@ -110,7 +110,7 @@
                     if((strtolower($competency_score->score) == "non admis") or (strtolower($competency_score->score) == "non admise")){
                         $is_admis = false;
                     }
-                    $admission = '<span class="red_col">'.strtoupper($competency_score->score).'</span>';
+                    $admission = '<span style="margin-left: 7mm" class="red_col">'.strtoupper($competency_score->score).'</span>';
                 }
             }
         }
@@ -256,14 +256,15 @@
             </span>
                 </div>
 
-                <div class="row" style="margin-top: 4mm">
+                <div class="row" style="margin-bottom: -2mm">
+                    <span style="margin-left: 22mm; line-height: 3mm;">
+                        Bulletin de notes
+                    </span>
+                </div>
+                <div class="row">
 
                     <div class="no-padding text-center" style="width: 63mm;float: left">
-
-                        <span>
-                            Bulletin de notes
-                        </span>
-                        <table class="table pass-result" style="width: 100%;font-size: 12px; line-height: 3mm; margin-left: 5mm">
+                        <table class="table pass-result" style="width: 100%;font-size: 12px; line-height: 3mm; margin-top: 5mm; margin-left: 5mm;">
                             <thead>
                             <tr class="set_border">
                                 <th colspan="2" rowspan="2">Compétences évaluées comblées</th>
@@ -381,11 +382,10 @@
                                 echo "C1";
                             }
                             ?>
-                        </span>
-                            du Cadre européen commun de référence pour les langues (CECRL) à la session de l’examen de niveau à l’Institut {{$exam_day}}.
+                        </span>du Cadre Européen Commun de Référence pour les Langues (CECRL) à la session de l’examen de niveau à l’Institut {{$exam_day}}.
                         </p>
 
-                        <p style="font-family: 'Calibri Light'; font-size: 12pt; font-style: italic">
+                        <p style="font-family: 'Calibri Light'; font-size: 12pt; font-style: italic; margin-top: 2mm;margin-left: 18mm">
                             Pour valoir ce que de droit.
                         </p>
 
@@ -401,7 +401,7 @@
                                 $c_month = strtolower(month_mois($now->formatLocalized('%B')));
                                 $c_year = $now->formatLocalized('%Y');
                                 ?>
-                                <b>Phnom Penh, ITC, le {{$c_day." ".$c_month." ".$c_year}}</b>
+                                Phnom Penh, ITC, le {{$c_day." ".$c_month." ".$c_year}}
                             <p style="margin-top: -10px !important;">
                                 Le Directeur de l’Institut de Technologie du Cambodge, <br/>
                                 <span style="font-style: italic">{{$issued_by}}</span>
