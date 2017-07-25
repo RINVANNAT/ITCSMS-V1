@@ -341,7 +341,7 @@
                             </div>
                         </div>
                     </div>
-                    <div style="width: 175mm; float: left; margin-left: 7mm; margin-top: 3mm; text-align: justify">
+                    <div style="width: 177mm; float: left; margin-left: 6mm; margin-top: 3mm; text-align: justify">
                         <?php
                         $exam_day = "";
                         $start = \Carbon\Carbon::createFromFormat("d/m/Y",$exam_start);
