@@ -372,15 +372,15 @@
                         <span class="blue" style="font-size: 21pt;">
                             <?php
                             if($student->grade_id == 1) {
-                                echo " &nbsp;A1";
+                                echo " A1";
                             } else if($student->grade_id == 2){
-                                echo "  &nbsp;A2";
+                                echo "  A2";
                             } else if($student->grade_id == 3){
-                                echo "  &nbsp;B1";
+                                echo "  B1";
                             } else if($student->grade_id == 4){
-                                echo "  &nbsp;B2";
+                                echo "  B2";
                             } else if($student->grade_id == 5){
-                                echo "  &nbsp;C1";
+                                echo "  C1";
                             }
                             ?>
                         </span>du Cadre Européen Commun de Référence pour les Langues (CECRL) à la session de l’examen de niveau à l’Institut {{$exam_day}}.
