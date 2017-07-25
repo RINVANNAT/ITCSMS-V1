@@ -30,7 +30,7 @@
             font-size: 20pt;
         }
         .text-21{
-            font-size: 24pt;
+            font-size: 23pt;
         }
 
         .attestation_title {
@@ -44,7 +44,7 @@
             font-size: 8pt; font-family: 'Calibri Light (Headings)'; text-align: left
         }
         .description-extra-small{
-            font-style: italic;
+            font-style: italic !important;
             font-size: 6pt; font-family: 'Calibri Light (Headings)'; text-align: left
         }
 
@@ -265,10 +265,10 @@
                 <div class="row">
 
                     <div class="no-padding text-center" style="width: 63mm;float: left">
-                        <table class="table pass-result" style="width: 100%;font-size: 12px; line-height: 3mm; margin: 5mm 0 3mm 5mm;">
+                        <table class="table pass-result" style="width: 100%;font-size: 12px; line-height: 3mm; margin: 5mm 0 3mm 4mm;">
                             <thead>
                             <tr class="set_border">
-                                <th colspan="2" rowspan="2">Compétences évaluées comblées</th>
+                                <th colspan="2" rowspan="2" style="text-align: center">Compétences évaluées comblées</th>
                                 <th style="text-align: center">Note*</th>
                             </tr>
                             </thead>
@@ -308,7 +308,7 @@
 
                                 <td style="border-bottom: 0px !important; border-left: none !important; border-right: none !important;"> </td>
 
-                                <td style="border-bottom: 0px !important; border-left: none !important; border-right: none !important;">
+                                <td style="border-bottom: 0px !important; border-left: none !important; border-right: none !important; font-style: normal">
                                     Note Finale
                                 </td>
 
@@ -372,15 +372,15 @@
                         <span class="blue" style="font-size: 21pt;">
                             <?php
                             if($student->grade_id == 1) {
-                                echo "A1";
+                                echo " &nbsp;A1";
                             } else if($student->grade_id == 2){
-                                echo "A2";
+                                echo "  &nbsp;A2";
                             } else if($student->grade_id == 3){
-                                echo "B1";
+                                echo "  &nbsp;B1";
                             } else if($student->grade_id == 4){
-                                echo "B2";
+                                echo "  &nbsp;B2";
                             } else if($student->grade_id == 5){
-                                echo "C1";
+                                echo "  &nbsp;C1";
                             }
                             ?>
                         </span>du Cadre Européen Commun de Référence pour les Langues (CECRL) à la session de l’examen de niveau à l’Institut {{$exam_day}}.
