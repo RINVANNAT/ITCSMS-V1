@@ -23,7 +23,10 @@
         .toolbar {
             float: left;
         }
-        .dataTables_filter, .dataTables_info { display: none; }
+
+        .dataTables_filter, .dataTables_info {
+            display: none;
+        }
     </style>
 @stop
 
@@ -72,8 +75,11 @@
                     @include('backend.schedule.timetables.includes.partials.timetable-assignment')
                 </div>
             @else
-                <div class="col-md-12">
+                <div class="col-xs-12 col-sm-9 col-md-9">
                     @include('backend.schedule.timetables.includes.partials.timetable-viewer')
+                </div>
+                <div class="col-xs-12 col-sm-3 col-md-3">
+                    @include('backend.schedule.timetables.includes.partials.rest-course-session')
                 </div>
             @endif
         </div>
@@ -97,6 +103,100 @@
 
     {{--timetable management--}}
     <script type="text/javascript">
+
+        function get_groups() {
+            toggleLoading(true);
+            $.ajax({
+                type: 'POST',
+                url: '/admin/schedule/timetables/get_groups',
+                data: $('#options-filter').serialize(),
+                success: function (response) {
+                    if (response.status === true) {
+                        var group_item = '';
+                        $.each(response.groups, function (key, val) {
+                            group_item += '<option value="' + val.id + '">' + val.name + '</option>';
+                        });
+
+                        $('select[name="group"]').html(group_item);
+                    }
+                    else {
+                        $('select[name="group"]').html('');
+                    }
+                },
+                error: function () {
+                    swal(
+                        'Oops...',
+                        'Something went wrong!',
+                        'error'
+                    );
+                },
+                complete: function () {
+                    get_weeks($('select[name="semester"] :selected').val());
+                    get_rest_course_sessions();
+                    toggleLoading(false);
+                }
+            })
+        }
+
+        function get_rest_course_sessions() {
+            toggleLoading(true);
+            $.ajax({
+                type: 'POST',
+                url: '/admin/schedule/timetables/get_course_sessions',
+                data: $('#options-filter').serialize(),
+                success: function (response) {
+                    if (response.status === true) {
+                        var course_session_item = '';
+                        $.each(response.course_sessions, function (key, val) {
+                            if (val.teacher_name === null) {
+                                course_session_item += '<li class="course-item disabled">';
+                            }
+                            else {
+                                course_session_item += '<li class="course-item">';
+                            }
+                            course_session_item += '<span class="handle ui-sortable-handle">' +
+                                '<i class="fa fa-ellipsis-v"></i> ' +
+                                '<i class="fa fa-ellipsis-v"></i>' +
+                                '</span>' +
+                                '<span class="text course-name">' + val.course_name + '</span><br>';
+                            if (val.teacher_name === null) {
+                                course_session_item += '<span style="margin-left: 28px;" class="teacher-name bg-danger badge">Unsigned</span><br/>';
+                            } else {
+                                course_session_item += '<span style="margin-left: 28px;" class="teacher-name">' + val.teacher_name + '</span><br/>';
+                            }
+                            if (val.tp !== 0) {
+                                course_session_item += '<span style="margin-left: 28px;" class="course-type">TP</span> : ' +
+                                    '<span class="times">' + val.remaining + '</span> H'
+                            }
+                            else if (val.td !== 0) {
+                                course_session_item += '<span style="margin-left: 28px;" class="course-type">TD</span> : ' +
+                                    '<span class="times">' + val.remaining + '</span> H'
+                            }
+                            else {
+                                course_session_item += '<span style="margin-left: 28px;" class="course-type">Course</span> : ' +
+                                    '<span class="times">' + val.remaining + '</span> H'
+                            }
+                            course_session_item += '<span class="text courses-session-id" style="display: none;">' + val.course_session_id + '</span><span class="text slot-id" style="display: none;">' + val.id + '</span><br>' + '</li>';
+                        });
+
+                        $('.courses.todo-list').html(course_session_item);
+                    }
+                    else {
+                        $('.courses.todo-list').html("<li class='course-item'>There are no rest course sessions.</li>");
+                    }
+                },
+                error: function () {
+                    swal(
+                        'Oops...',
+                        'Something went wrong!',
+                        'error'
+                    );
+                },
+                complete: function () {
+                    toggleLoading(false);
+                }
+            });
+        }
 
         var oTable = $('#timetables-table').DataTable({
             processing: true,
@@ -458,6 +558,11 @@
                         }
                     });
                 });
+            });
+
+            $('#options-filter').on('change', function (event) {
+                event.preventDefault();
+                get_rest_course_sessions();
             });
         });
     </script>

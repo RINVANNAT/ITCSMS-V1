@@ -130,10 +130,11 @@ function getStudentReExam(subjects, pass_moyenn, approximate_moyenne) {
     var total_credit = 0;
     if ('fail' in subjects) {//=== isset() in php
 
-
         if ('pass' in subjects) {
 
             var validate_score = 0;
+
+            //console.log(subjects);
 
             $.each(subjects['fail'], function (f_key, f_val) {
 
@@ -145,8 +146,8 @@ function getStudentReExam(subjects, pass_moyenn, approximate_moyenne) {
 
             $.each(subjects['pass'], function (p_key, p_val) {
                 //console.log(validate_score +'=='+ validate_score +'++'+ parseFloat(p_val['score']) +'*'+ p_val['credit']);
-                total_credit = total_credit + parseFloat(p_val['credit']);
-                validate_score = validate_score + (parseFloat(p_val['score']) * p_val['credit']);
+                total_credit += parseFloat(p_val['credit']);
+                validate_score  += (parseFloat(p_val['score']) * p_val['credit']);
                 //console.log(validate_score);
             });
 

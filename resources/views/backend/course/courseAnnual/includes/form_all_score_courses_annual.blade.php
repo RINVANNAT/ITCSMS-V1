@@ -846,7 +846,7 @@
                     '&dept_option_id=' + BaseData.dept_option_id +
                     '&academic_year_id=' + BaseData.academic_year_id, '_blank');
 
-        })
+        });
 
 
         function assignNumberRattrapage() {
@@ -859,9 +859,22 @@
                $.each(table_data, function (i, student) {
 
                    if (student['student_id_card'] != null && student['student_id_card'] != '') {
-                       var number_rattrapage = numberSubjectRattrapage(array_fail_subject[student['student_id_card']], '{{\App\Models\Enum\ScoreEnum::Pass_Moyenne}}', '{{\App\Models\Enum\ScoreEnum::Aproximation_Moyenne}}');
 
-                       student['Rattrapage'] = number_rattrapage;
+                       var moyenne = calculate_moyenne(array_fail_subject[student['student_id_card']]);
+                       console.log(moyenne);
+
+                       if ( moyenne >= parseFloat('{{\App\Models\Enum\ScoreEnum::Pass_Moyenne}}')) {
+                           var all_subjects = array_fail_subject[student['student_id_card']];
+
+                           if ('fail' in all_subjects) {
+                               student['Rattrapage'] = all_subjects['fail'].length;
+                           } else {
+                               student['Rattrapage'] = 0;
+                           }
+                       } else {
+                           var number_rattrapage = numberSubjectRattrapage(array_fail_subject[student['student_id_card']], '{{\App\Models\Enum\ScoreEnum::Pass_Moyenne}}', '{{\App\Models\Enum\ScoreEnum::Aproximation_Moyenne}}');
+                           student['Rattrapage'] = number_rattrapage;
+                       }
                    }
                });
 
@@ -878,6 +891,8 @@
         function numberSubjectRattrapage(subjects, pass_moyenne, approximate_moyenne) {
 
             var number_subject = getStudentReExam(subjects, pass_moyenne, approximate_moyenne);
+
+
             if ('fail' in number_subject) {
                 return number_subject['fail'].length;
             } else {

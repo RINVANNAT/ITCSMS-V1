@@ -135,7 +135,8 @@ trait AjaxCRUDTimetableController
             } else if ($department_id == 13) {
                 return Response::json(['status' => true, 'grades' => Grade::all()]);
             } else {
-                return Response::json(['status' => true, 'grades' => Grade::where('id', '>', 2)->get()]);
+                return Response::json(['status' => true, 'grades' => Grade::all()]);
+                // return Response::json(['status' => true, 'grades' => Grade::where('id', '>', 2)->get()]);
             }
         }
         return Response::json(['status' => false]);

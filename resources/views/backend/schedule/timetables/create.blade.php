@@ -497,9 +497,6 @@
                 eventDragStart: function (event, jsEvent, ui, view) {
                     get_rooms();
                 },
-                eventClick: function (calEvent, jsEvent, view) {
-                    // Trigger when click the event.
-                },
                 eventDrop: function (event, delta, revertFunc) {
                     var start_date = event.start.format();
                     move_timetable_slot(event, start_date);

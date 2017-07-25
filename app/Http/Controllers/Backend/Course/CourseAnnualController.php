@@ -2337,6 +2337,9 @@ class CourseAnnualController extends Controller
             return count($item);
         })->max();
 
+        //dump($element['e20160930']);
+        //dd($element);//e20160930
+
         foreach ($element as $key => $value) {
 
             $string_observatoin = '';
@@ -2399,73 +2402,6 @@ class CourseAnnualController extends Controller
             $array_tmp_rank[$key] = $score_moyenne;
             $value['Rank'] = "";
 
-            /*if (!$semesterId) {
-                if ($moyenne < ScoreEnum::Pass_Moyenne) {
-
-                    if ($check_redouble !== false) {
-
-                        if ($check_redouble !== null) {
-
-                            if ($check_redouble->is_changed) {
-                                $value['Redouble'] = $check_redouble->redouble_name;
-                            } else {
-                                if ($degreeId == ScoreEnum::Degree_I) {//---if student is in ENgineer or association
-                                    $value['Redouble'] = $this->studentEliminationManager($idCardPointToStudent, $studentRedoubleHistory, $key, $check_redouble, $gradeId, $academicYearID, ScoreEnum::Red_I);
-                                } else {
-
-
-                                    $value['Redouble'] = $this->studentEliminationManager($idCardPointToStudent, $studentRedoubleHistory, $key, $check_redouble, $gradeId, $academicYearID, ScoreEnum::Red_T);
-                                }
-                            }
-                        } else {
-                            if ($degreeId == ScoreEnum::Degree_I) {//---if student is in ENgineer or association
-                                $value['Redouble'] = $this->studentEliminationManager($idCardPointToStudent, $studentRedoubleHistory, $key, $check_redouble, $gradeId, $academicYearID, ScoreEnum::Red_I);
-                            } else {
-
-
-                                $value['Redouble'] = $this->studentEliminationManager($idCardPointToStudent, $studentRedoubleHistory, $key, $check_redouble, $gradeId, $academicYearID, ScoreEnum::Red_T);
-                            }
-                        }
-
-                    } else {
-
-                        //---student has been set as Elimination (Radié)
-
-                        $value['Redouble'] = 'Radié';//even the student has score upper than 30 cos student have been set radie as true;
-                        $this->updateStatusStudent($key, $status = true);
-                    }
-
-                } else {
-                    $value['Redouble'] = ScoreEnum::Pass;
-                }
-            } else {
-
-                //----request each semester ----
-
-                //$check_redouble = $this->checkRedouble($idCardPointToStudent[$key], $academicYearID);//---check this current year if student has been change in redouble
-
-
-                if ($check_redouble !== false) {
-
-                    if ($check_redouble !== null) {
-
-
-                        if ($check_redouble->is_changed) {
-
-                            $value['Redouble'] = $check_redouble->redouble_name;
-                        } else {
-                            $value['Redouble'] = '';
-                        }
-
-                    } else {
-                        $value['Redouble'] = '';
-                    }
-                } else {
-                    $value['Redouble'] = 'Radié';
-                }
-            }*/
-
-
             $redouble_objects = $this->findRecordRedouble($idCardPointToStudent[$key], $redouble = isset($redoubles[$key])?$redoubles[$key]:null, $academicYearID);
             $value['Redouble'] = $redouble_objects['current_redouble'];
             //---assign number of rattrapage
@@ -2487,7 +2423,9 @@ class CourseAnnualController extends Controller
         //-----find student classement
 
         $array_data = collect($element)->sortByDesc('Moyenne')->toArray();
+
         $array_data = array_values($array_data);
+
         $array_data = collect($array_data)->map(function ($data, $key) {
             $data['number'] = $key + 1;
             $data['Rank'] = $key + 1;
@@ -2526,6 +2464,9 @@ class CourseAnnualController extends Controller
             $array_data[] = $emptyData['average'];
             $array_data[] = $emptyData['data_empty'];
         }
+
+
+        //dd($fail_subjects['e20160930']);
 
         return json_encode([
             'array_fail_subject' => $fail_subjects,

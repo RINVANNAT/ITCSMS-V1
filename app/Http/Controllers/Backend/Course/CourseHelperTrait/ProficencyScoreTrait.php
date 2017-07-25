@@ -44,7 +44,7 @@ trait ProficencyScoreTrait
         $competencies = DB::table('competencies')
             ->where('competency_type_id', $courseAnnual->competency_type_id)
             ->where('type', "value")
-            ->orderBy('name')->get();
+            ->orderBy('id')->get();
 
 
         $additionalColumns = DB::table('competencies')
@@ -243,7 +243,7 @@ trait ProficencyScoreTrait
         $competencies = DB::table('competencies')
             ->where('competency_type_id', $courseAnnual->competency_type_id)
             ->where('type', "value")
-            ->orderBy('name')->get();
+            ->orderBy('id')->get();
 
         $additionalColumns = DB::table('competencies')
             ->where('competency_type_id', $courseAnnual->competency_type_id)
@@ -520,7 +520,6 @@ trait ProficencyScoreTrait
         }
 
     }
-
 
     // replace competency with real score value
     private function getExpression($originalRule, $competencies, $scores)
@@ -898,6 +897,7 @@ trait ProficencyScoreTrait
     }
 
     public function markPrintedCertificate(Request $request){
+
         $studentAnnualIds = json_decode($request->ids);
         $course_annual_id = $request->course_annual_id;
 
