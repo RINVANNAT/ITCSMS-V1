@@ -18,7 +18,7 @@
         }
 
         .blue {
-            font-family: "Arial Rounded MT Bold" !important;
+            font-family: "arial-rounded" !important;
             color: #0F6AB4 !important;
         }
         .text-12{
