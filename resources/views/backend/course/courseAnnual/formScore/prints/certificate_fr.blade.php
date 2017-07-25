@@ -324,7 +324,7 @@
 
 
                         <div class="row" style="margin-top: 5%;line-height: 3mm;">
-                            <div class="col-md-12 col-xs-12" style="margin-left: 5mm">
+                            <div class="col-md-12 col-xs-12" style="margin-left: 4mm; padding-right: 0mm">
                                 <p class="description">
                                     *Note minimale requise par épreuve : 05/25 <br/>
                                     *Seuil de réussite pour obtenir le niveau : 50/100
