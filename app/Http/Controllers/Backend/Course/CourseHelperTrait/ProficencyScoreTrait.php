@@ -852,6 +852,7 @@ trait ProficencyScoreTrait
     public function printCertificate(Request $request)
     {
         $studentAnnualIds = json_decode($request->ids);
+        $issued_by = $request->issued_by;
         $courseAnnual = CourseAnnual::find($request->course_annual_id);
         $departments = Department::lists("code","id")->toArray();
         $students  = DB::table('students')
@@ -891,7 +892,8 @@ trait ProficencyScoreTrait
                 'competencies' => $competencies,
                 'students'=> $students,
                 'exam_start'=>$request->exam_start,
-                'exam_end'=>$request->exam_end
+                'exam_end'=>$request->exam_end,
+                'issued_by' => $issued_by
             ]
         );
     }

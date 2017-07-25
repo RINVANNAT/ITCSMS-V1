@@ -28,6 +28,10 @@
             }
 
             @font-face {
+                font-family: arial-rounded;
+                src: url("{{url('assets/fonts/arial-rounded-mt-bold.ttf')}}");
+            }
+            @font-face {
                 font-family: bayon;
                 src: url("{{url('assets/fonts/Bayon.ttf')}}");
             }
@@ -91,7 +95,7 @@
                     font: 12pt "Tahoma";
                 }
                 .page {
-                    padding: 15mm;
+                    padding: 15mm 15mm 15mm 30mm;
                     margin: 0 auto;
                     border: initial;
                     border-radius: initial;

@@ -48,6 +48,11 @@
                 <input class="form-control col-md-8 daterange" type="text" name="daterange" placeholder="Please provide exam date"/>
             </div>
 
+            <div class="pull-right">
+                <label>Issued by: </label>
+                <input type="text" name="issued_by" class="form-control" placeholder="Empty if director"/>
+            </div>
+
         </div><!-- /.box-header -->
 
         <div class="box-body certificate_table">
@@ -100,10 +105,12 @@
             } else {
                 var exam_start = $('input[name="daterange"]').data('daterangepicker').startDate;
                 var exam_end = $('input[name="daterange"]').data('daterangepicker').endDate;
+                var issued_by = $('input[name="issued_by"]').val();
                 // Open new window to print
                 PopupCenterDual(
                         print_url
                         +"?course_annual_id="+course_annual_id
+                        +"&issued_by="+issued_by
                         +'&ids='+JSON.stringify(selected_ids)
                         +'&exam_start='+ exam_start.format("DD/MM/YYYY")
                         +'&exam_end='+ exam_end.format("DD/MM/YYYY"),

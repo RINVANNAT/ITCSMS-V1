@@ -18,8 +18,8 @@
         }
 
         .blue {
-            font-family: "Calibri Light (Headings)";
-            color: #0F6AB4;
+            font-family: "Arial Rounded MT Bold" !important;
+            color: #0F6AB4 !important;
         }
         .text-12{
             font-size: 10pt;
@@ -37,9 +37,6 @@
         .attestation_title {
             margin-top: 10mm;
             font-size: 24pt;
-            font-family: "Calibri Light (Headings)";
-            color: #0F6AB4;
-            font-weight: bold;
         }
         .description{
             font-size: 9pt; font-family: 'Calibri Light (Headings)'; text-align: left
@@ -103,7 +100,7 @@
                     if((strtolower($competency_score->score) == "non admis") or (strtolower($competency_score->score) == "non admise")){
                         $is_admis = false;
                     }
-                    $admission = '<span class="red_col">'.$competency_score->score.'</span>';
+                    $admission = '<span class="red_col">'.strtoupper($competency_score->score).'</span>';
                 }
             }
         }
@@ -188,7 +185,7 @@
                         *Seuil de réussite pour obtenir le niveau : 50/100
                     </p>
                     <p>
-                        <span class="blue">Le niveau A1 :</span> niveau introductif ou de découverte
+                        <span class="blue">Le niveau A1d :</span> niveau introductif ou de découverte
                     </p>
 
                     <p>
@@ -212,7 +209,7 @@
                 </div>
 
                 <div class="row text-center attestation_title text-21">
-                   <span>
+                   <span class="blue">
                        ATTESTATION de NIVEAU de LANGUE FRANÇAISE
                    </span>
                 </div>
@@ -226,7 +223,7 @@
                 <div class="row text-center panel_top_8" style="font-family: 'Calibri Light'; font-size: 12pt; margin-top: 12mm; font-weight: bold">
             <span>
                 @if($student->gender_id == 1)
-                    M
+                    M.
                 @else
                     Mlle
                 @endif
@@ -332,7 +329,7 @@
 
 
                     </div>
-                    <div style="width: 160mm; float: left; margin-left: 15mm; text-align: justify">
+                    <div style="width: 170mm; float: left; margin-left: 5mm; text-align: justify">
                         <?php
                         $exam_day = "";
                         $start = \Carbon\Carbon::createFromFormat("d/m/Y",$exam_start);
@@ -360,7 +357,7 @@
                         ?>
                         <p style="font-family: 'Calibri Light'; font-size: 12pt; ">
                             a comblé avec succès un niveau de langue française
-                        <span style="font-size: 21pt; color: #0a6aa1">
+                        <span class="blue" style="font-size: 21pt;">
                             <?php
                             if($student->grade_id == 1) {
                                 echo "A1";
@@ -375,7 +372,7 @@
                             }
                             ?>
                         </span>
-                            du Cadre européen commun de référence pour les langues (CECRL) à la session de l’examen de niveau à l’Institut, survenue {{$exam_day}}.
+                            du Cadre européen commun de référence pour les langues (CECRL) à la session de l’examen de niveau à l’Institut {{$exam_day}}.
                         </p>
 
                         <p style="font-family: 'Calibri Light'; font-size: 12pt; font-style: italic">
@@ -393,7 +390,7 @@
                                 <b>Phnom Penh, ITC, le {{$c_day." ".$c_month." ".$c_year}}</b>
                             <p style="margin-top: -10px !important;">
                                 Le Directeur de l’Institut de Technologie du Cambodge, <br/>
-                                P.O.
+                                <span style="font-style: italic">{{$issued_by}}</span>
                             </p>
                             </p>
                         </div>
