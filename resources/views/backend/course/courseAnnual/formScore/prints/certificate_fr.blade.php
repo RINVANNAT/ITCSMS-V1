@@ -30,7 +30,7 @@
             font-size: 20pt;
         }
         .text-21{
-            font-size: 23pt;
+            font-size: 21pt !important;
         }
 
         .attestation_title {
@@ -209,7 +209,7 @@
             </div>
         @else
             <div class="page">
-                <div class="row text-center title" style="margin-top: 10mm; margin-left: -17mm">
+                <div class="row text-center title" style="margin-top: 10mm; margin-left: -14mm">
                     <p class="text-20">
                         Institut de Technologie du Cambodge
                     </p>
@@ -218,22 +218,22 @@
                     </p>
                 </div>
                 <div class="row">
-                    <span class="text-13" style="font-style: italic; margin-left: 5mm">N<sup>o</sup>Réf.: .................ITC</span>
+                    <span class="text-13" style="font-style: italic; margin-left: 5mm">N<sup> o</sup>Réf.: .................ITC</span>
                 </div>
 
-                <div class="row text-center attestation_title text-21" style="margin-left: -17mm">
-                   <span class="blue">
+                <div class="row text-center attestation_title" style="margin-left: -14mm">
+                   <span class="blue text-21">
                        ATTESTATION de NIVEAU de LANGUE FRANÇAISE
                    </span>
                 </div>
 
-                <div class="row text-center" style="font-family: 'Calibri Light'; font-size: 12pt; margin-top: 10mm;margin-left: -17mm">
+                <div class="row text-center" style="font-family: 'Calibri Light'; font-size: 12pt; margin-top: 10mm;margin-left: -14mm">
                     <span>
                         Le Directeur de l’Institut de Technologie du Cambodge atteste que 
                     </span>
                 </div>
 
-                <div class="row text-center panel_top_8" style="font-family: 'Calibri Light'; font-size: 12pt; margin-top: 10mm; font-weight: bold;margin-left: -17mm">
+                <div class="row text-center panel_top_8" style="font-family: 'Calibri Light'; font-size: 12pt; margin-top: 10mm; font-weight: bold;margin-left: -14mm">
             <span>
                 @if($student->gender_id == 1)
                     M.
