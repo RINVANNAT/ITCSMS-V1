@@ -442,7 +442,7 @@
 
                                 if (oldValue != newValue) {
 
-                                    if(check_val) {
+                                    //if(check_val) {
 
                                         var remark_rul = '{{route('student.update_status')}}';
                                         var baseData_redouble = {
@@ -468,9 +468,9 @@
                                                 }
                                             }
                                         });
-                                    } else {
-                                        notify('error', 'Please choose value by double click on cell', 'Danger')
-                                    }
+//                                    } else {
+//                                        notify('error', 'Please choose value by double click on cell', 'Danger')
+//                                    }
                                 }
 
                             }
