@@ -251,19 +251,19 @@
                     </div>
                 </div>
 
-                <div class="row text-center attestation_title" style="margin-left: -14mm">
+                <div class="row text-center attestation_title" style="margin-left: -13mm">
                    <span class="blue text-21">
                        ATTESTATION de NIVEAU de LANGUE FRANÇAISE
                    </span>
                 </div>
 
-                <div class="row text-center" style="font-family: 'Calibri Light'; font-size: 12pt; margin-top: 6mm;margin-left: -14mm">
+                <div class="row text-center" style="font-family: 'Calibri Light'; font-size: 12pt; margin-top: 6mm;margin-left: -13mm">
                     <span>
                         Le Directeur de l’Institut de Technologie du Cambodge atteste que 
                     </span>
                 </div>
 
-                <div class="row text-center panel_top_8" style="font-family: 'Calibri Light'; font-size: 12pt; margin-top: 7mm; font-weight: bold;margin-left: -14mm">
+                <div class="row text-center panel_top_8" style="font-family: 'Calibri Light'; font-size: 12pt; margin-top: 7mm; font-weight: bold;margin-left: -13mm">
             <span style="font-weight: bold">
                 @if($student->gender_id == 1)
                     M.
