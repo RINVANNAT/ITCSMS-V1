@@ -843,7 +843,14 @@ trait ProficencyScoreTrait
                 }
                 if ($keyword != null and $keyword['value'] != "") {
                     $instance->collection = $instance->collection->filter(function ($row) use ($request, $keyword) {
-                        return Str::contains(strtolower($row['name_latin']), strtolower($keyword['value'])) ? true : false;
+                        if(
+                            Str::contains(strtolower($row['name_latin']), strtolower($keyword['value'])) ||
+                            Str::contains(strtolower($row['id_card']), strtolower($keyword['value']))
+                        ){
+                            return true;
+                        } else {
+                            return false;
+                        }
                     });
                 }
             })

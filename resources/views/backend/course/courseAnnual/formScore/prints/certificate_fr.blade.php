@@ -42,7 +42,7 @@
         }
 
         .attestation_title {
-            margin-top: 10mm;
+            margin-top: 0mm;
             font-size: 23pt;
         }
         .description{
@@ -232,17 +232,15 @@
                         <p class="text-14">
                             Institut de Technologie du Cambodge
                         </p>
+                        <span class="text-13" style="font-style: italic;">N<sup> o</sup>Réf.: .................ITC</span>
                     </div>
-                    <div class="pull-right text-center">
-                        <p class="text-14" style="line-height: 6mm">
+                    <div class="pull-right text-center" style="padding-right: 8mm;">
+                        <p class="text-14" style="line-height: 6mm" style="margin-bottom: 0px">
                             Royaume du Cambodge <br/>
                             Nation Religion Roi <br/>
                             <span class="text-20" style="font-family: tactieng !important;">3</span>
                         </p>
                     </div>
-                </div>
-                <div class="row">
-                    <span class="text-13" style="font-style: italic; margin-left: 5mm">N<sup> o</sup>Réf.: .................ITC</span>
                 </div>
 
                 <div class="row text-center attestation_title" style="margin-left: -14mm">
@@ -251,13 +249,13 @@
                    </span>
                 </div>
 
-                <div class="row text-center" style="font-family: 'Calibri Light'; font-size: 12pt; margin-top: 10mm;margin-left: -14mm">
+                <div class="row text-center" style="font-family: 'Calibri Light'; font-size: 12pt; margin-top: 6mm;margin-left: -14mm">
                     <span>
                         Le Directeur de l’Institut de Technologie du Cambodge atteste que 
                     </span>
                 </div>
 
-                <div class="row text-center panel_top_8" style="font-family: 'Calibri Light'; font-size: 12pt; margin-top: 10mm; font-weight: bold;margin-left: -14mm">
+                <div class="row text-center panel_top_8" style="font-family: 'Calibri Light'; font-size: 12pt; margin-top: 6mm; font-weight: bold;margin-left: -14mm">
             <span>
                 @if($student->gender_id == 1)
                     M.
@@ -271,18 +269,19 @@
                 $year = \Carbon\Carbon::createFromFormat("Y-m-d H:i:s",$student->dob)->formatLocalized('%Y');
                 ?>
                 {{strtoupper($student->name_latin)}}, <br/>
+                ID : {{$student->id_card}} <br/><br/>
                 @if($student->gender_id == 1)
                     né
                 @else
                     née
                 @endif
 
-                le {{$day." ".$month." ".$year}}, <br/> ID : {{$student->id_card}}
+                le {{$day." ".$month." ".$year}}
             </span>
                 </div>
                 <div class="row">
 
-                    <div class="no-padding text-center" style="width: 63mm;float: left; margin-top: -20mm">
+                    <div class="no-padding text-center" style="width: 63mm;float: left; margin-top: -2mm">
                         <div class="row" style="margin-bottom: -2mm;">
                             <span style="margin-left: 8mm; line-height: 3mm;">
                                 Bulletin de notes
