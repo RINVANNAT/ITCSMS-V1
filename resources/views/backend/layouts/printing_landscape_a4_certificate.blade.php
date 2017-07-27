@@ -28,6 +28,11 @@
             }
 
             @font-face {
+                font-family: franklin_gothic;
+                src: url("{{url('assets/fonts/Franklin Gothic Demi Cond Regular.ttf')}}");
+            }
+
+            @font-face {
                 font-family: arial-rounded;
                 src: url("{{url('assets/fonts/arial-rounded-mt-bold.ttf')}}");
             }

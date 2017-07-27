@@ -235,10 +235,10 @@
                         <span class="text-13" style="font-style: italic;">N<sup> o</sup>Réf.: .................ITC</span>
                     </div>
                     <div class="pull-right text-center" style="padding-right: 8mm;">
-                        <p class="text-14" style="line-height: 6mm" style="margin-bottom: 0px">
+                        <p class="text-14" style="line-height: 6mm; margin-bottom: 0px; font-family: franklin_gothic !important;">
                             Royaume du Cambodge <br/>
                             Nation Religion Roi <br/>
-                            <span class="text-20" style="font-family: tactieng !important;">3</span>
+                            <span class="text-20" style="font-family: tactieng !important;">6</span>
                         </p>
                     </div>
                 </div>
@@ -249,14 +249,14 @@
                    </span>
                 </div>
 
-                <div class="row text-center" style="font-family: 'Calibri Light'; font-size: 12pt; margin-top: 6mm;margin-left: -14mm">
+                <div class="row text-center" style="font-family: 'Calibri Light'; font-size: 12pt; margin-top: 4mm;margin-left: -14mm">
                     <span>
                         Le Directeur de l’Institut de Technologie du Cambodge atteste que 
                     </span>
                 </div>
 
                 <div class="row text-center panel_top_8" style="font-family: 'Calibri Light'; font-size: 12pt; margin-top: 6mm; font-weight: bold;margin-left: -14mm">
-            <span>
+            <span style="font-weight: bold">
                 @if($student->gender_id == 1)
                     M.
                 @else
