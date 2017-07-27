@@ -229,7 +229,7 @@
             <div class="page">
                 <div class="row title" style="margin-top: 14mm; padding-left: 5mm; padding-right: 5mm;">
                     <div class="pull-left">
-                        <p class="text-14">
+                        <p class="text-14" style="font-size: 13pt; font-weight: bold">
                             Institut de Technologie du Cambodge
                         </p>
                         <span class="text-13" style="font-style: italic;">Réf.: .................ITC</span>
