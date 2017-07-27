@@ -38,11 +38,11 @@
             font-size: 20pt;
         }
         .text-21{
-            font-size: 21pt !important;
+            font-size: 19pt !important;
         }
 
         .attestation_title {
-            margin-top: 0mm;
+            margin-top: 7mm;
             font-size: 23pt;
         }
         .description{
@@ -234,7 +234,7 @@
                         </p>
                         <span class="text-13" style="font-style: italic;">N<sup> o</sup>Réf.: .................ITC</span>
                     </div>
-                    <div class="pull-right text-center" style="padding-right: 8mm;">
+                    <div class="pull-right text-center" style="padding-right: 6mm; margin-top: -7mm">
                         <p class="text-14" style="line-height: 6mm; margin-bottom: 0px; font-family: franklin_gothic !important;">
                             Royaume du Cambodge <br/>
                             Nation Religion Roi <br/>
