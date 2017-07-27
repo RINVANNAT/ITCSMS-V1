@@ -93,6 +93,14 @@
 @stop
 @section('content')
 
+    <?php
+            if($issued_number != null) {
+                $number = $issued_number;
+            } else {
+                $number = 0;
+            }
+
+    ?>
     @foreach($students as $student)
         <?php
         $ce = "";
@@ -232,7 +240,7 @@
                         <p class="text-14" style="font-size: 13pt; font-weight: bold">
                             Institut de Technologie du Cambodge
                         </p>
-                        <span class="text-13" style="font-style: italic;">Réf.: .................ITC</span>
+                        <span class="text-13" style="font-style: italic;">Réf.: <span> &nbsp;&nbsp;&nbsp;{{$number}} &nbsp;&nbsp;&nbsp;</span>ITC</span>
                     </div>
                     <div class="pull-right text-center" style="padding-right: 9mm; margin-top: -7mm">
                         <p class="text-14" style="line-height: 6mm; margin-bottom: 0px; font-family: franklin_gothic !important;">
@@ -269,14 +277,14 @@
                 $year = \Carbon\Carbon::createFromFormat("Y-m-d H:i:s",$student->dob)->formatLocalized('%Y');
                 ?>
                 {{strtoupper($student->name_latin)}}, <br/><br/>
-                ID : {{$student->id_card}} <br/>
+                ID : {{$student->id_card}}, <br/>
                 @if($student->gender_id == 1)
                     né
                 @else
                     née
                 @endif
 
-                le {{$day." ".$month." ".$year}}
+                le {{$day." ".$month." ".$year}},
             </span>
                 </div>
                 <div class="row">
@@ -418,7 +426,7 @@
                         du Cadre Européen Commun de Référence pour les Langues (CECRL) à la session de l’examen de niveau à l’Institut {{$exam_day}}.
                         </p>
 
-                        <p style="font-family: 'Calibri Light'; font-size: 12pt; font-style: italic; margin-top: 2mm;margin-left: 18mm">
+                        <p style="font-family: 'Calibri Light'; font-size: 12pt; font-style: italic; margin-top: 5mm;margin-left: 18mm">
                             Pour valoir ce que de droit.
                         </p>
 
@@ -447,7 +455,9 @@
                 </div>
             </div>
         @endif
-
+        <?php
+            $number++;
+        ?>
     @endforeach
 
 @endsection

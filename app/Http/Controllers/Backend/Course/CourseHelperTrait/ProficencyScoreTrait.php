@@ -877,6 +877,7 @@ trait ProficencyScoreTrait
         $studentAnnualIds = json_decode($request->ids);
         $issued_by = $request->issued_by;
         $issued_date = $request->issued_date;
+        $issued_number = $request->issued_number;
         $courseAnnual = CourseAnnual::find($request->course_annual_id);
         $departments = Department::lists("code","id")->toArray();
         $students  = DB::table('students')
@@ -918,7 +919,8 @@ trait ProficencyScoreTrait
                 'exam_start'=>$request->exam_start,
                 'exam_end'=>$request->exam_end,
                 'issued_by' => $issued_by,
-                'issued_date' => $issued_date
+                'issued_date' => $issued_date,
+                'issued_number' => $issued_number
             ]
         );
     }

@@ -55,6 +55,9 @@
             </div>
 
             <div class="pull-right">
+                <input type="text" name="issued_number" class="form-control"  placeholder="Issued number"/>
+            </div>
+            <div class="pull-right">
                 <input type="text" name="issued_by" class="form-control"  placeholder="Issued by"/>
             </div>
             <div class="pull-right" style="margin-right: 5px;">
@@ -116,12 +119,14 @@
                 var exam_end = $('input[name="daterange"]').data('daterangepicker').endDate;
                 var issued_by = $('input[name="issued_by"]').val();
                 var issued_date = $('input[name="issued_date"]').val();
+                var issued_number = $('input[name="issued_number"]').val();
                 // Open new window to print
                 PopupCenterDual(
                         print_url
                         +"?course_annual_id="+course_annual_id
                         +"&issued_by="+issued_by
                         +"&issued_date="+issued_date
+                        +"&issued_number="+issued_number
                         +'&ids='+JSON.stringify(selected_ids)
                         +'&exam_start='+ exam_start.format("DD/MM/YYYY")
                         +'&exam_end='+ exam_end.format("DD/MM/YYYY"),
