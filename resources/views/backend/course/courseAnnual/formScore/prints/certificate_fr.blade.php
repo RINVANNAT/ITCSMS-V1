@@ -20,6 +20,11 @@
             font-family: "arial-rounded" !important;
             color: #0F6AB4 !important;
         }
+
+        .green {
+            font-family: "arial-rounded" !important;
+            color: #23E123 !important;
+        }
         .text-12{
             font-size: 10pt;
         }
@@ -78,6 +83,7 @@
 
         .td_result{
             font-style: normal !important;
+            text-align: center !important;
         }
 
     </style>
@@ -111,7 +117,7 @@
                     if((strtolower($competency_score->score) == "non admis") or (strtolower($competency_score->score) == "non admise")){
                         $is_admis = false;
                     }
-                    $admission = '<span style="margin-left: 7mm" class="red_col">'.strtoupper($competency_score->score).'</span>';
+                    $admission = strtoupper($competency_score->score);
                 }
             }
         }
@@ -131,7 +137,7 @@
                        RESULTAT de NIVEAU de LANGUE FRANÇAISE
                    </span>
                 </div>
-                <table class="table fail-result" style="width: 100%;font-size: 12pt; line-height: 3mm;margin-top: 10mm">
+                <table class="table fail-result" style="width: 80%;font-size: 12pt; line-height: 3mm;margin: 10mm auto">
                     <thead>
                     <tr class="set_border">
                         <th colspan="2" rowspan="2">Compétences évaluées comblées</th>
@@ -178,7 +184,7 @@
                             Note Finale
                         </td>
 
-                        <td style="border-bottom: 0px !important; border-left: none !important; border-right: none !important; font-style: normal">
+                        <td style="text-align: center;border-bottom: 0px !important; border-left: none !important; border-right: none !important; font-style: normal">
                             {!! $total !!}
                         </td>
 
@@ -186,10 +192,10 @@
 
                     </tbody>
                 </table>
-                {!! $admission !!}
+                <span style="margin-left: 27mm" class="red_col">{!! $admission !!}</span>
 
 
-                <div class="row description" style="margin-top: 5%;line-height: 3mm;">
+                <div class="row description" style="margin-top: 5%; margin-left: 20mm; line-height: 3mm;">
 
                     <div class="col-md-12 col-xs-12">
                         <p class="description">
@@ -197,6 +203,18 @@
                             *Seuil de réussite pour obtenir le niveau : 50/100
                         </p>
                         <p class="description-small">
+                            @if($student->grade_id == 1)
+                                <span class="blue">Le niveau A1 :</span> niveau introductif ou de découverte
+                            @elseif($student->grade_id == 2)
+                                <span class="blue">Le niveau A2 :</span> niveau intermédiaire ou de survie
+                            @elseif($student->grade_id == 3)
+                                <span class="green">Le niveau B1 :</span> niveau seuil
+                            @elseif($student->grade_id == 4)
+                                <span class="green">Le niveau B2 :</span> niveau avancé ou indépendant
+                            @elseif($student->grade_id == 5)
+                                <span class="green">Le niveau C1 :</span>
+                            @endif
+
                             <span class="blue">Le niveau A1 :</span> niveau introductif ou de découverte
                         </p>
 
@@ -321,7 +339,7 @@
                             </tbody>
                         </table>
 
-                        {!! $admission !!}
+                        <span style="margin-left: 7mm" class="red_col">{!! $admission !!}</span>
 
 
                         <div class="row" style="margin-top: 5%;line-height: 3mm;">
@@ -331,7 +349,17 @@
                                     *Seuil de réussite pour obtenir le niveau : 50/100
                                 </p>
                                 <p class="description-small">
-                                    <span class="blue">Le niveau A1 :</span> niveau introductif ou de découverte
+                                    @if($student->grade_id == 1)
+                                        <span class="blue">Le niveau A1 :</span> niveau introductif ou de découverte
+                                    @elseif($student->grade_id == 2)
+                                        <span class="blue">Le niveau A2 :</span> niveau intermédiaire ou de survie
+                                    @elseif($student->grade_id == 3)
+                                        <span class="green">Le niveau B1 :</span> niveau seuil
+                                    @elseif($student->grade_id == 4)
+                                        <span class="green">Le niveau B2 :</span> niveau avancé ou indépendant
+                                    @elseif($student->grade_id == 5)
+                                        <span class="green">Le niveau C1 :</span>
+                                    @endif
                                 </p>
 
                                 <p class="description-extra-small">
@@ -369,21 +397,21 @@
                         ?>
                         <p style="font-family: 'Calibri Light'; font-size: 12pt; ">
                             a comblé avec succès un niveau de langue française
-                        <span class="blue" style="font-size: 21pt;">
+
                             <?php
                             if($student->grade_id == 1) {
-                                echo " &nbsp;A1";
+                                echo "<span class='blue' style='font-size: 21pt;'> &nbsp;A1</span>";
                             } else if($student->grade_id == 2){
-                                echo "  &nbsp;A2";
+                                echo "<span class='blue' style='font-size: 21pt;'>  &nbsp;A2</span>";
                             } else if($student->grade_id == 3){
-                                echo "  &nbsp;B1";
+                                echo "<span class='green' style='font-size: 21pt;'>  &nbsp;B1</span>";
                             } else if($student->grade_id == 4){
-                                echo "  &nbsp;B2";
+                                echo "<span class='green' style='font-size: 21pt;'>  &nbsp;B2</span>";
                             } else if($student->grade_id == 5){
-                                echo "  &nbsp;C1";
+                                echo "<span class='green' style='font-size: 21pt;'>  &nbsp;C1</span>";
                             }
                             ?>
-                        </span>du Cadre Européen Commun de Référence pour les Langues (CECRL) à la session de l’examen de niveau à l’Institut {{$exam_day}}.
+                        du Cadre Européen Commun de Référence pour les Langues (CECRL) à la session de l’examen de niveau à l’Institut {{$exam_day}}.
                         </p>
 
                         <p style="font-family: 'Calibri Light'; font-size: 12pt; font-style: italic; margin-top: 2mm;margin-left: 18mm">

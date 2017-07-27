@@ -758,6 +758,7 @@ trait ProficencyScoreTrait
     }
 
     public function getDataForRequestPrintCertificate(Request $request) {
+
         $course_annual_id = $request->get("course_annual_id");
         $course_annual = CourseAnnual::find($course_annual_id);
 
@@ -829,9 +830,12 @@ trait ProficencyScoreTrait
         });
 
         $score_collection = collect($score_collection);
-        $datatables =  app('datatables')->of($score_collection);
-        return $datatables
-
+        $datatables =  app('datatables')->of($score_collection)
+            ->filter(function ($query) use ($request) {
+                if ($request->has('search.value')) {
+                    $query->where('name_latin', 'like', "%{$request->get('search.value')}%");
+                }
+            })
             ->addColumn('checkbox', function($student) {
                 return '<input type="checkbox" checked class="checkbox" data-id='.$student['student_annual_id'].'>';
             })
@@ -845,8 +849,9 @@ trait ProficencyScoreTrait
                 $actions = '<button data-id='.$student['student_annual_id'].' style="float: right" class="btn btn-block btn-default btn-sm btn-single-print"><i class="fa fa-print"></i> Print</button>';
                 return  $actions;
 
-            })
-            ->make(true);
+            });
+
+        return $datatables->make(true);
     }
 
     public function printCertificate(Request $request)
