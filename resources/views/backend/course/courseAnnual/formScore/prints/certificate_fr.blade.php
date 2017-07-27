@@ -227,14 +227,14 @@
             </div>
         @else
             <div class="page">
-                <div class="row title" style="margin-top: 10mm; padding-left: 5mm; padding-right: 5mm;">
+                <div class="row title" style="margin-top: 14mm; padding-left: 5mm; padding-right: 5mm;">
                     <div class="pull-left">
                         <p class="text-14">
                             Institut de Technologie du Cambodge
                         </p>
                         <span class="text-13" style="font-style: italic;">N<sup> o</sup>Réf.: .................ITC</span>
                     </div>
-                    <div class="pull-right text-center" style="padding-right: 6mm; margin-top: -7mm">
+                    <div class="pull-right text-center" style="padding-right: 9mm; margin-top: -7mm">
                         <p class="text-14" style="line-height: 6mm; margin-bottom: 0px; font-family: franklin_gothic !important;">
                             Royaume du Cambodge <br/>
                             Nation Religion Roi <br/>
