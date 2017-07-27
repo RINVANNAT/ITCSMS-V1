@@ -268,8 +268,8 @@
                 $month = strtolower(month_mois($month));
                 $year = \Carbon\Carbon::createFromFormat("Y-m-d H:i:s",$student->dob)->formatLocalized('%Y');
                 ?>
-                {{strtoupper($student->name_latin)}}, <br/>
-                ID : {{$student->id_card}} <br/><br/>
+                {{strtoupper($student->name_latin)}}, <br/><br/>
+                ID : {{$student->id_card}} <br/>
                 @if($student->gender_id == 1)
                     né
                 @else
