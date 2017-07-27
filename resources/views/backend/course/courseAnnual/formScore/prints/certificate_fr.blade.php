@@ -31,6 +31,9 @@
         .text-13{
             font-size: 12pt;
         }
+        .text-14{
+            font-size: 14pt;
+        }
         .text-20{
             font-size: 20pt;
         }
@@ -128,9 +131,6 @@
                     <p class="text-20">
                         Institut de Technologie du Cambodge
                     </p>
-                    <p class="text-13">
-                        Section de Français
-                    </p>
                 </div>
                 <div class="row text-center attestation_title text-21">
                    <span>
@@ -227,13 +227,19 @@
             </div>
         @else
             <div class="page">
-                <div class="row text-center title" style="margin-top: 10mm; margin-left: -14mm">
-                    <p class="text-20">
-                        Institut de Technologie du Cambodge
-                    </p>
-                    <p class="text-13">
-                        Section de Français
-                    </p>
+                <div class="row title" style="margin-top: 10mm; padding-left: 5mm; padding-right: 5mm;">
+                    <div class="pull-left">
+                        <p class="text-14">
+                            Institut de Technologie du Cambodge
+                        </p>
+                    </div>
+                    <div class="pull-right text-center">
+                        <p class="text-14" style="line-height: 6mm">
+                            Royaume du Cambodge <br/>
+                            Nation Religion Roi <br/>
+                            <span class="text-20" style="font-family: tactieng !important;">3</span>
+                        </p>
+                    </div>
                 </div>
                 <div class="row">
                     <span class="text-13" style="font-style: italic; margin-left: 5mm">N<sup> o</sup>Réf.: .................ITC</span>
@@ -264,25 +270,24 @@
                 $month = strtolower(month_mois($month));
                 $year = \Carbon\Carbon::createFromFormat("Y-m-d H:i:s",$student->dob)->formatLocalized('%Y');
                 ?>
-                {{strtoupper($student->name_latin)}},
+                {{strtoupper($student->name_latin)}}, <br/>
                 @if($student->gender_id == 1)
                     né
                 @else
                     née
                 @endif
 
-                le {{$day." ".$month." ".$year}}, ID : {{$student->id_card}}
+                le {{$day." ".$month." ".$year}}, <br/> ID : {{$student->id_card}}
             </span>
-                </div>
-
-                <div class="row" style="margin-bottom: -2mm">
-                    <span style="margin-left: 22mm; line-height: 3mm;">
-                        Bulletin de notes
-                    </span>
                 </div>
                 <div class="row">
 
-                    <div class="no-padding text-center" style="width: 63mm;float: left">
+                    <div class="no-padding text-center" style="width: 63mm;float: left; margin-top: -20mm">
+                        <div class="row" style="margin-bottom: -2mm;">
+                            <span style="margin-left: 8mm; line-height: 3mm;">
+                                Bulletin de notes
+                            </span>
+                        </div>
                         <table class="table pass-result" style="width: 100%;font-size: 12px; line-height: 3mm; margin: 5mm 0 3mm 4mm;">
                             <thead>
                             <tr class="set_border">
@@ -430,7 +435,7 @@
                                 $c_month = strtolower(month_mois($now->formatLocalized('%B')));
                                 $c_year = $now->formatLocalized('%Y');
                                 ?>
-                                Phnom Penh, ITC, le {{$c_day." ".$c_month." ".$c_year}}
+                                Phnom Penh, le {{$c_day." ".$c_month." ".$c_year}}
                             <p style="margin-top: -10px !important;">
                                 Le Directeur de l’Institut de Technologie du Cambodge, <br/>
                                 <span style="font-style: italic">{{$issued_by}}</span>

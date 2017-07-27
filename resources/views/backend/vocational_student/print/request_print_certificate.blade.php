@@ -17,7 +17,7 @@
 
     <style>
         .text-10{
-            font-size: 10px !important;
+            font-size: 9pt !important;
         }
         .toolbar {
             float: left;
@@ -37,6 +37,10 @@
 
         .checkbox-toggle{
             margin-left: 5px;
+        }
+        select[name="decision"] {
+            margin-left: 3mm;
+            height: 8mm;
         }
     </style>
 @stop
@@ -159,6 +163,7 @@
                     method:'POST',
                     data:function(d){
                         d.course_annual_id = course_annual_id;
+                        d.decision = $('select[name="decision"]').val();
                     }
                 },
                 columns: [
@@ -205,6 +210,11 @@
                         }
                         $(this).data("clicks", !clicks);
                     });
+
+                    $('select[name="decision"]').off("change");
+                    $('select[name="decision"]').on("change", function(){
+                       oTable.draw();
+                    });
                 }
             });
             $(".toolbar").html(
@@ -212,7 +222,12 @@
                         '<i class="fa fa-check-square-o"></i>'+
                     '</button>'+
                     '<button type="button" data-toggle="tooltip" data-placement="right" title="Print certificate on selected students " class="btn btn-default btn-sm btn-print"><i class="fa fa-print"></i> Print Selected</button>'+
-                    '<button type="button" data-toggle="tooltip" data-placement="right" title="You can mark the printed date on every certificate " class="btn btn-default btn-sm btn-mark-printed-date"><i class="fa fa-calendar"></i> Mark Printed Date</button>'
+                    '<button type="button" data-toggle="tooltip" data-placement="right" title="You can mark the printed date on every certificate " class="btn btn-default btn-sm btn-mark-printed-date"><i class="fa fa-calendar"></i> Mark Printed Date</button>'+
+                    '<select class="form-control" name="decision">' +
+                            '<option value="" selected>Filter by result</option>'+
+                            '<option value="admis">Admis</option>'+
+                            '<option value="non admis">Non Admis</option>'+
+                    '</select>'
             );
             oTable.draw();
         });

@@ -20,6 +20,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Response;
 use Illuminate\Support\Facades\DB;
 use App\Repositories\Backend\CompetencyScore\EloquentCompetencyScoreRepository;
+use Illuminate\Support\Str;
 use JWadhams\JsonLogic;
 use Maatwebsite\Excel\Facades\Excel;
 
@@ -779,6 +780,7 @@ trait ProficencyScoreTrait
                     ->where('competency_types.id', '=', $course_annual->competency_type_id);
             })
             ->select('competencies.*')
+            ->orderBy('id')
             ->get();
 
         $competencies = collect($competencies)->keyBy('id')->toArray();
@@ -798,7 +800,7 @@ trait ProficencyScoreTrait
             $eachItem['class'] = $degrees[$item->degree_id].$item->grade_id.$departments[$item->department_id];
             $eachItem['gender'] = $item->code;
             $eachItem['printed_certificate'] = "";
-
+            $eachItem['decision'] = "";
             if(isset($printed_certificates[$item->student_annual_id])){
                 $eachItem['printed_certificate'] = "";
 
@@ -814,6 +816,7 @@ trait ProficencyScoreTrait
 
                     if($competency->type == 'condition') {
                         $strScore .= '<br/><span class="text-10">'.$competencies[$prop->competency_id]->name. ':'. '<span class="text-red">'.$prop->score.'</span></span>';
+                        $eachItem['decision'] = strtolower($prop->score);
                     } else if($competency->type == 'value') {
                         $strScore .= '<span class="text-10">'.$competencies[$prop->competency_id]->name. ':'. '<span class="text-red">'.$prop->score.'</span> / </span>';
                     } else {
@@ -831,9 +834,17 @@ trait ProficencyScoreTrait
 
         $score_collection = collect($score_collection);
         $datatables =  app('datatables')->of($score_collection)
-            ->filter(function ($query) use ($request) {
-                if ($request->has('search.value')) {
-                    $query->where('name_latin', 'like', "%{$request->get('search.value')}%");
+            ->filter(function ($instance) use ($request) {
+                $keyword = $request->get('search');
+                if ($request->has('decision') and $request->get('decision') != "") {
+                    $instance->collection = $instance->collection->filter(function ($row) use ($request) {
+                        return Str::contains($row['decision'], $request->get('decision')) ? true : false;
+                    });
+                }
+                if ($keyword != null and $keyword['value'] != "") {
+                    $instance->collection = $instance->collection->filter(function ($row) use ($request, $keyword) {
+                        return Str::contains(strtolower($row['name_latin']), strtolower($keyword['value'])) ? true : false;
+                    });
                 }
             })
             ->addColumn('checkbox', function($student) {
