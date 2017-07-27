@@ -6,15 +6,8 @@ use App\Http\Controllers\Backend\Schedule\Traits\ViewTimetableByTeacherControlle
 use App\Http\Controllers\Controller;
 use App\Models\AcademicYear;
 use App\Models\CourseAnnual;
-use App\Models\Degree;
-use App\Models\Department;
-use App\Models\DepartmentOption;
 use App\Models\Employee;
-use App\Models\Grade;
-use App\Models\Group;
 use App\Models\Schedule\Timetable\TimetableSlot;
-use App\Models\Schedule\Timetable\Week;
-use App\Models\Semester;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -73,8 +66,10 @@ class DashboardController extends Controller
         foreach ($timetable_slots as $timetable_slot) {
             $timetables->push($timetable_slot->timetable);
         }
+        $timetables = $timetables->keyBy('id');
 
-        if (count($timetables) > 0) {
+
+        /*if (count($timetables) > 0) {
             $timetables = $timetables->keyBy('id');
 
             $academicYears = new Collection();
@@ -187,7 +182,7 @@ class DashboardController extends Controller
                     'groups' => $array_groups
                 ])
                 ->withUser(access()->user());
-        }
-        return view('backend.dashboard', compact('courses'))->withUser(access()->user());
+        }*/
+        return view('backend.dashboard', compact('courses', 'timetables'))->withUser(access()->user());
     }
 }

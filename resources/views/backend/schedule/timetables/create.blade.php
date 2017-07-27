@@ -287,6 +287,7 @@
                     }
                     $('#timetable').fullCalendar('removeEvents');
                     $('#timetable').fullCalendar('renderEvents', response.timetableSlots, true);
+                    $('#timetable').fullCalendar('changeView', 'agendaWeek');
                     $('#timetable').fullCalendar('rerenderEvents');
                     toggleLoading(false);
                 },

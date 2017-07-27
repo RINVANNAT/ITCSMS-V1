@@ -6,6 +6,7 @@
     {!! Html::style('plugins/fullcalendar/fullcalendar.css') !!}
     {!! Html::style('plugins/sweetalert2/dist/sweetalert2.css') !!}
     {!! Html::style('plugins/toastr/toastr.min.css') !!}
+    {!! Html::style('plugins/select2/select2.min.css') !!}
     {!! Html::style('css/backend/schedule/timetable.css') !!}
     {!! Html::style('bower_components/bootstrap-toggle/css/bootstrap2-toggle.min.css') !!}
 
@@ -28,6 +29,11 @@
 
         .toggle.ios .toggle-handle {
             border-radius: 20px;
+        }
+
+        .select2-container--default .select2-results__option--highlighted[aria-selected] {
+            background-color: #3c8dbc;
+            color: #fff;
         }
     </style>
 
@@ -98,7 +104,7 @@
                     <ul class="timeline timeline-inverse">
 
                         @if($teacher)
-                            @if(isset($academicYears))
+                            @if(isset($timetables))
                                 @include('backend.dashboard.includes.timetable')
                             @endif
                             @include('backend.dashboard.teacher')
@@ -214,6 +220,7 @@
     {!! Html::script('plugins/fullcalendar/fullcalendar.js') !!}
     {!! Html::script('plugins/sweetalert2/dist/sweetalert2.js') !!}
     {!! Html::script('plugins/toastr/toastr.min.js') !!}
+    {!! Html::script('plugins/select2/select2.full.min.js') !!}
     {!! Html::script('bower_components/bootstrap-toggle/js/bootstrap2-toggle.min.js') !!}
     {!! Html::script('js/backend/schedule/timetable.js') !!}
 
@@ -478,9 +485,16 @@
         /** load script */
         $(function () {
             show_timetable();
+
             get_teacher_timetable();
+
             $('#form_teacher_timetable').on('change', function () {
                 get_teacher_timetable();
+            });
+
+            $('#teacher_timetable').select2({
+                placeholder: "Timetable",
+                allowClear: true
             });
         });
     </script>
