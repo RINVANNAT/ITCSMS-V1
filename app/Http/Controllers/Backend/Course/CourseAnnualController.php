@@ -2937,7 +2937,6 @@ class CourseAnnualController extends Controller
                 $studentAnnualIds = $studentAnnualIds
                     ->whereNull('group_student_annuals.department_id')
                     ->lists('student_annual_id');
-
             }
 
             $students = $students->whereIn('studentAnnuals.id', $studentAnnualIds);
@@ -3256,6 +3255,7 @@ class CourseAnnualController extends Controller
                             }
                         }
 
+                        // Absence score is included
                         if ($courseAnnual->is_counted_absence) {
 
                             if (is_numeric($row['abs']) || ((trim($row['abs']) == null) || (trim($row['abs']) == ''))) { // ---absence column
@@ -4658,13 +4658,11 @@ class CourseAnnualController extends Controller
     public function updateStudentStatus(Request $request)
     {
 
-
         if (auth()->user()->allow("evaluate-student")) {
 
             $academicYearId = $request->academic_year_id;
             $studentIdCard = $request->student_id_card;
             $redouble = $request->redouble;
-
 
             $student = Student::where('id_card', $studentIdCard)->select('students.id as student_id', 'students.radie')->first();
 

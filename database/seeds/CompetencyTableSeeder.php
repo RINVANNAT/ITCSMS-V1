@@ -28,8 +28,8 @@ class CompetencyTableSeeder extends Seeder
 
         $enProperties = [
             'readOnly' => false,
-            'max' => 40,
-            'min' => 10,
+            'max' => 10,
+            'min' => 0,
             'color' => 'yellow'
         ];
 
@@ -43,16 +43,7 @@ class CompetencyTableSeeder extends Seeder
         $competencies  = [
 
             [
-                'name' => 'SP',
-                'competency_type_id' => 1,
-                'properties' => json_encode(['min' => 9, 'max'=> 50, 'color' => 'yellow', 'readOnly' => false]),
-                'type' => "value",
-                'calculation_rule' => null,
-                'created_at' => Carbon::now(),
-                'create_uid' => 1
-            ],
-            [
-                'name' => 'RD',
+                'name' => 'S',
                 'competency_type_id' => 1,
                 'properties' => json_encode($enProperties),
                 'type' => "value",
@@ -61,7 +52,16 @@ class CompetencyTableSeeder extends Seeder
                 'create_uid' => 1
             ],
             [
-                'name' => 'WR',
+                'name' => 'R',
+                'competency_type_id' => 1,
+                'properties' => json_encode($enProperties),
+                'type' => "value",
+                'calculation_rule' => null,
+                'created_at' => Carbon::now(),
+                'create_uid' => 1
+            ],
+            [
+                'name' => 'W',
                 'properties' => json_encode($enProperties),
                 'type' => "value",
                 'calculation_rule' => null,
@@ -70,7 +70,7 @@ class CompetencyTableSeeder extends Seeder
                 'create_uid' => 1
             ],
             [
-                'name' => 'LS',
+                'name' => 'L',
                 'properties' => json_encode($enProperties),
                 'type' => "value",
                 'calculation_rule' => null,
@@ -82,7 +82,7 @@ class CompetencyTableSeeder extends Seeder
             [
                 'name' => 'Overall Band Score',
                 'properties' => json_encode(['min' => 9, 'max'=> 40, 'color' => null, 'readOnly' => true]),
-                'calculation_rule' => '((ls/4)+(rd/4)+(sp/5)+(wr/4))',
+                'calculation_rule' => '{"+":[{"var":"s"}, {"var":"r"}, {"var":"w"}, {"var":"l"}]}',
                 'type' => "calculation",
                 'competency_type_id' => 1,
                 'created_at' => Carbon::now(),
@@ -91,7 +91,7 @@ class CompetencyTableSeeder extends Seeder
             [
                 'name' => 'IELTS Band Score',
                 'properties' => json_encode(['min' => 4, 'max'=> 9, 'color' => null, 'readOnly' => true]),
-                'calculation_rule' => '(9*(ls+rd+sp+wr))/40',
+                'calculation_rule' => '{"/":[{"+":[{"var":"s"}, {"var":"r"}, {"var":"w"}, {"var":"l"}]},4]}',
                 'type' => "calculation",
                 'competency_type_id' => 1,
                 'created_at' => Carbon::now(),
@@ -100,7 +100,7 @@ class CompetencyTableSeeder extends Seeder
             [
                 'name' => 'Level',
                 'properties' => json_encode(['min' => null, 'max'=> null, 'color' => null, 'readOnly' => true]),
-                'calculation_rule' => null,
+                'calculation_rule' => '{"if":[{"and":[{">=":[{"var":"l"},5]},{">=":[{"var":"w"},5]},{">=":[{"var":"r"},5]},{">=":[{"var":"s"},5]}]},{"if":[{"<":[{"/":[{"+":[{"var":"s"},{"var":"r"},{"var":"w"},{"var":"l"}]},4]},4.5]},"",{"<":[{"/":[{"+":[{"var":"s"},{"var":"r"},{"var":"w"},{"var":"l"}]},4]},5.5]},"A2",{"<":[{"/":[{"+":[{"var":"s"},{"var":"r"},{"var":"w"},{"var":"l"}]},4]},6.5]},"B1",{"<":[{"/":[{"+":[{"var":"s"},{"var":"r"},{"var":"w"},{"var":"l"}]},4]},7.5]},"B2",{"<":[{"/":[{"+":[{"var":"s"},{"var":"r"},{"var":"w"},{"var":"l"}]},4]},8]},"C1","C2"]},""]}',
                 'type' => "condition",
                 'competency_type_id' => 1,
                 'created_at' => Carbon::now(),

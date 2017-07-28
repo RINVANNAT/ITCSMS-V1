@@ -20,6 +20,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Response;
 use Illuminate\Support\Facades\DB;
 use App\Repositories\Backend\CompetencyScore\EloquentCompetencyScoreRepository;
+use Illuminate\Support\Str;
 use JWadhams\JsonLogic;
 use Maatwebsite\Excel\Facades\Excel;
 
@@ -476,6 +477,9 @@ trait ProficencyScoreTrait
                     //$score =  eval('return '.$constructNewRule.';');
 
                     $score = JsonLogic::apply(json_decode($competency->calculation_rule),$basic_scores);
+                    if($competency->type == "calculation"){
+                        $score = $this->floatFormat($score);
+                    }
 
                     $input = [
                         'course_annual_id' => $courseAnnualId,
@@ -755,6 +759,7 @@ trait ProficencyScoreTrait
     }
 
     public function getDataForRequestPrintCertificate(Request $request) {
+
         $course_annual_id = $request->get("course_annual_id");
         $course_annual = CourseAnnual::find($course_annual_id);
 
@@ -775,6 +780,7 @@ trait ProficencyScoreTrait
                     ->where('competency_types.id', '=', $course_annual->competency_type_id);
             })
             ->select('competencies.*')
+            ->orderBy('id')
             ->get();
 
         $competencies = collect($competencies)->keyBy('id')->toArray();
@@ -794,7 +800,7 @@ trait ProficencyScoreTrait
             $eachItem['class'] = $degrees[$item->degree_id].$item->grade_id.$departments[$item->department_id];
             $eachItem['gender'] = $item->code;
             $eachItem['printed_certificate'] = "";
-
+            $eachItem['decision'] = "";
             if(isset($printed_certificates[$item->student_annual_id])){
                 $eachItem['printed_certificate'] = "";
 
@@ -810,6 +816,7 @@ trait ProficencyScoreTrait
 
                     if($competency->type == 'condition') {
                         $strScore .= '<br/><span class="text-10">'.$competencies[$prop->competency_id]->name. ':'. '<span class="text-red">'.$prop->score.'</span></span>';
+                        $eachItem['decision'] = strtolower($prop->score);
                     } else if($competency->type == 'value') {
                         $strScore .= '<span class="text-10">'.$competencies[$prop->competency_id]->name. ':'. '<span class="text-red">'.$prop->score.'</span> / </span>';
                     } else {
@@ -826,9 +833,27 @@ trait ProficencyScoreTrait
         });
 
         $score_collection = collect($score_collection);
-        $datatables =  app('datatables')->of($score_collection);
-        return $datatables
-
+        $datatables =  app('datatables')->of($score_collection)
+            ->filter(function ($instance) use ($request) {
+                $keyword = $request->get('search');
+                if ($request->has('decision') and $request->get('decision') != "") {
+                    $instance->collection = $instance->collection->filter(function ($row) use ($request) {
+                        return Str::contains($row['decision'], $request->get('decision')) ? true : false;
+                    });
+                }
+                if ($keyword != null and $keyword['value'] != "") {
+                    $instance->collection = $instance->collection->filter(function ($row) use ($request, $keyword) {
+                        if(
+                            Str::contains(strtolower($row['name_latin']), strtolower($keyword['value'])) ||
+                            Str::contains(strtolower($row['id_card']), strtolower($keyword['value']))
+                        ){
+                            return true;
+                        } else {
+                            return false;
+                        }
+                    });
+                }
+            })
             ->addColumn('checkbox', function($student) {
                 return '<input type="checkbox" checked class="checkbox" data-id='.$student['student_annual_id'].'>';
             })
@@ -842,13 +867,17 @@ trait ProficencyScoreTrait
                 $actions = '<button data-id='.$student['student_annual_id'].' style="float: right" class="btn btn-block btn-default btn-sm btn-single-print"><i class="fa fa-print"></i> Print</button>';
                 return  $actions;
 
-            })
-            ->make(true);
+            });
+
+        return $datatables->make(true);
     }
 
     public function printCertificate(Request $request)
     {
         $studentAnnualIds = json_decode($request->ids);
+        $issued_by = $request->issued_by;
+        $issued_date = $request->issued_date;
+        $issued_number = $request->issued_number;
         $courseAnnual = CourseAnnual::find($request->course_annual_id);
         $departments = Department::lists("code","id")->toArray();
         $students  = DB::table('students')
@@ -888,7 +917,10 @@ trait ProficencyScoreTrait
                 'competencies' => $competencies,
                 'students'=> $students,
                 'exam_start'=>$request->exam_start,
-                'exam_end'=>$request->exam_end
+                'exam_end'=>$request->exam_end,
+                'issued_by' => $issued_by,
+                'issued_date' => $issued_date,
+                'issued_number' => $issued_number
             ]
         );
     }

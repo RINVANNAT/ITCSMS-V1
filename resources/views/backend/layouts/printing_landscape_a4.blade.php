@@ -28,6 +28,10 @@
             }
 
             @font-face {
+                font-family: arial-rounded;
+                src: url("{{url('assets/fonts/arial-rounded-mt-bold.ttf')}}");
+            }
+            @font-face {
                 font-family: bayon;
                 src: url("{{url('assets/fonts/Bayon.ttf')}}");
             }

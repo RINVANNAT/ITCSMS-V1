@@ -31,5 +31,8 @@ bin/
 !/public/img/profiles/avatar.png
 !/public/img/profiles/
 /public/bower_components/
-/public/plugins/
+
 /public/assets/
+/public/score/
+!/public/score/
+/public/plugins/
