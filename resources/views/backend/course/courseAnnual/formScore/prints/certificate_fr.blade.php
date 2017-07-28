@@ -6,6 +6,11 @@
 @section('after-styles-end')
     <link rel="stylesheet" media="print, screen" href="{{ url('css/backend/transcript.css') }}">
     <style>
+        u {
+            vertical-align: text-top;
+            border-bottom: 1px dotted #000;
+            text-decoration: none;
+        }
         .table > thead > tr > th, .table > thead > tr > td, .table > tbody > tr > th, .table > tbody > tr > td, .table > tfoot > tr > th, .table > tfoot > tr > td{
             padding: 3px !important;
         }
@@ -94,12 +99,7 @@
 @section('content')
 
     <?php
-            if($issued_number != null) {
-                $number = $issued_number;
-            } else {
-                $number = 0;
-            }
-
+        $number = $issued_number;
     ?>
     @foreach($students as $student)
         <?php
@@ -240,13 +240,13 @@
                         <p class="text-14" style="font-size: 13pt; font-weight: bold">
                             Institut de Technologie du Cambodge
                         </p>
-                        <span class="text-13" style="font-style: italic;">Réf.: <span> &nbsp;&nbsp;&nbsp;{{$number}} &nbsp;&nbsp;&nbsp;</span>/ITC</span>
+                        <span class="text-13" style="font-style: italic;">Réf.: <u> &nbsp;&nbsp;&nbsp;{{$number!=null?$number:""}} &nbsp;&nbsp;&nbsp;</u>/ITC</span>
                     </div>
                     <div class="pull-right text-center" style="padding-right: 9mm; margin-top: -7mm">
                         <p class="text-14" style="line-height: 6mm; margin-bottom: 0px; font-family: franklin_gothic !important;">
                             Royaume du Cambodge <br/>
                             Nation Religion Roi <br/>
-                            <span class="text-20" style="font-family: tactieng !important;">7</span>
+                            <span style="font-family: tactieng !important; font-size: 35pt">7</span>
                         </p>
                     </div>
                 </div>
@@ -295,7 +295,7 @@
                                 Bulletin de notes
                             </span>
                         </div>
-                        <table class="table pass-result" style="width: 100%;font-size: 12px; line-height: 3mm; margin: 5mm 0 3mm 4mm;">
+                        <table class="table pass-result" style="width: 100%;font-size: 12px; line-height: 3mm; margin: 5mm 0 3mm 3mm;">
                             <thead>
                             <tr class="set_border">
                                 <th colspan="2" rowspan="2" style="text-align: center">Compétences évaluées comblées</th>
@@ -355,7 +355,7 @@
 
 
                         <div class="row" style="margin-top: 5%;line-height: 3mm;">
-                            <div class="col-md-12 col-xs-12" style="margin-left: 4mm; padding-right: 0mm">
+                            <div class="col-md-12 col-xs-12" style="margin-left: 3mm; padding-right: 0mm">
                                 <p class="description">
                                     *Note minimale requise par épreuve : 05/25 <br/>
                                     *Seuil de réussite pour obtenir le niveau : 50/100
@@ -456,7 +456,9 @@
             </div>
         @endif
         <?php
-            $number++;
+            if($number!= null) {
+                $number++;
+            }
         ?>
     @endforeach
 

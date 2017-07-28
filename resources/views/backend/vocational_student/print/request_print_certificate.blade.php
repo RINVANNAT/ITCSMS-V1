@@ -57,7 +57,7 @@
             <div class="pull-right">
                 <input type="text" name="issued_number" class="form-control"  placeholder="Issued number"/>
             </div>
-            <div class="pull-right">
+            <div class="pull-right" style="margin-right: 5px;">
                 <input type="text" name="issued_by" class="form-control"  placeholder="Issued by"/>
             </div>
             <div class="pull-right" style="margin-right: 5px;">
