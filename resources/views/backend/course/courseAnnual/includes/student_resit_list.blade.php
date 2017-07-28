@@ -46,7 +46,6 @@
         <?php $student = $studentRattrapage['student'];?>
         <?php $totalScore =0; $approximation_score=0;?>
 
-        <input type="hidden" value="{{$student->id_card}}" name="student_id_card[]">
         <tr>
             <td>{{$index}}</td>
             <td>{{$student->id_card}}</td>
@@ -67,7 +66,9 @@
 
                                         <td>
                                             {{--set checked--}}
-                                            <label for="{{$student->id_card}}_{{$count_label}}" style=" font-size: 12pt;" class="btn btn-xs btn-default"><input student_annual_id = "{{$student->student_annual_id}}" student_name="{{$student->name_kh}}" id="{{$student->id_card}}_{{$count_label}}" credit="{{$courseAnnual->course_annual_credit}}" student_id="{{$student->id_card}}" class="{{$student->id_card}} input_value" type="checkbox" onchange="calculateScore($(this))" name="{{$student->id_card}}[]" value="{{$courseAnnual->course_annual_id}}" course_name="{{$courseAnnual->name_en}}" checked score="{{$fail['score']}}"> {{number_format((float)($fail['score']), 2, '.', '')}}</label>
+                                            <label for="{{$student->id_card}}_{{$count_label}}" style=" font-size: 12pt;" class="btn btn-xs btn-default">
+                                                <input student_annual_id = "{{$student->student_annual_id}}" student_name="{{$student->name_kh}}" id="{{$student->id_card}}_{{$count_label}}" credit="{{$courseAnnual->course_annual_credit}}" student_id="{{$student->id_card}}" class="{{$student->id_card}} input_value" type="checkbox" onchange="calculateScore($(this))" name="{{$student->id_card}}[]" value="{{$courseAnnual->course_annual_id}}" course_name="{{$courseAnnual->name_en}}" checked score="{{$fail['score']}}"> {{number_format((float)($fail['score']), 2, '.', '')}}
+                                            </label>
 
                                         </td>
 
@@ -86,7 +87,9 @@
 
                                         <td>
                                             {{--set checked--}}
-                                            <label for="{{$student->id_card}}_{{$count_label}}" student_annual_id = "{{$student->student_annual_id}}" student_name="{{$student->name_kh}}" style=" font-size: 12pt;" class="btn btn-xs btn-default"><input id="{{$student->id_card}}_{{$count_label}}" credit="{{$courseAnnual->course_annual_credit}}" student_id="{{$student->id_card}}" class="{{$student->id_card}} input_value" type="checkbox" onchange="calculateScore($(this))" name="{{$student->id_card}}[]" value="{{$courseAnnual->course_annual_id}}" course_name="{{$courseAnnual->name_en}}" score="{{$pass['score']}}"> {{number_format((float)($pass['score']), 2, '.', '')}}</label>
+                                            <label for="{{$student->id_card}}_{{$count_label}}" student_annual_id = "{{$student->student_annual_id}}" student_name="{{$student->name_kh}}" style=" font-size: 12pt;" class="btn btn-xs btn-default">
+                                                <input id="{{$student->id_card}}_{{$count_label}}" credit="{{$courseAnnual->course_annual_credit}}" student_id="{{$student->id_card}}" class="{{$student->id_card}} input_value" type="checkbox" onchange="calculateScore($(this))" name="{{$student->id_card}}[]" value="{{$courseAnnual->course_annual_id}}" course_name="{{$courseAnnual->name_en}}" score="{{$pass['score']}}"> {{number_format((float)($pass['score']), 2, '.', '')}}
+                                            </label>
 
                                         </td>
 
@@ -108,7 +111,9 @@
 
                                     <td>
                                         {{--set checked--}}
-                                        <label for="{{$student->id_card}}_{{$count_label}}" style=" font-size: 12pt;" class="btn btn-xs btn-default"><input student_annual_id = "{{$student->student_annual_id}}" student_name="{{$student->name_kh}}" id="{{$student->id_card}}_{{$count_label}}" credit="{{$courseAnnual->course_annual_credit}}" student_id="{{$student->id_card}}" class="{{$student->id_card}} input_value" type="checkbox" onchange="calculateScore($(this))" name="{{$student->id_card}}[]" value="{{$courseAnnual->course_annual_id}}" course_name="{{$courseAnnual->name_en}}" checked score="{{$fail['score']}}"> {{number_format((float)($fail['score']), 2, '.', '')}}</label>
+                                        <label for="{{$student->id_card}}_{{$count_label}}" style=" font-size: 12pt;" class="btn btn-xs btn-default">
+                                            <input student_annual_id = "{{$student->student_annual_id}}" student_name="{{$student->name_kh}}" id="{{$student->id_card}}_{{$count_label}}" credit="{{$courseAnnual->course_annual_credit}}" student_id="{{$student->id_card}}" class="{{$student->id_card}} input_value" type="checkbox" onchange="calculateScore($(this))" name="{{$student->id_card}}[]" value="{{$courseAnnual->course_annual_id}}" course_name="{{$courseAnnual->name_en}}" checked score="{{$fail['score']}}"> {{number_format((float)($fail['score']), 2, '.', '')}}
+                                        </label>
 
                                     </td>
 
@@ -126,7 +131,9 @@
 
                                     <td>
                                         {{--set checked--}}
-                                        <label for="{{$student->id_card}}_{{$count_label}}" style=" font-size: 12pt;" class="btn btn-xs btn-default"><input student_annual_id = "{{$student->student_annual_id}}" student_name="{{$student->name_kh}}" id="{{$student->id_card}}_{{$count_label}}" credit="{{$courseAnnual->course_annual_credit}}" student_id="{{$student->id_card}}" class="{{$student->id_card}} input_value" type="checkbox" onchange="calculateScore($(this))" name="{{$student->id_card}}[]" value="{{$courseAnnual->course_annual_id}}" course_name="{{$courseAnnual->name_en}}" score="{{$pass['score']}}"> {{number_format((float)($pass['score']), 2, '.', '')}}</label>
+                                        <label for="{{$student->id_card}}_{{$count_label}}" style=" font-size: 12pt;" class="btn btn-xs btn-default">
+                                            <input student_annual_id = "{{$student->student_annual_id}}" student_name="{{$student->name_kh}}" id="{{$student->id_card}}_{{$count_label}}" credit="{{$courseAnnual->course_annual_credit}}" student_id="{{$student->id_card}}" class="{{$student->id_card}} input_value" type="checkbox" onchange="calculateScore($(this))" name="{{$student->id_card}}[]" value="{{$courseAnnual->course_annual_id}}" course_name="{{$courseAnnual->name_en}}" score="{{$pass['score']}}"> {{number_format((float)($pass['score']), 2, '.', '')}}
+                                        </label>
 
                                     </td>
 
@@ -149,7 +156,9 @@
 
                                 <td>
                                     {{--set checked--}}
-                                    <label for="{{$student->id_card}}_{{$count_label}}" style=" font-size: 12pt;" class="btn btn-xs btn-default"><input student_annual_id = "{{$student->student_annual_id}}" student_name="{{$student->name_kh}}" id="{{$student->id_card}}_{{$count_label}}" credit="{{$courseAnnual->course_annual_credit}}" student_id="{{$student->id_card}}" class="{{$student->id_card}} input_value" type="checkbox" onchange="calculateScore($(this))" name="{{$student->id_card}}[]" value="{{$courseAnnual->course_annual_id}}" course_name="{{$courseAnnual->name_en}}" checked score="{{$fail['score']}}"> {{number_format((float)($fail['score']), 2, '.', '')}}</label>
+                                    <label for="{{$student->id_card}}_{{$count_label}}" style=" font-size: 12pt;" class="btn btn-xs btn-default">
+                                        <input student_annual_id = "{{$student->student_annual_id}}" student_name="{{$student->name_kh}}" id="{{$student->id_card}}_{{$count_label}}" credit="{{$courseAnnual->course_annual_credit}}" student_id="{{$student->id_card}}" class="{{$student->id_card}} input_value" type="checkbox" onchange="calculateScore($(this))" name="{{$student->id_card}}[]" value="{{$courseAnnual->course_annual_id}}" course_name="{{$courseAnnual->name_en}}" checked score="{{$fail['score']}}"> {{number_format((float)($fail['score']), 2, '.', '')}}
+                                    </label>
 
                                 </td>
 
@@ -167,7 +176,9 @@
 
                                 <td>
                                     {{--set checked--}}
-                                    <label for="{{$student->id_card}}_{{$count_label}}" style=" font-size: 12pt;" class="btn btn-xs btn-default"><input student_annual_id = "{{$student->student_annual_id}}" student_name="{{$student->name_kh}}" id="{{$student->id_card}}_{{$count_label}}" credit="{{$courseAnnual->course_annual_credit}}" student_id="{{$student->id_card}}" class="{{$student->id_card}} input_value" type="checkbox" onchange="calculateScore($(this))" name="{{$student->id_card}}[]" value="{{$courseAnnual->course_annual_id}}" course_name="{{$courseAnnual->name_en}}" score="{{$pass['score']}}"> {{number_format((float)($pass['score']), 2, '.', '')}}</label>
+                                    <label for="{{$student->id_card}}_{{$count_label}}" style=" font-size: 12pt;" class="btn btn-xs btn-default">
+                                        <input student_annual_id = "{{$student->student_annual_id}}" student_name="{{$student->name_kh}}" id="{{$student->id_card}}_{{$count_label}}" credit="{{$courseAnnual->course_annual_credit}}" student_id="{{$student->id_card}}" class="{{$student->id_card}} input_value" type="checkbox" onchange="calculateScore($(this))" name="{{$student->id_card}}[]" value="{{$courseAnnual->course_annual_id}}" course_name="{{$courseAnnual->name_en}}" score="{{$pass['score']}}"> {{number_format((float)($pass['score']), 2, '.', '')}}
+                                    </label>
 
                                 </td>
 

@@ -944,8 +944,8 @@ trait StudentScore {
             $courseAnnuals = $courseAnnuals->where('course_annuals.department_option_id', '=',$props['dept_option_id']);
         }
 
+//        $courseAnnuals = $courseAnnuals->where('course_annuals.course_id', '=', 587);
         $courseAnnuals = $courseAnnuals->orderBy('course_annuals.semester_id')->orderBy('course_annuals.name_en');// note restricted order by semester this is very important to make dynamic table course of each year [if change there would have bugs]
-
 
         return $courseAnnuals;
 
