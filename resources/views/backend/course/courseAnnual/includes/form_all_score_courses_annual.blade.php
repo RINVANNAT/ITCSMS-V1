@@ -671,6 +671,7 @@
                                                     $.each(settingData, function (key, val) {
 
                                                         if (val.student_id_card == arrayData[rank].student_id_card) {
+
                                                             val.number = rank + 1;
                                                             sortedData.push(val);
                                                         }
