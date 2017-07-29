@@ -518,7 +518,6 @@
                                 data: baseData_remark,
                                 dataType: "json",
                                 success: function (resultData) {
-
                                     notify('success', 'General Mark Done!', 'Info');
                                 },
                                 error: function (response) {
@@ -673,8 +672,9 @@
 
                                                         if (val.student_id_card == arrayData[rank].student_id_card) {
                                                             val.number = rank + 1;
-                                                            sortedData.push(val)
+                                                            sortedData.push(val);
                                                         }
+
                                                     })
                                                 }
                                                 for (var index = arrayData.length; index < settingData.length; index++) {
