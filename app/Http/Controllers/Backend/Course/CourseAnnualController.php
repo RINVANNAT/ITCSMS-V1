@@ -3805,6 +3805,7 @@ class CourseAnnualController extends Controller
                 $col_span[] = $col . $letter . '6';
 
             } else {
+
                 if ($header == '') {
                     $first_headers[] = 'No';
                 } else {
