@@ -249,6 +249,7 @@
                 status = false;
             } else {
                 $.each(change, function(key, value) {
+
                     if(current_resit_subject[key] != value ) {
                         status = false;
                     }

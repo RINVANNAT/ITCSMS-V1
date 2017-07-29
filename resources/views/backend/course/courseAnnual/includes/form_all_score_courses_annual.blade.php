@@ -518,8 +518,7 @@
                                 data: baseData_remark,
                                 dataType: "json",
                                 success: function (resultData) {
-
-                                    notify('success', 'Marked!', 'Info');
+                                    notify('success', 'General Mark Done!', 'Info');
                                 },
                                 error: function (response) {
 
@@ -674,8 +673,9 @@
                                                         if (val.student_id_card == arrayData[rank].student_id_card) {
 
                                                             val.number = rank + 1;
-                                                            sortedData.push(val)
+                                                            sortedData.push(val);
                                                         }
+
                                                     })
                                                 }
                                                 for (var index = arrayData.length; index < settingData.length; index++) {
@@ -886,7 +886,6 @@
 
                        var moyenne = calculate_moyenne(array_fail_subject[student['student_id_card']]);
 
-
                        if ( moyenne >= parseFloat('{{\App\Models\Enum\ScoreEnum::Pass_Moyenne}}')) {
                            var all_subjects = array_fail_subject[student['student_id_card']];
 
@@ -915,7 +914,6 @@
         function numberSubjectRattrapage(subjects, pass_moyenne, approximate_moyenne) {
 
             var number_subject = getStudentReExam(subjects, pass_moyenne, approximate_moyenne);
-
 
             if ('fail' in number_subject) {
                 return number_subject['fail'].length;

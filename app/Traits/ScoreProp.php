@@ -72,6 +72,7 @@ trait ScoreProp {
 
             return ($studentAnnualIds);
         } else {
+
             return DB::table('group_student_annuals')
                 ->whereIn('group_id', $groupIds)
                 ->where('semester_id', $semesterId)
@@ -84,6 +85,7 @@ trait ScoreProp {
 
     public function scoreAnnualProp( $courseAnnualId)
     {
+
         $select = [
             'scores.course_annual_id', 'scores.student_annual_id',
             'scores.score', 'scores.score_absence', 'percentages.name',

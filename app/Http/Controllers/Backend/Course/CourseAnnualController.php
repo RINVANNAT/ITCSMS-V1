@@ -1821,9 +1821,6 @@ class CourseAnnualController extends Controller
         }
 
 
-        //dd($checkUpdate .'=='. (count($inputs) - $checkNotUpdated));
-
-
         if ($checkUpdate == count($inputs) - $checkNotUpdated) {
 
             $reDrawTable = $this->handsonTableData($inputs[0]['course_annual_id'], $request_group = null);
@@ -2337,8 +2334,6 @@ class CourseAnnualController extends Controller
             return count($item);
         })->max();
 
-        //dump($element['e20160930']);
-        //dd($element);//e20160930
 
         foreach ($element as $key => $value) {
 
@@ -2466,8 +2461,6 @@ class CourseAnnualController extends Controller
         }
 
 
-        //dd($fail_subjects['e20160930']);
-
         return json_encode([
             'array_fail_subject' => $fail_subjects,
             'status' => true,
@@ -2522,14 +2515,27 @@ class CourseAnnualController extends Controller
      */
     private function assignValueRattrapage($arrayData, $arrayFailSubject)
     {
-
         $dataWithRattrapage = [];
+
         foreach ($arrayData as $data) {
 
             if ($data['student_id_card'] != null) {
-                $numberRattrapage = $this->numberRattrapage($arrayFailSubject[$data['student_id_card']]);
-                $data['Rattrapage'] = $numberRattrapage;
+
+                if($data['Moyenne'] >= ScoreEnum::Pass_Moyenne) {
+
+                    $arrayPassOrFails  = $arrayFailSubject[$data['student_id_card']]; // array of every subjects of student with score
+                    if(isset($arrayPassOrFails['fail'])) {
+                        $data['Rattrapage'] = count($arrayPassOrFails['fail']);
+                    } else {
+                        $data['Rattrapage'] = ScoreEnum::Zero;
+                    }
+                } else {
+
+                    $numberRattrapage = $this->numberRattrapage($arrayFailSubject[$data['student_id_card']]);
+                    $data['Rattrapage'] = $numberRattrapage;
+                }
             }
+
             $dataWithRattrapage[] = $data;
         }
         return $dataWithRattrapage;
@@ -2694,6 +2700,7 @@ class CourseAnnualController extends Controller
 
         //-----loop arrange table from column to row ---
 
+
         if ($status) {
 
             if (count($annualCourses) > 1) {
@@ -2707,19 +2714,24 @@ class CourseAnnualController extends Controller
                         foreach ($filtered_students as $stu_dent) {
 
                             $array_observation[$stu_dent->id_card] = $stu_dent;
-                            $each_score = isset($eachCourseAnnualScores[$eachCourse->course_annual_id]) ? (isset($eachCourseAnnualScores[$eachCourse->course_annual_id][$stu_dent->student_annual_id]) ? $this->compareResitScore($eachCourseAnnualScores[$eachCourse->course_annual_id][$stu_dent->student_annual_id]) : 0) : 0;
 
+                            $each_score = isset($eachCourseAnnualScores[$eachCourse->course_annual_id]) ? (isset($eachCourseAnnualScores[$eachCourse->course_annual_id][$stu_dent->student_annual_id]) ? $this->compareResitScore($eachCourseAnnualScores[$eachCourse->course_annual_id][$stu_dent->student_annual_id]) : 0) : 0;
                             $each_column_score = $this->score_constraint($each_score, $eachCourse, $stu_dent, $each_column_score);
                             $element = $this->init_element($stu_dent, $element);
 
                             //--------request for only one semester ------
                             $absence_by_course = isset($absences[$eachCourse->course_annual_id]) ? (isset($absences[$eachCourse->course_annual_id][$stu_dent->student_annual_id]) ? $absences[$eachCourse->course_annual_id][$stu_dent->student_annual_id] : null) : null;
+
                             $each_element_semester = $this->add_element_by_semester($each_score, $semesterId, $semesters, $eachCourse, $stu_dent, $element, $absence_by_course, $totalMoyenne, $totalAbs, $array_student_id_card);
 
                             if ($each_element_semester != false) {
+
                                 $totalMoyenne = $each_element_semester['total_moyenne'];
+
                                 $totalAbs = $each_element_semester['abs'];
+
                                 $element = $each_element_semester['element'];
+
                                 $array_student_id_card = $each_element_semester['student_id_card'];
 
                             } else {
@@ -2729,6 +2741,7 @@ class CourseAnnualController extends Controller
                             $fail_subjects = $this->generating_student_redouble($eachCourse, $stu_dent, $each_score, $fail_subjects);
 
                         }
+
 
                     } else {
                         $message = '<span style=" font-size: 14pt; color: red;"> '. $eachCourse->name_en.'</span>'. trans('strings.backend.course_annual.no_student_record');
@@ -2780,8 +2793,8 @@ class CourseAnnualController extends Controller
 
             if (count($annualCourses) > 1) {
 
-                foreach ($annualCourses as $eachCourse) {
 
+                foreach ($annualCourses as $eachCourse) {
 
                     $filtered_students = $this->filtering_student_annual($eachCourse, $groups);
 
@@ -2791,7 +2804,9 @@ class CourseAnnualController extends Controller
 
                             $array_observation[$stu_dent->id_card] = $stu_dent;
                             $absence_by_course = isset($absences[$eachCourse->course_annual_id]) ? (isset($absences[$eachCourse->course_annual_id][$stu_dent->student_annual_id]) ? $absences[$eachCourse->course_annual_id][$stu_dent->student_annual_id] : null) : null;
+
                             $each_score = isset($eachCourseAnnualScores[$eachCourse->course_annual_id]) ? (isset($eachCourseAnnualScores[$eachCourse->course_annual_id][$stu_dent->student_annual_id]) ? $this->compareResitScore($eachCourseAnnualScores[$eachCourse->course_annual_id][$stu_dent->student_annual_id]) : 0) : 0;
+
                             $each_column_score = $this->score_constraint($each_score, $eachCourse, $stu_dent, $each_column_score);
 
                             $each_element_semester = $this->concate_element_by_semester($each_score, $semesterId, $semesters, $eachCourse, $stu_dent, $element, $absence_by_course, $totalMoyenne, $totalAbs);
@@ -2811,8 +2826,8 @@ class CourseAnnualController extends Controller
                         $message = '<span style=" font-size: 14pt; color: red;"> '. $eachCourse->name_en.'</span>'. trans('strings.backend.course_annual.no_student_record');
                         return $this->empty_data($message, $type='warning');
                     }
-
                 }
+
 
             } else {
 
@@ -3072,7 +3087,6 @@ class CourseAnnualController extends Controller
             $alpha[] = $letter++;
         }
 
-//        dd($studentListScore);
 
         Excel::create($title, function ($excel) use ($studentListScore, $title, $alpha, $colHeaders) {
 
@@ -3756,6 +3770,7 @@ class CourseAnnualController extends Controller
     {
 
         $array_data = $this->allHandsontableData($request);
+
         $array_data = json_decode($array_data);
         $array_data = json_encode($array_data);
         $array_data = json_decode($array_data, true);
@@ -3771,7 +3786,6 @@ class CourseAnnualController extends Controller
         $col_span = [];
         $letter = 'A';
         $alpha = [];
-
 
         // -----first headers
         foreach ($array_data['nestedHeaders'][0] as $header) {
@@ -3791,6 +3805,7 @@ class CourseAnnualController extends Controller
                 $col_span[] = $col . $letter . '6';
 
             } else {
+
                 if ($header == '') {
                     $first_headers[] = 'No';
                 } else {
@@ -4030,13 +4045,15 @@ class CourseAnnualController extends Controller
         $fullUrl = $studentDataProperties['full_url'];
         $courseAnnuals = $studentDataProperties['course_annual'];
 
+
+
+
         return view('backend.course.courseAnnual.includes.student_redouble_lists',
             compact(
                 'status',
                 'courseAnnuals',
                 'studentRattrapages',
                 'academicYear',
-                'studentRattrapages',
                 'fullUrl',
                 'failCourseAnnuals',
                 'semesterId', 'degreeId', 'gradeId', 'departmentOptionId', 'departmentId', 'academicYearId'
@@ -4059,7 +4076,6 @@ class CourseAnnualController extends Controller
         $onlyResitCourseAnnuals = $studentDataProperties['resit_course_annual'];
         $fullUrl = $studentDataProperties['full_url'];
 
-
         return view('backend.course.courseAnnual.includes.resit_subject_lists',
             compact(
                 'students',
@@ -4077,23 +4093,24 @@ class CourseAnnualController extends Controller
     {
 
         $data = $request->all();
+
         $courseAnnualByPrograms = [];
         $academic_year_id = $request->academic_year_id;
         $academicYear = DB::table('academicYears')->where('id', $academic_year_id)->first();
-        $rattrapage_students = $request->student_id_card;
         $supplementary_subjects = [];
         $data_lists = [];
 
         $mustRattrapageStudents = [];
-        foreach ($rattrapage_students as $student) {
-            if (isset($data[$student])) {
+        foreach ($data as $studentIdCard =>  $failCourses) {
 
-                foreach ($data[$student] as $course_program_id) {
+            if(is_array($failCourses))
+            {
+                foreach ($failCourses as $course_program_id) {
                     if (!in_array($course_program_id, $supplementary_subjects)) {
                         $supplementary_subjects[] = $course_program_id;
                     }
                 }
-                $mustRattrapageStudents[] = $student;
+                $mustRattrapageStudents[] = $studentIdCard;
             }
 
         }
@@ -4121,7 +4138,9 @@ class CourseAnnualController extends Controller
         $index = 1;
         $true = true;
         $row_header = [];
+
         foreach ($students as $student) {
+
             if ($true) {
                 $one_student = $student;
                 $true = false;
@@ -4165,6 +4184,7 @@ class CourseAnnualController extends Controller
         $sub_header = 'Academic Year: ' . $academicYear->name_latin;
         $schoolTitle = 'Institute of Technology of Cambodia';
         $class = $degree->code . $grade->code . '-' . $department->code;
+
 
         Excel::create('Student Supplementary Courses', function ($excel) use ($data_lists, $alpha, $count, $header, $sub_header, $schoolTitle, $class, $row_header, $department) {
 
@@ -4579,8 +4599,6 @@ class CourseAnnualController extends Controller
 
                 $destroy = $studentResitSocre->delete();
                 if ($destroy) {
-
-//                    dd(isset($data[$student->id_card]));
 
                     if (isset($data[$student->id_card])) {
 

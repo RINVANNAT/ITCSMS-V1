@@ -33,3 +33,7 @@ bin/
 /public/bower_components/
 
 /public/assets/
+/public/score/
+!/public/score/
+/public/plugins/
+/public/plugins/DataTables-1.10.15/
