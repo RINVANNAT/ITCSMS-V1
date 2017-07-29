@@ -497,7 +497,7 @@
                                     notify('success', 'Marked!', 'Info');
                                 },
                                 error: function (response) {
-                                    console.log(response);
+
                                     notify('error', 'Something went wrong!', 'Info');
                                 }
                             });
@@ -519,7 +519,11 @@
                                 dataType: "json",
                                 success: function (resultData) {
 
-                                    //---call back function ....do some stuff
+                                    notify('success', 'Marked!', 'Info');
+                                },
+                                error: function (response) {
+
+                                    notify('error', 'Something went wrong!', 'Info');
                                 }
                             });
                         }
@@ -668,7 +672,7 @@
                                                     $.each(settingData, function (key, val) {
 
                                                         if (val.student_id_card == arrayData[rank].student_id_card) {
-//                                                    console.log(val.student_id_card +'=='+ arrayData[rank].student_id_card);
+
                                                             val.number = rank + 1;
                                                             sortedData.push(val)
                                                         }
@@ -881,7 +885,7 @@
                    if (student['student_id_card'] != null && student['student_id_card'] != '') {
 
                        var moyenne = calculate_moyenne(array_fail_subject[student['student_id_card']]);
-                       console.log(moyenne);
+
 
                        if ( moyenne >= parseFloat('{{\App\Models\Enum\ScoreEnum::Pass_Moyenne}}')) {
                            var all_subjects = array_fail_subject[student['student_id_card']];
