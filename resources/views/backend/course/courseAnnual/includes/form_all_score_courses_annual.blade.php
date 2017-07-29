@@ -519,7 +519,11 @@
                                 dataType: "json",
                                 success: function (resultData) {
 
-                                    //---call back function ....do some stuff
+                                    notify('success', 'General Mark Done!', 'Info');
+                                },
+                                error: function (response) {
+
+                                    notify('error', 'Something went wrong!', 'Info');
                                 }
                             });
                         }

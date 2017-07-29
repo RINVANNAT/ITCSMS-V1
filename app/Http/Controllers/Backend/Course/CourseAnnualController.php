@@ -2515,14 +2515,27 @@ class CourseAnnualController extends Controller
      */
     private function assignValueRattrapage($arrayData, $arrayFailSubject)
     {
-
         $dataWithRattrapage = [];
+
         foreach ($arrayData as $data) {
 
             if ($data['student_id_card'] != null) {
-                $numberRattrapage = $this->numberRattrapage($arrayFailSubject[$data['student_id_card']]);
-                $data['Rattrapage'] = $numberRattrapage;
+
+                if($data['Moyenne'] >= ScoreEnum::Pass_Moyenne) {
+
+                    $arrayPassOrFails  = $arrayFailSubject[$data['student_id_card']]; // array of every subjects of student with score
+                    if(isset($arrayPassOrFails['fail'])) {
+                        $data['Rattrapage'] = count($arrayPassOrFails['fail']);
+                    } else {
+                        $data['Rattrapage'] = ScoreEnum::Zero;
+                    }
+                } else {
+
+                    $numberRattrapage = $this->numberRattrapage($arrayFailSubject[$data['student_id_card']]);
+                    $data['Rattrapage'] = $numberRattrapage;
+                }
             }
+
             $dataWithRattrapage[] = $data;
         }
         return $dataWithRattrapage;
@@ -3757,6 +3770,7 @@ class CourseAnnualController extends Controller
     {
 
         $array_data = $this->allHandsontableData($request);
+
         $array_data = json_decode($array_data);
         $array_data = json_encode($array_data);
         $array_data = json_decode($array_data, true);
@@ -3772,7 +3786,6 @@ class CourseAnnualController extends Controller
         $col_span = [];
         $letter = 'A';
         $alpha = [];
-
 
         // -----first headers
         foreach ($array_data['nestedHeaders'][0] as $header) {
