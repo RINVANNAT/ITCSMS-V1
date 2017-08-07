@@ -158,7 +158,7 @@ trait StudentScore {
             $courseAnnuals = $courseAnnuals->where('course_annuals.grade_id', $studentAnnual->grade_id);
             $courseAnnuals = $courseAnnuals->where('course_annuals.department_option_id', $studentAnnual->department_option_id);
 
-            if($semester_id) {
+            if($semester_id == 1) { // apply semester filter only it is a 1st semester
                 $courseAnnuals = $courseAnnuals->where('course_annuals.semester_id', $semester_id);
             }
 

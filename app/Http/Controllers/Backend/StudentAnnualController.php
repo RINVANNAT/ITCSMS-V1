@@ -1,6 +1,9 @@
 <?php namespace App\Http\Controllers\Backend;
 
+use App\Http\Controllers\Backend\StudentTrait\PrintTranscriptTrait;
 use App\Http\Controllers\Backend\StudentTrait\StudentAnnualTrait;
+use App\Http\Controllers\Backend\StudentTrait\ReportingTrait;
+use App\Http\Controllers\Backend\Traits\FilteringTrait;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Backend\Student\CreateStudentRequest;
 use App\Http\Requests\Backend\Student\DeleteStudentRequest;
@@ -48,7 +51,11 @@ use Illuminate\Support\Facades\Response;
 
 class StudentAnnualController extends Controller
 {
-    use StudentScore; use StudentAnnualTrait;
+    use StudentScore;
+    use StudentAnnualTrait;
+    use ReportingTrait;
+    use FilteringTrait;
+    use PrintTranscriptTrait;
     /**
      * @var StudentAnnualRepositoryContract
      */
@@ -262,12 +269,12 @@ class StudentAnnualController extends Controller
                 // do nothing here
             } else if ($redouble == "no"){ // without redouble this year
                 $studentAnnuals->leftJoin('redouble_student', 'redouble_student.student_id','=','students.id')
-                        ->whereNotIn('students.id',function($query) use ($academic_year){
-                            $query->select('redouble_student.student_id')->from('redouble_student')->where('redouble_student.academic_year_id','=',$academic_year);
-                        });
+                    ->whereNotIn('students.id',function($query) use ($academic_year){
+                        $query->select('redouble_student.student_id')->from('redouble_student')->where('redouble_student.academic_year_id','=',$academic_year);
+                    });
             } else {  // only redouble student this year
                 $studentAnnuals->join('redouble_student', 'redouble_student.student_id','=','students.id')
-                        ->where('redouble_student.academic_year_id','=',$academic_year);
+                    ->where('redouble_student.academic_year_id','=',$academic_year);
             }
         }
 
@@ -282,6 +289,9 @@ class StudentAnnualController extends Controller
             ->addColumn('export', function ($studentAnnual) use ($scholarship_id) {
                 return  '<a href="'.route('admin.scholarship.holder').'?scholarship_id='.$scholarship_id.'&studentAnnual_id='.$studentAnnual->id.'" class="btn btn-xs btn-primary"><i class="fa fa-mail-forward" data-toggle="tooltip" data-placement="top" title="" data-original-title="'.trans('buttons.general.export').'"></i> </a>';
                 //return  '<a href="'.route('admin.candidate.popup_create').'?exam_id='.$scholarship_id.'&studentBac2_id='.$studentBac2->id.'" class="btn btn-xs btn-primary"><i class="fa fa-mail-forward" data-toggle="tooltip" data-placement="top" title="" data-original-title="'.trans('buttons.general.export').'"></i> </a>';
+            })
+            ->addColumn('checkbox', function($studentAnnual) {
+                return '<input type="checkbox" checked class="checkbox" data-id='.$studentAnnual->id.'>';
             })
             ->addColumn('action', function ($studentAnnual) {
                 $date = Carbon::createFromFormat("Y-m-d h:i:s",$studentAnnual->dob);
@@ -307,8 +317,8 @@ class StudentAnnualController extends Controller
                     $actions = $actions. ' <button class="btn btn-xs btn-danger btn-delete" data-remote="' . route('admin.studentAnnuals.destroy', $studentAnnual->id) . '"><i class="fa fa-times" data-toggle="tooltip" data-placement="top" title="' . trans('buttons.general.crud.delete') . '"></i></button>';
                 }
 
-
-                $actions = $actions.' <button class="btn btn-xs btn-info btn-show" data-remote="' . route('admin.studentAnnuals.show', $studentAnnual->id) . '"><i class="fa fa-eye" data-toggle="tooltip" data-placement="top" title="' . trans('buttons.general.view') . '"></i></button>' .
+                $actions = $actions.
+                    ' <button class="btn btn-xs btn-info btn-show" data-remote="' . route('admin.studentAnnuals.show', $studentAnnual->id) . '"><i class="fa fa-eye" data-toggle="tooltip" data-placement="top" title="' . trans('buttons.general.view') . '"></i></button>' .
                     " <button class='btn btn-xs btn-export' style='display:none' data-remote='" .
                     json_encode($data)  .
                     "'><i class='fa fa-external-link-square' data-toggle='tooltip' data-placement='top' title='" . 'export' . "'></i></button>" ;
@@ -318,9 +328,9 @@ class StudentAnnualController extends Controller
         // additional search
         $semester = $datatables->request->get('semester');
         $datatables->where('studentAnnuals.academic_year_id', '=', $academic_year)
-                    ->where(function($query) use($semester){
-                       $query->where("group_student_annuals.semester_id",$semester)->orWhereNull("group_student_annuals.semester_id");
-                    });
+            ->where(function($query) use($semester){
+                $query->where("group_student_annuals.semester_id",$semester)->orWhereNull("group_student_annuals.semester_id");
+            });
 
         if ($degree = $datatables->request->get('degree')) {
             $datatables->where('studentAnnuals.degree_id', '=', $degree);
@@ -357,8 +367,6 @@ class StudentAnnualController extends Controller
                 $datatables->where('students.radie','=', true);
             }
         }
-
-
         return $datatables->make(true);
     }
 
@@ -520,506 +528,6 @@ class StudentAnnualController extends Controller
         $income->save();
     }
 
-
-    public function get_student_list_by_age($academic_year_id, $degree, $date,$scholarships){
-
-        $grades = [1,2,3,4,5];
-        $ages = array(
-            ['min'=>0,'max'=>16,'name'=>'<16','data'=> array()],
-            ['min'=>16,'max'=>17,'name'=>'16','data'=> array()],
-            ['min'=>17,'max'=>18,'name'=>'17','data'=> array()],
-            ['min'=>18,'max'=>19,'name'=>'18','data'=> array()],
-            ['min'=>19,'max'=>20,'name'=>'19','data'=> array()],
-            ['min'=>20,'max'=>21,'name'=>'20','data'=> array()],
-            ['min'=>21,'max'=>22,'name'=>'21','data'=> array()],
-            ['min'=>22,'max'=>23,'name'=>'22','data'=> array()],
-            ['min'=>23,'max'=>24,'name'=>'23','data'=> array()],
-            ['min'=>24,'max'=>25,'name'=>'24','data'=> array()],
-            ['min'=>25,'max'=>26,'name'=>'25','data'=> array()],
-            ['min'=>26,'max'=>31,'name'=>'26-30','data'=> array()],
-            ['min'=>31,'max'=>40,'name'=>'31-39','data'=> array()],
-            ['min'=>40,'max'=>100,'name'=>'>39','data'=> array()]
-        );
-
-        $total_scholarship = 0;
-        $total_paid = 0;
-
-
-        foreach($ages as &$age){
-            $t_st = 0;
-            $t_sf = 0;
-            $t_pt = 0;
-            $t_pf = 0;
-
-            foreach($grades as $grade){
-                $minDate = Carbon::createFromFormat("d/m/Y",$date)->subYears($age['max'])->startOfDay();
-                $maxDate = Carbon::createFromFormat("d/m/Y",$date)->subYears($age['min'])->subDay()->endOfDay();
-
-                $total = DB::table('studentAnnuals')
-                    ->leftJoin('students','studentAnnuals.student_id','=','students.id')
-                    ->where('studentAnnuals.degree_id','=',$degree)
-                    ->where('studentAnnuals.grade_id','=',$grade)
-                    ->where('studentAnnuals.academic_year_id','=',$academic_year_id)
-                    ->whereBetween('students.dob',[$minDate,$maxDate])->count();
-
-
-                $total_female = DB::table('studentAnnuals')
-                    ->leftJoin('students','studentAnnuals.student_id','=','students.id')
-                    ->where('studentAnnuals.degree_id','=',$degree)
-                    ->where('studentAnnuals.grade_id','=',$grade)
-                    ->where('studentAnnuals.academic_year_id','=',$academic_year_id)
-                    ->whereBetween('students.dob',[$minDate,$maxDate])
-                    ->where('students.gender_id','=',2)->count(); // 2 is female
-
-                ;
-                $scholarship_total =  DB::table('studentAnnuals')
-                    ->join('scholarship_student_annual','studentAnnuals.id','=','scholarship_student_annual.student_annual_id')
-                    ->join('students','studentAnnuals.student_id','=','students.id')
-                    ->where('studentAnnuals.degree_id','=',$degree)
-                    ->where('studentAnnuals.grade_id','=',$grade)
-                    ->where('studentAnnuals.academic_year_id','=',$academic_year_id)
-                    ->whereIn('scholarship_student_annual.scholarship_id',$scholarships)
-                    ->whereBetween('students.dob',[$minDate,$maxDate])
-                    ->count();
-
-                $scholarship_female =  DB::table('studentAnnuals')
-                    ->join('scholarship_student_annual','studentAnnuals.id','=','scholarship_student_annual.student_annual_id')
-                    ->join('students','studentAnnuals.student_id','=','students.id')
-                    ->where('studentAnnuals.degree_id','=',$degree)
-                    ->where('studentAnnuals.grade_id','=',$grade)
-                    ->where('studentAnnuals.academic_year_id','=',$academic_year_id)
-                    ->whereIn('scholarship_student_annual.scholarship_id',$scholarships)
-                    ->whereBetween('students.dob',[$minDate,$maxDate])
-                    ->where('students.gender_id','=',2)->count(); // 2 is female
-
-                $array = array(
-                    'st' => $scholarship_total,
-                    'sf' => $scholarship_female,
-                    'pt' => $total-$scholarship_total,
-                    'pf' => $total_female-$scholarship_female
-                );
-
-                $t_st += $array['st'];
-                $t_sf += $array['sf'];
-                $t_pt += $array['pt'];
-                $t_pf += $array['pf'];
-
-                array_push($age['data'],$array);
-
-                // unset unnecessary variables
-
-                unset($query);
-                unset($minDate);
-                unset($maxDate);
-                unset($total);
-                unset($total_female);
-                unset($scholarship_total);
-                unset($scholarship_female);
-            }
-
-            array_push($age['data'],array('st'=>$t_st,'sf'=>$t_sf,'pt'=>$t_pt,'pf'=>$t_pf));
-            $total_scholarship = $total_scholarship+ $t_st;
-            $total_paid = $total_paid + $t_pt;
-        }
-
-        //dd("total:".$total_scholarship." | scholarship:".$total_paid." | all: ".($total_paid+$total_scholarship));
-        return $ages;
-    }
-
-    public function get_student_redouble($academic_year_id , $degree, $scholarships){
-
-        $departments = Department::where('parent_id',11)->with(['department_options'])->get()->toArray();
-        $grades = [1,2,3,4,5];
-
-        $array_total = array(
-            array('st'=>0,'sf'=>0,'pt'=>0,'pf'=>0),
-            array('st'=>0,'sf'=>0,'pt'=>0,'pf'=>0),
-            array('st'=>0,'sf'=>0,'pt'=>0,'pf'=>0),
-            array('st'=>0,'sf'=>0,'pt'=>0,'pf'=>0),
-            array('st'=>0,'sf'=>0,'pt'=>0,'pf'=>0),
-            array('st'=>0,'sf'=>0,'pt'=>0,'pf'=>0)
-        );
-
-
-        foreach($departments as &$department) {
-
-            $empty_option = array(
-                'id'=>null,
-                'name_kh'=>$department['name_kh'],
-                'name_en'=>$department['name_en'],
-                'name_fr'=>$department['name_fr'],
-                'code'=>$department['code']
-            );
-
-            if($department['department_options'] == null || count($department['department_options']) == 0){
-                $department['department_options'] = [$empty_option];
-            } else {
-                array_unshift($department['department_options'], $empty_option);
-            }
-
-            //dd($department);
-
-            foreach($department['department_options'] as &$option){
-
-                $records = array();
-                $t_st = 0;
-                $t_sf = 0;
-                $t_pt = 0;
-                $t_pf = 0;
-
-                foreach($grades as $grade){
-
-                    $total = DB::table('studentAnnuals')
-                        ->leftJoin('students','studentAnnuals.student_id','=','students.id')
-                        ->leftJoin('redouble_student','students.id','=','redouble_student.student_id')
-                        ->where('studentAnnuals.degree_id','=',$degree)
-                        ->where('studentAnnuals.grade_id','=',$grade)
-                        ->where('studentAnnuals.academic_year_id','=',$academic_year_id)
-                        ->where('studentAnnuals.department_id','=',$department['id'])
-                        ->where('studentAnnuals.department_option_id','=',$option['id'])
-                        ->where('redouble_student.redouble_id','=',$degree==2?$grade+5:$grade)->count();
-
-                    $total_female = DB::table('studentAnnuals')
-                        ->leftJoin('students','studentAnnuals.student_id','=','students.id')
-                        ->leftJoin('redouble_student','students.id','=','redouble_student.student_id')
-                        ->where('studentAnnuals.degree_id','=',$degree)
-                        ->where('studentAnnuals.grade_id','=',$grade)
-                        ->where('studentAnnuals.academic_year_id','=',$academic_year_id)
-                        ->where('studentAnnuals.department_id','=',$department['id'])
-                        ->where('studentAnnuals.department_option_id','=',$option['id'])
-                        ->where('students.gender_id','=',2)
-                        ->where('redouble_student.redouble_id','=',$degree==2?$grade+5:$grade)->count(); // 2 is female
-
-                    $scholarship_total =  DB::table('studentAnnuals')
-                        ->leftJoin('scholarship_student_annual','studentAnnuals.id','=','scholarship_student_annual.student_annual_id')
-                        ->leftJoin('students','studentAnnuals.student_id','=','students.id')
-                        ->leftJoin('redouble_student','students.id','=','redouble_student.student_id')
-                        ->where('studentAnnuals.degree_id','=',$degree)
-                        ->where('studentAnnuals.grade_id','=',$grade)
-                        ->where('studentAnnuals.academic_year_id','=',$academic_year_id)
-                        ->whereIn('scholarship_student_annual.scholarship_id',$scholarships)
-                        ->where('studentAnnuals.department_id','=',$department['id'])
-                        ->where('studentAnnuals.department_option_id','=',$option['id'])
-                        ->where('redouble_student.redouble_id','=',$degree==2?$grade+5:$grade)->count();
-
-                    $scholarship_female =  DB::table('studentAnnuals')
-                        ->leftJoin('scholarship_student_annual','studentAnnuals.id','=','scholarship_student_annual.student_annual_id')
-                        ->leftJoin('students','studentAnnuals.student_id','=','students.id')
-                        ->leftJoin('redouble_student','students.id','=','redouble_student.student_id')
-                        ->where('studentAnnuals.degree_id','=',$degree)
-                        ->where('studentAnnuals.grade_id','=',$grade)
-                        ->where('studentAnnuals.academic_year_id','=',$academic_year_id)
-                        ->whereIn('scholarship_student_annual.scholarship_id',$scholarships)
-                        ->where('studentAnnuals.department_id','=',$department['id'])
-                        ->where('studentAnnuals.department_option_id','=',$option['id'])
-                        ->where('students.gender_id','=',2)
-                        ->where('redouble_student.redouble_id','=',$degree==2?$grade+5:$grade)->count(); // 2 is female
-
-                    $array = array(
-                        'st' => $scholarship_total,
-                        'sf' => $scholarship_female,
-                        'pt' => $total-$scholarship_total,
-                        'pf' => $total_female-$scholarship_female
-                    );
-
-                    $t_st += $array['st'];
-                    $t_sf += $array['sf'];
-                    $t_pt += $array['pt'];
-                    $t_pf += $array['pf'];
-
-                    array_push($records,$array);
-
-                    // unset unnecessary variables
-
-                    unset($query);
-                    unset($minDate);
-                    unset($maxDate);
-                    unset($total);
-                    unset($total_female);
-                    unset($scholarship_total);
-                    unset($scholarship_female);
-
-                    $array_total[$grade-1]['st'] += $array['st'];
-                    $array_total[$grade-1]['sf'] += $array['sf'];
-                    $array_total[$grade-1]['pt'] += $array['pt'];
-                    $array_total[$grade-1]['pf'] += $array['pf'];
-                }
-
-                array_push($records,array('st'=>$t_st,'sf'=>$t_sf,'pt'=>$t_pt,'pf'=>$t_pf));
-                $array_total[5]['st'] += $t_st;
-                $array_total[5]['sf'] += $t_sf;
-                $array_total[5]['pt'] += $t_pt;
-                $array_total[5]['pf'] += $t_pf;
-
-                $option['data'] = $records;
-            }
-
-
-        }
-        array_push($departments,$array_total);
-        return $departments;
-    }
-
-    public function get_student_by_group($academic_year_id , $degree, $only_foreigner,$scholarships){
-        $departments = Department::where('parent_id',11)->with(['department_options'])->get()->toArray();
-        $grades = [1,2,3,4,5];
-
-        $array_total = array(
-            array('st'=>0,'sf'=>0,'pt'=>0,'pf'=>0),
-            array('st'=>0,'sf'=>0,'pt'=>0,'pf'=>0),
-            array('st'=>0,'sf'=>0,'pt'=>0,'pf'=>0),
-            array('st'=>0,'sf'=>0,'pt'=>0,'pf'=>0),
-            array('st'=>0,'sf'=>0,'pt'=>0,'pf'=>0),
-            array('st'=>0,'sf'=>0,'pt'=>0,'pf'=>0)
-        );
-
-        $locals = ['1','2','3','4','5','6','7','8','9','10','11','12','13','14','15','16','17','18','19','20','21','22','23','24','25'];
-        foreach($departments as &$department) {
-
-            $empty_option = array(
-                'id'=>null,
-                'name_kh'=>$department['name_kh'],
-                'name_en'=>$department['name_en'],
-                'name_fr'=>$department['name_fr'],
-                'code'=>$department['code']
-            );
-
-            if($department['department_options'] == null || count($department['department_options']) == 0){
-                $department['department_options'] = [$empty_option];
-            } else {
-                array_unshift($department['department_options'], $empty_option);
-            }
-
-            //dd($department);
-            foreach($department['department_options'] as &$option){
-                $records = array();
-                $t_st = 0;
-                $t_sf = 0;
-                $t_pt = 0;
-                $t_pf = 0;
-
-                foreach($grades as $grade){
-
-                    $total_query = DB::table('studentAnnuals')
-                        ->leftJoin('students','studentAnnuals.student_id','=','students.id')
-                        ->where('studentAnnuals.degree_id','=',$degree)
-                        ->where('studentAnnuals.grade_id','=',$grade)
-                        ->where('studentAnnuals.academic_year_id','=',$academic_year_id)
-                        ->where('studentAnnuals.department_id','=',$department['id'])
-                        ->where('studentAnnuals.department_option_id','=',$option['id']);
-
-                    if($only_foreigner == "true"){
-                        $total = $total_query->whereNotIn('students.origin_id',$locals)->count();
-                    } else {
-                        $total = $total_query->count();
-                    }
-
-                    $total_female_query = DB::table('studentAnnuals')
-                        ->leftJoin('students','studentAnnuals.student_id','=','students.id')
-                        ->where('studentAnnuals.degree_id','=',$degree)
-                        ->where('studentAnnuals.grade_id','=',$grade)
-                        ->where('studentAnnuals.academic_year_id','=',$academic_year_id)
-                        ->where('studentAnnuals.department_id','=',$department['id'])
-                        ->where('studentAnnuals.department_option_id','=',$option['id'])
-                        ->where('students.gender_id','=',2); // 2 is female
-
-                    if($only_foreigner == "true"){
-                        $total_female = $total_female_query->whereNotIn('students.origin_id',$locals)->count();
-                    } else {
-                        $total_female = $total_female_query->count();
-                    }
-
-                    $scholarship_total_query =  DB::table('studentAnnuals')
-                        ->leftJoin('scholarship_student_annual','studentAnnuals.id','=','scholarship_student_annual.student_annual_id')
-                        ->leftJoin('students','studentAnnuals.student_id','=','students.id')
-                        ->where('studentAnnuals.degree_id','=',$degree)
-                        ->where('studentAnnuals.grade_id','=',$grade)
-                        ->where('studentAnnuals.academic_year_id','=',$academic_year_id)
-                        ->whereIn('scholarship_student_annual.scholarship_id',$scholarships)
-                        ->where('studentAnnuals.department_id','=',$department['id'])
-                        ->where('studentAnnuals.department_option_id','=',$option['id']);
-
-                    if($only_foreigner == "true"){
-                        $scholarship_total = $scholarship_total_query->whereNotIn('students.origin_id',$locals)->count();
-                    } else {
-                        $scholarship_total = $scholarship_total_query->count();
-                    }
-
-                    $scholarship_female_query =  DB::table('studentAnnuals')
-                        ->leftJoin('scholarship_student_annual','studentAnnuals.id','=','scholarship_student_annual.student_annual_id')
-                        ->leftJoin('students','studentAnnuals.student_id','=','students.id')
-                        ->where('studentAnnuals.degree_id','=',$degree)
-                        ->where('studentAnnuals.grade_id','=',$grade)
-                        ->where('studentAnnuals.academic_year_id','=',$academic_year_id)
-                        ->whereIn('scholarship_student_annual.scholarship_id',$scholarships)
-                        ->where('studentAnnuals.department_id','=',$department['id'])
-                        ->where('studentAnnuals.department_option_id','=',$option['id'])
-                        ->where('students.gender_id','=',2); // 2 is female
-
-                    if($only_foreigner == "true"){
-                        $scholarship_female = $scholarship_female_query->whereNotIn('students.origin_id',$locals)->count();
-                    } else {
-                        $scholarship_female = $scholarship_female_query->count();
-                    }
-
-                    $array = array(
-                        'st' => $scholarship_total,
-                        'sf' => $scholarship_female,
-                        'pt' => $total-$scholarship_total,
-                        'pf' => $total_female-$scholarship_female
-                    );
-
-                    $t_st += $array['st'];
-                    $t_sf += $array['sf'];
-                    $t_pt += $array['pt'];
-                    $t_pf += $array['pf'];
-
-                    array_push($records,$array);
-
-                    // unset unnecessary variables
-
-                    unset($query);
-                    unset($minDate);
-                    unset($maxDate);
-                    unset($total);
-                    unset($total_female);
-                    unset($scholarship_total);
-                    unset($scholarship_female);
-
-                    $array_total[$grade-1]['st'] += $array['st'];
-                    $array_total[$grade-1]['sf'] += $array['sf'];
-                    $array_total[$grade-1]['pt'] += $array['pt'];
-                    $array_total[$grade-1]['pf'] += $array['pf'];
-                }
-
-                array_push($records,array('st'=>$t_st,'sf'=>$t_sf,'pt'=>$t_pt,'pf'=>$t_pf));
-                $array_total[5]['st'] += $t_st;
-                $array_total[5]['sf'] += $t_sf;
-                $array_total[5]['pt'] += $t_pt;
-                $array_total[5]['pf'] += $t_pf;
-
-                $option['data'] = $records;
-            }
-
-
-        }
-        array_push($departments,$array_total);
-        return $departments;
-    }
-
-    public function print_report($id){
-        return $this->prepare_print_and_preview($id,false);
-    }
-
-    public function preview_report($id){
-        return $this->prepare_print_and_preview($id,true);
-    }
-
-    public function prepare_print_and_preview($id, $is_preview){
-
-        $data = json_decode($_GET['data']);
-
-        $params = [
-            'scholarships' => []
-        ];
-
-        foreach($data as $key => $param){
-            if($param->name != "scholarships[]") {
-                $params[$param->name] = $param->value;
-            } else {
-                array_push($params['scholarships'],$param->value);
-            }
-        }
-
-        switch ($id) {
-            case 1:
-                if(isset($params['scholarships'])){
-                    $scholarships = $params['scholarships'];
-                } else {
-                    $scholarships = [];
-                }
-
-                $data = $this->get_student_list_by_age($params['academic_year_id'],$params['degree_id'],$params['date'],$scholarships);
-                $degree_name = Degree::find($params['degree_id'])->name_kh;
-                $academic_year_name = AcademicYear::find($params['academic_year_id'])->name_kh;
-                $date = $params['date'];
-
-                if($is_preview){
-                    return view('backend.studentAnnual.reporting.template_report_student_by_age',compact('id','data','degree_name','academic_year_name','date'));
-                } else{
-                    return view('backend.studentAnnual.reporting.print_report_student_by_age',compact('id','data','degree_name','academic_year_name','date'));
-                }
-
-                break;
-            case 2:
-                if(isset($params['scholarships'])){
-                    $scholarships = $params['scholarships'];
-                } else {
-                    $scholarships = [];
-                }
-
-                $data = $this->get_student_redouble($params['academic_year_id'],$params['degree_id'],$scholarships);
-                $degree_name = Degree::find($params['degree_id'])->name_kh;
-                $academic_year_name = AcademicYear::find($params['academic_year_id'])->name_kh;
-
-                if($is_preview){
-                    return view('backend.studentAnnual.reporting.template_report_student_redouble',compact('id','data','degree_name','academic_year_name'));
-                } else{
-                    return view('backend.studentAnnual.reporting.print_report_student_redouble',compact('id','data','degree_name','academic_year_name'));
-                }
-                break;
-            case 3:
-
-                if(isset($params['only_foreigner'])){
-                    $only_foreigner = "true";
-                } else {
-                    $only_foreigner = "false";
-                }
-
-                if(isset($params['scholarships'])){
-                    $scholarships = $params['scholarships'];
-                } else {
-                    $scholarships = [];
-                }
-                $data = $this->get_student_by_group($params['academic_year_id'],$params['degree_id'],$only_foreigner,$scholarships);
-                $degree_name = Degree::find($params['degree_id'])->name_kh;
-                $academic_year_name = AcademicYear::find($params['academic_year_id'])->name_kh;
-
-                if($is_preview) {
-                    return view('backend.studentAnnual.reporting.template_report_student_studying', compact('id', 'data', 'degree_name', 'academic_year_name','only_foreigner'));
-                } else {
-                    return view('backend.studentAnnual.reporting.print_report_student_studying',compact('id','data','degree_name','academic_year_name','only_foreigner'));
-                }
-                break;
-            default:
-                $view = 'backend.studentAnnual.reporting.reporting_student_by_age';
-        }
-    }
-
-    public function reporting($id){
-        $departments = Department::lists('name_kh','id')->toArray();
-        $degrees = Degree::lists('name_kh','id')->toArray();
-        $academicYears = AcademicYear::orderBy('id','desc')->lists('name_kh','id')->toArray();
-        $scholarships = Scholarship::select('code','id')->get();
-
-        $view = "";
-        switch ($id) {
-            case 1:
-                $view = 'backend.studentAnnual.reporting.reporting_student_by_age';
-                break;
-            case 2:
-                $view = 'backend.studentAnnual.reporting.reporting_student_redouble';
-                break;
-            case 3:
-                $view = 'backend.studentAnnual.reporting.reporting_student_studying';
-                break;
-            default:
-                return redirect(route('admin.studentAnnuals.index'));
-        }
-
-        return view($view,compact('id','degrees','academicYears','departments','scholarships'));
-    }
-
     public function request_export_fields(){
         // In case it is passed directly from current list
         $academic_year = isset($_GET['academic_year'])?$_GET['academic_year']:null;
@@ -1096,7 +604,7 @@ class StudentAnnualController extends Controller
         ;
 
 
-        $title = 'បញ្ជីនិស្សិតុ';
+        $title = 'áž”áž‰áŸ’áž‡áž¸áž“áž·ážŸáŸ’ážŸáž·ážáž»';
 
         if($ids = $_POST['student_ids']){
             $studentAnnuals = $studentAnnuals->whereIn('studentAnnuals.id',json_decode($ids));
@@ -1106,7 +614,7 @@ class StudentAnnualController extends Controller
                 $studentAnnuals = $studentAnnuals->where('studentAnnuals.academic_year_id', $academic_year);
 
                 $academic_year_obj = AcademicYear::where('id',$academic_year)->first();
-                $title .= " ឆ្នាំសិក្សា ".$academic_year_obj->name_kh;
+                $title .= " áž†áŸ’áž“áž¶áŸ†ážŸáž·áž€áŸ’ážŸáž¶ ".$academic_year_obj->name_kh;
             }
 
             if($redouble = $_POST['filter_redouble']){
@@ -1140,19 +648,19 @@ class StudentAnnualController extends Controller
                     ->where(function($query) use($semester){
                         $query->where("group_student_annuals.semester_id",$semester)->orWhereNull("group_student_annuals.semester_id");
                     });
-                $title .= " ឆមាសទី  ".$semester;
+                $title .= " áž†áž˜áž¶ážŸáž‘áž¸  ".$semester;
             }
             if ($group = $_POST['filter_group']) {
                 $studentAnnuals = $studentAnnuals->where('groups.code', $group);
 
-                $title .= " ក្រុម ".$group;
+                $title .= " áž€áŸ’ážšáž»áž˜ ".$group;
             }
 
             if ($degree = $_POST['filter_degree']) {
                 $studentAnnuals = $studentAnnuals->where('studentAnnuals.degree_id', $degree);
 
                 $degree_obj = Degree::where('id',$degree)->first();
-                $title .= "ថ្នាក់".$degree_obj->name_kh;
+                $title .= "ážáŸ’áž“áž¶áž€áŸ‹".$degree_obj->name_kh;
             }
 
             if ($grade = $_POST['filter_grade']) {
@@ -1165,19 +673,19 @@ class StudentAnnualController extends Controller
                 $studentAnnuals = $studentAnnuals->where('studentAnnuals.department_id', $department);
 
                 $department_obj = Department::where('id',$department)->first();
-                $title .= " ដេប៉ាតឺម៉ង់ ".$department_obj->name_kh;
+                $title .= " ážŠáŸáž”áŸ‰áž¶ážážºáž˜áŸ‰áž„áŸ‹ ".$department_obj->name_kh;
             }
             if ($gender = $_POST['filter_gender']) {
                 $studentAnnuals = $studentAnnuals->where('students.gender_id', $gender);
 
                 $gender_obj = Gender::where('id',$gender)->first();
-                $title .= " ភេទ".$gender_obj->name_kh;
+                $title .= " áž—áŸáž‘".$gender_obj->name_kh;
             }
             if ($option = $_POST['filter_option']) {
                 $studentAnnuals = $studentAnnuals->where('studentAnnuals.department_option_id', $option);
 
                 $option_obj = DepartmentOption::where('id',$option)->first();
-                $title .= " ជំនាញ ".$option_obj->name_kh;
+                $title .= " áž‡áŸ†áž“áž¶áž‰ ".$option_obj->name_kh;
             }
             if ($origin = $_POST['filter_origin']) {
                 $studentAnnuals = $studentAnnuals->where('students.origin_id', $origin);
@@ -1292,10 +800,10 @@ class StudentAnnualController extends Controller
             array_push($fields,$_POST['parent_phone']);
         }
 
-        Excel::create('បញ្ជីនិស្សិត', function($excel) use ($data, $title,$alpha,$fields) {
+        Excel::create('áž”áž‰áŸ’áž‡áž¸áž“áž·ážŸáŸ’ážŸáž·áž', function($excel) use ($data, $title,$alpha,$fields) {
 
             // Set the title
-            $excel->setTitle('បញ្ជីនិស្សិត');
+            $excel->setTitle('áž”áž‰áŸ’áž‡áž¸áž“áž·ážŸáŸ’ážŸáž·áž');
 
             // Chain the setters
             $excel->setCreator('Department of Study & Student Affair')
@@ -1315,16 +823,16 @@ class StudentAnnualController extends Controller
                 $sheet->setPageMargin(0.25);
 
                 $sheet->row(1, array(
-                    'ព្រះរាជាណាចក្រកម្ពុជា'
+                    'áž–áŸ’ážšáŸ‡ážšáž¶áž‡áž¶ážŽáž¶áž…áž€áŸ’ážšáž€áž˜áŸ’áž–áž»áž‡áž¶'
                 ));
                 $sheet->appendRow(array(
-                    'ជាតិ សាសនា ព្រះមហាក្សត្រ'
+                    'áž‡áž¶ážáž· ážŸáž¶ážŸáž“áž¶ áž–áŸ’ážšáŸ‡áž˜áž áž¶áž€áŸ’ážŸážáŸ’ážš'
                 ));
                 $sheet->appendRow(array(
-                    'ក្រសួងអប់រំ យុវជន ​និងកីឡា'
+                    'áž€áŸ’ážšážŸáž½áž„áž¢áž”áŸ‹ážšáŸ† áž™áž»ážœáž‡áž“ â€‹áž“áž·áž„áž€áž¸áž¡áž¶'
                 ));
                 $sheet->appendRow(array(
-                    'វិទ្យាស្ថានបច្ចេកវិទ្យាកម្ពុជា'
+                    'ážœáž·áž‘áŸ’áž™áž¶ážŸáŸ’ážáž¶áž“áž”áž…áŸ’áž…áŸáž€ážœáž·áž‘áŸ’áž™áž¶áž€áž˜áŸ’áž–áž»áž‡áž¶'
                 ));
                 $sheet->appendRow(array(
                     $title
@@ -1401,10 +909,10 @@ class StudentAnnualController extends Controller
                 $data = $this->get_student_list_by_age($params['academic_year_id'],$params['degree_id'],$params['date'],$scholarships);
                 $degree_name = Degree::find($params['degree_id'])->name_kh;
                 $academic_year_name = AcademicYear::find($params['academic_year_id'])->name_kh;
-                Excel::create('ស្ថិតិនិស្សិត តាមអាយុ', function($excel) use ($data,$degree_name,$academic_year_name) {
+                Excel::create('ážŸáŸ’ážáž·ážáž·áž“áž·ážŸáŸ’ážŸáž·áž ážáž¶áž˜áž¢áž¶áž™áž»', function($excel) use ($data,$degree_name,$academic_year_name) {
 
                     // Set the title
-                    $excel->setTitle('ស្ថិតិនិស្សិត តាមអាយុ');
+                    $excel->setTitle('ážŸáŸ’ážáž·ážáž·áž“áž·ážŸáŸ’ážŸáž·áž ážáž¶áž˜áž¢áž¶áž™áž»');
 
                     // Chain the setters
                     $excel->setCreator('Department of Study & Student Affair')
@@ -1422,25 +930,25 @@ class StudentAnnualController extends Controller
                         $sheet->setPageMargin(0.25);
 
                         $sheet->row(1, array(
-                            'ព្រះរាជាណាចក្រកម្ពុជា'
+                            'áž–áŸ’ážšáŸ‡ážšáž¶áž‡áž¶ážŽáž¶áž…áž€áŸ’ážšáž€áž˜áŸ’áž–áž»áž‡áž¶'
                         ));
                         $sheet->appendRow(array(
-                            'ជាតិ សាសនា ព្រះមហាក្សត្រ'
+                            'áž‡áž¶ážáž· ážŸáž¶ážŸáž“áž¶ áž–áŸ’ážšáŸ‡áž˜áž áž¶áž€áŸ’ážŸážáŸ’ážš'
                         ));
                         $sheet->appendRow(array(
-                            'ក្រសួងអប់រំ យុវជន ​និងកីឡា'
+                            'áž€áŸ’ážšážŸáž½áž„áž¢áž”áŸ‹ážšáŸ† áž™áž»ážœáž‡áž“ â€‹áž“áž·áž„áž€áž¸áž¡áž¶'
                         ));
                         $sheet->appendRow(array(
-                            'វិទ្យាស្ថានបច្ចេកវិទ្យាកម្ពុជា'
+                            'ážœáž·áž‘áŸ’áž™áž¶ážŸáŸ’ážáž¶áž“áž”áž…áŸ’áž…áŸáž€ážœáž·áž‘áŸ’áž™áž¶áž€áž˜áŸ’áž–áž»áž‡áž¶'
                         ));
                         $sheet->appendRow(array(
-                            'ស្ថិតិនិស្សិត តាមអាយុ ថ្នាក់'.$degree_name.'និងតាមឆ្នាំ ឆ្នាំសិក្សា'.$academic_year_name
+                            'ážŸáŸ’ážáž·ážáž·áž“áž·ážŸáŸ’ážŸáž·áž ážáž¶áž˜áž¢áž¶áž™áž» ážáŸ’áž“áž¶áž€áŸ‹'.$degree_name.'áž“áž·áž„ážáž¶áž˜áž†áŸ’áž“áž¶áŸ† áž†áŸ’áž“áž¶áŸ†ážŸáž·áž€áŸ’ážŸáž¶'.$academic_year_name
                         ));
 
                         $sheet->rows(array(
-                            array('អាយុ', 'ឆ្នាំទី១','','','','ឆ្នាំទី២','','','','ឆ្នាំទី៣','','','','ឆ្នាំទី៤','','','','ឆ្នាំទី៥','','','','សរុប','','',''),
-                            array('','អាហា.','', 'បង់ថ្លៃ','','អាហា.','', 'បង់ថ្លៃ','','អាហា.','', 'បង់ថ្លៃ','','អាហា.','', 'បង់ថ្លៃ','','អាហា.','', 'បង់ថ្លៃ','','អាហា.','', 'បង់ថ្លៃ',''),
-                            array('','សរុប','ស្រី','សរុប','ស្រី','សរុប','ស្រី','សរុប','ស្រី','សរុប','ស្រី','សរុប','ស្រី','សរុប','ស្រី','សរុប','ស្រី','សរុប','ស្រី','សរុប','ស្រី','សរុប','ស្រី','សរុប','ស្រី'),
+                            array('áž¢áž¶áž™áž»', 'áž†áŸ’áž“áž¶áŸ†áž‘áž¸áŸ¡','','','','áž†áŸ’áž“áž¶áŸ†áž‘áž¸áŸ¢','','','','áž†áŸ’áž“áž¶áŸ†áž‘áž¸áŸ£','','','','áž†áŸ’áž“áž¶áŸ†áž‘áž¸áŸ¤','','','','áž†áŸ’áž“áž¶áŸ†áž‘áž¸áŸ¥','','','','ážŸážšáž»áž”','','',''),
+                            array('','áž¢áž¶áž áž¶.','', 'áž”áž„áŸ‹ážáŸ’áž›áŸƒ','','áž¢áž¶áž áž¶.','', 'áž”áž„áŸ‹ážáŸ’áž›áŸƒ','','áž¢áž¶áž áž¶.','', 'áž”áž„áŸ‹ážáŸ’áž›áŸƒ','','áž¢áž¶áž áž¶.','', 'áž”áž„áŸ‹ážáŸ’áž›áŸƒ','','áž¢áž¶áž áž¶.','', 'áž”áž„áŸ‹ážáŸ’áž›áŸƒ','','áž¢áž¶áž áž¶.','', 'áž”áž„áŸ‹ážáŸ’áž›áŸƒ',''),
+                            array('','ážŸážšáž»áž”','ážŸáŸ’ážšáž¸','ážŸážšáž»áž”','ážŸáŸ’ážšáž¸','ážŸážšáž»áž”','ážŸáŸ’ážšáž¸','ážŸážšáž»áž”','ážŸáŸ’ážšáž¸','ážŸážšáž»áž”','ážŸáŸ’ážšáž¸','ážŸážšáž»áž”','ážŸáŸ’ážšáž¸','ážŸážšáž»áž”','ážŸáŸ’ážšáž¸','ážŸážšáž»áž”','ážŸáŸ’ážšáž¸','ážŸážšáž»áž”','ážŸáŸ’ážšáž¸','ážŸážšáž»áž”','ážŸáŸ’ážšáž¸','ážŸážšáž»áž”','ážŸáŸ’ážšáž¸','ážŸážšáž»áž”','ážŸáŸ’ážšáž¸'),
 
                         ));
 
@@ -1460,9 +968,9 @@ class StudentAnnualController extends Controller
                         }
 
                         $sheet->rows(array(
-                            array("",'សំគាល់ៈចំពោះគ្រឹះស្ថានឧត្តមសិក្សាណា ដែលបណ្តុះបណ្តាលលើសពី៤ ឬ៥ឆ្នាំ អាចបន្តទំព័របាន'),
-                            array('','','','','','','','','','','','','','','','','ធ្វើនៅ.............ថ្ងៃទី.............ខែ............ឆ្នាំ២០១...... '),
-                            array('','','','','','','','','','','','','','','','','សាកលវិទ្យាធិការ/នាយក')
+                            array("",'ážŸáŸ†áž‚áž¶áž›áŸ‹áŸˆáž…áŸ†áž–áŸ„áŸ‡áž‚áŸ’ážšáž¹áŸ‡ážŸáŸ’ážáž¶áž“áž§ážáŸ’ážáž˜ážŸáž·áž€áŸ’ážŸáž¶ážŽáž¶ ážŠáŸ‚áž›áž”ážŽáŸ’ážáž»áŸ‡áž”ážŽáŸ’ážáž¶áž›áž›áž¾ážŸáž–áž¸áŸ¤ áž¬áŸ¥áž†áŸ’áž“áž¶áŸ† áž¢áž¶áž…áž”áž“áŸ’ážáž‘áŸ†áž–áŸážšáž”áž¶áž“'),
+                            array('','','','','','','','','','','','','','','','','áž’áŸ’ážœáž¾áž“áŸ….............ážáŸ’áž„áŸƒáž‘áž¸.............ážáŸ‚............áž†áŸ’áž“áž¶áŸ†áŸ¢áŸ áŸ¡...... '),
+                            array('','','','','','','','','','','','','','','','','ážŸáž¶áž€áž›ážœáž·áž‘áŸ’áž™áž¶áž’áž·áž€áž¶ážš/áž“áž¶áž™áž€')
                         ));
 
                         $sheet->mergeCells('A1:Y1');
@@ -1518,10 +1026,10 @@ class StudentAnnualController extends Controller
 
                 $degree_name = Degree::find($params['degree_id'])->name_kh;
                 $academic_year_name = AcademicYear::find($params['academic_year_id'])->name_kh;
-                Excel::create('ស្ថិតិនិស្សិតត្រួតថ្នាក់ តាមដេប៉ាតឺម៉ង់និងជំនាញ ថ្នាក់'.$degree_name, function($excel) use ($data,$degree_name,$academic_year_name) {
+                Excel::create('ážŸáŸ’ážáž·ážáž·áž“áž·ážŸáŸ’ážŸáž·ážážáŸ’ážšáž½ážážáŸ’áž“áž¶áž€áŸ‹ ážáž¶áž˜ážŠáŸáž”áŸ‰áž¶ážážºáž˜áŸ‰áž„áŸ‹áž“áž·áž„áž‡áŸ†áž“áž¶áž‰ ážáŸ’áž“áž¶áž€áŸ‹'.$degree_name, function($excel) use ($data,$degree_name,$academic_year_name) {
 
                     // Set the title
-                    $excel->setTitle('ស្ថិតិនិស្សិត តាមអាយុ');
+                    $excel->setTitle('ážŸáŸ’ážáž·ážáž·áž“áž·ážŸáŸ’ážŸáž·áž ážáž¶áž˜áž¢áž¶áž™áž»');
 
                     // Chain the setters
                     $excel->setCreator('Department of Study & Student Affair')
@@ -1539,25 +1047,25 @@ class StudentAnnualController extends Controller
                         $sheet->setPageMargin(0.25);
 
                         $sheet->row(1, array(
-                            'ព្រះរាជាណាចក្រកម្ពុជា'
+                            'áž–áŸ’ážšáŸ‡ážšáž¶áž‡áž¶ážŽáž¶áž…áž€áŸ’ážšáž€áž˜áŸ’áž–áž»áž‡áž¶'
                         ));
                         $sheet->appendRow(array(
-                            'ជាតិ សាសនា ព្រះមហាក្សត្រ'
+                            'áž‡áž¶ážáž· ážŸáž¶ážŸáž“áž¶ áž–áŸ’ážšáŸ‡áž˜áž áž¶áž€áŸ’ážŸážáŸ’ážš'
                         ));
                         $sheet->appendRow(array(
-                            'ក្រសួងអប់រំ យុវជន ​និងកីឡា'
+                            'áž€áŸ’ážšážŸáž½áž„áž¢áž”áŸ‹ážšáŸ† áž™áž»ážœáž‡áž“ â€‹áž“áž·áž„áž€áž¸áž¡áž¶'
                         ));
                         $sheet->appendRow(array(
-                            'វិទ្យាស្ថានបច្ចេកវិទ្យាកម្ពុជា'
+                            'ážœáž·áž‘áŸ’áž™áž¶ážŸáŸ’ážáž¶áž“áž”áž…áŸ’áž…áŸáž€ážœáž·áž‘áŸ’áž™áž¶áž€áž˜áŸ’áž–áž»áž‡áž¶'
                         ));
                         $sheet->appendRow(array(
-                            'ស្ថិតិនិស្សិត តាមអាយុ ថ្នាក់'.$degree_name.'និងតាមឆ្នាំ ឆ្នាំសិក្សា'.$academic_year_name
+                            'ážŸáŸ’ážáž·ážáž·áž“áž·ážŸáŸ’ážŸáž·áž ážáž¶áž˜áž¢áž¶áž™áž» ážáŸ’áž“áž¶áž€áŸ‹'.$degree_name.'áž“áž·áž„ážáž¶áž˜áž†áŸ’áž“áž¶áŸ† áž†áŸ’áž“áž¶áŸ†ážŸáž·áž€áŸ’ážŸáž¶'.$academic_year_name
                         ));
 
                         $sheet->rows(array(
-                            array('ល.រ','មហាវិទ្យាល័យ','ឯកទេស / ជំនាញ','រយៈ', 'ឆ្នាំទី១','','','','ឆ្នាំទី២','','','','ឆ្នាំទី៣','','','','ឆ្នាំទី៤','','','','ឆ្នាំទី៥','','','','សរុប','','',''),
-                            array('','','','ពេល','អាហា.','', 'បង់ថ្លៃ','','អាហា.','', 'បង់ថ្លៃ','','អាហា.','', 'បង់ថ្លៃ','','អាហា.','', 'បង់ថ្លៃ','','អាហា.','', 'បង់ថ្លៃ','','អាហា.','', 'បង់ថ្លៃ',''),
-                            array('','','','បប','សរុប','ស្រី','សរុប','ស្រី','សរុប','ស្រី','សរុប','ស្រី','សរុប','ស្រី','សរុប','ស្រី','សរុប','ស្រី','សរុប','ស្រី','សរុប','ស្រី','សរុប','ស្រី','សរុប','ស្រី','សរុប','ស្រី'),
+                            array('áž›.ážš','áž˜áž áž¶ážœáž·áž‘áŸ’áž™áž¶áž›áŸáž™','áž¯áž€áž‘áŸážŸ / áž‡áŸ†áž“áž¶áž‰','ážšáž™áŸˆ', 'áž†áŸ’áž“áž¶áŸ†áž‘áž¸áŸ¡','','','','áž†áŸ’áž“áž¶áŸ†áž‘áž¸áŸ¢','','','','áž†áŸ’áž“áž¶áŸ†áž‘áž¸áŸ£','','','','áž†áŸ’áž“áž¶áŸ†áž‘áž¸áŸ¤','','','','áž†áŸ’áž“áž¶áŸ†áž‘áž¸áŸ¥','','','','ážŸážšáž»áž”','','',''),
+                            array('','','','áž–áŸáž›','áž¢áž¶áž áž¶.','', 'áž”áž„áŸ‹ážáŸ’áž›áŸƒ','','áž¢áž¶áž áž¶.','', 'áž”áž„áŸ‹ážáŸ’áž›áŸƒ','','áž¢áž¶áž áž¶.','', 'áž”áž„áŸ‹ážáŸ’áž›áŸƒ','','áž¢áž¶áž áž¶.','', 'áž”áž„áŸ‹ážáŸ’áž›áŸƒ','','áž¢áž¶áž áž¶.','', 'áž”áž„áŸ‹ážáŸ’áž›áŸƒ','','áž¢áž¶áž áž¶.','', 'áž”áž„áŸ‹ážáŸ’áž›áŸƒ',''),
+                            array('','','','áž”áž”','ážŸážšáž»áž”','ážŸáŸ’ážšáž¸','ážŸážšáž»áž”','ážŸáŸ’ážšáž¸','ážŸážšáž»áž”','ážŸáŸ’ážšáž¸','ážŸážšáž»áž”','ážŸáŸ’ážšáž¸','ážŸážšáž»áž”','ážŸáŸ’ážšáž¸','ážŸážšáž»áž”','ážŸáŸ’ážšáž¸','ážŸážšáž»áž”','ážŸáŸ’ážšáž¸','ážŸážšáž»áž”','ážŸáŸ’ážšáž¸','ážŸážšáž»áž”','ážŸáŸ’ážšáž¸','ážŸážšáž»áž”','ážŸáŸ’ážšáž¸','ážŸážšáž»áž”','ážŸáŸ’ážšáž¸','ážŸážšáž»áž”','ážŸáŸ’ážšáž¸'),
 
                         ));
 
@@ -1584,7 +1092,7 @@ class StudentAnnualController extends Controller
                             $key++;
                         }
 
-                        $row = array('សរុប','','','');
+                        $row = array('ážŸážšáž»áž”','','','');
                         foreach(end($data) as $total){
                             array_push($row, $total['st']);
                             array_push($row, $total['sf']);
@@ -1596,9 +1104,9 @@ class StudentAnnualController extends Controller
                         );
 
                         $sheet->rows(array(
-                            array("",'សំគាល់ៈចំពោះគ្រឹះស្ថានឧត្តមសិក្សាណា ដែលបណ្តុះបណ្តាលលើសពី៤ ឬ៥ឆ្នាំ អាចបន្តទំព័របាន'),
-                            array('','','','','','','','','','','','','','','','','ធ្វើនៅ.............ថ្ងៃទី.............ខែ............ឆ្នាំ២០១...... '),
-                            array('','','','','','','','','','','','','','','','','សាកលវិទ្យាធិការ/នាយក')
+                            array("",'ážŸáŸ†áž‚áž¶áž›áŸ‹áŸˆáž…áŸ†áž–áŸ„áŸ‡áž‚áŸ’ážšáž¹áŸ‡ážŸáŸ’ážáž¶áž“áž§ážáŸ’ážáž˜ážŸáž·áž€áŸ’ážŸáž¶ážŽáž¶ ážŠáŸ‚áž›áž”ážŽáŸ’ážáž»áŸ‡áž”ážŽáŸ’ážáž¶áž›áž›áž¾ážŸáž–áž¸áŸ¤ áž¬áŸ¥áž†áŸ’áž“áž¶áŸ† áž¢áž¶áž…áž”áž“áŸ’ážáž‘áŸ†áž–áŸážšáž”áž¶áž“'),
+                            array('','','','','','','','','','','','','','','','','áž’áŸ’ážœáž¾áž“áŸ….............ážáŸ’áž„áŸƒáž‘áž¸.............ážáŸ‚............áž†áŸ’áž“áž¶áŸ†áŸ¢áŸ áŸ¡...... '),
+                            array('','','','','','','','','','','','','','','','','ážŸáž¶áž€áž›ážœáž·áž‘áŸ’áž™áž¶áž’áž·áž€áž¶ážš/áž“áž¶áž™áž€')
                         ));
 
                         $sheet->mergeCells('A1:AB1');
@@ -1669,10 +1177,10 @@ class StudentAnnualController extends Controller
 
                 $degree_name = Degree::find($params['degree_id'])->name_kh;
                 $academic_year_name = AcademicYear::find($params['academic_year_id'])->name_kh;
-                Excel::create('ស្ថិតិនិស្សិត តាមដេប៉ាតឺម៉ង់និងជំនាញថ្នាក់'.$degree_name, function($excel) use ($data,$degree_name,$academic_year_name) {
+                Excel::create('ážŸáŸ’ážáž·ážáž·áž“áž·ážŸáŸ’ážŸáž·áž ážáž¶áž˜ážŠáŸáž”áŸ‰áž¶ážážºáž˜áŸ‰áž„áŸ‹áž“áž·áž„áž‡áŸ†áž“áž¶áž‰ážáŸ’áž“áž¶áž€áŸ‹'.$degree_name, function($excel) use ($data,$degree_name,$academic_year_name) {
 
                     // Set the title
-                    $excel->setTitle('ស្ថិតិនិស្សិត តាមអាយុ');
+                    $excel->setTitle('ážŸáŸ’ážáž·ážáž·áž“áž·ážŸáŸ’ážŸáž·áž ážáž¶áž˜áž¢áž¶áž™áž»');
 
                     // Chain the setters
                     $excel->setCreator('Department of Study & Student Affair')
@@ -1690,25 +1198,25 @@ class StudentAnnualController extends Controller
                         $sheet->setPageMargin(0.25);
 
                         $sheet->row(1, array(
-                            'ព្រះរាជាណាចក្រកម្ពុជា'
+                            'áž–áŸ’ážšáŸ‡ážšáž¶áž‡áž¶ážŽáž¶áž…áž€áŸ’ážšáž€áž˜áŸ’áž–áž»áž‡áž¶'
                         ));
                         $sheet->appendRow(array(
-                            'ជាតិ សាសនា ព្រះមហាក្សត្រ'
+                            'áž‡áž¶ážáž· ážŸáž¶ážŸáž“áž¶ áž–áŸ’ážšáŸ‡áž˜áž áž¶áž€áŸ’ážŸážáŸ’ážš'
                         ));
                         $sheet->appendRow(array(
-                            'ក្រសួងអប់រំ យុវជន ​និងកីឡា'
+                            'áž€áŸ’ážšážŸáž½áž„áž¢áž”áŸ‹ážšáŸ† áž™áž»ážœáž‡áž“ â€‹áž“áž·áž„áž€áž¸áž¡áž¶'
                         ));
                         $sheet->appendRow(array(
-                            'វិទ្យាស្ថានបច្ចេកវិទ្យាកម្ពុជា'
+                            'ážœáž·áž‘áŸ’áž™áž¶ážŸáŸ’ážáž¶áž“áž”áž…áŸ’áž…áŸáž€ážœáž·áž‘áŸ’áž™áž¶áž€áž˜áŸ’áž–áž»áž‡áž¶'
                         ));
                         $sheet->appendRow(array(
-                            'ស្ថិតិនិស្សិត តាមអាយុ ថ្នាក់'.$degree_name.'និងតាមឆ្នាំ ឆ្នាំសិក្សា'.$academic_year_name
+                            'ážŸáŸ’ážáž·ážáž·áž“áž·ážŸáŸ’ážŸáž·áž ážáž¶áž˜áž¢áž¶áž™áž» ážáŸ’áž“áž¶áž€áŸ‹'.$degree_name.'áž“áž·áž„ážáž¶áž˜áž†áŸ’áž“áž¶áŸ† áž†áŸ’áž“áž¶áŸ†ážŸáž·áž€áŸ’ážŸáž¶'.$academic_year_name
                         ));
 
                         $sheet->rows(array(
-                            array('ល.រ','មហាវិទ្យាល័យ','ឯកទេស / ជំនាញ','រយៈ', 'ឆ្នាំទី១','','','','ឆ្នាំទី២','','','','ឆ្នាំទី៣','','','','ឆ្នាំទី៤','','','','ឆ្នាំទី៥','','','','សរុប','','',''),
-                            array('','','','ពេល','អាហា.','', 'បង់ថ្លៃ','','អាហា.','', 'បង់ថ្លៃ','','អាហា.','', 'បង់ថ្លៃ','','អាហា.','', 'បង់ថ្លៃ','','អាហា.','', 'បង់ថ្លៃ','','អាហា.','', 'បង់ថ្លៃ',''),
-                            array('','','','បប','សរុប','ស្រី','សរុប','ស្រី','សរុប','ស្រី','សរុប','ស្រី','សរុប','ស្រី','សរុប','ស្រី','សរុប','ស្រី','សរុប','ស្រី','សរុប','ស្រី','សរុប','ស្រី','សរុប','ស្រី','សរុប','ស្រី'),
+                            array('áž›.ážš','áž˜áž áž¶ážœáž·áž‘áŸ’áž™áž¶áž›áŸáž™','áž¯áž€áž‘áŸážŸ / áž‡áŸ†áž“áž¶áž‰','ážšáž™áŸˆ', 'áž†áŸ’áž“áž¶áŸ†áž‘áž¸áŸ¡','','','','áž†áŸ’áž“áž¶áŸ†áž‘áž¸áŸ¢','','','','áž†áŸ’áž“áž¶áŸ†áž‘áž¸áŸ£','','','','áž†áŸ’áž“áž¶áŸ†áž‘áž¸áŸ¤','','','','áž†áŸ’áž“áž¶áŸ†áž‘áž¸áŸ¥','','','','ážŸážšáž»áž”','','',''),
+                            array('','','','áž–áŸáž›','áž¢áž¶áž áž¶.','', 'áž”áž„áŸ‹ážáŸ’áž›áŸƒ','','áž¢áž¶áž áž¶.','', 'áž”áž„áŸ‹ážáŸ’áž›áŸƒ','','áž¢áž¶áž áž¶.','', 'áž”áž„áŸ‹ážáŸ’áž›áŸƒ','','áž¢áž¶áž áž¶.','', 'áž”áž„áŸ‹ážáŸ’áž›áŸƒ','','áž¢áž¶áž áž¶.','', 'áž”áž„áŸ‹ážáŸ’áž›áŸƒ','','áž¢áž¶áž áž¶.','', 'áž”áž„áŸ‹ážáŸ’áž›áŸƒ',''),
+                            array('','','','áž”áž”','ážŸážšáž»áž”','ážŸáŸ’ážšáž¸','ážŸážšáž»áž”','ážŸáŸ’ážšáž¸','ážŸážšáž»áž”','ážŸáŸ’ážšáž¸','ážŸážšáž»áž”','ážŸáŸ’ážšáž¸','ážŸážšáž»áž”','ážŸáŸ’ážšáž¸','ážŸážšáž»áž”','ážŸáŸ’ážšáž¸','ážŸážšáž»áž”','ážŸáŸ’ážšáž¸','ážŸážšáž»áž”','ážŸáŸ’ážšáž¸','ážŸážšáž»áž”','ážŸáŸ’ážšáž¸','ážŸážšáž»áž”','ážŸáŸ’ážšáž¸','ážŸážšáž»áž”','ážŸáŸ’ážšáž¸','ážŸážšáž»áž”','ážŸáŸ’ážšáž¸'),
 
                         ));
 
@@ -1735,7 +1243,7 @@ class StudentAnnualController extends Controller
                             $key++;
                         }
 
-                        $row = array('សរុប','','','');
+                        $row = array('ážŸážšáž»áž”','','','');
                         foreach(end($data) as $total){
                             array_push($row, $total['st']);
                             array_push($row, $total['sf']);
@@ -1747,9 +1255,9 @@ class StudentAnnualController extends Controller
                         );
 
                         $sheet->rows(array(
-                            array("",'សំគាល់ៈចំពោះគ្រឹះស្ថានឧត្តមសិក្សាណា ដែលបណ្តុះបណ្តាលលើសពី៤ ឬ៥ឆ្នាំ អាចបន្តទំព័របាន'),
-                            array('','','','','','','','','','','','','','','','','ធ្វើនៅ.............ថ្ងៃទី.............ខែ............ឆ្នាំ២០១...... '),
-                            array('','','','','','','','','','','','','','','','','សាកលវិទ្យាធិការ/នាយក')
+                            array("",'ážŸáŸ†áž‚áž¶áž›áŸ‹áŸˆáž…áŸ†áž–áŸ„áŸ‡áž‚áŸ’ážšáž¹áŸ‡ážŸáŸ’ážáž¶áž“áž§ážáŸ’ážáž˜ážŸáž·áž€áŸ’ážŸáž¶ážŽáž¶ ážŠáŸ‚áž›áž”ážŽáŸ’ážáž»áŸ‡áž”ážŽáŸ’ážáž¶áž›áž›áž¾ážŸáž–áž¸áŸ¤ áž¬áŸ¥áž†áŸ’áž“áž¶áŸ† áž¢áž¶áž…áž”áž“áŸ’ážáž‘áŸ†áž–áŸážšáž”áž¶áž“'),
+                            array('','','','','','','','','','','','','','','','','áž’áŸ’ážœáž¾áž“áŸ….............ážáŸ’áž„áŸƒáž‘áž¸.............ážáŸ‚............áž†áŸ’áž“áž¶áŸ†áŸ¢áŸ áŸ¡...... '),
+                            array('','','','','','','','','','','','','','','','','ážŸáž¶áž€áž›ážœáž·áž‘áŸ’áž™áž¶áž’áž·áž€áž¶ážš/áž“áž¶áž™áž€')
                         ));
 
                         $sheet->mergeCells('A1:AB1');
@@ -2212,46 +1720,4 @@ class StudentAnnualController extends Controller
 
         return Response::json(array('success'=>true,'message'=>"Number of card printing is updated!"));
     }
-
-    public function print_transcript(PrintTranscriptRequest $request){
-        $student  = StudentAnnual::select([
-            'students.id_card',
-            'students.name_kh',
-            'students.name_latin',
-            'departments.name_kh as department',
-            'students.photo',
-            'studentAnnuals.department_id',
-            'studentAnnuals.degree_id',
-            'studentAnnuals.grade_id',
-            'studentAnnuals.academic_year_id',
-            'studentAnnuals.id',
-            'departments.name_kh as department_kh',
-            'departments.name_en as department_en',
-            'departments.name_fr as department_fr',
-            'degrees.name_en as degree_en',
-            'degrees.name_fr as degree_fr',
-            'degrees.name_kh as degree_kh',
-            'grades.name_en as grade_en',
-            'grades.name_fr as grade_fr',
-            'grades.name_kh as grade_kh',
-            'academicYears.name_kh as academic_year_kh',
-            'academicYears.name_latin as academic_year_latin'
-        ])
-            ->leftJoin('students','students.id','=','studentAnnuals.student_id')
-            ->leftJoin('academicYears', 'studentAnnuals.academic_year_id', '=', 'academicYears.id')
-            ->leftJoin('genders', 'students.gender_id', '=', 'genders.id')
-            ->leftJoin('grades', 'studentAnnuals.grade_id', '=', 'grades.id')
-            ->leftJoin('departmentOptions', 'studentAnnuals.department_option_id', '=', 'departmentOptions.id')
-            ->leftJoin('departments', 'studentAnnuals.department_id', '=', 'departments.id')
-            ->leftJoin('degrees', 'studentAnnuals.degree_id', '=', 'degrees.id')
-            ->where('studentAnnuals.id',$request->get("student_annual_id"))
-            ->first();
-
-        $semester = $request->get("semester_id");
-        $scores = $this->getStudentScoreBySemester($request->get("student_annual_id"),$request->get("semester_id"));
-
-        return view('backend.studentAnnual.print.transcript_semester',compact('scores','student','semester'));
-    }
-
-
 }

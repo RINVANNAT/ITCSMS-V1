@@ -5,7 +5,11 @@
   },
   "dependencies": {
     "laravel-elixir": "^4.0.0",
+    "laravel-elixir-vueify": "^2.0.0",
     "bootstrap-sass": "^3.0.0",
     "font-awesome": "^4.5.0"
+  },
+  "browser": {
+    "vue": "vue/dist/vue.common.js"
   }
 }

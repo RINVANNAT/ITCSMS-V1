@@ -399,8 +399,10 @@ return [
             'more_info' => 'More Information',
             'fields' => [
                 'id_card' => 'ID Card',
+                'name' => 'Name',
                 'name_kh' => 'Name KH',
                 'name_latin' => 'Name Latin',
+                'printed_transcript' => 'Printed Transcript',
                 'class' => "Class",
                 'photo' => 'Photo',
                 'gender_id' => 'Gender',
@@ -430,7 +432,7 @@ return [
                 'academic_year_id' => 'Academic Year',
                 'redouble_id' => 'Redouble',
                 'group' => 'Group',
-                'department_option_id' => 'Geo Technique',
+                'department_option_id' => 'Option',
                 'to_pay' => 'To Pay',
                 'debt' => 'Debt'
 

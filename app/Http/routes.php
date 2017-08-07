@@ -52,7 +52,7 @@ Route::group(['namespace' => 'Backend', 'prefix' => 'admin', 'middleware' => 'ad
     require(__DIR__ . '/Routes/Backend/Calendar.php');
     require(__DIR__ . '/Routes/Backend/Timetable.php');
     require(__DIR__ . '/Routes/Backend/VocationalStudent.php');
-
+    require(__DIR__ . '/Routes/Backend/Filter.php');
 
 });
 

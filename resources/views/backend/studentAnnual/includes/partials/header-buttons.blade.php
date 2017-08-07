@@ -15,6 +15,9 @@
                 @permission("print-students-id-card")
                 <li><a href="#" id="print_id_card">{{ trans('menus.backend.student.print_id_card') }}</a></li>
                 @endauth
+                @permission("print-transcript")
+                <li><a href="#" id="print_transcript">{{ trans('menus.backend.student.print_transcript') }}</a></li>
+                @endauth
             </ul>
         </div>
         @permission("manage-student-reporting")

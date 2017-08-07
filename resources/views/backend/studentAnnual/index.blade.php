@@ -11,9 +11,10 @@
 @endsection
 
 @section('after-styles-end')
-    {!! Html::style('plugins/datatables/dataTables.bootstrap.css') !!}
+    {!! Html::style('plugins/iCheck/square/red.css') !!}
+    {!! Html::style('plugins/DataTables-1.10.15/media/css/dataTables.bootstrap.min.css') !!}
     {!! Html::style('plugins/webui-popover/jquery.webui-popover.css') !!}
-    {!! Html::style('css/odoo1.css') !!}
+    {!! Html::style(elixir('css/student_search.css')) !!}
     <style>
         .toolbar {
             float: left;
@@ -45,14 +46,18 @@
         <div class="box-header with-border">
             <div class="mailbox-controls">
                 @permission("create-students")
-                <a href="{!! route('admin.studentAnnuals.create') !!}">
-                    <button class="btn btn-primary btn-sm"><i class="fa fa-plus-circle"></i> Add
+                <div class="btn-group">
+                    <a class="btn btn-primary btn-sm" href="{!! route('admin.studentAnnuals.create') !!}">
+                        <i class="fa fa-plus-circle"></i> Add
+                    </a>
+                    <button type="button" class="btn btn-primary btn-sm dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
+                        <span class="caret"></span>
+                        <span class="sr-only">Toggle Dropdown</span>
                     </button>
-                </a>
-                <a href="{!! route('admin.student.request_import') !!}">
-                    <button class="btn btn-primary btn-sm"><i class="fa fa-plus-circle"></i> Import
-                    </button>
-                </a>
+                    <ul class="dropdown-menu" role="menu">
+                        <li><a href="{!! route('admin.student.request_import') !!}">Import</a></li>
+                    </ul>
+                </div>
                 @endauth
 
                 <button class="btn btn-default btn-sm"><i class="fa fa-refresh"></i></button>
@@ -64,32 +69,57 @@
 
         </div><!-- /.box-header -->
 
-        <div class="box-body">
+        <div class="box-body" id="student_content">
+            {{--<searchbox></searchbox>--}}
             @include('backend.studentAnnual.includes.partials.table-header-index')
         </div><!-- /.box-body -->
     </div><!--box-->
 @stop
 
 @section('after-scripts-end')
-    {!! Html::script('plugins/datatables/jquery.dataTables.min.js') !!}
-    {!! Html::script('plugins/datatables/dataTables.bootstrap.min.js') !!}
+    {!! Html::script('plugins/iCheck/icheck.min.js') !!}
+    {!! Html::script('plugins/DataTables-1.10.15/media/js/jquery.dataTables.min.js') !!}
+    {!! Html::script('plugins/DataTables-1.10.15/media/js/dataTables.bootstrap.min.js') !!}
     {!! Html::script('plugins/webui-popover/jquery.webui-popover.js') !!}
+    {{--{!! Html::script('plugins/vue.js') !!}--}}
+    {!! HTML::script(elixir('js/student_search.js')) !!}
     <script>
         var filter_box = '';
+        var current_filtering = null;
+        var oTable;
         function hideCustomExport(){
             $('.btn-export').hide();
         }
 
+        function redraw_student_list(){
+            oTable.draw();
+        }
+
+        function get_parameters(){
+
+            return '?academic_year='+current_filtering.academic_year
+                    + '&degree='+current_filtering.degree
+                    + '&grade='+current_filtering.grade
+                    + '&department='+current_filtering.department
+                    + '&gender='+current_filtering.gender
+                    + '&option='+current_filtering.option
+                    + '&semester='+current_filtering.semester
+                    + '&origin='+current_filtering.origin
+                    + '&group='+current_filtering.group
+                    + '&radie='+current_filtering.radie
+                    + '&redouble='+current_filtering.redouble
+                    + '&search='+current_filtering.search.value;
+        }
+
         $(document).ready(function(){
-            var current_filtering = null;
             var custom_student_window = null;
 
 
-            var oTable = $('#students-table').DataTable({
-                dom: 'l<"toolbar">frtip',
+            oTable = $('#students-table').DataTable({
+                dom: '<"toolbar">frtip',
                 processing: true,
                 serverSide: true,
-                pageLength: 100,
+                pageLength: 50,
                 deferLoading: 0,
                 ajax: {
                     url:"{!! route('admin.student.data') !!}",
@@ -143,15 +173,15 @@
 //            $("div.toolbar").html(
 //                    get_filter_box()
 //            );
-//
-//            $('.o_searchview_more').on("click", function() {
-//                if ($('.slide_container').is(':hidden')) {
-//                    $('.slide_container').slideDown(300);
-//                } else {
-//                    $('.slide_container').slideUp(300);
-//                    //layer.remove();
-//                }
-//            });
+
+            $('.o_searchview_more').on("click", function() {
+                if ($('.slide_container').is(':hidden')) {
+                    $('.slide_container').slideDown(300);
+                } else {
+                    $('.slide_container').slideUp(300);
+                    //layer.remove();
+                }
+            });
 
 
 
@@ -163,46 +193,35 @@
             });
 
             $('#filter_degree').on('change', function(e) {
-                oTable.draw();
-                e.preventDefault();
+                redraw_student_list();
             });
             $('#filter_grade').on('change', function(e) {
-                oTable.draw();
-                e.preventDefault();
+                redraw_student_list();
             });
             $('#filter_department').on('change', function(e) {
-                oTable.draw();
-                e.preventDefault();
+                redraw_student_list();
             });
             $('#filter_gender').on('change', function(e) {
-                oTable.draw();
-                e.preventDefault();
+                redraw_student_list();
             });
             $('#filter_option').on('change', function(e) {
-                oTable.draw();
-                e.preventDefault();
+                redraw_student_list();
             });
             $('#filter_semester').on('change', function(e) {
-                oTable.draw();
-                e.preventDefault();
+                redraw_student_list();
             });
             $('#filter_origin').on('change', function(e) {
-                oTable.draw();
-                e.preventDefault();
+                redraw_student_list();
             });
             $('#filter_group').on('input', function(e) {
-                oTable.draw();
-                e.preventDefault();
-                //alert($('#filter_group').val());
+                redraw_student_list();
             });
 
             $('#filter_radie').on('change', function(e) {
-                oTable.draw();
-                e.preventDefault();
+                redraw_student_list();
             });
             $('#filter_redouble').on('change', function(e) {
-                oTable.draw();
-                e.preventDefault();
+                redraw_student_list();
             });
 
             enableDeleteRecord($('#students-table'));
@@ -222,18 +241,7 @@
 
             $(document).on('click', '#export_student_list', function (e) {
                 e.preventDefault();
-                var url = '{{route("admin.student.request_export_fields")}}'+
-                        "?academic_year="+$('#filter_academic_year').val()+
-                        '&degree='+ $('#filter_degree').val()+
-                        '&grade=' + $('#filter_grade').val()+
-                        '&department=' + $('#filter_department').val()+
-                        '&gender='+$('#filter_gender').val()+
-                        '&option='+$('#filter_option').val()+
-                        '&semester='+$('#filter_semester').val()+
-                        '&origin='+$('#filter_origin').val()+
-                        '&group='+$('#filter_group').val()+
-                        '&radie='+$('#filter_radie').val()+
-                        '&redouble='+$('#filter_redouble').val();
+                var url = '{{route("admin.student.request_export_fields")}}'+get_parameters();
 
                 PopupCenterDual(url,'Select fields to export','1200','960');
             });
@@ -265,19 +273,16 @@
 
                 PopupCenterDual(
                         url
-                        + '?academic_year='+current_filtering.academic_year
-                        + '&degree='+current_filtering.degree
-                        + '&grade='+current_filtering.grade
-                        + '&department='+current_filtering.department
-                        + '&gender='+current_filtering.gender
-                        + '&option='+current_filtering.option
-                        + '&semester='+current_filtering.semester
-                        + '&origin='+current_filtering.origin
-                        + '&group='+current_filtering.group
-                        + '&radie='+current_filtering.radie
-                        + '&redouble='+current_filtering.redouble
-                        + '&search='+current_filtering.search.value,
+                        + get_parameters(),
                         'Print ID Card','900','800');
+            });
+
+            $('#print_transcript').on('click',function(e){
+                e.preventDefault();
+                var url = "{{ route('admin.student.request_print_transcript') }}";
+
+                var new_tab = window.open(url+ get_parameters(),'_blank');
+                new_tab.focus();
             });
 
             $('#generate_id_card').on('click', function(e) {
@@ -327,35 +332,28 @@
             $('#generate_student_group').on('click', function() {
 
 
-            var  academic_year = $('#filter_academic_year').val(),
-                 academic_year_name = $('#filter_academic_year option:selected').text(),
-                 degree =  $('#filter_degree').val(),
-                 degree_name =  $('#filter_degree option:selected').text(),
-                 grade =  $('#filter_grade').val(),
-                 grade_name =  $('#filter_grade option:selected').text(),
-                 department = $('#filter_department').val(),
-                 department_name = $('#filter_department option:selected').text();
+                var  academic_year = $('#filter_academic_year').val(),
+                        academic_year_name = $('#filter_academic_year option:selected').text(),
+                        degree =  $('#filter_degree').val(),
+                        degree_name =  $('#filter_degree option:selected').text(),
+                        grade =  $('#filter_grade').val(),
+                        grade_name =  $('#filter_grade option:selected').text(),
+                        department = $('#filter_department').val(),
+                        department_name = $('#filter_department option:selected').text();
 
                 var url = "{{ route('admin.student.form_generate_student_group') }}";
                 var window_generate_group = PopupCenterDual(
-                                                url,
-                                               /* + '?academic_year_id='+academic_year
-                                                + '&academic_year_name='+academic_year_name
-                                                + '&degree_id='+degree
-                                                + '&degree_name='+degree_name
-                                                + '&grade_id='+grade
-                                                + '&grade_name='+grade_name
-                                                + '&department_id='+department
-                                                + '&department_name='+department_name,*/
-                                                'Generate Group','900','550');
-
+                        url,
+                        /* + '?academic_year_id='+academic_year
+                         + '&academic_year_name='+academic_year_name
+                         + '&degree_id='+degree
+                         + '&degree_name='+degree_name
+                         + '&grade_id='+grade
+                         + '&grade_name='+grade_name
+                         + '&department_id='+department
+                         + '&department_name='+department_name,*/
+                        'Generate Group','900','550');
             });
-
-
-
-
-
         });
     </script>
 @stop
-

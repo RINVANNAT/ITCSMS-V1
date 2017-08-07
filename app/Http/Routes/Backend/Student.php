@@ -57,11 +57,12 @@
 
 
         /*--end generate group---*/
+        Route::get('student/request_print_transcript', 'StudentAnnualController@request_print_transcript')->name('admin.student.request_print_transcript');
+        Route::post('student/request_print_transcript_data', 'StudentAnnualController@request_print_transcript_data')->name('admin.student.request_print_transcript_data');
         Route::get('student/print_transcript', 'StudentAnnualController@print_transcript')->name('admin.student.print_transcript');
-
+        Route::get('student/mark_printed_transcript', 'StudentAnnualController@mark_printed_transcript')->name('admin.student.mark_printed_transcript');
 
         Route::get('student/annual/export-lists-format', 'StudentAnnualController@exportFormatLists')->name('admin.student_annual.export_format_lists');
-
         Route::post('student/annual/import', 'StudentAnnualController@importStudentGroup')->name('student_annual.import');
 
     });

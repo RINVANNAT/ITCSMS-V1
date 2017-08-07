@@ -1,4 +1,5 @@
 var elixir = require('laravel-elixir');
+require('laravel-elixir-vueify-2.0');
 
 elixir(function(mix) {
  mix.phpUnit()
@@ -62,6 +63,9 @@ elixir(function(mix) {
      .styles([
          'backend/app.css'
      ], 'public/css/backend.css')
+     .styles([
+         'backend/student/search.css'
+     ], 'public/css/student_search.css')
 
      /**
       * Combine backend scripts
@@ -71,10 +75,11 @@ elixir(function(mix) {
          'plugins.js',
          'backend/app.js',
          'backend/plugin/toastr/toastr.min.js',
+         'backend/custom.js'
      ], 'public/js/backend.js')
-
+     .browserify('backend/student/search.js','public/js/student_search.js')
     /**
       * Apply version control
       */
-     .version(["public/css/frontend.css", "public/js/frontend.js", "public/css/backend.css", "public/js/backend.js"]);
+     .version(["public/css/frontend.css", "public/js/frontend.js", "public/css/backend.css","public/css/student_search.css" , "public/js/backend.js", "public/js/student_search.js"]);
 });
