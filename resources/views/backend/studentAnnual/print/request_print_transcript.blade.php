@@ -152,6 +152,7 @@
         }
 
         function print(selected_ids){
+
             // Check if exam date is selected
             if (selected_ids.length === 0) {
                 alert_error("","You need to select some students",null);

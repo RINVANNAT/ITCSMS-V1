@@ -101,11 +101,11 @@
                 <div class="gpa">
                     <?php
                     if($semester == 1) {
-                        $last_score = $scores["final_score_s1"];
+                        $last_score = $scores[$student['id']]["final_score_s1"];
                     } else if ($semester == 2) {
-                        $last_score = $scores["final_score_s2"];
+                        $last_score = $scores[$student['id']]["final_score_s2"];
                     } else {
-                        $last_score = $scores["final_score"];
+                        $last_score = $scores[$student['id']]["final_score"];
                     }
 
                     $gpa = "";
@@ -124,6 +124,7 @@
                     } else if ($last_score >= 40) {
                         $gpa = "1.0";
                     }  else {
+
                         $gpa = "0.0";
                     }
                     ?>

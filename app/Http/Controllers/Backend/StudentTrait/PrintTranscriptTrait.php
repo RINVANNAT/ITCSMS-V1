@@ -29,6 +29,7 @@ trait PrintTranscriptTrait
         );
     }
     public function request_print_transcript_data(PrintTranscriptRequest $request){
+
         $academic_year = $request->get('academic_year');
         $semester = 1;
 
@@ -108,6 +109,7 @@ trait PrintTranscriptTrait
         return $datatables->make(true);
     }
     public function print_transcript(PrintTranscriptRequest $request){
+
         $studentAnnualIds = json_decode($request->ids);
         $students  = StudentAnnual::select([
             'students.id_card',
@@ -151,7 +153,9 @@ trait PrintTranscriptTrait
         $issued_number = $request->get("issued_number");
         $issued_date = $request->get("issued_date");
         $scores = [];
+
         foreach($studentAnnualIds as $id){
+
             if($semester == "semester1"){
                 $scores[$id] = $this->getStudentScoreBySemester($id,1);
             } else {
@@ -159,7 +163,7 @@ trait PrintTranscriptTrait
             }
         }
 
-        dd($scores);
+
         return view('backend.studentAnnual.print.transcript_semester',
             compact(
                 'scores',

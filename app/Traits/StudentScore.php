@@ -3,6 +3,7 @@ namespace App\Traits;
 
 use App\Models\CourseAnnual;
 use App\Models\Department;
+use App\Models\Enum\SemesterEnum;
 use App\Models\Student;
 use Illuminate\Support\Facades\DB;
 use App\Models\Redouble;
@@ -147,8 +148,17 @@ trait StudentScore {
 
 
         if($studentAnnualId){
+
             $studentAnnual = DB::table('studentAnnuals')->where('id', $studentAnnualId)->first();
-            $semesters = DB::table('semesters')->get();
+            $groupStudentAnnuals = DB::table('group_student_annuals')
+                ->where('student_annual_id', '=', $studentAnnualId);
+
+            if($semester_id == SemesterEnum::SEMESTER_ONE) {
+                $groupStudentAnnuals = $groupStudentAnnuals->where('semester_id', '=', $semester_id)
+                    ->whereNull('department_id')->lists('group_id', 'semester_id');
+            } else {
+                $groupStudentAnnuals = $groupStudentAnnuals->whereNull('department_id')->lists('group_id', 'semester_id');
+            }
 
             $courseAnnuals = $this->getCourseAnnually();
 
@@ -158,7 +168,7 @@ trait StudentScore {
             $courseAnnuals = $courseAnnuals->where('course_annuals.grade_id', $studentAnnual->grade_id);
             $courseAnnuals = $courseAnnuals->where('course_annuals.department_option_id', $studentAnnual->department_option_id);
 
-            if($semester_id == 1) { // apply semester filter only it is a 1st semester
+            if($semester_id == SemesterEnum::SEMESTER_ONE) { // apply semester filter only it is a 1st semester
                 $courseAnnuals = $courseAnnuals->where('course_annuals.semester_id', $semester_id);
             }
 
@@ -166,32 +176,29 @@ trait StudentScore {
 
             if($courseAnnuals) {
 
-                foreach($courseAnnuals as $courseAnnual) {
-                    $arrayCourseAnnualIds[] = $courseAnnual->course_annual_id;
-                    $courseAnnualByProgram[$courseAnnual->course_id][] = $courseAnnual;
-                }
+                 collect($courseAnnuals)->filter(function( $item ) use(&$arrayCourseAnnualIds, &$courseAnnualByProgram) {
+                    $arrayCourseAnnualIds[] = $item->course_annual_id;
+                     $courseAnnualByProgram[$item->course_id][] = $item ;
+                });
 
                 $eachScoreCourseAnnual = $this->getCourseAnnualWithScore($arrayCourseAnnualIds);
                 $averages = $eachScoreCourseAnnual['averages'];
                 $absences = $eachScoreCourseAnnual['absences'];
 
                 $courseAnnualClass = DB::table('course_annual_classes')->whereIn('course_annual_id', $arrayCourseAnnualIds)->get();
+                 collect($courseAnnualClass)->filter(function($classItem) use(&$classByCourseAnnualIds) {
+                     $classByCourseAnnualIds[$classItem->course_annual_id][] = $classItem->group_id;
+                });
 
-                foreach($courseAnnualClass as $class) {
-                    $classByCourseAnnualIds[$class->course_annual_id][]= $class->group;
-                }
 
                 foreach($courseAnnuals as $courseAnnual) {
 
                     $groups = isset($classByCourseAnnualIds[$courseAnnual->course_annual_id])?$classByCourseAnnualIds[$courseAnnual->course_annual_id]:[];
-                    $class = [];
-                    foreach($groups as $group) {
-                        if($group != null) {
-                            $class[] = $group;
-                        }
-                    }
-                    if(count($class) > 0) {
-                        if(in_array($studentAnnual->group, $groups)) {
+
+
+                    if(count($groups) > 0) {
+
+                        if(in_array($groupStudentAnnuals[$courseAnnual->semester_id], $groups)) {
 
                             if(isset($absences[$courseAnnual->course_annual_id][$studentAnnual->id])){
                                 $absence = $absences[$courseAnnual->course_annual_id][$studentAnnual->id]->num_absence;
@@ -208,7 +215,7 @@ trait StudentScore {
                                 'credit'  => $courseAnnual->course_annual_credit,
                                 'semester' => $courseAnnual->semester_id,
                                 'absence' => $absence,
-                                'score'    => isset($averages[$courseAnnual->course_annual_id])?$averages[$courseAnnual->course_annual_id][$studentAnnual->id]->average:null
+                                'score'    => isset($averages[$courseAnnual->course_annual_id])? (isset($averages[$courseAnnual->course_annual_id][$studentAnnual->id]) ? $averages[$courseAnnual->course_annual_id][$studentAnnual->id]->average :null) :null
                             ];
                         }
                     } else {
@@ -227,11 +234,10 @@ trait StudentScore {
                             'credit'  => $courseAnnual->course_annual_credit,
                             'semester' => $courseAnnual->semester_id,
                             'absence' => $absence,
-                            'score'    => isset($averages[$courseAnnual->course_annual_id])?$averages[$courseAnnual->course_annual_id][$studentAnnual->id]->average:null
+                            'score'    => isset($averages[$courseAnnual->course_annual_id])? (isset($averages[$courseAnnual->course_annual_id][$studentAnnual->id]) ? $averages[$courseAnnual->course_annual_id][$studentAnnual->id]->average :null) :null
                         ];
                     }
                 }
-
 
                 $subjects = $student[$studentAnnualId];
                 $totalCredit = 0;
@@ -243,6 +249,7 @@ trait StudentScore {
                 $score_s2 = 0;
 
                 foreach ($subjects as $course_annual_id => $subject) {
+
                     $totalCredit = $totalCredit + $subject['credit'];
                     $score = $score + ($subject['credit'] * $subject['score']);
 
@@ -272,12 +279,9 @@ trait StudentScore {
                 } else {
                     $moyenne_s2 = 0;
                 }
-
                 $student = array_merge($subjects, ['final_score' => $moyenne]);
                 $student = array_merge($student, ['final_score_s1' => $moyenne_s1]);
                 $student = array_merge($student, ['final_score_s2' => $moyenne_s2]);
-
-
             } else {
                 $student = [];
             }
@@ -286,6 +290,8 @@ trait StudentScore {
         } else {
             return null;
         }
+
+
 
     }
     public function findRecordRedouble($student, $redouble, $academicYearId) {
