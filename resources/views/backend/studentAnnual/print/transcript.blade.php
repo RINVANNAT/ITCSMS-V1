@@ -23,10 +23,12 @@
                         <td width="75%"><h4><b>Degree:</b> <span class="no-bold">{{$student['degree_en']}}</span> </h4></td>
                         <td width="25%"><h4><b>Class:</b> <span class="no-bold">{{$student['grade_en']}}</span></h4></td>
                     </tr>
+                    @if($transcript_type == "semester1")
                     <tr>
                         <td width="75%"></td>
                         <td width="25%"><h4>1<sup>st</sup> <span class="no-bold">Semester</span></h4></td>
                     </tr>
+                    @endif
 
                     <tr>
                         <td colspan="2" class="break-line"><h4><b>ID:</b> <span class="no-bold">{{$student['id_card']}}</span></h4></td>
@@ -99,10 +101,8 @@
                 </div>
                 <div class="gpa">
                     <?php
-                    if($semester == 1) {
+                    if($transcript_type == "semester1") {
                         $last_score = $scores[$student['id']]["final_score_s1"];
-                    } else if ($semester == 2) {
-                        $last_score = $scores[$student['id']]["final_score_s2"];
                     } else {
                         $last_score = $scores[$student['id']]["final_score"];
                     }

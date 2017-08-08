@@ -220,7 +220,6 @@ trait PrintTranscriptTrait
             );
         });
 
-        $semester = $request->get("transcript_type");
         $transcript_type = $request->get("transcript_type");
         $issued_by = $request->get("issued_by");
         $issued_number = $request->get("issued_number");
@@ -229,7 +228,7 @@ trait PrintTranscriptTrait
 
         foreach($studentAnnualIds as $id){
 
-            if($semester == "semester1"){
+            if($transcript_type == "semester1"){
                 $scores[$id] = $this->getStudentScoreBySemester($id,1);
             } else {
                 $scores[$id] = $this->getStudentScoreBySemester($id,null); // Full year
