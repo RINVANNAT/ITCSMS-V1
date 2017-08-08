@@ -296,6 +296,9 @@
             $(document.body).on("change","#filter_group",function(e){
                 redraw_student_list();
             });
+            $(document.body).on("change","#filter_gender",function(e){
+                redraw_student_list();
+            });
         });
 
     </script>
