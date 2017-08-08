@@ -922,7 +922,6 @@
             }
         }
 
-
         $('#get_radie').on('click', function () {
 
             var pop_url = '{{route('student.dismiss')}}';

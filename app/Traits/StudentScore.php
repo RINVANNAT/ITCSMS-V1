@@ -154,6 +154,7 @@ trait StudentScore {
                 ->where('student_annual_id', '=', $studentAnnualId);
 
             if($semester_id == SemesterEnum::SEMESTER_ONE) {
+
                 $groupStudentAnnuals = $groupStudentAnnuals->where('semester_id', '=', $semester_id)
                     ->whereNull('department_id')->lists('group_id', 'semester_id');
             } else {
@@ -187,14 +188,17 @@ trait StudentScore {
 
                 $courseAnnualClass = DB::table('course_annual_classes')->whereIn('course_annual_id', $arrayCourseAnnualIds)->get();
                  collect($courseAnnualClass)->filter(function($classItem) use(&$classByCourseAnnualIds) {
-                     $classByCourseAnnualIds[$classItem->course_annual_id][] = $classItem->group_id;
+
+                     if($classItem->group_id) {
+                         $classByCourseAnnualIds[$classItem->course_annual_id][] = $classItem->group_id;
+                     }
+
                 });
 
 
                 foreach($courseAnnuals as $courseAnnual) {
 
                     $groups = isset($classByCourseAnnualIds[$courseAnnual->course_annual_id])?$classByCourseAnnualIds[$courseAnnual->course_annual_id]:[];
-
 
                     if(count($groups) > 0) {
 
