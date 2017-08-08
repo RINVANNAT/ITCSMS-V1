@@ -18,12 +18,115 @@
         <!-- Styles -->
         @yield('before-styles-end')
         {!! Html::style(elixir('css/backend.css')) !!}
-        <link rel="stylesheet" media="print, screen" href="{{ url('css/backend/printing_portrait_a4_transcript.css') }}">
+        {!! Html::style(elixir('css/student_transcript.css'), array('media' => 'print, screen')) !!}
+        {{--<link rel="stylesheet" media="print, screen" href="{{ url('css/backend/printing_portrait_a4_transcript.css') }}">--}}
+        <style>
+            h1, h2, h3, h4, h5, h6, .h1, .h2, .h3, .h4, .h5, .h6 {
+                font-family: 'bayon';
+            }
+            .modal-title{
+                font-family: 'KhmerOSMoulpali';
+            }
+
+            @font-face {
+                font-family: franklin_gothic;
+                src: url("{{url('assets/fonts/Franklin Gothic Demi Cond Regular.ttf')}}");
+            }
+
+            @font-face {
+                font-family: arial-rounded;
+                src: url("{{url('assets/fonts/arial-rounded-mt-bold.ttf')}}");
+            }
+            @font-face {
+                font-family: bayon;
+                src: url("{{url('assets/fonts/Bayon.ttf')}}");
+            }
+            @font-face {
+                font-family: kh-bokor;
+                src: url("{{url('assets/fonts/Kh-Bokor.ttf')}}");
+            }
+            @font-face {
+                font-family: khmerosmoulpali;
+                src: url("{{url('assets/fonts/KhmerOSMoulpali.ttf')}}");
+            }
+            @font-face {
+                font-family: metal;
+                src: url("{{url('assets/fonts/Metal.ttf')}}");
+            }
+            @font-face {
+                font-family: tactieng;
+                src: url("{{url('assets/fonts/TACTIENG.TTF')}}");
+            }
+            @font-face {
+                font-family: khmeros;
+                src: url("{{url('assets/fonts/KhmerOSContent-Regular.ttf')}}");
+            }
+
+            body {
+                width: 100%;
+                height: 100%;
+                margin: 0;
+                padding: 0;
+                background-color: #FAFAFA;
+                font: 11pt "Times New Roman";
+                line-height: 110%;
+            }
+
+            h4, h3, h2, h1 {
+                font-family: "Times New Roman"
+            }
+            * {
+                box-sizing: border-box;
+                -moz-box-sizing: border-box;
+            }
+
+            .page {
+                width: 210mm;
+                height: 297mm;
+                margin: 0 auto;
+                margin-top:10mm;
+                border: 1px #D3D3D3 solid;
+                padding: 20mm 22mm 10mm 22mm;
+                border-radius: 5px;
+                background: white;
+                box-shadow: 0 0 5px rgba(0, 0, 0, 0.1);
+                position: relative;
+            }
+            td {
+                font-family: "Times New Roman" !important;
+            }
+            @page {
+                size: 210mm 297mm;
+                margin: 0;
+            }
+            @media print {
+                html, body {
+                    width: 100%;
+                    height: 100%;
+                    margin: 0;
+                    padding: 0;
+                    background-color: #FAFAFA;
+                    font: 11pt "Times New Roman";
+                }
+                .page {
+                    padding: 20mm 22mm 10mm 22mm;
+                    margin: 0 auto;
+                    border: initial;
+                    border-radius: initial;
+                    width: 210mm;
+                    height: 297mm;
+                    box-shadow: initial;
+                    page-break-after: always;
+                    position: relative;
+                }
+
+            }
+        </style>
 
         @yield('after-styles-end')
 
     </head>
-    <body class="skin-{!! config('backend.theme') !!}" style="font-family: khmeros" onload="window.print()">
+    <body class="skin-{!! config('backend.theme') !!}">
 
         @yield('content')
     </body>

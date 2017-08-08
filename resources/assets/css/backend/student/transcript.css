@@ -1,0 +1,87 @@
+*{
+    box-sizing: border-box;
+}
+.transcript {
+    padding-top: 23mm;
+    margin: 0 auto;
+}
+.head{
+    margin: 0px;
+    padding: 0px;
+}
+.no-bold{
+    font-weight: normal !important;
+    font-size: 13pt;
+}
+h4{
+    line-height: 0px;
+}
+table{
+    border-collapse: collapse;
+}
+.clearfix{
+    clear: both;
+}
+table.subject{
+    width: 100%;
+    margin-top: 8mm;
+}
+
+table.subject tr td:nth-child(3){
+    text-align: center;
+}
+table.subject tr td:nth-child(4){
+    text-align: left;
+    padding-left: 32mm;
+}
+.director-signature{
+    margin-right: 10mm;
+    margin-bottom: 200px;
+    float: right;
+}
+.director-signature h4{
+    text-align: right;
+}
+.grading-system table{
+    width: 90%;
+}
+.remark h4{
+    text-decoration: underline;
+}
+.transcript-title h2, .transcript-title h4{
+    text-align: center;
+}
+.transcript-title img{
+    margin-top: 6mm;
+}
+.transcript-title h2{
+    color: #2a88bd;
+}
+table.head{
+    width: 100%;
+}
+table.head tr td.col-right{
+    text-align: left !important;
+}
+.gpa{
+    margin-top: 20px;
+    margin-bottom: 20px;
+}
+.break-line{
+    padding-top: 20px;
+}
+.page {
+    overflow: hidden;
+}
+.transcript-footer{
+    position:absolute;                  /* added */
+    bottom:10mm;                           /* added */
+    left:22mm;                             /* added */
+    font-size: 10pt;
+}
+td {
+    vertical-align: top;
+}
+.grading-system table{
+    margin-left: 5mm;
+}

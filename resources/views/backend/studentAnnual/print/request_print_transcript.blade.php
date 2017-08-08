@@ -66,6 +66,9 @@
         .select2-search__field,.select2-selection__choice, .select2-selection__clear{
             margin-top: 3px !important;
         }
+        input[name=issued_by] {
+            width: 50mm;
+        }
     </style>
 @stop
 
@@ -81,11 +84,11 @@
                 </select>
             </div>
 
-            <div class="pull-right">
-                <input type="text" name="issued_number" class="form-control"  placeholder="Issued number"/>
-            </div>
+            {{--<div class="pull-right">--}}
+                {{--<input type="text" name="issued_number" class="form-control"  placeholder="Issued number"/>--}}
+            {{--</div>--}}
             <div class="pull-right" style="margin-right: 5px;">
-                <input type="text" name="issued_by" class="form-control"  placeholder="Issued by"/>
+                <input type="text" name="issued_by" class="form-control"  placeholder="Issued by" value="Deputy Director General"/>
             </div>
             <div class="pull-right" style="margin-right: 5px;">
                 <input type="text" name="issued_date" class="form-control"  placeholder="Issued date"/>
@@ -156,21 +159,30 @@
             // Check if exam date is selected
             if (selected_ids.length === 0) {
                 alert_error("","You need to select some students",null);
-            } else {
-                var issued_by = $('input[name="issued_by"]').val();
-                var issued_date = $('input[name="issued_date"]').val();
-                var issued_number = $('input[name="issued_number"]').val();
-                var transcript_type = $('select[name="transcript_type"]').val();
-                // Open new window to print
-                PopupCenterDual(
-                        print_url
-                        +"?transcript_type="+ transcript_type
-                        +"&issued_by="+issued_by
-                        +"&issued_date="+issued_date
-                        +"&issued_number="+issued_number
-                        +'&ids='+JSON.stringify(selected_ids),
-                        'Printing','1200','800');
+                return;
             }
+            var issued_by = $('input[name="issued_by"]').val();
+            if(issued_by == ""){
+                alert_error("","You need to tell who issue this transcript",$('input[name="issued_by"]').focus());
+                return;
+            }
+            var issued_date = $('input[name="issued_date"]').val();
+            if(issued_date == ""){
+                alert_error("","You need to select issue date",$('input[name="issued_date"]').focus());
+                return;
+            }
+//                var issued_number = $('input[name="issued_number"]').val();
+            var transcript_type = $('select[name="transcript_type"]').val();
+            // Open new window to print
+            PopupCenterDual(
+                    print_url
+                    +"?transcript_type="+ transcript_type
+                    +"&issued_by="+issued_by
+                    +"&issued_date="+issued_date
+//                        +"&issued_number="+issued_number
+                    +'&ids='+JSON.stringify(selected_ids),
+                    'Printing','1200','800');
+
         }
         function mark_printed_transcript(){
             var transcript_type = $('select[name="transcript_type"]').val();
@@ -182,7 +194,7 @@
                 url: mark_url+"?transcript_type="+ transcript_type +'&ids='+JSON.stringify(selected_ids),
                 cache: false,
                 success: function(response){
-                    alert(response.message);
+                    notify("info",response.message,"info");
                     $(".fa", $(".checkbox-toggle")).data("clicks", true);
                     $(".fa", $(".checkbox-toggle")).removeClass("fa-square-o").addClass('fa-check-square-o');
                     oTable.draw("page");
@@ -191,7 +203,13 @@
         }
 
         $(function() {
+            var d = new Date();
+            var month = d.getMonth()+1;
+            var day = d.getDate();
+            var year = d.getFullYear();
+
             $('input[name="issued_date"]').datetimepicker({
+                defaultDate: day+"/"+month+"/"+year,
                 format: 'DD/MM/YYYY'
             });
             oTable = $('#students-table').DataTable({
@@ -206,30 +224,22 @@
                     data:function(d){
                         // In case additional fields is added for filter, modify export view as well: popup_export.blade.php
                         d.academic_year = $('#filter_academic_year').val();
-                        d.degree = $('#filter_degree').val();
-                        d.grade = $('#filter_grade').val();
-                        d.department = $('#filter_department').val();
                         d.gender = $('#filter_gender').val();
-                        d.option = $('#filter_option').val();
-                        d.origin = $('#filter_origin').val();
                         d.group = $('#filter_group').val();
-                        d.semester = $('#filter_semester').val();
-                        d.radie = $('#filter_radie').val();
-                        d.redouble = $('#filter_redouble').val();
+                        d.student_class = JSON.stringify($("#filter_class").select2('data'));
                     }
                 },
                 columns: [
                     { data: 'checkbox', name: 'checkbox',searchable:false,orderable:false},
-                    { data: 'id_card', name: 'students.id_card'},
-                    { data: 'name', name: 'students.name',searchable:false},
-                    { data: 'dob', name: 'dob',searchable:false},
-                    { data: 'gender', name: 'gender',searchable:false},
-                    { data: 'class' , name: 'class',searchable:false},
-                    { data: 'group' , name: 'group',searchable:false},
-                    { data: 'printed_transcript' , name: 'printed_transcript',searchable:false},
+                    { data: 'id_card', name: 'students.id_card',orderable: false},
+                    { data: 'name', name: 'students.name',orderable: false,searchable:false},
+                    { data: 'dob', name: 'dob',orderable: false,searchable:false},
+                    { data: 'gender', name: 'gender',orderable: false,searchable:false},
+                    { data: 'class' , name: 'class',orderable: false,searchable:false},
+                    { data: 'group' , name: 'group',orderable: false,searchable:false},
+                    { data: 'printed_transcript' , name: 'printed_transcript',orderable: false,searchable:false},
                     { data: 'action', name: 'action',orderable: false, searchable: false}
                 ],
-                order: [[2,"asc"],[5,"asc"]],
                 drawCallback: function() {
                     initIcheker();
                     $(".btn-print").off("click");
@@ -281,6 +291,9 @@
             update_filter_class(redraw_student_list);
 
             $(document.body).on("change","#filter_class",function(e){
+                redraw_student_list();
+            });
+            $(document.body).on("change","#filter_group",function(e){
                 redraw_student_list();
             });
         });

@@ -66,6 +66,9 @@ elixir(function(mix) {
      .styles([
          'backend/student/search.css'
      ], 'public/css/student_search.css')
+     .styles([
+         'backend/student/transcript.css'
+     ], 'public/css/student_transcript.css')
 
      /**
       * Combine backend scripts
@@ -81,5 +84,5 @@ elixir(function(mix) {
     /**
       * Apply version control
       */
-     .version(["public/css/frontend.css", "public/js/frontend.js", "public/css/backend.css","public/css/student_search.css" , "public/js/backend.js", "public/js/student_search.js"]);
+     .version(["public/css/frontend.css", "public/js/frontend.js", "public/css/backend.css","public/css/student_search.css","public/css/student_transcript.css" , "public/js/backend.js", "public/js/student_search.js"]);
 });
