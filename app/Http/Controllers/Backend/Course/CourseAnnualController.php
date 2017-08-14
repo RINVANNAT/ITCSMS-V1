@@ -2757,6 +2757,7 @@ class CourseAnnualController extends Controller
                     $filtered_students = $this->filtering_student_annual($course, $groups);
                 }
 
+
                 if(count($filtered_students) > 0) {
 
                     foreach ($filtered_students as $stu_dent) {
@@ -2848,7 +2849,6 @@ class CourseAnnualController extends Controller
                         $each_score = isset($eachCourseAnnualScores[$tmpCourse->course_annual_id]) ? (isset($eachCourseAnnualScores[$tmpCourse->course_annual_id][$stu_dent->student_annual_id]) ? $this->compareResitScore($eachCourseAnnualScores[$tmpCourse->course_annual_id][$stu_dent->student_annual_id]) : 0) : 0;
 
                         $each_column_score = $this->score_constraint($each_score, $tmpCourse, $stu_dent, $each_column_score);
-
 
                         $each_element_semester = $this->concate_element_by_semester($each_score, $semesterId, $semesters, $tmpCourse, $stu_dent, $element, $absence_by_course, $totalMoyenne, $totalAbs);
                         if ($each_element_semester == false) {
@@ -4040,12 +4040,8 @@ class CourseAnnualController extends Controller
 
         $studentRattrapages = $studentDataProperties['student_rattrapage'];
         $failCourseAnnuals = $studentDataProperties['all_fail_subject'];
-
-
         $fullUrl = $studentDataProperties['full_url'];
         $courseAnnuals = $studentDataProperties['course_annual'];
-
-
 
 
         return view('backend.course.courseAnnual.includes.student_redouble_lists',
@@ -4099,15 +4095,15 @@ class CourseAnnualController extends Controller
         $academicYear = DB::table('academicYears')->where('id', $academic_year_id)->first();
         $supplementary_subjects = [];
         $data_lists = [];
-
         $mustRattrapageStudents = [];
         foreach ($data as $studentIdCard =>  $failCourses) {
 
             if(is_array($failCourses))
             {
-                foreach ($failCourses as $course_program_id) {
-                    if (!in_array($course_program_id, $supplementary_subjects)) {
-                        $supplementary_subjects[] = $course_program_id;
+                foreach ($failCourses as $course_annual_id) {
+
+                    if (!in_array($course_annual_id, $supplementary_subjects)) {
+                        $supplementary_subjects[] = $course_annual_id;
                     }
                 }
                 $mustRattrapageStudents[] = $studentIdCard;
@@ -4116,8 +4112,12 @@ class CourseAnnualController extends Controller
         }
 
         $course_program_ids = [];
+
         $courseAnnuals = DB::table('course_annuals')->whereIn('id', $supplementary_subjects)->get();
+
+
         foreach ($courseAnnuals as $courseAnnual) {
+
             $courseAnnualByPrograms[$courseAnnual->course_id][] = $courseAnnual->id;
             if (!in_array($courseAnnual->course_id, $course_program_ids)) {
                 $course_program_ids[] = $courseAnnual->course_id;
@@ -4126,14 +4126,38 @@ class CourseAnnualController extends Controller
 
         $coursePrograms = Course::whereIn('id', $course_program_ids)->get();
         $students = DB::table('students')
+            ->join('studentAnnuals', function($query) use($academic_year_id) {
+                $query->on('studentAnnuals.student_id', '=', 'students.id')
+                    ->where('academic_year_id', '=', $academic_year_id);
+            })
             ->join('genders', 'genders.id', '=', 'students.gender_id')
             ->whereIn('id_card', $mustRattrapageStudents)
             ->orderBy('name_latin')
             ->select(
                 'students.name_latin', 'students.id as student_id',
-                'genders.code', 'students.id_card'
-            )
+                'genders.code', 'students.id_card', 'studentAnnuals.id as student_annual_id'
+            );
+        $studentAnnualIds = $students->lists('student_annual_id');
+        $students = $students->get();
+
+        $studentScores = DB::table('averages')
+            ->whereIn('student_annual_id', $studentAnnualIds)
             ->get();
+
+        $objectScores = [];
+
+        $objectScoreCollection = collect($studentScores);
+
+        $allCourseAnnualIds = $objectScoreCollection->unique('course_annual_id')->pluck('course_annual_id')->toArray();
+        $allCourseAnnuals = DB::table('course_annuals')->whereIn('id', $allCourseAnnualIds)->get();
+        $allCredits = collect($allCourseAnnuals)->sum('credit');
+        $allCourseAnnuals = collect($allCourseAnnuals)->keyBy('id')->toArray();
+
+
+        $objectScoreCollection->filter(function($item) use(&$objectScores){
+
+            $objectScores[$item->student_annual_id][$item->course_annual_id] = $item;
+        });
 
         $index = 1;
         $true = true;
@@ -4152,15 +4176,42 @@ class CourseAnnualController extends Controller
             foreach ($coursePrograms as $courseProgram) {
 
                 if ($courseProgram->is_counted_creditability) {
+
                     $row_header = array_merge($row_header, [$courseProgram->name_en]);
-                    if (count(array_intersect($courseAnnualByPrograms[$courseProgram->id], $data[$student->id_card])) > 0) {
-                        $array = array_merge($array, ['Ratt']);
+
+                    $intersetedCourses = array_intersect($courseAnnualByPrograms[$courseProgram->id], $data[$student->id_card]);
+                    if (count($intersetedCourses) > 0) {
+
+                        if(count($intersetedCourses) == 1) {
+
+                            $intersetedCourses = array_values($intersetedCourses);
+                            $studentScoreCourses = $objectScores[$student->student_annual_id];
+                            $eachScore = isset($studentScoreCourses[$intersetedCourses[0]]) ? $studentScoreCourses[$intersetedCourses[0]] :null;
+                            $array = array_merge($array, [$eachScore->average]);
+                        }
+
+                        /*---here if the count($intersectedCourse) > 1 that mean there is an error that one student have assigned two course-annuals that have the same course program--- */
+
                     } else {
+
                         $array = array_merge($array, ['']);
                     }
                 }
             }
 
+            $eachStudentScore = $objectScores[$student->student_annual_id];
+
+
+            $sumScores = collect($eachStudentScore)->sum(function($item) use($allCourseAnnuals, $allCredits, &$sum_scores) {
+                $martchedCourse = $allCourseAnnuals[$item->course_annual_id];
+
+                if($martchedCourse->is_counted_creditability) {
+                    return $item->average * $martchedCourse->credit;
+                }
+            });
+
+            $row_header = array_merge($row_header, ['Moyenne']);
+            $array = array_merge($array, [$this->floatFormat($sumScores/$allCredits)]);
             $count = count($array);
             $data_lists[] = $array;
             $index++;

@@ -190,6 +190,7 @@
         }
 
         function getCurrentCheckBoxVal() {
+
             var resit_subjects = [];
             $('input.input_value').each(function() {
                 if(this.checked) {

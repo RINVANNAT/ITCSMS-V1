@@ -791,11 +791,18 @@ trait StudentScore {
     public function findResitStudentAutomatic($array_fial_subject) {
 
         $studentResitExam = [];
+
         foreach($array_fial_subject as $studentIdCard =>  $array) {
 
-            $subjectRattrapages = $this->findRattrapageSubject($array);
-            $studentResitExam[$studentIdCard] = ['resit_subject'=>$subjectRattrapages];
+            $moyenne = $this->calculateMoyenne($array);
 
+            if( $moyenne < ScoreEnum::Pass_Moyenne) {
+                $subjectRattrapages = $this->findRattrapageSubject($array);
+                $studentResitExam[$studentIdCard] = ['resit_subject' => $subjectRattrapages];
+            } else {
+
+                $studentResitExam[$studentIdCard] = ['resit_subject' => $array];
+            }
         }
         return $studentResitExam;
     }
