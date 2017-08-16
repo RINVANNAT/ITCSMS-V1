@@ -247,9 +247,10 @@ class StudentAnnualController extends Controller
         }
 
         $studentAnnuals = StudentAnnual::select([
-            'studentAnnuals.id','groups.code as group','students.id_card','students.name_kh','students.dob as dob','students.name_latin', 'genders.code as gender', 'departmentOptions.code as option',
-            DB::raw("CONCAT(degrees.code,grades.code,departments.code) as class")
-        ])
+                'studentAnnuals.id',
+                'groups.code as group','students.id_card','students.name_kh','students.dob as dob','students.name_latin', 'genders.code as gender', 'departmentOptions.code as option',
+                DB::raw("CONCAT(degrees.code,grades.code,departments.code) as class")
+            ])
             ->leftJoin('students','students.id','=','studentAnnuals.student_id')
             ->leftJoin('genders', 'students.gender_id', '=', 'genders.id')
             ->leftJoin('grades', 'studentAnnuals.grade_id', '=', 'grades.id')

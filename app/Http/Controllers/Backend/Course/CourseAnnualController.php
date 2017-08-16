@@ -467,10 +467,7 @@ class CourseAnnualController extends Controller
             }
         }
 
-
         $array_groups = $this->groupStudentAnnual($courseAnnual->semester_id);
-
-
         if($ownerCourseDeparment->is_vocational) {
 
             $array_groups =  $array_groups
@@ -587,7 +584,6 @@ class CourseAnnualController extends Controller
         $semesters = Semester::lists("name_kh", "id");
         $competency_types = CompetencyType::lists('name','id')->toArray();
 
-
         return view('backend.course.courseAnnual.edit', compact('competency_types','courseAnnual', 'departments', 'academicYears', 'degrees', 'grades', 'courses', 'options', 'semesters', 'groups', 'midterm', 'final', 'other_departments'));
     }
 
@@ -600,7 +596,6 @@ class CourseAnnualController extends Controller
      */
     public function update(UpdateCourseAnnualRequest $request, $id)
     {
-
         $input = $request->all();
         $midterm_id = $request->midterm_percentage_id;
         $final_id = $request->final_percentage_id;

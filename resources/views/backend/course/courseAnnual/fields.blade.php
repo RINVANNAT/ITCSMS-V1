@@ -151,7 +151,6 @@
                         @if($status == true)
                             <label style="font-size: 12pt" class="btn btn-xs" for="{{$group->group_id}}"> <input id="{{$group->group_id}}" disabled type="checkbox" name="groups[]" class=" each_check_box" value="{{$group->group_id}}"> {{$group->group_code}}</label>
                         @endif
-
                     @endif
 
                 @endforeach
@@ -228,23 +227,23 @@
     <div class="col-lg-9">
         <div class="box box-solid" style="border-top: 1px solid #d2d6de" id="scoring_panel">
             <div class="box-header with-border">
-                <div class="col-md-6">
+                <div class="col-md-6 col-xs-6">
                     @if((isset($courseAnnual) and $courseAnnual->normal_scoring == true) or (!isset($courseAnnual)))
                         <label for="normal_scoring_panel" style="float:left; font-size: 12pt" class="control-label">Normal Scoring <input onclick="toggleVisible('#normal_scoring_panel', this)"  id="normal_scoring" name="normal_scoring" value="checked" type="checkbox" checked></label>
                     @else
                         <label for="normal_scoring_panel" style="float:left; font-size: 12pt" class="control-label">Normal Scoring <input onclick="toggleVisible('#normal_scoring_panel', this)"  id="normal_scoring" name="normal_scoring" value="checked" type="checkbox"></label>
                     @endif
                 </div>
-                <div class="col-md-6">
+                <div class="col-md-6 col-xs-6">
                     @if(isset($courseAnnual) and $courseAnnual->competency_type_id != null)
-                        <label for="normal_scoring_panel" style="float:left; font-size: 12pt" class="control-label">Competency Scoring (SA/SF Section) <input onclick="toggleVisible('#competency_scoring_panel', this)" name="competency_scoring" value="checked"  id="competency_scoring" type="checkbox" checked></label>
+                        <label for="competency_scoring_panel" style="float:left; font-size: 12pt" class="control-label">Competency Scoring (SA/SF Section) <input onclick="toggleVisible('#competency_scoring_panel', this)" name="competency_scoring" value="checked"  id="competency_scoring" type="checkbox" checked></label>
                     @else
-                        <label for="normal_scoring_panel" style="float:left; font-size: 12pt" class="control-label">Competency Scoring (SA/SF Section) <input onclick="toggleVisible('#competency_scoring_panel', this)" name="competency_scoring" value="checked"  id="competency_scoring" type="checkbox"></label>
+                        <label for="competency_scoring_panel" style="float:left; font-size: 12pt" class="control-label">Competency Scoring (SA/SF Section) <input onclick="toggleVisible('#competency_scoring_panel', this)" name="competency_scoring" value="checked"  id="competency_scoring" type="checkbox"></label>
                     @endif
                 </div>
             </div>
             <div class="box-body" style="padding: 10px 0 0 0">
-                <div class="col-md-6">
+                <div class="col-md-6 col-xs-6">
                 @if((isset($courseAnnual) and $courseAnnual->normal_scoring == true) or (!isset($courseAnnual)))
                     <div id="normal_scoring_panel">
                 @else
@@ -381,26 +380,25 @@
                         </div>
                     @endif
                 </div>
-
+                </div>
+                <div class="col-md-6 col-xs-6">
                 @if(isset($courseAnnual) and $courseAnnual->competency_type_id != null)
-                <div class="col-md-6">
                     <div id="competency_scoring_panel">
-                    @else
+                        <div class="callout callout-danger">
+                            <h4>Info!</h4>
+
+                            <p>Competency scoring is not editable. In case you want to change, please recreate this course</p>
+                        </div>
+                @else
                     <div id="competency_scoring_panel" style="display: none;">
-                    @endif
+                @endif
                         <div class="form-group">
                             {!! Form::label('competency_type_id', "Competency Type", ['class' => 'col-lg-5 control-label required']) !!}
                             <div class="col-lg-7">
                                 {{ Form::select('competency_type_id', $competency_types, isset($courseAnnual)?$courseAnnual->competency_type_id:null, ['class' => 'form-control','placeholder' => ""]) }}
-                                <div class="callout callout-danger">
-                                    <h4>Info!</h4>
-
-                                    <p>Competency scoring is not editable. In case you want to change, please recreate this course</p>
-                                </div>
                             </div>
                         </div>
                     </div>
-
                 </div>
             </div>
         </div>
