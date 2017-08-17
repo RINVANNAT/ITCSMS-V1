@@ -289,12 +289,12 @@
                 <div class="row">
 
                     <div class="no-padding text-center" style="width: 63mm;float: left; margin-top: -2mm">
-                        <div class="row" style="margin-bottom: -2mm;">
+                        <div class="row" style="margin-bottom: -3mm;">
                             <span style="margin-left: 8mm; line-height: 3mm;">
                                 Bulletin de notes
                             </span>
                         </div>
-                        <table class="table pass-result" style="width: 100%;font-size: 12px; line-height: 3mm; margin: 5mm 0 3mm 3mm;">
+                        <table class="table pass-result" style="width: 100%;font-size: 12px; line-height: 3mm; margin: 5mm 0 3mm 5mm;">
                             <thead>
                             <tr class="set_border">
                                 <th colspan="2" rowspan="2" style="text-align: center">Compétences évaluées comblées</th>
@@ -354,7 +354,7 @@
 
 
                         <div class="row" style="margin-top: 5%;line-height: 3mm;">
-                            <div class="col-md-12 col-xs-12" style="margin-left: 3mm; padding-right: 0mm">
+                            <div class="col-md-12 col-xs-12" style="margin-left: 5mm; padding-right: 0mm">
                                 <p class="description">
                                     *Note minimale requise par épreuve : 05/25 <br/>
                                     *Seuil de réussite pour obtenir le niveau : 50/100
@@ -428,7 +428,7 @@
                             Pour valoir ce que de droit.
                         </p>
 
-                        <div class="pull-right" style="margin-top: 8mm; margin-right: 26mm">
+                        <div class="pull-right" style="margin-top: 6mm; margin-right: 26mm">
                             <p class="text-center title" style="font-size: 12pt">
                                 <?php
                                 if(($issued_date == null) or ($issued_date == "")){
