@@ -47,7 +47,7 @@
         }
 
         .attestation_title {
-            margin-top: 8mm;
+            margin-top: 11mm;
             font-size: 23pt;
         }
         .description{
@@ -158,14 +158,14 @@
                         <td rowspan="2" class="td_result" style="text-align:center; vertical-align:middle;" > ÉCRIT </td>
                         <td>Compréhension</td>
                         <td class="td_result">
-                            {!! $ce !!}
+                            {!! to_fr_number($ce) !!}
                         </td>
                     </tr>
                     <tr class="set_border">
 
                         <td >Production</td>
                         <td class="td_result">
-                            {!! $pe !!}
+                            {!! to_fr_number($pe) !!}
                         </td>
                     </tr>
 
@@ -173,14 +173,14 @@
                         <td rowspan="2" class="td_result" style="text-align:center; vertical-align:middle;"  > ORAL </td>
                         <td>Compréhension</td>
                         <td class="td_result">
-                            {!! $co !!}
+                            {!! to_fr_number($co) !!}
                         </td>
                     </tr>
                     <tr class="set_border">
 
                         <td >Production</td>
                         <td class="td_result">
-                            {!! $po !!}
+                            {!! to_fr_number($po) !!}
                         </td>
                     </tr>
 
@@ -193,7 +193,7 @@
                         </td>
 
                         <td style="text-align: center;border-bottom: 0px !important; border-left: none !important; border-right: none !important; font-style: normal">
-                            {!! $total !!}
+                            {!! to_fr_number($total) !!}
                         </td>
 
                     </tr>
@@ -227,8 +227,7 @@
                         </p>
 
                         <p class="description-extra-small">
-                            Cette originale attestation est délivrée en un seul exemplaire. Aucun double ne pourra être refait. <br/>
-                            Cette attestation est accompagnée par le bulletin de notes de l’étudiant (e) intéressé(e).
+                            Cette originale attestation est délivrée en une seule fois. <br/>
                         </p>
                     </div>
                 </div>
@@ -308,14 +307,14 @@
                                 <td rowspan="2" class="td_result" style="text-align:center; vertical-align:middle;" > ÉCRIT </td>
                                 <td>Compréhension</td>
                                 <td class="td_result">
-                                    {!! $ce !!}
+                                    {!! to_fr_number($ce) !!}
                                 </td>
                             </tr>
                             <tr class="set_border">
 
                                 <td >Production</td>
                                 <td class="td_result">
-                                    {!! $pe !!}
+                                    {!! to_fr_number($pe) !!}
                                 </td>
                             </tr>
 
@@ -323,14 +322,14 @@
                                 <td rowspan="2" class="td_result" style="text-align:center; vertical-align:middle;"  > ORAL </td>
                                 <td>Compréhension</td>
                                 <td class="td_result">
-                                    {!! $co !!}
+                                    {!! to_fr_number($co) !!}
                                 </td>
                             </tr>
                             <tr class="set_border">
 
                                 <td >Production</td>
                                 <td class="td_result">
-                                    {!! $po !!}
+                                    {!! to_fr_number($po) !!}
                                 </td>
                             </tr>
 
@@ -343,7 +342,7 @@
                                 </td>
 
                                 <td style="border-bottom: 0px !important; border-left: none !important; border-right: none !important; font-style: normal">
-                                    {!! $total !!}
+                                    {!! to_fr_number($total) !!}
                                 </td>
 
                             </tr>
@@ -375,8 +374,7 @@
                                 </p>
 
                                 <p class="description-extra-small">
-                                    Cette originale attestation est délivrée en un seul exemplaire. <br/>Aucun double ne pourra être refait. <br/>
-                                    Cette attestation est accompagnée par le bulletin de notes de l’étudiant (e) intéressé(e).
+                                    Cette originale attestation est délivrée en une seule fois.
                                 </p>
                             </div>
                         </div>

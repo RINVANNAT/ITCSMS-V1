@@ -153,3 +153,16 @@ if (! function_exists('day_jour')) {
         }
     }
 }
+
+if (! function_exists('to_fr_number')) {
+    /**
+     * Convert english day to french
+     *
+     * @param $number
+     * @return String
+     */
+    function to_fr_number($number)
+    {
+        return str_replace(".",",",$number);
+    }
+}
