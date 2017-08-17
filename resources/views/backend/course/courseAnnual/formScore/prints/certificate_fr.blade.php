@@ -47,7 +47,7 @@
         }
 
         .attestation_title {
-            margin-top: 11mm;
+            margin-top: 8mm;
             font-size: 23pt;
         }
         .description{
@@ -239,7 +239,7 @@
                         <p class="text-14" style="font-size: 13pt; font-weight: bold">
                             Institut de Technologie du Cambodge
                         </p>
-                        <span class="text-13" style="font-style: italic;">Réf.: <u> &nbsp;&nbsp;&nbsp;{{$number!=null?$number:""}} &nbsp;&nbsp;&nbsp;</u>/ITC</span>
+                        <span class="text-13" style="font-style: italic;">Réf.:  &nbsp;&nbsp;&nbsp;{{$number!=null?$number:""}} &nbsp;&nbsp;&nbsp;/ITC</span>
                     </div>
                     <div class="pull-right text-center" style="padding-right: 9mm; margin-top: -7mm">
                         <p class="text-14" style="line-height: 6mm; margin-bottom: 0px; font-family: franklin_gothic !important;">
@@ -442,7 +442,7 @@
                                 ?>
                                 Phnom Penh, le {{$c_day." ".$c_month." ".$c_year}}
                             <p style="margin-top: -10px !important;">
-                                Le Directeur de l’Institut de Technologie du Cambodge, <br/>
+                                Le Directeur de l’Institut de Technologie du Cambodge <br/>
                                 <span style="font-style: italic">{{$issued_by}}</span>
                             </p>
                             </p>
