@@ -50,6 +50,7 @@ trait CourseProgramTrait
 
         foreach ($coursePrograms as $program) {
             $element = [
+                'ID' => $program->id,
                 'Name Khmer' => $program->name_kh,
                 'Name in French' => $program->name_fr,
                 'Name in English' => $program->name_en,
@@ -68,7 +69,7 @@ trait CourseProgramTrait
         $title = 'List Course Program';
 
         $colHeaders = [
-            'Name Khmer', 'Name French', 'Name English', 'Code', 'Class', 'Semester', 'Time Course', 'Time TD', 'Time TP', 'Creadit'
+            'ID','Name Khmer', 'Name French', 'Name English', 'Code', 'Class', 'Semester', 'Time Course', 'Time TD', 'Time TP', 'Creadit'
         ];
 
         Excel::create($title, function ($excel) use ($arrayData, $title, $colHeaders, $header) {
@@ -80,8 +81,8 @@ trait CourseProgramTrait
                 foreach ($arrayData as $data) {
                     $sheet->appendRow($data);
                 }
-                $sheet->mergeCells('A1:J1');
-                $sheet->cells('A1:J1', function($cell) {
+                $sheet->mergeCells('A1:K1');
+                $sheet->cells('A1:K1', function($cell) {
                     $cell->setAlignment('center');
                 });
             });
