@@ -3069,12 +3069,12 @@ class CourseAnnualController extends Controller
 
             }
         }
-        $courseName = explode(" ", $courseAnnual->name_en);
-        $acronym = "";
-
-        foreach ($courseName as $char) {
-            $acronym .= $char[0];
-        }
+//        $courseName = explode(" ", $courseAnnual->name_en);
+//        $acronym = "";
+//
+//        foreach ($courseName as $char) {
+//            $acronym .= $char[0];
+//        }
         $title = 'Student_Score_Lists';
         $alpha = [];
         $letter = 'A';
