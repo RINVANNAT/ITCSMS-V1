@@ -443,7 +443,7 @@
                                 Phnom Penh, le {{$c_day." ".$c_month." ".$c_year}}
                             <p style="margin-top: -10px !important; text-align: center">
                                 @if($issued_by != "")
-                                    P. 
+                                    P.
                                 @endif
                                 Le Directeur de l’Institut de Technologie du Cambodge <br/>
                                 <span style="font-style: italic">{{$issued_by}}</span>

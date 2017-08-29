@@ -48,12 +48,12 @@
             @endauth
 
             @permission('view-vocational-student-management')
-            <li class="{{ Active::pattern('admin/vocational_student*') }}">
-                <a href="{!!url('admin/vocational_students')!!}">
-                    <i class="fa fa-users"></i>
-                    <span>{{ trans('menus.backend.student.title') }}</span>
-                </a>
-            </li>
+            {{--<li class="{{ Active::pattern('admin/vocational_student*') }}">--}}
+                {{--<a href="{!!url('admin/vocational_students')!!}">--}}
+                    {{--<i class="fa fa-users"></i>--}}
+                    {{--<span>{{ trans('menus.backend.student.title') }}</span>--}}
+                {{--</a>--}}
+            {{--</li>--}}
             @endauth
 
             @permission('view-employee-management')
