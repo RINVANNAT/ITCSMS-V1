@@ -1,7 +1,10 @@
 <?php
 
 namespace App\Http\Controllers\Backend\StudentTrait;
+use App\Models\AcademicYear;
+use App\Models\Degree;
 use App\Models\Department;
+use App\Models\Scholarship;
 use App\Models\StudentAnnual;
 use Illuminate\Support\Facades\DB;
 
