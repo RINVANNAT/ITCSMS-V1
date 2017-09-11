@@ -28,6 +28,7 @@ use App\Models\Enum\ScoreEnum;
 use App\Models\Enum\SemesterEnum;
 use App\Models\Gender;
 use App\Models\Grade;
+use App\Models\GroupStudentAnnual;
 use App\Models\ResitStudentAnnual;
 use App\Models\Score;
 use App\Models\Semester;
@@ -5199,8 +5200,7 @@ class CourseAnnualController extends Controller
 
     public function test(Request $request){
         $studentAnnuals = StudentAnnual::select([
-            'studentAnnuals.id','students.id_card',
-            DB::raw('CONCAT(degrees.code,grades.code,departments.code,"departmentOptions"."code") as class')
+            'studentAnnuals.id'
         ])
             ->leftJoin('students','students.id','=','studentAnnuals.student_id')
             ->leftJoin('genders', 'students.gender_id', '=', 'genders.id')
@@ -5211,7 +5211,15 @@ class CourseAnnualController extends Controller
             ->leftJoin('group_student_annuals', 'group_student_annuals.student_annual_id', '=', 'studentAnnuals.id')
             ->leftJoin('groups','groups.id','=','group_student_annuals.group_id')
 //            ->whereNull('group_student_annuals.department_id');
-            ->get();
-        dd($studentAnnuals);
+            ->where('studentAnnuals.academic_year_id',2017)
+            ->where('studentAnnuals.department_id',5)
+            ->where('studentAnnuals.degree_id',1)
+            ->lists('id');
+
+        dd(collect($studentAnnuals));
+        $group_student_annuals = GroupStudentAnnual::select(['student_annual_id as id'])
+            ->whereNull('department_id')
+            ->get()->toArray();
+        dd(collect($group_student_annuals));
     }
 }

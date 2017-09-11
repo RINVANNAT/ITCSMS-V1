@@ -9,21 +9,16 @@
         .space{
             margin-left: 5px;
         }
-
         .space_{
             padding-right: 5px !important;
             padding-left: 5px !important;
         }
-
-
         .popupdiv{
             height:200px;
             width: 600px;
             background-color: #AED6F1;
             opacity: 60;
-
         }
-
         .blog_course{
             border-top-left-radius: 0;
             border-top-right-radius: 0;
@@ -31,24 +26,19 @@
             border-bottom-left-radius: 3px;
             padding: 10px;
         }
-
         .drop-menu {
             margin-top: 5px;
         }
-
         .handsontable td{
             color: #000 !important;
         }
-
         .selection {
             width: 120px;
             font-size: 13pt;
             height: 23px;
             margin-bottom: 5px;
-
         }
         .current_row td{
-
             gradient(to bottom,rgba(181,209,255,0.34) 0,rgba(181,209,255,0.34) 100%);
                 background-image: linear-gradient(rgba(181, 209, 255, 0.5) 0px, rgba(181, 209, 255, 0.341176) 100%);
                 background-position-x: initial;
@@ -61,7 +51,6 @@
                 background-clip: initial;
                 background-color: #fff !important;
         }
-
         .btn_success_custom {
             background-color: #ff9999;
             border-color: #ffffcc;
@@ -70,8 +59,6 @@
             border: 1px solid transparent;
         }
     </style>
-
-
 @endsection
 
 @section('after-style-end')
@@ -79,8 +66,6 @@
 @endsection
 
 @section('content')
-
-
     @include('backend.course.courseAnnual.includes.partials.modal_publish')
     <div class="box box-success">
         <div class="box-header with-border">
