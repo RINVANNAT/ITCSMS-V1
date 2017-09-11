@@ -158,7 +158,7 @@ trait ScoreProp {
     {
 
         $courseAnnual = CourseAnnual::where('id', $input['course_annual_id'])->first();
-        if ($courseAnnual->is_allow_scoring || auth()->user()->allow("input-score-without-blocking")) {
+        if ($courseAnnual->is_allow_scoring != "no" || auth()->user()->allow("input-score-without-blocking")) {
             $totalScore = $this->averages->findAverageByCourseIdAndStudentId($input['course_annual_id'], (int)$input['student_annual_id']);// check if total score existe
 
             if ($totalScore) {

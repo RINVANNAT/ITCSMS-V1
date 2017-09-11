@@ -107,17 +107,15 @@
 
                 <a class="btn btn-primary btn-xs pull-right" id="export_score" href="{{route('course_annual.export_course_score_annual')}}" target="_blank" style="margin-left:5px">Export Score</a>
 
-                @if($courseAnnual->is_allow_scoring)
+                @if($courseAnnual->is_allow_scoring != "no")
 
                     @if($allowCloningScore)
-
                         <button class="btn btn-success btn-xs pull-right" id="clone_score" data-toggle="tooltip" data-placement="top" title=" The action is to allow you to clone score of this course from responsible department!"  style="margin-left:5px"> Clone-Score </button>
-
                     @else
-                        @if(access()->user()->allow("input-score-without-blocking") || ($courseAnnual->is_allow_scoring && $mode == "edit"))
+                        @if(access()->user()->allow("input-score-without-blocking") || ($courseAnnual->is_allow_scoring != "no" && $mode == "edit"))
                             <button class="btn btn-warning btn-xs pull-right" id="save_editted_score" style="margin-left:5px">Save Changes!</button>
                         @endif
-                        @if(access()->user()->allow("input-score-without-blocking") || ($courseAnnual->is_allow_scoring && $mode == "edit"))
+                        @if(access()->user()->allow("input-score-without-blocking") || ($courseAnnual->is_allow_scoring =="yes" && $mode == "edit"))
                             <a href="{{route('course_annual.form_import_score')}}" target="_self" class="btn btn-info btn-xs pull-right" id="import_score" style="margin-left: 5px"> Import Score</a>
                         @endif
 
@@ -143,11 +141,18 @@
                             This is in viewing mode. You cannot delete or modify this course.
                         </p>
                     </div>
-                @elseif(!$courseAnnual->is_allow_scoring)
+                @elseif(!$courseAnnual->is_allow_scoring == "no")
                     <div class="alert alert-danger">
                         <h4><i class="icon fa fa-info"></i> Scoring is blocked!</h4>
                         <p>
                             This course is blocked for scoring. Please contact student & study affair office if you wish to make change.
+                        </p>
+                    </div>
+                @elseif(!$courseAnnual->is_allow_scoring == "only_retake")
+                    <div class="alert alert-warning">
+                        <h4><i class="icon fa fa-info"></i> Scoring is allowed only retake exam (resist column)</h4>
+                        <p>
+                            The general scoring for this course is blocked. Only retake exam score is allowed. Please contact student & study affair office if you wish to make change.
                         </p>
                     </div>
                 @endif
@@ -854,13 +859,14 @@
                                 $('#blog_button').append('<button class="btn btn-success btn-xs pull-right" id="clone_score" data-toggle="tooltip" data-placement="top" title=" The action is to allow you to clone score of this course from responsible department!"  style="margin-left:5px"> Clone-Score </button>')
                             }
 
-                            @if(access()->user()->allow("input-score-without-blocking") || ($courseAnnual->is_allow_scoring && $mode == "edit"))
+
+                            @if(access()->user()->allow("input-score-without-blocking") || ($courseAnnual->is_allow_scoring != "no" && $mode == "edit"))
                                 if($('#save_editted_score').is(':visible')) {
                                    $('#blog_button').find('#save_editted_score').remove();
                                 }
                             @endif
 
-                            @if(access()->user()->allow("input-score-without-blocking") || ($courseAnnual->is_allow_scoring && $mode == "edit"))//import_score
+                            @if(access()->user()->allow("input-score-without-blocking") || ($courseAnnual->is_allow_scoring != "no" && $mode == "edit"))//import_score
                                 if($('#import_score').is(':visible')) {
                                     $('#blog_button').find('#import_score').remove();
                                 }
@@ -872,12 +878,12 @@
                                 $('#blog_button').find('#clone_score').remove();
                             }
 
-                            @if(access()->user()->allow("input-score-without-blocking") || ($courseAnnual->is_allow_scoring && $mode == "edit"))
+                            @if(access()->user()->allow("input-score-without-blocking") || ($courseAnnual->is_allow_scoring != "no" && $mode == "edit"))
                             if(!$('#save_editted_score').is(':visible')) {
                                 $('#blog_button').append('<button class="btn btn-primary btn-xs pull-right" id="save_editted_score" style="margin-left:5px">Save Changes!</button>')
                             }
                             @endif
-                            @if(access()->user()->allow("input-score-without-blocking") || ($courseAnnual->is_allow_scoring && $mode == "edit"))//import_score
+                            @if(access()->user()->allow("input-score-without-blocking") || ($courseAnnual->is_allow_scoring != "no" && $mode == "edit"))//import_score
                             if(!$('#import_score').is(':visible')) {
                                 $('#blog_button').append('<a href="{{route('course_annual.form_import_score')}}" target="_self" class="btn btn-info btn-xs pull-right" id="import_score" style="margin-left: 5px"> Import Score</a>')
                             }

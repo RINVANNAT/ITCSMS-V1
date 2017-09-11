@@ -500,7 +500,7 @@ trait CourseAnnualTrait
     {
         $courseAnnual = CourseAnnual::where('id', $request->course_annual_id)->first();
 
-        if($courseAnnual->is_allow_scoring) {
+        if($courseAnnual->is_allow_scoring == "yes" || $courseAnnual->is_allow_scoring == "only_retake") {
             if($courseAnnual->responsible_department_id) {
 
                 $resDepartment = Department::where('id', $courseAnnual->responsible_department_id)->first();

@@ -96,6 +96,7 @@
                         <div class="btn-group">
                             <button class="btn btn-success btn-sm" id="btn_disable_scoring"><i class="fa fa-toggle-on"></i> {{trans('buttons.course.course_annual.disable_scoring')}}</button>
                             <button class="btn btn-warning btn-sm" id="btn_enable_scoring"><i class="fa fa-toggle-off"></i> {{trans('buttons.course.course_annual.enable_scoring')}}</button>
+                            <button class="btn btn-default btn-sm" id="btn_only_retake_scoring"> {{trans('buttons.course.course_annual.only_retake_score')}}</button>
                         </div>
                         @endauth
 
@@ -178,6 +179,7 @@
         var base_url = '{{url('img/profiles/')}}';
         var disable_scoring_url = "{{route('admin.course.course_annual.disable_scoring')}}";
         var enable_scoring_url = "{{route('admin.course.course_annual.enable_scoring')}}";
+        var only_retake_scoring_url = "{{route('admin.course.course_annual.only_retake_scoring')}}";
         var current_course = null;
         var search_employee_box = null;
         $(function() {
@@ -348,7 +350,6 @@
                     }
                 });
             });
-
             $("#btn_enable_scoring").on("click", function(e){
                 $.ajax({
                     url: enable_scoring_url,
@@ -373,6 +374,29 @@
                     }
                 });
             });
+            $("#btn_only_retake_scoring").on("click", function(e){
+              $.ajax({
+                url: only_retake_scoring_url,
+                type: 'POST',
+                data:{
+                  academic_year : $('#filter_academic_year').val(),
+                  degree : $('#filter_degree').val(),
+                  grade : $('#filter_grade').val(),
+                  department : $('#filter_department').val(),
+                  semester : $('#filter_semester').val(),
+                  lecturer : $('#filter_lecturer').val(),
+                  dept_option : $('#filter_dept_option').val()
+                },
+                success: function (response) {
+                  if(response.success){
+                    oTable.draw();
+                    notify("success","",response.message.toString());
+                  } else {
+                    notify("error","",response.message.toString());
+                  }
+                }
+                });
+          });
         });
 
         function init_search_box(){

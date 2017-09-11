@@ -938,16 +938,19 @@ class CourseAnnualController extends Controller
                 return $html;
             })
             ->setRowClass(function ($courseAnnual) {
-                return ($courseAnnual->is_allow_scoring ? '' : 'score_disabled');
+                return ($courseAnnual->is_allow_scoring=="no" ? 'score_disabled' : '');
             })
             ->addColumn('action', function ($courseAnnual) use ($employee) {
 
-                if ($courseAnnual->is_allow_scoring) {
-                    $action_toggle_scoring = ' <a href="' . route('admin.course.course_annual.toggle_scoring', $courseAnnual->id) . '" class="btn btn-xs btn-success toggle_scoring"><i class="fa fa-toggle-off" data-toggle="tooltip" data-placement="top" title="" data-original-title="Disable Scoring"></i></a>';
+                if ($courseAnnual->is_allow_scoring == "no") {
+                    $action_toggle_scoring = ' <a href="' . route('admin.course.course_annual.toggle_scoring', $courseAnnual->id) . '?operation=yes" class="btn btn-xs btn-warning toggle_scoring"><i class="fa fa-toggle-on" data-toggle="tooltip" data-placement="top" title="" data-original-title="Enable Scoring"></i></a>';
+                    $action_input_score = ' <a href="' . route('admin.course.form_input_score_course_annual', $courseAnnual->id) . '" class="btn btn-xs btn-default input_score_course"><i class="fa fa-area-chart" data-toggle="tooltip" data-placement="top" title="" data-original-title="' . 'input score' . '"></i></a>';
+                } else if ($courseAnnual->is_allow_scoring == "yes") {
+                    $action_toggle_scoring = ' <a href="' . route('admin.course.course_annual.toggle_scoring', $courseAnnual->id) . '?operation=no" class="btn btn-xs btn-success toggle_scoring"><i class="fa fa-toggle-off" data-toggle="tooltip" data-placement="top" title="" data-original-title="Disable Scoring"></i></a>';
                     $action_input_score = ' <a href="' . route('admin.course.form_input_score_course_annual', $courseAnnual->id) . '" class="btn btn-xs btn-info input_score_course"><i class="fa fa-area-chart" data-toggle="tooltip" data-placement="top" title="" data-original-title="' . 'input score' . '"></i></a>';
                 } else {
-                    $action_toggle_scoring = ' <a href="' . route('admin.course.course_annual.toggle_scoring', $courseAnnual->id) . '" class="btn btn-xs btn-warning toggle_scoring"><i class="fa fa-toggle-on" data-toggle="tooltip" data-placement="top" title="" data-original-title="Enable Scoring"></i></a>';
-                    $action_input_score = ' <a href="' . route('admin.course.form_input_score_course_annual', $courseAnnual->id) . '" class="btn btn-xs btn-default input_score_course"><i class="fa fa-area-chart" data-toggle="tooltip" data-placement="top" title="" data-original-title="' . 'input score' . '"></i></a>';
+                    $action_toggle_scoring = ' <a href="' . route('admin.course.course_annual.toggle_scoring', $courseAnnual->id) . '?operation=no" class="btn btn-xs btn-default toggle_scoring"><i class="fa fa-toggle-off" data-toggle="tooltip" data-placement="top" title="" data-original-title="Disable Scoring"></i></a>';
+                    $action_input_score = ' <a href="' . route('admin.course.form_input_score_course_annual', $courseAnnual->id) . '" class="btn btn-xs btn-info input_score_course"><i class="fa fa-area-chart" data-toggle="tooltip" data-placement="top" title="" data-original-title="' . 'input score' . '"></i></a>';
                 }
 
                 $action_view_score = ' <a href="' . route('admin.course.form_input_score_course_annual', $courseAnnual->id) . '?mode=view' . '" class="btn btn-xs btn-default view_score_course"><i class="fa fa-area-chart" data-toggle="tooltip" data-placement="top" title="" data-original-title="' . 'view score' . '"></i></a>';
@@ -1433,12 +1436,18 @@ class CourseAnnualController extends Controller
         $columnHeader = $headers['colHeader'];
         $columns = $headers['column'];
 
-
-        if(!$courseAnnual->is_allow_scoring) {
-
+        if($courseAnnual->is_allow_scoring == "no") {
             /*---set readonly true foreach column of the score ---*/
             $columns = collect($columns)->map(function($item, $key) {
                 $item['readOnly'] = true;
+                return $item;
+            })->toArray();
+        } else if($courseAnnual->is_allow_scoring == "only_retake"){
+            /*--- only retake score is allowed to input ---*/
+            $columns = collect($columns)->map(function($item, $key) {
+                if($item['data'] != "resit"){
+                    $item['readOnly'] = true;
+                }
                 return $item;
             })->toArray();
         } else {
@@ -1977,7 +1986,7 @@ class CourseAnnualController extends Controller
     {
 
 
-        if ($courseAnnual->is_allow_scoring || auth()->user()->allow("input-score-without-blocking")) {
+        if ($courseAnnual->is_allow_scoring != "no" || auth()->user()->allow("input-score-without-blocking")) {
 
             if ($averageByCourse) {
                 /*---update total score of each course annual in table average ---*/
@@ -3608,12 +3617,12 @@ class CourseAnnualController extends Controller
     {
         if ($request->ajax()) {
             $course_annual = CourseAnnual::find($id);
-
-            if ($course_annual->is_allow_scoring) {
-                $course_annual->is_allow_scoring = false;
-            } else {
-                $course_annual->is_allow_scoring = true;
+            $operation = $request->get('operation');
+            if($operation == null || $operation == ""){
+                $operation = "no";
             }
+
+            $course_annual->is_allow_scoring = $operation;
 
             if ($course_annual->save()) {
                 return \Illuminate\Support\Facades\Response::json(array("success" => true, "message" => "Operation is successful."));
@@ -3621,7 +3630,6 @@ class CourseAnnualController extends Controller
                 return \Illuminate\Support\Facades\Response::json(array("success" => false, "message" => "Something went wrong."));
             }
         }
-
     }
 
     private function mass_toggle_scoring(ToggleScoringCourseAnnualRequest $request, $status)
@@ -3687,27 +3695,33 @@ class CourseAnnualController extends Controller
     public function enable_scoring(ToggleScoringCourseAnnualRequest $request)
     {
         if ($request->ajax()) { // Only accept through ajax
-            if ($this->mass_toggle_scoring($request, true)) {
+            if ($this->mass_toggle_scoring($request, "yes")) {
                 return \Illuminate\Support\Facades\Response::json(array("success" => true, "message" => "All given courses are allowed for scoring."));
             } else {
                 return \Illuminate\Support\Facades\Response::json(array("success" => false, "message" => "Something went wrong."));
             }
         }
     }
-
     public function disable_scoring(ToggleScoringCourseAnnualRequest $request)
     {
-
         if ($request->ajax()) { // Only accept through ajax
-            if ($this->mass_toggle_scoring($request, false)) {
+            if ($this->mass_toggle_scoring($request, "no")) {
                 return \Illuminate\Support\Facades\Response::json(array("success" => true, "message" => "All given courses are blocked from scoring."));
             } else {
                 return \Illuminate\Support\Facades\Response::json(array("success" => false, "message" => "Something went wrong."));
             }
         }
     }
-
-
+    public function only_retake_scoring(ToggleScoringCourseAnnualRequest $request)
+    {
+        if ($request->ajax()) { // Only accept through ajax
+            if ($this->mass_toggle_scoring($request, "only_retake")) {
+                return \Illuminate\Support\Facades\Response::json(array("success" => true, "message" => "All given courses are blocked from scoring."));
+            } else {
+                return \Illuminate\Support\Facades\Response::json(array("success" => false, "message" => "Something went wrong."));
+            }
+        }
+    }
     public function saveEachObservation(Request $request)
     {
 
@@ -3994,8 +4008,10 @@ class CourseAnnualController extends Controller
     {
 
         $courseAnnual = $this->courseAnnuals->findOrThrowException($request->course_annual_id);
-        if ($courseAnnual->is_allow_scoring) {
-            return Response::json(['status' => true, 'message' => 'Allowed!']);
+        if ($courseAnnual->is_allow_scoring == "yes") {
+            return Response::json(['status' => true, 'message' => 'Allowed all scoring!']);
+        } else if($courseAnnual->is_allow_scoring == "only_retake") {
+            return Response::json(['status' => true, 'message' => 'Allowed scoring only retake exam!']);
         } else {
             return Response::json(['status' => false, 'message' => 'You are not allowed to make any changes on the score sheet, please ask the administrator to enable scoring!!']);
         }
@@ -4047,8 +4063,7 @@ class CourseAnnualController extends Controller
                 'academicYear',
                 'fullUrl',
                 'failCourseAnnuals',
-                'semesterId', 'degreeId', 'gradeId', 'departmentOptionId', 'departmentId', 'academicYearId'
-            )
+                'semesterId', 'degreeId', 'gradeId', 'departmentOptionId', 'departmentId', 'academicYearId')
         );
     }
 
@@ -5182,4 +5197,21 @@ class CourseAnnualController extends Controller
 
     }
 
+    public function test(Request $request){
+        $studentAnnuals = StudentAnnual::select([
+            'studentAnnuals.id','students.id_card',
+            DB::raw('CONCAT(degrees.code,grades.code,departments.code,"departmentOptions"."code") as class')
+        ])
+            ->leftJoin('students','students.id','=','studentAnnuals.student_id')
+            ->leftJoin('genders', 'students.gender_id', '=', 'genders.id')
+            ->leftJoin('grades', 'studentAnnuals.grade_id', '=', 'grades.id')
+            ->leftJoin('departmentOptions', 'studentAnnuals.department_option_id', '=', 'departmentOptions.id')
+            ->leftJoin('departments', 'studentAnnuals.department_id', '=', 'departments.id')
+            ->leftJoin('degrees', 'studentAnnuals.degree_id', '=', 'degrees.id')
+            ->leftJoin('group_student_annuals', 'group_student_annuals.student_annual_id', '=', 'studentAnnuals.id')
+            ->leftJoin('groups','groups.id','=','group_student_annuals.group_id')
+//            ->whereNull('group_student_annuals.department_id');
+            ->get();
+        dd($studentAnnuals);
+    }
 }
