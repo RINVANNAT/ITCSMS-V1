@@ -5199,27 +5199,6 @@ class CourseAnnualController extends Controller
     }
 
     public function test(Request $request){
-        $studentAnnuals = StudentAnnual::select([
-            'studentAnnuals.id'
-        ])
-            ->leftJoin('students','students.id','=','studentAnnuals.student_id')
-            ->leftJoin('genders', 'students.gender_id', '=', 'genders.id')
-            ->leftJoin('grades', 'studentAnnuals.grade_id', '=', 'grades.id')
-            ->leftJoin('departmentOptions', 'studentAnnuals.department_option_id', '=', 'departmentOptions.id')
-            ->leftJoin('departments', 'studentAnnuals.department_id', '=', 'departments.id')
-            ->leftJoin('degrees', 'studentAnnuals.degree_id', '=', 'degrees.id')
-            ->leftJoin('group_student_annuals', 'group_student_annuals.student_annual_id', '=', 'studentAnnuals.id')
-            ->leftJoin('groups','groups.id','=','group_student_annuals.group_id')
-//            ->whereNull('group_student_annuals.department_id');
-            ->where('studentAnnuals.academic_year_id',2017)
-            ->where('studentAnnuals.department_id',5)
-            ->where('studentAnnuals.degree_id',1)
-            ->lists('id');
 
-        dd(collect($studentAnnuals));
-        $group_student_annuals = GroupStudentAnnual::select(['student_annual_id as id'])
-            ->whereNull('department_id')
-            ->get()->toArray();
-        dd(collect($group_student_annuals));
     }
 }

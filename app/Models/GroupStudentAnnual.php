@@ -11,4 +11,5 @@ use Illuminate\Database\Eloquent\Model;
 class GroupStudentAnnual extends Model
 {
     protected $table = 'group_student_annuals';
+    protected $guarded = ['id'];
 }
