@@ -344,6 +344,8 @@ trait StudentTrait
 
         if(is_string($score_by_course)){
             dd($score_by_course);
+        } else {
+            dd($score_by_course);
         }
         return $score_by_course * $credit;
     }
