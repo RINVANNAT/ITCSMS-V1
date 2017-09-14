@@ -5,6 +5,8 @@ use Illuminate\Database\Seeder;
 class FixMissingStudentsCauseByMissingGroup extends Seeder
 {
     /**
+     * This seed is used to fix bug cause by missing student record in group_student_annuals
+     * No need to run this again.
      * Run the database seeds.
      *
      * @return void

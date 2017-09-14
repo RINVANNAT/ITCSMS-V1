@@ -342,6 +342,9 @@ trait StudentTrait
 
     public function calculateScoreByCredit($credit, $score_by_course) {
 
+        if(is_string($score_by_course)){
+            dd($score_by_course);
+        }
         return $score_by_course * $credit;
     }
 
