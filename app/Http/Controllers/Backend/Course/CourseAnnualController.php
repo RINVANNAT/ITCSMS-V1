@@ -627,18 +627,14 @@ class CourseAnnualController extends Controller
 
                 if (!isset($count_absence)) {
                     //---if the course doese not count the absence ..then find absence score and delete
-
                     $absences = DB::table('absences')->where('course_annual_id', $id);
-
                     if ($absences->get()) {
                         $absences->delete();
                     }
                 }
 
                 if (isset($midterm_id) || isset($final_id)) {
-
                     if (isset($midterm_id)) {//----record score midterm has been created
-
                         if ($midterm['percent'] > 0) {//---score midterm requested from user---
                             //----make change the record ---
                             $scores = DB::table('scores')->where('course_annual_id', $id);//---prevent if percentage created but score record was not created
@@ -679,20 +675,25 @@ class CourseAnnualController extends Controller
                             //---the score midterm is requested to be 0----
                             //---so we have to delete the existing score
 
-                            $scores = DB::table('scores')->where(function($query) use ($midterm_id, $id) {
-                                $query->where('course_annual_id','=',  $id);
-                            })->select('scores.id as score_id');
-                            if ($scores->get() > 0) {
-                                $scores->delete();
-                            }
+                            $old_midterm_percentage = DB::table('percentages')->where('id',$midterm_id)->get();
+                            $old_midterm_percentage=$old_midterm_percentage[0];
 
-                            //----delete  percentage----
-                            $midterm_percentage = DB::table('percentages')->whereIn('id', [$midterm_id, $final_id]);
-                            if ($midterm_percentage->get()) {
-                                $midterm_percentage->delete();
+                            if($old_midterm_percentage->percent != 0){
+                                $scores = DB::table('scores')->where(function($query) use ($midterm_id, $id) {
+                                    $query->where('course_annual_id','=',  $id);
+                                })->select('scores.id as score_id');
+                                if ($scores->get() > 0) {
+                                    $scores->delete();
+                                }
+
+                                //----delete  percentage----
+                                $midterm_percentage = DB::table('percentages')->whereIn('id', [$midterm_id, $final_id]);
+                                if ($midterm_percentage->get()) {
+                                    $midterm_percentage->delete();
+                                }
+                                //---- create new score
+                                $this->createScorePercentage($midterm['percent'], $final['percent'], $id);
                             }
-                            //---- create new score
-                            $this->createScorePercentage($midterm['percent'], $final['percent'], $id);
                         }
                     } else {
 
