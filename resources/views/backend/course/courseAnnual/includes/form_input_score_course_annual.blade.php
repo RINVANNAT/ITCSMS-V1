@@ -126,14 +126,14 @@
                             This is in viewing mode. You cannot delete or modify this course.
                         </p>
                     </div>
-                @elseif(!$courseAnnual->is_allow_scoring == "no")
+                @elseif($courseAnnual->is_allow_scoring == "no")
                     <div class="alert alert-danger">
                         <h4><i class="icon fa fa-info"></i> Scoring is blocked!</h4>
                         <p>
                             This course is blocked for scoring. Please contact student & study affair office if you wish to make change.
                         </p>
                     </div>
-                @elseif(!$courseAnnual->is_allow_scoring == "only_retake")
+                @elseif($courseAnnual->is_allow_scoring == "only_retake")
                     <div class="alert alert-warning">
                         <h4><i class="icon fa fa-info"></i> Scoring is allowed only retake exam (resist column)</h4>
                         <p>
