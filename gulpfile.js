@@ -64,8 +64,11 @@ elixir(function(mix) {
          'backend/app.css'
      ], 'public/css/backend.css')
      .styles([
-         'backend/student/search.css'
+        'backend/student/search.css'
      ], 'public/css/student_search.css')
+     .styles([
+        'plugin/handsontable/handsontable.full.min.css'
+     ], 'public/css/handsontable.full.min.css')
      .styles([
          'backend/student/transcript.css'
      ], 'public/css/student_transcript.css')
@@ -80,9 +83,22 @@ elixir(function(mix) {
          'backend/plugin/toastr/toastr.min.js',
          'backend/custom.js'
      ], 'public/js/backend.js')
+     .scripts([
+         'plugin/handsontable/handsontable.full.min.js'
+     ], 'public/js/handsontable.full.min.js')
      .browserify('backend/student/search.js','public/js/student_search.js')
     /**
       * Apply version control
       */
-     .version(["public/css/frontend.css", "public/js/frontend.js", "public/css/backend.css","public/css/student_search.css","public/css/student_transcript.css" , "public/js/backend.js", "public/js/student_search.js"]);
+     .version([
+       "public/css/frontend.css",
+       "public/js/frontend.js",
+       "public/css/backend.css",
+       "public/css/student_search.css",
+       "public/css/student_transcript.css" ,
+       "public/js/backend.js",
+       "public/js/student_search.js",
+       'public/js/handsontable.full.min.js',
+       'public/css/handsontable.full.min.css'
+     ]);
 });

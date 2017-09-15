@@ -1,148 +1,108 @@
 @extends ('backend.layouts.popup_master')
 
 @section ('title', 'Course Annual' . ' | ' . 'Total Score Annually')
+@section('after-styles-end')
+    {!! Html::style(elixir('css/handsontable.full.min.css')) !!}
+    <style>
+        .handsontable td.area {
+            background-color: black;
+        }
+        .popupdiv {
+            height: 200px;
+            width: 600px;
+            background-color: red;
+            opacity: 60;
+        }
+        .drop-menu {
+            margin-top: 5px;
+        }
+        .pop_margin {
+            margin-right: 30px;
+        }
+        .margin-left2 {
+            margin-left: 5px;
+        }
+        .selection {
+
+            /*width: 80px;
+            font-size: 10pt;
+            height: 23px;
+            margin-left: 5px;*/
+        }
+        /*@-moz-document url-prefix() { !* targets Firefox only *!
+            select {
+                padding: 15px 0!important;
+
+            }
+        }*/
+        .h4 {
+            text-align: left;
+            margin-top: -3px !important;
+        }
+        .handsontable thead tr:first-child {
+            height: 80px !important;
+            vertical-align: middle !important;
+        }
+        .handsontable thead tr:nth-child(2) {
+            height: 50px !important;
+            vertical-align: middle !important;
+        }
+        .handsontable th {
+            white-space: normal !important;
+        }
+        .handsontable td {
+            color: #000 !important;
+        }
+        .current_row td {
+
+        gradient(to bottom, rgba(181, 209, 255, 0.34) 0, rgba(181, 209, 255, 0.34) 100 %);
+            background-image: linear-gradient(rgba(181, 209, 255, 0.5) 0px, rgba(181, 209, 255, 0.341176) 100%);
+            background-position-x: initial;
+            background-position-y: initial;
+            background-size: initial;
+            background-repeat-x: initial;
+            background-repeat-y: initial;
+            background-attachment: initial;
+            background-origin: initial;
+            background-clip: initial;
+            background-color: #fff !important;
+        }
+        .htAutocompleteArrow {
+
+            float: right !important;
+            font-size: 10px !important;
+            color: #EEE !important;
+            cursor: default !important;
+            width: 16px !important;
+            text-align: center !important;
+        }
+        .handsontable td .htAutocompleteArrow:hover {
+            color: #777 !important;
+        }
+        .handsontable td.area .htAutocompleteArrow {
+
+            color: #d3d3d3 !important;
+        }
+        .top {
+            margin-top: 5px;
+            color: #0A0A0A;
+        }
+        .top a {
+            color: black;
+        }
+        .col-sm-3 {
+            width:16.2%;
+
+        }
+        .left-margin {
+            margin-left: 5px;
+        }
+    </style>
+@endsection
 
 @section('content')
 
     <div class="box box-success">
-
-        <style>
-
-            .handsontable td.area {
-                background-color: black;
-            }
-
-            /*.ht_master tr > td:nth-of-type(odd) {*/
-            /*background-color: #f00;*/
-            /*}*/
-
-            /*!* Every even column *!*/
-            /*.ht_master tr > td:nth-of-type(even) {*/
-            /*background-color: #919291;*/
-            /*}*/
-
-            /* Every odd row */
-            /*.ht_master tr:nth-of-type(odd) > td {*/
-            /*background-color: #F7F8FF;*/
-            /*}*/
-
-            /*Every even row */
-            /*.ht_master tr:nth-of-type(even) > td {*/
-            /*background-color: #F7F8FF;*/
-            /*}*/
-
-            /*.ht_master tr:nth-of-type(50) > td {*/
-            /*background-color: #F7F8FF;*/
-            /*}*/
-            .popupdiv {
-                height: 200px;
-                width: 600px;
-                background-color: red;
-                opacity: 60;
-
-            }
-
-            .drop-menu {
-                margin-top: 5px;
-            }
-
-            .pop_margin {
-                margin-right: 30px;
-            }
-
-            .margin-left2 {
-                margin-left: 5px;
-            }
-
-            .selection {
-
-                /*width: 80px;
-                font-size: 10pt;
-                height: 23px;
-                margin-left: 5px;*/
-            }
-
-            /*@-moz-document url-prefix() { !* targets Firefox only *!
-                select {
-                    padding: 15px 0!important;
-
-                }
-            }*/
-
-            .h4 {
-                text-align: left;
-                margin-top: -3px !important;
-            }
-
-            .handsontable thead tr:first-child {
-                height: 80px !important;
-                vertical-align: middle !important;
-            }
-
-            .handsontable thead tr:nth-child(2) {
-                height: 50px !important;
-                vertical-align: middle !important;
-            }
-
-            .handsontable th {
-                white-space: normal !important;
-            }
-
-            .handsontable td {
-                color: #000 !important;
-            }
-
-            .current_row td {
-
-            gradient(to bottom, rgba(181, 209, 255, 0.34) 0, rgba(181, 209, 255, 0.34) 100 %);
-                background-image: linear-gradient(rgba(181, 209, 255, 0.5) 0px, rgba(181, 209, 255, 0.341176) 100%);
-                background-position-x: initial;
-                background-position-y: initial;
-                background-size: initial;
-                background-repeat-x: initial;
-                background-repeat-y: initial;
-                background-attachment: initial;
-                background-origin: initial;
-                background-clip: initial;
-                background-color: #fff !important;
-            }
-
-            .htAutocompleteArrow {
-
-                float: right !important;
-                font-size: 10px !important;
-                color: #EEE !important;
-                cursor: default !important;
-                width: 16px !important;
-                text-align: center !important;
-            }
-
-            .handsontable td .htAutocompleteArrow:hover {
-                color: #777 !important;
-            }
-
-            .handsontable td.area .htAutocompleteArrow {
-
-                color: #d3d3d3 !important;
-            }
-
-            .top {
-                margin-top: 5px;
-                color: #0A0A0A;
-            }
-
-            .top a {
-                color: black;
-            }
-
-            .col-sm-3 {
-                width:16.2%;
-
-            }
-            .left-margin {
-                margin-left: 5px;
-            }
-        </style>
         <div class="box-header with-border" style="margin-bottom: 0px">
 
             <div class=" no-paddingcol-sm-12">
@@ -290,9 +250,7 @@
 @stop
 
 @section('after-scripts-end')
-
-    {!! Html::style('plugins/handsontable-test/handsontable.full.min.css') !!}
-    {!! Html::script('plugins/handsontable-test/handsontable.full.min.js') !!}
+    {!! HTML::script(elixir('js/handsontable.full.min.js')) !!}
     {!! Html::script('plugins/jpopup/jpopup.js') !!}
     {!! Html::script('js/backend/course/courseAnnual/all_score.js') !!}
     {{--myscript--}}
