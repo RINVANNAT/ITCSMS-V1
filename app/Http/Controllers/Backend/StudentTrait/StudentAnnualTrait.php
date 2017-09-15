@@ -31,7 +31,7 @@ trait StudentAnnualTrait
     public function formGenerateGroup(GenerateStudentGroupRequest $request) {
 
         $degrees = Degree::lists('name_en','id');
-        $grades = Grade::lists('name_en', 'id');
+        $grades = Grade::orderBy('id')->lists('name_en', 'id');
         $departments = Department::where('parent_id', 11)->orderBy('id')->get();//lists('code', 'id');
         $academicYears = AcademicYear::orderBy('id', 'DESC')->lists('name_latin', 'id');
         $semesters = Semester::lists('name_en', 'id');

@@ -157,7 +157,7 @@ class CourseAnnualController extends Controller
 
         $academicYears = AcademicYear::orderBy("id", "desc")->lists('name_latin', 'id');
         $degrees = Degree::lists('name_en', 'id');
-        $grades = Grade::lists('name_en', 'id');
+        $grades = Grade::orderBy('id')->lists('name_en', 'id');
         $semesters = Semester::orderBy('id')->lists('name_en', 'id');
         $studentGroup = StudentAnnual::select('group')->groupBy('group')->orderBy('group')->lists('group');
 
@@ -1158,8 +1158,8 @@ class CourseAnnualController extends Controller
         }
         $academicYears = AcademicYear::lists('name_latin', 'id')->toArray();
         $degrees = Degree::lists('name_en', 'id')->toArray();
-        $grades = Grade::lists('name_en', 'id')->toArray();
-        $semesters = Semester::lists("name_en", "id");
+        $grades = Grade::orderBy('id')->lists('name_en', 'id')->toArray();
+        $semesters = Semester::orderBy('id')->lists("name_en", "id");
 
         if ($deptOption == '') {
             $deptOption = null;
@@ -1249,7 +1249,7 @@ class CourseAnnualController extends Controller
 
         $academicYears = AcademicYear::orderBy("id", "desc")->lists('name_latin', 'id')->toArray();
         $degrees = Degree::lists('name_en', 'id')->toArray();
-        $grades = Grade::lists('name_en', 'id')->toArray();
+        $grades = Grade::orderBy('id')->lists('name_en', 'id')->toArray();
 
         $semesters = Semester::orderBy('id')->lists('name_en', 'id')->toArray();
         $departmentOptions = DB::table('departmentOptions')->get();
@@ -2065,7 +2065,7 @@ class CourseAnnualController extends Controller
 
         $academicYears = AcademicYear::orderBy("id", "desc")->lists('name_latin', 'id')->toArray();
         $degrees = Degree::lists('name_en', 'id')->toArray();
-        $grades = Grade::lists('name_en', 'id')->toArray();
+        $grades = Grade::orderBy('id')->lists('name_en', 'id')->toArray();
 
         $semesters = Semester::orderBy('id')->lists('name_en', 'id')->toArray();
         $departmentOptions = DB::table('departmentOptions')->get();
