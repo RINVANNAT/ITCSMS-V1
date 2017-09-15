@@ -2065,7 +2065,12 @@ class CourseAnnualController extends Controller
 
         $academicYears = AcademicYear::orderBy("id", "desc")->lists('name_latin', 'id')->toArray();
         $degrees = Degree::lists('name_en', 'id')->toArray();
-        $grades = Grade::orderBy('id')->lists('name_en', 'id')->toArray();
+        $grades = Grade::select([
+                            'id', DB::raw("CONCAT(code, '-', name_en) as name"
+                        )])
+                        ->orderBy('id')
+                        ->lists('name', 'id')
+                        ->toArray();
 
         $semesters = Semester::orderBy('id')->lists('name_en', 'id')->toArray();
         $departmentOptions = DB::table('departmentOptions')->get();
