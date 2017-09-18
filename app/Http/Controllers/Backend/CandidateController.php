@@ -86,12 +86,12 @@ class CandidateController extends Controller
 
 
 
-            $dif = $exam->academic_year_id - 2015;
+            $dif = $exam->academic_year_id - 2016;
             if($exam->type_id == 1){ // Engineer
-                $promotion_id = config('app.promotions.I.2015')+$dif;
+                $promotion_id = config('app.promotions.I.2016')+$dif;
                 $promotions = Promotion::where('id',$promotion_id)->orderBy('id','desc')->lists('name','id')->toArray();
             } else if($exam->type_id == 2){
-                $promotion_id = config('app.promotions.T.2015')+$dif;
+                $promotion_id = config('app.promotions.T.2016')+$dif;
                 $promotions = Promotion::where('id',$promotion_id)->orderBy('id','desc')->lists('name','id')->toArray();
             } else {
                 $promotions = Promotion::orderBy('id','desc')->lists('name','id')->toArray();

@@ -235,11 +235,10 @@
     </div>
 
 @endif
-
 <div class="form-group col-sm-6 required">
     {!! Form::label('promotion',trans('labels.backend.candidates.fields.promotion_id'),array('class'=>'col-sm-4 control-label required')) !!}
     <div class="col-sm-8">
-        {!! Form::select('promotion_id',$promotions, [key($promotions)=>$promotions[key($promotions)]], array('class'=>'form-control input','id'=>'candidate_promotion_id','placeholder'=>'Promotion', 'Required'=>'required')) !!}
+        {!! Form::select('promotion_id',$promotions, array_keys($promotions)[0], array('class'=>'form-control input','id'=>'candidate_promotion_id','placeholder'=>'Promotion', 'Required'=>'required')) !!}
     </div>
 </div>
 

@@ -69,6 +69,7 @@
                 dom: 'lf<"toolbar">rtip',
                 processing: true,
                 serverSide: true,
+                deferLoading: 0,
                 pageLength: {!! config('app.records_per_page')!!},
                 ajax: {
                     url: '{!! route('admin.configuration.studentBac2.data')."?exam_id=".$exam_id !!}',
@@ -109,7 +110,8 @@
             });
 
             enableDeleteRecord($('#studentBac2s-table'));
-
+            oTable.draw();
+//
             $(document).on('click', ".export", function(e){
                 e.preventDefault();
 

@@ -48,7 +48,8 @@ class StudentBac2Controller extends Controller
     public function popup_index()
     {
         $exam_id = $_GET['exam_id'];
-        $academicYears = AcademicYear::orderBy('id','desc')->lists('name_kh','id');
+        $last_year = AcademicYear::orderBy('id','desc')->first();
+        $academicYears = AcademicYear::orderBy('id','desc')->where('id','!=',$last_year->id)->lists('name_kh','id');
         $origins = Origin::lists('name_kh','id');
         return view('backend.configuration.studentBac2.popup_index',compact('exam_id','academicYears','origins'));
     }
@@ -135,7 +136,6 @@ class StudentBac2Controller extends Controller
     public function data()
     {
         $exam_id = Input::get('exam_id');
-
         $studentBac2s = DB::table('studentBac2s')
             ->leftJoin('genders','studentBac2s.gender_id','=','genders.id')
             ->leftJoin('highSchools','studentBac2s.highschool_id','=','highSchools.id')
