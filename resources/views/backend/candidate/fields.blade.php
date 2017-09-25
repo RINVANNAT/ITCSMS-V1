@@ -36,12 +36,16 @@
         {!! Form::label('register_from',trans('labels.backend.candidates.fields.register_from'),array('class'=>'col-sm-4 control-label required')) !!}
         <div class="col-sm-8">
             @if(isset($candidate) && $candidate != null)
-                {!! Form::select('register_from', ['ITC'=>'ITC','Ministry'=>'Ministry'],$candidate->register_from, array('class'=>'form-control input','id'=>'candidate_register_from','required'=>'required')) !!}
+                {!! Form::select('register_from', ['ITC'=>'ITC','Ministry'=>'Ministry'],$candidate->register_from, array('class'=>'form-control input','id'=>'candidate_register_from','required'=>'required','disabled')) !!}
             @else
                 @if($exam->type_id == 2)
-                    {!! Form::select('register_from', ['ITC'=>'ITC'],['ITC'=>'ITC'], array('class'=>'form-control input','id'=>'candidate_register_from','disabled','required'=>'required')) !!}
+                    {!! Form::select('register_from', ['ITC'=>'ITC'],['ITC'=>'ITC'], array('class'=>'form-control input','id'=>'candidate_register_from','disabled','required'=>'required','disabled')) !!}
                 @else
-                    {!! Form::select('register_from', [""=>"",'ITC'=>'ITC','Ministry'=>'Ministry'],isset($studentBac2)?$studentBac2->status:"", array('class'=>'form-control input','id'=>'candidate_register_from','required'=>'required')) !!}
+                    @if(isset($studentBac2))
+                        {!! Form::select('register_from', [""=>"",'ITC'=>'ITC','Ministry'=>'Ministry'],isset($studentBac2)?$studentBac2->status:"", array('class'=>'form-control input','id'=>'candidate_register_from','required'=>'required','disabled')) !!}
+                    @else
+                        {!! Form::select('register_from', [""=>"",'ITC'=>'ITC','Ministry'=>'Ministry'],isset($studentBac2)?$studentBac2->status:"", array('class'=>'form-control input','id'=>'candidate_register_from','required'=>'required')) !!}
+                    @endif
                 @endif
             @endif
 
