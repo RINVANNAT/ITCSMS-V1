@@ -269,7 +269,8 @@ class CandidateController extends Controller
     {
         $exam = Exam::where('id',$request->get('exam_id'))->first();
         $candidate = Candidate::where('id',$id)->first();
-        if($exam->accept_registration && $candidate->result != "Pending"){ // If this result is still pending, they can update their info
+
+        if($exam->accept_registration && $candidate->result == "Pending"){ // If this result is still pending, they can update their info
             $result = $this->candidates->update($id, $request->all());
 
             if($result['status']==true){
