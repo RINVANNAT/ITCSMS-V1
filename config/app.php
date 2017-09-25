@@ -28,12 +28,12 @@ return [
     'records_per_page' => 25,
     'promotions' => [
         'T' => [
-            2015 => 21,
-            2016 => 22
+            2015 => env('PROMOTION_T_2015'),
+            2016 => env('PROMOTION_T_2016')
         ],
         'I' => [
-            2015 => 34,
-            2016 => 35
+            2015 => env('PROMOTION_I_2015'),
+            2016 => env('PROMOTION_I_2016')
         ]
     ],
 

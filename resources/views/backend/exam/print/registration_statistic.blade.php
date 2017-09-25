@@ -601,8 +601,6 @@
                 </tbody>
             </table>
 
-
-
             <div class="footer">
                 <hr/>
                 <span>Concours d'entree ITC {{isset($academic_year)?($academic_year->id-1):"N/A"}}</span>
