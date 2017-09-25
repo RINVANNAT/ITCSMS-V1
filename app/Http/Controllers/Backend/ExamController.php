@@ -1130,6 +1130,10 @@ class ExamController extends Controller
 
     public function download_registration_statistic(DownloadExaminationDocumentsRequest $request,$exam_id){
 
+        $academic_year = Exam::leftJoin('academicYears','exams.academic_year_id','=','academicYears.id')
+                            ->where('exams.id',$exam_id)
+                            ->select('academicYears.id')
+                            ->first();
         $dates = Candidate::where('exam_id',$exam_id)
             ->orderBy('created_at')
             ->get()
@@ -1206,11 +1210,7 @@ class ExamController extends Controller
             $allCandidates[$candidate->can_result][$candidate->bac_total_grade][$candidate->code_gender][] = $candidate;
 
         }
-
-
         // below is : Student Engineer Registration
-
-
         $exam = Exam::where('id', $exam_id)->first();
 
         $allStudents = [];
@@ -1309,10 +1309,10 @@ class ExamController extends Controller
 
                 $allStudents =[]; // array of student registration
                 $allCandidates =[]; // candidate registration
-                return view('backend.exam.print.registration_statistic',compact('candidates', 'allCandidates', 'arrayGrades', 'allStudents'));
+                return view('backend.exam.print.registration_statistic',compact('candidates', 'allCandidates', 'arrayGrades', 'allStudents','academic_year'));
 
             } else {
-                return view('backend.exam.print.registration_statistic',compact('candidates', 'allCandidates', 'arrayGrades', 'allStudents'));
+                return view('backend.exam.print.registration_statistic',compact('candidates', 'allCandidates', 'arrayGrades', 'allStudents','academic_year'));
             }
 
         }
