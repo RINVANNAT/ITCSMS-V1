@@ -190,8 +190,10 @@
             <div class="col-lg-10" style="padding-bottom: 10px;">
                 <?php
                     $redouble_history = [];
-                    foreach($studentAnnual->student->redoubles as $r){
-                        $redouble_history[$r->id] = $r->name_en;
+                    if(isset($studentAnnual)){
+                        foreach($studentAnnual->student->redoubles as $r){
+                            $redouble_history[$r->id] = $r->name_en;
+                        }
                     }
                 ?>
 
@@ -204,9 +206,9 @@
                         @endif
                     </div>
                 @endforeach
-
                 {{--{!! Form::select('redouble_id',$redoubles,null, array('class'=>'form-control','placeholder'=>'')) !!}--}}
             </div>
+
             {!! Form::label('name', trans('labels.backend.students.fields.scholarship_id'), ['class' => 'col-lg-2 control-label']) !!}
             <div class="col-lg-10" style="padding-bottom: 10px;">
                 {!! Form::select('scholarship_ids[]',$scholarships,null, array('class'=>'form-control select2','multiple'=>'multiple','style'=>'width:100%')) !!}
