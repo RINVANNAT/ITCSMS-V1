@@ -806,6 +806,7 @@ trait AjaxCRUDTimetableController
             ['academic_year_id', request('academicYear')],
             ['department_id', request('department')],
             ['degree_id', request('degree')],
+            ['grade_id', request('grade')],
             ['option_id', request('option') == null ? null : request('option')],
             ['group_id', request('group') == null ? null : request('group')],
             ['semester_id', request('semester')],
