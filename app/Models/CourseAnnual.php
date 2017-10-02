@@ -61,6 +61,15 @@ class CourseAnnual extends Model
         return $this->belongsTo('App\Models\Employee');
     }
 
+    /**
+     * Need to improve performance of exporting course session timetable.
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany
+     */
+    public function courseSessions () {
+        return $this->hasMany(CourseSession::class);
+    }
+
 	public function isScoreRuleChange(){
 
 

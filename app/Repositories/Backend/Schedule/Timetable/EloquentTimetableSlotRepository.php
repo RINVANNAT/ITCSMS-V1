@@ -5,6 +5,7 @@ namespace App\Repositories\Backend\Schedule\Timetable;
 use App\Http\Requests\Backend\Schedule\Timetable\CreateTimetableRequest;
 use App\Http\Requests\Backend\Schedule\Timetable\CreateTimetableSlotRequest;
 use App\Models\Configuration;
+use App\Models\CourseAnnual;
 use App\Models\CourseAnnualClass;
 use App\Models\CourseSession;
 use App\Models\Group;
@@ -166,12 +167,27 @@ class EloquentTimetableSlotRepository implements TimetableSlotRepositoryContract
     /**
      * Export course sessions.
      *
-     * @return mixed
+     * @param $data
+     * @return bool
      */
-    public function export_course_sessions()
+    public function export_course_sessions($data)
     {
         $flag = true;
-        $course_sessions = CourseSession::all();
+
+        $course_annuals = CourseAnnual::where([
+            ['academic_year_id', $data['academic_year_id']],
+            ['department_id', $data['department_id']],
+        ])->get();
+
+        $course_sessions = new Collection();
+
+        foreach ($course_annuals as $course_annual){
+            foreach ($course_annual->courseSessions as $courseSession){
+                $course_sessions->push($courseSession);
+            }
+        }
+
+        // $course_sessions = CourseSession::all();
         foreach ($course_sessions as $course_session) {
             if (count(Slot::where('course_session_id', $course_session->id)->get()) > 0) {
                 continue;

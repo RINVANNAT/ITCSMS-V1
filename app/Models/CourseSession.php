@@ -36,7 +36,7 @@ class CourseSession extends Model
     }
 
     public function courseAnnual(){
-        return $this->belongsTo('App\Models\CourseAnnual');
+        return $this->belongsTo('App\Models\CourseAnnual', 'course_annual_id');
     }
 
     public function groups(){

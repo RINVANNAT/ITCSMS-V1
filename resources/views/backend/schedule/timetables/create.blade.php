@@ -872,11 +872,17 @@
             });
 
             // export course session into slots table.
-            $(document).on('click', '.btn_export_course_session', function () {
+            $(document).on('click', '.btn_export_course_session', function (event) {
+                event.preventDefault();
                 toggleLoading(true);
                 $.ajax({
                     type: 'POST',
                     url: '{!! route('export_course_session') !!}',
+                    data: {
+                        _token: '{{ csrf_token() }}',
+                        academic_year_id: $('select[name=academicYear]').val(),
+                        department_id: $('select[name=department]').val(),
+                    },
                     success: function (response) {
                         if (response.status === true) {
                             get_course_sessions();

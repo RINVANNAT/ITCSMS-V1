@@ -365,7 +365,7 @@
                         row += '<td>';
                         //row += //*<span class="start_date"> ' + moment(val.start, 'YYYY-MM-DD').fromNow() + '</span> -*// '<span class="start_date">' + moment(val.end, 'YYYY-MM-DD').fromNow() + '</span>';
                         if (val.description === 'true') {
-                            row += '<span class="start_date"> and ' + moment(val.end, 'YYYY-MM-DD').fromNow() + '</span>';
+                            row += '<span class="start_date"> end ' + moment(val.end, 'YYYY-MM-DD').fromNow() + '</span>';
                         } else if (val.description === 'false') {
                             row += '<span class="start_date"> start ' + moment(val.start, 'YYYY-MM-DD').fromNow() + '</span>';
                         } else {

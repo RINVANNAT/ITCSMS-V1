@@ -8,7 +8,7 @@
                             data-toggle="popover"
                             data-placement="left"
                             data-trigger="hover"
-                            title="Export Course Session"
+                            title="Update Course Session"
                             data-content="After you clicked, your course session will exported.">
                         <i class="fa fa-refresh {{--fa-pulse--}} fa-1x"></i>
                     </button>

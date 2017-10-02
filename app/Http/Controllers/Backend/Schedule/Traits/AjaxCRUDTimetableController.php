@@ -681,7 +681,8 @@ trait AjaxCRUDTimetableController
      */
     public function export_course_session()
     {
-        if ($this->timetableSlotRepo->export_course_sessions() == true) {
+        $data = request()->all();
+        if ($this->timetableSlotRepo->export_course_sessions($data) == true) {
             return Response::json(['status' => true]);
         }
         return Response::json(['status' => false]);
