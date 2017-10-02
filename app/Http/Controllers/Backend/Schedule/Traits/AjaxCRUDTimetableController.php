@@ -807,12 +807,24 @@ trait AjaxCRUDTimetableController
      */
     public function assign_update()
     {
+        $now = Carbon::now('Asia/Phnom_Penh');
         $configuration = Configuration::find(request('configuration_id'));
         if ($configuration instanceof Configuration) {
             $configuration->created_at = new Carbon(request('start'));
             $configuration->updated_at = new Carbon(request('end'));
+
+            if ((strtotime($now) >= strtotime(new Carbon(request('start')))) && (strtotime($now) <= strtotime(new Carbon(request('end'))))) {
+                $configuration->description = 'true';
+                $configuration->timestamps = false;
+
+            } else if (strtotime($now) > strtotime(new Carbon(request('end')))) {
+                $configuration->description = 'finished';
+                $configuration->timestamps = false;
+            } else {
+                $configuration->description = 'false';
+                $configuration->timestamps = false;
+            }
             $configuration->update();
-            $this->timetableSlotRepo->set_permission_create_timetable();
             return Response::json(['status' => true]);
         }
         return Response::json(['status' => false]);

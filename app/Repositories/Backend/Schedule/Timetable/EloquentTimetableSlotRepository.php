@@ -722,11 +722,13 @@ class EloquentTimetableSlotRepository implements TimetableSlotRepositoryContract
      */
     public function set_permission_create_timetable()
     {
+        Log::info('Cron Set Schedule Assignment Timetable was executed.');
+
         $now = Carbon::now('Asia/Phnom_Penh');
         $departments = Configuration::where('key', 'like', 'timetable_%')->get();
         foreach ($departments as $department) {
-            Log::info('now:' . $now . 'start:' . $department->created_at . 'end:' . $department->updated_at);
-            if (strtotime($now) >= strtotime($department->created_at) && strtotime($now) <= strtotime($department->updated_at)) {
+
+            if ((strtotime($now) >= strtotime($department->created_at)) && (strtotime($now) <= strtotime($department->updated_at))) {
                 $department->description = 'true';
                 $department->timestamps = false;
                 $department->update();

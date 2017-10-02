@@ -72,8 +72,6 @@ function get_options(department_id) {
         data: {department_id: department_id},
         success: function (response) {
             var option = '';
-            console.log('timetable.js');
-            console.log(response.options);
             $.each(response.options, function (key, val) {
                 option += '<option value="' + val.id + '">' + val.code + '</option>';
             });
@@ -104,7 +102,6 @@ function get_grades(department_id) {
             if (response.status === true) {
                 var grades = '';
                 $.each(response.grades, function (key, val) {
-                    console.log
                     grades += '<option value="' + val.id + '">' + val.name_en + '</option>';
                 });
                 $('select[name="grade"]').html(grades);
