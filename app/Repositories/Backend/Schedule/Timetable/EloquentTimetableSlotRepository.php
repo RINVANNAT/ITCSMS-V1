@@ -781,11 +781,14 @@ class EloquentTimetableSlotRepository implements TimetableSlotRepositoryContract
      *
      * @param Timetable $timetable
      * @param Collection $timetableSlots
+     * @param null $by_teacher
      * @return mixed
      */
     public function get_timetable_slot_with_conflict_info(Timetable $timetable, Collection $timetableSlots, $by_teacher = null)
     {
         $timetable_slots = $this->get_timetable_slot_details($timetable, $by_teacher);
+
+        // dd($timetable_slots);
 
         foreach ($timetable_slots as $timetable_slot) {
             if (($timetable_slot instanceof TimetableSlot) && is_object($timetable_slot)) {

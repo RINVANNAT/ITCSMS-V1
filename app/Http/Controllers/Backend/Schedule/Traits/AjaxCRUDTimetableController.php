@@ -314,9 +314,12 @@ trait AjaxCRUDTimetableController
      */
     public function get_timetable_slots(CreateTimetableRequest $request)
     {
+        // dd($request->all());
         $timetableSlots = new Collection();
 
+        // find timetable
         $timetable = $this->timetableRepo->find_timetable_is_existed($request);
+
         if ($timetable instanceof Timetable) {
             $this->timetableSlotRepo->get_timetable_slot_with_conflict_info($timetable, $timetableSlots, null);
         }

@@ -30,7 +30,7 @@ class EloquentTimetableRepository implements TimetableRepositoryContract
             ['week_id', $request->weekly],
             ['group_id', $request->group == null ? null : $request->group]
         ])
-            ->first();
+        ->first();
 
         if ($timetable instanceof Timetable) {
             return $timetable;

@@ -284,8 +284,7 @@
                             $("#btn_clone").attr('disabled', false);
                             $('#btn_publish').attr('disabled', true);
                         }
-                    }
-                    else{
+                    }else{
                         $("#btn_clone").attr('disabled', true);
                         $('#btn_publish').attr('disabled', true);
                     }
@@ -349,6 +348,7 @@
 
             $('#timetable').fullCalendar("rerenderEvents");
         }
+
         /** move timetable slot */
         function move_timetable_slot(event, start_date) {
             toggleLoading(true);
@@ -385,6 +385,7 @@
                 }
             })
         }
+
         /** resize timetable slot */
         function resize_timetable_slot(timetable_slot_id, end_date, revertFunc) {
             $.ajax({
