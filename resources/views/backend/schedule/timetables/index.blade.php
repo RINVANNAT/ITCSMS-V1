@@ -364,7 +364,13 @@
                         row += '</td>';
                         row += '<td>';
                         //row += //*<span class="start_date"> ' + moment(val.start, 'YYYY-MM-DD').fromNow() + '</span> -*// '<span class="start_date">' + moment(val.end, 'YYYY-MM-DD').fromNow() + '</span>';
-                        row += '<span class="start_date">' + moment(val.end, 'YYYY-MM-DD').fromNow() + '</span>';
+                        if (val.description === 'true') {
+                            row += '<span class="start_date"> and' + moment(val.end, 'YYYY-MM-DD').fromNow() + '</span>';
+                        } else if (val.description === 'false') {
+                            row += '<span class="start_date"> ' + moment(val.end, 'YYYY-MM-DD').fromNow() + '</span>';
+                        } else {
+                            row += '<span class="start_date">' + moment(val.end, 'YYYY-MM-DD').fromNow() + '</span>';
+                        }
                         row += '</td>';
                         row += '<td>';
                         if (val.description === 'true') {
@@ -374,10 +380,11 @@
                         } else {
                             row += '<span class="label label-success">{{ trans('labels.backend.schedule.timetable.status.finished') }}</span>';
                         }
+                        
                         row += '</td>';
                         row += '<td>';
-                        row += '<button class="btn btn-primary btn-xs" id="btn_assign_update"><i class="fa fa-edit"></i></button> ';
-                        row += '<button class="btn btn-danger btn-xs" id="btn_assign_delete"><i class="fa fa-trash"></i></button> ';
+                        row += '<button class="btn btn-primary btn-xs" id="btn_assign_update"><i class="fa fa-clock-o"></i> Set Time</button> ';
+                        // row += '<button class="btn btn-danger btn-xs" id="btn_assign_delete"><i class="fa fa-trash"></i></button> ';
                         row += '</td>';
                         row += '</tr>';
                     });

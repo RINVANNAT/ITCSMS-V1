@@ -655,8 +655,7 @@ trait AjaxCRUDTimetableController
      *
      * @return mixed
      */
-    public
-    function export_course_session()
+    public function export_course_session()
     {
         if ($this->timetableSlotRepo->export_course_sessions() == true) {
             return Response::json(['status' => true]);
