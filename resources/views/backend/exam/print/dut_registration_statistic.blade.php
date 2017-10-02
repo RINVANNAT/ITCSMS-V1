@@ -68,16 +68,16 @@
 
 
                             <?php
-                            $A_Male = isset($candidates[34])?$candidates[34]['M']:[];
-                            $A_Female = isset($candidates[34])?$candidates[34]['F']:[];
-                            $B_Male = isset($candidates[35])?$candidates[35]['M']:[];
-                            $B_Female = isset($candidates[35])?$candidates[35]['F']:[];
-                            $C_Male = isset($candidates[36])?$candidates[36]['M']:[];
-                            $C_Female = isset($candidates[36])?$candidates[36]['F']:[];
-                            $D_Male = isset($candidates[37])?$candidates[37]['M']:[];
-                            $D_Female = isset($candidates[37])?$candidates[37]['F']:[];
-                            $E_Male = isset($candidates[38])?$candidates[38]['M']:[];
-                            $E_Female = isset($candidates[38])?$candidates[38]['F']:[];
+                            $A_Male = isset($candidates[34]['M'])?$candidates[34]['M']:[];
+                            $A_Female = isset($candidates[34]['F'])?$candidates[34]['F']:[];
+                            $B_Male = isset($candidates[35]['M'])?$candidates[35]['M']:[];
+                            $B_Female = isset($candidates[35]['F'])?$candidates[35]['F']:[];
+                            $C_Male = isset($candidates[36]['M'])?$candidates[36]['M']:[];
+                            $C_Female = isset($candidates[36]['F'])?$candidates[36]['F']:[];
+                            $D_Male = isset($candidates[37]['M'])?$candidates[37]['M']:[];
+                            $D_Female = isset($candidates[37]['F'])?$candidates[37]['F']:[];
+                            $E_Male = isset($candidates[38]['M'])?$candidates[38]['M']:[];
+                            $E_Female = isset($candidates[38]['F'])?$candidates[38]['F']:[];
 
                             ?>
                                 <td>{{count($A_Male)}}</td>

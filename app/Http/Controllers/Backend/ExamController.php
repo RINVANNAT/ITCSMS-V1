@@ -1329,6 +1329,32 @@ class ExamController extends Controller
         $candidateDuts = $this->dutRegistration($exam_id);
 
         $candidates = $candidateDuts[0];
+        if(!isset($candidates[34])){
+            $candidates[34] = [];
+            $candidates[34]['M'] = [];
+            $candidates[34]['F'] = [];
+        }
+        if(!isset($candidates[35])){
+            $candidates[35] = [];
+            $candidates[35]['M'] = [];
+            $candidates[35]['F'] = [];
+        }
+        if(!isset($candidates[36])){
+            $candidates[36] = [];
+            $candidates[36]['M'] = [];
+            $candidates[36]['F'] = [];
+        }
+        if(!isset($candidates[37])){
+            $candidates[37] = [];
+            $candidates[37]['M'] = [];
+            $candidates[37]['F'] = [];
+        }
+        if(!isset($candidates[38])){
+            $candidates[38] = [];
+            $candidates[38]['M'] = [];
+            $candidates[38]['F'] = [];
+        }
+        ksort($candidates);
         $total = $candidateDuts[1];
         return view('backend.exam.print.dut_registration_statistic',compact('candidates', 'total','academic_year'));
     }
