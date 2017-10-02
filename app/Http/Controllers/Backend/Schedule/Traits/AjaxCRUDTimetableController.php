@@ -110,10 +110,33 @@ trait AjaxCRUDTimetableController
      */
     public function get_options()
     {
+        $dept_ids = [2, 3, 5, 6];
+
         $department_id = request('department_id');
+        $options = DepartmentOption::where('department_id', $department_id)->get();
+
+        if (in_array($department_id, $dept_ids)) {
+
+            $additional_option = [
+                'id' => '',
+                'name_kh' => '',
+                'name_en' => '',
+                'name_fr' => '',
+                'code' => '',
+                'active' => true,
+                'created_at' => Carbon::today(),
+                'updated_at' => Carbon::today(),
+                'department_id' => 10,
+                'degree_id' => 1,
+                'create_uid' => 10,
+                'write_uid' => 10
+            ];
+
+            $options = collect($options)->push($additional_option);
+        }
 
         if (isset($department_id)) {
-            return Response::json(['status' => true, 'options' => DepartmentOption::where('department_id', $department_id)->get()]);
+            return Response::json(['status' => true, 'options' => $options]);
         }
         return Response::json(['status' => false]);
     }
@@ -129,14 +152,13 @@ trait AjaxCRUDTimetableController
 
         if (isset($department_id)) {
             if ($department_id == 8) {
-                return Response::json(['status' => true, 'grades' => Grade::where('id', '<=', 2)->get()]);
+                return Response::json(['status' => true, 'grades' => Grade::where('id', '<=', 2)->orderBy('id')->get()]);
             } else if ($department_id == 12) {
-                return Response::json(['status' => true, 'grades' => Grade::where('id', '>', 1)->get()]);
+                return Response::json(['status' => true, 'grades' => Grade::where('id', '>', 1)->orderBy('id')->get()]);
             } else if ($department_id == 13) {
-                return Response::json(['status' => true, 'grades' => Grade::all()]);
+                return Response::json(['status' => true, 'grades' => Grade::orderBy('id')->get()]);
             } else {
-                return Response::json(['status' => true, 'grades' => Grade::all()]);
-                // return Response::json(['status' => true, 'grades' => Grade::where('id', '>', 2)->get()]);
+                return Response::json(['status' => true, 'grades' => Grade::orderBy('id')->get()]);
             }
         }
         return Response::json(['status' => false]);
@@ -154,8 +176,10 @@ trait AjaxCRUDTimetableController
         $degree_id = request('degree');
         $grade_id = request('grade');
         $semester_id = request('semester');
-        $option_id = request('option') == null ? null : request('option');
+        $option_id = (request('option') == null ? null : (request('option') == '' ? null : request('option')));
         $group_id = request('group') == null ? null : request('group');
+
+        //dd(request()->all());
 
         $course_sessions = DB::table('course_annuals')
             ->where([

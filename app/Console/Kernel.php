@@ -33,11 +33,13 @@ class Kernel extends ConsoleKernel
         /** Timetable Assignment */
         $schedule->command('timetable:setPermissionCreateTimetable')
             ->timezone('Asia/Phnom_Penh')
-            ->dailyAt('00:00');
+            //->dailyAt('00:00');
+            ->everyMinute();
 
         $schedule->command('timetable:setPermissionCreateTimetable')
             ->timezone('Asia/Phnom_Penh')
-            ->dailyAt('06:00');
+            //->dailyAt('06:00');
+            ->everyMinute();
 
         /** Testing Simple Console */
         $schedule->command('log:demo')->everyMinute();

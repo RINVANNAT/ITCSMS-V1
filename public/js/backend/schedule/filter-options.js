@@ -43,6 +43,7 @@ function get_options(department_id) {
         data: {department_id: department_id},
         success: function (response) {
             var option = '';
+            console.log(response.options);
             $.each(response.options, function (key, val) {
                 option += '<option value="' + val.id + '">' + val.code + '</option>';
             });
