@@ -1,6 +1,9 @@
 {
-  "css/backend.css": "css/backend-09a641e9c9.css",
-  "css/frontend.css": "css/frontend-3f551f0f59.css",
-  "js/backend.js": "js/backend-9daae22819.js",
-  "js/frontend.js": "js/frontend-bb67baa093.js"
+  "css/backend.css": "css/backend-d935c34a15.css",
+  "css/frontend.css": "css/frontend-8409925b8a.css",
+  "css/student_search.css": "css/student_search-58828db39b.css",
+  "css/student_transcript.css": "css/student_transcript-64ec6d1507.css",
+  "js/backend.js": "js/backend-7bc4ebc805.js",
+  "js/frontend.js": "js/frontend-bb67baa093.js",
+  "js/student_search.js": "js/student_search-47cb2fbc9b.js"
 }

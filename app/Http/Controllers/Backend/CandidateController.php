@@ -86,12 +86,12 @@ class CandidateController extends Controller
 
 
 
-            $dif = $exam->academic_year_id - 2015;
+            $dif = $exam->academic_year_id - 2016;
             if($exam->type_id == 1){ // Engineer
-                $promotion_id = config('app.promotions.I.2015')+$dif;
+                $promotion_id = config('app.promotions.I.2016')+$dif;
                 $promotions = Promotion::where('id',$promotion_id)->orderBy('id','desc')->lists('name','id')->toArray();
             } else if($exam->type_id == 2){
-                $promotion_id = config('app.promotions.T.2015')+$dif;
+                $promotion_id = config('app.promotions.T.2016')+$dif;
                 $promotions = Promotion::where('id',$promotion_id)->orderBy('id','desc')->lists('name','id')->toArray();
             } else {
                 $promotions = Promotion::orderBy('id','desc')->lists('name','id')->toArray();
@@ -175,8 +175,6 @@ class CandidateController extends Controller
                     return Response::json($result,422);
                 }
             }
-
-            dd($result);
         } else {
             return Response::json(array("message"=>"You cannot register new candidate with this examination"),422);
         }
@@ -269,7 +267,8 @@ class CandidateController extends Controller
     {
         $exam = Exam::where('id',$request->get('exam_id'))->first();
         $candidate = Candidate::where('id',$id)->first();
-        if($exam->accept_registration && $candidate->result != "Pending"){ // If this result is still pending, they can update their info
+
+        if($exam->accept_registration && $candidate->result == "Pending"){ // If this result is still pending, they can update their info
             $result = $this->candidates->update($id, $request->all());
 
             if($result['status']==true){

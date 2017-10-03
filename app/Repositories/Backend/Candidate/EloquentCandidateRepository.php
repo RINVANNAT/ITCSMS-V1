@@ -59,8 +59,6 @@ class EloquentCandidateRepository implements CandidateRepositoryContract
      */
     public function create($input)
     {
-
-        //dd($input['choice_department']);
         $result = array();
 
         if (Candidate::where('register_id', $input['register_id'])->where('exam_id',$input['exam_id'])->first()) {

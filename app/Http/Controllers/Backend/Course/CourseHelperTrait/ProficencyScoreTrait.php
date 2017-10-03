@@ -746,7 +746,12 @@ trait ProficencyScoreTrait
         return false;
     }
 
-
+    /**
+     * Return view of printing certificate layout
+     *
+     * @param Request $request (course_annual_id)
+     * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View
+     */
     public function requestPrintCertificate(Request $request)
     {
         $course_annual_id = $request->get("course_annual_id");
@@ -758,6 +763,12 @@ trait ProficencyScoreTrait
         return view('backend.vocational_student.print.request_print_certificate',compact("students","departments","degrees","course_annual_id"));
     }
 
+    /**
+     * Retrieve related data (student's info, score,..) for printing certificate layout
+     *
+     * @param Request $request (course_annual_id)
+     * @return mixed
+     */
     public function getDataForRequestPrintCertificate(Request $request) {
 
         $course_annual_id = $request->get("course_annual_id");
@@ -872,6 +883,13 @@ trait ProficencyScoreTrait
         return $datatables->make(true);
     }
 
+    /**
+     * Print students' certificates for vocational courses such as english/french
+     * Require student_ids and course_id. issued_date, issued_by and issued_number are optional
+     *
+     * @param Request $request
+     * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View
+     */
     public function printCertificate(Request $request)
     {
         $studentAnnualIds = json_decode($request->ids);
@@ -925,11 +943,19 @@ trait ProficencyScoreTrait
         );
     }
 
+    /**
+     * Mark specific students that their certificate have been printed.
+     * required 2 parameters: array of student ids, and course_annual_id
+     *
+     * @param Request $request
+     * @return \Illuminate\Http\JsonResponse
+     */
     public function markPrintedCertificate(Request $request){
 
         $studentAnnualIds = json_decode($request->ids);
         $course_annual_id = $request->course_annual_id;
 
+        // Because our main server is running on UTC time zone
         $date = Carbon::now()->addHours(7);
 
         $success = true;

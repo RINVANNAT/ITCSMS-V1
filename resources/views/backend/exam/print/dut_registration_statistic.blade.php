@@ -68,16 +68,16 @@
 
 
                             <?php
-                            $A_Male = $candidates[34]['M'];
-                            $A_Female = $candidates[34]['F'];
-                            $B_Male = $candidates[35]['M'];
-                            $B_Female = $candidates[35]['F'];
-                            $C_Male = $candidates[36]['M'];
-                            $C_Female = $candidates[36]['F'];
-                            $D_Male = $candidates[37]['M'];
-                            $D_Female = $candidates[37]['F'];
-                            $E_Male = $candidates[38]['M'];
-                            $E_Female = $candidates[38]['F'];
+                            $A_Male = isset($candidates[34]['M'])?$candidates[34]['M']:[];
+                            $A_Female = isset($candidates[34]['F'])?$candidates[34]['F']:[];
+                            $B_Male = isset($candidates[35]['M'])?$candidates[35]['M']:[];
+                            $B_Female = isset($candidates[35]['F'])?$candidates[35]['F']:[];
+                            $C_Male = isset($candidates[36]['M'])?$candidates[36]['M']:[];
+                            $C_Female = isset($candidates[36]['F'])?$candidates[36]['F']:[];
+                            $D_Male = isset($candidates[37]['M'])?$candidates[37]['M']:[];
+                            $D_Female = isset($candidates[37]['F'])?$candidates[37]['F']:[];
+                            $E_Male = isset($candidates[38]['M'])?$candidates[38]['M']:[];
+                            $E_Female = isset($candidates[38]['F'])?$candidates[38]['F']:[];
 
                             ?>
                                 <td>{{count($A_Male)}}</td>
@@ -117,7 +117,7 @@
 
             <div class="footer">
                 <hr/>
-                <span>Concours d'entree ITC 2016</span>
+                <span>Concours d'entree ITC {{$academic_year->id - 1}}</span>
                 <span class="pull-right">Page {{$page_number}} sur {{$total_page}}</span>
             </div>
         </div>

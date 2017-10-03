@@ -132,10 +132,22 @@ trait ScoreProp {
     }
 
     public function compareResitScore($average) {
-        if($average->resit_score > $average->average) {
-            return $average->resit_score;
-        } else {
+        if(
+            strtolower($average->resit_score) != "a" && strtolower($average->resit_score) != "f"
+            && strtolower($average->average) != "a" && strtolower($average->average) != "f"
+        ){
+            if($average->resit_score > $average->average) {
+                return $average->resit_score;
+            } else {
+                return $average->average;
+            }
+        } else if (
+            (strtolower($average->resit_score) == "a" || strtolower($average->resit_score) == "f" ) &&
+            (strtolower($average->average) != "a" && strtolower($average->average) != "f")
+        ){
             return $average->average;
+        } else {
+            return $average->resit_score;
         }
     }
 
@@ -158,7 +170,7 @@ trait ScoreProp {
     {
 
         $courseAnnual = CourseAnnual::where('id', $input['course_annual_id'])->first();
-        if ($courseAnnual->is_allow_scoring || auth()->user()->allow("input-score-without-blocking")) {
+        if ($courseAnnual->is_allow_scoring != "no" || auth()->user()->allow("input-score-without-blocking")) {
             $totalScore = $this->averages->findAverageByCourseIdAndStudentId($input['course_annual_id'], (int)$input['student_annual_id']);// check if total score existe
 
             if ($totalScore) {

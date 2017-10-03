@@ -1130,6 +1130,10 @@ class ExamController extends Controller
 
     public function download_registration_statistic(DownloadExaminationDocumentsRequest $request,$exam_id){
 
+        $academic_year = Exam::leftJoin('academicYears','exams.academic_year_id','=','academicYears.id')
+                            ->where('exams.id',$exam_id)
+                            ->select('academicYears.id')
+                            ->first();
         $dates = Candidate::where('exam_id',$exam_id)
             ->orderBy('created_at')
             ->get()
@@ -1206,11 +1210,7 @@ class ExamController extends Controller
             $allCandidates[$candidate->can_result][$candidate->bac_total_grade][$candidate->code_gender][] = $candidate;
 
         }
-
-
         // below is : Student Engineer Registration
-
-
         $exam = Exam::where('id', $exam_id)->first();
 
         $allStudents = [];
@@ -1309,10 +1309,10 @@ class ExamController extends Controller
 
                 $allStudents =[]; // array of student registration
                 $allCandidates =[]; // candidate registration
-                return view('backend.exam.print.registration_statistic',compact('candidates', 'allCandidates', 'arrayGrades', 'allStudents'));
+                return view('backend.exam.print.registration_statistic',compact('candidates', 'allCandidates', 'arrayGrades', 'allStudents','academic_year'));
 
             } else {
-                return view('backend.exam.print.registration_statistic',compact('candidates', 'allCandidates', 'arrayGrades', 'allStudents'));
+                return view('backend.exam.print.registration_statistic',compact('candidates', 'allCandidates', 'arrayGrades', 'allStudents','academic_year'));
             }
 
         }
@@ -1322,11 +1322,41 @@ class ExamController extends Controller
 
     public function download_dut_registration_statistic ($exam_id) {
 
-       $candidateDuts = $this->dutRegistration($exam_id);
+        $academic_year = Exam::leftJoin('academicYears','exams.academic_year_id','=','academicYears.id')
+            ->where('exams.id',$exam_id)
+            ->select('academicYears.id')
+            ->first();
+        $candidateDuts = $this->dutRegistration($exam_id);
 
         $candidates = $candidateDuts[0];
+        if(!isset($candidates[34])){
+            $candidates[34] = [];
+            $candidates[34]['M'] = [];
+            $candidates[34]['F'] = [];
+        }
+        if(!isset($candidates[35])){
+            $candidates[35] = [];
+            $candidates[35]['M'] = [];
+            $candidates[35]['F'] = [];
+        }
+        if(!isset($candidates[36])){
+            $candidates[36] = [];
+            $candidates[36]['M'] = [];
+            $candidates[36]['F'] = [];
+        }
+        if(!isset($candidates[37])){
+            $candidates[37] = [];
+            $candidates[37]['M'] = [];
+            $candidates[37]['F'] = [];
+        }
+        if(!isset($candidates[38])){
+            $candidates[38] = [];
+            $candidates[38]['M'] = [];
+            $candidates[38]['F'] = [];
+        }
+        ksort($candidates);
         $total = $candidateDuts[1];
-        return view('backend.exam.print.dut_registration_statistic',compact('candidates', 'total'));
+        return view('backend.exam.print.dut_registration_statistic',compact('candidates', 'total','academic_year'));
     }
 
     private function dutRegistration($exam_id) {
@@ -1655,6 +1685,10 @@ class ExamController extends Controller
 
     public function download_student_dut_registration_statistic($exam_id) {
 
+        $academic_year = Exam::leftJoin('academicYears','exams.academic_year_id','=','academicYears.id')
+            ->where('exams.id',$exam_id)
+            ->select('academicYears.id')
+            ->first();
         $students = $this->studentDUTRegistration($exam_id);
         $allDepts = $this->getAllDepartments();
 
@@ -1741,7 +1775,7 @@ class ExamController extends Controller
         }
 
 
-        return view('backend.exam.print.student_dut_registration_statistic',compact('candidates', 'allDepts', 'arrayGrades', 'totalBydept'));
+        return view('backend.exam.print.student_dut_registration_statistic',compact('candidates', 'allDepts', 'arrayGrades', 'totalBydept','academic_year'));
 
 
     }

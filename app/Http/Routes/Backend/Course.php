@@ -17,6 +17,7 @@ Route::group([
         Route::get('course-disable-enable-scoring/{id}', 'CourseAnnualController@toggle_scoring')->name('admin.course.course_annual.toggle_scoring');
         Route::post('course-mass-disable-scoring', 'CourseAnnualController@disable_scoring')->name('admin.course.course_annual.disable_scoring');
         Route::post('course-mass-enable-scoring', 'CourseAnnualController@enable_scoring')->name('admin.course.course_annual.enable_scoring');
+        Route::post('course-mass-only-retake-scoring', 'CourseAnnualController@only_retake_scoring')->name('admin.course.course_annual.only_retake_scoring');
         Route::post('/course-annual/load-reference-course', 'CourseAnnualController@loadReferenceCourse')->name('course_annual.load_reference_course');
     });
 
@@ -167,5 +168,5 @@ Route::group([
 
     Route::get('/student/statistic-radie', 'CourseAnnualController@student_statistic_radie')->name('student.statistic_radie');
 
-
+    Route::get('/test', 'CourseAnnualController@test')->name('test');
 });

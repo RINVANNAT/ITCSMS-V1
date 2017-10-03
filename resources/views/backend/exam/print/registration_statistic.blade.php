@@ -109,14 +109,12 @@
             </table>
             <div class="footer">
                 <hr/>
-                <span>Concours d'entree ITC 2016</span>
+                <span>Concours d'entree ITC {{isset($academic_year)?($academic_year->id-1):"N/A"}}</span>
                 {{--<span class="pull-right">Page {{$page_number}} sur {{$total_page +2}}</span>--}}
             </div>
         </div>
         <?php $page_number++; ?>
     @endif
-
-
 
     @if($allCandidates)
         <div class="page">
@@ -251,18 +249,9 @@
                     <td style="color: darkred;">
                         {{$total_g}}
                     </td>
-
                 </tr>
-
-
-
                 </tbody>
             </table>
-
-
-
-
-
 
             <strong class="text-center"> Percentage </strong>
             <table class="table table-bordered" width="100%">
@@ -359,11 +348,8 @@
                         @endforeach
 
                         <?php $totalCandidates = $totalCandidates + $total_pass_reserve; $total_g = $total_g+ $total_girl;?>
-
                         <td>{{$total_pass_reserve}} </td>
-
                         <td> {{sprintf('%0.2f',($total_girl/$total_pass_reserve)*100)}} % </td>
-
                     </tr>
 
                 @endforeach
@@ -397,7 +383,7 @@
 
             <div class="footer">
                 <hr/>
-                <span>Concours d'entree ITC 2016</span>
+                <span>Concours d'entree ITC {{isset($academic_year)?($academic_year->id-1):"N/A"}}</span>
                 {{--<span class="pull-right">Page {{$page_number}} sur {{$total_page+2}}</span>--}}
             </div>
 
@@ -615,11 +601,9 @@
                 </tbody>
             </table>
 
-
-
             <div class="footer">
                 <hr/>
-                <span>Concours d'entree ITC 2016</span>
+                <span>Concours d'entree ITC {{isset($academic_year)?($academic_year->id-1):"N/A"}}</span>
                 {{--<span class="pull-right">Page {{$page_number+1}} sur {{$total_page+2}}</span>--}}
             </div>
 
