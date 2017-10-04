@@ -297,6 +297,15 @@ trait AjaxCRUDTimetableController
     {
         $rooms = DB::table('rooms')
             ->join('buildings', 'buildings.id', '=', 'rooms.building_id')
+            ->where(function ($query) {
+                if(!access()->hasRole('Administrator')){
+                    if(!access()->hasRole('Administrator')){
+                        $department_id = ((auth()->user())->employees)[0]->department_id;
+                        $query->where('rooms.department_id', $department_id)
+                            ->orWhere('rooms.is_public_room', true);
+                    }
+                }
+            })
             ->select('rooms.id as id', 'rooms.name as name', 'buildings.code as code')
             ->get();
 
@@ -314,14 +323,16 @@ trait AjaxCRUDTimetableController
      */
     public function get_timetable_slots(CreateTimetableRequest $request)
     {
-        // dd($request->all());
+        //dd($request->all());
         $timetableSlots = new Collection();
 
         // find timetable
         $timetable = $this->timetableRepo->find_timetable_is_existed($request);
 
+
         if ($timetable instanceof Timetable) {
             $this->timetableSlotRepo->get_timetable_slot_with_conflict_info($timetable, $timetableSlots, null);
+            // dd($timetableSlots);
         }
 
         // get student annuals.
@@ -552,14 +563,13 @@ trait AjaxCRUDTimetableController
     }
 
     /**
-     * Get conflict information.
+     * Get conflict information to show pop-up window.
      *
      * @return mixed
      */
     public function get_conflict_info()
     {
         $timetableSlot = TimetableSlot::find(request('timetable_slot_id'));
-
         // check conflict room.
         if ($this->timetableSlotRepo->is_conflict_room($timetableSlot)[0]['status'] == true) {
             $conflicts['is_conflict_room'] = true;

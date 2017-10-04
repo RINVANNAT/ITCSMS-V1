@@ -692,7 +692,6 @@
                         }
 
                         if (response.data.lecturer.canNotMerge.length > 0) {
-                            console.log(100);
                             panel_conflict += '<li class="list-group-item">' +
                                 '<i class="fa fa-user"></i> Lecturer ' +
                                 '<div class="box-conflict" style="margin-top: 10px; border-radius: 4px; min-height: 70px; max-height: 100px;">';
