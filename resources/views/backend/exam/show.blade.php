@@ -368,9 +368,9 @@
             /* ------------------------------------------------  Staff Exam Section -------------------------------------------*/
             @permission('view-exam-staff')
 
-            initJsTree_StaffSelected($('#selected_staffs'), '{{route('admin.exam.get-all-roles',$exam->id)}}', '{{route('admin.exam.get-staff-by-role',$exam->id)}}', iconUrl2, iconUrl3);
+            //initJsTree_StaffSelected($('#selected_staffs'), '{{route('admin.exam.get-all-roles',$exam->id)}}', '{{route('admin.exam.get-staff-by-role',$exam->id)}}', iconUrl2, iconUrl3);
 
-            initJsTree_StaffRole($('#all_staff_role'), '{{route('admin.exam.get-all-departements',$exam->id)}}', '{{route('admin.exam.get-all-positions',$exam->id)}}','{{route('admin.exam.get-all-staffs-by-position',$exam->id)}}', iconUrl1, iconUrl2, iconUrl3 );
+            //initJsTree_StaffRole($('#all_staff_role'), '{{route('admin.exam.get-all-departements',$exam->id)}}', '{{route('admin.exam.get-all-positions',$exam->id)}}','{{route('admin.exam.get-all-staffs-by-position',$exam->id)}}', iconUrl1, iconUrl2, iconUrl3 );
 
             $("#btn_save_staff_role").click(function(){
                 baseData= {
@@ -1169,7 +1169,7 @@
                             colors: ['#058DC7', '#50B432', '#ED561B', '#DDDF00', '#24CBE5', '#64E572', '#FF9655', '#FFF263', '#6AF9C4']
                         });
 
-                        Highcharts.chart('candidate_engineer_result', {
+                    /*    Highcharts.chart('candidate_engineer_result', {
                             data: {
                                 table: 'datatable_candidate_resutl'
                             },
@@ -1233,7 +1233,7 @@
                                             this.point.name + ' = ' + this.point.y;
                                 }
                             }
-                        });
+                        }); */
                     });
 
 
@@ -1244,7 +1244,6 @@
                     //-------Start build Student Engineer Statistic: the number of candidate that register to study in ITC---//
 
                     //------ this chart also use the data from the table we created from ajax---//
-
                     $(function () {
                         Highcharts.chart('container', {
                             data: {
@@ -1304,32 +1303,20 @@
                             }
                         });
                     });
-
-
                     //------end of student engineer registration chart----//
-
                 }
-
             });
-
-
         //-----end of first ajax request---//
-
-
 
 
         //------------start new ajax request --------------//
         //--------here we use this ajax to get the data for showing in a line chart----///
-
-
 
             $.ajax({
                 type: 'GET',
                 dataType: "json",
                 url: "{{route('admin.exam.download_registration_statistic',$exam->id)."?type=data_chart_candidate_registration"}}",
                 success: function(resultData) {
-
-
                     var grade_A = resultData['34'],
                             grade_B = resultData['35'],
                             grade_C = resultData['36'],
@@ -1471,28 +1458,14 @@
                             }]
                         });
                     });
-
-
                     //------end of chart Candidate Engineer Registration-------//
-
                 }
-
             });
-
-
-
         //--------end of ajax request for line chart ------//
         @endif
-
         //-------this is end of Candidate Engineer------------//
-
-
         //------start create charts for Dut student and candidate------//
-
-
         @if($exam->type_id == 2)
-
-
             //--------start ajax for reqesting the table of data--------//
             $.ajax({
             type: 'GET',
