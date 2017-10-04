@@ -270,9 +270,19 @@ trait AjaxCRUDTimetableController
         if (array_key_exists('query', request()->all())) {
             if (request('query') != ' ') {
                 $rooms = DB::table('rooms')
+                    ->join('roomTypes', 'roomTypes.id', '=', 'rooms.room_type_id')
                     ->join('buildings', 'buildings.id', '=', 'rooms.building_id')
+                    ->where(function ($query) {
+                        if (!access()->hasRole('Administrator')) {
+                            if (!access()->hasRole('Administrator')) {
+                                $department_id = ((auth()->user())->employees)[0]->department_id;
+                                $query->where('rooms.department_id', $department_id)
+                                    ->orWhere('rooms.is_public_room', true);
+                            }
+                        }
+                    })
                     ->where(DB::raw("CONCAT(buildings.code, '-', rooms.name)"), 'LIKE', "%" . request('query') . "%")
-                    ->select('rooms.id as id', 'rooms.name as name', 'buildings.code as code')
+                    ->select('rooms.id as id', 'rooms.name as name', 'buildings.code as code', 'rooms.nb_desk as desk', 'rooms.nb_chair as chair', 'roomTypes.name as room_type')
                     ->get();
 
                 if (count($rooms) > 0) {
@@ -297,16 +307,17 @@ trait AjaxCRUDTimetableController
     {
         $rooms = DB::table('rooms')
             ->join('buildings', 'buildings.id', '=', 'rooms.building_id')
+            ->join('roomTypes', 'roomTypes.id', '=', 'rooms.room_type_id')
             ->where(function ($query) {
-                if(!access()->hasRole('Administrator')){
-                    if(!access()->hasRole('Administrator')){
+                if (!access()->hasRole('Administrator')) {
+                    if (!access()->hasRole('Administrator')) {
                         $department_id = ((auth()->user())->employees)[0]->department_id;
                         $query->where('rooms.department_id', $department_id)
                             ->orWhere('rooms.is_public_room', true);
                     }
                 }
             })
-            ->select('rooms.id as id', 'rooms.name as name', 'buildings.code as code')
+            ->select('rooms.id as id', 'rooms.name as name', 'buildings.code as code', 'rooms.nb_desk as desk', 'rooms.nb_chair as chair', 'roomTypes.name as room_type')
             ->get();
 
         return Response::json([
@@ -513,6 +524,7 @@ trait AjaxCRUDTimetableController
                 $rooms_used = DB::table('timetables')
                     ->join('timetable_slots', 'timetable_slots.timetable_id', '=', 'timetables.id')
                     ->join('rooms', 'rooms.id', '=', 'timetable_slots.room_id')
+                    ->join('roomTypes', 'roomTypes.id', '=', 'rooms.room_type_id')
                     ->where([
                         ['timetables.academic_year_id', $academic_year_id],
                         ['timetables.week_id', $week_id],
@@ -520,9 +532,18 @@ trait AjaxCRUDTimetableController
                         ['timetable_slots.end', $timetable_slot->end]
                     ])
                     ->join('buildings', 'buildings.id', '=', 'rooms.building_id')
+                    ->where(function ($query) {
+                        if (!access()->hasRole('Administrator')) {
+                            if (!access()->hasRole('Administrator')) {
+                                $department_id = ((auth()->user())->employees)[0]->department_id;
+                                $query->where('rooms.department_id', $department_id)
+                                    ->orWhere('rooms.is_public_room', true);
+                            }
+                        }
+                    })
                     ->where(DB::raw("CONCAT(buildings.code, '-', rooms.name)"), 'LIKE', "%" . $query . "%")
                     ->whereNotNull('timetable_slots.room_id')
-                    ->select('rooms.id as id', 'rooms.name as name', 'buildings.code as code')
+                    ->select('rooms.id as id', 'rooms.name as name', 'buildings.code as code', 'rooms.nb_desk as desk', 'rooms.nb_chair as chair', 'roomTypes.name as room_type')
                     ->distinct('name', 'code')
                     ->get();
 
@@ -536,15 +557,34 @@ trait AjaxCRUDTimetableController
                         ['timetable_slots.end', $timetable_slot->end]
                     ])
                     ->join('buildings', 'buildings.id', '=', 'rooms.building_id')
+                    ->where(function ($query) {
+                        if (!access()->hasRole('Administrator')) {
+                            if (!access()->hasRole('Administrator')) {
+                                $department_id = ((auth()->user())->employees)[0]->department_id;
+                                $query->where('rooms.department_id', $department_id)
+                                    ->orWhere('rooms.is_public_room', true);
+                            }
+                        }
+                    })
                     ->where(DB::raw("CONCAT(buildings.code, '-', rooms.name)"), 'LIKE', "%" . $query . "%")
                     ->whereNotNull('timetable_slots.room_id')
                     ->lists('timetable_slots.room_id');
 
                 $rooms_remaining = DB::table('rooms')
                     ->join('buildings', 'buildings.id', '=', 'rooms.building_id')
+                    ->join('roomTypes', 'roomTypes.id', '=', 'rooms.room_type_id')
+                    ->where(function ($query) {
+                        if (!access()->hasRole('Administrator')) {
+                            if (!access()->hasRole('Administrator')) {
+                                $department_id = ((auth()->user())->employees)[0]->department_id;
+                                $query->where('rooms.department_id', $department_id)
+                                    ->orWhere('rooms.is_public_room', true);
+                            }
+                        }
+                    })
                     ->whereNotIn('rooms.id', $rooms_tmp == [] ? [] : $rooms_tmp)
                     ->where(DB::raw("CONCAT(buildings.code, '-', rooms.name)"), 'LIKE', "%" . $query . "%")
-                    ->select('rooms.id as id', 'rooms.name as name', 'buildings.code as code')
+                    ->select('rooms.id as id', 'rooms.name as name', 'buildings.code as code', 'rooms.nb_desk as desk', 'rooms.nb_chair as chair', 'roomTypes.name as room_type')
                     ->get();
 
                 if (count($rooms_remaining) > 0) {

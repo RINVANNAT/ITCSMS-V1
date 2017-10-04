@@ -29,6 +29,10 @@
             background-color: #dd4b39 !important;
             color: #fff;
         }
+
+        .bg-red {
+            background-color: #dd4b39 !important;
+        }
     </style>
 
 @stop
@@ -169,10 +173,18 @@
                     if (response.status === true) {
                         var room_item = '';
                         $.each(response.rooms, function (key, val) {
-                            room_item += '<div class="room-item enabled" id="' + val.id + '">'
-                                + '<i class="fa fa-building-o"></i> '
+
+                            room_item += '<div class="info-box">'
+                                + '<span class="info-box-icon bg-aqua">'
                                 + '<span>' + val.code + '-' + val.name + '</span>'
-                                + '</div> ';
+                                + '</span>'
+                                + '<div class="info-box-content">'
+                                + '<span class="info-box-number">' + val.room_type + '</span>'
+                                + '<span class="info-box-number room_id hidden">' + val.id + '</span>'
+                                + '<span class="info-box-text text-muted">' + (val.desk === null ? 0 : val.desk) + ' Desk</span>'
+                                + '<span class="info-box-text text-muted">' + (val.chair === null ? 0 : val.chair) + ' Chair</span>'
+                                + '</div>'
+                                + '</div>'
                         });
 
                         $('.rooms').html(room_item);
@@ -197,21 +209,37 @@
                     timetable_slot_id: timetable_slot_id
                 },
                 success: function (response) {
-                    if (response.status == true) {
+                    if (response.status === true) {
                         var room_item = '';
 
                         $.each(response.roomRemain, function (key, val) {
-                            room_item += '<div class="room-item enabled" id="' + val.id + '">'
-                                + '<i class="fa fa-building-o"></i> '
+
+                            room_item += '<div class="info-box">'
+                                + '<span class="info-box-icon bg-aqua">'
                                 + '<span>' + val.code + '-' + val.name + '</span>'
-                                + '</div> ';
+                                + '</span>'
+                                + '<div class="info-box-content">'
+                                + '<span class="info-box-number room_title">' + val.room_type + '</span>'
+                                + '<span class="info-box-number room_id hidden">' + val.id + '</span>'
+                                + '<span class="info-box-text text-muted">' + (val.desk === null ? 0 : val.desk) + ' Desk</span>'
+                                + '<span class="info-box-text text-muted">' + (val.chair === null ? 0 : val.chair) + ' Chair</span>'
+                                + '</div>'
+                                + '</div>';
                         });
 
                         $.each(response.roomUsed, function (key, val) {
-                            room_item += '<div class="room-item disabled bg-danger" id="' + val.id + '">'
-                                + '<i class="fa fa-building-o"></i> '
+
+                            room_item += '<div class="info-box-room-use">'
+                                + '<span class="info-box-icon bg-red">'
                                 + '<span>' + val.code + '-' + val.name + '</span>'
-                                + '</div> ';
+                                + '</span>'
+                                + '<div class="info-box-content">'
+                                + '<span class="info-box-number">' + val.room_type + '</span>'
+                                + '<span class="info-box-number room_id hidden">' + val.id + '</span>'
+                                + '<span class="info-box-text text-muted">' + (val.desk === null ? 0 : val.desk) + ' Desk</span>'
+                                + '<span class="info-box-text text-muted">' + (val.chair === null ? 0 : val.chair) + ' Chair</span>'
+                                + '</div>'
+                                + '</div>';
                         });
                         $('.rooms').html(room_item);
                     }
@@ -243,17 +271,57 @@
                         var room_item = '';
 
                         $.each(response.roomRemain, function (key, val) {
-                            room_item += '<div class="room-item enabled" id="' + val.id + '">'
-                                + '<i class="fa fa-building-o"></i> '
+                            var desks = null;
+                            var chairs = null
+                            if (val.desk == null) {
+                                desks = 0;
+                            } else {
+                                desks = val.desk;
+                            }
+
+                            if (val.chair == null) {
+                                chairs = 0;
+                            } else {
+                                chairs = val.chair;
+                            }
+                            room_item += '<div class="info-box">'
+                                + '<span class="info-box-icon bg-aqua">'
                                 + '<span>' + val.code + '-' + val.name + '</span>'
-                                + '</div> ';
+                                + '</span>'
+                                + '<div class="info-box-content">'
+                                + '<span class="info-box-number room_title">' + val.room_type + '</span>'
+                                + '<span class="info-box-number room_id hidden">' + val.id + '</span>'
+                                + '<span class="info-box-text text-muted">' + desks + ' Desk</span>'
+                                + '<span class="info-box-text text-muted">' + chairs + ' Chair</span>'
+                                + '</div>'
+                                + '</div>';
                         });
 
                         $.each(response.roomUsed, function (key, val) {
-                            room_item += '<div class="room-item bg-danger" id="' + val.id + '">'
-                                + '<i class="fa fa-building-o"></i> '
+                            var desks = null;
+                            var chairs = null
+                            if (val.desk == null) {
+                                desks = 0;
+                            } else {
+                                desks = val.desk;
+                            }
+
+                            if (val.chair == null) {
+                                chairs = 0;
+                            } else {
+                                chairs = val.chair;
+                            }
+                            room_item += '<div class="info-box-room-use">'
+                                + '<span class="info-box-icon bg-red">'
                                 + '<span>' + val.code + '-' + val.name + '</span>'
-                                + '</div> ';
+                                + '</span>'
+                                + '<div class="info-box-content">'
+                                + '<span class="info-box-number">' + val.room_type + '</span>'
+                                + '<span class="info-box-number room_id hidden">' + val.id + '</span>'
+                                + '<span class="info-box-text text-muted">' + desks + ' Desk</span>'
+                                + '<span class="info-box-text text-muted">' + chairs + ' Chair</span>'
+                                + '</div>'
+                                + '</div>';
                         });
                         $('.rooms').html(room_item);
                     } else {
@@ -284,7 +352,7 @@
                             $("#btn_clone").attr('disabled', false);
                             $('#btn_publish').attr('disabled', true);
                         }
-                    }else{
+                    } else {
                         $("#btn_clone").attr('disabled', true);
                         $('#btn_publish').attr('disabled', true);
                     }
@@ -769,18 +837,19 @@
             });
 
             // add room to timetable slot.
-            $(document).on('click', '.rooms .room-item.enabled', function () {
+            $(document).on('click', '.rooms .info-box', function () {
                 var dom_room = $(this);
+                console.log(dom_room.find('.room_id').text());
                 $.ajax({
                     type: 'POST',
                     url: '/admin/schedule/timetables/insert_room_into_timetable_slot',
                     data: {
                         timetable_slot_id: $('.side-course.course-selected').attr('id'),
-                        room_id: $(this).attr('id')
+                        room_id: $(this).find('.room_id').text()
                     },
                     success: function (response) {
                         if (response.status === true) {
-                            $('.container-room').find('.side-course.course-selected').parent().children().eq(1).children().eq(0).html('<p class="fc-room">' + dom_room.children().eq(1).text() + '</p>');
+                            $('.container-room').find('.side-course.course-selected').parent().children().eq(1).children().eq(0).html('<p class="fc-room">' + dom_room.find('.room_name').text() + '</p>');
                             dom_room.remove();
                             notify('success', 'Room was added', 'Add Room');
                             get_timetable_slots();
