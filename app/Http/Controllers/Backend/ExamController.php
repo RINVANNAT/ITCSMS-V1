@@ -765,29 +765,41 @@ class ExamController extends Controller
 
     public function download_attendance_list(DownloadExaminationDocumentsRequest $request, $exam_id){
 
+        $academic_year = Exam::leftJoin('academicYears','exams.academic_year_id','=','academicYears.id')
+            ->where('exams.id',$exam_id)
+            ->select('academicYears.id')
+            ->first();
         $exam = $this->exams->findOrThrowException($exam_id);
         $courses = $exam->entranceExamCourses()->get();
         $rooms = $exam->rooms()->with('building')->orderBy('building_id')->orderBy('name')->get();
 
-        return view('backend.exam.print.attendance_list',compact('rooms','courses'));
+        return view('backend.exam.print.attendance_list',compact('rooms','courses','academic_year'));
     }
 
     public function download_candidate_list(DownloadExaminationDocumentsRequest $request,$exam_id){
 
+        $academic_year = Exam::leftJoin('academicYears','exams.academic_year_id','=','academicYears.id')
+            ->where('exams.id',$exam_id)
+            ->select('academicYears.id')
+            ->first();
         $exam = $this->exams->findOrThrowException($exam_id);
         $rooms = $exam->rooms()->with('building')->orderBy('building_id')->orderBy('name')->get();
 
-        return view('backend.exam.print.candidate_list',compact('rooms'));
+        return view('backend.exam.print.candidate_list',compact('rooms','academic_year'));
     }
 
     public function download_candidate_list_by_register_id(DownloadExaminationDocumentsRequest $request,$exam_id){
 
+        $academic_year = Exam::leftJoin('academicYears','exams.academic_year_id','=','academicYears.id')
+            ->where('exams.id',$exam_id)
+            ->select('academicYears.id')
+            ->first();
         $exam = $this->exams->findOrThrowException($exam_id);
         $candidates = $exam->candidates()->with('gender')->with('room')->with('room.building')->orderBy('register_id')->get()->toArray();
 
         $chunk_candidates = array_chunk($candidates,30);
 
-        return view('backend.exam.print.candidate_list_order_by_register_id',compact('chunk_candidates'));
+        return view('backend.exam.print.candidate_list_order_by_register_id',compact('chunk_candidates','academic_year'));
     }
 
     public function download_room_sticker(DownloadExaminationDocumentsRequest $request,$exam_id){
