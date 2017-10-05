@@ -167,6 +167,7 @@ class CourseAnnualController extends Controller
     /**
      * @param Request $request
      * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View
+     * this function is used for filtering department option by the department id (return view as the selection option)
      */
     public function getDeptOption(Request $request)
     {
@@ -176,6 +177,12 @@ class CourseAnnualController extends Controller
 
     }
 
+    /**
+     * @param Request $request
+     * @return mixed
+     * this is a function used for returning group of students when creating each course annual (filter by course program id and
+     *  - academic_year_id, grade_id, degree_id, ....)
+     */
     public function filteringStudentGroup(Request $request)
     {
 
@@ -247,6 +254,11 @@ class CourseAnnualController extends Controller
 
     }
 
+    /**
+     * @param Request $request
+     * @return string
+     * this function will return groups of student as a view (selection)
+     */
     public function getStudentGroupSelection(Request $request)
     {
 
@@ -3085,12 +3097,6 @@ class CourseAnnualController extends Controller
 
             }
         }
-//        $courseName = explode(" ", $courseAnnual->name_en);
-//        $acronym = "";
-//
-//        foreach ($courseName as $char) {
-//            $acronym .= $char[0];
-//        }
         $title = 'Student_Score_Lists';
         $alpha = [];
         $letter = 'A';
