@@ -36,16 +36,7 @@ trait ViewTimetableByTeacherController
         $self = request('filter_by');
         $timetableSlots = new Collection();
 
-        $timetable = Timetable::where([
-            ['academic_year_id', request('academicYears')],
-            ['department_id', request('departments')],
-            ['degree_id', request('degrees')],
-            ['grade_id', request('grades')],
-            ['semester_id', request('semesters')],
-            ['week_id', request('weeks')],
-            ['group_id', request('groups')],
-            ['option_id', request('options')]
-        ])->first();
+        $timetable = Timetable::find(\request('timetable_id'));
 
         if ($timetable instanceof Timetable) {
             if ($timetable instanceof Timetable) {

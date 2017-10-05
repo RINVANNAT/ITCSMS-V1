@@ -359,12 +359,21 @@
                         row += '<td class="hidden">';
                         row += val.key_id;
                         row += '</td>';
+                        row += '<td class="hidden">';
+                        row += val.start + ' - ' + val.end;
+                        row += '</td>';
                         row += '<td>';
                         row += val.code;
                         row += '</td>';
                         row += '<td>';
                         //row += //*<span class="start_date"> ' + moment(val.start, 'YYYY-MM-DD').fromNow() + '</span> -*// '<span class="start_date">' + moment(val.end, 'YYYY-MM-DD').fromNow() + '</span>';
-                        row += '<span class="start_date">' + moment(val.end, 'YYYY-MM-DD').fromNow() + '</span>';
+                        if (val.description === 'true') {
+                            row += '<span class="start_date"> end ' + moment(val.end, 'YYYY-MM-DD').fromNow() + '</span>';
+                        } else if (val.description === 'false') {
+                            row += '<span class="start_date"> start ' + moment(val.start, 'YYYY-MM-DD').fromNow() + '</span>';
+                        } else {
+                            row += '<span class="start_date">' + moment(val.end, 'YYYY-MM-DD').fromNow() + '</span>';
+                        }
                         row += '</td>';
                         row += '<td>';
                         if (val.description === 'true') {
@@ -374,10 +383,11 @@
                         } else {
                             row += '<span class="label label-success">{{ trans('labels.backend.schedule.timetable.status.finished') }}</span>';
                         }
+                        
                         row += '</td>';
                         row += '<td>';
-                        row += '<button class="btn btn-primary btn-xs" id="btn_assign_update"><i class="fa fa-edit"></i></button> ';
-                        row += '<button class="btn btn-danger btn-xs" id="btn_assign_delete"><i class="fa fa-trash"></i></button> ';
+                        row += '<button class="btn btn-primary btn-xs" id="btn_assign_update"><i class="fa fa-clock-o"></i> Set Time</button> ';
+                        // row += '<button class="btn btn-danger btn-xs" id="btn_assign_delete"><i class="fa fa-trash"></i></button> ';
                         row += '</td>';
                         row += '</tr>';
                     });
@@ -415,38 +425,18 @@
 
             // click edit timetable assignment
             $(document).on('click', '#btn_assign_update', function () {
-                toggleLoading(true);
                 $('#display-assign').find('.info').removeClass();
                 $('#display-assign').find('.danger').removeClass();
                 var dom = $(this).parent().parent();
                 dom.addClass('info');
-                $.ajax({
-                    type: 'POST',
-                    url: '{{ route('update_assign_timetable') }}',
-                    data: {
-                        'id': dom.children().eq(0).text()
-                    },
-                    success: function (response) {
-                        $('#modal-update-assign').modal('show');
-                        $('#modal-update-assign').find('input[name="update-datetime"]').val(response.start + ' - ' + response.end);
-                        $('input[name="update-datetime"]').daterangepicker({
-                            timeZone: 'Asia/Phnom_Penh',
-                            format: 'YYYY-MM-DD'
-                        }, function (start, end) {
-                            startDateUpdate = start;
-                            endDateUpdate = end;
-                        });
-                    },
-                    error: function () {
-                        swal(
-                            'Update Assignment Timetable',
-                            'Something went wrong!',
-                            'error'
-                        );
-                    },
-                    complete: function () {
-                        toggleLoading(false);
-                    }
+                $('#modal-update-assign').modal('show');
+                $('#modal-update-assign').find('input[name="update-datetime"]').val(dom.children().eq(1).text());
+                $('input[name="update-datetime"]').daterangepicker({
+                    timeZone: 'Asia/Phnom_Penh',
+                    format: 'YYYY-MM-DD'
+                }, function (start, end) {
+                    startDateUpdate = start;
+                    endDateUpdate = end;
                 });
             });
 

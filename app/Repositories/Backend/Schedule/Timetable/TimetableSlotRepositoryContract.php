@@ -97,9 +97,10 @@ interface TimetableSlotRepositoryContract
     /**
      * Export course sessions.
      *
+     * @param $data
      * @return mixed
      */
-    public function export_course_sessions();
+    public function export_course_sessions($data);
 
     /**
      * Export from course_session to slots.

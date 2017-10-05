@@ -102,7 +102,6 @@ function get_grades(department_id) {
             if (response.status === true) {
                 var grades = '';
                 $.each(response.grades, function (key, val) {
-                    console.log
                     grades += '<option value="' + val.id + '">' + val.name_en + '</option>';
                 });
                 $('select[name="grade"]').html(grades);
@@ -192,10 +191,16 @@ function search_rooms(query) {
             if (response.status === true) {
                 var room_item = '';
                 $.each(response.rooms, function (key, val) {
-                    room_item += '<div class="room-item" id="' + val.id + '">'
-                        + '<i class="fa fa-building-o"></i> '
+                    room_item += '<div class="info-box">'
+                        + '<span class="info-box-icon bg-aqua">'
                         + '<span>' + val.code + '-' + val.name + '</span>'
-                        + '</div> ';
+                        + '</span>'
+                        + '<div class="info-box-content">'
+                        + '<span class="info-box-number">' + val.room_type + '</span>'
+                        + '<span class="info-box-text text-muted">' + (val.desk === null ? 0 : val.desk) + ' Desk</span>'
+                        + '<span class="info-box-text text-muted">' + (val.chair === null ? 0 : val.chair) + ' Chair</span>'
+                        + '</div>'
+                        + '</div>';
                 });
 
                 $('.rooms').html(room_item);
