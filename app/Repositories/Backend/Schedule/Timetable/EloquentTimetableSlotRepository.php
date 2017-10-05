@@ -180,8 +180,8 @@ class EloquentTimetableSlotRepository implements TimetableSlotRepositoryContract
 
         $course_sessions = new Collection();
 
-        foreach ($course_annuals as $course_annual){
-            foreach ($course_annual->courseSessions as $courseSession){
+        foreach ($course_annuals as $course_annual) {
+            foreach ($course_annual->courseSessions as $courseSession) {
                 $course_sessions->push($courseSession);
             }
         }
@@ -360,24 +360,16 @@ class EloquentTimetableSlotRepository implements TimetableSlotRepositoryContract
      */
     public function check_conflict_lecturer(TimetableSlot $timetableSlot)
     {
-        // dd('enter function check_conflict_lecturer');
-        // find merge timetable match with argument
-        $mergeTimetableSlot = MergeTimetableSlot::find($timetableSlot->group_merge_id);
-        // dd($mergeTimetableSlot);
         // find timetable match with argument
         $timetable = $timetableSlot->timetable;
-
-        // dd($timetable);
 
         // find all timetables match with argument
         $timetables = Timetable::where([
             ['academic_year_id', $timetable->academic_year_id],
             ['week_id', $timetable->week_id]
         ])
-        ->where('id', '!=', $timetable->id)
-        ->get();
-
-        // dd(count($timetables));
+            ->where('id', '!=', $timetable->id)
+            ->get();
 
         // declare and prepare data
         $result = array();
@@ -388,33 +380,30 @@ class EloquentTimetableSlotRepository implements TimetableSlotRepositoryContract
             foreach ($timetables as $itemTimetable) {
                 if (count($itemTimetable->timetableSlots) > 0) {
                     foreach ($itemTimetable->timetableSlots as $itemTimetableSlot) {
-                        // find merge timetable slot and then compare with input and the other merge timetable slot
-                        $itemMergeTimetableSlot = MergeTimetableSlot::find($itemTimetableSlot->group_merge_id);
-//                        // compare start and end date && teacher
-                        if(
-                            ($itemTimetableSlot->teacher_name == $mergeTimetableSlot->teacher_name)
-                            &&
-                            (
-                                ((strtotime($itemMergeTimetableSlot->start) <= strtotime($mergeTimetableSlot->start)) && (strtotime($itemMergeTimetableSlot->end) > strtotime($mergeTimetableSlot->start)))
+                        if (
+                            (((strtotime($timetableSlot->start) > strtotime($itemTimetableSlot->start)) && (strtotime($timetableSlot->start) < strtotime($itemTimetableSlot->end)))
                                 ||
-                                ((strtotime($mergeTimetableSlot->end) > strtotime($itemMergeTimetableSlot->start)) && (strtotime($mergeTimetableSlot->end) < strtotime($itemMergeTimetableSlot->end)))
-                            )
-                            && ($mergeTimetableSlot->group_merge_id != $itemTimetableSlot->group_merge_id)
-                        ){
-                            if((strtotime($timetableSlot->start) == strtotime($itemTimetableSlot->start)) && (strtotime($timetableSlot->end) == strtotime($itemTimetableSlot->end)) && ($timetableSlot->type == $itemTimetableSlot->type) && ($timetableSlot->slot->course_annual_id == $itemTimetableSlot->slot->course_annual_id)){
+                                ((strtotime($timetableSlot->end) > strtotime($itemTimetableSlot->start)) && (strtotime($timetableSlot->end) < strtotime($itemTimetableSlot->end)))
+                                ||
+                                (strtotime($timetableSlot->start) == strtotime($itemTimetableSlot->start)) && (strtotime($timetableSlot->end) == strtotime($itemTimetableSlot->end)))
+                            &&
+                            ($timetableSlot->id != $itemTimetableSlot->id)
+                            &&
+                            ($timetableSlot->teacher_name == $itemTimetableSlot->teacher_name)
+                            &&
+                            ($timetableSlot->group_merge_id != $itemTimetableSlot->group_merge_id)
+                        ) {
+                            if ((strtotime($timetableSlot->start) == strtotime($itemTimetableSlot->start)) && (strtotime($timetableSlot->end) == strtotime($itemTimetableSlot->end)) && ($timetableSlot->type == $itemTimetableSlot->type) && ($timetableSlot->slot->course_annual_id == $itemTimetableSlot->slot->course_annual_id)) {
                                 array_push($canMerge, $itemTimetableSlot);
-                            }else{
-                                Log::info($timetableSlot);
-                                Log::info($itemTimetableSlot);
-                                array_push($canNotMerge,     $itemTimetableSlot);
+                            } else {
+                                array_push($canNotMerge, $itemTimetableSlot);
                             }
-                        }else{
-                                Log::info('not conflict');
                         }
                     }
                 }
             }
         }
+
         // push those two array into result
         $result['canMerge'] = $canMerge;
         $result['canNotMerge'] = $canNotMerge;
