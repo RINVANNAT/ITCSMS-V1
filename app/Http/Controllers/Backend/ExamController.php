@@ -542,6 +542,13 @@ class ExamController extends Controller
 
         $rooms = json_decode($_POST['room_ids']);
 
+        $rooms = collect($rooms);
+        $rooms_key_by_secret_code = $rooms->keyBy('secret_code');
+        if(count($rooms)>count($rooms_key_by_secret_code)) {
+            // Some duplicate code exist
+            return Response::json(array('success'=>false,'message'=>"Duplicate secret code!"));
+        }
+        // Everything is alright.
         foreach($rooms as $room){
             DB::table('examRooms')
                 ->where('exam_id',$exam_id)
