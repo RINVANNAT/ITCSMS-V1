@@ -1,13 +1,13 @@
 function setSelectedRow() {
 
-    var current_rows = $(document).find(".current_row");
-    if (current_rows != null) {
-        current_rows.removeClass("current_row");
-    }
-    var row = $(".current").closest("tr").find('td')[0];
-    var num_tr = $(row).text();
-    $(".current").closest("tr").addClass("current_row");
-    $('div.ht_master').find('table').find('tbody').find('tr:eq('+(num_tr-1)+')').addClass('current_row')
+    // var current_rows = $(document).find(".current_row");
+    // if (current_rows != null) {
+    //     current_rows.removeClass("current_row");
+    // }
+    // var row = $(".current").closest("tr").find('td')[0];
+    // var num_tr = $(row).text();
+    // $(".current").closest("tr").addClass("current_row");
+    // $('div.ht_master').find('table').find('tbody').find('tr:eq('+(num_tr-1)+')').addClass('current_row')
 
 }
 

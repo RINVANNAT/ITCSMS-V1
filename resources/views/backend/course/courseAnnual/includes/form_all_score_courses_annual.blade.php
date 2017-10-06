@@ -4,9 +4,6 @@
 @section('after-styles-end')
     {!! Html::style(elixir('css/handsontable.full.min.css')) !!}
     <style>
-        .handsontable td.area {
-            background-color: black;
-        }
         .popupdiv {
             height: 200px;
             width: 600px;
@@ -50,22 +47,15 @@
         .handsontable th {
             white-space: normal !important;
         }
+
         .handsontable td {
             color: #000 !important;
         }
-        .current_row td {
-
-        gradient(to bottom, rgba(181, 209, 255, 0.34) 0, rgba(181, 209, 255, 0.34) 100 %);
-            background-image: linear-gradient(rgba(181, 209, 255, 0.5) 0px, rgba(181, 209, 255, 0.341176) 100%);
-            background-position-x: initial;
-            background-position-y: initial;
-            background-size: initial;
-            background-repeat-x: initial;
-            background-repeat-y: initial;
-            background-attachment: initial;
-            background-origin: initial;
-            background-clip: initial;
-            background-color: #fff !important;
+        .currentRow {
+            background-image: linear-gradient(rgba(181, 209, 255, 0.5) 0px, rgba(181, 209, 255, 0.341176) 100%) !important;
+        }
+        .currentCol {
+            background-image: linear-gradient(rgba(181, 209, 255, 0.5) 0px, rgba(181, 209, 255, 0.341176) 100%) !important;
         }
         .htAutocompleteArrow {
 
@@ -272,6 +262,8 @@
             filters: true,
             dropdownMenu: ['filter_by_condition', 'filter_action_bar'],
             className: "htRight 4",
+            currentRowClassName: 'currentRow',
+            currentColClassName: 'currentCol',
             cells: function (row, col, prop) {
 
                 this.renderer = colorRenderer;
@@ -329,9 +321,9 @@
 
 
             },
-            beforeOnCellMouseDown: function (event, coord, TD) {
-                return true;
-            },
+//            beforeOnCellMouseDown: function (event, coord, TD) {
+//                return true;
+//            },
             afterOnCellMouseDown: function (event, coord, TD) {
                 return false;
             },
