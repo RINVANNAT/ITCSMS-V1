@@ -618,7 +618,8 @@ class ExamController extends Controller
                 }
 
                 $sheet->mergeCells('A1:C1');
-                $sheet->cells('A1:C'.count($rooms)+1, function($cells) {
+                $range = 'A1:C'.(count($rooms)+1);
+                $sheet->cells($range, function($cells) {
                     $cells->setAlignment('center');
                     $cells->setValignment('middle');
                 });
