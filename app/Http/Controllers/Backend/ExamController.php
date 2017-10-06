@@ -818,6 +818,11 @@ class ExamController extends Controller
     }
 
     public function download_correction_sheet(DownloadExaminationDocumentsRequest $request,$exam_id){
+        $academic_year = Exam::leftJoin('academicYears','exams.academic_year_id','=','academicYears.id')
+            ->where('exams.id',$exam_id)
+            ->select('academicYears.id')
+            ->first();
+
         $exam = $this->exams->findOrThrowException($exam_id);
         $courses = $exam->entranceExamCourses()->get();
         $rooms = $exam->rooms()->with('candidates')->get()->toArray();
@@ -830,7 +835,7 @@ class ExamController extends Controller
             return $a['roomcode'] - $b['roomcode'];
         });
 
-        return view('backend.exam.print.correction_sheet',compact('rooms','courses'));
+        return view('backend.exam.print.correction_sheet',compact('rooms','courses','academic_year'));
     }
 
     public function download_candidate_list_dut(DownloadExaminationDocumentsRequest $request,$exam_id){
