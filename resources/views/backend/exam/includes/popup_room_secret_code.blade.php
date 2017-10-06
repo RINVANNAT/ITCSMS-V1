@@ -1,7 +1,13 @@
 @extends ('backend.layouts.popup_master')
 
 @section ('title', trans('labels.backend.exams.title') . ' | ' . trans('labels.backend.exams.secret_code.title'))
-
+@section ('after-styles-end')
+    <style>
+        .duplicate {
+            background-color: yellow;
+        }
+    </style>
+@endsection
 @section('content')
 
     <div class="box box-success">
@@ -18,7 +24,7 @@
         </div>
         <!-- /.box-header -->
         <div class="box-body">
-            <table class="table table-bordered">
+            <table class="table table-bordered" id="table_secret_code">
                 <tbody>
                 <tr>
                     <th style="width: 10px">#</th>
@@ -61,15 +67,29 @@
 
 @section('after-scripts-end')
     <script>
-        function is_secret_code_exist(code){
-            var found = false;
+        function is_secret_code_exist(scode){
+            var found=false;
             $(document).find('.secret_code').each(function(){
-                if($(this).val() == code){
+                if($(this).val() == scode){
                     console.log("code exist");
                     found = true;
                 }
             });
             return found;
+        }
+        function highlight_duplicate_code(){
+          $('.secret_code').removeClass("duplicate");
+          var codes = [];
+          $('.secret_code').each(function() {
+            // check if there is another one with the same value
+            //console.log($('.secret_code[value="' + $(this).val() + '"]').size());
+            if(jQuery.inArray($(this).val(),codes) == -1){
+              codes.push($(this).val());
+            } else {
+              $(this).addClass("duplicate");
+              $(this).focus();
+            }
+          });
         }
 
         $(function() {
@@ -79,6 +99,10 @@
             });
 
             $("#btn-auto-save").click(function () {
+                // Remove highlight if exist
+                $('#table_secret_code').find('.duplicate').each(function() {
+                  $(this).removeClass('duplicate');
+                });
                 var min = parseInt($('#min_range').val());
                 var max = parseInt($('#max_range').val());
                 var rooms = $(document).find('.secret_code');
@@ -88,11 +112,17 @@
                     if(rooms.length > (max-min)){
                         notify("error","info", "Bigger number gap is required!");
                     } else {
+                        var code;
                         $.each(rooms,function(){
                             $(this).prop('disabled', false);
-                            var code = Math.floor(Math.random()*(max-min + 1)) + min;
-                            while(is_secret_code_exist(code)){
+                            while(true){
                                 code = Math.floor(Math.random()*(max-min + 1)) + min;
+                                console.log(is_secret_code_exist(code));
+                                if(is_secret_code_exist(code)){
+                                  // don't break the loop, generate a new code
+                                } else {
+                                  break;
+                                }
                             }
                             $(this).val(code);
                         });
@@ -121,10 +151,17 @@
                     data: {room_ids:JSON.stringify(rooms)},
                     dataType: "json",
                     success: function(resultData) {
+                      if(resultData.success == true){
                         notify('success','Generate secret code', resultData.message);
                         $(document).find('.secret_code').each(function() {
-                            $(this).prop('disabled', true);
+                          $(this).prop('disabled', true);
                         });
+                      } else {
+                        // Something wrong. Duplicate code
+                        notify('error',resultData.message,'Error');
+                        // Find duplicate records and highlight them
+                        highlight_duplicate_code();
+                      }
                     }
                 });
             });
