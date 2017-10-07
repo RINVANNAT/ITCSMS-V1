@@ -567,8 +567,8 @@ return [
                 ],
                 'message' => [
                     'save_success' => 'your record have been save!',
-                    'save_duplicate' => 'Duplicate Record!',
-                    'corrector_missing' => 'Please add the Corrector Name',
+                    'save_duplicate' => 'Duplicate record!',
+                    'corrector_missing' => 'Please add the corrector name',
                     'zero_value' => 'You have inputted 0 Value!!!',
 
                 ]
