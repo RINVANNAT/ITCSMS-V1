@@ -1912,6 +1912,7 @@ class ExamController extends Controller
 
         $availableRooms = $this->roomWithNotInputtedScoreCandidate($exam_id, $number_correction, $subjectId);
 
+        //dd($availableRooms);
         $all_keys= array_keys($availableRooms);
         $cur_key = array_search($roomId,$all_keys);
 
