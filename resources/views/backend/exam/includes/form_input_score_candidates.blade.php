@@ -235,6 +235,7 @@
 
 @if($status)
     <script>
+      var total_candidate = {{count($candidates)}};
       function ajaxRequest(method, baseUrl, baseData){
 
         $.ajax({
@@ -336,12 +337,24 @@
       // when typing enter key to focus on the under input field
       $('.inputs_score').keydown(function (e) {
             if (e.which === 13) {
-                var index = $('.inputs_score').index(this) + 3;
+                var column_number = $(this).parent().index();
+                var index = $('.inputs_score').index(this);
+                if(index === ((total_candidate*3)-(4-column_number))){
+                  index = column_number;
+
+                  if(index === 3) return;
+                } else {
+                  index = index + 3;
+                }
                 $('.inputs_score').eq(index).focus().select();
             }
-        });
+      });
+      $('.inputs_score').on('focus',function(e){
+        console.log("CELL: "+ $('.inputs_score').index(this));
+        console.log("TD: "+ $(this).parent().index());
+        console.log("Total: "+total_candidate);
+      });
       // calculation input value on each row
-
       var length = JSON.parse('<?php echo $i ?>');
       calculateSum(length);
       for(var k=1; k<=length; k++) {
@@ -375,7 +388,8 @@
             console.log(room_id + '--' + room_code);
             window.location.href = baseUrl+'?room_id='+ room_id + '&room_code=' + room_code + '&entrance_course_id=' + course_id + '&course_name=' + course_name +'&number_correction=' + number_correction;
         });
-//        $('input.inputs_score').
+
+        // Highlight selected row
         $("tr > td > input").focus(function(e){
           $(this).parent().parent().addClass('highlight');
         }).blur(function(e){
