@@ -18,6 +18,9 @@
         .exam_room {
             width: 1.8cm !important;
         }
+        .footer {
+            bottom: 20px !important;
+        }
 
         table th {
             background-color: grey;
@@ -47,6 +50,9 @@
             }
             .exam_room {
                 width: 1.8cm !important;
+            }
+            .footer {
+                bottom: 20px !important;
             }
         }
     </style>
