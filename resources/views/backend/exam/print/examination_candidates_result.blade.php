@@ -79,7 +79,7 @@
                     <tr>
                         <th width="1.2cm" class="center">ល.រ</th>
                         <th width="1.2cm" class="center">បង្កាន់ ដៃ</th>
-                        <th width="1.2cm" class="center">បន្ទប់ប្រលង</th>
+                        <th width="1.25cm" class="center">បន្ទប់ប្រលង</th>
                         <th class="left">ឈ្មោះជាភាសាខ្មែរ</th>
                         <th class="left">ឈ្មោះជាឡាតាំង</th>
                         <th width="1cm" class="center">ភេទ</th>
