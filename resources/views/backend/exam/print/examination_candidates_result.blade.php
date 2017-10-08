@@ -133,7 +133,7 @@
 
                 <div class="footer">
                     <hr/>
-                    <span>Concours d'entree ITC 2016</span>
+                    <span>Concours d'entree ITC {{ $academic_year->id - 1 }}</span>
                     <span class="pull-right">Page {{$page_number}} sur {{$total_page}}</span>
                 </div>
             </div>
@@ -154,7 +154,7 @@
 
                     <div class="col-sm-5 no-padding pull-right" style="font-size: 10pt;">
                         <div class="col-sm-12 no-padding text-center">
-                            ធ្វើនៅភ្នំពេញ ថ្ងៃទី ០៩ ខែ តុលា ឆ្នាំ ២០១៦
+                            ធ្វើនៅភ្នំពេញ ថ្ងៃទី ០៩ ខែ តុលា ឆ្នាំ ២០១៧
                         </div>
                         <div class="col-sm-12 no-padding text-center">
                             នាយកវិទ្យាស្ថានបច្ចេកវិទ្យាកម្ពុជា
