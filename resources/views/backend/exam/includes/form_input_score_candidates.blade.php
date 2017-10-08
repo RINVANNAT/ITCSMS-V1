@@ -349,11 +349,11 @@
                 $('.inputs_score').eq(index).focus().select();
             }
       });
-      $('.inputs_score').on('focus',function(e){
-        console.log("CELL: "+ $('.inputs_score').index(this));
-        console.log("TD: "+ $(this).parent().index());
-        console.log("Total: "+total_candidate);
-      });
+//      $('.inputs_score').on('focus',function(e){
+//        console.log("CELL: "+ $('.inputs_score').index(this));
+//        console.log("TD: "+ $(this).parent().index());
+//        console.log("Total: "+total_candidate);
+//      });
       // calculation input value on each row
       var length = JSON.parse('<?php echo $i ?>');
       calculateSum(length);

@@ -4,7 +4,6 @@
 @stop
 @section('after-styles-end')
     <style>
-
         table th, table td {
             text-align: center;
             padding-top: 3px !important;
@@ -28,7 +27,12 @@
             .table-bordered > tfoot > tr > td {
                 border:2px solid #000000 !important;
             }
+            .page {
+                min-height: 290mm;
+                height: 290mm;
+            }
         }
+
     </style>
 @stop
 @section('content')
