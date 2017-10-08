@@ -19,7 +19,7 @@
             width: 1.8cm !important;
         }
         .footer {
-            bottom: 20px !important;
+            bottom: 25px !important;
         }
 
         table th {
@@ -52,7 +52,7 @@
                 width: 1.8cm !important;
             }
             .footer {
-                bottom: 20px !important;
+                bottom: 25px !important;
             }
             .page {
                 height: 290mm;
