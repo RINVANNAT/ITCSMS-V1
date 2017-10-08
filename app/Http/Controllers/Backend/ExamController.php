@@ -772,6 +772,14 @@ class ExamController extends Controller
         })->export('xls');
     }
 
+    /**
+     * Find
+     * @param $scores
+     */
+    private function find_correct_score($scores){
+
+    }
+
     public function download_attendance_statistic(DownloadExaminationDocumentsRequest $request, $exam_id){
         $exam_scores = SecretRoomScore::join('entranceExamCourses','entranceExamCourses.id','=','secret_room_score.course_id')
             ->where('secret_room_score.exam_id',$exam_id)
@@ -789,7 +797,15 @@ class ExamController extends Controller
             ->orderBy('order_in_room', 'ASC')
             ->orderBy('sequence', 'ASC')
             ->get();
-        dd($exam_scores);
+        $exam_score_by_course = $exam_scores->groupBy('name_kh');
+
+        $exam_score_by_course->each(function ($item, $key) {
+           $exam_score_by_room = $item->groupBy('roomcode');
+           $exam_score_by_room->each(function($item,$key) {
+               $exam_score_by_order = $item->groupBy('order_in_room');
+                dd($exam_score_by_order);
+           });
+        });
         return view('backend.exam.print.attendance_statistic');
     }
 
@@ -2379,19 +2395,22 @@ class ExamController extends Controller
     }
 
     public function printCandidateResultLists(Request $request) {
-
         if($request->status == 'request_print_page') {
             return Response::json(['status'=> true]);
         } else {
+            $academic_year = Exam::leftJoin('academicYears','exams.academic_year_id','=','academicYears.id')
+                ->where('exams.id',$request->exam_id)
+                ->select('academicYears.id')
+                ->first();
             $candidateRes = $this->getCandidateResult($request->exam_id);
 
             if($candidateRes) {
                 $status = true;
 //                $candidatesResults = array_chunk($candidatesResults, 30);
-                return view('backend.exam.print.examination_candidates_result', compact('candidateRes', 'status'));
+                return view('backend.exam.print.examination_candidates_result', compact('candidateRes', 'status','academic_year'));
             } else {
                 $status = false;
-                return view('backend.exam.print.examination_candidates_result', compact('status'));
+                return view('backend.exam.print.examination_candidates_result', compact('status','academic_year'));
             }
         }
     }
