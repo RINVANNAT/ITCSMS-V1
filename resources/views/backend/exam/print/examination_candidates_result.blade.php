@@ -15,6 +15,9 @@
         .font_small {
             font-size: 13px;
         }
+        .exam_room {
+            width: 1.8cm !important;
+        }
 
         table th {
             background-color: grey;
@@ -41,6 +44,9 @@
             .table-bordered > tbody > tr > td,
             .table-bordered > tfoot > tr > td {
                 border:1px solid #000000 !important;
+            }
+            .exam_room {
+                width: 1.8cm !important;
             }
         }
     </style>
@@ -79,7 +85,7 @@
                     <tr>
                         <th width="1.2cm" class="center">ល.រ</th>
                         <th width="1.2cm" class="center">បង្កាន់ ដៃ</th>
-                        <th width="1.8cm" class="center">បន្ទប់ប្រលង</th>
+                        <th class="center exam_room">បន្ទប់ប្រលង</th>
                         <th class="left">ឈ្មោះជាភាសាខ្មែរ</th>
                         <th class="left">ឈ្មោះជាឡាតាំង</th>
                         <th width="1cm" class="center">ភេទ</th>
