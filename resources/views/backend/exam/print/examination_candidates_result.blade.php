@@ -72,7 +72,7 @@
                 @if($page_number == 1)
                     <center>
                     <h3>បញ្ជីរាយឈ្មោះបេក្ខជន ជាប់ {{$key}} ចូលរៀនថ្នាក់ឆ្នាំសិក្សាមូលដ្ឋាន</h3>
-                    <h3>នៅ​ វបក សម្រាប់ឆ្នាំសិក្សា ២០១៦-២០១៧</h3>
+                    <h3>នៅ​ វបក សម្រាប់ឆ្នាំសិក្សា ២០១៧-២០១៨</h3>
                     </center>
                 @endif
                 <table class="table table-bordered" width="100%">
@@ -121,7 +121,7 @@
 
                         <div class="col-sm-5 no-padding pull-right" style="font-size: 10pt;">
                             <div class="col-sm-12 no-padding text-center">
-                                ធ្វើនៅភ្នំពេញ ថ្ងៃទី ០៩ ខែ តុលា ឆ្នាំ ២០១៦
+                                ធ្វើនៅភ្នំពេញ ថ្ងៃទី ០៩ ខែ តុលា ឆ្នាំ ២០១៧
                             </div>
                             <div class="col-sm-12 no-padding text-center">
                                 នាយកវិទ្យាស្ថានបច្ចេកវិទ្យាកម្ពុជា
