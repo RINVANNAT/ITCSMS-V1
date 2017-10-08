@@ -2389,7 +2389,7 @@ class ExamController extends Controller
 //        $candidateResults = array_merge((array) $candidateTmp1, (array) $candidateTmp2);
 
 
-        return array('ស្ថាពរ'=>$studentPassed, 'បំរុង'=>$studentReserved);
+        return array('ស្ថាពរ'=>$studentPassed, 'បម្រុង'=>$studentReserved);
 
 
     }
@@ -2426,7 +2426,8 @@ class ExamController extends Controller
             ->select(
                 'studentBac2s.can_id',
                 'candidates.result',
-                'candidates.total_score'
+                'candidates.total_score',
+                'candidates.can_id'
             )
             ->orderBy('candidates.total_score', 'DESC')
             ->get();
@@ -2450,6 +2451,8 @@ class ExamController extends Controller
             }
             $last = $cand;
         }
+
+        dd($cands);
 
         // Lists candidates who have register to ITC
         $candsRegister = DB::table('candidatesFromMoeys')
@@ -2558,6 +2561,10 @@ class ExamController extends Controller
             });
 
         })->export('xls');
+    }
+
+    public function export_candidate_ministry_list_v2($exam_id) {
+
     }
 
     public function export_candidate_result_list ($exam_id) {
@@ -2764,6 +2771,7 @@ class ExamController extends Controller
                 'highSchools.name_kh as highschool',
                 'origins.name_kh as origin',
                 'candidates.bac_year',
+                'candidates.register_from',
                 'math.name_en as math_grade',
                 'phys.name_en as phys_grade',
                 'chem.name_en as chem_grade',
@@ -2867,55 +2875,30 @@ class ExamController extends Controller
                         $result = "";
                     }
 
-                    if(in_array($candidate->can_id,$candsRegister)) {
-                        $row = array(
-                            $order,
-                            $candidate->room_name,
-                            crypt::decrypt($candidate->roomcode),
-                            $candidate->register_id,
-                            $candidate->name_kh,
-                            $candidate->name_latin,
-                            $candidate->gender,
-                            Carbon::createFromFormat('Y-m-d H:i:s',$candidate->dob)->format("d/m/Y"),
-                            $candidate->highschool,
-                            $candidate->origin,
-                            'Ministry',
-                            $candidate->bac_year,
-                            $candidate->math_grade,
-                            $candidate->phys_grade,
-                            $candidate->chem_grade,
-                            $candidate->grade,
-                            $candidate->percentile,
-                            $candidate->can_id,
-                            $candidate->total_score,
-                            $result,
-                            $rank
-                        );
-                    } else {
-                        $row = array(
-                            $order,
-                            $candidate->room_name,
-                            crypt::decrypt($candidate->roomcode),
-                            $candidate->register_id,
-                            $candidate->name_kh,
-                            $candidate->name_latin,
-                            $candidate->gender,
-                            Carbon::createFromFormat('Y-m-d H:i:s',$candidate->dob)->format("d/m/Y"),
-                            $candidate->highschool,
-                            $candidate->origin,
-                            'ITC',
-                            $candidate->bac_year,
-                            $candidate->math_grade,
-                            $candidate->phys_grade,
-                            $candidate->chem_grade,
-                            $candidate->grade,
-                            $candidate->percentile,
-                            $candidate->can_id,
-                            $candidate->total_score,
-                            $result,
-                            $rank
-                        );
-                    }
+                    $row = array(
+                        $order,
+                        $candidate->room_name,
+                        crypt::decrypt($candidate->roomcode),
+                        $candidate->register_id,
+                        $candidate->name_kh,
+                        $candidate->name_latin,
+                        $candidate->gender,
+                        Carbon::createFromFormat('Y-m-d H:i:s',$candidate->dob)->format("d/m/Y"),
+                        $candidate->highschool,
+                        $candidate->origin,
+                        $candidate->register_from,
+                        $candidate->bac_year,
+                        $candidate->math_grade,
+                        $candidate->phys_grade,
+                        $candidate->chem_grade,
+                        $candidate->grade,
+                        $candidate->percentile,
+                        $candidate->can_id,
+                        $candidate->total_score,
+                        $result,
+                        $rank
+                    );
+
                     foreach($allCourses as $allCourse) {
                         $elements =  array(
                             $allCandidates[$candidate->register_id][$allCourse->name_kh]['score_c'],
