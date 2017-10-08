@@ -15,7 +15,6 @@
                 font-size: 28px;
             }
 
-
             .modal {
                 position: fixed;
                 top: 0;

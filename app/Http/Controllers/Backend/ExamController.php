@@ -22,6 +22,7 @@ use App\Models\ExamRoom;
 use App\Models\ExamType;
 use App\Models\Origin;
 use App\Models\Room;
+use App\Models\SecretRoomScore;
 use App\Models\Student;
 use App\Models\StudentAnnual;
 use App\Models\StudentBac2;
@@ -771,6 +772,27 @@ class ExamController extends Controller
         })->export('xls');
     }
 
+    public function download_attendance_statistic(DownloadExaminationDocumentsRequest $request, $exam_id){
+        $exam_scores = SecretRoomScore::join('entranceExamCourses','entranceExamCourses.id','=','secret_room_score.course_id')
+            ->where('secret_room_score.exam_id',$exam_id)
+            ->select(
+                'roomcode',
+                'secret_room_score.id',
+                'order_in_room',
+                'score_c',
+                'score_w',
+                'score_na',
+                'sequence',
+                'entranceExamCourses.name_kh'
+            )
+            ->orderBy('roomcode', 'ASC')
+            ->orderBy('order_in_room', 'ASC')
+            ->orderBy('sequence', 'ASC')
+            ->get();
+        dd($exam_scores);
+        return view('backend.exam.print.attendance_statistic');
+    }
+
     public function download_attendance_list(DownloadExaminationDocumentsRequest $request, $exam_id){
 
         $academic_year = Exam::leftJoin('academicYears','exams.academic_year_id','=','academicYears.id')
@@ -891,8 +913,6 @@ class ExamController extends Controller
         return view('backend.exam.print.candidate_list_dut',compact('chunk_candidates','departments'));
     }
 
-
-
     public function export_candidate_dut_detail (DownloadExaminationDocumentsRequest $request,$exam_id) {
 
         $allDutCands = [];
@@ -993,7 +1013,6 @@ class ExamController extends Controller
 
     }
 
-
     private function getCandidateFromDB($exam_id) {
 
         $candidates = Candidate::where('exam_id',$exam_id)
@@ -1028,8 +1047,6 @@ class ExamController extends Controller
 
         return $candidates;
     }
-
-
 
     public function export_candidate_dut_list (DownloadExaminationDocumentsRequest $request,$exam_id) {
 
@@ -1119,14 +1136,10 @@ class ExamController extends Controller
     }
 
     public function download_candidate_list_ing(DownloadExaminationDocumentsRequest $request,$exam_id){
-//        $exam = $this->exams->findOrThrowException($exam_id);
-//        $candidates = $exam->candidates()
-//            ->with('gender')
-//            ->with('origin')
-//            ->with('bacTotal')
-//            ->orderBy('register_id')
-//            ->get()->toArray();
-
+        $academic_year = Exam::leftJoin('academicYears','exams.academic_year_id','=','academicYears.id')
+            ->where('exams.id',$exam_id)
+            ->select('academicYears.id')
+            ->first();
         $candidates = Candidate::where('exam_id',$exam_id)
                         ->leftJoin('genders','candidates.gender_id','=','genders.id')
                         ->leftJoin('origins','candidates.province_id','=','origins.id')
@@ -1150,7 +1163,7 @@ class ExamController extends Controller
         $chunk_candidates = array_chunk($candidates,43);
 
 
-        return view('backend.exam.print.candidate_list_ing',compact('chunk_candidates'));
+        return view('backend.exam.print.candidate_list_ing',compact('chunk_candidates','academic_year'));
     }
 
     public function download_registration_statistic(DownloadExaminationDocumentsRequest $request,$exam_id){
@@ -1343,7 +1356,6 @@ class ExamController extends Controller
         }
 
     }
-
 
     public function download_dut_registration_statistic ($exam_id) {
 
@@ -1653,7 +1665,6 @@ class ExamController extends Controller
         return view('backend.exam.print.dut_result_statistic',compact('candidates', 'allDepts', 'arrayGrades', 'totalBydept','total_dept_grade'));
     }
 
-
     private function studentDUTRegistration($exam_id) {
 
 
@@ -1706,7 +1717,6 @@ class ExamController extends Controller
 
 
     }
-
 
     public function download_student_dut_registration_statistic($exam_id) {
 
@@ -1834,7 +1844,6 @@ class ExamController extends Controller
         return view('backend.exam.includes.popup_add_input_score_course',compact('exam_id', 'courses'));
     }
 
-
     public function getAllRooms($exam_id, Request $request) { // From select course, roomcode, correction number form
 
         $correction = $request->number_correction;
@@ -1859,7 +1868,6 @@ class ExamController extends Controller
         return $roomFromDB;
 
     }
-
 
     private  function roomWithNotInputtedScoreCandidate ($exam_id, $correction, $entranceCourseId) {
 
@@ -2374,11 +2382,8 @@ class ExamController extends Controller
 
         if($request->status == 'request_print_page') {
             return Response::json(['status'=> true]);
-
         } else {
-
             $candidateRes = $this->getCandidateResult($request->exam_id);
-
 
             if($candidateRes) {
                 $status = true;
@@ -2939,7 +2944,6 @@ class ExamController extends Controller
         return $updateCandidateScore;
     }
 
-
     public function printCandidateErrorScore($examId, Request $request) {
 
         $errors = $this->exams->getErrorScore($examId,$request->get('course_id'));
@@ -2947,8 +2951,6 @@ class ExamController extends Controller
 
         return view('backend.exam.print.candidate_score_error', compact('errors', 'courseName'));
     }
-
-
 
     public function generate_room(GenerateRoomExamRequest $request, $exam_id){ // In candidate section
 
@@ -3017,15 +3019,12 @@ class ExamController extends Controller
         return view('backend.exam.includes.popup_view_missing_candidate', compact('missing'));
     }
 
-
     public function formGenerateScores($examId) {
 
         $departments = $this->getAllDepartments();
 
         return view('backend.exam.includes.form_generate_DUT_score', compact('examId', 'departments'));
     }
-
-
 
     private function isAvalaibleDept($arrayNumberOfCandInEachDept, $deptId, $studentRate, $findsum) {
 
@@ -3255,7 +3254,6 @@ class ExamController extends Controller
         }
     }
 
-
     private function updateCandiateDepartment($candidate_id, $department_id, $rank, $result) {
 
         $res = DB::table('candidate_department')
@@ -3316,7 +3314,6 @@ class ExamController extends Controller
 
         return $candidateDept;
     }
-
 
     private function getAllDUTCandidates($examId) {
 
@@ -3416,8 +3413,6 @@ class ExamController extends Controller
             return array($uniqueDept, $allStudentByDept);
         }
     }
-
-
 
     public function exportData($examId) {
 

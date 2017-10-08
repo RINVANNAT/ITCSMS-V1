@@ -9,6 +9,9 @@
             </div>
             <!-- /.box-header -->
             <div class="box-body">
+                <div class="box-header with-border">
+                    <h4 class="box-title">Candidate Registration</h4>
+                </div>
                 <div class="row">
                     @if($exam->type_id == 2)
 
@@ -50,22 +53,27 @@
 
                     @if($exam->type_id == 1)
                         <div class="img">
-                            <a target="_blank" href="{{route('admin.exam.download_candidate_list_ing',$exam->id)}}">
-                                <div class="desc">Candidate Engineer List</div>
-                            </a>
+                            <div class="desc">Candidate Engineer List</div>
+                            <div class="desc">
+                                <a target="_blank" href="{{route('admin.exam.download_candidate_list_ing',$exam->id)}}">
+                                    <button  class="btn btn-primary btn-xs"> Print </button>
+                                </a>
+                            </div>
                         </div>
 
                         <div class="img">
-                            <a target="_blank" href="{{route('admin.exam.download_registration_statistic',$exam->id)}}">
-                                <div class="desc">Registration Statistic</div>
-                            </a>
+                            <div class="desc">Registration <br/> Statistic</div>
+                            <div class="desc">
+                                <a target="_blank" href="{{route('admin.exam.download_registration_statistic',$exam->id)}}">
+                                    <button  class="btn btn-primary btn-xs"> Print </button>
+                                </a>
+                            </div>
                         </div>
                     @endif
 
                 </div>
                 @if($exam->type_id == 2)
                     <div class="row">
-
                         <div class="img">
                             @permission('download-examination-document')
                             <div class="desc">Successfully Passed DUT</div>
@@ -128,8 +136,10 @@
 
 
                 @if($exam->type_id == 1)
+                <div class="box-header with-border">
+                    <h4 class="box-title">Exam Preparation</h4>
+                </div>
                 <div class="row">
-
                     <div class="img">
                         @permission('download-examination-document')
                             <div class="desc">Candidate Attendance List By Course</div>
@@ -251,6 +261,20 @@
 
                         @endauth
 
+                    </div>
+                </div>
+
+                <div class="box-header with-border">
+                    <h4 class="box-title">Examination Statistic</h4>
+                </div>
+                <div class="row">
+                    <div class="img">
+                        <div class="desc">Absence Statistic By Course | M/F</div>
+                        <div class="desc">
+                            <a target="_blank" href="{{route('admin.exam.download_attendance_statistic',$exam->id)}}">
+                                <button  class="btn btn-primary btn-xs"> Print </button>
+                            </a>
+                        </div>
                     </div>
                 </div>
                 @endif
