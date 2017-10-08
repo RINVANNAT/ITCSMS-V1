@@ -55,8 +55,8 @@
                 bottom: 25px !important;
             }
             .page {
-                height: 290mm;
-                min-height: 290mm;
+                height: 288mm !important;
+                min-height: 288mm !important;
             }
         }
     </style>
