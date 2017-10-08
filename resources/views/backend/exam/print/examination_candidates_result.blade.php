@@ -52,11 +52,11 @@
                 width: 1.8cm !important;
             }
             .footer {
-                bottom: 25px !important;
+                bottom: 30px !important;
             }
             .page {
-                height: 288mm !important;
-                min-height: 288mm !important;
+                height: 285mm !important;
+                min-height: 285mm !important;
             }
         }
     </style>
