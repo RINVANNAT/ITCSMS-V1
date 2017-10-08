@@ -54,6 +54,10 @@
             .footer {
                 bottom: 20px !important;
             }
+            .page {
+                height: 290mm;
+                min-height: 290mm;
+            }
         }
     </style>
 @stop
@@ -144,7 +148,7 @@
                 @endif
 
                 <div class="footer">
-                    <hr/>
+                    <hr style="margin-top: 5px; margin-bottom: 10px"/>
                     <span>Concours d'entree ITC {{ $academic_year->id - 1 }}</span>
                     <span class="pull-right">Page {{$page_number}} sur {{$total_page}}</span>
                 </div>
