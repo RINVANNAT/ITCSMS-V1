@@ -2622,10 +2622,8 @@ class ExamController extends Controller
         foreach ($dhes as &$dhe) {
             $passed_candidate_ranking = $passed_candidate_rankings->get($dhe->can_id);
             $dhe->result = $passed_candidate_ranking==null?"N/A":$passed_candidate_ranking->result;
-            $dhe->ranking = $passed_candidate_ranking==null?"N/A":$passed_candidate_ranking->ranking;
+            $dhe->rank = $passed_candidate_ranking==null?"N/A":$passed_candidate_ranking->rank;
         }
-
-//        dd($dhes->groupBy("result"));
 
         Excel::create('Student Result To Send to DHE', function($excel) use ($dhes) {
 
@@ -2670,7 +2668,7 @@ class ExamController extends Controller
                         $candidate->math_grade,
                         $candidate->phys_grade,
                         $candidate->chem_grade,
-                        $candidate->ranking,
+                        $candidate->rank,
                         $result,
                         $candidate->can_id
                     );
