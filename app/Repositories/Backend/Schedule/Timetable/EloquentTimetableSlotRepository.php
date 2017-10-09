@@ -1030,9 +1030,4 @@ class EloquentTimetableSlotRepository implements TimetableSlotRepositoryContract
         }
         return array($groupStudentsLanguage, $groups);
     }
-
-    public function test()
-    {
-        return 100;
-    }
 }

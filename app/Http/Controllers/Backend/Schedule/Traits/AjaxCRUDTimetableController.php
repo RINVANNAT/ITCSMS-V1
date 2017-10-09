@@ -918,4 +918,56 @@ trait AjaxCRUDTimetableController
         $configuration = Configuration::find(request('id'));
         return Response::json(['status' => true, 'start' => (new Carbon($configuration->created_at))->toDateString(), 'end' => (new Carbon($configuration->updated_at))->toDateString()]);
     }
+
+    public function search_course_session()
+    {
+        $academic_year_id = request('academic');
+        $department_id = request('department');
+        $degree_id = request('degree');
+        $grade_id = request('grade');
+        $semester_id = request('semester');
+        $option_id = (request('option') == null ? null : (request('option') == '' ? null : request('option')));
+        $group_id = request('group') == null ? null : request('group');
+
+        // dd(request()->all());
+
+        $course_sessions = DB::table('course_annuals')
+            ->where([
+                ['course_annuals.academic_year_id', $academic_year_id],
+                ['course_annuals.department_id', $department_id],
+                ['course_annuals.degree_id', $degree_id],
+                ['course_annuals.grade_id', $grade_id],
+                ['course_annuals.semester_id', $semester_id],
+                ['course_annuals.department_option_id', $option_id],
+            ])
+            ->join('slots', 'slots.course_annual_id', '=', 'course_annuals.id')
+            ->leftJoin('employees', 'employees.id', '=', 'slots.lecturer_id')
+            ->where('slots.group_id', '=', $group_id)
+            ->where([
+                ['slots.time_remaining', '>', 0],
+                ['course_annuals.name_en', 'like', '%' . request('query') . '%'],
+            ])
+            ->select(
+                'slots.id as id',
+                'slots.course_session_id as course_session_id',
+                'slots.time_tp as tp',
+                'slots.time_td as td',
+                'slots.time_course as tc',
+                'slots.time_remaining as remaining',
+                'course_annuals.name_en as course_name',
+                'employees.name_latin as teacher_name'
+            )->get();
+
+        // dd($course_sessions);
+        if (count($course_sessions) > 0) {
+            return Response::json([
+                'status' => true,
+                'course_sessions' => $course_sessions
+            ]);
+        } else {
+            return Response::json([
+                'status' => false
+            ]);
+        }
+    }
 }
