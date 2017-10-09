@@ -2638,7 +2638,7 @@ class ExamController extends Controller
 
             $excel->sheet('បញ្ជីនិស្សិត្រ', function($sheet) use ($dhes) {
 
-                $header = array('ល.រ',"គោត្តនាមនិងនាម","ភេទ","ថ្ងៃខែឆ្នាំកំណើត","មកពីវិទ្យាល័យ","ខេត្តក្រុង","ឆ្នាំជាប់ទុតិយភូមិ","គណិតវិទ្យា","រូបវិទ្យា","គីមីវិទ្យា","ចំណាត់ថ្នាក់",'CanID');
+                $header = array('ល.រ',"គោត្តនាមនិងនាម","ភេទ","ថ្ងៃខែឆ្នាំកំណើត","មកពីវិទ្យាល័យ","ខេត្តក្រុង","ឆ្នាំជាប់ទុតិយភូមិ","គណិតវិទ្យា","រូបវិទ្យា","គីមីវិទ្យា","ចំណាត់ថ្នាក់",'លទ្ធផល','CanID');
                 $sheet->setOrientation('portrait');
                 // Set top, right, bottom, left
                 $sheet->setPageMargin(array(
@@ -2665,8 +2665,12 @@ class ExamController extends Controller
                     $row = array($index,$candidate->name_kh,$candidate->gender,
                         $candidate->dob,
                         $candidate->highschool,
-                        $candidate->origin,$candidate->bac_year,
-                        $candidate->math_grade,$candidate->phys_grade,$candidate->chem_grade,
+                        $candidate->origin,
+                        $candidate->bac_year,
+                        $candidate->math_grade,
+                        $candidate->phys_grade,
+                        $candidate->chem_grade,
+                        $candidate->ranking,
                         $result,
                         $candidate->can_id
                     );
