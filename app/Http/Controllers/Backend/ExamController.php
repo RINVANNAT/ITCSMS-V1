@@ -2655,10 +2655,13 @@ class ExamController extends Controller
                 foreach ($dhes as $candidate) {
                     if($candidate->result == "Fail" || $candidate->result == "Reserve" || $candidate->result == "Reject"){
                         $result = "ធ្លាក់";
+                        $rank = '';
                     } else if ($candidate->result == "Pass"){
                         $result= "ជាប់";
+                        $rank = $candidate->rank;
                     }  else {
                         $result = $candidate->result;
+                        $rank = $candidate->rank;
                     }
                     $row = array($index,$candidate->name_kh,$candidate->gender,
                         $candidate->dob,
@@ -2668,7 +2671,7 @@ class ExamController extends Controller
                         $candidate->math_grade,
                         $candidate->phys_grade,
                         $candidate->chem_grade,
-                        $candidate->rank,
+                        $rank,
                         $result,
                         $candidate->can_id
                     );
