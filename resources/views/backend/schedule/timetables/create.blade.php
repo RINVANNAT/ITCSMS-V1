@@ -178,8 +178,8 @@
                                 + '<div class="info-box-content">'
                                 + '<span class="info-box-number">' + val.room_type + '</span>'
                                 + '<span class="info-box-number room_id hidden">' + val.id + '</span>'
-                                + '<span class="info-box-text text-muted">' + (val.desk === null ? 0 : val.desk) + ' Desk</span>'
-                                + '<span class="info-box-text text-muted">' + (val.chair === null ? 0 : val.chair) + ' Chair</span>'
+                                + '<span class="info-box-text text-muted">' + (val.desk === null ? 'N/A' : val.desk) + ' Desk</span>'
+                                + '<span class="info-box-text text-muted">' + (val.chair === null ? 'N/A' : val.chair) + ' Chair</span>'
                                 + '</div>'
                                 + '</div>'
                         });
@@ -218,8 +218,8 @@
                                 + '<div class="info-box-content">'
                                 + '<span class="info-box-number room_title">' + val.room_type + '</span>'
                                 + '<span class="info-box-number room_id hidden">' + val.id + '</span>'
-                                + '<span class="info-box-text text-muted">' + (val.desk === null ? 0 : val.desk) + ' Desk</span>'
-                                + '<span class="info-box-text text-muted">' + (val.chair === null ? 0 : val.chair) + ' Chair</span>'
+                                + '<span class="info-box-text text-muted">' + (val.desk === null ? 'N/A' : val.desk) + ' Desk</span>'
+                                + '<span class="info-box-text text-muted">' + (val.chair === null ? 'N/A' : val.chair) + ' Chair</span>'
                                 + '</div>'
                                 + '</div>';
                         });
@@ -233,8 +233,8 @@
                                 + '<div class="info-box-content">'
                                 + '<span class="info-box-number">' + val.room_type + '</span>'
                                 + '<span class="info-box-number room_id hidden">' + val.id + '</span>'
-                                + '<span class="info-box-text text-muted">' + (val.desk === null ? 0 : val.desk) + ' Desk</span>'
-                                + '<span class="info-box-text text-muted">' + (val.chair === null ? 0 : val.chair) + ' Chair</span>'
+                                + '<span class="info-box-text text-muted">' + (val.desk === null ? 'N/A' : val.desk) + ' Desk</span>'
+                                + '<span class="info-box-text text-muted">' + (val.chair === null ? 'N/A' : val.chair) + ' Chair</span>'
                                 + '</div>'
                                 + '</div>';
                         });
@@ -268,19 +268,7 @@
                         var room_item = '';
 
                         $.each(response.roomRemain, function (key, val) {
-                            var desks = null;
-                            var chairs = null
-                            if (val.desk == null) {
-                                desks = 0;
-                            } else {
-                                desks = val.desk;
-                            }
 
-                            if (val.chair == null) {
-                                chairs = 0;
-                            } else {
-                                chairs = val.chair;
-                            }
                             room_item += '<div class="info-box">'
                                 + '<span class="info-box-icon bg-aqua">'
                                 + '<span>' + val.code + '-' + val.name + '</span>'
@@ -288,26 +276,14 @@
                                 + '<div class="info-box-content">'
                                 + '<span class="info-box-number room_title">' + val.room_type + '</span>'
                                 + '<span class="info-box-number room_id hidden">' + val.id + '</span>'
-                                + '<span class="info-box-text text-muted">' + desks + ' Desk</span>'
-                                + '<span class="info-box-text text-muted">' + chairs + ' Chair</span>'
+                                + '<span class="info-box-text text-muted">' + (val.desk === null ? 'N/A' : val.desk) + ' Desk</span>'
+                                + '<span class="info-box-text text-muted">' + (val.chair === null ? 'N/A' : val.chair) + ' Chair</span>'
                                 + '</div>'
                                 + '</div>';
                         });
 
                         $.each(response.roomUsed, function (key, val) {
-                            var desks = null;
-                            var chairs = null
-                            if (val.desk == null) {
-                                desks = 0;
-                            } else {
-                                desks = val.desk;
-                            }
 
-                            if (val.chair == null) {
-                                chairs = 0;
-                            } else {
-                                chairs = val.chair;
-                            }
                             room_item += '<div class="info-box-room-use">'
                                 + '<span class="info-box-icon bg-red">'
                                 + '<span>' + val.code + '-' + val.name + '</span>'
@@ -315,8 +291,8 @@
                                 + '<div class="info-box-content">'
                                 + '<span class="info-box-number">' + val.room_type + '</span>'
                                 + '<span class="info-box-number room_id hidden">' + val.id + '</span>'
-                                + '<span class="info-box-text text-muted">' + desks + ' Desk</span>'
-                                + '<span class="info-box-text text-muted">' + chairs + ' Chair</span>'
+                                + '<span class="info-box-text text-muted">' + (val.desk === null ? 'N/A' : val.desk) + ' Desk</span>'
+                                + '<span class="info-box-text text-muted">' + (val.chair === null ? 'N/A' : val.chair) + ' Chair</span>'
                                 + '</div>'
                                 + '</div>';
                         });

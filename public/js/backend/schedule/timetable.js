@@ -197,8 +197,8 @@ function search_rooms(query) {
                         + '</span>'
                         + '<div class="info-box-content">'
                         + '<span class="info-box-number">' + val.room_type + '</span>'
-                        + '<span class="info-box-text text-muted">' + (val.desk === null ? 0 : val.desk) + ' Desk</span>'
-                        + '<span class="info-box-text text-muted">' + (val.chair === null ? 0 : val.chair) + ' Chair</span>'
+                        + '<span class="info-box-text text-muted">' + (val.desk === null ? 'N/A' : val.desk) + ' Desk</span>'
+                        + '<span class="info-box-text text-muted">' + (val.chair === null ? 'N/A' : val.chair) + ' Chair</span>'
                         + '</div>'
                         + '</div>';
                 });
