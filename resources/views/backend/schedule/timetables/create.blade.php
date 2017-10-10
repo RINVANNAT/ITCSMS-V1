@@ -353,10 +353,7 @@
                         $("#btn_clone").attr('disabled', true);
                         $('#btn_publish').attr('disabled', true);
                     }
-                    else{
-                        $("#btn_clone").attr('disabled', true);
-                        $('#btn_publish').attr('disabled', true);
-                    }
+
                     $('#timetable').fullCalendar('removeEvents');
                     $('#timetable').fullCalendar('renderEvents', response.timetableSlots, true);
                     $('#timetable').fullCalendar('changeView', 'agendaWeek');

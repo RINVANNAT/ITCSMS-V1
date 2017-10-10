@@ -76,6 +76,7 @@ class EloquentRoomRepository implements RoomRepositoryContract
         if (isset($input['building_id'])) $room->building_id = $input['building_id'];
 
         if (isset($input['is_exam_room'])) $room->is_exam_room = $input['is_exam_room'];
+        if (isset($input['is_public_room'])) $room->is_public_room = $input['is_public_room'];
 
         $room->created_at = Carbon::now();
         $room->create_uid = auth()->id();
@@ -105,6 +106,7 @@ class EloquentRoomRepository implements RoomRepositoryContract
         $room->size = $input['size'];
         $room->active = isset($input['active']) ? true : false;
         $room->room_type_id = $input['room_type_id'];
+        $room->is_exam_room = isset($input['is_exam_room']) ? true : false;
         $room->department_id = $input['department_id'];
         $room->building_id = $input['building_id'];
         $room->is_public_room = isset($input['is_public_room']) ? true : false;
