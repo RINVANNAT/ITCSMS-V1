@@ -12,42 +12,20 @@
                 <div class="panel-heading">
                     <form action="/admin/dashboard/get_teacher_timetable" method="POST" id="form_teacher_timetable">
                         <div class="pull-left">
-                            <select name="timetable_id" id="teacher_timetable" class="form-control"
+                            <select name="academic_year" id="academic_years" class="form-control"
                                     style="width: 300px;">
-                                @foreach($timetables as $timetable)
-                                    <option value="{{ $timetable->id }}">
-
-                                        @if(!is_null($timetable->group) && !is_null($timetable->option))
-                                            {{
-                                               $timetable->academicYear->name_latin. '::'
-                                               .$timetable->department->code
-                                               .$timetable->option->code. '('
-                                               .$timetable->degree->code
-                                               .$timetable->grade->code. '-'
-                                               .$timetable->group->code. ')::'
-                                               .$timetable->week->name_en
-                                            }}
-                                        @elseif(is_null($timetable->option) && !is_null($timetable->group))
-                                            {{
-                                               $timetable->academicYear->name_latin. '::'
-                                               .$timetable->department->code. '('
-                                               .$timetable->degree->code
-                                               .$timetable->grade->code. '-'
-                                               .$timetable->group->code. ')::'
-                                               .$timetable->week->name_en
-                                            }}
-                                        @elseif(!is_null($timetable->option) && is_null($timetable->group))
-                                            {{
-                                               $timetable->academicYear->name_latin. '::'
-                                               .$timetable->department->code
-                                               .$timetable->option->code. '('
-                                               .$timetable->degree->code
-                                               .$timetable->grade->code. ')::'
-                                               .$timetable->week->name_en
-                                            }}
-                                        @endif
-                                    </option>
+                                @foreach($academic_years as $academic_year)
+                                    <option value="{{ $academic_year->id }}">{{ $academic_year->name_latin }}</option>
                                 @endforeach
+
+                            </select>
+
+                            <select name="week" id="weeks" class="form-control"
+                                    style="width: 300px;">
+                                @foreach($weeks as $week)
+                                    <option value="{{ $week->id }}">{{ $week->name_en }}</option>
+                                @endforeach
+
                             </select>
 
                         </div>

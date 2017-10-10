@@ -3,12 +3,11 @@
 namespace App\Http\Controllers\Backend\Schedule\Traits;
 
 use App\Models\Schedule\Timetable\Slot;
-use App\Models\Schedule\Timetable\Timetable;
 use App\Models\Schedule\Timetable\TimetableSlot;
 use App\Repositories\Backend\Schedule\Timetable\EloquentTimetableSlotRepository;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
-use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Response;
 
 /**
@@ -31,44 +30,56 @@ trait ViewTimetableByTeacherController
         $this->viewTimetableSlotRepoByTeacher = $eloquentTimetableSlotRepository;
     }
 
+    /**
+     * @return mixed
+     */
     public function get_teacher_timetable()
     {
-        $self = request('filter_by');
-        $timetableSlots = new Collection();
+        $newTimetableSlots = DB::table('timetables')
+            ->join('timetable_slots', 'timetables.id', '=', 'timetable_slots.timetable_id')
+            ->join('departments', 'departments.id', '=', 'timetables.department_id')
+            ->join('degrees', 'degrees.id', '=', 'timetables.degree_id')
+            ->join('grades', 'grades.id', '=', 'timetables.grade_id')
+            ->join('groups', 'groups.id', '=', 'timetables.group_id')
+            ->leftJoin('rooms', 'rooms.id', '=', 'timetable_slots.room_id')
+            ->leftJoin('buildings', 'buildings.id', '=', 'rooms.building_id')
+            ->where([
+                ['timetables.academic_year_id', \request('academic_year')],
+                ['timetables.week_id', \request('week')],
+                ['timetable_slots.teacher_name', (auth()->user()->employees)[0]->name_latin],
+            ])
+            ->select(
+                'timetable_slots.id',
+                'timetable_slots.course_name as title',
+                'timetable_slots.course_name',
+                'timetable_slots.teacher_name',
+                'timetable_slots.group_merge_id as group_merge_id',
+                'timetable_slots.type as course_type',
+                'timetable_slots.start',
+                'timetable_slots.end',
+                'buildings.code as building',
+                'rooms.name as room',
+                'departments.code as department_name',
+                'degrees.code as degree_name',
+                'grades.code as grade_name',
+                'groups.code as group_name'
+            )->get();
 
-        $timetable = Timetable::find(\request('timetable_id'));
+        /*$test = new Collection();  // timetableSlots.
 
-        if ($timetable instanceof Timetable) {
-            if ($timetable instanceof Timetable) {
-                if ($self != null) {
-                    $this->viewTimetableSlotRepoByTeacher->get_timetable_slot_with_conflict_info($timetable, $timetableSlots, auth()->user()->name);
-                } else {
-                    $this->viewTimetableSlotRepoByTeacher->get_timetable_slot_with_conflict_info($timetable, $timetableSlots);
-                }
+        $newTimetableSlots = collect($newTimetableSlots)->groupBy('group_merge_id')->toArray();
+
+        foreach ($newTimetableSlots as $index => $item) {
+            $item = collect($item)->toArray();
+            $groups = new Collection();
+            foreach ($item as $subItem) {
+                $groups->push($subItem->group_name);
             }
+            array_push($item, $groups);
+            $test->push($item);
+        }*/
 
-            // get student annuals.
-            if (request('departments') < 12 && ($timetable instanceof Timetable)) {
-                // get student annuals id
-                $student_annual_ids = $this->viewTimetableSlotRepoByTeacher->find_student_annual_ids($timetable);
-                $department_languages = array(12, 13); // (english, french)
-                foreach ($department_languages as $department_language) {
-                    // get group language, [@return array(Collection $groups, Array $groups)]
-                    $groups = $this->viewTimetableSlotRepoByTeacher->get_group_student_annual_form_language($department_language, $student_annual_ids, $timetable);
-
-                    // get timetable language,
-                    $timetables = $this->viewTimetableSlotRepoByTeacher->get_timetables_form_language_by_student_annual($groups[0], $timetable, $department_language);
-
-                    // get timetable slots [@return array(timetableSlots, groupsRoom)]
-                    $timetableSlotsLang = $this->viewTimetableSlotRepoByTeacher->get_timetable_slot_language_dept($timetables, $groups[0]);
-
-                    // set timetable slots language to view.
-                    $this->viewTimetableSlotRepoByTeacher->set_timetable_slot_language($timetableSlots, $timetableSlotsLang[1], $timetableSlotsLang[0]);
-                }
-            }
-
-        }
-        return Response::json(['status' => true, 'timetable' => $timetable == null ? null : $timetable, 'timetableSlots' => $timetableSlots]);
+        return Response::json(['status' => true, 'timetableSlots' => $newTimetableSlots]);
     }
 
     /**
