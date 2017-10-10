@@ -321,7 +321,7 @@
                 timezone: 'Asia/Phnom_Penh',
                 droppable: true,
                 dragRevertDuration: 0,
-                editable: true,
+                editable: '{{ access()->allow('teacher-edit-timetable') ? true : false }}',
                 eventConstraint: {
                     start: '07:00:00',
                     end: '20:00:00'
@@ -367,6 +367,7 @@
                         if (typeof event.type !== 'undefined') {
                             object += '<span class="text-primary"> (' + event.type + ')</span> ';
                         }
+                        object += '<span class="text-primary"> (' + event.degree_name + event.grade_name + '(' +event.group_name +')-' + event.department_name + ')</span> ';
                         object += '</div>';
 
                         // check conflict lecturer and render
@@ -463,15 +464,6 @@
                 url: '/admin/dashboard/get_teacher_timetable',
                 data: $('#form_teacher_timetable').serialize(),
                 success: function (response) {
-                    if (response.timetable !== null) {
-                        if (response.timetable.completed === false) {
-                            $("#btn_clone").attr('disabled', true);
-                            $('#btn_publish').attr('disabled', false);
-                        } else {
-                            $("#btn_clone").attr('disabled', false);
-                            $('#btn_publish').attr('disabled', true);
-                        }
-                    }
                     $('#timetable_for_teacher').fullCalendar('removeEvents');
                     $('#timetable_for_teacher').fullCalendar('renderEvents', response.timetableSlots, true);
                     $('#timetable_for_teacher').fullCalendar('rerenderEvents');
@@ -492,8 +484,13 @@
                 get_teacher_timetable();
             });
 
-            $('#teacher_timetable').select2({
-                placeholder: "Timetable",
+            $('#academic_years').select2({
+                placeholder: "Academic Year",
+                allowClear: true
+            });
+
+            $('#weeks').select2({
+                placeholder: "Week",
                 allowClear: true
             });
         });
