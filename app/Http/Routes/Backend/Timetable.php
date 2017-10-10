@@ -4,7 +4,8 @@ Route::group(['namespace' => 'Schedule', 'prefix' => 'schedule', 'middleware' =>
 
     /** Http Requesting. */
     Route::get('/timetables', 'TimetableController@index')->name('admin.schedule.timetables.index');
-    Route::get('/timetables/create', 'TimetableController@create')->name('admin.schedule.timetables.create');
+    Route::get('/timetables/create/{academic?}/{department?}/{degree?}/{option?}/{grade?}/{semester?}/{group?}/{week?}', 'TimetableController@create')
+        ->name('admin.schedule.timetables.create');
     Route::get('/timetables/show/{timetable}', 'TimetableController@show')->name('admin.schedule.timetables.show');
     Route::post('/timetables/delete', 'TimetableController@delete')->name('admin.schedule.timetables.delete');
     Route::post('/timetables/publish', 'TimetableController@publish')->name('admin.schedule.timetables.publish');

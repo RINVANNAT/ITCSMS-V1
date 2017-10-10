@@ -768,7 +768,13 @@
             });
 
             // filter options
-            get_options($('select[name="department"] :selected').val());
+            @if(isset($academic_id))
+                $('select[name="department"] option:selected').val({{$department_id}});
+                $('select[name="degree"] option:selected').val({{$degree_id}});
+                $('select[name="grade"] option:selected').val({{$grade_id}});
+            @else
+                get_options($('select[name="department"] :selected').val());
+            @endif
             drag_course_session();
             get_rooms();
 
