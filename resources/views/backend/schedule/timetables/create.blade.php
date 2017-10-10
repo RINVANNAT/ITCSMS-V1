@@ -788,6 +788,7 @@
             $(document).on('click', '.fc-room', function () {
                 var dom = $(this);
                 var timetable_slot_id = $(this).parent().parent().parent().children().eq(0).attr('id');
+
                 $.ajax({
                     type: 'POST',
                     url: '/admin/schedule/timetables/remove_room_from_timetable_slot',
@@ -806,6 +807,9 @@
                         else {
                             notify('error', 'Something went wrong.', 'Remove Room');
                         }
+                    },
+                    complete: function () {
+                        get_rooms();
                     }
                 })
             });
@@ -824,7 +828,8 @@
                     success: function (response) {
                         if (response.status === true) {
                             $('.container-room').find('.side-course.course-selected').parent().children().eq(1).children().eq(0).html('<p class="fc-room">' + dom_room.find('.room_name').text() + '</p>');
-                            dom_room.remove();
+                            dom_room.find('.info-box-icon').removeClass('bg-aqua').addClass('bg-red');
+                            dom_room.css('cursor', 'not-allowed');
                             notify('success', 'Room was added', 'Add Room');
                             get_timetable_slots();
                         } else {
