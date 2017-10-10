@@ -37,3 +37,4 @@ bin/
 !/public/score/
 /public/plugins/
 /public/plugins/DataTables-1.10.15/
+/public/build/
