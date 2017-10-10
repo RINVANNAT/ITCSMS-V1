@@ -38,34 +38,22 @@ Route::group([], function() {
     Route::get('exams/{id}/download_correction_sheet', 'ExamController@download_correction_sheet')->name('admin.exam.download_correction_sheet');
     Route::get('exams/{id}/download_candidate_list_by_register_id', 'ExamController@download_candidate_list_by_register_id')->name('admin.exam.download_candidate_list_by_register_id');
     Route::get('exams/{id}/download_candidate_list_dut', 'ExamController@download_candidate_list_dut')->name('admin.exam.download_candidate_list_dut');
-
-
     Route::get('exams/{id}/download_candidate_list_ing', 'ExamController@download_candidate_list_ing')->name('admin.exam.download_candidate_list_ing');
     Route::get('exams/{id}/download_registration_statistic', 'ExamController@download_registration_statistic')->name('admin.exam.download_registration_statistic');
-
     Route::get('exams/{id}/download_dut_registration_statistic', 'ExamController@download_dut_registration_statistic')->name('admin.exam.download_dut_registration_statistic');
-
     Route::get('exams/{id}/download_dut_result_statistic', 'ExamController@download_dut_result_statistic')->name('admin.exam.download_dut_result_statistic');
-
     Route::get('exams/{id}/download_student_dut_registration_statistic', 'ExamController@download_student_dut_registration_statistic')->name('admin.exam.download_student_dut_registration_statistic');
-
-
+    Route::get('exams/{id}/download_attendance_statistic', 'ExamController@download_attendance_statistic')->name('admin.exam.download_attendance_statistic');
 
     //------download document as excel format
 
-
-
-     Route::get('exams/{id}/export_candidate_list_dut', 'ExamController@export_candidate_dut_list')->name('admin.exam.export_candidate_list_dut');
-
+    Route::get('exams/{id}/export_candidate_list_dut', 'ExamController@export_candidate_dut_list')->name('admin.exam.export_candidate_list_dut');
     Route::get('exams/{id}/export_candidate_dut_detail', 'ExamController@export_candidate_dut_detail')->name('admin.exam.export_candidate_dut_detail');
-
     Route::get('exams/{id}/export_attendance_list', 'ExamController@export_attendance_list')->name('admin.exam.export_attendance_list');
     Route::get('exams/{id}/export_candidate_list', 'ExamController@export_candidate_list')->name('admin.exam.export_candidate_list');
     Route::get('exams/{id}/export_candidate_list_by_register_id', 'ExamController@export_candidate_list_by_register_id')->name('admin.exam.export_candidate_list_by_register_id');
-
     Route::get('exams/{id}/export_candidate_result_lists', 'ExamController@export_candidate_result_list')->name('admin.exam.export_candidate_result_lists');
     Route::get('exams/{id}/export_candidate_result_detail', 'ExamController@export_candidate_result_detail')->name('admin.exam.export_candidate_result_detail');
-
     Route::get('exams/{id}/export_candidate_ministry_list', 'ExamController@export_candidate_ministry_list')->name('admin.exam.export_candidate_ministry_list');
 
 
@@ -113,20 +101,12 @@ Route::group([], function() {
 
     Route::get('exams/{id}/DUT-candidate-result-list-type', 'ExamController@getDUTCandidateResultListTypes')->name('admin.exam.dut_candidate_result_list_type');
 
-
     Route::get('exams/{id}/print-candidate-dut-result', 'ExamController@printCandidateDUTResult')->name('admin.exam.print_candidate_dut_result');
 
 //    Route::get('exams/{id}/print-candidate-dut-pass-by-dept', 'ExamController@printCandidateDUTResult')->name('admin.exam.print_candidate_dut_pass_by_dept');
 
-
-
     //-----------------------statistic chart view
-
-
-
     Route::get('exams/{id}/dut_registration_statistic', 'ExamController@requestEachChartData')->name('admin.exam.dut_registration_statistic');
-
-
     Route::get('exams/{id}/export-data', 'ExamController@exportData')->name('admin.exam.export_data');// link to get data for teacher Seng
 
 

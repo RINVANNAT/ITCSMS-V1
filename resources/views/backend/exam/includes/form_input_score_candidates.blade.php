@@ -17,12 +17,31 @@
             }
 
             .enlarge-selection{
-                margin-top: 10px;
-                font-size: 22px;
+                margin-top: 15px;
+                font-size: 40px;
                 border-radius: 0;
-                background: transparent;
-                width: 100px;
+                height: 45px;
+                border:none;
                 text-indent: 10px;
+                color:#fff;
+                background-color: #31708f;
+            }
+            #pre_room, #next_room {
+                margin-top: 18px;
+                background-color: #fff;
+                color: #444;
+                font-size: 20px;
+                border-color: #fff;
+                text-decoration: underline;
+            }
+            #pre_room:hover,#next_room:hover{
+                background-color: #fff !important;
+            }
+            #selected_room {
+                margin-top: -10px;
+            }
+            .highlight{
+                background-color: #c7d4ea;
             }
         </style>
         <div class="box-header with-border">
@@ -36,7 +55,7 @@
             <div class="container">
                 <div class="col-sm-12 no-padding" style="margin-top: -15px">
                     <div class="col-sm-4">
-                        <div class="col-sm-12 ">
+                        <div class="col-sm-12" style="margin-left: 20px">
                             <h3> {{trans('labels.backend.exams.score.form_score.room_code')}}  </h3>
                         </div>
 
@@ -44,24 +63,26 @@
                        <div>
                            {{--here we need --}}
 
-                           <div class="col-sm-12 text-center">
+                           <div class="col-sm-12 text-center" style="padding-left: 0px;padding-right: 0px;margin-left: -50px">
                                @if($preRoom != null)
-                               <div class="col-sm-3 text-info btn btn-primary no-padding enlarge-number" id="pre_room" room_id="{{$preRoom['room_id']}}"  style="margin-top: 7px">
-                                   {{ $preRoom['room_code'] }}
+                               <div class="col-sm-3 text-info btn btn-default no-padding enlarge-number" id="pre_room" room_id="{{$preRoom['room_id']}}" room_code="{{ $preRoom['room_code'] }}">
+                                   ❮ {{ $preRoom['room_code'] }}
+                               </div>
+                               @else
+                               <div class="col-sm-3">
                                </div>
                                @endif
 
-                               <div class="col-sm-4 text-info enlarge-number no-padding" id="selected_room" room_id="{{$roomId}}" style="margin-top: -10px">
-                                 <strong> <h1> {{ $roomCode }}</h1></strong>
+                               <div class="col-sm-5 text-info enlarge-number no-padding" id="selected_room" room_id="{{$roomId}}">
+                                   {!! Form::select('room',$availableRooms, $roomId, array('class'=>'form-control enlarge-selection','id'=>'room_selection')) !!}
                                </div>
                                @if($nextRoom != null)
-                               <div class="col-sm-3 text-info btn btn-primary no-padding enlarge-number" id="next_room" room_id="{{$nextRoom['room_id']}}" style="margin-top: 7px">
-                                   {{ $nextRoom['room_code'] }}
+                               <div class="col-sm-3 text-info btn btn-default no-padding enlarge-number" id="next_room" room_id="{{$nextRoom['room_id']}}" room_code="{{ $nextRoom['room_code'] }}">
+                                   {{ $nextRoom['room_code'] }} ❯
                                </div>
                                @endif
+                               <div class="col-sm-1">
 
-                               <div class="col-sm-2 ">
-                                   {!! Form::select('room',$availableRooms, null, array('class'=>'form-control enlarge-selection','id'=>'room_selection')) !!}
                                </div>
 
                            </div>
@@ -213,167 +234,168 @@
 @section('after-scripts-end')
 
 @if($status)
+    <script>
+      var total_candidate = {{count($candidates)}};
+      function ajaxRequest(method, baseUrl, baseData){
 
-        <script>
+        $.ajax({
+          type: method,
+          url: baseUrl,
+          data: baseData,
+          dataType: "json",
+          success: function(result) {
+            if(result.status) {
 
-            $("#btn_cancel_form").click(function () {
-    //                opener.update_ui_course();
-                window.close();
-            });
-
-            function ajaxRequest(method, baseUrl, baseData){
-
-                $.ajax({
-                    type: method,
-                    url: baseUrl,
-                    data: baseData,
-                    dataType: "json",
-                    success: function(result) {
-                        if(result.status) {
-
-                            notify("success","info", "{{trans('labels.backend.exams.score.message.save_success')}}");
-                        } else {
-                            notify("error","info", "{{trans('labels.backend.exams.score.message.save_duplicate')}}");
-                        }
-
-                    }
-                });
+              notify("success","info", "{{trans('labels.backend.exams.score.message.save_success')}}");
+            } else {
+              notify("error","info", "{{trans('labels.backend.exams.score.message.save_duplicate')}}");
             }
 
-            $("#btn_save_candidate_score").click(function() {
+          }
+        });
+      }
+      function calculateSum(length) {
+        var total_question = JSON.parse('{{$candidate->total_question}}');
+        for(var i=1; i<= length; i++) {
+          var sum =0;
+          $(".validate_"+i).each(function() {
+            if (!isNaN(this.value) && this.value.length != 0) {
+              var tmp = sum;
+              sum += parseInt(this.value);
+              $(this).css("background-color", "#FEFFB0");
+              $("input#total_"+i).val(tmp);
+              if( $("input#total_"+i).val() == total_question) {
+                $(".validate_"+i).css("color", "");
+                $("input#total_"+i).css("color", "");
+              } else if( $("input#total_"+i).val() == 0) {
+                $(".validate_"+i).css("color", "red");
+              } else {
+                $(".validate_"+i).css("color", "");
+                $("input#total_"+i).val(tmp).css("color", "red");
+              }
+            }
+          });
 
-                var data = $( "form.table_score" ).serializeArray();
+        }
+      }
+      $("#btn_cancel_form").click(function () {
+//                opener.update_ui_course();
+            window.close();
+        });
+      $("#btn_save_candidate_score").click(function() {
 
-                console.log(data);
-                var baseData = $( "form.table_score" ).serialize();
-                var corrector_name = $('#corrector_name').val();
-                var check =0;
-                var status = 0;
-                $.each(data, function(index, value) {
-                    if(value.name == 'score_id[]') {
-                        check++;
-                    }
-                });
+            var data = $( "form.table_score" ).serializeArray();
 
-               for(var i =1 ; i <= check; i++) {
-                   if( $("input#total_"+i).val() == 0) {
-                       status++;
-                   }
+            console.log(data);
+            var baseData = $( "form.table_score" ).serialize();
+            var corrector_name = $('#corrector_name').val();
+            var check =0;
+            var status = 0;
+            $.each(data, function(index, value) {
+                if(value.name == 'score_id[]') {
+                    check++;
+                }
+            });
+
+           for(var i =1 ; i <= check; i++) {
+               if( $("input#total_"+i).val() == 0) {
+                   status++;
                }
+           }
 
-                if(corrector_name != '' ) {
+            if(corrector_name != '' ) {
 
-                    if(status > 0) {
-                        swal({
-                            title: "Confirm",
-                            text: "{{trans('labels.backend.exams.score.message.zero_value')}}",
-                            type: "info",
-                            showCancelButton: true,
-                            cancelButtonText: "{{ trans('labels.backend.exams.score.btn_cancel') }}",
-                            confirmButtonColor: "#DD6B55",
-                            confirmButtonText: "{{ trans('labels.backend.exams.score.btn_ok') }}",
-                            closeOnConfirm: true
-                        }, function(confirmed) {
-                            if (confirmed) {
-                                ajaxRequest('POST', $( "form.table_score").attr('action')+'?corrector_name='+corrector_name, $( "form.table_score" ).serialize());
-                            }
-                        });
-                    } else {
-                        ajaxRequest('POST', $( "form.table_score").attr('action')+'?corrector_name='+corrector_name, $( "form.table_score" ).serialize());
-                    }
-                } else {
-
-                    notify("error","info", "{{trans('labels.backend.exams.score.message.corrector_missing')}}");
-                }
-            });
-
-            // to disable of string inputted
-            $(".number_only").keypress(function (e) {
-                if (e.which != 8 && e.which != 0 && (e.which < 48 || e.which > 57)) {
-                    return false;
-                }
-            });
-
-            // when typing enter key to focus on the under input field
-            $('.inputs_score').keydown(function (e) {
-                if (e.which === 13) {
-                    var index = $('.inputs_score').index(this) + 3;
-                    $('.inputs_score').eq(index).focus().select();
-                }
-            });
-
-            // calculation input value on each row
-
-            var length = JSON.parse('<?php echo $i ?>');
-            calculateSum(length);
-
-            for(var k=1; k<=length; k++) {
-
-                $('.validate_'+k).on('keyup', function() {
-
-                    calculateSum(length);
-
-                });
-            }
-            function calculateSum(length) {
-
-                var total_question = JSON.parse('{{$candidate->total_question}}');
-
-                for(var i=1; i<= length; i++) {
-                    var sum =0;
-                    $(".validate_"+i).each(function() {
-                        if (!isNaN(this.value) && this.value.length != 0) {
-                            var tmp = sum;
-                            sum += parseInt(this.value);
-                            $(this).css("background-color", "#FEFFB0");
-                            $("input#total_"+i).val(tmp);
-                            if( $("input#total_"+i).val() == total_question) {
-                                $(".validate_"+i).css("color", "");
-                                $("input#total_"+i).css("color", "");
-                            } else if( $("input#total_"+i).val() == 0) {
-                                $(".validate_"+i).css("color", "red");
-                            } else {
-                                $(".validate_"+i).css("color", "");
-                                $("input#total_"+i).val(tmp).css("color", "red");
-                            }
+                if(status > 0) {
+                    swal({
+                        title: "Confirm",
+                        text: "{{trans('labels.backend.exams.score.message.zero_value')}}",
+                        type: "info",
+                        showCancelButton: true,
+                        cancelButtonText: "{{ trans('labels.backend.exams.score.btn_cancel') }}",
+                        confirmButtonColor: "#DD6B55",
+                        confirmButtonText: "{{ trans('labels.backend.exams.score.btn_ok') }}",
+                        closeOnConfirm: true
+                    }, function(confirmed) {
+                        if (confirmed) {
+                            ajaxRequest('POST', $( "form.table_score").attr('action')+'?corrector_name='+corrector_name, $( "form.table_score" ).serialize());
                         }
                     });
-
+                } else {
+                    ajaxRequest('POST', $( "form.table_score").attr('action')+'?corrector_name='+corrector_name, $( "form.table_score" ).serialize());
                 }
+            } else {
+              $('#corrector_name').focus();
+              notify("error","{{trans('labels.backend.exams.score.message.corrector_missing')}}","Error");
             }
+        });
+      // to disable of string inputted
+      $(".number_only").keypress(function (e) {
+            if (e.which != 8 && e.which != 0 && (e.which < 48 || e.which > 57)) {
+                return false;
+            }
+        });
+      // when typing enter key to focus on the under input field
+      $('.inputs_score').keydown(function (e) {
+            if (e.which === 13) {
+                var column_number = $(this).parent().index();
+                var index = $('.inputs_score').index(this);
+                if(index === ((total_candidate*3)-(4-column_number))){
+                  index = column_number;
 
+                  if(index === 3) return;
+                } else {
+                  index = index + 3;
+                }
+                $('.inputs_score').eq(index).focus().select();
+            }
+      });
+//      $('.inputs_score').on('focus',function(e){
+//        console.log("CELL: "+ $('.inputs_score').index(this));
+//        console.log("TD: "+ $(this).parent().index());
+//        console.log("Total: "+total_candidate);
+//      });
+      // calculation input value on each row
+      var length = JSON.parse('<?php echo $i ?>');
+      calculateSum(length);
+      for(var k=1; k<=length; k++) {
+        $('.validate_'+k).on('keyup', function() {
+          calculateSum(length);
+        });
+      }
+    </script>
+@endif
+    <script>
+        var baseUrl = '{!! route('admin.exam.request_input_score_form', $exam_id) !!}';
+        var course_id = $('#course_id').val();
+        var course_name = '{{$subject}}';
+        var number_correction = JSON.parse('{{$number_correction}}');
 
+        $('#next_room').on('click', function(){
+            var room_id =  $(this).attr('room_id');
+            var room_code = $(this).attr('room_code');
+            window.location.href = baseUrl+'?room_id='+ room_id + '&room_code=' + room_code + '&entrance_course_id=' + course_id + '&course_name=' + course_name + '&number_correction=' + number_correction;
+        });
 
-        </script>
+        $('#pre_room').on('click', function(){
+            var room_id =  $(this).attr('room_id');
+            var room_code = $(this).attr('room_code');
+            window.location.href = baseUrl+'?room_id='+ room_id + '&room_code=' + room_code + '&entrance_course_id=' + course_id + '&course_name=' + course_name + '&number_correction=' + number_correction;
+        });
 
-    @endif
+        $('#room_selection').on('change', function() {
+            var room_id = $(this).val();
+            var room_code = $('#room_selection :selected' ).text();
+            console.log(room_id + '--' + room_code);
+            window.location.href = baseUrl+'?room_id='+ room_id + '&room_code=' + room_code + '&entrance_course_id=' + course_id + '&course_name=' + course_name +'&number_correction=' + number_correction;
+        });
 
-        <script>
-            var baseUrl = '{!! route('admin.exam.request_input_score_form', $exam_id) !!}';
-            var course_id = $('#course_id').val();
-            var course_name = '{{$subject}}';
-            var number_correction = JSON.parse('{{$number_correction}}');
-
-            $('#next_room').on('click', function(){
-                var room_id =  $(this).attr('room_id');
-                var room_code = $(this).text();
-                window.location.href = baseUrl+'?room_id='+ room_id + '&room_code=' + room_code + '&entrance_course_id=' + course_id + '&course_name=' + course_name + '&number_correction=' + number_correction;
-
-            });
-
-            $('#pre_room').on('click', function(){
-                var room_id =  $(this).attr('room_id');
-                var room_code = $(this).text();
-                window.location.href = baseUrl+'?room_id='+ room_id + '&room_code=' + room_code + '&entrance_course_id=' + course_id + '&course_name=' + course_name + '&number_correction=' + number_correction;
-            });
-
-            $('#room_selection').on('change', function() {
-                var room_id = $(this).val();
-                var room_code = $('#room_selection :selected' ).text();
-                console.log(room_id + '--' + room_code);
-                window.location.href = baseUrl+'?room_id='+ room_id + '&room_code=' + room_code + '&entrance_course_id=' + course_id + '&course_name=' + course_name +'&number_correction=' + number_correction;
-            });
-        </script>
+        // Highlight selected row
+        $("tr > td > input").focus(function(e){
+          $(this).parent().parent().addClass('highlight');
+        }).blur(function(e){
+          $(this).parent().parent().removeClass('highlight');
+        });
+    </script>
 
 @stop
 

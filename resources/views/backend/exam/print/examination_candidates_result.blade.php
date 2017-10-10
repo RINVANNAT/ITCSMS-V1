@@ -15,6 +15,12 @@
         .font_small {
             font-size: 13px;
         }
+        .exam_room {
+            width: 1.8cm !important;
+        }
+        .footer {
+            bottom: 25px !important;
+        }
 
         table th {
             background-color: grey;
@@ -41,6 +47,16 @@
             .table-bordered > tbody > tr > td,
             .table-bordered > tfoot > tr > td {
                 border:1px solid #000000 !important;
+            }
+            .exam_room {
+                width: 1.8cm !important;
+            }
+            .footer {
+                bottom: 30px !important;
+            }
+            .page {
+                height: 285mm !important;
+                min-height: 285mm !important;
             }
         }
     </style>
@@ -72,14 +88,14 @@
                 @if($page_number == 1)
                     <center>
                     <h3>បញ្ជីរាយឈ្មោះបេក្ខជន ជាប់ {{$key}} ចូលរៀនថ្នាក់ឆ្នាំសិក្សាមូលដ្ឋាន</h3>
-                    <h3>នៅ​ វបក សម្រាប់ឆ្នាំសិក្សា ២០១៦-២០១៧</h3>
+                    <h3>នៅ​ វបក សម្រាប់ឆ្នាំសិក្សា ២០១៧-២០១៨</h3>
                     </center>
                 @endif
                 <table class="table table-bordered" width="100%">
                     <tr>
                         <th width="1.2cm" class="center">ល.រ</th>
                         <th width="1.2cm" class="center">បង្កាន់ ដៃ</th>
-                        <th width="1.2cm" class="center">បន្ទប់ប្រលង</th>
+                        <th class="center exam_room">បន្ទប់ប្រលង</th>
                         <th class="left">ឈ្មោះជាភាសាខ្មែរ</th>
                         <th class="left">ឈ្មោះជាឡាតាំង</th>
                         <th width="1cm" class="center">ភេទ</th>
@@ -121,7 +137,7 @@
 
                         <div class="col-sm-5 no-padding pull-right" style="font-size: 10pt;">
                             <div class="col-sm-12 no-padding text-center">
-                                ធ្វើនៅភ្នំពេញ ថ្ងៃទី ០៩ ខែ តុលា ឆ្នាំ ២០១៦
+                                ធ្វើនៅភ្នំពេញ ថ្ងៃទី ០៩ ខែ តុលា ឆ្នាំ ២០១៧
                             </div>
                             <div class="col-sm-12 no-padding text-center">
                                 នាយកវិទ្យាស្ថានបច្ចេកវិទ្យាកម្ពុជា
@@ -132,8 +148,8 @@
                 @endif
 
                 <div class="footer">
-                    <hr/>
-                    <span>Concours d'entree ITC 2016</span>
+                    <hr style="margin-top: 5px; margin-bottom: 10px"/>
+                    <span>Concours d'entree ITC {{ $academic_year->id - 1 }}</span>
                     <span class="pull-right">Page {{$page_number}} sur {{$total_page}}</span>
                 </div>
             </div>
@@ -154,7 +170,7 @@
 
                     <div class="col-sm-5 no-padding pull-right" style="font-size: 10pt;">
                         <div class="col-sm-12 no-padding text-center">
-                            ធ្វើនៅភ្នំពេញ ថ្ងៃទី ០៩ ខែ តុលា ឆ្នាំ ២០១៦
+                            ធ្វើនៅភ្នំពេញ ថ្ងៃទី ០៩ ខែ តុលា ឆ្នាំ ២០១៧
                         </div>
                         <div class="col-sm-12 no-padding text-center">
                             នាយកវិទ្យាស្ថានបច្ចេកវិទ្យាកម្ពុជា

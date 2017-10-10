@@ -994,6 +994,7 @@ class SeedCustomsPermissions extends Seeder
                 ]
             ]
         ];
+
         $roots[] = [
             'name' => 'Absence',
             'groups' => [
@@ -1037,6 +1038,7 @@ class SeedCustomsPermissions extends Seeder
                 ]
             ]
         ];
+
         $roots[] = [
             'name' => 'EvalStatus',
             'groups' => [
@@ -2027,6 +2029,26 @@ class SeedCustomsPermissions extends Seeder
                             'display_name' => 'Remove Room From Timetable Slot',
                             'dependency' => [
                                 'view-backend', 'view-schedule-management', 'view-timetable-management'
+                            ]
+                        ]
+                    ]
+                ],
+                [
+                    'name' => 'Teacher Timetable Management',
+                    'groups' => [],
+                    'permissions' => [
+                        [
+                            'name' => 'teacher-view-timetable',
+                            'display_name' => 'Teacher View Timetable',
+                            'dependency' => [
+                                'view-backend'
+                            ]
+                        ],
+                        [
+                            'name' => 'teacher-edit-timetable',
+                            'display_name' => 'Teacher Edit Timetable',
+                            'dependency' => [
+                                'view-backend'
                             ]
                         ]
                     ]

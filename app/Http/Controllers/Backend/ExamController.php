@@ -22,6 +22,7 @@ use App\Models\ExamRoom;
 use App\Models\ExamType;
 use App\Models\Origin;
 use App\Models\Room;
+use App\Models\SecretRoomScore;
 use App\Models\Student;
 use App\Models\StudentAnnual;
 use App\Models\StudentBac2;
@@ -542,6 +543,13 @@ class ExamController extends Controller
 
         $rooms = json_decode($_POST['room_ids']);
 
+        $rooms = collect($rooms);
+        $rooms_key_by_secret_code = $rooms->keyBy('secret_code');
+        if(count($rooms)>count($rooms_key_by_secret_code)) {
+            // Some duplicate code exist
+            return Response::json(array('success'=>false,'message'=>"Duplicate secret code!"));
+        }
+        // Everything is alright.
         foreach($rooms as $room){
             DB::table('examRooms')
                 ->where('exam_id',$exam_id)
@@ -611,7 +619,8 @@ class ExamController extends Controller
                 }
 
                 $sheet->mergeCells('A1:C1');
-                $sheet->cells('A1:C'.count($rooms)+1, function($cells) {
+                $range = 'A1:C'.(count($rooms)+1);
+                $sheet->cells($range, function($cells) {
                     $cells->setAlignment('center');
                     $cells->setValignment('middle');
                 });
@@ -763,6 +772,43 @@ class ExamController extends Controller
         })->export('xls');
     }
 
+    /**
+     * Find
+     * @param $scores
+     */
+    private function find_correct_score($scores){
+
+    }
+
+    public function download_attendance_statistic(DownloadExaminationDocumentsRequest $request, $exam_id){
+        $exam_scores = SecretRoomScore::join('entranceExamCourses','entranceExamCourses.id','=','secret_room_score.course_id')
+            ->where('secret_room_score.exam_id',$exam_id)
+            ->select(
+                'roomcode',
+                'secret_room_score.id',
+                'order_in_room',
+                'score_c',
+                'score_w',
+                'score_na',
+                'sequence',
+                'entranceExamCourses.name_kh'
+            )
+            ->orderBy('roomcode', 'ASC')
+            ->orderBy('order_in_room', 'ASC')
+            ->orderBy('sequence', 'ASC')
+            ->get();
+        $exam_score_by_course = $exam_scores->groupBy('name_kh');
+
+        $exam_score_by_course->each(function ($item, $key) {
+           $exam_score_by_room = $item->groupBy('roomcode');
+           $exam_score_by_room->each(function($item,$key) {
+               $exam_score_by_order = $item->groupBy('order_in_room');
+                dd($exam_score_by_order);
+           });
+        });
+        return view('backend.exam.print.attendance_statistic');
+    }
+
     public function download_attendance_list(DownloadExaminationDocumentsRequest $request, $exam_id){
 
         $academic_year = Exam::leftJoin('academicYears','exams.academic_year_id','=','academicYears.id')
@@ -810,6 +856,11 @@ class ExamController extends Controller
     }
 
     public function download_correction_sheet(DownloadExaminationDocumentsRequest $request,$exam_id){
+        $academic_year = Exam::leftJoin('academicYears','exams.academic_year_id','=','academicYears.id')
+            ->where('exams.id',$exam_id)
+            ->select('academicYears.id')
+            ->first();
+
         $exam = $this->exams->findOrThrowException($exam_id);
         $courses = $exam->entranceExamCourses()->get();
         $rooms = $exam->rooms()->with('candidates')->get()->toArray();
@@ -822,7 +873,7 @@ class ExamController extends Controller
             return $a['roomcode'] - $b['roomcode'];
         });
 
-        return view('backend.exam.print.correction_sheet',compact('rooms','courses'));
+        return view('backend.exam.print.correction_sheet',compact('rooms','courses','academic_year'));
     }
 
     public function download_candidate_list_dut(DownloadExaminationDocumentsRequest $request,$exam_id){
@@ -877,8 +928,6 @@ class ExamController extends Controller
 
         return view('backend.exam.print.candidate_list_dut',compact('chunk_candidates','departments'));
     }
-
-
 
     public function export_candidate_dut_detail (DownloadExaminationDocumentsRequest $request,$exam_id) {
 
@@ -980,7 +1029,6 @@ class ExamController extends Controller
 
     }
 
-
     private function getCandidateFromDB($exam_id) {
 
         $candidates = Candidate::where('exam_id',$exam_id)
@@ -1015,8 +1063,6 @@ class ExamController extends Controller
 
         return $candidates;
     }
-
-
 
     public function export_candidate_dut_list (DownloadExaminationDocumentsRequest $request,$exam_id) {
 
@@ -1106,14 +1152,10 @@ class ExamController extends Controller
     }
 
     public function download_candidate_list_ing(DownloadExaminationDocumentsRequest $request,$exam_id){
-//        $exam = $this->exams->findOrThrowException($exam_id);
-//        $candidates = $exam->candidates()
-//            ->with('gender')
-//            ->with('origin')
-//            ->with('bacTotal')
-//            ->orderBy('register_id')
-//            ->get()->toArray();
-
+        $academic_year = Exam::leftJoin('academicYears','exams.academic_year_id','=','academicYears.id')
+            ->where('exams.id',$exam_id)
+            ->select('academicYears.id')
+            ->first();
         $candidates = Candidate::where('exam_id',$exam_id)
                         ->leftJoin('genders','candidates.gender_id','=','genders.id')
                         ->leftJoin('origins','candidates.province_id','=','origins.id')
@@ -1137,7 +1179,7 @@ class ExamController extends Controller
         $chunk_candidates = array_chunk($candidates,43);
 
 
-        return view('backend.exam.print.candidate_list_ing',compact('chunk_candidates'));
+        return view('backend.exam.print.candidate_list_ing',compact('chunk_candidates','academic_year'));
     }
 
     public function download_registration_statistic(DownloadExaminationDocumentsRequest $request,$exam_id){
@@ -1330,7 +1372,6 @@ class ExamController extends Controller
         }
 
     }
-
 
     public function download_dut_registration_statistic ($exam_id) {
 
@@ -1640,7 +1681,6 @@ class ExamController extends Controller
         return view('backend.exam.print.dut_result_statistic',compact('candidates', 'allDepts', 'arrayGrades', 'totalBydept','total_dept_grade'));
     }
 
-
     private function studentDUTRegistration($exam_id) {
 
 
@@ -1693,7 +1733,6 @@ class ExamController extends Controller
 
 
     }
-
 
     public function download_student_dut_registration_statistic($exam_id) {
 
@@ -1821,7 +1860,6 @@ class ExamController extends Controller
         return view('backend.exam.includes.popup_add_input_score_course',compact('exam_id', 'courses'));
     }
 
-
     public function getAllRooms($exam_id, Request $request) { // From select course, roomcode, correction number form
 
         $correction = $request->number_correction;
@@ -1846,7 +1884,6 @@ class ExamController extends Controller
         return $roomFromDB;
 
     }
-
 
     private  function roomWithNotInputtedScoreCandidate ($exam_id, $correction, $entranceCourseId) {
 
@@ -1899,6 +1936,7 @@ class ExamController extends Controller
 
         $availableRooms = $this->roomWithNotInputtedScoreCandidate($exam_id, $number_correction, $subjectId);
 
+        //dd($availableRooms);
         $all_keys= array_keys($availableRooms);
         $cur_key = array_search($roomId,$all_keys);
 
@@ -2351,28 +2389,28 @@ class ExamController extends Controller
 //        $candidateResults = array_merge((array) $candidateTmp1, (array) $candidateTmp2);
 
 
-        return array('ស្ថាពរ'=>$studentPassed, 'បំរុង'=>$studentReserved);
+        return array('ស្ថាពរ'=>$studentPassed, 'បម្រុង'=>$studentReserved);
 
 
     }
 
     public function printCandidateResultLists(Request $request) {
-
         if($request->status == 'request_print_page') {
             return Response::json(['status'=> true]);
-
         } else {
-
+            $academic_year = Exam::leftJoin('academicYears','exams.academic_year_id','=','academicYears.id')
+                ->where('exams.id',$request->exam_id)
+                ->select('academicYears.id')
+                ->first();
             $candidateRes = $this->getCandidateResult($request->exam_id);
-
 
             if($candidateRes) {
                 $status = true;
 //                $candidatesResults = array_chunk($candidatesResults, 30);
-                return view('backend.exam.print.examination_candidates_result', compact('candidateRes', 'status'));
+                return view('backend.exam.print.examination_candidates_result', compact('candidateRes', 'status','academic_year'));
             } else {
                 $status = false;
-                return view('backend.exam.print.examination_candidates_result', compact('status'));
+                return view('backend.exam.print.examination_candidates_result', compact('status','academic_year'));
             }
         }
     }
@@ -2388,7 +2426,8 @@ class ExamController extends Controller
             ->select(
                 'studentBac2s.can_id',
                 'candidates.result',
-                'candidates.total_score'
+                'candidates.total_score',
+                'candidates.can_id'
             )
             ->orderBy('candidates.total_score', 'DESC')
             ->get();
@@ -2412,6 +2451,8 @@ class ExamController extends Controller
             }
             $last = $cand;
         }
+
+        dd($cands);
 
         // Lists candidates who have register to ITC
         $candsRegister = DB::table('candidatesFromMoeys')
@@ -2520,6 +2561,10 @@ class ExamController extends Controller
             });
 
         })->export('xls');
+    }
+
+    public function export_candidate_ministry_list_v2($exam_id) {
+
     }
 
     public function export_candidate_result_list ($exam_id) {
@@ -2726,6 +2771,7 @@ class ExamController extends Controller
                 'highSchools.name_kh as highschool',
                 'origins.name_kh as origin',
                 'candidates.bac_year',
+                'candidates.register_from',
                 'math.name_en as math_grade',
                 'phys.name_en as phys_grade',
                 'chem.name_en as chem_grade',
@@ -2829,55 +2875,30 @@ class ExamController extends Controller
                         $result = "";
                     }
 
-                    if(in_array($candidate->can_id,$candsRegister)) {
-                        $row = array(
-                            $order,
-                            $candidate->room_name,
-                            crypt::decrypt($candidate->roomcode),
-                            $candidate->register_id,
-                            $candidate->name_kh,
-                            $candidate->name_latin,
-                            $candidate->gender,
-                            Carbon::createFromFormat('Y-m-d H:i:s',$candidate->dob)->format("d/m/Y"),
-                            $candidate->highschool,
-                            $candidate->origin,
-                            'Ministry',
-                            $candidate->bac_year,
-                            $candidate->math_grade,
-                            $candidate->phys_grade,
-                            $candidate->chem_grade,
-                            $candidate->grade,
-                            $candidate->percentile,
-                            $candidate->can_id,
-                            $candidate->total_score,
-                            $result,
-                            $rank
-                        );
-                    } else {
-                        $row = array(
-                            $order,
-                            $candidate->room_name,
-                            crypt::decrypt($candidate->roomcode),
-                            $candidate->register_id,
-                            $candidate->name_kh,
-                            $candidate->name_latin,
-                            $candidate->gender,
-                            Carbon::createFromFormat('Y-m-d H:i:s',$candidate->dob)->format("d/m/Y"),
-                            $candidate->highschool,
-                            $candidate->origin,
-                            'ITC',
-                            $candidate->bac_year,
-                            $candidate->math_grade,
-                            $candidate->phys_grade,
-                            $candidate->chem_grade,
-                            $candidate->grade,
-                            $candidate->percentile,
-                            $candidate->can_id,
-                            $candidate->total_score,
-                            $result,
-                            $rank
-                        );
-                    }
+                    $row = array(
+                        $order,
+                        $candidate->room_name,
+                        crypt::decrypt($candidate->roomcode),
+                        $candidate->register_id,
+                        $candidate->name_kh,
+                        $candidate->name_latin,
+                        $candidate->gender,
+                        Carbon::createFromFormat('Y-m-d H:i:s',$candidate->dob)->format("d/m/Y"),
+                        $candidate->highschool,
+                        $candidate->origin,
+                        $candidate->register_from,
+                        $candidate->bac_year,
+                        $candidate->math_grade,
+                        $candidate->phys_grade,
+                        $candidate->chem_grade,
+                        $candidate->grade,
+                        $candidate->percentile,
+                        $candidate->can_id,
+                        $candidate->total_score,
+                        $result,
+                        $rank
+                    );
+
                     foreach($allCourses as $allCourse) {
                         $elements =  array(
                             $allCandidates[$candidate->register_id][$allCourse->name_kh]['score_c'],
@@ -2925,7 +2946,6 @@ class ExamController extends Controller
         return $updateCandidateScore;
     }
 
-
     public function printCandidateErrorScore($examId, Request $request) {
 
         $errors = $this->exams->getErrorScore($examId,$request->get('course_id'));
@@ -2933,8 +2953,6 @@ class ExamController extends Controller
 
         return view('backend.exam.print.candidate_score_error', compact('errors', 'courseName'));
     }
-
-
 
     public function generate_room(GenerateRoomExamRequest $request, $exam_id){ // In candidate section
 
@@ -3003,15 +3021,12 @@ class ExamController extends Controller
         return view('backend.exam.includes.popup_view_missing_candidate', compact('missing'));
     }
 
-
     public function formGenerateScores($examId) {
 
         $departments = $this->getAllDepartments();
 
         return view('backend.exam.includes.form_generate_DUT_score', compact('examId', 'departments'));
     }
-
-
 
     private function isAvalaibleDept($arrayNumberOfCandInEachDept, $deptId, $studentRate, $findsum) {
 
@@ -3241,7 +3256,6 @@ class ExamController extends Controller
         }
     }
 
-
     private function updateCandiateDepartment($candidate_id, $department_id, $rank, $result) {
 
         $res = DB::table('candidate_department')
@@ -3302,7 +3316,6 @@ class ExamController extends Controller
 
         return $candidateDept;
     }
-
 
     private function getAllDUTCandidates($examId) {
 
@@ -3402,8 +3415,6 @@ class ExamController extends Controller
             return array($uniqueDept, $allStudentByDept);
         }
     }
-
-
 
     public function exportData($examId) {
 

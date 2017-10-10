@@ -22,6 +22,7 @@ Route::group(['namespace' => 'Schedule', 'prefix' => 'schedule', 'middleware' =>
     Route::post('timetables/get_conflict_info', 'TimetableController@get_conflict_info')->name('get_conflict_info');
     Route::post('timetables/merge_timetable_slot', 'TimetableController@merge_timetable_slot')->name('merge_timetable_slot');
     Route::post('timetables/remove_timetable_slot', 'TimetableController@remove_timetable_slot')->name('remove_timetable_slot');
+    Route::post('timetables/search_course_session', 'TimetableController@search_course_session')->name('search_course_session');
 
     /** timetable assignment */
     Route::post('timetables/export_course_session', 'TimetableController@export_course_session')->name('export_course_session');

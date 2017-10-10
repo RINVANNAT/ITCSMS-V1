@@ -3,20 +3,31 @@
         <div class="box box-default" style="border-top: 1px solid #f1f1f1;">
             <div class="box-header with-border">
                 <div class="box-tools pull-right">
-                    <button class="btn btn-primary btn-xs btn_export_course_session"
-                            data-container="body"
-                            data-toggle="popover"
-                            data-placement="left"
-                            data-trigger="hover"
-                            title="Update Course Session"
-                            data-content="After you clicked, your course session will exported.">
-                        <i class="fa fa-refresh {{--fa-pulse--}} fa-1x"></i>
-                    </button>
-
+                    <div class="row">
+                        <div class="col-xs-9 col-xs-offset-3 col-sm-9 col-sm-offset-9 col-md-9 col-md-offset-3">
+                            <div class="input-group">
+                                <input type="text"
+                                       class="form-control input-sm"
+                                       id="search_course_session"
+                                       placeholder="Search Course Session">
+                                <span class="input-group-btn">
+                                    <button class="btn btn-primary btn-sm btn_export_course_session"
+                                            data-container="body"
+                                            data-toggle="popover"
+                                            data-placement="left"
+                                            data-trigger="hover"
+                                            title="Update Course Session"
+                                            data-content="After you clicked, your course session will exported.">
+                                        <i class="fa fa-refresh"></i>
+                                    </button>
+                                </span>
+                            </div>
+                        </div>
+                    </div>
                 </div>
                 <h3 class="box-title">
-                    <i class="fa fa-drivers-license-o"></i>
-                    {{ trans('labels.backend.schedule.timetable.courses_sessions') }}
+                    <i class="fa fa-drivers-license-o" data-toggle="tooltip" data-placement="top" title="List all course sessions"></i>
+                    {{--{{ trans('labels.backend.schedule.timetable.courses_sessions') }}--}}
                 </h3>
             </div>
             <div class="box-body courses-sessions">

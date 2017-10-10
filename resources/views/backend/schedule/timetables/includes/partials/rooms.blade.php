@@ -2,8 +2,8 @@
     <div class="col-md-12">
         <div class="box box-default" style="border-top: 1px solid #f1f1f1;">
             <div class="box-header with-border">
-                <i class="fa fa-building"></i>
-                <h3 class="box-title">{{ trans('labels.backend.schedule.timetable.rooms') }}</h3>
+                <i class="fa fa-building" data-toggle="tooltip" data-placement="top" title="List all building"></i>
+                {{--<h3 class="box-title">{{ trans('labels.backend.schedule.timetable.rooms') }}</h3>--}}
                 <div class="box-tools pull-right">
                     <form id="search-rooms"
                           class="search-rooms"

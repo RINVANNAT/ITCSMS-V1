@@ -277,18 +277,19 @@ return [
             'sub_import_title' => 'Import rooms',
             'fields' => [
                 'active' => 'Is Active',
-                'public' => "Is public",
-                'name' => "Name",
-                'nb_desk' => "Total Desk",
+                'public' => 'Is public',
+                'exam' => 'Is exam',
+                'name' => 'Name',
+                'nb_desk' => 'Total Desk',
                 'nb_chair' => 'Total Chair',
                 'nb_chair_exam' => 'Chair Exam',
                 'size' => 'Size',
                 'room_type_id' => 'Room Type',
                 'building_id' => 'Building',
                 'department_id' => 'Department',
-                'description' => "Description",
-                'is_exam_room' => "Is an Exam Room",
-                'is_public_room' => "Is a Public Room"
+                'description' => 'Description',
+                'is_exam_room' => 'Is an Exam Room',
+                'is_public_room' => 'Is a Public Room'
             ]
         ],
         'roomTypes' => [
@@ -569,8 +570,8 @@ return [
                 ],
                 'message' => [
                     'save_success' => 'your record have been save!',
-                    'save_duplicate' => 'Duplicate Record!',
-                    'corrector_missing' => 'Please add the Corrector Name',
+                    'save_duplicate' => 'Duplicate record!',
+                    'corrector_missing' => 'Please add the corrector name',
                     'zero_value' => 'You have inputted 0 Value!!!',
 
                 ]

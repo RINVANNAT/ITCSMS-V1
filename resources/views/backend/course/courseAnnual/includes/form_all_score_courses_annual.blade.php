@@ -9,21 +9,16 @@
             width: 600px;
             background-color: red;
             opacity: 60;
-
         }
-
         .drop-menu {
             margin-top: 5px;
         }
-
         .pop_margin {
             margin-right: 30px;
         }
-
         .margin-left2 {
             margin-left: 5px;
         }
-
         .selection {
 
             /*width: 80px;
@@ -31,29 +26,24 @@
             height: 23px;
             margin-left: 5px;*/
         }
-
         /*@-moz-document url-prefix() { !* targets Firefox only *!
             select {
                 padding: 15px 0!important;
 
             }
         }*/
-
         .h4 {
             text-align: left;
             margin-top: -3px !important;
         }
-
         .handsontable thead tr:first-child {
             height: 80px !important;
             vertical-align: middle !important;
         }
-
         .handsontable thead tr:nth-child(2) {
             height: 50px !important;
             vertical-align: middle !important;
         }
-
         .handsontable th {
             white-space: normal !important;
         }
@@ -61,22 +51,12 @@
         .handsontable td {
             color: #000 !important;
         }
-
-        .current_row td {
-
-        gradient(to bottom, rgba(181, 209, 255, 0.34) 0, rgba(181, 209, 255, 0.34) 100 %);
-            background-image: linear-gradient(rgba(181, 209, 255, 0.5) 0px, rgba(181, 209, 255, 0.341176) 100%);
-            background-position-x: initial;
-            background-position-y: initial;
-            background-size: initial;
-            background-repeat-x: initial;
-            background-repeat-y: initial;
-            background-attachment: initial;
-            background-origin: initial;
-            background-clip: initial;
-            background-color: #fff !important;
+        .currentRow {
+            background-image: linear-gradient(rgba(181, 209, 255, 0.5) 0px, rgba(181, 209, 255, 0.341176) 100%) !important;
         }
-
+        .currentCol {
+            background-image: linear-gradient(rgba(181, 209, 255, 0.5) 0px, rgba(181, 209, 255, 0.341176) 100%) !important;
+        }
         .htAutocompleteArrow {
 
             float: right !important;
@@ -86,25 +66,20 @@
             width: 16px !important;
             text-align: center !important;
         }
-
         .handsontable td .htAutocompleteArrow:hover {
             color: #777 !important;
         }
-
         .handsontable td.area .htAutocompleteArrow {
 
             color: #d3d3d3 !important;
         }
-
         .top {
             margin-top: 5px;
             color: #0A0A0A;
         }
-
         .top a {
             color: black;
         }
-
         .col-sm-3 {
             width:16.2%;
 
@@ -114,6 +89,7 @@
         }
     </style>
 @endsection
+
 @section('content')
 
     <div class="box box-success">
@@ -268,7 +244,9 @@
     {!! Html::script('plugins/jpopup/jpopup.js') !!}
     {!! Html::script('js/backend/course/courseAnnual/all_score.js') !!}
     {{--myscript--}}
+
     <script>
+
         var table_width;
         var hotInstance;
         var print_url = "{{route('admin.course.print_total_score')}}";
@@ -284,6 +262,8 @@
             filters: true,
             dropdownMenu: ['filter_by_condition', 'filter_action_bar'],
             className: "htRight 4",
+            currentRowClassName: 'currentRow',
+            currentColClassName: 'currentCol',
             cells: function (row, col, prop) {
 
                 this.renderer = colorRenderer;

@@ -77,7 +77,7 @@
 
             <div class="alert alert-info alert-dismissible">
                 <button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>
-                <h4><i class="icon fa fa-info"></i> Welcome to ITC-School Management Information System.</h4>
+                <h4><i class="fa fa-info"></i> Welcome to ITC-School Management Information System.</h4>
                 <p>
                     This application is under construction with partial release. Please report the problems or your
                     demanding to our developers by using this <a href="{{route('admin.reporting.index')}}">REPORTING
@@ -104,7 +104,7 @@
                     <ul class="timeline timeline-inverse">
 
                         @if($teacher)
-                            @if(isset($timetables))
+                            @if(isset($timetables) && access()->allow('teacher-view-timetable'))
                                 @include('backend.dashboard.includes.timetable')
                             @endif
                             @include('backend.dashboard.teacher')

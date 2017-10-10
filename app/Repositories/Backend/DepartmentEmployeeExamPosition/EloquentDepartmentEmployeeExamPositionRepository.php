@@ -72,6 +72,11 @@ class EloquentDepartmentEmployeeExamPositionRepository extends EloquentTempEmplo
 
     }
 
+    /**
+     * @param $department_id
+     * @param $exam_id
+     * @return array
+     */
     public function getAllPositionByDepartements($department_id, $exam_id)
     {
 
@@ -83,33 +88,35 @@ class EloquentDepartmentEmployeeExamPositionRepository extends EloquentTempEmplo
 
 
         $departmentMinistryId = Department::where('name_en','Ministry')
-            ->select('name_kh','id')->get();
-        $ministryId = $departmentMinistryId->toarray();
+            ->select('name_kh','id')->first();
 
-        if((int)$ministryId[0]['id'] !== (int)$department_id) {
+        if($departmentMinistryId) {
+            if($departmentMinistryId->id !== (int)$department_id) {
 
-            $employeePositions = DB::table('employees')
-                ->join('employee_position', 'employees.id', '=', 'employee_position.employee_id')
-                ->join('positions', 'positions.id', '=', 'employee_position.position_id')
-                ->where([
-                    ['department_id', $department_id],
-                    ['employees.active', '=', true]
-                ])
-                ->whereNotIn('employees.id', $employeeWithRoleIds[0])
-                ->select('employees.id', 'employee_position.position_id', 'positions.title')->get();
+                $employeePositions = DB::table('employees')
+                    ->join('employee_position', 'employees.id', '=', 'employee_position.employee_id')
+                    ->join('positions', 'positions.id', '=', 'employee_position.position_id')
+                    ->where([
+                        ['department_id', $department_id],
+                        ['employees.active', '=', true]
+                    ])
+                    ->whereNotIn('employees.id', $employeeWithRoleIds[0])
+                    ->select('employees.id', 'employee_position.position_id', 'positions.title')->get();
 
 
 
-            foreach ($employeePositions as $employeePosition) {
+                foreach ($employeePositions as $employeePosition) {
 
-                $element = array(
-                    "id" => 'position_' . $department_id . '_' . $employeePosition->position_id,
-                    "text" => $employeePosition->title,
-                    "children" => true,
-                    "type" => "position"
-                );
-                array_push($arrayPositions, $element);
+                    $element = array(
+                        "id" => 'position_' . $department_id . '_' . $employeePosition->position_id,
+                        "text" => $employeePosition->title,
+                        "children" => true,
+                        "type" => "position"
+                    );
+                    array_push($arrayPositions, $element);
+                }
             }
+
         } else {
 
             $temporaryEmployeeWithoutRoles = TempEmployee::whereNotIn('tempEmployees.id',$employeeWithRoleIds[1] )
@@ -127,6 +134,8 @@ class EloquentDepartmentEmployeeExamPositionRepository extends EloquentTempEmplo
             }
 
         }
+
+
         $arrayPositions = array_map("unserialize", array_unique(array_map("serialize", $arrayPositions)));
         return $arrayPositions;
 

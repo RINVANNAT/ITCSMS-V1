@@ -20,6 +20,7 @@
     {!! Html::style('plugins/iCheck/all.css') !!}
     {!! Html::style('plugins/toastr/toastr.min.css') !!}
     {!! Html::style('css/backend/schedule/timetable.css') !!}
+
     <style type="text/css">
         .bg-primary {
             background-color: #337ab7 !important;
@@ -101,10 +102,6 @@
 
         <div class="box-body">
             <div class="row">
-                {{--<div class="col-md-9 col-sm-12 col-xs-12" style="overflow-x: auto">
-                    --}}{{--Timetable render--}}{{--
-                    <div id="timetable" style="width: 1345px;"></div>
-                </div>--}}
                 <div class="col-md-9 col-sm-12 col-xs-12">
                     <div id="timetable" class="view-timetable"></div>
                 </div>
@@ -356,6 +353,7 @@
                         $("#btn_clone").attr('disabled', true);
                         $('#btn_publish').attr('disabled', true);
                     }
+
                     $('#timetable').fullCalendar('removeEvents');
                     $('#timetable').fullCalendar('renderEvents', response.timetableSlots, true);
                     $('#timetable').fullCalendar('changeView', 'agendaWeek');
@@ -1001,7 +999,77 @@
                     })
                 })
 
-            })
+            });
+
+            $(document).on('keyup', '#search_course_session', function (event) {
+                event.preventDefault();
+                var query = $(this).val();
+                $.ajax({
+                    type: 'POST',
+                    url: '{{ route('search_course_session') }}',
+                    data: {
+                        _token: '{{ csrf_token() }}',
+                        academic: $('select[name=academicYear]').val(),
+                        department: $('select[name=department]').val(),
+                        degree: $('select[name=degree]').val(),
+                        option: $('select[name=option]').val(),
+                        grade: $('select[name=grade]').val(),
+                        semester: $('select[name=semester]').val(),
+                        group: $('select[name=group]').val(),
+                        week: $('select[name=weekly]').val(),
+                        query: query
+                    },
+                    success: function (response) {
+                        if (response.status === true) {
+                            var course_session_item = '';
+                            $.each(response.course_sessions, function (key, val) {
+                                if (val.teacher_name === null) {
+                                    course_session_item += '<li class="course-item disabled">';
+                                }
+                                else {
+                                    course_session_item += '<li class="course-item">';
+                                }
+                                course_session_item += '<span class="handle ui-sortable-handle">' +
+                                    '<i class="fa fa-ellipsis-v"></i> ' +
+                                    '<i class="fa fa-ellipsis-v"></i>' +
+                                    '</span>' +
+                                    '<span class="text course-name">' + val.course_name + '</span><br>';
+                                if (val.teacher_name === null) {
+                                    course_session_item += '<span style="margin-left: 28px;" class="teacher-name bg-danger badge">Unsigned</span><br/>';
+                                } else {
+                                    course_session_item += '<span style="margin-left: 28px;" class="teacher-name">' + val.teacher_name + '</span><br/>';
+                                }
+                                if (val.tp !== 0) {
+                                    course_session_item += '<span style="margin-left: 28px;" class="course-type">TP</span> : ' +
+                                        '<span class="times">' + val.remaining + '</span> H'
+                                }
+                                else if (val.td !== 0) {
+                                    course_session_item += '<span style="margin-left: 28px;" class="course-type">TD</span> : ' +
+                                        '<span class="times">' + val.remaining + '</span> H'
+                                }
+                                else {
+                                    course_session_item += '<span style="margin-left: 28px;" class="course-type">Course</span> : ' +
+                                        '<span class="times">' + val.remaining + '</span> H'
+                                }
+                                course_session_item += '<span class="text courses-session-id" style="display: none;">' + val.course_session_id + '</span><span class="text slot-id" style="display: none;">' + val.id + '</span><br>' + '</li>';
+                            });
+
+                            $('.courses.todo-list').html(course_session_item);
+                            drag_course_session()
+                        }
+                        else {
+                            $('.courses.todo-list').html("<li class='course-item'>There are no course sessions created yet.</li>");
+                        }
+                    },
+                    error: function () {
+                        swal(
+                            'Oops...',
+                            'Searching search course went wrong!',
+                            'error'
+                        );
+                    }
+                })
+            });
         });
 
     </script>
