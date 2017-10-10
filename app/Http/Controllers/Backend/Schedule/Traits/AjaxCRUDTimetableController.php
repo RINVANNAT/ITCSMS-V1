@@ -943,10 +943,11 @@ trait AjaxCRUDTimetableController
             ->join('slots', 'slots.course_annual_id', '=', 'course_annuals.id')
             ->leftJoin('employees', 'employees.id', '=', 'slots.lecturer_id')
             ->where('slots.group_id', '=', $group_id)
-            ->where([
-                ['slots.time_remaining', '>', 0],
-                ['course_annuals.name_en', 'like', '%' . request('query') . '%'],
-            ])
+            ->where('slots.time_remaining', '>', 0)
+            ->where(function ($query) {
+                $query->whereRaw('LOWER(course_annuals.name_en) LIKE ?', array('%' . strtolower(request('query')) . '%'))
+                    ->orWhereRaw('LOWER(employees.name_latin) LIKE ?', array('%' . strtolower(request('query')) . '%'));
+            })
             ->select(
                 'slots.id as id',
                 'slots.course_session_id as course_session_id',
