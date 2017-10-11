@@ -235,7 +235,7 @@ class TimetableController extends Controller
             $dept_ids = [2, 3, 5, 6];
 
             $department_id = request('department_id');
-            $options_ = DepartmentOption::where('department_id', $department_id)->get();
+            $options_ = DepartmentOption::where('department_id', $department)->get();
 
             if (in_array($department_id, $dept_ids)) {
 
