@@ -648,9 +648,13 @@
                     hide_conflict_information();
                 },
                 eventDragStop: function (event, jsEvent, ui, view) {
-                    if (isEventOverDiv(jsEvent.clientX, jsEvent.clientY)) {
-                        remove_timetable_slots(event);
-                        $('#timetable').fullCalendar('removeEvent', event.id);
+                    try {
+                        if (isEventOverDiv(jsEvent.clientX, jsEvent.clientY)) {
+                            remove_timetable_slots(event);
+                            $('#timetable').fullCalendar('removeEvent', event.id);
+                        }
+                    }catch(e){
+                        console.log(e);
                     }
                 },
                 loading: function (isLoading, view) {
