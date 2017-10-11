@@ -14,6 +14,7 @@
         .not-mine {
             border: 4px solid red;
         }
+
         .bg-primary {
             background-color: #337ab7 !important;
         }
@@ -327,7 +328,6 @@
                     end: '20:00:00'
                 },
                 eventDrop: function (event, delta, revertFunc) {
-                    console.log(100);
                     var start_date = event.start.format();
                     move_timetable_slot(event, start_date);
                     get_teacher_timetable();
@@ -367,7 +367,7 @@
                         if (typeof event.type !== 'undefined') {
                             object += '<span class="text-primary"> (' + event.type + ')</span> ';
                         }
-                        object += '<span class="text-primary"> (' + event.degree_name + event.grade_name + '(' +event.group_name +')-' + event.department_name + ')</span> ';
+                        object += '<span class="text-primary"> (' + event.degree_name + event.grade_name + '-' + event.department_name + ')</span> ';
                         object += '</div>';
 
                         // check conflict lecturer and render
@@ -404,14 +404,9 @@
                         if (typeof event.groups !== 'undefined') {
                             if (event.groups.length > 0) {
                                 var groups = '<p>Gr: ';
-                                for (var i = 0; i < event.groups.length; i++) {
-                                    if (event.groups[i] !== null) {
-                                        groups += event.groups[i].code + ' ';
-                                    }
-                                    else {
-                                        groups = '';
-                                    }
-                                }
+                                event.groups.forEach(function (ele) {
+                                    groups += ele;
+                                });
                                 groups += '</p>';
                             }
                             object += groups;
@@ -485,13 +480,11 @@
             });
 
             $('#academic_years').select2({
-                placeholder: "Academic Year",
-                allowClear: true
+                placeholder: "Academic Year"
             });
 
             $('#weeks').select2({
-                placeholder: "Week",
-                allowClear: true
+                placeholder: "Week"
             });
         });
     </script>

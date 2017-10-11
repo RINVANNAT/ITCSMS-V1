@@ -7,6 +7,7 @@ use App\Models\Schedule\Timetable\TimetableSlot;
 use App\Repositories\Backend\Schedule\Timetable\EloquentTimetableSlotRepository;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Response;
 
@@ -45,6 +46,7 @@ trait ViewTimetableByTeacherController
             ->leftJoin('buildings', 'buildings.id', '=', 'rooms.building_id')
             ->where([
                 ['timetables.academic_year_id', \request('academic_year')],
+                ['timetables.completed', true],
                 ['timetables.week_id', \request('week')],
                 ['timetable_slots.teacher_name', (auth()->user()->employees)[0]->name_latin],
             ])
@@ -65,21 +67,29 @@ trait ViewTimetableByTeacherController
                 'groups.code as group_name'
             )->get();
 
-        /*$test = new Collection();  // timetableSlots.
+        // dd($newTimetableSlots);
 
-        $newTimetableSlots = collect($newTimetableSlots)->groupBy('group_merge_id')->toArray();
-
+        $test = new Collection();  // timetableSlots.
+        $newTimetableSlots = collect($newTimetableSlots)->groupBy('group_merge_id');
         foreach ($newTimetableSlots as $index => $item) {
-            $item = collect($item)->toArray();
-            $groups = new Collection();
+            $groups = [];
             foreach ($item as $subItem) {
-                $groups->push($subItem->group_name);
+                array_push($groups, $subItem->group_name);
+                $subItem = new Collection($subItem);
+                $subItem->put('groups', $groups);
+                $test->push($subItem);
             }
-            array_push($item, $groups);
-            $test->push($item);
-        }*/
+        }
 
-        return Response::json(['status' => true, 'timetableSlots' => $newTimetableSlots]);
+        $test = collect($test)->keyBy('group_merge_id');
+        //dd($test->toArray());
+
+        $newArray = [];
+        foreach ($test->toArray() as $item) {
+            array_push($newArray, collect($item)->toArray());
+        }
+
+        return Response::json(['status' => true, 'timetableSlots' => $newArray]);
     }
 
     /**

@@ -317,18 +317,18 @@
                 url: '{!! route('get_timetable_slots') !!}',
                 data: $('#options-filter').serialize(),
                 success: function (response) {
-                    if (typeof  response.timetable === "undefined") {
-                        if (response.timetable.completed === false) {
-                            $("#btn_clone").attr('disabled', true);
-                            $('#btn_publish').attr('disabled', false);
-                        } else {
-                            $("#btn_clone").attr('disabled', false);
-                            $('#btn_publish').attr('disabled', true);
-                        }
-                    } else {
-                        $("#btn_clone").attr('disabled', true);
-                        $('#btn_publish').attr('disabled', true);
-                    }
+                    /*if (typeof  response.timetable === "undefined") {
+                     if (response.timetable.completed === false) {
+                     $("#btn_clone").attr('disabled', true);
+                     $('#btn_publish').attr('disabled', false);
+                     } else {
+                     $("#btn_clone").attr('disabled', false);
+                     $('#btn_publish').attr('disabled', true);
+                     }
+                     } else {
+                     $("#btn_clone").attr('disabled', true);
+                     $('#btn_publish').attr('disabled', true);
+                     }*/
 
                     $('#timetable').fullCalendar('removeEvents');
                     $('#timetable').fullCalendar('renderEvents', response.timetableSlots, true);
