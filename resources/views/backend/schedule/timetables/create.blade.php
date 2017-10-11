@@ -135,7 +135,6 @@
     <script type="text/javascript">
         /*Drag course session into timetable.*/
         function drag_course_session() {
-
             @if(access()->allow('drag-course-session'))
             $('.courses .course-item').each(function () {
                 // store data so the calendar knows to render an event upon drop
@@ -781,6 +780,7 @@
                 $("select[name='semester'] option[value={{ $semester_id }}]").attr('selected', true);
                 $("select[name='group'] option[value={{ $group_id }}]").attr('selected', true);
                 $("select[name='weekly'] option[value={{ $week_id }}]").attr('selected', true);
+                get_course_sessions();
             @else
                 get_options($('select[name="department"] :selected').val());
             @endif
@@ -854,6 +854,7 @@
                             notify('warning', 'Please select which course.', 'Add Room');
                             get_timetable_slots();
                         }
+                        get_rooms();
                     },
                     error: function (response) {
                         if (response.status === 403) {

@@ -47,13 +47,12 @@
                 data-toggle="tooltip"
                 data-placement="top"
                 title="{{ trans('inputs.backend.schedule.timetable.options.option') }}">
-            <option selected disabled>{{ trans('inputs.backend.schedule.timetable.options.option') }}</option>
-
             @if(isset($options_))
                 @foreach($options_ as $item)
                     <option value="{{ $item->id }}">{{ $item->code }}</option>
                 @endforeach
             @else
+                <option disabled selected>{{ trans('inputs.backend.schedule.timetable.options.option') }}</option>
                 @foreach($options as $option)
                     <option value="{{ $option->id }}">{{ $option->code }}</option>
                 @endforeach
@@ -92,10 +91,16 @@
                 data-toggle="tooltip"
                 data-placement="top"
                 title="{{ trans('inputs.backend.schedule.timetable.options.option') }}">
-            <option selected disabled>{{ trans('inputs.backend.schedule.timetable.options.option') }}</option>
-            @foreach($department->department_options as $option)
-                <option value="{{ $option->id }}">{{ $option->code }}</option>
-            @endforeach
+            @if(isset($options_))
+                @foreach($options_ as $item)
+                    <option value="{{ $item->id }}">{{ $item->code }}</option>
+                @endforeach
+            @else
+                <option disabled selected>{{ trans('inputs.backend.schedule.timetable.options.option') }}</option>
+                @foreach($department->department_options as $option)
+                    <option value="{{ $option->id }}">{{ $option->code }}</option>
+                @endforeach
+            @endif
         </select>
     @endif
 @endif
@@ -136,7 +141,9 @@
         data-toggle="tooltip"
         data-placement="top"
         title="{{ trans('inputs.backend.schedule.timetable.options.group') }}">
-    <option selected disabled>{{ trans('inputs.backend.schedule.timetable.options.group') }}</option>
+    @if($group_id != 0)
+        <option selected disabled>{{ trans('inputs.backend.schedule.timetable.options.group') }}</option>
+    @endif
     @if(isset($groups))
         @foreach($groups as $group)
             <option value="{{ $group->id }}">{{ $group->name }}</option>
