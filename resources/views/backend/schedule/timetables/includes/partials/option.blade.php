@@ -51,6 +51,12 @@
             @foreach($options as $option)
                 <option value="{{ $option->id }}">{{ $option->code }}</option>
             @endforeach
+
+            @if(isset($options_))
+                @foreach($options_ as $item)
+                    <option value="{{ $item->id }}">{{ $item->code }}</option>
+                @endforeach
+            @endif
         </select>
     @endif
 @else

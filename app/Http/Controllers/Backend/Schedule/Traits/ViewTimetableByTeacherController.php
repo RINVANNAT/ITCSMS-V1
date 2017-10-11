@@ -67,9 +67,7 @@ trait ViewTimetableByTeacherController
                 'groups.code as group_name'
             )->get();
 
-        // dd($newTimetableSlots);
-
-        $test = new Collection();  // timetableSlots.
+        $timetableSlots = new Collection();  // timetableSlots.
         $newTimetableSlots = collect($newTimetableSlots)->groupBy('group_merge_id');
         foreach ($newTimetableSlots as $index => $item) {
             $groups = [];
@@ -77,19 +75,18 @@ trait ViewTimetableByTeacherController
                 array_push($groups, $subItem->group_name);
                 $subItem = new Collection($subItem);
                 $subItem->put('groups', $groups);
-                $test->push($subItem);
+                $timetableSlots->push($subItem);
             }
         }
 
-        $test = collect($test)->keyBy('group_merge_id');
-        //dd($test->toArray());
+        $timetableSlots = collect($timetableSlots)->keyBy('group_merge_id');
 
-        $newArray = [];
-        foreach ($test->toArray() as $item) {
-            array_push($newArray, collect($item)->toArray());
+        $newArrayTimetableSlots = [];
+        foreach ($timetableSlots->toArray() as $item) {
+            array_push($newArrayTimetableSlots, collect($item)->toArray());
         }
 
-        return Response::json(['status' => true, 'timetableSlots' => $newArray]);
+        return Response::json(['status' => true, 'timetableSlots' => $newArrayTimetableSlots]);
     }
 
     /**
