@@ -3,6 +3,7 @@
 namespace App\Repositories\Backend\Schedule\Timetable;
 
 use App\Http\Requests\Backend\Schedule\Timetable\CreateTimetableRequest;
+use App\Models\Schedule\Timetable\Timetable;
 
 /**
  * Interface TimetableRepositoryContract
@@ -25,4 +26,12 @@ interface TimetableRepositoryContract
      * @return mixed
      */
     public function create_timetable(CreateTimetableRequest $request);
+
+    /**
+     * To check timetable slot has half hour.
+     *
+     * @param Timetable $timetable
+     * @return mixed
+     */
+    public function hasHalfHour(Timetable $timetable);
 }

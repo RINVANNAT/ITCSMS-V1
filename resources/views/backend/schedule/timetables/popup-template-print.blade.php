@@ -12,7 +12,6 @@
 @stop
 
 @section('content')
-
     @if(isset($timetables))
         @foreach($timetables as $timetable)
             <page size="A4" layout="portrait" class="each-page">
@@ -37,20 +36,679 @@
                         </th>
                     </tr>
                     </thead>
-                    <tbody>
-                    <tr align="center" style="height: 30px !important;">
-                        <td style="font-weight: bold;">{{ trans('labels.backend.schedule.timetable.popup_print_template.days.hours') }}</td>
-                        <td style="font-weight: bold; width: 15% !important;">{{ trans('labels.backend.schedule.timetable.popup_print_template.days.monday') }}</td>
-                        <td style="font-weight: bold; width: 15% !important;">{{ trans('labels.backend.schedule.timetable.popup_print_template.days.tuesday') }}</td>
-                        <td style="font-weight: bold; width: 15% !important;">{{ trans('labels.backend.schedule.timetable.popup_print_template.days.wednesday') }}</td>
-                        <td style="font-weight: bold; width: 15% !important;">{{ trans('labels.backend.schedule.timetable.popup_print_template.days.thursday') }}</td>
-                        <td style="font-weight: bold; width: 15% !important;">{{ trans('labels.backend.schedule.timetable.popup_print_template.days.friday') }}</td>
-                        <td style="font-weight: bold; width: 15% !important;">{{ trans('labels.backend.schedule.timetable.popup_print_template.days.saturday') }}</td>
-                    </tr>
-                    @if($timetable->degree->id != 2)
-                        {{--7 to 8--}}
+                    @if(!has_half_hour($timetable))
+                        <tbody>
+                        <tr align="center" style="height: 30px !important;">
+                            <td style="font-weight: bold;">{{ trans('labels.backend.schedule.timetable.popup_print_template.days.hours') }}</td>
+                            <td style="font-weight: bold; width: 15% !important;">{{ trans('labels.backend.schedule.timetable.popup_print_template.days.monday') }}</td>
+                            <td style="font-weight: bold; width: 15% !important;">{{ trans('labels.backend.schedule.timetable.popup_print_template.days.tuesday') }}</td>
+                            <td style="font-weight: bold; width: 15% !important;">{{ trans('labels.backend.schedule.timetable.popup_print_template.days.wednesday') }}</td>
+                            <td style="font-weight: bold; width: 15% !important;">{{ trans('labels.backend.schedule.timetable.popup_print_template.days.thursday') }}</td>
+                            <td style="font-weight: bold; width: 15% !important;">{{ trans('labels.backend.schedule.timetable.popup_print_template.days.friday') }}</td>
+                            <td style="font-weight: bold; width: 15% !important;">{{ trans('labels.backend.schedule.timetable.popup_print_template.days.saturday') }}</td>
+                        </tr>
+                        @if($timetable->degree->id != 2)
+                            {{--7 to 8--}}
+                            <tr>
+                                <td align="center" valign="middle">07h00 - 07h55</td>
+
+                                @for($i=2; $i<=7; $i++)
+                                    @php $tmp = true; @endphp
+
+                                    @foreach($timetablesSlotsLang as $timetableSlot)
+                                        @if( $i == ((new \Carbon\Carbon($timetableSlot['start']))->day) )
+                                            @if( ((new \Carbon\Carbon($timetableSlot['start']))->hour) == 7)
+                                                <td rowspan="{{ ( (new \Carbon\Carbon($timetableSlot['end']))->hour - (new \Carbon\Carbon($timetableSlot['start']))->hour) }}">
+                                                    <div class="col-md-12 text-center text-bold"
+                                                         style="margin-bottom: 10px;">{{ $timetableSlot['course_name'] }}</div>
+                                                    <div class="lang-info">
+                                                        @foreach($timetableSlot['slotsForLanguage'] as $key => $item)
+                                                            @if($key % 2 !== 0)
+                                                                <div class="lang-info-right">Gr: {{ $item['group'] }}
+                                                                    ({{ $item['building'] }}-{{$item['room']}})
+                                                                </div>
+                                                            @else
+                                                                <div class="lang-info-left">Gr: {{ $item['group'] }}
+                                                                    ({{ $item['building'] }}-{{$item['room']}})
+                                                                </div>
+                                                            @endif
+                                                            <div class="clearfix"></div>
+                                                        @endforeach
+                                                    </div>
+                                                </td>
+                                                @php $tmp = false; @endphp
+                                                @break
+                                            @endif
+                                        @endif
+                                    @endforeach
+
+                                    @foreach($timetable->timetableSlots as $timetableSlot)
+                                        @if( $i == ((new \Carbon\Carbon($timetableSlot->start))->day) )
+                                            @if( ((new \Carbon\Carbon($timetableSlot->start))->hour) == 7)
+                                                <td rowspan="{{ ( (new \Carbon\Carbon($timetableSlot->end))->hour - (new \Carbon\Carbon($timetableSlot->start))->hour) }}"
+                                                    style="position: relative !important;">
+                                                    <p style="text-align: right;">{{ $timetableSlot->type }}</p>
+                                                    <p style="text-align: center; font-weight: bold;">{{ $timetableSlot->course_name }}</p>
+                                                    <p style="text-align: center;">{{ $timetableSlot->teacher_name }}</p>
+                                                    <p style="text-align: right;">@if($timetableSlot->room != null) {{ $timetableSlot->room->name }}
+                                                        -{{ $timetableSlot->room->building->code }} @else
+                                                            NULL @endif</p>
+                                                </td>
+                                                @php $tmp = false; @endphp
+                                                @break
+                                            @endif
+                                        @endif
+                                    @endforeach
+                                    @if($tmp)
+                                        <td style="height: 60px !important;"></td>
+                                    @endif
+                                @endfor
+                            </tr>
+                            {{--8 to 9--}}
+                            <tr>
+                                <td align="center" valign="middle">08h00 - 08h55</td>
+
+                                @for($i=2; $i<=7; $i++)
+                                    @php $tmp = true; @endphp
+
+                                    @foreach($timetablesSlotsLang as $timetableSlot)
+                                        @if( $i == ((new \Carbon\Carbon($timetableSlot['start']))->day) )
+                                            @php $start = ((new \Carbon\Carbon($timetableSlot['start']))->hour); @endphp
+                                            @php $end = ((new \Carbon\Carbon($timetableSlot['end']))->hour); @endphp
+
+                                            @if(($start==7 && ($end==9 || $end==10 || $end==11)))
+                                                @php $tmp = false; @endphp
+                                                @continue
+                                            @elseif(($start==8 && ($end==9 || $end==10 || $end==11)))
+                                                <td rowspan="{{ ( (new \Carbon\Carbon($timetableSlot['end']))->hour - (new \Carbon\Carbon($timetableSlot['start']))->hour) }}">
+                                                    <div class="col-md-12 text-center text-bold"
+                                                         style="margin-bottom: 10px;">{{ $timetableSlot['course_name'] }}</div>
+                                                    @foreach($timetableSlot['slotsForLanguage'] as $key => $item)
+                                                        @if($key % 2 !== 0)
+                                                            <div class="lang-info-right">Gr: {{ $item['group'] }}
+                                                                ({{ $item['building'] }}-{{$item['room']}})
+                                                            </div>
+                                                        @else
+                                                            <div class="lang-info-left">Gr: {{ $item['group'] }}
+                                                                ({{ $item['building'] }}-{{$item['room']}})
+                                                            </div>
+                                                        @endif
+                                                    @endforeach
+                                                </td>
+                                                @php $tmp = false; @endphp
+                                                @break
+                                            @endif
+                                        @endif
+                                    @endforeach
+
+
+                                    @foreach($timetable->timetableSlots as $timetableSlot)
+                                        @if( $i == ((new \Carbon\Carbon($timetableSlot->start))->day) )
+
+                                            @php $start = ((new \Carbon\Carbon($timetableSlot->start))->hour); @endphp
+                                            @php $end = ((new \Carbon\Carbon($timetableSlot->end))->hour); @endphp
+
+                                            @if(($start==7 && ($end==9 || $end==10 || $end==11)))
+                                                @php $tmp = false; @endphp
+                                                @continue
+                                            @elseif(($start==8 && ($end==9 || $end==10 || $end==11)))
+                                                <td rowspan="{{ ($end-$start) }}"
+                                                    style="position: relative !important;">
+                                                    <p style="text-align: right;">{{ $timetableSlot->type }}</p>
+                                                    <p style="text-align: center; font-weight: bold;">{{ $timetableSlot->course_name }}</p>
+                                                    <p style="text-align: center;">{{ $timetableSlot->teacher_name }}</p>
+                                                    <p style="text-align: right;">@if($timetableSlot->room != null) {{ $timetableSlot->room->name }}
+                                                        -{{ $timetableSlot->room->building->code }} @else
+                                                            NULL @endif</p>
+                                                </td>
+                                                @php $tmp = false; @endphp
+                                                @break
+                                            @endif
+                                        @endif
+                                    @endforeach
+                                    @if($tmp)
+                                        <td style="height: 60px !important;"></td>
+                                    @endif
+                                @endfor
+
+                            </tr>
+                            {{--9 to 10--}}
+                            <tr>
+                                <td align="center" valign="middle">09h10 - 10h05</td>
+
+                                @for($i=2; $i<=7; $i++)
+                                    @php $tmp = true; @endphp
+
+                                    @foreach($timetablesSlotsLang as $timetableSlot)
+                                        @if( $i == ((new \Carbon\Carbon($timetableSlot['start']))->day) )
+                                            @php $start = ((new \Carbon\Carbon($timetableSlot['start']))->hour); @endphp
+                                            @php $end = ((new \Carbon\Carbon($timetableSlot['end']))->hour); @endphp
+
+                                            @if(($start==7 && ($end==10 || $end==11)) || ($start==8 && ($end==10 || $end==11)))
+                                                @php $tmp = false; @endphp
+                                                @continue
+                                            @elseif(($start==9 && ($end==10 || $end==11)))
+                                                <td rowspan="{{ ( (new \Carbon\Carbon($timetableSlot['end']))->hour - (new \Carbon\Carbon($timetableSlot['start']))->hour) }}">
+                                                    <div class="col-md-12 text-center text-bold"
+                                                         style="margin-bottom: 10px;">{{ $timetableSlot['course_name'] }}</div>
+                                                    @foreach($timetableSlot['slotsForLanguage'] as $key => $item)
+                                                        @if($key % 2 !== 0)
+                                                            <div class="lang-info-right">Gr: {{ $item['group'] }}
+                                                                ({{ $item['building'] }}-{{$item['room']}})
+                                                            </div>
+                                                        @else
+                                                            <div class="lang-info-left">Gr: {{ $item['group'] }}
+                                                                ({{ $item['building'] }}-{{$item['room']}})
+                                                            </div>
+                                                        @endif
+                                                    @endforeach
+                                                </td>
+                                                @php $tmp = false; @endphp
+                                                @break
+                                            @endif
+                                        @endif
+                                    @endforeach
+
+                                    @foreach($timetable->timetableSlots as $timetableSlot)
+                                        @if( $i == ((new \Carbon\Carbon($timetableSlot->start))->day) )
+                                            @php $start = ((new \Carbon\Carbon($timetableSlot->start))->hour); @endphp
+                                            @php $end = ((new \Carbon\Carbon($timetableSlot->end))->hour); @endphp
+
+                                            @if(($start==7 && ($end==10 || $end==11)) || ($start==8 && ($end==10 || $end==11)))
+                                                @php $tmp = false; @endphp
+                                                @continue
+                                            @elseif(($start==9 && ($end==10 || $end==11)))
+                                                <td rowspan="{{ ($end-$start) }}"
+                                                    style="position: relative !important;">
+                                                    <p style="text-align: right;">{{ $timetableSlot->type }}</p>
+                                                    <p style="text-align: center; font-weight: bold;">{{ $timetableSlot->course_name }}</p>
+                                                    <p style="text-align: center;">{{ $timetableSlot->teacher_name }}</p>
+                                                    <p style="text-align: right;">@if($timetableSlot->room != null) {{ $timetableSlot->room->name }}
+                                                        -{{ $timetableSlot->room->building->code }} @else
+                                                            NULL @endif</p>
+                                                </td>
+                                                @php $tmp = false; @endphp
+                                                @break
+                                            @endif
+                                        @endif
+                                    @endforeach
+                                    @if($tmp)
+                                        <td style="height: 60px !important;"></td>
+                                    @endif
+                                @endfor
+
+                            </tr>
+                            {{--10 to 11--}}
+                            <tr>
+                                <td align="center" valign="middle">10h10 - 10h:05</td>
+
+                                @for($i=2; $i<=7; $i++)
+                                    @php $tmp = true; @endphp
+
+                                    @foreach($timetablesSlotsLang as $timetableSlot)
+                                        @if( $i == ((new \Carbon\Carbon($timetableSlot['start']))->day) )
+                                            @php $start = ((new \Carbon\Carbon($timetableSlot['start']))->hour); @endphp
+                                            @php $end = ((new \Carbon\Carbon($timetableSlot['end']))->hour); @endphp
+                                            @if(($start==7 && $end==11) || ($start==8 && $end==11) || ($start==9 && $end==11))
+                                                @php $tmp = false; @endphp
+                                                @continue
+                                            @elseif(($start==10 && $end==11))
+                                                <td rowspan="{{ ( (new \Carbon\Carbon($timetableSlot['end']))->hour - (new \Carbon\Carbon($timetableSlot['start']))->hour) }}">
+                                                    <div class="col-md-12 text-center text-bold"
+                                                         style="margin-bottom: 10px;">{{ $timetableSlot['course_name'] }}</div>
+                                                    @foreach($timetableSlot['slotsForLanguage'] as $key => $item)
+                                                        @if($key % 2 !== 0)
+                                                            <div class="lang-info-right">Gr: {{ $item['group'] }}
+                                                                ({{ $item['building'] }}-{{$item['room']}})
+                                                            </div>
+                                                        @else
+                                                            <div class="lang-info-left">Gr: {{ $item['group'] }}
+                                                                ({{ $item['building'] }}-{{$item['room']}})
+                                                            </div>
+                                                        @endif
+                                                    @endforeach
+                                                </td>
+                                                @php $tmp = false; @endphp
+                                                @break
+                                            @endif
+                                        @endif
+                                    @endforeach
+
+                                    @foreach($timetable->timetableSlots as $timetableSlot)
+                                        @if( $i == ((new \Carbon\Carbon($timetableSlot->start))->day) )
+                                            @php $start = ((new \Carbon\Carbon($timetableSlot->start))->hour); @endphp
+                                            @php $end = ((new \Carbon\Carbon($timetableSlot->end))->hour); @endphp
+                                            @if(($start==7 && $end==11) || ($start==8 && $end==11) || ($start==9 && $end==11))
+                                                @php $tmp = false; @endphp
+                                                @continue
+                                            @elseif(($start==10 && $end==11))
+                                                <td rowspan="{{ ($end-$start) }}"
+                                                    style="position: relative !important;">
+                                                    <p style="text-align: right;">{{ $timetableSlot->type }}</p>
+                                                    <p style="text-align: center; font-weight: bold;">{{ $timetableSlot->course_name }}</p>
+                                                    <p style="text-align: center;">{{ $timetableSlot->teacher_name }}</p>
+                                                    <p style="text-align: right;">@if($timetableSlot->room != null) {{ $timetableSlot->room->name }}
+                                                        -{{ $timetableSlot->room->building->code }} @else
+                                                            NULL @endif</p>
+                                                </td>
+                                                @php $tmp = false; @endphp
+                                                @break
+                                            @endif
+                                        @endif
+                                    @endforeach
+                                    @if($tmp)
+                                        <td style="height: 60px !important;"></td>
+                                    @endif
+                                @endfor
+
+                            </tr>
+                            <tr style="height: 30px !important;">
+                                <td colspan="7"></td>
+                            </tr>
+                            {{--1 to 2--}}
+                            <tr>
+                                <td align="center" valign="middle">13h00 - 14h55</td>
+
+                                @for($i=2; $i<=7; $i++)
+                                    @php $tmp = true; @endphp
+
+                                    @foreach($timetablesSlotsLang as $timetableSlot)
+                                        @if( $i == ((new \Carbon\Carbon($timetableSlot['start']))->day) )
+                                            @php $start = ((new \Carbon\Carbon($timetableSlot['start']))->hour); @endphp
+                                            @php $end = ((new \Carbon\Carbon($timetableSlot['end']))->hour); @endphp
+
+                                            @if( $start == 13)
+                                                <td rowspan="{{ $end-$start }}">
+                                                    <div class="col-md-12 text-center text-bold"
+                                                         style="margin-bottom: 10px;">{{ $timetableSlot['course_name'] }}</div>
+                                                    @foreach($timetableSlot['slotsForLanguage'] as $key => $item)
+                                                        @if($key % 2 !== 0)
+                                                            <div class="lang-info-right">Gr: {{ $item['group'] }}
+                                                                ({{ $item['building'] }}-{{$item['room']}})
+                                                            </div>
+                                                        @else
+                                                            <div class="lang-info-left">Gr: {{ $item['group'] }}
+                                                                ({{ $item['building'] }}-{{$item['room']}})
+                                                            </div>
+                                                        @endif
+                                                    @endforeach
+                                                </td>
+                                                @php $tmp = false; @endphp
+                                                @break
+                                            @endif
+                                        @endif
+                                    @endforeach
+
+                                    @foreach($timetable->timetableSlots as $timetableSlot)
+                                        @if( $i == ((new \Carbon\Carbon($timetableSlot->start))->day) )
+                                            @php $start = ((new \Carbon\Carbon($timetableSlot->start))->hour); @endphp
+                                            @php $end = ((new \Carbon\Carbon($timetableSlot->end))->hour); @endphp
+
+                                            @if( ((new \Carbon\Carbon($timetableSlot->start))->hour) == 13)
+                                                <td rowspan="{{ ($end-$start) }}"
+                                                    style="position: relative !important;">
+                                                    <p style="text-align: right;">{{ $timetableSlot->type }}</p>
+                                                    <p style="text-align: center; font-weight: bold;">{{ $timetableSlot->course_name }}</p>
+                                                    <p style="text-align: center;">{{ $timetableSlot->teacher_name }}</p>
+                                                    <p style="text-align: right;">@if($timetableSlot->room != null) {{ $timetableSlot->room->name }}
+                                                        -{{ $timetableSlot->room->building->code }} @else
+                                                            NULL @endif</p>
+                                                </td>
+                                                @php $tmp = false; @endphp
+                                                @break
+                                            @endif
+                                        @endif
+                                    @endforeach
+                                    @if($tmp)
+                                        <td style="height: 60px !important;"></td>
+                                    @endif
+                                @endfor
+
+                            </tr>
+                            {{--2 to 3--}}
+                            <tr>
+                                <td align="center" valign="middle">14h00 - 15h55</td>
+
+                                @for($i=2; $i<=7; $i++)
+                                    @php $tmp = true; @endphp
+
+                                    @foreach($timetablesSlotsLang as $timetableSlot)
+                                        @if( $i == ((new \Carbon\Carbon($timetableSlot['start']))->day) )
+
+                                            @php $start = ((new \Carbon\Carbon($timetableSlot['start']))->hour); @endphp
+                                            @php $end = ((new \Carbon\Carbon($timetableSlot['end']))->hour); @endphp
+
+                                            @if(($start==13 && ($end==15 || $end==16 || $end==17)))
+                                                @php $tmp = false; @endphp
+                                                @continue
+                                            @elseif(($start==14 && ($end==15 || $end==16 || $end==17)))
+                                                <td rowspan="{{ $end-$start }}">
+                                                    <div class="col-md-12 text-center text-bold"
+                                                         style="margin-bottom: 10px;">{{ $timetableSlot['course_name'] }}</div>
+                                                    @foreach($timetableSlot['slotsForLanguage'] as $key => $item)
+                                                        @if($key % 2 !== 0)
+                                                            <div class="lang-info-right">Gr: {{ $item['group'] }}
+                                                                ({{ $item['building'] }}-{{$item['room']}})
+                                                            </div>
+                                                        @else
+                                                            <div class="lang-info-left">Gr: {{ $item['group'] }}
+                                                                ({{ $item['building'] }}-{{$item['room']}})
+                                                            </div>
+                                                        @endif
+                                                    @endforeach
+                                                </td>
+                                                @php $tmp = false; @endphp
+                                                @break
+                                            @endif
+                                        @endif
+                                    @endforeach
+
+                                    @foreach($timetable->timetableSlots as $timetableSlot)
+                                        @if( $i == ((new \Carbon\Carbon($timetableSlot->start))->day) )
+
+                                            @php $start = ((new \Carbon\Carbon($timetableSlot->start))->hour); @endphp
+                                            @php $end = ((new \Carbon\Carbon($timetableSlot->end))->hour); @endphp
+
+                                            @if(($start==13 && ($end==15 || $end==16 || $end==17)))
+                                                @php $tmp = false; @endphp
+                                                @continue
+                                            @elseif(($start==14 && ($end==15 || $end==16 || $end==17)))
+                                                <td rowspan="{{ ($end-$start) }}"
+                                                    style="position: relative !important;">
+                                                    <p style="text-align: right;">{{ $timetableSlot->type }}</p>
+                                                    <p style="text-align: center; font-weight: bold;">{{ $timetableSlot->course_name }}</p>
+                                                    <p style="text-align: center;">{{ $timetableSlot->teacher_name }}</p>
+                                                    <p style="text-align: right;">@if($timetableSlot->room != null) {{ $timetableSlot->room->name }}
+                                                        -{{ $timetableSlot->room->building->code }} @else
+                                                            NULL @endif</p>
+                                                </td>
+                                                @php $tmp = false; @endphp
+                                                @break
+                                            @endif
+                                        @endif
+                                    @endforeach
+                                    @if($tmp)
+                                        <td style="height: 60px !important;"></td>
+                                    @endif
+                                @endfor
+
+                            </tr>
+                            {{--3 to 4--}}
+                            <tr>
+                                <td align="center" valign="middle">15h10 - 16h05</td>
+
+                                @for($i=2; $i<=7; $i++)
+                                    @php $tmp = true; @endphp
+
+                                    @foreach($timetablesSlotsLang as $timetableSlot)
+                                        @if( $i == ((new \Carbon\Carbon($timetableSlot['start']))->day) )
+
+                                            @php $start = ((new \Carbon\Carbon($timetableSlot['start']))->hour); @endphp
+                                            @php $end = ((new \Carbon\Carbon($timetableSlot['end']))->hour); @endphp
+
+                                            @if(($start==13 && ($end==16 || $end==17)) || ($start==14 && ($end==16 || $end==17)))
+                                                @php $tmp = false; @endphp
+                                                @continue
+                                            @elseif(($start==15 && ($end==16 || $end==17)))
+                                                <td rowspan="{{ $end-$start }}">
+                                                    <div class="col-md-12 text-center text-bold"
+                                                         style="margin-bottom: 10px;">{{ $timetableSlot['course_name'] }}</div>
+                                                    @foreach($timetableSlot['slotsForLanguage'] as $key => $item)
+                                                        @if($key % 2 !== 0)
+                                                            <div class="lang-info-right">Gr: {{ $item['group'] }}
+                                                                ({{ $item['building'] }}-{{$item['room']}})
+                                                            </div>
+                                                        @else
+                                                            <div class="lang-info-left">Gr: {{ $item['group'] }}
+                                                                ({{ $item['building'] }}-{{$item['room']}})
+                                                            </div>
+                                                        @endif
+                                                    @endforeach
+                                                </td>
+                                                @php $tmp = false; @endphp
+                                                @break
+                                            @endif
+
+                                        @endif
+                                    @endforeach
+
+                                    @foreach($timetable->timetableSlots as $timetableSlot)
+                                        @if( $i == ((new \Carbon\Carbon($timetableSlot->start))->day) )
+
+                                            @php $start = ((new \Carbon\Carbon($timetableSlot->start))->hour); @endphp
+                                            @php $end = ((new \Carbon\Carbon($timetableSlot->end))->hour); @endphp
+
+                                            @if(($start==13 && ($end==16 || $end==17)) || ($start==14 && ($end==16 || $end==17)))
+                                                @php $tmp = false; @endphp
+                                                @continue
+                                            @elseif(($start==15 && ($end==16 || $end==17)))
+                                                <td rowspan="{{ ($end-$start) }}"
+                                                    style="position: relative !important;">
+                                                    <p style="text-align: right;">{{ $timetableSlot->type }}</p>
+                                                    <p style="text-align: center; font-weight: bold;">{{ $timetableSlot->course_name }}</p>
+                                                    <p style="text-align: center;">{{ $timetableSlot->teacher_name }}</p>
+                                                    <p style="text-align: right;">@if($timetableSlot->room != null) {{ $timetableSlot->room->name }}
+                                                        -{{ $timetableSlot->room->building->code }} @else
+                                                            NULL @endif</p>
+                                                </td>
+                                                @php $tmp = false; @endphp
+                                                @break
+                                            @endif
+                                        @endif
+                                    @endforeach
+                                    @if($tmp)
+                                        <td style="height: 60px !important;"></td>
+                                    @endif
+                                @endfor
+                            </tr>
+                            {{--4 to 5--}}
+                            <tr>
+                                <td align="center" valign="middle">16h10 - 17h:05</td>
+
+                                @for($i=2; $i<=7; $i++)
+                                    @php $tmp = true; @endphp
+
+                                    @foreach($timetablesSlotsLang as $timetableSlot)
+                                        @if( $i == ((new \Carbon\Carbon($timetableSlot['start']))->day) )
+                                            @php $start = ((new \Carbon\Carbon($timetableSlot['start']))->hour); @endphp
+                                            @php $end = ((new \Carbon\Carbon($timetableSlot['end']))->hour); @endphp
+
+                                            @if(($start==13 && $end==17) || ($start==14 && $end==17) || ($start==15 && $end==17))
+                                                @php $tmp = false; @endphp
+                                                @continue
+                                            @elseif(($start==16 && $end==17))
+                                                <td rowspan="{{ $end-$start }}">
+                                                    <div class="col-md-12 text-center text-bold"
+                                                         style="margin-bottom: 10px;">{{ $timetableSlot['course_name'] }}</div>
+                                                    @foreach($timetableSlot['slotsForLanguage'] as $key => $item)
+                                                        @if($key % 2 !== 0)
+                                                            <div class="lang-info-right">Gr: {{ $item['group'] }}
+                                                                ({{ $item['building'] }}-{{$item['room']}})
+                                                            </div>
+                                                        @else
+                                                            <div class="lang-info-left">Gr: {{ $item['group'] }}
+                                                                ({{ $item['building'] }}-{{$item['room']}})
+                                                            </div>
+                                                        @endif
+                                                    @endforeach
+                                                </td>
+                                                @php $tmp = false; @endphp
+                                                @break
+                                            @endif
+                                        @endif
+                                    @endforeach
+
+                                    @foreach($timetable->timetableSlots as $timetableSlot)
+                                        @if( $i == ((new \Carbon\Carbon($timetableSlot->start))->day) )
+                                            @php $start = ((new \Carbon\Carbon($timetableSlot->start))->hour); @endphp
+                                            @php $end = ((new \Carbon\Carbon($timetableSlot->end))->hour); @endphp
+
+                                            @if(($start==13 && $end==17) || ($start==14 && $end==17) || ($start==15 && $end==17))
+                                                @php $tmp = false; @endphp
+                                                @continue
+                                            @elseif(($start==16 && $end==17))
+                                                <td rowspan="{{ ($end-$start) }}"
+                                                    style="position: relative !important;">
+                                                    <p style="text-align: right;">{{ $timetableSlot->type }}</p>
+                                                    <p style="text-align: center; font-weight: bold;">{{ $timetableSlot->course_name }}</p>
+                                                    <p style="text-align: center;">{{ $timetableSlot->teacher_name }}</p>
+                                                    <p style="text-align: right;">@if($timetableSlot->room != null) {{ $timetableSlot->room->name }}
+                                                        -{{ $timetableSlot->room->building->code }} @else
+                                                            NULL @endif</p>
+                                                </td>
+                                                @php $tmp = false; @endphp
+                                                @break
+                                            @endif
+                                        @endif
+                                    @endforeach
+                                    @if($tmp)
+                                        <td style="height: 60px !important;"></td>
+                                    @endif
+                                @endfor
+                            </tr>
+                        @else
+                            {{--17 to 18--}}
+                            <tr>
+                                <td align="center" valign="middle">17h30 - 18h05</td>
+
+                                @for($i=2; $i<=7; $i++)
+                                    @php $tmp = true; @endphp
+
+                                    @foreach($timetablesSlotsLang as $timetableSlot)
+                                        @if( $i == ((new \Carbon\Carbon($timetableSlot['start']))->day) )
+                                            @if( ((new \Carbon\Carbon($timetableSlot['start']))->hour) >= 17)
+                                                <td rowspan="{{ ( (new \Carbon\Carbon($timetableSlot['end']))->hour - (new \Carbon\Carbon($timetableSlot['start']))->hour) }}">
+                                                    <div class="col-md-12 text-center text-bold"
+                                                         style="margin-bottom: 10px;">{{ $timetableSlot['course_name'] }}</div>
+                                                    <div class="lang-info">
+                                                        @foreach($timetableSlot['slotsForLanguage'] as $key => $item)
+                                                            @if($key % 2 !== 0)
+                                                                <div class="lang-info-right">Gr: {{ $item['group'] }}
+                                                                    ({{ $item['building'] }}-{{$item['room']}})
+                                                                </div>
+                                                            @else
+                                                                <div class="lang-info-left">Gr: {{ $item['group'] }}
+                                                                    ({{ $item['building'] }}-{{$item['room']}})
+                                                                </div>
+                                                            @endif
+                                                            <div class="clearfix"></div>
+                                                        @endforeach
+                                                    </div>
+                                                </td>
+                                                @php $tmp = false; @endphp
+                                                @break
+                                            @endif
+                                        @endif
+                                    @endforeach
+
+                                    @foreach($timetable->timetableSlots as $timetableSlot)
+                                        @if( $i == ((new \Carbon\Carbon($timetableSlot->start))->day) )
+                                            @if( ((new \Carbon\Carbon($timetableSlot->start))->hour) >= 7)
+                                                <td rowspan="{{ ( (new \Carbon\Carbon($timetableSlot->end))->hour - (new \Carbon\Carbon($timetableSlot->start))->hour) }}"
+                                                    style="position: relative !important;">
+                                                    <p style="text-align: right;">{{ $timetableSlot->type }}</p>
+                                                    <p style="text-align: center; font-weight: bold;">{{ $timetableSlot->course_name }}</p>
+                                                    <p style="text-align: center;">{{ $timetableSlot->teacher_name }}</p>
+                                                    <p style="text-align: right;">@if($timetableSlot->room != null) {{ $timetableSlot->room->name }}
+                                                        -{{ $timetableSlot->room->building->code }} @else
+                                                            NULL @endif</p>
+                                                </td>
+                                                @php $tmp = false; @endphp
+                                                @break
+                                            @endif
+                                        @endif
+                                    @endforeach
+                                    @if($tmp)
+                                        <td style="height: 60px !important;"></td>
+                                    @endif
+                                @endfor
+                            </tr>
+                            {{--18 to 19--}}
+                            <tr>
+                                <td align="center" valign="middle">18h10 - 19h05</td>
+
+                                @for($i=2; $i<=7; $i++)
+                                    @php $tmp = true; @endphp
+
+                                    @foreach($timetablesSlotsLang as $timetableSlot)
+                                        @if( $i == ((new \Carbon\Carbon($timetableSlot['start']))->day) )
+                                            @php $start = ((new \Carbon\Carbon($timetableSlot['start']))->hour); @endphp
+                                            @php $end = ((new \Carbon\Carbon($timetableSlot['end']))->hour); @endphp
+
+                                            @if(($start >= 17 && $end == 19))
+                                                @php $tmp = false; @endphp
+                                                @continue
+                                            @elseif(($start==18 && $end==19))
+                                                <td rowspan="{{ ( (new \Carbon\Carbon($timetableSlot['end']))->hour - (new \Carbon\Carbon($timetableSlot['start']))->hour) }}">
+                                                    <div class="col-md-12 text-center text-bold"
+                                                         style="margin-bottom: 10px;">{{ $timetableSlot['course_name'] }}</div>
+                                                    @foreach($timetableSlot['slotsForLanguage'] as $key => $item)
+                                                        @if($key % 2 !== 0)
+                                                            <div class="lang-info-right">Gr: {{ $item['group'] }}
+                                                                ({{ $item['building'] }}-{{$item['room']}})
+                                                            </div>
+                                                        @else
+                                                            <div class="lang-info-left">Gr: {{ $item['group'] }}
+                                                                ({{ $item['building'] }}-{{$item['room']}})
+                                                            </div>
+                                                        @endif
+                                                    @endforeach
+                                                </td>
+                                                @php $tmp = false; @endphp
+                                                @break
+                                            @endif
+                                        @endif
+                                    @endforeach
+
+
+                                    @foreach($timetable->timetableSlots as $timetableSlot)
+                                        @if( $i == ((new \Carbon\Carbon($timetableSlot->start))->day) )
+
+                                            @php $start = ((new \Carbon\Carbon($timetableSlot->start))->hour); @endphp
+                                            @php $end = ((new \Carbon\Carbon($timetableSlot->end))->hour); @endphp
+
+                                            @if(($start>=17 && $end ==19))
+                                                @php $tmp = false; @endphp
+                                                @continue
+                                            @elseif(($start==17 && $end==19))
+                                                <td rowspan="{{ ($end-$start) }}"
+                                                    style="position: relative !important;">
+                                                    <p style="text-align: right;">{{ $timetableSlot->type }}</p>
+                                                    <p style="text-align: center; font-weight: bold;">{{ $timetableSlot->course_name }}</p>
+                                                    <p style="text-align: center;">{{ $timetableSlot->teacher_name }}</p>
+                                                    <p style="text-align: right;">@if($timetableSlot->room != null) {{ $timetableSlot->room->name }}
+                                                        -{{ $timetableSlot->room->building->code }} @else
+                                                            NULL @endif</p>
+                                                </td>
+                                                @php $tmp = false; @endphp
+                                                @break
+                                            @endif
+                                        @endif
+                                    @endforeach
+                                    @if($tmp)
+                                        <td style="height: 60px !important;"></td>
+                                    @endif
+                                @endfor
+
+                            </tr>
+                        @endif
+
+                        </tbody>
+                    @else
+                        <tbody>
+                        <tr align="center" style="height: 30px !important;">
+                            <td style="font-weight: bold;">{{ trans('labels.backend.schedule.timetable.popup_print_template.days.hours') }}</td>
+                            <td style="font-weight: bold; width: 15% !important;">{{ trans('labels.backend.schedule.timetable.popup_print_template.days.monday') }}</td>
+                            <td style="font-weight: bold; width: 15% !important;">{{ trans('labels.backend.schedule.timetable.popup_print_template.days.tuesday') }}</td>
+                            <td style="font-weight: bold; width: 15% !important;">{{ trans('labels.backend.schedule.timetable.popup_print_template.days.wednesday') }}</td>
+                            <td style="font-weight: bold; width: 15% !important;">{{ trans('labels.backend.schedule.timetable.popup_print_template.days.thursday') }}</td>
+                            <td style="font-weight: bold; width: 15% !important;">{{ trans('labels.backend.schedule.timetable.popup_print_template.days.friday') }}</td>
+                            <td style="font-weight: bold; width: 15% !important;">{{ trans('labels.backend.schedule.timetable.popup_print_template.days.saturday') }}</td>
+                        </tr>
+
+                        {{--7 - 7:30--}}
                         <tr>
-                            <td align="center" valign="middle">07h00 - 07h55</td>
+                            <td align="center" valign="middle" rowspan="2">07h00 - 07h55</td>
 
                             @for($i=2; $i<=7; $i++)
                                 @php $tmp = true; @endphp
@@ -103,579 +761,9 @@
                                 @endif
                             @endfor
                         </tr>
-                        {{--8 to 9--}}
-                        <tr>
-                            <td align="center" valign="middle">08h00 - 08h55</td>
 
-                            @for($i=2; $i<=7; $i++)
-                                @php $tmp = true; @endphp
-
-                                @foreach($timetablesSlotsLang as $timetableSlot)
-                                    @if( $i == ((new \Carbon\Carbon($timetableSlot['start']))->day) )
-                                        @php $start = ((new \Carbon\Carbon($timetableSlot['start']))->hour); @endphp
-                                        @php $end = ((new \Carbon\Carbon($timetableSlot['end']))->hour); @endphp
-
-                                        @if(($start==7 && ($end==9 || $end==10 || $end==11)))
-                                            @php $tmp = false; @endphp
-                                            @continue
-                                        @elseif(($start==8 && ($end==9 || $end==10 || $end==11)))
-                                            <td rowspan="{{ ( (new \Carbon\Carbon($timetableSlot['end']))->hour - (new \Carbon\Carbon($timetableSlot['start']))->hour) }}">
-                                                <div class="col-md-12 text-center text-bold"
-                                                     style="margin-bottom: 10px;">{{ $timetableSlot['course_name'] }}</div>
-                                                @foreach($timetableSlot['slotsForLanguage'] as $key => $item)
-                                                    @if($key % 2 !== 0)
-                                                        <div class="lang-info-right">Gr: {{ $item['group'] }}
-                                                            ({{ $item['building'] }}-{{$item['room']}})
-                                                        </div>
-                                                    @else
-                                                        <div class="lang-info-left">Gr: {{ $item['group'] }}
-                                                            ({{ $item['building'] }}-{{$item['room']}})
-                                                        </div>
-                                                    @endif
-                                                @endforeach
-                                            </td>
-                                            @php $tmp = false; @endphp
-                                            @break
-                                        @endif
-                                    @endif
-                                @endforeach
-
-
-                                @foreach($timetable->timetableSlots as $timetableSlot)
-                                    @if( $i == ((new \Carbon\Carbon($timetableSlot->start))->day) )
-
-                                        @php $start = ((new \Carbon\Carbon($timetableSlot->start))->hour); @endphp
-                                        @php $end = ((new \Carbon\Carbon($timetableSlot->end))->hour); @endphp
-
-                                        @if(($start==7 && ($end==9 || $end==10 || $end==11)))
-                                            @php $tmp = false; @endphp
-                                            @continue
-                                        @elseif(($start==8 && ($end==9 || $end==10 || $end==11)))
-                                            <td rowspan="{{ ($end-$start) }}" style="position: relative !important;">
-                                                <p style="text-align: right;">{{ $timetableSlot->type }}</p>
-                                                <p style="text-align: center; font-weight: bold;">{{ $timetableSlot->course_name }}</p>
-                                                <p style="text-align: center;">{{ $timetableSlot->teacher_name }}</p>
-                                                <p style="text-align: right;">@if($timetableSlot->room != null) {{ $timetableSlot->room->name }}
-                                                    -{{ $timetableSlot->room->building->code }} @else NULL @endif</p>
-                                            </td>
-                                            @php $tmp = false; @endphp
-                                            @break
-                                        @endif
-                                    @endif
-                                @endforeach
-                                @if($tmp)
-                                    <td style="height: 60px !important;"></td>
-                                @endif
-                            @endfor
-
-                        </tr>
-                        {{--9 to 10--}}
-                        <tr>
-                            <td align="center" valign="middle">09h10 - 10h05</td>
-
-                            @for($i=2; $i<=7; $i++)
-                                @php $tmp = true; @endphp
-
-                                @foreach($timetablesSlotsLang as $timetableSlot)
-                                    @if( $i == ((new \Carbon\Carbon($timetableSlot['start']))->day) )
-                                        @php $start = ((new \Carbon\Carbon($timetableSlot['start']))->hour); @endphp
-                                        @php $end = ((new \Carbon\Carbon($timetableSlot['end']))->hour); @endphp
-
-                                        @if(($start==7 && ($end==10 || $end==11)) || ($start==8 && ($end==10 || $end==11)))
-                                            @php $tmp = false; @endphp
-                                            @continue
-                                        @elseif(($start==9 && ($end==10 || $end==11)))
-                                            <td rowspan="{{ ( (new \Carbon\Carbon($timetableSlot['end']))->hour - (new \Carbon\Carbon($timetableSlot['start']))->hour) }}">
-                                                <div class="col-md-12 text-center text-bold"
-                                                     style="margin-bottom: 10px;">{{ $timetableSlot['course_name'] }}</div>
-                                                @foreach($timetableSlot['slotsForLanguage'] as $key => $item)
-                                                    @if($key % 2 !== 0)
-                                                        <div class="lang-info-right">Gr: {{ $item['group'] }}
-                                                            ({{ $item['building'] }}-{{$item['room']}})
-                                                        </div>
-                                                    @else
-                                                        <div class="lang-info-left">Gr: {{ $item['group'] }}
-                                                            ({{ $item['building'] }}-{{$item['room']}})
-                                                        </div>
-                                                    @endif
-                                                @endforeach
-                                            </td>
-                                            @php $tmp = false; @endphp
-                                            @break
-                                        @endif
-                                    @endif
-                                @endforeach
-
-                                @foreach($timetable->timetableSlots as $timetableSlot)
-                                    @if( $i == ((new \Carbon\Carbon($timetableSlot->start))->day) )
-                                        @php $start = ((new \Carbon\Carbon($timetableSlot->start))->hour); @endphp
-                                        @php $end = ((new \Carbon\Carbon($timetableSlot->end))->hour); @endphp
-
-                                        @if(($start==7 && ($end==10 || $end==11)) || ($start==8 && ($end==10 || $end==11)))
-                                            @php $tmp = false; @endphp
-                                            @continue
-                                        @elseif(($start==9 && ($end==10 || $end==11)))
-                                            <td rowspan="{{ ($end-$start) }}" style="position: relative !important;">
-                                                <p style="text-align: right;">{{ $timetableSlot->type }}</p>
-                                                <p style="text-align: center; font-weight: bold;">{{ $timetableSlot->course_name }}</p>
-                                                <p style="text-align: center;">{{ $timetableSlot->teacher_name }}</p>
-                                                <p style="text-align: right;">@if($timetableSlot->room != null) {{ $timetableSlot->room->name }}
-                                                    -{{ $timetableSlot->room->building->code }} @else NULL @endif</p>
-                                            </td>
-                                            @php $tmp = false; @endphp
-                                            @break
-                                        @endif
-                                    @endif
-                                @endforeach
-                                @if($tmp)
-                                    <td style="height: 60px !important;"></td>
-                                @endif
-                            @endfor
-
-                        </tr>
-                        {{--10 to 11--}}
-                        <tr>
-                            <td align="center" valign="middle">10h10 - 10h:05</td>
-
-                            @for($i=2; $i<=7; $i++)
-                                @php $tmp = true; @endphp
-
-                                @foreach($timetablesSlotsLang as $timetableSlot)
-                                    @if( $i == ((new \Carbon\Carbon($timetableSlot['start']))->day) )
-                                        @php $start = ((new \Carbon\Carbon($timetableSlot['start']))->hour); @endphp
-                                        @php $end = ((new \Carbon\Carbon($timetableSlot['end']))->hour); @endphp
-                                        @if(($start==7 && $end==11) || ($start==8 && $end==11) || ($start==9 && $end==11))
-                                            @php $tmp = false; @endphp
-                                            @continue
-                                        @elseif(($start==10 && $end==11))
-                                            <td rowspan="{{ ( (new \Carbon\Carbon($timetableSlot['end']))->hour - (new \Carbon\Carbon($timetableSlot['start']))->hour) }}">
-                                                <div class="col-md-12 text-center text-bold"
-                                                     style="margin-bottom: 10px;">{{ $timetableSlot['course_name'] }}</div>
-                                                @foreach($timetableSlot['slotsForLanguage'] as $key => $item)
-                                                    @if($key % 2 !== 0)
-                                                        <div class="lang-info-right">Gr: {{ $item['group'] }}
-                                                            ({{ $item['building'] }}-{{$item['room']}})
-                                                        </div>
-                                                    @else
-                                                        <div class="lang-info-left">Gr: {{ $item['group'] }}
-                                                            ({{ $item['building'] }}-{{$item['room']}})
-                                                        </div>
-                                                    @endif
-                                                @endforeach
-                                            </td>
-                                            @php $tmp = false; @endphp
-                                            @break
-                                        @endif
-                                    @endif
-                                @endforeach
-
-                                @foreach($timetable->timetableSlots as $timetableSlot)
-                                    @if( $i == ((new \Carbon\Carbon($timetableSlot->start))->day) )
-                                        @php $start = ((new \Carbon\Carbon($timetableSlot->start))->hour); @endphp
-                                        @php $end = ((new \Carbon\Carbon($timetableSlot->end))->hour); @endphp
-                                        @if(($start==7 && $end==11) || ($start==8 && $end==11) || ($start==9 && $end==11))
-                                            @php $tmp = false; @endphp
-                                            @continue
-                                        @elseif(($start==10 && $end==11))
-                                            <td rowspan="{{ ($end-$start) }}" style="position: relative !important;">
-                                                <p style="text-align: right;">{{ $timetableSlot->type }}</p>
-                                                <p style="text-align: center; font-weight: bold;">{{ $timetableSlot->course_name }}</p>
-                                                <p style="text-align: center;">{{ $timetableSlot->teacher_name }}</p>
-                                                <p style="text-align: right;">@if($timetableSlot->room != null) {{ $timetableSlot->room->name }}
-                                                    -{{ $timetableSlot->room->building->code }} @else NULL @endif</p>
-                                            </td>
-                                            @php $tmp = false; @endphp
-                                            @break
-                                        @endif
-                                    @endif
-                                @endforeach
-                                @if($tmp)
-                                    <td style="height: 60px !important;"></td>
-                                @endif
-                            @endfor
-
-                        </tr>
-                        <tr style="height: 30px !important;">
-                            <td colspan="7"></td>
-                        </tr>
-                        {{--1 to 2--}}
-                        <tr>
-                            <td align="center" valign="middle">13h00 - 14h55</td>
-
-                            @for($i=2; $i<=7; $i++)
-                                @php $tmp = true; @endphp
-
-                                @foreach($timetablesSlotsLang as $timetableSlot)
-                                    @if( $i == ((new \Carbon\Carbon($timetableSlot['start']))->day) )
-                                        @php $start = ((new \Carbon\Carbon($timetableSlot['start']))->hour); @endphp
-                                        @php $end = ((new \Carbon\Carbon($timetableSlot['end']))->hour); @endphp
-
-                                        @if( $start == 13)
-                                            <td rowspan="{{ $end-$start }}">
-                                                <div class="col-md-12 text-center text-bold"
-                                                     style="margin-bottom: 10px;">{{ $timetableSlot['course_name'] }}</div>
-                                                @foreach($timetableSlot['slotsForLanguage'] as $key => $item)
-                                                    @if($key % 2 !== 0)
-                                                        <div class="lang-info-right">Gr: {{ $item['group'] }}
-                                                            ({{ $item['building'] }}-{{$item['room']}})
-                                                        </div>
-                                                    @else
-                                                        <div class="lang-info-left">Gr: {{ $item['group'] }}
-                                                            ({{ $item['building'] }}-{{$item['room']}})
-                                                        </div>
-                                                    @endif
-                                                @endforeach
-                                            </td>
-                                            @php $tmp = false; @endphp
-                                            @break
-                                        @endif
-                                    @endif
-                                @endforeach
-
-                                @foreach($timetable->timetableSlots as $timetableSlot)
-                                    @if( $i == ((new \Carbon\Carbon($timetableSlot->start))->day) )
-                                        @php $start = ((new \Carbon\Carbon($timetableSlot->start))->hour); @endphp
-                                        @php $end = ((new \Carbon\Carbon($timetableSlot->end))->hour); @endphp
-
-                                        @if( ((new \Carbon\Carbon($timetableSlot->start))->hour) == 13)
-                                            <td rowspan="{{ ($end-$start) }}" style="position: relative !important;">
-                                                <p style="text-align: right;">{{ $timetableSlot->type }}</p>
-                                                <p style="text-align: center; font-weight: bold;">{{ $timetableSlot->course_name }}</p>
-                                                <p style="text-align: center;">{{ $timetableSlot->teacher_name }}</p>
-                                                <p style="text-align: right;">@if($timetableSlot->room != null) {{ $timetableSlot->room->name }}
-                                                    -{{ $timetableSlot->room->building->code }} @else NULL @endif</p>
-                                            </td>
-                                            @php $tmp = false; @endphp
-                                            @break
-                                        @endif
-                                    @endif
-                                @endforeach
-                                @if($tmp)
-                                    <td style="height: 60px !important;"></td>
-                                @endif
-                            @endfor
-
-                        </tr>
-                        {{--2 to 3--}}
-                        <tr>
-                            <td align="center" valign="middle">14h00 - 15h55</td>
-
-                            @for($i=2; $i<=7; $i++)
-                                @php $tmp = true; @endphp
-
-                                @foreach($timetablesSlotsLang as $timetableSlot)
-                                    @if( $i == ((new \Carbon\Carbon($timetableSlot['start']))->day) )
-
-                                        @php $start = ((new \Carbon\Carbon($timetableSlot['start']))->hour); @endphp
-                                        @php $end = ((new \Carbon\Carbon($timetableSlot['end']))->hour); @endphp
-
-                                        @if(($start==13 && ($end==15 || $end==16 || $end==17)))
-                                            @php $tmp = false; @endphp
-                                            @continue
-                                        @elseif(($start==14 && ($end==15 || $end==16 || $end==17)))
-                                            <td rowspan="{{ $end-$start }}">
-                                                <div class="col-md-12 text-center text-bold"
-                                                     style="margin-bottom: 10px;">{{ $timetableSlot['course_name'] }}</div>
-                                                @foreach($timetableSlot['slotsForLanguage'] as $key => $item)
-                                                    @if($key % 2 !== 0)
-                                                        <div class="lang-info-right">Gr: {{ $item['group'] }}
-                                                            ({{ $item['building'] }}-{{$item['room']}})
-                                                        </div>
-                                                    @else
-                                                        <div class="lang-info-left">Gr: {{ $item['group'] }}
-                                                            ({{ $item['building'] }}-{{$item['room']}})
-                                                        </div>
-                                                    @endif
-                                                @endforeach
-                                            </td>
-                                            @php $tmp = false; @endphp
-                                            @break
-                                        @endif
-                                    @endif
-                                @endforeach
-
-                                @foreach($timetable->timetableSlots as $timetableSlot)
-                                    @if( $i == ((new \Carbon\Carbon($timetableSlot->start))->day) )
-
-                                        @php $start = ((new \Carbon\Carbon($timetableSlot->start))->hour); @endphp
-                                        @php $end = ((new \Carbon\Carbon($timetableSlot->end))->hour); @endphp
-
-                                        @if(($start==13 && ($end==15 || $end==16 || $end==17)))
-                                            @php $tmp = false; @endphp
-                                            @continue
-                                        @elseif(($start==14 && ($end==15 || $end==16 || $end==17)))
-                                            <td rowspan="{{ ($end-$start) }}" style="position: relative !important;">
-                                                <p style="text-align: right;">{{ $timetableSlot->type }}</p>
-                                                <p style="text-align: center; font-weight: bold;">{{ $timetableSlot->course_name }}</p>
-                                                <p style="text-align: center;">{{ $timetableSlot->teacher_name }}</p>
-                                                <p style="text-align: right;">@if($timetableSlot->room != null) {{ $timetableSlot->room->name }}
-                                                    -{{ $timetableSlot->room->building->code }} @else NULL @endif</p>
-                                            </td>
-                                            @php $tmp = false; @endphp
-                                            @break
-                                        @endif
-                                    @endif
-                                @endforeach
-                                @if($tmp)
-                                    <td style="height: 60px !important;"></td>
-                                @endif
-                            @endfor
-
-                        </tr>
-                        {{--3 to 4--}}
-                        <tr>
-                            <td align="center" valign="middle">15h10 - 16h05</td>
-
-                            @for($i=2; $i<=7; $i++)
-                                @php $tmp = true; @endphp
-
-                                @foreach($timetablesSlotsLang as $timetableSlot)
-                                    @if( $i == ((new \Carbon\Carbon($timetableSlot['start']))->day) )
-
-                                        @php $start = ((new \Carbon\Carbon($timetableSlot['start']))->hour); @endphp
-                                        @php $end = ((new \Carbon\Carbon($timetableSlot['end']))->hour); @endphp
-
-                                        @if(($start==13 && ($end==16 || $end==17)) || ($start==14 && ($end==16 || $end==17)))
-                                            @php $tmp = false; @endphp
-                                            @continue
-                                        @elseif(($start==15 && ($end==16 || $end==17)))
-                                            <td rowspan="{{ $end-$start }}">
-                                                <div class="col-md-12 text-center text-bold"
-                                                     style="margin-bottom: 10px;">{{ $timetableSlot['course_name'] }}</div>
-                                                @foreach($timetableSlot['slotsForLanguage'] as $key => $item)
-                                                    @if($key % 2 !== 0)
-                                                        <div class="lang-info-right">Gr: {{ $item['group'] }}
-                                                            ({{ $item['building'] }}-{{$item['room']}})
-                                                        </div>
-                                                    @else
-                                                        <div class="lang-info-left">Gr: {{ $item['group'] }}
-                                                            ({{ $item['building'] }}-{{$item['room']}})
-                                                        </div>
-                                                    @endif
-                                                @endforeach
-                                            </td>
-                                            @php $tmp = false; @endphp
-                                            @break
-                                        @endif
-
-                                    @endif
-                                @endforeach
-
-                                @foreach($timetable->timetableSlots as $timetableSlot)
-                                    @if( $i == ((new \Carbon\Carbon($timetableSlot->start))->day) )
-
-                                        @php $start = ((new \Carbon\Carbon($timetableSlot->start))->hour); @endphp
-                                        @php $end = ((new \Carbon\Carbon($timetableSlot->end))->hour); @endphp
-
-                                        @if(($start==13 && ($end==16 || $end==17)) || ($start==14 && ($end==16 || $end==17)))
-                                            @php $tmp = false; @endphp
-                                            @continue
-                                        @elseif(($start==15 && ($end==16 || $end==17)))
-                                            <td rowspan="{{ ($end-$start) }}" style="position: relative !important;">
-                                                <p style="text-align: right;">{{ $timetableSlot->type }}</p>
-                                                <p style="text-align: center; font-weight: bold;">{{ $timetableSlot->course_name }}</p>
-                                                <p style="text-align: center;">{{ $timetableSlot->teacher_name }}</p>
-                                                <p style="text-align: right;">@if($timetableSlot->room != null) {{ $timetableSlot->room->name }}
-                                                    -{{ $timetableSlot->room->building->code }} @else NULL @endif</p>
-                                            </td>
-                                            @php $tmp = false; @endphp
-                                            @break
-                                        @endif
-                                    @endif
-                                @endforeach
-                                @if($tmp)
-                                    <td style="height: 60px !important;"></td>
-                                @endif
-                            @endfor
-                        </tr>
-                        {{--4 to 5--}}
-                        <tr>
-                            <td align="center" valign="middle">16h10 - 17h:05</td>
-
-                            @for($i=2; $i<=7; $i++)
-                                @php $tmp = true; @endphp
-
-                                @foreach($timetablesSlotsLang as $timetableSlot)
-                                    @if( $i == ((new \Carbon\Carbon($timetableSlot['start']))->day) )
-                                        @php $start = ((new \Carbon\Carbon($timetableSlot['start']))->hour); @endphp
-                                        @php $end = ((new \Carbon\Carbon($timetableSlot['end']))->hour); @endphp
-
-                                        @if(($start==13 && $end==17) || ($start==14 && $end==17) || ($start==15 && $end==17))
-                                            @php $tmp = false; @endphp
-                                            @continue
-                                        @elseif(($start==16 && $end==17))
-                                            <td rowspan="{{ $end-$start }}">
-                                                <div class="col-md-12 text-center text-bold"
-                                                     style="margin-bottom: 10px;">{{ $timetableSlot['course_name'] }}</div>
-                                                @foreach($timetableSlot['slotsForLanguage'] as $key => $item)
-                                                    @if($key % 2 !== 0)
-                                                        <div class="lang-info-right">Gr: {{ $item['group'] }}
-                                                            ({{ $item['building'] }}-{{$item['room']}})
-                                                        </div>
-                                                    @else
-                                                        <div class="lang-info-left">Gr: {{ $item['group'] }}
-                                                            ({{ $item['building'] }}-{{$item['room']}})
-                                                        </div>
-                                                    @endif
-                                                @endforeach
-                                            </td>
-                                            @php $tmp = false; @endphp
-                                            @break
-                                        @endif
-                                    @endif
-                                @endforeach
-
-                                @foreach($timetable->timetableSlots as $timetableSlot)
-                                    @if( $i == ((new \Carbon\Carbon($timetableSlot->start))->day) )
-                                        @php $start = ((new \Carbon\Carbon($timetableSlot->start))->hour); @endphp
-                                        @php $end = ((new \Carbon\Carbon($timetableSlot->end))->hour); @endphp
-
-                                        @if(($start==13 && $end==17) || ($start==14 && $end==17) || ($start==15 && $end==17))
-                                            @php $tmp = false; @endphp
-                                            @continue
-                                        @elseif(($start==16 && $end==17))
-                                            <td rowspan="{{ ($end-$start) }}" style="position: relative !important;">
-                                                <p style="text-align: right;">{{ $timetableSlot->type }}</p>
-                                                <p style="text-align: center; font-weight: bold;">{{ $timetableSlot->course_name }}</p>
-                                                <p style="text-align: center;">{{ $timetableSlot->teacher_name }}</p>
-                                                <p style="text-align: right;">@if($timetableSlot->room != null) {{ $timetableSlot->room->name }}
-                                                    -{{ $timetableSlot->room->building->code }} @else NULL @endif</p>
-                                            </td>
-                                            @php $tmp = false; @endphp
-                                            @break
-                                        @endif
-                                    @endif
-                                @endforeach
-                                @if($tmp)
-                                    <td style="height: 60px !important;"></td>
-                                @endif
-                            @endfor
-                        </tr>
-                    @else
-                        {{--17 to 18--}}
-                        <tr>
-                            <td align="center" valign="middle">17h30 - 18h05</td>
-
-                            @for($i=2; $i<=7; $i++)
-                                @php $tmp = true; @endphp
-
-                                @foreach($timetablesSlotsLang as $timetableSlot)
-                                    @if( $i == ((new \Carbon\Carbon($timetableSlot['start']))->day) )
-                                        @if( ((new \Carbon\Carbon($timetableSlot['start']))->hour) >= 17)
-                                            <td rowspan="{{ ( (new \Carbon\Carbon($timetableSlot['end']))->hour - (new \Carbon\Carbon($timetableSlot['start']))->hour) }}">
-                                                <div class="col-md-12 text-center text-bold"
-                                                     style="margin-bottom: 10px;">{{ $timetableSlot['course_name'] }}</div>
-                                                <div class="lang-info">
-                                                    @foreach($timetableSlot['slotsForLanguage'] as $key => $item)
-                                                        @if($key % 2 !== 0)
-                                                            <div class="lang-info-right">Gr: {{ $item['group'] }}
-                                                                ({{ $item['building'] }}-{{$item['room']}})
-                                                            </div>
-                                                        @else
-                                                            <div class="lang-info-left">Gr: {{ $item['group'] }}
-                                                                ({{ $item['building'] }}-{{$item['room']}})
-                                                            </div>
-                                                        @endif
-                                                        <div class="clearfix"></div>
-                                                    @endforeach
-                                                </div>
-                                            </td>
-                                            @php $tmp = false; @endphp
-                                            @break
-                                        @endif
-                                    @endif
-                                @endforeach
-
-                                @foreach($timetable->timetableSlots as $timetableSlot)
-                                    @if( $i == ((new \Carbon\Carbon($timetableSlot->start))->day) )
-                                        @if( ((new \Carbon\Carbon($timetableSlot->start))->hour) >= 7)
-                                            <td rowspan="{{ ( (new \Carbon\Carbon($timetableSlot->end))->hour - (new \Carbon\Carbon($timetableSlot->start))->hour) }}"
-                                                style="position: relative !important;">
-                                                <p style="text-align: right;">{{ $timetableSlot->type }}</p>
-                                                <p style="text-align: center; font-weight: bold;">{{ $timetableSlot->course_name }}</p>
-                                                <p style="text-align: center;">{{ $timetableSlot->teacher_name }}</p>
-                                                <p style="text-align: right;">@if($timetableSlot->room != null) {{ $timetableSlot->room->name }}
-                                                    -{{ $timetableSlot->room->building->code }} @else NULL @endif</p>
-                                            </td>
-                                            @php $tmp = false; @endphp
-                                            @break
-                                        @endif
-                                    @endif
-                                @endforeach
-                                @if($tmp)
-                                    <td style="height: 60px !important;"></td>
-                                @endif
-                            @endfor
-                        </tr>
-                        {{--18 to 19--}}
-                        <tr>
-                            <td align="center" valign="middle">18h10 - 19h05</td>
-
-                            @for($i=2; $i<=7; $i++)
-                                @php $tmp = true; @endphp
-
-                                @foreach($timetablesSlotsLang as $timetableSlot)
-                                    @if( $i == ((new \Carbon\Carbon($timetableSlot['start']))->day) )
-                                        @php $start = ((new \Carbon\Carbon($timetableSlot['start']))->hour); @endphp
-                                        @php $end = ((new \Carbon\Carbon($timetableSlot['end']))->hour); @endphp
-
-                                        @if(($start >= 17 && $end == 19))
-                                            @php $tmp = false; @endphp
-                                            @continue
-                                        @elseif(($start==18 && $end==19))
-                                            <td rowspan="{{ ( (new \Carbon\Carbon($timetableSlot['end']))->hour - (new \Carbon\Carbon($timetableSlot['start']))->hour) }}">
-                                                <div class="col-md-12 text-center text-bold"
-                                                     style="margin-bottom: 10px;">{{ $timetableSlot['course_name'] }}</div>
-                                                @foreach($timetableSlot['slotsForLanguage'] as $key => $item)
-                                                    @if($key % 2 !== 0)
-                                                        <div class="lang-info-right">Gr: {{ $item['group'] }}
-                                                            ({{ $item['building'] }}-{{$item['room']}})
-                                                        </div>
-                                                    @else
-                                                        <div class="lang-info-left">Gr: {{ $item['group'] }}
-                                                            ({{ $item['building'] }}-{{$item['room']}})
-                                                        </div>
-                                                    @endif
-                                                @endforeach
-                                            </td>
-                                            @php $tmp = false; @endphp
-                                            @break
-                                        @endif
-                                    @endif
-                                @endforeach
-
-
-                                @foreach($timetable->timetableSlots as $timetableSlot)
-                                    @if( $i == ((new \Carbon\Carbon($timetableSlot->start))->day) )
-
-                                        @php $start = ((new \Carbon\Carbon($timetableSlot->start))->hour); @endphp
-                                        @php $end = ((new \Carbon\Carbon($timetableSlot->end))->hour); @endphp
-
-                                        @if(($start>=17 && $end==19))
-                                            @php $tmp = false; @endphp
-                                            @continue
-                                        @elseif(($start==17 && $end==19))
-                                            <td rowspan="{{ ($end-$start) }}" style="position: relative !important;">
-                                                <p style="text-align: right;">{{ $timetableSlot->type }}</p>
-                                                <p style="text-align: center; font-weight: bold;">{{ $timetableSlot->course_name }}</p>
-                                                <p style="text-align: center;">{{ $timetableSlot->teacher_name }}</p>
-                                                <p style="text-align: right;">@if($timetableSlot->room != null) {{ $timetableSlot->room->name }}
-                                                    -{{ $timetableSlot->room->building->code }} @else NULL @endif</p>
-                                            </td>
-                                            @php $tmp = false; @endphp
-                                            @break
-                                        @endif
-                                    @endif
-                                @endforeach
-                                @if($tmp)
-                                    <td style="height: 60px !important;"></td>
-                                @endif
-                            @endfor
-
-                        </tr>
+                        </tbody>
                     @endif
-
-                    </tbody>
                 </table>
             </page>
         @endforeach
