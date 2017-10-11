@@ -4,6 +4,7 @@ namespace App\Repositories\Backend\Schedule\Timetable;
 
 use App\Http\Requests\Backend\Schedule\Timetable\CreateTimetableRequest;
 use App\Models\Schedule\Timetable\Timetable;
+use Carbon\Carbon;
 
 /**
  * Class EloquentTimetableRepository
@@ -30,7 +31,7 @@ class EloquentTimetableRepository implements TimetableRepositoryContract
             ['week_id', $request->weekly],
             ['group_id', $request->group == null ? null : $request->group]
         ])
-        ->first();
+            ->first();
 
         if ($timetable instanceof Timetable) {
             return $timetable;
@@ -61,6 +62,25 @@ class EloquentTimetableRepository implements TimetableRepositoryContract
 
         if ($newTimetable->save()) {
             return $newTimetable;
+        }
+        return false;
+    }
+
+    /**
+     * To check timetable slot has half hour.
+     *
+     * @param Timetable $timetable
+     * @return mixed
+     */
+    public function hasHalfHour(Timetable $timetable)
+    {
+        $timetableSlots = $timetable->timetableSlots;
+        foreach ($timetableSlots as $timetableSlot) {
+            $start = new Carbon($timetableSlot->start);
+            $end = new Carbon($timetableSlot->end);
+            if (($end->minute - $start->minute) == 30 || ($start->minute - $end->minute) == 30) {
+                return true;
+            }
         }
         return false;
     }

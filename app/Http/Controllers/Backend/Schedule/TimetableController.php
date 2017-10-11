@@ -37,8 +37,12 @@ use Yajra\Datatables\Datatables;
  */
 class TimetableController extends Controller
 {
-    use AjaxCRUDTimetableController, AjaxCloneTimetableController, PrintTimetableController, ExportTimetableController;
-    use ViewTimetableByTeacherController;
+    use AjaxCRUDTimetableController,
+        AjaxCloneTimetableController,
+        PrintTimetableController,
+        ExportTimetableController,
+        ViewTimetableByTeacherController;
+
     /**
      * @var TimetableRepositoryContract
      */
@@ -221,7 +225,7 @@ class TimetableController extends Controller
      * @param $week
      * @return mixed
      */
-    public function create($academic = null, $department = null, $degree = null, $option = null, $grade = null, $semester = null, $group = null, $week=null)
+    public function create($academic = null, $department = null, $degree = null, $option = null, $grade = null, $semester = null, $group = null, $week = null)
     {
         $now = Carbon::now('Asia/Phnom_Penh');
         $employee = Employee::where('user_id', auth()->user()->id)->first();
@@ -231,7 +235,7 @@ class TimetableController extends Controller
             $createTimetablePermissionConfiguration = null;
         }
 
-        if(isset($option)){
+        if (isset($option)) {
             $dept_ids = [2, 3, 5, 6];
 
             $department_id = request('department_id');
@@ -256,11 +260,11 @@ class TimetableController extends Controller
 
                 $options_ = collect($options_)->push($additional_option);
             }
-        }else{
+        } else {
             $options_ = null;
         }
 
-        if(isset($academic)){
+        if (isset($academic)) {
             $groups = DB::table('course_annuals')
                 ->where([
                     ['academic_year_id', $academic],
@@ -268,8 +272,8 @@ class TimetableController extends Controller
                     ['degree_id', $degree],
                     ['grade_id', $grade]
                 ])
-                ->where(function ($query) use ($option){
-                    if(!is_null($option) && $option != 0){
+                ->where(function ($query) use ($option) {
+                    if (!is_null($option) && $option != 0) {
                         $query->where('department_option_id', $option);
                     }
                 })
@@ -286,7 +290,7 @@ class TimetableController extends Controller
                     return strcmp($a->name, $b->name);
                 }
             });
-        }else{
+        } else {
             $groups = null;
         }
 
