@@ -231,6 +231,35 @@ class TimetableController extends Controller
             $createTimetablePermissionConfiguration = null;
         }
 
+        if(isset($option)){
+            $dept_ids = [2, 3, 5, 6];
+
+            $department_id = request('department_id');
+            $options_ = DepartmentOption::where('department_id', $department_id)->get();
+
+            if (in_array($department_id, $dept_ids)) {
+
+                $additional_option = [
+                    'id' => '',
+                    'name_kh' => '',
+                    'name_en' => '',
+                    'name_fr' => '',
+                    'code' => '',
+                    'active' => true,
+                    'created_at' => Carbon::today(),
+                    'updated_at' => Carbon::today(),
+                    'department_id' => 10,
+                    'degree_id' => 1,
+                    'create_uid' => 10,
+                    'write_uid' => 10
+                ];
+
+                $options_ = collect($options_)->push($additional_option);
+            }
+        }else{
+            $options_ = null;
+        }
+
         if(isset($academic)){
             $groups = DB::table('course_annuals')
                 ->where([
@@ -272,7 +301,8 @@ class TimetableController extends Controller
                     'semester_id' => $semester,
                     'group_id' => $group,
                     'week_id' => $week,
-                    'groups' => $groups
+                    'groups' => $groups,
+                    'options_' => $options_
                 ]);
             }
         } else {
@@ -285,7 +315,8 @@ class TimetableController extends Controller
                 'semester_id' => $semester,
                 'group_id' => $group,
                 'week_id' => $week,
-                'groups' => $groups
+                'groups' => $groups,
+                'options_' => $options_
             ]);
         }
 
