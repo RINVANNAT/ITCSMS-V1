@@ -9,12 +9,12 @@
                                 <input type="text"
                                        class="form-control input-sm"
                                        id="search_course_session"
-                                       placeholder="Search Course Session">
+                                       placeholder="SEARCH COURSE SESSION">
                                 <span class="input-group-btn">
                                     <button class="btn btn-primary btn-sm btn_export_course_session"
                                             data-container="body"
                                             data-toggle="popover"
-                                            data-placement="left"
+                                            data-placement="bottom"
                                             data-trigger="hover"
                                             title="Update Course Session"
                                             data-content="After you clicked, your course session will exported.">
