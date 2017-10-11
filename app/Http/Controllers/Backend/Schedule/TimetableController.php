@@ -211,9 +211,17 @@ class TimetableController extends Controller
     /**
      * Create timetable page.
      *
-     * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View
+     * @param null $academic
+     * @param null $department
+     * @param null $degree
+     * @param null $option
+     * @param null $grade
+     * @param null $semester
+     * @param null $group
+     * @param $week
+     * @return mixed
      */
-    public function create()
+    public function create($academic = null, $department = null, $degree = null, $option = null, $grade = null, $semester = null, $group = null, $week=null)
     {
         $now = Carbon::now('Asia/Phnom_Penh');
         $employee = Employee::where('user_id', auth()->user()->id)->first();
@@ -223,12 +231,62 @@ class TimetableController extends Controller
             $createTimetablePermissionConfiguration = null;
         }
 
+        if(isset($academic)){
+            $groups = DB::table('course_annuals')
+                ->where([
+                    ['academic_year_id', $academic],
+                    ['department_id', $department],
+                    ['degree_id', $degree],
+                    ['grade_id', $grade]
+                ])
+                ->where(function ($query) use ($option){
+                    if(!is_null($option) && $option != 0){
+                        $query->where('department_option_id', $option);
+                    }
+                })
+                ->join('slots', 'slots.course_annual_id', '=', 'course_annuals.id')
+                ->join('groups', 'groups.id', '=', 'slots.group_id')
+                ->distinct('groups.code')
+                ->select('groups.code as name', 'groups.id as id')
+                ->get();
+
+            usort($groups, function ($a, $b) {
+                if (is_numeric($a->name)) {
+                    return $a->name - $b->name;
+                } else {
+                    return strcmp($a->name, $b->name);
+                }
+            });
+        }else{
+            $groups = null;
+        }
+
         if (isset($createTimetablePermissionConfiguration)) {
             if (access()->allow('create-timetable') && (strtotime($now) >= strtotime($createTimetablePermissionConfiguration->created_at) && strtotime($now) <= strtotime($createTimetablePermissionConfiguration->updated_at))) {
-                return view('backend.schedule.timetables.create');
+                return view('backend.schedule.timetables.create')->with([
+                    'academic_year_id' => $academic,
+                    'department_id' => $department,
+                    'degree_id' => $degree,
+                    'option_id' => $option,
+                    'grade_id' => $grade,
+                    'semester_id' => $semester,
+                    'group_id' => $group,
+                    'week_id' => $week,
+                    'groups' => $groups
+                ]);
             }
         } else {
-            return view('backend.schedule.timetables.create');
+            return view('backend.schedule.timetables.create')->with([
+                'academic_year_id' => $academic,
+                'department_id' => $department,
+                'degree_id' => $degree,
+                'option_id' => $option,
+                'grade_id' => $grade,
+                'semester_id' => $semester,
+                'group_id' => $group,
+                'week_id' => $week,
+                'groups' => $groups
+            ]);
         }
 
         return abort(404);
@@ -289,7 +347,21 @@ class TimetableController extends Controller
                 $timetableSlots->push($timetableSlot);
             }
         }
-        return view('backend.schedule.timetables.show', compact('timetableSlots', 'timetable', 'now', 'createTimetablePermissionConfiguration'));
+
+        //dd($timetable);
+        $options = [
+            $timetable->academic_year_id,
+            $timetable->department_id,
+            $timetable->degree_id,
+            isset($timetable->option_id) ? $timetable->option_id : 0,
+            $timetable->grade_id,
+            $timetable->semester_id,
+            isset($timetable->group_id) ? $timetable->group_id : 0,
+            $timetable->week_id
+        ];
+
+
+        return view('backend.schedule.timetables.show', compact('timetableSlots', 'timetable', 'now', 'createTimetablePermissionConfiguration', 'options'));
     }
 
     /**

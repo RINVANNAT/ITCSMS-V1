@@ -43,6 +43,7 @@
 @stop
 
 @section('content')
+
     <div class="box box-success">
         <div class="box-header with-border">
             <div class="mailbox-controls">
@@ -56,7 +57,7 @@
                                data-original-title="Create a new timetable"
                                href="{{ route('admin.schedule.timetables.create') }}">
                                 <i class="fa fa-plus-circle"></i>
-                                {{ trans('buttons.backend.schedule.timetable.create') }}
+                                Manage Timetable
                             </a>
                         </div>
                     @endif
@@ -64,11 +65,12 @@
                     <div class="pull-left">
                         <a class="btn btn-primary btn-sm"
                            data-toggle="tooltip"
-                           data-placement="top" title="Create a new timetable"
-                           data-original-title="Create a new timetable"
-                           href="{{ route('admin.schedule.timetables.create') }}">
+                           data-placement="top"
+                           title="Manage timetable"
+                           data-original-title="Manage timetable"
+                           href="{{ route('admin.schedule.timetables.create', $options) }}">
                             <i class="fa fa-plus-circle"></i>
-                            {{ trans('buttons.backend.schedule.timetable.create') }}
+                            Manage Timetable
                         </a>
                     </div>
                 @endif

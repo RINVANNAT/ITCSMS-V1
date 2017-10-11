@@ -54,7 +54,7 @@
         </select>
     @endif
 @else
-{{--end of global timetable--}}
+    {{--end of global timetable--}}
     @if(isset($department))
         <select name="department"
                 data-toggle="tooltip"
@@ -130,6 +130,11 @@
         data-placement="top"
         title="{{ trans('inputs.backend.schedule.timetable.options.group') }}">
     <option selected disabled>{{ trans('inputs.backend.schedule.timetable.options.group') }}</option>
+    @if(isset($groups))
+        @foreach($groups as $group)
+            <option value="{{ $group->id }}">{{ $group->name }}</option>
+        @endforeach
+    @endif
 </select>
 
 @if(isset($weeks))

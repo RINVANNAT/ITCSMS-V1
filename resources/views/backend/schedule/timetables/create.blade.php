@@ -768,7 +768,21 @@
             });
 
             // filter options
-            get_options($('select[name="department"] :selected').val());
+            @if(isset($academic_year_id))
+                $("select[name='academicYear'] option[value={{ $academic_year_id }}]").attr('selected', true);
+                $("select[name='department'] option[value={{ $department_id }}]").attr('selected', true);
+                $("select[name='degree'] option[value={{ $degree_id }}]").attr('selected', true);
+                $("select[name='option'] option[value={{ $option_id }}]").attr('selected', true);
+                $("select[name='grade'] option[value={{ $grade_id }}]").attr('selected', true);
+                $("select[name='semester'] option[value={{ $semester_id }}]").attr('selected', true);
+                $("select[name='group'] option[value={{ $group_id }}]").attr('selected', true);
+                $("select[name='weekly'] option[value={{ $week_id }}]").attr('selected', true);
+            @else
+                get_options($('select[name="department"] :selected').val());
+            @endif
+
+            get_timetable_slots();
+            get_timetable();
             drag_course_session();
             get_rooms();
 
