@@ -157,8 +157,14 @@
             data-placement="top"
             title="{{ trans('inputs.backend.schedule.timetable.options.weekly') }}">
         <option selected disabled>{{ trans('inputs.backend.schedule.timetable.options.weekly') }}</option>
-        @foreach($weeks as $week)
-            <option value="{{ $week->id }}">{{ $week->name_en }}</option>
-        @endforeach
+        @if(isset($weeks_))
+            @foreach($weeks_ as $item)
+                <option value="{{ $item->id }}">{{ $item->name_en }}</option>
+            @endforeach
+        @else
+            @foreach($weeks as $week)
+                <option value="{{ $week->id }}">{{ $week->name_en }}</option>
+            @endforeach
+        @endif
     </select>
 @endif
