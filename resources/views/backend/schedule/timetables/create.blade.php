@@ -652,7 +652,7 @@
                             remove_timetable_slots(event);
                             $('#timetable').fullCalendar('removeEvent', event.id);
                         }
-                    }catch(e){
+                    } catch (e) {
                         console.log(e);
                     }
                 },
@@ -773,14 +773,14 @@
             // filter options
             @if(isset($academic_year_id))
                 $("select[name='academicYear'] option[value={{ $academic_year_id }}]").attr('selected', true);
-                $("select[name='department'] option[value={{ $department_id }}]").attr('selected', true);
-                $("select[name='degree'] option[value={{ $degree_id }}]").attr('selected', true);
-                $("select[name='option'] option[value={{ $option_id }}]").attr('selected', true);
-                $("select[name='grade'] option[value={{ $grade_id }}]").attr('selected', true);
-                $("select[name='semester'] option[value={{ $semester_id }}]").attr('selected', true);
-                $("select[name='group'] option[value={{ $group_id }}]").attr('selected', true);
-                $("select[name='weekly'] option[value={{ $week_id }}]").attr('selected', true);
-                get_course_sessions();
+            $("select[name='department'] option[value={{ $department_id }}]").attr('selected', true);
+            $("select[name='degree'] option[value={{ $degree_id }}]").attr('selected', true);
+            $("select[name='option'] option[value={{ $option_id }}]").attr('selected', true);
+            $("select[name='grade'] option[value={{ $grade_id }}]").attr('selected', true);
+            $("select[name='semester'] option[value={{ $semester_id }}]").attr('selected', true);
+            $("select[name='group'] option[value={{ $group_id }}]").attr('selected', true);
+            $("select[name='weekly'] option[value={{ $week_id }}]").attr('selected', true);
+            get_course_sessions();
             @else
                 get_options($('select[name="department"] :selected').val());
             @endif
@@ -817,6 +817,7 @@
                         dom.parent().parent().children().eq(0).empty();
                         dom.remove();
                         notify('info', 'Room was removed.', 'Remove Room');
+                        $('#timetable').find('.course-selected').removeClass('course-selected');
                     },
                     error: function (response) {
                         if (response.status === 403) {

@@ -294,6 +294,8 @@ class TimetableController extends Controller
             $groups = null;
         }
 
+        $weeks = Week::where('semester_id', $semester)->get();
+
         if (isset($createTimetablePermissionConfiguration)) {
             if (access()->allow('create-timetable') && (strtotime($now) >= strtotime($createTimetablePermissionConfiguration->created_at) && strtotime($now) <= strtotime($createTimetablePermissionConfiguration->updated_at))) {
                 return view('backend.schedule.timetables.create')->with([
@@ -306,7 +308,8 @@ class TimetableController extends Controller
                     'group_id' => $group,
                     'week_id' => $week,
                     'groups' => $groups,
-                    'options_' => $options_
+                    'options_' => $options_,
+                    'weeks_' => $weeks
                 ]);
             }
         } else {
@@ -320,7 +323,8 @@ class TimetableController extends Controller
                 'group_id' => $group,
                 'week_id' => $week,
                 'groups' => $groups,
-                'options_' => $options_
+                'options_' => $options_,
+                'weeks_' => $weeks
             ]);
         }
 

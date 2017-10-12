@@ -2,33 +2,31 @@
     <div class="col-md-12">
         <div class="box box-default" style="border-top: 1px solid #f1f1f1;">
             <div class="box-header with-border">
-                <div class="box-tools pull-right">
-                    <div class="row">
-                        <div class="col-xs-9 col-xs-offset-3 col-sm-9 col-sm-offset-9 col-md-9 col-md-offset-3">
-                            <div class="input-group">
-                                <input type="text"
-                                       class="form-control input-sm"
-                                       id="search_course_session"
-                                       placeholder="SEARCH COURSE SESSION">
-                                <span class="input-group-btn">
-                                    <button class="btn btn-primary btn-sm btn_export_course_session"
-                                            data-container="body"
-                                            data-toggle="popover"
-                                            data-placement="bottom"
-                                            data-trigger="hover"
-                                            title="Update Course Session"
-                                            data-content="After you clicked, your course session will exported.">
-                                        <i class="fa fa-refresh"></i>
-                                    </button>
-                                </span>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <h3 class="box-title">
-                    <i class="fa fa-drivers-license-o" data-toggle="tooltip" data-placement="top" title="List all course sessions"></i>
+
+                <h3 class="box-title" data-toggle="tooltip" data-placement="top" data-title="Course Session">
+                    <i class="fa fa-drivers-license-o"></i>
                     {{--{{ trans('labels.backend.schedule.timetable.courses_sessions') }}--}}
                 </h3>
+
+                <div class="box-tools pull-right">
+                    <form class="form-inline">
+                        <input type="text"
+                               class="form-control input-sm"
+                               id="search_course_session"
+                               placeholder="SEARCH COURSE SESSION">
+                        <button class="btn btn-primary btn-sm btn_export_course_session"
+                                data-container="body"
+                                data-toggle="popover"
+                                data-placement="bottom"
+                                data-trigger="hover"
+                                title="Update Course Session"
+                                data-content="After you clicked, your course session will exported.">
+                            <i class="fa fa-refresh"></i>
+                        </button>
+                    </form>
+                    <div class="clearfix"></div>
+                </div>
+
             </div>
             <div class="box-body courses-sessions">
                 @if(access()->allow('drag-course-session'))
