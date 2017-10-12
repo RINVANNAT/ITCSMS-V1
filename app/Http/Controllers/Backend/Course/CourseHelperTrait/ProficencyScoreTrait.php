@@ -9,6 +9,7 @@
 namespace App\Http\Controllers\Backend\Course\CourseHelperTrait;
 
 
+use App\Models\CertificateReference;
 use App\Models\CompetencyScore;
 use App\Models\CourseAnnual;
 use App\Models\Degree;
@@ -784,6 +785,12 @@ trait ProficencyScoreTrait
             ->where("course_annual_id",$course_annual_id)
             ->get();
         $printed_certificates = collect($printed_certificates)->groupBy("student_annual_id")->toArray();
+        // Get certificate reference number
+        $certificate_references = CertificateReference::where('course_annual_id',$course_annual_id)
+            ->get()
+            ->keyBy('student_annual_id')
+            ->toArray();
+
         // All competencies
         $competencies = DB::table('competencies')
             ->join('competency_types', function($query) use ($course_annual) {
@@ -802,7 +809,7 @@ trait ProficencyScoreTrait
         $competencyScores = collect($competencyScores)->groupBy('student_annual_id')->toArray();
 
         $score_collection = [];
-        collect($students['student_data'])->filter(function($item) use (&$score_collection, $competencyScores, $competencies, $degrees, $departments,$printed_certificates){
+        collect($students['student_data'])->filter(function($item) use (&$score_collection, $competencyScores, $competencies, $degrees, $departments,$printed_certificates, $certificate_references){
 
             $eachScoreProp = isset($competencyScores[$item->student_annual_id])?$competencyScores[$item->student_annual_id]:[];
             $strScore = '';
@@ -812,6 +819,7 @@ trait ProficencyScoreTrait
             $eachItem['gender'] = $item->code;
             $eachItem['printed_certificate'] = "";
             $eachItem['decision'] = "";
+            $eachItem['ref_number'] = "";
             if(isset($printed_certificates[$item->student_annual_id])){
                 $eachItem['printed_certificate'] = "";
 
@@ -820,6 +828,9 @@ trait ProficencyScoreTrait
                 }
             }
 
+            if(isset($certificate_references[$item->student_annual_id])){
+                $eachItem['ref_number'] = $certificate_references[$item->student_annual_id]['ref_number'];
+            }
             if(count($eachScoreProp) >0) {
                 foreach($eachScoreProp as $prop) {
 
@@ -895,9 +906,12 @@ trait ProficencyScoreTrait
         $studentAnnualIds = json_decode($request->ids);
         $issued_by = $request->issued_by;
         $issued_date = $request->issued_date;
-        $issued_number = $request->issued_number;
         $courseAnnual = CourseAnnual::find($request->course_annual_id);
         $departments = Department::lists("code","id")->toArray();
+        $certificate_references = CertificateReference::where('course_annual_id',$request->course_annual_id)
+            ->get()
+            ->keyBy('student_annual_id')
+            ->toArray();
         $students  = DB::table('students')
             ->join('studentAnnuals', function($query) use($studentAnnualIds) {
                 $query->on('studentAnnuals.student_id', '=', 'students.id')
@@ -938,7 +952,7 @@ trait ProficencyScoreTrait
                 'exam_end'=>$request->exam_end,
                 'issued_by' => $issued_by,
                 'issued_date' => $issued_date,
-                'issued_number' => $issued_number
+                'certificate_references' => $certificate_references
             ]
         );
     }

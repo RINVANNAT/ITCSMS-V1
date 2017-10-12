@@ -54,9 +54,9 @@
                 <input class="form-control col-md-8 daterange" type="text" name="daterange" placeholder="Please provide exam date"/>
             </div>
 
-            <div class="pull-right">
-                <input type="text" name="issued_number" class="form-control"  placeholder="Issued number"/>
-            </div>
+            {{--<div class="pull-right">--}}
+                {{--<input type="text" name="issued_number" class="form-control"  placeholder="Issued number"/>--}}
+            {{--</div>--}}
             <div class="pull-right" style="margin-right: 5px;">
                 <input type="text" name="issued_by" class="form-control"  placeholder="Issued by"/>
             </div>
@@ -75,6 +75,7 @@
                     <th>Name</th>
                     <th>Class</th>
                     <th>Score</th>
+                    <th>Ref. Number</th>
                     <th>Printed Date</th>
                     <th></th>
                 </tr>
@@ -119,14 +120,14 @@
                 var exam_end = $('input[name="daterange"]').data('daterangepicker').endDate;
                 var issued_by = $('input[name="issued_by"]').val();
                 var issued_date = $('input[name="issued_date"]').val();
-                var issued_number = $('input[name="issued_number"]').val();
+                //var issued_number = $('input[name="issued_number"]').val();
                 // Open new window to print
                 PopupCenterDual(
                         print_url
                         +"?course_annual_id="+course_annual_id
                         +"&issued_by="+issued_by
                         +"&issued_date="+issued_date
-                        +"&issued_number="+issued_number
+                        //+"&issued_number="+issued_number
                         +'&ids='+JSON.stringify(selected_ids)
                         +'&exam_start='+ exam_start.format("DD/MM/YYYY")
                         +'&exam_end='+ exam_end.format("DD/MM/YYYY"),
@@ -177,6 +178,7 @@
                     { data: 'name', name: 'name', searchable:false},
                     { data: 'class', name: 'class',orderable:false},
                     { data: 'score_prop', name: 'score_prop',orderable:false},
+                    { data: 'ref_number', name: 'ref_number',orderable:false},
                     { data: 'printed_certificate', name: 'printed_certificate',orderable:false, searchable:false},
                     { data: 'action', name: 'action',orderable: false, searchable: false}
                 ],
