@@ -18,3 +18,62 @@ if (!function_exists('has_half_hour')) {
         return false;
     }
 }
+
+
+if (!function_exists('fill_out_cell')) {
+    /**
+     * @param $timetableSlots
+     * @return string
+     */
+    function fill_out_cell($timetableSlots, $str_start, $str_end)
+    {
+        $cols = '';
+        for($day=2; $day<=7; $day++){
+            foreach ($timetableSlots as $slot){
+                if((new \Carbon\Carbon($slot->start))->day == $day){
+                    if(get_date_str($slot->start) == $str_start){
+                        $cols .= '<td rowspan="'.get_rowspan($slot->start, $slot->end).'">'
+                            .'<p>'.$slot->course_name.'</p>'
+                            .'</td>';
+                    }
+                }else{
+                    $cols .='<td></td>';
+                }
+            }
+        }
+
+        return $cols;
+    }
+}
+
+if (!function_exists('get_rowspan')) {
+    /**
+     * @param $start
+     * @param $end
+     * @return float|int
+     */
+    function get_rowspan($start, $end)
+    {
+        $start = (new \Carbon\Carbon($start));
+        $end = (new \Carbon\Carbon($end));
+        $minute = $end->diffInMinutes($start);
+        return ($minute)/(30);
+    }
+}
+
+if (!function_exists('get_date_str')) {
+    /**
+     * @param $date
+     * @return string
+     */
+    function get_date_str($date)
+    {
+        $date = new \Carbon\Carbon($date);
+        $hour = $date->hour;
+        $minute = $date->minute;
+        if($minute == 30){
+            return $hour.':'.$minute;
+        }
+        return ''.$hour.'';
+    }
+}
