@@ -846,11 +846,11 @@ trait ExportTimetableController
 
                 $countRows = 6;
                 // $countColumns = 1;
-                for ($timesRow = 0; $timesRow < 18; $timesRow++) {
+                for ($timesRow = 0; $timesRow < 17; $timesRow++) {
                     // timesRow = 0 => row = timesRow + countRows = 6;
                     // we start from 6 to [...] row.
                     $countColumns = 1;
-                    if ($timesRow == 9) {
+                    if ($timesRow == 8) {
                         $sheet->row(38, function ($row) {
                             // call cell manipulation methods
                             $row->setBackground('#f1f1f1');
@@ -990,6 +990,129 @@ trait ExportTimetableController
                                             (get_date_str($start) == '10' && get_date_str($end) == '11')
                                         )
                                         ) {
+                                        $this->append_data($sheet, $columns, $countColumns, $countRows, $timetableSlot);
+                                        break;
+                                    }
+                                } else if ($timesRow == 9) {
+                                    if (get_date_str($start) == '13') {
+                                        $this->append_data($sheet, $columns, $countColumns, $countRows, $timetableSlot);
+                                        break;
+                                    }
+                                } else if ($timesRow == 10) {
+                                    if (
+                                        (get_date_str($start) == '13:30')
+                                        ||
+                                        (get_date_str($start) == '13' && (get_date_str($end) == '14' || get_date_str($end) == '14:30' || get_date_str($end) == '15' || get_date_str($end) == '15:30' || get_date_str($end) == '16' || get_date_str($end) == '16:30' || get_date_str($end) == '17'))
+                                    ) {
+                                        $this->append_data($sheet, $columns, $countColumns, $countRows, $timetableSlot);
+                                        break;
+                                    }
+                                } else if ($timesRow == 11) {
+                                    if (
+                                        (get_date_str($start) == '14')
+                                        ||
+                                        (
+                                            (get_date_str($start) == '13' && (get_date_str($end) == '14:30' || get_date_str($end) == '15' || get_date_str($end) == '15:30' || get_date_str($end) == '16' || get_date_str($end) == '16:30' || get_date_str($end) == '17'))
+                                            ||
+                                            (get_date_str($start) == '13:30' && (get_date_str($end) == '14:30' || get_date_str($end) == '15' || get_date_str($end) == '15:30' || get_date_str($end) == '16' || get_date_str($end) == '16:30' || get_date_str($end) == '17'))
+                                        )
+                                    ) {
+                                        $this->append_data($sheet, $columns, $countColumns, $countRows, $timetableSlot);
+                                        break;
+                                    }
+                                } else if ($timesRow == 12) {
+                                    if (
+                                        (get_date_str($start) == '14:30')
+                                        ||
+                                        (
+                                            (get_date_str($start) == '13' && (get_date_str($end) == '15' || get_date_str($end) == '15:30' || get_date_str($end) == '16' || get_date_str($end) == '16:30' || get_date_str($end) == '17'))
+                                            ||
+                                            (get_date_str($start) == '13:30' && (get_date_str($end) == '15' || get_date_str($end) == '15:30' || get_date_str($end) == '16' || get_date_str($end) == '16:30' || get_date_str($end) == '17'))
+                                            ||
+                                            (get_date_str($start) == '14' && (get_date_str($end) == '15' || get_date_str($end) == '15:30' || get_date_str($end) == '16' || get_date_str($end) == '16:30' || get_date_str($end) == '17'))
+                                        )
+                                    ) {
+                                        $this->append_data($sheet, $columns, $countColumns, $countRows, $timetableSlot);
+                                        break;
+                                    }
+                                }
+                                else if ($timesRow == 13) {
+                                    if (
+                                        (get_date_str($start) == '15')
+                                        ||
+                                        (
+                                            (get_date_str($start) == '13' && (get_date_str($end) == '15:30' || get_date_str($end) == '16' || get_date_str($end) == '16:30' || get_date_str($end) == '17'))
+                                            ||
+                                            (get_date_str($start) == '13:30' && (get_date_str($end) == '15:30' || get_date_str($end) == '16' || get_date_str($end) == '16:30' || get_date_str($end) == '17'))
+                                            ||
+                                            (get_date_str($start) == '14' && (get_date_str($end) == '15:30' || get_date_str($end) == '16' || get_date_str($end) == '16:30' || get_date_str($end) == '17'))
+                                            ||
+                                            (get_date_str($start) == '14:30' && (get_date_str($end) == '15:30' || get_date_str($end) == '16' || get_date_str($end) == '16:30' || get_date_str($end) == '17'))
+                                        )
+                                    ) {
+                                        $this->append_data($sheet, $columns, $countColumns, $countRows, $timetableSlot);
+                                        break;
+                                    }
+                                }else if ($timesRow == 14) {
+                                    if (
+                                        (get_date_str($start) == '15:30')
+                                        ||
+                                        (
+                                            (get_date_str($start) == '13' && (get_date_str($end) == '16' || get_date_str($end) == '16:30' || get_date_str($end) == '17'))
+                                            ||
+                                            (get_date_str($start) == '13:30' && (get_date_str($end) == '16' || get_date_str($end) == '16:30' || get_date_str($end) == '17'))
+                                            ||
+                                            (get_date_str($start) == '14' && (get_date_str($end) == '16' || get_date_str($end) == '16:30' || get_date_str($end) == '17'))
+                                            ||
+                                            (get_date_str($start) == '14:30' && (get_date_str($end) == '16' || get_date_str($end) == '16:30' || get_date_str($end) == '17'))
+                                            ||
+                                            (get_date_str($start) == '15' && (get_date_str($end) == '16' || get_date_str($end) == '16:30' || get_date_str($end) == '17'))
+                                        )
+                                    ) {
+                                        $this->append_data($sheet, $columns, $countColumns, $countRows, $timetableSlot);
+                                        break;
+                                    }
+                                } else if ($timesRow == 15) {
+                                    if (
+                                        (get_date_str($start) == '16')
+                                        ||
+                                        (
+                                            (get_date_str($start) == '13' && (get_date_str($end) == '16:30' || get_date_str($end) == '17'))
+                                            ||
+                                            (get_date_str($start) == '13:30' && (get_date_str($end) == '16:30' || get_date_str($end) == '17'))
+                                            ||
+                                            (get_date_str($start) == '14' && (get_date_str($end) == '16:30' || get_date_str($end) == '17'))
+                                            ||
+                                            (get_date_str($start) == '14:30' && (get_date_str($end) == '16:30' || get_date_str($end) == '17'))
+                                            ||
+                                            (get_date_str($start) == '15' && (get_date_str($end) == '16:30' || get_date_str($end) == '17'))
+                                            ||
+                                            (get_date_str($start) == '15:30' && (get_date_str($end) == '16:30' || get_date_str($end) == '17'))
+                                        )
+                                    ) {
+                                        $this->append_data($sheet, $columns, $countColumns, $countRows, $timetableSlot);
+                                        break;
+                                    }
+                                } else if ($timesRow == 16) {
+                                    if (
+                                        (get_date_str($start) == '16:30')
+                                        ||
+                                        (
+                                            (get_date_str($start) == '13' && get_date_str($end) == '17')
+                                            ||
+                                            (get_date_str($start) == '13:30' && get_date_str($end) == '17')
+                                            ||
+                                            (get_date_str($start) == '14' && get_date_str($end) == '17')
+                                            ||
+                                            (get_date_str($start) == '14:30' && get_date_str($end) == '17')
+                                            ||
+                                            (get_date_str($start) == '15' && get_date_str($end) == '17')
+                                            ||
+                                            (get_date_str($start) == '15:30' && get_date_str($end) == '17')
+                                            ||
+                                            (get_date_str($start) == '16' && get_date_str($end) == '17')
+                                        )
+                                    ) {
                                         $this->append_data($sheet, $columns, $countColumns, $countRows, $timetableSlot);
                                         break;
                                     }
