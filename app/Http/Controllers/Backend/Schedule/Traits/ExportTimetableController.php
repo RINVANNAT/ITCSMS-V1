@@ -844,11 +844,9 @@ trait ExportTimetableController
                     $cells->setValignment('center');
                 });
 
-                $sheet->setBorder('A5:M70', 'thin');
-
                 $countRows = 6;
                 // $countColumns = 1;
-                for ($timesRow = 0; $timesRow < 17; $timesRow++) {
+                for ($timesRow = 0; $timesRow < 18; $timesRow++) {
                     // timesRow = 0 => row = timesRow + countRows = 6;
                     // we start from 6 to [...] row.
                     $countColumns = 1;
@@ -857,7 +855,7 @@ trait ExportTimetableController
                             // call cell manipulation methods
                             $row->setBackground('#f1f1f1');
                         });
-                        $countRows = 38;
+                        $countRows = 39;
                         continue;
                     }
                     for ($columnDay = 2; $columnDay <= 7; $columnDay++) {
