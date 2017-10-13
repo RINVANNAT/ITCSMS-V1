@@ -28,15 +28,15 @@ table.timetable tr td {
 }
 
 table.timetable th {
-    padding: 10px !important;
+    padding: 5px !important;
 }
 
 table.timetable p, table.timetable tr td {
-    font-size: 14px !important;
+    font-size: 11px !important;
     margin: 8px !important;
     padding: 0 !important;
-    line-height: 1 !important;
-    height: 30px !important;
+    line-height: normal;
+    height: 40px !important;
 }
 
 th {
@@ -116,7 +116,7 @@ page[size="A5"][layout="portrait"] {
         margin: 0;
         box-shadow: 0;
         width: 100%;
-        font-size: 10px;
+        font-size: 11px;
         padding: 0px;
     }
 
@@ -150,4 +150,26 @@ page[size="A5"][layout="portrait"] {
 
 .lang-info-right {
     float: right;
+}
+
+
+table.timetable tr td{
+    position: relative !important;
+}
+
+table.timetable tr td div.course_type {
+    position: absolute;
+    top: 5px;
+    right: 5px;
+}
+
+table.timetable tr td div.course_name,
+table.timetable tr td div.teacher_name{
+    text-align: center;
+}
+
+table.timetable tr td div.room_name {
+    position: absolute;
+    bottom: 5px;
+    right: 5px;
 }

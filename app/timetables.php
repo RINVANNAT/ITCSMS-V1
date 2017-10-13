@@ -28,16 +28,16 @@ if (!function_exists('fill_out_cell')) {
     function fill_out_cell($timetableSlots, $str_start, $str_end)
     {
         $cols = '';
-        for($day=2; $day<=7; $day++){
-            foreach ($timetableSlots as $slot){
-                if((new \Carbon\Carbon($slot->start))->day == $day){
-                    if(get_date_str($slot->start) == $str_start){
-                        $cols .= '<td rowspan="'.get_rowspan($slot->start, $slot->end).'">'
-                            .'<p>'.$slot->course_name.'</p>'
-                            .'</td>';
+        for ($day = 2; $day <= 7; $day++) {
+            foreach ($timetableSlots as $slot) {
+                if ((new \Carbon\Carbon($slot->start))->day == $day) {
+                    if (get_date_str($slot->start) == $str_start) {
+                        $cols .= '<td rowspan="' . get_rowspan($slot->start, $slot->end) . '">'
+                            . '<p>' . $slot->course_name . '</p>'
+                            . '</td>';
                     }
-                }else{
-                    $cols .='<td></td>';
+                } else {
+                    $cols .= '<td></td>';
                 }
             }
         }
@@ -57,7 +57,7 @@ if (!function_exists('get_rowspan')) {
         $start = (new \Carbon\Carbon($start));
         $end = (new \Carbon\Carbon($end));
         $minute = $end->diffInMinutes($start);
-        return ($minute)/(30);
+        return ($minute) / (30);
     }
 }
 
@@ -71,9 +71,40 @@ if (!function_exists('get_date_str')) {
         $date = new \Carbon\Carbon($date);
         $hour = $date->hour;
         $minute = $date->minute;
-        if($minute == 30){
-            return $hour.':'.$minute;
+        if ($minute == 30) {
+            return $hour . ':' . $minute;
         }
-        return ''.$hour.'';
+        return '' . $hour . '';
+    }
+}
+
+if (!function_exists('smis_str_limit')) {
+    /**
+     * @param $str
+     * @param $limit_str
+     * @return string
+     */
+    function smis_str_limit($str, $limit_str)
+    {
+        if (strlen($str) > $limit_str) {
+            return str_limit($str, $limit_str);
+        }
+        return $str;
+    }
+}
+
+if (!function_exists('smis_concat_room')) {
+    /**
+     * @param $room
+     * @param $building
+     * @param null $symbol
+     * @return string
+     */
+    function smis_concat_str($room, $building, $symbol=null)
+    {
+        if($symbol == null){
+            return $room. '-' .$building;
+        }
+        return $room . $symbol . $building;
     }
 }

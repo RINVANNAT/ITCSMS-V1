@@ -128,7 +128,11 @@ trait ExportTimetableController
                             foreach ($weeks as $week) {
                                 $findTimetable = $this->find_timetable_export_timetable_file($timetable, $group, $week);
                                 if ($findTimetable instanceof Timetable) {
-                                    $this->generate_sheet($excel, $findTimetable, $group, $week);
+                                    if(!has_half_hour($findTimetable)){
+                                        $this->generate_sheet($excel, $findTimetable, $group, $week);
+                                    }else{
+                                        $this->halfHourTemplate($excel, $findTimetable, null, $week);
+                                    }
                                 } else {
                                     continue;
                                 }
@@ -140,7 +144,11 @@ trait ExportTimetableController
                         foreach ($weeks as $week) {
                             $findTimetable = $this->find_timetable_export_timetable_file($timetable, null, $week);
                             if ($findTimetable instanceof Timetable) {
-                                $this->generate_sheet($excel, $findTimetable, null, $week);
+                                if(!has_half_hour($findTimetable)){
+                                    $this->generate_sheet($excel, $findTimetable, null, $week);
+                                }else{
+                                    $this->halfHourTemplate($excel, $findTimetable, null, $week);
+                                }
                             } else {
                                 continue;
                             }
@@ -666,6 +674,541 @@ trait ExportTimetableController
             $cell->setAlignment('right');
             // Set all borders (top, right, bottom, left)
             $cell->setBorder('none', 'thin', 'thin', 'thin');
+        });
+    }
+
+    /**
+     * @param $excel
+     * @param Timetable $findTimetable
+     * @param null $group
+     * @param $week
+     * @return mixed
+     */
+    public function halfHourTemplate($excel, Timetable $findTimetable, $group = null, $week){
+        $filename = ($group == null ? '' : 'Group(' . Group::find($group)->code . ')-') . Week::find($week)->name_en;
+        return $excel->sheet($filename, function ($sheet) use ($findTimetable, $group, $week) {
+            // prepare header data
+            $academicYear = $findTimetable->academicYear->name_latin;
+            $department = $findTimetable->department->code;
+            $degree = $findTimetable->degree->code;
+            $grade = $findTimetable->grade->code;
+            $display_group = $group == null ? '' : '(' . Group::find($group)->code . ')';
+            $semester = $findTimetable->semester->id == 1 ? 'I' : 'II';
+            $week = Week::find($week);
+            $timetableSlots = $findTimetable->timetableSlots;
+            $timetableSlotsLanguages = new Collection();
+            // find student annual ids
+            $student_annual_ids = $this->exportTimetableSlotRepository->find_student_annual_ids($findTimetable);
+            // have many student annual ids
+            if (count($student_annual_ids) > 0) {
+                // init array of dept language
+                $department_languages = array(12, 13); // (english, french)
+                foreach ($department_languages as $department_language) {
+                    $groups = $this->exportTimetableSlotRepository->find_group_student_annual_form_language($department_language, $student_annual_ids, $findTimetable);
+                    $timetables = $this->exportTimetableSlotRepository->get_timetables_form_language_by_student_annual($groups[0], $findTimetable, $department_language);
+                    $timetableSlotsLang = $this->exportTimetableSlotRepository->get_timetable_slot_language_dept($timetables, $groups[0]);
+                    $this->exportTimetableSlotRepository->set_timetable_slot_language($timetableSlotsLanguages, $timetableSlotsLang[1], $timetableSlotsLang[0]);
+                }
+            }
+
+            // insert logo
+            $logo = new \PHPExcel_Worksheet_Drawing();
+            $logo->setPath(public_path('img/timetable/logo-print.jpg'));
+            $logo->setWidth(80);
+            $logo->setHeight(60);
+            $logo->setOffsetX(25);
+            $logo->setCoordinates('A1');
+            $logo->setWorksheet($sheet);
+
+            $sheet->setOrientation('landscape');
+            $sheet->setFontFamily('Arial Narrow');
+
+            $sheet->mergeCells('C1:I1');
+            $sheet->mergeCells('C2:I2');
+
+            $sheet->cells('C1:I2', function ($cells) {
+                $cells->setAlignment('center');
+                $cells->setValignment('center');
+                $cells->setFontSize(12);
+                $cells->setFontWeight('bold');
+
+            });
+
+            // header sheet
+            $sheet->row(1, array('', '', 'EMPLOI DU TEMPS ' . $academicYear, '', '', '', '', '', '', 'Semestre - ' . $semester, '', '', ''));
+            $sheet->row(2, array('', '', 'Groupe: ' . $department . '-' . $degree . $grade . ($group == null ? '' : $display_group), '', '', '', '', '', '', 'Semaines ' . $week->id, '', '', ''));
+
+            // header table
+            $sheet->row(5, array('Horaire', 'Lundi', '', 'Mardi', '', 'Mercredi', '', 'Jeudi', '', 'Vendredi', '', 'Samedi', ''));
+            $sheet->setHeight(5, 20);
+
+            // set width header
+            $sheet->setWidth(array(
+                'A' => 20,
+                'B' => 15,
+                'C' => 15,
+                'D' => 15,
+                'E' => 15,
+                'F' => 15,
+                'G' => 15,
+                'H' => 15,
+                'I' => 15,
+                'J' => 15,
+                'K' => 15,
+                'L' => 15,
+                'M' => 15
+            ));
+
+            // semester header
+            $sheet->mergeCells('J1:L1');
+            $sheet->mergeCells('J2:L2');
+            $sheet->cells('J1:L2', function ($cells) {
+                $cells->setFontSize(12);
+            });
+
+            // merge header
+            $sheet->mergeCells('B5:C5');
+            $sheet->mergeCells('D5:E5');
+            $sheet->mergeCells('F5:G5');
+            $sheet->mergeCells('H5:I5');
+            $sheet->mergeCells('J5:K5');
+            $sheet->mergeCells('L5:M5');
+
+            $sheet->setBorder('A5:M5', 'thin');
+            $sheet->cells('A5:M5', function ($cells) {
+                $cells->setFontSize(12);
+                $cells->setFontWeight('bold');
+                $cells->setAlignment('center');
+                $cells->setValignment('center');
+            });
+
+            $columns = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M'];
+
+            if ($findTimetable->degree->id != 2) { // associate
+
+                $sheet->row(6, array('7h00-7h30'));
+                $sheet->mergeCells('A6:A9');
+
+                $sheet->row(10, array('7h30-8h00'));
+                $sheet->mergeCells('A10:A13');
+
+                $sheet->row(14, array('8h00-8h30'));
+                $sheet->mergeCells('A14:A17');
+
+                $sheet->row(18, array('8h30-9h00'));
+                $sheet->mergeCells('A18:A21');
+
+                $sheet->row(22, array('9h00-9h30'));
+                $sheet->mergeCells('A22:A25');
+
+                $sheet->row(26, array('9h30-10h00'));
+                $sheet->mergeCells('A26:A29');
+
+                $sheet->row(30, array('10h00-10h30'));
+                $sheet->mergeCells('A30:A33');
+
+                $sheet->row(34, array('10h30-11h00'));
+                $sheet->mergeCells('A34:A37');
+
+                $sheet->mergeCells('A38:M38');
+
+                $sheet->row(39, array('13h00-13h30'));
+                $sheet->mergeCells('A39:A42');
+
+                $sheet->row(43, array('13h30-14h00'));
+                $sheet->mergeCells('A43:A46');
+
+                $sheet->row(47, array('14h00-14h30'));
+                $sheet->mergeCells('A47:A50');
+
+                $sheet->row(51, array('14h30-15h00'));
+                $sheet->mergeCells('A51:A54');
+
+                $sheet->row(55, array('15h00-15h30'));
+                $sheet->mergeCells('A55:A58');
+
+                $sheet->row(59, array('15h30-16h00'));
+                $sheet->mergeCells('A59:A62');
+
+                $sheet->row(63, array('16h00-16h30'));
+                $sheet->mergeCells('A63:A66');
+
+                $sheet->row(67, array('16h30-17h00'));
+                $sheet->mergeCells('A67:A70');
+
+
+                $sheet->setBorder('A5:A70', 'thin');
+                $sheet->cells('A5:A70', function ($cells) {
+                    $cells->setFontSize(12);
+                    $cells->setAlignment('center');
+                    $cells->setValignment('center');
+                });
+
+                $sheet->setBorder('A5:M70', 'thin');
+
+                $countRows = 6;
+                // $countColumns = 1;
+                for ($timesRow = 0; $timesRow < 17; $timesRow++) {
+                    // timesRow = 0 => row = timesRow + countRows = 6;
+                    // we start from 6 to [...] row.
+                    $countColumns = 1;
+                    if ($timesRow == 9) {
+                        $sheet->row(38, function ($row) {
+                            // call cell manipulation methods
+                            $row->setBackground('#f1f1f1');
+                        });
+                        $countRows = 38;
+                        continue;
+                    }
+                    for ($columnDay = 2; $columnDay <= 7; $columnDay++) {
+                        $sheet->cells($columns[$countColumns] . $countRows . ':' . $columns[$countColumns + 1] . ($countRows + 3), function ($cells) {
+                            // Set all borders (top, right, bottom, left)
+                            $cells->setBorder('thin', 'thin', 'thin', 'thin');
+                        });
+                        // timetable slot of dept
+                        foreach ($timetableSlots as $timetableSlot) {
+                            $start = $timetableSlot->start;
+                            $end = $timetableSlot->end;
+                            $day = (new Carbon($timetableSlot->start))->day;
+
+                            if ($columnDay == $day) {
+                                if ($timesRow == 0) {
+                                    if (get_date_str($start) == '7') {
+                                        $this->append_data($sheet, $columns, $countColumns, $countRows, $timetableSlot);
+                                        break;
+                                    }
+                                } else if ($timesRow == 1) {
+                                    if (
+                                        (get_date_str($start) == '7:30')
+                                        ||
+                                        (get_date_str($start) == '7' && (get_date_str($end) == '8' || get_date_str($end) == '8:30' || get_date_str($end) == '9' || get_date_str($end) == '9:30' || get_date_str($end) == '10' || get_date_str($end) == '10:30' || get_date_str($end) == '11'))
+                                        ) {
+                                        $this->append_data($sheet, $columns, $countColumns, $countRows, $timetableSlot);
+                                        break;
+                                    }
+                                } else if ($timesRow == 2) {
+                                    if (
+                                        (get_date_str($start) == '8')
+                                        ||
+                                        (
+                                            (get_date_str($start) == '7' && (get_date_str($end) == '8:30' || get_date_str($end) == '9' || get_date_str($end) == '9:30' || get_date_str($end) == '10' || get_date_str($end) == '10:30' || get_date_str($end) == '11'))
+                                            ||
+                                            (get_date_str($start) == '7:30' && (get_date_str($end) == '8:30' || get_date_str($end) == '9' || get_date_str($end) == '9:30' || get_date_str($end) == '10' || get_date_str($end) == '10:30' || get_date_str($end) == '11'))
+                                        )
+                                        ) {
+                                        $this->append_data($sheet, $columns, $countColumns, $countRows, $timetableSlot);
+                                        break;
+                                    }
+                                } else if ($timesRow == 3) {
+                                    if (
+                                        (get_date_str($start) == '8:30')
+                                        ||
+                                        (
+                                            (get_date_str($start) == '7' && (get_date_str($end) == '9' || get_date_str($end) == '9:30' || get_date_str($end) == '10' || get_date_str($end) == '10:30' || get_date_str($end) == '11'))
+                                            ||
+                                            (get_date_str($start) == '7:30' && (get_date_str($end) == '9' || get_date_str($end) == '9:30' || get_date_str($end) == '10' || get_date_str($end) == '10:30' || get_date_str($end) == '11'))
+                                            ||
+                                            (get_date_str($start) == '8' && (get_date_str($end) == '9' || get_date_str($end) == '9:30' || get_date_str($end) == '10' || get_date_str($end) == '10:30' || get_date_str($end) == '11'))
+                                        )
+                                        ) {
+                                        $this->append_data($sheet, $columns, $countColumns, $countRows, $timetableSlot);
+                                        break;
+                                    }
+                                }
+                                else if ($timesRow == 4) {
+                                    if (
+                                        (get_date_str($start) == '9')
+                                        ||
+                                        (
+                                            (get_date_str($start) == '7' && (get_date_str($end) == '9:30' || get_date_str($end) == '10' || get_date_str($end) == '10:30' || get_date_str($end) == '11'))
+                                            ||
+                                            (get_date_str($start) == '7:30' && (get_date_str($end) == '9:30' || get_date_str($end) == '10' || get_date_str($end) == '10:30' || get_date_str($end) == '11'))
+                                            ||
+                                            (get_date_str($start) == '8' && (get_date_str($end) == '9:30' || get_date_str($end) == '10' || get_date_str($end) == '10:30' || get_date_str($end) == '11'))
+                                            ||
+                                            (get_date_str($start) == '8:30' && (get_date_str($end) == '9:30' || get_date_str($end) == '10' || get_date_str($end) == '10:30' || get_date_str($end) == '11'))
+                                        )
+                                        ) {
+                                        $this->append_data($sheet, $columns, $countColumns, $countRows, $timetableSlot);
+                                        break;
+                                    }
+                                }else if ($timesRow == 5) {
+                                    if (
+                                        (get_date_str($start) == '9:30')
+                                        ||
+                                        (
+                                            (get_date_str($start) == '7' && (get_date_str($end) == '10' || get_date_str($end) == '10:30' || get_date_str($end) == '11'))
+                                            ||
+                                            (get_date_str($start) == '7:30' && (get_date_str($end) == '10' || get_date_str($end) == '10:30' || get_date_str($end) == '11'))
+                                            ||
+                                            (get_date_str($start) == '8' && (get_date_str($end) == '10' || get_date_str($end) == '10:30' || get_date_str($end) == '11'))
+                                            ||
+                                            (get_date_str($start) == '8:30' && (get_date_str($end) == '10' || get_date_str($end) == '10:30' || get_date_str($end) == '11'))
+                                            ||
+                                            (get_date_str($start) == '9' && (get_date_str($end) == '10' || get_date_str($end) == '10:30' || get_date_str($end) == '11'))
+                                        )
+                                        ) {
+                                        $this->append_data($sheet, $columns, $countColumns, $countRows, $timetableSlot);
+                                        break;
+                                    }
+                                } else if ($timesRow == 6) {
+                                    if (
+                                        (get_date_str($start) == '10')
+                                        ||
+                                        (
+                                            (get_date_str($start) == '7' && (get_date_str($end) == '10:30' || get_date_str($end) == '11'))
+                                            ||
+                                            (get_date_str($start) == '7:30' && (get_date_str($end) == '10:30' || get_date_str($end) == '11'))
+                                            ||
+                                            (get_date_str($start) == '8' && (get_date_str($end) == '10:30' || get_date_str($end) == '11'))
+                                            ||
+                                            (get_date_str($start) == '8:30' && (get_date_str($end) == '10:30' || get_date_str($end) == '11'))
+                                            ||
+                                            (get_date_str($start) == '9' && (get_date_str($end) == '10:30' || get_date_str($end) == '11'))
+                                            ||
+                                            (get_date_str($start) == '9:30' && (get_date_str($end) == '10:30' || get_date_str($end) == '11'))
+                                        )
+                                        ) {
+                                        $this->append_data($sheet, $columns, $countColumns, $countRows, $timetableSlot);
+                                        break;
+                                    }
+                                } else if ($timesRow == 7) {
+                                    if (
+                                        (get_date_str($start) == '10:30')
+                                        ||
+                                        (
+                                            (get_date_str($start) == '7' && get_date_str($end) == '11')
+                                            ||
+                                            (get_date_str($start) == '7:30' && get_date_str($end) == '11')
+                                            ||
+                                            (get_date_str($start) == '8' && get_date_str($end) == '11')
+                                            ||
+                                            (get_date_str($start) == '8:30' && get_date_str($end) == '11')
+                                            ||
+                                            (get_date_str($start) == '9' && get_date_str($end) == '11')
+                                            ||
+                                            (get_date_str($start) == '9:30' && get_date_str($end) == '11')
+                                            ||
+                                            (get_date_str($start) == '10' && get_date_str($end) == '11')
+                                        )
+                                        ) {
+                                        $this->append_data($sheet, $columns, $countColumns, $countRows, $timetableSlot);
+                                        break;
+                                    }
+                                }
+                                else {
+                                    continue;
+                                }
+
+                            }
+                        }
+                        $countColumns += 2;
+                    }
+                    $countRows += 4;
+                }
+
+                // export language course
+                if (count($student_annual_ids) > 0 && count($timetableSlotsLanguages)) {
+
+                    for ($timesRow = 7; $timesRow <= 15; $timesRow++) {
+                        $countColumns = 1;
+
+                        for ($columnDay = 2; $columnDay <= 7; $columnDay++) {
+
+                            foreach ($timetableSlotsLanguages as $timetableSlotsLanguage) {
+
+                                if ($timesRow == 7) {
+                                    $countRows = 6;
+                                } elseif ($timesRow == 8) {
+                                    $countRows = 10;
+                                } elseif ($timesRow == 9) {
+                                    $countRows = 14;
+                                } elseif ($timesRow == 13) {
+                                    $countRows = 23;
+                                } elseif ($timesRow == 14) {
+                                    $countRows = 27;
+                                } elseif ($timesRow == 15) {
+                                    $countRows = 31;
+                                } else {
+                                    continue;
+                                }
+
+                                $startDay = (new Carbon($timetableSlotsLanguage['start']))->day;
+                                $startHour = (new Carbon($timetableSlotsLanguage['start']))->hour;
+
+                                if (($startDay == $columnDay) && ($startHour == $timesRow)) {
+
+                                    $sheet->mergeCells($columns[$countColumns] . $countRows . ':' . $columns[$countColumns + 1] . $countRows);
+                                    $sheet->cell($columns[$countColumns] . $countRows, function ($cell) use ($timetableSlotsLanguage) {
+                                        $cell->setValue($timetableSlotsLanguage['course_name']);
+                                        $cell->setAlignment('center');
+                                        $cell->setFontWeight('bold');
+                                    });
+
+                                    for ($i = $countRows + 1; $i <= $countRows + 7; $i++) {
+                                        $sheet->mergeCells($columns[$countColumns] . $i . ':' . $columns[$countColumns + 1] . $i);
+                                    }
+
+                                    $i = $countRows + 1;
+
+                                    for ($k = 0; $k < count($timetableSlotsLanguage['slotsForLanguage']); $k += 2) {
+                                        $sheet->cell($columns[$countColumns] . $i, function ($cell) use ($timetableSlotsLanguage, $k) {
+                                            // Set all borders (top, right, bottom, left)
+                                            $cell->setBorder('none', 'none', 'none', 'none');
+                                            $cell->setFontWeight('bold');
+                                            $a = '';
+                                            $b = '';
+                                            if (isset($timetableSlotsLanguage['slotsForLanguage'][$k])) {
+                                                $a = 'Gr.' . $timetableSlotsLanguage['slotsForLanguage'][$k]['group'] . ':' . $timetableSlotsLanguage['slotsForLanguage'][$k]['room'] . '-' . $timetableSlotsLanguage['slotsForLanguage'][$k]['building'];
+                                            }
+                                            if (isset($timetableSlotsLanguage['slotsForLanguage'][$k + 1])) {
+                                                $b = 'Gr.' . $timetableSlotsLanguage['slotsForLanguage'][$k + 1]['group'] . ':' . $timetableSlotsLanguage['slotsForLanguage'][$k + 1]['room'] . '-' . $timetableSlotsLanguage['slotsForLanguage'][$k + 1]['building'];
+                                            }
+                                            if ($a != '' && $b != '') {
+                                                $cell->setValue($a . ', ' . $b);
+                                            } else if ($a != '' && $b == '') {
+                                                $cell->setValue($a);
+                                            }
+                                            $cell->setAlignment('center');
+                                        });
+                                        $i++;
+                                    }
+                                }
+                            }
+                            $countColumns += 2;
+                        }
+                    }
+                }
+            }
+            else {
+                $sheet->row(6, array('17h30-18h05'));
+                $sheet->mergeCells('A6:A9');
+
+                $sheet->row(10, array('18h10-10h05'));
+                $sheet->mergeCells('A10:A13');
+
+                $sheet->setBorder('A5:A13', 'thin');
+                $sheet->cells('A5:A13', function ($cells) {
+                    $cells->setFontSize(12);
+                    $cells->setAlignment('center');
+                    $cells->setValignment('center');
+                });
+                $countRows = 6;
+                // $countColumns = 1;
+                for ($timesRow = 0; $timesRow < 2; $timesRow++) {
+                    // timesRow = 0 => row = timesRow + countRows = 6;
+                    // we start from 6 to [...] row.
+                    $countColumns = 1;
+                    for ($columnDay = 2; $columnDay <= 7; $columnDay++) {
+                        $sheet->cells($columns[$countColumns] . $countRows . ':' . $columns[$countColumns + 1] . ($countRows + 3), function ($cells) {
+                            // Set all borders (top, right, bottom, left)
+                            $cells->setBorder('thin', 'thin', 'thin', 'thin');
+                        });
+                        // timetable slot of dept
+                        foreach ($timetableSlots as $timetableSlot) {
+                            $start = (new Carbon($timetableSlot->start))->hour;
+                            $end = (new Carbon($timetableSlot->end))->hour;
+                            $day = (new Carbon($timetableSlot->start))->day;
+
+                            if ($columnDay == $day) {
+                                if ($timesRow == 0) {
+                                    if ($start == 17 && $end >= 18) {
+                                        $this->append_data($sheet, $columns, $countColumns, $countRows, $timetableSlot);
+                                        break;
+                                    }
+                                } else if ($timesRow == 1) {
+                                    if ($start <= 18 && $end >= 19) {
+                                        $this->append_data($sheet, $columns, $countColumns, $countRows, $timetableSlot);
+                                        break;
+                                    }
+                                } else {
+                                    continue;
+                                }
+
+                            }
+                        }
+                        $countColumns += 2;
+                    }
+                    $countRows += 4;
+                }
+
+                // export language course
+                if (count($student_annual_ids) > 0 && count($timetableSlotsLanguages)) {
+
+                    for ($timesRow = 7; $timesRow <= 9; $timesRow++) {
+                        $countColumns = 1;
+
+                        for ($columnDay = 2; $columnDay <= 7; $columnDay++) {
+
+                            foreach ($timetableSlotsLanguages as $timetableSlotsLanguage) {
+
+                                if ($timesRow == 7) {
+                                    $countRows = 6;
+                                } elseif ($timesRow == 8) {
+                                    $countRows = 10;
+                                } elseif ($timesRow == 9) {
+                                    $countRows = 14;
+                                } else {
+                                    continue;
+                                }
+
+                                $startDay = (new Carbon($timetableSlotsLanguage['start']))->day;
+                                $startHour = (new Carbon($timetableSlotsLanguage['start']))->hour;
+
+                                if (($startDay == $columnDay) && ($startHour == $timesRow)) {
+
+                                    $sheet->mergeCells($columns[$countColumns] . $countRows . ':' . $columns[$countColumns + 1] . $countRows);
+                                    $sheet->cell($columns[$countColumns] . $countRows, function ($cell) use ($timetableSlotsLanguage) {
+                                        $cell->setValue($timetableSlotsLanguage['course_name']);
+                                        $cell->setAlignment('center');
+                                        $cell->setFontWeight('bold');
+                                    });
+
+                                    for ($i = $countRows + 1; $i <= $countRows + 7; $i++) {
+                                        $sheet->mergeCells($columns[$countColumns] . $i . ':' . $columns[$countColumns + 1] . $i);
+                                    }
+
+                                    $i = $countRows + 1;
+
+                                    for ($k = 0; $k < count($timetableSlotsLanguage['slotsForLanguage']); $k += 2) {
+                                        $sheet->cell($columns[$countColumns] . $i, function ($cell) use ($timetableSlotsLanguage, $k) {
+                                            // Set all borders (top, right, bottom, left)
+                                            $cell->setBorder('none', 'none', 'none', 'none');
+                                            $cell->setFontWeight('bold');
+                                            $a = '';
+                                            $b = '';
+                                            if (isset($timetableSlotsLanguage['slotsForLanguage'][$k])) {
+                                                $a = 'Gr.' . $timetableSlotsLanguage['slotsForLanguage'][$k]['group'] . ':' . $timetableSlotsLanguage['slotsForLanguage'][$k]['room'] . '-' . $timetableSlotsLanguage['slotsForLanguage'][$k]['building'];
+                                            }
+                                            if (isset($timetableSlotsLanguage['slotsForLanguage'][$k + 1])) {
+                                                $b = 'Gr.' . $timetableSlotsLanguage['slotsForLanguage'][$k + 1]['group'] . ':' . $timetableSlotsLanguage['slotsForLanguage'][$k + 1]['room'] . '-' . $timetableSlotsLanguage['slotsForLanguage'][$k + 1]['building'];
+                                            }
+                                            if ($a != '' && $b != '') {
+                                                $cell->setValue($a . ', ' . $b);
+                                            } else if ($a != '' && $b == '') {
+                                                $cell->setValue($a);
+                                            }
+                                            $cell->setAlignment('center');
+                                        });
+                                        $i++;
+                                    }
+                                }
+                            }
+                            $countColumns += 2;
+                        }
+                    }
+                }
+
+                // border bottom cells
+                // Set all borders (top, right, bottom, left)
+                $sheet->cells('A38:M38', function ($cells) {
+                    $cells->setFontSize(10);
+                });
+
+                $sheet->cells('M6:M38', function ($cells) {
+                    $cells->setFontSize(10);
+                });
+            }
         });
     }
 }
