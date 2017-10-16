@@ -1129,7 +1129,7 @@ trait ExportTimetableController
                 }
 
                 // export language course
-                if (count($student_annual_ids) > 0 && count($timetableSlotsLanguages)) {
+                if (count($student_annual_ids) > 0 && count($timetableSlotsLanguages) > 0) {
 
                     for ($timesRow = 7; $timesRow <= 15; $timesRow++) {
                         $countColumns = 1;
@@ -1144,12 +1144,32 @@ trait ExportTimetableController
                                     $countRows = 10;
                                 } elseif ($timesRow == 9) {
                                     $countRows = 14;
+                                } elseif ($timesRow == 10) {
+                                    $countRows = 18;
+                                } elseif ($timesRow == 11) {
+                                    $countRows = 22;
+                                } elseif ($timesRow == 12) {
+                                    $countRows = 26;
                                 } elseif ($timesRow == 13) {
-                                    $countRows = 23;
+                                    $countRows = 30;
                                 } elseif ($timesRow == 14) {
-                                    $countRows = 27;
-                                } elseif ($timesRow == 15) {
-                                    $countRows = 31;
+                                    $countRows = 34;
+                                } elseif ($timesRow == 16) {
+                                    $countRows = 39;
+                                } elseif ($timesRow == 17) {
+                                    $countRows = 43;
+                                } elseif ($timesRow == 18) {
+                                    $countRows = 47;
+                                } elseif ($timesRow == 19) {
+                                    $countRows = 51;
+                                } elseif ($timesRow == 20) {
+                                    $countRows = 55;
+                                } elseif ($timesRow == 21) {
+                                    $countRows = 59;
+                                } elseif ($timesRow == 22) {
+                                    $countRows = 63;
+                                } elseif ($timesRow == 23) {
+                                    $countRows = 64;
                                 } else {
                                     continue;
                                 }

@@ -172,7 +172,7 @@
 
                             room_item += '<div class="info-box">'
                                 + '<span class="info-box-icon bg-aqua">'
-                                + '<span>' + val.code + '-' + val.name + '</span>'
+                                + '<span class="room_name">' + val.code + '-' + val.name + '</span>'
                                 + '</span>'
                                 + '<div class="info-box-content">'
                                 + '<span class="info-box-number">' + val.room_type + '</span>'
@@ -212,7 +212,7 @@
 
                             room_item += '<div class="info-box">'
                                 + '<span class="info-box-icon bg-aqua">'
-                                + '<span>' + val.code + '-' + val.name + '</span>'
+                                + '<span class="room_name">' + val.code + '-' + val.name + '</span>'
                                 + '</span>'
                                 + '<div class="info-box-content">'
                                 + '<span class="info-box-number room_title">' + val.room_type + '</span>'
@@ -227,7 +227,7 @@
 
                             room_item += '<div class="info-box-room-use">'
                                 + '<span class="info-box-icon bg-red">'
-                                + '<span>' + val.code + '-' + val.name + '</span>'
+                                + '<span class="room_name">' + val.code + '-' + val.name + '</span>'
                                 + '</span>'
                                 + '<div class="info-box-content">'
                                 + '<span class="info-box-number">' + val.room_type + '</span>'
@@ -270,7 +270,7 @@
 
                             room_item += '<div class="info-box">'
                                 + '<span class="info-box-icon bg-aqua">'
-                                + '<span>' + val.code + '-' + val.name + '</span>'
+                                + '<span class="room_name">' + val.code + '-' + val.name + '</span>'
                                 + '</span>'
                                 + '<div class="info-box-content">'
                                 + '<span class="info-box-number room_title">' + val.room_type + '</span>'
@@ -285,7 +285,7 @@
 
                             room_item += '<div class="info-box-room-use">'
                                 + '<span class="info-box-icon bg-red">'
-                                + '<span>' + val.code + '-' + val.name + '</span>'
+                                + '<span class="room_name">' + val.code + '-' + val.name + '</span>'
                                 + '</span>'
                                 + '<div class="info-box-content">'
                                 + '<span class="info-box-number">' + val.room_type + '</span>'
@@ -792,8 +792,8 @@
 
             // select timetable slot to add room.
             $(document).on('click', '.side-course', function () {
-                $('body').find('.course-selected').removeClass('course-selected');
-                $(this).addClass('course-selected');
+                $('.side-course').not(this).removeClass('course-selected');
+                $(this).toggleClass('course-selected');
                 var academic_year_id = $('select[name="academicYear"] :selected').val();
                 var week_id = $('select[name="weekly"] :selected').val();
                 var timetable_slot_id = $(this).attr('id');
@@ -817,7 +817,7 @@
                         dom.parent().parent().children().eq(0).empty();
                         dom.remove();
                         notify('info', 'Room was removed.', 'Remove Room');
-                        $('#timetable').find('.course-selected').removeClass('course-selected');
+                        // $('#timetable').find('.course-selected').removeClass('course-selected');
                     },
                     error: function (response) {
                         if (response.status === 403) {
@@ -828,15 +828,14 @@
                         }
                     },
                     complete: function () {
-                        get_rooms();
+                        get_suggest_room($('select[name="academicYear"] :selected').val(), $('select[name="weekly"] :selected').val(), timetable_slot_id);
                     }
                 })
             });
 
             // add room to timetable slot.
-            $(document).on('click', '.rooms .info-box', function () {
+            $(document).on('click', '.rooms > .info-box', function (e) {
                 var dom_room = $(this);
-                console.log(dom_room.find('.room_id').text());
                 $.ajax({
                     type: 'POST',
                     url: '/admin/schedule/timetables/insert_room_into_timetable_slot',
@@ -850,10 +849,12 @@
                             dom_room.find('.info-box-icon').removeClass('bg-aqua').addClass('bg-red');
                             dom_room.css('cursor', 'not-allowed');
                             notify('success', 'Room was added', 'Add Room');
-                            get_timetable_slots();
+                            get_suggest_room($('select[name="academicYear"] :selected').val(), $('select[name="weekly"] :selected').val(), $('.side-course.course-selected').attr('id'));
+                            console.log($('.side-course.course-selected').attr('id'));
+                            // get_timetable_slots();
                         } else {
                             notify('warning', 'Please select which course.', 'Add Room');
-                            get_timetable_slots();
+                            // get_timetable_slots();
                         }
                         get_rooms();
                     },
