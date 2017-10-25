@@ -56,4 +56,10 @@ Route::group(['namespace' => 'Schedule', 'prefix' => 'schedule', 'middleware' =>
     /** Export Excel */
     Route::get('timetables/export/{id}', 'TimetableController@export_timetable')->name('timetables.export');
     Route::post('timetables/export/file', 'TimetableController@export_file')->name('timetables.export_file');
+
+    /** Check available room */
+    Route::group(['prefix' => 'timetables/check-available-room'], function (){
+        Route::get('', 'CheckAvailableRoomController@index')->name('check-available-room.index');
+        Route::post('/get_rooms', 'CheckAvailableRoomController@get_rooms')->name('check-available-room.get_rooms');
+    });
 });

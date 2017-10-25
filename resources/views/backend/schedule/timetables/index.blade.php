@@ -64,6 +64,11 @@
                     <i class="fa fa-plus-circle"></i> {{ trans('buttons.backend.schedule.timetable.assignment_permission') }}
                 </button>
                 @endauth
+
+                <a href="/admin/schedule/timetables/check-available-room" class="btn btn-warning btn-sm">
+                    <i class="fa fa-plus-circle"></i> Check Available Room
+                </a>
+
             </div>
         </div>
         <div class="row">
