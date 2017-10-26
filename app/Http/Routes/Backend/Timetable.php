@@ -61,5 +61,6 @@ Route::group(['namespace' => 'Schedule', 'prefix' => 'schedule', 'middleware' =>
     Route::group(['prefix' => 'timetables/check-available-room'], function (){
         Route::get('', 'CheckAvailableRoomController@index')->name('check-available-room.index');
         Route::post('/get_rooms', 'CheckAvailableRoomController@get_rooms')->name('check-available-room.get_rooms');
+        Route::post('/get-unavailable-room-info', 'CheckAvailableRoomController@get_unavailable_room_info')->name('check-available-room.get_unavailable_room_info');
     });
 });
