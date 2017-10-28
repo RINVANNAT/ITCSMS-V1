@@ -3010,7 +3010,7 @@ class ExamController extends Controller
                         $candidate->name_kh,
                         $candidate->name_latin,
                         $candidate->gender,
-                        Carbon::createFromFormat('Y-m-d H:i:s',$candidate->dob)->format("d/m/Y"),
+                        Carbon::createFromFormat('Y-m-d H:i:s',$candidate->dob)->formatLocalized("%B %d, %Y"),
                         $candidate->highschool,
                         $candidate->origin,
                         $candidate->register_from,
