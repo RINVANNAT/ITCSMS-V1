@@ -964,7 +964,7 @@ class ExamController extends Controller
                 'ឈ្មោះ ខ្មែរ'             => $candidate->name_kh,
                 'ឈ្មោះ ឡាតាំង'            => $candidate->name_latin,
                 'ភេទ'                      => $candidate->gender,
-                'ថ្ងៃខែរឆ្នាំកំនើត'           => $candidate->dob->formatLocalized("%d/%b/%Y"),
+                'ថ្ងៃខែរឆ្នាំកំនើត'           => $candidate->dob->formatLocalized("%B %d, %Y"),
                 'វិទ្យាល័យ'                => $candidate->highschool,
                 'ប្រភព'                   => $candidate->origin,
                 'Bac Year'      => $candidate->bac_year,
