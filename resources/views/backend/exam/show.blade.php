@@ -1132,7 +1132,7 @@
 
         };
 
-//        blog statistic chart
+//       ------------------------------------------------------ blog statistic chart
 
 
 
@@ -1150,10 +1150,17 @@
                 type: 'data_chart'
             };
             $.ajax({
+
                 type: 'GET',
                 url: "{{route('admin.exam.download_registration_statistic',$exam->id)."?type=data_chart"}}",
                 success: function(resultData) {
+<<<<<<< HEAD
                     $('#table_data').append(resultData);
+=======
+
+
+                    $('#table_data').append(resultData); //----the table_data is the id of the div in file exam_general_info.blade.php ...the included view
+>>>>>>> d1eac7927270d915fa2a5ed021c3e02cdcc8769d
                     //this is a function to build the chart after requesting ajax
                     //-----start build a chart of Result Candidate Engineer----//
                     //----- we use the data from table that we create from ajax request : datatable_cadidate_result is the id table we created

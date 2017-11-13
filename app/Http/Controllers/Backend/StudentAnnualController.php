@@ -25,6 +25,7 @@ use App\Models\Enum\ScoreEnum;
 use App\Models\Enum\SemesterEnum;
 use App\Models\Gender;
 use App\Models\Grade;
+use App\Models\Group;
 use App\Models\HighSchool;
 use App\Models\History;
 use App\Models\Income;
@@ -118,16 +119,19 @@ class StudentAnnualController extends Controller
         $academic_years = AcademicYear::orderBy('id','desc')->lists('name_kh','id');
         $departments = Department::where('parent_id',11)->orderBy('id','DESC')->lists('code','id'); // 11 is for all academic departments
         $degrees = Degree::lists('name_kh','id');
-        $grades = Grade::lists('name_kh','id');
+        $grades = Grade::orderBy('id','ASC')->lists('name_kh','id');
         $scholarships = Scholarship::lists('code','id');
         $origins = Origin::lists('name_kh','id');
         $genders = Gender::lists('name_kh','id');
         $highSchools = HighSchool::lists('name_kh','id');
-        $promotions = Promotion::orderBy('name','DESC')->lists('name','id');
+        $promotions = Promotion::select('name','id')->get()->toArray();
+        $promotions = collect($promotions)->sortBy('name')->pluck('name','id');
         $histories = History::lists('name_en','id');
         $redoubles = Redouble::lists('name_en','id');
         $department_options = DepartmentOption::lists('code','id');
-        return view('backend.studentAnnual.create',compact('departments','promotions','degrees','grades','genders','histories','scholarships','highSchools','origins','academic_years','redoubles','department_options'));
+        $groups = Group::select('code','id')->where('code','!=','')->where('code','!=',null)->get()->toArray();
+        $groups = collect($groups)->sortBy('code')->pluck('code','id');
+        return view('backend.studentAnnual.create',compact('departments','promotions','degrees','grades','genders','histories','scholarships','highSchools','origins','academic_years','redoubles','department_options','groups'));
     }
 
     /**
@@ -203,7 +207,10 @@ class StudentAnnualController extends Controller
         $redoubles = Redouble::lists('name_en','id');
         $department_options = DepartmentOption::lists('code','id');
         $smis_server = Configuration::where("key","smis_server")->first();
-        return view('backend.studentAnnual.edit',compact('smis_server','studentAnnual','departments','promotions','degrees','grades','genders','histories','scholarships','highSchools','origins','academic_years','redoubles','department_options'));
+        $groups = Group::select('code','id')->where('code','!=','')->where('code','!=',null)->get()->toArray();
+        $groups = collect($groups)->sortBy('code')->pluck('code','id');
+
+        return view('backend.studentAnnual.edit',compact('smis_server','studentAnnual','departments','promotions','degrees','grades','genders','histories','scholarships','highSchools','origins','academic_years','redoubles','department_options','groups'));
 
     }
 

@@ -98,9 +98,6 @@
 @stop
 @section('content')
 
-    <?php
-        $number = $issued_number;
-    ?>
     @foreach($students as $student)
         <?php
         $ce = "";
@@ -239,7 +236,7 @@
                         <p class="text-14" style="font-size: 13pt; font-weight: bold">
                             Institut de Technologie du Cambodge
                         </p>
-                        <span class="text-13" style="font-style: italic;">Réf.:  &nbsp;&nbsp;&nbsp;{{$number!=null?$number:""}} &nbsp;&nbsp;&nbsp; ITC.SF</span>
+                        <span class="text-13" style="font-style: italic;">Réf.:  &nbsp;&nbsp;&nbsp;{{$certificate_references[$student->id]['ref_number']}} &nbsp;&nbsp;&nbsp; ITC.SF</span>
                     </div>
                     <div class="pull-right text-center" style="padding-right: 9mm; margin-top: -7mm">
                         <p class="text-14" style="line-height: 6mm; margin-bottom: 0px; font-family: franklin_gothic !important;">
@@ -456,11 +453,7 @@
                 </div>
             </div>
         @endif
-        <?php
-            if($number!= null) {
-                $number++;
-            }
-        ?>
+
     @endforeach
 
 @endsection

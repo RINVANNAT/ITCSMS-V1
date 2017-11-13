@@ -91,7 +91,7 @@
                 <input type="text" name="issued_by" class="form-control"  placeholder="Issued by" value="Deputy Director General"/>
             </div>
             <div class="pull-right" style="margin-right: 5px;">
-                <input type="text" name="issued_date" class="form-control"  placeholder="Issued date"/>
+                <input type="text" name="issued_date" class="form-control"  placeholder="Issued date" value="{{$current_date}}"/>
             </div>
 
         </div><!-- /.box-header -->
@@ -203,13 +203,8 @@
         }
 
         $(function() {
-            var d = new Date();
-            var month = d.getMonth()+1;
-            var day = d.getDate();
-            var year = d.getFullYear();
-
             $('input[name="issued_date"]').datetimepicker({
-                defaultDate: day+"/"+month+"/"+year,
+                useCurrent:false,
                 format: 'DD/MM/YYYY'
             });
             oTable = $('#students-table').DataTable({

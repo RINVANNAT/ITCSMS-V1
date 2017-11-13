@@ -964,7 +964,7 @@ class ExamController extends Controller
                 'ឈ្មោះ ខ្មែរ'             => $candidate->name_kh,
                 'ឈ្មោះ ឡាតាំង'            => $candidate->name_latin,
                 'ភេទ'                      => $candidate->gender,
-                'ថ្ងៃខែរឆ្នាំកំនើត'           => $candidate->dob->formatLocalized("%d/%b/%Y"),
+                'ថ្ងៃខែរឆ្នាំកំនើត'           => $candidate->dob->formatLocalized("%B %d, %Y"),
                 'វិទ្យាល័យ'                => $candidate->highschool,
                 'ប្រភព'                   => $candidate->origin,
                 'Bac Year'      => $candidate->bac_year,
@@ -2564,7 +2564,140 @@ class ExamController extends Controller
     }
 
     public function export_candidate_ministry_list_v2($exam_id) {
+<<<<<<< HEAD
 
+=======
+        $exam = Exam::where('id',$exam_id)->first();
+        $dhes = StudentBac2::join('genders','studentBac2s.gender_id','=','genders.id')
+            ->join('highSchools','studentBac2s.highschool_id','=','highSchools.id')
+            ->join('origins','studentBac2s.province_id','=','origins.id')
+            ->leftJoin('gdeGrades as math','studentBac2s.bac_math_grade','=','math.id')
+            ->leftJoin('gdeGrades as phys','studentBac2s.bac_phys_grade','=','phys.id')
+            ->leftJoin('gdeGrades as chem','studentBac2s.bac_chem_grade','=','chem.id')
+            ->where('studentBac2s.bac_year',$exam->academic_year_id - 1)
+            ->where('studentBac2s.status','Ministry')
+            ->select(
+                'studentBac2s.can_id',
+                'studentBac2s.name_kh',
+                'highSchools.name_kh as highschool',
+                'genders.code as gender',
+                'studentBac2s.dob',
+                'origins.name_kh as origin',
+                'studentBac2s.bac_year',
+                'math.name_en as math_grade',
+                'phys.name_en as phys_grade',
+                'chem.name_en as chem_grade'
+            )->get();
+
+        $cands = Candidate::join('studentBac2s', 'studentBac2s.id', '=', 'candidates.studentBac2_id')
+            ->where('candidates.exam_id', $exam_id)
+            ->select(
+                'candidates.result',
+                'candidates.total_score',
+                'studentBac2s.can_id',
+                'candidates.register_from'
+            )
+            ->orderBy('candidates.total_score', 'DESC')
+            ->get();
+
+        $index =1;
+
+        $last = null;
+        $same_index = 0;
+        foreach($cands as &$cand) {
+            if($last!= null && ($cand->total_score == $last->total_score)){ // the last one and this one have the same score, so he must have the same range
+                $cand->rank = $index-1;
+                $same_index++;
+            } else {
+                if($same_index>0){
+                    $index = $index + $same_index;
+                    $same_index = 0;
+                }
+                $cand->rank = $index;
+                $index++;
+            }
+            $last = $cand;
+        }
+
+        // The candidates who registered at ITC and passed the selection and also registered from DHE
+        $candidate_from_dhe = $cands->groupBy('register_from')->get('Ministry');
+        // Their ranking base on can_id
+        $passed_candidate_rankings = $candidate_from_dhe->keyBy('can_id');
+
+        foreach ($dhes as &$dhe) {
+            $passed_candidate_ranking = $passed_candidate_rankings->get($dhe->can_id);
+            $dhe->result = $passed_candidate_ranking==null?"N/A":$passed_candidate_ranking->result;
+            $dhe->rank = $passed_candidate_ranking==null?"N/A":$passed_candidate_ranking->rank;
+        }
+
+        Excel::create('Student Result To Send to DHE', function($excel) use ($dhes) {
+
+            // Set the title
+            $excel->setTitle('លទ្ធផលសំរាប់បញ្ជូនទៅគ្រឹះស្ថានឧត្តមសិក្សា');
+
+            // Chain the setters
+            $excel->setCreator('Institute of Technology of Cambodia')
+                ->setCompany('Institute of Technology of Cambodia');
+
+            $excel->sheet('បញ្ជីនិស្សិត្រ', function($sheet) use ($dhes) {
+
+                $header = array('ល.រ',"គោត្តនាមនិងនាម","ភេទ","ថ្ងៃខែឆ្នាំកំណើត","មកពីវិទ្យាល័យ","ខេត្តក្រុង","ឆ្នាំជាប់ទុតិយភូមិ","គណិតវិទ្យា","រូបវិទ្យា","គីមីវិទ្យា","ចំណាត់ថ្នាក់",'លទ្ធផល','CanID');
+                $sheet->setOrientation('portrait');
+                // Set top, right, bottom, left
+                $sheet->setPageMargin(array(
+                    0.25, 0.30, 0.25, 0.30
+                ));
+
+                // Set all margins
+                $sheet->setPageMargin(0.25);
+
+                $sheet->rows(
+                    array($header)
+                );
+
+                $index = 1;
+
+                foreach ($dhes as $candidate) {
+                    if($candidate->result == "Fail" || $candidate->result == "Reserve" || $candidate->result == "Reject"){
+                        $result = "ធ្លាក់";
+                        $rank = '';
+                    } else if ($candidate->result == "Pass"){
+                        $result= "ជាប់";
+                        $rank = $candidate->rank;
+                    }  else {
+                        $result = $candidate->result;
+                        $rank = $candidate->rank;
+                    }
+                    $row = array($index,$candidate->name_kh,$candidate->gender,
+                        $candidate->dob,
+                        $candidate->highschool,
+                        $candidate->origin,
+                        $candidate->bac_year,
+                        $candidate->math_grade,
+                        $candidate->phys_grade,
+                        $candidate->chem_grade,
+                        $rank,
+                        $result,
+                        $candidate->can_id
+                    );
+
+                    $sheet->appendRow(
+                        $row
+                    );
+                    $index++;
+                }
+
+                /*$sheet->mergeCells('A1:C1');
+                $sheet->cells('A1:C'.count($rooms)+1, function($cells) {
+                    $cells->setAlignment('center');
+                    $cells->setValignment('middle');
+                });
+                $sheet->setBorder('A2:C'.(2+count($rooms)), 'thin');*/
+
+            });
+
+        })->export('xls');
+>>>>>>> d1eac7927270d915fa2a5ed021c3e02cdcc8769d
     }
 
     public function export_candidate_result_list ($exam_id) {
@@ -2883,7 +3016,11 @@ class ExamController extends Controller
                         $candidate->name_kh,
                         $candidate->name_latin,
                         $candidate->gender,
+<<<<<<< HEAD
                         Carbon::createFromFormat('Y-m-d H:i:s',$candidate->dob)->format("d/m/Y"),
+=======
+                        Carbon::createFromFormat('Y-m-d H:i:s',$candidate->dob)->formatLocalized("%B %d, %Y"),
+>>>>>>> d1eac7927270d915fa2a5ed021c3e02cdcc8769d
                         $candidate->highschool,
                         $candidate->origin,
                         $candidate->register_from,

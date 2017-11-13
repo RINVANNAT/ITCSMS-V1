@@ -7,6 +7,7 @@ use App\Exceptions\GeneralException;
 use App\Http\Requests\Backend\Student\StoreStudentRequest;
 use App\Http\Requests\Backend\Student\UpdateStudentRequest;
 use App\Models\AcademicYear;
+use App\Models\GroupStudentAnnual;
 use App\Models\Student;
 use App\Models\StudentAnnual;
 use Carbon\Carbon;
@@ -207,12 +208,12 @@ class EloquentStudentAnnualRepository implements StudentAnnualRepositoryContract
             $student->id_card = 'e'.$last_academic_year->id.str_pad($next_id, 4, '0', STR_PAD_LEFT);
         }
 
+        // Double check again if id card is already exist
         if (Student::where('id_card', $student->id_card)->first()) {
             throw new GeneralException(trans('exceptions.backend.students.already_exists'));
         }
 
         /* ------------------ work with photo ----------------*/
-
         if($request->file('photo')!= null){
             $imageName = $student->id_card . '.' .$request->file('photo')->getClientOriginalExtension();
             $student->photo = $imageName;
@@ -282,7 +283,6 @@ class EloquentStudentAnnualRepository implements StudentAnnualRepositoryContract
 
             $studentAnnual->student_id = $student->id;
             $studentAnnual->academic_year_id = $last_academic_year->id;
-            $studentAnnual->group = $input['group'];
             $studentAnnual->active = isset($input['active'])?true:false;
             $studentAnnual->promotion_id = $input['promotion_id'];
             $studentAnnual->department_id = $input['department_id'];
@@ -306,9 +306,17 @@ class EloquentStudentAnnualRepository implements StudentAnnualRepositoryContract
             }
 
             if ($studentAnnual->save()) {
+                // Check if there are scholarships attached
                 if(isset($input['scholarship_ids'])){
                     $studentAnnual->scholarships()->sync($input['scholarship_ids']);
                 }
+                // Update group
+                GroupStudentAnnual::create([
+                    'student_annual_id' => $studentAnnual->id,
+                    'group_id' => $input['group_id'],
+                    'semester_id' => 1, // By default, when create new student, it is for semester 1
+                    'created_at' => Carbon::now()
+                ]);
                 DB::commit();
                 return true;
             }
@@ -412,7 +420,6 @@ class EloquentStudentAnnualRepository implements StudentAnnualRepositoryContract
 
             $studentAnnual->student_id = $student->id;
             $studentAnnual->academic_year_id = $input['academic_year_id'];//$last_academic_year->id;
-            $studentAnnual->group = $input['group'];
             $studentAnnual->active = isset($input['active'])?true:false;
             $studentAnnual->promotion_id = $input['promotion_id'];
             $studentAnnual->department_id = $input['department_id'];
@@ -439,6 +446,9 @@ class EloquentStudentAnnualRepository implements StudentAnnualRepositoryContract
                 if(isset($input['scholarship_ids'])){
                     $studentAnnual->scholarships()->sync($input['scholarship_ids']);
                 }
+                //To do here
+                //$group_student = GroupStudentAnnual::where('student_annual',$studentAnnual->id)
+
                 DB::commit();
 
                 return true;

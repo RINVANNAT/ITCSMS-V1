@@ -275,7 +275,7 @@
                                             <tbody>
                                             <tr>
                                                 <th colspan="4">Semester 1</th>
-                                                {{--<th style="width: 60px"><button data-semester="1" data-student_id="{{$studentAnnual->id}}" class="btn btn-xs print_transcript_semester_1">Print Transcript</button></th>--}}
+                                                <th style="width: 60px"><button data-semester="1" data-student_id="{{$studentAnnual->id}}" class="btn btn-xs print_transcript_semester_1">Print Transcript</button></th>
                                             </tr>
                                             <tr>
                                                 <th style="width: 10px">#</th>

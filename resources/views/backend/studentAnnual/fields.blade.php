@@ -140,7 +140,7 @@
                 <div role="tabpanel" class="tab-pane" id="award_info" style="padding-top:20px">
                     {!! Form::label('name', trans('labels.backend.students.fields.highschool_id'), ['class' => 'col-lg-2 control-label']) !!}
                     <div class="col-lg-10" style="padding-bottom: 10px;">
-                        {!! Form::select('high_school_id',$highSchools,isset($studentAnnual->student->high_school_id)?$studentAnnual->student->high_school_id:null, array('class'=>'form-control')) !!}
+                        {!! Form::select('high_school_id',$highSchools,isset($studentAnnual->student->high_school_id)?$studentAnnual->student->high_school_id:null, array('class'=>'form-control','placeholder'=>'Choose high school')) !!}
                     </div>
                     {!! Form::label('name', trans('labels.backend.students.fields.mcs_no'), ['class' => 'col-lg-2 control-label']) !!}
                     <div class="col-lg-10" style="padding-bottom: 10px;">
@@ -180,7 +180,7 @@
             </div>
             {!! Form::label('name', trans('labels.backend.students.fields.group'), ['class' => 'col-lg-2 control-label']) !!}
             <div class="col-lg-10" style="padding-bottom: 10px;">
-                {!! Form::text('group',null, array('class'=>'form-control')) !!}
+                {!! Form::select('group_id',$groups,null, array('class'=>'form-control','required'=>'required')) !!}
             </div>
             {!! Form::label('name', trans('labels.backend.students.fields.history_id'), ['class' => 'col-lg-2 control-label']) !!}
             <div class="col-lg-10" style="padding-bottom: 10px;">
