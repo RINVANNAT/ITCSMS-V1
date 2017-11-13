@@ -2,22 +2,31 @@
     <div class="col-md-12">
         <div class="box box-default" style="border-top: 1px solid #f1f1f1;">
             <div class="box-header with-border">
-                <div class="box-tools pull-right">
-                    <button class="btn btn-primary btn-xs btn_export_course_session"
-                            data-container="body"
-                            data-toggle="popover"
-                            data-placement="left"
-                            data-trigger="hover"
-                            title="Export Course Session"
-                            data-content="After you clicked, your course session will exported.">
-                        <i class="fa fa-refresh {{--fa-pulse--}} fa-1x"></i>
-                    </button>
 
-                </div>
-                <h3 class="box-title">
+                <h3 class="box-title" data-toggle="tooltip" data-placement="top" data-title="Course Session">
                     <i class="fa fa-drivers-license-o"></i>
-                    {{ trans('labels.backend.schedule.timetable.courses_sessions') }}
+                    {{--{{ trans('labels.backend.schedule.timetable.courses_sessions') }}--}}
                 </h3>
+
+                <div class="box-tools pull-right">
+                    <form class="form-inline">
+                        <input type="text"
+                               class="form-control input-sm"
+                               id="search_course_session"
+                               placeholder="SEARCH COURSE SESSION">
+                        <button class="btn btn-primary btn-sm btn_export_course_session"
+                                data-container="body"
+                                data-toggle="popover"
+                                data-placement="bottom"
+                                data-trigger="hover"
+                                title="Update Course Session"
+                                data-content="After you clicked, your course session will exported.">
+                            <i class="fa fa-refresh"></i>
+                        </button>
+                    </form>
+                    <div class="clearfix"></div>
+                </div>
+
             </div>
             <div class="box-body courses-sessions">
                 @if(access()->allow('drag-course-session'))

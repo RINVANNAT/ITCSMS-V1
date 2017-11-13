@@ -277,16 +277,19 @@ return [
             'sub_import_title' => 'Import rooms',
             'fields' => [
                 'active' => 'Is Active',
-                'name' => "Name",
-                'nb_desk' => "Total Desk",
+                'public' => 'Is public',
+                'exam' => 'Is exam',
+                'name' => 'Name',
+                'nb_desk' => 'Total Desk',
                 'nb_chair' => 'Total Chair',
                 'nb_chair_exam' => 'Chair Exam',
                 'size' => 'Size',
                 'room_type_id' => 'Room Type',
                 'building_id' => 'Building',
                 'department_id' => 'Department',
-                'description' => "Description",
-                'is_exam_room' => "Is an Exam Room"
+                'description' => 'Description',
+                'is_exam_room' => 'Is an Exam Room',
+                'is_public_room' => 'Is a Public Room'
             ]
         ],
         'roomTypes' => [
@@ -1039,7 +1042,7 @@ return [
                 'rooms' => 'Rooms',
                 'table' => [
                     'academic_year' => 'Academic Year',
-                    'department'=> 'Department',
+                    'department' => 'Department',
                     'degree' => 'Degree',
                     'grade' => 'Grade',
                     'option' => 'Option',

@@ -2,9 +2,9 @@
 
 namespace App\Repositories\Backend\Schedule\Timetable;
 
-use App\Http\Requests\Backend\Schedule\Timetable\CreateTimetableRequest;
 use App\Http\Requests\Backend\Schedule\Timetable\CreateTimetableSlotRequest;
 use App\Models\Configuration;
+use App\Models\CourseAnnual;
 use App\Models\CourseAnnualClass;
 use App\Models\CourseSession;
 use App\Models\Group;
@@ -166,12 +166,27 @@ class EloquentTimetableSlotRepository implements TimetableSlotRepositoryContract
     /**
      * Export course sessions.
      *
-     * @return mixed
+     * @param $data
+     * @return bool
      */
-    public function export_course_sessions()
+    public function export_course_sessions($data)
     {
         $flag = true;
-        $course_sessions = CourseSession::all();
+
+        $course_annuals = CourseAnnual::where([
+            ['academic_year_id', $data['academic_year_id']],
+            ['department_id', $data['department_id']],
+        ])->get();
+
+        $course_sessions = new Collection();
+
+        foreach ($course_annuals as $course_annual) {
+            foreach ($course_annual->courseSessions as $courseSession) {
+                $course_sessions->push($courseSession);
+            }
+        }
+
+        // $course_sessions = CourseSession::all();
         foreach ($course_sessions as $course_session) {
             if (count(Slot::where('course_session_id', $course_session->id)->get()) > 0) {
                 continue;
@@ -345,8 +360,6 @@ class EloquentTimetableSlotRepository implements TimetableSlotRepositoryContract
      */
     public function check_conflict_lecturer(TimetableSlot $timetableSlot)
     {
-        // find merge timetable match with argument
-        $mergeTimetableSlot = MergeTimetableSlot::find($timetableSlot->group_merge_id);
         // find timetable match with argument
         $timetable = $timetableSlot->timetable;
 
@@ -367,29 +380,30 @@ class EloquentTimetableSlotRepository implements TimetableSlotRepositoryContract
             foreach ($timetables as $itemTimetable) {
                 if (count($itemTimetable->timetableSlots) > 0) {
                     foreach ($itemTimetable->timetableSlots as $itemTimetableSlot) {
-                        // find merge timetable slot and then compare with input and the other merge timetable slot
-                        $itemMergeTimetableSlot = MergeTimetableSlot::find($itemTimetableSlot->group_merge_id);
-                        // compare start and end date && teacher
-                        if ((((strtotime($itemMergeTimetableSlot->start) <= strtotime($mergeTimetableSlot->start)) && (strtotime($itemMergeTimetableSlot->end) > strtotime($mergeTimetableSlot->start))) ||
-                                ((strtotime($mergeTimetableSlot->end) > strtotime($itemMergeTimetableSlot->start)) && (strtotime($mergeTimetableSlot->end) < strtotime($itemMergeTimetableSlot->end))))
-                            && ($itemTimetableSlot->teacher_name == $timetableSlot->teacher_name)
-                            && ($timetableSlot->group_merge_id != $itemTimetableSlot->group_merge_id)
+                        if (
+                            (((strtotime($timetableSlot->start) > strtotime($itemTimetableSlot->start)) && (strtotime($timetableSlot->start) < strtotime($itemTimetableSlot->end)))
+                                ||
+                                ((strtotime($timetableSlot->end) > strtotime($itemTimetableSlot->start)) && (strtotime($timetableSlot->end) < strtotime($itemTimetableSlot->end)))
+                                ||
+                                (strtotime($timetableSlot->start) == strtotime($itemTimetableSlot->start)) && (strtotime($timetableSlot->end) == strtotime($itemTimetableSlot->end)))
+                            &&
+                            ($timetableSlot->id != $itemTimetableSlot->id)
+                            &&
+                            ($timetableSlot->teacher_name == $itemTimetableSlot->teacher_name)
+                            &&
+                            ($timetableSlot->group_merge_id != $itemTimetableSlot->group_merge_id)
                         ) {
-                            // find which timetable slot can merge
-                            // by compare with start, end, course_annual_id and type of timetable slot
                             if ((strtotime($timetableSlot->start) == strtotime($itemTimetableSlot->start)) && (strtotime($timetableSlot->end) == strtotime($itemTimetableSlot->end)) && ($timetableSlot->type == $itemTimetableSlot->type) && ($timetableSlot->slot->course_annual_id == $itemTimetableSlot->slot->course_annual_id)) {
                                 array_push($canMerge, $itemTimetableSlot);
-                            } // and can not merge
-                            else {
+                            } else {
                                 array_push($canNotMerge, $itemTimetableSlot);
                             }
-                            // if conflict, add into result array.
-                            // array_push($result, $itemTimetableSlot);
                         }
                     }
                 }
             }
         }
+
         // push those two array into result
         $result['canMerge'] = $canMerge;
         $result['canNotMerge'] = $canNotMerge;
@@ -706,11 +720,13 @@ class EloquentTimetableSlotRepository implements TimetableSlotRepositoryContract
      */
     public function set_permission_create_timetable()
     {
+        Log::info('Cron Set Schedule Assignment Timetable was executed.');
+
         $now = Carbon::now('Asia/Phnom_Penh');
         $departments = Configuration::where('key', 'like', 'timetable_%')->get();
         foreach ($departments as $department) {
-            Log::info('now:' . $now . 'start:' . $department->created_at . 'end:' . $department->updated_at);
-            if (strtotime($now) >= strtotime($department->created_at) && strtotime($now) <= strtotime($department->updated_at)) {
+
+            if ((strtotime($now) >= strtotime($department->created_at)) && (strtotime($now) <= strtotime($department->updated_at))) {
                 $department->description = 'true';
                 $department->timestamps = false;
                 $department->update();
@@ -763,11 +779,14 @@ class EloquentTimetableSlotRepository implements TimetableSlotRepositoryContract
      *
      * @param Timetable $timetable
      * @param Collection $timetableSlots
+     * @param null $by_teacher
      * @return mixed
      */
     public function get_timetable_slot_with_conflict_info(Timetable $timetable, Collection $timetableSlots, $by_teacher = null)
     {
         $timetable_slots = $this->get_timetable_slot_details($timetable, $by_teacher);
+
+        // dd($timetable_slots);
 
         foreach ($timetable_slots as $timetable_slot) {
             if (($timetable_slot instanceof TimetableSlot) && is_object($timetable_slot)) {
@@ -787,6 +806,7 @@ class EloquentTimetableSlotRepository implements TimetableSlotRepositoryContract
                     $groups = [];
                 }
                 // check conflict lecturer.
+                // dd('beforeCheck');
                 $dataLecturer = $this->check_conflict_lecturer($itemTimetableSlot);
 
                 // check conflict room.
@@ -1009,10 +1029,5 @@ class EloquentTimetableSlotRepository implements TimetableSlotRepositoryContract
             }
         }
         return array($groupStudentsLanguage, $groups);
-    }
-
-    public function test()
-    {
-        return 100;
     }
 }

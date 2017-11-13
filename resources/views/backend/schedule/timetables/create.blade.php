@@ -20,6 +20,7 @@
     {!! Html::style('plugins/iCheck/all.css') !!}
     {!! Html::style('plugins/toastr/toastr.min.css') !!}
     {!! Html::style('css/backend/schedule/timetable.css') !!}
+
     <style type="text/css">
         .bg-primary {
             background-color: #337ab7 !important;
@@ -28,6 +29,10 @@
         .bg-danger {
             background-color: #dd4b39 !important;
             color: #fff;
+        }
+
+        .bg-red {
+            background-color: #dd4b39 !important;
         }
     </style>
 
@@ -97,10 +102,6 @@
 
         <div class="box-body">
             <div class="row">
-                {{--<div class="col-md-9 col-sm-12 col-xs-12" style="overflow-x: auto">
-                    --}}{{--Timetable render--}}{{--
-                    <div id="timetable" style="width: 1345px;"></div>
-                </div>--}}
                 <div class="col-md-9 col-sm-12 col-xs-12">
                     <div id="timetable" class="view-timetable"></div>
                 </div>
@@ -134,7 +135,6 @@
     <script type="text/javascript">
         /*Drag course session into timetable.*/
         function drag_course_session() {
-
             @if(access()->allow('drag-course-session'))
             $('.courses .course-item').each(function () {
                 // store data so the calendar knows to render an event upon drop
@@ -169,10 +169,18 @@
                     if (response.status === true) {
                         var room_item = '';
                         $.each(response.rooms, function (key, val) {
-                            room_item += '<div class="room-item enabled" id="' + val.id + '">'
-                                + '<i class="fa fa-building-o"></i> '
-                                + '<span>' + val.code + '-' + val.name + '</span>'
-                                + '</div> ';
+
+                            room_item += '<div class="info-box">'
+                                + '<span class="info-box-icon bg-aqua">'
+                                + '<span class="room_name">' + val.code + '-' + val.name + '</span>'
+                                + '</span>'
+                                + '<div class="info-box-content">'
+                                + '<span class="info-box-number">' + val.room_type + '</span>'
+                                + '<span class="info-box-number room_id hidden">' + val.id + '</span>'
+                                + '<span class="info-box-text text-muted">' + (val.desk === null ? 'N/A' : val.desk) + ' Desk</span>'
+                                + '<span class="info-box-text text-muted">' + (val.chair === null ? 'N/A' : val.chair) + ' Chair</span>'
+                                + '</div>'
+                                + '</div>'
                         });
 
                         $('.rooms').html(room_item);
@@ -197,21 +205,37 @@
                     timetable_slot_id: timetable_slot_id
                 },
                 success: function (response) {
-                    if (response.status == true) {
+                    if (response.status === true) {
                         var room_item = '';
 
                         $.each(response.roomRemain, function (key, val) {
-                            room_item += '<div class="room-item enabled" id="' + val.id + '">'
-                                + '<i class="fa fa-building-o"></i> '
-                                + '<span>' + val.code + '-' + val.name + '</span>'
-                                + '</div> ';
+
+                            room_item += '<div class="info-box">'
+                                + '<span class="info-box-icon bg-aqua">'
+                                + '<span class="room_name">' + val.code + '-' + val.name + '</span>'
+                                + '</span>'
+                                + '<div class="info-box-content">'
+                                + '<span class="info-box-number room_title">' + val.room_type + '</span>'
+                                + '<span class="info-box-number room_id hidden">' + val.id + '</span>'
+                                + '<span class="info-box-text text-muted">' + (val.desk === null ? 'N/A' : val.desk) + ' Desk</span>'
+                                + '<span class="info-box-text text-muted">' + (val.chair === null ? 'N/A' : val.chair) + ' Chair</span>'
+                                + '</div>'
+                                + '</div>';
                         });
 
                         $.each(response.roomUsed, function (key, val) {
-                            room_item += '<div class="room-item disabled bg-danger" id="' + val.id + '">'
-                                + '<i class="fa fa-building-o"></i> '
-                                + '<span>' + val.code + '-' + val.name + '</span>'
-                                + '</div> ';
+
+                            room_item += '<div class="info-box-room-use">'
+                                + '<span class="info-box-icon bg-red">'
+                                + '<span class="room_name">' + val.code + '-' + val.name + '</span>'
+                                + '</span>'
+                                + '<div class="info-box-content">'
+                                + '<span class="info-box-number">' + val.room_type + '</span>'
+                                + '<span class="info-box-number room_id hidden">' + val.id + '</span>'
+                                + '<span class="info-box-text text-muted">' + (val.desk === null ? 'N/A' : val.desk) + ' Desk</span>'
+                                + '<span class="info-box-text text-muted">' + (val.chair === null ? 'N/A' : val.chair) + ' Chair</span>'
+                                + '</div>'
+                                + '</div>';
                         });
                         $('.rooms').html(room_item);
                     }
@@ -243,17 +267,33 @@
                         var room_item = '';
 
                         $.each(response.roomRemain, function (key, val) {
-                            room_item += '<div class="room-item enabled" id="' + val.id + '">'
-                                + '<i class="fa fa-building-o"></i> '
-                                + '<span>' + val.code + '-' + val.name + '</span>'
-                                + '</div> ';
+
+                            room_item += '<div class="info-box">'
+                                + '<span class="info-box-icon bg-aqua">'
+                                + '<span class="room_name">' + val.code + '-' + val.name + '</span>'
+                                + '</span>'
+                                + '<div class="info-box-content">'
+                                + '<span class="info-box-number room_title">' + val.room_type + '</span>'
+                                + '<span class="info-box-number room_id hidden">' + val.id + '</span>'
+                                + '<span class="info-box-text text-muted">' + (val.desk === null ? 'N/A' : val.desk) + ' Desk</span>'
+                                + '<span class="info-box-text text-muted">' + (val.chair === null ? 'N/A' : val.chair) + ' Chair</span>'
+                                + '</div>'
+                                + '</div>';
                         });
 
                         $.each(response.roomUsed, function (key, val) {
-                            room_item += '<div class="room-item bg-danger" id="' + val.id + '">'
-                                + '<i class="fa fa-building-o"></i> '
-                                + '<span>' + val.code + '-' + val.name + '</span>'
-                                + '</div> ';
+
+                            room_item += '<div class="info-box-room-use">'
+                                + '<span class="info-box-icon bg-red">'
+                                + '<span class="room_name">' + val.code + '-' + val.name + '</span>'
+                                + '</span>'
+                                + '<div class="info-box-content">'
+                                + '<span class="info-box-number">' + val.room_type + '</span>'
+                                + '<span class="info-box-number room_id hidden">' + val.id + '</span>'
+                                + '<span class="info-box-text text-muted">' + (val.desk === null ? 'N/A' : val.desk) + ' Desk</span>'
+                                + '<span class="info-box-text text-muted">' + (val.chair === null ? 'N/A' : val.chair) + ' Chair</span>'
+                                + '</div>'
+                                + '</div>';
                         });
                         $('.rooms').html(room_item);
                     } else {
@@ -276,17 +316,22 @@
                 url: '{!! route('get_timetable_slots') !!}',
                 data: $('#options-filter').serialize(),
                 success: function (response) {
-                    if (response.timetable !== null) {
-                        if (response.timetable.completed === false) {
-                            $("#btn_clone").attr('disabled', true);
-                            $('#btn_publish').attr('disabled', false);
-                        } else {
-                            $("#btn_clone").attr('disabled', false);
-                            $('#btn_publish').attr('disabled', true);
-                        }
-                    }
+                    /*if (typeof  response.timetable === "undefined") {
+                     if (response.timetable.completed === false) {
+                     $("#btn_clone").attr('disabled', true);
+                     $('#btn_publish').attr('disabled', false);
+                     } else {
+                     $("#btn_clone").attr('disabled', false);
+                     $('#btn_publish').attr('disabled', true);
+                     }
+                     } else {
+                     $("#btn_clone").attr('disabled', true);
+                     $('#btn_publish').attr('disabled', true);
+                     }*/
+
                     $('#timetable').fullCalendar('removeEvents');
                     $('#timetable').fullCalendar('renderEvents', response.timetableSlots, true);
+                    $('#timetable').fullCalendar('changeView', 'agendaWeek');
                     $('#timetable').fullCalendar('rerenderEvents');
                     toggleLoading(false);
                 },
@@ -344,6 +389,7 @@
 
             $('#timetable').fullCalendar("rerenderEvents");
         }
+
         /** move timetable slot */
         function move_timetable_slot(event, start_date) {
             toggleLoading(true);
@@ -380,6 +426,7 @@
                 }
             })
         }
+
         /** resize timetable slot */
         function resize_timetable_slot(timetable_slot_id, end_date, revertFunc) {
             $.ajax({
@@ -600,9 +647,13 @@
                     hide_conflict_information();
                 },
                 eventDragStop: function (event, jsEvent, ui, view) {
-                    if (isEventOverDiv(jsEvent.clientX, jsEvent.clientY)) {
-                        remove_timetable_slots(event);
-                        $('#timetable').fullCalendar('removeEvent', event.id);
+                    try {
+                        if (isEventOverDiv(jsEvent.clientX, jsEvent.clientY)) {
+                            remove_timetable_slots(event);
+                            $('#timetable').fullCalendar('removeEvent', event.id);
+                        }
+                    } catch (e) {
+                        console.log(e);
                     }
                 },
                 loading: function (isLoading, view) {
@@ -686,7 +737,6 @@
                         }
 
                         if (response.data.lecturer.canNotMerge.length > 0) {
-                            console.log(100);
                             panel_conflict += '<li class="list-group-item">' +
                                 '<i class="fa fa-user"></i> Lecturer ' +
                                 '<div class="box-conflict" style="margin-top: 10px; border-radius: 4px; min-height: 70px; max-height: 100px;">';
@@ -721,14 +771,29 @@
             });
 
             // filter options
-            get_options($('select[name="department"] :selected').val());
+            @if(isset($academic_year_id))
+                $("select[name='academicYear'] option[value={{ $academic_year_id }}]").attr('selected', true);
+            $("select[name='department'] option[value={{ $department_id }}]").attr('selected', true);
+            $("select[name='degree'] option[value={{ $degree_id }}]").attr('selected', true);
+            $("select[name='option'] option[value={{ $option_id }}]").attr('selected', true);
+            $("select[name='grade'] option[value={{ $grade_id }}]").attr('selected', true);
+            $("select[name='semester'] option[value={{ $semester_id }}]").attr('selected', true);
+            $("select[name='group'] option[value={{ $group_id }}]").attr('selected', true);
+            $("select[name='weekly'] option[value={{ $week_id }}]").attr('selected', true);
+            get_course_sessions();
+            @else
+                get_options($('select[name="department"] :selected').val());
+            @endif
+
+            get_timetable_slots();
+            get_timetable();
             drag_course_session();
             get_rooms();
 
             // select timetable slot to add room.
             $(document).on('click', '.side-course', function () {
-                $('body').find('.course-selected').removeClass('course-selected');
-                $(this).addClass('course-selected');
+                $('.side-course').not(this).removeClass('course-selected');
+                $(this).toggleClass('course-selected');
                 var academic_year_id = $('select[name="academicYear"] :selected').val();
                 var week_id = $('select[name="weekly"] :selected').val();
                 var timetable_slot_id = $(this).attr('id');
@@ -741,6 +806,7 @@
             $(document).on('click', '.fc-room', function () {
                 var dom = $(this);
                 var timetable_slot_id = $(this).parent().parent().parent().children().eq(0).attr('id');
+
                 $.ajax({
                     type: 'POST',
                     url: '/admin/schedule/timetables/remove_room_from_timetable_slot',
@@ -751,6 +817,7 @@
                         dom.parent().parent().children().eq(0).empty();
                         dom.remove();
                         notify('info', 'Room was removed.', 'Remove Room');
+                        // $('#timetable').find('.course-selected').removeClass('course-selected');
                     },
                     error: function (response) {
                         if (response.status === 403) {
@@ -759,30 +826,37 @@
                         else {
                             notify('error', 'Something went wrong.', 'Remove Room');
                         }
+                    },
+                    complete: function () {
+                        get_suggest_room($('select[name="academicYear"] :selected').val(), $('select[name="weekly"] :selected').val(), timetable_slot_id);
                     }
                 })
             });
 
             // add room to timetable slot.
-            $(document).on('click', '.rooms .room-item.enabled', function () {
+            $(document).on('click', '.rooms > .info-box', function (e) {
                 var dom_room = $(this);
                 $.ajax({
                     type: 'POST',
                     url: '/admin/schedule/timetables/insert_room_into_timetable_slot',
                     data: {
                         timetable_slot_id: $('.side-course.course-selected').attr('id'),
-                        room_id: $(this).attr('id')
+                        room_id: $(this).find('.room_id').text()
                     },
                     success: function (response) {
                         if (response.status === true) {
-                            $('.container-room').find('.side-course.course-selected').parent().children().eq(1).children().eq(0).html('<p class="fc-room">' + dom_room.children().eq(1).text() + '</p>');
-                            dom_room.remove();
+                            $('.container-room').find('.side-course.course-selected').parent().children().eq(1).children().eq(0).html('<p class="fc-room">' + dom_room.find('.room_name').text() + '</p>');
+                            dom_room.find('.info-box-icon').removeClass('bg-aqua').addClass('bg-red');
+                            dom_room.css('cursor', 'not-allowed');
                             notify('success', 'Room was added', 'Add Room');
-                            get_timetable_slots();
+                            get_suggest_room($('select[name="academicYear"] :selected').val(), $('select[name="weekly"] :selected').val(), $('.side-course.course-selected').attr('id'));
+                            console.log($('.side-course.course-selected').attr('id'));
+                            // get_timetable_slots();
                         } else {
                             notify('warning', 'Please select which course.', 'Add Room');
-                            get_timetable_slots();
+                            // get_timetable_slots();
                         }
+                        get_rooms();
                     },
                     error: function (response) {
                         if (response.status === 403) {
@@ -871,11 +945,17 @@
             });
 
             // export course session into slots table.
-            $(document).on('click', '.btn_export_course_session', function () {
+            $(document).on('click', '.btn_export_course_session', function (event) {
+                event.preventDefault();
                 toggleLoading(true);
                 $.ajax({
                     type: 'POST',
                     url: '{!! route('export_course_session') !!}',
+                    data: {
+                        _token: '{{ csrf_token() }}',
+                        academic_year_id: $('select[name=academicYear]').val(),
+                        department_id: $('select[name=department]').val(),
+                    },
                     success: function (response) {
                         if (response.status === true) {
                             get_course_sessions();
@@ -921,7 +1001,77 @@
                     })
                 })
 
-            })
+            });
+
+            $(document).on('keyup', '#search_course_session', function (event) {
+                event.preventDefault();
+                var query = $(this).val();
+                $.ajax({
+                    type: 'POST',
+                    url: '{{ route('search_course_session') }}',
+                    data: {
+                        _token: '{{ csrf_token() }}',
+                        academic: $('select[name=academicYear]').val(),
+                        department: $('select[name=department]').val(),
+                        degree: $('select[name=degree]').val(),
+                        option: $('select[name=option]').val(),
+                        grade: $('select[name=grade]').val(),
+                        semester: $('select[name=semester]').val(),
+                        group: $('select[name=group]').val(),
+                        week: $('select[name=weekly]').val(),
+                        query: query
+                    },
+                    success: function (response) {
+                        if (response.status === true) {
+                            var course_session_item = '';
+                            $.each(response.course_sessions, function (key, val) {
+                                if (val.teacher_name === null) {
+                                    course_session_item += '<li class="course-item disabled">';
+                                }
+                                else {
+                                    course_session_item += '<li class="course-item">';
+                                }
+                                course_session_item += '<span class="handle ui-sortable-handle">' +
+                                    '<i class="fa fa-ellipsis-v"></i> ' +
+                                    '<i class="fa fa-ellipsis-v"></i>' +
+                                    '</span>' +
+                                    '<span class="text course-name">' + val.course_name + '</span><br>';
+                                if (val.teacher_name === null) {
+                                    course_session_item += '<span style="margin-left: 28px;" class="teacher-name bg-danger badge">Unsigned</span><br/>';
+                                } else {
+                                    course_session_item += '<span style="margin-left: 28px;" class="teacher-name">' + val.teacher_name + '</span><br/>';
+                                }
+                                if (val.tp !== 0) {
+                                    course_session_item += '<span style="margin-left: 28px;" class="course-type">TP</span> : ' +
+                                        '<span class="times">' + val.remaining + '</span> H'
+                                }
+                                else if (val.td !== 0) {
+                                    course_session_item += '<span style="margin-left: 28px;" class="course-type">TD</span> : ' +
+                                        '<span class="times">' + val.remaining + '</span> H'
+                                }
+                                else {
+                                    course_session_item += '<span style="margin-left: 28px;" class="course-type">Course</span> : ' +
+                                        '<span class="times">' + val.remaining + '</span> H'
+                                }
+                                course_session_item += '<span class="text courses-session-id" style="display: none;">' + val.course_session_id + '</span><span class="text slot-id" style="display: none;">' + val.id + '</span><br>' + '</li>';
+                            });
+
+                            $('.courses.todo-list').html(course_session_item);
+                            drag_course_session()
+                        }
+                        else {
+                            $('.courses.todo-list').html("<li class='course-item'>There are no course sessions created yet.</li>");
+                        }
+                    },
+                    error: function () {
+                        swal(
+                            'Oops...',
+                            'Searching search course went wrong!',
+                            'error'
+                        );
+                    }
+                })
+            });
         });
 
     </script>

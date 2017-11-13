@@ -2452,6 +2452,8 @@ class ExamController extends Controller
             $last = $cand;
         }
 
+        dd($cands);
+
         // Lists candidates who have register to ITC
         $candsRegister = DB::table('candidatesFromMoeys')
             ->join("studentBac2s","studentBac2s.can_id",'=',"candidatesFromMoeys.can_id")
@@ -2562,6 +2564,9 @@ class ExamController extends Controller
     }
 
     public function export_candidate_ministry_list_v2($exam_id) {
+<<<<<<< HEAD
+
+=======
         $exam = Exam::where('id',$exam_id)->first();
         $dhes = StudentBac2::join('genders','studentBac2s.gender_id','=','genders.id')
             ->join('highSchools','studentBac2s.highschool_id','=','highSchools.id')
@@ -2692,6 +2697,7 @@ class ExamController extends Controller
             });
 
         })->export('xls');
+>>>>>>> d1eac7927270d915fa2a5ed021c3e02cdcc8769d
     }
 
     public function export_candidate_result_list ($exam_id) {
@@ -3010,7 +3016,11 @@ class ExamController extends Controller
                         $candidate->name_kh,
                         $candidate->name_latin,
                         $candidate->gender,
+<<<<<<< HEAD
+                        Carbon::createFromFormat('Y-m-d H:i:s',$candidate->dob)->format("d/m/Y"),
+=======
                         Carbon::createFromFormat('Y-m-d H:i:s',$candidate->dob)->formatLocalized("%B %d, %Y"),
+>>>>>>> d1eac7927270d915fa2a5ed021c3e02cdcc8769d
                         $candidate->highschool,
                         $candidate->origin,
                         $candidate->register_from,

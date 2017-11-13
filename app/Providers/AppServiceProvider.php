@@ -46,7 +46,7 @@ class AppServiceProvider extends ServiceProvider
                     'academicYears' => AcademicYear::latest()->get(),
                     'departments' => Department::where('parent_id', 11)->get(),
                     'degrees' => Degree::all(),
-                    'grades' => Grade::all(),
+                    'grades' => Grade::orderBy('id')->get(),
                     'options' => DepartmentOption::all(),
                     'semesters' => Semester::all(),
                     'weeks' => Week::all()
@@ -55,7 +55,7 @@ class AppServiceProvider extends ServiceProvider
                 $view->with([
                     'academicYears' => AcademicYear::latest()->get(),
                     'department' => Department::getDepartmentIdByAuthentication(),
-                    'grades' => Grade::all(),
+                    'grades' => Grade::orderBy('id')->get(),
                     'semesters' => Semester::all(),
                     'weeks' => Week::all()
                 ]);
@@ -67,7 +67,7 @@ class AppServiceProvider extends ServiceProvider
                     'academicYears' => AcademicYear::latest()->get(),
                     'departments' => Department::where('parent_id', 11)->get(),
                     'degrees' => Degree::all(),
-                    'grades' => Grade::all(),
+                    'grades' => Grade::orderBy('id')->get(),
                     'options' => DepartmentOption::all(),
                     'semesters' => Semester::all(),
                     'weeks' => Week::all()
@@ -76,7 +76,7 @@ class AppServiceProvider extends ServiceProvider
                 $view->with([
                     'academicYears' => AcademicYear::latest()->get(),
                     'department' => Department::getDepartmentIdByAuthentication(),
-                    'grades' => Grade::all(),
+                    'grades' => Grade::orderBy('id')->get(),
                     'semesters' => Semester::all(),
                     'weeks' => Week::all()
                 ]);

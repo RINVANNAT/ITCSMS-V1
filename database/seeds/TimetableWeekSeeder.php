@@ -20,7 +20,7 @@ class TimetableWeekSeeder extends Seeder
         DB::statement('TRUNCATE weeks CASCADE');
 
         $weeks = [];
-        for ($weekItem = 1; $weekItem <= 36; $weekItem++) {
+        for ($weekItem = 1; $weekItem <= 32; $weekItem++) {
 
             $week = array(
                 'id' => $weekItem,
@@ -32,7 +32,7 @@ class TimetableWeekSeeder extends Seeder
                 'updated_at' => \Carbon\Carbon::now()
             );
 
-            if ($weekItem <= 18) {
+            if ($weekItem <= 16) {
                 $week['semester_id'] = 1;
             } else {
                 $week['semester_id'] = 2;

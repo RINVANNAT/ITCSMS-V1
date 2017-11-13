@@ -110,10 +110,33 @@ trait AjaxCRUDTimetableController
      */
     public function get_options()
     {
+        $dept_ids = [2, 3, 5, 6];
+
         $department_id = request('department_id');
+        $options = DepartmentOption::where('department_id', $department_id)->get();
+
+        if (in_array($department_id, $dept_ids)) {
+
+            $additional_option = [
+                'id' => '',
+                'name_kh' => '',
+                'name_en' => '',
+                'name_fr' => '',
+                'code' => '',
+                'active' => true,
+                'created_at' => Carbon::today(),
+                'updated_at' => Carbon::today(),
+                'department_id' => 10,
+                'degree_id' => 1,
+                'create_uid' => 10,
+                'write_uid' => 10
+            ];
+
+            $options = collect($options)->push($additional_option);
+        }
 
         if (isset($department_id)) {
-            return Response::json(['status' => true, 'options' => DepartmentOption::where('department_id', $department_id)->get()]);
+            return Response::json(['status' => true, 'options' => $options]);
         }
         return Response::json(['status' => false]);
     }
@@ -129,14 +152,13 @@ trait AjaxCRUDTimetableController
 
         if (isset($department_id)) {
             if ($department_id == 8) {
-                return Response::json(['status' => true, 'grades' => Grade::where('id', '<=', 2)->get()]);
+                return Response::json(['status' => true, 'grades' => Grade::where('id', '<=', 2)->orderBy('id')->get()]);
             } else if ($department_id == 12) {
-                return Response::json(['status' => true, 'grades' => Grade::where('id', '>', 1)->get()]);
+                return Response::json(['status' => true, 'grades' => Grade::where('id', '>', 1)->orderBy('id')->get()]);
             } else if ($department_id == 13) {
-                return Response::json(['status' => true, 'grades' => Grade::all()]);
+                return Response::json(['status' => true, 'grades' => Grade::orderBy('id')->get()]);
             } else {
-                return Response::json(['status' => true, 'grades' => Grade::all()]);
-                // return Response::json(['status' => true, 'grades' => Grade::where('id', '>', 2)->get()]);
+                return Response::json(['status' => true, 'grades' => Grade::orderBy('id')->get()]);
             }
         }
         return Response::json(['status' => false]);
@@ -154,8 +176,10 @@ trait AjaxCRUDTimetableController
         $degree_id = request('degree');
         $grade_id = request('grade');
         $semester_id = request('semester');
-        $option_id = request('option') == null ? null : request('option');
+        $option_id = (request('option') == null ? null : (request('option') == '' ? null : request('option')));
         $group_id = request('group') == null ? null : request('group');
+
+        //dd(request()->all());
 
         $course_sessions = DB::table('course_annuals')
             ->where([
@@ -246,9 +270,19 @@ trait AjaxCRUDTimetableController
         if (array_key_exists('query', request()->all())) {
             if (request('query') != ' ') {
                 $rooms = DB::table('rooms')
+                    ->join('roomTypes', 'roomTypes.id', '=', 'rooms.room_type_id')
                     ->join('buildings', 'buildings.id', '=', 'rooms.building_id')
+                    ->where(function ($query) {
+                        if (!access()->hasRole('Administrator')) {
+                            if (!access()->hasRole('Administrator')) {
+                                $department_id = ((auth()->user())->employees)[0]->department_id;
+                                $query->where('rooms.department_id', $department_id)
+                                    ->orWhere('rooms.is_public_room', true);
+                            }
+                        }
+                    })
                     ->where(DB::raw("CONCAT(buildings.code, '-', rooms.name)"), 'LIKE', "%" . request('query') . "%")
-                    ->select('rooms.id as id', 'rooms.name as name', 'buildings.code as code')
+                    ->select('rooms.id as id', 'rooms.name as name', 'buildings.code as code', 'rooms.nb_desk as desk', 'rooms.nb_chair as chair', 'roomTypes.name as room_type')
                     ->get();
 
                 if (count($rooms) > 0) {
@@ -273,7 +307,17 @@ trait AjaxCRUDTimetableController
     {
         $rooms = DB::table('rooms')
             ->join('buildings', 'buildings.id', '=', 'rooms.building_id')
-            ->select('rooms.id as id', 'rooms.name as name', 'buildings.code as code')
+            ->join('roomTypes', 'roomTypes.id', '=', 'rooms.room_type_id')
+            ->where(function ($query) {
+                if (!access()->hasRole('Administrator')) {
+                    if (!access()->hasRole('Administrator')) {
+                        $department_id = ((auth()->user())->employees)[0]->department_id;
+                        $query->where('rooms.department_id', $department_id)
+                            ->orWhere('rooms.is_public_room', true);
+                    }
+                }
+            })
+            ->select('rooms.id as id', 'rooms.name as name', 'buildings.code as code', 'rooms.nb_desk as desk', 'rooms.nb_chair as chair', 'roomTypes.name as room_type')
             ->get();
 
         return Response::json([
@@ -290,22 +334,27 @@ trait AjaxCRUDTimetableController
      */
     public function get_timetable_slots(CreateTimetableRequest $request)
     {
+        //dd($request->all());
         $timetableSlots = new Collection();
 
+        // find timetable
         $timetable = $this->timetableRepo->find_timetable_is_existed($request);
+
+
         if ($timetable instanceof Timetable) {
             $this->timetableSlotRepo->get_timetable_slot_with_conflict_info($timetable, $timetableSlots, null);
+            // dd($timetableSlots);
         }
 
         // get student annuals.
         if ($request->department < 12 && ($timetable instanceof Timetable)) {
             // get student annuals id
             $student_annual_ids = $this->timetableSlotRepo->find_student_annual_ids($timetable);
+
             $department_languages = array(12, 13); // (english, french)
             foreach ($department_languages as $department_language) {
                 // get group language, [@return array(Collection $groups, Array $groups)]
                 $groups = $this->timetableSlotRepo->get_group_student_annual_form_language($department_language, $student_annual_ids, $timetable);
-
                 // get timetable language,
                 $timetables = $this->timetableSlotRepo->get_timetables_form_language_by_student_annual($groups[0], $timetable, $department_language);
 
@@ -475,6 +524,7 @@ trait AjaxCRUDTimetableController
                 $rooms_used = DB::table('timetables')
                     ->join('timetable_slots', 'timetable_slots.timetable_id', '=', 'timetables.id')
                     ->join('rooms', 'rooms.id', '=', 'timetable_slots.room_id')
+                    ->join('roomTypes', 'roomTypes.id', '=', 'rooms.room_type_id')
                     ->where([
                         ['timetables.academic_year_id', $academic_year_id],
                         ['timetables.week_id', $week_id],
@@ -482,9 +532,18 @@ trait AjaxCRUDTimetableController
                         ['timetable_slots.end', $timetable_slot->end]
                     ])
                     ->join('buildings', 'buildings.id', '=', 'rooms.building_id')
+                    ->where(function ($query) {
+                        if (!access()->hasRole('Administrator')) {
+                            if (!access()->hasRole('Administrator')) {
+                                $department_id = ((auth()->user())->employees)[0]->department_id;
+                                $query->where('rooms.department_id', $department_id)
+                                    ->orWhere('rooms.is_public_room', true);
+                            }
+                        }
+                    })
                     ->where(DB::raw("CONCAT(buildings.code, '-', rooms.name)"), 'LIKE', "%" . $query . "%")
                     ->whereNotNull('timetable_slots.room_id')
-                    ->select('rooms.id as id', 'rooms.name as name', 'buildings.code as code')
+                    ->select('rooms.id as id', 'rooms.name as name', 'buildings.code as code', 'rooms.nb_desk as desk', 'rooms.nb_chair as chair', 'roomTypes.name as room_type')
                     ->distinct('name', 'code')
                     ->get();
 
@@ -498,15 +557,34 @@ trait AjaxCRUDTimetableController
                         ['timetable_slots.end', $timetable_slot->end]
                     ])
                     ->join('buildings', 'buildings.id', '=', 'rooms.building_id')
+                    ->where(function ($query) {
+                        if (!access()->hasRole('Administrator')) {
+                            if (!access()->hasRole('Administrator')) {
+                                $department_id = ((auth()->user())->employees)[0]->department_id;
+                                $query->where('rooms.department_id', $department_id)
+                                    ->orWhere('rooms.is_public_room', true);
+                            }
+                        }
+                    })
                     ->where(DB::raw("CONCAT(buildings.code, '-', rooms.name)"), 'LIKE', "%" . $query . "%")
                     ->whereNotNull('timetable_slots.room_id')
                     ->lists('timetable_slots.room_id');
 
                 $rooms_remaining = DB::table('rooms')
                     ->join('buildings', 'buildings.id', '=', 'rooms.building_id')
+                    ->join('roomTypes', 'roomTypes.id', '=', 'rooms.room_type_id')
+                    ->where(function ($query) {
+                        if (!access()->hasRole('Administrator')) {
+                            if (!access()->hasRole('Administrator')) {
+                                $department_id = ((auth()->user())->employees)[0]->department_id;
+                                $query->where('rooms.department_id', $department_id)
+                                    ->orWhere('rooms.is_public_room', true);
+                            }
+                        }
+                    })
                     ->whereNotIn('rooms.id', $rooms_tmp == [] ? [] : $rooms_tmp)
                     ->where(DB::raw("CONCAT(buildings.code, '-', rooms.name)"), 'LIKE', "%" . $query . "%")
-                    ->select('rooms.id as id', 'rooms.name as name', 'buildings.code as code')
+                    ->select('rooms.id as id', 'rooms.name as name', 'buildings.code as code', 'rooms.nb_desk as desk', 'rooms.nb_chair as chair', 'roomTypes.name as room_type')
                     ->get();
 
                 if (count($rooms_remaining) > 0) {
@@ -525,14 +603,13 @@ trait AjaxCRUDTimetableController
     }
 
     /**
-     * Get conflict information.
+     * Get conflict information to show pop-up window.
      *
      * @return mixed
      */
     public function get_conflict_info()
     {
         $timetableSlot = TimetableSlot::find(request('timetable_slot_id'));
-
         // check conflict room.
         if ($this->timetableSlotRepo->is_conflict_room($timetableSlot)[0]['status'] == true) {
             $conflicts['is_conflict_room'] = true;
@@ -655,10 +732,10 @@ trait AjaxCRUDTimetableController
      *
      * @return mixed
      */
-    public
-    function export_course_session()
+    public function export_course_session()
     {
-        if ($this->timetableSlotRepo->export_course_sessions() == true) {
+        $data = request()->all();
+        if ($this->timetableSlotRepo->export_course_sessions($data) == true) {
             return Response::json(['status' => true]);
         }
         return Response::json(['status' => false]);
@@ -783,12 +860,24 @@ trait AjaxCRUDTimetableController
      */
     public function assign_update()
     {
+        $now = Carbon::now('Asia/Phnom_Penh');
         $configuration = Configuration::find(request('configuration_id'));
         if ($configuration instanceof Configuration) {
             $configuration->created_at = new Carbon(request('start'));
             $configuration->updated_at = new Carbon(request('end'));
+
+            if ((strtotime($now) >= strtotime(new Carbon(request('start')))) && (strtotime($now) <= strtotime(new Carbon(request('end'))))) {
+                $configuration->description = 'true';
+                $configuration->timestamps = false;
+
+            } else if (strtotime($now) > strtotime(new Carbon(request('end')))) {
+                $configuration->description = 'finished';
+                $configuration->timestamps = false;
+            } else {
+                $configuration->description = 'false';
+                $configuration->timestamps = false;
+            }
             $configuration->update();
-            $this->timetableSlotRepo->set_permission_create_timetable();
             return Response::json(['status' => true]);
         }
         return Response::json(['status' => false]);
@@ -806,6 +895,7 @@ trait AjaxCRUDTimetableController
             ['academic_year_id', request('academicYear')],
             ['department_id', request('department')],
             ['degree_id', request('degree')],
+            ['grade_id', request('grade')],
             ['option_id', request('option') == null ? null : request('option')],
             ['group_id', request('group') == null ? null : request('group')],
             ['semester_id', request('semester')],
@@ -827,5 +917,58 @@ trait AjaxCRUDTimetableController
     {
         $configuration = Configuration::find(request('id'));
         return Response::json(['status' => true, 'start' => (new Carbon($configuration->created_at))->toDateString(), 'end' => (new Carbon($configuration->updated_at))->toDateString()]);
+    }
+
+    public function search_course_session()
+    {
+        $academic_year_id = request('academic');
+        $department_id = request('department');
+        $degree_id = request('degree');
+        $grade_id = request('grade');
+        $semester_id = request('semester');
+        $option_id = (request('option') == null ? null : (request('option') == '' ? null : request('option')));
+        $group_id = request('group') == null ? null : request('group');
+
+        // dd(request()->all());
+
+        $course_sessions = DB::table('course_annuals')
+            ->where([
+                ['course_annuals.academic_year_id', $academic_year_id],
+                ['course_annuals.department_id', $department_id],
+                ['course_annuals.degree_id', $degree_id],
+                ['course_annuals.grade_id', $grade_id],
+                ['course_annuals.semester_id', $semester_id],
+                ['course_annuals.department_option_id', $option_id],
+            ])
+            ->join('slots', 'slots.course_annual_id', '=', 'course_annuals.id')
+            ->leftJoin('employees', 'employees.id', '=', 'slots.lecturer_id')
+            ->where('slots.group_id', '=', $group_id)
+            ->where('slots.time_remaining', '>', 0)
+            ->where(function ($query) {
+                $query->whereRaw('LOWER(course_annuals.name_en) LIKE ?', array('%' . strtolower(request('query')) . '%'))
+                    ->orWhereRaw('LOWER(employees.name_latin) LIKE ?', array('%' . strtolower(request('query')) . '%'));
+            })
+            ->select(
+                'slots.id as id',
+                'slots.course_session_id as course_session_id',
+                'slots.time_tp as tp',
+                'slots.time_td as td',
+                'slots.time_course as tc',
+                'slots.time_remaining as remaining',
+                'course_annuals.name_en as course_name',
+                'employees.name_latin as teacher_name'
+            )->get();
+
+        // dd($course_sessions);
+        if (count($course_sessions) > 0) {
+            return Response::json([
+                'status' => true,
+                'course_sessions' => $course_sessions
+            ]);
+        } else {
+            return Response::json([
+                'status' => false
+            ]);
+        }
     }
 }

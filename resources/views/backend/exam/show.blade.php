@@ -1154,20 +1154,23 @@
                 type: 'GET',
                 url: "{{route('admin.exam.download_registration_statistic',$exam->id)."?type=data_chart"}}",
                 success: function(resultData) {
+<<<<<<< HEAD
+                    $('#table_data').append(resultData);
+=======
 
 
                     $('#table_data').append(resultData); //----the table_data is the id of the div in file exam_general_info.blade.php ...the included view
+>>>>>>> d1eac7927270d915fa2a5ed021c3e02cdcc8769d
                     //this is a function to build the chart after requesting ajax
                     //-----start build a chart of Result Candidate Engineer----//
                     //----- we use the data from table that we create from ajax request : datatable_cadidate_result is the id table we created
                     $(function () {
-
                         Highcharts.setOptions({
                             colors: ['#058DC7', '#50B432', '#ED561B', '#DDDF00', '#24CBE5', '#64E572', '#FF9655', '#FFF263', '#6AF9C4']
                         });
                         Highcharts.chart('candidate_engineer_result', {
                             data: {
-                                table: 'datatable_candidate_resutl'
+                                table: 'table_data'
                             },
                             lang: {
                                 noData: "{{ trans('labels.backend.exams.chart.engineer_statistic.no_result') }}"

@@ -2,18 +2,17 @@
     <div class="col-md-12">
         <div class="box box-default" style="border-top: 1px solid #f1f1f1;">
             <div class="box-header with-border">
-                <i class="fa fa-building"></i>
-                <h3 class="box-title">{{ trans('labels.backend.schedule.timetable.rooms') }}</h3>
+                <h3 class="box-title" data-toggle="tooltip" data-placement="top" title="Rooms">
+                    <i class="fa fa-building"></i>
+                </h3>
+
                 <div class="box-tools pull-right">
-                    <form id="search-rooms"
-                          class="search-rooms"
-                          method="POST"
-                          action="{{ route('admin.schedule.timetables.search_rooms') }}">
+                    <div class="form-group">
                         <input type="text"
                                class="form-control input-sm"
                                name="search_room_query"
                                placeholder="{{ trans('strings.backend.timetable.search_room') }}"/>
-                    </form>
+                    </div>
                 </div>
             </div>
             <div class="box-body">

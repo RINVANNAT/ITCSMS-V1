@@ -4,7 +4,8 @@ Route::group(['namespace' => 'Schedule', 'prefix' => 'schedule', 'middleware' =>
 
     /** Http Requesting. */
     Route::get('/timetables', 'TimetableController@index')->name('admin.schedule.timetables.index');
-    Route::get('/timetables/create', 'TimetableController@create')->name('admin.schedule.timetables.create');
+    Route::get('/timetables/create/{academic?}/{department?}/{degree?}/{option?}/{grade?}/{semester?}/{group?}/{week?}', 'TimetableController@create')
+        ->name('admin.schedule.timetables.create');
     Route::get('/timetables/show/{timetable}', 'TimetableController@show')->name('admin.schedule.timetables.show');
     Route::post('/timetables/delete', 'TimetableController@delete')->name('admin.schedule.timetables.delete');
     Route::post('/timetables/publish', 'TimetableController@publish')->name('admin.schedule.timetables.publish');
@@ -22,6 +23,7 @@ Route::group(['namespace' => 'Schedule', 'prefix' => 'schedule', 'middleware' =>
     Route::post('timetables/get_conflict_info', 'TimetableController@get_conflict_info')->name('get_conflict_info');
     Route::post('timetables/merge_timetable_slot', 'TimetableController@merge_timetable_slot')->name('merge_timetable_slot');
     Route::post('timetables/remove_timetable_slot', 'TimetableController@remove_timetable_slot')->name('remove_timetable_slot');
+    Route::post('timetables/search_course_session', 'TimetableController@search_course_session')->name('search_course_session');
 
     /** timetable assignment */
     Route::post('timetables/export_course_session', 'TimetableController@export_course_session')->name('export_course_session');
@@ -54,4 +56,11 @@ Route::group(['namespace' => 'Schedule', 'prefix' => 'schedule', 'middleware' =>
     /** Export Excel */
     Route::get('timetables/export/{id}', 'TimetableController@export_timetable')->name('timetables.export');
     Route::post('timetables/export/file', 'TimetableController@export_file')->name('timetables.export_file');
+
+    /** Check available room */
+    Route::group(['prefix' => 'timetables/check-available-room'], function (){
+        Route::get('', 'CheckAvailableRoomController@index')->name('check-available-room.index');
+        Route::get('/get_rooms', 'CheckAvailableRoomController@get_rooms')->name('check-available-room.get_rooms');
+        Route::post('/get-unavailable-room-info', 'CheckAvailableRoomController@get_unavailable_room_info')->name('check-available-room.get_unavailable_room_info');
+    });
 });

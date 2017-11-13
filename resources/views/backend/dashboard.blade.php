@@ -6,6 +6,7 @@
     {!! Html::style('plugins/fullcalendar/fullcalendar.css') !!}
     {!! Html::style('plugins/sweetalert2/dist/sweetalert2.css') !!}
     {!! Html::style('plugins/toastr/toastr.min.css') !!}
+    {!! Html::style('plugins/select2/select2.min.css') !!}
     {!! Html::style('css/backend/schedule/timetable.css') !!}
     {!! Html::style('bower_components/bootstrap-toggle/css/bootstrap2-toggle.min.css') !!}
 
@@ -13,6 +14,7 @@
         .not-mine {
             border: 4px solid red;
         }
+
         .bg-primary {
             background-color: #337ab7 !important;
         }
@@ -28,6 +30,11 @@
 
         .toggle.ios .toggle-handle {
             border-radius: 20px;
+        }
+
+        .select2-container--default .select2-results__option--highlighted[aria-selected] {
+            background-color: #3c8dbc;
+            color: #fff;
         }
     </style>
 
@@ -71,7 +78,7 @@
 
             <div class="alert alert-info alert-dismissible">
                 <button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>
-                <h4><i class="icon fa fa-info"></i> Welcome to ITC-School Management Information System.</h4>
+                <h4><i class="fa fa-info"></i> Welcome to ITC-School Management Information System.</h4>
                 <p>
                     This application is under construction with partial release. Please report the problems or your
                     demanding to our developers by using this <a href="{{route('admin.reporting.index')}}">REPORTING
@@ -98,7 +105,7 @@
                     <ul class="timeline timeline-inverse">
 
                         @if($teacher)
-                            @if(isset($academicYears))
+                            @if(isset($timetables) && access()->allow('teacher-view-timetable'))
                                 @include('backend.dashboard.includes.timetable')
                             @endif
                             @include('backend.dashboard.teacher')
@@ -214,6 +221,7 @@
     {!! Html::script('plugins/fullcalendar/fullcalendar.js') !!}
     {!! Html::script('plugins/sweetalert2/dist/sweetalert2.js') !!}
     {!! Html::script('plugins/toastr/toastr.min.js') !!}
+    {!! Html::script('plugins/select2/select2.full.min.js') !!}
     {!! Html::script('bower_components/bootstrap-toggle/js/bootstrap2-toggle.min.js') !!}
     {!! Html::script('js/backend/schedule/timetable.js') !!}
 
@@ -314,13 +322,12 @@
                 timezone: 'Asia/Phnom_Penh',
                 droppable: true,
                 dragRevertDuration: 0,
-                editable: true,
+                editable: '{{ access()->allow('teacher-edit-timetable') ? true : false }}',
                 eventConstraint: {
                     start: '07:00:00',
                     end: '20:00:00'
                 },
                 eventDrop: function (event, delta, revertFunc) {
-                    console.log(100);
                     var start_date = event.start.format();
                     move_timetable_slot(event, start_date);
                     get_teacher_timetable();
@@ -360,6 +367,7 @@
                         if (typeof event.type !== 'undefined') {
                             object += '<span class="text-primary"> (' + event.type + ')</span> ';
                         }
+                        object += '<span class="text-primary"> (' + event.degree_name + event.grade_name + '-' + event.department_name + ')</span> ';
                         object += '</div>';
 
                         // check conflict lecturer and render
@@ -396,14 +404,9 @@
                         if (typeof event.groups !== 'undefined') {
                             if (event.groups.length > 0) {
                                 var groups = '<p>Gr: ';
-                                for (var i = 0; i < event.groups.length; i++) {
-                                    if (event.groups[i] !== null) {
-                                        groups += event.groups[i].code + ' ';
-                                    }
-                                    else {
-                                        groups = '';
-                                    }
-                                }
+                                event.groups.forEach(function (ele) {
+                                    groups += ele;
+                                });
                                 groups += '</p>';
                             }
                             object += groups;
@@ -456,15 +459,6 @@
                 url: '/admin/dashboard/get_teacher_timetable',
                 data: $('#form_teacher_timetable').serialize(),
                 success: function (response) {
-                    if (response.timetable !== null) {
-                        if (response.timetable.completed === false) {
-                            $("#btn_clone").attr('disabled', true);
-                            $('#btn_publish').attr('disabled', false);
-                        } else {
-                            $("#btn_clone").attr('disabled', false);
-                            $('#btn_publish').attr('disabled', true);
-                        }
-                    }
                     $('#timetable_for_teacher').fullCalendar('removeEvents');
                     $('#timetable_for_teacher').fullCalendar('renderEvents', response.timetableSlots, true);
                     $('#timetable_for_teacher').fullCalendar('rerenderEvents');
@@ -478,9 +472,19 @@
         /** load script */
         $(function () {
             show_timetable();
+
             get_teacher_timetable();
+
             $('#form_teacher_timetable').on('change', function () {
                 get_teacher_timetable();
+            });
+
+            $('#academic_years').select2({
+                placeholder: "Academic Year"
+            });
+
+            $('#weeks').select2({
+                placeholder: "Week"
             });
         });
     </script>
