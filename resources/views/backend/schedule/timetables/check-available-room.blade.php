@@ -1,6 +1,6 @@
 @extends ('backend.layouts.master')
 
-@section ('title', 'Check Unavailable Room | SMIS')
+@section ('title', 'SMIS | Check Unavailable Room ')
 
 @section('page-header')
 
@@ -137,7 +137,7 @@
 
                     $.each(event.rooms, function (key, val) {
                         template += '<span class="fc-title">' +
-                            '<button class="btn btn-danger" id="showRoomInfo" data-toggle="popover" data-trigger="focus" title="Dismissible popover" data-content="dsafsdfasfd"' +
+                            '<button class="btn btn-danger showRoomInfo"' +
                             'data-start="' + event._start._i + '" ' +
                             'data-end="' + event._end._i + '" ' +
                             'data-room-id="' + val.id + '" ' +
@@ -156,7 +156,7 @@
 
         function getRooms(academic, week) {
             $.ajax({
-                type: 'POST',
+                type: 'GET',
                 url: '/admin/schedule/timetables/check-available-room/get_rooms',
                 data: {
                     academic: academic,
@@ -207,13 +207,9 @@
                 getRooms($('select[name="academic"]').val(), $('select[name="week"]').val());
             });
 
-            $(document).on('click', '#showRoomInfo', function () {
+            $(document).on('click', '.showRoomInfo', function () {
                 var data_timetable_slot_id = $(this).attr('data-timetable-slot-id');
                 getUnavailableRoomInfo(data_timetable_slot_id)
-            });
-
-            $('.showRoomInfo').popover({
-                trigger: 'over'
             });
 
         });

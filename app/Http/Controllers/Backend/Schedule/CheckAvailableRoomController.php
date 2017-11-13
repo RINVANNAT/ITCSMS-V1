@@ -8,7 +8,12 @@ use App\Models\Schedule\Timetable\Timetable;
 use App\Models\Schedule\Timetable\TimetableSlot;
 use App\Models\Schedule\Timetable\Week;
 use Arcanedev\Support\Collection;
+use Illuminate\Support\Facades\DB;
 
+/**
+ * Class CheckAvailableRoomController
+ * @package App\Http\Controllers\Backend\Schedule
+ */
 class CheckAvailableRoomController extends Controller
 {
     /**
@@ -48,7 +53,10 @@ class CheckAvailableRoomController extends Controller
             ->distinct('room_id')
             ->get();
 
-        $tmps = (new Collection($timetableSlots))->groupBy('start', 'end')->toArray();
+        $tmps = (new Collection($timetableSlots))->groupBy('start')->toArray();
+        $end = (new Collection($timetableSlots))->groupBy('end')->toArray();
+
+
 
         $rooms = [];
         foreach ($tmps as $tmp) {
@@ -71,7 +79,12 @@ class CheckAvailableRoomController extends Controller
         return ['status' => true, 'data' => $rooms];
     }
 
-    public function get_unavailable_room_info ()
+    /**
+     * Get all unavailable room.
+     *
+     * @return mixed
+     */
+    public function get_unavailable_room_info()
     {
         $timetableSlot = TimetableSlot::find(request('timetableSlotId'));
         $timetable = $timetableSlot->timetable;
