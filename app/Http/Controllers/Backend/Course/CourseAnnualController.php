@@ -200,8 +200,11 @@ class CourseAnnualController extends Controller
                 })
                 ->join('groups', function ($groupQuery) {
                     $groupQuery->on('groups.id', '=', 'course_annual_classes.group_id');
-                })->lists('groups.code');
-
+                });
+            if ( $request->academic_year_id ) {
+                $selectedGroups = $selectedGroups->where('course_annuals.academic_year_id','=',$request->academic_year_id);
+            }
+            $selectedGroups = $selectedGroups->lists('groups.code');
         }
 
         if ($academicYearId = $request->academic_year_id) {
@@ -229,8 +232,8 @@ class CourseAnnualController extends Controller
             }
         }
 
-        $groupCodes = $groups->lists('group_code');
 
+        $groupCodes = $groups->lists('group_code');
         $groupIdCodes = $groups->lists('group_id', 'group_code');
 
         asort($groupCodes);
