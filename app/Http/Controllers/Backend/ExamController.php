@@ -105,7 +105,7 @@ class ExamController extends Controller
      */
     public function store(StoreExamRequest $request)
     {
-       
+
         $id = $this->exams->create($request->all());
         return redirect()->route('admin.exam.show',[$request->get('type_id'),$id])->withFlashSuccess(trans('alerts.backend.generals.created'));
 
@@ -239,7 +239,7 @@ class ExamController extends Controller
             })
             ->make(true);
     }
-    
+
     public function get_courses($id){
         $exam = $this->exams->findOrThrowException($id);
         $course = $exam->courses();
@@ -252,8 +252,8 @@ class ExamController extends Controller
             ->editColumn('description', '{!! $description !!}')
             ->addColumn('action', function ($exam) {
                 return  '<a href="'.route('admin.exams.edit',$exam->id).'" class="btn btn-xs btn-primary"><i class="fa fa-pencil" data-toggle="tooltip" data-placement="top" title="" data-original-title="'.trans('buttons.general.crud.edit').'"></i> </a>'.
-                ' <button class="btn btn-xs btn-danger btn-delete" data-remote="'.route('admin.exams.destroy', $exam->id) .'"><i class="fa fa-times" data-toggle="tooltip" data-placement="top" title="' . trans('buttons.general.crud.delete') . '"></i></button>'.
-                ' <a href="'.route('admin.exams.show',$exam->id).'" class="btn btn-xs btn-info"><i class="fa fa-eye" data-toggle="tooltip" data-placement="top" title="" data-original-title="'.trans('buttons.general.view').'"></i> </a>';
+                    ' <button class="btn btn-xs btn-danger btn-delete" data-remote="'.route('admin.exams.destroy', $exam->id) .'"><i class="fa fa-times" data-toggle="tooltip" data-placement="top" title="' . trans('buttons.general.crud.delete') . '"></i></button>'.
+                    ' <a href="'.route('admin.exams.show',$exam->id).'" class="btn btn-xs btn-info"><i class="fa fa-eye" data-toggle="tooltip" data-placement="top" title="" data-original-title="'.trans('buttons.general.view').'"></i> </a>';
             })
             ->make(true);
     }
@@ -646,13 +646,13 @@ class ExamController extends Controller
                         $candidates =  $room->candidates()->with('gender')->orderBy('register_id')->get();
                         foreach($candidates as $candidate) {
                             $element = array(
-                                'លេខបង្កាន់ដៃ'              => str_pad($candidate->register_id, 4, '0', STR_PAD_LEFT),
-                                'បន្ទប់'                    => $room->building->code."-".$room->name,
-                                'ឈ្មោះ ខ្មែរ'             => $candidate->name_kh,
-                                'ឈ្មោះ ឡាតាំង'            => $candidate->name_latin,
-                                'ភេទ'                      => $candidate->gender->code,
-                                'ថ្ងៃខែរឆ្នាំកំនើត'           => $candidate->dob->formatLocalized("%d/%b/%Y"),
-                                'ហត្ថលេខា'                => ''
+                                'áž›áŸážáž”áž„áŸ’áž€áž¶áž“áŸ‹ážŠáŸƒ'              => str_pad($candidate->register_id, 4, '0', STR_PAD_LEFT),
+                                'áž”áž“áŸ’áž‘áž”áŸ‹'                    => $room->building->code."-".$room->name,
+                                'ážˆáŸ’áž˜áŸ„áŸ‡ ážáŸ’áž˜áŸ‚ážš'             => $candidate->name_kh,
+                                'ážˆáŸ’áž˜áŸ„áŸ‡ áž¡áž¶ážáž¶áŸ†áž„'            => $candidate->name_latin,
+                                'áž—áŸáž‘'                      => $candidate->gender->code,
+                                'ážáŸ’áž„áŸƒážáŸ‚ážšáž†áŸ’áž“áž¶áŸ†áž€áŸ†áž“áž¾áž'           => $candidate->dob->formatLocalized("%d/%b/%Y"),
+                                'áž ážáŸ’ážáž›áŸážáž¶'                => ''
                             );
 //                            $element = array(
 //                                'Order'     =>  str_pad($candidate->register_id, 4, '0', STR_PAD_LEFT),
@@ -673,17 +673,17 @@ class ExamController extends Controller
         }
 
 
-        $fields= ['លេខបង្កាន់ដៃ', 'បន្ទប់', 'ឈ្មោះ ខ្មែរ', 'ឈ្មោះ ឡាតាំង', 'ភេទ', 'ថ្ងៃខែរឆ្នាំកំនើត', 'ហត្ថលេខា'];
+        $fields= ['áž›áŸážáž”áž„áŸ’áž€áž¶áž“áŸ‹ážŠáŸƒ', 'áž”áž“áŸ’áž‘áž”áŸ‹', 'ážˆáŸ’áž˜áŸ„áŸ‡ ážáŸ’áž˜áŸ‚ážš', 'ážˆáŸ’áž˜áŸ„áŸ‡ áž¡áž¶ážáž¶áŸ†áž„', 'áž—áŸáž‘', 'ážáŸ’áž„áŸƒážáŸ‚ážšáž†áŸ’áž“áž¶áŸ†áž€áŸ†áž“áž¾áž', 'áž ážáŸ’ážáž›áŸážáž¶'];
 
 //        $fields= ['Order', 'Room', 'Name Khmer', 'Name Latin', 'Sexe', 'Birth Date', 'Signature'];
-        $title = 'បញ្ជីវត្តមានបេក្ខជន';
+        $title = 'áž”áž‰áŸ’áž‡áž¸ážœážáŸ’ážáž˜áž¶áž“áž”áŸáž€áŸ’ážáž‡áž“';
 //        $title = 'Candidates';
         $alpha = [];
         $letter = 'A';
         while ($letter !== 'AAA') {
             $alpha[] = $letter++;
         }
-        Excel::create('បញ្ជីវត្តមានបេក្ខជន', function($excel) use ($candidateData, $title,$alpha,$fields) {
+        Excel::create('áž”áž‰áŸ’áž‡áž¸ážœážáŸ’ážáž˜áž¶áž“áž”áŸáž€áŸ’ážáž‡áž“', function($excel) use ($candidateData, $title,$alpha,$fields) {
             foreach($candidateData as $key => $data) {
                 $excel->sheet($key, function($sheet) use($data,$title,$alpha,$fields) {
                     $sheet->fromArray($data);
@@ -704,11 +704,11 @@ class ExamController extends Controller
                 if($candidates) {
                     foreach($candidates as $candidate) {
                         $element = array(
-                            'លេខបង្កាន់ដៃ'              => str_pad($candidate->register_id, 4, '0', STR_PAD_LEFT),
-                            'ឈ្មោះ ខ្មែរ'             => $candidate->name_kh,
-                            'ឈ្មោះ ឡាតាំង'            => $candidate->name_latin,
-                            'ភេទ'                      => $candidate->gender->code,
-                            'ថ្ងៃខែរឆ្នាំកំនើត'           => $candidate->dob->formatLocalized("%d/%b/%Y")
+                            'áž›áŸážáž”áž„áŸ’áž€áž¶áž“áŸ‹ážŠáŸƒ'              => str_pad($candidate->register_id, 4, '0', STR_PAD_LEFT),
+                            'ážˆáŸ’áž˜áŸ„áŸ‡ ážáŸ’áž˜áŸ‚ážš'             => $candidate->name_kh,
+                            'ážˆáŸ’áž˜áŸ„áŸ‡ áž¡áž¶ážáž¶áŸ†áž„'            => $candidate->name_latin,
+                            'áž—áŸáž‘'                      => $candidate->gender->code,
+                            'ážáŸ’áž„áŸƒážáŸ‚ážšáž†áŸ’áž“áž¶áŸ†áž€áŸ†áž“áž¾áž'           => $candidate->dob->formatLocalized("%d/%b/%Y")
                         );
                         $candidateByRoom[$room->building->code."-".$room->name][] = $element;
 
@@ -717,14 +717,14 @@ class ExamController extends Controller
             }
         }
 
-        $fields= ['លេខបង្កាន់ដៃ', 'ឈ្មោះ ខ្មែរ', 'ឈ្មោះ ឡាតាំង', 'ភេទ', 'ថ្ងៃខែរឆ្នាំកំនើត'];
-        $title = 'បញ្ជីបេក្ខជន';
+        $fields= ['áž›áŸážáž”áž„áŸ’áž€áž¶áž“áŸ‹ážŠáŸƒ', 'ážˆáŸ’áž˜áŸ„áŸ‡ ážáŸ’áž˜áŸ‚ážš', 'ážˆáŸ’áž˜áŸ„áŸ‡ áž¡áž¶ážáž¶áŸ†áž„', 'áž—áŸáž‘', 'ážáŸ’áž„áŸƒážáŸ‚ážšáž†áŸ’áž“áž¶áŸ†áž€áŸ†áž“áž¾áž'];
+        $title = 'áž”áž‰áŸ’áž‡áž¸áž”áŸáž€áŸ’ážáž‡áž“';
         $alpha = [];
         $letter = 'A';
         while ($letter !== 'AAA') {
             $alpha[] = $letter++;
         }
-        Excel::create('បញ្ជីបេក្ខជន', function($excel) use ($candidateByRoom, $title,$alpha,$fields) {
+        Excel::create('áž”áž‰áŸ’áž‡áž¸áž”áŸáž€áŸ’ážáž‡áž“', function($excel) use ($candidateByRoom, $title,$alpha,$fields) {
             foreach($candidateByRoom as $key => $data) {
                 $excel->sheet($key, function($sheet) use($data,$title,$alpha,$fields) {
                     $sheet->fromArray($data);
@@ -745,30 +745,30 @@ class ExamController extends Controller
                 $candidateRooms = $candidate->room;
                 if($candidateRooms) {
                     $element = array(
-                        'លេខបង្កាន់ដៃ'              => str_pad($candidate->register_id, 4, '0', STR_PAD_LEFT),
-                        'បន្ទប់'                    => $candidate->room->building->code."-".$candidate->room->name,
-                        'ឈ្មោះ ខ្មែរ'             => $candidate->name_kh,
-                        'ឈ្មោះ ឡាតាំង'            => $candidate->name_latin,
-                        'ភេទ'                      => $candidate->gender->code,
-                        'ថ្ងៃខែរឆ្នាំកំនើត'           => $candidate->dob->formatLocalized("%d/%b/%Y")
+                        'áž›áŸážáž”áž„áŸ’áž€áž¶áž“áŸ‹ážŠáŸƒ'              => str_pad($candidate->register_id, 4, '0', STR_PAD_LEFT),
+                        'áž”áž“áŸ’áž‘áž”áŸ‹'                    => $candidate->room->building->code."-".$candidate->room->name,
+                        'ážˆáŸ’áž˜áŸ„áŸ‡ ážáŸ’áž˜áŸ‚ážš'             => $candidate->name_kh,
+                        'ážˆáŸ’áž˜áŸ„áŸ‡ áž¡áž¶ážáž¶áŸ†áž„'            => $candidate->name_latin,
+                        'áž—áŸáž‘'                      => $candidate->gender->code,
+                        'ážáŸ’áž„áŸƒážáŸ‚ážšáž†áŸ’áž“áž¶áŸ†áž€áŸ†áž“áž¾áž'           => $candidate->dob->formatLocalized("%d/%b/%Y")
                     );
                     $candidateByRoom[] = $element;
                 }
             }
         }
 
-        $fields= ['លេខបង្កាន់ដៃ', 'បន្ទប់', 'ឈ្មោះ ខ្មែរ', 'ឈ្មោះ ឡាតាំង', 'ភេទ', 'ថ្ងៃខែរឆ្នាំកំនើត'];
-        $title = 'បញ្ជីបេក្ខជន';
+        $fields= ['áž›áŸážáž”áž„áŸ’áž€áž¶áž“áŸ‹ážŠáŸƒ', 'áž”áž“áŸ’áž‘áž”áŸ‹', 'ážˆáŸ’áž˜áŸ„áŸ‡ ážáŸ’áž˜áŸ‚ážš', 'ážˆáŸ’áž˜áŸ„áŸ‡ áž¡áž¶ážáž¶áŸ†áž„', 'áž—áŸáž‘', 'ážáŸ’áž„áŸƒážáŸ‚ážšáž†áŸ’áž“áž¶áŸ†áž€áŸ†áž“áž¾áž'];
+        $title = 'áž”áž‰áŸ’áž‡áž¸áž”áŸáž€áŸ’ážáž‡áž“';
         $alpha = [];
         $letter = 'A';
         while ($letter !== 'AAA') {
             $alpha[] = $letter++;
         }
-        Excel::create('បញ្ជីបេក្ខជនតាមបន្ទប់ រៀបតាមលេខបង្កាន់ដៃ', function($excel) use ($candidateByRoom, $title,$alpha,$fields) {
+        Excel::create('áž”áž‰áŸ’áž‡áž¸áž”áŸáž€áŸ’ážáž‡áž“ážáž¶áž˜áž”áž“áŸ’áž‘áž”áŸ‹ ážšáŸ€áž”ážáž¶áž˜áž›áŸážáž”áž„áŸ’áž€áž¶áž“áŸ‹ážŠáŸƒ', function($excel) use ($candidateByRoom, $title,$alpha,$fields) {
 
-                $excel->sheet($title, function($sheet) use($candidateByRoom,$title,$alpha,$fields) {
-                    $sheet->fromArray($candidateByRoom);
-                });
+            $excel->sheet($title, function($sheet) use($candidateByRoom,$title,$alpha,$fields) {
+                $sheet->fromArray($candidateByRoom);
+            });
         })->export('xls');
     }
 
@@ -800,11 +800,11 @@ class ExamController extends Controller
         $exam_score_by_course = $exam_scores->groupBy('name_kh');
 
         $exam_score_by_course->each(function ($item, $key) {
-           $exam_score_by_room = $item->groupBy('roomcode');
-           $exam_score_by_room->each(function($item,$key) {
-               $exam_score_by_order = $item->groupBy('order_in_room');
+            $exam_score_by_room = $item->groupBy('roomcode');
+            $exam_score_by_room->each(function($item,$key) {
+                $exam_score_by_order = $item->groupBy('order_in_room');
                 dd($exam_score_by_order);
-           });
+            });
         });
         return view('backend.exam.print.attendance_statistic');
     }
@@ -960,13 +960,13 @@ class ExamController extends Controller
             }
 
             $element = array(
-                'លេខបង្កាន់ដៃ'              => str_pad($candidate->register_id, 4, '0', STR_PAD_LEFT),
-                'ឈ្មោះ ខ្មែរ'             => $candidate->name_kh,
-                'ឈ្មោះ ឡាតាំង'            => $candidate->name_latin,
-                'ភេទ'                      => $candidate->gender,
-                'ថ្ងៃខែរឆ្នាំកំនើត'           => $candidate->dob->formatLocalized("%B %d, %Y"),
-                'វិទ្យាល័យ'                => $candidate->highschool,
-                'ប្រភព'                   => $candidate->origin,
+                'áž›áŸážáž”áž„áŸ’áž€áž¶áž“áŸ‹ážŠáŸƒ'              => str_pad($candidate->register_id, 4, '0', STR_PAD_LEFT),
+                'ážˆáŸ’áž˜áŸ„áŸ‡ ážáŸ’áž˜áŸ‚ážš'             => $candidate->name_kh,
+                'ážˆáŸ’áž˜áŸ„áŸ‡ áž¡áž¶ážáž¶áŸ†áž„'            => $candidate->name_latin,
+                'áž—áŸáž‘'                      => $candidate->gender,
+                'ážáŸ’áž„áŸƒážáŸ‚ážšáž†áŸ’áž“áž¶áŸ†áž€áŸ†áž“áž¾áž'           => $candidate->dob->formatLocalized("%B %d, %Y"),
+                'ážœáž·áž‘áŸ’áž™áž¶áž›áŸáž™'                => $candidate->highschool,
+                'áž”áŸ’ážšáž—áž–'                   => $candidate->origin,
                 'Bac Year'      => $candidate->bac_year,
                 'Score'         => $candidate->bac_percentile,
                 'Bac'           => $candidate->bac_total_grade,
@@ -989,13 +989,13 @@ class ExamController extends Controller
         }
 
         $fields= [
-            'លេខបង្កាន់ដៃ',
-            'ឈ្មោះ ខ្មែរ',
-            'ឈ្មោះ ឡាតាំង',
-            'ភេទ',
-            'ថ្ងៃខែរឆ្នាំកំនើត',
-            'វិទ្យាល័យ',
-            'ប្រភព',
+            'áž›áŸážáž”áž„áŸ’áž€áž¶áž“áŸ‹ážŠáŸƒ',
+            'ážˆáŸ’áž˜áŸ„áŸ‡ ážáŸ’áž˜áŸ‚ážš',
+            'ážˆáŸ’áž˜áŸ„áŸ‡ áž¡áž¶ážáž¶áŸ†áž„',
+            'áž—áŸáž‘',
+            'ážáŸ’áž„áŸƒážáŸ‚ážšáž†áŸ’áž“áž¶áŸ†áž€áŸ†áž“áž¾áž',
+            'ážœáž·áž‘áŸ’áž™áž¶áž›áŸáž™',
+            'áž”áŸ’ážšáž—áž–',
             'Bac Year',
             'Score',
             'Bac',
@@ -1014,7 +1014,7 @@ class ExamController extends Controller
 
         ];
 
-        $title = 'បញ្ជីបេក្ខជន DUT';
+        $title = 'áž”áž‰áŸ’áž‡áž¸áž”áŸáž€áŸ’ážáž‡áž“ DUT';
         $alpha = [];
         $letter = 'A';
         while ($letter !== 'AAA') {
@@ -1087,13 +1087,13 @@ class ExamController extends Controller
                 $candidateOptions[$choice->code] = $choice->rank;
             }
             $element = array(
-                'លេខបង្កាន់ដៃ'              => str_pad($candidate->register_id, 4, '0', STR_PAD_LEFT),
-                'ឈ្មោះ ខ្មែរ'             => $candidate->name_kh,
-                'ឈ្មោះ ឡាតាំង'            => $candidate->name_latin,
-                'ភេទ'                      => $candidate->gender,
-                'ថ្ងៃខែរឆ្នាំកំនើត'           => $candidate->dob->formatLocalized("%d/%b/%Y"),
-                'វិទ្យាល័យ'                => $candidate->highschool,
-                'ប្រភព'                   => $candidate->origin,
+                'áž›áŸážáž”áž„áŸ’áž€áž¶áž“áŸ‹ážŠáŸƒ'              => str_pad($candidate->register_id, 4, '0', STR_PAD_LEFT),
+                'ážˆáŸ’áž˜áŸ„áŸ‡ ážáŸ’áž˜áŸ‚ážš'             => $candidate->name_kh,
+                'ážˆáŸ’áž˜áŸ„áŸ‡ áž¡áž¶ážáž¶áŸ†áž„'            => $candidate->name_latin,
+                'áž—áŸáž‘'                      => $candidate->gender,
+                'ážáŸ’áž„áŸƒážáŸ‚ážšáž†áŸ’áž“áž¶áŸ†áž€áŸ†áž“áž¾áž'           => $candidate->dob->formatLocalized("%d/%b/%Y"),
+                'ážœáž·áž‘áŸ’áž™áž¶áž›áŸáž™'                => $candidate->highschool,
+                'áž”áŸ’ážšáž—áž–'                   => $candidate->origin,
                 'Bac Year'      => $candidate->bac_year,
                 'Score'         => $candidate->bac_percentile,
                 'Bac'           => $candidate->bac_total_grade,
@@ -1113,13 +1113,13 @@ class ExamController extends Controller
         }
 
         $fields= [
-            'លេខបង្កាន់ដៃ',
-            'ឈ្មោះ ខ្មែរ',
-            'ឈ្មោះ ឡាតាំង',
-            'ភេទ',
-            'ថ្ងៃខែរឆ្នាំកំនើត',
-            'វិទ្យាល័យ',
-            'ប្រភព',
+            'áž›áŸážáž”áž„áŸ’áž€áž¶áž“áŸ‹ážŠáŸƒ',
+            'ážˆáŸ’áž˜áŸ„áŸ‡ ážáŸ’áž˜áŸ‚ážš',
+            'ážˆáŸ’áž˜áŸ„áŸ‡ áž¡áž¶ážáž¶áŸ†áž„',
+            'áž—áŸáž‘',
+            'ážáŸ’áž„áŸƒážáŸ‚ážšáž†áŸ’áž“áž¶áŸ†áž€áŸ†áž“áž¾áž',
+            'ážœáž·áž‘áŸ’áž™áž¶áž›áŸáž™',
+            'áž”áŸ’ážšáž—áž–',
             'Bac Year',
             'Score',
             'Bac',
@@ -1136,7 +1136,7 @@ class ExamController extends Controller
 
         ];
 
-        $title = 'បញ្ជីបេក្ខជន DUT';
+        $title = 'áž”áž‰áŸ’áž‡áž¸áž”áŸáž€áŸ’ážáž‡áž“ DUT';
         $alpha = [];
         $letter = 'A';
         while ($letter !== 'AAA') {
@@ -1157,24 +1157,24 @@ class ExamController extends Controller
             ->select('academicYears.id')
             ->first();
         $candidates = Candidate::where('exam_id',$exam_id)
-                        ->leftJoin('genders','candidates.gender_id','=','genders.id')
-                        ->leftJoin('origins','candidates.province_id','=','origins.id')
-                        ->leftJoin('highSchools','candidates.highschool_id','=','highSchools.id')
-                        ->leftJoin('gdeGrades as bacTotal','candidates.bac_total_grade','=','bacTotal.id')
-                        ->orderBy('register_id')
-                        ->select([
-                            'register_id',
-                            'candidates.name_kh',
-                            'candidates.name_latin',
-                            'genders.name_kh as gender',
-                            'candidates.dob',
-                            'highSchools.name_kh as highschool',
-                            'origins.name_kh as origin',
-                            'candidates.bac_year',
-                            'bacTotal.name_en as bac_total_grade',
-                            'candidates.bac_percentile'
-                        ])
-                        ->get()->toArray();
+            ->leftJoin('genders','candidates.gender_id','=','genders.id')
+            ->leftJoin('origins','candidates.province_id','=','origins.id')
+            ->leftJoin('highSchools','candidates.highschool_id','=','highSchools.id')
+            ->leftJoin('gdeGrades as bacTotal','candidates.bac_total_grade','=','bacTotal.id')
+            ->orderBy('register_id')
+            ->select([
+                'register_id',
+                'candidates.name_kh',
+                'candidates.name_latin',
+                'genders.name_kh as gender',
+                'candidates.dob',
+                'highSchools.name_kh as highschool',
+                'origins.name_kh as origin',
+                'candidates.bac_year',
+                'bacTotal.name_en as bac_total_grade',
+                'candidates.bac_percentile'
+            ])
+            ->get()->toArray();
 
         $chunk_candidates = array_chunk($candidates,43);
 
@@ -1185,9 +1185,9 @@ class ExamController extends Controller
     public function download_registration_statistic(DownloadExaminationDocumentsRequest $request,$exam_id){
 
         $academic_year = Exam::leftJoin('academicYears','exams.academic_year_id','=','academicYears.id')
-                            ->where('exams.id',$exam_id)
-                            ->select('academicYears.id')
-                            ->first();
+            ->where('exams.id',$exam_id)
+            ->select('academicYears.id')
+            ->first();
         $dates = Candidate::where('exam_id',$exam_id)
             ->orderBy('created_at')
             ->get()
@@ -2389,7 +2389,7 @@ class ExamController extends Controller
 //        $candidateResults = array_merge((array) $candidateTmp1, (array) $candidateTmp2);
 
 
-        return array('ស្ថាពរ'=>$studentPassed, 'បម្រុង'=>$studentReserved);
+        return array('ážŸáŸ’ážáž¶áž–ážš'=>$studentPassed, 'áž”áž˜áŸ’ážšáž»áž„'=>$studentReserved);
 
 
     }
@@ -2452,8 +2452,6 @@ class ExamController extends Controller
             $last = $cand;
         }
 
-        dd($cands);
-
         // Lists candidates who have register to ITC
         $candsRegister = DB::table('candidatesFromMoeys')
             ->join("studentBac2s","studentBac2s.can_id",'=',"candidatesFromMoeys.can_id")
@@ -2503,15 +2501,15 @@ class ExamController extends Controller
         Excel::create('Student Result To Send to DHE', function($excel) use ($candidates_moeys) {
 
             // Set the title
-            $excel->setTitle('លទ្ធផលសំរាប់បញ្ជូនទៅគ្រឹះស្ថានឧត្តមសិក្សា');
+            $excel->setTitle('áž›áž‘áŸ’áž’áž•áž›ážŸáŸ†ážšáž¶áž”áŸ‹áž”áž‰áŸ’áž‡áž¼áž“áž‘áŸ…áž‚áŸ’ážšáž¹áŸ‡ážŸáŸ’ážáž¶áž“áž§ážáŸ’ážáž˜ážŸáž·áž€áŸ’ážŸáž¶');
 
             // Chain the setters
             $excel->setCreator('Institute of Technology of Cambodia')
                 ->setCompany('Institute of Technology of Cambodia');
 
-            $excel->sheet('បញ្ជីនិស្សិត្រ', function($sheet) use ($candidates_moeys) {
+            $excel->sheet('áž”áž‰áŸ’áž‡áž¸áž“áž·ážŸáŸ’ážŸáž·ážáŸ’ážš', function($sheet) use ($candidates_moeys) {
 
-                $header = array('ល.រ',"គោត្តនាមនិងនាម","ភេទ","ថ្ងៃខែឆ្នាំកំណើត","មកពីវិទ្យាល័យ","ខេត្តក្រុង","ឆ្នាំជាប់ទុតិយភូមិ","គណិតវិទ្យា","រូបវិទ្យា","គីមីវិទ្យា","ចំណាត់ថ្នាក់");
+                $header = array('áž›.ážš',"áž‚áŸ„ážáŸ’ážáž“áž¶áž˜áž“áž·áž„áž“áž¶áž˜","áž—áŸáž‘","ážáŸ’áž„áŸƒážáŸ‚áž†áŸ’áž“áž¶áŸ†áž€áŸ†ážŽáž¾áž","áž˜áž€áž–áž¸ážœáž·áž‘áŸ’áž™áž¶áž›áŸáž™","ážáŸážáŸ’ážáž€áŸ’ážšáž»áž„","áž†áŸ’áž“áž¶áŸ†áž‡áž¶áž”áŸ‹áž‘áž»ážáž·áž™áž—áž¼áž˜áž·","áž‚ážŽáž·ážážœáž·áž‘áŸ’áž™áž¶","ážšáž¼áž”ážœáž·áž‘áŸ’áž™áž¶","áž‚áž¸áž˜áž¸ážœáž·áž‘áŸ’áž™áž¶","áž…áŸ†ážŽáž¶ážáŸ‹ážáŸ’áž“áž¶áž€áŸ‹");
                 $sheet->setOrientation('portrait');
                 // Set top, right, bottom, left
                 $sheet->setPageMargin(array(
@@ -2530,9 +2528,9 @@ class ExamController extends Controller
                 foreach ($candidates_moeys as $candidate) {
 
                     if($candidate->result == "Fail"){
-                        $result = "ធ្លាក់";
+                        $result = "áž’áŸ’áž›áž¶áž€áŸ‹";
                     } else if ($candidate->result == "Pass"){
-                        $result= "ជាប់";
+                        $result= "áž‡áž¶áž”áŸ‹";
                     } else if ($candidate->result == "NA"){
                         $result= "NA";
                     } else {
@@ -2564,9 +2562,6 @@ class ExamController extends Controller
     }
 
     public function export_candidate_ministry_list_v2($exam_id) {
-<<<<<<< HEAD
-
-=======
         $exam = Exam::where('id',$exam_id)->first();
         $dhes = StudentBac2::join('genders','studentBac2s.gender_id','=','genders.id')
             ->join('highSchools','studentBac2s.highschool_id','=','highSchools.id')
@@ -2633,15 +2628,15 @@ class ExamController extends Controller
         Excel::create('Student Result To Send to DHE', function($excel) use ($dhes) {
 
             // Set the title
-            $excel->setTitle('លទ្ធផលសំរាប់បញ្ជូនទៅគ្រឹះស្ថានឧត្តមសិក្សា');
+            $excel->setTitle('áž›áž‘áŸ’áž’áž•áž›ážŸáŸ†ážšáž¶áž”áŸ‹áž”áž‰áŸ’áž‡áž¼áž“áž‘áŸ…áž‚áŸ’ážšáž¹áŸ‡ážŸáŸ’ážáž¶áž“áž§ážáŸ’ážáž˜ážŸáž·áž€áŸ’ážŸáž¶');
 
             // Chain the setters
             $excel->setCreator('Institute of Technology of Cambodia')
                 ->setCompany('Institute of Technology of Cambodia');
 
-            $excel->sheet('បញ្ជីនិស្សិត្រ', function($sheet) use ($dhes) {
+            $excel->sheet('áž”áž‰áŸ’áž‡áž¸áž“áž·ážŸáŸ’ážŸáž·ážáŸ’ážš', function($sheet) use ($dhes) {
 
-                $header = array('ល.រ',"គោត្តនាមនិងនាម","ភេទ","ថ្ងៃខែឆ្នាំកំណើត","មកពីវិទ្យាល័យ","ខេត្តក្រុង","ឆ្នាំជាប់ទុតិយភូមិ","គណិតវិទ្យា","រូបវិទ្យា","គីមីវិទ្យា","ចំណាត់ថ្នាក់",'លទ្ធផល','CanID');
+                $header = array('áž›.ážš',"áž‚áŸ„ážáŸ’ážáž“áž¶áž˜áž“áž·áž„áž“áž¶áž˜","áž—áŸáž‘","ážáŸ’áž„áŸƒážáŸ‚áž†áŸ’áž“áž¶áŸ†áž€áŸ†ážŽáž¾áž","áž˜áž€áž–áž¸ážœáž·áž‘áŸ’áž™áž¶áž›áŸáž™","ážáŸážáŸ’ážáž€áŸ’ážšáž»áž„","áž†áŸ’áž“áž¶áŸ†áž‡áž¶áž”áŸ‹áž‘áž»ážáž·áž™áž—áž¼áž˜áž·","áž‚ážŽáž·ážážœáž·áž‘áŸ’áž™áž¶","ážšáž¼áž”ážœáž·áž‘áŸ’áž™áž¶","áž‚áž¸áž˜áž¸ážœáž·áž‘áŸ’áž™áž¶","áž…áŸ†ážŽáž¶ážáŸ‹ážáŸ’áž“áž¶áž€áŸ‹",'áž›áž‘áŸ’áž’áž•áž›','CanID');
                 $sheet->setOrientation('portrait');
                 // Set top, right, bottom, left
                 $sheet->setPageMargin(array(
@@ -2659,10 +2654,10 @@ class ExamController extends Controller
 
                 foreach ($dhes as $candidate) {
                     if($candidate->result == "Fail" || $candidate->result == "Reserve" || $candidate->result == "Reject"){
-                        $result = "ធ្លាក់";
+                        $result = "áž’áŸ’áž›áž¶áž€áŸ‹";
                         $rank = '';
                     } else if ($candidate->result == "Pass"){
-                        $result= "ជាប់";
+                        $result= "áž‡áž¶áž”áŸ‹";
                         $rank = $candidate->rank;
                     }  else {
                         $result = $candidate->result;
@@ -2697,7 +2692,6 @@ class ExamController extends Controller
             });
 
         })->export('xls');
->>>>>>> d1eac7927270d915fa2a5ed021c3e02cdcc8769d
     }
 
     public function export_candidate_result_list ($exam_id) {
@@ -2705,24 +2699,24 @@ class ExamController extends Controller
         $candidates = $this->getCandidateResult($exam_id);
 
         $fields= [
-            'ល.រ',
-            'លេខបង្កាន់ដៃ',
-            'បនទ្ប់ប្រលង',
-            'ឈ្មោះ ខ្មែរ',
-            'ឈ្មោះ ឡាតាំង',
-            'ភេទ',
-            'ថ្ងៃខែរឆ្នាំកំនើត',
-            "ខេត្តក្រុង"
+            'áž›.ážš',
+            'áž›áŸážáž”áž„áŸ’áž€áž¶áž“áŸ‹ážŠáŸƒ',
+            'áž”áž“áž‘áŸ’áž”áŸ‹áž”áŸ’ážšáž›áž„',
+            'ážˆáŸ’áž˜áŸ„áŸ‡ ážáŸ’áž˜áŸ‚ážš',
+            'ážˆáŸ’áž˜áŸ„áŸ‡ áž¡áž¶ážáž¶áŸ†áž„',
+            'áž—áŸáž‘',
+            'ážáŸ’áž„áŸƒážáŸ‚ážšáž†áŸ’áž“áž¶áŸ†áž€áŸ†áž“áž¾áž',
+            "ážáŸážáŸ’ážáž€áŸ’ážšáž»áž„"
         ];
-        $title = 'បញ្ជីលទ្ទផលរបស់បេក្ខជន';
+        $title = 'áž”áž‰áŸ’áž‡áž¸áž›áž‘áŸ’áž‘áž•áž›ážšáž”ážŸáŸ‹áž”áŸáž€áŸ’ážáž‡áž“';
         $alpha = [];
         $letter = 'A';
         while ($letter !== 'AAA') {
             $alpha[] = $letter++;
         }
-        Excel::create('បញ្ជីលទ្ទផលបេក្ខជន', function($excel) use ($candidates, $title,$alpha,$fields) {
+        Excel::create('áž”áž‰áŸ’áž‡áž¸áž›áž‘áŸ’áž‘áž•áž›áž”áŸáž€áŸ’ážáž‡áž“', function($excel) use ($candidates, $title,$alpha,$fields) {
 
-            $excel->sheet("បញ្ជីលទ្ទផលបេក្ខជន", function($sheet) use($candidates,$title,$alpha,$fields) {
+            $excel->sheet("áž”áž‰áŸ’áž‡áž¸áž›áž‘áŸ’áž‘áž•áž›áž”áŸáž€áŸ’ážáž‡áž“", function($sheet) use($candidates,$title,$alpha,$fields) {
 
                 $sheet->setOrientation('portrait');
                 // Set top, right, bottom, left
@@ -2917,27 +2911,27 @@ class ExamController extends Controller
             ->get();
 
         $fields= [
-            'ល.រ',
-            'បនទ្ប់',
-            'លេខបន្ទប់សំងាត់',
-            'លេខបង្កាន់ដៃ',
-            'ឈ្មោះ ខ្មែរ',
-            'ឈ្មោះ ឡាតាំង',
-            'ភេទ',
-            'ថ្ងៃខែរឆ្នាំកំនើត',
-            "វិទ្យាល័យ",
-            "ខេត្តក្រុង",
+            'áž›.ážš',
+            'áž”áž“áž‘áŸ’áž”áŸ‹',
+            'áž›áŸážáž”áž“áŸ’áž‘áž”áŸ‹ážŸáŸ†áž„áž¶ážáŸ‹',
+            'áž›áŸážáž”áž„áŸ’áž€áž¶áž“áŸ‹ážŠáŸƒ',
+            'ážˆáŸ’áž˜áŸ„áŸ‡ ážáŸ’áž˜áŸ‚ážš',
+            'ážˆáŸ’áž˜áŸ„áŸ‡ áž¡áž¶ážáž¶áŸ†áž„',
+            'áž—áŸáž‘',
+            'ážáŸ’áž„áŸƒážáŸ‚ážšáž†áŸ’áž“áž¶áŸ†áž€áŸ†áž“áž¾áž',
+            "ážœáž·áž‘áŸ’áž™áž¶áž›áŸáž™",
+            "ážáŸážáŸ’ážáž€áŸ’ážšáž»áž„",
             "Register_from",
-            "ឆ្នាំជាប់បាក់ឌុប",
-            "និទ្ទេសគណិតវិទ្យា",
-            "និទ្ទេសរូបវិទ្យា",
-            "និទ្ទេសគីមីវិទ្យា",
-            "និទ្ទេសសរុប",
+            "áž†áŸ’áž“áž¶áŸ†áž‡áž¶áž”áŸ‹áž”áž¶áž€áŸ‹ážŒáž»áž”",
+            "áž“áž·áž‘áŸ’áž‘áŸážŸáž‚ážŽáž·ážážœáž·áž‘áŸ’áž™áž¶",
+            "áž“áž·áž‘áŸ’áž‘áŸážŸážšáž¼áž”ážœáž·áž‘áŸ’áž™áž¶",
+            "áž“áž·áž‘áŸ’áž‘áŸážŸáž‚áž¸áž˜áž¸ážœáž·áž‘áŸ’áž™áž¶",
+            "áž“áž·áž‘áŸ’áž‘áŸážŸážŸážšáž»áž”",
             "Percentile",
             "can ID",
-            "ពិន្ទុ",
-            "លទ្ធផល",
-            "ចំណាត់ថ្នាក់",
+            "áž–áž·áž“áŸ’áž‘áž»",
+            "áž›áž‘áŸ’áž’áž•áž›",
+            "áž…áŸ†ážŽáž¶ážáŸ‹ážáŸ’áž“áž¶áž€áŸ‹",
             "math_c",
             "math_w",
             "math_na",
@@ -2949,15 +2943,15 @@ class ExamController extends Controller
             "logic_na"
 
         ];
-        $title = 'បញ្ជីលទ្ទផលរបស់បេក្ខជន';
+        $title = 'áž”áž‰áŸ’áž‡áž¸áž›áž‘áŸ’áž‘áž•áž›ážšáž”ážŸáŸ‹áž”áŸáž€áŸ’ážáž‡áž“';
         $alpha = [];
         $letter = 'A';
         while ($letter !== 'AAA') {
             $alpha[] = $letter++;
         }
-        Excel::create('បញ្ជីលទ្ទផលបេក្ខជន', function($excel) use ($candsRegister,$allCandidates, $allCourses, $candidates, $title,$alpha,$fields) {
+        Excel::create('áž”áž‰áŸ’áž‡áž¸áž›áž‘áŸ’áž‘áž•áž›áž”áŸáž€áŸ’ážáž‡áž“', function($excel) use ($candsRegister,$allCandidates, $allCourses, $candidates, $title,$alpha,$fields) {
 
-            $excel->sheet("បញ្ជីលទ្ទផលបេក្ខជន", function($sheet) use($candsRegister, $allCandidates, $allCourses, $candidates,$title,$alpha,$fields) {
+            $excel->sheet("áž”áž‰áŸ’áž‡áž¸áž›áž‘áŸ’áž‘áž•áž›áž”áŸáž€áŸ’ážáž‡áž“", function($sheet) use($candsRegister, $allCandidates, $allCourses, $candidates,$title,$alpha,$fields) {
 
                 $sheet->setOrientation('portrait');
                 // Set top, right, bottom, left
@@ -3016,11 +3010,7 @@ class ExamController extends Controller
                         $candidate->name_kh,
                         $candidate->name_latin,
                         $candidate->gender,
-<<<<<<< HEAD
-                        Carbon::createFromFormat('Y-m-d H:i:s',$candidate->dob)->format("d/m/Y"),
-=======
                         Carbon::createFromFormat('Y-m-d H:i:s',$candidate->dob)->formatLocalized("%B %d, %Y"),
->>>>>>> d1eac7927270d915fa2a5ed021c3e02cdcc8769d
                         $candidate->highschool,
                         $candidate->origin,
                         $candidate->register_from,
@@ -3168,12 +3158,12 @@ class ExamController extends Controller
     private function isAvalaibleDept($arrayNumberOfCandInEachDept, $deptId, $studentRate, $findsum) {
 
         $totalSelectionCands =0;
-          if($findsum != null) { // calculation of the total selection of number of student
-              foreach( $arrayNumberOfCandInEachDept as $key => $value) {
-                  $totalSelectionCands = $totalSelectionCands + (int)$value;
-              }
-              return $totalSelectionCands;
-          }
+        if($findsum != null) { // calculation of the total selection of number of student
+            foreach( $arrayNumberOfCandInEachDept as $key => $value) {
+                $totalSelectionCands = $totalSelectionCands + (int)$value;
+            }
+            return $totalSelectionCands;
+        }
 
     }
 
@@ -3193,42 +3183,42 @@ class ExamController extends Controller
 
             foreach($dUTCandidates as $dUTCandidate) {
 
-                   $count++;
+                $count++;
 
                 //if($count <= $totalCands) {
-                    $statusRank =1;
-                    $candidateDepts = $this->getCandidateDept($dUTCandidate->candidate_id); // List of all chosen department order by rank
-                    foreach($candidateDepts as $candidateDept) {// loop candidate department option from the 1 choice to the end 1->8
+                $statusRank =1;
+                $candidateDepts = $this->getCandidateDept($dUTCandidate->candidate_id); // List of all chosen department order by rank
+                foreach($candidateDepts as $candidateDept) {// loop candidate department option from the 1 choice to the end 1->8
 
-                        //if($candidateDept->rank == $statusRank) {
+                    //if($candidateDept->rank == $statusRank) {
 
-                            foreach($arrayCandidateInEachDept as $index => $value) { // index: ID of department, value: Number of success student
+                    foreach($arrayCandidateInEachDept as $index => $value) { // index: ID of department, value: Number of success student
 
-                                if((int)$candidateDept->department_id == (int)$index) {
+                        if((int)$candidateDept->department_id == (int)$index) {
 
-                                    $numberStudent = (int)$value;
+                            $numberStudent = (int)$value;
 
-                                    if($numberStudent > 0) {
+                            if($numberStudent > 0) {
 //                                        $test[] = array('index='.$index, 'value='.$value, 'dept='.$candidateDept->department_id, 'rank='.$statusRank, 'cand_id='.$dUTCandidate->candidate_id);
 
-                                        $numberStudent = $numberStudent -1;
-                                        $arrayCandidateInEachDept[$index] = $numberStudent;
+                                $numberStudent = $numberStudent -1;
+                                $arrayCandidateInEachDept[$index] = $numberStudent;
 
-                                        $update = $this-> updateCandiateDepartment($dUTCandidate->candidate_id, $candidateDept->department_id,$candidateDept->rank, $result='Pass');
+                                $update = $this-> updateCandiateDepartment($dUTCandidate->candidate_id, $candidateDept->department_id,$candidateDept->rank, $result='Pass');
 
-                                        if($update) {
-                                            $candResult = $this->updateDutCandResult($examId, $dUTCandidate->candidate_id, $candRes = 'Pass');
-                                            break;
-                                        }
-                                    } else {
-                                        $statusRank++;
-                                    }
+                                if($update) {
+                                    $candResult = $this->updateDutCandResult($examId, $dUTCandidate->candidate_id, $candRes = 'Pass');
+                                    break;
                                 }
+                            } else {
+                                $statusRank++;
                             }
-                       // } else {
-                        //    break;
-                        //}
+                        }
                     }
+                    // } else {
+                    //    break;
+                    //}
+                }
 //                } else {
 //                    $candResult = $this->updateDutCandResult($examId, $dUTCandidate->candidate_id, $candRes = 'Reserve');
 //                }
@@ -3358,14 +3348,14 @@ class ExamController extends Controller
         $resultType = $request->status;
 
         if($resultType == 'Pass') {
-            $title = "បញ្ជីបេក្ខជន<span style='font-size: 150%'>ជាប់ស្ថាពរ</span>";
+            $title = "áž”áž‰áŸ’áž‡áž¸áž”áŸáž€áŸ’ážáž‡áž“<span style='font-size: 150%'>áž‡áž¶áž”áŸ‹ážŸáŸ’ážáž¶áž–ážš</span>";
             $allStudentByDept=[];
             $candidateDUTs = $this->getSucceedCandidateDUTFromDB($examId, $is_success='Pass');
             //$candidateDUTs = array_chunk($candidateDUTs, 27);
             return  view('backend.exam.print.print_examination_DUT_candidate_result', compact('allStudentByDept', 'candidateDUTs', 'title'));
 
         } else if($resultType == 'Reserve') {
-            $title = "បញ្ជីបេក្ខជន<span style='font-size: 150%'>ជាប់បំរុង</span>";
+            $title = "áž”áž‰áŸ’áž‡áž¸áž”áŸáž€áŸ’ážáž‡áž“<span style='font-size: 150%'>áž‡áž¶áž”áŸ‹áž”áŸ†ážšáž»áž„</span>";
             $allStudentByDept=[];
             $candidateDUTs = $this->getSucceedCandidateDUTFromDB($examId, $is_success='Reserve');
             //$candidateDUTs = array_chunk($candidateDUTs, 27);
@@ -3374,7 +3364,7 @@ class ExamController extends Controller
 
         } else if($resultType == 'pass_by_dept') {
 
-            $title = 'បញ្ជីបេក្ខជនជាប់ស្ថាពរ';
+            $title = 'áž”áž‰áŸ’áž‡áž¸áž”áŸáž€áŸ’ážáž‡áž“áž‡áž¶áž”áŸ‹ážŸáŸ’ážáž¶áž–ážš';
 //            $allDepts = $this->getAllDepartments();
             $candidateDUTs=[];
             $studentByDept = $this->arrayStudentPassOrReserveByDept($examId, $is_success='Pass');
@@ -3384,7 +3374,7 @@ class ExamController extends Controller
             return  view('backend.exam.print.print_examination_DUT_candidate_result', compact('allStudentByDept', 'candidateDUTs', 'title', 'allDepts'));
 
         } else {
-            $title = 'បញ្ជីបេក្ខជនជាប់បំរុង';
+            $title = 'áž”áž‰áŸ’áž‡áž¸áž”áŸáž€áŸ’ážáž‡áž“áž‡áž¶áž”áŸ‹áž”áŸ†ážšáž»áž„';
             $candidateDUTs=[];
             $studentByDept = $this->arrayStudentPassOrReserveByDept($examId, $is_success='Reserve');
             $allDepts = $studentByDept[0];
@@ -3467,45 +3457,45 @@ class ExamController extends Controller
 
     private function getSucceedCandidateDUTFromDB($examId, $is_success) {
 
-         if($is_success != null) {
-             $dUTCandidates = DB::table('candidates')
-                 ->join('candidate_department', 'candidates.id', '=', 'candidate_department.candidate_id')
-                 ->join('departments', 'departments.id', '=', 'candidate_department.department_id')
-                 ->join('genders', 'genders.id', '=', 'candidates.gender_id')
-                 ->join('academicYears', 'academicYears.id', '=', 'candidates.academic_year_id')
-                 ->join('origins', 'origins.id', '=', 'candidates.province_id')
-                 ->where([
-                     ['candidate_department.is_success', '=', $is_success],
-                     ['candidates.exam_id', '=', $examId],
-                     ['origins.is_province', '=', true],
-                     ['origins.active', '=', true]
-                 ])
-                 ->select('origins.name_kh as province_name', 'academicYears.name_kh as academic_year', 'candidates.register_id','candidates.dob as birth_date', 'candidates.register_from as home_town', 'genders.name_kh as gender', 'candidates.id as candidate_id', 'candidates.name_kh', 'candidates.name_latin', 'candidate_department.is_success', 'candidate_department.rank', 'departments.code as department_name', 'departments.id as department_id', 'candidates.bac_percentile')
-                 ->orderBy('register_id', 'ASC')
-                 ->get();
+        if($is_success != null) {
+            $dUTCandidates = DB::table('candidates')
+                ->join('candidate_department', 'candidates.id', '=', 'candidate_department.candidate_id')
+                ->join('departments', 'departments.id', '=', 'candidate_department.department_id')
+                ->join('genders', 'genders.id', '=', 'candidates.gender_id')
+                ->join('academicYears', 'academicYears.id', '=', 'candidates.academic_year_id')
+                ->join('origins', 'origins.id', '=', 'candidates.province_id')
+                ->where([
+                    ['candidate_department.is_success', '=', $is_success],
+                    ['candidates.exam_id', '=', $examId],
+                    ['origins.is_province', '=', true],
+                    ['origins.active', '=', true]
+                ])
+                ->select('origins.name_kh as province_name', 'academicYears.name_kh as academic_year', 'candidates.register_id','candidates.dob as birth_date', 'candidates.register_from as home_town', 'genders.name_kh as gender', 'candidates.id as candidate_id', 'candidates.name_kh', 'candidates.name_latin', 'candidate_department.is_success', 'candidate_department.rank', 'departments.code as department_name', 'departments.id as department_id', 'candidates.bac_percentile')
+                ->orderBy('register_id', 'ASC')
+                ->get();
 
-             return $dUTCandidates;
+            return $dUTCandidates;
 
-         } else {
+        } else {
 
-             $dUTCandidates = DB::table('candidates')
-                 ->join('candidate_department', 'candidates.id', '=', 'candidate_department.candidate_id')
-                 ->join('departments', 'departments.id', '=', 'candidate_department.department_id')
-                 ->join('genders', 'genders.id', '=', 'candidates.gender_id')
-                 ->join('academicYears', 'academicYears.id', '=', 'candidates.academic_year_id')
-                 ->join('origins', 'origins.id', '=', 'candidates.province_id')
-                 ->where([
-                     ['candidates.exam_id', '=', $examId],
-                     ['candidates.result', '=', 'Fail'],
-                     ['origins.is_province', '=', true],
-                     ['origins.active', '=', true]
-                 ])
-                 ->select('origins.name_kh as province_name', 'academicYears.name_kh as academic_year', 'candidates.register_id','candidates.dob as birth_date', 'candidates.register_from as home_town', 'genders.name_kh as gender', 'candidates.id as candidate_id', 'candidates.name_kh', 'candidates.name_latin', 'candidate_department.is_success', 'candidate_department.rank', 'departments.code as department_name', 'departments.id as department_id', 'candidates.bac_percentile')
-                 ->orderBy('register_id', 'ASC')
-                 ->get();
+            $dUTCandidates = DB::table('candidates')
+                ->join('candidate_department', 'candidates.id', '=', 'candidate_department.candidate_id')
+                ->join('departments', 'departments.id', '=', 'candidate_department.department_id')
+                ->join('genders', 'genders.id', '=', 'candidates.gender_id')
+                ->join('academicYears', 'academicYears.id', '=', 'candidates.academic_year_id')
+                ->join('origins', 'origins.id', '=', 'candidates.province_id')
+                ->where([
+                    ['candidates.exam_id', '=', $examId],
+                    ['candidates.result', '=', 'Fail'],
+                    ['origins.is_province', '=', true],
+                    ['origins.active', '=', true]
+                ])
+                ->select('origins.name_kh as province_name', 'academicYears.name_kh as academic_year', 'candidates.register_id','candidates.dob as birth_date', 'candidates.register_from as home_town', 'genders.name_kh as gender', 'candidates.id as candidate_id', 'candidates.name_kh', 'candidates.name_latin', 'candidate_department.is_success', 'candidate_department.rank', 'departments.code as department_name', 'departments.id as department_id', 'candidates.bac_percentile')
+                ->orderBy('register_id', 'ASC')
+                ->get();
 
-             return $dUTCandidates;
-         }
+            return $dUTCandidates;
+        }
 
     }
 
@@ -3589,7 +3579,7 @@ class ExamController extends Controller
             $data[] = $el;
 
         }
-//        $fields= ['លេខបង្កាន់ដៃ', 'បន្ទប់', 'ឈ្មោះ ខ្មែរ', 'ឈ្មោះ ឡាតាំង', 'ភេទ', 'ថ្ងៃខែរឆ្នាំកំនើត', 'ហត្ថលេខា'];
+//        $fields= ['áž›áŸážáž”áž„áŸ’áž€áž¶áž“áŸ‹ážŠáŸƒ', 'áž”áž“áŸ’áž‘áž”áŸ‹', 'ážˆáŸ’áž˜áŸ„áŸ‡ ážáŸ’áž˜áŸ‚ážš', 'ážˆáŸ’áž˜áŸ„áŸ‡ áž¡áž¶ážáž¶áŸ†áž„', 'áž—áŸáž‘', 'ážáŸ’áž„áŸƒážáŸ‚ážšáž†áŸ’áž“áž¶áŸ†áž€áŸ†áž“áž¾áž', 'áž ážáŸ’ážáž›áŸážáž¶'];
 
         $fields= ['Name_Khmer', 'Mother_name', 'Father_name'];
         $title = 'Student High School';
@@ -3600,9 +3590,9 @@ class ExamController extends Controller
         }
         Excel::create('Student High School Data', function($excel) use ($data, $title,$alpha,$fields) {
 
-                $excel->sheet($title, function($sheet) use($data,$title,$alpha,$fields) {
-                    $sheet->fromArray($data);
-                });
+            $excel->sheet($title, function($sheet) use($data,$title,$alpha,$fields) {
+                $sheet->fromArray($data);
+            });
 
         })->export('xls');
     }
