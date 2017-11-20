@@ -17,8 +17,8 @@ class DeleteStudentRequest extends Request
      */
     public function authorize()
     {
-        //return access()->allow('delete-students');
-        return false;
+        return access()->allow('delete-students');
+        // return false;
     }
 
     /**

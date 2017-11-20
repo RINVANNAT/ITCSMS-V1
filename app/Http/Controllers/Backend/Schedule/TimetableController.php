@@ -19,6 +19,7 @@ use App\Models\Department;
 use App\Models\DepartmentOption;
 use App\Models\Employee;
 use App\Models\Grade;
+use App\Models\Schedule\Timetable\Slot;
 use App\Models\Schedule\Timetable\Timetable;
 use App\Models\Schedule\Timetable\TimetableSlot;
 use App\Models\Schedule\Timetable\Week;
@@ -437,7 +438,19 @@ class TimetableController extends Controller
      */
     public function delete(DeleteTimetableRequest $request)
     {
-        if (Timetable::find($request->id) instanceof Timetable) {
+        $timetable = Timetable::find($request->id);
+        $timetableSlots = $timetable->timetableSlots;
+        if(count($timetableSlots)>0) {
+            foreach ($timetableSlots as $timetableSlot){
+                $slot = Slot::find($timetableSlot->slot_id);
+                if($slot instanceof Slot){
+                    $slot->time_remaining = ($timetableSlot->durations+$slot->time_remaining);
+                    $slot->updated_at = Carbon::now();
+                    $slot->update();
+                }
+            }
+        }
+        if ($timetable instanceof Timetable) {
             DB::table('timetables')->where('id', '=', $request->id)->delete();
             return Response::json(['status' => true], 200);
         }
