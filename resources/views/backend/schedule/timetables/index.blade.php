@@ -1,6 +1,6 @@
 @extends ('backend.layouts.master')
 
-@section ('title', trans('labels.backend.schedule.timetable.meta_title'))
+@section ('title', 'ITC - TTMS')
 
 @section('page-header')
     <h1>

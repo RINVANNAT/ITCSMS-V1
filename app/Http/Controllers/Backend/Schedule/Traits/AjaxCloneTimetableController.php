@@ -67,6 +67,7 @@ trait AjaxCloneTimetableController
                     return strcmp($a->code, $b->code);
                 }
             });
+
             return Response::json(['weeks' => $weeks, 'groups' => $groups], 200);
         }
     }
