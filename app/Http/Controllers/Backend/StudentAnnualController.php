@@ -1541,7 +1541,6 @@ class StudentAnnualController extends Controller
         }
     }
 
-
     public function generate_id_card(GenerateStudentIDCardRequest $request, $exam_id){
 
 
@@ -1610,7 +1609,6 @@ class StudentAnnualController extends Controller
             return Response::json(array('success'=>false, 'message' => 'Generate Errors'));
         }
     }
-
 
     public function request_print_id_card(PrintStudentIDCardRequest $request){
 

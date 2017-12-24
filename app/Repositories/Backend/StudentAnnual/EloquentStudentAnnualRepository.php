@@ -173,9 +173,6 @@ class EloquentStudentAnnualRepository implements StudentAnnualRepositoryContract
         }
     }
 
-
-
-
     /**
      * @param  StoreStudentRequest $request
      * @throws GeneralException
@@ -446,8 +443,15 @@ class EloquentStudentAnnualRepository implements StudentAnnualRepositoryContract
                 if(isset($input['scholarship_ids'])){
                     $studentAnnual->scholarships()->sync($input['scholarship_ids']);
                 }
-                //To do here
-                //$group_student = GroupStudentAnnual::where('student_annual',$studentAnnual->id)
+                if(isset($input['group_id'])){
+                    // Problem with semester
+                    $group_student = GroupStudentAnnual::where('student_annual_id',$studentAnnual->id)
+                                            ->where('semester_id',1)
+                                            ->first();
+                    $group_student->group_id = $input['group_id'];
+                    $group_student->save();
+                }
+
 
                 DB::commit();
 
