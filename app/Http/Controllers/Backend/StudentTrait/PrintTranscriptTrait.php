@@ -237,7 +237,7 @@ trait PrintTranscriptTrait
         }
 
 
-        return view('backend.studentAnnual.print.transcript',
+        return view('backend.studentAnnual.print.foundation_certificate',
             compact(
                 'scores',
                 'students',
