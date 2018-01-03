@@ -159,7 +159,10 @@ Route::group([
 
     /*---end generate student next academic ---*/
 
-
+    Route::get('request_print_transcript', 'CourseAnnualController@request_print_transcript')->name('admin.student.request_print_transcript');
+    Route::post('request_print_transcript_data', 'CourseAnnualController@request_print_transcript_data')->name('admin.student.request_print_transcript_data');
+    Route::get('print_transcript', 'CourseAnnualController@print_transcript')->name('admin.student.print_transcript');
+    Route::get('mark_printed_transcript', 'CourseAnnualController@mark_printed_transcript')->name('admin.student.mark_printed_transcript');
 
 
     /*

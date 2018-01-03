@@ -59,8 +59,8 @@
             padding: 5mm;
         }
 
-        img {
-            width: 100px;
+        .img {
+            width: 120px;
             height: auto;
             position: absolute;
             top: 30px;
@@ -131,13 +131,13 @@
                         <h3 class="text-bold">Academic Transcript</h3>
                         <div class="row">
                             <div class="col-md-6">
-                                <span class="left">Name: {{strtoupper($student['name_latin'])}}</span>
+                                <span class="left">Name: <b>{{strtoupper($student['name_latin'])}}</b></span>
                             </div>
                             <div class="col-md-6">
-                                <span class="right">ID: {{$student['id_card']}}</span>
+                                <span class="right" style="margin-right: 5mm">ID: {{$student['id_card']}}</span>
                             </div>
                         </div>
-                        <table width="100%">
+                        <table width="100%" style="margin-top: 3mm;">
                             <thead>
                             <tr>
                                 <th class="text_left">មុខវិជ្ជាទូទៅ</th>
@@ -147,37 +147,38 @@
                             </tr>
                             </thead>
                             <tbody>
-                            <?php $i = 1 ?>
                             @foreach($scores[$student['id']] as $key => $score)
                                 @if(is_numeric($key))
+                                    @if(strtolower($score['name_en']) != "technical drawing" && strtolower($score['name_en']) != "computer for engineering")
                                     <tr>
                                         <td style="text-align: left;width: 35%">{{isset($score['name_kh'])?$score['name_kh']:""}}</td>
                                         <td style="text-align: left;width: 35%">{{isset($score['name_en'])?$score['name_en']:""}}</td>
                                         <td style="text-align: center;width: 15%">{{ $score["credit"] }}</td>
                                         <?php
-                                        $grade = "";
-                                        if($score["score"] >= 85){
-                                            $grade = "A";
-                                        } else if ($score["score"] >= 80) {
-                                            $grade = "B<sup>+</sup>";
-                                        } else if ($score["score"] >= 70) {
-                                            $grade = "B";
-                                        } else if ($score["score"] >= 65) {
-                                            $grade = "C<sup>+</sup>";
-                                        } else if ($score["score"] >= 50) {
-                                            $grade = "C";
-                                        } else if ($score["score"] >= 45) {
-                                            $grade = "D";
-                                        } else if ($score["score"] >= 40) {
-                                            $grade = "E";
-                                        }  else {
-                                            $grade = "F";
-                                        }
-
+                                        $grade = get_grading($score["score"]);
                                         ?>
                                         <td class="col-right" style="text-align:center; width: 15%;">{!! $grade !!}</td>
                                     </tr>
-                                    <?php $i++ ?>
+                                    @endif
+                                @endif
+                            @endforeach
+                            <tr>
+                                <th>មុខវិជ្ជាតម្ឬង់ទិស</th>
+                                <th colspan="3">Oriented Subjects</th>
+                            </tr>
+                            @foreach($scores[$student['id']] as $key => $score)
+                                @if(is_numeric($key))
+                                    @if(strtolower($score['name_en']) == "technical drawing" || strtolower($score['name_en']) == "computer for engineering" || strtolower($score['name_en']) == "informatic")
+                                        <tr>
+                                            <td style="text-align: left;width: 35%">{{isset($score['name_kh'])?$score['name_kh']:""}}</td>
+                                            <td style="text-align: left;width: 35%">{{isset($score['name_en'])?$score['name_en']:""}}</td>
+                                            <td style="text-align: center;width: 15%">{{ $score["credit"] }}</td>
+                                            <?php
+                                            $grade = get_grading($score["score"]);
+                                            ?>
+                                            <td class="col-right" style="text-align:center; width: 15%;">{!! $grade !!}</td>
+                                        </tr>
+                                    @endif
                                 @endif
                             @endforeach
                             </tbody>
@@ -218,20 +219,20 @@
                                     <h5><b>Note:</b></h5>
                                     <table style="margin-left: 18px" width="100%">
                                         <tr>
-                                            <td>A = 85% -100% = ល្អប្រសើរ</td>
-                                            <td>C = 50% - 64% = មធ្យម</td>
+                                            <td>A &nbsp;= 85% -100% = ល្អប្រសើរ</td>
+                                            <td>C &nbsp;= 50% - 64% = មធ្យម</td>
                                         </tr>
                                         <tr>
                                             <td>B<sup>+</sup> = 80% - 84% = ល្អណាស់</td>
-                                            <td>D = 45% - 49% = ខ្សោយ</td>
+                                            <td>D &nbsp;= 45% - 49% = ខ្សោយ</td>
                                         </tr>
                                         <tr>
-                                            <td>B = 70% - 79% = ល្អ</td>
-                                            <td>E = 40% - 44% = ខ្សោយណាស់</td>
+                                            <td>B &nbsp;= 70% - 79% = ល្អ</td>
+                                            <td>E &nbsp;= 40% - 44% = ខ្សោយណាស់</td>
                                         </tr>
                                         <tr>
                                             <td>C<sup>+</sup> = 65% - 69% = ល្អបង្គួរ</td>
-                                            <td>F = < 40% = ធ្លាក់</td>
+                                            <td>F &nbsp;= < 40% = ធ្លាក់</td>
                                         </tr>
                                     </table>
                                 </div>
@@ -260,7 +261,7 @@
                                 <div class="clearfix"></div>
                                 <div class="header-left">
                                     <div class="pull-left">
-                                        <p class="text-center"><img src="{{ asset('img/ITC_Logo.png') }}"/></p>
+                                        <p class="text-center"><img class="img" src="{{ asset('img/ITC_Logo.png') }}"/></p>
                                         <h4 class="text-center branch_title">វិទ្យាស្ថានបច្ចេកវិទ្យាកម្ពុជា</h4>
                                         <h4 class="text-center">Institute of Technology of Cambodia</h4>​
                                     </div>
@@ -272,11 +273,10 @@
                             <div class="col-md-12 margin-top-40">
                                 <h3 class="text-center main-title">វិញ្ញាបនបត្រថ្នាក់ឆ្នាំសិក្សាមូលដ្ឋាន</h3>
                                 <h3 class="text-center text-bold">Certificate of Foundation Year Course</h3>
-                                <h3 class="text-center text-bold">2015 - 2016</h3>
+                                <h3 class="text-center text-bold">{{$student['academic_year_latin']}}</h3>
                             </div>
                         </div>
-
-                        <p class="bottom-footer">លេខ: គ.ទ.ក ០២១៧១៣០០៦ ៧២៤/១៦/<span class="text-bold">វ.ប.ក</span></p>
+                        <p class="bottom-footer">លេខ: គ.ទ.ក ០២១៧១៣០០៦ {{to_khmer_number($ranking_data[$student['id_card']]->Rank)}}/{{to_khmer_number(substr($student['academic_year_id'],-2))}}/<span class="text-bold">វ.ប.ក</span></p>
                     </div>
                 </div>
             </div>
@@ -292,22 +292,28 @@
                         <h4 class="tran-header text-center">បញ្ជាក់ថា​ :</h4>
                         <div class="row">
                             <div class="col-md-6">
-                                <h4 class="left">និស្សិតឈ្មោះ: <strong>រិទ្ធិ បញ្ញា</strong></h4>
+                                <h4 class="left">និស្សិតឈ្មោះ: <strong>{{$student['name_kh']}}</strong></h4>
                             </div>
                             <div class="col-md-6">
-                                <h4 class="right">ភេទ: ប្រុស</h4>
+                                <h4 class="right">ភេទ: {{to_khmer_gender($student['gender'])}}</h4>
                             </div>
                         </div>
                         <div class="row">
-                            <div class="col-md-6">
-                                <h4 class="left">ថ្ងៃខែឆ្នាំកំណើត: ១១ ខែសីហា ១៩៩៨</h4>
+                            <div class="col-md-12">
+                                <?php
+                                $dob = \Carbon\Carbon::createFromFormat("Y-m-d H:i:s",$student['dob']);
+                                $dob_y = $dob->year;
+                                $dob_m = $dob->month;
+                                $dob_d = $dob->day;
+                                ?>
+                                <h4 class="left">ថ្ងៃខែឆ្នាំកំណើត: {{to_khmer_number($dob_d)}} ខែ {{to_khmer_month($dob_m)}} ឆ្នាំ {{to_khmer_number($dob_y)}}</h4>
                             </div>
                         </div>
                         <div class="row">
                             <div class="col-md-12">
                                 <h4 class="tran-content line-height">
                                     បានបញ្ចប់ថ្នាក់ឆ្នាំសិក្សាមូលដ្ឋានដោយជោគជ័យនៅ វិទ្យាស្ថានបច្ចេកវិទ្យាកម្ពុជា
-                                    ក្នុងឆ្នាំសិក្សា ២០១៥_២០១៦។
+                                    ក្នុងឆ្នាំសិក្សា {{$student['academic_year_kh']}}។
                                 </h4>
                             </div>
                         </div>
@@ -320,12 +326,18 @@
                         </div>
                         <div class="row">
                             <div class="col-md-4">
-                                <div class="photo"></div>
+                                <img class="photo" src="{{$smis_server->value}}/img/profiles/{{$student['photo']}}">
                             </div>
                             <div class="col-md-8">
                                 <div align="center">
                                     <h4>
-                                        រាជធានីភ្នំពេញ ថ្ងៃទី១៥ ខែកញ្ញា ឆ្នាំ២០១៦
+                                        <?php
+                                            $d = \Carbon\Carbon::createFromFormat("d/m/Y", $issued_date);
+                                            $issue_d = $d->day;
+                                            $issue_m = $d->month;
+                                            $issue_y = $d->year;
+                                        ?>
+                                        រាជធានីភ្នំពេញ ថ្ងៃទី{{to_khmer_number($issue_d)}} ខែ{{to_khmer_month($issue_m)}} ឆ្នាំ{{to_khmer_number($issue_y)}}
                                     </h4>
                                     <h4>
                                         ជ. នាយកវិទ្យាស្ថានបច្ចេកវិទ្យាកម្ពុជា
@@ -346,15 +358,15 @@
                         <h4 class="tran-header text-center">Certifies that</h4>
                         <div class="row">
                             <div class="col-md-6">
-                                <h4 class="left">Name: <strong>ANG MALYNET</strong></h4>
+                                <h4 class="left">Name: <strong>{{strtoupper($student['name_latin'])}}</strong></h4>
                             </div>
                             <div class="col-md-6">
-                                <h4 class="right">Sex: Male</h4>
+                                <h4 class="right">Sex: {{strtolower($student['gender'])=="m"?"Male":"Female"}}</h4>
                             </div>
                         </div>
                         <div class="row">
                             <div class="col-md-6">
-                                <h4 class="left">Born: on 11 August 1998</h4>
+                                <h4 class="left">Born on {{\Carbon\Carbon::createFromFormat("Y-m-d H:i:s",$student['dob'])->formatLocalized('%d %B %Y')}}</h4>
                             </div>
                         </div>
 
@@ -363,7 +375,7 @@
                             <div class="col-md-12">
                                 <h4 class="line-height tran-content">
                                     has successfully completed Foundation Year Course at Institute of Technology of Cambodia in
-                                    academic year 2015-2016
+                                    academic year {{$student['academic_year_latin']}}
                                 </h4>
                             </div>
                         </div>
@@ -371,7 +383,7 @@
                         <div class="row">
                             <div class="col-md-12">
                                 <h4 class="line-height tran-last-content">
-                                    This certificate is presented to ther bearer with all rights and privileges thereto
+                                    This certificate is presented to the bearer with all rights and privileges thereto
                                     pertaining.
                                 </h4>
                             </div>
@@ -380,7 +392,7 @@
                         <div class="row">
                             <div class="col-md-12">
                                 <div align="center">
-                                    <h4>Issued at Phnom Penh, 15 September 2016</h4>
+                                    <h4>Issued at Phnom Penh, {{\Carbon\Carbon::createFromFormat("d/m/Y",$issued_date)->formatLocalized('%d %B %Y')}}</h4>
                                     <h4>For Director General</h4>
                                     <h4>Deputy Director</h4>
                                 </div>

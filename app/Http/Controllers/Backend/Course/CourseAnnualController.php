@@ -4,6 +4,7 @@ use App\Exceptions\GeneralException;
 use App\Http\Controllers\Backend\Course\CourseHelperTrait\GenerateStudentTrait;
 use App\Http\Controllers\Backend\Course\CourseHelperTrait\ProficencyScoreTrait;
 use App\Http\Controllers\Backend\Course\CourseHelperTrait\StudentStatisticTrait;
+use App\Http\Controllers\Backend\StudentTrait\PrintTranscriptTrait;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Backend\Course\CourseAnnual\CourseAnnualAssignmentRequest;
 use App\Http\Requests\Backend\Course\CourseAnnual\CreateCourseAnnualRequest;
@@ -69,6 +70,7 @@ class CourseAnnualController extends Controller
     use StudentStatisticTrait;
     use ProficencyScoreTrait;
     use GenerateStudentTrait;
+    use PrintTranscriptTrait;
 
     /**
      * @var CourseAnnualRepositoryContract
@@ -2131,12 +2133,12 @@ class CourseAnnualController extends Controller
         return ['col_width' => $colWidths, 'nested_header' => $nestedHeaders];
     }
 
-    public function allHandsontableData(Request $request)
+    public function get_total_score_summary($param)
     {
         // ------declare reqested data ------
 
-        $academicYearID = $request->academic_year_id;
-        $semesterId = $request->semester_id;
+        $academicYearID = $param['academic_year_id'];
+        $semesterId = $param['semester_id'];
 
         $request_group_filter = '';
         //-----------end requested data---------
@@ -2160,7 +2162,7 @@ class CourseAnnualController extends Controller
 
         //------get course type -------
 
-        $courseAnnuals = $this->getCourseAnnualWithProp($request->all());
+        $courseAnnuals = $this->getCourseAnnualWithProp($param);
         $array_course_annual_ids = $courseAnnuals->lists('course_annual_id');
         $arrayCourseAnnual = collect($courseAnnuals->get())->groupBy('course_id')->toArray();
         if (count($array_course_annual_ids) == 0) {
@@ -2370,9 +2372,9 @@ class CourseAnnualController extends Controller
 
             if(count($value) < $countElement) {
                 foreach($propertiesSemester2 as $str_index => $prop2) {
-                   if(!isset($value[$str_index])) {
-                       $value = array_merge($value, [$str_index => $prop2]);
-                   }
+                    if(!isset($value[$str_index])) {
+                        $value = array_merge($value, [$str_index => $prop2]);
+                    }
                 }
             }
 
@@ -2495,6 +2497,11 @@ class CourseAnnualController extends Controller
             'colWidths' => $colWidths
         ]);
     }
+    public function allHandsontableData(Request $request)
+    {
+        $param = $request->all();
+        return $this->get_total_score_summary($param);
+    }
 
     private function checkRedouble($student, $academicYearId)
     {
@@ -2580,7 +2587,6 @@ class CourseAnnualController extends Controller
      */
     public function print_total_score(Request $request)
     {
-
         $data = $this->allHandsontableData($request);
         $data = json_decode($data);
 

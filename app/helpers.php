@@ -166,3 +166,140 @@ if (! function_exists('to_fr_number')) {
         return str_replace(".",",",$number);
     }
 }
+if (! function_exists('get_grading')) {
+    /**
+     * Convert english day to french
+     *
+     * @param $score
+     * @return String
+     */
+    function get_grading($score)
+    {
+        $grade = "";
+        if($score >= 85){
+            $grade = "A";
+        } else if ($score >= 80) {
+            $grade = "B<sup>+</sup>";
+        } else if ($score >= 70) {
+            $grade = "B";
+        } else if ($score >= 65) {
+            $grade = "C<sup>+</sup>";
+        } else if ($score >= 50) {
+            $grade = "C";
+        } else if ($score >= 45) {
+            $grade = "D";
+        } else if ($score >= 40) {
+            $grade = "E";
+        }  else {
+            $grade = "F";
+        }
+        return $grade;
+    }
+}
+if (! function_exists('to_khmer_number')) {
+    /**
+     * Convert english day to french
+     *
+     * @param $number
+     * @return String
+     */
+    function to_khmer_number($number)
+    {
+        $elements = trim($number);
+        $elements = str_split($elements);
+        $kh_number = "";
+        foreach($elements as $element) {
+            switch ($element) {
+                case "0":
+                    $kh_number = $kh_number."០";
+                    break;
+                case "1":
+                    $kh_number = $kh_number."១";
+                    break;
+                case "2":
+                    $kh_number = $kh_number."២";
+                    break;
+                case "3":
+                    $kh_number = $kh_number."៣";
+                    break;
+                case "4":
+                    $kh_number = $kh_number."៤";
+                    break;
+                case "5":
+                    $kh_number = $kh_number."៥";
+                    break;
+                case "6":
+                    $kh_number = $kh_number."៦";
+                    break;
+                case "7":
+                    $kh_number = $kh_number."៧";
+                    break;
+                case "8":
+                    $kh_number = $kh_number."៨";
+                    break;
+                case "9":
+                    $kh_number = $kh_number."៩";
+                    break;
+                default:
+                    break;
+            }
+        }
+        return $kh_number;
+    }
+}
+if (! function_exists('to_khmer_gender')) {
+    /**
+     * Convert english day to french
+     *
+     * @param $gender
+     * @return String
+     */
+    function to_khmer_gender($gender)
+    {
+        $a = strtolower($gender);
+        if($a == "m" || $a == "male") {
+            return "ប្រុស";
+        } else {
+            return "ស្រី";
+        }
+    }
+}
+if (! function_exists('to_khmer_month')) {
+    /**
+     * Convert english day to french
+     *
+     * @param $month
+     * @return String
+     */
+    function to_khmer_month($month)
+    {
+        switch ($month) {
+            case "1":
+                return "មករា";
+            case "2":
+                return "កុម្ភះ";
+            case "3":
+                return "មិនា";
+            case "4":
+                return "មេសា";
+            case "5":
+                return "ឪសភា";
+            case "6":
+                return "មិថុនា";
+            case "7":
+                return "កក្កដា";
+            case "8":
+                return "សីហា";
+            case "9":
+                return "កញ្ញា";
+            case "10":
+                return "តុលា";
+            case "11":
+                return "វិច្ឆកា";
+            case "12":
+                return "ធ្នូ";
+            default:
+                return "";
+        }
+    }
+}

@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Backend\StudentTrait;
 use App\Http\Requests\Backend\Student\PrintTranscriptRequest;
 use App\Models\AcademicYear;
+use App\Models\Configuration;
 use App\Models\Gender;
 use App\Models\PrintedTranscript;
 use App\Models\StudentAnnual;
@@ -164,12 +165,14 @@ trait PrintTranscriptTrait
     }
     public function print_transcript(PrintTranscriptRequest $request){
 
+        $smis_server = Configuration::where("key","smis_server")->first();
         $semester = 1;
         $studentAnnualIds = json_decode($request->ids);
         $students  = StudentAnnual::select([
             'students.id_card',
             'students.name_kh',
             'students.name_latin',
+            'students.dob',
             'departments.name_kh as department',
             'students.photo',
             'studentAnnuals.id',
@@ -190,6 +193,7 @@ trait PrintTranscriptTrait
             'grades.name_en as grade_en',
             'grades.name_fr as grade_fr',
             'grades.name_kh as grade_kh',
+            'academicYears.id as academic_id',
             'academicYears.name_kh as academic_year_kh',
             'academicYears.name_latin as academic_year_latin',
             'genders.code as gender',
@@ -235,17 +239,33 @@ trait PrintTranscriptTrait
                 $scores[$id] = $this->getStudentScoreBySemester($id,null); // Full year
             }
         }
+        $ranking_data = [];
+        if(isset($students[0]) && $students[0]['degree_id'] == 1 && $students[0]['grade_id'] == 1) {
+            $params = array(
+                "department_id" => $students[0]['department_id'],
+                "degree_id" => $students[0]['degree_id'],
+                "grade_id" => $students[0]['grade_id'],
+                "academic_year_id" => $students[0]['academic_id'],
+                "semester_id" => "",
+                "dept_option_id" => ""
+            );
+            $ranking_data = collect(json_decode($this->get_total_score_summary($params))->data)->keyBy("student_id_card");
+            $view = 'backend.studentAnnual.print.foundation_certificate';
+        } else {
+            $view = 'backend.studentAnnual.print.transcript';
+        }
 
-
-        return view('backend.studentAnnual.print.foundation_certificate',
+        return view($view,
             compact(
+                'ranking_data',
                 'scores',
                 'students',
                 'semester',
                 'transcript_type',
                 'issued_by',
                 'issued_date',
-                'issued_number'
+                'issued_number',
+                'smis_server'
             )
         );
     }
