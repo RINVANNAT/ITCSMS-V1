@@ -51,7 +51,7 @@
         <div class="row">
             <div class="col-md-6 col-xs-6">
                 <div class="border margin-right-5" align="center">
-                    <h4 class="h2-title">ព្រឹត្តិបត្រពិន្ទុ</h4>
+                    <h4 class="h2_khmer_title">ព្រឹត្តិបត្រពិន្ទុ</h4>
                     <h3 class="text-bold english_section" style="font-size: 20px">Academic Transcript</h3>
                     <div class="row">
                         <div class="col-md-6 english_section">
@@ -160,7 +160,7 @@
         <div class="row">
             <div class="col-md-6 col-xs-6">
                 <div class="border margin-right-5 khmer_section">
-                    <p class="text-center h1_khmer_title"><strong>នាយក</strong></p>
+                    <p class="text-center h2_khmer_title"><strong>នាយក</strong></p>
                     <p class="tran-header text-center">បញ្ជាក់ថា​ :</p>
                     <div class="row">
                         <div class="col-md-6">
@@ -211,10 +211,10 @@
                                     ?>
                                     រាជធានីភ្នំពេញ ថ្ងៃទី{{to_khmer_number($issue_d)}} ខែ{{to_khmer_month($issue_m)}} ឆ្នាំ{{to_khmer_number($issue_y)}}
                                 </p>
-                                <p>
+                                <p style="font-family: 'khmer_m2' !important;">
                                     ជ. នាយកវិទ្យាស្ថានបច្ចេកវិទ្យាកម្ពុជា
                                 </p>
-                                <p>
+                                <p style="font-family: 'khmer_m2' !important;">
                                     នាយករង
                                 </p>
                             </div>
