@@ -162,7 +162,7 @@
                 <div class="border margin-right-5 khmer_section">
                     <p class="text-center h2_khmer_title"><strong>នាយក</strong></p>
                     <p class="tran-header text-center">បញ្ជាក់ថា​ :</p>
-                    <div class="row">
+                    <div class="row" style="margin-top: 10mm">
                         <div class="col-md-6">
                             <p class="left">និស្សិតឈ្មោះ: <strong>{{$student['name_kh']}}</strong></p>
                         </div>
@@ -226,7 +226,7 @@
                 <div class="border margin-left-5 english_section">
                     <p align="center"><strong>DIRECTOR</strong></p>
                     <p class="tran-header text-center">Certifies that</p>
-                    <div class="row">
+                    <div class="row" style="margin-top: 10mm">
                         <div class="col-md-8">
                             <p class="left">Name: <strong>{{strtoupper($student['name_latin'])}}</strong></p>
                         </div>
