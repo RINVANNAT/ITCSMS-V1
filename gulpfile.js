@@ -72,6 +72,9 @@ elixir(function(mix) {
      .styles([
          'backend/student/transcript.css'
      ], 'public/css/student_transcript.css')
+     .styles([
+       'backend/student/foundation_certificate.css'
+     ], 'public/css/foundation_certificate.css')
 
      /**
       * Combine backend scripts
@@ -96,6 +99,7 @@ elixir(function(mix) {
        "public/css/backend.css",
        "public/css/student_search.css",
        "public/css/student_transcript.css" ,
+       "public/css/foundation_certificate.css",
        "public/js/backend.js",
        "public/js/student_search.js",
        'public/js/handsontable.full.min.js',

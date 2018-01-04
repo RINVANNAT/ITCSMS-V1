@@ -1,0 +1,202 @@
+@font-face {
+    font-family: franklin_gothic;
+    src: url("{{url('assets/fonts/Franklin Gothic Demi Cond Regular.ttf')}}");
+}
+
+@font-face {
+    font-family: arial-rounded;
+    src: url("{{url('assets/fonts/arial-rounded-mt-bold.ttf')}}");
+}
+@font-face {
+    font-family: bayon;
+    src: url("{{url('assets/fonts/Bayon.ttf')}}");
+}
+@font-face {
+    font-family: kh-bokor;
+    src: url("{{url('assets/fonts/Kh-Bokor.ttf')}}");
+}
+@font-face {
+    font-family: khmerosmoulpali;
+    src: url("{{url('assets/fonts/KhmerOSMoulpali.ttf')}}");
+}
+@font-face {
+    font-family: metal;
+    src: url("{{url('assets/fonts/Metal.ttf')}}");
+}
+@font-face {
+    font-family: tactieng;
+    src: url("{{url('assets/fonts/TACTIENG.TTF')}}");
+}
+@font-face {
+    font-family: khmeros;
+    src: url("{{url('assets/fonts/KhmerOSContent-Regular.ttf')}}");
+}
+
+@font-face {
+    font-family: khmer_m1;
+    src: url("{{ asset('assets/fonts/khmer M1.volt.ttf') }}");
+}
+
+@font-face {
+    font-family: khmer_m2;
+    src: url("{{ asset('assets/fonts/khmer M2.volt.ttf') }}");
+}
+
+@font-face {
+    font-family: khmer_niroth;
+    src: url("{{ asset('assets/fonts/KhmerOSniroth.ttf') }}");
+}
+
+/** {*/
+    /*box-sizing: border-box;*/
+    /*-moz-box-sizing: border-box;*/
+/*}*/
+
+.page {
+    width: 297mm;
+    height: 200mm;
+    margin: 0 auto;
+    /*border: 1px #D3D3D3 solid;*/
+    padding: 10mm !important;
+    /*border-radius: 5px;*/
+    background: white;
+    /*box-shadow: 0 0 5px rgba(0, 0, 0, 0.1);*/
+    position: relative;
+    page-break-after: always;
+}
+td {
+    font-family: "khmeros" !important;
+}
+@page {
+    size: 297mm 210mm;
+    margin: 0;
+}
+
+body {
+    width: 100%;
+    height: 100%;
+    margin: 0;
+    padding: 0;
+    background-color: #FAFAFA;
+    font-family: "khmeros" !important;
+    line-height: 110%;
+}
+.right {
+    float: right;
+}
+.left {
+    float: left;
+}
+.text_right {
+    text-align: right;
+}
+.text_left {
+    text-align: left;
+}
+.text_center {
+    text-align: center;
+}
+.smallest_text {
+    font-size: 9pt;
+}
+/*.border {
+    border: 2px solid black;
+    height: 190mm;
+    padding: 5mm;
+}*/
+.page {
+    font-family: "khmeros";
+}
+
+.border {
+    /*border: 2px solid black;*/
+    height: 190mm;
+    padding: 5mm;
+    /*background-color: #0a6aa1 !important;*/
+}
+
+.img {
+    width: 120px;
+    height: auto;
+    position: absolute;
+    top: 30px;
+    left: 90px;
+}
+
+.margin-top-40 {
+    margin-top: 40px;
+}
+.bottom-footer {
+    position: absolute;
+    left: 60px;
+    bottom: 10px;
+}
+
+/*slide2*/
+.tran-content{
+    margin-top: 30px;
+}
+.tran-last-content{
+    margin-top: 50px;
+}
+.tran-header {
+    margin-top: 30px;
+    margin-bottom: 30px;
+}
+
+.line-height{
+    line-height: 1.8;
+}
+.photo {
+    width: 130px;
+    margin-top: 15px;
+}
+
+.margin-left-5 {
+    margin-left: 5mm;
+}
+
+.margin-right-5 {
+    margin-right: 5mm;
+}
+tr {
+    height: 23px;
+}
+th {
+    height: 30px;
+}
+
+.h1_khmer_title {
+    font-family: khmer_m1 !important;
+    font-size: 24px;
+}
+.h2_khmer_title {
+    font-family: khmer_m2 !important;
+    font-size: 20px;
+}
+.h3_khmer_title {
+    font-family: khmer_m2 !important;
+}
+
+.h1_english_title {
+    font-family: khmer_m1 !important;
+}
+.h2_english_title {
+    font-family: khmer_m2 !important;
+}
+.h3_english_title {
+    font-family: khmer_m2 !important;
+}
+.english_section {
+    font-family: "Times New Roman" !important;
+    font-size: 16px;
+}
+.english_section p{
+    font-size: 18px;
+}
+.khmer_section {
+    font-family: "khmeros" !important;
+}
+.khmer_section h5{
+    font-size: 16px;
+}
