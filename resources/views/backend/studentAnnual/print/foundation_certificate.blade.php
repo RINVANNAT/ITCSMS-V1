@@ -148,7 +148,10 @@
                             <h3 class="text-center text-bold">{{$student['academic_year_latin']}}</h3>
                         </div>
                     </div>
-                    <p class="bottom-footer">លេខ: គ.ទ.ក ០២១៧១៣០០៦ {{to_khmer_number($ranking_data[$student['id_card']]->Rank)}}/{{to_khmer_number(substr($student['academic_year_id'],-2))}}/<span class="text-bold">វ.ប.ក</span></p>
+                    <?php
+                        $now = \Carbon\Carbon::now();
+                    ?>
+                    <p class="bottom-footer">លេខ: គ.ទ.ក ០២១៧១៣០០៦/ {{to_khmer_number($ranking_data[$student['id_card']]->Rank)}}/{{to_khmer_number(substr($now->year,-2))}}/<span class="text-bold">វ.ប.ក</span></p>
                 </div>
             </div>
         </div>
@@ -224,10 +227,10 @@
                     <p align="center"><strong>DIRECTOR</strong></p>
                     <p class="tran-header text-center">Certifies that</p>
                     <div class="row">
-                        <div class="col-md-6">
+                        <div class="col-md-8">
                             <p class="left">Name: <strong>{{strtoupper($student['name_latin'])}}</strong></p>
                         </div>
-                        <div class="col-md-6">
+                        <div class="col-md-4">
                             <p class="right">Sex: {{strtolower($student['gender'])=="m"?"Male":"Female"}}</p>
                         </div>
                     </div>

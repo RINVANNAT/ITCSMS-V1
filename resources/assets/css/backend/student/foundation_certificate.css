@@ -99,20 +99,13 @@ body {
 .smallest_text {
     font-size: 9pt;
 }
-/*.border {
-    border: 2px solid black;
-    height: 190mm;
-    padding: 5mm;
-}*/
 .page {
     font-family: "khmeros";
 }
 
 .border {
-    /*border: 2px solid black;*/
     height: 190mm;
-    padding: 5mm;
-    /*background-color: #0a6aa1 !important;*/
+    padding: 8mm;
 }
 
 .img {
@@ -192,11 +185,11 @@ th {
     font-size: 16px;
 }
 .english_section p{
-    font-size: 18px;
+    font-size: 16px;
 }
 .khmer_section {
     font-family: "khmeros" !important;
 }
-.khmer_section h5{
-    font-size: 16px;
+.khmer_section p{
+    font-size: 13px;
 }
