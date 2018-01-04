@@ -116,20 +116,20 @@
                                 <h5><b>Note:</b></h5>
                                 <table style="margin-left: 18px" width="100%">
                                     <tr>
-                                        <td>A &nbsp;= 85% -100% = ល្អប្រសើរ</td>
-                                        <td>C &nbsp;= 50% - 64% = មធ្យម</td>
+                                        <td class="english_section">A &nbsp;= 85% -100% = <span class="khmer_section">ល្អប្រសើរ</span></td>
+                                        <td class="english_section">C &nbsp;= 50% - 64% = <span class="khmer_section">មធ្យម</span></td>
                                     </tr>
                                     <tr>
-                                        <td>B<sup>+</sup> = 80% - 84% = ល្អណាស់</td>
-                                        <td>D &nbsp;= 45% - 49% = ខ្សោយ</td>
+                                        <td class="english_section">B<sup>+</sup> = 80% - 84% = <span class="khmer_section">ល្អណាស់</span></td>
+                                        <td class="english_section">D &nbsp;= 45% - 49% = <span class="khmer_section">ខ្សោយ</span></td>
                                     </tr>
                                     <tr>
-                                        <td>B &nbsp;= 70% - 79% = ល្អ</td>
-                                        <td>E &nbsp;= 40% - 44% = ខ្សោយណាស់</td>
+                                        <td class="english_section">B &nbsp;= 70% - 79% = <span class="khmer_section">ល្អ</span></td>
+                                        <td class="english_section">E &nbsp;= 40% - 44% = <span class="khmer_section">ខ្សោយណាស់</span></td>
                                     </tr>
                                     <tr>
-                                        <td>C<sup>+</sup> = 65% - 69% = ល្អបង្គួរ</td>
-                                        <td>F &nbsp;= < 40% = ធ្លាក់</td>
+                                        <td class="english_section">C<sup>+</sup> = 65% - 69% = <span class="khmer_section">ល្អបង្គួរ</span></td>
+                                        <td class="english_section">F &nbsp;= < 40% = <span class="khmer_section">ធ្លាក់</span></td>
                                     </tr>
                                 </table>
                             </div>
