@@ -93,7 +93,9 @@
             <div class="pull-right" style="margin-right: 5px;">
                 <input type="text" name="issued_date" class="form-control"  placeholder="Issued date" value="{{$current_date}}"/>
             </div>
-
+            <div class="pull-right" style="margin-right: 5px; margin-top: 6px;">
+                <input type="checkbox" name="photo"  placeholder="Photo" value="photo" checked/> Photo
+            </div>
         </div><!-- /.box-header -->
 
         <div class="box-body">
@@ -173,6 +175,7 @@
             }
 //                var issued_number = $('input[name="issued_number"]').val();
             var transcript_type = $('select[name="transcript_type"]').val();
+            var photo = $('input[name="photo"]').val();
             // Open new window to print
             PopupCenterDual(
                     print_url
@@ -180,6 +183,7 @@
                     +"&issued_by="+issued_by
                     +"&issued_date="+issued_date
 //                        +"&issued_number="+issued_number
+                    +"&photo="+photo
                     +'&ids='+JSON.stringify(selected_ids),
                     'Printing','1200','800');
 

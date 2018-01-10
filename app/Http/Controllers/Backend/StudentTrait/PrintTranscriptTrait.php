@@ -168,6 +168,7 @@ trait PrintTranscriptTrait
         $smis_server = Configuration::where("key","smis_server")->first();
         $semester = 1;
         $studentAnnualIds = json_decode($request->ids);
+        $photo = $request->photo;
         $students  = StudentAnnual::select([
             'students.id_card',
             'students.name_kh',
@@ -214,6 +215,7 @@ trait PrintTranscriptTrait
                 $query->where("group_student_annuals.semester_id",$semester)->orWhereNull("group_student_annuals.semester_id");
             })
             ->whereIn('studentAnnuals.id', $studentAnnualIds)
+            ->orderBy('students.id_card','ASC')
             ->get()
             ->toArray();
 
@@ -265,7 +267,8 @@ trait PrintTranscriptTrait
                 'issued_by',
                 'issued_date',
                 'issued_number',
-                'smis_server'
+                'smis_server',
+                'photo'
             )
         );
     }
