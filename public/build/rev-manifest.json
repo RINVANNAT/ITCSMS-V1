@@ -1,9 +1,12 @@
 {
   "css/backend.css": "css/backend-d935c34a15.css",
+  "css/foundation_certificate.css": "css/foundation_certificate-6db908f69c.css",
   "css/frontend.css": "css/frontend-8409925b8a.css",
+  "css/handsontable.full.min.css": "css/handsontable.full.min-e5042b3a1b.css",
   "css/student_search.css": "css/student_search-58828db39b.css",
   "css/student_transcript.css": "css/student_transcript-64ec6d1507.css",
   "js/backend.js": "js/backend-7bc4ebc805.js",
   "js/frontend.js": "js/frontend-bb67baa093.js",
-  "js/student_search.js": "js/student_search-47cb2fbc9b.js"
+  "js/handsontable.full.min.js": "js/handsontable.full.min-eb4e3c18a9.js",
+  "js/student_search.js": "js/student_search-d62a3a0911.js"
 }
