@@ -138,11 +138,11 @@ function column_freezing(delet_col_url) /*'{{route('admin.course.delete-score')}
 
 function setSelectedRow() {
 
-    var current_rows = $(document).find(".current_row");
-    if(current_rows != null){
-        current_rows.removeClass("current_row");
-    }
-    $(".current").closest("tr").addClass("current_row");
+    // var current_rows = $(document).find(".current_row");
+    // if(current_rows != null){
+    //     current_rows.removeClass("current_row");
+    // }
+    // $(".current").closest("tr").addClass("current_row");
 }
 
 

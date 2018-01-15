@@ -1,35 +1,22 @@
 @extends ('backend.layouts.popup_master')
 
 @section ('title', trans('labels.backend.exams.title') . ' | ' . trans('labels.backend.exams.score.request_score_form'))
-
-@section('content')
+@section('after-styles-end')
     <style>
-
-        .current_row td {
-
-            gradient(to bottom, rgba(181, 209, 255, 0.34) 0, rgba(181, 209, 255, 0.34) 100 %);
-                background-image: linear-gradient(rgba(181, 209, 255, 0.5) 0px, rgba(181, 209, 255, 0.341176) 100%);
-                background-position-x: initial;
-                background-position-y: initial;
-                background-size: initial;
-                background-repeat-x: initial;
-                background-repeat-y: initial;
-                background-attachment: initial;
-                background-origin: initial;
-                background-clip: initial;
-                background-color: #fff !important;
+        .currentRow {
+            background-image: linear-gradient(rgba(181, 209, 255, 0.5) 0px, rgba(181, 209, 255, 0.341176) 100%) !important;
         }
-
+        .currentCol {
+            background-image: linear-gradient(rgba(181, 209, 255, 0.5) 0px, rgba(181, 209, 255, 0.341176) 100%) !important;
+        }
         .handsontable td{
             color: #000 !important;
         }
 
     </style>
-    {!! Html::style('plugins/handsontable-test/handsontable.full.min.css') !!}
-
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/2.1.4/jquery.min.js"></script>
-    <script>window.jQuery || document.write('<script src="{{asset('js/vendor/jquery/jquery-2.1.4.min.js')}}"><\/script>')</script>
-
+    {!! Html::style(elixir('css/handsontable.full.min.css')) !!}
+@endsection
+@section('content')
 
     <div class="box box-success">
         <div class="box-header with-border text_font">
@@ -106,7 +93,7 @@
     </div>
 @stop
 @section('after-scripts-end')
-    {!! Html::script('plugins/handsontable-test/handsontable.full.min.js') !!}
+    {!! HTML::script(elixir('js/handsontable.full.min.js')) !!}
     {!! Html::script('score/js/proficency_score.js') !!}
     <script>
 
@@ -129,6 +116,8 @@
                 columns: [parseInt('{{count($headers[1]) }}')],
                 indicators: false
             };
+            setting.currentRowClassName = 'currentRow';
+            setting.currentColClassName = 'currentCol';
 
             setting.colWidths = JSON.parse('<?php echo  json_encode($colWidths);?>');
 
