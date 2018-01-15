@@ -142,6 +142,20 @@
         {{ Form::select('semester_id', $semesters, null, ['class' => 'form-control']) }}
     </div>
 </div>
+<div class="form-group">
+    {!! Form::label('active', trans('labels.backend.coursePrograms.fields.active'), ['class' => 'col-lg-3 control-label required']) !!}
+    <div class="col-lg-7">
+        @if(isset($courseProgram))
+            @if($courseProgram->active)
+                <input type="checkbox" name="active" id="active" class="boolean_input" checked>
+            @else
+                <input type="checkbox" name="active" id="active" class="boolean_input" >
+            @endif
+        @else
+            <input type="checkbox" name="active" id="active" class="boolean_input" checked>
+        @endif
+    </div>
+</div>
 
 <hr/>
 

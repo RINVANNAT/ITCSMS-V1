@@ -95,7 +95,11 @@ class EloquentCourseProgramRepository implements CourseProgramRepositoryContract
         $course->grade_id = $input["grade_id"];
         $course->department_id = $input["department_id"];
         $course->semester_id = $input["semester_id"];
-
+        if(isset($input["active"])) {
+            $course->active = true;
+        } else {
+            $course->active = false;
+        }
 
         $course->create_uid = auth()->id();
         $course->created_at = Carbon::now();
@@ -148,6 +152,11 @@ class EloquentCourseProgramRepository implements CourseProgramRepositoryContract
         $courseProgram->grade_id = $input["grade_id"];
         $courseProgram->department_id = $input["department_id"];
         $courseProgram->semester_id = $input["semester_id"];
+        if(isset($input["active"])) {
+            $courseProgram->active = true;
+        } else {
+            $courseProgram->active = false;
+        }
 
         $courseProgram->updated_at = Carbon::now();
         $courseProgram->write_uid = auth()->id();

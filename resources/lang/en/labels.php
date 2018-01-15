@@ -868,6 +868,7 @@ return [
             'sub_detail_title' => 'Detail of a course program',
             'sub_import_title' => 'Import course program',
             'fields' => [
+                'active' => "Active",
                 'name_kh' => "Name in Khmer",
                 'name_en' => 'Name in English',
                 'name_fr' => 'Name in French',
