@@ -49,9 +49,15 @@
     {!! HTML::script('plugins/select2/select2.full.min.js') !!}
 
     <script>
+
+        $('.block_course_reference').hide();
         var $search_url = "{{route('admin.employee.search')}}";
         var base_url = '{{url('img/profiles/')}}';
         var get_group_url = "{{route('course_annual.get_group_filtering')}}";
+        var depts = {
+            sa: '{{config('access.departments.sa')}}',
+            sf: '{{config('access.departments.sf')}}'
+        };
 
         $(document).ready(function() {
 
@@ -144,11 +150,13 @@
             });
 
             $('#course_id').on('change', function() {
+
                 setTimeCourseTpTd();
                 setNameKhEnFr();
                 setSelectedField();
                 load_group('{{\App\Models\Enum\CourseAnnualEnum::CREATE}}');
-                loadReferenceCourse('{{route('course_annual.load_reference_course')}}', '{{csrf_token()}}', '');
+
+                loadReferenceCourse('{{route('course_annual.load_reference_course')}}', '{{csrf_token()}}', '', depts);
             });
 
 
@@ -197,7 +205,7 @@
 
             });
 
-            loadReferenceCourse('{{route('course_annual.load_reference_course')}}', '{{csrf_token()}}', '');
+            loadReferenceCourse('{{route('course_annual.load_reference_course')}}', '{{csrf_token()}}', '',depts);
 
         })
 

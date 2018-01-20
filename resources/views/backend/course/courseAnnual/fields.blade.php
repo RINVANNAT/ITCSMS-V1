@@ -414,13 +414,17 @@
 
 
 
-    {!! Form::label('reference_course_id', trans('labels.backend.coursePrograms.fields.reference_course_id'), ['class' => 'col-lg-2 control-label']) !!}
-    <div class="col-lg-3">
+    <div class="block_course_reference">
+        {!! Form::label('reference_course_id', trans('labels.backend.coursePrograms.fields.reference_course_id'), ['class' => 'col-lg-2 control-label']) !!}
+        <div class="col-lg-3">
 
-        <select  name="reference_course_id" id="reference_course_id" class="form-control" >
+            <select  name="reference_course_id" id="reference_course_id" class="form-control" >
 
-        </select>
+            </select>
+        </div>
+
     </div>
+
 </div>
 
 
