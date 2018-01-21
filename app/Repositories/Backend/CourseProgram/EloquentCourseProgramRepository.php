@@ -161,8 +161,6 @@ class EloquentCourseProgramRepository implements CourseProgramRepositoryContract
         $courseProgram->updated_at = Carbon::now();
         $courseProgram->write_uid = auth()->id();
 
-
-
         if ($courseProgram->save()) {
             return true;
         }
