@@ -1045,6 +1045,7 @@
         $.ajax({
           type: 'GET',
           url: '{{route('course_annual.clone_score')}}',
+
           data: baseData,
           dataType: "JSON",
           success: function(resultData) {

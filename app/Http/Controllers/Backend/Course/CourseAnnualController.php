@@ -299,6 +299,7 @@ class CourseAnnualController extends Controller
      */
     public function create(CreateCourseAnnualRequest $request)
     {
+
         $other_departments = Department::where("parent_id", config('access.departments.department_academic'))->orderBy("code")->lists("code", "id");
         if (auth()->user()->allow("view-all-score-in-all-department")) {
             $courses = Course::orderBy('updated_at', 'desc')->get();
@@ -3076,8 +3077,13 @@ class CourseAnnualController extends Controller
                 if ($studentScores) {
                     foreach ($studentScores as $score) {
 
-                        $totalScore = $totalScore + ($score->score);// calculate score for stuent annual
-                        $scoreData[$score->name] = (($score->score != null) ? $score->score : null);
+                        if(is_numeric($score->score)) {
+                            $totalScore = $totalScore + ($score->score);// calculate score for stuent annual
+                            $scoreData[$score->name] = (($score->score != null) ? $score->score : null);
+                        } else {
+                            $scoreData[$score->name] = (($score->score != null) ? $score->score : null);
+                        }
+
                     }
                 } else {
 

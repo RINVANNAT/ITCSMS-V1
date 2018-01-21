@@ -131,62 +131,92 @@ $(".check_all_box").change(function() {
 });
 
 
-function loadReferenceCourse(route, token, selected_course_annual_id)
+function loadReferenceCourse(route, token, selected_course_annual_id, depts)
 {
     var baseData ;
 
     if($('select#responsible_department_id :selected').val()) {
 
-        if(selected_course_annual_id != null && selected_course_annual_id!= '') {
-            baseData = {department_id : $('select#responsible_department_id :selected').val(), _token:token, degree_id: $('select#degree_id :selected').val(), grade_id:$('select#grade_id :selected').val(), course_annual_id: selected_course_annual_id}
-        } else {
-            baseData = {department_id : $('select#responsible_department_id :selected').val(), _token:token, degree_id: $('select#degree_id :selected').val(), grade_id:$('select#grade_id :selected').val()}
-        }
-        $.ajax({
-            method: 'POST',
-            url: route,
-            data:baseData ,
-            dataType: 'JSON',
-            success:function (result) {
+        var responsible_department_id = $('select#responsible_department_id :selected').val();
 
-                $('#reference_course_id').select2({
-                    data: result.data,
-                    allowClear: true,
-                    placeholder: " Select Program"
-                });
-            },
-            error: function() {
+        if(responsible_department_id == depts.sa || responsible_department_id == depts.sf) {
 
-                notify('error', 'Something went wrong!')
+
+            if(selected_course_annual_id != null && selected_course_annual_id!= '') {
+                baseData = {department_id : $('select#responsible_department_id :selected').val(), _token:token, degree_id: $('select#degree_id :selected').val(), grade_id:$('select#grade_id :selected').val(), course_annual_id: selected_course_annual_id}
+            } else {
+                baseData = {department_id : $('select#responsible_department_id :selected').val(), _token:token, degree_id: $('select#degree_id :selected').val(), grade_id:$('select#grade_id :selected').val()}
             }
-        })
+            $.ajax({
+                method: 'POST',
+                url: route,
+                data:baseData ,
+                dataType: 'JSON',
+                success:function (result) {
+
+                    $('#reference_course_id').select2({
+                        data: result.data,
+                        allowClear: true,
+                        placeholder: " Select Program"
+                    });
+                },
+                error: function(error) {
+
+                    notify('error', 'Something went wrong!')
+                }
+            })
+
+            $( ".block_course_reference" ).show();
+        } else {
+
+
+            $( ".block_course_reference" ).hide();
+
+        }
+
+
     }
 
 
     $(document).on('change', 'select#responsible_department_id', function() {
 
-        if(selected_course_annual_id != null && selected_course_annual_id!= '') {
-            baseData = {department_id : $(this).val(), _token:token, degree_id: $('select#degree_id :selected').val(), grade_id:$('select#grade_id :selected').val(), course_annual_id: selected_course_annual_id}
+        var responsible_department_id = $('select#responsible_department_id :selected').val();
+
+        if(responsible_department_id == depts.sa || responsible_department_id == depts.sf) {
+
+            if(selected_course_annual_id != null && selected_course_annual_id!= '') {
+                baseData = {
+                    department_id : $(this).val(),
+                    _token:token,
+                    degree_id: $('select#degree_id :selected').val(),
+                    grade_id:$('select#grade_id :selected').val(),
+                    course_annual_id: selected_course_annual_id
+                }
+            } else {
+
+                baseData = {department_id : $(this).val(), _token:token, degree_id: $('select#degree_id :selected').val(), grade_id:$('select#grade_id :selected').val()}
+            }
+            $.ajax({
+                method: 'POST',
+                url: route,
+                data:baseData ,
+                dataType: 'JSON',
+                success:function (result) {
+                    $('#reference_course_id').html('').select2({
+                        placeholder: " Select Program",
+                        data: result.data,
+                        allowClear: true
+                    });
+                },
+                error: function() {
+                    notify('error', 'Something went wrong!')
+                }
+            });
+            $( ".block_course_reference" ).show();
         } else {
 
-            baseData = {department_id : $(this).val(), _token:token, degree_id: $('select#degree_id :selected').val(), grade_id:$('select#grade_id :selected').val()}
+            $( ".block_course_reference" ).hide();
         }
-        $.ajax({
-            method: 'POST',
-            url: route,
-            data:baseData ,
-            dataType: 'JSON',
-            success:function (result) {
-                $('#reference_course_id').html('').select2({
-                    placeholder: " Select Program",
-                    data: result.data,
-                    allowClear: true
-                });
-            },
-            error: function() {
-                notify('error', 'Something went wrong!')
-            }
-        })
 
     });
 

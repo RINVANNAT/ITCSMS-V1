@@ -320,7 +320,9 @@ trait CourseAnnualTrait
                 if(isset($courseAnnual->reference_course_id)) {
 
                     /*---these are score that inputted from the SA or SF. and we need these score to update for student in each department ---*/
-                    $courseAnnualIds = CourseAnnual::where('course_id', $courseAnnual->reference_course_id)->lists('id')->toArray();
+                    $courseAnnualIds = CourseAnnual::where('course_id', $courseAnnual->reference_course_id)
+                        ->where('academic_year_id', $courseAnnual->academic_year_id)
+                        ->lists('id')->toArray();
 
                     if(count($courseAnnualIds) > 0) {
 
@@ -342,6 +344,7 @@ trait CourseAnnualTrait
                         /*----end score from depatment SA or SF----*/
 
                         /*---loop course score that we need to update for student (consit of student annual id ) ----*/
+                        /*---marching score base on student annual id----*/
                         foreach($scoreCourseAnnualProp as $studentAnnualId =>  $scoreProp) {
                             /*--there are two type of score. 1 midterm and 2 final score --*/
 
@@ -537,7 +540,7 @@ trait CourseAnnualTrait
         }
 
         $data = [];
-        if($request->department_id != null && $request->department_id != '') {
+        if($request->department_id != null && $request->department_id != '') { // department_id is the responsible_department_id
             $department = Department::where('id', $request->department_id)->first();
 
             $courses = Course::where('department_id', $request->department_id);
@@ -572,6 +575,7 @@ trait CourseAnnualTrait
             return Response::json(['status' => true, 'data' => $data]);
 
         } else {
+
             return Response::json(['status' => false, 'message' => 'No selected responsible department!']);
         }
     }
