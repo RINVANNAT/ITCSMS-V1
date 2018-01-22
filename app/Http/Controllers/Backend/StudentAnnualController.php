@@ -1,5 +1,6 @@
 <?php namespace App\Http\Controllers\Backend;
 
+use App\Http\Controllers\Backend\StudentTrait\PrintExaminationAttendanceListTrait;
 use App\Http\Controllers\Backend\StudentTrait\PrintTranscriptTrait;
 use App\Http\Controllers\Backend\StudentTrait\StudentAnnualTrait;
 use App\Http\Controllers\Backend\StudentTrait\ReportingTrait;
@@ -57,6 +58,7 @@ class StudentAnnualController extends Controller
     use ReportingTrait;
     use FilteringTrait;
     use PrintTranscriptTrait;
+    use PrintExaminationAttendanceListTrait;
     /**
      * @var StudentAnnualRepositoryContract
      */
@@ -1730,4 +1732,5 @@ class StudentAnnualController extends Controller
 
         return Response::json(array('success'=>true,'message'=>"Number of card printing is updated!"));
     }
+
 }

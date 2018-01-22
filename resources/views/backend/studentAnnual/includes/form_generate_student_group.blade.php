@@ -524,7 +524,6 @@
                     }
                 }
             });
-
         }
 
         function ajaxRequest(method, baseUrl, baseData) {
