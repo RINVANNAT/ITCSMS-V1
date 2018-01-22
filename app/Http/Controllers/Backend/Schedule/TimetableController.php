@@ -230,6 +230,7 @@ class TimetableController extends Controller
     {
         $now = Carbon::now('Asia/Phnom_Penh');
         $employee = Employee::where('user_id', auth()->user()->id)->first();
+        $degrees = Degree::all();
         if ($employee instanceof Employee) {
             $createTimetablePermissionConfiguration = Configuration::where('key', 'timetable_' . $employee->department_id)->first();
         } else {
@@ -310,7 +311,8 @@ class TimetableController extends Controller
                     'week_id' => $week,
                     'groups' => $groups,
                     'options_' => $options_,
-                    'weeks_' => $weeks
+                    'weeks_' => $weeks,
+                    'degrees' => $degrees
                 ]);
             }
         } else {
@@ -325,7 +327,8 @@ class TimetableController extends Controller
                 'week_id' => $week,
                 'groups' => $groups,
                 'options_' => $options_,
-                'weeks_' => $weeks
+                'weeks_' => $weeks,
+                'degrees' => $degrees
             ]);
         }
 

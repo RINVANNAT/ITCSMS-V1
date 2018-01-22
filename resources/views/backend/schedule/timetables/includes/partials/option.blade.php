@@ -76,7 +76,7 @@
                 data-placement="top"
                 title="{{ trans('inputs.backend.schedule.timetable.options.degree') }}">
             <option selected disabled>{{ trans('inputs.backend.schedule.timetable.options.degree') }}</option>
-            @foreach($department->degrees as $index => $degree)
+            @foreach($degrees as $index => $degree)
                 @if($index==0)
                     <option value="{{ $degree->id }}" selected>{{ $degree->name_en }}</option>
                 @else
