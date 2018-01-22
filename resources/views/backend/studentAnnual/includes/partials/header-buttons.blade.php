@@ -5,6 +5,9 @@
             </button>
             <ul class="dropdown-menu" role="menu">
                 @permission('generate-student-group')
+                <li><a href="{{route('admin.student.request_print_examination_attendance_list')}}">{{ trans('menus.backend.student.generate_examination_list') }}</a></li>
+                @endauth
+                @permission('generate-student-group')
                 <li><a href="#" id="generate_student_group">{{ trans('menus.backend.student.generate_group') }}</a></li>
                 @endauth
 
