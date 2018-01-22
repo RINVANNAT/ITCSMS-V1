@@ -24,22 +24,20 @@
 @endsection
 
 @section('content')
+    <?php $group=1; ?>
     @foreach($data as $page)
         <div class="page">
             <div class="row">
                 <div class="col-md-12">
-                    <div class="sign-header">
-                        <div class="row">
-                            <div class="col-md-8">
-                                <h5>Institut de Technologie du Cambodge</h5>
-                                <h4>Departement {{$page[0]["class"]}}</h4>
-                            </div>
-                            <div class="col-md-4">
-                                <?php $now = \Carbon\Carbon::now() ?>
-                                <h6 class="pull-right">Updated: {{$now->format("d/m/Y")}}</h6>
-                            </div>
+                    <div class="row">
+                        <div class="col-md-8">
+                            <h5>Institut de Technologie du Cambodge</h5>
+                            <h4>Departement {{$page[0]["class"]}}</h4>
                         </div>
-
+                        <div style="position: absolute;top: 0;right: 0; margin-right: 15px;">
+                            <?php $now = \Carbon\Carbon::now() ?>
+                            <h6 class="pull-right">Updated: {{$now->format("d/m/Y")}}</h6>
+                        </div>
                     </div>
                     <div class="sign-title">
                         <h3 class="title" align="center"><strong>សម្រង់វត្តមាននិស្សិតប្រលងបញ្ចប់ឆមាសទី. {{$semester}}</strong></h3>
@@ -52,12 +50,8 @@
                             </div>
                         </div>
                         <div class="row">
-                            <div class="col-md-6">
-                                <h3 style="margin-top: 5px;">Promotion {{$page[0]["promotion"]}}</h3>
-                            </div>
-                            <div class="col-md-6">
-                                <h3 style="margin-top: 5px;" class="pull-right">Group: 1</h3>
-                            </div>
+                            <span style="margin: 5px 15px 5px; font-size: 20px;">Promotion {{$page[0]["promotion"]}}</span>
+                            <span style="margin: 5px 15px 5px; font-size: 20px; float:right;">Group: {{$group}}</span>
                         </div>
                         <table class="table table-bordered">
                             <tr>
@@ -73,7 +67,7 @@
                             <tr>
                                 <td class="center">{{$index}}</td>
                                 <td>{{$student["id_card"]}}</td>
-                                <td>{{$student["name_latin"]}}</td>
+                                <td>{{strtoupper($student["name_latin"])}}</td>
                                 <td class="center">{{$student["gender"]}}</td>
                                 <td></td>
                                 <td></td>
@@ -86,6 +80,7 @@
                 </div>
             </div>
         </div>
+        <?php $group++ ?>
     @endforeach
 @endsection
 

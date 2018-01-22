@@ -54,10 +54,10 @@
                         <h4 class="h2_khmer_title">ព្រឹត្តិបត្រពិន្ទុ</h4>
                         <h3 class="text-bold english_section" style="font-size: 20px">Academic Transcript</h3>
                         <div class="row">
-                            <div class="col-md-6 english_section">
+                            <div class="col-md-8 english_section">
                                 <span class="left">Name: <b>{{strtoupper($student['name_latin'])}}</b></span>
                             </div>
-                            <div class="col-md-6 english_section">
+                            <div class="col-md-4 english_section">
                                 <span class="right" style="margin-right: 5mm">ID: {{$student['id_card']}}</span>
                             </div>
                         </div>
