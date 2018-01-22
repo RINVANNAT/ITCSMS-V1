@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Backend\StudentTrait;
 use App\Models\AcademicYear;
+use App\Models\Department;
 use App\Models\Gender;
 use App\Models\StudentAnnual;
 use Carbon\Carbon;
@@ -84,16 +85,6 @@ trait PrintExaminationAttendanceListTrait
         $remainder = $total_student%$number_student_per_class;
         $data = [];
         $index = 0;
-        for($i=0;$i<($total_class-$remainder);$i++) {
-            $per_class = array();
-            for($j=1;$j<=$number_student_per_class;$j++) {
-                $record = $studentAnnuals[$index];
-                $record["index"] = $index+1;
-                $per_class[]= $record;
-                $index++;
-            }
-            $data[] = $per_class;
-        }
         for($i=0;$i<$remainder;$i++) {
             $per_class = array();
             for($j=1;$j<=($number_student_per_class+1);$j++) {
@@ -104,9 +95,20 @@ trait PrintExaminationAttendanceListTrait
             }
             $data[] = $per_class;
         }
+        for($i=0;$i<($total_class-$remainder);$i++) {
+            $per_class = array();
+            for($j=1;$j<=$number_student_per_class;$j++) {
+                $record = $studentAnnuals[$index];
+                $record["index"] = $index+1;
+                $per_class[]= $record;
+                $index++;
+            }
+            $data[] = $per_class;
+        }
 
         $academic_year = AcademicYear::where("id",$academic_year)->first();
+        $department = Department::where("id",$department)->first();
 
-        return view("backend.studentAnnual.print.examination_attendance_list",compact("data","academic_year","semester"));
+        return view("backend.studentAnnual.print.examination_attendance_list",compact("data","academic_year","semester","department"));
     }
 }

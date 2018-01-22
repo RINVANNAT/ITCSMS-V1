@@ -7,6 +7,13 @@
 
         .sign-title {
             margin-bottom: 10px;
+            margin-top: 10px;
+        }
+        .title-size {
+            font-size: 16px;
+        }
+        .title {
+            font-family: khmeros;
         }
         th {
             background-color: #a8f1e7eb;
@@ -30,37 +37,54 @@
             <div class="row">
                 <div class="col-md-12">
                     <div class="row">
-                        <div class="col-md-8">
-                            <h5>Institut de Technologie du Cambodge</h5>
-                            <h4>Departement {{$page[0]["class"]}}</h4>
+                        <div class="col-md-12">
+                            <span class="title-size">Institut de Technologie du Cambodge</span>
                         </div>
-                        <div style="position: absolute;top: 0;right: 0; margin-right: 15px;">
-                            <?php $now = \Carbon\Carbon::now() ?>
-                            <h6 class="pull-right">Updated: {{$now->format("d/m/Y")}}</h6>
+                        <div class="col-md-12">
+                            <span class="title-size">Departement : {{$department->name_fr}}</span>
                         </div>
                     </div>
-                    <div class="sign-title">
-                        <h3 class="title" align="center"><strong>សម្រង់វត្តមាននិស្សិតប្រលងបញ្ចប់ឆមាសទី. {{$semester}}</strong></h3>
+                    <div class="sign-title" align="center">
+                        <span class="title"><strong>សម្រង់វត្តមាននិស្សិតប្រលងបញ្ចប់ឆមាសទី {{to_khmer_number($semester)}}</strong></span>
                     </div>
 
                     <div class="sign-content">
                         <div class="row">
-                            <div class="col-md-12">
-                                <h3>Classe: {{$page[0]["class"]}} ({{$academic_year->name_latin}})</h3>
+                            <span style="font-weight: bold; font-size: 16px; margin-left: 15px;">Classe: {{$page[0]["class"]}} (Nb. {{count($page)}})</span>
+                            <span style="margin-right: 15px;font-size: 16px;float: right">Année Scolaire {{$academic_year->name_latin}}</span>
+                        </div>
+                        <div class="row" style="line-height: 30px;">
+                            <div class="col-md-12 col-lg-12">
+                                <span class="underline">
+                                    <span class="no_underline title">មុខវិជ្ជា: </span> (M .............) .....................................................................................................................................
+                                </span>
+                            </div>
+                            <div class="col-md-6 col-lg-6 col-xs-6">
+                                <span class="title">ថ្ងៃទី  ខែ ឆ្នាំ</span> .........................................................
+                            </div>
+                            <div class="col-md-6 col-lg-6 col-xs-6">
+                                <span class="title">បន្ទប់លេខ</span> ...............................................................
                             </div>
                         </div>
-                        <div class="row">
-                            <span style="margin: 5px 15px 5px; font-size: 20px;">Promotion {{$page[0]["promotion"]}}</span>
-                            <span style="margin: 5px 15px 5px; font-size: 20px; float:right;">Group: {{$group}}</span>
+                        <div class="row" style="line-height: 30px;">
+                            <div class="col-md-6 col-lg-6 col-xs-6">
+                                <span class="title">រយះពេល</span> ...............................................................
+                            </div>
+                            <div class="col-md-3 col-lg-3 col-xs-3">
+                                <span class="title">ចាប់ពីម៉ោង</span> ................
+                            </div>
+                            <div class="col-md-3 col-lg-3 col-xs-3">
+                                <span class="title">ដល់ម៉ោង</span> ................
+                            </div>
                         </div>
                         <table class="table table-bordered">
                             <tr>
                                 <th class="center">No</th>
                                 <th>ID</th>
-                                <th>Non et Prenoms</th>
+                                <th>Prénoms et Noms</th>
                                 <th class="center">Sexe</th>
-                                <th>Provenance</th>
-                                <th>Observation</th>
+                                <th>Signature</th>
+                                <th>Observations</th>
                             </tr>
                             <?php $index = 1; ?>
                             @foreach($page as $student)
@@ -75,6 +99,15 @@
                             <?php $index++; ?>
                             @endforeach
                         </table>
+                        <div class="col-xs-8"></div>
+                        <div class="col-xs-4" align="center">
+                            <div class="row">
+                                Phnom Penh, le .................... 2018
+                            </div>
+                            <div class="row">
+                                Le Directeur Adjoint
+                            </div>
+                        </div>
                     </div>
 
                 </div>
