@@ -679,7 +679,7 @@
 
             // Compare
             return (x >= offset.left
-            && y >= offset.top
+            // && y >= offset.top
             && x <= offset.right
             && y <= offset.bottom);
 
