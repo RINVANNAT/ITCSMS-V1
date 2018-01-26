@@ -28,6 +28,10 @@ trait PrintExaminationAttendanceListTrait
         $department = $request->get("department_id");
         $degree = $request->get("degree_id");
         $grade = $request->get("grade_id");
+        $by_group = false;
+        if($request->get("by_group") != null) {
+            $by_group = true;
+        }
 
         $number_student_per_class = $request->get("number_student_per_class");
         $order_by = $request->get("order_by");
@@ -81,29 +85,33 @@ trait PrintExaminationAttendanceListTrait
         $total_student = count($studentAnnuals);
 
         // Already validate from frontend: remainder must less than total class
-        $total_class = (int) ($total_student/$number_student_per_class);
-        $remainder = $total_student%$number_student_per_class;
-        $data = [];
-        $index = 0;
-        for($i=0;$i<$remainder;$i++) {
-            $per_class = array();
-            for($j=1;$j<=($number_student_per_class+1);$j++) {
-                $record = $studentAnnuals[$index];
-                $record["index"] = $index+1;
-                $per_class[]= $record;
-                $index++;
+        if($by_group) {
+            $data = collect($studentAnnuals)->groupBy("group");
+        } else {
+            $total_class = (int) ($total_student/$number_student_per_class);
+            $remainder = $total_student%$number_student_per_class;
+            $data = [];
+            $index = 0;
+            for($i=0;$i<$remainder;$i++) {
+                $per_class = array();
+                for($j=1;$j<=($number_student_per_class+1);$j++) {
+                    $record = $studentAnnuals[$index];
+                    $record["index"] = $index+1;
+                    $per_class[]= $record;
+                    $index++;
+                }
+                $data[] = $per_class;
             }
-            $data[] = $per_class;
-        }
-        for($i=0;$i<($total_class-$remainder);$i++) {
-            $per_class = array();
-            for($j=1;$j<=$number_student_per_class;$j++) {
-                $record = $studentAnnuals[$index];
-                $record["index"] = $index+1;
-                $per_class[]= $record;
-                $index++;
+            for($i=0;$i<($total_class-$remainder);$i++) {
+                $per_class = array();
+                for($j=1;$j<=$number_student_per_class;$j++) {
+                    $record = $studentAnnuals[$index];
+                    $record["index"] = $index+1;
+                    $per_class[]= $record;
+                    $index++;
+                }
+                $data[] = $per_class;
             }
-            $data[] = $per_class;
         }
 
         $academic_year = AcademicYear::where("id",$academic_year)->first();
