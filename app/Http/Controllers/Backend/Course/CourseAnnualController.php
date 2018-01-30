@@ -512,10 +512,14 @@ class CourseAnnualController extends Controller
         }
 
         usort($array_groups, function ($a, $b) {
-            if(is_numeric($a->group_code)) {
-                return $a->group_code - $b->group_code;
+            if($a!= null & $b!= null) {
+                if(is_numeric($a->group_code)) {
+                    return $a->group_code - $b->group_code;
+                } else {
+                    return strcmp($a->group_code, $b->group_code);
+                }
             } else {
-                return strcmp($a->group_code, $b->group_code);
+                return "";
             }
         });
 
