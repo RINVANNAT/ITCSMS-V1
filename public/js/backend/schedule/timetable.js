@@ -1,3 +1,26 @@
+// export course session into slots table.
+$(document).on('click', '.btn_export_course_program', function (event) {
+    event.preventDefault();
+    toggleLoading(true);
+    axios.post('/admin/schedule/timetables/export_course_program', {
+        academic_year_id: $('select[name=academicYear]').val(),
+        department_id: $('select[name=department]').val(),
+        degree_id: $('select[name=degree]').val(),
+        option_id: $('select[name=option]').val(),
+        grade_id: $('select[name=grade]').val(),
+        semester_id: $('select[name=semester]').val(),
+    }).then( function (response) {
+        if( response.data.status ) {
+            get_course_sessions();
+            notify('info', 'Slots was exported', 'Export Courses');
+        }
+        toggleLoading(false);
+    }).catch(function (error) {
+        console.info(error);
+        notify('error', 'Slots was not exported', 'Export Courses');
+    });
+});
+
 /** Get rooms. **/
 function get_groups() {
     toggleLoading(true);

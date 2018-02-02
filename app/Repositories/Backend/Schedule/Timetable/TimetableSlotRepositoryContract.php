@@ -95,14 +95,6 @@ interface TimetableSlotRepositoryContract
     public function is_merged(TimetableSlot $timetableSlot);
 
     /**
-     * Export course sessions.
-     *
-     * @param $data
-     * @return mixed
-     */
-    public function export_course_sessions($data);
-
-    /**
      * Export from course_session to slots.
      *
      * @param CourseSession $courseSession

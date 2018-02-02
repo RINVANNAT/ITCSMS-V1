@@ -9,6 +9,7 @@ use App\Http\Requests\Backend\Schedule\Timetable\RemoveRoomFromTimetableSlot;
 use App\Http\Requests\Backend\Schedule\Timetable\RemoveTimetableSlotRequest;
 use App\Http\Requests\Backend\Schedule\Timetable\ResizeTimetableSlotRequest;
 use App\Models\Configuration;
+use App\Models\Course;
 use App\Models\Department;
 use App\Models\DepartmentOption;
 use App\Models\Grade;
@@ -732,13 +733,42 @@ trait AjaxCRUDTimetableController
      *
      * @return mixed
      */
-    public function export_course_session()
+    public function export_course_program()
     {
         $data = request()->all();
-        if ($this->timetableSlotRepo->export_course_sessions($data) == true) {
-            return Response::json(['status' => true]);
+        $course_programs = Course::where([
+            ['department_id', $data['department_id']],
+            ['degree_id', $data['degree_id']],
+            ['department_option_id', $data['option_id']],
+            ['grade_id', $data['grade_id']],
+            ['semester_id', $data['semester_id']]
+        ])->get();
+
+        if(count($course_programs)>0){
+            foreach ($course_programs as $course_program) {
+                $has_course_types = [];
+                (!is_null($course_program->time_course)) ? $has_course_types['time_course'] = 'time_course' : null;
+                (!is_null($course_program->time_td)) ? $has_course_types['time_td'] = 'time_td' : null;
+                (!is_null($course_program->time_tp)) ? $has_course_types['time_tp'] = 'time_tp' : null;
+                DB::transaction(function () use ($has_course_types, $course_program){
+                    for ($i=0; $i<count($has_course_types); $i++){
+                        $newSlot = new Slot();
+                        $newSlot->time_tp = $course_program->time_tp;
+                        $newSlot->time_td = $course_program->time_td;
+                        $newSlot->time_course = $course_program->time_course;
+                        $newSlot->lecturer_id = null; /** @TODO lecturer_id nullable  */
+                        $newSlot->responsible_department_id = $course_program->responsible_department_id;
+                        $newSlot->group_id = null; /** @TODO lecturer_id nullable  */
+                        $newSlot->time_used = $has_course_types[$i];
+                        $newSlot->time_remaining = $has_course_types[$i];
+                        $newSlot->created_uid = auth()->user()->id;
+                        $newSlot->write_uid = auth()->user()->id;
+                        $newSlot->save();
+                    }
+                });
+            }
         }
-        return Response::json(['status' => false]);
+        return array('status' => true, 'message' => 'Operation is successfully.');
     }
 
     /**

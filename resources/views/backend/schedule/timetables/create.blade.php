@@ -122,6 +122,7 @@
 @stop
 
 @section('after-scripts-end')
+    {!! Html::script('js/backend/schedule/axios.min.js') !!}
     {!! Html::script('plugins/iCheck/icheck.js') !!}
     {!! Html::script('plugins/datatables/jquery.dataTables.min.js') !!}
     {!! Html::script('plugins/datatables/dataTables.bootstrap.min.js') !!}
@@ -773,13 +774,13 @@
             // filter options
             @if(isset($academic_year_id))
                 $("select[name='academicYear'] option[value={{ $academic_year_id }}]").attr('selected', true);
-            $("select[name='department'] option[value={{ $department_id }}]").attr('selected', true);
-            $("select[name='degree'] option[value={{ $degree_id }}]").attr('selected', true);
-            $("select[name='option'] option[value={{ $option_id }}]").attr('selected', true);
-            $("select[name='grade'] option[value={{ $grade_id }}]").attr('selected', true);
-            $("select[name='semester'] option[value={{ $semester_id }}]").attr('selected', true);
-            $("select[name='group'] option[value={{ $group_id }}]").attr('selected', true);
-            $("select[name='weekly'] option[value={{ $week_id }}]").attr('selected', true);
+                $("select[name='department'] option[value={{ $department_id }}]").attr('selected', true);
+                $("select[name='degree'] option[value={{ $degree_id }}]").attr('selected', true);
+                $("select[name='option'] option[value={{ $option_id }}]").attr('selected', true);
+                $("select[name='grade'] option[value={{ $grade_id }}]").attr('selected', true);
+                $("select[name='semester'] option[value={{ $semester_id }}]").attr('selected', true);
+                $("select[name='group'] option[value={{ $group_id }}]").attr('selected', true);
+                $("select[name='weekly'] option[value={{ $week_id }}]").attr('selected', true);
             get_course_sessions();
             @else
                 get_options($('select[name="department"] :selected').val());
@@ -944,32 +945,7 @@
                 });
             });
 
-            // export course session into slots table.
-            $(document).on('click', '.btn_export_course_session', function (event) {
-                event.preventDefault();
-                toggleLoading(true);
-                $.ajax({
-                    type: 'POST',
-                    url: '{!! route('export_course_session') !!}',
-                    data: {
-                        _token: '{{ csrf_token() }}',
-                        academic_year_id: $('select[name=academicYear]').val(),
-                        department_id: $('select[name=department]').val(),
-                    },
-                    success: function (response) {
-                        if (response.status === true) {
-                            get_course_sessions();
-                            notify('info', 'Slots was exported', 'Export Slots');
-                        }
-                        else {
-                            notify('warning', 'Slots was not exported', 'Export Slots');
-                        }
-                    },
-                    complete: function () {
-                        toggleLoading(false);
-                    }
-                });
-            });
+
 
             // publish timetable
             $(document).on('click', '#btn_publish', function (e) {

@@ -303,3 +303,15 @@ if (! function_exists('to_khmer_month')) {
         }
     }
 }
+if (! function_exists('ddc')) {
+    /**
+     * Debugs code.
+     *
+     * @param $data
+     */
+    function ddc($data)
+    {
+        echo json_encode($data);
+        die();
+    }
+}

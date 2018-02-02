@@ -14,7 +14,7 @@
                                class="form-control input-sm"
                                id="search_course_session"
                                placeholder="SEARCH COURSE SESSION">
-                        <button class="btn btn-primary btn-sm btn_export_course_session"
+                        <button class="btn btn-primary btn-sm btn_export_course_program"
                                 data-container="body"
                                 data-toggle="popover"
                                 data-placement="bottom"

@@ -165,50 +165,6 @@ class EloquentTimetableSlotRepository implements TimetableSlotRepositoryContract
     }
 
     /**
-     * Export course sessions.
-     *
-     * @param $data
-     * @return bool
-     */
-    public function export_course_sessions($data)
-    {
-        $flag = true;
-
-        $course_annuals = CourseAnnual::where([
-            ['academic_year_id', $data['academic_year_id']],
-            ['department_id', $data['department_id']],
-        ])->get();
-
-        $course_sessions = new Collection();
-
-        foreach ($course_annuals as $course_annual) {
-            foreach ($course_annual->courseSessions as $courseSession) {
-                $course_sessions->push($courseSession);
-            }
-        }
-
-        // $course_sessions = CourseSession::all();
-        foreach ($course_sessions as $course_session) {
-            if (count(Slot::where('course_session_id', $course_session->id)->get()) > 0) {
-                continue;
-            } else {
-                $course_annual_classes = CourseAnnualClass::where('course_session_id', $course_session->id)->get();
-                foreach ($course_annual_classes as $course_annual_class) {
-                    if ($this->export_slot($course_session, $course_annual_class)) {
-                        $flag = true;
-                    } else {
-                        $flag = false;
-                    }
-                }
-                if ($flag == false) {
-                    break;
-                }
-            }
-        }
-        return $flag;
-    }
-
-    /**
      * Export from course_session to slots.
      *
      * @param CourseSession $course_session
