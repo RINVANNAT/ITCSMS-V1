@@ -351,8 +351,8 @@ class EloquentTimetableSlotRepository implements TimetableSlotRepositoryContract
                             ($timetableSlot->group_merge_id != $itemTimetableSlot->group_merge_id)
                         ) {
 
-                            $currentCourse = Course::find(CourseAnnual::find($timetableSlot->slot->course_annual_id)->course_id);
-                            $otherCourse = Course::find(CourseAnnual::find($itemTimetableSlot->slot->course_annual_id)->course_id);
+                            $currentCourse = Course::find($timetableSlot->slot->course_program_id);
+                            $otherCourse = Course::find($itemTimetableSlot->slot->course_program_id);
 
                             if ((strtotime($timetableSlot->start) == strtotime($itemTimetableSlot->start)) && (strtotime($timetableSlot->end) == strtotime($itemTimetableSlot->end)) && ($timetableSlot->type == $itemTimetableSlot->type) && ($otherCourse->id == $currentCourse->id)) {
                                 array_push($canMerge, $itemTimetableSlot);
