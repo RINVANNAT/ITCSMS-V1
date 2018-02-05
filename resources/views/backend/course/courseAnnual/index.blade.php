@@ -105,7 +105,7 @@
                             <button class="btn btn-primary btn-sm" id="course_assignment"><i class="fa fa-map-signs"></i> {{trans('buttons.course.course_annual.course_assignment')}}</button>
                             @endauth
                             @permission('generate-course-annual')
-                            <button class="btn btn-info btn-sm" id="generate_course_annual"><i class="fa fa-puzzle-piece"></i> Generate Courses</button>
+                            {{--<button class="btn btn-info btn-sm" id="generate_course_annual"><i class="fa fa-puzzle-piece"></i> Generate Courses</button>--}}
                             @endauth
 
                             @permission('view-all-score-course-annual')
