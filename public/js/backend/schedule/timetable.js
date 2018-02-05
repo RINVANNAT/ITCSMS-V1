@@ -32,7 +32,7 @@ function get_groups() {
             if (response.status === true) {
                 var group_item = '';
                 $.each(response.groups, function (key, val) {
-                    group_item += '<option value="' + val.id + '">' + val.name + '</option>';
+                    group_item += '<option value="' + val.id + '">' + val.code + '</option>';
                 });
 
                 $('select[name="group"]').html(group_item);

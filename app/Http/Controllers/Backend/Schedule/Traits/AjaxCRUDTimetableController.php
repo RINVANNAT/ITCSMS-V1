@@ -13,6 +13,7 @@ use App\Models\Course;
 use App\Models\Department;
 use App\Models\DepartmentOption;
 use App\Models\Grade;
+use App\Models\Group;
 use App\Models\Schedule\Timetable\Slot;
 use App\Models\Schedule\Timetable\Timetable;
 use App\Models\Schedule\Timetable\TimetableSlot;
@@ -226,39 +227,24 @@ trait AjaxCRUDTimetableController
      */
     public function get_groups()
     {
-        $academic_year_id = request('academicYear');
-        $department_id = request('department');
-        $degree_id = request('degree');
-        $grade_id = request('grade');
-        $option_id = request('option') == null ? null : request('option');
-
-        // get group by search on slot tables.
-        $groups = DB::table('course_annuals')
-            ->where([
-                ['academic_year_id', $academic_year_id],
-                ['department_id', $department_id],
-                ['degree_id', $degree_id],
-                ['grade_id', $grade_id],
-                ['department_option_id', $option_id]
-            ])
-            ->join('slots', 'slots.course_annual_id', '=', 'course_annuals.id')
-            ->join('groups', 'groups.id', '=', 'slots.group_id')
-            ->distinct('groups.code')
-            ->select('groups.code as name', 'groups.id as id')
-            ->get();
-
+        $code = 200;
+        $groups = Group::all()->toArray();
         usort($groups, function ($a, $b) {
-            if (is_numeric($a->name)) {
-                return $a->name - $b->name;
-            } else {
-                return strcmp($a->name, $b->name);
+            try {
+                if (is_numeric($a->code)) {
+                    return $a->code - $b->code;
+                } else {
+                    return strcmp($a->code, $b->code);
+                }
+            }catch (\Exception $e){
+                $code = $e->getCode();
+                return array('code' => $code, 'status' => false, 'groups' => null);
             }
         });
 
         if (count($groups) > 0) {
-            return Response::json(['status' => true, 'groups' => $groups]);
+            return array('code' => $code, 'status' => true, 'groups' => $groups);
         }
-        return Response::json(['status' => false]);
     }
 
     /**
@@ -750,22 +736,24 @@ trait AjaxCRUDTimetableController
                 (!is_null($course_program->time_course)) ? $has_course_types['time_course'] = 'time_course' : null;
                 (!is_null($course_program->time_td)) ? $has_course_types['time_td'] = 'time_td' : null;
                 (!is_null($course_program->time_tp)) ? $has_course_types['time_tp'] = 'time_tp' : null;
-                DB::transaction(function () use ($has_course_types, $course_program){
-                    for ($i=0; $i<count($has_course_types); $i++){
-                        $newSlot = new Slot();
-                        $newSlot->time_tp = $course_program->time_tp;
-                        $newSlot->time_td = $course_program->time_td;
-                        $newSlot->time_course = $course_program->time_course;
-                        $newSlot->lecturer_id = null; /** @TODO lecturer_id nullable  */
-                        $newSlot->responsible_department_id = $course_program->responsible_department_id;
-                        $newSlot->group_id = null; /** @TODO lecturer_id nullable  */
-                        $newSlot->time_used = $has_course_types[$i];
-                        $newSlot->time_remaining = $has_course_types[$i];
-                        $newSlot->created_uid = auth()->user()->id;
-                        $newSlot->write_uid = auth()->user()->id;
-                        $newSlot->save();
-                    }
-                });
+                for ($i=0; $i<3; $i++){
+                    DB::transaction(function () use ($has_course_types, $course_program){
+                        for ($i=0; $i<count($has_course_types); $i++){
+                            $newSlot = new Slot();
+                            $newSlot->time_tp = $course_program->time_tp;
+                            $newSlot->time_td = $course_program->time_td;
+                            $newSlot->time_course = $course_program->time_course;
+                            $newSlot->lecturer_id = null; /** @TODO lecturer_id nullable  */
+                            $newSlot->responsible_department_id = $course_program->responsible_department_id;
+                            $newSlot->group_id = null; /** @TODO group_id nullable  */
+                            $newSlot->time_used = $has_course_types[$i];
+                            $newSlot->time_remaining = $has_course_types[$i];
+                            $newSlot->created_uid = auth()->user()->id;
+                            $newSlot->write_uid = auth()->user()->id;
+                            $newSlot->save();
+                        }
+                    });
+                }
             }
         }
         return array('status' => true, 'message' => 'Operation is successfully.');

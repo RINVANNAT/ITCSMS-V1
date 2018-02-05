@@ -21,7 +21,6 @@ class CreateSlotsTable extends Migration
             $table->integer('course_annual_id')->unsigned();
             $table->integer('course_session_id')->unsigned();
             $table->integer('lecturer_id')->unsigned()->nullable();
-            $table->integer('responsible_department_id')->unsigned()->nullable();
             $table->integer('group_id')->unsigned()->nullable();
             $table->double('time_used')->nullable();
             $table->double('time_remaining')->nullable();
