@@ -119,7 +119,7 @@
                     if (response.status === true) {
                         var group_item = '';
                         $.each(response.groups, function (key, val) {
-                            group_item += '<option value="' + val.id + '">' + val.name + '</option>';
+                            group_item += '<option value="' + val.id + '">' + val.code + '</option>';
                         });
 
                         $('select[name="group"]').html(group_item);
@@ -147,7 +147,7 @@
             toggleLoading(true);
             $.ajax({
                 type: 'POST',
-                url: '/admin/schedule/timetables/get_course_sessions',
+                url: '/admin/schedule/timetables/get_course_programs',
                 data: $('#options-filter').serialize(),
                 success: function (response) {
                     if (response.status === true) {
@@ -268,6 +268,7 @@
             $('.smis-close-icon').click(function () {
                 $('.smis-notification').addClass('animated slideOutRight');
             });
+
             get_options($('select[name="department"] :selected').val());
 
             $(document).on('change', 'select[name="semester"]', function () {

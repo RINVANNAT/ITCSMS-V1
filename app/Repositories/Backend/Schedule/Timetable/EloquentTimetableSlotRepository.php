@@ -782,13 +782,13 @@ class EloquentTimetableSlotRepository implements TimetableSlotRepositoryContract
                 $timetableSlot->put('conflict_lecturer', $dataLecturer);
                 $timetableSlot->put('building', $timetable_slot->building);
                 // sort group before push
-                usort($groups, function ($a, $b) {
+                /*usort($groups, function ($a, $b) {
                     if (is_numeric($a->code)) {
                         return $a->code - $b->code;
                     } else {
                         return strcmp($a->code, $b->code);
                     }
-                });
+                });*/
                 // push groups array into item timetable slot
                 $timetableSlot->put('groups', $groups);
                 $timetableSlot->put('room', $timetable_slot->room);

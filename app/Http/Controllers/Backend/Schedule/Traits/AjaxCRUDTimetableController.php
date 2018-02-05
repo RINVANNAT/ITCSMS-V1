@@ -634,24 +634,24 @@ trait AjaxCRUDTimetableController
 
         // sort result can not merge item
         if (count($resultArrayCanNotMergeItem) > 1) {
-            usort($resultArrayCanNotMergeItem, function ($a, $b) {
+            /*usort($resultArrayCanNotMergeItem, function ($a, $b) {
                 if (is_numeric($a->group)) {
                     return $a->group - $b->group;
                 } else {
                     return strcmp($a->group, $b->group);
                 }
-            });
+            });*/
         }
 
         // sort result can merge item
         if (count($resultArrayCanMergeItem) > 1) {
-            usort($resultArrayCanMergeItem, function ($a, $b) {
+            /*usort($resultArrayCanMergeItem, function ($a, $b) {
                 if (is_numeric($a->group)) {
                     return $a->group - $b->group;
                 } else {
                     return strcmp($a->group, $b->group);
                 }
-            });
+            });*/
         }
 
         // put can or can't merge to lecturer collection.
