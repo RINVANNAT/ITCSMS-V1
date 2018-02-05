@@ -8,6 +8,7 @@ $(document).on('click', '.btn_export_course_program', function (event) {
         degree_id: $('select[name=degree]').val(),
         option_id: $('select[name=option]').val(),
         grade_id: $('select[name=grade]').val(),
+        group_id: $('select[name=group]').val(),
         semester_id: $('select[name=semester]').val(),
     }).then( function (response) {
         if( response.data.status ) {

@@ -722,6 +722,7 @@ trait AjaxCRUDTimetableController
     public function export_course_program()
     {
         $data = request()->all();
+        $group_id = is_null($data['group_id']) ? null : $data['group_id'];
         $course_programs = Course::where([
             ['department_id', $data['department_id']],
             ['degree_id', $data['degree_id']],
@@ -732,27 +733,67 @@ trait AjaxCRUDTimetableController
 
         if(count($course_programs)>0){
             foreach ($course_programs as $course_program) {
-                $has_course_types = [];
-                (!is_null($course_program->time_course)) ? $has_course_types['time_course'] = 'time_course' : null;
-                (!is_null($course_program->time_td)) ? $has_course_types['time_td'] = 'time_td' : null;
-                (!is_null($course_program->time_tp)) ? $has_course_types['time_tp'] = 'time_tp' : null;
-                for ($i=0; $i<3; $i++){
-                    DB::transaction(function () use ($has_course_types, $course_program){
-                        for ($i=0; $i<count($has_course_types); $i++){
-                            $newSlot = new Slot();
-                            $newSlot->time_tp = $course_program->time_tp;
-                            $newSlot->time_td = $course_program->time_td;
-                            $newSlot->time_course = $course_program->time_course;
-                            $newSlot->lecturer_id = null; /** @TODO lecturer_id nullable  */
-                            $newSlot->responsible_department_id = $course_program->responsible_department_id;
-                            $newSlot->group_id = null; /** @TODO group_id nullable  */
-                            $newSlot->time_used = $has_course_types[$i];
-                            $newSlot->time_remaining = $has_course_types[$i];
-                            $newSlot->created_uid = auth()->user()->id;
-                            $newSlot->write_uid = auth()->user()->id;
-                            $newSlot->save();
+                $slots = Slot::where('course_program_id', $course_program->id)->get();
+                if(count($slots)==0){
+                    for ($i=0; $i<3; $i++){
+                        if($i == 0) {
+                            if($course_program->time_tp>0) {
+                                DB::transaction(function () use ($data, $course_program, $group_id){
+                                    $newSlot = new Slot();
+                                    $newSlot->time_tp = $course_program->time_tp;
+                                    $newSlot->time_td = $course_program->time_td;
+                                    $newSlot->time_course = $course_program->time_course;
+                                    $newSlot->lecturer_id = null;
+                                    $newSlot->course_program_id = $course_program->id;
+                                    $newSlot->semester_id = $data['semester_id'];
+                                    $newSlot->time_used = 0;
+                                    $newSlot->group_id = $group_id;
+                                    $newSlot->time_remaining = $course_program->time_tp;
+                                    $newSlot->created_uid = auth()->user()->id;
+                                    $newSlot->write_uid = auth()->user()->id;
+                                    $newSlot->save();
+                                });
+                            }
                         }
-                    });
+                        else if($i == 1) {
+                            if($course_program->time_td>0) {
+                                DB::transaction(function () use ($data, $course_program, $group_id){
+                                    $newSlot = new Slot();
+                                    $newSlot->time_tp = $course_program->time_tp;
+                                    $newSlot->time_td = $course_program->time_td;
+                                    $newSlot->time_course = $course_program->time_course;
+                                    $newSlot->lecturer_id = null;
+                                    $newSlot->course_program_id = $course_program->id;
+                                    $newSlot->semester_id = $data['semester_id'];
+                                    $newSlot->group_id = $group_id;
+                                    $newSlot->time_used = 0;
+                                    $newSlot->time_remaining = $course_program->time_td;
+                                    $newSlot->created_uid = auth()->user()->id;
+                                    $newSlot->write_uid = auth()->user()->id;
+                                    $newSlot->save();
+                                });
+                            }
+                        }
+                        else if($i == 2 ){
+                            if($course_program->time_course>0) {
+                                DB::transaction(function () use ($data, $course_program, $group_id){
+                                    $newSlot = new Slot();
+                                    $newSlot->time_tp = $course_program->time_tp;
+                                    $newSlot->time_td = $course_program->time_td;
+                                    $newSlot->time_course = $course_program->time_course;
+                                    $newSlot->lecturer_id = null;
+                                    $newSlot->course_program_id = $course_program->id;
+                                    $newSlot->semester_id = $data['semester_id'];
+                                    $newSlot->group_id = $group_id;
+                                    $newSlot->time_used = 0;
+                                    $newSlot->time_remaining = $course_program->time_course;
+                                    $newSlot->created_uid = auth()->user()->id;
+                                    $newSlot->write_uid = auth()->user()->id;
+                                    $newSlot->save();
+                                });
+                            }
+                        }
+                    }
                 }
             }
         }
