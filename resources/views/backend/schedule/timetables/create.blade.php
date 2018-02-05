@@ -979,12 +979,12 @@
 
             });
 
-            $(document).on('keyup', '#search_course_session', function (event) {
+            $(document).on('keyup', '#search_course_program', function (event) {
                 event.preventDefault();
                 var query = $(this).val();
                 $.ajax({
                     type: 'POST',
-                    url: '{{ route('search_course_session') }}',
+                    url: '{{ route('search_course_program') }}',
                     data: {
                         _token: '{{ csrf_token() }}',
                         academic: $('select[name=academicYear]').val(),

@@ -12,7 +12,7 @@
                     <form class="form-inline">
                         <input type="text"
                                class="form-control input-sm"
-                               id="search_course_session"
+                               id="search_course_program"
                                placeholder="SEARCH COURSE SESSION">
                         <button class="btn btn-primary btn-sm btn_export_course_program"
                                 data-container="body"

@@ -971,7 +971,7 @@ trait AjaxCRUDTimetableController
         return Response::json(['status' => true, 'start' => (new Carbon($configuration->created_at))->toDateString(), 'end' => (new Carbon($configuration->updated_at))->toDateString()]);
     }
 
-    public function search_course_session()
+    public function search_course_program()
     {
         $academic_year_id = request('academic');
         $department_id = request('department');
@@ -981,46 +981,32 @@ trait AjaxCRUDTimetableController
         $option_id = (request('option') == null ? null : (request('option') == '' ? null : request('option')));
         $group_id = request('group') == null ? null : request('group');
 
-        // dd(request()->all());
+        $course_program_ids = Course::where([
+            ['department_id', $department_id],
+            ['degree_id', $degree_id],
+            ['grade_id', $grade_id],
+            ['department_option_id', $option_id],
+            ['semester_id', $semester_id],
+        ])->pluck('id');
 
-        $course_sessions = DB::table('course_annuals')
-            ->where([
-                ['course_annuals.academic_year_id', $academic_year_id],
-                ['course_annuals.department_id', $department_id],
-                ['course_annuals.degree_id', $degree_id],
-                ['course_annuals.grade_id', $grade_id],
-                ['course_annuals.semester_id', $semester_id],
-                ['course_annuals.department_option_id', $option_id],
-            ])
-            ->join('slots', 'slots.course_annual_id', '=', 'course_annuals.id')
-            ->leftJoin('employees', 'employees.id', '=', 'slots.lecturer_id')
-            ->where('slots.group_id', '=', $group_id)
+        $slots = Slot::join('courses', 'courses.id', '=', 'slots.course_program_id')
+            ->whereIn('course_program_id', $course_program_ids)
+            ->where('group_id', $group_id)
+            ->where('slots.academic_year_id', $academic_year_id)
             ->where('slots.time_remaining', '>', 0)
             ->where(function ($query) {
-                $query->whereRaw('LOWER(course_annuals.name_en) LIKE ?', array('%' . strtolower(request('query')) . '%'))
-                    ->orWhereRaw('LOWER(employees.name_latin) LIKE ?', array('%' . strtolower(request('query')) . '%'));
+                $query->whereRaw('LOWER(courses.name_en) LIKE ?', array('%' . strtolower(request('query')) . '%'))
+                    ->orWhereRaw('LOWER(courses.name_kh) LIKE ?', array('%' . strtolower(request('query')) . '%'));
             })
             ->select(
                 'slots.id as id',
-                'slots.course_session_id as course_session_id',
+                'slots.course_program_id as course_session_id',
                 'slots.time_tp as tp',
                 'slots.time_td as td',
                 'slots.time_course as tc',
                 'slots.time_remaining as remaining',
-                'course_annuals.name_en as course_name',
-                'employees.name_latin as teacher_name'
+                'courses.name_en as course_name'
             )->get();
-
-        // dd($course_sessions);
-        if (count($course_sessions) > 0) {
-            return Response::json([
-                'status' => true,
-                'course_sessions' => $course_sessions
-            ]);
-        } else {
-            return Response::json([
-                'status' => false
-            ]);
-        }
+        return array('status' => true, 'course_sessions' => $slots, 'code' => 200);
     }
 }
