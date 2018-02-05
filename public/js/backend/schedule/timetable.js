@@ -12,7 +12,7 @@ $(document).on('click', '.btn_export_course_program', function (event) {
         semester_id: $('select[name=semester]').val(),
     }).then( function (response) {
         if( response.data.status ) {
-            get_course_sessions();
+            get_course_programs();
             notify('info', 'Slots was exported', 'Export Courses');
         }
         toggleLoading(false);
@@ -79,7 +79,7 @@ function get_weeks(semester_id) {
             );
         },
         complete: function () {
-            get_course_sessions();
+            get_course_programs();
             get_timetable();
             get_timetable_slots();
             toggleLoading(false);
@@ -144,16 +144,16 @@ function get_grades(department_id) {
     })
 }
 /** Get course sessions. **/
-function get_course_sessions() {
+function get_course_programs() {
     toggleLoading(true);
     $.ajax({
         type: 'POST',
-        url: '/admin/schedule/timetables/get_course_sessions',
+        url: '/admin/schedule/timetables/get_course_programs',
         data: $('#options-filter').serialize(),
         success: function (response) {
             if (response.status === true) {
                 var course_session_item = '';
-                $.each(response.course_sessions, function (key, val) {
+                $.each(response.data, function (key, val) {
                     if (val.teacher_name === null) {
                         course_session_item += '<li class="course-item disabled">';
                     }

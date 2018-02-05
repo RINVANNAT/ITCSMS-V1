@@ -171,7 +171,7 @@ trait AjaxCRUDTimetableController
      *
      * @return mixed
      */
-    public function get_course_sessions()
+    public function get_course_programs()
     {
         $academic_year_id = request('academicYear');
         $department_id = request('department');
@@ -192,6 +192,7 @@ trait AjaxCRUDTimetableController
         $slots = Slot::join('courses', 'courses.id', '=', 'slots.course_program_id')
             ->whereIn('course_program_id', $course_program_ids)
             ->where('group_id', $group_id)
+            ->where('slots.academic_year_id', $academic_year_id)
             ->select(
                 'slots.id as id',
                 'slots.course_program_id as course_session_id',
@@ -201,17 +202,7 @@ trait AjaxCRUDTimetableController
                 'slots.time_remaining as remaining',
                 'courses.name_en as course_name'
             )->get();
-
-        if (count($slots) > 0) {
-            return Response::json([
-                'status' => true,
-                'course_sessions' => $slots
-            ]);
-        } else {
-            return Response::json([
-                'status' => false
-            ]);
-        }
+        return array('status' => true, 'data' => $slots, 'code' => 200);
     }
 
     /**
@@ -729,6 +720,8 @@ trait AjaxCRUDTimetableController
             foreach ($course_programs as $course_program) {
                 $slots = Slot::where([
                     ['course_program_id', $course_program->id],
+                    ['academic_year_id', $data['academic_year_id']],
+                    ['semester_id', $data['semester_id']],
                     ['group_id', $group_id],
                 ])->get();
                 if(count($slots)==0){

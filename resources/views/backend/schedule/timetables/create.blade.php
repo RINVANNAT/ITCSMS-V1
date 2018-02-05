@@ -383,7 +383,7 @@
                 },
                 complete: function () {
                     toggleLoading(false);
-                    get_course_sessions();
+                    get_course_programs();
                     $('.panel-conflict').hide();
                 }
             });
@@ -422,7 +422,7 @@
                 },
                 complete: function () {
                     get_timetable_slots();
-                    get_course_sessions();
+                    get_course_programs();
                     toggleLoading(false);
                 }
             })
@@ -452,11 +452,11 @@
                         notify('error', response.message, "Resize timetable Slot");
                     }
                     get_timetable_slots();
-                    get_course_sessions();
+                    get_course_programs();
                 },
                 complete: function () {
                     get_timetable_slots();
-                    get_course_sessions();
+                    get_course_programs();
                     $('#timetable').fullCalendar({
                         eventDurationEditable: true
                     });
@@ -485,7 +485,7 @@
 
                 },
                 complete: function () {
-                    get_course_sessions();
+                    get_course_programs();
                     get_timetable_slots();
                     toggleLoading(false);
                 }
@@ -540,7 +540,7 @@
                     copiedEventObject.allDay = true;
 
                     create_timetable_slots(copiedEventObject);
-                    get_course_sessions();
+                    get_course_programs();
                 },
                 eventDragStart: function (event, jsEvent, ui, view) {
                     get_rooms();
@@ -551,7 +551,7 @@
                     hide_conflict_information();
                     get_timetable();
                     set_background_color_slot_not_allow();
-                    get_course_sessions();
+                    get_course_programs();
                 },
                 eventRender: function (event, element, view) {
                     set_background_color_slot_not_allow();
@@ -781,7 +781,7 @@
                 $("select[name='semester'] option[value={{ $semester_id }}]").attr('selected', true);
                 $("select[name='group'] option[value={{ $group_id }}]").attr('selected', true);
                 $("select[name='weekly'] option[value={{ $week_id }}]").attr('selected', true);
-            get_course_sessions();
+            get_course_programs();
             @else
                 get_options($('select[name="department"] :selected').val());
             @endif
@@ -899,7 +899,7 @@
             });
             // get timetable slots by on change weekly option.
             $(document).on('change', 'select[name="weekly"]', function () {
-                get_course_sessions();
+                get_course_programs();
                 get_timetable();
                 get_timetable_slots();
             });
