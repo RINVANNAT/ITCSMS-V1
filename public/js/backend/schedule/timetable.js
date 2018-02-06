@@ -270,7 +270,7 @@ function get_employees(query=null) {
                         aria-selected="false">
                         <div class="select2-result-repository clearfix">
                             <div class="select2-result-repository__avatar">
-                                <img src="https://smis.itc.app/img/profiles/avatar.png">
+                                <img src="/img/profiles/avatar.png">
                             </div>
                             <div class="select2-result-repository__meta">
                                 <div class="select2-result-repository__title">`+(employee.id_card == null ? 'No ID Card' : employee.id_card)+` | `+employee.employee_name_kh+`</div>
