@@ -346,7 +346,7 @@ class EloquentTimetableSlotRepository implements TimetableSlotRepositoryContract
                             &&
                             ($timetableSlot->id != $itemTimetableSlot->id)
                             &&
-                            ($timetableSlot->teacher_name == $itemTimetableSlot->teacher_name)
+                            (($timetableSlot->teacher_name == $itemTimetableSlot->teacher_name) && ($timetableSlot->teacher_name != 'undefined'))
                             &&
                             ($timetableSlot->group_merge_id != $itemTimetableSlot->group_merge_id)
                         ) {
