@@ -17,7 +17,7 @@
 }
 
 #timetable {
-    border: 1px solid #f1f1f1;
+    border: 1px solid #dddddd;
     padding: 10px;
 }
 
@@ -114,6 +114,11 @@
     background-color: #f1f1f1;
     height: 280px;
     overflow-y: auto;
+}
+
+
+.box-header.with-border {
+    border-bottom: 1px solid #ddd !important;
 }
 
 .rooms, .box-conflict {
