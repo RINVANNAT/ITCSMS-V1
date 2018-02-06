@@ -366,7 +366,7 @@
                             <div class="col-lg-7">
                                 <select name="midterm_score" id="midterm_score_id" class="form-control">
                                     <option value="{{\App\Models\Enum\ScoreEnum::Midterm_0}}">  0% </option>
-                                    <option value="{{\App\Models\Enum\ScoreEnum::Midterm_30}}"> 30% </option>
+                                    <option value="{{\App\Models\Enum\ScoreEnum::Midterm_30}}" selected> 30% </option>
                                     <option value="{{\App\Models\Enum\ScoreEnum::Midterm_40}}"> 40%</option>
                                 </select>
                             </div>

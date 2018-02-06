@@ -333,6 +333,7 @@ class CourseAnnualController extends Controller
                 ->orderBy('courses.degree_id', 'asc')
                 ->orderBy('courses.grade_id', 'asc')
                 ->orderBy('courses.semester_id', 'asc')
+                ->where('courses.active',true)
                 ->get();
         } else {
             $employee = Employee::where('user_id', Auth::user()->id)->first();
@@ -365,6 +366,7 @@ class CourseAnnualController extends Controller
                 ->orderBy('courses.degree_id', 'asc')
                 ->orderBy('courses.grade_id', 'asc')
                 ->orderBy('courses.semester_id', 'asc')
+                ->where('courses.active',true)
                 ->get();
         }
         $courses = [];
