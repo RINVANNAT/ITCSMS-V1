@@ -6,6 +6,7 @@ use App\Models\Group;
 use App\Models\Schedule\Timetable\Timetable;
 use App\Models\Schedule\Timetable\Week;
 use App\Repositories\Backend\Schedule\Timetable\EloquentTimetableSlotRepository;
+use Barryvdh\Snappy\Facades\SnappyPdf as PDF;
 use Illuminate\Support\Collection;
 
 /**
@@ -88,6 +89,7 @@ trait PrintTimetableController
             }
         });
 
+
         return view('backend.schedule.timetables.popup-print', compact('weeks', 'groups', 'timetable'));
     }
 
@@ -147,7 +149,7 @@ trait PrintTimetableController
             }
         }
 
-        return view('backend.schedule.timetables.popup-template-print', compact('timetables', 'timetablesSlotsLang'));
+        return PDF::loadView('backend.schedule.timetables.popup-template-print', compact('timetables', 'timetablesSlotsLang'))->setPaper('A4', 'landscape')->stream();
     }
 
     /** Custom Function. */

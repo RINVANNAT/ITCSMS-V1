@@ -14,7 +14,7 @@
 @section('content')
     @if(isset($timetables))
         @foreach($timetables as $timetable)
-            <page size="A4" layout="portrait" class="each-page">
+            <page size="A4" class="each-page">
                 <table class="timetable">
                     <thead>
                     <tr style="border: none !important; margin-bottom: 200px !important;">
