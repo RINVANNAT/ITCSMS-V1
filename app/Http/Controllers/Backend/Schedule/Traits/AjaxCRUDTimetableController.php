@@ -191,6 +191,7 @@ trait AjaxCRUDTimetableController
         ])->pluck('id');
 
         $slots = Slot::join('courses', 'courses.id', '=', 'slots.course_program_id')
+            ->leftJoin('employees', 'employees.id', '=', 'slots.lecturer_id')
             ->whereIn('course_program_id', $course_program_ids)
             ->where('group_id', $group_id)
             ->where('slots.academic_year_id', $academic_year_id)
@@ -201,7 +202,8 @@ trait AjaxCRUDTimetableController
                 'slots.time_td as td',
                 'slots.time_course as tc',
                 'slots.time_remaining as remaining',
-                'courses.name_en as course_name'
+                'courses.name_en as course_name',
+                'employees.name_latin as teacher_name'
             )->get();
         return array('status' => true, 'data' => $slots, 'code' => 200);
     }
