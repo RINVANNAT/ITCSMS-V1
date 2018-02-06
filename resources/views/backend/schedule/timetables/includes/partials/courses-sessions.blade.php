@@ -1,6 +1,6 @@
 <div class="row">
     <div class="col-md-12">
-        <div class="box box-default" style="border-top: 1px solid #f1f1f1;">
+        <div class="box box-default" style="border: 1px solid #dddddd;">
             <div class="box-header with-border">
 
                 <h3 class="box-title" data-toggle="tooltip" data-placement="top" data-title="Course Session">

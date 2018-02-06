@@ -771,6 +771,7 @@
             get_course_programs();
             @else
                 get_options($('select[name="department"] :selected').val());
+                get_groups();
             @endif
 
             get_timetable_slots();
@@ -874,15 +875,17 @@
             });
             // get timetable slot by on change option.
             $(document).on('change', 'select[name="option"]', function () {
-                get_groups();
+                get_weeks($('select[name="semester"] :selected').val());
             });
             // get timetable slot by on change grade option.
             $(document).on('change', 'select[name="grade"]', function () {
-                get_groups();
+                get_weeks($('select[name="semester"] :selected').val());
             });
             // get timetable slot by on change group option.
             $(document).on('change', 'select[name="group"]', function () {
-                get_weeks($('select[name="semester"] :selected').val());
+                get_course_programs();
+                get_timetable();
+                get_timetable_slots();
             });
             // get timetable slots by on change weekly option.
             $(document).on('change', 'select[name="weekly"]', function () {

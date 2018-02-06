@@ -312,4 +312,12 @@ interface TimetableSlotRepositoryContract
      * @return mixed
      */
     public function set_timetable_slot_language(Collection $timetableSlots, Collection $groupsRoom, Collection $languageTimetableSlots);
+
+    /**
+     * Sort groups.
+     *
+     * @param array $groups
+     * @return mixed
+     */
+    public function sort_groups (array $groups);
 }
