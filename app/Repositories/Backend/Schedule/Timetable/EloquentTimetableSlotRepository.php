@@ -782,13 +782,7 @@ class EloquentTimetableSlotRepository implements TimetableSlotRepositoryContract
                 $timetableSlot->put('conflict_lecturer', $dataLecturer);
                 $timetableSlot->put('building', $timetable_slot->building);
                 // sort group before push
-                /*usort($groups, function ($a, $b) {
-                    if (is_numeric($a->code)) {
-                        return $a->code - $b->code;
-                    } else {
-                        return strcmp($a->code, $b->code);
-                    }
-                });*/
+                $groups = $this->sort_groups($groups);
                 // push groups array into item timetable slot
                 $timetableSlot->put('groups', $groups);
                 $timetableSlot->put('room', $timetable_slot->room);
@@ -990,5 +984,29 @@ class EloquentTimetableSlotRepository implements TimetableSlotRepositoryContract
             }
         }
         return array($groupStudentsLanguage, $groups);
+    }
+
+    /**
+     * Sort groups.
+     *
+     * @param array $groups
+     * @return array
+     */
+    public function sort_groups(array $groups)
+    {
+        try {
+            usort($groups, function ($a, $b) {
+                if (is_numeric($a['code']) && !is_numeric($b['code'])) {
+                    return 1;
+                } else if (!is_numeric($a['code']) && is_numeric($b['code'])) {
+                    return -1;
+                } else {
+                    return ($a['code'] < $b['code']) ? -1 : 1;
+                }
+            });
+        }catch (\Exception $e) {
+            return array('status' => false, 'data' => [], 'code' => $e->getCode());
+        }
+        return $groups;
     }
 }

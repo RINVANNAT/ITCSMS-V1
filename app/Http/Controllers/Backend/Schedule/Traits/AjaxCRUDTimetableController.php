@@ -213,20 +213,8 @@ trait AjaxCRUDTimetableController
     public function get_groups()
     {
         $code = 200;
-        $groups = Group::all()->toArray();
-        usort($groups, function ($a, $b) {
-            try {
-                if (is_numeric($a->code)) {
-                    return $a->code - $b->code;
-                } else {
-                    return strcmp($a->code, $b->code);
-                }
-            }catch (\Exception $e){
-                $code = $e->getCode();
-                return array('code' => $code, 'status' => false, 'groups' => null);
-            }
-        });
-
+        $groups = Group::get()->toArray();
+        $groups = $this->timetableSlotRepo->sort_groups($groups);
         if (count($groups) > 0) {
             return array('code' => $code, 'status' => true, 'groups' => $groups);
         }
@@ -716,7 +704,7 @@ trait AjaxCRUDTimetableController
             ['semester_id', $data['semester_id']]
         ])->get();
 
-        if(count($course_programs)>0){
+        if (count($course_programs) > 0) {
             foreach ($course_programs as $course_program) {
                 $slots = Slot::where([
                     ['course_program_id', $course_program->id],
@@ -724,11 +712,11 @@ trait AjaxCRUDTimetableController
                     ['semester_id', $data['semester_id']],
                     ['group_id', $group_id],
                 ])->get();
-                if(count($slots)==0){
-                    for ($i=0; $i<3; $i++){
-                        if($i == 0) {
-                            if($course_program->time_tp>0) {
-                                DB::transaction(function () use ($data, $course_program, $group_id){
+                if (count($slots) == 0) {
+                    for ($i = 0; $i < 3; $i++) {
+                        if ($i == 0) {
+                            if ($course_program->time_tp > 0) {
+                                DB::transaction(function () use ($data, $course_program, $group_id) {
                                     $newSlot = new Slot();
                                     $newSlot->time_tp = $course_program->time_tp;
                                     $newSlot->time_td = $course_program->time_td;
@@ -745,10 +733,9 @@ trait AjaxCRUDTimetableController
                                     $newSlot->save();
                                 });
                             }
-                        }
-                        else if($i == 1) {
-                            if($course_program->time_td>0) {
-                                DB::transaction(function () use ($data, $course_program, $group_id){
+                        } else if ($i == 1) {
+                            if ($course_program->time_td > 0) {
+                                DB::transaction(function () use ($data, $course_program, $group_id) {
                                     $newSlot = new Slot();
                                     $newSlot->time_tp = $course_program->time_tp;
                                     $newSlot->time_td = $course_program->time_td;
@@ -765,10 +752,9 @@ trait AjaxCRUDTimetableController
                                     $newSlot->save();
                                 });
                             }
-                        }
-                        else if($i == 2 ){
-                            if($course_program->time_course>0) {
-                                DB::transaction(function () use ($data, $course_program, $group_id){
+                        } else if ($i == 2) {
+                            if ($course_program->time_course > 0) {
+                                DB::transaction(function () use ($data, $course_program, $group_id) {
                                     $newSlot = new Slot();
                                     $newSlot->time_tp = $course_program->time_tp;
                                     $newSlot->time_td = $course_program->time_td;
@@ -890,6 +876,7 @@ trait AjaxCRUDTimetableController
      * Delete timetable assignment.
      *
      * @return mixed
+     * @throws \Exception
      */
     public function assign_delete()
     {
@@ -971,6 +958,11 @@ trait AjaxCRUDTimetableController
         return Response::json(['status' => true, 'start' => (new Carbon($configuration->created_at))->toDateString(), 'end' => (new Carbon($configuration->updated_at))->toDateString()]);
     }
 
+    /**
+     * Search groups.
+     *
+     * @return array
+     */
     public function search_course_program()
     {
         $academic_year_id = request('academic');
