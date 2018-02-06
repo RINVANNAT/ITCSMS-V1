@@ -151,7 +151,7 @@ function get_course_programs() {
         url: '/admin/schedule/timetables/get_course_programs',
         data: $('#options-filter').serialize(),
         success: function (response) {
-            if (response.status === true) {
+            if (response.status === true && response.data.length>0) {
                 var course_session_item = '';
                 $.each(response.data, function (key, val) {
                     if (val.teacher_name === null) {
@@ -189,7 +189,7 @@ function get_course_programs() {
                 drag_course_session()
             }
             else {
-                $('.courses.todo-list').html("<li class='course-item'>There are no course sessions created yet.</li>");
+                $('.courses.todo-list').html("<li class='course-item'>NO COURSES, PLEASE EXPORT COURSE !</li>");
             }
         },
         error: function () {
@@ -253,4 +253,44 @@ function set_background_color_slot_not_allow() {
     $('.view-timetable').find('[data-time="12:00:00"]').addClass('slot-not-allow');
     $('.view-timetable').find('[data-time="12:30:00"]').addClass('slot-not-allow');
     $('.view-timetable').find('[data-time="17:00:00"]').addClass('slot-not-allow');
+}
+
+
+function get_employees(query=null) {
+    axios.post('/admin/schedule/timetables/get_employees', {
+        query: query
+    }).then( response => {
+        if(response.data.data.length>0) {
+            console.log(23);
+            let employee_template = '';
+            response.data.data.forEach( (employee) => {
+                employee_template += `
+                    <li class="select2-results__option"
+                        role="treeitem"
+                        aria-selected="false">
+                        <div class="select2-result-repository clearfix">
+                            <div class="select2-result-repository__avatar">
+                                <img src="https://smis.itc.app/img/profiles/avatar.png">
+                            </div>
+                            <div class="select2-result-repository__meta">
+                                <div class="select2-result-repository__title">`+(employee.id_card == null ? 'No ID Card' : employee.id_card)+` | `+employee.employee_name_kh+`</div>
+                                <div class="select2-result-repository__description">`+employee.employee_name_latin+`</div>
+                                <div class="select2-result-repository__statistics">
+                                    <div class="select2-result-repository__forks">
+                                        <i class="fa fa-bank"></i> `+employee.department_code+`
+                                    </div>
+                                    <div class="select2-result-repository__stargazers">
+                                        <i class="fa fa-venus-mars"></i> `+employee.gender_code+`
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </li>
+                `;
+            });
+            $('#employee-viewer').html(employee_template);
+        }else{
+            $('#employee-viewer').html('<h1>NO EMPLOYEES</h1>');
+        }
+    })
 }

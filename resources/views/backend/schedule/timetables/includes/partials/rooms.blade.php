@@ -58,29 +58,19 @@
                                 <input type="text"
                                        style="border-radius: 4px !important;"
                                        class="form-control"
-                                       name="search_room_query"
+                                       id="search-employee"
+                                       name="employee_query"
                                        placeholder="Find lecturer..."/>
                             </div>
                         </div>
                         <div class="box-body">
-                            @if(access()->allow('add-room-timetable-slot') && access()->allow('remove-room-timetable-slot'))
-                                <div class="rooms">
-                                    @if(isset($rooms))
-                                        @foreach($rooms as $room)
-                                            <div class="room-item">
-                                                <i class="fa fa-building-o"></i>
-                                                {{ $room->name }}
-                                            </div>
-                                        @endforeach
-                                    @endif
-                                </div>
-                            @else
-                                <div class="alert alert-danger {{--alert-dismissible--}}">
-                                    {{--<button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>--}}
-                                    <h4><i class="icon fa fa-info"></i>{{ trans('strings.backend.timetable.block_add_room') }}</h4>
-                                    <p>{{ trans('strings.backend.timetable.desc_block_add_room') }}</p>
-                                </div>
-                            @endif
+                            <div class="select2-results">
+                                <ul class="select2-results__options"
+                                    role="tree"
+                                    id="employee-viewer"
+                                    aria-expanded="true"
+                                    aria-hidden="false"></ul>
+                            </div>
                         </div>
                     </div>
                 </div>

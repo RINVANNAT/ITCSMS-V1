@@ -778,6 +778,7 @@
             get_timetable();
             drag_course_session();
             get_rooms();
+            get_employees();
 
             // select timetable slot to add room.
             $(document).on('click', '.side-course', function () {
@@ -1038,6 +1039,11 @@
                     }
                 })
             });
+
+            $(document).on('keyup', '#search-employee', function () {
+                let query = $(this).val();
+                get_employees(query);
+            })
         });
 
     </script>

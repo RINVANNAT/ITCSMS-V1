@@ -40,6 +40,7 @@ Route::group(['namespace' => 'Schedule', 'prefix' => 'schedule', 'middleware' =>
     Route::post('timetables/get_grades', 'TimetableController@get_grades')->name('admin.schedule.timetables.get_grades');
     Route::post('timetables/get_course_programs', 'TimetableController@get_course_programs')->name('admin.schedule.timetables.get_course_programs');
     Route::post('timetables/get_rooms', 'TimetableController@get_rooms')->name('admin.schedule.timetables.get_rooms');
+    Route::post('timetables/get_employees', 'TimetableController@get_employees')->name('admin.schedule.timetables.get_employees');
     Route::post('timetables/search_rooms', 'TimetableController@search_rooms')->name('admin.schedule.timetables.search_rooms');
     Route::post('timetables/filter-courses-sessions', 'TimetableController@filterCoursesSessions')->name('admin.schedule.timetables.filterCoursesSessions');
 

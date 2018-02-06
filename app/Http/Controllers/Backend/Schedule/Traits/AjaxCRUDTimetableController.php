@@ -12,6 +12,7 @@ use App\Models\Configuration;
 use App\Models\Course;
 use App\Models\Department;
 use App\Models\DepartmentOption;
+use App\Models\Employee;
 use App\Models\Grade;
 use App\Models\Group;
 use App\Models\Schedule\Timetable\Slot;
@@ -1000,5 +1001,34 @@ trait AjaxCRUDTimetableController
                 'courses.name_en as course_name'
             )->get();
         return array('status' => true, 'course_sessions' => $slots, 'code' => 200);
+    }
+
+    /**
+     * Get Employees.
+     *
+     * @return array
+     */
+    public function get_employees()
+    {
+        $query = request('query');
+        $employees = Employee::join('genders', 'employees.gender_id', '=', 'genders.id')
+            ->join('departments', 'departments.id', '=', 'employees.department_id')
+            ->where(function ($sql) use ($query) {
+                if (isset($query) && !is_null($query) && $query != '') {
+                    $sql->orWhere('employees.name_kh', 'ilike', '%' . $query . '%')
+                        ->orWhere('employees.name_latin', 'ilike', '%' . $query . '%')
+                        ->orWhere('departments.code', 'ilike', '%' . $query . '%');
+                }
+            })
+            ->select([
+                'employees.name_kh as employee_name_kh',
+                'employees.name_latin as employee_name_latin',
+                'employees.id_card as id_card',
+                'genders.code as gender_code',
+                'departments.code as department_code'
+            ])
+            ->orderBy('employee_name_kh', 'asc')
+            ->get();
+        return array('status' => true, 'code' => 200, 'data' => $employees);
     }
 }
