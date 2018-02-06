@@ -139,7 +139,7 @@ function get_grades(department_id) {
             );
         },
         complete: function () {
-            get_groups();
+            // get_groups();
         }
     })
 }
