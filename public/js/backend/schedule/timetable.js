@@ -153,6 +153,7 @@ function get_course_programs() {
         success: function (response) {
             if (response.status === true && response.data.length>0) {
                 var course_session_item = '';
+                console.log(response.data);
                 $.each(response.data, function (key, val) {
                     if (val.teacher_name === null) {
                         course_session_item += '<li class="course-item disabled">';
@@ -166,9 +167,9 @@ function get_course_programs() {
                         '</span>' +
                         '<span class="text course-name">' + val.course_name + '</span><br>';
                     if (val.teacher_name === null) {
-                        course_session_item += '<span style="margin-left: 28px;" class="teacher-name bg-danger badge">Unsigned</span><br/>';
+                        course_session_item += '<span style="margin-left: 28px;" class="teacher_name bg-danger badge">Unsigned</span><br/>';
                     } else {
-                        course_session_item += '<span style="margin-left: 28px;" class="teacher-name">' + val.teacher_name + '</span><br/>';
+                        course_session_item += '<span style="margin-left: 28px;" class="leacher_name">' + val.teacher_name + '</span><br/>';
                     }
                     if (val.tp !== 0) {
                         course_session_item += '<span style="margin-left: 28px;" class="course-type">TP</span> : ' +
@@ -182,7 +183,8 @@ function get_course_programs() {
                         course_session_item += '<span style="margin-left: 28px;" class="course-type">Course</span> : ' +
                             '<span class="times">' + val.remaining + '</span> H'
                     }
-                    course_session_item += '<span class="text courses-session-id" style="display: none;">' + val.course_session_id + '</span><span class="text slot-id" style="display: none;">' + val.id + '</span><br>' + '</li>';
+                    course_session_item += '<span class="hidden lecturer-id">'+val.lecturer_id+'</span>';
+                    course_session_item += '<span class="text course_program_id" style="display: none;">' + val.course_program_id + '</span><span class="text slot-id" style="display: none;">' + val.id + '</span><br>' + '</li>';
                 });
 
                 $('.courses.todo-list').html(course_session_item);
@@ -283,6 +285,7 @@ function get_employees(query=null) {
                                     </div>
                                 </div>
                             </div>
+                            <span class="lecturer_id hidden">`+employee.employee_id+`</span>
                         </div>
                     </li>
                 `;
@@ -291,5 +294,23 @@ function get_employees(query=null) {
         }else{
             $('#employee-viewer').html('<h1>NO EMPLOYEES</h1>');
         }
+    })
+}
+
+function assign_lecturer_to_course_program() {
+    $(document).on('click', 'li.select2-results__option', function () {
+        let slot_id = $('.course-program-selected').find('.slot-id').text();
+        console.log(slot_id);
+        if(slot_id === '') {
+            notify('info', 'Please selected course program!', 'Assign Lecturer');
+            return 0;
+        }
+        let lecturer_id = $(this).find('.lecturer_id').text();
+        axios.post('/admin/schedule/timetables/assign_lecturer_to_course_program', {
+            slot_id: slot_id,
+            lecturer_id: lecturer_id
+        }).then( response => {
+            get_course_programs();
+        })
     })
 }

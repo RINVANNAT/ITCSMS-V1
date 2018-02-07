@@ -49,12 +49,12 @@ class EloquentTimetableSlotRepository implements TimetableSlotRepositoryContract
                     $newTimetableSlot = new TimetableSlot();
 
                     $newTimetableSlot->timetable_id = $timetable->id;
-                    $newTimetableSlot->course_session_id = $request->course_session_id;
+                    $newTimetableSlot->course_program_id = $request->course_program_id;
                     $request->room_id == null ?: $newTimetableSlot->room_id = $request->room_id;
                     $newTimetableSlot->slot_id = $request->slot_id;
                     $newTimetableSlot->group_merge_id = $newMergeTimetableSlot->id;
                     $newTimetableSlot->course_name = $request->course_name;
-                    $newTimetableSlot->teacher_name = $request->teacher_name;
+                    $newTimetableSlot->lecturer_id = isset($request->lecturer_id) ? $request->lecturer_id: null;
                     $newTimetableSlot->type = $request->course_type;
                     $newTimetableSlot->start = new Carbon($request->start);
                     $newTimetableSlot->end = new Carbon($request->end == null ? $request->start : $request->end);
@@ -715,23 +715,18 @@ class EloquentTimetableSlotRepository implements TimetableSlotRepositoryContract
         $timetable_slots = TimetableSlot::where('timetable_id', $timetable->id)
             ->leftJoin('rooms', 'rooms.id', '=', 'timetable_slots.room_id')
             ->leftJoin('buildings', 'buildings.id', '=', 'rooms.building_id')
-            ->where(function ($query) use ($by_teacher) {
-                if ($by_teacher != null) {
-                    $query->where('timetable_slots.teacher_name', '=', $by_teacher);
-                }
-            })
+            ->leftJoin('employees', 'employees.id', '=', 'timetable_slots.lecturer_id')
             ->select(
                 'timetable_slots.id',
                 'timetable_slots.course_name as title',
                 'timetable_slots.course_name',
-                'timetable_slots.teacher_name',
+                'employees.name_latin as teacher_name',
                 'timetable_slots.type as course_type',
                 'timetable_slots.start',
                 'timetable_slots.end',
                 'buildings.code as building',
                 'rooms.name as room'
             )->get();
-
         return $timetable_slots;
     }
 
@@ -747,12 +742,10 @@ class EloquentTimetableSlotRepository implements TimetableSlotRepositoryContract
     {
         $timetable_slots = $this->get_timetable_slot_details($timetable, $by_teacher);
 
-        // dd($timetable_slots);
-
         foreach ($timetable_slots as $timetable_slot) {
             if (($timetable_slot instanceof TimetableSlot) && is_object($timetable_slot)) {
                 // convert from array object to collection object.
-                $itemTimetableSlot = TimetableSlot::find($timetable_slot->id);
+                $itemTimetableSlot = TimetableSlot::with('employee')->find($timetable_slot->id);
                 $timetableSlot = new Collection($itemTimetableSlot);
 
                 // find and prepare groups to render when timetable slot merge together
@@ -766,8 +759,8 @@ class EloquentTimetableSlotRepository implements TimetableSlotRepositoryContract
                 } else {
                     $groups = [];
                 }
+
                 // check conflict lecturer.
-                // dd('beforeCheck');
                 $dataLecturer = $this->check_conflict_lecturer($itemTimetableSlot);
 
                 // check conflict room.

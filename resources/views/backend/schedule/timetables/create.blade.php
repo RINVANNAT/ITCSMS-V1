@@ -141,10 +141,10 @@
                 // store data so the calendar knows to render an event upon drop
                 $(this).data('event', {
                     slot_id: $(this).find('.slot-id').text(),
-                    course_session_id: $(this).find('.courses-session-id').text(),
+                    course_program_id: $(this).find('.course_program_id').text(),
                     course_name: $(this).find('.course-name').text(),
                     class_name: 'course-item',
-                    teacher_name: $(this).find('.teacher-name').text(),
+                    lecturer_id: $(this).find('.lecturer-id').text(),
                     course_type: $(this).find('.course-type').text(),
                     times: $(this).find('.times').text()
                 });
@@ -350,10 +350,10 @@
                     'semester': $('select[name="semester"] :selected').val(),
                     'weekly': $('select[name="weekly"] :selected').val(),
                     'group': $('select[name="group"] :selected').val(),
-                    'course_session_id': copiedEventObject.course_session_id,
+                    'course_program_id': copiedEventObject.course_program_id,
                     'slot_id': copiedEventObject.slot_id,
                     'course_name': copiedEventObject.course_name,
-                    'teacher_name': copiedEventObject.teacher_name,
+                    'lecturer_id': copiedEventObject.lecturer_id,
                     'course_type': copiedEventObject.course_type,
                     'start': copiedEventObject.start,
                     'end': copiedEventObject.end
@@ -579,14 +579,14 @@
                         // check conflict lecturer and render
                         if (typeof event.conflict_lecturer !== 'undefined') {
                             if (event.conflict_lecturer.canMerge.length > 0 || event.conflict_lecturer.canNotMerge.length > 0) {
-                                object += '<p class="text-primary conflict">' + event.teacher_name + '</p> ';
+                                object += '<p class="text-primary conflict">' + (event.employee != null ? event.employee.name_latin : 'NO LECTURER') + '</p> ';
                             }
                             else {
-                                object += '<p class="text-primary">' + event.teacher_name + '</p> ';
+                                object += '<p class="text-primary">' + (event.employee != null ? event.employee.name_latin : 'NO LECTURER') + '</p> ';
                             }
                         }
                         else {
-                            object += '<p class="text-primary">' + event.teacher_name + '</p> ';
+                            object += '<p class="text-primary">' + (event.employee != null ? event.employee.name_latin : 'NO LECTURER') + '</p> ';
                         }
 
                         object += '</div>';
@@ -786,6 +786,7 @@
             drag_course_session();
             get_rooms();
             get_employees();
+            assign_lecturer_to_course_program();
 
             $(document).on('click', '.todo-list .course-item', function () {
                 $('.courses.todo-list>.course-item').not(this).removeClass('course-program-selected');
@@ -852,11 +853,8 @@
                             dom_room.css('cursor', 'not-allowed');
                             notify('success', 'Room was added', 'Add Room');
                             get_suggest_room($('select[name="academicYear"] :selected').val(), $('select[name="weekly"] :selected').val(), $('.side-course.course-selected').attr('id'));
-                            console.log($('.side-course.course-selected').attr('id'));
-                            // get_timetable_slots();
                         } else {
                             notify('warning', 'Please select which course.', 'Add Room');
-                            // get_timetable_slots();
                         }
                         get_rooms();
                     },
@@ -947,8 +945,6 @@
                     }
                 });
             });
-
-
 
             // publish timetable
             $(document).on('click', '#btn_publish', function (e) {
