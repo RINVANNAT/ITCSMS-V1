@@ -787,8 +787,8 @@
             get_rooms();
             get_employees();
 
-            $(document).on('click', 'ul.todo-list>li.course-item', function () {
-                $('.todo-list').not(this).removeClass('course-program-selected');
+            $(document).on('click', '.todo-list .course-item', function () {
+                $('.courses.todo-list>.course-item').not(this).removeClass('course-program-selected');
                 $(this).toggleClass('course-program-selected');
             })
 
