@@ -261,7 +261,6 @@ function get_employees(query=null) {
         query: query
     }).then( response => {
         if(response.data.data.length>0) {
-            console.log(23);
             let employee_template = '';
             response.data.data.forEach( (employee) => {
                 employee_template += `
