@@ -181,7 +181,23 @@
 
 .course-item.disabled {
     border-left: 2px solid red;
-    cursor: not-allowed;
+    cursor: pointer;
+    /*cursor: not-allowed;*/
+}
+
+.todo-list {
+    background-color: #f1f1f1;
+    padding: 10px;
+}
+.todo-list > li {
+    background-color: #fff !important;
+    margin-bottom: 8px;
+}
+
+.todo-list > li.course-program-selected {
+    background-color: #f1f1f1 !important;
+    border: 1px solid #eee;
+    border-left: 0 !important;
 }
 
 .box.box-success .panel-conflict {
@@ -191,7 +207,6 @@
     z-index: 998;
     width: 350px;
     display: -webkit-box;
-    display: -webkit-flex;
     display: -ms-flexbox;
     display: flex;
     -webkit-flex-direction: column;

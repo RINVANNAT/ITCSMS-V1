@@ -148,14 +148,21 @@
                     course_type: $(this).find('.course-type').text(),
                     times: $(this).find('.times').text()
                 });
-                if ($(this).data('event').teacher_name !== 'Unsigned') {
+
+                $(this).draggable({
+                    zIndex: 9999,
+                    revert: true,
+                    revertDuration: 0
+                });
+
+                /*if ($(this).data('event').teacher_name !== 'Unsigned') {
                     // make the event draggable using jQuery UI
                     $(this).draggable({
                         zIndex: 9999,
                         revert: true,      // will cause the event to go back to its
                         revertDuration: 0  //  original position after the drag
                     });
-                }
+                }*/
             });
             @endif
         }
@@ -779,6 +786,11 @@
             drag_course_session();
             get_rooms();
             get_employees();
+
+            $(document).on('click', 'ul.todo-list>li.course-item', function () {
+                $('.todo-list').not(this).removeClass('course-program-selected');
+                $(this).toggleClass('course-program-selected');
+            })
 
             // select timetable slot to add room.
             $(document).on('click', '.side-course', function () {
