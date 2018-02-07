@@ -189,7 +189,7 @@ function get_course_programs() {
                 drag_course_session()
             }
             else {
-                $('.courses.todo-list').html("<li class='course-item'>NO COURSES, PLEASE EXPORT COURSE !</li>");
+                $('.courses.todo-list').html("<li class='course-item text-center'>No Courses!</li>");
             }
         },
         error: function () {
