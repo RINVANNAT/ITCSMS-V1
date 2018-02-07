@@ -62,7 +62,6 @@ class DashboardController extends Controller
                 ->orderBy('course_annuals.semester_id', "ASC")
                 ->get()
                 ->toArray();
-            dd($courses);
         }
 
         /** @var Collection $timetables */
