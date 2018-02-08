@@ -141,14 +141,9 @@
         data-toggle="tooltip"
         data-placement="top"
         title="{{ trans('inputs.backend.schedule.timetable.options.group') }}">
-    @if($group_id != 0)
-        <option selected disabled>{{ trans('inputs.backend.schedule.timetable.options.group') }}</option>
-    @endif
-    @if(isset($groups))
-        @foreach($groups as $group)
-            <option value="{{ $group->id }}">{{ $group->name }}</option>
-        @endforeach
-    @endif
+    @foreach($groups as $group)
+        <option value="{{ $group['id'] }}">{{ $group['code'] }}</option>
+    @endforeach
 </select>
 
 @if(isset($weeks))

@@ -778,7 +778,7 @@
             get_course_programs();
             @else
                 get_options($('select[name="department"] :selected').val());
-                get_groups();
+                get_weeks($('select[name="semester"] :selected').val());
             @endif
 
             get_timetable_slots();

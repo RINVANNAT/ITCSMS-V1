@@ -1040,16 +1040,43 @@ trait AjaxCRUDTimetableController
 
         $slot_id = request('slot_id');
         $lecturer_id = request('lecturer_id');
-        if(isset($slot_id) && !is_null($slot_id)) {
+        if (isset($slot_id) && !is_null($slot_id)) {
             try {
-                DB::transaction(function () use ($slot_id, $lecturer_id){
+                DB::transaction(function () use ($slot_id, $lecturer_id) {
                     $slot = Slot::find($slot_id);
                     $slot->lecturer_id = $lecturer_id;
                     $slot->write_uid = auth()->user()->id;
                     $slot->updated_at = Carbon::now();
                     $slot->update();
                 });
-            }catch (\Exception $e) {
+            } catch (\Exception $e) {
+                $result['code'] = $e->getCode();
+                $result['message'] = $e->getMessage();
+            }
+        }
+
+        return $result;
+    }
+
+    public function assign_lecturer_to_timetable_slot()
+    {
+        $result = [
+            'code' => 200,
+            'data' => [],
+            'message' => "The operation was executed successfully"
+        ];
+
+        $timetable_slot_id = request('timetable_slot_id');
+        $lecturer_id = request('lecturer_id');
+        if (isset($timetable_slot_id) && !is_null($timetable_slot_id)) {
+            try {
+                DB::transaction(function () use ($timetable_slot_id, $lecturer_id) {
+                    $timetable_slot = TimetableSlot::find($timetable_slot_id);
+                    $timetable_slot->lecturer_id = $lecturer_id;
+                    $timetable_slot->updated_at = Carbon::now();
+                    $timetable_slot->update();
+                });
+            } catch (\Exception $e) {
                 $result['code'] = $e->getCode();
                 $result['message'] = $e->getMessage();
             }

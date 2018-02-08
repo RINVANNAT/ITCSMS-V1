@@ -24,7 +24,8 @@ Route::group(['namespace' => 'Schedule', 'prefix' => 'schedule', 'middleware' =>
     Route::post('timetables/merge_timetable_slot', 'TimetableController@merge_timetable_slot')->name('merge_timetable_slot');
     Route::post('timetables/remove_timetable_slot', 'TimetableController@remove_timetable_slot')->name('remove_timetable_slot');
     Route::post('timetables/search_course_program', 'TimetableController@search_course_program')->name('search_course_program');
-    Route::post('timetables/assign_lecturer_to_course_program', 'TimetableController@assign_lecturer_to_course_program')->name('search_course_program');
+    Route::post('timetables/assign_lecturer_to_course_program', 'TimetableController@assign_lecturer_to_course_program')->name('assign_lecturer_to_course_program');
+    Route::post('timetables/assign_lecturer_to_timetable_slot', 'TimetableController@assign_lecturer_to_timetable_slot')->name('assign_lecturer_to_timetable_slot');
 
     /** timetable assignment */
     Route::post('timetables/export_course_program', 'TimetableController@export_course_program')->name('export_course_program');

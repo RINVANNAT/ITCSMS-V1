@@ -19,6 +19,7 @@ use App\Models\Department;
 use App\Models\DepartmentOption;
 use App\Models\Employee;
 use App\Models\Grade;
+use App\Models\Group;
 use App\Models\Schedule\Timetable\Slot;
 use App\Models\Schedule\Timetable\Timetable;
 use App\Models\Schedule\Timetable\TimetableSlot;
@@ -266,36 +267,8 @@ class TimetableController extends Controller
             $options_ = null;
         }
 
-        if (isset($academic)) {
-            $groups = DB::table('course_annuals')
-                ->where([
-                    ['academic_year_id', $academic],
-                    ['department_id', $department],
-                    ['degree_id', $degree],
-                    ['grade_id', $grade]
-                ])
-                ->where(function ($query) use ($option) {
-                    if (!is_null($option) && $option != 0) {
-                        $query->where('department_option_id', $option);
-                    }
-                })
-                ->join('slots', 'slots.course_annual_id', '=', 'course_annuals.id')
-                ->join('groups', 'groups.id', '=', 'slots.group_id')
-                ->distinct('groups.code')
-                ->select('groups.code as name', 'groups.id as id')
-                ->get();
-
-            usort($groups, function ($a, $b) {
-                if (is_numeric($a->name)) {
-                    return $a->name - $b->name;
-                } else {
-                    return strcmp($a->name, $b->name);
-                }
-            });
-        } else {
-            $groups = null;
-        }
-
+        $groups = Group::get()->toArray();
+        $groups = $this->timetableSlotRepo->sort_groups($groups);
         $weeks = Week::where('semester_id', $semester)->get();
 
         if (isset($createTimetablePermissionConfiguration)) {
