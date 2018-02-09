@@ -35,40 +35,36 @@ class EloquentTimetableSlotRepository implements TimetableSlotRepositoryContract
      */
     public function create_timetable_slot(Timetable $timetable, CreateTimetableSlotRequest $request)
     {
-        // create new group merge
         $newMergeTimetableSlot = $this->create_merge_timetable_slot($request);
-        // check new group merge created or not.
         if ($newMergeTimetableSlot instanceof MergeTimetableSlot) {
-            // find Slot match with request.
             $slot = Slot::find($request->slot_id);
             if ($slot instanceof Slot) {
-                // find durations between two start and end date.
                 $duration = $this->durations(new Carbon($request->start), new Carbon($request->end == null ? $request->start : $request->end));
                 if ($slot->time_remaining > 0 && $slot->time_remaining >= $duration) {
-                    // crate new instance
-                    $newTimetableSlot = new TimetableSlot();
-
-                    $newTimetableSlot->timetable_id = $timetable->id;
-                    $newTimetableSlot->course_program_id = $request->course_program_id;
-                    $request->room_id == null ?: $newTimetableSlot->room_id = $request->room_id;
-                    $newTimetableSlot->slot_id = $request->slot_id;
-                    $newTimetableSlot->group_merge_id = $newMergeTimetableSlot->id;
-                    $newTimetableSlot->course_name = $request->course_name;
-                    $newTimetableSlot->lecturer_id = isset($request->lecturer_id) ? $request->lecturer_id: null;
-                    $newTimetableSlot->type = $request->course_type;
-                    $newTimetableSlot->start = new Carbon($request->start);
-                    $newTimetableSlot->end = new Carbon($request->end == null ? $request->start : $request->end);
-                    $newTimetableSlot->durations = $duration;
-                    $newTimetableSlot->created_uid = auth()->user()->id;
-                    $newTimetableSlot->updated_uid = auth()->user()->id;
-                    // check new timetable slot created or not.
-                    if ($newTimetableSlot->save()) {
-                        // update total times of slot
-                        $slot->time_remaining = $slot->time_remaining - $duration;
-                        $slot->updated_at = Carbon::now();
-                        $slot->update();
-                        return $newTimetableSlot;
-                    }
+                    DB::transaction ( function () use ($timetable, $request, $newMergeTimetableSlot, $duration, $slot){
+                        $newTimetableSlot = new TimetableSlot();
+                        $newTimetableSlot->timetable_id = $timetable->id;
+                        $newTimetableSlot->course_program_id = $request->course_program_id;
+                        $request->room_id == null ?: $newTimetableSlot->room_id = $request->room_id;
+                        $newTimetableSlot->slot_id = $request->slot_id;
+                        $newTimetableSlot->group_merge_id = $newMergeTimetableSlot->id;
+                        $newTimetableSlot->course_name = $request->course_name;
+                        if (isset($request->lecturer_id) && !is_null($request->lecturer_id) && $request->lecturer_id != 'null') {
+                            $newTimetableSlot->lecturer_id = $request->lecturer_id;
+                        }
+                        $newTimetableSlot->type = $request->course_type;
+                        $newTimetableSlot->start = new Carbon($request->start);
+                        $newTimetableSlot->end = new Carbon($request->end == null ? $request->start : $request->end);
+                        $newTimetableSlot->durations = $duration;
+                        $newTimetableSlot->created_uid = auth()->user()->id;
+                        $newTimetableSlot->updated_uid = auth()->user()->id;
+                        if ($newTimetableSlot->save()) {
+                            $slot->time_remaining = $slot->time_remaining - $duration;
+                            $slot->updated_at = Carbon::now();
+                            $slot->update();
+                            return $newTimetableSlot;
+                        }
+                    });
                 }
             }
         }

@@ -64,7 +64,7 @@ class DashboardController extends Controller
 
         /** @var Collection $timetables */
         $timetables = new Collection();
-        $timetable_slots = TimetableSlot::where(['teacher_name' => auth()->user()->name])->get();
+        $timetable_slots = TimetableSlot::where(['lecturer_id' => Employee::where('user_id')->first()->id])->get();
 
         foreach ($timetable_slots as $timetable_slot) {
             $timetables->push($timetable_slot->timetable);
