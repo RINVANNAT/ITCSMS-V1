@@ -35,40 +35,36 @@ class EloquentTimetableSlotRepository implements TimetableSlotRepositoryContract
      */
     public function create_timetable_slot(Timetable $timetable, CreateTimetableSlotRequest $request)
     {
-        // create new group merge
         $newMergeTimetableSlot = $this->create_merge_timetable_slot($request);
-        // check new group merge created or not.
         if ($newMergeTimetableSlot instanceof MergeTimetableSlot) {
-            // find Slot match with request.
             $slot = Slot::find($request->slot_id);
             if ($slot instanceof Slot) {
-                // find durations between two start and end date.
                 $duration = $this->durations(new Carbon($request->start), new Carbon($request->end == null ? $request->start : $request->end));
                 if ($slot->time_remaining > 0 && $slot->time_remaining >= $duration) {
-                    // crate new instance
-                    $newTimetableSlot = new TimetableSlot();
-
-                    $newTimetableSlot->timetable_id = $timetable->id;
-                    $newTimetableSlot->course_session_id = $request->course_session_id;
-                    $request->room_id == null ?: $newTimetableSlot->room_id = $request->room_id;
-                    $newTimetableSlot->slot_id = $request->slot_id;
-                    $newTimetableSlot->group_merge_id = $newMergeTimetableSlot->id;
-                    $newTimetableSlot->course_name = $request->course_name;
-                    $newTimetableSlot->teacher_name = $request->teacher_name;
-                    $newTimetableSlot->type = $request->course_type;
-                    $newTimetableSlot->start = new Carbon($request->start);
-                    $newTimetableSlot->end = new Carbon($request->end == null ? $request->start : $request->end);
-                    $newTimetableSlot->durations = $duration;
-                    $newTimetableSlot->created_uid = auth()->user()->id;
-                    $newTimetableSlot->updated_uid = auth()->user()->id;
-                    // check new timetable slot created or not.
-                    if ($newTimetableSlot->save()) {
-                        // update total times of slot
-                        $slot->time_remaining = $slot->time_remaining - $duration;
-                        $slot->updated_at = Carbon::now();
-                        $slot->update();
-                        return $newTimetableSlot;
-                    }
+                    DB::transaction ( function () use ($timetable, $request, $newMergeTimetableSlot, $duration, $slot){
+                        $newTimetableSlot = new TimetableSlot();
+                        $newTimetableSlot->timetable_id = $timetable->id;
+                        $newTimetableSlot->course_program_id = $request->course_program_id;
+                        $request->room_id == null ?: $newTimetableSlot->room_id = $request->room_id;
+                        $newTimetableSlot->slot_id = $request->slot_id;
+                        $newTimetableSlot->group_merge_id = $newMergeTimetableSlot->id;
+                        $newTimetableSlot->course_name = $request->course_name;
+                        if (isset($request->lecturer_id) && !is_null($request->lecturer_id) && $request->lecturer_id != 'null') {
+                            $newTimetableSlot->lecturer_id = $request->lecturer_id;
+                        }
+                        $newTimetableSlot->type = $request->course_type;
+                        $newTimetableSlot->start = new Carbon($request->start);
+                        $newTimetableSlot->end = new Carbon($request->end == null ? $request->start : $request->end);
+                        $newTimetableSlot->durations = $duration;
+                        $newTimetableSlot->created_uid = auth()->user()->id;
+                        $newTimetableSlot->updated_uid = auth()->user()->id;
+                        if ($newTimetableSlot->save()) {
+                            $slot->time_remaining = $slot->time_remaining - $duration;
+                            $slot->updated_at = Carbon::now();
+                            $slot->update();
+                            return $newTimetableSlot;
+                        }
+                    });
                 }
             }
         }
@@ -715,23 +711,18 @@ class EloquentTimetableSlotRepository implements TimetableSlotRepositoryContract
         $timetable_slots = TimetableSlot::where('timetable_id', $timetable->id)
             ->leftJoin('rooms', 'rooms.id', '=', 'timetable_slots.room_id')
             ->leftJoin('buildings', 'buildings.id', '=', 'rooms.building_id')
-            ->where(function ($query) use ($by_teacher) {
-                if ($by_teacher != null) {
-                    $query->where('timetable_slots.teacher_name', '=', $by_teacher);
-                }
-            })
+            ->leftJoin('employees', 'employees.id', '=', 'timetable_slots.lecturer_id')
             ->select(
                 'timetable_slots.id',
                 'timetable_slots.course_name as title',
                 'timetable_slots.course_name',
-                'timetable_slots.teacher_name',
+                'employees.name_latin as teacher_name',
                 'timetable_slots.type as course_type',
                 'timetable_slots.start',
                 'timetable_slots.end',
                 'buildings.code as building',
                 'rooms.name as room'
             )->get();
-
         return $timetable_slots;
     }
 
@@ -747,12 +738,10 @@ class EloquentTimetableSlotRepository implements TimetableSlotRepositoryContract
     {
         $timetable_slots = $this->get_timetable_slot_details($timetable, $by_teacher);
 
-        // dd($timetable_slots);
-
         foreach ($timetable_slots as $timetable_slot) {
             if (($timetable_slot instanceof TimetableSlot) && is_object($timetable_slot)) {
                 // convert from array object to collection object.
-                $itemTimetableSlot = TimetableSlot::find($timetable_slot->id);
+                $itemTimetableSlot = TimetableSlot::with('employee')->find($timetable_slot->id);
                 $timetableSlot = new Collection($itemTimetableSlot);
 
                 // find and prepare groups to render when timetable slot merge together
@@ -766,8 +755,8 @@ class EloquentTimetableSlotRepository implements TimetableSlotRepositoryContract
                 } else {
                     $groups = [];
                 }
+
                 // check conflict lecturer.
-                // dd('beforeCheck');
                 $dataLecturer = $this->check_conflict_lecturer($itemTimetableSlot);
 
                 // check conflict room.

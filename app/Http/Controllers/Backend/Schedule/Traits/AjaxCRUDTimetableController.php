@@ -197,12 +197,13 @@ trait AjaxCRUDTimetableController
             ->where('slots.academic_year_id', $academic_year_id)
             ->select(
                 'slots.id as id',
-                'slots.course_program_id as course_session_id',
+                'slots.course_program_id as course_program_id',
                 'slots.time_tp as tp',
                 'slots.time_td as td',
                 'slots.time_course as tc',
                 'slots.time_remaining as remaining',
                 'courses.name_en as course_name',
+                'slots.lecturer_id as lecturer_id',
                 'employees.name_latin as teacher_name'
             )->get();
         return array('status' => true, 'data' => $slots, 'code' => 200);
@@ -1017,6 +1018,7 @@ trait AjaxCRUDTimetableController
                 }
             })
             ->select([
+                'employees.id as employee_id',
                 'employees.name_kh as employee_name_kh',
                 'employees.name_latin as employee_name_latin',
                 'employees.id_card as id_card',
@@ -1026,5 +1028,60 @@ trait AjaxCRUDTimetableController
             ->orderBy('employee_name_kh', 'asc')
             ->get();
         return array('status' => true, 'code' => 200, 'data' => $employees);
+    }
+
+    public function assign_lecturer_to_course_program()
+    {
+        $result = [
+            'code' => 200,
+            'data' => [],
+            'message' => "The operation was executed successfully"
+        ];
+
+        $slot_id = request('slot_id');
+        $lecturer_id = request('lecturer_id');
+        if (isset($slot_id) && !is_null($slot_id)) {
+            try {
+                DB::transaction(function () use ($slot_id, $lecturer_id) {
+                    $slot = Slot::find($slot_id);
+                    $slot->lecturer_id = $lecturer_id;
+                    $slot->write_uid = auth()->user()->id;
+                    $slot->updated_at = Carbon::now();
+                    $slot->update();
+                });
+            } catch (\Exception $e) {
+                $result['code'] = $e->getCode();
+                $result['message'] = $e->getMessage();
+            }
+        }
+
+        return $result;
+    }
+
+    public function assign_lecturer_to_timetable_slot()
+    {
+        $result = [
+            'code' => 200,
+            'data' => [],
+            'message' => "The operation was executed successfully"
+        ];
+
+        $timetable_slot_id = request('timetable_slot_id');
+        $lecturer_id = request('lecturer_id');
+        if (isset($timetable_slot_id) && !is_null($timetable_slot_id)) {
+            try {
+                DB::transaction(function () use ($timetable_slot_id, $lecturer_id) {
+                    $timetable_slot = TimetableSlot::find($timetable_slot_id);
+                    $timetable_slot->lecturer_id = $lecturer_id;
+                    $timetable_slot->updated_at = Carbon::now();
+                    $timetable_slot->update();
+                });
+            } catch (\Exception $e) {
+                $result['code'] = $e->getCode();
+                $result['message'] = $e->getMessage();
+            }
+        }
+
+        return $result;
     }
 }
