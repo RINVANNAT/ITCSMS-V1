@@ -718,8 +718,8 @@ trait AjaxCRUDTimetableController
                                 DB::transaction(function () use ($data, $course_program, $group_id) {
                                     $newSlot = new Slot();
                                     $newSlot->time_tp = $course_program->time_tp;
-                                    $newSlot->time_td = $course_program->time_td;
-                                    $newSlot->time_course = $course_program->time_course;
+                                    $newSlot->time_td = 0;
+                                    $newSlot->time_course = 0;
                                     $newSlot->academic_year_id = $data['academic_year_id'];
                                     $newSlot->course_program_id = $course_program->id;
                                     $newSlot->lecturer_id = null;
@@ -736,9 +736,9 @@ trait AjaxCRUDTimetableController
                             if ($course_program->time_td > 0) {
                                 DB::transaction(function () use ($data, $course_program, $group_id) {
                                     $newSlot = new Slot();
-                                    $newSlot->time_tp = $course_program->time_tp;
+                                    $newSlot->time_tp = 0;
                                     $newSlot->time_td = $course_program->time_td;
-                                    $newSlot->time_course = $course_program->time_course;
+                                    $newSlot->time_course = 0;
                                     $newSlot->lecturer_id = null;
                                     $newSlot->academic_year_id = $data['academic_year_id'];
                                     $newSlot->course_program_id = $course_program->id;
@@ -755,8 +755,8 @@ trait AjaxCRUDTimetableController
                             if ($course_program->time_course > 0) {
                                 DB::transaction(function () use ($data, $course_program, $group_id) {
                                     $newSlot = new Slot();
-                                    $newSlot->time_tp = $course_program->time_tp;
-                                    $newSlot->time_td = $course_program->time_td;
+                                    $newSlot->time_tp = 0;
+                                    $newSlot->time_td = 0;
                                     $newSlot->time_course = $course_program->time_course;
                                     $newSlot->lecturer_id = null;
                                     $newSlot->academic_year_id = $data['academic_year_id'];
@@ -980,14 +980,18 @@ trait AjaxCRUDTimetableController
             ['semester_id', $semester_id],
         ])->pluck('id');
 
+
         $slots = Slot::join('courses', 'courses.id', '=', 'slots.course_program_id')
+            ->leftJoin('employees', 'employees.id', '=', 'slots.lecturer_id')
             ->whereIn('course_program_id', $course_program_ids)
             ->where('group_id', $group_id)
             ->where('slots.academic_year_id', $academic_year_id)
             ->where('slots.time_remaining', '>', 0)
             ->where(function ($query) {
                 $query->whereRaw('LOWER(courses.name_en) LIKE ?', array('%' . strtolower(request('query')) . '%'))
-                    ->orWhereRaw('LOWER(courses.name_kh) LIKE ?', array('%' . strtolower(request('query')) . '%'));
+                    ->orWhereRaw('LOWER(courses.name_kh) LIKE ?', array('%' . strtolower(request('query')) . '%'))
+                    ->orWhereRaw('LOWER(employees.name_latin) LIKE ?', array('%' . strtolower(request('query')) . '%'))
+                    ->orWhereRaw('LOWER(employees.name_kh) LIKE ?', array('%' . strtolower(request('query')) . '%'));
             })
             ->select(
                 'slots.id as id',
@@ -996,7 +1000,9 @@ trait AjaxCRUDTimetableController
                 'slots.time_td as td',
                 'slots.time_course as tc',
                 'slots.time_remaining as remaining',
-                'courses.name_en as course_name'
+                'courses.name_en as course_name',
+                'slots.lecturer_id as lecturer_id',
+                'employees.name_latin as teacher_name'
             )->get();
         return array('status' => true, 'course_sessions' => $slots, 'code' => 200);
     }
