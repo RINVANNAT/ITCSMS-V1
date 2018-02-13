@@ -717,8 +717,8 @@ trait AjaxCRUDTimetableController
                                 DB::transaction(function () use ($data, $course_program, $group_id) {
                                     $newSlot = new Slot();
                                     $newSlot->time_tp = $course_program->time_tp;
-                                    $newSlot->time_td = $course_program->time_td;
-                                    $newSlot->time_course = $course_program->time_course;
+                                    $newSlot->time_td = 0;
+                                    $newSlot->time_course = 0;
                                     $newSlot->academic_year_id = $data['academic_year_id'];
                                     $newSlot->course_program_id = $course_program->id;
                                     $newSlot->lecturer_id = null;
@@ -735,9 +735,9 @@ trait AjaxCRUDTimetableController
                             if ($course_program->time_td > 0) {
                                 DB::transaction(function () use ($data, $course_program, $group_id) {
                                     $newSlot = new Slot();
-                                    $newSlot->time_tp = $course_program->time_tp;
+                                    $newSlot->time_tp = 0;
                                     $newSlot->time_td = $course_program->time_td;
-                                    $newSlot->time_course = $course_program->time_course;
+                                    $newSlot->time_course = 0;
                                     $newSlot->lecturer_id = null;
                                     $newSlot->academic_year_id = $data['academic_year_id'];
                                     $newSlot->course_program_id = $course_program->id;
@@ -754,8 +754,8 @@ trait AjaxCRUDTimetableController
                             if ($course_program->time_course > 0) {
                                 DB::transaction(function () use ($data, $course_program, $group_id) {
                                     $newSlot = new Slot();
-                                    $newSlot->time_tp = $course_program->time_tp;
-                                    $newSlot->time_td = $course_program->time_td;
+                                    $newSlot->time_tp = 0;
+                                    $newSlot->time_td = 0;
                                     $newSlot->time_course = $course_program->time_course;
                                     $newSlot->lecturer_id = null;
                                     $newSlot->academic_year_id = $data['academic_year_id'];
