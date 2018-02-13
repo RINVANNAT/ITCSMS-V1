@@ -39,83 +39,110 @@
 @stop
 
 @section('content')
-    <div class="box box-success">
-        <div class="box-header with-border">
-            <div class="mailbox-controls">
-                <div class="pull-right">
-                    @permission('generate-timetable')
-                    <a href="#">
-                        <button class="btn btn-primary btn-sm"
-                                data-placement="right"
-                                title="Tooltip on top"
-                                disabled="true">
-                            {{ trans('buttons.backend.schedule.timetable.generate') }}
-                        </button>
-                    </a>
-                    @endauth
+    <div class="row">
+        <div class="col-md-12">
+            <div class="box box-success">
+                <div class="box-header with-border">
+                    <div class="mailbox-controls">
+                        <div class="pull-right">
 
-                    @permission('clone-timetable')
-                    <button class="btn btn-success btn-sm btn_clone_timetable"
-                            data-toggle="modal"
-                            data-target="#clone-timetable"
-                            data-toggle="tooltip"
-                            data-placement="top"
-                            id="btn_clone"
-                            title="{{ trans('buttons.backend.schedule.timetable.clone') }}">
-                        {{ trans('buttons.backend.schedule.timetable.clone') }}
-                    </button>
-                    @endauth
+                            <div class="btn-group">
+                                <button class="btn btn-default btn-sm"
+                                        id="t-cog"
+                                        data-toggle="dropdown"
+                                        aria-expanded="false">
+                                    <i class="fa fa-cogs"></i>
+                                </button>
+                            </div>
 
-                    @permission('publish-timetable')
-                    <a href="#">
-                        <button class="btn btn-info btn-sm"
-                                data-toggle="tooltip"
-                                data-placement="top"
-                                id="btn_publish"
-                                title="{{ trans('buttons.backend.schedule.timetable.publish') }}">
-                            {{ trans('buttons.backend.schedule.timetable.publish') }}
-                        </button>
-                    </a>
-                    @endauth
+                            @permission('generate-timetable')
+                            <a href="#">
+                                <button class="btn btn-primary btn-sm"
+                                        data-placement="right"
+                                        title="Tooltip on top"
+                                        disabled="true">
+                                    {{ trans('buttons.backend.schedule.timetable.generate') }}
+                                </button>
+                            </a>
+                            @endauth
 
-                    @permission('save-change-timetable')
-                    <a href="#">
-                        <button class="btn btn-danger btn-sm"
-                                data-toggle="tooltip"
-                                data-placement="top"
-                                title="{{ trans('buttons.backend.schedule.timetable.save_change') }}">
-                            {{ trans('buttons.backend.schedule.timetable.save_change') }}
-                        </button>
-                    </a>
-                    @endauth
+                            @permission('clone-timetable')
+                            <button class="btn btn-success btn-sm btn_clone_timetable"
+                                    data-toggle="modal"
+                                    data-target="#clone-timetable"
+                                    data-toggle="tooltip"
+                                    data-placement="top"
+                                    id="btn_clone"
+                                    title="{{ trans('buttons.backend.schedule.timetable.clone') }}">
+                                {{ trans('buttons.backend.schedule.timetable.clone') }}
+                            </button>
+                            @endauth
+
+                            @permission('publish-timetable')
+                            <a href="#">
+                                <button class="btn btn-info btn-sm"
+                                        data-toggle="tooltip"
+                                        data-placement="top"
+                                        id="btn_publish"
+                                        title="{{ trans('buttons.backend.schedule.timetable.publish') }}">
+                                    {{ trans('buttons.backend.schedule.timetable.publish') }}
+                                </button>
+                            </a>
+                            @endauth
+
+                            @permission('save-change-timetable')
+                            <a href="#">
+                                <button class="btn btn-danger btn-sm"
+                                        data-toggle="tooltip"
+                                        data-placement="top"
+                                        title="{{ trans('buttons.backend.schedule.timetable.save_change') }}">
+                                    {{ trans('buttons.backend.schedule.timetable.save_change') }}
+                                </button>
+                            </a>
+                            @endauth
+                        </div>
+
+                        <form name="options-filter"
+                              id="options-filter"
+                              method="POST"
+                              action="{{ route('admin.schedule.timetables.filter') }}">
+                            @include('backend.schedule.timetables.includes.partials.option')
+                        </form>
+                    </div>
                 </div>
 
-                <form name="options-filter"
-                      id="options-filter"
-                      method="POST"
-                      action="{{ route('admin.schedule.timetables.filter') }}">
-                    @include('backend.schedule.timetables.includes.partials.option')
-                </form>
+                <div class="box-body">
+                    <div class="row">
+                        <div class="col-md-9 col-sm-12 col-xs-12">
+                            <div id="timetable" class="view-timetable"></div>
+                        </div>
+                        <div class="col-md-3 col-sm-12 col-xs-12">
 
+                            @include('backend.schedule.timetables.includes.partials.courses-sessions')
+
+                            @include('backend.schedule.timetables.includes.partials.rooms')
+
+                        </div>
+                    </div>
+                    <div class="clearfix"></div>
+                </div>
+                <div class="panel-conflict box box-danger" id="conflict" style="display: none;"></div>
             </div>
         </div>
+    </div>
 
-        <div class="box-body">
-            <div class="row">
-                <div class="col-md-9 col-sm-12 col-xs-12">
-                    <div id="timetable" class="view-timetable"></div>
-                </div>
-                <div class="col-md-3 col-sm-12 col-xs-12">
-
-                    @include('backend.schedule.timetables.includes.partials.courses-sessions')
-
-                    @include('backend.schedule.timetables.includes.partials.rooms')
-
-                </div>
-            </div>
-            <div class="clearfix"></div>
+    <div class="t-cog" style="display:none;width: 300px;position: fixed;bottom: 10px;right: 24px; padding: 10px; background-color: #fff; border: 1px solid #d0d0d0;">
+        <div class="t-cog-header" style="border-bottom: 1px solid #dddddd;">
+            <h4>Settings</h4>
         </div>
-        <div class="panel-conflict box box-danger" id="conflict" style="display: none;"></div>
+        <div class="t-cog-body">
+            <div><label><input type="checkbox"> Option 1</label></div>
+            <div><label><input type="checkbox"> Option 1</label></div>
+            <div><label><input type="checkbox"> Option 1</label></div>
+            <div><label><input type="checkbox"> Option 1</label></div>
+            <div><label><input type="checkbox"> Option 1</label></div>
+            <div><label><input type="checkbox"> Option 1</label></div>
+        </div>
     </div>
 
     @include('backend.schedule.timetables.includes.modals.clone')
@@ -154,15 +181,6 @@
                     revert: true,
                     revertDuration: 0
                 });
-
-                /*if ($(this).data('event').teacher_name !== 'Unsigned') {
-                    // make the event draggable using jQuery UI
-                    $(this).draggable({
-                        zIndex: 9999,
-                        revert: true,      // will cause the event to go back to its
-                        revertDuration: 0  //  original position after the drag
-                    });
-                }*/
             });
             @endif
         }
@@ -1052,6 +1070,10 @@
             $(document).on('keyup', '#search-employee', function () {
                 let query = $(this).val();
                 get_employees(query);
+            })
+
+            $('#t-cog').click(function () {
+                $('.t-cog').toggle();
             })
         });
 

@@ -384,7 +384,7 @@ trait AjaxCRUDTimetableController
 
                 $slot = Slot::find($timetable_slot->slot_id);
 
-                if (($slot->time_remaining >= $new_durations) && $slot->time_remaining >= 0) {
+                if (($slot->time_remaining >= ($new_durations-$old_durations)) && $slot->time_remaining >= 0) {
                     if ($new_durations > $old_durations) {
                         $interval = $new_durations - $old_durations;
                         $slot->time_remaining = $slot->time_remaining - $interval;
