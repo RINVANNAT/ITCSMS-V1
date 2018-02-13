@@ -111,6 +111,15 @@ trait AjaxCloneTimetableController
                             $newTimetable->save();
                         }
 
+                        $newTimetableSlots = $newTimetable->timetableSlots;
+                        foreach ($newTimetableSlots as $newTimetableSlot) {
+                            $newSlot = Slot::find($newTimetableSlot->slot_id);
+                            $newSlot->time_remaining += $newTimetableSlot->durations;
+                            if($newSlot->update()) {
+                                $newTimetableSlot->delete();
+                            }
+                        }
+
                         $timetable_slots = TimetableSlot::where('timetable_id', $timetable->id)->get();
 
                         foreach ($timetable_slots as $timetable_slot) {
