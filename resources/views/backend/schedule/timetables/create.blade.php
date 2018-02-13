@@ -1028,6 +1028,7 @@
                                     course_session_item += '<span style="margin-left: 28px;" class="course-type">Course</span> : ' +
                                         '<span class="times">' + val.remaining + '</span> H'
                                 }
+                                course_session_item += '<span class="hidden lecturer-id">' + val.lecturer_id + '</span>';
                                 course_session_item += '<span class="text courses-session-id" style="display: none;">' + val.course_session_id + '</span><span class="text slot-id" style="display: none;">' + val.id + '</span><br>' + '</li>';
                             });
 
