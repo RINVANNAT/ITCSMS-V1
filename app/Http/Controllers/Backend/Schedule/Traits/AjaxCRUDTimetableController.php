@@ -697,7 +697,7 @@ trait AjaxCRUDTimetableController
         $course_programs = Course::where([
             ['department_id', $data['department_id']],
             ['degree_id', $data['degree_id']],
-            ['department_option_id', $data['option_id']],
+            ['department_option_id', isset($data['option_id']) ? $data['option_id'] : null],
             ['grade_id', $data['grade_id']],
             ['semester_id', $data['semester_id']]
         ])->get();
