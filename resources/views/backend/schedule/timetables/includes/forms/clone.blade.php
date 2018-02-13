@@ -26,7 +26,7 @@
     </div>
 </div>
 
-<div class="form-group">
+{{--<div class="form-group">
     <div class="col-md-10 col-md-offset-2">
         <div class="row">
             <div class="col-md-12">
@@ -43,7 +43,7 @@
     <div class="col-md-8 col-md-offset-2">
         <div class="row render_groups"></div>
     </div>
-</div>
+</div>--}}
 
 <hr/>
 <div class="form-group">

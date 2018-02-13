@@ -522,32 +522,36 @@ class EloquentTimetableSlotRepository implements TimetableSlotRepositoryContract
      */
     public function copied_timetable_slot(Slot $slot, Timetable $timetable, TimetableSlot $timetableSlot)
     {
-        $newMergeTimetableSlot = new MergeTimetableSlot();
-        $newMergeTimetableSlot->start = $timetableSlot->start;
-        $newMergeTimetableSlot->end = $timetableSlot->end;
-        if ($newMergeTimetableSlot->save()) {
-            $newTimetableSlot = new TimetableSlot();
-            $newTimetableSlot->timetable_id = $timetable->id;
-            $newTimetableSlot->course_session_id = $slot->course_session_id;
-            $newTimetableSlot->slot_id = $slot->id;
-            $newTimetableSlot->room_id = $timetableSlot->room_id;
-            $newTimetableSlot->group_merge_id = $newMergeTimetableSlot->id;
-            $newTimetableSlot->course_name = $timetableSlot->course_name;
-            $newTimetableSlot->teacher_name = $timetableSlot->teacher_name;
-            $newTimetableSlot->type = $timetableSlot->type;
+        try {
+            $newMergeTimetableSlot = new MergeTimetableSlot();
+            $newMergeTimetableSlot->start = $timetableSlot->start;
+            $newMergeTimetableSlot->end = $timetableSlot->end;
+            if ($newMergeTimetableSlot->save()) {
+                $newTimetableSlot = new TimetableSlot();
+                $newTimetableSlot->timetable_id = $timetable->id;
+                $newTimetableSlot->course_program_id = $slot->course_program_id;
+                $newTimetableSlot->slot_id = $slot->id;
+                $newTimetableSlot->room_id = $timetableSlot->room_id;
+                $newTimetableSlot->group_merge_id = $newMergeTimetableSlot->id;
+                $newTimetableSlot->course_name = $timetableSlot->course_name;
+                $newTimetableSlot->lecturer_id = $timetableSlot->lecturer_id;
+                $newTimetableSlot->type = $timetableSlot->type;
 
-            $newTimetableSlot->durations = $timetableSlot->durations;
-            $slot->time_remaining = $slot->time_remaining - $timetableSlot->durations;
-            $slot->update();
+                $newTimetableSlot->durations = $timetableSlot->durations;
+                $slot->time_remaining = $slot->time_remaining - $timetableSlot->durations;
+                $slot->update();
 
-            $newTimetableSlot->start = $timetableSlot->start;
-            $newTimetableSlot->end = $timetableSlot->end;
-            $newTimetableSlot->created_uid = auth()->user()->id;
-            $newTimetableSlot->updated_uid = auth()->user()->id;
-            $newTimetableSlot->save();
-            return true;
+                $newTimetableSlot->start = $timetableSlot->start;
+                $newTimetableSlot->end = $timetableSlot->end;
+                $newTimetableSlot->created_uid = auth()->user()->id;
+                $newTimetableSlot->updated_uid = auth()->user()->id;
+                $newTimetableSlot->save();
+                return true;
+            }
+        }catch (\Exception $e) {
+            dd($e->getMessage());
+            return false;
         }
-        return false;
     }
 
     /**

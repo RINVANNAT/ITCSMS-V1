@@ -39,22 +39,22 @@ function clone_timetable_form() {
                     + '</div>';
             });
 
-            var groups = '';
-
-            $.each(response.groups, function (key, val) {
-                groups += '<div class="col-md-2">'
-                    + '<label for="' + val.id + '">'
-                    + '<input type="checkbox"'
-                    + 'data-target="groups"'
-                    + 'name="groups[]"'
-                    + 'value="' + val.id + '"'
-                    + 'class="square groups_value"> ' + val.code
-                    + '</label>'
-                    + '</div>';
-            });
+            // var groups = '';
+            //
+            // $.each(response.groups, function (key, val) {
+            //     groups += '<div class="col-md-2">'
+            //         + '<label for="' + val.id + '">'
+            //         + '<input type="checkbox"'
+            //         + 'data-target="groups"'
+            //         + 'name="groups[]"'
+            //         + 'value="' + val.id + '"'
+            //         + 'class="square groups_value"> ' + val.code
+            //         + '</label>'
+            //         + '</div>';
+            // });
 
             $('.render_weeks').html(weeks);
-            $('.render_groups').html(groups);
+            // $('.render_groups').html(groups);
 
             $('#academic_year_id').val($('select[name="academicYear"] :selected').val());
             $('#department_id').val($('select[name="department"] :selected').val());
@@ -105,7 +105,7 @@ $(function () {
                 success: function (response) {
                     if (response.status === true) {
                         notify('info', 'Cloning timetable successfully', 'Clone Timetable');
-                        get_course_sessions();
+                        get_course_programs();
                     } else {
                         swal(
                             'Oops...',
@@ -121,7 +121,7 @@ $(function () {
                 complete: function () {
                     toggleLoading(false);
                     get_timetable_slots();
-                    get_course_sessions();
+                    get_course_programs();
                 }
             });
         });
