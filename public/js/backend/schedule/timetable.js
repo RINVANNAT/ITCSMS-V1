@@ -105,7 +105,9 @@ function get_grades(department_id) {
             );
         },
         complete: function () {
-            // get_groups();
+            get_course_programs();
+            get_timetable();
+            get_timetable_slots();
         }
     })
 }
