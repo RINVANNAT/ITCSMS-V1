@@ -1,14 +1,3 @@
-function checkInternetConnection() {
-    if (!navigator.onLine) {
-        swal(
-            'Oops...',
-            'Your internet connection is fail.',
-            'error'
-        );
-        return false;
-    }
-}
-
 // preparing checkbox weeks and groups.
 function checkBoxComponents() {
     $('input[type="checkbox"].square').iCheck({
@@ -76,16 +65,6 @@ function clone_timetable_form() {
             $('#group_id').val($('select[name="group"] :selected').val());
             $('#week_id').val($('select[name="weekly"] :selected').val());
             checkBoxComponents();
-        },
-        error: function () {
-            swal(
-                'Form submission is failed',
-                'Hello World!',
-                'error'
-            );
-        },
-        complete: function () {
-
         }
     })
 }
