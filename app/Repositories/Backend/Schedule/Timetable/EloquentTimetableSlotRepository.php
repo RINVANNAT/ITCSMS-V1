@@ -41,7 +41,7 @@ class EloquentTimetableSlotRepository implements TimetableSlotRepositoryContract
             if ($slot instanceof Slot) {
                 $duration = $this->durations(new Carbon($request->start), new Carbon($request->end == null ? $request->start : $request->end));
                 if ($slot->time_remaining > 0 && $slot->time_remaining >= $duration) {
-                    DB::transaction ( function () use ($timetable, $request, $newMergeTimetableSlot, $duration, $slot){
+                    try {
                         $newTimetableSlot = new TimetableSlot();
                         $newTimetableSlot->timetable_id = $timetable->id;
                         $newTimetableSlot->course_program_id = $request->course_program_id;
@@ -62,9 +62,11 @@ class EloquentTimetableSlotRepository implements TimetableSlotRepositoryContract
                             $slot->time_remaining = $slot->time_remaining - $duration;
                             $slot->updated_at = Carbon::now();
                             $slot->update();
-                            return $newTimetableSlot;
                         }
-                    });
+                        return $newTimetableSlot;
+                    }catch (\Exception $e) {
+                        return $e->getMessage();
+                    }
                 }
             }
         }
