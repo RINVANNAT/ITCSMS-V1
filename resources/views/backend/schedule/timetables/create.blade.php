@@ -54,9 +54,9 @@
                                     <span class="fa fa-cog"></span>
                                 </button>
                                 <ul class="dropdown-menu">
-                                    <li><a href="javascript:void(0)"><label><input type="checkbox" id="filter_language" name="filter_language"/> Show language session</label></a></li>
-                                    <li><a href="javascript:void(0)"><label><input type="checkbox" id="filter_alphabet_group" name="filter_alphabet_group" checked/> Get Alphabet Group</label></a></li>
-                                    <li><a href="javascript:void(0)"><label><input type="checkbox" id="filter_number_group" name="filter_number_group" checked/> Get Number Group</label></a></li>
+                                    <li><a href="javascript:void(0)"><label><input type="checkbox" id="filter_language" checked name="filter_language"/> Show language session</label></a></li>
+                                    <li><a href="javascript:void(0)"><label><input type="checkbox" id="filter_alphabet_group" name="filter_alphabet_group"/> Get Alphabet Group</label></a></li>
+                                    <li><a href="javascript:void(0)"><label><input type="checkbox" id="filter_number_group" name="filter_number_group"/> Get Number Group</label></a></li>
                                     <li role="separator" class="divider"></li>
                                     <li><a href="javascript:void(0)"><label><input type="checkbox"/> Other Option</label></a></li>
                                 </ul>

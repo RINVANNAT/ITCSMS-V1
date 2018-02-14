@@ -39,6 +39,7 @@ trait PrintTimetableController
     {
         // find timetable
         $timetable = Timetable::find($id);
+
         // find all timetable slot by academic year and department id.
         // in order to get weeks.
         $allWeeks = Timetable::where([
@@ -46,18 +47,18 @@ trait PrintTimetableController
             ['department_id', $timetable->department_id],
             ['semester_id', $timetable->semester_id]
         ])
-            ->select('week_id')
-            ->groupBy('week_id')
-            ->get();
+        ->select('week_id')
+        ->groupBy('week_id')
+        ->get();
 
         $allGroups = Timetable::where([
             ['academic_year_id', $timetable->academic_year_id],
             ['department_id', $timetable->department_id],
             ['semester_id', $timetable->semester_id]
         ])
-            ->select('group_id')
-            ->groupBy('group_id')
-            ->get();
+        ->select('group_id')
+        ->groupBy('group_id')
+        ->get();
 
         $weeks = array();
         $groups = array();
@@ -124,6 +125,17 @@ trait PrintTimetableController
                 if ($itemTimetable instanceof Timetable) {
                     $timetables->push($itemTimetable);
                 }
+            }
+        }
+
+        $student_annual_ids = $this->timetableSlotRepos->find_student_annual_ids($infoTimetable);
+        if ($infoTimetable->department_id < 12) {
+            $department_languages = array(12, 13);
+            foreach ($department_languages as $department_language) {
+                $groups = $this->timetableSlotRepos->get_group_student_annual_form_language($department_language, $student_annual_ids, $infoTimetable);
+                $timetablesLang = $this->timetableSlotRepos->get_timetables_form_language_by_student_annual($groups[0], $infoTimetable, $department_language);
+                $timetableSlotsLang = $this->timetableSlotRepos->get_timetable_slot_language_dept($timetablesLang, $groups[0]);
+                $this->timetableSlotRepos->set_timetable_slot_language($timetablesSlotsLang, $timetableSlotsLang[1], $timetableSlotsLang[0]);
             }
         }
 

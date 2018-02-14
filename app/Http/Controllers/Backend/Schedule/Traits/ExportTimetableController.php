@@ -192,7 +192,7 @@ trait ExportTimetableController
                 // init array of dept language
                 $department_languages = array(12, 13); // (english, french)
                 foreach ($department_languages as $department_language) {
-                    $groups = $this->exportTimetableSlotRepository->find_group_student_annual_form_language($department_language, $student_annual_ids, $findTimetable);
+                    $groups = $this->exportTimetableSlotRepository->get_group_student_annual_form_language($department_language, $student_annual_ids, $findTimetable);
                     $timetables = $this->exportTimetableSlotRepository->get_timetables_form_language_by_student_annual($groups[0], $findTimetable, $department_language);
                     $timetableSlotsLang = $this->exportTimetableSlotRepository->get_timetable_slot_language_dept($timetables, $groups[0]);
                     $this->exportTimetableSlotRepository->set_timetable_slot_language($timetableSlotsLanguages, $timetableSlotsLang[1], $timetableSlotsLang[0]);
@@ -655,7 +655,8 @@ trait ExportTimetableController
 
         $sheet->mergeCells($columns[$countColumns] . ($countRows + 2) . ':' . $columns[$countColumns + 1] . ($countRows + 2));
         $sheet->cell($columns[$countColumns] . ($countRows + 2), function ($cell) use ($timetableSlot) {
-            $cell->setValue($timetableSlot->teacher_name);
+            $teacher_name = ($timetableSlot->lecturer_id == null ? 'No Lecturer' : $timetableSlot->employee->name_latin);
+            $cell->setValue($teacher_name);
             // Set all borders (top, right, bottom, left)
             $cell->setBorder('none', 'thin', 'none', 'thin');
             $cell->setAlignment('center');

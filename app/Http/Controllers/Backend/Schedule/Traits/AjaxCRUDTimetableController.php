@@ -334,19 +334,24 @@ trait AjaxCRUDTimetableController
             $timetableSlots = new Collection();
             $timetable = $this->timetableRepo->find_timetable_is_existed($request);
             if (($request->filter_language == "true") && !($request->department == 12 || $request->department == 13)) {
-                $timetableLangs = Timetable::where([
-                    ['academic_year_id', $request->academicYear],
-                    ['degree_id', $request->degree],
-                    ['grade_id', $request->grade],
-                    ['semester_id', $request->semester],
-                    ['week_id', $request->weekly],
-                    ['completed', true],
-                ])
-                ->whereIn('department_id', [12, 13])
-                ->get();
+                if ($request->department < 12 && ($timetable instanceof Timetable)) {
+                    // get student annuals id
+                    $student_annual_ids = $this->timetableSlotRepo->find_student_annual_ids($timetable);
 
-                foreach ($timetableLangs as $timetableLang) {
-                    $this->timetableSlotRepo->get_timetable_slot_with_conflict_info($timetableLang, $timetableSlots, null);
+                    $department_languages = array(12, 13); // (english, french)
+                    foreach ($department_languages as $department_language) {
+                        // get group language, [@return array(Collection $groups, Array $groups)]
+                        $groups = $this->timetableSlotRepo->get_group_student_annual_form_language($department_language, $student_annual_ids, $timetable);
+
+                        // get timetable language,
+                        $timetables = $this->timetableSlotRepo->get_timetables_form_language_by_student_annual($groups[0], $timetable, $department_language);
+
+                        // get timetable slots [@return array(timetableSlots, groupsRoom)]
+                        $timetableSlotsLang = $this->timetableSlotRepo->get_timetable_slot_language_dept($timetables, $groups[0]);
+
+                        // set timetable slots language to view.
+                        $this->timetableSlotRepo->set_timetable_slot_language($timetableSlots, $timetableSlotsLang[1], $timetableSlotsLang[0]);
+                    }
                 }
             }
 
@@ -362,6 +367,7 @@ trait AjaxCRUDTimetableController
         } catch (\Exception $e) {
             $result['code'] = $e->getCode();
             $result['message'] = $e->getMessage();
+            $request['status'] = false;
         }
         return $result;
     }
@@ -552,7 +558,14 @@ trait AjaxCRUDTimetableController
                     })
                     ->where(DB::raw("CONCAT(buildings.code, '-', rooms.name)"), 'ilike', "%" . $query . "%")
                     ->whereNotNull('timetable_slots.room_id')
-                    ->select('rooms.id as id', 'rooms.name as name', 'buildings.code as code', 'rooms.nb_desk as desk', 'rooms.nb_chair as chair', 'roomTypes.name as room_type')
+                    ->select(
+                        'rooms.id as id',
+                        'rooms.name as name',
+                        'buildings.code as code',
+                        'rooms.nb_desk as desk',
+                        'rooms.nb_chair as chair',
+                        'roomTypes.name as room_type'
+                    )
                     ->distinct('name', 'code')
                     ->get();
 
@@ -593,7 +606,14 @@ trait AjaxCRUDTimetableController
                     })
                     ->whereNotIn('rooms.id', $rooms_tmp == [] ? [] : $rooms_tmp)
                     ->where(DB::raw("CONCAT(buildings.code, '-', rooms.name)"), 'ilike', "%" . $query . "%")
-                    ->select('rooms.id as id', 'rooms.name as name', 'buildings.code as code', 'rooms.nb_desk as desk', 'rooms.nb_chair as chair', 'roomTypes.name as room_type')
+                    ->select(
+                        'rooms.id as id',
+                        'rooms.name as name',
+                        'buildings.code as code',
+                        'rooms.nb_desk as desk',
+                        'rooms.nb_chair as chair',
+                        'roomTypes.name as room_type'
+                    )
                     ->get();
 
                 return Response::json([

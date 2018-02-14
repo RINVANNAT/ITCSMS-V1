@@ -87,7 +87,7 @@
                                                 <td rowspan="{{ ( (new \Carbon\Carbon($timetableSlot->end))->hour - (new \Carbon\Carbon($timetableSlot->start))->hour) }}">
                                                     <div class="course_type">{{ $timetableSlot->type }}</div>
                                                     <div class="course_name">{{ smis_str_limit($timetableSlot->course_name, 20) }}</div>
-                                                    <div class="teacher_name">{{ $timetableSlot->employee->name_latin }}</div>
+                                                    <div class="teacher_name">{{ ($timetableSlot->lecturer_id == null ? 'No Lecturer' : $timetableSlot->employee->name_latin) }}</div>
                                                     <div class="room_name">
                                                         {{ $timetableSlot->room != null ?  smis_concat_str($timetableSlot->room->name, $timetableSlot->room->building->code) : 'N/A'}}
                                                     </div>
@@ -220,7 +220,7 @@
                                                 <td rowspan="{{ ($end-$start) }}">
                                                     <div class="course_type">{{ $timetableSlot->type }}</div>
                                                     <div class="course_name">{{ smis_str_limit($timetableSlot->course_name, 20) }}</div>
-                                                    <div class="teacher_name">{{ $timetableSlot->employee->name_latin }}</div>
+                                                    <div class="teacher_name">{{ ($timetableSlot->lecturer_id != null ? $timetableSlot->employee->name_latin: 'No Lecturer') }}</div>
                                                     <div class="room_name">
                                                         {{ $timetableSlot->room != null ? smis_concat_str($timetableSlot->room->name, $timetableSlot->room->building->code) : 'N/A' }}
                                                     </div>
