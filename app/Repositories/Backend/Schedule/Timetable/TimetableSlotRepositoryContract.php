@@ -2,7 +2,6 @@
 
 namespace App\Repositories\Backend\Schedule\Timetable;
 
-use App\Http\Requests\Backend\Schedule\Timetable\CreateTimetableRequest;
 use App\Http\Requests\Backend\Schedule\Timetable\CreateTimetableSlotRequest;
 use App\Models\CourseAnnualClass;
 use App\Models\CourseSession;
@@ -257,67 +256,10 @@ interface TimetableSlotRepositoryContract
     public function get_timetable_slot_with_conflict_info(Timetable $timetable, Collection $timetableSlots, $by_teacher = null);
 
     /**
-     * Get all student annuals.
-     *
-     * @param Timetable $timetable
-     * @return mixed
-     */
-    public function find_student_annual_ids(Timetable $timetable);
-
-    /**
-     * Get group student annual from language.
-     *
-     * @param $department_id
-     * @param array $student_annual_ids
-     * @param Timetable $timetable
-     * @return mixed
-     */
-    public function get_group_student_annual_form_language($department_id, array $student_annual_ids, Timetable $timetable);
-
-    /**
-     * Get group student annual from language.
-     *
-     * @param $department_id
-     * @param array $student_annual_ids
-     * @param Timetable $timetable
-     * @return mixed
-     */
-    public function find_group_student_annual_form_language($department_id, array $student_annual_ids, Timetable $timetable);
-
-    /**
-     * Get timetables from dept language.
-     *
-     * @param array $group_students
-     * @param Timetable $timetable
-     * @param $department_id
-     * @return mixed
-     */
-    public function get_timetables_form_language_by_student_annual(array $group_students, Timetable $timetable, $department_id);
-
-    /**
-     * Get timetable slots from language dept.
-     *
-     * @param Collection $timetables
-     * @param array $groupStudentsLanguage
-     * @return mixed
-     */
-    public function get_timetable_slot_language_dept(Collection $timetables, array $groupStudentsLanguage);
-
-    /**
-     * Set language timetable slot into TimetableSlots.
-     *
-     * @param Collection $timetableSlots
-     * @param Collection $groupsRoom
-     * @param Collection $languageTimetableSlots
-     * @return mixed
-     */
-    public function set_timetable_slot_language(Collection $timetableSlots, Collection $groupsRoom, Collection $languageTimetableSlots);
-
-    /**
      * Sort groups.
      *
      * @param array $groups
      * @return mixed
      */
-    public function sort_groups (array $groups);
+    public function sort_groups(array $groups);
 }

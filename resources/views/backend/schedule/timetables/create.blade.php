@@ -47,12 +47,19 @@
                         <div class="pull-right">
 
                             <div class="btn-group">
-                                <button class="btn btn-default btn-sm"
-                                        id="t-cog"
+                                <button class="btn btn-warning dropdown-toggle btn-sm"
                                         data-toggle="dropdown"
+                                        aria-haspopup="true"
                                         aria-expanded="false">
-                                    <i class="fa fa-cogs"></i>
+                                    <span class="fa fa-cog"></span>
                                 </button>
+                                <ul class="dropdown-menu">
+                                    <li><a href="javascript:void(0)"><label><input type="checkbox" id="filter_language" name="filter_language"/> Show language session</label></a></li>
+                                    <li><a href="javascript:void(0)"><label><input type="checkbox" id="filter_alphabet_group" name="filter_alphabet_group" checked/> Get Alphabet Group</label></a></li>
+                                    <li><a href="javascript:void(0)"><label><input type="checkbox" id="filter_number_group" name="filter_number_group" checked/> Get Number Group</label></a></li>
+                                    <li role="separator" class="divider"></li>
+                                    <li><a href="javascript:void(0)"><label><input type="checkbox"/> Other Option</label></a></li>
+                                </ul>
                             </div>
 
                             @permission('generate-timetable')
@@ -128,20 +135,6 @@
                 </div>
                 <div class="panel-conflict box box-danger" id="conflict" style="display: none;"></div>
             </div>
-        </div>
-    </div>
-
-    <div class="t-cog" style="display:none;width: 300px;position: fixed;bottom: 10px;right: 24px; padding: 10px; background-color: #fff; border: 1px solid #d0d0d0;">
-        <div class="t-cog-header" style="border-bottom: 1px solid #dddddd;">
-            <h4>Settings</h4>
-        </div>
-        <div class="t-cog-body">
-            <div><label><input type="checkbox"> Option 1</label></div>
-            <div><label><input type="checkbox"> Option 1</label></div>
-            <div><label><input type="checkbox"> Option 1</label></div>
-            <div><label><input type="checkbox"> Option 1</label></div>
-            <div><label><input type="checkbox"> Option 1</label></div>
-            <div><label><input type="checkbox"> Option 1</label></div>
         </div>
     </div>
 
@@ -336,11 +329,13 @@
         }
         /** get timetable slots */
         function get_timetable_slots() {
+            let data = $('#options-filter').serializeArray();
+            data.push({name: 'filter_language', value: $('#filter_language').is(':checked')});
             toggleLoading(true);
             $.ajax({
                 type: 'POST',
                 url: '{!! route('get_timetable_slots') !!}',
-                data: $('#options-filter').serialize(),
+                data: data,
                 success: function (response) {
                     $('#timetable').fullCalendar('removeEvents');
                     $('#timetable').fullCalendar('renderEvents', response.timetableSlots, true);
@@ -918,6 +913,12 @@
             });
             // get timetable slots by on change weekly option.
             $(document).on('change', 'select[name="weekly"]', function () {
+                get_course_programs();
+                get_timetable();
+                get_timetable_slots();
+            });
+
+            $(document).on('change', '#filter_language', function () {
                 get_course_programs();
                 get_timetable();
                 get_timetable_slots();

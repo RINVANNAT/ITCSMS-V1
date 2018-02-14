@@ -323,13 +323,47 @@ trait AjaxCRUDTimetableController
      */
     public function get_timetable_slots(CreateTimetableRequest $request)
     {
-        $timetableSlots = new Collection();
-        $timetable = $this->timetableRepo->find_timetable_is_existed($request);
+        $result = array(
+            'code' => 200,
+            'message' => 'Successfully',
+            'timetable' => null,
+            'timetableSlots' => [],
+        );
 
-        if ($timetable instanceof Timetable) {
-            $this->timetableSlotRepo->get_timetable_slot_with_conflict_info($timetable, $timetableSlots, null);
+        try {
+            $timetableSlots = new Collection();
+            $timetable = $this->timetableRepo->find_timetable_is_existed($request);
+            if (($request->filter_language == "true") && !($request->department == 12 || $request->department == 13)) {
+                $timetableLangs = Timetable::where([
+                    ['academic_year_id', $request->academicYear],
+                    ['degree_id', $request->degree],
+                    ['grade_id', $request->grade],
+                    ['semester_id', $request->semester],
+                    ['week_id', $request->weekly],
+                    ['completed', true],
+                ])
+                ->whereIn('department_id', [12, 13])
+                ->get();
+
+                foreach ($timetableLangs as $timetableLang) {
+                    $this->timetableSlotRepo->get_timetable_slot_with_conflict_info($timetableLang, $timetableSlots, null);
+                }
+            }
+
+            if ($timetable instanceof Timetable) {
+                $this->timetableSlotRepo->get_timetable_slot_with_conflict_info($timetable, $timetableSlots, null);
+            }
+
+            if (!is_null($timetable)) {
+                $result['timetable'] = $timetable;
+                $result['timetableSlots'] = $timetableSlots;
+            }
+
+        } catch (\Exception $e) {
+            $result['code'] = $e->getCode();
+            $result['message'] = $e->getMessage();
         }
-        return Response::json(['status' => true, 'timetable' => $timetable == null ? null : $timetable, 'timetableSlots' => $timetableSlots]);
+        return $result;
     }
 
     /**
@@ -384,7 +418,7 @@ trait AjaxCRUDTimetableController
 
                 $slot = Slot::find($timetable_slot->slot_id);
 
-                if (($slot->time_remaining >= ($new_durations-$old_durations)) && $slot->time_remaining >= 0) {
+                if (($slot->time_remaining >= ($new_durations - $old_durations)) && $slot->time_remaining >= 0) {
                     if ($new_durations > $old_durations) {
                         $interval = $new_durations - $old_durations;
                         $slot->time_remaining = $slot->time_remaining - $interval;
