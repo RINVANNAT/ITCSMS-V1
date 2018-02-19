@@ -614,7 +614,7 @@ class StudentAnnualController extends Controller
         ;
 
 
-        $title = 'áž”áž‰áŸ’áž‡áž¸áž“áž·ážŸáŸ’ážŸáž·ážáž»';
+        $title = 'បញ្ជីឈ្មោះនិស្សិត';
 
         if($ids = $_POST['student_ids']){
             $studentAnnuals = $studentAnnuals->whereIn('studentAnnuals.id',json_decode($ids));
@@ -624,7 +624,7 @@ class StudentAnnualController extends Controller
                 $studentAnnuals = $studentAnnuals->where('studentAnnuals.academic_year_id', $academic_year);
 
                 $academic_year_obj = AcademicYear::where('id',$academic_year)->first();
-                $title .= " áž†áŸ’áž“áž¶áŸ†ážŸáž·áž€áŸ’ážŸáž¶ ".$academic_year_obj->name_kh;
+                $title .= " នៅឆ្នាំសិក្សា ".$academic_year_obj->name_kh;
             }
 
             if($redouble = $_POST['filter_redouble']){
@@ -658,19 +658,19 @@ class StudentAnnualController extends Controller
                     ->where(function($query) use($semester){
                         $query->where("group_student_annuals.semester_id",$semester)->orWhereNull("group_student_annuals.semester_id");
                     });
-                $title .= " áž†áž˜áž¶ážŸáž‘áž¸  ".$semester;
+                $title .= " ឆមាសទី  ".$semester;
             }
             if ($group = $_POST['filter_group']) {
                 $studentAnnuals = $studentAnnuals->where('groups.code', $group);
 
-                $title .= " áž€áŸ’ážšáž»áž˜ ".$group;
+                $title .= " ក្រុម ".$group;
             }
 
             if ($degree = $_POST['filter_degree']) {
                 $studentAnnuals = $studentAnnuals->where('studentAnnuals.degree_id', $degree);
 
                 $degree_obj = Degree::where('id',$degree)->first();
-                $title .= "ážáŸ’áž“áž¶áž€áŸ‹".$degree_obj->name_kh;
+                $title .= "ថ្នាក់".$degree_obj->name_kh;
             }
 
             if ($grade = $_POST['filter_grade']) {
@@ -683,19 +683,19 @@ class StudentAnnualController extends Controller
                 $studentAnnuals = $studentAnnuals->where('studentAnnuals.department_id', $department);
 
                 $department_obj = Department::where('id',$department)->first();
-                $title .= " ážŠáŸáž”áŸ‰áž¶ážážºáž˜áŸ‰áž„áŸ‹ ".$department_obj->name_kh;
+                $title .= " ដេប៉ាតឺម៉ង់ ".$department_obj->name_kh;
             }
             if ($gender = $_POST['filter_gender']) {
                 $studentAnnuals = $studentAnnuals->where('students.gender_id', $gender);
 
                 $gender_obj = Gender::where('id',$gender)->first();
-                $title .= " áž—áŸáž‘".$gender_obj->name_kh;
+                $title .= " ភេទ".$gender_obj->name_kh;
             }
             if ($option = $_POST['filter_option']) {
                 $studentAnnuals = $studentAnnuals->where('studentAnnuals.department_option_id', $option);
 
                 $option_obj = DepartmentOption::where('id',$option)->first();
-                $title .= " áž‡áŸ†áž“áž¶áž‰ ".$option_obj->name_kh;
+                $title .= " ជំនាញ ".$option_obj->name_kh;
             }
             if ($origin = $_POST['filter_origin']) {
                 $studentAnnuals = $studentAnnuals->where('students.origin_id', $origin);
@@ -704,6 +704,7 @@ class StudentAnnualController extends Controller
         //dd($studentAnnuals->toSql());
         $data = $studentAnnuals->get()->toArray();
 
+        //dd($data);
         foreach ($data as &$value){
             $date = Carbon::createFromFormat('Y-m-d H:i:s',$value['dob'])->formatLocalized("%d/%b/%Y");
             $value['dob'] = $date;
@@ -810,10 +811,10 @@ class StudentAnnualController extends Controller
             array_push($fields,$_POST['parent_phone']);
         }
 
-        Excel::create('áž”áž‰áŸ’áž‡áž¸áž“áž·ážŸáŸ’ážŸáž·áž', function($excel) use ($data, $title,$alpha,$fields) {
+        Excel::create('បញ្ចីឈ្មោះនិស្សិត', function($excel) use ($data, $title,$alpha,$fields) {
 
             // Set the title
-            $excel->setTitle('áž”áž‰áŸ’áž‡áž¸áž“áž·ážŸáŸ’ážŸáž·áž');
+            $excel->setTitle('បញ្ចីឈ្មោះនិស្សិត');
 
             // Chain the setters
             $excel->setCreator('Department of Study & Student Affair')
@@ -833,16 +834,16 @@ class StudentAnnualController extends Controller
                 $sheet->setPageMargin(0.25);
 
                 $sheet->row(1, array(
-                    'áž–áŸ’ážšáŸ‡ážšáž¶áž‡áž¶ážŽáž¶áž…áž€áŸ’ážšáž€áž˜áŸ’áž–áž»áž‡áž¶'
+                    ''
                 ));
                 $sheet->appendRow(array(
-                    'áž‡áž¶ážáž· ážŸáž¶ážŸáž“áž¶ áž–áŸ’ážšáŸ‡áž˜áž áž¶áž€áŸ’ážŸážáŸ’ážš'
+                    ''
                 ));
                 $sheet->appendRow(array(
-                    'áž€áŸ’ážšážŸáž½áž„áž¢áž”áŸ‹ážšáŸ† áž™áž»ážœáž‡áž“ â€‹áž“áž·áž„áž€áž¸áž¡áž¶'
+                    ''
                 ));
                 $sheet->appendRow(array(
-                    'ážœáž·áž‘áŸ’áž™áž¶ážŸáŸ’ážáž¶áž“áž”áž…áŸ’áž…áŸáž€ážœáž·áž‘áŸ’áž™áž¶áž€áž˜áŸ’áž–áž»áž‡áž¶'
+                    ''
                 ));
                 $sheet->appendRow(array(
                     $title
