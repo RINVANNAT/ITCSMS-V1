@@ -64,11 +64,19 @@
                                                         @foreach($timetableSlot['slotsForLanguage'] as $key => $item)
                                                             @if($key % 2 !== 0)
                                                                 <div class="lang-info-right">Gr: {{ $item['group'] }}
-                                                                    ({{ $item['building'] }}-{{$item['room']}})
+                                                                    @if(!is_null($item['room']))
+                                                                        ({{ $item['building'] }}-{{$item['room']}})
+                                                                    @else
+                                                                        None
+                                                                    @endif
                                                                 </div>
                                                             @else
                                                                 <div class="lang-info-left">Gr: {{ $item['group'] }}
-                                                                    ({{ $item['building'] }}-{{$item['room']}})
+                                                                    @if(!is_null($item['room']))
+                                                                        ({{ $item['building'] }}-{{$item['room']}})
+                                                                    @else
+                                                                        None
+                                                                    @endif
                                                                 </div>
                                                             @endif
                                                             <div class="clearfix"></div>
@@ -124,11 +132,19 @@
                                                     @foreach($timetableSlot['slotsForLanguage'] as $key => $item)
                                                         @if($key % 2 !== 0)
                                                             <div class="lang-info-right">Gr: {{ $item['group'] }}
-                                                                ({{ $item['building'] }}-{{$item['room']}})
+                                                                @if(!is_null($item['room']))
+                                                                    ({{ $item['building'] }}-{{$item['room']}})
+                                                                @else
+                                                                    None
+                                                                @endif
                                                             </div>
                                                         @else
                                                             <div class="lang-info-left">Gr: {{ $item['group'] }}
-                                                                ({{ $item['building'] }}-{{$item['room']}})
+                                                                @if(!is_null($item['room']))
+                                                                    ({{ $item['building'] }}-{{$item['room']}})
+                                                                @else
+                                                                    None
+                                                                @endif
                                                             </div>
                                                         @endif
                                                     @endforeach
@@ -193,11 +209,19 @@
                                                     @foreach($timetableSlot['slotsForLanguage'] as $key => $item)
                                                         @if($key % 2 !== 0)
                                                             <div class="lang-info-right">Gr: {{ $item['group'] }}
-                                                                ({{ $item['building'] }}-{{$item['room']}})
+                                                                @if(!is_null($item['room']))
+                                                                    ({{ $item['building'] }}-{{$item['room']}})
+                                                                @else
+                                                                    None
+                                                                @endif
                                                             </div>
                                                         @else
                                                             <div class="lang-info-left">Gr: {{ $item['group'] }}
-                                                                ({{ $item['building'] }}-{{$item['room']}})
+                                                                @if(!is_null($item['room']))
+                                                                    ({{ $item['building'] }}-{{$item['room']}})
+                                                                @else
+                                                                    None
+                                                                @endif
                                                             </div>
                                                         @endif
                                                     @endforeach
@@ -257,11 +281,19 @@
                                                     @foreach($timetableSlot['slotsForLanguage'] as $key => $item)
                                                         @if($key % 2 !== 0)
                                                             <div class="lang-info-right">Gr: {{ $item['group'] }}
-                                                                ({{ $item['building'] }}-{{$item['room']}})
+                                                                @if(!is_null($item['room']))
+                                                                    ({{ $item['building'] }}-{{$item['room']}})
+                                                                @else
+                                                                    None
+                                                                @endif
                                                             </div>
                                                         @else
                                                             <div class="lang-info-left">Gr: {{ $item['group'] }}
-                                                                ({{ $item['building'] }}-{{$item['room']}})
+                                                                @if(!is_null($item['room']))
+                                                                    ({{ $item['building'] }}-{{$item['room']}})
+                                                                @else
+                                                                    None
+                                                                @endif
                                                             </div>
                                                         @endif
                                                     @endforeach
@@ -384,11 +416,19 @@
                                                     @foreach($timetableSlot['slotsForLanguage'] as $key => $item)
                                                         @if($key % 2 !== 0)
                                                             <div class="lang-info-right">Gr: {{ $item['group'] }}
-                                                                ({{ $item['building'] }}-{{$item['room']}})
+                                                                @if(!is_null($item['room']))
+                                                                    ({{ $item['building'] }}-{{$item['room']}})
+                                                                @else
+                                                                    None
+                                                                @endif
                                                             </div>
                                                         @else
                                                             <div class="lang-info-left">Gr: {{ $item['group'] }}
-                                                                ({{ $item['building'] }}-{{$item['room']}})
+                                                                @if(!is_null($item['room']))
+                                                                    ({{ $item['building'] }}-{{$item['room']}})
+                                                                @else
+                                                                    None
+                                                                @endif
                                                             </div>
                                                         @endif
                                                     @endforeach
@@ -451,11 +491,19 @@
                                                     @foreach($timetableSlot['slotsForLanguage'] as $key => $item)
                                                         @if($key % 2 !== 0)
                                                             <div class="lang-info-right">Gr: {{ $item['group'] }}
-                                                                ({{ $item['building'] }}-{{$item['room']}})
+                                                                @if(!is_null($item['room']))
+                                                                    ({{ $item['building'] }}-{{$item['room']}})
+                                                                @else
+                                                                    None
+                                                                @endif
                                                             </div>
                                                         @else
                                                             <div class="lang-info-left">Gr: {{ $item['group'] }}
-                                                                ({{ $item['building'] }}-{{$item['room']}})
+                                                                @if(!is_null($item['room']))
+                                                                    ({{ $item['building'] }}-{{$item['room']}})
+                                                                @else
+                                                                    None
+                                                                @endif
                                                             </div>
                                                         @endif
                                                     @endforeach
@@ -517,11 +565,19 @@
                                                     @foreach($timetableSlot['slotsForLanguage'] as $key => $item)
                                                         @if($key % 2 !== 0)
                                                             <div class="lang-info-right">Gr: {{ $item['group'] }}
-                                                                ({{ $item['building'] }}-{{$item['room']}})
+                                                                @if(!is_null($item['room']))
+                                                                    ({{ $item['building'] }}-{{$item['room']}})
+                                                                @else
+                                                                    None
+                                                                @endif
                                                             </div>
                                                         @else
                                                             <div class="lang-info-left">Gr: {{ $item['group'] }}
-                                                                ({{ $item['building'] }}-{{$item['room']}})
+                                                                @if(!is_null($item['room']))
+                                                                    ({{ $item['building'] }}-{{$item['room']}})
+                                                                @else
+                                                                    None
+                                                                @endif
                                                             </div>
                                                         @endif
                                                     @endforeach
@@ -577,11 +633,19 @@
                                                         @foreach($timetableSlot['slotsForLanguage'] as $key => $item)
                                                             @if($key % 2 !== 0)
                                                                 <div class="lang-info-right">Gr: {{ $item['group'] }}
-                                                                    ({{ $item['building'] }}-{{$item['room']}})
+                                                                    @if(!is_null($item['room']))
+                                                                        ({{ $item['building'] }}-{{$item['room']}})
+                                                                    @else
+                                                                        None
+                                                                    @endif
                                                                 </div>
                                                             @else
                                                                 <div class="lang-info-left">Gr: {{ $item['group'] }}
-                                                                    ({{ $item['building'] }}-{{$item['room']}})
+                                                                    @if(!is_null($item['room']))
+                                                                        ({{ $item['building'] }}-{{$item['room']}})
+                                                                    @else
+                                                                        None
+                                                                    @endif
                                                                 </div>
                                                             @endif
                                                             <div class="clearfix"></div>
@@ -637,11 +701,19 @@
                                                     @foreach($timetableSlot['slotsForLanguage'] as $key => $item)
                                                         @if($key % 2 !== 0)
                                                             <div class="lang-info-right">Gr: {{ $item['group'] }}
-                                                                ({{ $item['building'] }}-{{$item['room']}})
+                                                                @if(!is_null($item['room']))
+                                                                    ({{ $item['building'] }}-{{$item['room']}})
+                                                                @else
+                                                                    None
+                                                                @endif
                                                             </div>
                                                         @else
                                                             <div class="lang-info-left">Gr: {{ $item['group'] }}
-                                                                ({{ $item['building'] }}-{{$item['room']}})
+                                                                @if(!is_null($item['room']))
+                                                                    ({{ $item['building'] }}-{{$item['room']}})
+                                                                @else
+                                                                    None
+                                                                @endif
                                                             </div>
                                                         @endif
                                                     @endforeach
@@ -716,11 +788,19 @@
                                                     @foreach($timetableSlot['slotsForLanguage'] as $key => $item)
                                                         @if($key % 2 !== 0)
                                                             <div class="lang-info-right">Gr: {{ $item['group'] }}
-                                                                ({{ $item['building'] }}-{{$item['room']}})
+                                                                @if(!is_null($item['room']))
+                                                                    ({{ $item['building'] }}-{{$item['room']}})
+                                                                @else
+                                                                    None
+                                                                @endif
                                                             </div>
                                                         @else
                                                             <div class="lang-info-left">Gr: {{ $item['group'] }}
-                                                                ({{ $item['building'] }}-{{$item['room']}})
+                                                                @if(!is_null($item['room']))
+                                                                    ({{ $item['building'] }}-{{$item['room']}})
+                                                                @else
+                                                                    None
+                                                                @endif
                                                             </div>
                                                         @endif
                                                         <div class="clearfix"></div>
@@ -785,11 +865,19 @@
                                                 @foreach($timetableSlot['slotsForLanguage'] as $key => $item)
                                                     @if($key % 2 !== 0)
                                                         <div class="lang-info-right">Gr: {{ $item['group'] }}
-                                                            ({{ $item['building'] }}-{{$item['room']}})
+                                                            @if(!is_null($item['room']))
+                                                                ({{ $item['building'] }}-{{$item['room']}})
+                                                            @else
+                                                                None
+                                                            @endif
                                                         </div>
                                                     @else
                                                         <div class="lang-info-left">Gr: {{ $item['group'] }}
-                                                            ({{ $item['building'] }}-{{$item['room']}})
+                                                            @if(!is_null($item['room']))
+                                                                ({{ $item['building'] }}-{{$item['room']}})
+                                                            @else
+                                                                None
+                                                            @endif
                                                         </div>
                                                     @endif
                                                 @endforeach
@@ -858,11 +946,19 @@
                                                 @foreach($timetableSlot['slotsForLanguage'] as $key => $item)
                                                     @if($key % 2 !== 0)
                                                         <div class="lang-info-right">Gr: {{ $item['group'] }}
-                                                            ({{ $item['building'] }}-{{$item['room']}})
+                                                            @if(!is_null($item['room']))
+                                                                ({{ $item['building'] }}-{{$item['room']}})
+                                                            @else
+                                                                None
+                                                            @endif
                                                         </div>
                                                     @else
                                                         <div class="lang-info-left">Gr: {{ $item['group'] }}
-                                                            ({{ $item['building'] }}-{{$item['room']}})
+                                                            @if(!is_null($item['room']))
+                                                                ({{ $item['building'] }}-{{$item['room']}})
+                                                            @else
+                                                                None
+                                                            @endif
                                                         </div>
                                                     @endif
                                                 @endforeach
@@ -896,11 +992,19 @@
                                                 @foreach($timetableSlot['slotsForLanguage'] as $key => $item)
                                                     @if($key % 2 !== 0)
                                                         <div class="lang-info-right">Gr: {{ $item['group'] }}
-                                                            ({{ $item['building'] }}-{{$item['room']}})
+                                                            @if(!is_null($item['room']))
+                                                                ({{ $item['building'] }}-{{$item['room']}})
+                                                            @else
+                                                                None
+                                                            @endif
                                                         </div>
                                                     @else
                                                         <div class="lang-info-left">Gr: {{ $item['group'] }}
-                                                            ({{ $item['building'] }}-{{$item['room']}})
+                                                            @if(!is_null($item['room']))
+                                                                ({{ $item['building'] }}-{{$item['room']}})
+                                                            @else
+                                                                None
+                                                            @endif
                                                         </div>
                                                     @endif
                                                 @endforeach
@@ -975,11 +1079,19 @@
                                                 @foreach($timetableSlot['slotsForLanguage'] as $key => $item)
                                                     @if($key % 2 !== 0)
                                                         <div class="lang-info-right">Gr: {{ $item['group'] }}
-                                                            ({{ $item['building'] }}-{{$item['room']}})
+                                                            @if(!is_null($item['room']))
+                                                                ({{ $item['building'] }}-{{$item['room']}})
+                                                            @else
+                                                                None
+                                                            @endif
                                                         </div>
                                                     @else
                                                         <div class="lang-info-left">Gr: {{ $item['group'] }}
-                                                            ({{ $item['building'] }}-{{$item['room']}})
+                                                            @if(!is_null($item['room']))
+                                                                ({{ $item['building'] }}-{{$item['room']}})
+                                                            @else
+                                                                None
+                                                            @endif
                                                         </div>
                                                     @endif
                                                 @endforeach
@@ -1058,11 +1170,19 @@
                                                 @foreach($timetableSlot['slotsForLanguage'] as $key => $item)
                                                     @if($key % 2 !== 0)
                                                         <div class="lang-info-right">Gr: {{ $item['group'] }}
-                                                            ({{ $item['building'] }}-{{$item['room']}})
+                                                            @if(!is_null($item['room']))
+                                                                ({{ $item['building'] }}-{{$item['room']}})
+                                                            @else
+                                                                None
+                                                            @endif
                                                         </div>
                                                     @else
                                                         <div class="lang-info-left">Gr: {{ $item['group'] }}
-                                                            ({{ $item['building'] }}-{{$item['room']}})
+                                                            @if(!is_null($item['room']))
+                                                                ({{ $item['building'] }}-{{$item['room']}})
+                                                            @else
+                                                                None
+                                                            @endif
                                                         </div>
                                                     @endif
                                                 @endforeach
@@ -1145,11 +1265,19 @@
                                                 @foreach($timetableSlot['slotsForLanguage'] as $key => $item)
                                                     @if($key % 2 !== 0)
                                                         <div class="lang-info-right">Gr: {{ $item['group'] }}
-                                                            ({{ $item['building'] }}-{{$item['room']}})
+                                                            @if(!is_null($item['room']))
+                                                                ({{ $item['building'] }}-{{$item['room']}})
+                                                            @else
+                                                                None
+                                                            @endif
                                                         </div>
                                                     @else
                                                         <div class="lang-info-left">Gr: {{ $item['group'] }}
-                                                            ({{ $item['building'] }}-{{$item['room']}})
+                                                            @if(!is_null($item['room']))
+                                                                ({{ $item['building'] }}-{{$item['room']}})
+                                                            @else
+                                                                None
+                                                            @endif
                                                         </div>
                                                     @endif
                                                 @endforeach
@@ -1236,11 +1364,19 @@
                                                 @foreach($timetableSlot['slotsForLanguage'] as $key => $item)
                                                     @if($key % 2 !== 0)
                                                         <div class="lang-info-right">Gr: {{ $item['group'] }}
-                                                            ({{ $item['building'] }}-{{$item['room']}})
+                                                            @if(!is_null($item['room']))
+                                                                ({{ $item['building'] }}-{{$item['room']}})
+                                                            @else
+                                                                None
+                                                            @endif
                                                         </div>
                                                     @else
                                                         <div class="lang-info-left">Gr: {{ $item['group'] }}
-                                                            ({{ $item['building'] }}-{{$item['room']}})
+                                                            @if(!is_null($item['room']))
+                                                                ({{ $item['building'] }}-{{$item['room']}})
+                                                            @else
+                                                                None
+                                                            @endif
                                                         </div>
                                                     @endif
                                                 @endforeach
@@ -1331,11 +1467,19 @@
                                                 @foreach($timetableSlot['slotsForLanguage'] as $key => $item)
                                                     @if($key % 2 !== 0)
                                                         <div class="lang-info-right">Gr: {{ $item['group'] }}
-                                                            ({{ $item['building'] }}-{{$item['room']}})
+                                                            @if(!is_null($item['room']))
+                                                                ({{ $item['building'] }}-{{$item['room']}})
+                                                            @else
+                                                                None
+                                                            @endif
                                                         </div>
                                                     @else
                                                         <div class="lang-info-left">Gr: {{ $item['group'] }}
-                                                            ({{ $item['building'] }}-{{$item['room']}})
+                                                            @if(!is_null($item['room']))
+                                                                ({{ $item['building'] }}-{{$item['room']}})
+                                                            @else
+                                                                None
+                                                            @endif
                                                         </div>
                                                     @endif
                                                 @endforeach
@@ -1414,11 +1558,19 @@
                                                     @foreach($timetableSlot['slotsForLanguage'] as $key => $item)
                                                         @if($key % 2 !== 0)
                                                             <div class="lang-info-right">Gr: {{ $item['group'] }}
-                                                                ({{ $item['building'] }}-{{$item['room']}})
+                                                                @if(!is_null($item['room']))
+                                                                    ({{ $item['building'] }}-{{$item['room']}})
+                                                                @else
+                                                                    None
+                                                                @endif
                                                             </div>
                                                         @else
                                                             <div class="lang-info-left">Gr: {{ $item['group'] }}
-                                                                ({{ $item['building'] }}-{{$item['room']}})
+                                                                @if(!is_null($item['room']))
+                                                                    ({{ $item['building'] }}-{{$item['room']}})
+                                                                @else
+                                                                    None
+                                                                @endif
                                                             </div>
                                                         @endif
                                                         <div class="clearfix"></div>
@@ -1462,11 +1614,19 @@
                                                 @foreach($timetableSlot['slotsForLanguage'] as $key => $item)
                                                     @if($key % 2 !== 0)
                                                         <div class="lang-info-right">Gr: {{ $item['group'] }}
-                                                            ({{ $item['building'] }}-{{$item['room']}})
+                                                            @if(!is_null($item['room']))
+                                                                ({{ $item['building'] }}-{{$item['room']}})
+                                                            @else
+                                                                None
+                                                            @endif
                                                         </div>
                                                     @else
                                                         <div class="lang-info-left">Gr: {{ $item['group'] }}
-                                                            ({{ $item['building'] }}-{{$item['room']}})
+                                                            @if(!is_null($item['room']))
+                                                                ({{ $item['building'] }}-{{$item['room']}})
+                                                            @else
+                                                                None
+                                                            @endif
                                                         </div>
                                                     @endif
                                                 @endforeach
@@ -1527,11 +1687,19 @@
                                                 @foreach($timetableSlot['slotsForLanguage'] as $key => $item)
                                                     @if($key % 2 !== 0)
                                                         <div class="lang-info-right">Gr: {{ $item['group'] }}
-                                                            ({{ $item['building'] }}-{{$item['room']}})
+                                                            @if(!is_null($item['room']))
+                                                                ({{ $item['building'] }}-{{$item['room']}})
+                                                            @else
+                                                                None
+                                                            @endif
                                                         </div>
                                                     @else
                                                         <div class="lang-info-left">Gr: {{ $item['group'] }}
-                                                            ({{ $item['building'] }}-{{$item['room']}})
+                                                            @if(!is_null($item['room']))
+                                                                ({{ $item['building'] }}-{{$item['room']}})
+                                                            @else
+                                                                None
+                                                            @endif
                                                         </div>
                                                     @endif
                                                 @endforeach
@@ -1601,11 +1769,19 @@
                                                 @foreach($timetableSlot['slotsForLanguage'] as $key => $item)
                                                     @if($key % 2 !== 0)
                                                         <div class="lang-info-right">Gr: {{ $item['group'] }}
-                                                            ({{ $item['building'] }}-{{$item['room']}})
+                                                            @if(!is_null($item['room']))
+                                                                ({{ $item['building'] }}-{{$item['room']}})
+                                                            @else
+                                                                None
+                                                            @endif
                                                         </div>
                                                     @else
                                                         <div class="lang-info-left">Gr: {{ $item['group'] }}
-                                                            ({{ $item['building'] }}-{{$item['room']}})
+                                                            @if(!is_null($item['room']))
+                                                                ({{ $item['building'] }}-{{$item['room']}})
+                                                            @else
+                                                                None
+                                                            @endif
                                                         </div>
                                                     @endif
                                                 @endforeach
@@ -1681,11 +1857,19 @@
                                                 @foreach($timetableSlot['slotsForLanguage'] as $key => $item)
                                                     @if($key % 2 !== 0)
                                                         <div class="lang-info-right">Gr: {{ $item['group'] }}
-                                                            ({{ $item['building'] }}-{{$item['room']}})
+                                                            @if(!is_null($item['room']))
+                                                                ({{ $item['building'] }}-{{$item['room']}})
+                                                            @else
+                                                                None
+                                                            @endif
                                                         </div>
                                                     @else
                                                         <div class="lang-info-left">Gr: {{ $item['group'] }}
-                                                            ({{ $item['building'] }}-{{$item['room']}})
+                                                            @if(!is_null($item['room']))
+                                                                ({{ $item['building'] }}-{{$item['room']}})
+                                                            @else
+                                                                None
+                                                            @endif
                                                         </div>
                                                     @endif
                                                 @endforeach
@@ -1765,11 +1949,19 @@
                                                 @foreach($timetableSlot['slotsForLanguage'] as $key => $item)
                                                     @if($key % 2 !== 0)
                                                         <div class="lang-info-right">Gr: {{ $item['group'] }}
-                                                            ({{ $item['building'] }}-{{$item['room']}})
+                                                            @if(!is_null($item['room']))
+                                                                ({{ $item['building'] }}-{{$item['room']}})
+                                                            @else
+                                                                None
+                                                            @endif
                                                         </div>
                                                     @else
                                                         <div class="lang-info-left">Gr: {{ $item['group'] }}
-                                                            ({{ $item['building'] }}-{{$item['room']}})
+                                                            @if(!is_null($item['room']))
+                                                                ({{ $item['building'] }}-{{$item['room']}})
+                                                            @else
+                                                                None
+                                                            @endif
                                                         </div>
                                                     @endif
                                                 @endforeach
@@ -1853,11 +2045,19 @@
                                                 @foreach($timetableSlot['slotsForLanguage'] as $key => $item)
                                                     @if($key % 2 !== 0)
                                                         <div class="lang-info-right">Gr: {{ $item['group'] }}
-                                                            ({{ $item['building'] }}-{{$item['room']}})
+                                                            @if(!is_null($item['room']))
+                                                                ({{ $item['building'] }}-{{$item['room']}})
+                                                            @else
+                                                                None
+                                                            @endif
                                                         </div>
                                                     @else
                                                         <div class="lang-info-left">Gr: {{ $item['group'] }}
-                                                            ({{ $item['building'] }}-{{$item['room']}})
+                                                            @if(!is_null($item['room']))
+                                                                ({{ $item['building'] }}-{{$item['room']}})
+                                                            @else
+                                                                None
+                                                            @endif
                                                         </div>
                                                     @endif
                                                 @endforeach
@@ -1946,11 +2146,19 @@
                                                 @foreach($timetableSlot['slotsForLanguage'] as $key => $item)
                                                     @if($key % 2 !== 0)
                                                         <div class="lang-info-right">Gr: {{ $item['group'] }}
-                                                            ({{ $item['building'] }}-{{$item['room']}})
+                                                            @if(!is_null($item['room']))
+                                                                ({{ $item['building'] }}-{{$item['room']}})
+                                                            @else
+                                                                None
+                                                            @endif
                                                         </div>
                                                     @else
                                                         <div class="lang-info-left">Gr: {{ $item['group'] }}
-                                                            ({{ $item['building'] }}-{{$item['room']}})
+                                                            @if(!is_null($item['room']))
+                                                                ({{ $item['building'] }}-{{$item['room']}})
+                                                            @else
+                                                                None
+                                                            @endif
                                                         </div>
                                                     @endif
                                                 @endforeach
@@ -2042,11 +2250,19 @@
                                                 @foreach($timetableSlot['slotsForLanguage'] as $key => $item)
                                                     @if($key % 2 !== 0)
                                                         <div class="lang-info-right">Gr: {{ $item['group'] }}
-                                                            ({{ $item['building'] }}-{{$item['room']}})
+                                                            @if(!is_null($item['room']))
+                                                                ({{ $item['building'] }}-{{$item['room']}})
+                                                            @else
+                                                                None
+                                                            @endif
                                                         </div>
                                                     @else
                                                         <div class="lang-info-left">Gr: {{ $item['group'] }}
-                                                            ({{ $item['building'] }}-{{$item['room']}})
+                                                            @if(!is_null($item['room']))
+                                                                ({{ $item['building'] }}-{{$item['room']}})
+                                                            @else
+                                                                None
+                                                            @endif
                                                         </div>
                                                     @endif
                                                 @endforeach

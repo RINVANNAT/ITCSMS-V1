@@ -128,16 +128,7 @@ trait PrintTimetableController
             }
         }
 
-        $student_annual_ids = $this->timetableSlotRepos->find_student_annual_ids($infoTimetable);
-        if ($infoTimetable->department_id < 12) {
-            $department_languages = array(12, 13);
-            foreach ($department_languages as $department_language) {
-                $groups = $this->timetableSlotRepos->get_group_student_annual_form_language($department_language, $student_annual_ids, $infoTimetable);
-                $timetablesLang = $this->timetableSlotRepos->get_timetables_form_language_by_student_annual($groups[0], $infoTimetable, $department_language);
-                $timetableSlotsLang = $this->timetableSlotRepos->get_timetable_slot_language_dept($timetablesLang, $groups[0]);
-                $this->timetableSlotRepos->set_timetable_slot_language($timetablesSlotsLang, $timetableSlotsLang[1], $timetableSlotsLang[0]);
-            }
-        }
+        $this->timetableSlotRepo->get_timetable_slot_language_dept($timetablesSlotsLang, $infoTimetable);
 
         return PDF::loadView('backend.schedule.timetables.popup-template-print', compact('timetables', 'timetablesSlotsLang'))
             ->setPaper('A4', 'landscape')

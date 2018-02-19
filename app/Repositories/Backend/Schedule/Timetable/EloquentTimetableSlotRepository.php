@@ -1004,7 +1004,7 @@ class EloquentTimetableSlotRepository implements TimetableSlotRepositoryContract
      */
     public function get_timetable_slot_language_dept(Collection $timetableSlots, Timetable $timetable)
     {
-        $department_languages = array(12, 13); // (english, french)
+        $department_languages = array(12, 13);
         $tmp = collect();
         foreach ($department_languages as $department_language) {
             $timetableLangs = Timetable::where([
@@ -1052,6 +1052,7 @@ class EloquentTimetableSlotRepository implements TimetableSlotRepositoryContract
                 $tmp->push($timetable_slot)->toJson();
             }
         }
+
         foreach ($tmp as $item) {
             $timetableSlots->push($item);
         }
