@@ -303,13 +303,11 @@ interface TimetableSlotRepositoryContract
     public function get_timetables_form_language_by_student_annual($group_students, Timetable $timetable, $department_id);
 
     /**
-     * Get timetable slots from language dept.
-     *
-     * @param Collection $timetables
-     * @param array $groupStudentsLanguage
+     * @param Collection $timetableSlots
+     * @param Timetable $timetable
      * @return mixed
      */
-    public function get_timetable_slot_language_dept(Collection $timetables, $groupStudentsLanguage);
+    public function get_timetable_slot_language_dept(Collection $timetableSlots, Timetable $timetable);
 
     /**
      * Set language timetable slot into TimetableSlots.

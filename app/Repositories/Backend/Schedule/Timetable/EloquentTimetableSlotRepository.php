@@ -904,9 +904,9 @@ class EloquentTimetableSlotRepository implements TimetableSlotRepositoryContract
             ['semester_id', $timetable->semester_id],
             ['completed', true],
         ])
-        ->orderBy('group_id')
-        ->distinct('group_id')
-        ->lists('group_id');
+            ->orderBy('group_id')
+            ->distinct('group_id')
+            ->lists('group_id');
         foreach ($groupStudentsLanguage as $item) {
             $group = Group::find($item);
             if ($group instanceof Group) {
@@ -956,8 +956,6 @@ class EloquentTimetableSlotRepository implements TimetableSlotRepositoryContract
      */
     public function get_timetables_form_language_by_student_annual($group_students, Timetable $timetable, $department_id)
     {
-        // TODO: Implement get_timetables_form_language_by_student_annual() method.
-        // ddc($group_students);
         $timetables = new Collection();
         foreach ($group_students as $group_student) {
             $getTimetable = Timetable::where([
@@ -981,60 +979,6 @@ class EloquentTimetableSlotRepository implements TimetableSlotRepositoryContract
     }
 
     /**
-     * Get timetable slots from language dept.
-     *
-     * @param Collection $timetables
-     * @param array $groupStudentsLanguage
-     * @return mixed
-     */
-    public function get_timetable_slot_language_dept(Collection $timetables, $groupStudentsLanguage)
-    {
-        // TODO: Implement get_timetable_slot_language_dept() method.
-        $timetableSlots = new Collection();
-        $groupAndRoom = new Collection();
-        $tmp = new Collection();
-        //$groupsHasCreatedTimetable = array();
-
-        foreach ($timetables as $timetable) {
-            $getTimetableSlotsLanguage = $this->get_timetable_slot_details($timetable);
-            if (count($getTimetableSlotsLanguage) > 0) {
-                foreach ($getTimetableSlotsLanguage as $item) {
-                    $newGroupAndRoom = array();
-
-                    $newGroupAndRoom['room'] = $item->room;
-                    $newGroupAndRoom['building'] = $item->building;
-                    $newGroupAndRoom['group'] = Group::find($timetable->group_id)->code;
-
-                    //array_push($groupsHasCreatedTimetable, $timetable->group_id);
-                    $tmp->push($newGroupAndRoom);
-                    $timetableSlots->push($item);
-                }
-            }
-        }
-
-        /*$groupsHasNoCreatedTimetable = collect($groupStudentsLanguage)->diff($groupsHasCreatedTimetable);
-
-        // set those properties to above groups.
-        foreach ($groupsHasNoCreatedTimetable as $item){
-            $newGroupAndRoom = array();
-            $newGroupAndRoom['room'] = null;
-            $newGroupAndRoom['building'] = null;
-            $newGroupAndRoom['group'] = Group::find($item)->code;
-
-            $tmp->push($newGroupAndRoom);
-        }*/
-
-        foreach (collect($tmp)->sortBy('group') as $item) {
-            $groupAndRoom->push($item);
-        }
-
-        // find group language has not create timetable yet.
-
-
-        return array(collect($timetableSlots)->keyBy('start'), $groupAndRoom);
-    }
-
-    /**
      * Set language timetable slot into TimetableSlots.
      *
      * @param Collection $timetableSlots
@@ -1044,8 +988,6 @@ class EloquentTimetableSlotRepository implements TimetableSlotRepositoryContract
      */
     public function set_timetable_slot_language(Collection $timetableSlots, Collection $groupsRoom, Collection $languageTimetableSlots)
     {
-        // TODO: Implement set_timetable_slot_language() method.
-        // pass timetable slots.
         foreach ($languageTimetableSlots as $item) {
             $item->teacher_name = '';
             $timetableSlot = new Collection($item->toArray());
@@ -1053,5 +995,65 @@ class EloquentTimetableSlotRepository implements TimetableSlotRepositoryContract
             $timetableSlots->push($timetableSlot);
         }
         return $timetableSlots;
+    }
+
+    /**
+     * @param Collection $timetableSlots
+     * @param Timetable $timetable
+     * @return mixed
+     */
+    public function get_timetable_slot_language_dept(Collection $timetableSlots, Timetable $timetable)
+    {
+        $department_languages = array(12, 13); // (english, french)
+        $tmp = collect();
+        foreach ($department_languages as $department_language) {
+            $timetableLangs = Timetable::where([
+                ['academic_year_id', $timetable->academic_year_id],
+                ['department_id', $department_language],
+                ['degree_id', $timetable->degree_id],
+                ['grade_id', $timetable->grade_id],
+                ['semester_id', $timetable->semester_id],
+                ['week_id', $timetable->week_id],
+            ])->get();
+            $timetableSlotLangs = collect();
+            foreach ($timetableLangs as $timetableLang) {
+                foreach ($timetableLang->timetableSlots as $timetableSlot) {
+                    $timetableSlotLangs->push($timetableSlot);
+                }
+            }
+
+            $groupTimetableSlotLangsByStart = $timetableSlotLangs->groupBy('start');
+            foreach ($groupTimetableSlotLangsByStart as $item) {
+                $timetable_slot = [];
+                $groups = array();
+                foreach ($item as $index => $subItem) {
+                    $subGroups = array();
+                    if ($index == 0) {
+                        $timetable_slot = $subItem;
+                    }
+                    $subItemTimetable = TimetableSlot::find($subItem->id)->timetable;
+                    $room = Room::find($subItem->room_id);
+                    $group = Group::find($subItemTimetable->group_id);
+                    if ($group instanceof Group) {
+                        $subGroups['group'] = $group->code;
+                    } else {
+                        $subGroups['group'] = null;
+                    }
+                    if ($room instanceof Room) {
+                        $subGroups['room'] = $room->name;
+                        $subGroups['building'] = $room->building->code;
+                    } else {
+                        $subGroups['building'] = null;
+                        $subGroups['room'] = null;
+                    }
+                    array_push($groups, $subGroups);
+                }
+                $timetable_slot['slotsForLanguage'] = $groups;
+                $tmp->push($timetable_slot)->toJson();
+            }
+        }
+        foreach ($tmp as $item) {
+            $timetableSlots->push($item);
+        }
     }
 }
