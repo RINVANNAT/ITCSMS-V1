@@ -19,6 +19,7 @@ use App\Models\Department;
 use App\Models\DepartmentOption;
 use App\Models\Employee;
 use App\Models\Grade;
+use App\Models\Group;
 use App\Models\Schedule\Timetable\Slot;
 use App\Models\Schedule\Timetable\Timetable;
 use App\Models\Schedule\Timetable\TimetableSlot;
@@ -266,36 +267,8 @@ class TimetableController extends Controller
             $options_ = null;
         }
 
-        if (isset($academic)) {
-            $groups = DB::table('course_annuals')
-                ->where([
-                    ['academic_year_id', $academic],
-                    ['department_id', $department],
-                    ['degree_id', $degree],
-                    ['grade_id', $grade]
-                ])
-                ->where(function ($query) use ($option) {
-                    if (!is_null($option) && $option != 0) {
-                        $query->where('department_option_id', $option);
-                    }
-                })
-                ->join('slots', 'slots.course_annual_id', '=', 'course_annuals.id')
-                ->join('groups', 'groups.id', '=', 'slots.group_id')
-                ->distinct('groups.code')
-                ->select('groups.code as name', 'groups.id as id')
-                ->get();
-
-            usort($groups, function ($a, $b) {
-                if (is_numeric($a->name)) {
-                    return $a->name - $b->name;
-                } else {
-                    return strcmp($a->name, $b->name);
-                }
-            });
-        } else {
-            $groups = null;
-        }
-
+        $groups = Group::get()->toArray();
+        $groups = $this->timetableSlotRepo->sort_groups($groups);
         $weeks = Week::where('semester_id', $semester)->get();
 
         if (isset($createTimetablePermissionConfiguration)) {
@@ -351,7 +324,6 @@ class TimetableController extends Controller
                 'timetable_slots.id',
                 'timetable_slots.course_name as title',
                 'timetable_slots.course_name',
-                'timetable_slots.teacher_name',
                 'timetable_slots.type as type',
                 'timetable_slots.start',
                 'timetable_slots.end',
@@ -361,29 +333,10 @@ class TimetableController extends Controller
             ->get();
         $timetableSlots = new Collection();
 
-        if ($timetable->department_id < 12 && ($timetable instanceof Timetable)) {
-            // get student annuals id
-            $student_annual_ids = $this->timetableSlotRepo->find_student_annual_ids($timetable);
-            $department_languages = array(12, 13); // (english, french)
-            foreach ($department_languages as $department_language) {
-                // get group language, [@return array(Collection $groups, Array $groups)]
-                $groups = $this->timetableSlotRepo->get_group_student_annual_form_language($department_language, $student_annual_ids, $timetable);
-
-                // get timetable language,
-                $timetables = $this->timetableSlotRepo->get_timetables_form_language_by_student_annual($groups[0], $timetable, $department_language);
-
-                // get timetable slots [@return array(timetableSlots, groupsRoom)]
-                $timetableSlotsLang = $this->timetableSlotRepo->get_timetable_slot_language_dept($timetables, $groups[0]);
-
-                // set timetable slots language to view.
-                $this->timetableSlotRepo->set_timetable_slot_language($timetableSlots, $timetableSlotsLang[1], $timetableSlotsLang[0]);
-            }
-        }
-
         foreach ($timetable_slots as $timetable_slot) {
             if (($timetable_slot instanceof TimetableSlot) && is_object($timetable_slot)) {
 
-                $newTimetableSlot = TimetableSlot::find($timetable_slot->id);
+                $newTimetableSlot = TimetableSlot::with('employee')->find($timetable_slot->id);
                 $timetableSlot = new Collection($newTimetableSlot);
                 $timetableSlot->put('building', $timetable_slot->building);
                 $timetableSlot->put('room', $timetable_slot->room);
@@ -391,7 +344,6 @@ class TimetableController extends Controller
             }
         }
 
-        //dd($timetable);
         $options = [
             $timetable->academic_year_id,
             $timetable->department_id,
@@ -402,7 +354,6 @@ class TimetableController extends Controller
             isset($timetable->group_id) ? $timetable->group_id : 0,
             $timetable->week_id
         ];
-
 
         return view('backend.schedule.timetables.show', compact('timetableSlots', 'timetable', 'now', 'createTimetablePermissionConfiguration', 'options'));
     }

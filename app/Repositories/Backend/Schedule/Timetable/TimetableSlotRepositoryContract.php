@@ -95,6 +95,14 @@ interface TimetableSlotRepositoryContract
     public function is_merged(TimetableSlot $timetableSlot);
 
     /**
+     * Export course sessions.
+     *
+     * @param $data
+     * @return mixed
+     */
+    public function export_course_sessions($data);
+
+    /**
      * Export from course_session to slots.
      *
      * @param CourseSession $courseSession
@@ -292,16 +300,14 @@ interface TimetableSlotRepositoryContract
      * @param $department_id
      * @return mixed
      */
-    public function get_timetables_form_language_by_student_annual(array $group_students, Timetable $timetable, $department_id);
+    public function get_timetables_form_language_by_student_annual($group_students, Timetable $timetable, $department_id);
 
     /**
-     * Get timetable slots from language dept.
-     *
-     * @param Collection $timetables
-     * @param array $groupStudentsLanguage
+     * @param Collection $timetableSlots
+     * @param Timetable $timetable
      * @return mixed
      */
-    public function get_timetable_slot_language_dept(Collection $timetables, array $groupStudentsLanguage);
+    public function get_timetable_slot_language_dept(Collection $timetableSlots, Timetable $timetable);
 
     /**
      * Set language timetable slot into TimetableSlots.
@@ -312,12 +318,4 @@ interface TimetableSlotRepositoryContract
      * @return mixed
      */
     public function set_timetable_slot_language(Collection $timetableSlots, Collection $groupsRoom, Collection $languageTimetableSlots);
-
-    /**
-     * Sort groups.
-     *
-     * @param array $groups
-     * @return mixed
-     */
-    public function sort_groups (array $groups);
 }

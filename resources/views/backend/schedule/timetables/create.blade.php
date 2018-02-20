@@ -39,83 +39,103 @@
 @stop
 
 @section('content')
-    <div class="box box-success">
-        <div class="box-header with-border">
-            <div class="mailbox-controls">
-                <div class="pull-right">
-                    @permission('generate-timetable')
-                    <a href="#">
-                        <button class="btn btn-primary btn-sm"
-                                data-placement="right"
-                                title="Tooltip on top"
-                                disabled="true">
-                            {{ trans('buttons.backend.schedule.timetable.generate') }}
-                        </button>
-                    </a>
-                    @endauth
+    <div class="row">
+        <div class="col-md-12">
+            <div class="box box-success">
+                <div class="box-header with-border">
+                    <div class="mailbox-controls">
+                        <div class="pull-right">
 
-                    @permission('clone-timetable')
-                    <button class="btn btn-success btn-sm btn_clone_timetable"
-                            data-toggle="modal"
-                            data-target="#clone-timetable"
-                            data-toggle="tooltip"
-                            data-placement="top"
-                            id="btn_clone"
-                            title="{{ trans('buttons.backend.schedule.timetable.clone') }}">
-                        {{ trans('buttons.backend.schedule.timetable.clone') }}
-                    </button>
-                    @endauth
+                            <div class="btn-group">
+                                <button class="btn btn-warning dropdown-toggle btn-sm"
+                                        data-toggle="dropdown"
+                                        aria-haspopup="true"
+                                        aria-expanded="false">
+                                    <span class="fa fa-cog"></span>
+                                </button>
+                                <ul class="dropdown-menu">
+                                    <li><a href="javascript:void(0)"><label><input type="checkbox" id="filter_language" checked name="filter_language"/> Show language session</label></a></li>
+                                    <li><a href="javascript:void(0)"><label><input type="checkbox" id="filter_alphabet_group" name="filter_alphabet_group"/> Get Alphabet Group</label></a></li>
+                                    <li><a href="javascript:void(0)"><label><input type="checkbox" id="filter_number_group" name="filter_number_group"/> Get Number Group</label></a></li>
+                                    <li role="separator" class="divider"></li>
+                                    <li><a href="javascript:void(0)"><label><input type="checkbox"/> Other Option</label></a></li>
+                                </ul>
+                            </div>
 
-                    @permission('publish-timetable')
-                    <a href="#">
-                        <button class="btn btn-info btn-sm"
-                                data-toggle="tooltip"
-                                data-placement="top"
-                                id="btn_publish"
-                                title="{{ trans('buttons.backend.schedule.timetable.publish') }}">
-                            {{ trans('buttons.backend.schedule.timetable.publish') }}
-                        </button>
-                    </a>
-                    @endauth
+                            @permission('generate-timetable')
+                            <a href="#">
+                                <button class="btn btn-primary btn-sm"
+                                        data-placement="right"
+                                        title="Tooltip on top"
+                                        disabled="true">
+                                    {{ trans('buttons.backend.schedule.timetable.generate') }}
+                                </button>
+                            </a>
+                            @endauth
 
-                    @permission('save-change-timetable')
-                    <a href="#">
-                        <button class="btn btn-danger btn-sm"
-                                data-toggle="tooltip"
-                                data-placement="top"
-                                title="{{ trans('buttons.backend.schedule.timetable.save_change') }}">
-                            {{ trans('buttons.backend.schedule.timetable.save_change') }}
-                        </button>
-                    </a>
-                    @endauth
+                            @permission('clone-timetable')
+                            <button class="btn btn-success btn-sm btn_clone_timetable"
+                                    data-toggle="modal"
+                                    data-target="#clone-timetable"
+                                    data-toggle="tooltip"
+                                    data-placement="top"
+                                    id="btn_clone"
+                                    title="{{ trans('buttons.backend.schedule.timetable.clone') }}">
+                                {{ trans('buttons.backend.schedule.timetable.clone') }}
+                            </button>
+                            @endauth
+
+                            @permission('publish-timetable')
+                            <a href="#">
+                                <button class="btn btn-info btn-sm"
+                                        data-toggle="tooltip"
+                                        data-placement="top"
+                                        id="btn_publish"
+                                        title="{{ trans('buttons.backend.schedule.timetable.publish') }}">
+                                    {{ trans('buttons.backend.schedule.timetable.publish') }}
+                                </button>
+                            </a>
+                            @endauth
+
+                            @permission('save-change-timetable')
+                            <a href="#">
+                                <button class="btn btn-danger btn-sm"
+                                        data-toggle="tooltip"
+                                        data-placement="top"
+                                        title="{{ trans('buttons.backend.schedule.timetable.save_change') }}">
+                                    {{ trans('buttons.backend.schedule.timetable.save_change') }}
+                                </button>
+                            </a>
+                            @endauth
+                        </div>
+
+                        <form name="options-filter"
+                              id="options-filter"
+                              method="POST"
+                              action="{{ route('admin.schedule.timetables.filter') }}">
+                            @include('backend.schedule.timetables.includes.partials.option')
+                        </form>
+                    </div>
                 </div>
 
-                <form name="options-filter"
-                      id="options-filter"
-                      method="POST"
-                      action="{{ route('admin.schedule.timetables.filter') }}">
-                    @include('backend.schedule.timetables.includes.partials.option')
-                </form>
+                <div class="box-body">
+                    <div class="row">
+                        <div class="col-md-9 col-sm-12 col-xs-12">
+                            <div id="timetable" class="view-timetable"></div>
+                        </div>
+                        <div class="col-md-3 col-sm-12 col-xs-12">
 
+                            @include('backend.schedule.timetables.includes.partials.courses-sessions')
+
+                            @include('backend.schedule.timetables.includes.partials.rooms')
+
+                        </div>
+                    </div>
+                    <div class="clearfix"></div>
+                </div>
+                <div class="panel-conflict box box-danger" id="conflict" style="display: none;"></div>
             </div>
         </div>
-
-        <div class="box-body">
-            <div class="row">
-                <div class="col-md-9 col-sm-12 col-xs-12">
-                    <div id="timetable" class="view-timetable"></div>
-                </div>
-                <div class="col-md-3 col-sm-12 col-xs-12">
-
-                    @include('backend.schedule.timetables.includes.partials.courses-sessions')
-
-                    @include('backend.schedule.timetables.includes.partials.rooms')
-
-                </div>
-            </div>
-            <div class="clearfix"></div>
-        </div>
-        <div class="panel-conflict box box-danger" id="conflict" style="display: none;"></div>
     </div>
 
     @include('backend.schedule.timetables.includes.modals.clone')
@@ -141,21 +161,19 @@
                 // store data so the calendar knows to render an event upon drop
                 $(this).data('event', {
                     slot_id: $(this).find('.slot-id').text(),
-                    course_session_id: $(this).find('.courses-session-id').text(),
+                    course_program_id: $(this).find('.course_program_id').text(),
                     course_name: $(this).find('.course-name').text(),
                     class_name: 'course-item',
-                    teacher_name: $(this).find('.teacher-name').text(),
+                    lecturer_id: $(this).find('.lecturer-id').text(),
                     course_type: $(this).find('.course-type').text(),
                     times: $(this).find('.times').text()
                 });
-                if ($(this).data('event').teacher_name !== 'Unsigned') {
-                    // make the event draggable using jQuery UI
-                    $(this).draggable({
-                        zIndex: 9999,
-                        revert: true,      // will cause the event to go back to its
-                        revertDuration: 0  //  original position after the drag
-                    });
-                }
+
+                $(this).draggable({
+                    zIndex: 9999,
+                    revert: true,
+                    revertDuration: 0
+                });
             });
             @endif
         }
@@ -311,11 +329,13 @@
         }
         /** get timetable slots */
         function get_timetable_slots() {
+            let data = $('#options-filter').serializeArray();
+            data.push({name: 'filter_language', value: $('#filter_language').is(':checked')});
             toggleLoading(true);
             $.ajax({
                 type: 'POST',
                 url: '{!! route('get_timetable_slots') !!}',
-                data: $('#options-filter').serialize(),
+                data: data,
                 success: function (response) {
                     $('#timetable').fullCalendar('removeEvents');
                     $('#timetable').fullCalendar('renderEvents', response.timetableSlots, true);
@@ -343,10 +363,10 @@
                     'semester': $('select[name="semester"] :selected').val(),
                     'weekly': $('select[name="weekly"] :selected').val(),
                     'group': $('select[name="group"] :selected').val(),
-                    'course_session_id': copiedEventObject.course_session_id,
+                    'course_program_id': copiedEventObject.course_program_id,
                     'slot_id': copiedEventObject.slot_id,
                     'course_name': copiedEventObject.course_name,
-                    'teacher_name': copiedEventObject.teacher_name,
+                    'lecturer_id': copiedEventObject.lecturer_id,
                     'course_type': copiedEventObject.course_type,
                     'start': copiedEventObject.start,
                     'end': copiedEventObject.end
@@ -498,7 +518,7 @@
                 },
                 allDaySlot: false,
                 hiddenDays: [0],
-                height: 650,
+                height: 735,
                 fixedWeekCount: false,
                 minTime: '07:00:00',
                 maxTime: '20:00:00',
@@ -572,14 +592,14 @@
                         // check conflict lecturer and render
                         if (typeof event.conflict_lecturer !== 'undefined') {
                             if (event.conflict_lecturer.canMerge.length > 0 || event.conflict_lecturer.canNotMerge.length > 0) {
-                                object += '<p class="text-primary conflict">' + event.teacher_name + '</p> ';
+                                object += '<p class="text-primary conflict">' + (event.employee != null ? event.employee.name_latin : 'NO LECTURER') + '</p> ';
                             }
                             else {
-                                object += '<p class="text-primary">' + event.teacher_name + '</p> ';
+                                object += '<p class="text-primary">' + (event.employee != null ? event.employee.name_latin : 'NO LECTURER') + '</p> ';
                             }
                         }
                         else {
-                            object += '<p class="text-primary">' + event.teacher_name + '</p> ';
+                            object += '<p class="text-primary">' + (event.employee != null ? event.employee.name_latin : 'NO LECTURER') + '</p> ';
                         }
 
                         object += '</div>';
@@ -771,12 +791,20 @@
             get_course_programs();
             @else
                 get_options($('select[name="department"] :selected').val());
+                get_weeks($('select[name="semester"] :selected').val());
             @endif
 
             get_timetable_slots();
             get_timetable();
             drag_course_session();
             get_rooms();
+            get_employees();
+            assign_lecturer_to_course_program();
+
+            $(document).on('click', '.todo-list .course-item', function () {
+                $('.courses.todo-list>.course-item').not(this).removeClass('course-program-selected');
+                $(this).toggleClass('course-program-selected');
+            })
 
             // select timetable slot to add room.
             $(document).on('click', '.side-course', function () {
@@ -838,11 +866,8 @@
                             dom_room.css('cursor', 'not-allowed');
                             notify('success', 'Room was added', 'Add Room');
                             get_suggest_room($('select[name="academicYear"] :selected').val(), $('select[name="weekly"] :selected').val(), $('.side-course.course-selected').attr('id'));
-                            console.log($('.side-course.course-selected').attr('id'));
-                            // get_timetable_slots();
                         } else {
                             notify('warning', 'Please select which course.', 'Add Room');
-                            // get_timetable_slots();
                         }
                         get_rooms();
                     },
@@ -874,18 +899,26 @@
             });
             // get timetable slot by on change option.
             $(document).on('change', 'select[name="option"]', function () {
-                get_groups();
+                get_weeks($('select[name="semester"] :selected').val());
             });
             // get timetable slot by on change grade option.
             $(document).on('change', 'select[name="grade"]', function () {
-                get_groups();
+                get_weeks($('select[name="semester"] :selected').val());
             });
             // get timetable slot by on change group option.
             $(document).on('change', 'select[name="group"]', function () {
-                get_weeks($('select[name="semester"] :selected').val());
+                get_course_programs();
+                get_timetable();
+                get_timetable_slots();
             });
             // get timetable slots by on change weekly option.
             $(document).on('change', 'select[name="weekly"]', function () {
+                get_course_programs();
+                get_timetable();
+                get_timetable_slots();
+            });
+
+            $(document).on('change', '#filter_language', function () {
                 get_course_programs();
                 get_timetable();
                 get_timetable_slots();
@@ -931,8 +964,6 @@
                     }
                 });
             });
-
-
 
             // publish timetable
             $(document).on('click', '#btn_publish', function (e) {
@@ -1016,6 +1047,7 @@
                                     course_session_item += '<span style="margin-left: 28px;" class="course-type">Course</span> : ' +
                                         '<span class="times">' + val.remaining + '</span> H'
                                 }
+                                course_session_item += '<span class="hidden lecturer-id">' + val.lecturer_id + '</span>';
                                 course_session_item += '<span class="text courses-session-id" style="display: none;">' + val.course_session_id + '</span><span class="text slot-id" style="display: none;">' + val.id + '</span><br>' + '</li>';
                             });
 
@@ -1035,6 +1067,15 @@
                     }
                 })
             });
+
+            $(document).on('keyup', '#search-employee', function () {
+                let query = $(this).val();
+                get_employees(query);
+            })
+
+            $('#t-cog').click(function () {
+                $('.t-cog').toggle();
+            })
         });
 
     </script>

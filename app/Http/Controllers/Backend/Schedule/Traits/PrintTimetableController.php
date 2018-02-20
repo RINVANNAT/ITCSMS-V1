@@ -6,6 +6,7 @@ use App\Models\Group;
 use App\Models\Schedule\Timetable\Timetable;
 use App\Models\Schedule\Timetable\Week;
 use App\Repositories\Backend\Schedule\Timetable\EloquentTimetableSlotRepository;
+use Barryvdh\Snappy\Facades\SnappyPdf as PDF;
 use Illuminate\Support\Collection;
 
 /**
@@ -38,6 +39,7 @@ trait PrintTimetableController
     {
         // find timetable
         $timetable = Timetable::find($id);
+
         // find all timetable slot by academic year and department id.
         // in order to get weeks.
         $allWeeks = Timetable::where([
@@ -45,18 +47,18 @@ trait PrintTimetableController
             ['department_id', $timetable->department_id],
             ['semester_id', $timetable->semester_id]
         ])
-            ->select('week_id')
-            ->groupBy('week_id')
-            ->get();
+        ->select('week_id')
+        ->groupBy('week_id')
+        ->get();
 
         $allGroups = Timetable::where([
             ['academic_year_id', $timetable->academic_year_id],
             ['department_id', $timetable->department_id],
             ['semester_id', $timetable->semester_id]
         ])
-            ->select('group_id')
-            ->groupBy('group_id')
-            ->get();
+        ->select('group_id')
+        ->groupBy('group_id')
+        ->get();
 
         $weeks = array();
         $groups = array();
@@ -88,6 +90,7 @@ trait PrintTimetableController
             }
         });
 
+
         return view('backend.schedule.timetables.popup-print', compact('weeks', 'groups', 'timetable'));
     }
 
@@ -96,7 +99,6 @@ trait PrintTimetableController
      */
     public function get_template_print()
     {
-        // dd(request()->all());
         $groups = request('groups');
         $weeks = request('weeks');
         $baseTimetableId = request('timetable');
@@ -126,28 +128,11 @@ trait PrintTimetableController
             }
         }
 
-        // get timetable from languages
-        // get student annual id
-        $student_annual_ids = $this->timetableSlotRepos->find_student_annual_ids($infoTimetable);
+        $this->timetableSlotRepo->get_timetable_slot_language_dept($timetablesSlotsLang, $infoTimetable);
 
-        if(count($student_annual_ids)>0){
-            // (english, french)
-            $department_languages = array(12, 13);
-
-            // get all timetable slot language
-            foreach ($department_languages as $department_language) {
-                // get group languages.
-                $groups = $this->timetableSlotRepos->find_group_student_annual_form_language($department_language, $student_annual_ids, $infoTimetable);
-                // get timetables language
-                $timetablesLang = $this->timetableSlotRepos->get_timetables_form_language_by_student_annual($groups[0], $infoTimetable, $department_language);
-                // get timetable slot language.
-                $timetableSlotsLang = $this->timetableSlotRepos->get_timetable_slot_language_dept($timetablesLang, $groups[0]);
-                // set all timetable slot into
-                $this->timetableSlotRepos->set_timetable_slot_language($timetablesSlotsLang, $timetableSlotsLang[1], $timetableSlotsLang[0]);
-            }
-        }
-
-        return view('backend.schedule.timetables.popup-template-print', compact('timetables', 'timetablesSlotsLang'));
+        return PDF::loadView('backend.schedule.timetables.popup-template-print', compact('timetables', 'timetablesSlotsLang'))
+            ->setPaper('A4', 'landscape')
+            ->stream();
     }
 
     /** Custom Function. */

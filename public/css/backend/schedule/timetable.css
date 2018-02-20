@@ -17,7 +17,7 @@
 }
 
 #timetable {
-    border: 1px solid #f1f1f1;
+    border: 1px solid #dddddd;
     padding: 10px;
 }
 
@@ -116,6 +116,11 @@
     overflow-y: auto;
 }
 
+
+.box-header.with-border {
+    border-bottom: 1px solid #ddd !important;
+}
+
 .rooms, .box-conflict {
     padding: 10px;
     margin: 0px;
@@ -175,8 +180,24 @@
 }
 
 .course-item.disabled {
+    border: 1px solid #ece8e8;
     border-left: 2px solid red;
-    cursor: not-allowed;
+    cursor: pointer;
+}
+
+.todo-list {
+    background-color: #f1f1f1;
+    padding: 10px;
+}
+.todo-list > li {
+    background-color: #fff !important;
+    margin-bottom: 8px;
+}
+
+.todo-list > li.course-program-selected {
+    background-color: #d4d4d4 !important;
+    border: 1px solid #ece8e8;
+    border-left: 2px solid red;
 }
 
 .box.box-success .panel-conflict {
@@ -186,7 +207,6 @@
     z-index: 998;
     width: 350px;
     display: -webkit-box;
-    display: -webkit-flex;
     display: -ms-flexbox;
     display: flex;
     -webkit-flex-direction: column;
@@ -325,4 +345,33 @@
     .fc-time-grid-event::-webkit-scrollbar-thumb {
         background: #999 !important;
     }
+}
+
+.select2-results {
+    height: 280px;
+    overflow-y: scroll;
+    background-color: #f1f1f1;
+}
+
+ul.select2-results__options {
+    padding: 10px;
+    margin: 0;
+}
+
+ul.select2-results__options li.select2-results__option {
+    list-style: none;
+    padding: 10px;
+    background-color: #fff;
+    margin: 0px 0px 8px;
+    cursor: pointer;
+}
+
+li.select2-results__option {
+    border-left: 2px solid #3c8dbc;
+    border-top-left-radius: 2px;
+    border-bottom-left-radius: 2px;
+}
+
+ul.select2-results__options li.select2-results__option:hover {
+    background-color: #dddddd;
 }

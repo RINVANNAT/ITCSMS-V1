@@ -35,55 +35,42 @@ class EloquentTimetableSlotRepository implements TimetableSlotRepositoryContract
      */
     public function create_timetable_slot(Timetable $timetable, CreateTimetableSlotRequest $request)
     {
-        // create new group merge
         $newMergeTimetableSlot = $this->create_merge_timetable_slot($request);
-        // check new group merge created or not.
         if ($newMergeTimetableSlot instanceof MergeTimetableSlot) {
-            // find Slot match with request.
             $slot = Slot::find($request->slot_id);
             if ($slot instanceof Slot) {
-                // find durations between two start and end date.
                 $duration = $this->durations(new Carbon($request->start), new Carbon($request->end == null ? $request->start : $request->end));
                 if ($slot->time_remaining > 0 && $slot->time_remaining >= $duration) {
-                    // crate new instance
-                    $newTimetableSlot = new TimetableSlot();
-
-                    $newTimetableSlot->timetable_id = $timetable->id;
-                    $newTimetableSlot->course_session_id = $request->course_session_id;
-                    $request->room_id == null ?: $newTimetableSlot->room_id = $request->room_id;
-                    $newTimetableSlot->slot_id = $request->slot_id;
-                    $newTimetableSlot->group_merge_id = $newMergeTimetableSlot->id;
-                    $newTimetableSlot->course_name = $request->course_name;
-                    $newTimetableSlot->teacher_name = $request->teacher_name;
-                    $newTimetableSlot->type = $request->course_type;
-                    $newTimetableSlot->start = new Carbon($request->start);
-                    $newTimetableSlot->end = new Carbon($request->end == null ? $request->start : $request->end);
-                    $newTimetableSlot->durations = $duration;
-                    $newTimetableSlot->created_uid = auth()->user()->id;
-                    $newTimetableSlot->updated_uid = auth()->user()->id;
-                    // check new timetable slot created or not.
-                    if ($newTimetableSlot->save()) {
-                        // update total times of slot
-                        $slot->time_remaining = $slot->time_remaining - $duration;
-                        $slot->updated_at = Carbon::now();
-                        $slot->update();
+                    try {
+                        $newTimetableSlot = new TimetableSlot();
+                        $newTimetableSlot->timetable_id = $timetable->id;
+                        $newTimetableSlot->course_program_id = $request->course_program_id;
+                        $request->room_id == null ?: $newTimetableSlot->room_id = $request->room_id;
+                        $newTimetableSlot->slot_id = $request->slot_id;
+                        $newTimetableSlot->group_merge_id = $newMergeTimetableSlot->id;
+                        $newTimetableSlot->course_name = $request->course_name;
+                        if (isset($request->lecturer_id) && !is_null($request->lecturer_id) && $request->lecturer_id != 'null') {
+                            $newTimetableSlot->lecturer_id = $request->lecturer_id;
+                        }
+                        $newTimetableSlot->type = $request->course_type;
+                        $newTimetableSlot->start = new Carbon($request->start);
+                        $newTimetableSlot->end = new Carbon($request->end == null ? $request->start : $request->end);
+                        $newTimetableSlot->durations = $duration;
+                        $newTimetableSlot->created_uid = auth()->user()->id;
+                        $newTimetableSlot->updated_uid = auth()->user()->id;
+                        if ($newTimetableSlot->save()) {
+                            $slot->time_remaining = $slot->time_remaining - $duration;
+                            $slot->updated_at = Carbon::now();
+                            $slot->update();
+                        }
                         return $newTimetableSlot;
+                    } catch (\Exception $e) {
+                        return $e->getMessage();
                     }
                 }
             }
         }
         return false;
-    }
-
-    /**
-     * Get timetable slots by a timetable.
-     *
-     * @param Timetable $timetable
-     * @return mixed
-     */
-    public function get_timetable_slots(Timetable $timetable)
-    {
-        return TimetableSlot::where('timetable_id', $timetable->id)->get();
     }
 
     /**
@@ -346,7 +333,7 @@ class EloquentTimetableSlotRepository implements TimetableSlotRepositoryContract
                             &&
                             ($timetableSlot->id != $itemTimetableSlot->id)
                             &&
-                            ($timetableSlot->teacher_name == $itemTimetableSlot->teacher_name)
+                            (($timetableSlot->lecturer_id == $itemTimetableSlot->lecturer_id) && (!is_null($timetableSlot->lecturer_id)))
                             &&
                             ($timetableSlot->group_merge_id != $itemTimetableSlot->group_merge_id)
                         ) {
@@ -524,32 +511,35 @@ class EloquentTimetableSlotRepository implements TimetableSlotRepositoryContract
      */
     public function copied_timetable_slot(Slot $slot, Timetable $timetable, TimetableSlot $timetableSlot)
     {
-        $newMergeTimetableSlot = new MergeTimetableSlot();
-        $newMergeTimetableSlot->start = $timetableSlot->start;
-        $newMergeTimetableSlot->end = $timetableSlot->end;
-        if ($newMergeTimetableSlot->save()) {
-            $newTimetableSlot = new TimetableSlot();
-            $newTimetableSlot->timetable_id = $timetable->id;
-            $newTimetableSlot->course_session_id = $slot->course_session_id;
-            $newTimetableSlot->slot_id = $slot->id;
-            $newTimetableSlot->room_id = $timetableSlot->room_id;
-            $newTimetableSlot->group_merge_id = $newMergeTimetableSlot->id;
-            $newTimetableSlot->course_name = $timetableSlot->course_name;
-            $newTimetableSlot->teacher_name = $timetableSlot->teacher_name;
-            $newTimetableSlot->type = $timetableSlot->type;
+        try {
+            $newMergeTimetableSlot = new MergeTimetableSlot();
+            $newMergeTimetableSlot->start = $timetableSlot->start;
+            $newMergeTimetableSlot->end = $timetableSlot->end;
+            if ($newMergeTimetableSlot->save()) {
+                $newTimetableSlot = new TimetableSlot();
+                $newTimetableSlot->timetable_id = $timetable->id;
+                $newTimetableSlot->course_program_id = $slot->course_program_id;
+                $newTimetableSlot->slot_id = $slot->id;
+                $newTimetableSlot->room_id = $timetableSlot->room_id;
+                $newTimetableSlot->group_merge_id = $newMergeTimetableSlot->id;
+                $newTimetableSlot->course_name = $timetableSlot->course_name;
+                $newTimetableSlot->lecturer_id = $timetableSlot->lecturer_id;
+                $newTimetableSlot->type = $timetableSlot->type;
 
-            $newTimetableSlot->durations = $timetableSlot->durations;
-            $slot->time_remaining = $slot->time_remaining - $timetableSlot->durations;
-            $slot->update();
+                $newTimetableSlot->durations = $timetableSlot->durations;
+                $slot->time_remaining = $slot->time_remaining - $timetableSlot->durations;
+                $slot->update();
 
-            $newTimetableSlot->start = $timetableSlot->start;
-            $newTimetableSlot->end = $timetableSlot->end;
-            $newTimetableSlot->created_uid = auth()->user()->id;
-            $newTimetableSlot->updated_uid = auth()->user()->id;
-            $newTimetableSlot->save();
-            return true;
+                $newTimetableSlot->start = $timetableSlot->start;
+                $newTimetableSlot->end = $timetableSlot->end;
+                $newTimetableSlot->created_uid = auth()->user()->id;
+                $newTimetableSlot->updated_uid = auth()->user()->id;
+                $newTimetableSlot->save();
+                return true;
+            }
+        } catch (\Exception $e) {
+            return false;
         }
-        return false;
     }
 
     /**
@@ -715,23 +705,18 @@ class EloquentTimetableSlotRepository implements TimetableSlotRepositoryContract
         $timetable_slots = TimetableSlot::where('timetable_id', $timetable->id)
             ->leftJoin('rooms', 'rooms.id', '=', 'timetable_slots.room_id')
             ->leftJoin('buildings', 'buildings.id', '=', 'rooms.building_id')
-            ->where(function ($query) use ($by_teacher) {
-                if ($by_teacher != null) {
-                    $query->where('timetable_slots.teacher_name', '=', $by_teacher);
-                }
-            })
+            ->leftJoin('employees', 'employees.id', '=', 'timetable_slots.lecturer_id')
             ->select(
                 'timetable_slots.id',
                 'timetable_slots.course_name as title',
                 'timetable_slots.course_name',
-                'timetable_slots.teacher_name',
+                'employees.name_latin as teacher_name',
                 'timetable_slots.type as course_type',
                 'timetable_slots.start',
                 'timetable_slots.end',
                 'buildings.code as building',
                 'rooms.name as room'
             )->get();
-
         return $timetable_slots;
     }
 
@@ -747,12 +732,10 @@ class EloquentTimetableSlotRepository implements TimetableSlotRepositoryContract
     {
         $timetable_slots = $this->get_timetable_slot_details($timetable, $by_teacher);
 
-        // dd($timetable_slots);
-
         foreach ($timetable_slots as $timetable_slot) {
             if (($timetable_slot instanceof TimetableSlot) && is_object($timetable_slot)) {
                 // convert from array object to collection object.
-                $itemTimetableSlot = TimetableSlot::find($timetable_slot->id);
+                $itemTimetableSlot = TimetableSlot::with('employee')->find($timetable_slot->id);
                 $timetableSlot = new Collection($itemTimetableSlot);
 
                 // find and prepare groups to render when timetable slot merge together
@@ -766,8 +749,8 @@ class EloquentTimetableSlotRepository implements TimetableSlotRepositoryContract
                 } else {
                     $groups = [];
                 }
+
                 // check conflict lecturer.
-                // dd('beforeCheck');
                 $dataLecturer = $this->check_conflict_lecturer($itemTimetableSlot);
 
                 // check conflict room.
@@ -792,6 +775,86 @@ class EloquentTimetableSlotRepository implements TimetableSlotRepositoryContract
             }
         }
         return $timetableSlots;
+    }
+
+    /**
+     * Sort groups.
+     *
+     * @param array $groups
+     * @return array
+     */
+    public function sort_groups(array $groups)
+    {
+        try {
+            usort($groups, function ($a, $b) {
+                if (is_numeric($a['code']) && !is_numeric($b['code'])) {
+                    return 1;
+                } else if (!is_numeric($a['code']) && is_numeric($b['code'])) {
+                    return -1;
+                } else {
+                    return ($a['code'] < $b['code']) ? -1 : 1;
+                }
+            });
+        } catch (\Exception $e) {
+            return array('status' => false, 'groups' => [], 'code' => $e->getCode());
+        }
+        return $groups;
+    }
+
+    /**
+     * Get timetable slots by a timetable.
+     *
+     * @param Timetable $timetable
+     * @return mixed
+     */
+    public function get_timetable_slots(Timetable $timetable)
+    {
+        // TODO: Implement get_timetable_slots() method.
+        return TimetableSlot::where('timetable_id', $timetable->id)->get();
+    }
+
+    /**
+     * Export course sessions.
+     *
+     * @param $data
+     * @return mixed
+     */
+    public function export_course_sessions($data)
+    {
+        $flag = true;
+
+        $course_annuals = CourseAnnual::where([
+            ['academic_year_id', $data['academic_year_id']],
+            ['department_id', $data['department_id']],
+        ])->get();
+
+        $course_sessions = new Collection();
+
+        foreach ($course_annuals as $course_annual) {
+            foreach ($course_annual->courseSessions as $courseSession) {
+                $course_sessions->push($courseSession);
+            }
+        }
+
+        // $course_sessions = CourseSession::all();
+        foreach ($course_sessions as $course_session) {
+            if (count(Slot::where('course_session_id', $course_session->id)->get()) > 0) {
+                continue;
+            } else {
+                $course_annual_classes = CourseAnnualClass::where('course_session_id', $course_session->id)->get();
+                foreach ($course_annual_classes as $course_annual_class) {
+                    if ($this->export_slot($course_session, $course_annual_class)) {
+                        $flag = true;
+                    } else {
+                        $flag = false;
+                    }
+                }
+                if ($flag == false) {
+                    break;
+                }
+            }
+        }
+        return $flag;
     }
 
     /**
@@ -833,6 +896,38 @@ class EloquentTimetableSlotRepository implements TimetableSlotRepositoryContract
     public function get_group_student_annual_form_language($department_id, array $student_annual_ids, Timetable $timetable)
     {
         $groups = array();
+        $groupStudentsLanguage = Timetable::where([
+            ['academic_year_id', $timetable->academic_year_id],
+            ['department_id', $department_id],
+            ['degree_id', $timetable->degree_id],
+            ['grade_id', $timetable->grade_id],
+            ['semester_id', $timetable->semester_id],
+            ['completed', true],
+        ])
+            ->orderBy('group_id')
+            ->distinct('group_id')
+            ->lists('group_id');
+        foreach ($groupStudentsLanguage as $item) {
+            $group = Group::find($item);
+            if ($group instanceof Group) {
+                array_push($groups, $group);
+            }
+        }
+        return array($groupStudentsLanguage, $groups);
+    }
+
+    /**
+     * Get group student annual from language.
+     *
+     * @param $department_id
+     * @param array $student_annual_ids
+     * @param Timetable $timetable
+     * @return mixed
+     */
+    public function find_group_student_annual_form_language($department_id, array $student_annual_ids, Timetable $timetable)
+    {
+        // TODO: Implement find_group_student_annual_form_language() method.
+        $groups = array();
         $groupStudentsLanguage = DB::table('group_student_annuals')
             ->whereIn('student_annual_id', $student_annual_ids)
             ->where([
@@ -852,16 +947,15 @@ class EloquentTimetableSlotRepository implements TimetableSlotRepositoryContract
     }
 
     /**
-     * Get timetable slot from dept language.
+     * Get timetables from dept language.
      *
      * @param array $group_students
      * @param Timetable $timetable
      * @param $department_id
      * @return mixed
      */
-    public function get_timetables_form_language_by_student_annual(array $group_students, Timetable $timetable, $department_id)
+    public function get_timetables_form_language_by_student_annual($group_students, Timetable $timetable, $department_id)
     {
-        //dd($group_students);
         $timetables = new Collection();
         foreach ($group_students as $group_student) {
             $getTimetable = Timetable::where([
@@ -885,59 +979,6 @@ class EloquentTimetableSlotRepository implements TimetableSlotRepositoryContract
     }
 
     /**
-     * Get timetable slots from language dept.
-     *
-     * @param Collection $timetables
-     * @param array $groupStudentsLanguage
-     * @return mixed
-     */
-    public function get_timetable_slot_language_dept(Collection $timetables, array $groupStudentsLanguage)
-    {
-        $timetableSlots = new Collection();
-        $groupAndRoom = new Collection();
-        $tmp = new Collection();
-        //$groupsHasCreatedTimetable = array();
-
-        foreach ($timetables as $timetable) {
-            $getTimetableSlotsLanguage = $this->get_timetable_slot_details($timetable);
-            if (count($getTimetableSlotsLanguage) > 0) {
-                foreach ($getTimetableSlotsLanguage as $item) {
-                    $newGroupAndRoom = array();
-
-                    $newGroupAndRoom['room'] = $item->room;
-                    $newGroupAndRoom['building'] = $item->building;
-                    $newGroupAndRoom['group'] = Group::find($timetable->group_id)->code;
-
-                    //array_push($groupsHasCreatedTimetable, $timetable->group_id);
-                    $tmp->push($newGroupAndRoom);
-                    $timetableSlots->push($item);
-                }
-            }
-        }
-
-        /*$groupsHasNoCreatedTimetable = collect($groupStudentsLanguage)->diff($groupsHasCreatedTimetable);
-
-        // set those properties to above groups.
-        foreach ($groupsHasNoCreatedTimetable as $item){
-            $newGroupAndRoom = array();
-            $newGroupAndRoom['room'] = null;
-            $newGroupAndRoom['building'] = null;
-            $newGroupAndRoom['group'] = Group::find($item)->code;
-
-            $tmp->push($newGroupAndRoom);
-        }*/
-
-        foreach (collect($tmp)->sortBy('group') as $item) {
-            $groupAndRoom->push($item);
-        }
-
-        // find group language has not create timetable yet.
-
-
-        return array(collect($timetableSlots)->keyBy('start'), $groupAndRoom);
-    }
-
-    /**
      * Set language timetable slot into TimetableSlots.
      *
      * @param Collection $timetableSlots
@@ -947,7 +988,6 @@ class EloquentTimetableSlotRepository implements TimetableSlotRepositoryContract
      */
     public function set_timetable_slot_language(Collection $timetableSlots, Collection $groupsRoom, Collection $languageTimetableSlots)
     {
-        // pass timetable slots.
         foreach ($languageTimetableSlots as $item) {
             $item->teacher_name = '';
             $timetableSlot = new Collection($item->toArray());
@@ -958,55 +998,63 @@ class EloquentTimetableSlotRepository implements TimetableSlotRepositoryContract
     }
 
     /**
-     * Get group student annual from language.
-     *
-     * @param $department_id
-     * @param array $student_annual_ids
+     * @param Collection $timetableSlots
      * @param Timetable $timetable
      * @return mixed
      */
-    public function find_group_student_annual_form_language($department_id, array $student_annual_ids, Timetable $timetable)
+    public function get_timetable_slot_language_dept(Collection $timetableSlots, Timetable $timetable)
     {
-        $groups = array();
-        $groupStudentsLanguage = DB::table('group_student_annuals')
-            ->whereIn('student_annual_id', $student_annual_ids)
-            ->where([
-                ['department_id', $department_id],
-                ['semester_id', $timetable->semester_id]
-            ])
-            ->orderBy('group_id')
-            ->distinct('group_id')
-            ->lists('group_id');
-        foreach ($groupStudentsLanguage as $item) {
-            $group = Group::find($item);
-            if ($group instanceof Group) {
-                array_push($groups, $group);
+        $department_languages = array(12, 13);
+        $tmp = collect();
+        foreach ($department_languages as $department_language) {
+            $timetableLangs = Timetable::where([
+                ['academic_year_id', $timetable->academic_year_id],
+                ['department_id', $department_language],
+                ['degree_id', $timetable->degree_id],
+                ['grade_id', $timetable->grade_id],
+                ['semester_id', $timetable->semester_id],
+                ['week_id', $timetable->week_id],
+            ])->get();
+            $timetableSlotLangs = collect();
+            foreach ($timetableLangs as $timetableLang) {
+                foreach ($timetableLang->timetableSlots as $timetableSlot) {
+                    $timetableSlotLangs->push($timetableSlot);
+                }
+            }
+
+            $groupTimetableSlotLangsByStart = $timetableSlotLangs->groupBy('start');
+            foreach ($groupTimetableSlotLangsByStart as $item) {
+                $timetable_slot = [];
+                $groups = array();
+                foreach ($item as $index => $subItem) {
+                    $subGroups = array();
+                    if ($index == 0) {
+                        $timetable_slot = $subItem;
+                    }
+                    $subItemTimetable = TimetableSlot::find($subItem->id)->timetable;
+                    $room = Room::find($subItem->room_id);
+                    $group = Group::find($subItemTimetable->group_id);
+                    if ($group instanceof Group) {
+                        $subGroups['group'] = $group->code;
+                    } else {
+                        $subGroups['group'] = null;
+                    }
+                    if ($room instanceof Room) {
+                        $subGroups['room'] = $room->name;
+                        $subGroups['building'] = $room->building->code;
+                    } else {
+                        $subGroups['building'] = null;
+                        $subGroups['room'] = null;
+                    }
+                    array_push($groups, $subGroups);
+                }
+                $timetable_slot['slotsForLanguage'] = $groups;
+                $tmp->push($timetable_slot)->toJson();
             }
         }
-        return array($groupStudentsLanguage, $groups);
-    }
 
-    /**
-     * Sort groups.
-     *
-     * @param array $groups
-     * @return array
-     */
-    public function sort_groups(array $groups)
-    {
-        try {
-            usort($groups, function ($a, $b) {
-                if (is_numeric($a['code']) && !is_numeric($b['code'])) {
-                    return 1;
-                } else if (!is_numeric($a['code']) && is_numeric($b['code'])) {
-                    return -1;
-                } else {
-                    return ($a['code'] < $b['code']) ? -1 : 1;
-                }
-            });
-        }catch (\Exception $e) {
-            return array('status' => false, 'data' => [], 'code' => $e->getCode());
+        foreach ($tmp as $item) {
+            $timetableSlots->push($item);
         }
-        return $groups;
     }
 }

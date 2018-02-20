@@ -4,8 +4,13 @@ namespace App\Http\Controllers\Backend\Schedule\Traits;
 
 use App\Http\Requests\Backend\Schedule\Timetable\CloneTimetableRequest;
 use App\Http\Requests\Backend\Schedule\Timetable\FormCloneTimetableRequest;
+use App\Models\Group;
+use App\Models\Schedule\Timetable\MergeTimetableSlot;
+use App\Models\Schedule\Timetable\Slot;
 use App\Models\Schedule\Timetable\Timetable;
+use App\Models\Schedule\Timetable\TimetableSlot;
 use App\Models\Schedule\Timetable\Week;
+use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Response;
 
@@ -46,28 +51,8 @@ trait AjaxCloneTimetableController
             // get all weeks by semester request.
             $weeks = Week::where('semester_id', $request->semester)->get();
             // find groups
-            $groups = DB::table('course_annuals')
-                ->where([
-                    ['academic_year_id', $request->academicYear],
-                    ['department_id', $request->department],
-                    ['degree_id', $request->degree],
-                    ['grade_id', $request->grade],
-                    ['department_option_id', $request->option == null ? null : $request->option]
-                ])
-                ->join('slots', 'slots.course_annual_id', '=', 'course_annuals.id')
-                ->join('groups', 'groups.id', '=', 'slots.group_id')
-                ->distinct('groups.code')
-                ->select('groups.code', 'groups.id')
-                ->get();
-
-            usort($groups, function ($a, $b) {
-                if (is_numeric($a->code)) {
-                    return $a->code - $b->code;
-                } else {
-                    return strcmp($a->code, $b->code);
-                }
-            });
-
+            $groups = Group::select('groups.code', 'groups.id')->get()->toArray();
+            $groups = $this->timetableSlotRepo->sort_groups($groups);
             return Response::json(['weeks' => $weeks, 'groups' => $groups], 200);
         }
     }
@@ -76,28 +61,89 @@ trait AjaxCloneTimetableController
      * Clone timetable.
      *
      * @param CloneTimetableRequest $request
+     * @return mixed
      */
     public function clone_timetable(CloneTimetableRequest $request)
     {
-        // dd($request->all());
-        $timetable = Timetable::where([
-            ['academic_year_id', $request->academic_year_id],
-            ['department_id', $request->department_id],
-            ['degree_id', $request->degree_id],
-            ['option_id', $request->option_id == null ? null : $request->option_id],
-            ['grade_id', $request->grade_id],
-            ['semester_id', $request->semester_id],
-            ['week_id', $request->week_id],
-            ['group_id', $request->group_id == null ? null : $request->group_id]
-        ])
-            ->first();
-        // dd($timetable);
-        // start clone.
-        if($timetable instanceof Timetable){
-            if ($this->timetableSlotRepo->clone_timetable($timetable, $request->groups, $request->weeks)) {
-                return Response::json(['status' => true], 200);
+        $result = array(
+            'code' => 200,
+            'status' => true,
+            'message' => 'The operations was executed successfully',
+            'data' => []
+        );
+
+        try {
+            $timetable = Timetable::where([
+                ['academic_year_id', $request->academic_year_id],
+                ['department_id', $request->department_id],
+                ['degree_id', $request->degree_id],
+                ['option_id', $request->option_id == null ? null : $request->option_id],
+                ['grade_id', $request->grade_id],
+                ['semester_id', $request->semester_id],
+                ['week_id', $request->week_id],
+                ['group_id', $request->group_id == null ? null : $request->group_id]
+            ])->first();
+
+            if ($timetable instanceof Timetable) {
+                // process clone
+                $weeks = $request->weeks;
+                if(count($weeks) >0) {
+                    foreach ($weeks as $week) {
+                        if($week == $request->week_id) {
+                            continue;
+                        }
+                        $newTimetable = Timetable::where([
+                            ['academic_year_id', $request->academic_year_id],
+                            ['department_id', $request->department_id],
+                            ['degree_id', $request->degree_id],
+                            ['option_id', $request->option_id == null ? null : $request->option_id],
+                            ['grade_id', $request->grade_id],
+                            ['semester_id', $request->semester_id],
+                            ['week_id', $week],
+                            ['group_id', $request->group_id == null ? null : $request->group_id]
+                        ])->first();
+
+                        if(! ($newTimetable instanceof Timetable)){
+                            $newTimetable = $timetable->replicate(); // duplicate and update
+                            $newTimetable->week_id = $week;
+                            $newTimetable->created_at = Carbon::now();
+                            $newTimetable->updated_at = Carbon::now();
+                            $newTimetable->save();
+                        }
+
+                        $newTimetableSlots = $newTimetable->timetableSlots;
+                        foreach ($newTimetableSlots as $newTimetableSlot) {
+                            $newSlot = Slot::find($newTimetableSlot->slot_id);
+                            $newSlot->time_remaining += $newTimetableSlot->durations;
+                            if($newSlot->update()) {
+                                $newTimetableSlot->delete();
+                            }
+                        }
+
+                        $timetable_slots = TimetableSlot::where('timetable_id', $timetable->id)->get();
+
+                        foreach ($timetable_slots as $timetable_slot) {
+                            $slot = Slot::find($timetable_slot->slot_id);
+                            if($slot->time_remaining >= $timetable_slot->durations) {
+                                $findTimetableSlots = TimetableSlot::where([
+                                    ['course_program_id', $timetable_slot->course_program_id],
+                                    ['slot_id', $slot->id],
+                                    ['timetable_id', $newTimetable->id],
+                                ])->get();
+                                if(!(count($findTimetableSlots)>0)){
+                                    $this->timetableSlotRepo->copied_timetable_slot($slot, $newTimetable, $timetable_slot);
+                                }
+                            }
+                        }
+                    }
+                }
             }
+        }catch (\Exception $e) {
+            $result['code'] = $e->getCode();
+            $result['message'] = $e->getMessage();
+            $result['status'] = false;
         }
-        return Response::json(['status' => false, 'message' => 'Timetable did not created yet.']);
+
+        return $result;
     }
 }

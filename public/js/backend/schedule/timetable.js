@@ -10,8 +10,8 @@ $(document).on('click', '.btn_export_course_program', function (event) {
         grade_id: $('select[name=grade]').val(),
         group_id: $('select[name=group]').val(),
         semester_id: $('select[name=semester]').val(),
-    }).then( function (response) {
-        if( response.data.status ) {
+    }).then(function (response) {
+        if (response.data.status) {
             get_course_programs();
             notify('info', 'Slots was exported', 'Export Courses');
         }
@@ -21,40 +21,6 @@ $(document).on('click', '.btn_export_course_program', function (event) {
         notify('error', 'Slots was not exported', 'Export Courses');
     });
 });
-
-/** Get rooms. **/
-function get_groups() {
-    toggleLoading(true);
-    $.ajax({
-        type: 'POST',
-        url: '/admin/schedule/timetables/get_groups',
-        data: $('#options-filter').serialize(),
-        success: function (response) {
-            if (response.status === true) {
-                var group_item = '';
-                $.each(response.groups, function (key, val) {
-                    group_item += '<option value="' + val.id + '">' + val.code + '</option>';
-                });
-
-                $('select[name="group"]').html(group_item);
-            }
-            else {
-                $('select[name="group"]').html('');
-            }
-        },
-        error: function () {
-            swal(
-                'Oops...',
-                'Something went wrong!',
-                'error'
-            );
-        },
-        complete: function () {
-            get_weeks($('select[name="semester"] :selected').val());
-            toggleLoading(false);
-        }
-    })
-}
 
 /** Get weeks. **/
 function get_weeks(semester_id) {
@@ -139,10 +105,13 @@ function get_grades(department_id) {
             );
         },
         complete: function () {
-            get_groups();
+            get_course_programs();
+            get_timetable();
+            get_timetable_slots();
         }
     })
 }
+
 /** Get course sessions. **/
 function get_course_programs() {
     toggleLoading(true);
@@ -151,7 +120,7 @@ function get_course_programs() {
         url: '/admin/schedule/timetables/get_course_programs',
         data: $('#options-filter').serialize(),
         success: function (response) {
-            if (response.status === true) {
+            if (response.status === true && response.data.length > 0) {
                 var course_session_item = '';
                 $.each(response.data, function (key, val) {
                     if (val.teacher_name === null) {
@@ -166,9 +135,9 @@ function get_course_programs() {
                         '</span>' +
                         '<span class="text course-name">' + val.course_name + '</span><br>';
                     if (val.teacher_name === null) {
-                        course_session_item += '<span style="margin-left: 28px;" class="teacher-name bg-danger badge">Unsigned</span><br/>';
+                        course_session_item += '<span style="margin-left: 28px;" class="teacher_name bg-danger badge">Unsigned</span><br/>';
                     } else {
-                        course_session_item += '<span style="margin-left: 28px;" class="teacher-name">' + val.teacher_name + '</span><br/>';
+                        course_session_item += '<span style="margin-left: 28px;" class="leacher_name">' + val.teacher_name + '</span><br/>';
                     }
                     if (val.tp !== 0) {
                         course_session_item += '<span style="margin-left: 28px;" class="course-type">TP</span> : ' +
@@ -182,14 +151,15 @@ function get_course_programs() {
                         course_session_item += '<span style="margin-left: 28px;" class="course-type">Course</span> : ' +
                             '<span class="times">' + val.remaining + '</span> H'
                     }
-                    course_session_item += '<span class="text courses-session-id" style="display: none;">' + val.course_session_id + '</span><span class="text slot-id" style="display: none;">' + val.id + '</span><br>' + '</li>';
+                    course_session_item += '<span class="hidden lecturer-id">' + val.lecturer_id + '</span>';
+                    course_session_item += '<span class="text course_program_id" style="display: none;">' + val.course_program_id + '</span><span class="text slot-id" style="display: none;">' + val.id + '</span><br>' + '</li>';
                 });
 
                 $('.courses.todo-list').html(course_session_item);
                 drag_course_session()
             }
             else {
-                $('.courses.todo-list').html("<li class='course-item'>There are no course sessions created yet.</li>");
+                $('.courses.todo-list').html("<li class='course-item text-center'>No Courses!</li>");
             }
         },
         error: function () {
@@ -253,4 +223,72 @@ function set_background_color_slot_not_allow() {
     $('.view-timetable').find('[data-time="12:00:00"]').addClass('slot-not-allow');
     $('.view-timetable').find('[data-time="12:30:00"]').addClass('slot-not-allow');
     $('.view-timetable').find('[data-time="17:00:00"]').addClass('slot-not-allow');
+}
+
+
+function get_employees(query = null) {
+    axios.post('/admin/schedule/timetables/get_employees', {
+        query: query
+    }).then(response => {
+        if (response.data.data.length > 0) {
+            let employee_template = '';
+            response.data.data.forEach((employee) => {
+                employee_template += `
+                    <li class="select2-results__option"
+                        role="treeitem"
+                        aria-selected="false">
+                        <div class="select2-result-repository clearfix">
+                            <div class="select2-result-repository__avatar">
+                                <img src="/img/profiles/avatar.png">
+                            </div>
+                            <div class="select2-result-repository__meta">
+                                <div class="select2-result-repository__title">` + (employee.id_card == null ? 'No ID Card' : employee.id_card) + ` | ` + employee.employee_name_kh + `</div>
+                                <div class="select2-result-repository__description">` + employee.employee_name_latin + `</div>
+                                <div class="select2-result-repository__statistics">
+                                    <div class="select2-result-repository__forks">
+                                        <i class="fa fa-bank"></i> ` + employee.department_code + `
+                                    </div>
+                                    <div class="select2-result-repository__stargazers">
+                                        <i class="fa fa-venus-mars"></i> ` + employee.gender_code + `
+                                    </div>
+                                </div>
+                            </div>
+                            <span class="lecturer_id hidden">` + employee.employee_id + `</span>
+                        </div>
+                    </li>
+                `;
+            });
+            $('#employee-viewer').html(employee_template);
+        } else {
+            $('#employee-viewer').html('<h1>NO EMPLOYEES</h1>');
+        }
+    })
+}
+
+function assign_lecturer_to_course_program() {
+    $(document).on('click', 'li.select2-results__option', function () {
+        let slot_id = $('.course-program-selected').find('.slot-id').text();
+        if (slot_id !== '') {
+            let lecturer_id = $(this).find('.lecturer_id').text();
+            axios.post('/admin/schedule/timetables/assign_lecturer_to_course_program', {
+                slot_id: slot_id,
+                lecturer_id: lecturer_id
+            }).then(response => {
+                get_course_programs();
+                notify('info', response.data.message, 'Assign Lecturer');
+            })
+        }
+        let timetable_slot_id = $('.side-course.course-selected').attr('id');
+        if (timetable_slot_id !== '') {
+            let lecturer_id = $(this).find('.lecturer_id').text();
+            axios.post('/admin/schedule/timetables/assign_lecturer_to_timetable_slot', {
+                timetable_slot_id: timetable_slot_id,
+                lecturer_id: lecturer_id
+            }).then(response => {
+                get_course_programs();
+                get_timetable_slots();
+                notify('info', response.data.message, 'Assign Lecturer');
+            })
+        }
+    })
 }
