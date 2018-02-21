@@ -11,8 +11,6 @@
         .text_font{
             font-size: 14pt;
         }
-
-
         .form-control_ {
             display: block;
             width: 24%;

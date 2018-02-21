@@ -333,6 +333,7 @@ class CourseAnnualController extends Controller
                 ->orderBy('courses.degree_id', 'asc')
                 ->orderBy('courses.grade_id', 'asc')
                 ->orderBy('courses.semester_id', 'asc')
+                ->where('courses.active',true)
                 ->get();
         } else {
             $employee = Employee::where('user_id', Auth::user()->id)->first();
@@ -365,6 +366,7 @@ class CourseAnnualController extends Controller
                 ->orderBy('courses.degree_id', 'asc')
                 ->orderBy('courses.grade_id', 'asc')
                 ->orderBy('courses.semester_id', 'asc')
+                ->where('courses.active',true)
                 ->get();
         }
         $courses = [];
@@ -512,10 +514,14 @@ class CourseAnnualController extends Controller
         }
 
         usort($array_groups, function ($a, $b) {
-            if(is_numeric($a->group_code)) {
-                return $a->group_code - $b->group_code;
+            if($a!= null & $b!= null) {
+                if(is_numeric($a->group_code)) {
+                    return $a->group_code - $b->group_code;
+                } else {
+                    return strcmp($a->group_code, $b->group_code);
+                }
             } else {
-                return strcmp($a->group_code, $b->group_code);
+                return "";
             }
         });
 

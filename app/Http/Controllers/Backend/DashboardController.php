@@ -33,14 +33,15 @@ class DashboardController extends Controller
         $academic_years = AcademicYear::latest()->get();
         $weeks = Week::all();
 
+        $last_year = AcademicYear::orderBy('id', 'DESC')->first();
         if ($employee != null) {
-            $last_year = AcademicYear::orderBy('id', 'DESC')->first();
             $courses = CourseAnnual::leftJoin('departments', 'course_annuals.department_id', '=', 'departments.id')
                 ->leftJoin('degrees', 'course_annuals.degree_id', '=', 'degrees.id')
                 ->leftJoin('grades', 'course_annuals.grade_id', '=', 'grades.id')
                 ->leftJoin('semesters', 'course_annuals.semester_id', '=', 'semesters.id')
                 ->leftJoin('departmentOptions', 'course_annuals.department_option_id', '=', 'departmentOptions.id')
                 ->where('course_annuals.academic_year_id', $last_year->id)
+                ->where('course_annuals.semester_id', 1)
                 ->where('employee_id', $employee->id)
                 ->with("courseAnnualClass")
                 ->select([
@@ -48,6 +49,7 @@ class DashboardController extends Controller
                     'course_annuals.degree_id',
                     'course_annuals.grade_id',
                     'course_annuals.semester_id',
+                    'course_annuals.academic_year_id',
                     'course_annuals.name_en',
                     'course_annuals.id',
                     'semesters.name_kh as semester',
