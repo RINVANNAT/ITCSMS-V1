@@ -3,10 +3,13 @@
 namespace App\Http\Controllers\Backend\Internship;
 
 use App\Models\AcademicYear;
+use App\Models\Employee;
+use App\Models\Student;
 use Illuminate\Http\Request;
 
 use App\Http\Requests;
 use App\Http\Controllers\Controller;
+use Illuminate\Support\Facades\Input;
 
 /**
  * Class InternshipController
@@ -21,7 +24,6 @@ class InternshipController extends Controller
      */
     public function index()
     {
-
         return view('backend.internship.index');
     }
 
@@ -41,8 +43,8 @@ class InternshipController extends Controller
     /**
      * Store a newly created resource in storage.
      *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\Response
+     * @param  \Illuminate\Http\Request $request
+     * @return void
      */
     public function store(Request $request)
     {
@@ -52,8 +54,8 @@ class InternshipController extends Controller
     /**
      * Display the specified resource.
      *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
+     * @param  int $id
+     * @return void
      */
     public function show($id)
     {
@@ -63,8 +65,8 @@ class InternshipController extends Controller
     /**
      * Show the form for editing the specified resource.
      *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
+     * @param  int $id
+     * @return void
      */
     public function edit($id)
     {
@@ -74,9 +76,9 @@ class InternshipController extends Controller
     /**
      * Update the specified resource in storage.
      *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
+     * @param  \Illuminate\Http\Request $request
+     * @param  int $id
+     * @return void
      */
     public function update(Request $request, $id)
     {
@@ -86,11 +88,54 @@ class InternshipController extends Controller
     /**
      * Remove the specified resource from storage.
      *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
+     * @param  int $id
+     * @return void
      */
     public function destroy($id)
     {
         //
+    }
+
+    public function search(Request $request)
+    {
+        if ($request->ajax()) {
+            $academic_year_id = Input::get('academic_year_id');
+            $page = Input::get('page');
+            $resultCount = 25;
+            $offset = ($page - 1) * $resultCount;
+
+            $students = Student::join('genders', 'genders.id', '=', 'students.gender_id')
+                ->join('studentAnnuals', 'studentAnnuals.student_id', '=', 'students.id')
+                ->join('departments', 'departments.id', '=', 'studentAnnuals.department_id')
+                ->where('studentAnnuals.academic_year_id', $academic_year_id)
+                ->where('students.name_latin', 'ilike', "%" . Input::get("term") . "%")
+                ->orWhere('students.name_kh', 'ilike', "%" . Input::get("term") . "%")
+                ->select([
+                    'studentAnnuals.id as id',
+                    'students.id_card',
+                    'students.name_kh as text',
+                    'students.name_latin',
+                    'genders.code as gender',
+                    'departments.code as department'
+                ]);
+
+            $client = $students
+                ->orderBy('name_latin')
+                ->skip($offset)
+                ->take($resultCount)
+                ->get();
+
+            $count = Count($students->get());
+            $endCount = $offset + $resultCount;
+            $morePages = $count > $endCount;
+
+            $results = array(
+                'results' => $client,
+                'pagination' => array(
+                    "more" => $morePages
+                )
+            );
+            return response()->json($results);
+        }
     }
 }
