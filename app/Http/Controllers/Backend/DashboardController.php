@@ -28,7 +28,7 @@ class DashboardController extends Controller
      */
     public function index()
     {
-        $employee = Employee::where('user_id', Auth::user()->id)->first();
+        /*$employee = Employee::where('user_id', Auth::user()->id)->first();
         $courses = null;
         $academic_years = AcademicYear::latest()->get();
         $weeks = Week::all();
@@ -60,16 +60,16 @@ class DashboardController extends Controller
                 ->orderBy('course_annuals.semester_id', "ASC")
                 ->get()
                 ->toArray();
-        }
+        }*/
 
         /** @var Collection $timetables */
-        $timetables = new Collection();
+        /*$timetables = new Collection();
         $timetable_slots = TimetableSlot::where(['teacher_name' => auth()->user()->name])->get();
 
         foreach ($timetable_slots as $timetable_slot) {
             $timetables->push($timetable_slot->timetable);
         }
-        $timetables = $timetables->keyBy('id');
+        $timetables = $timetables->keyBy('id');*/
 
 
         return view('backend.dashboard', compact('courses', 'timetables', 'academic_years', 'weeks'))->withUser(access()->user());
