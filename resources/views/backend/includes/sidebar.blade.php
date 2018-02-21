@@ -136,6 +136,19 @@
             </li>
             @endauth
 
+            <li class="{{ Active::pattern('admin/internship*') }} treeview">
+                <a href="#">
+                    <i class="fa fa-gavel"></i>
+                    <span>Manage Internship</span>
+                    <i class="fa fa-angle-left pull-right"></i>
+                </a>
+                <ul class="treeview-menu {{ Active::pattern('admin/internship/*', 'menu-open') }}" style="display: none; {{ Active::pattern('admin/internship*', 'display: block;') }}">
+                    <li class="{{ Active::pattern('admin/internship*') }}">
+                        <a href="{{ route('internship.index') }}">Internship</a>
+                    </li>
+                </ul>
+            </li>
+
             @permission('view-schedule-management')
             <li class="{{ Active::pattern('admin/schedule*') }} treeview">
                 <a href="#">
