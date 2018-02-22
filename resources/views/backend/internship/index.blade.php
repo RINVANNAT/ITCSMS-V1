@@ -17,13 +17,16 @@
         <div class="box-header with-border">
             <h3 class="box-title">Internship</h3>
             <div class="box-tools pull-right">
-                <a class="btn btn-default btn-sm" href="{{ route('internship.create') }}">
+                <a class="btn btn-default btn-sm"
+                   id="print"
+                   target="_blank">
                     <i class="fa fa-print"></i>
-                    Print Internship Certificate
+                    Print
                 </a>
-                <a class="btn btn-primary btn-sm" href="{{ route('internship.create') }}">
+                <a class="btn btn-primary btn-sm"
+                   href="{{ route('internship.create') }}">
                     <i class="fa fa-plus-circle"></i>
-                    Create an new internship
+                    Create
                 </a>
             </div>
         </div>
@@ -35,9 +38,9 @@
                     <th></th>
                     <th>Internship title</th>
                     <th>Subject</th>
+                    <th>Students</th>
                     <th>Contact Name</th>
-                    <th>Contact Detial</th>
-                    <th>Period</th>
+                    <th>Contact Detail</th>
                     <th>Actions</th>
                 </tr>
                 </thead>
@@ -68,15 +71,24 @@
                     {data: 'checkbox', name: 'checkbox', orderable: false, searchable: false},
                     {data: 'internship_title', name: 'internship_title'},
                     {data: 'subject', name: 'subject'},
+                    {data: 'students', name: 'students', orderable: false, searchable: false},
                     {data: 'contact_name', name: 'contact_name'},
                     {data: 'contact_detail', name: 'contact_detail', orderable: false, searchable: false},
-                    {data: 'period', name: 'period', orderable: false, searchable: false},
                     {data: 'actions', name: 'actions', orderable: false, searchable: false},
                 ],
                 order: [[1, 'asc']],
                 drawCallback: function() {
                     initIcheker();
                 }
+            })
+
+            $(document).on('click', '#print', function (e) {
+                e.preventDefault();
+                let selected_ids = [];
+                $('#internships input:checked').each(function(){
+                    selected_ids.push($(this).data('id'));
+                });
+                window.open('https://smis.itc.app/admin/internship/'+encodeURIComponent(JSON.stringify(selected_ids))+'/print_internship');
             })
         })
     </script>
