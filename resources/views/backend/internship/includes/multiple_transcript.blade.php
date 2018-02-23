@@ -4,7 +4,7 @@
             <p>Ref No ........... ITC.BE</p>
         </div>
         <div class="col-md-6">
-            <p class="pull-right">Phnom Penh, {{ (new \Carbon\Carbon($internship->date))->toFormattedDateString() }}</p>
+            <p class="pull-right">Phnom Penh, {{ \Carbon\Carbon::parse($internship->date)->format('F d, Y') }}</p>
         </div>
     </div>
 
@@ -22,7 +22,7 @@
 
     <div class="row">
         <div class="col-md-12">
-            <p>
+            <p class="text-justify">
                 Dear {{ $internship->contact_name }}, <br/>
                 The {{ $internship->department->name_en }} of Institute of Technology of Cambodia (ITC) is searching for a company that can accept one of our {{ strtolower($internship->grade->name_en) }} Engineering students to do internship, so those students can get work experience from your company and this work experience will contribute towards the completion of their studies.
             </p>
@@ -52,7 +52,7 @@
     <div class="row align-justify">
         <div class="col-md-12">
             <p>
-                The internship period will take place from {{ (new \Carbon\Carbon($internship->start_date))->toFormattedDateString() }} to {{ (new \Carbon\Carbon($internship->end_date))->toFormattedDateString() }} and would need to be scheduled by both your company and ITC.
+                The internship period will take place from {{ (new \Carbon\Carbon($internship->start_date))->format('F d') }} to {{ (new \Carbon\Carbon($internship->end_date))->format('F d, Y') }} and would need to be scheduled by both your company and ITC.
             </p>
 
             <p>
