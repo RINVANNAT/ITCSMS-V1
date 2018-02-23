@@ -24,7 +24,7 @@
         <div class="col-md-12">
             <p class="text-justify">
                 Dear Sir, <br/>
-                The {{ $internship->department->name_en }} of Institute of Technology of Cambodia (ITC) is searching for a company that can accept one of our {{ $internship->grade->name_en }} year Engineering students to do internship, so this student can get work experience from your company and this work experience will contribute towards the completion of his study.
+                The {{ $internship->department->name_en }} of Institute of Technology of Cambodia (ITC) is searching for a company that {{ count($internship->internship_student_annuals) }} accept one of our {{ $internship->grade->name_en }} year Engineering students to do internship, so this student can get work experience from your company and this work experience will contribute towards the completion of his study.
             </p>
         </div>
     </div>
