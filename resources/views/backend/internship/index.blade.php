@@ -88,7 +88,7 @@
                 $('#internships input:checked').each(function(){
                     selected_ids.push($(this).data('id'));
                 });
-                window.open('https://smis.itc.app/admin/internship/'+encodeURIComponent(JSON.stringify(selected_ids))+'/print_internship');
+                window.open('{{ env('MY_DOMAIN') }}/admin/internship/'+encodeURIComponent(JSON.stringify(selected_ids))+'/print_internship');
             })
         })
     </script>
