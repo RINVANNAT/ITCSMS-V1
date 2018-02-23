@@ -136,6 +136,7 @@
             </li>
             @endauth
 
+            @permission('view-internship-management')
             <li class="{{ Active::pattern('admin/internship*') }} treeview">
                 <a href="#">
                     <i class="fa fa-gavel"></i>
@@ -148,6 +149,7 @@
                     </li>
                 </ul>
             </li>
+            @endauth
 
             @permission('view-schedule-management')
             <li class="{{ Active::pattern('admin/schedule*') }} treeview">

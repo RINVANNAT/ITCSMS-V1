@@ -3,6 +3,8 @@
 namespace App\Http\Controllers\Backend\Internship;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Backend\Internship\DeleteInternshipRequest;
+use App\Http\Requests\Backend\Internship\StoreInternshipRequest;
 use App\Models\AcademicYear;
 use App\Models\Internship\Internship;
 use App\Models\Internship\InternshipStudentAnnual;
@@ -53,10 +55,10 @@ class InternshipController extends Controller
     /**
      * Store a newly created resource in storage.
      *
-     * @param  \Illuminate\Http\Request $request
+     * @param StoreInternshipRequest $request
      * @return mixed
      */
-    public function store(Request $request)
+    public function store(StoreInternshipRequest $request)
     {
         $result = array(
             'code' => 1,
@@ -152,10 +154,11 @@ class InternshipController extends Controller
      * Remove the specified resource from storage.
      *
      * @param  Internship $internship
+     * @param DeleteInternshipRequest $request
      * @return mixed
      * @throws \Exception
      */
-    public function delete(Internship $internship)
+    public function delete(Internship $internship, DeleteInternshipRequest $request)
     {
         if ($internship instanceof Internship) {
             $internship->delete();
