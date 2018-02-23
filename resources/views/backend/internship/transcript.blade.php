@@ -36,8 +36,28 @@
         @media print {
             .page {
                 page-break-after: auto;
+                page-break-before: auto;
             }
-            p {page-break-inside: avoid;}
+
+            p {
+                page-break-inside: avoid;
+                page-break-before: auto;
+                page-break-after: auto;
+            }
+        }
+
+        .page {
+            padding: 4.5cm 2.3cm 3cm 2.5cm;
+        }
+
+        .tran-header {
+            padding: 0px !important;
+        }
+
+        .student-label, .student-list {
+            display: inline-block;
+            vertical-align: top;
+            padding-left: 15px;
         }
     </style>
 @stop

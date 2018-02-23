@@ -35,10 +35,10 @@
         </div>
 
         <div class="row">
-            <div class="col-md-3">
+            <div class="student-label">
                 <p>The name of student is:</p>
             </div>
-            <div class="col-md-9">
+            <div class="student-list">
                 @foreach($internship->internship_student_annuals as $internship_student_annual)
                     <p>
                         <strong>

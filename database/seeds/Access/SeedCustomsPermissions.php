@@ -1816,6 +1816,41 @@ class SeedCustomsPermissions extends Seeder
             ]
         ];
 
+        $roots[] = [
+            'name' => 'View Internship',
+            'groups' => [],
+            'permissions' => [
+                [
+                    'name' => 'view-internship-management',
+                    'display_name' => 'View internship Management',
+                    'dependency' => [
+                        'view-backend'
+                    ]
+                ],
+                [
+                    'name' => 'create-internship',
+                    'display_name' => 'Create an internship',
+                    'dependency' => [
+                        'view-backend', 'view-internship-management'
+                    ]
+                ],
+                [
+                    'name' => 'edit-internship',
+                    'display_name' => 'Edit an internship',
+                    'dependency' => [
+                        'view-backend', 'view-internship-management'
+                    ]
+                ],
+                [
+                    'name' => 'delete-internship',
+                    'display_name' => 'Delete an internship',
+                    'dependency' => [
+                        'view-backend', 'view-internship-management'
+                    ]
+                ]
+            ]
+        ];
+
         /* Schedule Permission */
         $roots[] = [
             'name' => 'Schedule Management',
