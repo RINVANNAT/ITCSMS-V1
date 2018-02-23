@@ -90,7 +90,7 @@
                 </p>
             </div>
 
-            {{--@php
+            <?php
             $teacher = false;
             foreach ($user->roles as $role) {
                 if ($role->name == "Teacher") {
@@ -98,18 +98,18 @@
                     break;
                 }
             }
-           @endphp--}}
+           ?>
 
             <div class="row">
                 <div class="col-md-12">
                     <ul class="timeline timeline-inverse">
 
-                        {{--@if($teacher)
+                        @if($teacher)
                             @if(isset($timetables) && access()->allow('teacher-view-timetable'))
                                 @include('backend.dashboard.includes.timetable')
                             @endif
                             @include('backend.dashboard.teacher')
-                        @endif--}}
+                        @endif
 
                         <li>
                             <i class="fa fa-user bg-purple"></i>
