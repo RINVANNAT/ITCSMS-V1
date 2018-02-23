@@ -35,14 +35,12 @@
 
         @media print {
             .page {
-                page-break-after: auto;
-                page-break-before: auto;
+                page-break-after: avoid;
+                page-break-before: avoid;
             }
 
             p {
                 page-break-inside: avoid;
-                page-break-before: auto;
-                page-break-after: auto;
             }
         }
 
@@ -58,6 +56,9 @@
             display: inline-block;
             vertical-align: top;
             padding-left: 15px;
+        }
+        p {
+            font-size: 14px;
         }
     </style>
 @stop
