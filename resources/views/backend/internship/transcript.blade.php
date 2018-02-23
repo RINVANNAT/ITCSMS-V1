@@ -3,6 +3,11 @@
 @section('after-styles-end')
     <link rel="stylesheet" href="{{ asset('css/backend/prints/prints.css') }}"/>
     <style>
+        @font-face {
+            font-family: crimson_roman;
+            src: url("{{ asset('fonts/Crimson-Roman.ttf') }}");
+        }
+
         .tran-header {
             padding: 50px;
         }
@@ -22,11 +27,7 @@
             background: white;
             box-shadow: none !important;
             position: relative;
-            font-family: "Times New Roman" !important;
-        }
-
-        .contact_detail p {
-            line-height: 12px;
+            font-family: "Times New Roman", serif !important;
         }
 
         body {
