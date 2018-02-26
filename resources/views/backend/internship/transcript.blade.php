@@ -8,6 +8,10 @@
                 src: url("{{ asset('fonts/Crimson-Roman.ttf') }}");
             }
 
+            /*.half-width {*/
+                /*width: 50%;*/
+            /*}*/
+
             .tran-header {
                 padding: 50px;
             }
@@ -22,31 +26,12 @@
                 margin: 0 auto;
                 margin-top: 10mm;
                 border: 0 !important;
-                padding: 10mm 10mm 10mm 10mm;
+                padding: 4.5cm 2.3cm 3cm 2.5cm;
                 border-radius: 0px !important;
                 background: white;
                 box-shadow: none !important;
                 position: relative;
                 font-family: "Times New Roman", serif !important;
-            }
-
-            body {
-                /*background-color: #3A3A3A;*/
-            }
-
-            @media print {
-                .page {
-                    page-break-after: avoid;
-                    page-break-before: avoid;
-                }
-
-                p {
-                    page-break-inside: avoid;
-                }
-            }
-
-            .page {
-                padding: 4.5cm 2.3cm 3cm 2.5cm;
             }
 
             .tran-header {
@@ -58,7 +43,9 @@
                 vertical-align: top;
                 padding-left: 15px;
             }
-
+            .contact_detail p {
+                line-height: 0.8em;
+            }
             p {
                 font-size: 14px;
             }

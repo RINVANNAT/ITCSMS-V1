@@ -47,7 +47,7 @@ trait PrintInternshipTrait
         }
 
         return PDF::loadView('backend.internship.transcript', compact('internships'))
-            ->setPaper('A4')
+            ->setPaper('a4', 'portrait')
             ->stream();
     }
 }
