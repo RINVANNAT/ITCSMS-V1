@@ -23,6 +23,7 @@ use Yajra\Datatables\Facades\Datatables;
 class InternshipController extends Controller
 {
     use PrintInternshipTrait;
+
     /**
      * Display a listing of the resource.
      *
@@ -233,7 +234,7 @@ class InternshipController extends Controller
                 }
                 $template = '<ul>';
                 foreach ($students as $student) {
-                    $template .= '<li>'.$student->name_kh.'</li>';
+                    $template .= '<li>' . $student->name_kh . '</li>';
                 }
                 $template .= '</ul>';
 
