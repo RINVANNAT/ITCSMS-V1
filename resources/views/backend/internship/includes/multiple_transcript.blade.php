@@ -1,6 +1,6 @@
 <div class="page">
     <div class="row">
-        <div class="col-md-12" style="padding-bottom: 18px">
+        <div class="col-md-12" style="padding-bottom: 18px;margin-top: -10px;">
             <span>Ref No ........... ITC.BE</span>
             <span class="pull-right">Phnom Penh, {{ \Carbon\Carbon::parse($internship->date)->format('F d, Y') }}</span>
         </div>

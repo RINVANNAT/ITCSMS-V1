@@ -25,7 +25,7 @@
                 height: 297mm;
                 margin: 0 auto;
                 border: 0 !important;
-                padding: 3.5cm 1.3cm 2cm 1.5cm;
+                padding: 3.4cm 1.2cm 1.9cm 1.4cm;
                 border-radius: 0px !important;
                 background: white;
                 box-shadow: none !important;
@@ -46,7 +46,7 @@
                 line-height: 0.8em;
             }
             p, span{
-                font-size: 16px !important;
+                font-size: 18px !important;
             }
         </style>
     </head>

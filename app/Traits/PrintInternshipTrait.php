@@ -46,6 +46,8 @@ trait PrintInternshipTrait
             $result['message'] = $e->getMessage();
         }
 
+//        return view('backend.internship.transcript', compact('internships'));
+
         return PDF::loadView('backend.internship.transcript', compact('internships'))
             ->setPaper('a4', 'portrait')
             ->stream();
