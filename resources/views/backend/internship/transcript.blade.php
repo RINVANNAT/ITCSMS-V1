@@ -24,9 +24,8 @@
                 width: 210mm;
                 height: 297mm;
                 margin: 0 auto;
-                margin-top: 10mm;
                 border: 0 !important;
-                padding: 4.5cm 2.3cm 3cm 2.5cm;
+                padding: 3.5cm 1.3cm 2cm 1.5cm;
                 border-radius: 0px !important;
                 background: white;
                 box-shadow: none !important;
@@ -46,8 +45,8 @@
             .contact_detail p {
                 line-height: 0.8em;
             }
-            p {
-                font-size: 14px;
+            p, span{
+                font-size: 16px !important;
             }
         </style>
     </head>
