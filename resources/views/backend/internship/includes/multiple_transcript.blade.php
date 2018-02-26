@@ -1,6 +1,6 @@
 <div class="page">
     <div class="row">
-        <div class="col-md-12" style="padding-bottom: 18px;margin-top: -10px;">
+        <div class="col-md-12" style="padding-bottom: 1cm;margin-top: -12px;">
             <span>Ref No ........... ITC.BE</span>
             <span class="pull-right">Phnom Penh, {{ \Carbon\Carbon::parse($internship->date)->format('F d, Y') }}</span>
         </div>
@@ -72,9 +72,9 @@
             @endif
         </div>
 
-        <div class="col-md-12" style="margin-top: 50px;">
+        <div class="col-md-12" style="margin-top: 87px;">
             <p>Deputy Director,</p>
-            <p>Institute Of Technology of Cambodia</p>
+            <p style="margin-top:-10px;">Institute of Technology of Cambodia</p>
         </div>
     </div>
 </div>

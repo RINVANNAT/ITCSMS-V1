@@ -8,18 +8,6 @@
                 src: url("{{ asset('fonts/Crimson-Roman.ttf') }}");
             }
 
-            /*.half-width {*/
-                /*width: 50%;*/
-            /*}*/
-
-            .tran-header {
-                padding: 50px;
-            }
-
-            .align-justify {
-                text-align: justify;
-            }
-
             .page {
                 width: 210mm;
                 height: 297mm;
@@ -32,11 +20,7 @@
                 position: relative;
                 font-family: "Times New Roman", serif !important;
             }
-
-            .tran-header {
-                padding: 0px !important;
-            }
-
+            
             .student-label, .student-list {
                 display: inline-block;
                 vertical-align: top;
