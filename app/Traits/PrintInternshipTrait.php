@@ -9,6 +9,7 @@ use App\Models\Grade;
 use App\Models\Internship\Internship;
 use App\Models\Student;
 use App\Models\StudentAnnual;
+use PDF;
 
 trait PrintInternshipTrait
 {
@@ -45,6 +46,10 @@ trait PrintInternshipTrait
             $result['message'] = $e->getMessage();
         }
 
-        return view('backend.internship.transcript', compact('internships'));
+//        return view('backend.internship.transcript', compact('internships'));
+
+        return PDF::loadView('backend.internship.transcript', compact('internships'))
+            ->setPaper('a4', 'portrait')
+            ->stream();
     }
 }

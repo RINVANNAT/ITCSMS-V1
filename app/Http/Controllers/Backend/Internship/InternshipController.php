@@ -70,16 +70,18 @@ class InternshipController extends Controller
 
             if (array_key_exists('id', $request->all())) {
                 $internship = Internship::find($request->id);
-                $internship->number = $request->number;
-                $internship->ref_number = $request->ref_number;
-                $internship->number = $request->number;
-                $internship->subject = $request->subject;
-                $internship->internship_title = $request->internship_title;
-                $internship->date = $request->date;
-                $internship->start_date = new Carbon((explode(' - ', $request->period))[0]);
-                $internship->end_date = new Carbon((explode(' - ', $request->period))[1]);
-                $internship->contact_name = $request->contact_name;
-                $internship->contact_detail = $request->contact_detail;
+                $internship->person = $request->person;
+                $internship->company = $request->company;
+                $internship->address = $request->address;
+                $internship->phone = $request->phone;
+                $internship->hot_line = $request->hot_line;
+                $internship->e_mail_address = $request->e_mail_address;
+                $internship->web = $request->web;
+                $internship->title = $request->title;
+                $internship->training_field = $request->training_field;
+                $internship->start = new Carbon($request->start);
+                $internship->end = new Carbon($request->end);
+                $internship->issue_date = new Carbon($request->issue_date);
 
                 if ($internship->update()) {
                     if (count($request->students) > 0) {
@@ -98,16 +100,18 @@ class InternshipController extends Controller
                 }
             } else {
                 $newInternship = new Internship();
-                $newInternship->number = $request->number;
-                $newInternship->ref_number = $request->ref_number;
-                $newInternship->number = $request->number;
-                $newInternship->subject = $request->subject;
-                $newInternship->internship_title = $request->internship_title;
-                $newInternship->date = $request->date;
-                $newInternship->start_date = new Carbon((explode(' - ', $request->period))[0]);
-                $newInternship->end_date = new Carbon((explode(' - ', $request->period))[1]);
-                $newInternship->contact_name = $request->contact_name;
-                $newInternship->contact_detail = $request->contact_detail;
+                $newInternship->person = $request->person;
+                $newInternship->company = $request->company;
+                $newInternship->address = $request->address;
+                $newInternship->phone = $request->phone;
+                $newInternship->hot_line = $request->hot_line;
+                $newInternship->e_mail_address = $request->e_mail_address;
+                $newInternship->web = $request->web;
+                $newInternship->title = $request->title;
+                $newInternship->training_field = $request->training_field;
+                $newInternship->start = new Carbon($request->start);
+                $newInternship->end = new Carbon($request->end);
+                $newInternship->issue_date = new Carbon($request->issue_date);
                 if ($newInternship->save()) {
                     foreach ($request->students as $studentAnnualId) {
                         $newInternshipStudentAnnual = new InternshipStudentAnnual();
@@ -166,6 +170,10 @@ class InternshipController extends Controller
         return redirect()->back()->with('flash_info', 'The operation was execute successfully');
     }
 
+    /**
+     * @param Request $request
+     * @return \Illuminate\Http\JsonResponse
+     */
     public function search(Request $request)
     {
         if ($request->ajax()) {
@@ -209,9 +217,12 @@ class InternshipController extends Controller
         }
     }
 
+    /**
+     * @return mixed
+     */
     public function data()
     {
-        $internships = Internship::select(['id', 'internship_title', 'subject', 'contact_name', 'contact_detail'])->latest();
+        $internships = Internship::select('*')->latest();
         return Datatables::of($internships)
             ->addColumn('students', function ($internship) {
                 $students = array();
@@ -228,6 +239,9 @@ class InternshipController extends Controller
 
                 return $template;
             })
+            ->addColumn('company_info', function ($internship) {
+                return $internship->company;
+            })
             ->addColumn('actions', function ($internship) {
                 return '<a href="' . route('internship.edit', $internship) . '" class="btn btn-xs btn-primary"><i class="fa fa-pencil" data-toggle="tooltip" data-placement="top" title="" data-original-title="Edit"></i></a>' .
                     ' <a href="' . route('internship.delete', $internship) . '" class="btn btn-xs btn-danger"><i class="fa fa-trash" data-toggle="tooltip" data-placement="top" title="" data-original-title="Delete"></i></a>';
@@ -238,6 +252,9 @@ class InternshipController extends Controller
             ->make(true);
     }
 
+    /**
+     * @return string
+     */
     public function getStudents()
     {
         $internship = Internship::with('internship_student_annuals')->find(\request('id'));
