@@ -166,6 +166,10 @@ class InternshipController extends Controller
         return redirect()->back()->with('flash_info', 'The operation was execute successfully');
     }
 
+    /**
+     * @param Request $request
+     * @return \Illuminate\Http\JsonResponse
+     */
     public function search(Request $request)
     {
         if ($request->ajax()) {
@@ -209,6 +213,9 @@ class InternshipController extends Controller
         }
     }
 
+    /**
+     * @return mixed
+     */
     public function data()
     {
         $internships = Internship::select(['id', 'internship_title', 'subject', 'contact_name', 'contact_detail'])->latest();
@@ -238,6 +245,9 @@ class InternshipController extends Controller
             ->make(true);
     }
 
+    /**
+     * @return string
+     */
     public function getStudents()
     {
         $internship = Internship::with('internship_student_annuals')->find(\request('id'));
