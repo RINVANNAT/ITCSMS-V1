@@ -33,7 +33,7 @@
         </div>
 
         <div class="form-group">
-            <label class="col-md-3 control-label required">Phone</label>
+            <label class="col-md-3 control-label">Phone</label>
             <div class="col-md-9">
                 <input type="text"
                        name="phone"
@@ -43,7 +43,7 @@
         </div>
 
         <div class="form-group">
-            <label class="col-md-3 control-label required">H/P</label>
+            <label class="col-md-3 control-label">H/P</label>
             <div class="col-md-9">
                 <input type="text"
                        name="hot_line"
@@ -53,7 +53,7 @@
         </div>
 
         <div class="form-group">
-            <label class="col-md-3 control-label required">E-Mail Address</label>
+            <label class="col-md-3 control-label">E-Mail Address</label>
             <div class="col-md-9">
                 <input type="text"
                        name="e_mail_address"
@@ -63,7 +63,7 @@
         </div>
 
         <div class="form-group">
-            <label class="col-md-3 control-label required">Web</label>
+            <label class="col-md-3 control-label">Web</label>
             <div class="col-md-9">
                 <input type="text"
                        name="web"

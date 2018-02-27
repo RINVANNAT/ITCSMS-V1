@@ -12,10 +12,10 @@
                 To: {{ $internship->person }} <br/>
                 {{ $internship->company }} <br/>
                 {{ $internship->address }} <br/>
-                Phone: {{ $internship->phone }} <br/>
-                H/P: {{ $internship->hot_line }} <br/>
-                E-Mail Address: {{ $internship->e_mail_address }} <br/>
-                Web: {{ $internship->web }}
+                @if($internship->phone != "") Phone: {{ $internship->phone }} <br/> @endif
+                @if($internship->hot_line != "") H/P: {{ $internship->hot_line }} <br/> @endif
+                @if($internship->e_mail_address != "") E-Mail Address: {{ $internship->e_mail_address }} <br/> @endif
+                @if($internship->web != "") Web: {{ $internship->web }} @endif
             </p>
         </div>
     </div>
