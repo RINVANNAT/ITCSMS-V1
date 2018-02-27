@@ -241,7 +241,13 @@ class InternshipController extends Controller
                 return $template;
             })
             ->addColumn('company_info', function ($internship) {
-                return $internship->company;
+                return 'To: <strong>' . $internship->person . '</strong><br/>'.
+                    '<strong>'. $internship->company. '</strong><br/>'.
+                    '<strong>'.$internship->address . '</strong><br/>'.
+                    'Phone: <strong>' .$internship->phone . '</strong><br/>'.
+                    'H/P: <strong>' .$internship->hot_line . '</strong><br/>'.
+                    'E-Mail: <strong>' .$internship->e_mail_address . '</strong><br/>'.
+                    'Web: <strong>' .$internship->web. '</strong>';
             })
             ->addColumn('actions', function ($internship) {
                 return '<a href="' . route('internship.edit', $internship) . '" class="btn btn-xs btn-primary"><i class="fa fa-pencil" data-toggle="tooltip" data-placement="top" title="" data-original-title="Edit"></i></a>' .

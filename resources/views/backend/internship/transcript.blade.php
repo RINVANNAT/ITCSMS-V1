@@ -20,6 +20,10 @@
                 position: relative;
                 font-family: "Times New Roman", serif !important;
             }
+            .page {
+                overflow: hidden;
+                page-break-after: always;
+            }
             
             .student-label, .student-list {
                 display: inline-block;
