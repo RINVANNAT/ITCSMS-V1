@@ -14,6 +14,7 @@ use App\Traits\PrintInternshipTrait;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Input;
+use PetstoreIO\Category;
 use Yajra\Datatables\Facades\Datatables;
 
 /**
@@ -256,6 +257,10 @@ class InternshipController extends Controller
             ->addColumn('checkbox', function ($internship) {
                 return '<input type="checkbox" name="internships[]" checked class="checkbox" data-id=' . $internship->id . '>';
             })
+            ->editColumn('printed_at', function ($internship){
+                return '<span class="label label-success">'.
+                    $internship->printed_at . '</span>';
+            })
             ->make(true);
     }
 
@@ -277,5 +282,22 @@ class InternshipController extends Controller
         }
 
         return $students->toJson();
+    }
+
+    /**
+     * @return array
+     */
+    public function markPrinted(){
+        if ( count(\request('internship_ids'))>0  ){
+            $now = Carbon::now();
+            foreach (\request('internship_ids') as $item){
+                $internship = Internship::find((int) $item);
+                $internship->printed_at = $now;
+                $internship->update();
+            }
+            return [
+                'status'=> true
+            ];
+        }
     }
 }
