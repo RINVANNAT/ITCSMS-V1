@@ -27,6 +27,7 @@ class CreateInternshipsTable extends Migration
             $table->dateTime('issue_date')->nullable();
             $table->dateTime('start');
             $table->dateTime('end');
+            $table->dateTime('printed_at')->nullable();
 
             $table->timestamps();
         });

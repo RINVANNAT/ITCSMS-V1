@@ -79,10 +79,16 @@
                 <p>Yours Faithfully,</p>
             @endif
         </div>
+    </div>
 
+    <div class="row">
         <div class="col-md-12" style="margin-top: 87px;">
             <p>Deputy Director,</p>
             <p style="margin-top:-10px;">Institute of Technology of Cambodia</p>
+        </div>
+
+        <div class="col-md-12" style="position: absolute; bottom: 0; right: 0;">
+            {{$internship->id}}
         </div>
     </div>
 </div>

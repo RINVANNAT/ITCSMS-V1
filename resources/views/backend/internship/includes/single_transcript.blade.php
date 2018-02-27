@@ -29,7 +29,7 @@
     <div class="row">
         <div class="col-md-12">
             <p class="text-justify">
-                Dear Sir, <br/>
+                Dear {{ $internship->person }}, <br/>
                 The {{ $internship->department->name_en }} of Institute of Technology of Cambodia (ITC) is searching for a company that {{ count($internship->internship_student_annuals) }} accept one of our {{ $internship->grade->name_en }} year Engineering students to do internship, so this student can get work experience from your company and this work experience will contribute towards the completion of his study.
             </p>
         </div>
@@ -83,10 +83,16 @@
                 <p>Yours Faithfully,</p>
             @endif
         </div>
+    </div>
 
+    <div class="row">
         <div class="col-md-12" style="margin-top: 87px;">
             <p>Deputy Director,</p>
             <p style="margin-top:-10px;">Institute of Technology of Cambodia</p>
+        </div>
+
+        <div class="col-md-12" style="position: absolute; bottom: 0; right: 0;">
+            {{$internship->id}}
         </div>
     </div>
 </div>

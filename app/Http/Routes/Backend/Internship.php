@@ -10,4 +10,5 @@ Route::group(['middleware' => 'auth', 'prefix' => 'internship', 'namespace' => '
     Route::get('/data', 'InternshipController@data')->name('internship.data');
     Route::get('student-search', 'InternshipController@search')->name('internship.search');
     Route::post('get-students', 'InternshipController@getStudents')->name('internship.get-students');
+    Route::post('/mark_as_printed', 'InternshipController@markPrinted')->name('internship.mark_as_printed');
 });

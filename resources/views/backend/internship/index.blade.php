@@ -23,6 +23,12 @@
                     <i class="fa fa-print"></i>
                     Print
                 </a>
+                <a class="btn btn-default btn-sm"
+                   id="printed_date"
+                   target="_blank">
+                    <i class="fa fa-print"></i>
+                    Mark as printed
+                </a>
                 <a class="btn btn-primary btn-sm"
                    href="{{ route('internship.create') }}">
                     <i class="fa fa-plus-circle"></i>
@@ -40,6 +46,7 @@
                     <th>Training Fields</th>
                     <th>Students</th>
                     <th>Company Info</th>
+                    <th>Printed Date</th>
                     <th>Actions</th>
                 </tr>
                 </thead>
@@ -50,6 +57,7 @@
 
 @section('after-scripts-end')
     {!! Html::script('plugins/iCheck/icheck.min.js') !!}
+    {!! Html::script('plugins/toastr/toastr.min.js') !!}
     {!! Html::script('plugins/datatables/jquery.dataTables.min.js') !!}
     {!! Html::script('plugins/datatables/dataTables.bootstrap.min.js') !!}
 
@@ -62,7 +70,7 @@
         }
 
         $(function () {
-            $('#internships').DataTable({
+            let oTable = $('#internships').DataTable({
                 processing: true,
                 serverSide: true,
                 ajax: '{{ route('internship.data') }}',
@@ -72,13 +80,14 @@
                     {data: 'training_field', name: 'training_field'},
                     {data: 'students', name: 'students', orderable: false, searchable: false},
                     {data: 'company_info', name: 'company_info'},
+                    {data: 'printed_at', name: 'printed_at'},
                     {data: 'actions', name: 'actions', orderable: false, searchable: false},
                 ],
                 order: [[1, 'asc']],
                 drawCallback: function() {
                     initIcheker();
                 }
-            })
+            });
 
             $(document).on('click', '#print', function (e) {
                 e.preventDefault();
@@ -87,8 +96,27 @@
                     selected_ids.push($(this).data('id'));
                 });
                 window.open('{{ env('MY_DOMAIN') }}/admin/internship/'+encodeURIComponent(JSON.stringify(selected_ids))+'/print_internship');
-            })
-        })
+            });
 
+            $(document).on('click', '#printed_date', function (e) {
+                e.preventDefault();
+                let selected_ids = [];
+                $('#internships input:checked').each(function(){
+                    selected_ids.push($(this).data('id'));
+                });
+                $.ajax({
+                    url: '{{ route('internship.mark_as_printed') }}',
+                    method: 'POST',
+                    data: {
+                        internship_ids: selected_ids
+                    }
+                }).done(function (response) {
+                    if(response){
+                        toastr["success"]("The marked row has been mark as printed")
+                        oTable.draw(true);
+                    }
+                })
+            })
+        });
     </script>
 @stop
