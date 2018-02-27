@@ -5,7 +5,7 @@
         <style type="text/css">
             @font-face {
                 font-family: times_new_roman_normal;
-                src: url("{{ asset('fonts/Times_New_Roman_Normal.ttf') }}");
+                src: url("{{ asset('fonts/TIMES.TTF') }}");
             }
 
             .page {
