@@ -17,10 +17,10 @@ class CreateInternshipsTable extends Migration
             $table->string('person');
             $table->string('company');
             $table->string('address');
-            $table->string('phone');
-            $table->string('hot_line');
-            $table->string('e_mail_address');
-            $table->string('web');
+            $table->string('phone')->nullable();
+            $table->string('hot_line')->nullable();
+            $table->string('e_mail_address')->nullable();
+            $table->string('web')->nullable();
             $table->string('title');
             $table->string('training_field');
 
