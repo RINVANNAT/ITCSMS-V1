@@ -89,5 +89,6 @@
                 window.open('{{ env('MY_DOMAIN') }}/admin/internship/'+encodeURIComponent(JSON.stringify(selected_ids))+'/print_internship');
             })
         })
+
     </script>
 @stop
