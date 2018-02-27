@@ -4,8 +4,8 @@
         <link rel="stylesheet" href="{{ asset('css/backend/prints/prints.css') }}"/>
         <style type="text/css">
             @font-face {
-                font-family: crimson_roman;
-                src: url("{{ asset('fonts/Crimson-Roman.ttf') }}");
+                font-family: times_new_roman_normal;
+                src: url("{{ asset('fonts/Times_New_Roman_Normal.ttf') }}");
             }
 
             .page {
@@ -34,6 +34,7 @@
                 line-height: 0.8em;
             }
             p, span{
+                font-family: times_new_roman_normal !important;
                 font-size: 18px !important;
             }
         </style>
