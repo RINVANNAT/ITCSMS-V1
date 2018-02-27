@@ -13,7 +13,7 @@ class StoreInternshipRequest extends Request
      */
     public function authorize()
     {
-        return access()->allow('store-internship');
+        return access()->allow('create-internship');
     }
 
     /**
