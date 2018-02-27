@@ -24,7 +24,17 @@ class StoreInternshipRequest extends Request
     public function rules()
     {
         return [
-            //
+            'person' => 'required',
+            'company' => 'required',
+            'address' => 'required',
+            'phone' => 'required',
+            'hot_line' => 'required',
+            'e_mail_address' => 'required',
+            'web' => 'required',
+            'title' => 'required',
+            'training_field' => 'required',
+            'start' => 'required',
+            'end' => 'required'
         ];
     }
 }

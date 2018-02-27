@@ -36,11 +36,10 @@
                 <thead>
                 <tr>
                     <th></th>
-                    <th>Internship title</th>
-                    <th>Subject</th>
+                    <th>Title</th>
+                    <th>Training Fields</th>
                     <th>Students</th>
-                    <th>Contact Name</th>
-                    <th>Contact Detail</th>
+                    <th>Company Info</th>
                     <th>Actions</th>
                 </tr>
                 </thead>
@@ -69,11 +68,10 @@
                 ajax: '{{ route('internship.data') }}',
                 columns: [
                     {data: 'checkbox', name: 'checkbox', orderable: false, searchable: false},
-                    {data: 'internship_title', name: 'internship_title'},
-                    {data: 'subject', name: 'subject'},
+                    {data: 'title', name: 'title'},
+                    {data: 'training_field', name: 'training_field'},
                     {data: 'students', name: 'students', orderable: false, searchable: false},
-                    {data: 'contact_name', name: 'contact_name'},
-                    {data: 'contact_detail', name: 'contact_detail', orderable: false, searchable: false},
+                    {data: 'company_info', name: 'company_info'},
                     {data: 'actions', name: 'actions', orderable: false, searchable: false},
                 ],
                 order: [[1, 'asc']],
@@ -91,5 +89,6 @@
                 window.open('{{ env('MY_DOMAIN') }}/admin/internship/'+encodeURIComponent(JSON.stringify(selected_ids))+'/print_internship');
             })
         })
+
     </script>
 @stop

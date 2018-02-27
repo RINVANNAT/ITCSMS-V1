@@ -1,20 +1,28 @@
 <div class="page">
     <div class="row">
         <div class="col-md-12" style="padding-bottom: 1cm;margin-top: -12px;">
-            <span>Ref No ........... ITC.BE</span>
-            <span class="pull-right">Phnom Penh, {{ \Carbon\Carbon::parse($internship->date)->format('F d, Y') }}</span>
-        </div>
-    </div>
-
-    <div class="row">
-        <div class="col-md-12 contact_detail">
-            {!! $internship->contact_detail !!}
+            <span>Ref. N<sup>o</sup> .................. ITC.BE</span>
+            <span class="pull-right">Phnom Penh, {{ \Carbon\Carbon::parse($internship->issue_date)->format('F d, Y') }}</span>
         </div>
     </div>
 
     <div class="row">
         <div class="col-md-12">
-            <br/><p><strong>Subject: {{ $internship->subject }}</strong></p><br/>
+            <p>
+                To: {{ $internship->person }} <br/>
+                {{ $internship->company }} <br/>
+                {{ $internship->address }} <br/>
+                Phone: {{ $internship->phone }} <br/>
+                H/P: {{ $internship->hot_line }} <br/>
+                E-Mail Address: {{ $internship->e_mail_address }} <br/>
+                Web: {{ $internship->web }}
+            </p>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-12">
+            <br/><p><strong>Subject: {{ $internship->title }}</strong></p><br/>
         </div>
     </div>
 
@@ -47,14 +55,14 @@
         </div>
     </div>
 
-    <div class="row align-justify">
+    <div class="row text-justify">
         <div class="col-md-12">
             <p>
                 The internship period will take place from {{ (new \Carbon\Carbon($internship->start_date))->format('F d') }} to {{ (new \Carbon\Carbon($internship->end_date))->format('F d, Y') }} and would need to be scheduled by both your company and ITC.
             </p>
 
             <p>
-                In this case, we would like to ask for your cooperation with our institute and let our student do this internship in your company in the field of {{ strtoupper($internship->internship_title) }}. After that,
+                In this case, we would like to ask for your cooperation with our institute and let our student do this internship in your company in the field of {{ strtoupper($internship->training_field) }}. After that,
                 @foreach($internship->internship_student_annuals as $internship_student_annual)
                     {{ ($internship_student_annual->gender->code == 'M') ? 'he' : 'she' }}
                 @endforeach
@@ -69,7 +77,7 @@
                 We are looking forward to hearing from your acceptance.
             </p>
 
-            @if(!empty($internship->contact_name))
+            @if(!empty($internship->person))
                 <p>Yours Sincerely,</p>
             @else
                 <p>Yours Faithfully,</p>
