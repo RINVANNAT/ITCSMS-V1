@@ -255,7 +255,11 @@ class InternshipController extends Controller
                     ' <a href="' . route('internship.delete', $internship) . '" class="btn btn-xs btn-danger"><i class="fa fa-trash" data-toggle="tooltip" data-placement="top" title="" data-original-title="Delete"></i></a>';
             })
             ->addColumn('checkbox', function ($internship) {
-                return '<input type="checkbox" name="internships[]" checked class="checkbox" data-id=' . $internship->id . '>';
+                if(!is_null($internship->printed_at)) {
+                    return '<input type="checkbox" name="internships[]" class="checkbox" data-id=' . $internship->id . '>';
+                }else {
+                    return '<input type="checkbox" name="internships[]" checked class="checkbox" data-id=' . $internship->id . '>';
+                }
             })
             ->editColumn('printed_at', function ($internship){
                 return '<span class="label label-success">'.
