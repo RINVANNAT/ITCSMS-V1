@@ -68,7 +68,7 @@
             </p>
 
             <p>
-                In this case, we would like to ask for your cooperation with our institute and let our students do this internship in your company in the field of {{ strtoupper($internship->training_field) }}. After that, they will write a
+                In this case, we would like to ask for your cooperation with our institute and let our students do this internship in your company in the field of {{strtoupper($internship->training_field)}}. After that, they will write a
                 @if((($internship->degree->id == 2) && ($internship->grade->id == 2)) || (($internship->grade->id == 5) && ($internship->degree->id == 1)))
                 thesis and present it to a jury of the Institute for an evaluation. This evaluation will bring account with others for the final exam.
                 @else
