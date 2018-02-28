@@ -81,7 +81,7 @@
                     {data: 'title', name: 'title'},
                     {data: 'training_field', name: 'training_field'},
                     {data: 'students', name: 'students', orderable: false, searchable: false},
-                    {data: 'company_info', name: 'company_info'},
+                    {data: 'company_info', name: 'company_info', orderable: false, searchable: false},
                     {data: 'printed_at', name: 'printed_at'},
                     {data: 'actions', name: 'actions', orderable: false, searchable: false},
                 ],
@@ -133,9 +133,6 @@
                         }
                     })
                 })
-
-
-
             })
         });
     </script>
