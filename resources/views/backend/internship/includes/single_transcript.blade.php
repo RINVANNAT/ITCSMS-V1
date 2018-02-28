@@ -68,7 +68,7 @@
             </p>
 
             <p>
-                In this case, we would like to ask for your cooperation with our institute and let our students do this internship in your company in the field of {{ strtoupper($internship->training_field) }}. After that,
+                In this case, we would like to ask for your cooperation with our institute and let our students do this internship in your company in the field of {{strtoupper($internship->training_field)}}. After that,
                 @foreach($internship->internship_student_annuals as $internship_student_annual)
                     {{ ($internship_student_annual->gender->code == 'M') ? 'he' : 'she' }}
                 @endforeach
