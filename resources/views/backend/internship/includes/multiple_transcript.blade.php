@@ -30,7 +30,13 @@
         <div class="col-md-12">
             <p class="text-justify">
                 Dear {{ $internship->person }}, <br/>
-                The {{ $internship->department->name_en }} of Institute of Technology of Cambodia (ITC) is searching for a company that can accept {{ count($internship->internship_student_annuals) }} of our {{ strtolower($internship->grade->name_en) }} Engineering students to do internship, so those students can get work experience from your company and this work experience will contribute towards the completion of their studies.
+                The {{ $internship->department->name_en }} of Institute of Technology of Cambodia (ITC) is searching for a company that can accept {{ count($internship->internship_student_annuals) }} of our {{ strtolower($internship->grade->name_en) }}
+                @if($internship->degree->id == 2)
+                    Technician
+                @else
+                    Engineering
+                @endif
+                students to do internship, so those students can get work experience from your company and this work experience will contribute towards the completion of their studies.
             </p>
         </div>
     </div>
@@ -58,11 +64,16 @@
     <div class="row text-justify">
         <div class="col-md-12">
             <p>
-                The internship period will take place from {{ (new \Carbon\Carbon($internship->start_date))->format('F d') }} to {{ (new \Carbon\Carbon($internship->end_date))->format('F d, Y') }} and would need to be scheduled by both your company and ITC.
+                The internship period will take place from {{ (new \Carbon\Carbon($internship->start))->format('F d') }} to {{ (new \Carbon\Carbon($internship->end))->format('F d, Y') }} and would need to be scheduled by both your company and ITC.
             </p>
 
             <p>
-                In this case, we would like to ask for your cooperation with our institute and let our students do this internship in your company in the field of {{ strtoupper($internship->training_field) }}. After that, they will write a thesis and present it to a jury of the Institute for an evaluation. This evaluation will bring account with others for the final exam.
+                In this case, we would like to ask for your cooperation with our institute and let our students do this internship in your company in the field of {{ strtoupper($internship->training_field) }}. After that, they will write a
+                @if((($internship->degree->id == 2) && ($internship->grade->id == 2)) || (($internship->grade->id == 5) && ($internship->degree->id == 1)))
+                thesis and present it to a jury of the Institute for an evaluation. This evaluation will bring account with others for the final exam.
+                @else
+                report which will be submitted to their relevant development.
+                @endif
             </p>
 
             <p>
