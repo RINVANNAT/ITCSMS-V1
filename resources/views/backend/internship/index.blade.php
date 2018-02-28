@@ -2,6 +2,7 @@
 
 @section('after-styles-end')
     {!! Html::style('plugins/iCheck/square/red.css') !!}
+    {!! Html::style('plugins/sweetalert2/dist/sweetalert2.css') !!}
     {!! Html::style('plugins/datatables/dataTables.bootstrap.css') !!}
 @stop
 
@@ -26,7 +27,7 @@
                 <a class="btn btn-default btn-sm"
                    id="printed_date"
                    target="_blank">
-                    <i class="fa fa-print"></i>
+                    <i class="fa fa-calendar"></i>
                     Mark as printed
                 </a>
                 <a class="btn btn-primary btn-sm"
@@ -57,6 +58,7 @@
 
 @section('after-scripts-end')
     {!! Html::script('plugins/iCheck/icheck.min.js') !!}
+    {!! Html::script('plugins/sweetalert2/dist/sweetalert2.js') !!}
     {!! Html::script('plugins/toastr/toastr.min.js') !!}
     {!! Html::script('plugins/datatables/jquery.dataTables.min.js') !!}
     {!! Html::script('plugins/datatables/dataTables.bootstrap.min.js') !!}
@@ -104,18 +106,36 @@
                 $('#internships input:checked').each(function(){
                     selected_ids.push($(this).data('id'));
                 });
-                $.ajax({
-                    url: '{{ route('internship.mark_as_printed') }}',
-                    method: 'POST',
-                    data: {
-                        internship_ids: selected_ids
-                    }
-                }).done(function (response) {
-                    if(response){
-                        toastr["success"]("The marked row has been mark as printed")
-                        oTable.draw(true);
-                    }
+                swal({
+                    title: 'Mark selected row as printed',
+                    text: "Do you want to mark selected row as printed?",
+                    type: 'warning',
+                    showCancelButton: true,
+                    confirmButtonColor: '#3085d6',
+                    cancelButtonColor: '#d33',
+                    cancelButtonText: 'No',
+                    confirmButtonText: 'Yes'
+                }).then(function () {
+                    toggleLoading(true);
+                    $.ajax({
+                        type: 'POST',
+                        url: '{{ route('internship.mark_as_printed') }}',
+                        data: {internship_ids: selected_ids},
+                        success: function () {
+                            notify('info', 'The marked row has been mark as printed.', 'Mark internship letter as printed');
+                        },
+                        error: function () {
+                            notify('error', 'Something went wrong', 'Mark internship letter as printed');
+                        },
+                        complete: function () {
+                            oTable.draw(true);
+                            toggleLoading(false);
+                        }
+                    })
                 })
+
+
+
             })
         });
     </script>
