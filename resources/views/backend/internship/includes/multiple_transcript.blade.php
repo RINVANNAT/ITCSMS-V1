@@ -2,7 +2,7 @@
     <div class="row">
         <div class="col-md-12" style="padding-bottom: 0.4cm;margin-top: -12px;">
             <span>Ref. N<sup>o</sup> .................. ITC.BE</span>
-            <span class="pull-right">Phnom Penh, {{ \Carbon\Carbon::parse($internship->issue_date)->format('F d, Y') }}</span>
+            <span class="pull-right">Phnom Penh, {{ \Carbon\Carbon::parse($internship->issue_date)->format('F') }} ..............., {{ \Carbon\Carbon::parse($internship->issue_date)->format('Y') }}</span>
         </div>
     </div>
 
