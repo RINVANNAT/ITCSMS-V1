@@ -13,7 +13,7 @@ class StoreInternshipRequest extends Request
      */
     public function authorize()
     {
-        return access()->allow('store-internship');
+        return access()->allow('create-internship');
     }
 
     /**
@@ -24,7 +24,13 @@ class StoreInternshipRequest extends Request
     public function rules()
     {
         return [
-            //
+            'person' => 'required',
+            'company' => 'required',
+            'address' => 'required',
+            'title' => 'required',
+            'training_field' => 'required',
+            'start' => 'required',
+            'end' => 'required'
         ];
     }
 }

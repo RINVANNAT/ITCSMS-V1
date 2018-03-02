@@ -91,7 +91,7 @@
                 theme: "bootstrap"
             });
 
-            $('#date').datetimepicker({
+            $('#issue_date, #start, #end').datetimepicker({
                 format: 'YYYY-MM-DD'
             });
 

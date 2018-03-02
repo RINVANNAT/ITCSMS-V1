@@ -52,11 +52,7 @@
                 <h3 class="box-title">Create Internship</h3>
             </div>
             <div class="box-body">
-                <div class="row">
-                    <div class="col-md-offset-1 col-md-10">
-                        @include('backend.internship.includes.form')
-                    </div>
-                </div>
+                @include('backend.internship.includes.form')
             </div>
         </div>
 
@@ -91,7 +87,7 @@
                 theme: "bootstrap"
             });
 
-            $('#date').datetimepicker({
+            $('#issue_date, #start, #end').datetimepicker({
                 format: 'YYYY-MM-DD'
             });
 

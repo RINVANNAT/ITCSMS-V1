@@ -204,6 +204,7 @@ return [
         Yajra\Datatables\DatatablesServiceProvider::class,
         Maatwebsite\Excel\ExcelServiceProvider::class,
         Jenssegers\Date\DateServiceProvider::class,
+        Barryvdh\Snappy\ServiceProvider::class,
 
 
         /*
@@ -284,6 +285,8 @@ return [
         'Socialite'   => Laravel\Socialite\Facades\Socialite::class,
         'Datatables' => Yajra\Datatables\Datatables::class,
         'Excel' => Maatwebsite\Excel\Facades\Excel::class,
+        'PDF' => Barryvdh\Snappy\Facades\SnappyPdf::class,
+        'SnappyImage' => Barryvdh\Snappy\Facades\SnappyImage::class,
 
         'Date' => Jenssegers\Date\Date::class,
         'Flash'     => Laracasts\Flash\Flash::class,

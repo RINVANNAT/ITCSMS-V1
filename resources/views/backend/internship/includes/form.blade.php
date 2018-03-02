@@ -2,131 +2,160 @@
     <input type="hidden" name="id" value="{{ $internship->id }}"/>
 @endif
 <div class="row">
-    <div class="col-md-12">
-        <fieldset>
-            <legend>Header</legend>
-            <div class="form-group">
-                <label class="col-md-3 control-label">No.</label>
-                <div class="col-md-1">
-                    <input type="text"
-                           readonly
-                           value="{{ $number }}"
-                           name="number"
-                           class="form-control">
-                </div>
-
-                <label class="col-md-1 control-label">Ref. No</label>
-                <div class="col-md-3">
-                    <input type="text"
-                           name="ref_number"
-                           value="{{ isset($internship) ? $internship->ref_number : null }}"
-                           class="form-control">
-                </div>
-
-                <label class="col-md-1 control-label">Date</label>
-                <div class="col-md-3">
-                    <input class="form-control"
-                           id="date"
-                           value="{{ isset($internship) ? $internship->date : null }}"
-                           name="date"
-                           type="text">
-                </div>
-            </div>
-
-            <div class="form-group">
-                <label class="col-md-3 control-label required">Title</label>
-                <div class="col-md-9">
-                    <input type="text"
-                           name="internship_title"
-                           value="{{ isset($internship) ? $internship->internship_title : null }}"
-                           required
-                           class="form-control"/>
-                </div>
-            </div>
-
-            <div class="form-group">
-                <label class="col-md-3 control-label required">Subject</label>
-                <div class="col-md-9">
-                    <input type="text"
-                           name="subject"
-                           value="{{ isset($internship) ? $internship->subject : null }}"
-                           required
-                           class="form-control"/>
-                </div>
-            </div>
-
-            <div class="form-group">
-                <label class="col-md-3 control-label required">Internship Period</label>
-                <div class="col-md-9">
-                    <input type="text"
-                           name="period"
-                           value="{{ isset($internship) ? (new \Carbon\Carbon($internship->start_date))->format("m/d/Y"). ' - ' .(new \Carbon\Carbon($internship->end_date))->format("m/d/Y") : null }}"
-                           id="period"
-                           class="form-control"/>
-                </div>
-            </div>
-        </fieldset>
-    </div>
-</div>
-<div class="row">
     <div class="col-md-6">
-        <fieldset>
-            <legend>Company Info</legend>
-
-            <div class="form-group">
-                <label class="col-md-4 control-label required">Contact Name</label>
-                <div class="col-md-8">
-                    <input type="text"
-                           name="contact_name"
-                           value="{{ isset($internship) ? $internship->contact_name : null }}"
-                           class="form-control">
-                </div>
+        <div class="form-group">
+            <label class="col-md-3 control-label required">Person</label>
+            <div class="col-md-9">
+                <input class="form-control"
+                       value="{{ isset($internship) ? $internship->person : null }}"
+                       name="person"
+                       type="text">
             </div>
+        </div>
 
-            <div class="form-group">
-                <label class="col-md-4 control-label required">Contact Detail</label>
-                <div class="col-md-8">
-                    <textarea name="contact_detail"
-                              id="contact_detail"
-                              class="form-control"
-                              value="{{ isset($internship) ? $internship->contact_detail : null }}"
-                              rows="18"></textarea>
-                </div>
+        <div class="form-group">
+            <label class="col-md-3 control-label required">Company</label>
+            <div class="col-md-9">
+                <input type="text"
+                       name="company"
+                       value="{{ isset($internship) ? $internship->company : null }}"
+                       class="form-control"/>
             </div>
-        </fieldset>
+        </div>
+
+        <div class="form-group">
+            <label class="col-md-3 control-label required">Address</label>
+            <div class="col-md-9">
+                <textarea class="form-control"
+                          name="address"
+                          rows="4">{{ isset($internship) ? $internship->address : null }}</textarea>
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label class="col-md-3 control-label">Phone</label>
+            <div class="col-md-9">
+                <input type="text"
+                       name="phone"
+                       value="{{ isset($internship) ? $internship->phone : null }}"
+                       class="form-control"/>
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label class="col-md-3 control-label">H/P</label>
+            <div class="col-md-9">
+                <input type="text"
+                       name="hot_line"
+                       value="{{ isset($internship) ? $internship->hot_line : null }}"
+                       class="form-control"/>
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label class="col-md-3 control-label">E-Mail Address</label>
+            <div class="col-md-9">
+                <input type="text"
+                       name="e_mail_address"
+                       value="{{ isset($internship) ? $internship->e_mail_address : null }}"
+                       class="form-control"/>
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label class="col-md-3 control-label">Web</label>
+            <div class="col-md-9">
+                <input type="text"
+                       name="web"
+                       value="{{ isset($internship) ? $internship->web : null }}"
+                       class="form-control"/>
+            </div>
+        </div>
     </div>
 
     <div class="col-md-6">
-        <fieldset>
-            <legend>Student Info</legend>
+        <div class="row">
+            <div class="col-md-12">
+                <div class="form-group">
+                    <label class="col-md-3 control-label required">Title</label>
+                    <div class="col-md-9">
+                        <input type="text"
+                               value="{{ isset($internship) ? $internship->title : null }}"
+                               name="title"
+                               class="form-control">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-md-3 control-label required">Training Field</label>
+                    <div class="col-md-9">
+                        <input type="text"
+                               name="training_field"
+                               value="{{ isset($internship) ? $internship->training_field : null }}"
+                               class="form-control">
+                    </div>
+                </div>
 
-            <div class="form-group">
-                <label class="col-md-4 control-label required">Academic Year</label>
-                <div class="col-md-8">
-                    <select class="form-control"
-                            name="academic_year"
-                            id="academic_year">
-                        @foreach($academic_years as $academic_year)
-                            @if(isset($pre_academic_year))
-                                @if($pre_academic_year->id == $academic_year->id)
-                                    <option value="{{ $academic_year->id }}" selected>{{ $academic_year->name_latin }}</option>
+                <div class="form-group">
+                    <label class="col-md-3 control-label required">Start</label>
+                    <div class="col-md-9">
+                        <input class="form-control"
+                               id="start"
+                               value="{{ isset($internship) ? $internship->start : null }}"
+                               name="start"
+                               type="text">
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="col-md-3 control-label required">End</label>
+                    <div class="col-md-9">
+                        <input class="form-control"
+                               id="end"
+                               value="{{ isset($internship) ? $internship->end : null }}"
+                               name="end"
+                               type="text">
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="col-md-3 control-label required">Issue Date</label>
+                    <div class="col-md-9">
+                        <input class="form-control"
+                               id="issue_date"
+                               value="{{ isset($internship) ? $internship->issue_date : null }}"
+                               name="issue_date"
+                               type="text">
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="col-md-3 control-label required">Academic Year</label>
+                    <div class="col-md-9">
+                        <select class="form-control"
+                                name="academic_year"
+                                id="academic_year">
+                            @foreach($academic_years as $academic_year)
+                                @if(isset($pre_academic_year))
+                                    @if($pre_academic_year->id == $academic_year->id)
+                                        <option value="{{ $academic_year->id }}" selected>{{ $academic_year->name_latin }}</option>
+                                    @else
+                                        <option value="{{ $academic_year->id }}">{{ $academic_year->name_latin }}</option>
+                                    @endif
                                 @else
                                     <option value="{{ $academic_year->id }}">{{ $academic_year->name_latin }}</option>
                                 @endif
-                            @else
-                                <option value="{{ $academic_year->id }}">{{ $academic_year->name_latin }}</option>
-                            @endif
-                        @endforeach
-                    </select>
+                            @endforeach
+                        </select>
+                    </div>
                 </div>
-            </div>
 
-            <div class="form-group">
-                <label class="col-md-4 control-label required">Students</label>
-                <div class="col-md-8">
-                    <select class="form-control" name="students[]" id="students"></select>
+                <div class="form-group">
+                    <label class="col-md-3 control-label required">Students</label>
+                    <div class="col-md-9">
+                        <select class="form-control" name="students[]" id="students"></select>
+                    </div>
                 </div>
             </div>
-        </fieldset>
+        </div>
     </div>
 </div>
