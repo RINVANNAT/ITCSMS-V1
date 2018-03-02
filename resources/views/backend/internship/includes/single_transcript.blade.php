@@ -24,7 +24,7 @@
     <div class="row">
         <div class="col-md-12">
             <br/>
-            <p class="text-bold">
+            <p style="font-family: times_new_roman_normal_bold !important; font-weight: bold;">
                 Subject: Training for the
                 {{ convert_degree($internship->grade->id) }}
                 Year

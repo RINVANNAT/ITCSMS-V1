@@ -8,6 +8,11 @@
                 src: url("{{ asset('fonts/TIMES.TTF') }}");
             }
 
+            @font-face {
+                font-family: times_new_roman_normal_bold;
+                src: url("{{ asset('fonts/Times_New_Roman_Bold.ttf') }}");
+            }
+
             .page {
                 width: 210mm;
                 height: 297mm;
