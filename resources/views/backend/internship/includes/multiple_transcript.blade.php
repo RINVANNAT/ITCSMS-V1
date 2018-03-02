@@ -24,17 +24,16 @@
     <div class="row">
         <div class="col-md-12">
             <br/>
-            <p>
-                <strong>Subject: Training for the
-                    {{ convert_degree($internship->grade->id) }}
-                    Year
-                    @if($internship->degree->id == 2)
-                        Technician
-                    @else
-                        Engineering
-                    @endif
-                    Student
-                </strong>
+            <p class="text-bold">
+                Subject: Training for the
+                {{ convert_degree($internship->grade->id) }}
+                Year
+                @if($internship->degree->id == 2)
+                    Technician
+                @else
+                    Engineering
+                @endif
+                Student
             </p><br/>
         </div>
     </div>
@@ -43,7 +42,7 @@
         <div class="col-md-12">
             <p class="text-justify">
                 Dear {{ $internship->person }}, <br/>
-                The {{ $internship->department->name_en }} of Institute of Technology of Cambodia (ITC) is searching for a company that can accept {{ count($internship->internship_student_annuals) }} of our {{ convert_degree($internship->grade->id) }}
+                The {{ $internship->department->name_en }} Department of Institute of Technology of Cambodia (ITC) is searching for a company that can accept {{ count($internship->internship_student_annuals) }} of our {{ convert_degree($internship->grade->id) }} year
                 @if($internship->degree->id == 2)
                     Technician
                 @else
