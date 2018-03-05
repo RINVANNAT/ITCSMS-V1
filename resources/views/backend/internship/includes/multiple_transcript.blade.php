@@ -105,7 +105,7 @@
     </div>
 
     <div class="row">
-        <div class="col-md-12" style="margin-top: 87px;">
+        <div class="col-md-12" style="position: absolute;bottom: 0;left: 1cm;">
             <p>Deputy Director,</p>
             <p style="margin-top:-10px;">Institute of Technology of Cambodia</p>
         </div>
