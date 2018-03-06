@@ -42,7 +42,7 @@
         <div class="col-md-12">
             <p class="text-justify">
                 Dear {{ $internship->person }}, <br/>
-                The {{ $internship->department->name_en }} Department of Institute of Technology of Cambodia (ITC) is searching for a company that {{ count($internship->internship_student_annuals) }} accept one of our {{ convert_degree($internship->grade->id) }} year
+                The {{ $internship->department->name_en }} Department of Institute of Technology of Cambodia (ITC) is searching for a company that can accept one of our {{ convert_degree($internship->grade->id) }} year
                 @if($internship->degree->id == 2)
                     Technician
                 @else
