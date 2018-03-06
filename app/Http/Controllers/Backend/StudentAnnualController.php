@@ -610,9 +610,8 @@ class StudentAnnualController extends Controller
             ->leftJoin('histories', 'studentAnnuals.history_id', '=', 'histories.id')
             ->leftJoin('highSchools', 'students.high_school_id', '=', 'highSchools.id')
             ->leftJoin('group_student_annuals', 'group_student_annuals.student_annual_id', '=', 'studentAnnuals.id')
-            ->leftJoin('groups','groups.id','=','group_student_annuals.group_id');
-        ;
-
+            ->leftJoin('groups','groups.id','=','group_student_annuals.group_id')
+            ->whereNULL('group_student_annuals.department_id');
 
         $title = 'បញ្ជីឈ្មោះនិស្សិត';
 
