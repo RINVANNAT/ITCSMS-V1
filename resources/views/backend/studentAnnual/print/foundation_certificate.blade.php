@@ -38,9 +38,10 @@
                 $student_pass = false;
                 $gpa = "0.0";
             }
+
             foreach ($scores[$student['id']] as $key => $score) {
                 if(is_numeric($key)) {
-                    if(intval($score["score"]) < 30) {
+                    if(intval($score["score"]) < 30 && intval($score["resit"]) < 30) {
                         $student_pass = false;
                     }
                 }
@@ -190,7 +191,7 @@
         }
         foreach ($scores[$student['id']] as $key => $score) {
             if(is_numeric($key)) {
-                if(intval($score["score"]) < 30) {
+                if(intval($score["score"]) < 30 && intval($score["resit"]) < 30) {
                     $student_pass = false;
                 }
             }
