@@ -46,7 +46,7 @@
                 }
             }
         ?>
-        @if($student_pass)
+        @if($student_pass && ($is_front == 'true'))
             <div class="page">
             <div class="row">
                 <div class="col-md-6 col-xs-6">
@@ -196,7 +196,7 @@
             }
         }
         ?>
-        @if($student_pass)
+        @if($student_pass && ($is_back == 'true'))
             <div class="page">
                 <div class="row">
                     <div class="col-md-6 col-xs-6">
@@ -239,7 +239,7 @@
                             </div>
                             <div class="row">
                                 <div class="col-md-4 col-xs-4">
-                                    @if($photo != null)
+                                    @if($photo == 'true')
                                         <img class="photo" src="{{$smis_server->value}}/img/profiles/{{$student['photo']}}">
                                     @else
                                         <div class="photo"></div>

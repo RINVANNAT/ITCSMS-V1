@@ -31,7 +31,6 @@ trait PrintTranscriptTrait
         );
     }
     public function request_print_transcript_data(PrintTranscriptRequest $request){
-
         $academic_year = $request->get('academic_year');
         $group = $request->get('group');
         $gender = $request->get('gender');
@@ -164,11 +163,12 @@ trait PrintTranscriptTrait
         return $datatables->make(true);
     }
     public function print_transcript(PrintTranscriptRequest $request){
-
         $smis_server = Configuration::where("key","smis_server")->first();
         $semester = 1;
         $studentAnnualIds = json_decode($request->ids);
         $photo = $request->photo;
+        $is_back = $request->is_back;
+        $is_front = $request->is_front;
         $students  = StudentAnnual::select([
             'students.id_card',
             'students.name_kh',
@@ -268,7 +268,9 @@ trait PrintTranscriptTrait
                 'issued_date',
                 'issued_number',
                 'smis_server',
-                'photo'
+                'photo',
+                'is_front',
+                'is_back'
             )
         );
     }
