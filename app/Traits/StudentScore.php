@@ -1,6 +1,7 @@
 <?php
 namespace App\Traits;
 
+use App\Models\Average;
 use App\Models\CourseAnnual;
 use App\Models\Department;
 use App\Models\Enum\SemesterEnum;
@@ -200,7 +201,15 @@ trait StudentScore {
 
                     $groups = isset($classByCourseAnnualIds[$courseAnnual->course_annual_id])?$classByCourseAnnualIds[$courseAnnual->course_annual_id]:[];
 
+                    $resit = Average::where([
+                        ['student_annual_id', $studentAnnual->id],
+                        ['course_annual_id', $courseAnnual->course_annual_id],
+                    ])->whereNotNull('resit_score')->pluck('resit_score')->first();
+
                     if(count($groups) > 0) {
+
+
+
 
                         if(in_array($groupStudentAnnuals[$courseAnnual->semester_id], $groups)) {
 
@@ -211,6 +220,8 @@ trait StudentScore {
                             }
 
                             //---this is the course annual which this student learn
+
+
                             $student[$studentAnnual->id][$courseAnnual->course_annual_id] = [
 
                                 'name_kh' => $courseAnnual->name_kh,
@@ -219,6 +230,7 @@ trait StudentScore {
                                 'credit'  => $courseAnnual->course_annual_credit,
                                 'semester' => $courseAnnual->semester_id,
                                 'absence' => $absence,
+                                'resit' => $resit,
                                 'score'    => isset($averages[$courseAnnual->course_annual_id])? (isset($averages[$courseAnnual->course_annual_id][$studentAnnual->id]) ? $averages[$courseAnnual->course_annual_id][$studentAnnual->id]->average :null) :null
                             ];
                         }
@@ -238,6 +250,7 @@ trait StudentScore {
                             'credit'  => $courseAnnual->course_annual_credit,
                             'semester' => $courseAnnual->semester_id,
                             'absence' => $absence,
+                            'resit' => $resit,
                             'score'    => isset($averages[$courseAnnual->course_annual_id])? (isset($averages[$courseAnnual->course_annual_id][$studentAnnual->id]) ? $averages[$courseAnnual->course_annual_id][$studentAnnual->id]->average :null) :null
                         ];
                     }

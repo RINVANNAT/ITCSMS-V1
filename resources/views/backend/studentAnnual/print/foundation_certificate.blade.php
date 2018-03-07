@@ -38,15 +38,16 @@
                 $student_pass = false;
                 $gpa = "0.0";
             }
+
             foreach ($scores[$student['id']] as $key => $score) {
                 if(is_numeric($key)) {
-                    if(intval($score["score"]) < 30) {
+                    if(intval($score["score"]) < 30 && intval($score["resit"]) < 30) {
                         $student_pass = false;
                     }
                 }
             }
         ?>
-        @if($student_pass)
+        @if($student_pass && ($is_front == 'true'))
             <div class="page">
             <div class="row">
                 <div class="col-md-6 col-xs-6">
@@ -190,13 +191,13 @@
         }
         foreach ($scores[$student['id']] as $key => $score) {
             if(is_numeric($key)) {
-                if(intval($score["score"]) < 30) {
+                if(intval($score["score"]) < 30 && intval($score["resit"]) < 30) {
                     $student_pass = false;
                 }
             }
         }
         ?>
-        @if($student_pass)
+        @if($student_pass && ($is_back == 'true'))
             <div class="page">
                 <div class="row">
                     <div class="col-md-6 col-xs-6">
@@ -239,7 +240,7 @@
                             </div>
                             <div class="row">
                                 <div class="col-md-4 col-xs-4">
-                                    @if($photo != null)
+                                    @if($photo == 'true')
                                         <img class="photo" src="{{$smis_server->value}}/img/profiles/{{$student['photo']}}">
                                     @else
                                         <div class="photo"></div>
