@@ -564,6 +564,22 @@ class StudentAnnualController extends Controller
 
     public function export(){
 
+        $group_option_priorities = DB::table("group_options")
+            ->leftJoin("group_option_student","group_option_student.group_option_id","=","group_options.id")
+            ->select([
+                "group_option_student.student_id",
+                "group_option_student.priority",
+                "group_options.title"
+            ])
+            ->orderBy("priority","ASC")
+            ->get();
+
+        $group_option_priorities = collect($group_option_priorities)
+            ->groupBy("student_id")
+            ->map(function ($pb) {
+                return $pb->keyBy('priority');
+            })
+            ->toArray();
         $studentAnnuals = StudentAnnual::select([
             'studentAnnuals.id',
             'students.id as student_id',
@@ -810,7 +826,11 @@ class StudentAnnualController extends Controller
             array_push($fields,$_POST['parent_phone']);
         }
 
-        Excel::create('បញ្ចីឈ្មោះនិស្សិត', function($excel) use ($data, $title,$alpha,$fields) {
+        array_push($fields,'group_option_priority_1');
+        array_push($fields,'group_option_priority_2');
+        array_push($fields,'group_option_priority_3');
+
+        Excel::create('បញ្ចីឈ្មោះនិស្សិត', function($excel) use ($data, $title,$alpha,$fields,$group_option_priorities) {
 
             // Set the title
             $excel->setTitle('បញ្ចីឈ្មោះនិស្សិត');
@@ -819,7 +839,7 @@ class StudentAnnualController extends Controller
             $excel->setCreator('Department of Study & Student Affair')
                 ->setCompany('Institute of Technology of Cambodia');
 
-            $excel->sheet('New sheet', function($sheet) use ($data,$title,$alpha,$fields) {
+            $excel->sheet('New sheet', function($sheet) use ($data,$title,$alpha,$fields,$group_option_priorities) {
 
                 $number_column = count($fields);
 
@@ -861,7 +881,24 @@ class StudentAnnualController extends Controller
 
                     $row = array();
                     foreach($fields as $field){
-                        $row[$field] = $item[$field];
+                        if($field == "group_option_priority_1") {
+                            $row[$field] = "";
+                            if(!empty($group_option_priorities[$item["student_id"]][1]->title)){
+                                $row[$field] = $group_option_priorities[$item["student_id"]][1]->title;
+                            }
+                        } else if($field == "group_option_priority_2") {
+                            $row[$field] = "";
+                            if(!empty($group_option_priorities[$item["student_id"]][2]->title)){
+                                $row[$field] = $group_option_priorities[$item["student_id"]][2]->title;
+                            }
+                        } else if($field == "group_option_priority_3") {
+                            $row[$field] = "";
+                            if(!empty($group_option_priorities[$item["student_id"]][3]->title)){
+                                $row[$field] = $group_option_priorities[$item["student_id"]][3]->title;
+                            }
+                        } else {
+                            $row[$field] = $item[$field];
+                        }
                     }
 
                     $sheet->appendRow(
