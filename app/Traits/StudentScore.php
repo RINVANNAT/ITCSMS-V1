@@ -169,6 +169,7 @@ trait StudentScore {
             $courseAnnuals = $courseAnnuals->where('course_annuals.degree_id', $studentAnnual->degree_id);
             $courseAnnuals = $courseAnnuals->where('course_annuals.grade_id', $studentAnnual->grade_id);
             $courseAnnuals = $courseAnnuals->where('course_annuals.department_option_id', $studentAnnual->department_option_id);
+            $courseAnnuals = $courseAnnuals->where('course_annuals.is_counted_creditability', true);
 
             if($semester_id == SemesterEnum::SEMESTER_ONE) { // apply semester filter only it is a 1st semester
                 $courseAnnuals = $courseAnnuals->where('course_annuals.semester_id', $semester_id);

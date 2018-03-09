@@ -159,7 +159,7 @@ trait PrintTranscriptTrait
 //                $actions = '<button data-id='.$student["id"].' style="float: right" class="btn btn-block btn-default btn-sm btn-single-print"><i class="fa fa-print"></i> Print</button>';
 //                return  $actions;
 //
-//            })
+//            });
         return $datatables->make(true);
     }
     public function print_transcript(PrintTranscriptRequest $request){
@@ -256,7 +256,6 @@ trait PrintTranscriptTrait
         } else {
             $view = 'backend.studentAnnual.print.transcript';
         }
-
         return view($view,
             compact(
                 'ranking_data',
