@@ -154,12 +154,12 @@ trait PrintTranscriptTrait
             ->editColumn('dob', function($student) {
                 $dob = Carbon::createFromFormat('Y-m-d H:i:s',$student["dob"])->format('d/m/Y');
                 return $dob;
-            })
-            ->addColumn('action', function ($student) {
-                $actions = '<button data-id='.$student["id"].' style="float: right" class="btn btn-block btn-default btn-sm btn-single-print"><i class="fa fa-print"></i> Print</button>';
-                return  $actions;
-
             });
+//            ->addColumn('action', function ($student) {
+//                $actions = '<button data-id='.$student["id"].' style="float: right" class="btn btn-block btn-default btn-sm btn-single-print"><i class="fa fa-print"></i> Print</button>';
+//                return  $actions;
+//
+//            })
         return $datatables->make(true);
     }
     public function print_transcript(PrintTranscriptRequest $request){

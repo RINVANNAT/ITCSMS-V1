@@ -251,7 +251,7 @@
                     {data: 'class', name: 'class', orderable: false, searchable: false},
                     {data: 'group', name: 'group', orderable: false, searchable: false},
                     {data: 'printed_transcript', name: 'printed_transcript', orderable: false, searchable: false},
-                    {data: 'action', name: 'action', orderable: false, searchable: false}
+                    // {data: 'action', name: 'action', orderable: false, searchable: false}
                 ],
                 drawCallback: function () {
                     initIcheker();
