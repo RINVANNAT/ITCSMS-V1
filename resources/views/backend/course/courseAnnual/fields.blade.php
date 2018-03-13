@@ -223,6 +223,15 @@
 </div>
 
 <div class="form-group">
+
+    {!! Form::label('name_fr', "Name French", ['class' => 'col-lg-2 col-lg-offset-5 control-label']) !!}
+
+    <div class="col-lg-3">
+        {{ Form::text('name_fr',  null, ['class' => 'form-control', 'id'=> 'name_fr', 'required' => 'required']) }}
+    </div>
+</div>
+
+<div class="form-group">
     {!! Form::label('Scoring', "Scoring", ['class' => 'col-lg-3 control-label required']) !!}
     <div class="col-lg-9">
         <div class="box box-solid" style="border-top: 1px solid #d2d6de" id="scoring_panel">
