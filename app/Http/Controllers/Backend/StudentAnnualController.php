@@ -27,6 +27,7 @@ use App\Models\Enum\SemesterEnum;
 use App\Models\Gender;
 use App\Models\Grade;
 use App\Models\Group;
+use App\Models\GroupStudentAnnual;
 use App\Models\HighSchool;
 use App\Models\History;
 use App\Models\Income;
@@ -194,7 +195,12 @@ class StudentAnnualController extends Controller
     {
         $studentAnnual = $this->students->findOrThrowException($id);
 
-        //dd($studentAnnual);
+        $group_id = GroupStudentAnnual::where('student_annual_id', $studentAnnual->id)
+            ->whereNull('department_id')
+            ->pluck('group_id')
+            ->first();
+
+        $studentAnnual->group_id = $group_id;
 
         $academic_years = AcademicYear::orderBy('id','desc')->lists('name_kh','id');
         $departments = Department::where('parent_id',11)->orderBy('id','DESC')->lists('code','id'); // 11 is for all academic departments
