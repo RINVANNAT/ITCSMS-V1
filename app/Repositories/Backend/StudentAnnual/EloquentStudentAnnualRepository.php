@@ -7,6 +7,7 @@ use App\Exceptions\GeneralException;
 use App\Http\Requests\Backend\Student\StoreStudentRequest;
 use App\Http\Requests\Backend\Student\UpdateStudentRequest;
 use App\Models\AcademicYear;
+use App\Models\Group;
 use App\Models\GroupStudentAnnual;
 use App\Models\Student;
 use App\Models\StudentAnnual;
@@ -445,11 +446,13 @@ class EloquentStudentAnnualRepository implements StudentAnnualRepositoryContract
                 }
                 if(isset($input['group_id'])){
                     // Problem with semester
+                    // dd(Group::find($input['group_id']));
                     $group_student = GroupStudentAnnual::where('student_annual_id',$studentAnnual->id)
                                             ->where('semester_id',1)
+                                            ->whereNull('department_id')
                                             ->first();
                     $group_student->group_id = $input['group_id'];
-                    $group_student->save();
+                    $group_student->update();
                 }
 
 
