@@ -154,12 +154,12 @@ trait PrintTranscriptTrait
             ->editColumn('dob', function($student) {
                 $dob = Carbon::createFromFormat('Y-m-d H:i:s',$student["dob"])->format('d/m/Y');
                 return $dob;
-            })
-            ->addColumn('action', function ($student) {
+            });
+            /*->addColumn('action', function ($student) {
                 $actions = '<button data-id='.$student["id"].' style="float: right" class="btn btn-block btn-default btn-sm btn-single-print"><i class="fa fa-print"></i> Print</button>';
                 return  $actions;
 
-            });
+            });*/
         return $datatables->make(true);
     }
     public function print_transcript(PrintTranscriptRequest $request){
@@ -169,6 +169,9 @@ trait PrintTranscriptTrait
         $photo = $request->photo;
         $is_back = $request->is_back;
         $is_front = $request->is_front;
+        $is_certificate = $request->is_certificate;
+
+        ($is_back == 'true' || $is_front == 'true' ? $is_certificate = 'true' : $is_certificate);
         $students  = StudentAnnual::select([
             'students.id_card',
             'students.name_kh',
@@ -242,7 +245,7 @@ trait PrintTranscriptTrait
             }
         }
         $ranking_data = [];
-        if(isset($students[0]) && $students[0]['degree_id'] == 1 && $students[0]['grade_id'] == 1) {
+        if(isset($students[0]) && $students[0]['degree_id'] == 1 && $students[0]['grade_id'] == 1 && $is_certificate == 'true') {
             $params = array(
                 "department_id" => $students[0]['department_id'],
                 "degree_id" => $students[0]['degree_id'],
@@ -270,7 +273,8 @@ trait PrintTranscriptTrait
                 'smis_server',
                 'photo',
                 'is_front',
-                'is_back'
+                'is_back',
+                'is_certificate'
             )
         );
     }

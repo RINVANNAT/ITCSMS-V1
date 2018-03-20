@@ -167,7 +167,7 @@
             });
         }
 
-        function print(selected_ids, is_back = null, is_front = null) {
+        function print(selected_ids, is_back = null, is_front = null, is_certificate = false) {
 
             // Check if exam date is selected
             if (selected_ids.length === 0) {
@@ -197,6 +197,7 @@
                 + "&photo=" + photo
                 + "&is_back=" + is_back
                 + "&is_front=" + is_front
+                + "&is_certificate=" + is_certificate
                 + '&ids=' + JSON.stringify(selected_ids),
                 'Printing', '1200', '800');
 
@@ -251,11 +252,12 @@
                     {data: 'class', name: 'class', orderable: false, searchable: false},
                     {data: 'group', name: 'group', orderable: false, searchable: false},
                     {data: 'printed_transcript', name: 'printed_transcript', orderable: false, searchable: false},
-                    {data: 'action', name: 'action', orderable: false, searchable: false}
+                    // {data: 'action', name: 'action', orderable: false, searchable: false}
                 ],
                 drawCallback: function () {
                     initIcheker();
                     $(".btn-print").off("click");
+
                     $(".btn-print").on("click", function () {
                         selected_ids = [];
                         $('#students-table input:checked').each(function () {
@@ -278,6 +280,22 @@
                             selected_ids.push($(this).data('id'));
                         });
                         print(selected_ids, true, false);
+                    });
+                    // print certificate
+                    $(".btn-print-certificate").on("click", function () {
+                        selected_ids = [];
+                        $('#students-table input:checked').each(function () {
+                            selected_ids.push($(this).data('id'));
+                        });
+                        print(selected_ids, true, true, true);
+                    });
+                    // print transcript
+                    $(".btn-print-transcript").on("click", function () {
+                        selected_ids = [];
+                        $('#students-table input:checked').each(function () {
+                            selected_ids.push($(this).data('id'));
+                        });
+                        print(selected_ids, false, false);
                     });
 
                     $(".btn-single-print").off("click");
@@ -316,8 +334,13 @@
                             <button type="button" class="btn btn-default btn-sm btn-print-front" data-value="front"><i class="fa fa-print"></i> FRONT</button>
                             <button type="button" class="btn btn-default btn-sm btn-print-back" data-value="back"><i class="fa fa-print"></i> BACK</button>
                         </div>
+
+                        <div class="btn-group">
+                            <button type="button" class="btn btn-default btn-sm btn-print-transcript" data-value="transcript"><i class="fa fa-print"></i> Print Transcript</button>
+                            <button type="button" class="btn btn-default btn-sm btn-print-certificate" data-value="certificate"><i class="fa fa-print"></i> Print Certificate</button>
+                        </div>
+
                     ` +
-                '<button type="button" data-toggle="tooltip" data-placement="right" title="Print transcript on selected students " class="btn btn-default btn-sm btn-print"><i class="fa fa-print"></i> Print Selected</button>' +
                 '<button type="button" data-toggle="tooltip" data-placement="right" title="You can mark the printed date on every transcript " class="btn btn-default btn-sm btn-mark-printed-date"><i class="fa fa-calendar"></i> Mark Printed Date</button>' +
                 '{!! Form::select('gender',$genders,null, array('class'=>'form-control filter','id'=>'filter_gender','placeholder'=>'Gender')) !!} ' +
                 '{!! Form::text('group',null, array('class'=>'form-control filter','id'=>'filter_group','placeholder'=>'Group')) !!} ' +
