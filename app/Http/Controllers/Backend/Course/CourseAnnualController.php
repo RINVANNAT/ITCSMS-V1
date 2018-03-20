@@ -1637,7 +1637,7 @@ class CourseAnnualController extends Controller
                                 $checkFraudAbsScore++;// to count each score of one student who has been frauded in exam or absence
                                 $totalScore = $totalScore;
                             } else if($score->score == "" || $score->score == null) {
-                                $totalScore = $totalScore + 0;// calculate score for stuent annual
+                                $totalScore = $totalScore + 0;// calculate score for student annual
                             } else {
                                 $totalScore = $totalScore + $score->score;// calculate score for stuent annual
                             }
