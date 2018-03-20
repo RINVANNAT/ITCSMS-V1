@@ -1636,9 +1636,12 @@ class CourseAnnualController extends Controller
                             if ((strtoupper($score->score) == ScoreEnum::Fraud) || ($score->score == ScoreEnum::Absence)) {
                                 $checkFraudAbsScore++;// to count each score of one student who has been frauded in exam or absence
                                 $totalScore = $totalScore;
+                            } else if($score->score == "" || $score->score == null) {
+                                $totalScore = $totalScore + 0;// calculate score for stuent annual
                             } else {
                                 $totalScore = $totalScore + $score->score;// calculate score for stuent annual
                             }
+
                             $scoreData[$score->name] = (($score->score != null) ? $score->score : null);//assign each score value midterm/ final
                             $scoreData['percentage_id' . '_' . $score->name] = $score->percentage_id;
                             $scoreData['score_id' . '_' . $score->name] = $score->score_id;

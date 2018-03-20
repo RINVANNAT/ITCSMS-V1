@@ -118,8 +118,3 @@ Route::group(['prefix' => 'api', 'namespace' => 'API'], function () {
         require(__DIR__ . '/Routes/Backend/API/timetable.php');
     });
 });
-
-
-
-
-
