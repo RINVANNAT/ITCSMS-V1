@@ -78,7 +78,6 @@
     <script type="text/javascript" src="{{ asset('plugins/daterangepicker/moment.js') }}"></script>
     <script type="text/javascript" src="{{ asset('plugins/daterangepicker/daterangepicker.js') }}"></script>
     <script type="text/javascript" src="{{ asset('plugins/datetimepicker/bootstrap-datetimepicker.min.js') }}"></script>
-    <script src="https://cdn.ckeditor.com/ckeditor5/1.0.0-alpha.2/classic/ckeditor.js"></script>
     <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/axios/0.18.0/axios.min.js"></script>
     <script>
         var $search_url = "{{route('internship.search')}}";
@@ -96,13 +95,6 @@
             });
 
             $('#period').daterangepicker();
-
-            ClassicEditor.create( document.querySelector( '#contact_detail' ) )
-                .then( editor => {
-                    @if(isset($internship))
-                    editor.setData('{!! $internship->contact_detail !!}');
-                    @endif
-                })
 
             // search student
             var selectStudents = $("#students").select2({
@@ -148,7 +140,6 @@
                 })
                 @endif
             });
-
         })
     </script>
 @stop

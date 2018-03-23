@@ -14,6 +14,23 @@
         </div>
 
         <div class="form-group">
+            <div class="col-md-offset-3 col-md-9">
+                <label>
+                    <input type="checkbox"
+                           name="is_name"
+                           @if(isset($internship))
+                               @if($internship->is_name == true)
+                                   checked
+                               @endif
+                           @else
+                            checked
+                           @endif
+                           value="{{ isset($internship) ? $internship->is_name : 1 }}"/> Is person's name?
+                </label>
+            </div>
+        </div>
+
+        <div class="form-group">
             <label class="col-md-3 control-label required">Company</label>
             <div class="col-md-9">
                 <input type="text"
@@ -77,7 +94,7 @@
         <div class="row">
             <div class="col-md-12">
                 <div class="form-group">
-                    <label class="col-md-3 control-label required">Title</label>
+                    <label class="col-md-3 control-label">Title</label>
                     <div class="col-md-9">
                         <input type="text"
                                value="{{ isset($internship) ? $internship->title : null }}"

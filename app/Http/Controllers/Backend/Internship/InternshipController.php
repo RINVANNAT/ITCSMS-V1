@@ -68,6 +68,9 @@ class InternshipController extends Controller
             'data' => []
         );
 
+        $is_name = $request->is_name;
+        isset($is_name) ? $is_name = true : $is_name = false;
+
         try {
 
             if (array_key_exists('id', $request->all())) {
@@ -84,6 +87,7 @@ class InternshipController extends Controller
                 $internship->start = new Carbon($request->start);
                 $internship->end = new Carbon($request->end);
                 $internship->issue_date = new Carbon($request->issue_date);
+                $internship->is_name = $is_name;
 
                 if ($internship->update()) {
                     if (count($request->students) > 0) {
@@ -114,6 +118,7 @@ class InternshipController extends Controller
                 $newInternship->start = new Carbon($request->start);
                 $newInternship->end = new Carbon($request->end);
                 $newInternship->issue_date = new Carbon($request->issue_date);
+                $newInternship->is_name = $is_name;
                 if ($newInternship->save()) {
                     foreach ($request->students as $studentAnnualId) {
                         $newInternshipStudentAnnual = new InternshipStudentAnnual();
