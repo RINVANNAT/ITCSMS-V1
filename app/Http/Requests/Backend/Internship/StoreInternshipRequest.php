@@ -27,7 +27,6 @@ class StoreInternshipRequest extends Request
             'person' => 'required',
             'company' => 'required',
             'address' => 'required',
-            'title' => 'required',
             'training_field' => 'required',
             'start' => 'required',
             'end' => 'required'

@@ -9,8 +9,10 @@
     <div class="row">
         <div class="col-md-12">
             <p>
-                To: {{ $internship->person }} <br/>
-                {{ $internship->title }} <br/>
+                To: {{ $internship->person }}<br/>
+                @if($internship->title != '')
+                    {{ $internship->title }} <br/>
+                @endif
                 {{ $internship->company }} <br/>
                 {{ $internship->address }} <br/>
                 @if($internship->phone != "") Phone: {{ $internship->phone }} <br/> @endif
@@ -41,7 +43,7 @@
     <div class="row">
         <div class="col-md-12">
             <p class="text-justify">
-                Dear {{ $internship->person }}, <br/>
+                Dear {{ $internship->is_name == true ? $internship->person : 'Sir/Madam' }}, <br/>
                 The {{ $internship->department->name_en }} Department of Institute of Technology of Cambodia (ITC) is searching for a company that can accept one of our {{ convert_degree($internship->grade->id) }} year
                 @if($internship->degree->id == 2)
                     Technician
@@ -104,7 +106,7 @@
                 We are looking forward to hearing from your acceptance.
             </p>
 
-            @if(!empty($internship->person))
+            @if($internship->is_name)
                 <p>Yours Sincerely,</p>
             @else
                 <p>Yours Faithfully,</p>
