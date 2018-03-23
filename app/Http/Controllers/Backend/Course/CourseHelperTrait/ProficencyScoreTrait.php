@@ -16,6 +16,7 @@ use App\Models\Degree;
 use App\Models\Department;
 use App\Models\DepartmentOption;
 use App\Models\PrintedCertificate;
+use Barryvdh\Snappy\Facades\SnappyPdf;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Response;
@@ -943,6 +944,10 @@ trait ProficencyScoreTrait
         } else {
             $view = "backend.course.courseAnnual.formScore.prints.certificate_fr";
         }
+        $scores = $arrayScores;
+        $exam_start = $request->exam_start;
+        $exam_end = $request->exam_end;
+
         return view($view,
             [
                 'scores' => $arrayScores,
@@ -955,6 +960,10 @@ trait ProficencyScoreTrait
                 'certificate_references' => $certificate_references
             ]
         );
+
+        return SnappyPdf::loadView($view, compact('scores', 'competencies', 'students', 'exam_start', 'exam_end', 'issued_by', 'issued_date', 'certificate_references'))
+            ->setOrientation('landscape')
+            ->stream();
     }
 
     /**
