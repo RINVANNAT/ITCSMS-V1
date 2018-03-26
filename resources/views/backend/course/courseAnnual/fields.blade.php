@@ -426,12 +426,19 @@
     <div class="block_course_reference">
         {!! Form::label('reference_course_id', trans('labels.backend.coursePrograms.fields.reference_course_id'), ['class' => 'col-lg-2 control-label']) !!}
         <div class="col-lg-3">
-
-            <select  name="reference_course_id" id="reference_course_id" class="form-control" >
-
-            </select>
+            @if(isset($courseAnnual))
+                <select  name="reference_course_id"
+                         readonly
+                         class="form-control">
+                    <option value="{{ $courseAnnual->reference_course->id }}">{{ $courseAnnual->reference_course->name_en }}</option>
+                </select>
+            @else
+                <select  name="reference_course_id"
+                         id="reference_course_id"
+                         class="form-control">
+                </select>
+            @endif
         </div>
-
     </div>
 
 </div>

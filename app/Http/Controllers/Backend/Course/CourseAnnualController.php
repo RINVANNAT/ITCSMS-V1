@@ -451,7 +451,7 @@ class CourseAnnualController extends Controller
      * Display the specified resource.
      *
      * @param  int $id
-     * @return \Illuminate\Http\Response
+     * @return void
      */
     public function show($id)
     {
@@ -468,7 +468,8 @@ class CourseAnnualController extends Controller
     public function edit(EditCourseAnnualRequest $request, $id)
     {
         $groups = [];
-        $courseAnnual = $this->courseAnnuals->findOrThrowException($id);
+        // $courseAnnual = $this->courseAnnuals->findOrThrowException($id);
+        $courseAnnual = CourseAnnual::with('reference_course')->find($id);
         $ownerCourseDeparment = Department::where('id', $courseAnnual->department_id)->first();
         $scores = $this->getPropertiesFromScoreTable($courseAnnual);
         $arrayPercentages = collect($scores)->groupBy('percentage_id')->toArray();
@@ -621,6 +622,7 @@ class CourseAnnualController extends Controller
      */
     public function update(UpdateCourseAnnualRequest $request, $id)
     {
+        dd($request->all());
         $input = $request->all();
         $midterm_id = $request->midterm_percentage_id;
         $final_id = $request->final_percentage_id;

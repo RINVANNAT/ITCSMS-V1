@@ -74,7 +74,7 @@
                             <tbody>
                             @foreach($scores[$student['id']] as $key => $score)
                                 @if(is_numeric($key))
-                                    @if(strtolower($score['name_en']) != "technical drawing" && strtolower($score['name_en']) != "computer for engineering")
+                                    @if(strtolower($score['name_en']) != "technical drawing" && strtolower($score['name_en']) != "computer for engineering" && strtolower($score['name_en']) != "informatic")
                                         <tr>
                                             <td style="text-align: left;width: 35%">{{isset($score['name_kh'])?$score['name_kh']:""}}</td>
                                             <td class="english_section" style="text-align: left;width: 35%">{{isset($score['name_en'])?$score['name_en']:""}}</td>
