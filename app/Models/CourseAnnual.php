@@ -86,6 +86,10 @@ class CourseAnnual extends Model
 		return $test;
 	}
 
+	public function reference_course()
+    {
+        return $this->belongsTo(Course::class, 'reference_course_id');
+    }
 
     /**
      * The attributes that should be casted to native types.
