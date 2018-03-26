@@ -263,7 +263,7 @@
                             <?php
                                 $now = \Carbon\Carbon::now();
                                 $c_day = $now->formatLocalized('%d');
-                                $c_month = month_mois($now->formatLocalized('%B'));
+                                $c_month = $now->formatLocalized('%B');
                                 $c_year = $now->formatLocalized('%Y');
                             ?>
                             <b>Phnom Penh, ITC, {{$c_day." ".$c_month." ".$c_year}}</b>
