@@ -216,7 +216,7 @@
                 pageLength: 50,
                 deferLoading: 0,
                 ajax: {
-                    url: "{!! route('admin.student.request_print_transcript_data') !!}",
+                    url: "{!! route('admin.student.request_print_attestation_data') !!}",
                     method: 'POST',
                     data: function (d) {
                         // In case additional fields is added for filter, modify export view as well: popup_export.blade.php
