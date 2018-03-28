@@ -164,6 +164,10 @@ Route::group([
     Route::get('print_transcript', 'CourseAnnualController@print_transcript')->name('admin.student.print_transcript');
     Route::get('mark_printed_transcript', 'CourseAnnualController@mark_printed_transcript')->name('admin.student.mark_printed_transcript');
 
+    Route::get('request_print_attestation', 'CourseAnnualController@request_print_attestation')->name('admin.student.request_print_attestation');
+    Route::get('print_attestation', 'CourseAnnualController@print_attestation')->name('admin.student.print_attestation');
+    Route::post('request_print_attestation_data', 'CourseAnnualController@request_print_attestation_data')->name('admin.student.request_print_attestation_data');
+
 
     /*
      * ---student statistic----
