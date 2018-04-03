@@ -426,7 +426,7 @@
     <div class="block_course_reference">
         {!! Form::label('reference_course_id', trans('labels.backend.coursePrograms.fields.reference_course_id'), ['class' => 'col-lg-2 control-label']) !!}
         <div class="col-lg-3">
-            @if(isset($courseAnnual))
+            @if(isset($courseAnnual) && isset($courseAnnual->reference_course->id))
                 <select  name="reference_course_id"
                          readonly
                          class="form-control">
