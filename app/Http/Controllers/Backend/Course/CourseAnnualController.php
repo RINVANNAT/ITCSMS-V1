@@ -626,7 +626,6 @@ class CourseAnnualController extends Controller
      */
     public function update(UpdateCourseAnnualRequest $request, $id)
     {
-        dd($request->all());
         $input = $request->all();
         $midterm_id = $request->midterm_percentage_id;
         $final_id = $request->final_percentage_id;
