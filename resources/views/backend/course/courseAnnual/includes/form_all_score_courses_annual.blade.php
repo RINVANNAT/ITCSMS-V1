@@ -95,7 +95,7 @@
     <div class="box box-success">
         <div class="box-header with-border" style="margin-bottom: 0px">
 
-            <div class=" no-paddingcol-sm-12">
+            <div class="no-padding col-sm-12">
 
                 <div class="dropdown pull-left action-button">
 
