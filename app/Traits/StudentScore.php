@@ -175,7 +175,7 @@ trait StudentScore {
                 $courseAnnuals = $courseAnnuals->where('course_annuals.semester_id', $semester_id);
             }
 
-            $courseAnnuals = $courseAnnuals->get();
+            $courseAnnuals = $courseAnnuals->orderBy('course_annuals.name_en')->get();
 
             if($courseAnnuals) {
 
