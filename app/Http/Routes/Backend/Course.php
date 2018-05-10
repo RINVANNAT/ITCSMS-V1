@@ -174,7 +174,7 @@ Route::group([
 
     /*---Print average final year route ---*/
 
-    Route::get('print_average_final_year', 'CourseAnnualController@print_average_final_year')->name('admin.student.print_average_final_year');
+    Route::get('print_average_final_year/{type}', 'CourseAnnualController@print_average_final_year')->name('admin.student.print_average_final_year');
 
     /*---End of print average final year route ---*/
 

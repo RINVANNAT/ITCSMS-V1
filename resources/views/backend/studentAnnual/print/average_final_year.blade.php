@@ -22,6 +22,10 @@
         tr {
             page-break-inside: avoid !important;
         }
+
+        td {
+            page-break-inside: avoid !important;
+        }
         table tr td {
             font-size: 11px;
         }
@@ -92,9 +96,9 @@
                         <td class="no-border"></td>
                         <td class="no-border"></td>
                         <td class="no-border"></td>
-                        <td class="border-thin" align="center" colspan="2">1<sup>ere</sup> annee</td>
-                        <td class="border-thin" align="center" colspan="2">2<sup>eme</sup> annee</td>
-                        <td class="border-thin" align="center" colspan="2">Moy. de Sortie</td>
+                        <td class="border-thin" align="center" colspan="3">1<sup>ere</sup> annee</td>
+                        <td class="border-thin" align="center" colspan="3">2<sup>eme</sup> annee</td>
+                        <td class="border-thin" align="center" colspan="3">Moy. de Sortie</td>
                         <td class="border-thin border-bottom" align="center" colspan="2" rowspan="2">Mention <br/> de Sortie</td>
                         <td class="border-thin border-bottom" align="center" rowspan="2">Observation</td>
                     </tr>
@@ -104,8 +108,11 @@
                         <td class="border-thin border-bottom" align="center"><strong>Noms et Prenoms</strong></td>
                         <td class="border-thin border-bottom" align="center"><strong>Sexe</strong></td>
                         <td class="border-thin border-bottom" align="center" colspan="2">Moy.(M1)</td>
+                        <td class="border-thin border-bottom" align="center">GPA</td>
                         <td class="border-thin border-bottom" align="center" colspan="2">Moy.(M2)</td>
+                        <td class="border-thin border-bottom" align="center">GPA</td>
                         <td class="border-thin border-bottom" align="center" colspan="2">(M1+M2)/2</td>
+                        <td class="border-thin border-bottom" align="center">GPA</td>
                     </tr>
                     @php
                         $num = 50;
@@ -119,15 +126,21 @@
                             @if($i==1)
                                 <td class="cell-sm" rowspan="{{$num}}"></td>
                                 <td class="border-thin" align="center"><strong>81.73</strong></td>
+                                <td class="border-thin" align="center"><strong>81.73</strong></td>
                                 <td class="cell-sm" rowspan="{{$num}}"></td>
                                 <td class="border-thin" align="center"><strong>79.03</strong></td>
+                                <td class="border-thin" align="center"><strong>79.03</strong></td>
                                 <td class="cell-sm" rowspan="{{$num}}"></td>
+                                <td class="border-thin" align="center"><strong>80.38</strong></td>
                                 <td class="border-thin" align="center"><strong>80.38</strong></td>
                                 <td class="cell-sm" rowspan="{{$num}}"></td>
                                 <td class="border-thin">Tres Bien</td>
                             @else
                                 <td class="border-thin" align="center"><strong>81.73</strong></td>
+                                <td class="border-thin" align="center"><strong>81.73</strong></td>
                                 <td class="border-thin" align="center"><strong>79.03</strong></td>
+                                <td class="border-thin" align="center"><strong>79.03</strong></td>
+                                <td class="border-thin" align="center"><strong>80.38</strong></td>
                                 <td class="border-thin" align="center"><strong>80.38</strong></td>
                                 <td class="border-thin">Tres Bien</td>
                             @endif

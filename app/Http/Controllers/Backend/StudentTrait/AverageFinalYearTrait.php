@@ -10,13 +10,16 @@ namespace App\Http\Controllers\Backend\StudentTrait;
 
 use PDF;
 
-trait PrintAverageFinalYearTrait
+trait AverageFinalYearTrait
 {
     /**
      * @return mixed
      */
-    public function print_average_final_year(){
-//        return view('backend.studentAnnual.print.average_final_year');
+    public function print_average_final_year($type){
+
+        if ($type == "show"){
+            return view('backend.studentAnnual.average_final_year');
+        }
         return PDF::loadView('backend.studentAnnual.print.average_final_year')->setPaper('a4')->stream();
     }
 }
