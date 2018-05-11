@@ -46,7 +46,7 @@
                 <div class="row">
                     <div class="col-sm-12">
                         <div class="pull-right btn-right">
-                            <select name="student_class" class="form-control filter" multiple="multiple" id="filter_class"></select>
+                            <select name="student_class" class="form-control filter" id="filter_class"></select>
                             <a target="_blank" href="{{route('admin.student.print_average_final_year', ['type'=>'print'])}}">
                                 <button class="btn btn-primary btn-average-final-year btn-sm" data-toggle="tooltip" style="margin-left: 5px" data-placement="left"  title="Print Average Final Year" id="print_average_final_year"><i class="fa fa-print"></i></button>
                             </a>
@@ -191,7 +191,7 @@
         $(function () {
             $.ajax({
                 type: 'POST',
-                url: '{{route('admin.filter.get_filter_by_class')}}',
+                url: '{{route('admin.filter.get_filter_by_class_final_year')}}',
                 data: {'academic_year_id': 2018},
                 dataType: "json",
                 success: function (response) {
@@ -199,7 +199,6 @@
                         $('#filter_class').select2({
                             data: response.data,
                             placeholder: "Select a class",
-                            allowClear: true
                         });
                         try {
                             callback();
