@@ -72,69 +72,46 @@ class InternshipController extends Controller
         isset($is_name) ? $is_name = true : $is_name = false;
 
         try {
+            $internship = '';
 
             if (array_key_exists('id', $request->all())) {
                 $internship = Internship::find($request->id);
-                $internship->person = $request->person;
-                $internship->company = $request->company;
-                $internship->address = $request->address;
-                $internship->phone = $request->phone;
-                $internship->hot_line = $request->hot_line;
-                $internship->e_mail_address = $request->e_mail_address;
-                $internship->web = $request->web;
-                $internship->title = $request->title;
-                $internship->training_field = $request->training_field;
-                $internship->start = new Carbon($request->start);
-                $internship->end = new Carbon($request->end);
-                $internship->issue_date = new Carbon($request->issue_date);
-                $internship->is_name = $is_name;
-
-                if ($internship->update()) {
+                if($internship instanceof Internship) {
+                    $internship->update($request->all());
                     if (count($request->students) > 0) {
                         $internshipStudentAnnuals = InternshipStudentAnnual::where('internship_id', $internship->id)->get();
                         foreach ($internshipStudentAnnuals as $internshipStudentAnnual) {
                             $internshipStudentAnnual->delete();
                         }
-                    }
 
-                    foreach ($request->students as $studentAnnualId) {
-                        $newInternshipStudentAnnual = new InternshipStudentAnnual();
-                        $newInternshipStudentAnnual->internship_id = $internship->id;
-                        $newInternshipStudentAnnual->student_annual_id = $studentAnnualId;
-                        $newInternshipStudentAnnual->save();
+                        foreach ($request->students as $studentAnnualId) {
+                            InternshipStudentAnnual::create([
+                                'internship_id' => $internship->id,
+                                'student_annual_id' => $studentAnnualId
+                            ]);
+                        }
                     }
                 }
             } else {
-                $newInternship = new Internship();
-                $newInternship->person = $request->person;
-                $newInternship->company = $request->company;
-                $newInternship->address = $request->address;
-                $newInternship->phone = $request->phone;
-                $newInternship->hot_line = $request->hot_line;
-                $newInternship->e_mail_address = $request->e_mail_address;
-                $newInternship->web = $request->web;
-                $newInternship->title = $request->title;
-                $newInternship->training_field = $request->training_field;
-                $newInternship->start = new Carbon($request->start);
-                $newInternship->end = new Carbon($request->end);
-                $newInternship->issue_date = new Carbon($request->issue_date);
-                $newInternship->is_name = $is_name;
-                if ($newInternship->save()) {
+                $internship = Internship::create($request->all());
+                if ($internship instanceof Internship) {
                     foreach ($request->students as $studentAnnualId) {
-                        $newInternshipStudentAnnual = new InternshipStudentAnnual();
-                        $newInternshipStudentAnnual->internship_id = $newInternship->id;
-                        $newInternshipStudentAnnual->student_annual_id = $studentAnnualId;
-                        $newInternshipStudentAnnual->save();
+                        InternshipStudentAnnual::create([
+                            'internship_id' => $internship->id,
+                            'student_annual_id' => $studentAnnualId
+                        ]);
                     }
                 }
             }
+
+            return redirect()->route('internship.edit', ['internship' => $internship]);
 
         } catch (\Exception $e) {
             $result['code'] = 0;
             $result['message'] = $e->getMessage();
         }
 
-        return redirect()->route('internship.index')->withFlashSuccess('The operation was execute successfully');
+        return redirect()->route('internship.index')->withFlashDanger($result['message']);
     }
 
     /**
@@ -260,11 +237,7 @@ class InternshipController extends Controller
                     ' <a href="' . route('internship.delete', $internship) . '" class="btn btn-xs btn-danger"><i class="fa fa-trash" data-toggle="tooltip" data-placement="top" title="" data-original-title="Delete"></i></a>';
             })
             ->addColumn('checkbox', function ($internship) {
-                if(!is_null($internship->printed_at)) {
-                    return '<input type="checkbox" name="internships[]" class="checkbox" data-id=' . $internship->id . '>';
-                }else {
-                    return '<input type="checkbox" name="internships[]" checked class="checkbox" data-id=' . $internship->id . '>';
-                }
+                return '<input type="checkbox" name="internships[]" class="checkbox" data-id=' . $internship->id . '>';
             })
             ->editColumn('printed_at', function ($internship){
                 return '<span class="label label-success">'.

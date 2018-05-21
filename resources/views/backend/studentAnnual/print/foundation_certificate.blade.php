@@ -87,14 +87,14 @@
                                     @endif
                                 @endif
                             @endforeach
-                            <tr>
+                            <tr valign="bottom" style="height: 30px">
                                 <th>មុខវិជ្ជាតម្រង់ទិស</th>
                                 <th class="english_section" colspan="3">Oriented Subjects</th>
                             </tr>
                             @foreach($scores[$student['id']] as $key => $score)
                                 @if(is_numeric($key))
                                     @if(strtolower($score['name_en']) == "technical drawing" || strtolower($score['name_en']) == "computer for engineering" || strtolower($score['name_en']) == "informatic")
-                                        <tr>
+                                        <tr valign="bottom">
                                             <td style="text-align: left;width: 35%">{{isset($score['name_kh'])?$score['name_kh']:""}}</td>
                                             <td class="english_section" style="text-align: left;width: 35%">{{isset($score['name_en'])?$score['name_en']:""}}</td>
                                             <td class="english_section" style="text-align: center;width: 15%">{{ $score["credit"] }}</td>

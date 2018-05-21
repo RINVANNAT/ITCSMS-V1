@@ -6,6 +6,10 @@ use Illuminate\Database\Eloquent\Model;
 
 class InternshipStudentAnnual extends Model
 {
+    protected $fillable = [
+        'internship_id',
+        'student_annual_id'
+    ];
     /**
      * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
      */

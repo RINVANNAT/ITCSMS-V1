@@ -2,7 +2,21 @@
     <input type="hidden" name="id" value="{{ $internship->id }}"/>
 @endif
 <div class="row">
+
     <div class="col-md-6">
+        @if(isset($internship))
+            <div class="form-group">
+                <label class="col-md-3 control-label">Ref. Number</label>
+                <div class="col-md-9">
+                    <input class="form-control"
+                           value="{{ $internship->id }}"
+                           readonly
+                           name="person"
+                           type="text">
+                </div>
+            </div>
+        @endif
+
         <div class="form-group">
             <label class="col-md-3 control-label required">Person</label>
             <div class="col-md-9">
