@@ -43,6 +43,7 @@
                 <thead>
                 <tr>
                     <th></th>
+                    <th>Number</th>
                     <th>Title</th>
                     <th>Training Fields</th>
                     <th>Students</th>
@@ -78,6 +79,7 @@
                 ajax: '{{ route('internship.data') }}',
                 columns: [
                     {data: 'checkbox', name: 'checkbox', orderable: false, searchable: false},
+                    {data: 'id', name: 'id'},
                     {data: 'title', name: 'title'},
                     {data: 'training_field', name: 'training_field'},
                     {data: 'students', name: 'students', orderable: false, searchable: false},

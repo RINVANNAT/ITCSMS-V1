@@ -13,6 +13,12 @@ class FilterController extends Controller
 {
     use FilteringTrait;
 
+    /**
+     * Get all classes
+     *
+     * @param Request $request
+     * @return mixed
+     */
     public function get_filter_value_by_class(Request $request){
         $filters = $this->get_available_class($request->get('academic_year_id'));
 
@@ -39,6 +45,12 @@ class FilterController extends Controller
         return Response::json($select2_object);
     }
 
+    /**
+     * Get I5 and T2 classes
+     *
+     * @param Request $request
+     * @return mixed
+     */
     public function get_filter_by_class_final_year(Request $request){
         $filters = $this->get_available_class_last_year($request->get('academic_year_id'));
 

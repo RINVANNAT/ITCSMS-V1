@@ -7,7 +7,7 @@
     <meta name="_token" content="X2IQMvdghRfpLlHKugb0MK9lDoeaeSpbxQpH2Oq9"/>
 
     <title>
-        ITC-SMS | Certificate of Foundation Year Course
+        ITC-SMS | Average Final Year
     </title>
 
     <!-- Meta -->
@@ -25,7 +25,6 @@
 
         table tr td {
             font-size: 11px;
-            page-break-inside: avoid !important;
         }
         .border-thin {
             border: 0.5px solid black !important;
@@ -45,22 +44,19 @@
             border-bottom: 1px solid black !important;
         }
         .page {
-
-            /*width: 297mm;*/
-            /*height: 210mm;*/
             margin: 0 auto;
-            /*margin-top: 10mm;*/
-            /*border: 1px #D3D3D3 solid;*/
             padding: -0.3mm -0.3mm 0mm 0.3mm !important;
-            /*border-radius: 5px;*/
-            /*background: white;*/
-            /*box-shadow: 0 0 5px rgba(0, 0, 0, 0.1);*/
             position: relative;
             font-family: "Times New Roman" !important;
         }
+
         .table > thead > tr > th, .table > thead > tr > td, .table > tbody > tr > th, .table > tbody > tr > td, .table > tfoot > tr > th, .table > tfoot > tr > td {
             padding-top: 0px;
             padding-bottom: 0px;
+            vertical-align: middle;
+        }
+        .mention {
+            width: 60px !important;
         }
         .cell-sm {
             padding: 1px !important;
@@ -98,7 +94,7 @@
                         <td class="border-thin" align="center" colspan="2">1<sup>ere</sup> annee</td>
                         <td class="border-thin" align="center" colspan="2">2<sup>eme</sup> annee</td>
                         <td class="border-thin" align="center" colspan="2">Moy. de Sortie</td>
-                        <td class="border-thin border-bottom" align="center" rowspan="2">Mention <br/> de Sortie</td>
+                        <td class="border-thin border-bottom mention" align="center" rowspan="2">Mention <br/> de Sortie</td>
                         <td class="border-thin border-bottom" align="center" rowspan="2">Observation</td>
                     </tr>
                     <tr>
@@ -119,15 +115,15 @@
                     @for($i=1;$i<=$num;$i++)
                         <tr>
                             <td class="border-thin border-left border-right" align="center">{{$i}}</td>
-                            <td class="border-thin">e20150956</td>
+                            <td class="border-thin text-center">e20150956</td>
                             <td class="border-thin">LUN SOCHEAT</td>
-                            <td class="border-thin" align="center">F</td>
-                            <td class="border-thin" align="center"><strong>81.73</strong></td>
-                            <td class="border-thin" align="center"><strong>3.5</strong></td>
-                            <td class="border-thin" align="center"><strong>79.03</strong></td>
-                            <td class="border-thin" align="center"><strong>3.0</strong></td>
-                            <td class="border-thin" align="center"><strong>80.38</strong></td>
-                            <td class="border-thin" align="center"><strong>3.5</strong></td>
+                            <td class="border-thin text-center">F</td>
+                            <td class="border-thin text-center"><strong>81.73</strong></td>
+                            <td class="border-thin text-center"><strong>3.5</strong></td>
+                            <td class="border-thin text-center"><strong>79.03</strong></td>
+                            <td class="border-thin text-center"><strong>3.0</strong></td>
+                            <td class="border-thin text-center"><strong>80.38</strong></td>
+                            <td class="border-thin text-center"><strong>3.5</strong></td>
                             <td class="border-thin">Tres Bien</td>
                             <td class="border-thin border-left border-right"></td>
                         </tr>
@@ -150,13 +146,13 @@
                         <td class="no-border"></td>
                         <td class="no-border"></td>
                         <td class="no-border"></td>
-                        <td class="no-border" align="center">Max</td>
-                        <td class="no-border" align="center" colspan="2">84.19</td>
-                        <td class="no-border" align="center">84.19</td>
-                        <td class="no-border" align="center" colspan="2">79.96</td>
-                        <td class="no-border" align="center">79.96</td>
-                        <td class="no-border" align="center" colspan="2">80.38</td>
-                        <td class="no-border" align="center">80.38</td>
+                        <td class="no-border" align="center">Min</td>
+                        <td class="no-border" align="center">50.81</td>
+                        <td class="no-border" align="center">50.81</td>
+                        <td class="no-border" align="center">53.56</td>
+                        <td class="no-border" align="center">53.56</td>
+                        <td class="no-border" align="center">25.41</td>
+                        <td class="no-border" align="center">25.41</td>
                         <td class="no-border"></td>
                         <td class="no-border"></td>
                     </tr>

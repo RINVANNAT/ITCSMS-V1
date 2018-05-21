@@ -65,6 +65,11 @@
                     <a href="{{ route('internship.index') }}" class="btn btn-danger btn-xs">Cancel</a>
                 </div>
                 <div class="pull-right">
+                    <a class="btn btn-primary btn-xs"
+                       href="{{ route('internship.create') }}">
+                        <i class="fa fa-plus-circle"></i>
+                        New
+                    </a>
                     <input type="submit" id="submit_form" class="btn btn-info btn-xs" value="Update">
                 </div>
                 <div class="clearfix"></div>

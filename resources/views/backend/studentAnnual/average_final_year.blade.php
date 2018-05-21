@@ -34,6 +34,9 @@
         .top a {
             color: black;
         }
+        table tr th, table tr td {
+            border: 1px solid #000000 !important;
+        }
     </style>
 @endsection
 
@@ -86,10 +89,10 @@
                                     <td class="no-border"></td>
                                     <td class="no-border"></td>
                                     <td class="no-border"></td>
-                                    <td class="border-thin" align="center" colspan="3">1<sup>ere</sup> annee</td>
-                                    <td class="border-thin" align="center" colspan="3">2<sup>eme</sup> annee</td>
-                                    <td class="border-thin" align="center" colspan="3">Moy. de Sortie</td>
-                                    <td class="border-thin border-bottom" align="center" colspan="2" rowspan="2">Mention <br/> de Sortie</td>
+                                    <td class="border-thin" align="center" colspan="2">1<sup>ere</sup> annee</td>
+                                    <td class="border-thin" align="center" colspan="2">2<sup>eme</sup> annee</td>
+                                    <td class="border-thin" align="center" colspan="2">Moy. de Sortie</td>
+                                    <td class="border-thin border-bottom" align="center" rowspan="2">Mention <br/> de Sortie</td>
                                     <td class="border-thin border-bottom" align="center" rowspan="2">Observation</td>
                                 </tr>
                                 <tr>
@@ -97,11 +100,11 @@
                                     <td class="border-thin border-bottom" align="center">ID</td>
                                     <td class="border-thin border-bottom" align="center"><strong>Noms et Prenoms</strong></td>
                                     <td class="border-thin border-bottom" align="center"><strong>Sexe</strong></td>
-                                    <td class="border-thin border-bottom" align="center" colspan="2">Moy.(M1)</td>
+                                    <td class="border-thin border-bottom" align="center">Moy.(M1)</td>
                                     <td class="border-thin border-bottom" align="center">GPA</td>
-                                    <td class="border-thin border-bottom" align="center" colspan="2">Moy.(M2)</td>
+                                    <td class="border-thin border-bottom" align="center">Moy.(M2)</td>
                                     <td class="border-thin border-bottom" align="center">GPA</td>
-                                    <td class="border-thin border-bottom" align="center" colspan="2">(M1+M2)/2</td>
+                                    <td class="border-thin border-bottom" align="center">(M1+M2)/2</td>
                                     <td class="border-thin border-bottom" align="center">GPA</td>
                                 </tr>
                                 @php
@@ -113,27 +116,13 @@
                                         <td class="border-thin">e20150956</td>
                                         <td class="border-thin">LUN SOCHEAT</td>
                                         <td class="border-thin" align="center">F</td>
-                                        @if($i==1)
-                                            <td class="cell-sm" rowspan="{{$num}}"></td>
-                                            <td class="border-thin" align="center"><strong>81.73</strong></td>
-                                            <td class="border-thin" align="center"><strong>3.5</strong></td>
-                                            <td class="cell-sm" rowspan="{{$num}}"></td>
-                                            <td class="border-thin" align="center"><strong>79.03</strong></td>
-                                            <td class="border-thin" align="center"><strong>3.0</strong></td>
-                                            <td class="cell-sm" rowspan="{{$num}}"></td>
-                                            <td class="border-thin" align="center"><strong>80.38</strong></td>
-                                            <td class="border-thin" align="center"><strong>3.5</strong></td>
-                                            <td class="cell-sm" rowspan="{{$num}}"></td>
-                                            <td class="border-thin">Tres Bien</td>
-                                        @else
-                                            <td class="border-thin" align="center"><strong>81.73</strong></td>
-                                            <td class="border-thin" align="center"><strong>3.5</strong></td>
-                                            <td class="border-thin" align="center"><strong>79.03</strong></td>
-                                            <td class="border-thin" align="center"><strong>3.0</strong></td>
-                                            <td class="border-thin" align="center"><strong>80.38</strong></td>
-                                            <td class="border-thin" align="center"><strong>3.5</strong></td>
-                                            <td class="border-thin">Tres Bien</td>
-                                        @endif
+                                        <td class="border-thin" align="center"><strong>81.73</strong></td>
+                                        <td class="border-thin" align="center"><strong>3.5</strong></td>
+                                        <td class="border-thin" align="center"><strong>79.03</strong></td>
+                                        <td class="border-thin" align="center"><strong>3.0</strong></td>
+                                        <td class="border-thin" align="center"><strong>80.38</strong></td>
+                                        <td class="border-thin" align="center"><strong>3.5</strong></td>
+                                        <td class="border-thin">Tres Bien</td>
                                         <td class="border-thin border-left border-right"></td>
                                     </tr>
                                 @endfor
@@ -142,27 +131,27 @@
                                     <td class="border-top"></td>
                                     <td class="border-top"></td>
                                     <td class="border-top" align="center">Min</td>
-                                    <td class="border-top" align="center" colspan="2">50.81</td>
                                     <td class="border-top" align="center">50.81</td>
-                                    <td class="border-top" align="center" colspan="2">53.56</td>
+                                    <td class="border-top" align="center">50.81</td>
                                     <td class="border-top" align="center">53.56</td>
-                                    <td class="border-top" align="center" colspan="2">25.41</td>
+                                    <td class="border-top" align="center">53.56</td>
                                     <td class="border-top" align="center">25.41</td>
-                                    <td class="border-top" colspan="2"></td>
+                                    <td class="border-top" align="center">25.41</td>
+                                    <td class="border-top"></td>
                                     <td class="border-top"></td>
                                 </tr>
                                 <tr>
                                     <td class="no-border"></td>
                                     <td class="no-border"></td>
                                     <td class="no-border"></td>
-                                    <td class="no-border" align="center">Max</td>
-                                    <td class="no-border" align="center" colspan="2">84.19</td>
-                                    <td class="no-border" align="center">84.19</td>
-                                    <td class="no-border" align="center" colspan="2">79.96</td>
-                                    <td class="no-border" align="center">79.96</td>
-                                    <td class="no-border" align="center" colspan="2">80.38</td>
-                                    <td class="no-border" align="center">80.38</td>
-                                    <td class="no-border" colspan="2"></td>
+                                    <td class="no-border" align="center">Min</td>
+                                    <td class="no-border" align="center">50.81</td>
+                                    <td class="no-border" align="center">50.81</td>
+                                    <td class="no-border" align="center">53.56</td>
+                                    <td class="no-border" align="center">53.56</td>
+                                    <td class="no-border" align="center">25.41</td>
+                                    <td class="no-border" align="center">25.41</td>
+                                    <td class="no-border"></td>
                                     <td class="no-border"></td>
                                 </tr>
 

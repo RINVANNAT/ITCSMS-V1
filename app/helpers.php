@@ -329,3 +329,21 @@ if (! function_exists('convert_degree')) {
         }
     }
 }
+
+function message_success ($data) {
+    $response = [
+        'code' => 1,
+        'data' => $data,
+        'message' => 'success message'
+    ];
+    return $response;
+}
+
+function message_error ($message) {
+    $response = [
+        'code' => 0,
+        'data' => [],
+        'message' => $message
+    ];
+    return $response;
+}
