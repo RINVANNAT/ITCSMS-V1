@@ -6,7 +6,10 @@
         {{--<span class="name_en">ENG RATANA</span>--}}
         {{--<span class="name_kh">អេង រតនា</span>--}}
         <span class="department" >
-        ដេប៉ាតឺម៉ង់ {{isset($front->department)?$front->department:""}}
+            @if($front->degree_id != 5)
+                ដេប៉ាតឺម៉ង់
+            @endif
+            {{isset($front->department)?$front->department:""}}
         </span>
         <span class="id_card">អត្តលេខនិស្សិត/ID : <strong>{{isset($front->id_card)?$front->id_card:""}}</strong></span>
         <div class="avatar">
