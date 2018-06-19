@@ -37,7 +37,15 @@ trait PrintExaminationAttendanceListTrait
         $order_by = $request->get("order_by");
 
         $studentAnnuals = StudentAnnual::select([
-            'studentAnnuals.id',"promotions.name as promotion",'groups.code as group','students.id_card','students.name_kh','students.dob as dob','students.name_latin', 'genders.code as gender', 'departmentOptions.code as option',
+            'studentAnnuals.id',
+            "promotions.name as promotion",
+            'groups.code as group',
+            'students.id_card',
+            'students.name_kh',
+            'students.dob as dob',
+            'students.name_latin',
+            'genders.code as gender',
+            'departmentOptions.code as option',
             DB::raw("CONCAT(degrees.code,grades.code,departments.code,\"departmentOptions\".code) as class")
         ])
             ->leftJoin('students','students.id','=','studentAnnuals.student_id')
@@ -74,14 +82,13 @@ trait PrintExaminationAttendanceListTrait
         if(!empty($grade)){
             $studentAnnuals = $studentAnnuals->where('grades.id',$grade);
         }
-
         if($order_by == "by_name") {
             $studentAnnuals = $studentAnnuals->orderBy("name_latin");
         } else {
             $studentAnnuals = $studentAnnuals->orderBy("id_card");
         }
 
-        $studentAnnuals = $studentAnnuals->get()->toArray();
+            $studentAnnuals = $studentAnnuals->get()->toArray();
         $total_student = count($studentAnnuals);
 
         // Already validate from frontend: remainder must less than total class

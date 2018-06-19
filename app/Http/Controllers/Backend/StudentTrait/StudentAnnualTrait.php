@@ -112,6 +112,10 @@ trait StudentAnnualTrait
                     $studentAnnuals = $studentAnnuals->where(function($query) {
                         $query->whereNull('students.radie')
                             ->orWhere('students.radie', '=', false);
+                    })
+
+                    ->whereNotIn('students.id',function($query) use ($academic_year_id){
+                        $query->select('redouble_student.student_id')->from('redouble_student')->where('redouble_student.academic_year_id','=',$academic_year_id);
                     });
                 }
                 $studentAnnuals = $studentAnnuals
@@ -124,7 +128,10 @@ trait StudentAnnualTrait
                     $studentAnnuals = $studentAnnuals->where(function($query) {
                         $query->whereNull('students.radie')
                             ->orWhere('students.radie', '=', false);
-                    });
+                    })
+                        ->whereNotIn('students.id',function($query) use ($academic_year_id){
+                            $query->select('redouble_student.student_id')->from('redouble_student')->where('redouble_student.academic_year_id','=',$academic_year_id);
+                        });
                 }
                 $studentAnnuals = $studentAnnuals->where('studentAnnuals.department_id', $department->id)
                     ->select('studentAnnuals.*', 'students.id_card', 'students.name_latin','students.radie')
@@ -137,7 +144,10 @@ trait StudentAnnualTrait
                 $studentAnnuals = $studentAnnuals->where(function($query) {
                     $query->whereNull('students.radie')
                         ->orWhere('students.radie', '=', false);
-                });
+                })
+                    ->whereNotIn('students.id',function($query) use ($academic_year_id){
+                        $query->select('redouble_student.student_id')->from('redouble_student')->where('redouble_student.academic_year_id','=',$academic_year_id);
+                    });
             }
             $studentAnnuals = $studentAnnuals
                 ->select('studentAnnuals.*', 'students.id_card', 'students.name_latin','students.radie')
