@@ -65,10 +65,10 @@ trait PrintExaminationAttendanceListTrait
             })
             ->where(function($query){
                 $query->where('students.radie','=', false)->orWhereNull('students.radie');
-            })
-            ->whereNotIn('students.id',function($query) use ($academic_year){
-                $query->select('redouble_student.student_id')->from('redouble_student')->where('redouble_student.academic_year_id','=',$academic_year);
             });
+            //->whereNotIn('students.id',function($query) use ($academic_year){
+            //    $query->select('redouble_student.student_id')->from('redouble_student')->where('redouble_student.academic_year_id','=',$academic_year);
+            //});
 
         if(!empty($department_option)){
             $studentAnnuals = $studentAnnuals->where('departmentOptions.id',$department_option);
