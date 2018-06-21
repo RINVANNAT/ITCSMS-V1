@@ -124,6 +124,6 @@ trait PrintExaminationAttendanceListTrait
         $academic_year = AcademicYear::where("id",$academic_year)->first();
         $department = Department::where("id",$department)->first();
 
-        return view("backend.studentAnnual.print.examination_attendance_list",compact("data","academic_year","semester","department"));
+        return view("backend.studentAnnual.print.examination_attendance_list",compact("data","academic_year","semester","department","by_group"));
     }
 }

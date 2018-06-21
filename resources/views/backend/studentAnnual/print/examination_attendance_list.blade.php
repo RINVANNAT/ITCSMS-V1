@@ -31,7 +31,7 @@
 @endsection
 
 @section('content')
-    <?php $group=1; ?>
+    <?php $group='A'; ?>
     @foreach($data as $page)
         <div class="page">
             <div class="row">
@@ -50,7 +50,11 @@
 
                     <div class="sign-content">
                         <div class="row">
-                            <span style="font-weight: bold; font-size: 16px; margin-left: 15px;">Classe: {{$page[0]["class"]}} - {{$page[0]["group"]}} (Nb. {{count($page)}})</span>
+                            @if($by_group)
+                                <span style="font-weight: bold; font-size: 16px; margin-left: 15px;">Classe: {{$page[0]["class"]}} - {{$page[0]["group"]}} (Nb. {{count($page)}})</span>
+                            @else
+                                <span style="font-weight: bold; font-size: 16px; margin-left: 15px;">Classe: {{$page[0]["class"]}} - {{$group}} (Nb. {{count($page)}})</span>
+                            @endif
                             <span style="margin-right: 15px;font-size: 16px;float: right">Année Scolaire {{$academic_year->name_latin}}</span>
                         </div>
                         <div class="row" style="line-height: 30px;">
