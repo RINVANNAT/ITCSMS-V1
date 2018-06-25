@@ -18,6 +18,10 @@
                         <tr>
                             <td colspan="2"><h4><b>Option:</b> <span class="no-bold">{{$student['option_en']}}</span></h4></td>
                         </tr>
+                    @elseif($student['option_en'] != "" && ($student['department_id'] == 2 && $student['degree_id'] == 1 ))
+                        <tr>
+                            <td colspan="2"><h4><b>Option:</b> <span class="no-bold">{{$student['option_en']}}</span></h4></td>
+                        </tr>
                     @endif
                     <tr>
                         <td width="75%"><h4><b>Degree:</b> <span class="no-bold">{{$student['degree_en']}}</span> </h4></td>
