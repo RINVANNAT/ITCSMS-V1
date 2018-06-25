@@ -20,7 +20,7 @@
         <td colspan="25" align="center" class="blue">
             <span>ស្ថិតិនិស្សិត តាមអាយុ ថ្នាក់</span>
             <span>{{$degree_name}}</span>
-            <span>និងតាមឆ្នាំ ឆ្នាំសិក្សា<span id="academicYear">{{$academic_year_name}}</span></span>
+            <span>និងតាមឆ្នាំ ឆ្នាំសិក្សា<span id="academicYear">{{$academic_year_name}} ឆមាសទី {{$semester_id}}</span></span>
         </td>
     </tr>
     <tr align="center" class="insertBorder">

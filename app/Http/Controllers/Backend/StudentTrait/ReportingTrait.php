@@ -18,7 +18,7 @@ use Illuminate\Support\Facades\DB;
  */
 trait ReportingTrait
 {
-    public function get_student_list_by_age($academic_year_id, $degree, $date,$scholarships){
+    public function get_student_list_by_age($academic_year_id, $degree, $date,$scholarships, $semester_id){
 
         $grades = [1,2,3,4,5];
         $ages = array(
@@ -41,7 +41,6 @@ trait ReportingTrait
         $total_scholarship = 0;
         $total_paid = 0;
 
-
         foreach($ages as &$age){
             $t_st = 0;
             $t_sf = 0;
@@ -54,6 +53,9 @@ trait ReportingTrait
 
                 $total = DB::table('studentAnnuals')
                     ->leftJoin('students','studentAnnuals.student_id','=','students.id')
+                    ->leftJoin('group_student_annuals','studentAnnuals.id','=','group_student_annuals.student_annual_id')
+                    ->whereNull('group_student_annuals.department_id')
+                    ->where('group_student_annuals.semester_id','=',$semester_id)
                     ->where('studentAnnuals.degree_id','=',$degree)
                     ->where('studentAnnuals.grade_id','=',$grade)
                     ->where('studentAnnuals.academic_year_id','=',$academic_year_id)
@@ -62,6 +64,9 @@ trait ReportingTrait
 
                 $total_female = DB::table('studentAnnuals')
                     ->leftJoin('students','studentAnnuals.student_id','=','students.id')
+                    ->leftJoin('group_student_annuals','studentAnnuals.id','=','group_student_annuals.student_annual_id')
+                    ->whereNull('group_student_annuals.department_id')
+                    ->where('group_student_annuals.semester_id','=',$semester_id)
                     ->where('studentAnnuals.degree_id','=',$degree)
                     ->where('studentAnnuals.grade_id','=',$grade)
                     ->where('studentAnnuals.academic_year_id','=',$academic_year_id)
@@ -72,6 +77,9 @@ trait ReportingTrait
                 $scholarship_total =  DB::table('studentAnnuals')
                     ->join('scholarship_student_annual','studentAnnuals.id','=','scholarship_student_annual.student_annual_id')
                     ->join('students','studentAnnuals.student_id','=','students.id')
+                    ->leftJoin('group_student_annuals','studentAnnuals.id','=','group_student_annuals.student_annual_id')
+                    ->whereNull('group_student_annuals.department_id')
+                    ->where('group_student_annuals.semester_id','=',$semester_id)
                     ->where('studentAnnuals.degree_id','=',$degree)
                     ->where('studentAnnuals.grade_id','=',$grade)
                     ->where('studentAnnuals.academic_year_id','=',$academic_year_id)
@@ -82,6 +90,9 @@ trait ReportingTrait
                 $scholarship_female =  DB::table('studentAnnuals')
                     ->join('scholarship_student_annual','studentAnnuals.id','=','scholarship_student_annual.student_annual_id')
                     ->join('students','studentAnnuals.student_id','=','students.id')
+                    ->leftJoin('group_student_annuals','studentAnnuals.id','=','group_student_annuals.student_annual_id')
+                    ->whereNull('group_student_annuals.department_id')
+                    ->where('group_student_annuals.semester_id','=',$semester_id)
                     ->where('studentAnnuals.degree_id','=',$degree)
                     ->where('studentAnnuals.grade_id','=',$grade)
                     ->where('studentAnnuals.academic_year_id','=',$academic_year_id)
@@ -123,7 +134,7 @@ trait ReportingTrait
         return $ages;
     }
 
-    public function get_student_redouble($academic_year_id , $degree, $scholarships){
+    public function get_student_redouble($academic_year_id , $degree, $scholarships, $semester_id){
 
         $departments = Department::where('parent_id',11)->with(['department_options'])->get()->toArray();
         $grades = [1,2,3,4,5];
@@ -169,6 +180,9 @@ trait ReportingTrait
                     $total = DB::table('studentAnnuals')
                         ->leftJoin('students','studentAnnuals.student_id','=','students.id')
                         ->leftJoin('redouble_student','students.id','=','redouble_student.student_id')
+                        ->leftJoin('group_student_annuals','studentAnnuals.id','=','group_student_annuals.student_annual_id')
+                        ->whereNull('group_student_annuals.department_id')
+                        ->where('group_student_annuals.semester_id','=',$semester_id)
                         ->where('studentAnnuals.degree_id','=',$degree)
                         ->where('studentAnnuals.grade_id','=',$grade)
                         ->where('studentAnnuals.academic_year_id','=',$academic_year_id)
@@ -180,6 +194,9 @@ trait ReportingTrait
                     $total_female = DB::table('studentAnnuals')
                         ->leftJoin('students','studentAnnuals.student_id','=','students.id')
                         ->leftJoin('redouble_student','students.id','=','redouble_student.student_id')
+                        ->leftJoin('group_student_annuals','studentAnnuals.id','=','group_student_annuals.student_annual_id')
+                        ->whereNull('group_student_annuals.department_id')
+                        ->where('group_student_annuals.semester_id','=',$semester_id)
                         ->where('studentAnnuals.degree_id','=',$degree)
                         ->where('studentAnnuals.grade_id','=',$grade)
                         ->where('studentAnnuals.academic_year_id','=',$academic_year_id)
@@ -193,6 +210,9 @@ trait ReportingTrait
                         ->leftJoin('scholarship_student_annual','studentAnnuals.id','=','scholarship_student_annual.student_annual_id')
                         ->leftJoin('students','studentAnnuals.student_id','=','students.id')
                         ->leftJoin('redouble_student','students.id','=','redouble_student.student_id')
+                        ->leftJoin('group_student_annuals','studentAnnuals.id','=','group_student_annuals.student_annual_id')
+                        ->whereNull('group_student_annuals.department_id')
+                        ->where('group_student_annuals.semester_id','=',$semester_id)
                         ->where('studentAnnuals.degree_id','=',$degree)
                         ->where('studentAnnuals.grade_id','=',$grade)
                         ->where('studentAnnuals.academic_year_id','=',$academic_year_id)
@@ -206,6 +226,9 @@ trait ReportingTrait
                         ->leftJoin('scholarship_student_annual','studentAnnuals.id','=','scholarship_student_annual.student_annual_id')
                         ->leftJoin('students','studentAnnuals.student_id','=','students.id')
                         ->leftJoin('redouble_student','students.id','=','redouble_student.student_id')
+                        ->leftJoin('group_student_annuals','studentAnnuals.id','=','group_student_annuals.student_annual_id')
+                        ->whereNull('group_student_annuals.department_id')
+                        ->where('group_student_annuals.semester_id','=',$semester_id)
                         ->where('studentAnnuals.degree_id','=',$degree)
                         ->where('studentAnnuals.grade_id','=',$grade)
                         ->where('studentAnnuals.academic_year_id','=',$academic_year_id)
@@ -261,7 +284,7 @@ trait ReportingTrait
         return $departments;
     }
 
-    public function get_student_by_group($academic_year_id , $degree, $only_foreigner,$scholarships){
+    public function get_student_by_group($academic_year_id , $degree, $only_foreigner,$scholarships,$semester_id){
         $departments = Department::where('parent_id',11)->with(['department_options'])->get()->toArray();
         $grades = [1,2,3,4,5];
 
@@ -303,6 +326,9 @@ trait ReportingTrait
 
                     $total_query = DB::table('studentAnnuals')
                         ->leftJoin('students','studentAnnuals.student_id','=','students.id')
+                        ->leftJoin('group_student_annuals','studentAnnuals.id','=','group_student_annuals.student_annual_id')
+                        ->whereNull('group_student_annuals.department_id')
+                        ->where('group_student_annuals.semester_id','=',$semester_id)
                         ->where('studentAnnuals.degree_id','=',$degree)
                         ->where('studentAnnuals.grade_id','=',$grade)
                         ->where('studentAnnuals.academic_year_id','=',$academic_year_id)
@@ -317,6 +343,9 @@ trait ReportingTrait
 
                     $total_female_query = DB::table('studentAnnuals')
                         ->leftJoin('students','studentAnnuals.student_id','=','students.id')
+                        ->leftJoin('group_student_annuals','studentAnnuals.id','=','group_student_annuals.student_annual_id')
+                        ->whereNull('group_student_annuals.department_id')
+                        ->where('group_student_annuals.semester_id','=',$semester_id)
                         ->where('studentAnnuals.degree_id','=',$degree)
                         ->where('studentAnnuals.grade_id','=',$grade)
                         ->where('studentAnnuals.academic_year_id','=',$academic_year_id)
@@ -333,6 +362,9 @@ trait ReportingTrait
                     $scholarship_total_query =  DB::table('studentAnnuals')
                         ->leftJoin('scholarship_student_annual','studentAnnuals.id','=','scholarship_student_annual.student_annual_id')
                         ->leftJoin('students','studentAnnuals.student_id','=','students.id')
+                        ->leftJoin('group_student_annuals','studentAnnuals.id','=','group_student_annuals.student_annual_id')
+                        ->whereNull('group_student_annuals.department_id')
+                        ->where('group_student_annuals.semester_id','=',$semester_id)
                         ->where('studentAnnuals.degree_id','=',$degree)
                         ->where('studentAnnuals.grade_id','=',$grade)
                         ->where('studentAnnuals.academic_year_id','=',$academic_year_id)
@@ -349,6 +381,9 @@ trait ReportingTrait
                     $scholarship_female_query =  DB::table('studentAnnuals')
                         ->leftJoin('scholarship_student_annual','studentAnnuals.id','=','scholarship_student_annual.student_annual_id')
                         ->leftJoin('students','studentAnnuals.student_id','=','students.id')
+                        ->leftJoin('group_student_annuals','studentAnnuals.id','=','group_student_annuals.student_annual_id')
+                        ->whereNull('group_student_annuals.department_id')
+                        ->where('group_student_annuals.semester_id','=',$semester_id)
                         ->where('studentAnnuals.degree_id','=',$degree)
                         ->where('studentAnnuals.grade_id','=',$grade)
                         ->where('studentAnnuals.academic_year_id','=',$academic_year_id)
@@ -440,15 +475,16 @@ trait ReportingTrait
                     $scholarships = [];
                 }
 
-                $data = $this->get_student_list_by_age($params['academic_year_id'],$params['degree_id'],$params['date'],$scholarships);
+                $semester_id = $params['semester_id'];
+                $data = $this->get_student_list_by_age($params['academic_year_id'],$params['degree_id'],$params['date'],$scholarships,$semester_id);
                 $degree_name = Degree::find($params['degree_id'])->name_kh;
                 $academic_year_name = AcademicYear::find($params['academic_year_id'])->name_kh;
                 $date = $params['date'];
 
                 if($is_preview){
-                    return view('backend.studentAnnual.reporting.template_report_student_by_age',compact('id','data','degree_name','academic_year_name','date'));
+                    return view('backend.studentAnnual.reporting.template_report_student_by_age',compact('id','data','degree_name','academic_year_name','date','semester_id'));
                 } else{
-                    return view('backend.studentAnnual.reporting.print_report_student_by_age',compact('id','data','degree_name','academic_year_name','date'));
+                    return view('backend.studentAnnual.reporting.print_report_student_by_age',compact('id','data','degree_name','academic_year_name','date','semester_id'));
                 }
 
                 break;
@@ -459,14 +495,15 @@ trait ReportingTrait
                     $scholarships = [];
                 }
 
-                $data = $this->get_student_redouble($params['academic_year_id'],$params['degree_id'],$scholarships);
+                $semester_id = $params['semester_id'];
+                $data = $this->get_student_redouble($params['academic_year_id'],$params['degree_id'],$scholarships,$semester_id);
                 $degree_name = Degree::find($params['degree_id'])->name_kh;
                 $academic_year_name = AcademicYear::find($params['academic_year_id'])->name_kh;
 
                 if($is_preview){
-                    return view('backend.studentAnnual.reporting.template_report_student_redouble',compact('id','data','degree_name','academic_year_name'));
+                    return view('backend.studentAnnual.reporting.template_report_student_redouble',compact('id','data','degree_name','academic_year_name','semester_id'));
                 } else{
-                    return view('backend.studentAnnual.reporting.print_report_student_redouble',compact('id','data','degree_name','academic_year_name'));
+                    return view('backend.studentAnnual.reporting.print_report_student_redouble',compact('id','data','degree_name','academic_year_name','semester_id'));
                 }
                 break;
             case 3:
@@ -482,14 +519,16 @@ trait ReportingTrait
                 } else {
                     $scholarships = [];
                 }
-                $data = $this->get_student_by_group($params['academic_year_id'],$params['degree_id'],$only_foreigner,$scholarships);
+
+                $semester_id = $params['semester_id'];
+                $data = $this->get_student_by_group($params['academic_year_id'],$params['degree_id'],$only_foreigner,$scholarships,$semester_id);
                 $degree_name = Degree::find($params['degree_id'])->name_kh;
                 $academic_year_name = AcademicYear::find($params['academic_year_id'])->name_kh;
 
                 if($is_preview) {
-                    return view('backend.studentAnnual.reporting.template_report_student_studying', compact('id', 'data', 'degree_name', 'academic_year_name','only_foreigner'));
+                    return view('backend.studentAnnual.reporting.template_report_student_studying', compact('id', 'data', 'degree_name', 'academic_year_name','only_foreigner','semester_id'));
                 } else {
-                    return view('backend.studentAnnual.reporting.print_report_student_studying',compact('id','data','degree_name','academic_year_name','only_foreigner'));
+                    return view('backend.studentAnnual.reporting.print_report_student_studying',compact('id','data','degree_name','academic_year_name','only_foreigner','semester_id'));
                 }
                 break;
             default:
