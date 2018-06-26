@@ -959,7 +959,7 @@ class StudentAnnualController extends Controller
         switch ($id) {
             case 1:
 
-                $data = $this->get_student_list_by_age($params['academic_year_id'],$params['degree_id'],$params['date'],$scholarships);
+                $data = $this->get_student_list_by_age($params['academic_year_id'],$params['degree_id'],$params['date'],$scholarships,$params['semester_id']);
                 $degree_name = Degree::find($params['degree_id'])->name_kh;
                 $academic_year_name = AcademicYear::find($params['academic_year_id'])->name_kh;
                 Excel::create("ស្ថិតិនិស្សិត តាមអាយុ ", function($excel) use ($data,$degree_name,$academic_year_name) {
@@ -1075,7 +1075,7 @@ class StudentAnnualController extends Controller
                 })->export('xls');
                 break;
             case 2:
-                $data = $this->get_student_redouble($params['academic_year_id'],$params['degree_id'],$scholarships);
+                $data = $this->get_student_redouble($params['academic_year_id'],$params['degree_id'],$scholarships,$params['semester_id']);
 
                 $degree_name = Degree::find($params['degree_id'])->name_kh;
                 $academic_year_name = AcademicYear::find($params['academic_year_id'])->name_kh;
@@ -1225,7 +1225,7 @@ class StudentAnnualController extends Controller
                     $scholarships = [];
                 }
 
-                $data = $this->get_student_by_group($params['academic_year_id'],$params['degree_id'],$only_foreigner,$scholarships);
+                $data = $this->get_student_by_group($params['academic_year_id'],$params['degree_id'],$only_foreigner,$scholarships,$params['semester_id']);
 
                 $degree_name = Degree::find($params['degree_id'])->name_kh;
                 $academic_year_name = AcademicYear::find($params['academic_year_id'])->name_kh;
