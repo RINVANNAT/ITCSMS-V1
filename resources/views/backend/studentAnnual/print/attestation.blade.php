@@ -7,7 +7,7 @@
     <meta name="_token" content="X2IQMvdghRfpLlHKugb0MK9lDoeaeSpbxQpH2Oq9"/>
 
     <title>
-        ITC-SMS | Certificate of Foundation Year Course
+        ITC-SMS | Attestation
     </title>
 
     <!-- Meta -->
@@ -109,6 +109,7 @@
 
 </head>
 <body>
+@foreach($student_by_groups as $student_by_group)
 <div class="page">
     <div class="container">
         <div class="row">
@@ -116,31 +117,33 @@
                 <div class="row">
 
                     <div class="tran-title">
-                        <p class="title"><strong>ATTESTATION OF TECHNICIAN</strong></p>
+                        <p class="title"><strong>ATTESTATION</strong></p>
                     </div>
                 </div>
 
                 <div class="row margin-top-degree">
                     <div class="col-xs-4 no-padding">
-                        <p>Name: <strong>IENG CHEN CHOU</strong></p>
+                        <p>Name: <strong>{{$student_by_group[0]['name_latin']}}</strong></p>
                     </div>
-                    <div class="col-xs-4" align="center"><span>Sex: Male</span></div>
-                    <div class="col-xs-4" align="center"><span>ID: e20120248</span></div>
+                    <div class="col-xs-4" align="center"><span>Sex: {{to_latin_gender($student_by_group[0]['gender'])}}</span></div>
+                    <div class="col-xs-4" align="center"><span>ID: {{$student_by_group[0]['id_card']}}</span></div>
                 </div>
 
                 <div class="row">
                     <div class="col-xs-12 no-padding department">
-                        <p>Department: Electrical and Energy Engineering</p>
+                        <p>Department: {{$student_by_group[0]['department_en']}}</p>
                     </div>
                 </div>
+                @if($student_by_group[0]['option_en'] != null)
                 <div class="row">
                     <div class="col-xs-12 no-padding">
-                        <p>Option: Electrical and Energy</p>
+                        <p>Option: {{$student_by_group[0]['option_en']}}</p>
                     </div>
                 </div>
+                @endif
                 <div class="row">
                     <div class="col-xs-12 no-padding">
-                        <p>Degree: Engineer</p>
+                        <p>Degree: {{$student_by_group[0]['degree_en']}}</p>
                     </div>
                 </div>
 
@@ -153,6 +156,19 @@
                         </p>
                     </div>
                 </div>
+                <?php
+                    $result = [];
+                    foreach ($student_by_group as $student_by_class) {
+                        $result[$student_by_class["grade_id"]]["total_score"] = $scores[$student_by_class["id"]]["final_score"];
+                        $result[$student_by_class["grade_id"]]["total_gpa"] = get_gpa($scores[$student_by_class["id"]]["final_score"]);
+                        $result[$student_by_class["grade_id"]]["credit"] = 0;
+                        foreach ($scores[$student_by_class["id"]] as $key=>$score) {
+                            if(is_numeric($key)){
+                                $result[$student_by_class["grade_id"]]["credit"] += $score["credit"];
+                            }
+                        }
+                    }
+                ?>
                 <div class="row">
                     <div class="attestation-table">
                         <table class="table attestation-cell">
@@ -161,31 +177,37 @@
                                 <td class="border-top border-left border-bottom border-thin">Obtained scores</td>
                                 <td class="border-top border-right border-bottom border-thin">Number of credits</td>
                             </tr>
+                            @foreach($result as $year => $score_each_year)
                             <tr>
-                                <td class="border-thin half-width">Fourth year average:</td>
+                                <td class="border-thin half-width">{{get_order_alpha_numeric($year)}} year average:</td>
                                 <td align="center" class="border-left border-bottom border-thin background">
-                                    <span class="background-half"><strong>3.0</strong></span>
+                                    <span class="background-half"><strong>{{$score_each_year["total_score"]}}</strong></span>
                                 </td>
-                                <td align="center" class="border-right border-bottom">39</td>
+                                <td align="center" class="border-right border-bottom">{{$score_each_year["credit"]}}</td>
                             </tr>
-                            <tr>
-                                <td class="border-thin half-width">Fifth year average:</td>
-                                <td align="center" class="border-left border-bottom border-thin background"><strong>3.0</strong></td>
-                                <td align="center" class="border-right border-bottom">27</td>
-                            </tr>
+                            @endforeach
                         </table>
                     </div>
                 </div>
 
                 <div class="row">
                     <table class="table no-border">
+                        <?php
+                            $final_average_score = 0;
+                            foreach($result as $result_score) {
+                                $final_average_score += $result_score["total_score"];
+                            }
+                            $final_average_score = $final_average_score / 2;
+                            $final_average_gpa = get_gpa($final_average_score);
+                            $final_average_mention = get_english_mention($final_average_score);
+                        ?>
                         <tr>
                             <td align="right" style="width: 60%">
                                 Average of 2 final years = <strong><span style="font-size: 16px;"> FINAL AVERAGE:</span></strong>
                             </td>
                             <td></td>
                             <td align="center" style="width: 22%; font-size: 18px; border: 0.5px solid black">
-                                <strong>3.0</strong>
+                                <strong>{{$final_average_gpa}}</strong>
                             </td>
                         </tr>
                         <tr>
@@ -196,7 +218,7 @@
                         <tr class="attestation-cell">
                             <td align="right" style="width: 60%"><strong>FINAL MENTION:</strong></td>
                             <td></td>
-                            <td align="center" style="width: 22%; border: 0.5px solid black;"><strong>Good</strong></td>
+                            <td align="center" style="width: 22%; border: 0.5px solid black;"><strong>{{$final_average_mention}}</strong></td>
                         </tr>
                     </table>
                 </div>
@@ -204,9 +226,12 @@
 
                 <div class="row">
                     <div class="col-xs-6 col-xs-offset-6">
+                        <?php
+                        $date = \Carbon\Carbon::createFromFormat("d/m/Y",$issued_date);
+                        ?>
                         <div class="seen" align="center">
-                            <p>Phnom Penh, July 27, 2017</p>
-                            <p style="line-height: 0.1;"><strong>Deputy Direct General</strong></p>
+                            <p>Phnom Penh, {{$date->formatLocalized('%B %d, %Y')}}</p>
+                            <p style="line-height: 0.1;"><strong>{{$issued_by}}</strong></p>
                         </div>
                     </div>
                 </div>
@@ -244,5 +269,6 @@
         </div>
     </div>
 </div>
+@endforeach
 </body>
 </html>

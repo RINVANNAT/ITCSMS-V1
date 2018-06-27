@@ -115,7 +115,7 @@
         var selected_ids = null;
         var print_url = "{{ route('admin.student.print_attestation') }}";
         var mark_url = "{{ route('admin.student.mark_printed_transcript') }}";
-        var filter_class_url = '{{route('admin.filter.get_filter_by_class')}}';
+        var filter_class_url = '{{route('admin.filter.get_filter_by_class_final_year')}}';
         var oTable;
 
         function redraw_student_list() {

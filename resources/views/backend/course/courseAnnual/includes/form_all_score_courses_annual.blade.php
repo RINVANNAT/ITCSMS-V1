@@ -249,8 +249,8 @@
         var table_width;
         var hotInstance;
         var print_url = "{{route('admin.course.print_total_score')}}";
-        var average_final_year = '<a target="_blank" href="{{route('admin.student.print_average_final_year', ['type'=>'show'])}}"><button class="btn btn-warning btn-average-final-year" data-toggle="tooltip" style="margin-left: 5px" data-placement="left"  title="Print Average Final Year" id="print_average_final_year"> Average Final Year</button></a>';
-
+        var average_final_year = '<button class="btn btn-warning btn-average-final-year" data-toggle="tooltip" style="margin-left: 5px" data-placement="left"  title="Print Average Final Year" id="print_average_final_year"> Average Final Year</button>';
+        var final_score_url = "{{route('admin.student.print_average_final_year', ['type'=>'show'])}}";
         var setting = {
             readOnly: true,
             rowHeaders: false,
@@ -1001,6 +1001,12 @@
                 $('.selection_blog').slideToggle( "fast" )
             }
 
+        });
+
+        $(document).on("click",".btn-average-final-year", function () {
+            final_score_url = final_score_url+ "?department_id="+$("#filter_dept").val()+"&option_id="+$("#filter_dept_option").val()+"&degree_id="+$("#filter_degree").val()+"&grade_id="+$("#filter_grade").val()+"&academic_year_id="+$("#filter_academic_year").val();
+            var win_final_score = window.open(final_score_url, '_blank');
+            win_final_score.focus();
         });
 
         $('#generate_student').on('click', function(e) {

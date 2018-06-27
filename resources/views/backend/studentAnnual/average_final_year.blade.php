@@ -77,7 +77,7 @@
                     <div class="row">
                         <div class="col-xs-12">
                             <p align="center" style="line-height: normal"><strong>Moyenne fin d'etude</strong></p>
-                            <p align="center" style="line-height: normal">Annee Scolaire(16-17)</p>
+                            <p align="center" style="line-height: normal">Annee Scolaire({{$academic_year->name_latin}})</p>
                         </div>
                     </div>
 

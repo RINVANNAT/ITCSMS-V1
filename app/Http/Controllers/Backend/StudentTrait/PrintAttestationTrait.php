@@ -12,6 +12,7 @@ namespace App\Http\Controllers\Backend\StudentTrait;
 use App\Http\Requests\Backend\Student\PrintTranscriptRequest;
 use App\Models\AcademicYear;
 use App\Models\Gender;
+use App\Models\Student;
 use App\Models\StudentAnnual;
 use Barryvdh\Snappy\Facades\SnappyPdf;
 use Carbon\Carbon;
@@ -47,7 +48,7 @@ trait PrintAttestationTrait
         $department = [];
         $degree = [];
         $grade = [];
-        $semester = 1;
+        $semester = 2;
         $student_class = json_decode($request->get('student_class'));
         if(!empty($student_class)){
             foreach($student_class as $element){
@@ -68,7 +69,7 @@ trait PrintAttestationTrait
 
         // This will return all passed students in the given academic year/semester 1 as a collection
         $studentAnnuals = StudentAnnual::select([
-            'studentAnnuals.id','groups.code as group','students.id_card','students.name_kh','students.dob as dob','students.name_latin', 'genders.code as gender', 'departmentOptions.code as option',
+            'studentAnnuals.id','groups.code as group','students.id as student_id','students.id_card','students.name_kh','students.dob as dob','students.name_latin', 'genders.code as gender', 'departmentOptions.code as option',
             DB::raw("CONCAT(degrees.code,grades.code,departments.code,\"departmentOptions\".code) as class")
         ])
             ->leftJoin('students','students.id','=','studentAnnuals.student_id')
@@ -81,14 +82,6 @@ trait PrintAttestationTrait
             ->leftJoin('groups','groups.id','=','group_student_annuals.group_id')
             ->leftJoin('redouble_student', 'redouble_student.student_id','=','students.id')
             ->where('studentAnnuals.academic_year_id',$academic_year)
-            ->where([
-                ['studentAnnuals.degree_id', 1],
-                ['studentAnnuals.grade_id', 5]
-            ])
-            ->orwhere([
-                ['studentAnnuals.degree_id', 2],
-                ['studentAnnuals.grade_id', 2]
-            ])
             ->whereNull('group_student_annuals.department_id')
             ->where(function($query) use($semester){
                 $query->where("group_student_annuals.semester_id",$semester)->orWhereNull("group_student_annuals.semester_id");
@@ -99,24 +92,35 @@ trait PrintAttestationTrait
             ->whereNotIn('students.id',function($query) use ($academic_year){
                 $query->select('redouble_student.student_id')->from('redouble_student')->where('redouble_student.academic_year_id','=',$academic_year);
             });
-
-        if(!empty($department_option)){
-            $studentAnnuals = $studentAnnuals->whereIN('departmentOptions.id',$department_option);
-        }
-        if(!empty($department)){
-            $studentAnnuals = $studentAnnuals->whereIN('departments.id',$department);
-        }
-        if(!empty($degree)){
-            $studentAnnuals = $studentAnnuals->whereIN('degrees.id',$degree);
-        }
-        if(!empty($grade)){
-            $studentAnnuals = $studentAnnuals->whereIN('grades.id',$grade);
-        }
-        if($group != null){
-            $studentAnnuals = $studentAnnuals->where('groups.code',$group);
-        }
-        if($gender != null){
-            $studentAnnuals = $studentAnnuals->where('students.gender_id',$gender);
+        if(empty($student_class)) {
+            $studentAnnuals = $studentAnnuals->where(function($query) {
+                $query->where([
+                    ['studentAnnuals.degree_id', 1],
+                    ['studentAnnuals.grade_id', 5]
+                ])->orWhere([
+                    ['studentAnnuals.degree_id', 2],
+                    ['studentAnnuals.grade_id', 2]
+                ]);
+            });
+        } else {
+            if(!empty($department_option)){
+                $studentAnnuals = $studentAnnuals->whereIN('departmentOptions.id',$department_option);
+            }
+            if(!empty($department)){
+                $studentAnnuals = $studentAnnuals->whereIN('departments.id',$department);
+            }
+            if(!empty($degree)){
+                $studentAnnuals = $studentAnnuals->whereIN('degrees.id',$degree);
+            }
+            if(!empty($grade)){
+                $studentAnnuals = $studentAnnuals->whereIN('grades.id',$grade);
+            }
+            if($group != null){
+                $studentAnnuals = $studentAnnuals->where('groups.code',$group);
+            }
+            if($gender != null){
+                $studentAnnuals = $studentAnnuals->where('students.gender_id',$gender);
+            }
         }
 
         $studentAnnuals = $studentAnnuals->get()->toArray();
@@ -162,7 +166,7 @@ trait PrintAttestationTrait
                 }
             })
             ->addColumn('checkbox', function($student) {
-                return '<input type="checkbox" checked class="checkbox" data-id='.$student["id"].'>';
+                return '<input type="checkbox" checked class="checkbox" data-id='.$student["student_id"].'>';
             })
             ->addColumn('name', function($student) {
                 return  $student["name_kh"]."<br/>".
@@ -187,13 +191,14 @@ trait PrintAttestationTrait
     public function print_attestation(PrintTranscriptRequest $request){
         $smis_server = Configuration::where("key","smis_server")->first();
         $semester = 1;
-        $studentAnnualIds = json_decode($request->ids);
+        $studentIds = json_decode($request->ids);
 
-        $students  = StudentAnnual::select([
+        $students  = Student::select([
             'students.id_card',
             'students.name_kh',
             'students.name_latin',
             'students.dob',
+            'students.id as student_id',
             'departments.name_kh as department',
             'students.photo',
             'studentAnnuals.id',
@@ -221,7 +226,7 @@ trait PrintAttestationTrait
             'groups.code as group',
             DB::raw("CONCAT(degrees.code,grades.code,departments.code,\"departmentOptions\".code) as class")
         ])
-            ->leftJoin('students','students.id','=','studentAnnuals.student_id')
+            ->leftJoin('studentAnnuals','students.id','=','studentAnnuals.student_id')
             ->leftJoin('academicYears', 'studentAnnuals.academic_year_id', '=', 'academicYears.id')
             ->leftJoin('genders', 'students.gender_id', '=', 'genders.id')
             ->leftJoin('grades', 'studentAnnuals.grade_id', '=', 'grades.id')
@@ -234,18 +239,36 @@ trait PrintAttestationTrait
             ->where(function($query) use($semester){
                 $query->where("group_student_annuals.semester_id",$semester)->orWhereNull("group_student_annuals.semester_id");
             })
-            ->whereIn('studentAnnuals.id', $studentAnnualIds)
+            ->whereIn('students.id', $studentIds)
+            ->where(function($query) {
+                $query->where([
+                    ['studentAnnuals.degree_id', 1],
+                    ['studentAnnuals.grade_id', 4]
+                ])
+                ->orWhere([
+                    ['studentAnnuals.degree_id', 1],
+                    ['studentAnnuals.grade_id', 5]
+                ])
+                ->orWhere([
+                    ['studentAnnuals.degree_id', 2],
+                    ['studentAnnuals.grade_id', 1]
+                ])
+                ->orWhere([
+                    ['studentAnnuals.degree_id', 2],
+                    ['studentAnnuals.grade_id', 2]
+                ]);
+            })
             ->orderBy('students.id_card','ASC')
             ->get()
             ->toArray();
 
         $students = collect($students);
-        $students = collect($students)->sortBy(function($student){
+        $student_by_groups = collect($students)->sortBy(function($student){
             return sprintf('%-12s%s',
                 $student['class'],
                 $student['name_latin']
             );
-        });
+        })->groupBy("student_id");
 
         $transcript_type = $request->get("transcript_type");
         $issued_by = $request->get("issued_by");
@@ -253,12 +276,14 @@ trait PrintAttestationTrait
         $issued_date = $request->get("issued_date");
         $scores = [];
 
-        foreach($studentAnnualIds as $id){
-
-            if($transcript_type == "semester1"){
-                $scores[$id] = $this->getStudentScoreBySemester($id,1);
+        foreach($student_by_groups as $student_by_class){
+            if(count($student_by_class) == 2) {
+                foreach($student_by_class as $student_by_grade) {
+                    $scores[$student_by_grade["id"]] = $this->getStudentScoreBySemester($student_by_grade['id'],null); // Full year
+                }
             } else {
-                $scores[$id] = $this->getStudentScoreBySemester($id,null); // Full year
+                // Something wrong here. It suppose to have only 2
+                throw new \Exception('Students have multiple class record');
             }
         }
         $ranking_data = [];
@@ -266,25 +291,26 @@ trait PrintAttestationTrait
         /*if(isset($students[0]) && (($students[0]['degree_id'] == 1 && $students[0]['grade_id'] == 5) || ($students[0]['degree_id'] == 2 && $students[0]['grade_id'] == 2))) {
             $view = 'backend.studentAnnual.print.attestation';
         }*/
-        /*return view($view,
-            compact(
-                'ranking_data',
-                'scores',
-                'students',
-                'semester',
-                'transcript_type',
-                'issued_by',
-                'issued_date',
-                'issued_number',
-                'smis_server'
-            )
-        );*/
+
+        //return view($view,
+        //    compact(
+        //        'ranking_data',
+        //        'scores',
+        //        'student_by_groups',
+        //        'semester',
+        //        'transcript_type',
+        //        'issued_by',
+        //        'issued_date',
+        //        'issued_number',
+        //        'smis_server'
+        //    )
+        //);
 
         return SnappyPdf::loadView($view,
             compact(
                 'ranking_data',
                 'scores',
-                'students',
+                'student_by_groups',
                 'semester',
                 'transcript_type',
                 'issued_by',
