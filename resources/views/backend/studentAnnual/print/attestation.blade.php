@@ -123,7 +123,7 @@
 
                 <div class="row margin-top-degree">
                     <div class="col-xs-4 no-padding">
-                        <p>Name: <strong>{{$student_by_group[0]['name_latin']}}</strong></p>
+                        <p>Name: <strong>{{strtoupper($student_by_group[0]['name_latin'])}}</strong></p>
                     </div>
                     <div class="col-xs-4" align="center"><span>Sex: {{to_latin_gender($student_by_group[0]['gender'])}}</span></div>
                     <div class="col-xs-4" align="center"><span>ID: {{$student_by_group[0]['id_card']}}</span></div>
