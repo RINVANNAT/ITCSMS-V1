@@ -246,7 +246,7 @@
                                     <td>C = 50% - 64% = 2.0 = Fair</td>
                                 </tr>
                                 <tr>
-                                    <td>B<sup>+</sup> = 80% - 84% = 3.5 = ល្អណាស់</td>
+                                    <td>B<sup>+</sup> = 80% - 84% = 3.5 = Very Good</td>
                                     <td>D = 45% - 49% = 1.5 = Poor</td>
                                 </tr>
                                 <tr>
