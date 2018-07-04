@@ -41,7 +41,7 @@ class DashboardController extends Controller
                 ->leftJoin('semesters', 'course_annuals.semester_id', '=', 'semesters.id')
                 ->leftJoin('departmentOptions', 'course_annuals.department_option_id', '=', 'departmentOptions.id')
                 ->where('course_annuals.academic_year_id', $last_year->id)
-                ->where('course_annuals.semester_id', 1)
+                ->where('course_annuals.semester_id', 2)
                 ->where('employee_id', $employee->id)
                 ->with("courseAnnualClass")
                 ->select([

@@ -115,7 +115,6 @@
         <div class="row">
             <div class="col-xs-12">
                 <div class="row">
-
                     <div class="tran-title">
                         <p class="title"><strong>ATTESTATION</strong></p>
                     </div>
