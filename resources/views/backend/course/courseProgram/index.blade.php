@@ -69,7 +69,47 @@
                         <th width="20px;">{{ trans('labels.backend.coursePrograms.fields.time_td') }}</th>
                         <th width="20px;">{{ trans('labels.backend.coursePrograms.fields.time_tp') }}</th>
                         <th>{{ trans('labels.backend.coursePrograms.fields.credit') }}</th>
-                        <th  width="50px;">{{ trans('labels.general.actions') }}</th>
+                        <th  width="100px;">{{ trans('labels.general.actions') }}</th>
+                    </tr>
+                    </thead>
+                </table>
+            </div>
+
+            <div class="clearfix"></div>
+        </div><!-- /.box-body -->
+    </div><!--box-->
+
+    <div class="box box-success">
+        <div class="box-header with-border">
+            <div class="mailbox-controls">
+                @permission("create-coursePrograms")
+                <h3>Deactivated Course Program</h3>
+                @endauth
+
+                {{--<button class="btn btn-default btn-sm"><i class="fa fa-refresh"></i></button>--}}
+
+            </div>
+
+
+        </div><!-- /.box-header -->
+
+        <div class="box-body">
+            <div>
+                <table class="table table-striped table-bordered table-hover dt-responsive nowrap coursePrograms-table" cellspacing="0" width="100%">
+                    <thead>
+                    <tr>
+                        <th>{{ trans('labels.backend.coursePrograms.fields.name_kh') }}</th>
+                        <th style="display: none"></th>
+                        <th style="display: none"></th>
+                        <th>{{ trans('labels.backend.coursePrograms.fields.code') }}</th>
+                        <th>Class</th>
+                        <th>Permitted to</th>
+                        <th>{{ trans('labels.backend.coursePrograms.fields.semester') }}</th>
+                        <th width="20px;">{{ trans('labels.backend.coursePrograms.fields.time_course') }}</th>
+                        <th width="20px;">{{ trans('labels.backend.coursePrograms.fields.time_td') }}</th>
+                        <th width="20px;">{{ trans('labels.backend.coursePrograms.fields.time_tp') }}</th>
+                        <th>{{ trans('labels.backend.coursePrograms.fields.credit') }}</th>
+                        <th  width="100px;">{{ trans('labels.general.actions') }}</th>
                     </tr>
                     </thead>
                 </table>
@@ -138,7 +178,45 @@
                 ]
             });
 
+            var oTableDeactive = $('.coursePrograms-table').DataTable({
+                processing: true,
+                serverSide: true,
+                //deferLoading: true,
+                pageLength: {!! config('app.records_per_page')!!},
+
+                ajax: {
+                    url:'{!! route('admin.course.course_program.data') !!}',
+                    method:'POST',
+                    data:function(d){
+                        // In case additional fields is added for filter, modify export view as well: popup_export.blade.php
+                        d.degree = $('#filter_degree').val();
+                        d.grade = $('#filter_grade').val();
+                        d.department = $('#filter_department').val();
+                        d.department_option = $('#filter_dept_option').val();
+                        d.semester = $('#filter_semester').val();
+                        d.responsible_department = $('#filter_responsible_department').val();
+                        d.deactive = true
+
+                    }
+                },
+                columns: [
+                    { data: 'name_kh', name: 'name_kh'},
+                    { data: 'name_en', name: 'name_en'},
+                    { data: 'name_fr', name: 'name_fr'},
+                    { data: 'code', name: 'code'},
+                    { data: 'class', name: 'class', searchable:false},
+                    { data: 'responsible_department', name: 'responsible_department', searchable:false},
+                    { data: 'semester', name: 'semesters.id'},
+                    { data: 'time_course', name: 'time_course'},
+                    { data: 'time_td', name: 'time_td'},
+                    { data: 'time_tp', name: 'time_tp'},
+                    { data: 'credit', name: 'credit'},
+                    { data: 'action', name: 'action',orderable: false, searchable: false}
+                ]
+            });
+
             enableDeleteRecord($('#coursePrograms-table'));
+            enableDeleteRecord($('.coursePrograms-table'));
 
             $("div.toolbar").html(toolbar_html);
 
@@ -146,19 +224,23 @@
 
             $('#filter_degree').on('change', function(e) {
                 oTable.draw();
+                oTableDeactive.draw();
                 e.preventDefault();
             });
             $('#filter_grade').on('change', function(e) {
                 oTable.draw();
+                oTableDeactive.draw();
                 e.preventDefault();
             });
             $('#filter_department').on('change', function(e) {
                 oTable.draw();
+                oTableDeactive.draw();
                 hasDeptOption();
                 e.preventDefault();
             });
             $('#filter_responsible_department').on('change', function(e) {
                 oTable.draw();
+                oTableDeactive.draw();
                 e.preventDefault();
             });
 
@@ -170,11 +252,13 @@
 
             $(document).on('change', '#filter_dept_option', function() {
                 oTable.draw();
+                oTableDeactive.draw();
                 e.preventDefault();
             })
 
             $('#filter_semester').on('change', function(e) {
                 oTable.draw();
+                oTableDeactive.draw();
                 e.preventDefault();
             });
         });
