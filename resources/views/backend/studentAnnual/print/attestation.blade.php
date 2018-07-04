@@ -123,7 +123,7 @@
 
                 <div class="row margin-top-degree">
                     <div class="col-xs-4 no-padding">
-                        <p>Name: <strong>{{$student_by_group[0]['name_latin']}}</strong></p>
+                        <p>Name: <strong>{{strtoupper($student_by_group[0]['name_latin'])}}</strong></p>
                     </div>
                     <div class="col-xs-4" align="center"><span>Sex: {{to_latin_gender($student_by_group[0]['gender'])}}</span></div>
                     <div class="col-xs-4" align="center"><span>ID: {{$student_by_group[0]['id_card']}}</span></div>
@@ -246,7 +246,7 @@
                                     <td>C = 50% - 64% = 2.0 = Fair</td>
                                 </tr>
                                 <tr>
-                                    <td>B<sup>+</sup> = 80% - 84% = 3.5 = ល្អណាស់</td>
+                                    <td>B<sup>+</sup> = 80% - 84% = 3.5 = Very Good</td>
                                     <td>D = 45% - 49% = 1.5 = Poor</td>
                                 </tr>
                                 <tr>
