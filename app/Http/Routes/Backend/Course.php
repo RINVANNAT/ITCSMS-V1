@@ -23,6 +23,7 @@ Route::group([
 
     Route::group([], function() {
         Route::post('course-program-data', 'CourseController@data')->name('admin.course.course_program.data');
+        Route::get('course-program/activate/{id}', 'CourseController@activate')->name('admin.course.course_program.activate');
         Route::get('course-program-request-import', 'CourseController@request_import')->name('admin.course.course_program.request_import');
         Route::post('course-program-import', 'CourseController@import')->name('admin.course.course_program.import');
         Route::resource('course_program', 'CourseController');
