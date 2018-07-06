@@ -178,7 +178,7 @@
                     { data: 'name', name: 'name', searchable:false},
                     { data: 'class', name: 'class',orderable:false},
                     { data: 'score_prop', name: 'score_prop',orderable:false},
-                    { data: 'ref_number', name: 'ref_number',orderable:false},
+                    { data: 'ref_number', name: 'ref_number',orderable:false,searchable:true},
                     { data: 'printed_certificate', name: 'printed_certificate',orderable:false, searchable:false},
                     { data: 'action', name: 'action',orderable: false, searchable: false}
                 ],
