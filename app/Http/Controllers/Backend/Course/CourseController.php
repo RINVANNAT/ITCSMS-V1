@@ -301,9 +301,9 @@ class CourseController extends Controller
                 if(Auth::user()->allow('delete-coursePrograms')) {
 
                     if ($courseProgram->active == true){
-                        $actions = $actions.' <a href="' . route('admin.course.course_program.activate', $courseProgram->course_id) . '" class="btn btn-xs btn-warning"><i class="fa fa-retweet" data-toggle="tooltip" data-placement="top" title="Deactivate"></i></a>';
+                        $actions = $actions.' <a href="' . route('admin.course.course_program.activate', $courseProgram->course_id) . '" class="btn btn-xs btn-warning">Deactive</a>';
                     } else {
-                        $actions = $actions.' <a href="' . route('admin.course.course_program.activate', $courseProgram->course_id) . '" class="btn btn-xs btn-success"><i class="fa fa-check" data-toggle="tooltip" data-placement="top" title="Activate"></i></a>';
+                        $actions = $actions.' <a href="' . route('admin.course.course_program.activate', $courseProgram->course_id) . '" class="btn btn-xs btn-success">Active</i></a>';
                     }
                     $courseAnnuals = CourseAnnual::where('course_id', $courseProgram->course_id)->count();
                     if ($courseAnnuals == 0) {
