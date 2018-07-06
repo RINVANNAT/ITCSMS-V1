@@ -864,7 +864,6 @@ trait ProficencyScoreTrait
                         return Str::contains($row['decision'], $request->get('decision')) ? true : false;
                     });
                 }
-                
                 if ($keyword != null and $keyword['value'] != "") {
                     $instance->collection = $instance->collection->filter(function ($row) use ($request, $keyword) {
                         if(
