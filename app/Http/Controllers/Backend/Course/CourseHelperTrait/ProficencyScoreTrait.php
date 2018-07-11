@@ -209,8 +209,8 @@ trait ProficencyScoreTrait
         $studentByCourse = $studentByCourse->whereIn('studentAnnuals.id', $studentAnnualIds)
             ->orderBy('students.name_latin');
 
-        if($courseAnnual->semester_id >  1) {
-
+        if($courseAnnual->semester_id >  1 and $courseAnnual->department_id != 12 and $courseAnnual->department_id != 13) {
+            // Remove raidé student only if this course is not from department SA/SF and semester 2
             $studentByCourse = $studentByCourse
                 ->where(function($query) {
                     $query->where('students.radie','=',  false)
@@ -867,7 +867,6 @@ trait ProficencyScoreTrait
                 if ($keyword != null and $keyword['value'] != "") {
                     $instance->collection = $instance->collection->filter(function ($row) use ($request, $keyword) {
                         if(
-                            Str::contains(strtolower($row['name_latin']), strtolower($keyword['value'])) ||
                             (strtolower($row['id_card']) == strtolower($keyword['value'])) ||
                             (strtolower($row['ref_number']) == strtolower($keyword['value']))
                         ){
