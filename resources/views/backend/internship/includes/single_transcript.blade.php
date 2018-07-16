@@ -94,7 +94,7 @@
                     @foreach($internship->internship_student_annuals as $internship_student_annual)
                         {{ ($internship_student_annual->gender->code == 'M') ? 'his' : 'her' }}
                     @endforeach
-                    relevant development.
+                    relevant department.
                 @endif
             </p>
 

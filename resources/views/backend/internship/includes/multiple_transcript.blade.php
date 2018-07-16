@@ -86,7 +86,7 @@
                 @if((($internship->degree->id == 2) && ($internship->grade->id == 2)) || (($internship->grade->id == 5) && ($internship->degree->id == 1)))
                 thesis and present it to a jury of the Institute for an evaluation. This evaluation will bring account with others for the final exam.
                 @else
-                report which will be submitted to their relevant development.
+                report which will be submitted to their relevant department.
                 @endif
             </p>
 
