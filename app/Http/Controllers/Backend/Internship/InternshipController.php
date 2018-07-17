@@ -7,6 +7,7 @@ use App\Http\Requests\Backend\Internship\DeleteInternshipRequest;
 use App\Http\Requests\Backend\Internship\StoreInternshipRequest;
 use App\Models\AcademicYear;
 use App\Models\Internship\Internship;
+use App\Models\Internship\InternshipCompany;
 use App\Models\Internship\InternshipStudentAnnual;
 use App\Models\Student;
 use App\Models\StudentAnnual;
@@ -48,9 +49,11 @@ class InternshipController extends Controller
             $number += count($internships);
         }
         $academic_years = AcademicYear::latest()->get();
+        $companies = InternshipCompany::select('name as text', 'id')->orderBy('name', 'asc')->get();
         return view('backend.internship.create')->with([
             'academic_years' => $academic_years,
-            'number' => $number
+            'number' => $number,
+            'companies' => $companies
         ]);
     }
 
@@ -280,6 +283,17 @@ class InternshipController extends Controller
             return [
                 'status'=> true
             ];
+        }
+    }
+
+    public function remoteInternshipCompanies (Request $request)
+    {
+        $this->validate($request, ['q' => 'required']);
+        try {
+            $result = InternshipCompany::where('name', 'ilike', '%'.$request->q.'%')->select('name as text', 'id')->get();
+            return json_encode(['code' => 1, 'status' => 'success', 'results' => $result]);
+        } catch (\Exception $exception) {
+            return json_encode(['code' => 0, 'message' => $exception->getMessage()]);
         }
     }
 }

@@ -21,6 +21,8 @@
             <label class="col-md-3 control-label required">Person</label>
             <div class="col-md-9">
                 <input class="form-control"
+                       tabindex="1"
+                       autofocus
                        value="{{ isset($internship) ? $internship->person : null }}"
                        name="person"
                        type="text">
@@ -47,10 +49,11 @@
         <div class="form-group">
             <label class="col-md-3 control-label required">Company</label>
             <div class="col-md-9">
-                <input type="text"
-                       name="company"
-                       value="{{ isset($internship) ? $internship->company : null }}"
-                       class="form-control"/>
+                <select class="companies form-control">
+                    @foreach($companies as $company)
+                        <option value="{{ $company->id }}">{{ $company->text }}</option>
+                    @endforeach
+                </select>
             </div>
         </div>
 
@@ -111,6 +114,7 @@
                     <label class="col-md-3 control-label">Title</label>
                     <div class="col-md-9">
                         <input type="text"
+                               tabindex="2"
                                value="{{ isset($internship) ? $internship->title : null }}"
                                name="title"
                                class="form-control">

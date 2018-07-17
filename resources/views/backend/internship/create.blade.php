@@ -127,6 +127,13 @@
                 templateSelection: formatRepoSelectionEmployee,
                 multiple: true,
             });
+
+	        $(".companies").select2({
+		        placeholder: 'Enter company name',
+		        theme: "bootstrap",
+		        allowClear: true,
+		        tags: true,
+            });
         })
     </script>
 @stop

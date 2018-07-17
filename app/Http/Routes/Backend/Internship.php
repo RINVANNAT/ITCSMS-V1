@@ -11,4 +11,6 @@ Route::group(['middleware' => 'auth', 'prefix' => 'internship', 'namespace' => '
     Route::get('student-search', 'InternshipController@search')->name('internship.search');
     Route::post('get-students', 'InternshipController@getStudents')->name('internship.get-students');
     Route::post('/mark_as_printed', 'InternshipController@markPrinted')->name('internship.mark_as_printed');
+
+    Route::post('/remote-internship-companies', 'InternshipController@remoteInternshipCompanies')->name('internship.remote-internship-companies');
 });
