@@ -16,6 +16,7 @@ use App\Models\Degree;
 use App\Models\Department;
 use App\Models\DepartmentOption;
 use App\Models\PrintedCertificate;
+use Barryvdh\Snappy\Facades\SnappyPdf;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Response;
@@ -208,8 +209,8 @@ trait ProficencyScoreTrait
         $studentByCourse = $studentByCourse->whereIn('studentAnnuals.id', $studentAnnualIds)
             ->orderBy('students.name_latin');
 
-        if($courseAnnual->semester_id >  1) {
-
+        if($courseAnnual->semester_id >  1 and $courseAnnual->department_id != 12 and $courseAnnual->department_id != 13) {
+            // Remove raidé student only if this course is not from department SA/SF and semester 2
             $studentByCourse = $studentByCourse
                 ->where(function($query) {
                     $query->where('students.radie','=',  false)
@@ -866,8 +867,8 @@ trait ProficencyScoreTrait
                 if ($keyword != null and $keyword['value'] != "") {
                     $instance->collection = $instance->collection->filter(function ($row) use ($request, $keyword) {
                         if(
-                            Str::contains(strtolower($row['name_latin']), strtolower($keyword['value'])) ||
-                            Str::contains(strtolower($row['id_card']), strtolower($keyword['value']))
+                            (strtolower($row['id_card']) == strtolower($keyword['value'])) ||
+                            (strtolower($row['ref_number']) == strtolower($keyword['value']))
                         ){
                             return true;
                         } else {
@@ -943,6 +944,10 @@ trait ProficencyScoreTrait
         } else {
             $view = "backend.course.courseAnnual.formScore.prints.certificate_fr";
         }
+        $scores = $arrayScores;
+        $exam_start = $request->exam_start;
+        $exam_end = $request->exam_end;
+
         return view($view,
             [
                 'scores' => $arrayScores,
@@ -955,6 +960,10 @@ trait ProficencyScoreTrait
                 'certificate_references' => $certificate_references
             ]
         );
+
+        return SnappyPdf::loadView($view, compact('scores', 'competencies', 'students', 'exam_start', 'exam_end', 'issued_by', 'issued_date', 'certificate_references'))
+            ->setOrientation('landscape')
+            ->stream();
     }
 
     /**

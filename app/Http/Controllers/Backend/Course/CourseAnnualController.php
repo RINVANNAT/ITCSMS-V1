@@ -4,6 +4,8 @@ use App\Exceptions\GeneralException;
 use App\Http\Controllers\Backend\Course\CourseHelperTrait\GenerateStudentTrait;
 use App\Http\Controllers\Backend\Course\CourseHelperTrait\ProficencyScoreTrait;
 use App\Http\Controllers\Backend\Course\CourseHelperTrait\StudentStatisticTrait;
+use App\Http\Controllers\Backend\StudentTrait\PrintAttestationTrait;
+use App\Http\Controllers\Backend\StudentTrait\AverageFinalYearTrait;
 use App\Http\Controllers\Backend\StudentTrait\PrintTranscriptTrait;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Backend\Course\CourseAnnual\CourseAnnualAssignmentRequest;
@@ -71,6 +73,8 @@ class CourseAnnualController extends Controller
     use ProficencyScoreTrait;
     use GenerateStudentTrait;
     use PrintTranscriptTrait;
+    use PrintAttestationTrait;
+    use AverageFinalYearTrait;
 
     /**
      * @var CourseAnnualRepositoryContract
@@ -333,6 +337,7 @@ class CourseAnnualController extends Controller
                 ->orderBy('courses.degree_id', 'asc')
                 ->orderBy('courses.grade_id', 'asc')
                 ->orderBy('courses.semester_id', 'asc')
+                ->where('courses.active',true)
                 ->get();
         } else {
             $employee = Employee::where('user_id', Auth::user()->id)->first();
@@ -365,6 +370,7 @@ class CourseAnnualController extends Controller
                 ->orderBy('courses.degree_id', 'asc')
                 ->orderBy('courses.grade_id', 'asc')
                 ->orderBy('courses.semester_id', 'asc')
+                ->where('courses.active',true)
                 ->get();
         }
         $courses = [];
@@ -449,7 +455,7 @@ class CourseAnnualController extends Controller
      * Display the specified resource.
      *
      * @param  int $id
-     * @return \Illuminate\Http\Response
+     * @return void
      */
     public function show($id)
     {
@@ -466,7 +472,8 @@ class CourseAnnualController extends Controller
     public function edit(EditCourseAnnualRequest $request, $id)
     {
         $groups = [];
-        $courseAnnual = $this->courseAnnuals->findOrThrowException($id);
+        // $courseAnnual = $this->courseAnnuals->findOrThrowException($id);
+        $courseAnnual = CourseAnnual::with('reference_course')->find($id);
         $ownerCourseDeparment = Department::where('id', $courseAnnual->department_id)->first();
         $scores = $this->getPropertiesFromScoreTable($courseAnnual);
         $arrayPercentages = collect($scores)->groupBy('percentage_id')->toArray();
@@ -512,10 +519,14 @@ class CourseAnnualController extends Controller
         }
 
         usort($array_groups, function ($a, $b) {
-            if(is_numeric($a->group_code)) {
-                return $a->group_code - $b->group_code;
+            if($a!= null & $b!= null) {
+                if(is_numeric($a->group_code)) {
+                    return $a->group_code - $b->group_code;
+                } else {
+                    return strcmp($a->group_code, $b->group_code);
+                }
             } else {
-                return strcmp($a->group_code, $b->group_code);
+                return "";
             }
         });
 
@@ -1630,9 +1641,12 @@ class CourseAnnualController extends Controller
                             if ((strtoupper($score->score) == ScoreEnum::Fraud) || ($score->score == ScoreEnum::Absence)) {
                                 $checkFraudAbsScore++;// to count each score of one student who has been frauded in exam or absence
                                 $totalScore = $totalScore;
+                            } else if($score->score == "" || $score->score == null) {
+                                $totalScore = $totalScore + 0;// calculate score for student annual
                             } else {
                                 $totalScore = $totalScore + $score->score;// calculate score for stuent annual
                             }
+
                             $scoreData[$score->name] = (($score->score != null) ? $score->score : null);//assign each score value midterm/ final
                             $scoreData['percentage_id' . '_' . $score->name] = $score->percentage_id;
                             $scoreData['score_id' . '_' . $score->name] = $score->score_id;

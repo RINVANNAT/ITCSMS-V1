@@ -4,6 +4,7 @@ namespace App\Repositories\Backend\Schedule\Timetable;
 
 use App\Http\Requests\Backend\Schedule\Timetable\CreateTimetableSlotRequest;
 use App\Models\Configuration;
+use App\Models\Course;
 use App\Models\CourseAnnual;
 use App\Models\CourseAnnualClass;
 use App\Models\CourseSession;
@@ -393,7 +394,11 @@ class EloquentTimetableSlotRepository implements TimetableSlotRepositoryContract
                             &&
                             ($timetableSlot->group_merge_id != $itemTimetableSlot->group_merge_id)
                         ) {
-                            if ((strtotime($timetableSlot->start) == strtotime($itemTimetableSlot->start)) && (strtotime($timetableSlot->end) == strtotime($itemTimetableSlot->end)) && ($timetableSlot->type == $itemTimetableSlot->type) && ($timetableSlot->slot->course_annual_id == $itemTimetableSlot->slot->course_annual_id)) {
+
+                            $currentCourse = Course::find(CourseAnnual::find($timetableSlot->slot->course_annual_id)->course_id);
+                            $otherCourse = Course::find(CourseAnnual::find($itemTimetableSlot->slot->course_annual_id)->course_id);
+
+                            if ((strtotime($timetableSlot->start) == strtotime($itemTimetableSlot->start)) && (strtotime($timetableSlot->end) == strtotime($itemTimetableSlot->end)) && ($timetableSlot->type == $itemTimetableSlot->type) && ($otherCourse->id == $currentCourse->id)) {
                                 array_push($canMerge, $itemTimetableSlot);
                             } else {
                                 array_push($canNotMerge, $itemTimetableSlot);

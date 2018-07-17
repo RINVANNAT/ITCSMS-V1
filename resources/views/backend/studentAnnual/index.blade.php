@@ -285,6 +285,14 @@
                 new_tab.focus();
             });
 
+            $('#print_attestation').on('click',function(e){
+                e.preventDefault();
+                var url = "{{ route('admin.student.request_print_attestation') }}";
+
+                var new_tab = window.open(url+ get_parameters(),'_blank');
+                new_tab.focus();
+            });
+
             $('#generate_id_card').on('click', function(e) {
                 e.preventDefault();
                 var baseUrl = " {{ route('admin.student.generate_student_id_card',1) }}";

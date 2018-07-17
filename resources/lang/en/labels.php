@@ -710,7 +710,8 @@ return [
             'all_department' => 'All Department',
             'is_foreigner' => 'Only Foreigner',
             'date' => "Until",
-            'scholarships' => "Scholarships"
+            'scholarships' => "Scholarships",
+            'semester_id' => "Semester"
         ],
         'error' => [
             'reporting' => [

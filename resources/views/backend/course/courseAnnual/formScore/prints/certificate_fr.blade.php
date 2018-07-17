@@ -236,7 +236,15 @@
                         <p class="text-14" style="font-size: 13pt; font-weight: bold">
                             Institut de Technologie du Cambodge
                         </p>
-                        <span class="text-13" style="font-style: italic;">Réf.:  &nbsp;&nbsp;&nbsp;{{$certificate_references[$student->id]['ref_number']}} &nbsp;&nbsp;&nbsp; ITC.SF</span>
+                        <span class="text-13" style="font-style: italic;">Réf.:  &nbsp;&nbsp;&nbsp;
+                            @if((int) $certificate_references[$student->id]['ref_number'] < 10)
+                                00{{$certificate_references[$student->id]['ref_number']}} &nbsp;&nbsp;&nbsp; ITC.SF
+                            @elseif(((int) $certificate_references[$student->id]['ref_number']) >= 10 && ((int) (int) $certificate_references[$student->id]['ref_number']) < 100)
+                                0{{$certificate_references[$student->id]['ref_number']}} &nbsp;&nbsp;&nbsp; ITC.SF
+                            @else
+                                {{$certificate_references[$student->id]['ref_number']}} &nbsp;&nbsp;&nbsp; ITC.SF
+                            @endif
+                        </span>
                     </div>
                     <div class="pull-right text-center" style="padding-right: 9mm; margin-top: -7mm">
                         <p class="text-14" style="line-height: 6mm; margin-bottom: 0px; font-family: franklin_gothic !important;">

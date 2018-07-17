@@ -242,13 +242,13 @@ class CourseController extends Controller
                 'departmentOptions.code as option',
                 'semesters.name_en as semester',
                 'rd.code as responsible_department',
+                'courses.active',
                 DB::raw("CONCAT(degrees.code,grades.code,departments.code) as class")
             ])
             ->orderBy('courses.department_id','ASC')
             ->orderBy('courses.degree_id','ASC')
             ->orderBy('courses.grade_id','ASC')
-            ->orderBy('courses.semester_id','ASC')
-            ->where('courses.active',true);
+            ->orderBy('courses.semester_id','ASC');
 
         $datatables = app('datatables')->of($coursePrograms);
 
@@ -279,6 +279,12 @@ class CourseController extends Controller
             $datatables = $datatables ->where('courses.department_id', $employee->department->id );
         }
 
+        if($request->deactive == true) {
+            $datatables = $datatables -> where('courses.active', false);
+        } else {
+            $datatables = $datatables -> where('courses.active', true);
+        }
+
         $datatables
             ->editColumn('name_kh' , function($courseProgram) {
                 return '<b>'.$courseProgram->name_kh.'</b><br/>'.$courseProgram->name_en.'<br/>'.$courseProgram->name_fr;
@@ -293,12 +299,37 @@ class CourseController extends Controller
                     $actions = $actions.'<a href="' . route('admin.course.course_program.edit', $courseProgram->course_id) . '" class="btn btn-xs btn-primary"><i class="fa fa-pencil" data-toggle="tooltip" data-placement="top" title="" data-original-title="' . trans('buttons.general.crud.edit') . '"></i> </a>';
                 }
                 if(Auth::user()->allow('delete-coursePrograms')) {
-                    $actions = $actions.' <button class="btn btn-xs btn-danger btn-delete" data-remote="' . route('admin.course.course_program.destroy', $courseProgram->course_id) . '"><i class="fa fa-times" data-toggle="tooltip" data-placement="top" title="' . trans('buttons.general.crud.delete') . '"></i></button>';
+
+                    if ($courseProgram->active == true){
+                        $actions = $actions.' <a href="' . route('admin.course.course_program.activate', $courseProgram->course_id) . '" class="btn btn-xs btn-warning">Deactive</a>';
+                    } else {
+                        $actions = $actions.' <a href="' . route('admin.course.course_program.activate', $courseProgram->course_id) . '" class="btn btn-xs btn-success">Active</i></a>';
+                    }
+                    $courseAnnuals = CourseAnnual::where('course_id', $courseProgram->course_id)->count();
+                    if ($courseAnnuals == 0) {
+                        $actions = $actions.' <button class="btn btn-xs btn-danger btn-delete" data-remote="' . route('admin.course.course_program.destroy', $courseProgram->course_id) . '"><i class="fa fa-times" data-toggle="tooltip" data-placement="top" title="' . trans('buttons.general.crud.delete') . '"></i></button>';
+                    }
                 }
                 return  $actions;
             });
         
         return $datatables->make(true);
+    }
+
+    public function activate($id)
+    {
+        $courseProgram = Course::find($id);
+        if($courseProgram instanceof Course) {
+            if ($courseProgram->active == true){
+                $courseProgram->active = false;
+            }else {
+                $courseProgram->active = true;
+            }
+
+            if ($courseProgram->save()){
+                return redirect()->route('admin.course.course_program.index')->withFlashSuccess(trans('alerts.backend.generals.updated'));
+            }
+        }
     }
 
     public function request_import(RequestImportCourseProgramRequest $request)

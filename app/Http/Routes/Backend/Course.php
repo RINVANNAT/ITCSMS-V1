@@ -23,6 +23,7 @@ Route::group([
 
     Route::group([], function() {
         Route::post('course-program-data', 'CourseController@data')->name('admin.course.course_program.data');
+        Route::get('course-program/activate/{id}', 'CourseController@activate')->name('admin.course.course_program.activate');
         Route::get('course-program-request-import', 'CourseController@request_import')->name('admin.course.course_program.request_import');
         Route::post('course-program-import', 'CourseController@import')->name('admin.course.course_program.import');
         Route::resource('course_program', 'CourseController');
@@ -163,6 +164,20 @@ Route::group([
     Route::post('request_print_transcript_data', 'CourseAnnualController@request_print_transcript_data')->name('admin.student.request_print_transcript_data');
     Route::get('print_transcript', 'CourseAnnualController@print_transcript')->name('admin.student.print_transcript');
     Route::get('mark_printed_transcript', 'CourseAnnualController@mark_printed_transcript')->name('admin.student.mark_printed_transcript');
+
+    /*---Print attestation route ---*/
+
+    Route::get('request_print_attestation', 'CourseAnnualController@request_print_attestation')->name('admin.student.request_print_attestation');
+    Route::get('print_attestation', 'CourseAnnualController@print_attestation')->name('admin.student.print_attestation');
+    Route::post('request_print_attestation_data', 'CourseAnnualController@request_print_attestation_data')->name('admin.student.request_print_attestation_data');
+
+    /*---End of print attestation route ---*/
+
+    /*---Print average final year route ---*/
+
+    Route::get('print_average_final_year/{type}', 'CourseAnnualController@print_average_final_year')->name('admin.student.print_average_final_year');
+
+    /*---End of print average final year route ---*/
 
 
     /*

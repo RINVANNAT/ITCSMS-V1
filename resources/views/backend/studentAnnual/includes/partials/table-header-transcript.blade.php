@@ -10,7 +10,7 @@
         <th>{{ trans('labels.backend.students.fields.class') }}</th>
         <th>{{ trans('labels.backend.students.fields.group') }}</th>
         <th>{{ trans('labels.backend.students.fields.printed_transcript') }}</th>
-        <th>{{ trans('labels.general.actions') }}</th>
+        {{--<th>{{ trans('labels.general.actions') }}</th>--}}
     </tr>
     </thead>
 </table>

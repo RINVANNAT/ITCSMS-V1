@@ -46,5 +46,8 @@ return [
     'is_suspend'=>"Is Suspend",
     'to_pay'=>"To Pay",
     'to_pay_currency'=>"To Pay Currency",
-    'class' => "Class"
+    'class' => "Class",
+    'group_option_priority_1' => 'Priority 1',
+    'group_option_priority_2' => 'Priority 2',
+    'group_option_priority_3' => 'Priority 3'
 ];

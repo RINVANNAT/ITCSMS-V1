@@ -223,6 +223,15 @@
 </div>
 
 <div class="form-group">
+
+    {!! Form::label('name_fr', "Name French", ['class' => 'col-lg-2 col-lg-offset-5 control-label']) !!}
+
+    <div class="col-lg-3">
+        {{ Form::text('name_fr',  null, ['class' => 'form-control', 'id'=> 'name_fr', 'required' => 'required']) }}
+    </div>
+</div>
+
+<div class="form-group">
     {!! Form::label('Scoring', "Scoring", ['class' => 'col-lg-3 control-label required']) !!}
     <div class="col-lg-9">
         <div class="box box-solid" style="border-top: 1px solid #d2d6de" id="scoring_panel">
@@ -366,7 +375,7 @@
                             <div class="col-lg-7">
                                 <select name="midterm_score" id="midterm_score_id" class="form-control">
                                     <option value="{{\App\Models\Enum\ScoreEnum::Midterm_0}}">  0% </option>
-                                    <option value="{{\App\Models\Enum\ScoreEnum::Midterm_30}}"> 30% </option>
+                                    <option value="{{\App\Models\Enum\ScoreEnum::Midterm_30}}" selected> 30% </option>
                                     <option value="{{\App\Models\Enum\ScoreEnum::Midterm_40}}"> 40%</option>
                                 </select>
                             </div>
@@ -417,12 +426,19 @@
     <div class="block_course_reference">
         {!! Form::label('reference_course_id', trans('labels.backend.coursePrograms.fields.reference_course_id'), ['class' => 'col-lg-2 control-label']) !!}
         <div class="col-lg-3">
-
-            <select  name="reference_course_id" id="reference_course_id" class="form-control" >
-
-            </select>
+            @if(isset($courseAnnual) && isset($courseAnnual->reference_course->id))
+                <select  name="reference_course_id"
+                         readonly
+                         class="form-control">
+                    <option value="{{ $courseAnnual->reference_course->id }}">{{ $courseAnnual->reference_course->name_en }}</option>
+                </select>
+            @else
+                <select  name="reference_course_id"
+                         id="reference_course_id"
+                         class="form-control">
+                </select>
+            @endif
         </div>
-
     </div>
 
 </div>

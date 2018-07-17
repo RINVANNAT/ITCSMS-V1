@@ -14,7 +14,11 @@
                     <tr>
                         <td colspan="2"><h4><b>Department:</b> <span class="no-bold">{{$student['department_en']}}</span></h4></td>
                     </tr>
-                    @if($student['option_en'] != "")
+                    @if($student['option_en'] != "" && ($student['department_id'] != 2 && $student['degree_id'] != 2 && $student['grade_id'] != 2 ))
+                        <tr>
+                            <td colspan="2"><h4><b>Option:</b> <span class="no-bold">{{$student['option_en']}}</span></h4></td>
+                        </tr>
+                    @elseif($student['option_en'] != "" && ($student['department_id'] == 2 && $student['degree_id'] == 1 ))
                         <tr>
                             <td colspan="2"><h4><b>Option:</b> <span class="no-bold">{{$student['option_en']}}</span></h4></td>
                         </tr>

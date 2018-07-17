@@ -168,7 +168,7 @@ if (! function_exists('to_fr_number')) {
 }
 if (! function_exists('get_grading')) {
     /**
-     * Convert english day to french
+     * Convert score to grading
      *
      * @param $score
      * @return String
@@ -194,6 +194,96 @@ if (! function_exists('get_grading')) {
             $grade = "F";
         }
         return $grade;
+    }
+}
+if (! function_exists('get_gpa')) {
+    /**
+     * Convert score to gpa
+     *
+     * @param $score
+     * @return String
+     */
+    function get_gpa($score)
+    {
+        $gpa = "";
+        if($score >= 85){
+            $gpa = "4.00";
+        } else if ($score >= 80) {
+            $gpa = "3.50";
+        } else if ($score >= 70) {
+            $gpa = "3.00";
+        } else if ($score >= 65) {
+            $gpa = "2.50";
+        } else if ($score >= 50) {
+            $gpa = "2.00";
+        } else if ($score >= 45) {
+            $gpa = "1.50";
+        } else if ($score >= 40) {
+            $gpa = "1.00";
+        }  else {
+            $gpa = "0.00";
+        }
+        return $gpa;
+    }
+}
+if (! function_exists('get_english_mention')) {
+    /**
+     * Convert score to mention in english
+     *
+     * @param $score
+     * @return String
+     */
+    function get_english_mention($score)
+    {
+        $mention = "";
+        if($score >= 85){
+            $mention = "Excellent";
+        } else if ($score >= 80) {
+            $mention = "Very Good";
+        } else if ($score >= 70) {
+            $mention = "Good";
+        } else if ($score >= 65) {
+            $mention = "Fairly Good";
+        } else if ($score >= 50) {
+            $mention = "Fair";
+        } else if ($score >= 45) {
+            $mention = "Poor";
+        } else if ($score >= 40) {
+            $mention = "Very Poor";
+        }  else {
+            $mention = "Failure";
+        }
+        return $mention;
+    }
+}
+if (! function_exists('get_french_mention')) {
+    /**
+     * Convert score to mention in french
+     *
+     * @param $score
+     * @return String
+     */
+    function get_french_mention($score)
+    {
+        $mention = "";
+        if($score >= 85){
+            $mention = "Excellent";
+        } else if ($score >= 80) {
+            $mention = "Très Bien";
+        } else if ($score >= 70) {
+            $mention = "Bien";
+        } else if ($score >= 65) {
+            $mention = "Assez Bien";
+        } else if ($score >= 50) {
+            $mention = "Passable";
+        } else if ($score >= 45) {
+            $mention = "Faible";
+        } else if ($score >= 40) {
+            $mention = "Très Faible";
+        }  else {
+            $mention = "Insuffisant";
+        }
+        return $mention;
     }
 }
 if (! function_exists('to_khmer_number')) {
@@ -264,6 +354,23 @@ if (! function_exists('to_khmer_gender')) {
         }
     }
 }
+if (! function_exists('to_latin_gender')) {
+    /**
+     * Convert english day to french
+     *
+     * @param $gender
+     * @return String
+     */
+    function to_latin_gender($gender)
+    {
+        $a = strtolower($gender);
+        if($a == "m" || $a == "male") {
+            return "Male";
+        } else {
+            return "Female";
+        }
+    }
+}
 if (! function_exists('to_khmer_month')) {
     /**
      * Convert english day to french
@@ -298,6 +405,76 @@ if (! function_exists('to_khmer_month')) {
                 return "វិច្ឆកា";
             case "12":
                 return "ធ្នូ";
+            default:
+                return "";
+        }
+    }
+}
+
+if (! function_exists('convert_degree')) {
+    /**
+     * Convert string number to day
+     *
+     * @param int $year
+     * @return string
+     */
+    function convert_degree($year)
+    {
+        switch ($year) {
+            case 1:
+                return "1st";
+            case 2:
+                return "2nd";
+            case 3:
+                return "3rd";
+            case 4:
+                return "4th";
+            case 5:
+                return "5th";
+            default:
+                return "";
+        }
+    }
+}
+
+function message_success ($data) {
+    $response = [
+        'code' => 1,
+        'data' => $data,
+        'message' => 'success message'
+    ];
+    return $response;
+}
+
+function message_error ($message) {
+    $response = [
+        'code' => 0,
+        'data' => [],
+        'message' => $message
+    ];
+    return $response;
+}
+
+if (! function_exists('get_order_alpha_numeric')) {
+    /**
+     * Convert number to alpha numeric number
+     *
+     * @param int $number
+     * @return string
+     */
+    function get_order_alpha_numeric($number)
+    {
+        switch ($number) {
+            case 1:
+                return "First";
+            case 2:
+                return "Second";
+            case 3:
+                return "Third";
+            case 4:
+                return "Forth";
+            case 5:
+                return "Fifth";
             default:
                 return "";
         }

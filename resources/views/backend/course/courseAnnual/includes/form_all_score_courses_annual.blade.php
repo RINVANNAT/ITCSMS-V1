@@ -95,9 +95,9 @@
     <div class="box box-success">
         <div class="box-header with-border" style="margin-bottom: 0px">
 
-            <div class=" no-paddingcol-sm-12">
+            <div class="no-padding col-sm-12">
 
-                <div class="dropdown pull-left">
+                <div class="dropdown pull-left action-button">
 
                     <button class="btn btn-primary dropdown-toggle" type="button" data-toggle="dropdown">Action
                         <span class="caret"></span>
@@ -127,10 +127,9 @@
                 </div>
 
 
+                <div class="pull-right btn-right">
 
-                <div class="pull-right">
-
-                    <button class="btn btn-primary" data-toggle="tooltip" style="margin-left: 5px" data-placement="left"  title="Refresh-Table" id="refresh_score_sheet" >
+                    <button class="btn btn-primary" data-toggle="tooltip" data-placement="left"  title="Refresh-Table" id="refresh_score_sheet" >
                         <i class="fa fa-refresh" ></i>
                     </button>
 
@@ -250,7 +249,8 @@
         var table_width;
         var hotInstance;
         var print_url = "{{route('admin.course.print_total_score')}}";
-
+        var average_final_year = '<button class="btn btn-warning btn-average-final-year" data-toggle="tooltip" style="margin-left: 5px" data-placement="left"  title="Print Average Final Year" id="print_average_final_year"> Average Final Year</button>';
+        var final_score_url = "{{route('admin.student.print_average_final_year', ['type'=>'show'])}}";
         var setting = {
             readOnly: true,
             rowHeaders: false,
@@ -484,6 +484,41 @@
         $('.dept_option').hide();
 
         $(document).ready(function () {
+
+            $("#filter_dept").on("change", function () {
+
+                if($('.btn-right').children().children().hasClass('btn-average-final-year')){
+                    $('.btn-right').children().children('.btn-average-final-year').remove();
+                }
+
+                if(($(this).val() != 8 && $(this).val() != 12 && $(this).val() != 13) && (($(this).siblings('#filter_degree').val() == 1 && $(this).siblings('#filter_grade').val() == 5) || ($(this).siblings('#filter_degree').val() == 2 && $(this).siblings('#filter_grade').val() == 2))){
+                    $('.btn-right').prepend(average_final_year);
+                }
+            });
+
+            $("#filter_degree").on("change", function () {
+
+                if($('.btn-right').children().children().hasClass('btn-average-final-year')){
+                    $('.btn-right').children().children('.btn-average-final-year').remove();
+                }
+
+                if(($(this).siblings('#filter_dept').val() != 8 && $(this).siblings('#filter_dept').val() != 12 && $(this).siblings('#filter_dept').val() != 13) && (($(this).val() == 1 && $(this).siblings('#filter_grade').val() == 5) || ($(this).val() == 2 && $(this).siblings('#filter_grade').val() == 2))){
+                    $('.btn-right').prepend(average_final_year);
+                }
+
+            });
+
+            $("#filter_grade").on("change", function () {
+
+                if($('.btn-right').children().children().hasClass('btn-average-final-year')){
+                    $('.btn-right').children().children('.btn-average-final-year').remove();
+                }
+
+                if(($(this).siblings('#filter_dept').val() != 8 && $(this).siblings('#filter_dept').val() != 12 && $(this).siblings('#filter_dept').val() != 13) && (($(this).siblings('#filter_degree').val() == 1 && $(this).val() == 5) || ($(this).siblings('#filter_degree').val() == 2 && $(this).val() == 2))){
+                    $('.btn-right').prepend(average_final_year);
+                }
+
+            });
 
             $("#btn-print").on("click", function () {
 
@@ -966,6 +1001,12 @@
                 $('.selection_blog').slideToggle( "fast" )
             }
 
+        });
+
+        $(document).on("click",".btn-average-final-year", function () {
+            final_score_url = final_score_url+ "?department_id="+$("#filter_dept").val()+"&option_id="+$("#filter_dept_option").val()+"&degree_id="+$("#filter_degree").val()+"&grade_id="+$("#filter_grade").val()+"&academic_year_id="+$("#filter_academic_year").val();
+            var win_final_score = window.open(final_score_url, '_blank');
+            win_final_score.focus();
         });
 
         $('#generate_student').on('click', function(e) {

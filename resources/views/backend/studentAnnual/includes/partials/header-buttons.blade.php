@@ -20,6 +20,7 @@
                 @endauth
                 @permission("print-transcript")
                 <li><a href="#" id="print_transcript">{{ trans('menus.backend.student.print_transcript') }}</a></li>
+                <li><a href="#" id="print_attestation">{{ trans('menus.backend.student.print_attestation') }}</a></li>
                 @endauth
             </ul>
         </div>

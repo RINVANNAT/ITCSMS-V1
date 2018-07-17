@@ -38,15 +38,16 @@
                 $student_pass = false;
                 $gpa = "0.0";
             }
+
             foreach ($scores[$student['id']] as $key => $score) {
                 if(is_numeric($key)) {
-                    if(intval($score["score"]) < 30) {
+                    if(intval($score["score"]) < 30 && intval($score["resit"]) < 30) {
                         $student_pass = false;
                     }
                 }
             }
         ?>
-        @if($student_pass)
+        @if($student_pass && ($is_front == 'true'))
             <div class="page">
             <div class="row">
                 <div class="col-md-6 col-xs-6">
@@ -73,7 +74,7 @@
                             <tbody>
                             @foreach($scores[$student['id']] as $key => $score)
                                 @if(is_numeric($key))
-                                    @if(strtolower($score['name_en']) != "technical drawing" && strtolower($score['name_en']) != "computer for engineering")
+                                    @if(strtolower($score['name_en']) != "technical drawing" && strtolower($score['name_en']) != "computer for engineering" && strtolower($score['name_en']) != "informatic")
                                         <tr>
                                             <td style="text-align: left;width: 35%">{{isset($score['name_kh'])?$score['name_kh']:""}}</td>
                                             <td class="english_section" style="text-align: left;width: 35%">{{isset($score['name_en'])?$score['name_en']:""}}</td>
@@ -86,14 +87,14 @@
                                     @endif
                                 @endif
                             @endforeach
-                            <tr>
+                            <tr valign="bottom" style="height: 30px">
                                 <th>មុខវិជ្ជាតម្រង់ទិស</th>
                                 <th class="english_section" colspan="3">Oriented Subjects</th>
                             </tr>
                             @foreach($scores[$student['id']] as $key => $score)
                                 @if(is_numeric($key))
                                     @if(strtolower($score['name_en']) == "technical drawing" || strtolower($score['name_en']) == "computer for engineering" || strtolower($score['name_en']) == "informatic")
-                                        <tr>
+                                        <tr valign="bottom">
                                             <td style="text-align: left;width: 35%">{{isset($score['name_kh'])?$score['name_kh']:""}}</td>
                                             <td class="english_section" style="text-align: left;width: 35%">{{isset($score['name_en'])?$score['name_en']:""}}</td>
                                             <td class="english_section" style="text-align: center;width: 15%">{{ $score["credit"] }}</td>
@@ -190,13 +191,13 @@
         }
         foreach ($scores[$student['id']] as $key => $score) {
             if(is_numeric($key)) {
-                if(intval($score["score"]) < 30) {
+                if(intval($score["score"]) < 30 && intval($score["resit"]) < 30) {
                     $student_pass = false;
                 }
             }
         }
         ?>
-        @if($student_pass)
+        @if($student_pass && ($is_back == 'true'))
             <div class="page">
                 <div class="row">
                     <div class="col-md-6 col-xs-6">
@@ -239,7 +240,7 @@
                             </div>
                             <div class="row">
                                 <div class="col-md-4 col-xs-4">
-                                    @if($photo != null)
+                                    @if($photo == 'true')
                                         <img class="photo" src="{{$smis_server->value}}/img/profiles/{{$student['photo']}}">
                                     @else
                                         <div class="photo"></div>

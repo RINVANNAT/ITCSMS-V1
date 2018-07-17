@@ -22,80 +22,113 @@
 @stop
 
 @section('content')
-
-    <div class="box box-success">
-        <div class="box-header with-border">
-            <h2 class="box-title pull-left" style="padding-top: 8px;">Printing Student Examination List </h2>
-        </div>
-        <div class="box-body">
-            <div class="row">
-                <div class="col-md-4">
-                    <div class="box box-solid">
-                        <div class="box-header with-border">
-                            <h3 class="box-title">Filter</h3>
-                        </div>
-                        <!-- /.box-header -->
-                        <div class="box-body">
-                            <div class="form-group">
-                                <label>Academic Year</label>
-                                {!! Form::select('academic_year',$academicYears,null, array('class'=>'form-control filter','id'=>'filter_academic_year')) !!}
-                            </div>
-                            <div class="form-group">
-                                <label>Class</label>
-                                <select style="width: 100%" name="student_class" class="form-control filter" id="filter_class"></select>
-                            </div>
-                            <div class="form-group">
-                                <label>Semester</label>
-                                <select style="width: 100%" name="semester_id" class="form-control filter" id="filter_semester">
-                                    <option value="1">Semester 1</option>
-                                    <option value="2">Semester 2</option>
-                                </select>
-                            </div>
-                        </div>
-                    </div>
+    <div class="container">
+        <div class="col-md-4">
+            <div class="box box-success">
+                <div class="box-header with-border">
+                    <h2 class="box-title pull-left" style="padding-top: 8px;">Printing Student Examination List </h2>
                 </div>
-                <div class="col-md-8">
-                    <div class="box box-solid">
-                        <div class="box-header with-border">
-                            <h3 class="box-title">Class Detail</h3>
-                        </div>
-                        <!-- /.box-header -->
-                        <div class="box-body">
-                            <div class="callout callout-info">
-                                <label>Estimate number of student per class </label>
-                                <input type="number" name="number_student_per_class" style="color: black;text-align: center;"/>
-                                <span style="margin-left: 20px;">Number of students: <span id="number_of_student" class="text-danger" style="font-size: 20px;"></span></span>
-                                <br/>
-                                Result : <span id="estimate_student" style="color: black;"></span>
-                            </div>
-                            <div class="row">
-                                <div class="col-md-12">
-                                    <h3>Order student list by:</h3>
-                                    <label for="name_latin_rul" class="btn btn-sm btn-default" style="width: 160px;margin-right: 5px; font-size: 12pt" data-toggle="tooltip" data-position="top" title="If you choose this option, it will automatically order students by their name in latin">
-                                        <input type="radio" name="rule" class="rule" style="font-size: 10pt" id="name_latin_rul" value="by_name" checked>
-                                        Name Latin
-                                    </label>
-                                    <label for="id_card_rule" class="btn btn-sm btn-default" style="width: 160px; font-size: 12pt; margin-right: 5px;" data-toggle="tooltip" data-position="top" title="If you choose this option, it will automatically order students by ID Card.">
-                                        <input type="radio" name="rule" class="rule" style="font-size: 10pt" id="id_card_rule" value="by_id_card" >
-                                        ID Card
-                                    </label>
-                                </div>
-                            </div>
-
-                        </div>
-                        <div class="box-footer">
-                            <div class="row">
-                                <div class="col-md-12" align="right">
-                                    <button class="btn btn-success" id="print"><i class="fa fa-print"></i> Print</button>
-                                </div>
-                            </div>
-                        </div>
-                        <!-- /.box-body -->
+                <div class="box-body">
+                    <div class="form-group">
+                        <label>Academic Year</label>
+                        {!! Form::select('academic_year',$academicYears,null, array('class'=>'form-control filter','id'=>'filter_academic_year')) !!}
+                    </div>
+                    <div class="form-group">
+                        <label>Class</label>
+                        <select style="width: 100%" name="student_class" class="form-control filter" id="filter_class"></select>
+                    </div>
+                    <div class="form-group">
+                        <label>Semester</label>
+                        <select style="width: 100%" name="semester_id" class="form-control filter" id="filter_semester">
+                            <option value="1">Semester 1</option>
+                            <option value="2">Semester 2</option>
+                        </select>
                     </div>
                 </div>
             </div>
         </div>
+        <div class="col-md-8">
+            <div class="box-group" id="accordion">
+                <div class="panel box box-primary">
+                    <div class="box-header with-border">
+                        <h4 class="box-title">
+                            <a data-toggle="collapse" data-parent="#accordion" href="#collapseOne" aria-expanded="true" class="">
+                                Manual amount of student per class
+                            </a>
+                        </h4>
+                    </div>
+                    <div id="collapseOne" class="panel-collapse collapse in" aria-expanded="true" >
+                        <div class="row">
+                            <div class="col-md-12" style="padding: 30px;">
+                                <div class="callout callout-info">
+                                    <label>Estimate number of student per class </label>
+                                    <input type="number" name="number_student_per_class" style="color: black;text-align: center;"/>
+                                    <span style="margin-left: 20px;">Number of students: <span id="number_of_student" class="text-danger" style="font-size: 20px;"></span></span>
+                                    <br/>
+                                    Result : <span id="estimate_student" style="color: black;"></span>
+                                </div>
+                                <div class="row">
+                                    <div class="col-md-12">
+                                        <h3>Order student list by:</h3>
+                                        <label for="name_latin_rul" class="btn btn-sm btn-default" style="width: 160px;margin-right: 5px; font-size: 12pt" data-toggle="tooltip" data-position="top" title="If you choose this option, it will automatically order students by their name in latin">
+                                            <input type="radio" name="rule" class="rule" style="font-size: 10pt" id="name_latin_rul" value="by_name" checked>
+                                            Name Latin
+                                        </label>
+                                        <label for="id_card_rule" class="btn btn-sm btn-default" style="width: 160px; font-size: 12pt; margin-right: 5px;" data-toggle="tooltip" data-position="top" title="If you choose this option, it will automatically order students by ID Card.">
+                                            <input type="radio" name="rule" class="rule" style="font-size: 10pt" id="id_card_rule" value="by_id_card" >
+                                            ID Card
+                                        </label>
+                                    </div>
+                                </div>
+
+                                <div class="row">
+                                    <div class="col-md-12" align="right">
+                                        <button class="btn btn-success" id="print"><i class="fa fa-print"></i> Print</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="panel box box-warning">
+                    <div class="box-header with-border">
+                        <h4 class="box-title">
+                            <a data-toggle="collapse" data-parent="#accordion" href="#collapseTwo" class="collapsed" aria-expanded="false">
+                                Base on student group
+                            </a>
+                        </h4>
+                    </div>
+                    <div id="collapseTwo" class="panel-collapse collapse " aria-expanded="false" style="height: 0px;">
+                        <div class="row">
+                            <div class="col-md-12" style="padding: 30px">
+                                <div class="row">
+                                    <div class="col-md-12">
+                                        <h3>Order student list by:</h3>
+                                        <label for="name_latin_rul" class="btn btn-sm btn-default" style="width: 160px;margin-right: 5px; font-size: 12pt" data-toggle="tooltip" data-position="top" title="If you choose this option, it will automatically order students by their name in latin">
+                                            <input type="radio" name="rule_group" class="rule" style="font-size: 10pt" id="name_latin_rul" value="by_name" checked>
+                                            Name Latin
+                                        </label>
+                                        <label for="id_card_rule" class="btn btn-sm btn-default" style="width: 160px; font-size: 12pt; margin-right: 5px;" data-toggle="tooltip" data-position="top" title="If you choose this option, it will automatically order students by ID Card.">
+                                            <input type="radio" name="rule_group" class="rule" style="font-size: 10pt" id="id_card_rule" value="by_id_card" >
+                                            ID Card
+                                        </label>
+                                    </div>
+                                </div>
+
+                                <div class="row">
+                                    <div class="col-md-12" align="right">
+                                        <button class="btn btn-success" id="print_by_group"><i class="fa fa-print"></i> Print</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
     </div>
+
 
 @stop
 
@@ -157,8 +190,7 @@
                 }
             });
         }
-
-        function print(selected_ids){
+        function print(){
             var selected_class = $("#filter_class").select2('data')[0];
             if(($("input[name=number_student_per_class]").val() === null) || ($("input[name=number_student_per_class]").val() === "")) {
                 alert("Number of student per class is required!");
@@ -175,6 +207,20 @@
                     +"&department_option_id="+selected_class.department_option_id,
                     'Printing','1200','800');
             }
+        }
+        function print_by_group(){
+            var selected_class = $("#filter_class").select2('data')[0];
+            PopupCenterDual(
+                print_url
+                +"?academic_year_id="+$('#filter_academic_year').val()
+                +"&degree_id="+selected_class.degree_id
+                +"&grade_id="+selected_class.grade_id
+                +'&department_id='+selected_class.department_id
+                +"&semester_id="+$('#filter_semester').val()
+                +"&order_by="+$("input[name=rule]").val()
+                +"&department_option_id="+selected_class.department_option_id
+                +"&by_group=true",
+                'Printing','1200','800');
         }
 
         $(function() {
@@ -215,6 +261,9 @@
             });
             $(document.body).on("click","#print",function(e){
                 print();
+            });
+            $(document.body).on("click","#print_by_group",function(e){
+                print_by_group();
             });
         });
 

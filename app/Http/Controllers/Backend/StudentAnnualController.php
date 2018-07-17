@@ -27,6 +27,7 @@ use App\Models\Enum\SemesterEnum;
 use App\Models\Gender;
 use App\Models\Grade;
 use App\Models\Group;
+use App\Models\GroupStudentAnnual;
 use App\Models\HighSchool;
 use App\Models\History;
 use App\Models\Income;
@@ -194,7 +195,12 @@ class StudentAnnualController extends Controller
     {
         $studentAnnual = $this->students->findOrThrowException($id);
 
-        //dd($studentAnnual);
+        $group_id = GroupStudentAnnual::where('student_annual_id', $studentAnnual->id)
+            ->whereNull('department_id')
+            ->pluck('group_id')
+            ->first();
+
+        $studentAnnual->group_id = $group_id;
 
         $academic_years = AcademicYear::orderBy('id','desc')->lists('name_kh','id');
         $departments = Department::where('parent_id',11)->orderBy('id','DESC')->lists('code','id'); // 11 is for all academic departments
@@ -564,6 +570,22 @@ class StudentAnnualController extends Controller
 
     public function export(){
 
+        $group_option_priorities = DB::table("group_options")
+            ->leftJoin("group_option_student","group_option_student.group_option_id","=","group_options.id")
+            ->select([
+                "group_option_student.student_id",
+                "group_option_student.priority",
+                "group_options.title"
+            ])
+            ->orderBy("priority","ASC")
+            ->get();
+
+        $group_option_priorities = collect($group_option_priorities)
+            ->groupBy("student_id")
+            ->map(function ($pb) {
+                return $pb->keyBy('priority');
+            })
+            ->toArray();
         $studentAnnuals = StudentAnnual::select([
             'studentAnnuals.id',
             'students.id as student_id',
@@ -610,11 +632,10 @@ class StudentAnnualController extends Controller
             ->leftJoin('histories', 'studentAnnuals.history_id', '=', 'histories.id')
             ->leftJoin('highSchools', 'students.high_school_id', '=', 'highSchools.id')
             ->leftJoin('group_student_annuals', 'group_student_annuals.student_annual_id', '=', 'studentAnnuals.id')
-            ->leftJoin('groups','groups.id','=','group_student_annuals.group_id');
-        ;
+            ->leftJoin('groups','groups.id','=','group_student_annuals.group_id')
+            ->whereNULL('group_student_annuals.department_id');
 
-
-        $title = 'áž”áž‰áŸ’áž‡áž¸áž“áž·ážŸáŸ’ážŸáž·ážáž»';
+        $title = 'បញ្ជីឈ្មោះនិស្សិត';
 
         if($ids = $_POST['student_ids']){
             $studentAnnuals = $studentAnnuals->whereIn('studentAnnuals.id',json_decode($ids));
@@ -624,7 +645,7 @@ class StudentAnnualController extends Controller
                 $studentAnnuals = $studentAnnuals->where('studentAnnuals.academic_year_id', $academic_year);
 
                 $academic_year_obj = AcademicYear::where('id',$academic_year)->first();
-                $title .= " áž†áŸ’áž“áž¶áŸ†ážŸáž·áž€áŸ’ážŸáž¶ ".$academic_year_obj->name_kh;
+                $title .= " នៅឆ្នាំសិក្សា ".$academic_year_obj->name_kh;
             }
 
             if($redouble = $_POST['filter_redouble']){
@@ -658,19 +679,19 @@ class StudentAnnualController extends Controller
                     ->where(function($query) use($semester){
                         $query->where("group_student_annuals.semester_id",$semester)->orWhereNull("group_student_annuals.semester_id");
                     });
-                $title .= " áž†áž˜áž¶ážŸáž‘áž¸  ".$semester;
+                $title .= " ឆមាសទី  ".$semester;
             }
             if ($group = $_POST['filter_group']) {
                 $studentAnnuals = $studentAnnuals->where('groups.code', $group);
 
-                $title .= " áž€áŸ’ážšáž»áž˜ ".$group;
+                $title .= " ក្រុម ".$group;
             }
 
             if ($degree = $_POST['filter_degree']) {
                 $studentAnnuals = $studentAnnuals->where('studentAnnuals.degree_id', $degree);
 
                 $degree_obj = Degree::where('id',$degree)->first();
-                $title .= "ážáŸ’áž“áž¶áž€áŸ‹".$degree_obj->name_kh;
+                $title .= "ថ្នាក់".$degree_obj->name_kh;
             }
 
             if ($grade = $_POST['filter_grade']) {
@@ -683,19 +704,19 @@ class StudentAnnualController extends Controller
                 $studentAnnuals = $studentAnnuals->where('studentAnnuals.department_id', $department);
 
                 $department_obj = Department::where('id',$department)->first();
-                $title .= " ážŠáŸáž”áŸ‰áž¶ážážºáž˜áŸ‰áž„áŸ‹ ".$department_obj->name_kh;
+                $title .= " ដេប៉ាតឺម៉ង់ ".$department_obj->name_kh;
             }
             if ($gender = $_POST['filter_gender']) {
                 $studentAnnuals = $studentAnnuals->where('students.gender_id', $gender);
 
                 $gender_obj = Gender::where('id',$gender)->first();
-                $title .= " áž—áŸáž‘".$gender_obj->name_kh;
+                $title .= " ភេទ".$gender_obj->name_kh;
             }
             if ($option = $_POST['filter_option']) {
                 $studentAnnuals = $studentAnnuals->where('studentAnnuals.department_option_id', $option);
 
                 $option_obj = DepartmentOption::where('id',$option)->first();
-                $title .= " áž‡áŸ†áž“áž¶áž‰ ".$option_obj->name_kh;
+                $title .= " ជំនាញ ".$option_obj->name_kh;
             }
             if ($origin = $_POST['filter_origin']) {
                 $studentAnnuals = $studentAnnuals->where('students.origin_id', $origin);
@@ -704,6 +725,7 @@ class StudentAnnualController extends Controller
         //dd($studentAnnuals->toSql());
         $data = $studentAnnuals->get()->toArray();
 
+        //dd($data);
         foreach ($data as &$value){
             $date = Carbon::createFromFormat('Y-m-d H:i:s',$value['dob'])->formatLocalized("%d/%b/%Y");
             $value['dob'] = $date;
@@ -810,16 +832,20 @@ class StudentAnnualController extends Controller
             array_push($fields,$_POST['parent_phone']);
         }
 
-        Excel::create('áž”áž‰áŸ’áž‡áž¸áž“áž·ážŸáŸ’ážŸáž·áž', function($excel) use ($data, $title,$alpha,$fields) {
+        array_push($fields,'group_option_priority_1');
+        array_push($fields,'group_option_priority_2');
+        array_push($fields,'group_option_priority_3');
+
+        Excel::create('បញ្ចីឈ្មោះនិស្សិត', function($excel) use ($data, $title,$alpha,$fields,$group_option_priorities) {
 
             // Set the title
-            $excel->setTitle('áž”áž‰áŸ’áž‡áž¸áž“áž·ážŸáŸ’ážŸáž·áž');
+            $excel->setTitle('បញ្ចីឈ្មោះនិស្សិត');
 
             // Chain the setters
             $excel->setCreator('Department of Study & Student Affair')
                 ->setCompany('Institute of Technology of Cambodia');
 
-            $excel->sheet('New sheet', function($sheet) use ($data,$title,$alpha,$fields) {
+            $excel->sheet('New sheet', function($sheet) use ($data,$title,$alpha,$fields,$group_option_priorities) {
 
                 $number_column = count($fields);
 
@@ -833,16 +859,16 @@ class StudentAnnualController extends Controller
                 $sheet->setPageMargin(0.25);
 
                 $sheet->row(1, array(
-                    'áž–áŸ’ážšáŸ‡ážšáž¶áž‡áž¶ážŽáž¶áž…áž€áŸ’ážšáž€áž˜áŸ’áž–áž»áž‡áž¶'
+                    ''
                 ));
                 $sheet->appendRow(array(
-                    'áž‡áž¶ážáž· ážŸáž¶ážŸáž“áž¶ áž–áŸ’ážšáŸ‡áž˜áž áž¶áž€áŸ’ážŸážáŸ’ážš'
+                    ''
                 ));
                 $sheet->appendRow(array(
-                    'áž€áŸ’ážšážŸáž½áž„áž¢áž”áŸ‹ážšáŸ† áž™áž»ážœáž‡áž“ â€‹áž“áž·áž„áž€áž¸áž¡áž¶'
+                    ''
                 ));
                 $sheet->appendRow(array(
-                    'ážœáž·áž‘áŸ’áž™áž¶ážŸáŸ’ážáž¶áž“áž”áž…áŸ’áž…áŸáž€ážœáž·áž‘áŸ’áž™áž¶áž€áž˜áŸ’áž–áž»áž‡áž¶'
+                    ''
                 ));
                 $sheet->appendRow(array(
                     $title
@@ -861,7 +887,24 @@ class StudentAnnualController extends Controller
 
                     $row = array();
                     foreach($fields as $field){
-                        $row[$field] = $item[$field];
+                        if($field == "group_option_priority_1") {
+                            $row[$field] = "";
+                            if(!empty($group_option_priorities[$item["student_id"]][1]->title)){
+                                $row[$field] = $group_option_priorities[$item["student_id"]][1]->title;
+                            }
+                        } else if($field == "group_option_priority_2") {
+                            $row[$field] = "";
+                            if(!empty($group_option_priorities[$item["student_id"]][2]->title)){
+                                $row[$field] = $group_option_priorities[$item["student_id"]][2]->title;
+                            }
+                        } else if($field == "group_option_priority_3") {
+                            $row[$field] = "";
+                            if(!empty($group_option_priorities[$item["student_id"]][3]->title)){
+                                $row[$field] = $group_option_priorities[$item["student_id"]][3]->title;
+                            }
+                        } else {
+                            $row[$field] = $item[$field];
+                        }
                     }
 
                     $sheet->appendRow(
@@ -916,13 +959,13 @@ class StudentAnnualController extends Controller
         switch ($id) {
             case 1:
 
-                $data = $this->get_student_list_by_age($params['academic_year_id'],$params['degree_id'],$params['date'],$scholarships);
+                $data = $this->get_student_list_by_age($params['academic_year_id'],$params['degree_id'],$params['date'],$scholarships,$params['semester_id']);
                 $degree_name = Degree::find($params['degree_id'])->name_kh;
                 $academic_year_name = AcademicYear::find($params['academic_year_id'])->name_kh;
-                Excel::create('ážŸáŸ’ážáž·ážáž·áž“áž·ážŸáŸ’ážŸáž·áž ážáž¶áž˜áž¢áž¶áž™áž»', function($excel) use ($data,$degree_name,$academic_year_name) {
+                Excel::create("ស្ថិតិនិស្សិត តាមអាយុ ", function($excel) use ($data,$degree_name,$academic_year_name) {
 
                     // Set the title
-                    $excel->setTitle('ážŸáŸ’ážáž·ážáž·áž“áž·ážŸáŸ’ážŸáž·áž ážáž¶áž˜áž¢áž¶áž™áž»');
+                    $excel->setTitle("ស្ថិតិនិស្សិត តាមអាយុ ");
 
                     // Chain the setters
                     $excel->setCreator('Department of Study & Student Affair')
@@ -940,25 +983,25 @@ class StudentAnnualController extends Controller
                         $sheet->setPageMargin(0.25);
 
                         $sheet->row(1, array(
-                            'áž–áŸ’ážšáŸ‡ážšáž¶áž‡áž¶ážŽáž¶áž…áž€áŸ’ážšáž€áž˜áŸ’áž–áž»áž‡áž¶'
+                            "ព្រះរាជាណាចក្រកម្ពុជា"
                         ));
                         $sheet->appendRow(array(
-                            'áž‡áž¶ážáž· ážŸáž¶ážŸáž“áž¶ áž–áŸ’ážšáŸ‡áž˜áž áž¶áž€áŸ’ážŸážáŸ’ážš'
+                            "ជាតិ សាសនា ព្រះមហាក្សត្រ"
                         ));
                         $sheet->appendRow(array(
-                            'áž€áŸ’ážšážŸáž½áž„áž¢áž”áŸ‹ážšáŸ† áž™áž»ážœáž‡áž“ â€‹áž“áž·áž„áž€áž¸áž¡áž¶'
+                            "ក្រសួងអប់រំ យុវជន ​និងកីឡា"
                         ));
                         $sheet->appendRow(array(
-                            'ážœáž·áž‘áŸ’áž™áž¶ážŸáŸ’ážáž¶áž“áž”áž…áŸ’áž…áŸáž€ážœáž·áž‘áŸ’áž™áž¶áž€áž˜áŸ’áž–áž»áž‡áž¶'
+                            "វិទ្យាស្ថានបច្ចេកវិទ្យាកម្ពុជា"
                         ));
                         $sheet->appendRow(array(
-                            'ážŸáŸ’ážáž·ážáž·áž“áž·ážŸáŸ’ážŸáž·áž ážáž¶áž˜áž¢áž¶áž™áž» ážáŸ’áž“áž¶áž€áŸ‹'.$degree_name.'áž“áž·áž„ážáž¶áž˜áž†áŸ’áž“áž¶áŸ† áž†áŸ’áž“áž¶áŸ†ážŸáž·áž€áŸ’ážŸáž¶'.$academic_year_name
+                            "ស្ថិតិនិស្សិត តាមអាយុ ថ្នាក់".$degree_name."និងតាមឆ្នាំ ឆ្នាំសិក្សា".$academic_year_name
                         ));
 
                         $sheet->rows(array(
-                            array('áž¢áž¶áž™áž»', 'áž†áŸ’áž“áž¶áŸ†áž‘áž¸áŸ¡','','','','áž†áŸ’áž“áž¶áŸ†áž‘áž¸áŸ¢','','','','áž†áŸ’áž“áž¶áŸ†áž‘áž¸áŸ£','','','','áž†áŸ’áž“áž¶áŸ†áž‘áž¸áŸ¤','','','','áž†áŸ’áž“áž¶áŸ†áž‘áž¸áŸ¥','','','','ážŸážšáž»áž”','','',''),
-                            array('','áž¢áž¶áž áž¶.','', 'áž”áž„áŸ‹ážáŸ’áž›áŸƒ','','áž¢áž¶áž áž¶.','', 'áž”áž„áŸ‹ážáŸ’áž›áŸƒ','','áž¢áž¶áž áž¶.','', 'áž”áž„áŸ‹ážáŸ’áž›áŸƒ','','áž¢áž¶áž áž¶.','', 'áž”áž„áŸ‹ážáŸ’áž›áŸƒ','','áž¢áž¶áž áž¶.','', 'áž”áž„áŸ‹ážáŸ’áž›áŸƒ','','áž¢áž¶áž áž¶.','', 'áž”áž„áŸ‹ážáŸ’áž›áŸƒ',''),
-                            array('','ážŸážšáž»áž”','ážŸáŸ’ážšáž¸','ážŸážšáž»áž”','ážŸáŸ’ážšáž¸','ážŸážšáž»áž”','ážŸáŸ’ážšáž¸','ážŸážšáž»áž”','ážŸáŸ’ážšáž¸','ážŸážšáž»áž”','ážŸáŸ’ážšáž¸','ážŸážšáž»áž”','ážŸáŸ’ážšáž¸','ážŸážšáž»áž”','ážŸáŸ’ážšáž¸','ážŸážšáž»áž”','ážŸáŸ’ážšáž¸','ážŸážšáž»áž”','ážŸáŸ’ážšáž¸','ážŸážšáž»áž”','ážŸáŸ’ážšáž¸','ážŸážšáž»áž”','ážŸáŸ’ážšáž¸','ážŸážšáž»áž”','ážŸáŸ’ážšáž¸'),
+                            array("អាយុ", "ឆ្នាំទី១",'','','',"ឆ្នាំទី២",'','','',"ឆ្នាំទី៣",'','','',"ឆ្នាំទី៤",'','','',"ឆ្នាំទី៥",'','','',"សរុប",'','',''),
+                            array('',"អាហា.",'', "អាហា.",'', "បង់ថ្លៃ",'', "អាហា.",'', "បង់ថ្លៃ",'', "អាហា.",'', "បង់ថ្លៃ",'', "អាហា.",'', "បង់ថ្លៃ",'', "អាហា.",'', "បង់ថ្លៃ",'', "បង់ថ្លៃ",''),
+                            array('',"សរុប","ស្រី	","សរុប","ស្រី	","សរុប","ស្រី	","សរុប","ស្រី	","សរុប","ស្រី	","សរុប","ស្រី	","សរុប","ស្រី	","សរុប","ស្រី	","សរុប","ស្រី	","សរុប","ស្រី	","សរុប","ស្រី	","សរុប","ស្រី	"),
 
                         ));
 
@@ -978,9 +1021,9 @@ class StudentAnnualController extends Controller
                         }
 
                         $sheet->rows(array(
-                            array("",'ážŸáŸ†áž‚áž¶áž›áŸ‹áŸˆáž…áŸ†áž–áŸ„áŸ‡áž‚áŸ’ážšáž¹áŸ‡ážŸáŸ’ážáž¶áž“áž§ážáŸ’ážáž˜ážŸáž·áž€áŸ’ážŸáž¶ážŽáž¶ ážŠáŸ‚áž›áž”ážŽáŸ’ážáž»áŸ‡áž”ážŽáŸ’ážáž¶áž›áž›áž¾ážŸáž–áž¸áŸ¤ áž¬áŸ¥áž†áŸ’áž“áž¶áŸ† áž¢áž¶áž…áž”áž“áŸ’ážáž‘áŸ†áž–áŸážšáž”áž¶áž“'),
-                            array('','','','','','','','','','','','','','','','','áž’áŸ’ážœáž¾áž“áŸ….............ážáŸ’áž„áŸƒáž‘áž¸.............ážáŸ‚............áž†áŸ’áž“áž¶áŸ†áŸ¢áŸ áŸ¡...... '),
-                            array('','','','','','','','','','','','','','','','','ážŸáž¶áž€áž›ážœáž·áž‘áŸ’áž™áž¶áž’áž·áž€áž¶ážš/áž“áž¶áž™áž€')
+                            array("","សំគាល់ៈចំពោះគ្រឹះស្ថានឧត្តមសិក្សាណា ដែលបណ្តុះបណ្តាលលើសពី៤ ឬ៥ឆ្នាំ អាចបន្តទំព័របាន"),
+                            array('','','','','','','','','','','','','','','','',"ធ្វើនៅ.............ថ្ងៃទី.............ខែ............ឆ្នាំ២០១...... "),
+                            array('','','','','','','','','','','','','','','','',"សាកលវិទ្យាធិការ/នាយក")
                         ));
 
                         $sheet->mergeCells('A1:Y1');
@@ -1032,14 +1075,14 @@ class StudentAnnualController extends Controller
                 })->export('xls');
                 break;
             case 2:
-                $data = $this->get_student_redouble($params['academic_year_id'],$params['degree_id'],$scholarships);
+                $data = $this->get_student_redouble($params['academic_year_id'],$params['degree_id'],$scholarships,$params['semester_id']);
 
                 $degree_name = Degree::find($params['degree_id'])->name_kh;
                 $academic_year_name = AcademicYear::find($params['academic_year_id'])->name_kh;
-                Excel::create('ážŸáŸ’ážáž·ážáž·áž“áž·ážŸáŸ’ážŸáž·ážážáŸ’ážšáž½ážážáŸ’áž“áž¶áž€áŸ‹ ážáž¶áž˜ážŠáŸáž”áŸ‰áž¶ážážºáž˜áŸ‰áž„áŸ‹áž“áž·áž„áž‡áŸ†áž“áž¶áž‰ ážáŸ’áž“áž¶áž€áŸ‹'.$degree_name, function($excel) use ($data,$degree_name,$academic_year_name) {
+                Excel::create("ស្ថិតិនិស្សិតត្រួតថ្នាក់ថ្នាក់".$degree_name, function($excel) use ($data,$degree_name,$academic_year_name) {
 
                     // Set the title
-                    $excel->setTitle('ážŸáŸ’ážáž·ážáž·áž“áž·ážŸáŸ’ážŸáž·áž ážáž¶áž˜áž¢áž¶áž™áž»');
+                    $excel->setTitle("ស្ថិតិនិស្សិតត្រួតថ្នាក់");
 
                     // Chain the setters
                     $excel->setCreator('Department of Study & Student Affair')
@@ -1057,26 +1100,25 @@ class StudentAnnualController extends Controller
                         $sheet->setPageMargin(0.25);
 
                         $sheet->row(1, array(
-                            'áž–áŸ’ážšáŸ‡ážšáž¶áž‡áž¶ážŽáž¶áž…áž€áŸ’ážšáž€áž˜áŸ’áž–áž»áž‡áž¶'
+                            "ព្រះរាជាណាចក្រកម្ពុជា"
                         ));
                         $sheet->appendRow(array(
-                            'áž‡áž¶ážáž· ážŸáž¶ážŸáž“áž¶ áž–áŸ’ážšáŸ‡áž˜áž áž¶áž€áŸ’ážŸážáŸ’ážš'
+                            "ជាតិ សាសនា ព្រះមហាក្សត្រ"
                         ));
                         $sheet->appendRow(array(
-                            'áž€áŸ’ážšážŸáž½áž„áž¢áž”áŸ‹ážšáŸ† áž™áž»ážœáž‡áž“ â€‹áž“áž·áž„áž€áž¸áž¡áž¶'
+                            "ក្រសួងអប់រំ យុវជន ​និងកីឡា"
                         ));
                         $sheet->appendRow(array(
-                            'ážœáž·áž‘áŸ’áž™áž¶ážŸáŸ’ážáž¶áž“áž”áž…áŸ’áž…áŸáž€ážœáž·áž‘áŸ’áž™áž¶áž€áž˜áŸ’áž–áž»áž‡áž¶'
+                            "ឈ្មោះគ្រឹះស្ថានសិក្សាៈ វិទ្យាស្ថានបច្ចេកវិទ្យាកម្ពុជា"
                         ));
                         $sheet->appendRow(array(
-                            'ážŸáŸ’ážáž·ážáž·áž“áž·ážŸáŸ’ážŸáž·áž ážáž¶áž˜áž¢áž¶áž™áž» ážáŸ’áž“áž¶áž€áŸ‹'.$degree_name.'áž“áž·áž„ážáž¶áž˜áž†áŸ’áž“áž¶áŸ† áž†áŸ’áž“áž¶áŸ†ážŸáž·áž€áŸ’ážŸáž¶'.$academic_year_name
+                            "ស្ថិតិនិស្សិតត្រួតថ្នាក់ ថ្នាក់".$degree_name."ឆ្នាំសិក្សា".$academic_year_name
                         ));
 
                         $sheet->rows(array(
-                            array('áž›.ážš','áž˜áž áž¶ážœáž·áž‘áŸ’áž™áž¶áž›áŸáž™','áž¯áž€áž‘áŸážŸ / áž‡áŸ†áž“áž¶áž‰','ážšáž™áŸˆ', 'áž†áŸ’áž“áž¶áŸ†áž‘áž¸áŸ¡','','','','áž†áŸ’áž“áž¶áŸ†áž‘áž¸áŸ¢','','','','áž†áŸ’áž“áž¶áŸ†áž‘áž¸áŸ£','','','','áž†áŸ’áž“áž¶áŸ†áž‘áž¸áŸ¤','','','','áž†áŸ’áž“áž¶áŸ†áž‘áž¸áŸ¥','','','','ážŸážšáž»áž”','','',''),
-                            array('','','','áž–áŸáž›','áž¢áž¶áž áž¶.','', 'áž”áž„áŸ‹ážáŸ’áž›áŸƒ','','áž¢áž¶áž áž¶.','', 'áž”áž„áŸ‹ážáŸ’áž›áŸƒ','','áž¢áž¶áž áž¶.','', 'áž”áž„áŸ‹ážáŸ’áž›áŸƒ','','áž¢áž¶áž áž¶.','', 'áž”áž„áŸ‹ážáŸ’áž›áŸƒ','','áž¢áž¶áž áž¶.','', 'áž”áž„áŸ‹ážáŸ’áž›áŸƒ','','áž¢áž¶áž áž¶.','', 'áž”áž„áŸ‹ážáŸ’áž›áŸƒ',''),
-                            array('','','','áž”áž”','ážŸážšáž»áž”','ážŸáŸ’ážšáž¸','ážŸážšáž»áž”','ážŸáŸ’ážšáž¸','ážŸážšáž»áž”','ážŸáŸ’ážšáž¸','ážŸážšáž»áž”','ážŸáŸ’ážšáž¸','ážŸážšáž»áž”','ážŸáŸ’ážšáž¸','ážŸážšáž»áž”','ážŸáŸ’ážšáž¸','ážŸážšáž»áž”','ážŸáŸ’ážšáž¸','ážŸážšáž»áž”','ážŸáŸ’ážšáž¸','ážŸážšáž»áž”','ážŸáŸ’ážšáž¸','ážŸážšáž»áž”','ážŸáŸ’ážšáž¸','ážŸážšáž»áž”','ážŸáŸ’ážšáž¸','ážŸážšáž»áž”','ážŸáŸ’ážšáž¸'),
-
+                            array("ល.រ","មហាវិទ្យាល័យ","ឯកទេស / ជំនាញ", "រយៈពេល","ឆ្នាំទី១",'','','',"ឆ្នាំទី២",'','','',"ឆ្នាំទី៣",'','','',"ឆ្នាំទី៤",'','','',"ឆ្នាំទី៥",'','','',"សរុប",'','',''),
+                            array('','','','បប',"អាហា.",'', "បង់ថ្លៃ",'',"អាហា.",'', "បង់ថ្លៃ",'',"អាហា.",'', "បង់ថ្លៃ",'',"អាហា.",'', "បង់ថ្លៃ",'',"អាហា.",'', "បង់ថ្លៃ",'',"អាហា.",'', "បង់ថ្លៃ",''),
+                            array('','','','',"សរុប","ស្រី","សរុប","ស្រី","សរុប","ស្រី","សរុប","ស្រី","សរុប","ស្រី","សរុប","ស្រី","សរុប","ស្រី","សរុប","ស្រី","សរុប","ស្រី","សរុប","ស្រី","សរុប","ស្រី","សរុប","ស្រី"),
                         ));
 
                         $key = 1;
@@ -1102,7 +1144,7 @@ class StudentAnnualController extends Controller
                             $key++;
                         }
 
-                        $row = array('ážŸážšáž»áž”','','','');
+                        $row = array("សរុប",'','','');
                         foreach(end($data) as $total){
                             array_push($row, $total['st']);
                             array_push($row, $total['sf']);
@@ -1114,9 +1156,9 @@ class StudentAnnualController extends Controller
                         );
 
                         $sheet->rows(array(
-                            array("",'ážŸáŸ†áž‚áž¶áž›áŸ‹áŸˆáž…áŸ†áž–áŸ„áŸ‡áž‚áŸ’ážšáž¹áŸ‡ážŸáŸ’ážáž¶áž“áž§ážáŸ’ážáž˜ážŸáž·áž€áŸ’ážŸáž¶ážŽáž¶ ážŠáŸ‚áž›áž”ážŽáŸ’ážáž»áŸ‡áž”ážŽáŸ’ážáž¶áž›áž›áž¾ážŸáž–áž¸áŸ¤ áž¬áŸ¥áž†áŸ’áž“áž¶áŸ† áž¢áž¶áž…áž”áž“áŸ’ážáž‘áŸ†áž–áŸážšáž”áž¶áž“'),
-                            array('','','','','','','','','','','','','','','','','áž’áŸ’ážœáž¾áž“áŸ….............ážáŸ’áž„áŸƒáž‘áž¸.............ážáŸ‚............áž†áŸ’áž“áž¶áŸ†áŸ¢áŸ áŸ¡...... '),
-                            array('','','','','','','','','','','','','','','','','ážŸáž¶áž€áž›ážœáž·áž‘áŸ’áž™áž¶áž’áž·áž€áž¶ážš/áž“áž¶áž™áž€')
+                            array("","	សំគាល់ៈចំពោះគ្រឹះស្ថានឧត្តមសិក្សាណា ដែលបណ្តុះបណ្តាលលើសពី៤ ឬ៥ឆ្នាំ អាចបន្តទំព័របាន"),
+                            array('','','','','','','','','','','','','','','','','ធ្វើនៅ............ថ្ងៃទី.............ខែ............ឆ្នាំ២០១...... '),
+                            array('','','','','','','','','','','','','','','','',"សាកលវិទ្យាធិការ/នាយក")
                         ));
 
                         $sheet->mergeCells('A1:AB1');
@@ -1183,14 +1225,14 @@ class StudentAnnualController extends Controller
                     $scholarships = [];
                 }
 
-                $data = $this->get_student_by_group($params['academic_year_id'],$params['degree_id'],$only_foreigner,$scholarships);
+                $data = $this->get_student_by_group($params['academic_year_id'],$params['degree_id'],$only_foreigner,$scholarships,$params['semester_id']);
 
                 $degree_name = Degree::find($params['degree_id'])->name_kh;
                 $academic_year_name = AcademicYear::find($params['academic_year_id'])->name_kh;
-                Excel::create('ážŸáŸ’ážáž·ážáž·áž“áž·ážŸáŸ’ážŸáž·áž ážáž¶áž˜ážŠáŸáž”áŸ‰áž¶ážážºáž˜áŸ‰áž„áŸ‹áž“áž·áž„áž‡áŸ†áž“áž¶áž‰ážáŸ’áž“áž¶áž€áŸ‹'.$degree_name, function($excel) use ($data,$degree_name,$academic_year_name) {
+                Excel::create("ស្ថិតិនិស្សិតកំពុងសិក្សា ថ្នាក់".$degree_name, function($excel) use ($data,$degree_name,$academic_year_name) {
 
                     // Set the title
-                    $excel->setTitle('ážŸáŸ’ážáž·ážáž·áž“áž·ážŸáŸ’ážŸáž·áž ážáž¶áž˜áž¢áž¶áž™áž»');
+                    $excel->setTitle("ស្ថិតិនិស្សិតកំពុងសិក្សា");
 
                     // Chain the setters
                     $excel->setCreator('Department of Study & Student Affair')
@@ -1208,26 +1250,25 @@ class StudentAnnualController extends Controller
                         $sheet->setPageMargin(0.25);
 
                         $sheet->row(1, array(
-                            'áž–áŸ’ážšáŸ‡ážšáž¶áž‡áž¶ážŽáž¶áž…áž€áŸ’ážšáž€áž˜áŸ’áž–áž»áž‡áž¶'
+                            "ព្រះរាជាណាចក្រកម្ពុជា "
                         ));
                         $sheet->appendRow(array(
-                            'áž‡áž¶ážáž· ážŸáž¶ážŸáž“áž¶ áž–áŸ’ážšáŸ‡áž˜áž áž¶áž€áŸ’ážŸážáŸ’ážš'
+                            "ជាតិ សាសនា ព្រះមហាក្សត្រ"
                         ));
                         $sheet->appendRow(array(
-                            'áž€áŸ’ážšážŸáž½áž„áž¢áž”áŸ‹ážšáŸ† áž™áž»ážœáž‡áž“ â€‹áž“áž·áž„áž€áž¸áž¡áž¶'
+                            "ក្រសួងអប់រំ យុវជន ​និងកីឡា"
                         ));
                         $sheet->appendRow(array(
-                            'ážœáž·áž‘áŸ’áž™áž¶ážŸáŸ’ážáž¶áž“áž”áž…áŸ’áž…áŸáž€ážœáž·áž‘áŸ’áž™áž¶áž€áž˜áŸ’áž–áž»áž‡áž¶'
+                            "ឈ្មោះគ្រឹះស្ថានសិក្សាៈ វិទ្យាស្ថានបច្ចេកវិទ្យាកម្ពុជា"
                         ));
                         $sheet->appendRow(array(
-                            'ážŸáŸ’ážáž·ážáž·áž“áž·ážŸáŸ’ážŸáž·áž ážáž¶áž˜áž¢áž¶áž™áž» ážáŸ’áž“áž¶áž€áŸ‹'.$degree_name.'áž“áž·áž„ážáž¶áž˜áž†áŸ’áž“áž¶áŸ† áž†áŸ’áž“áž¶áŸ†ážŸáž·áž€áŸ’ážŸáž¶'.$academic_year_name
+                            "ស្ថិតិនិស្សិតកំពុងសិក្សា ថ្នាក់".$degree_name."ឆ្នាំសិក្សា".$academic_year_name
                         ));
 
                         $sheet->rows(array(
-                            array('áž›.ážš','áž˜áž áž¶ážœáž·áž‘áŸ’áž™áž¶áž›áŸáž™','áž¯áž€áž‘áŸážŸ / áž‡áŸ†áž“áž¶áž‰','ážšáž™áŸˆ', 'áž†áŸ’áž“áž¶áŸ†áž‘áž¸áŸ¡','','','','áž†áŸ’áž“áž¶áŸ†áž‘áž¸áŸ¢','','','','áž†áŸ’áž“áž¶áŸ†áž‘áž¸áŸ£','','','','áž†áŸ’áž“áž¶áŸ†áž‘áž¸áŸ¤','','','','áž†áŸ’áž“áž¶áŸ†áž‘áž¸áŸ¥','','','','ážŸážšáž»áž”','','',''),
-                            array('','','','áž–áŸáž›','áž¢áž¶áž áž¶.','', 'áž”áž„áŸ‹ážáŸ’áž›áŸƒ','','áž¢áž¶áž áž¶.','', 'áž”áž„áŸ‹ážáŸ’áž›áŸƒ','','áž¢áž¶áž áž¶.','', 'áž”áž„áŸ‹ážáŸ’áž›áŸƒ','','áž¢áž¶áž áž¶.','', 'áž”áž„áŸ‹ážáŸ’áž›áŸƒ','','áž¢áž¶áž áž¶.','', 'áž”áž„áŸ‹ážáŸ’áž›áŸƒ','','áž¢áž¶áž áž¶.','', 'áž”áž„áŸ‹ážáŸ’áž›áŸƒ',''),
-                            array('','','','áž”áž”','ážŸážšáž»áž”','ážŸáŸ’ážšáž¸','ážŸážšáž»áž”','ážŸáŸ’ážšáž¸','ážŸážšáž»áž”','ážŸáŸ’ážšáž¸','ážŸážšáž»áž”','ážŸáŸ’ážšáž¸','ážŸážšáž»áž”','ážŸáŸ’ážšáž¸','ážŸážšáž»áž”','ážŸáŸ’ážšáž¸','ážŸážšáž»áž”','ážŸáŸ’ážšáž¸','ážŸážšáž»áž”','ážŸáŸ’ážšáž¸','ážŸážšáž»áž”','ážŸáŸ’ážšáž¸','ážŸážšáž»áž”','ážŸáŸ’ážšáž¸','ážŸážšáž»áž”','ážŸáŸ’ážšáž¸','ážŸážšáž»áž”','ážŸáŸ’ážšáž¸'),
-
+                            array("ល.រ","មហាវិទ្យាល័យ","ឯកទេស / ជំនាញ", "រយៈពេល","ឆ្នាំទី១",'','','',"ឆ្នាំទី២",'','','',"ឆ្នាំទី៣",'','','',"ឆ្នាំទី៤",'','','',"ឆ្នាំទី៥",'','','',"សរុប",'','',''),
+                            array('','','','បប',"អាហា.",'', "បង់ថ្លៃ",'',"អាហា.",'', "បង់ថ្លៃ",'',"អាហា.",'', "បង់ថ្លៃ",'',"អាហា.",'', "បង់ថ្លៃ",'',"អាហា.",'', "បង់ថ្លៃ",'',"អាហា.",'', "បង់ថ្លៃ",''),
+                            array('','','','',"សរុប","ស្រី","សរុប","ស្រី","សរុប","ស្រី","សរុប","ស្រី","សរុប","ស្រី","សរុប","ស្រី","សរុប","ស្រី","សរុប","ស្រី","សរុប","ស្រី","សរុប","ស្រី","សរុប","ស្រី","សរុប","ស្រី")
                         ));
 
                         $key = 1;
@@ -1253,7 +1294,7 @@ class StudentAnnualController extends Controller
                             $key++;
                         }
 
-                        $row = array('ážŸážšáž»áž”','','','');
+                        $row = array("សរុប",'','','');
                         foreach(end($data) as $total){
                             array_push($row, $total['st']);
                             array_push($row, $total['sf']);
@@ -1265,9 +1306,9 @@ class StudentAnnualController extends Controller
                         );
 
                         $sheet->rows(array(
-                            array("",'ážŸáŸ†áž‚áž¶áž›áŸ‹áŸˆáž…áŸ†áž–áŸ„áŸ‡áž‚áŸ’ážšáž¹áŸ‡ážŸáŸ’ážáž¶áž“áž§ážáŸ’ážáž˜ážŸáž·áž€áŸ’ážŸáž¶ážŽáž¶ ážŠáŸ‚áž›áž”ážŽáŸ’ážáž»áŸ‡áž”ážŽáŸ’ážáž¶áž›áž›áž¾ážŸáž–áž¸áŸ¤ áž¬áŸ¥áž†áŸ’áž“áž¶áŸ† áž¢áž¶áž…áž”áž“áŸ’ážáž‘áŸ†áž–áŸážšáž”áž¶áž“'),
-                            array('','','','','','','','','','','','','','','','','áž’áŸ’ážœáž¾áž“áŸ….............ážáŸ’áž„áŸƒáž‘áž¸.............ážáŸ‚............áž†áŸ’áž“áž¶áŸ†áŸ¢áŸ áŸ¡...... '),
-                            array('','','','','','','','','','','','','','','','','ážŸáž¶áž€áž›ážœáž·áž‘áŸ’áž™áž¶áž’áž·áž€áž¶ážš/áž“áž¶áž™áž€')
+                            array("","	សំគាល់ៈចំពោះគ្រឹះស្ថានឧត្តមសិក្សាណា ដែលបណ្តុះបណ្តាលលើសពី៤ ឬ៥ឆ្នាំ អាចបន្តទំព័របាន"),
+                            array('','','','','','','','','','','','','','','','','ធ្វើនៅ............ថ្ងៃទី.............ខែ............ឆ្នាំ២០១...... '),
+                            array('','','','','','','','','','','','','','','','',"សាកលវិទ្យាធិការ/នាយក")
                         ));
 
                         $sheet->mergeCells('A1:AB1');

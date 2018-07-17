@@ -74,6 +74,4 @@ class Course extends Model
 	public function courseAnnual() {
 		return $this->hasMany('App\Models\CourseAnnual');
 	}
-	
-
 }

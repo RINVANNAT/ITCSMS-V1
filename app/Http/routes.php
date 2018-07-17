@@ -54,6 +54,8 @@ Route::group(['namespace' => 'Backend', 'prefix' => 'admin', 'middleware' => 'ad
     require(__DIR__ . '/Routes/Backend/VocationalStudent.php');
     require(__DIR__ . '/Routes/Backend/Filter.php');
 
+    require(__DIR__ . '/Routes/Backend/Internship.php');
+
 });
 
 
@@ -116,8 +118,3 @@ Route::group(['prefix' => 'api', 'namespace' => 'API'], function () {
         require(__DIR__ . '/Routes/Backend/API/timetable.php');
     });
 });
-
-
-
-
-
