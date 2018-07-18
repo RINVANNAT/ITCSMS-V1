@@ -49,9 +49,10 @@
         <div class="form-group">
             <label class="col-md-3 control-label required">Company</label>
             <div class="col-md-9">
-                <select class="companies form-control">
+                <select class="companies form-control" name="company">
+                    <option selected disabled></option>
                     @foreach($companies as $company)
-                        <option value="{{ $company->id }}">{{ $company->text }}</option>
+                        <option value="{{ $company }}">{{ $company->text }}</option>
                     @endforeach
                 </select>
             </div>
@@ -61,6 +62,7 @@
             <label class="col-md-3 control-label required">Address</label>
             <div class="col-md-9">
                 <textarea class="form-control"
+                          id="address"
                           name="address"
                           rows="4">{{ isset($internship) ? $internship->address : null }}</textarea>
             </div>
@@ -71,6 +73,7 @@
             <div class="col-md-9">
                 <input type="text"
                        name="phone"
+                       id="phone"
                        value="{{ isset($internship) ? $internship->phone : null }}"
                        class="form-control"/>
             </div>
@@ -80,6 +83,7 @@
             <label class="col-md-3 control-label">H/P</label>
             <div class="col-md-9">
                 <input type="text"
+                       id="hot_line"
                        name="hot_line"
                        value="{{ isset($internship) ? $internship->hot_line : null }}"
                        class="form-control"/>
@@ -91,6 +95,7 @@
             <div class="col-md-9">
                 <input type="text"
                        name="e_mail_address"
+                       id="e_mail_address"
                        value="{{ isset($internship) ? $internship->e_mail_address : null }}"
                        class="form-control"/>
             </div>
@@ -101,6 +106,7 @@
             <div class="col-md-9">
                 <input type="text"
                        name="web"
+                       id="web"
                        value="{{ isset($internship) ? $internship->web : null }}"
                        class="form-control"/>
             </div>
@@ -114,6 +120,7 @@
                     <label class="col-md-3 control-label">Title</label>
                     <div class="col-md-9">
                         <input type="text"
+                               id="title"
                                tabindex="2"
                                value="{{ isset($internship) ? $internship->title : null }}"
                                name="title"
@@ -125,6 +132,7 @@
                     <div class="col-md-9">
                         <input type="text"
                                name="training_field"
+                               id="training_field"
                                value="{{ isset($internship) ? $internship->training_field : null }}"
                                class="form-control">
                     </div>
