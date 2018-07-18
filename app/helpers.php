@@ -220,7 +220,9 @@ if (! function_exists('get_gpa')) {
             $gpa = "1.50";
         } else if ($score >= 40) {
             $gpa = "1.00";
-        }  else {
+        }  else if ($score == "N/A") {
+            $gpa = "N/A";
+        } else {
             $gpa = "0.00";
         }
         return $gpa;
