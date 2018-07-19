@@ -192,12 +192,17 @@ trait AverageFinalYearTrait
             }
         }
         $errors = [];
-        foreach($student_by_groups as $student_by_class){
+        foreach($student_by_groups as &$student_by_class){
+            $moy_score = 0;
             if(count($student_by_class) == 2) {
                 foreach($student_by_class as $student_by_grade) {
                     $scores[$student_by_grade["id"]] = $this->getStudentScoreBySemester($student_by_grade['id'],null); // Full year
                     if(empty($scores[$student_by_grade["id"]])) {
                         $scores[$student_by_grade["id"]] = array("final_score" => "N/A","final_score_s1" => "N/A","final_score_s2" => "N/A");
+                        $moy_score = "N/A";
+                    }
+                    if(is_numeric($moy_score)){
+                        $moy_score = $moy_score + $scores[$student_by_grade["id"]]["final_score"];
                     }
                 }
             } else {
@@ -205,7 +210,16 @@ trait AverageFinalYearTrait
                 array_push($errors,array("count"=>count($student_by_class), "id" => $student_by_class));
                 //throw new \Exception('Students have multiple class record');
             }
+            if(is_numeric($moy_score)) {
+                $student_by_class->put("moy_score",$moy_score/2);
+            } else {
+                $student_by_class->put("moy_score",$moy_score);
+            }
         }
+
+        $student_by_groups = $student_by_groups->sortByDesc(function($collection){
+            return $collection->get("moy_score");
+        });
 
         if ($type == "show"){
             return view('backend.studentAnnual.average_final_year', compact('student_by_groups','scores','department','department_option','degree','academic_year','department_id','option_id','degree_id','academic_year_id'));
