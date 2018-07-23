@@ -86,7 +86,10 @@
         <div class="box-header with-border">
             <h2 class="box-title pull-left" style="padding-top: 8px;">Printing Transcript for the exam in </h2>
             <div class="pull-left" style="padding-left: 10px;">
-                <select name="transcript_type" class="form-control">
+                <select name="transcript_type"
+                        v-model="semester_id"
+                        @change="onChangeSemester"
+                        class="form-control">
                     <option value="semester1">Semester 1</option>
                     <option value="year">End of Year</option>
                 </select>
@@ -100,8 +103,12 @@
                        value="Deputy Director General"/>
             </div>
             <div class="pull-right" style="margin-right: 5px;">
-                <input type="text" name="issued_date" class="form-control" placeholder="Issued date"
-                       value="{{$current_date}}"/>
+                <input type="text"
+                       id="issued_date"
+                       name="issued_date"
+                       v-model="issued_date"
+                       class="form-control"
+                       placeholder="Issued date"/>
             </div>
             <div class="pull-right" style="margin-right: 5px; margin-top: 6px;">
                 <input type="checkbox" name="photo" placeholder="Photo" value="photo" checked/> Photo
@@ -110,6 +117,44 @@
 
         <div class="box-body">
             @include('backend.studentAnnual.includes.partials.table-header-transcript')
+        </div>
+    </div>
+    <!-- Modal -->
+    <div id="myModal"
+         :class="'modal fade' + class_modal_toggle"
+         :style="style_css"
+         role="dialog">
+        <div class="modal-dialog">
+
+            <!-- Modal content-->
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" @click="closeModal" class="close" data-dismiss="modal">&times;</button>
+                    <h4 class="modal-title">Create Issued Date</h4>
+                </div>
+                <div class="modal-body">
+                    <form>
+                        <div class="form-group">
+                            <input type="text"
+                                   v-model="input_issued_date"
+                                   id="input_issued_date"
+                                   class="form-control"/>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button"
+                            id="create_issued_date"
+                            @click="createIssuedDate"
+                            class="btn btn-primary"
+                            data-dismiss="modal">Create</button>
+                    <button type="button"
+                            @click="closeModal"
+                            class="btn btn-default"
+                            data-dismiss="modal">Close</button>
+                </div>
+            </div>
+
         </div>
     </div>
 
@@ -123,6 +168,76 @@
     {!! Html::script('plugins/daterangepicker/daterangepicker.js') !!}
     {!! Html::script('plugins/datetimepicker/bootstrap-datetimepicker.min.js') !!}
     {!! Html::script('plugins/select2/select2.full.min.js') !!}
+    <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/0.18.0/axios.min.js"></script>
+
+    <script>
+        new Vue({
+            el: '#app',
+            data () {
+            	return {
+		            issued_date: null,
+                    semester_id: 'semester1',
+                    academic_year_id: null,
+                    class_modal_toggle: '',
+		            style_css: '',
+		            input_issued_date: null
+                }
+            },
+
+            methods: {
+	            onChangeSemester () {
+	            	this.getIssuedData()
+                },
+	            createIssuedDate () {
+	            	this.input_issued_date = $('#input_issued_date').val()
+		            this.academic_year_id = '{{ $academicYearSelected }}'
+		            let key = '_key_'+ this.academic_year_id + '_' + this.semester_id
+		            axios.post('/admin/course/get-key-issued-data/store', {
+		            	key: key,
+                        value: this.input_issued_date
+		            }).then((response) => {
+				            if (response.data.hasOwnProperty('config')) {
+					            this.issued_date = response.data.config.value
+                                this.closeModal()
+				            } else {
+					            this.class_modal_toggle = ' in'
+					            this.style_css = 'display: block; padding-left: 0px;'
+				            }
+			            })
+			            .catch((error) => {
+				            console.log(error)
+			            })
+                },
+                getIssuedData () {
+	            	this.academic_year_id = '{{ $academicYearSelected }}'
+	                let key = '_key_'+ this.academic_year_id + '_' + this.semester_id
+	                axios.post('/admin/course/get-key-issued-data', {
+	                	key: key,
+		                value: this.create_issused_date
+	                }).then((response) => {
+                        	if (response.data.hasOwnProperty('config')) {
+                        		this.issued_date = response.data.config.value
+                            } else {
+		                        this.class_modal_toggle = ' in'
+                                this.style_css = 'display: block; padding-left: 0px;'
+                            }
+                        })
+                        .catch((error) => {
+                        	console.log(error)
+                        })
+                },
+                closeModal () {
+	                this.class_modal_toggle = ''
+	                this.style_css = 'display: hide;'
+                }
+            },
+
+            mounted () {
+                this.getIssuedData()
+            }
+        })
+    </script>
 
     <script>
         var selected_ids = null;
@@ -222,7 +337,7 @@
         }
 
         $(function () {
-            $('input[name="issued_date"]').datetimepicker({
+            $('input[name="issued_date"], #input_issued_date').datetimepicker({
                 useCurrent: false,
                 format: 'DD/MM/YYYY'
             });
