@@ -76,18 +76,18 @@
 @section('content')
     @foreach($students as $student)
         <div class="page">
-            <div class="row text-center title" style="margin-top: 10mm;">
+            <div class="row text-right title" style="margin-top: 10mm;">
                 <p class="p1">
-                    Ministry of Education Youth and Sport
+                    Kingdom of Cambodia
                 </p>
-                <p class="p2">
-                    Institute of Technology of Cambodia
-                </p>
-                <p class="p2">
-                    English Section
+                <p style="margin-right: 18px; font-weight: normal">
+                    Nation Religion King
                 </p>
                 <p class="p2" style="text-align: left !important;">
-                    N<sup style="font-weight: lighter;">0</sup>............
+                    Institut de Technologie du Cambodge
+                </p>
+                <p style="text-align: left !important; font-weight: normal;">
+                    N<sup style="font-weight: lighter;">0</sup>............ITC/ES
                 </p>
             </div>
 
@@ -115,8 +115,8 @@
                     $month = \Carbon\Carbon::createFromFormat("Y-m-d H:i:s",$student->dob)->formatLocalized('%B');
                     $year = \Carbon\Carbon::createFromFormat("Y-m-d H:i:s",$student->dob)->formatLocalized('%Y');
                 ?>
-                {{strtoupper($student->name_latin)}}, born
-                {{$day." ".$month.", ".$year}}, ID : {{$student->id_card}}
+                {{strtoupper($student->name_latin)}}, ID : {{$student->id_card}}, Born on
+                {{$day." ".$month.", ".$year}}
             </span>
             </div>
 
@@ -145,17 +145,16 @@
                                 $score = $scores[$student->id];
                                 foreach($score as $competency_id => $competency_score){
                                     $property = json_decode($competencies[$competency_id]->properties);
-
                                     if(strtolower($competencies[$competency_id]->name) == "l"){
-                                        $ce = '<span class="red_col">'.$competency_score->score.'</span> /'.$property->max;
+                                        $ce = '<span class="red_col">'.$competency_score->score.'</span>/'.$property->max;
                                     } else if(strtolower($competencies[$competency_id]->name) == "r"){
-                                        $co = '<span class="red_col">'.$competency_score->score.'</span> /'.$property->max;
+                                        $co = '<span class="red_col">'.$competency_score->score.'</span>/'.$property->max;
                                     } else if(strtolower($competencies[$competency_id]->name) == "w"){
-                                        $pe = '<span class="red_col">'.$competency_score->score.'</span> /'.$property->max;
+                                        $pe = '<span class="red_col">'.$competency_score->score.'</span>/'.$property->max;
                                     } else if(strtolower($competencies[$competency_id]->name) == "s"){
-                                        $po = '<span class="red_col">'.$competency_score->score.'</span> /'.$property->max;
+                                        $po = '<span class="red_col">'.$competency_score->score.'</span>/'.$property->max;
                                     } else if(strtolower($competencies[$competency_id]->name) == "ielts band score"){
-                                        $total = '<span class="red_col">'.$competency_score->score.'</span> /'.$property->max;
+                                        $total = '<span class="red_col">'.$competency_score->score.'</span>/'.$property->max;
                                     }
                                 }
                             }
@@ -164,7 +163,7 @@
                         <tr class="set_border">
                             <td style="text-align:center; vertical-align:middle;" > Reading </td>
                             <td>
-                                {!! $ce !!}
+                                {!! $co !!}
                             </td>
                         </tr>
                         <tr class="set_border">
@@ -178,7 +177,7 @@
                         <tr class="set_border">
                             <td style="text-align:center; vertical-align:middle;" > Listening </td>
                             <td>
-                                {!! $co !!}
+                                {!! $ce !!}
                             </td>
                         </tr>
                         <tr class="set_border">
@@ -222,40 +221,12 @@
                             16 out of 40 IELTS Band score 5.0+ (5.5-6) CFER: B1<br/>
                             9 out of 40 IELTS Band score4.0+ (4.5-5) CFER: A2
                         </p>
-
-                        {{--<p style="font-size: 6pt; font-family: 'Calibri Light (Headings)'; text-align: left">--}}
-                            {{--*The minimum requirement Band score average is 5 <br>--}}
-                            {{--*The attestation cannot issue for the 2nd time--}}
-                        {{--</p>--}}
                     </div>
-
-
 
                 </div>
                 <div style="width: 160mm; float: left; margin-left: 15mm; text-align: justify">
-                    <p style="font-family: 'Calibri Light'; font-size: 12pt; ">
-                        Has successfully passed the English Language Level
-                        <span class="level" style="font-size: 21pt; color: #0a6aa1">
-                            <?php
-                                if($student->grade_id == 1) {
-                                    echo "A1";
-                                } else if($student->grade_id == 2){
-                                    echo "A2";
-                                } else if($student->grade_id == 3){
-                                    echo "B1";
-                                } else if($student->grade_id == 4){
-                                    echo "B2";
-                                } else if($student->grade_id == 5){
-                                    echo "C1";
-                                }
-                            ?>
-                        </span>
-                        of the Common European Framework of Reference for Language (CEFR) at the time of level examination session took place at the Institute of Technology of Cambodia in
-                        {{ \Carbon\Carbon::createFromFormat("d/m/Y",$exam_start)->format('F, jS Y') }}.
-                    </p>
-
-                    <p style="font-family: 'Calibri Light'; font-size: 12pt; font-style: italic">
-                        To assert that of right
+                    <p style="font-family: 'Calibri Light'; font-size: 12pt; line-height: 1.5;">
+                        Has successfully passed the English Exam equivalent to Common European Framework of Reference for Language (CEFR) at session talking place at the Institute of Technology of Cambodia on {{ \Carbon\Carbon::createFromFormat("d/m/Y",$exam_start)->format('F, jS Y') }}.
                     </p>
 
                     <div class="pull-right" style="margin-top: 8mm">
@@ -268,7 +239,7 @@
                             ?>
                             <b>Phnom Penh, ITC, {{$c_day." ".$c_month." ".$c_year}}</b>
                         <p style="margin-top: -10px !important;">
-                            Director of the Institute of Technology of Cambodia
+                            P. The Director of the Institute of Technology of Cambodia
                         </p>
                         </p>
                     </div>
