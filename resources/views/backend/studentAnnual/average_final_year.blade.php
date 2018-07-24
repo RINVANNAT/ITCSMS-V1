@@ -57,7 +57,7 @@
                 <div class="row">
                     <div class="col-sm-12">
                         <div class="pull-right btn-right">
-                            <select name="student_class" class="form-control filter" id="filter_class"></select>
+                            <select name="student_class" class="form-control filter" id="filter_class" onchange="selectClass(this.value)"></select>
                             <a target="_blank" href="{{route('admin.student.print_average_final_year', ['type'=>'print'])}}?department_id={{$department_id}}&option_id={{$option_id}}&degree_id={{$degree_id}}&academic_year_id={{$academic_year_id}}">
                                 <button class="btn btn-primary btn-average-final-year btn-sm" data-toggle="tooltip" style="margin-left: 5px" data-placement="left"  title="Print Average Final Year" id="print_average_final_year"><i class="fa fa-print"></i></button>
                             </a>
@@ -89,7 +89,7 @@
                         <div class="col-xs-12">
                             <p align="center" style="line-height: normal"><strong>Moyenne fin d'etude</strong></p>
                             <p align="center" style="line-height: normal">Département {{$department->name_fr}} {{$department_option != null? $department_option->name_fr:""}}</p>
-                            <p align="center" style="line-height: normal"><strong>Classe: {{$degree->code}} {{$degree->id == 1 ? '5' : '2'}} - {{$department->code}}</strong></p>
+                            <p align="center" style="line-height: normal"><strong>Classe: {{$degree->code}} {{$degree->id == 1 ? '5' : '2'}} - {{$department->code}}_{{ $department_option !=null ? $department_option->code : null }}</strong></p>
                             <p align="center" style="line-height: normal">Année Scolaire({{$academic_year->name_latin}})</p>
                         </div>
                     </div>
@@ -151,6 +151,7 @@
                                         }
                                     }
                                     ?>
+                                    @if(isset($student_by_group[0]))
                                     <tr>
                                         <td class="border-thin border-left border-right" align="center">{{$i}}</td>
                                         <td class="border-thin">{{$student_by_group[0]['id_card']}}</td>
@@ -210,6 +211,7 @@
                                         <td class="border-thin">{{$final_average_mention}}</td>
                                         <td class="border-thin border-left border-right"></td>
                                     </tr>
+                                    @endif
                                     <?php $i++; ?>
                                 @endforeach
                                 <tr>
@@ -274,6 +276,10 @@
                         $('#filter_class').select2({
                             data: response.data,
                             placeholder: "Select a class",
+                            initSelection(ele, callback) {
+                                let data = {id: '{{ $degree_id }}_{{ $degree_id == 1 ? 5 : 2 }}_{{$department_id}}_{{$option_id}}', text: '{{ $degree->code }}{{ $degree->id == 2 ? '2' : '5' }}{{ $department->code }}{{ $department_option != null ? $department_option->code : '' }}'};
+                                callback(data)
+                            }
                         });
                         try {
                             callback();
@@ -285,7 +291,16 @@
                     }
                 }
             })
+
+
         })
+
+        function selectClass(item) {
+            var params = item.split("_")
+            var url = "{{route('admin.student.print_average_final_year', ['type'=>'show'])}}";
+            console.log(params[3]=="")
+            location.replace(url+ "?department_id="+parseInt(params[2])+"&option_id="+(params[3] !== "" ? parseInt(params[3]): "")+"&degree_id="+parseInt(params[0])+"&grade_id="+(parseInt(params[0]) == 1 ? 5 : 2)+"&academic_year_id="+2018)
+        }
 
     </script>
 

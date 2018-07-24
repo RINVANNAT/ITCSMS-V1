@@ -25,108 +25,109 @@ trait AverageFinalYearTrait
      * @return mixed
      */
     public function print_average_final_year($type){
-        $department = null;
-        $department_option = null;
-        $degree = null;
-        $academic_year = null;
-        $department_id = $_GET["department_id"];
-        $option_id = $_GET["option_id"];
-        $degree_id= $_GET["degree_id"];
-        $academic_year_id = $_GET["academic_year_id"];
+        try {
+            $department = null;
+            $department_option = null;
+            $degree = null;
+            $academic_year = null;
+            $department_id = $_GET["department_id"];
+            $option_id = isset($_GET["option_id"]) ? null : $_GET["option_id"];
+            $degree_id= $_GET["degree_id"];
+            $academic_year_id = $_GET["academic_year_id"];
 
-        if($_GET["department_id"] != "") {
-            $department = Department::find($_GET["department_id"]);
-        }
-        if($_GET["option_id"] != "") {
-            $department_option = DepartmentOption::find($_GET["option_id"]);
-        }
-        if($_GET["degree_id"] != "") {
-            $degree = Degree::find($_GET["degree_id"]);
-        }
-        if($_GET["academic_year_id"] != "") {
-            $academic_year = AcademicYear::find($_GET["academic_year_id"]);
-        }
-        $semester = 2;
+            if($_GET["department_id"] != "") {
+                $department = Department::find($_GET["department_id"]);
+            }
+            if($_GET["option_id"] != "") {
+                $department_option = DepartmentOption::find($_GET["option_id"]);
+            }
+            if($_GET["degree_id"] != "") {
+                $degree = Degree::find($_GET["degree_id"]);
+            }
+            if($_GET["academic_year_id"] != "") {
+                $academic_year = AcademicYear::find($_GET["academic_year_id"]);
+            }
+            $semester = 2;
 
-        $graduated_student_ids = Student::select([
+            $graduated_student_ids = Student::select([
                 "students.id"
             ])
-            ->leftJoin('studentAnnuals','students.id','=','studentAnnuals.student_id')
-            ->leftJoin('academicYears', 'studentAnnuals.academic_year_id', '=', 'academicYears.id')
-            ->leftJoin('group_student_annuals', 'group_student_annuals.student_annual_id', '=', 'studentAnnuals.id')
-            ->where(function($query){
-                $query->where('students.radie','=', false)->orWhereNull('students.radie');
-            })
-            ->whereNull('group_student_annuals.department_id')
-            ->where("studentAnnuals.academic_year_id","=",$academic_year->id)
-            ->where(function($query) use($semester){
-                $query->where("group_student_annuals.semester_id",$semester)->orWhereNull("group_student_annuals.semester_id");
-            });
+                ->leftJoin('studentAnnuals','students.id','=','studentAnnuals.student_id')
+                ->leftJoin('academicYears', 'studentAnnuals.academic_year_id', '=', 'academicYears.id')
+                ->leftJoin('group_student_annuals', 'group_student_annuals.student_annual_id', '=', 'studentAnnuals.id')
+                ->where(function($query){
+                    $query->where('students.radie','=', false)->orWhereNull('students.radie');
+                })
+                ->whereNull('group_student_annuals.department_id')
+                ->where("studentAnnuals.academic_year_id","=",$academic_year->id)
+                ->where(function($query) use($semester){
+                    $query->where("group_student_annuals.semester_id",$semester)->orWhereNull("group_student_annuals.semester_id");
+                });
 
-        if($department_option != null){
-            $graduated_student_ids = $graduated_student_ids->where('studentAnnuals.department_option_id',"=",$department_option->id);
-        }
-        if($department != null){
-            $graduated_student_ids = $graduated_student_ids->where('studentAnnuals.department_id',"=",$department->id);
-        }
-        if($degree != null){
-            $graduated_student_ids = $graduated_student_ids->where('studentAnnuals.degree_id',"=",$degree->id);
-        }
-        $graduated_student_ids = $graduated_student_ids->where(function($query) {
-            $query->where('studentAnnuals.grade_id',"=", 5)
-                ->orWhere('studentAnnuals.grade_id',"=", 2);
-        })->pluck("id");
+            if($department_option != null){
+                $graduated_student_ids = $graduated_student_ids->where('studentAnnuals.department_option_id',"=",$department_option->id);
+            }
+            if($department != null){
+                $graduated_student_ids = $graduated_student_ids->where('studentAnnuals.department_id',"=",$department->id);
+            }
+            if($degree != null){
+                $graduated_student_ids = $graduated_student_ids->where('studentAnnuals.degree_id',"=",$degree->id);
+            }
+            $graduated_student_ids = $graduated_student_ids->where(function($query) {
+                $query->where('studentAnnuals.grade_id',"=", 5)
+                    ->orWhere('studentAnnuals.grade_id',"=", 2);
+            })->pluck("id");
 
-        $students  = Student::select([
-            'students.id_card',
-            'students.name_kh',
-            'students.name_latin',
-            'students.dob',
-            'students.id as student_id',
-            'departments.name_kh as department',
-            'students.photo',
-            'studentAnnuals.id',
-            'studentAnnuals.department_id',
-            'studentAnnuals.degree_id',
-            'studentAnnuals.grade_id',
-            'studentAnnuals.academic_year_id',
-            'studentAnnuals.id',
-            'departments.name_kh as department_kh',
-            'departments.name_en as department_en',
-            'departments.name_fr as department_fr',
-            'departmentOptions.name_en as option_en',
-            'departmentOptions.name_fr as option_fr',
-            'departmentOptions.name_kh as option_kh',
-            'degrees.name_en as degree_en',
-            'degrees.name_fr as degree_fr',
-            'degrees.name_kh as degree_kh',
-            'grades.name_en as grade_en',
-            'grades.name_fr as grade_fr',
-            'grades.name_kh as grade_kh',
-            'academicYears.id as academic_id',
-            'academicYears.name_kh as academic_year_kh',
-            'academicYears.name_latin as academic_year_latin',
-            'genders.code as gender',
-            'groups.code as group',
-            DB::raw("CONCAT(degrees.code,grades.code,departments.code,\"departmentOptions\".code) as class")
-        ])
-            ->leftJoin('studentAnnuals','students.id','=','studentAnnuals.student_id')
-            ->leftJoin('academicYears', 'studentAnnuals.academic_year_id', '=', 'academicYears.id')
-            ->leftJoin('genders', 'students.gender_id', '=', 'genders.id')
-            ->leftJoin('grades', 'studentAnnuals.grade_id', '=', 'grades.id')
-            ->leftJoin('departmentOptions', 'studentAnnuals.department_option_id', '=', 'departmentOptions.id')
-            ->leftJoin('departments', 'studentAnnuals.department_id', '=', 'departments.id')
-            ->leftJoin('degrees', 'studentAnnuals.degree_id', '=', 'degrees.id')
-            ->leftJoin('group_student_annuals', 'group_student_annuals.student_annual_id', '=', 'studentAnnuals.id')
-            ->leftJoin('groups','groups.id','=','group_student_annuals.group_id')
-            ->where(function($query){
-                $query->where('students.radie','=', false)->orWhereNull('students.radie');
-            })
-            ->whereNull('group_student_annuals.department_id')
-            //->whereIN("studentAnnuals.academic_year_id",[$academic_year->id,$academic_year->id-1])
-            ->where(function($query) use($semester){
-                $query->where("group_student_annuals.semester_id",$semester)->orWhereNull("group_student_annuals.semester_id");
-            });
+            $students  = Student::select([
+                'students.id_card',
+                'students.name_kh',
+                'students.name_latin',
+                'students.dob',
+                'students.id as student_id',
+                'departments.name_kh as department',
+                'students.photo',
+                'studentAnnuals.id',
+                'studentAnnuals.department_id',
+                'studentAnnuals.degree_id',
+                'studentAnnuals.grade_id',
+                'studentAnnuals.academic_year_id',
+                'studentAnnuals.id',
+                'departments.name_kh as department_kh',
+                'departments.name_en as department_en',
+                'departments.name_fr as department_fr',
+                'departmentOptions.name_en as option_en',
+                'departmentOptions.name_fr as option_fr',
+                'departmentOptions.name_kh as option_kh',
+                'degrees.name_en as degree_en',
+                'degrees.name_fr as degree_fr',
+                'degrees.name_kh as degree_kh',
+                'grades.name_en as grade_en',
+                'grades.name_fr as grade_fr',
+                'grades.name_kh as grade_kh',
+                'academicYears.id as academic_id',
+                'academicYears.name_kh as academic_year_kh',
+                'academicYears.name_latin as academic_year_latin',
+                'genders.code as gender',
+                'groups.code as group',
+                DB::raw("CONCAT(degrees.code,grades.code,departments.code,\"departmentOptions\".code) as class")
+            ])
+                ->leftJoin('studentAnnuals','students.id','=','studentAnnuals.student_id')
+                ->leftJoin('academicYears', 'studentAnnuals.academic_year_id', '=', 'academicYears.id')
+                ->leftJoin('genders', 'students.gender_id', '=', 'genders.id')
+                ->leftJoin('grades', 'studentAnnuals.grade_id', '=', 'grades.id')
+                ->leftJoin('departmentOptions', 'studentAnnuals.department_option_id', '=', 'departmentOptions.id')
+                ->leftJoin('departments', 'studentAnnuals.department_id', '=', 'departments.id')
+                ->leftJoin('degrees', 'studentAnnuals.degree_id', '=', 'degrees.id')
+                ->leftJoin('group_student_annuals', 'group_student_annuals.student_annual_id', '=', 'studentAnnuals.id')
+                ->leftJoin('groups','groups.id','=','group_student_annuals.group_id')
+                ->where(function($query){
+                    $query->where('students.radie','=', false)->orWhereNull('students.radie');
+                })
+                ->whereNull('group_student_annuals.department_id')
+                //->whereIN("studentAnnuals.academic_year_id",[$academic_year->id,$academic_year->id-1])
+                ->where(function($query) use($semester){
+                    $query->where("group_student_annuals.semester_id",$semester)->orWhereNull("group_student_annuals.semester_id");
+                });
 
             if($department_option != null){
                 $students = $students->where('studentAnnuals.department_option_id',"=",$department_option->id);
@@ -139,93 +140,102 @@ trait AverageFinalYearTrait
             }
             $students = $students->where(function($query) {
                 $query->where('studentAnnuals.grade_id',"=", 4)
-                ->orWhere('studentAnnuals.grade_id',"=", 5)
-                ->orWhere('studentAnnuals.grade_id',"=", 1)
-                ->orWhere('studentAnnuals.grade_id', 2);
+                    ->orWhere('studentAnnuals.grade_id',"=", 5)
+                    ->orWhere('studentAnnuals.grade_id',"=", 1)
+                    ->orWhere('studentAnnuals.grade_id', 2);
             })->whereIN('students.id',$graduated_student_ids);
 
             $students = $students->orderBy('students.id_card','ASC')
-            ->get()
-            ->toArray();
-        $students = collect($students);
-        $student_by_groups = collect($students)->sortBy(function($student){
-            return sprintf('%-12s%s',
-                $student['class'],
-                $student['name_latin']
-            );
-        })->groupBy("student_id");
+                ->get()
+                ->toArray();
+            $students = collect($students);
+            $student_by_groups = collect($students)->sortBy(function($student){
+                return sprintf('%-12s%s',
+                    $student['class'],
+                    $student['name_latin']
+                );
+            })->groupBy("student_id");
 
-        $scores = [];
-        // Clean redouble student record first
-        foreach($student_by_groups as &$student_by_class){
-            $before_graduated_year = null;
-            $before_graduated_key = null;
-            $graduated_year = null;
-            $graduated_key = null;
-            if(count($student_by_class) > 2) {
-                foreach($student_by_class as $key => $student_by_grade) {
-                    if($student_by_grade['grade_id'] == 4 || $student_by_grade['grade_id']==1){
-                        if($before_graduated_year !== null) {
-                            // already exist, compare which one is smaller then remove
-                            if($before_graduated_year>$student_by_grade['academic_year_id']){
-                                $student_by_class->forget($key);
+            $scores = [];
+            // Clean redouble student record first
+            foreach($student_by_groups as &$student_by_class){
+                $before_graduated_year = null;
+                $before_graduated_key = null;
+                $graduated_year = null;
+                $graduated_key = null;
+                if(count($student_by_class) > 2) {
+                    foreach($student_by_class as $key => $student_by_grade) {
+                        if($student_by_grade['grade_id'] == 4 || $student_by_grade['grade_id']==1){
+                            if($before_graduated_year !== null) {
+                                // already exist, compare which one is smaller then remove
+                                if($before_graduated_year>$student_by_grade['academic_year_id']){
+                                    $student_by_class->forget($key);
+                                } else {
+                                    $student_by_class->forget($before_graduated_key);
+                                }
                             } else {
-                                $student_by_class->forget($before_graduated_key);
+                                $before_graduated_key = $key;
+                                $before_graduated_year = $student_by_grade['academic_year_id'];
                             }
-                        } else {
-                            $before_graduated_key = $key;
-                            $before_graduated_year = $student_by_grade['academic_year_id'];
-                        }
-                    } else if ($student_by_grade['grade_id'] == 5 || $student_by_grade['grade_id']==2) {
-                        if($graduated_year !== null) {
-                            // already exist, compare which one is smaller then remove
-                            if($graduated_year>$student_by_grade['academic_year_id']){
-                                $student_by_class->forget($key);
+                        } else if ($student_by_grade['grade_id'] == 5 || $student_by_grade['grade_id']==2) {
+                            if($graduated_year !== null) {
+                                // already exist, compare which one is smaller then remove
+                                if($graduated_year>$student_by_grade['academic_year_id']){
+                                    $student_by_class->forget($key);
+                                } else {
+                                    $student_by_class->forget($graduated_key);
+                                }
                             } else {
-                                $student_by_class->forget($graduated_key);
+                                $graduated_key = $key;
+                                $graduated_year = $student_by_grade['academic_year_id'];
                             }
-                        } else {
-                            $graduated_key = $key;
-                            $graduated_year = $student_by_grade['academic_year_id'];
                         }
                     }
                 }
             }
-        }
-        $errors = [];
-        foreach($student_by_groups as &$student_by_class){
-            $moy_score = 0;
-            if(count($student_by_class) == 2) {
-                foreach($student_by_class as $student_by_grade) {
-                    $scores[$student_by_grade["id"]] = $this->getStudentScoreBySemester($student_by_grade['id'],null); // Full year
-                    if(empty($scores[$student_by_grade["id"]])) {
-                        $scores[$student_by_grade["id"]] = array("final_score" => "N/A","final_score_s1" => "N/A","final_score_s2" => "N/A");
-                        $moy_score = "N/A";
+            $errors = [];
+            // step 2
+            foreach($student_by_groups as &$student_by_class){
+                $moy_score = 0;
+                if(count($student_by_class) == 2) {
+                    foreach($student_by_class as $student_by_grade) {
+                        $scores[$student_by_grade["id"]] = $this->getStudentScoreBySemester($student_by_grade['id'],null); // Full year
+                        if(empty($scores[$student_by_grade["id"]])) {
+                            $scores[$student_by_grade["id"]] = array("final_score" => "N/A","final_score_s1" => "N/A","final_score_s2" => "N/A");
+                            $moy_score = "N/A";
+                        }
+                        if(is_numeric($moy_score)){
+                            $moy_score = $moy_score + $scores[$student_by_grade["id"]]["final_score"];
+                        }
                     }
-                    if(is_numeric($moy_score)){
-                        $moy_score = $moy_score + $scores[$student_by_grade["id"]]["final_score"];
-                    }
+                } else {
+                    // Something wrong here. It suppose to have only 2
+                    array_push($errors,array("count"=>count($student_by_class), "id" => $student_by_class));
+                    //throw new \Exception('Students have multiple class record');
+                }
+                if(is_numeric($moy_score)) {
+                    $student_by_class->put("moy_score",$moy_score/2);
+                } else {
+                    $student_by_class->put("moy_score",$moy_score);
+                }
+            }
+
+            $student_by_groups = $student_by_groups->sortByDesc(function($collection){
+                return $collection->get("moy_score");
+            });
+
+            //dd($scores[24985]);
+            if (count($student_by_groups) > 0) {
+                if ($type == "show"){
+                    return view('backend.studentAnnual.average_final_year', compact('student_by_groups','scores','department','department_option','degree','academic_year','department_id','option_id','degree_id','academic_year_id'));
+                }else if ($type == "print") {
+                    return PDF::loadView('backend.studentAnnual.print.average_final_year', compact('student_by_groups','scores','department','department_option','degree','academic_year'))->setPaper('a4')->stream();
                 }
             } else {
-                // Something wrong here. It suppose to have only 2
-                array_push($errors,array("count"=>count($student_by_class), "id" => $student_by_class));
-                //throw new \Exception('Students have multiple class record');
+                abort(404, 'Please provide us your message');
             }
-            if(is_numeric($moy_score)) {
-                $student_by_class->put("moy_score",$moy_score/2);
-            } else {
-                $student_by_class->put("moy_score",$moy_score);
-            }
-        }
-
-        $student_by_groups = $student_by_groups->sortByDesc(function($collection){
-            return $collection->get("moy_score");
-        });
-
-        if ($type == "show"){
-            return view('backend.studentAnnual.average_final_year', compact('student_by_groups','scores','department','department_option','degree','academic_year','department_id','option_id','degree_id','academic_year_id'));
-        }else if ($type == "print") {
-            return PDF::loadView('backend.studentAnnual.print.average_final_year', compact('student_by_groups','scores','department','department_option','degree','academic_year'))->setPaper('a4')->stream();
+        } catch (\Exception $e) {
+            abort(404, $e->getMessage());
         }
 
         return Excel::create('Average Final Year', function ($excel) use ($student_by_groups, $scores, $department, $department_option, $degree, $academic_year) {
@@ -233,6 +243,7 @@ trait AverageFinalYearTrait
                 $sheet->mergeCells('E3:G3');
                 $sheet->mergeCells('E4:G4');
                 $sheet->mergeCells('E5:G5');
+                $sheet->mergeCells('E6:G6');
                 $sheet->mergeCells('E7:F7');
                 $sheet->mergeCells('G7:H7');
                 $sheet->mergeCells('I7:J7');
@@ -258,89 +269,89 @@ trait AverageFinalYearTrait
                     $cell->setFontSize(12);
                     $cell->setAlignment('center');
                 });
-                $sheet->cell('E7', function ($cell) {
+                $sheet->cell('E8', function ($cell) {
                     $cell->setValue('1ère année');
                     $cell->setFontSize(10);
                     $cell->setAlignment('center');
                 });
-                $sheet->cell('G7', function ($cell) {
+                $sheet->cell('G8', function ($cell) {
                     $cell->setValue('2ème année');
                     $cell->setFontSize(10);
                     $cell->setAlignment('center');
                 });
-                $sheet->cell('I7', function ($cell) {
+                $sheet->cell('I8', function ($cell) {
                     $cell->setValue('Moy. de Sortie');
                     $cell->setFontSize(10);
                     $cell->setAlignment('center');
                 });
-                $sheet->cell('K7', function ($cell) {
+                $sheet->cell('K8', function ($cell) {
                     $cell->setValue('Mention');
                     $cell->setFontSize(10);
                     $cell->setAlignment('center');
                 });
-                $sheet->cell('L7', function ($cell) {
+                $sheet->cell('L8', function ($cell) {
                     $cell->setValue('Observation');
                     $cell->setFontSize(10);
                     $cell->setAlignment('center');
                 });
-                $sheet->cell('A8', function ($cell) {
+                $sheet->cell('A9', function ($cell) {
                     $cell->setValue('No');
                     $cell->setFontSize(10);
                     $cell->setAlignment('center');
                 });
-                $sheet->cell('B8', function ($cell) {
+                $sheet->cell('B9', function ($cell) {
                     $cell->setValue('ID');
                     $cell->setFontSize(10);
                     $cell->setAlignment('center');
                 });
-                $sheet->cell('C8', function ($cell) {
+                $sheet->cell('C9', function ($cell) {
                     $cell->setValue('Noms et Prénoms');
                     $cell->setFontSize(10);
                     $cell->setAlignment('center');
                 });
-                $sheet->cell('D8', function ($cell) {
+                $sheet->cell('D9', function ($cell) {
                     $cell->setValue('Sexe');
                     $cell->setFontSize(10);
                     $cell->setAlignment('center');
                 });
-                $sheet->cell('E8', function ($cell) {
+                $sheet->cell('E9', function ($cell) {
                     $cell->setValue('Moy.(M1)');
                     $cell->setFontSize(10);
                     $cell->setAlignment('center');
                 });
-                $sheet->cell('F8', function ($cell) {
+                $sheet->cell('F9', function ($cell) {
                     $cell->setValue('GPA');
                     $cell->setFontSize(10);
                     $cell->setAlignment('center');
                 });
-                $sheet->cell('G8', function ($cell) {
+                $sheet->cell('G9', function ($cell) {
                     $cell->setValue('Moy.(M2)');
                     $cell->setFontSize(10);
                     $cell->setAlignment('center');
                 });
-                $sheet->cell('H8', function ($cell) {
+                $sheet->cell('H9', function ($cell) {
                     $cell->setValue('GPA');
                     $cell->setFontSize(10);
                     $cell->setAlignment('center');
                 });
-                $sheet->cell('I8', function ($cell) {
+                $sheet->cell('I9', function ($cell) {
                     $cell->setValue('(M1+M2)/2');
                     $cell->setFontSize(10);
                     $cell->setAlignment('center');
                 });
-                $sheet->cell('J8', function ($cell) {
+                $sheet->cell('J9', function ($cell) {
                     $cell->setValue('GPA');
                     $cell->setFontSize(10);
                     $cell->setAlignment('center');
                 });
-                $sheet->cell('K8', function ($cell) {
+                $sheet->cell('K9', function ($cell) {
                     $cell->setValue('de sotie');
                     $cell->setFontSize(10);
                     $cell->setAlignment('center');
                 });
 
                 $i = 1;
-                $row = 9;
+                $row = 10;
 
                 $min_score_before_graduated = 100;
                 $min_score_graduated = 100;
@@ -443,8 +454,8 @@ trait AverageFinalYearTrait
                 $sheet->cell('I'.$row, $min_moy_score);
                 $sheet->cell('J'.$row, get_gpa($min_moy_score));
 
-                $sheet->setBorder('E7:L7', 'thin');
-                $sheet->setBorder('A8:L' . ($row-2), 'thin');
+                $sheet->setBorder('E8:L8', 'thin');
+                $sheet->setBorder('A9:L' . ($row-2), 'thin');
 
             });
         })->download('xls');
