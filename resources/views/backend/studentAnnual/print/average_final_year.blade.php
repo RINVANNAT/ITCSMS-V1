@@ -94,20 +94,36 @@
                             <td class="no-border"></td>
                             <td class="no-border"></td>
                             <td class="no-border"></td>
-                            <td class="border-thin" align="center" colspan="2">
-                                @if($student_by_groups->first()[0]['grade_id'] == 4)
-                                    4 <sup>ème</sup> année
-                                @else
-                                    1 <sup>ère</sup> année
+                            <?php
+                            // dd($student_by_groups->first());
+                            $first = true
+                            ?>
+                            @foreach($student_by_groups->first() as $student_by_group_key => $student_by_group)
+                                @if(is_numeric($student_by_group_key))
+                                    @if ($first)
+                                        @if($student_by_group['grade_id'] == 4)
+                                            <td class="border-thin" align="center" colspan="2">
+                                                4 <sup>ème</sup> année
+                                            </td>
+                                        @else
+                                            <td class="border-thin" align="center" colspan="2">
+                                                1 <sup>ère</sup> année
+                                            </td>
+                                        @endif
+                                        <?php $first = false; ?>
+                                    @else
+                                        @if($student_by_group['grade_id'] == 5)
+                                            <td class="border-thin" align="center" colspan="2">
+                                                5 <sup>ème</sup> année
+                                            </td>
+                                        @else
+                                            <td class="border-thin" align="center" colspan="2">
+                                                2 <sup>ème</sup> année
+                                            </td>
+                                        @endif
+                                    @endif
                                 @endif
-                            </td>
-                            <td class="border-thin" align="center" colspan="2">
-                                @if($student_by_groups->first()[1]['grade_id'] == 5)
-                                    5 <sup>ème</sup> année
-                                @else
-                                    2 <sup>ème</sup> année
-                                @endif
-                            </td>
+                            @endforeach
                             <td class="border-thin" align="center" colspan="2">Moy. de Sortie</td>
                             <td class="border-thin border-bottom" align="center" rowspan="2">Mention <br/> de Sortie</td>
                             <td class="border-thin border-bottom" align="center" rowspan="2">Observation</td>
@@ -288,7 +304,7 @@
             </div>
 
 
-    </div>
+        </div>
 </div>
 </body>
 </html>

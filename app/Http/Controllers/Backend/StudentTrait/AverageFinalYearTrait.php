@@ -299,12 +299,12 @@ trait AverageFinalYearTrait
                     $cell->setAlignment('center');
                 });
                 $sheet->cell('E8', function ($cell) {
-                    $cell->setValue('1ère année');
+                    $cell->setValue('année');
                     $cell->setFontSize(10);
                     $cell->setAlignment('center');
                 });
                 $sheet->cell('G8', function ($cell) {
-                    $cell->setValue('2ème année');
+                    $cell->setValue('année');
                     $cell->setFontSize(10);
                     $cell->setAlignment('center');
                 });
