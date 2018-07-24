@@ -134,13 +134,15 @@
                                 @foreach($student_by_groups as $student_by_group)
                                     <?php
                                     $result = [];
-                                    foreach ($student_by_group as $student_by_class) {
-                                        $result[$student_by_class["grade_id"]]["total_score"] = $scores[$student_by_class["id"]]["final_score"];
-                                        $result[$student_by_class["grade_id"]]["total_gpa"] = get_gpa($scores[$student_by_class["id"]]["final_score"]);
-                                        $result[$student_by_class["grade_id"]]["credit"] = 0;
-                                        foreach ($scores[$student_by_class["id"]] as $key=>$score) {
-                                            if(is_numeric($key)){
-                                                $result[$student_by_class["grade_id"]]["credit"] += $score["credit"];
+                                    foreach ($student_by_group as $key => $student_by_class) {
+                                        if(is_numeric($key)) {
+                                            $result[$student_by_class["grade_id"]]["total_score"] = $scores[$student_by_class["id"]]["final_score"];
+                                            $result[$student_by_class["grade_id"]]["total_gpa"] = get_gpa($scores[$student_by_class["id"]]["final_score"]);
+                                            $result[$student_by_class["grade_id"]]["credit"] = 0;
+                                            foreach ($scores[$student_by_class["id"]] as $key=>$score) {
+                                                if(is_numeric($key)){
+                                                    $result[$student_by_class["grade_id"]]["credit"] += $score["credit"];
+                                                }
                                             }
                                         }
                                     }
