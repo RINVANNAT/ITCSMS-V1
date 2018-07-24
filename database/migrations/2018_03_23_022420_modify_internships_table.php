@@ -27,6 +27,7 @@ class ModifyInternshipsTable extends Migration
     {
         Schema::table('internships', function (Blueprint $table) {
             $table->dropColumn('is_name');
+
         });
     }
 }
