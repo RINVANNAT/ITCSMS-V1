@@ -97,8 +97,10 @@ class InternshipController extends Controller
                     'web' => $objCompany->web
                 ]);
                 $request['company'] = $company->name;
+                $request['company_id'] = $company->id;
             } else {
                 $request['company'] = $isCompanyExisted->name;
+                $request['company_id'] = $isCompanyExisted->id;
             }
 
             if (array_key_exists('id', $request->all())) {
@@ -155,13 +157,14 @@ class InternshipController extends Controller
             $number += count($internships);
         }
         $academic_years = AcademicYear::latest()->get();
-        $internship = Internship::with('internship_student_annuals')->find($internship->id);
+        $internship = Internship::with('internship_student_annuals', 'internship_company')->find($internship->id);
         $pre_academic_year = null;
         foreach ($internship->internship_student_annuals as $internship_student_annual) {
             $student_annual = StudentAnnual::find($internship_student_annual->student_annual_id);
             $pre_academic_year = AcademicYear::find($student_annual->academic_year_id);
         }
         $companies = InternshipCompany::select('name as text', '*')->orderBy('name', 'asc')->get();
+
         return view('backend.internship.edit', compact('internship', 'number', 'academic_years', 'pre_academic_year', 'companies'));
     }
 
@@ -267,7 +270,11 @@ class InternshipController extends Controller
                     ' <a href="' . route('internship.delete', $internship) . '" class="btn btn-xs btn-danger"><i class="fa fa-trash" data-toggle="tooltip" data-placement="top" title="" data-original-title="Delete"></i></a>';
             })
             ->addColumn('checkbox', function ($internship) {
-                return '<input type="checkbox" name="internships[]" class="checkbox" data-id=' . $internship->id . '>';
+                if(is_null($internship->printed_at)) {
+                    return '<input type="checkbox" checked name="internships[]" class="checkbox" data-id=' . $internship->id . '>';
+                } else {
+                    return '<input type="checkbox" name="internships[]" class="checkbox" data-id=' . $internship->id . '>';
+                }
             })
             ->editColumn('printed_at', function ($internship){
                 return '<span class="label label-success">'.

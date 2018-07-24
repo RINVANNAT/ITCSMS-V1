@@ -18,4 +18,9 @@ class InternshipCompany extends Model
         'mail',
         'web'
     ];
+    
+    public function internships ()
+    {
+        return $this->hasMany(Internship::class, 'company_id', 'id');
+    }
 }

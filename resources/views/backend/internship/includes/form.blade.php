@@ -52,7 +52,15 @@
                 <select class="companies form-control" name="company">
                     <option selected disabled></option>
                     @foreach($companies as $company)
-                        <option value="{{ $company }}">{{ $company->text }}</option>
+                        @if(isset($internship))
+                            @if($internship->internship_company->id == $company->id)
+                                <option value="{{ $company }}" selected>{{ $company->text }}</option>
+                            @else
+                                <option value="{{ $company }}">{{ $company->text }}</option>
+                            @endif
+                        @else
+                            <option value="{{ $company }}">{{ $company->text }}</option>
+                        @endif
                     @endforeach
                 </select>
             </div>
@@ -195,7 +203,7 @@
                 <div class="form-group">
                     <label class="col-md-3 control-label required">Students</label>
                     <div class="col-md-9">
-                        <select class="form-control" name="students[]" id="students"></select>
+                        <select class="form-control" name="students[]" id="students" multiple></select>
                     </div>
                 </div>
             </div>

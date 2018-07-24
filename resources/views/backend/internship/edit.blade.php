@@ -58,7 +58,6 @@
                 </div>
             </div>
         </div>
-
         <div class="box box-success">
             <div class="box-body">
                 <div class="pull-left">
@@ -85,7 +84,30 @@
     <script type="text/javascript" src="{{ asset('plugins/daterangepicker/daterangepicker.js') }}"></script>
     <script type="text/javascript" src="{{ asset('plugins/datetimepicker/bootstrap-datetimepicker.min.js') }}"></script>
     <script type="text/javascript" src="{{ asset('js/internship.js') }}"></script>
-    <script type="text/javascript">
+    <script>
+        {{--@if(isset($internship))--}}
+        {{--let students = [];--}}
+            {{--@foreach($internship->internship_student_annuals as $student)--}}
+                {{--students.push({--}}
+                    {{--id: '{{ $student->id }}',--}}
+                    {{--department: '{{ $student->student->department }}',--}}
+                    {{--gender: '{{ $student->student->gender }}',--}}
+                    {{--id_card: '{{ $student->student->id_card }}',--}}
+                    {{--name_latin: '{{ $student->student->name_latin }}',--}}
+                    {{--text: '{{ $student->student->name_kh }}'--}}
+                {{--})--}}
+            {{--@endforeach--}}
+        {{--@endif--}}
 
+        {{--$(function () {--}}
+            {{--$('#students').val(null).trigger('change')--}}
+
+            {{--$('#students').trigger({--}}
+                {{--type: 'select2:select',--}}
+                {{--params: {--}}
+                    {{--data: students--}}
+                {{--}--}}
+            {{--})--}}
+        {{--})--}}
     </script>
 @stop

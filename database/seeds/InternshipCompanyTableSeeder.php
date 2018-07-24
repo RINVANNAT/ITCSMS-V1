@@ -17,12 +17,9 @@ class InternshipCompanyTableSeeder extends Seeder
         }
         $getCompaniesFromInternship = App\Models\Internship\Internship::orderBy('company', 'asc')->get();
         foreach ($getCompaniesFromInternship as $company) {
-            $foundOrCreate = \App\Models\Internship\InternshipCompany::where('name', 'ilike', '%'.$company->company)
-                ->orWhere('title', 'ilike', '%'.$company->title)
-                ->orWhere('training_field', 'ilike', '%'.$company->training_field)
-                ->first();
+            $foundOrCreate = \App\Models\Internship\InternshipCompany::where('name', 'ilike', '%'.$company->company)->first();
             if (!($foundOrCreate instanceof \App\Models\Internship\InternshipCompany)) {
-                \App\Models\Internship\InternshipCompany::create([
+                $internshipCompany = \App\Models\Internship\InternshipCompany::create([
                     'name' => $company->company,
                     'title' => $company->title,
                     'training_field' => $company->training_field,
@@ -32,6 +29,12 @@ class InternshipCompanyTableSeeder extends Seeder
                     'mail' => $company->e_mail_address,
                     'web' => $company->web
                 ]);
+
+                $company->company_id = $internshipCompany->id;
+                $company->update();
+            } else {
+                $company->company_id = $foundOrCreate->id;
+                $company->update();
             }
         }
     }
