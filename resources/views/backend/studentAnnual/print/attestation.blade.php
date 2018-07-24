@@ -34,7 +34,7 @@
 
         .title {
             text-align: center;
-            font-size: 20px !important;
+            font-size: 24px !important;
             vertical-align: middle;
             line-height: 50px;
             color: #fff;
@@ -206,7 +206,7 @@
                             </td>
                             <td></td>
                             <td align="center" style="width: 22%; font-size: 18px; border: 0.5px solid black">
-                                <strong>{{$final_average_gpa}}</strong>
+                                <strong>{{substr($final_average_gpa,0,3)}}</strong>
                             </td>
                         </tr>
                         <tr>

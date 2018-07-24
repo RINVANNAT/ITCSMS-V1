@@ -109,7 +109,7 @@
                             @endif
                         </td>
                         <td class="border-thin" align="center" colspan="2">Moy. de Sortie</td>
-                        <td class="border-thin border-bottom" align="center" rowspan="2">Mention <br/> de Sortie</td>
+                        <td class="border-thin border-bottom" align="center" rowspan="2" style="width: 100px !important;">Mention <br/> de Sortie</td>
                         <td class="border-thin border-bottom" align="center" rowspan="2">Observation</td>
                     </tr>
                     <tr>

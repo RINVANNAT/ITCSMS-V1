@@ -1006,6 +1006,7 @@
 
         $(document).on("click",".btn-average-final-year", function () {
             final_score_url = final_score_url+ "?department_id="+$("#filter_dept").val()+"&option_id="+$("#filter_dept_option").val()+"&degree_id="+$("#filter_degree").val()+"&grade_id="+$("#filter_grade").val()+"&academic_year_id="+$("#filter_academic_year").val();
+            console.log(final_score_url);
             var win_final_score = window.open(final_score_url, '_blank');
             win_final_score.focus();
         });
