@@ -487,8 +487,8 @@
 
             $("#filter_dept").on("change", function () {
 
-                if($('.btn-right').children().children().hasClass('btn-average-final-year')){
-                    $('.btn-right').children().children('.btn-average-final-year').remove();
+                if($('.btn-right').children().hasClass('btn-average-final-year')){
+                    $('.btn-right').children('.btn-average-final-year').remove();
                 }
 
                 if(($(this).val() != 8 && $(this).val() != 12 && $(this).val() != 13) && (($(this).siblings('#filter_degree').val() == 1 && $(this).siblings('#filter_grade').val() == 5) || ($(this).siblings('#filter_degree').val() == 2 && $(this).siblings('#filter_grade').val() == 2))){
@@ -498,8 +498,8 @@
 
             $("#filter_degree").on("change", function () {
 
-                if($('.btn-right').children().children().hasClass('btn-average-final-year')){
-                    $('.btn-right').children().children('.btn-average-final-year').remove();
+                if($('.btn-right').children().hasClass('btn-average-final-year')){
+                    $('.btn-right').children('.btn-average-final-year').remove();
                 }
 
                 if(($(this).siblings('#filter_dept').val() != 8 && $(this).siblings('#filter_dept').val() != 12 && $(this).siblings('#filter_dept').val() != 13) && (($(this).val() == 1 && $(this).siblings('#filter_grade').val() == 5) || ($(this).val() == 2 && $(this).siblings('#filter_grade').val() == 2))){
@@ -509,9 +509,10 @@
             });
 
             $("#filter_grade").on("change", function () {
+                console.log($('.btn-right').children().hasClass('btn-average-final-year'))
 
-                if($('.btn-right').children().children().hasClass('btn-average-final-year')){
-                    $('.btn-right').children().children('.btn-average-final-year').remove();
+                if($('.btn-right').children().hasClass('btn-average-final-year')){
+                    $('.btn-right').children('.btn-average-final-year').remove();
                 }
 
                 if(($(this).siblings('#filter_dept').val() != 8 && $(this).siblings('#filter_dept').val() != 12 && $(this).siblings('#filter_dept').val() != 13) && (($(this).siblings('#filter_degree').val() == 1 && $(this).val() == 5) || ($(this).siblings('#filter_degree').val() == 2 && $(this).val() == 2))){
@@ -1005,6 +1006,7 @@
 
         $(document).on("click",".btn-average-final-year", function () {
             final_score_url = final_score_url+ "?department_id="+$("#filter_dept").val()+"&option_id="+$("#filter_dept_option").val()+"&degree_id="+$("#filter_degree").val()+"&grade_id="+$("#filter_grade").val()+"&academic_year_id="+$("#filter_academic_year").val();
+            console.log(final_score_url);
             var win_final_score = window.open(final_score_url, '_blank');
             win_final_score.focus();
         });
