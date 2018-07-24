@@ -23,7 +23,7 @@
                 <input class="form-control"
                        tabindex="1"
                        autofocus
-                       value="{{ isset($internship) ? $internship->person : null }}"
+                       value="{{ isset($internship) ? $internship->person : old('person') }}"
                        name="person"
                        type="text">
             </div>
@@ -73,7 +73,7 @@
                           id="address"
                           tabindex="5"
                           name="address"
-                          rows="4">{{ isset($internship) ? $internship->address : null }}</textarea>
+                          rows="4">{{ isset($internship) ? $internship->address : old('address') }}</textarea>
             </div>
         </div>
 
@@ -84,7 +84,7 @@
                        name="phone"
                        tabindex="6"
                        id="phone"
-                       value="{{ isset($internship) ? $internship->phone : null }}"
+                       value="{{ isset($internship) ? $internship->phone : old('phone') }}"
                        class="form-control"/>
             </div>
         </div>
@@ -96,7 +96,7 @@
                        id="hot_line"
                        tabindex="6"
                        name="hot_line"
-                       value="{{ isset($internship) ? $internship->hot_line : null }}"
+                       value="{{ isset($internship) ? $internship->hot_line : old('hot_line') }}"
                        class="form-control"/>
             </div>
         </div>
@@ -108,7 +108,7 @@
                        tabindex="7"
                        name="e_mail_address"
                        id="e_mail_address"
-                       value="{{ isset($internship) ? $internship->e_mail_address : null }}"
+                       value="{{ isset($internship) ? $internship->e_mail_address : old('e_mail_address') }}"
                        class="form-control"/>
             </div>
         </div>
@@ -120,7 +120,7 @@
                        name="web"
                        tabindex="8"
                        id="web"
-                       value="{{ isset($internship) ? $internship->web : null }}"
+                       value="{{ isset($internship) ? $internship->web : old('web') }}"
                        class="form-control"/>
             </div>
         </div>
@@ -135,7 +135,7 @@
                         <input type="text"
                                id="title"
                                tabindex="2"
-                               value="{{ isset($internship) ? $internship->title : null }}"
+                               value="{{ isset($internship) ? $internship->title : old('title') }}"
                                name="title"
                                class="form-control">
                     </div>
@@ -147,7 +147,7 @@
                                name="training_field"
                                tabindex="4"
                                id="training_field"
-                               value="{{ isset($internship) ? $internship->training_field : null }}"
+                               value="{{ isset($internship) ? $internship->training_field : old('training_field') }}"
                                class="form-control">
                     </div>
                 </div>
@@ -158,7 +158,7 @@
                         <input class="form-control"
                                id="start"
                                tabindex="9"
-                               value="{{ isset($internship) ? $internship->start : null }}"
+                               value="{{ isset($internship) ? $internship->start : old('start') }}"
                                name="start"
                                type="text">
                     </div>
@@ -170,7 +170,7 @@
                         <input class="form-control"
                                id="end"
                                tabindex="10"
-                               value="{{ isset($internship) ? $internship->end : null }}"
+                               value="{{ isset($internship) ? $internship->end : old('end') }}"
                                name="end"
                                type="text">
                     </div>
@@ -182,7 +182,7 @@
                         <input class="form-control"
                                tabindex="11"
                                id="issue_date"
-                               value="{{ isset($internship) ? $internship->issue_date : null }}"
+                               value="{{ isset($internship) ? $internship->issue_date : old('issue_date') }}"
                                name="issue_date"
                                type="text">
                     </div>

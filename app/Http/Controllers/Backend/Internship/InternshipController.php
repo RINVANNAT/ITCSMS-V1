@@ -75,32 +75,29 @@ class InternshipController extends Controller
         isset($is_name) ? $is_name = true : $is_name = false;
 
         try {
-            $internship = '';
-            $company = '';
 
-            $objCompany = json_decode($request->company);
+            $company = json_decode($request->company);
 
-            $isCompanyExisted = InternshipCompany::where('name', 'ilike', '%'.$objCompany->name)
-                ->orWhere('title', 'ilike', '%'.$objCompany->title)
-                ->orWhere('training_field', 'ilike', '%'.$objCompany->training_field)
-                ->first();
-
-            if (!($isCompanyExisted instanceof InternshipCompany)) {
+            if (is_null($company)) {
                 $company = InternshipCompany::create([
-                    'name' => $objCompany->name,
-                    'title' => $objCompany->title,
-                    'training_field' => $objCompany->training_field,
-                    'address' => $objCompany->address,
-                    'phone' => $objCompany->phone,
-                    'hp' => $objCompany->hot_line,
-                    'mail' => $objCompany->e_mail_address,
-                    'web' => $objCompany->web
+                    'name' => $request->company,
+                    'title' => $request->title,
+                    'training_field' => $request->training_field,
+                    'address' => $request->address,
+                    'phone' => $request->phone,
+                    'hp' => $request->hot_line,
+                    'mail' => $request->e_mail_address,
+                    'web' => $request->web
                 ]);
                 $request['company'] = $company->name;
                 $request['company_id'] = $company->id;
             } else {
-                $request['company'] = $isCompanyExisted->name;
-                $request['company_id'] = $isCompanyExisted->id;
+                $findInternshipCompany = InternshipCompany::where('name', 'ilike', '%'.$company->name)
+                    ->orWhere('title', 'ilike', '%'.$company->title)
+                    ->orWhere('training_field', 'ilike', '%'.$company->training_field)
+                    ->first();
+                $request['company'] = $findInternshipCompany->name;
+                $request['company_id'] = $findInternshipCompany->id;
             }
 
             if (array_key_exists('id', $request->all())) {
