@@ -49,7 +49,7 @@
         <div class="form-group">
             <label class="col-md-3 control-label required">Company</label>
             <div class="col-md-9">
-                <select class="companies form-control" name="company">
+                <select class="companies form-control" tabindex="3" name="company">
                     <option selected disabled></option>
                     @foreach($companies as $company)
                         @if(isset($internship))
@@ -71,6 +71,7 @@
             <div class="col-md-9">
                 <textarea class="form-control"
                           id="address"
+                          tabindex="5"
                           name="address"
                           rows="4">{{ isset($internship) ? $internship->address : null }}</textarea>
             </div>
@@ -81,6 +82,7 @@
             <div class="col-md-9">
                 <input type="text"
                        name="phone"
+                       tabindex="6"
                        id="phone"
                        value="{{ isset($internship) ? $internship->phone : null }}"
                        class="form-control"/>
@@ -92,6 +94,7 @@
             <div class="col-md-9">
                 <input type="text"
                        id="hot_line"
+                       tabindex="6"
                        name="hot_line"
                        value="{{ isset($internship) ? $internship->hot_line : null }}"
                        class="form-control"/>
@@ -102,6 +105,7 @@
             <label class="col-md-3 control-label">E-Mail Address</label>
             <div class="col-md-9">
                 <input type="text"
+                       tabindex="7"
                        name="e_mail_address"
                        id="e_mail_address"
                        value="{{ isset($internship) ? $internship->e_mail_address : null }}"
@@ -114,6 +118,7 @@
             <div class="col-md-9">
                 <input type="text"
                        name="web"
+                       tabindex="8"
                        id="web"
                        value="{{ isset($internship) ? $internship->web : null }}"
                        class="form-control"/>
@@ -140,6 +145,7 @@
                     <div class="col-md-9">
                         <input type="text"
                                name="training_field"
+                               tabindex="4"
                                id="training_field"
                                value="{{ isset($internship) ? $internship->training_field : null }}"
                                class="form-control">
@@ -151,6 +157,7 @@
                     <div class="col-md-9">
                         <input class="form-control"
                                id="start"
+                               tabindex="9"
                                value="{{ isset($internship) ? $internship->start : null }}"
                                name="start"
                                type="text">
@@ -162,6 +169,7 @@
                     <div class="col-md-9">
                         <input class="form-control"
                                id="end"
+                               tabindex="10"
                                value="{{ isset($internship) ? $internship->end : null }}"
                                name="end"
                                type="text">
@@ -172,6 +180,7 @@
                     <label class="col-md-3 control-label required">Issue Date</label>
                     <div class="col-md-9">
                         <input class="form-control"
+                               tabindex="11"
                                id="issue_date"
                                value="{{ isset($internship) ? $internship->issue_date : null }}"
                                name="issue_date"
@@ -183,6 +192,7 @@
                     <label class="col-md-3 control-label required">Academic Year</label>
                     <div class="col-md-9">
                         <select class="form-control"
+                                tabindex="12"
                                 name="academic_year"
                                 id="academic_year">
                             @foreach($academic_years as $academic_year)
@@ -203,7 +213,7 @@
                 <div class="form-group">
                     <label class="col-md-3 control-label required">Students</label>
                     <div class="col-md-9">
-                        <select class="form-control" name="students[]" id="students" multiple></select>
+                        <select class="form-control" tabindex="13" name="students[]" id="students" multiple></select>
                     </div>
                 </div>
             </div>

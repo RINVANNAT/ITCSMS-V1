@@ -60,15 +60,15 @@
             <p>The name of student is:</p>
         </div>
         <div class="student-list">
-            @foreach($internship->internship_student_annuals as $internship_student_annual)
+            @foreach($internship->students as $student)
                 <p>
                     <strong>
-                        @if($internship_student_annual->gender->code == 'M')
+                        @if($student->gender->code == 'M')
                             Mr.
                         @else
                             Miss.
                         @endif
-                        {{ strtoupper($internship_student_annual->student->name_latin) }}
+                        {{ strtoupper($student->name_latin) }}
                     </strong>
                 </p>
             @endforeach
@@ -83,16 +83,16 @@
 
             <p>
                 In this case, we would like to ask for your cooperation with our institute and let our students do this internship in your company in the field of {{strtoupper($internship->training_field)}}. After that,
-                @foreach($internship->internship_student_annuals as $internship_student_annual)
-                    {{ ($internship_student_annual->gender->code == 'M') ? 'he' : 'she' }}
+                @foreach($internship->students as $student)
+                    {{ ($student->gender->code == 'M') ? 'he' : 'she' }}
                 @endforeach
                 will write a
                 @if((($internship->degree->id == 2) && ($internship->grade->id == 2)) || (($internship->grade->id == 5) && ($internship->degree->id == 1)))
                     thesis and present it to a jury of the Institute for an evaluation. This evaluation will bring account with others for the final exam.
                 @else
                     report which will be submitted to
-                    @foreach($internship->internship_student_annuals as $internship_student_annual)
-                        {{ ($internship_student_annual->gender->code == 'M') ? 'his' : 'her' }}
+                    @foreach($internship->students as $student)
+                        {{ ($student->gender->code == 'M') ? 'his' : 'her' }}
                     @endforeach
                     relevant department.
                 @endif

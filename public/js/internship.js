@@ -68,9 +68,8 @@ $(function () {
 	
 	$('#period').daterangepicker()
 	
-	// search student
 	$("#students").select2({
-		placeholder: 'Enter name or id card...',
+		placeholder: 'Enter name ...',
 		theme: "bootstrap",
 		allowClear: false,
 		tags: true,
@@ -91,18 +90,18 @@ $(function () {
 					term: params.term || '',
 					academic_year_id: $('#academic_year').val(),
 					page: params.page || 1
-				}
+				};
 			},
 			cache: true
 		},
 		escapeMarkup: function (markup) {
-			return markup
+			return markup;
 		},
 		minimumInputLength: 3,
 		templateResult: formatRepoEmployee,
 		templateSelection: formatRepoSelectionEmployee,
 		multiple: true
-	})
+	});
 	
 	$(".companies").select2({
 		placeholder: 'Enter name...',

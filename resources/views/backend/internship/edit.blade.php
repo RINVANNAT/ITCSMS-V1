@@ -84,30 +84,18 @@
     <script type="text/javascript" src="{{ asset('plugins/daterangepicker/daterangepicker.js') }}"></script>
     <script type="text/javascript" src="{{ asset('plugins/datetimepicker/bootstrap-datetimepicker.min.js') }}"></script>
     <script type="text/javascript" src="{{ asset('js/internship.js') }}"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/axios/0.18.0/axios.min.js"></script>
     <script>
-        {{--@if(isset($internship))--}}
-        {{--let students = [];--}}
-            {{--@foreach($internship->internship_student_annuals as $student)--}}
-                {{--students.push({--}}
-                    {{--id: '{{ $student->id }}',--}}
-                    {{--department: '{{ $student->student->department }}',--}}
-                    {{--gender: '{{ $student->student->gender }}',--}}
-                    {{--id_card: '{{ $student->student->id_card }}',--}}
-                    {{--name_latin: '{{ $student->student->name_latin }}',--}}
-                    {{--text: '{{ $student->student->name_kh }}'--}}
-                {{--})--}}
-            {{--@endforeach--}}
-        {{--@endif--}}
-
-        {{--$(function () {--}}
-            {{--$('#students').val(null).trigger('change')--}}
-
-            {{--$('#students').trigger({--}}
-                {{--type: 'select2:select',--}}
-                {{--params: {--}}
-                    {{--data: students--}}
-                {{--}--}}
-            {{--})--}}
-        {{--})--}}
+        $(function () {
+	        axios.post('{{ route('internship.get-students') }}', {
+		        id: '{{ $internship->id }}'
+	        }).then (response => {
+		        response.data.forEach((item) => {
+			        var newOption = new Option(item.text, item.id, true, true);
+			        // Append it to the select
+			        $('#students').append(newOption).trigger('change');
+                })
+	        })
+        })
     </script>
 @stop
