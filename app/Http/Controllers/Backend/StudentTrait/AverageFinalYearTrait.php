@@ -14,6 +14,7 @@ use App\Models\Department;
 use App\Models\DepartmentOption;
 use App\Models\Student;
 use App\Models\StudentAnnual;
+use Maatwebsite\Excel\Facades\Excel;
 use PDF;
 use Barryvdh\Snappy\Facades\SnappyPdf;
 use Illuminate\Support\Facades\DB;
@@ -223,7 +224,229 @@ trait AverageFinalYearTrait
 
         if ($type == "show"){
             return view('backend.studentAnnual.average_final_year', compact('student_by_groups','scores','department','department_option','degree','academic_year','department_id','option_id','degree_id','academic_year_id'));
+        }else if ($type == "print") {
+            return PDF::loadView('backend.studentAnnual.print.average_final_year', compact('student_by_groups','scores','department','department_option','degree','academic_year'))->setPaper('a4')->stream();
         }
-        return PDF::loadView('backend.studentAnnual.print.average_final_year', compact('student_by_groups','scores','department','department_option','degree','academic_year'))->setPaper('a4')->stream();
+
+        return Excel::create('Average Final Year', function ($excel) use ($student_by_groups, $scores, $department, $department_option, $degree, $academic_year) {
+            $excel->sheet('Sheet 1', function ($sheet) use ($student_by_groups, $scores, $department, $department_option, $degree, $academic_year) {
+                $sheet->mergeCells('E3:G3');
+                $sheet->mergeCells('E4:G4');
+                $sheet->mergeCells('E5:G5');
+                $sheet->mergeCells('E7:F7');
+                $sheet->mergeCells('G7:H7');
+                $sheet->mergeCells('I7:J7');
+
+                $sheet->cell('E3', function ($cell) {
+                    $cell->setValue('Moyenne fin d\'etude');
+                    $cell->setFontSize(15);
+                    $cell->setAlignment('center');
+                });
+
+                $sheet->cell('E4', function ($cell) use ($department, $department_option) {
+                    $cell->setValue('Département '.$department->name_fr.' '. ($department_option != null ? $department_option->name_fr : "") );
+                    $cell->setFontSize(13);
+                    $cell->setAlignment('center');
+                });
+                $sheet->cell('E5', function ($cell) use ($academic_year, $degree, $department) {
+                    $cell->setValue('Classe: '.$degree->code.($degree->id == 1 ? '5' : '2').'-'.$department->code);
+                    $cell->setFontSize(12);
+                    $cell->setAlignment('center');
+                });
+                $sheet->cell('E6', function ($cell) use ($academic_year) {
+                    $cell->setValue('Année Scolaire('.$academic_year->name_latin.')');
+                    $cell->setFontSize(12);
+                    $cell->setAlignment('center');
+                });
+                $sheet->cell('E7', function ($cell) {
+                    $cell->setValue('1ère année');
+                    $cell->setFontSize(10);
+                    $cell->setAlignment('center');
+                });
+                $sheet->cell('G7', function ($cell) {
+                    $cell->setValue('2ème année');
+                    $cell->setFontSize(10);
+                    $cell->setAlignment('center');
+                });
+                $sheet->cell('I7', function ($cell) {
+                    $cell->setValue('Moy. de Sortie');
+                    $cell->setFontSize(10);
+                    $cell->setAlignment('center');
+                });
+                $sheet->cell('K7', function ($cell) {
+                    $cell->setValue('Mention');
+                    $cell->setFontSize(10);
+                    $cell->setAlignment('center');
+                });
+                $sheet->cell('L7', function ($cell) {
+                    $cell->setValue('Observation');
+                    $cell->setFontSize(10);
+                    $cell->setAlignment('center');
+                });
+                $sheet->cell('A8', function ($cell) {
+                    $cell->setValue('No');
+                    $cell->setFontSize(10);
+                    $cell->setAlignment('center');
+                });
+                $sheet->cell('B8', function ($cell) {
+                    $cell->setValue('ID');
+                    $cell->setFontSize(10);
+                    $cell->setAlignment('center');
+                });
+                $sheet->cell('C8', function ($cell) {
+                    $cell->setValue('Noms et Prénoms');
+                    $cell->setFontSize(10);
+                    $cell->setAlignment('center');
+                });
+                $sheet->cell('D8', function ($cell) {
+                    $cell->setValue('Sexe');
+                    $cell->setFontSize(10);
+                    $cell->setAlignment('center');
+                });
+                $sheet->cell('E8', function ($cell) {
+                    $cell->setValue('Moy.(M1)');
+                    $cell->setFontSize(10);
+                    $cell->setAlignment('center');
+                });
+                $sheet->cell('F8', function ($cell) {
+                    $cell->setValue('GPA');
+                    $cell->setFontSize(10);
+                    $cell->setAlignment('center');
+                });
+                $sheet->cell('G8', function ($cell) {
+                    $cell->setValue('Moy.(M2)');
+                    $cell->setFontSize(10);
+                    $cell->setAlignment('center');
+                });
+                $sheet->cell('H8', function ($cell) {
+                    $cell->setValue('GPA');
+                    $cell->setFontSize(10);
+                    $cell->setAlignment('center');
+                });
+                $sheet->cell('I8', function ($cell) {
+                    $cell->setValue('(M1+M2)/2');
+                    $cell->setFontSize(10);
+                    $cell->setAlignment('center');
+                });
+                $sheet->cell('J8', function ($cell) {
+                    $cell->setValue('GPA');
+                    $cell->setFontSize(10);
+                    $cell->setAlignment('center');
+                });
+                $sheet->cell('K8', function ($cell) {
+                    $cell->setValue('de sotie');
+                    $cell->setFontSize(10);
+                    $cell->setAlignment('center');
+                });
+
+                $i = 1;
+                $row = 9;
+
+                $min_score_before_graduated = 100;
+                $min_score_graduated = 100;
+                $min_moy_score = 100;
+                $max_score_before_graduated = 0;
+                $max_score_graduated = 0;
+                $max_moy_score = 0;
+                foreach ($student_by_groups as $key => $student_by_group) {
+                    $result = [];
+                    foreach ($student_by_group as $key => $student_by_class) {
+                        if(is_numeric($key)) {
+                            $result[$student_by_class["grade_id"]]["total_score"] = $scores[$student_by_class["id"]]["final_score"];
+                            $result[$student_by_class["grade_id"]]["total_gpa"] = get_gpa($scores[$student_by_class["id"]]["final_score"]);
+                            $result[$student_by_class["grade_id"]]["credit"] = 0;
+                            foreach ($scores[$student_by_class["id"]] as $key=>$score) {
+                                if(is_numeric($key)){
+                                    $result[$student_by_class["grade_id"]]["credit"] += $score["credit"];
+                                }
+                            }
+                        }
+                    }
+                    $sheet->cell('A' . $row, $i);
+                    $sheet->cell('B'.$row, $student_by_group[0]['id_card']);
+                    $sheet->cell('C'.$row, strtoupper($student_by_group[0]['name_latin']));
+                    $sheet->cell('D'.$row, $student_by_group[0]['gender']);
+
+                    foreach ($result as $year => $score_each_year) {
+                        if($year == 4 || $year ==1) {
+                            if(is_numeric($score_each_year["total_score"]) && $min_score_before_graduated>$score_each_year["total_score"]){
+                                $min_score_before_graduated = $score_each_year["total_score"];
+                            }
+                            if(is_numeric($score_each_year["total_score"]) && $max_score_before_graduated<$score_each_year["total_score"]){
+                                $max_score_before_graduated = $score_each_year["total_score"];
+                            }
+                        } else if($year == 5 || $year ==2) {
+                            if(is_numeric($score_each_year["total_score"]) && $min_score_graduated>$score_each_year["total_score"]){
+                                $min_score_graduated = $score_each_year["total_score"];
+                            }
+                            if(is_numeric($score_each_year["total_score"]) && $max_score_graduated<$score_each_year["total_score"]){
+                                $max_score_graduated = $score_each_year["total_score"];
+                            }
+                        }
+
+                        if ($year == 1 || $year == 4){
+                            $sheet->cell('E'.$row, $score_each_year["total_score"]);
+                            $sheet->cell('F'.$row, $score_each_year["total_gpa"]);
+                        } else {
+                            $sheet->cell('G'.$row, $score_each_year["total_score"]);
+                            $sheet->cell('H'.$row, $score_each_year["total_gpa"]);
+                        }
+                    }
+
+                    $final_average_score = 0;
+                    foreach($result as $result_score) {
+                        if(is_numeric($result_score["total_score"]) && is_numeric($final_average_score)) {
+                            $final_average_score = $final_average_score + $result_score["total_score"];
+                        } else {
+                            $final_average_score = "N/A";
+                        }
+                    }
+                    if(is_numeric($final_average_score)) {
+                        $final_average_score = $final_average_score / 2;
+                        $final_average_gpa = get_gpa($final_average_score);
+                        $final_average_mention = get_french_mention($final_average_score);
+                        if($min_moy_score>$final_average_score) {
+                            $min_moy_score = $final_average_score;
+                        }
+                        if($max_moy_score<$final_average_score) {
+                            $max_moy_score = $final_average_score;
+                        }
+                    } else {
+                        $final_average_score = "N/A";
+                        $final_average_gpa = "N/A";
+                        $final_average_mention = "N/A";
+                    }
+
+                    $sheet->cell('I'.$row, is_numeric($final_average_score)?round($final_average_score,2):"N/A");
+                    $sheet->cell('J'.$row, $final_average_gpa);
+                    $sheet->cell('K'.$row, $final_average_mention);
+
+                    $i++;
+                    $row++;
+                }
+
+                $sheet->cell('D'.$row, 'Max');
+                $sheet->cell('E'.$row, $max_score_before_graduated);
+                $sheet->cell('F'.$row, get_gpa($max_score_before_graduated));
+                $sheet->cell('G'.$row, $max_score_graduated);
+                $sheet->cell('H'.$row, get_gpa($max_score_graduated));
+                $sheet->cell('I'.$row, $max_moy_score);
+                $sheet->cell('J'.$row, get_gpa($max_moy_score));
+
+                $row++;
+
+                $sheet->cell('D'.$row, 'Min');
+                $sheet->cell('E'.$row, $min_score_before_graduated);
+                $sheet->cell('F'.$row, get_gpa($min_score_before_graduated));
+                $sheet->cell('G'.$row, $min_score_graduated);
+                $sheet->cell('H'.$row, get_gpa($min_score_graduated));
+                $sheet->cell('I'.$row, $min_moy_score);
+                $sheet->cell('J'.$row, get_gpa($min_moy_score));
+
+                $sheet->setBorder('E7:L7', 'thin');
+                $sheet->setBorder('A8:L' . ($row-2), 'thin');
+
+            });
+        })->download('xls');
     }
 }

@@ -61,6 +61,9 @@
                             <a target="_blank" href="{{route('admin.student.print_average_final_year', ['type'=>'print'])}}?department_id={{$department_id}}&option_id={{$option_id}}&degree_id={{$degree_id}}&academic_year_id={{$academic_year_id}}">
                                 <button class="btn btn-primary btn-average-final-year btn-sm" data-toggle="tooltip" style="margin-left: 5px" data-placement="left"  title="Print Average Final Year" id="print_average_final_year"><i class="fa fa-print"></i></button>
                             </a>
+                            <a href="{{route('admin.student.print_average_final_year', ['type'=>'excel'])}}?department_id={{$department_id}}&option_id={{$option_id}}&degree_id={{$degree_id}}&academic_year_id={{$academic_year_id}}">
+                                <button class="btn btn-info btn-average-final-year btn-sm" data-toggle="tooltip" style="margin-left: 5px" data-placement="left"  title="Export Average Final Year as excel" id="excel_average_final_year"><i class="fa fa-download"></i></button>
+                            </a>
                         </div>
                     </div>
                 </div>
@@ -86,6 +89,7 @@
                         <div class="col-xs-12">
                             <p align="center" style="line-height: normal"><strong>Moyenne fin d'etude</strong></p>
                             <p align="center" style="line-height: normal">Département {{$department->name_fr}} {{$department_option != null? $department_option->name_fr:""}}</p>
+                            <p align="center" style="line-height: normal"><strong>Classe: {{$degree->code}} {{$degree->id == 1 ? '5' : '2'}} - {{$department->code}}</strong></p>
                             <p align="center" style="line-height: normal">Année Scolaire({{$academic_year->name_latin}})</p>
                         </div>
                     </div>
@@ -151,7 +155,7 @@
                                         <td class="border-thin border-left border-right" align="center">{{$i}}</td>
                                         <td class="border-thin">{{$student_by_group[0]['id_card']}}</td>
                                         <td class="border-thin">{{strtoupper($student_by_group[0]['name_latin'])}}</td>
-                                        <td class="border-thin" align="center">{{to_latin_gender($student_by_group[0]['gender'])}}</td>
+                                        <td class="border-thin" align="center">{{$student_by_group[0]['gender']}}</td>
                                         @foreach($result as $year => $score_each_year)
                                         <?php
                                             if($year == 4 || $year ==1) {
@@ -171,7 +175,7 @@
                                             }
                                         ?>
                                         <td class="border-thin" align="center"><strong>{{$score_each_year["total_score"]}}</strong></td>
-                                        <td class="border-thin" align="center"><strong>{{$score_each_year["total_gpa"]}}</strong></td>
+                                        <td class="border-thin" align="center"><strong>{{substr($score_each_year["total_gpa"],0,3)}}</strong></td>
                                         @endforeach
 
                                         <?php
@@ -202,7 +206,7 @@
                                         ?>
 
                                         <td class="border-thin" align="center"><strong>{{is_numeric($final_average_score)?round($final_average_score,2):"N/A"}}</strong></td>
-                                        <td class="border-thin" align="center"><strong>{{$final_average_gpa}}</strong></td>
+                                        <td class="border-thin" align="center"><strong>{{substr($final_average_gpa,0,3)}}</strong></td>
                                         <td class="border-thin">{{$final_average_mention}}</td>
                                         <td class="border-thin border-left border-right"></td>
                                     </tr>
@@ -214,11 +218,11 @@
                                     <td class="border-top"></td>
                                     <td class="border-top" align="center">Max</td>
                                     <td class="border-top" align="center">{{$max_score_before_graduated}}</td>
-                                    <td class="border-top" align="center">{{get_gpa($max_score_before_graduated)}}</td>
+                                    <td class="border-top" align="center">{{substr(get_gpa($max_score_before_graduated),0,3)}}</td>
                                     <td class="border-top" align="center">{{$max_score_graduated}}</td>
-                                    <td class="border-top" align="center">{{get_gpa($max_score_graduated)}}</td>
+                                    <td class="border-top" align="center">{{substr(get_gpa($max_score_graduated),0,3)}}</td>
                                     <td class="border-top" align="center">{{$max_moy_score}}</td>
-                                    <td class="border-top" align="center">{{get_gpa($max_moy_score)}}</td>
+                                    <td class="border-top" align="center">{{substr(get_gpa($max_moy_score),0,3)}}</td>
                                     <td class="border-top"></td>
                                     <td class="border-top"></td>
                                 </tr>
@@ -228,11 +232,11 @@
                                     <td class="no-border"></td>
                                     <td class="no-border" align="center">Min</td>
                                     <td class="border-top" align="center">{{$min_score_before_graduated}}</td>
-                                    <td class="border-top" align="center">{{get_gpa($min_score_before_graduated)}}</td>
+                                    <td class="border-top" align="center">{{substr(get_gpa($min_score_before_graduated),0,3)}}</td>
                                     <td class="border-top" align="center">{{$min_score_graduated}}</td>
-                                    <td class="border-top" align="center">{{get_gpa($min_score_graduated)}}</td>
+                                    <td class="border-top" align="center">{{substr(get_gpa($min_score_graduated),0,3)}}</td>
                                     <td class="border-top" align="center">{{$min_moy_score}}</td>
-                                    <td class="border-top" align="center">{{get_gpa($min_moy_score)}}</td>
+                                    <td class="border-top" align="center">{{substr(get_gpa($min_moy_score),0,3)}}</td>
                                     <td class="no-border"></td>
                                     <td class="no-border"></td>
                                 </tr>
