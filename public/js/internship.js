@@ -8,7 +8,7 @@ function setValues(company) {
 		$('#hot_line').val(company.hp)
 		$('#e_mail_address').val(company.mail)
 		$('#web').val(company.web)
-		$('#title').val(company.title)
+		// $('#title').val(company.title)
 		$('#training_field').val(company.training_field)
 	} else {
 		$('#address').val('')
@@ -16,7 +16,7 @@ function setValues(company) {
 		$('#hot_line').val('')
 		$('#e_mail_address').val('')
 		$('#web').val('')
-		$('#title').val('')
+		// $('#title').val('')
 		$('#training_field').val('')
 	}
 }
@@ -54,8 +54,6 @@ function formatRepoEmployee(repo) {
 }
 
 $(function () {
-	// input mask
-	// phone
 	$('#phone,#hot_line').inputmask('(+999) 99 99 99 99[9]')
 	
 	$('#academic_year').select2({
