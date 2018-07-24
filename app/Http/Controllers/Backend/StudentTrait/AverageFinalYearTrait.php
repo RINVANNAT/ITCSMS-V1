@@ -21,6 +21,28 @@ use Illuminate\Support\Facades\DB;
 
 trait AverageFinalYearTrait
 {
+    public function get_observation($student_id) {
+        $observation = "";
+        $student = Student::find($student_id);
+        $history = null;
+        $scholarship_list = null;
+        foreach ($student->studentAnnuals as $studentAnnual) {
+            if($studentAnnual->history != null && $history == null) {
+                $history = $studentAnnual->history->name_en;
+            }
+            foreach($studentAnnual->scholarships as $scholarship){
+                if($scholarship_list == null && $scholarship->code != 'Boursier Partielle') {
+                    $scholarship_list = $scholarship->code;
+                }
+            }
+        };
+        if($student->redoubles != null) {
+            foreach ($student->redoubles as $redouble) {
+                $observation = $observation." ".$redouble->name_en;
+            };
+        }
+        return preg_replace('/\s+/', ' ', $observation." ".$history." ".$scholarship_list);
+    }
     /**
      * @return mixed
      */
@@ -148,6 +170,13 @@ trait AverageFinalYearTrait
             $students = $students->orderBy('students.id_card','ASC')
                 ->get()
                 ->toArray();
+            foreach ($students as &$student) {
+                try{
+                    $student["observation"] = $this->get_observation($student['student_id']);
+                } catch (\Exception $e) {
+                    dd($e->getMessage());
+                }
+            }
             $students = collect($students);
             $student_by_groups = collect($students)->sortBy(function($student){
                 return sprintf('%-12s%s',
@@ -362,6 +391,7 @@ trait AverageFinalYearTrait
                 foreach ($student_by_groups as $key => $student_by_group) {
                     $result = [];
                     foreach ($student_by_group as $key => $student_by_class) {
+                        $lowest_score = 100;
                         if(is_numeric($key)) {
                             $result[$student_by_class["grade_id"]]["total_score"] = $scores[$student_by_class["id"]]["final_score"];
                             $result[$student_by_class["grade_id"]]["total_gpa"] = get_gpa($scores[$student_by_class["id"]]["final_score"]);
@@ -377,8 +407,12 @@ trait AverageFinalYearTrait
                     $sheet->cell('B'.$row, $student_by_group[0]['id_card']);
                     $sheet->cell('C'.$row, strtoupper($student_by_group[0]['name_latin']));
                     $sheet->cell('D'.$row, $student_by_group[0]['gender']);
+                    $sheet->cell('L'.$row, $student_by_group[0]['observation']);
 
                     foreach ($result as $year => $score_each_year) {
+                        if($lowest_score > $score_each_year["total_score"]) {
+                            $lowest_score = $score_each_year["total_score"];
+                        }
                         if($year == 4 || $year ==1) {
                             if(is_numeric($score_each_year["total_score"]) && $min_score_before_graduated>$score_each_year["total_score"]){
                                 $min_score_before_graduated = $score_each_year["total_score"];
@@ -416,6 +450,10 @@ trait AverageFinalYearTrait
                         $final_average_score = $final_average_score / 2;
                         $final_average_gpa = get_gpa($final_average_score);
                         $final_average_mention = get_french_mention($final_average_score);
+                        if($lowest_score<50) {
+                            $final_average_gpa = get_gpa($lowest_score);
+                            $final_average_mention = get_french_mention($lowest_score);
+                        }
                         if($min_moy_score>$final_average_score) {
                             $min_moy_score = $final_average_score;
                         }

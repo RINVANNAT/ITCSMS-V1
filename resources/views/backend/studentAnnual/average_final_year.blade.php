@@ -139,6 +139,7 @@
                                     <?php
                                     $result = [];
                                     foreach ($student_by_group as $key => $student_by_class) {
+                                        $lowest_score = 100;
                                         if(is_numeric($key)) {
                                             $result[$student_by_class["grade_id"]]["total_score"] = $scores[$student_by_class["id"]]["final_score"];
                                             $result[$student_by_class["grade_id"]]["total_gpa"] = get_gpa($scores[$student_by_class["id"]]["final_score"]);
@@ -159,6 +160,9 @@
                                         <td class="border-thin" align="center">{{$student_by_group[0]['gender']}}</td>
                                         @foreach($result as $year => $score_each_year)
                                         <?php
+                                            if($lowest_score > $score_each_year["total_score"]) {
+                                                $lowest_score = $score_each_year["total_score"];
+                                            }
                                             if($year == 4 || $year ==1) {
                                                 if(is_numeric($score_each_year["total_score"]) && $min_score_before_graduated>$score_each_year["total_score"]){
                                                     $min_score_before_graduated = $score_each_year["total_score"];
@@ -175,8 +179,24 @@
                                                 }
                                             }
                                         ?>
-                                        <td class="border-thin" align="center"><strong>{{$score_each_year["total_score"]}}</strong></td>
-                                        <td class="border-thin" align="center"><strong>{{substr($score_each_year["total_gpa"],0,3)}}</strong></td>
+                                        <td class="border-thin" align="center">
+                                            @if($score_each_year["total_score"]<50)
+                                            <strong style="color: red">
+                                            @else
+                                            <strong>
+                                            @endif
+                                                {{$score_each_year["total_score"]}}
+                                            </strong>
+                                        </td>
+                                        <td class="border-thin" align="center">
+                                            @if($score_each_year["total_score"]<50)
+                                            <strong style="color: red">
+                                            @else
+                                            <strong>
+                                            @endif
+                                                {{substr($score_each_year["total_gpa"],0,3)}}
+                                            </strong>
+                                        </td>
                                         @endforeach
 
                                         <?php
@@ -192,6 +212,10 @@
                                             $final_average_score = $final_average_score / 2;
                                             $final_average_gpa = get_gpa($final_average_score);
                                             $final_average_mention = get_french_mention($final_average_score);
+                                            if($lowest_score<50) {
+                                                $final_average_gpa = get_gpa($lowest_score);
+                                                $final_average_mention = get_french_mention($lowest_score);
+                                            }
                                             if($min_moy_score>$final_average_score) {
                                                 $min_moy_score = $final_average_score;
                                             }
@@ -206,10 +230,34 @@
 
                                         ?>
 
-                                        <td class="border-thin" align="center"><strong>{{is_numeric($final_average_score)?round($final_average_score,2):"N/A"}}</strong></td>
-                                        <td class="border-thin" align="center"><strong>{{substr($final_average_gpa,0,3)}}</strong></td>
-                                        <td class="border-thin">{{$final_average_mention}}</td>
-                                        <td class="border-thin border-left border-right"></td>
+                                        <td class="border-thin" align="center">
+                                            @if($final_average_score<50)
+                                            <strong style="color: red">
+                                            @else
+                                            <strong>
+                                            @endif
+                                                {{is_numeric($final_average_score)?round($final_average_score,2):"N/A"}}
+                                            </strong>
+                                        </td>
+                                        <td class="border-thin" align="center">
+                                            @if($final_average_gpa<2)
+                                            <strong style="color: red">
+                                            @else
+                                            <strong>
+                                            @endif
+                                                {{substr($final_average_gpa,0,3)}}
+                                            </strong>
+                                        </td>
+                                        <td class="border-thin">
+                                            @if($final_average_gpa<2)
+                                            <strong style="color: red">
+                                            @else
+                                            <strong>
+                                            @endif
+                                                {{$final_average_mention}}
+                                            </strong>
+                                        </td>
+                                        <td class="border-thin">{!! $student_by_group[0]['observation'] !!}</td>
                                     </tr>
                                     @endif
                                     <?php $i++; ?>

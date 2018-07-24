@@ -164,7 +164,6 @@ class StudentAnnual extends Model
         return $this->belongsToMany('App\Models\StudentEvalStatus');
     }
 
-
     public function groupStudentAnnuals()
     {
         return $this->belongsToMany('App\Models\Group', 'group_student_annuals', 'student_annual_id', 'group_id');
