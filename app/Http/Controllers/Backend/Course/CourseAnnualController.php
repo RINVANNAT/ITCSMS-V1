@@ -20,6 +20,7 @@ use App\Models\Absence;
 use App\Models\AcademicYear;
 use App\Models\Average;
 use App\Models\CompetencyType;
+use App\Models\Configuration;
 use App\Models\Course;
 use App\Models\CourseAnnual;
 use App\Models\Degree;
@@ -5239,7 +5240,32 @@ class CourseAnnualController extends Controller
 
     }
 
-    public function test(Request $request){
+    public function getKeyIssuedData(Request $request){
+		$this->validate($request, ['key' => 'required']);
 
+		try {
+			$config = Configuration::where('key', $request->key)->first();
+			if($config instanceof Configuration) {
+				return json_encode(['config' => $config]);
+			}
+			return json_encode([]);
+		} catch (\Exception $exception) {
+			return $exception->getMessage();
+		}
+    }
+
+    public function getKeyIssuedDateStore(Request $request)
+    {
+    	$this->validate($request, [
+    	    'key' => 'required',
+		    'value' => 'required'
+	    ]);
+
+    	try {
+    		$config = Configuration::create($request->all());
+    		return json_encode(['config' => $config]);
+	    } catch (\Exception $exception) {
+    		return $exception->getMessage();
+	    }
     }
 }

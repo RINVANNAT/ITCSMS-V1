@@ -24,10 +24,10 @@ trait PrintTranscriptTrait
         $academicYears = AcademicYear::orderBy('id','desc')->lists('name_kh','id');
         $genders = Gender::lists('code','id');
         $current_date = Carbon::now()->format('d/m/Y');
-
+        $academicYearSelected = $request->academic_year;
         return view(
             'backend.studentAnnual.print.request_print_transcript',
-            compact('academicYears','genders','student_class','current_date')
+            compact('academicYears','genders','student_class','current_date', 'academicYearSelected')
         );
     }
     public function request_print_transcript_data(PrintTranscriptRequest $request){

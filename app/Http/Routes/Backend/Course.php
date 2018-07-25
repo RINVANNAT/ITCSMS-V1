@@ -186,5 +186,7 @@ Route::group([
 
     Route::get('/student/statistic-radie', 'CourseAnnualController@student_statistic_radie')->name('student.statistic_radie');
 
-    Route::get('/test', 'CourseAnnualController@test')->name('test');
+    // axios request
+    Route::post('get-key-issued-data', 'CourseAnnualController@getKeyIssuedData');
+    Route::post('get-key-issued-data/store', 'CourseAnnualController@getKeyIssuedDateStore');
 });
