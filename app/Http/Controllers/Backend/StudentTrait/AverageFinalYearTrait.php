@@ -151,9 +151,9 @@ trait AverageFinalYearTrait
                     $query->where("group_student_annuals.semester_id",$semester)->orWhereNull("group_student_annuals.semester_id");
                 });
 
-            if($department_option != null){
-                $students = $students->where('studentAnnuals.department_option_id',"=",$department_option->id);
-            }
+            //if($department_option != null){
+            //    $students = $students->where('studentAnnuals.department_option_id',"=",$department_option->id);
+            //}
             if($department != null){
                 $students = $students->where('studentAnnuals.department_id',"=",$department->id);
             }
@@ -187,6 +187,7 @@ trait AverageFinalYearTrait
 
             $scores = [];
             // Clean redouble student record first
+            //dd($student_by_groups);
             foreach($student_by_groups as &$student_by_class){
                 $before_graduated_year = null;
                 $before_graduated_key = null;
@@ -253,7 +254,9 @@ trait AverageFinalYearTrait
                 return $collection->get("moy_score");
             });
 
-            //dd($scores[24985]);
+            //dd($errors);
+            //dd($student_by_groups);
+            //dd($scores);
             if (count($student_by_groups) > 0) {
                 if ($type == "show"){
                     return view('backend.studentAnnual.average_final_year', compact('student_by_groups','scores','department','department_option','degree','academic_year','department_id','option_id','degree_id','academic_year_id'));
