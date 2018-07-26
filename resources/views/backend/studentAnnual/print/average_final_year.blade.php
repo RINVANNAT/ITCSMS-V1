@@ -81,7 +81,7 @@
                 <div class="col-xs-12">
                     <p align="center" style="line-height: normal"><strong>Moyenne fin d'etude</strong></p>
                     <p align="center" style="line-height: normal">Département {{$department->name_fr}} {{$department_option != null? $department_option->name_fr:""}}</p>
-                    <p align="center" style="line-height: normal"><strong>Classe: {{$degree->code}} {{$degree->id == 1 ? '5' : '2'}} - {{$department->code}}_{{ $department_option !=null ? $department_option->code : null }}</strong></p>
+                    <p align="center" style="line-height: normal"><strong>Classe: {{$degree->code}} {{$degree->id == 1 ? '5' : '2'}} - {{$department->code}} {{ $department_option !=null ? $department_option->code : null }}</strong></p>
                     <p align="center" style="line-height: normal">Année Scolaire({{$academic_year->name_latin}})</p>
                 </div>
             </div>
@@ -164,12 +164,12 @@
                                 }
                             }
                             ?>
-                            @if(isset($student_by_group[0]))
+                            @if(isset($student_by_group->first()))
                                 <tr>
                                     <td class="border-thin border-left border-right" align="center">{{$i}}</td>
-                                    <td class="border-thin">{{$student_by_group[0]['id_card']}}</td>
-                                    <td class="border-thin">{{strtoupper($student_by_group[0]['name_latin'])}}</td>
-                                    <td class="border-thin" align="center">{{$student_by_group[0]['gender']}}</td>
+                                    <td class="border-thin">{{$student_by_group->first()['id_card']}}</td>
+                                    <td class="border-thin">{{strtoupper($student_by_group->first()['name_latin'])}}</td>
+                                    <td class="border-thin" align="center">{{$student_by_group->first()['gender']}}</td>
                                     <?php $courses_fail = "" ?>
                                     @foreach($result as $year => $score_each_year)
                                         <?php
@@ -275,8 +275,8 @@
                                     </td>
                                     <td class="border-thin">
                                         <?php
-                                        if($student_by_group[0]['observation'] != '' and $student_by_group[0]['observation'] != ' ') {
-                                            echo $student_by_group[0]['observation'] . "<br/>";
+                                        if($student_by_group->first()['observation'] != '' and $student_by_group->first()['observation'] != ' ') {
+                                            echo $student_by_group->first()['observation'] . "<br/>";
                                         }
                                         echo '<span style="color: red;">';
                                         if($courses_fail != "" and $courses_fail != " "){

@@ -436,9 +436,9 @@ trait AverageFinalYearTrait
                         }
                     }
                     $sheet->cell('A' . $row, $i);
-                    $sheet->cell('B'.$row, $student_by_group[0]['id_card']);
-                    $sheet->cell('C'.$row, strtoupper($student_by_group[0]['name_latin']));
-                    $sheet->cell('D'.$row, $student_by_group[0]['gender']);
+                    $sheet->cell('B'.$row, $student_by_group->first()['id_card']);
+                    $sheet->cell('C'.$row, strtoupper($student_by_group->first()['name_latin']));
+                    $sheet->cell('D'.$row, $student_by_group->first()['gender']);
 
                     $courses_fail = "";
                     foreach ($result as $year => $score_each_year) {
@@ -506,8 +506,8 @@ trait AverageFinalYearTrait
                     $sheet->cell('K'.$row, $final_average_mention);
 
                     $remark = "";
-                    if($student_by_group[0]['observation'] != '' and $student_by_group[0]['observation'] != ' ') {
-                        $remark = $student_by_group[0]['observation'] . " ";
+                    if($student_by_group->first()['observation'] != '' and $student_by_group->first()['observation'] != ' ') {
+                        $remark = $student_by_group->first()['observation'] . " ";
                     }
                     if($courses_fail != "" and $courses_fail != " "){
                         $courses_fail = substr($courses_fail,0,-5);

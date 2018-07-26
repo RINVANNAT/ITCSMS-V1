@@ -172,12 +172,12 @@
                                         }
                                     }
                                     ?>
-                                    @if(isset($student_by_group[0]))
+                                    @if(isset($student_by_group->first()))
                                     <tr>
                                         <td class="border-thin border-left border-right" align="center">{{$i}}</td>
-                                        <td class="border-thin">{{$student_by_group[0]['id_card']}}</td>
-                                        <td class="border-thin">{{strtoupper($student_by_group[0]['name_latin'])}}</td>
-                                        <td class="border-thin" align="center">{{$student_by_group[0]['gender']}}</td>
+                                        <td class="border-thin">{{$student_by_group->first()['id_card']}}</td>
+                                        <td class="border-thin">{{strtoupper($student_by_group->first()['name_latin'])}}</td>
+                                        <td class="border-thin" align="center">{{$student_by_group->first()['gender']}}</td>
                                         <?php $courses_fail = "" ?>
                                         @foreach($result as $year => $score_each_year)
                                         <?php
@@ -283,8 +283,8 @@
                                         </td>
                                         <td class="border-thin">
                                             <?php
-                                                if($student_by_group[0]['observation'] != '' and $student_by_group[0]['observation'] != ' ') {
-                                                    echo $student_by_group[0]['observation'] . "<br/>";
+                                                if($student_by_group->first()['observation'] != '' and $student_by_group->first()['observation'] != ' ') {
+                                                    echo $student_by_group->first()['observation'] . "<br/>";
                                                 }
                                                 echo '<span style="color: red;">';
                                                 if($courses_fail != "" and $courses_fail != " "){
