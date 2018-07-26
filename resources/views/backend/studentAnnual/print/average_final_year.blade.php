@@ -164,7 +164,7 @@
                                 }
                             }
                             ?>
-                            @if(isset($student_by_group->first()))
+                            @if($student_by_group->first())
                                 <tr>
                                     <td class="border-thin border-left border-right" align="center">{{$i}}</td>
                                     <td class="border-thin">{{$student_by_group->first()['id_card']}}</td>
