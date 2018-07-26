@@ -157,7 +157,11 @@
                                         if(is_numeric($key)){
                                             $result[$student_by_class["grade_id"]]["credit"] += $score["credit"];
                                             if($score["score"] <30) {
-                                                $result[$student_by_class["grade_id"]]["courses_fail"] = $result[$student_by_class["grade_id"]]["courses_fail"] . $score["name_fr"] . " (". $score["score"] .")". "<br/>";
+                                                if($score["resit"] == null) {
+                                                    $result[$student_by_class["grade_id"]]["courses_fail"] = $result[$student_by_class["grade_id"]]["courses_fail"] . $score["name_fr"] . " (". $score["score"] .")". "<br/>";
+                                                } else if($score["resit"] < 30) {
+                                                    $result[$student_by_class["grade_id"]]["courses_fail"] = $result[$student_by_class["grade_id"]]["courses_fail"] . $score["name_fr"] . " (". $score["score"] .")". "<br/>";
+                                                }
                                             }
                                         }
                                     }
