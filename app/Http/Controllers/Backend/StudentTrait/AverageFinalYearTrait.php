@@ -53,7 +53,7 @@ trait AverageFinalYearTrait
             $degree = null;
             $academic_year = null;
             $department_id = $_GET["department_id"];
-            $option_id = isset($_GET["option_id"]) ? null : $_GET["option_id"];
+            $option_id = isset($_GET["option_id"]) ? $_GET["option_id"] : null;
             $degree_id= $_GET["degree_id"];
             $academic_year_id = $_GET["academic_year_id"];
 
@@ -261,7 +261,7 @@ trait AverageFinalYearTrait
                 if ($type == "show"){
                     return view('backend.studentAnnual.average_final_year', compact('student_by_groups','scores','department','department_option','degree','academic_year','department_id','option_id','degree_id','academic_year_id'));
                 }else if ($type == "print") {
-                    return PDF::loadView('backend.studentAnnual.print.average_final_year', compact('student_by_groups','scores','department','department_option','degree','academic_year'))->setPaper('a4')->stream();
+                    return PDF::loadView('backend.studentAnnual.print.average_final_year', compact('student_by_groups','scores','department','department_option','degree','academic_year','department_id','option_id','degree_id','academic_year_id'))->setPaper('a4')->stream();
                 }
             } else {
                 abort(404, 'Please provide us your message');
@@ -286,13 +286,13 @@ trait AverageFinalYearTrait
                     $cell->setAlignment('center');
                 });
 
-                $sheet->cell('E4', function ($cell) use ($department, $department_option) {
-                    $cell->setValue('Département '.$department->name_fr.' '. ($department_option != null ? $department_option->name_fr : "") );
+                $sheet->cell('E4', function ($cell) use ($department) {
+                    $cell->setValue('Département '.$department->name_fr);
                     $cell->setFontSize(13);
                     $cell->setAlignment('center');
                 });
-                $sheet->cell('E5', function ($cell) use ($academic_year, $degree, $department) {
-                    $cell->setValue('Classe: '.$degree->code.($degree->id == 1 ? '5' : '2').'-'.$department->code);
+                $sheet->cell('E5', function ($cell) use ($academic_year, $degree, $department, $department_option) {
+                    $cell->setValue('Classe: '.$degree->code.($degree->id == 1 ? '5' : '2').'-'.$department->code.' '. ($department_option != null ? $department_option->code : ""));
                     $cell->setFontSize(12);
                     $cell->setAlignment('center');
                 });
@@ -301,16 +301,41 @@ trait AverageFinalYearTrait
                     $cell->setFontSize(12);
                     $cell->setAlignment('center');
                 });
-                $sheet->cell('E8', function ($cell) {
-                    $cell->setValue('année');
-                    $cell->setFontSize(10);
-                    $cell->setAlignment('center');
-                });
-                $sheet->cell('G8', function ($cell) {
-                    $cell->setValue('année');
-                    $cell->setFontSize(10);
-                    $cell->setAlignment('center');
-                });
+                $first = true;
+                foreach($student_by_groups->first() as $student_by_group_key => $student_by_group) {
+                    if(is_numeric($student_by_group_key)) {
+                        if($first) {
+                            if($student_by_group['grade_id'] == 4) {
+                                $sheet->cell('E8', function ($cell) {
+                                    $cell->setValue('4ème année');
+                                    $cell->setFontSize(10);
+                                    $cell->setAlignment('center');
+                                });
+                            } else {
+                                $sheet->cell('E8', function ($cell) {
+                                    $cell->setValue('1ère année');
+                                    $cell->setFontSize(10);
+                                    $cell->setAlignment('center');
+                                });
+                            }
+                            $first = false;
+                        } else {
+                            if($student_by_group['grade_id'] == 5) {
+                                $sheet->cell('G8', function ($cell) {
+                                    $cell->setValue('5ème année');
+                                    $cell->setFontSize(10);
+                                    $cell->setAlignment('center');
+                                });
+                            } else {
+                                $sheet->cell('G8', function ($cell) {
+                                    $cell->setValue('2ème année');
+                                    $cell->setFontSize(10);
+                                    $cell->setAlignment('center');
+                                });
+                            }
+                        }
+                    }
+                }
                 $sheet->cell('I8', function ($cell) {
                     $cell->setValue('Moy. de Sortie');
                     $cell->setFontSize(10);
@@ -399,9 +424,13 @@ trait AverageFinalYearTrait
                             $result[$student_by_class["grade_id"]]["total_score"] = $scores[$student_by_class["id"]]["final_score"];
                             $result[$student_by_class["grade_id"]]["total_gpa"] = get_gpa($scores[$student_by_class["id"]]["final_score"]);
                             $result[$student_by_class["grade_id"]]["credit"] = 0;
+                            $result[$student_by_class["grade_id"]]["courses_fail"] = "";
                             foreach ($scores[$student_by_class["id"]] as $key=>$score) {
                                 if(is_numeric($key)){
                                     $result[$student_by_class["grade_id"]]["credit"] += $score["credit"];
+                                    if($score["score"] <30) {
+                                        $result[$student_by_class["grade_id"]]["courses_fail"] = $result[$student_by_class["grade_id"]]["courses_fail"] . $score["name_fr"] . " (". $score["score"] .")". " ";
+                                    }
                                 }
                             }
                         }
@@ -410,8 +439,8 @@ trait AverageFinalYearTrait
                     $sheet->cell('B'.$row, $student_by_group[0]['id_card']);
                     $sheet->cell('C'.$row, strtoupper($student_by_group[0]['name_latin']));
                     $sheet->cell('D'.$row, $student_by_group[0]['gender']);
-                    $sheet->cell('L'.$row, $student_by_group[0]['observation']);
 
+                    $courses_fail = "";
                     foreach ($result as $year => $score_each_year) {
                         if($lowest_score > $score_each_year["total_score"]) {
                             $lowest_score = $score_each_year["total_score"];
@@ -430,6 +459,9 @@ trait AverageFinalYearTrait
                             if(is_numeric($score_each_year["total_score"]) && $max_score_graduated<$score_each_year["total_score"]){
                                 $max_score_graduated = $score_each_year["total_score"];
                             }
+                        }
+                        if($score_each_year["courses_fail"] != "" and $score_each_year["courses_fail"] != " "){
+                            $courses_fail = $courses_fail . $score_each_year["courses_fail"]. " ";
                         }
 
                         if ($year == 1 || $year == 4){
@@ -473,6 +505,15 @@ trait AverageFinalYearTrait
                     $sheet->cell('J'.$row, $final_average_gpa);
                     $sheet->cell('K'.$row, $final_average_mention);
 
+                    $remark = "";
+                    if($student_by_group[0]['observation'] != '' and $student_by_group[0]['observation'] != ' ') {
+                        $remark = $student_by_group[0]['observation'] . " ";
+                    }
+                    if($courses_fail != "" and $courses_fail != " "){
+                        $courses_fail = substr($courses_fail,0,-5);
+                        $remark = $remark." ". $courses_fail;
+                    }
+                    $sheet->cell('L'.$row, $remark);
                     $i++;
                     $row++;
                 }
