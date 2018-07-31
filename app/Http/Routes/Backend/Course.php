@@ -189,4 +189,7 @@ Route::group([
     // axios request
     Route::post('get-key-issued-data', 'CourseAnnualController@getKeyIssuedData');
     Route::post('get-key-issued-data/store', 'CourseAnnualController@getKeyIssuedDateStore');
+
+    Route::post('attestation/get-key-issued-date-attestation', 'CourseAnnualController@getKeyIssuedAttestationDate');
+    Route::post('attestation/get-key-issued-date-attestation/store', 'CourseAnnualController@getKeyIssuedDateAttestationStore');
 });

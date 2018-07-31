@@ -29,10 +29,11 @@ trait PrintAttestationTrait
         $academicYears = AcademicYear::orderBy('id','desc')->lists('name_kh','id');
         $genders = Gender::lists('code','id');
         $current_date = Carbon::now()->format('d/m/Y');
+        $academicYear = $request->academic_year;
 
         return view(
             'backend.studentAnnual.print.request_print_attestation',
-            compact('academicYears','genders','student_class','current_date')
+            compact('academicYears','genders','student_class','current_date', 'academicYear')
         );
     }
 

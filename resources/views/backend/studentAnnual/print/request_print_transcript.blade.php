@@ -105,6 +105,7 @@
             <div class="pull-right" style="margin-right: 5px;">
                 <input type="text"
                        id="issued_date"
+                       readonly
                        name="issued_date"
                        v-model="issued_date"
                        class="form-control"
@@ -112,6 +113,9 @@
             </div>
             <div class="pull-right" style="margin-right: 5px; margin-top: 6px;">
                 <input type="checkbox" name="photo" placeholder="Photo" value="photo" checked/> Photo
+            </div>
+            <div class="pull-right" style="margin-right: 5px;">
+                <button class="btn btn-primary btn-sm" @click="showModal()">New Issue Date</button>
             </div>
         </div><!-- /.box-header -->
 
@@ -136,7 +140,7 @@
                     <form>
                         <div class="form-group">
                             <input type="text"
-                                   v-model="input_issued_date"
+                                   v-model="issued_date"
                                    id="input_issued_date"
                                    class="form-control"/>
                         </div>
@@ -186,6 +190,10 @@
             },
 
             methods: {
+	            showModal () {
+		            this.class_modal_toggle = ' in'
+		            this.style_css = 'display: block; padding-left: 0px;'
+	            },
 	            onChangeSemester () {
 	            	this.getIssuedData()
                 },
@@ -230,6 +238,7 @@
                 closeModal () {
 	                this.class_modal_toggle = ''
 	                this.style_css = 'display: hide;'
+	                window.location.reload(true)
                 }
             },
 

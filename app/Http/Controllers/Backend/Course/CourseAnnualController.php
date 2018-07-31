@@ -5262,10 +5262,54 @@ class CourseAnnualController extends Controller
 	    ]);
 
     	try {
-    		$config = Configuration::create($request->all());
+            $config = Configuration::where('key', $request->key)->first();
+
+            if ($config instanceof Configuration) {
+            	$config->value = $request->value;
+            	$config->update();
+            } else {
+                $config = Configuration::create($request->all());
+            }
     		return json_encode(['config' => $config]);
 	    } catch (\Exception $exception) {
     		return $exception->getMessage();
 	    }
+    }
+
+    public function getKeyIssuedAttestationDate(Request $request){
+        $this->validate($request, ['key' => 'required']);
+
+        try {
+            $config = Configuration::where('key', $request->key)->first();
+            if($config instanceof Configuration) {
+                return json_encode(['config' => $config]);
+            }
+            return json_encode([]);
+        } catch (\Exception $exception) {
+            return $exception->getMessage();
+        }
+    }
+
+    public function getKeyIssuedDateAttestationStore(Request $request)
+    {
+        $this->validate($request, [
+            'key' => 'required',
+            'value' => 'required'
+        ]);
+
+        try {
+            $config = Configuration::where('key', $request->key)->first();
+
+            if ($config instanceof Configuration) {
+            	$config->value = $request->value;
+            	$config->update();
+            } else {
+            	$config = Configuration::create($request->all());
+            }
+
+            return json_encode(['config' => $config]);
+        } catch (\Exception $exception) {
+            return $exception->getMessage();
+        }
     }
 }
