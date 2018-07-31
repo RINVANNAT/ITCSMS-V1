@@ -180,7 +180,7 @@
                             <tr>
                                 <td class="border-thin half-width">{{get_order_alpha_numeric($year)}} year average:</td>
                                 <td align="center" class="border-left border-bottom border-thin background">
-                                    <span class="background-half"><strong>{{$score_each_year["total_score"]}}</strong></span>
+                                    <span class="background-half"><strong>{{substr($score_each_year["total_gpa"],0,3)}}</strong></span>
                                 </td>
                                 <td align="center" class="border-right border-bottom">{{$score_each_year["credit"]}}</td>
                             </tr>
@@ -205,7 +205,7 @@
                                 Average of 2 final years = <strong><span style="font-size: 16px;"> FINAL AVERAGE:</span></strong>
                             </td>
                             <td></td>
-                            <td align="center" style="width: 22%; font-size: 18px; border: 0.5px solid black">
+                            <td align="center" style="width: 22%; font-size: 18px; border: 0.5px solid black; background-color: yellow">
                                 <strong>{{substr($final_average_gpa,0,3)}}</strong>
                             </td>
                         </tr>
@@ -217,7 +217,7 @@
                         <tr class="attestation-cell">
                             <td align="right" style="width: 60%"><strong>FINAL MENTION:</strong></td>
                             <td></td>
-                            <td align="center" style="width: 22%; border: 0.5px solid black;"><strong>{{$final_average_mention}}</strong></td>
+                            <td align="center" style="width: 22%; border: 0.5px solid black; background-color: yellow"><strong>{{$final_average_mention}}</strong></td>
                         </tr>
                     </table>
                 </div>
@@ -230,7 +230,7 @@
                         ?>
                         <div class="seen" align="center">
                             <p>Phnom Penh, {{$date->formatLocalized('%B %d, %Y')}}</p>
-                            <p style="line-height: 0.1;"><strong>{{$issued_by}}</strong></p>
+                            <h4 style="line-height: 0.1;"><strong>{{$issued_by}}</strong></h4>
                         </div>
                     </div>
                 </div>
@@ -259,7 +259,7 @@
                             </table>
                         </div>
                         <div class="remark">
-                            <span class="smallest_text"> <u>Remark</u>: This attestation cannot be given a second time.</span>
+                            <span class="smallest_text"> <u><b>Remark</b></u>: This attestation cannot be given a second time.</span>
                         </div>
                     </div>
                 </div>
