@@ -190,7 +190,7 @@ trait PrintAttestationTrait
      */
     public function print_attestation(PrintTranscriptRequest $request){
         $smis_server = Configuration::where("key","smis_server")->first();
-        $semester = 1;
+        $semester = 2;
         $studentIds = json_decode($request->ids);
 
         $students  = Student::select([
@@ -235,29 +235,33 @@ trait PrintAttestationTrait
             ->leftJoin('degrees', 'studentAnnuals.degree_id', '=', 'degrees.id')
             ->leftJoin('group_student_annuals', 'group_student_annuals.student_annual_id', '=', 'studentAnnuals.id')
             ->leftJoin('groups','groups.id','=','group_student_annuals.group_id')
+            ->where(function($query){
+                $query->where('students.radie','=', false)->orWhereNull('students.radie');
+            })
             ->whereNull('group_student_annuals.department_id')
+            //->whereIN("studentAnnuals.academic_year_id",[$academic_year->id,$academic_year->id-1])
             ->where(function($query) use($semester){
                 $query->where("group_student_annuals.semester_id",$semester)->orWhereNull("group_student_annuals.semester_id");
             })
-            ->whereIn('students.id', $studentIds)
             ->where(function($query) {
                 $query->where([
                     ['studentAnnuals.degree_id', 1],
                     ['studentAnnuals.grade_id', 4]
                 ])
-                ->orWhere([
-                    ['studentAnnuals.degree_id', 1],
-                    ['studentAnnuals.grade_id', 5]
-                ])
-                ->orWhere([
-                    ['studentAnnuals.degree_id', 2],
-                    ['studentAnnuals.grade_id', 1]
-                ])
-                ->orWhere([
-                    ['studentAnnuals.degree_id', 2],
-                    ['studentAnnuals.grade_id', 2]
-                ]);
+                    ->orWhere([
+                        ['studentAnnuals.degree_id', 1],
+                        ['studentAnnuals.grade_id', 5]
+                    ])
+                    ->orWhere([
+                        ['studentAnnuals.degree_id', 2],
+                        ['studentAnnuals.grade_id', 1]
+                    ])
+                    ->orWhere([
+                        ['studentAnnuals.degree_id', 2],
+                        ['studentAnnuals.grade_id', 2]
+                    ]);
             })
+            ->whereIN('students.id',$studentIds)
             ->orderBy('students.id_card','ASC')
             ->get()
             ->toArray();
@@ -275,36 +279,90 @@ trait PrintAttestationTrait
         $issued_number = $request->get("issued_number");
         $issued_date = $request->get("issued_date");
         $scores = [];
-
-        foreach($student_by_groups as $student_by_class){
+        foreach($student_by_groups as &$student_by_class){
+            $before_graduated_year = null;
+            $before_graduated_key = null;
+            $graduated_year = null;
+            $graduated_key = null;
+            if(count($student_by_class) > 2) {
+                foreach($student_by_class as $key => $student_by_grade) {
+                    if($student_by_grade['grade_id'] == 4 || $student_by_grade['grade_id']==1){
+                        if($before_graduated_year !== null) {
+                            // already exist, compare which one is smaller then remove
+                            if($before_graduated_year>$student_by_grade['academic_year_id']){
+                                $student_by_class->forget($key);
+                            } else {
+                                $student_by_class->forget($before_graduated_key);
+                            }
+                        } else {
+                            $before_graduated_key = $key;
+                            $before_graduated_year = $student_by_grade['academic_year_id'];
+                        }
+                    } else if ($student_by_grade['grade_id'] == 5 || $student_by_grade['grade_id']==2) {
+                        if($graduated_year !== null) {
+                            // already exist, compare which one is smaller then remove
+                            if($graduated_year>$student_by_grade['academic_year_id']){
+                                $student_by_class->forget($key);
+                            } else {
+                                $student_by_class->forget($graduated_key);
+                            }
+                        } else {
+                            $graduated_key = $key;
+                            $graduated_year = $student_by_grade['academic_year_id'];
+                        }
+                    }
+                }
+            }
+        }
+        $errors = [];
+        foreach($student_by_groups as &$student_by_class){
+            $moy_score = 0;
             if(count($student_by_class) == 2) {
                 foreach($student_by_class as $student_by_grade) {
                     $scores[$student_by_grade["id"]] = $this->getStudentScoreBySemester($student_by_grade['id'],null); // Full year
+                    if(empty($scores[$student_by_grade["id"]])) {
+                        $scores[$student_by_grade["id"]] = array("final_score" => "N/A","final_score_s1" => "N/A","final_score_s2" => "N/A");
+                        $moy_score = "N/A";
+                    }
+                    if(is_numeric($moy_score)){
+                        $moy_score = $moy_score + $scores[$student_by_grade["id"]]["final_score"];
+                    }
                 }
             } else {
                 // Something wrong here. It suppose to have only 2
-                throw new \Exception('Students have multiple class record');
+                array_push($errors,array("count"=>count($student_by_class), "id" => $student_by_class));
+                //throw new \Exception('Students have multiple class record');
+            }
+
+            if(is_numeric($moy_score)) {
+                $student_by_class->put("moy_score",$moy_score/2);
+            } else {
+                $student_by_class->put("moy_score",$moy_score);
             }
         }
+
+        $student_by_groups = $student_by_groups->sortByDesc(function($collection){
+            return $collection->get("moy_score");
+        });
         $ranking_data = [];
         $view = 'backend.studentAnnual.print.attestation';
         /*if(isset($students[0]) && (($students[0]['degree_id'] == 1 && $students[0]['grade_id'] == 5) || ($students[0]['degree_id'] == 2 && $students[0]['grade_id'] == 2))) {
             $view = 'backend.studentAnnual.print.attestation';
         }*/
 
-        //return view($view,
-        //    compact(
-        //        'ranking_data',
-        //        'scores',
-        //        'student_by_groups',
-        //        'semester',
-        //        'transcript_type',
-        //        'issued_by',
-        //        'issued_date',
-        //        'issued_number',
-        //        'smis_server'
-        //    )
-        //);
+        return view($view,
+            compact(
+                'ranking_data',
+                'scores',
+                'student_by_groups',
+                'semester',
+                'transcript_type',
+                'issued_by',
+                'issued_date',
+                'issued_number',
+                'smis_server'
+            )
+        );
 
         return SnappyPdf::loadView($view,
             compact(

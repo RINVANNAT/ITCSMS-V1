@@ -96,7 +96,8 @@
                             <td class="no-border"></td>
                             <?php
                             // dd($student_by_groups->first());
-                            $first = true
+                            $first = true;
+                            $fail = false;
                             ?>
                             @foreach($student_by_groups->first() as $student_by_group_key => $student_by_group)
                                 @if(is_numeric($student_by_group_key))
@@ -159,8 +160,10 @@
                                             if($score["score"] <30) {
                                                 if($score["resit"] == null) {
                                                     $result[$student_by_class["grade_id"]]["courses_fail"] = $result[$student_by_class["grade_id"]]["courses_fail"] . $score["name_fr"] . " (". $score["score"] .")". "<br/>";
+                                                    $fail = true;
                                                 } else if($score["resit"] < 30) {
                                                     $result[$student_by_class["grade_id"]]["courses_fail"] = $result[$student_by_class["grade_id"]]["courses_fail"] . $score["name_fr"] . " (". $score["score"] .")". "<br/>";
+                                                    $fail = true;
                                                 }
                                             }
                                         }
@@ -232,7 +235,10 @@
                                         $final_average_score = $final_average_score / 2;
                                         $final_average_gpa = get_gpa($final_average_score);
                                         $final_average_mention = get_french_mention($final_average_score);
-                                        if($lowest_score<50) {
+                                        if ($fail) {
+                                            $final_average_gpa = "";
+                                            $final_average_mention = "Echoué";
+                                        } else if($lowest_score<50) {
                                             $final_average_gpa = get_gpa($lowest_score);
                                             $final_average_mention = get_french_mention($lowest_score);
                                         }
@@ -265,7 +271,15 @@
                                                 @else
                                                     <strong>
                                                         @endif
-                                                        {{substr($final_average_gpa,0,3)}}
+                                                        <?php
+                                                        if($fail) {
+                                                            echo "";
+                                                        } else if(is_numeric($final_average_score)) {
+                                                            echo substr($final_average_gpa,0,3);
+                                                        } else {
+                                                            echo "N/A";
+                                                        }
+                                                        ?>
                                                     </strong>
                                     </td>
                                     <td class="border-thin">

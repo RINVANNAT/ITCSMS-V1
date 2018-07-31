@@ -122,27 +122,27 @@
 
                 <div class="row margin-top-degree">
                     <div class="col-xs-4 no-padding">
-                        <p>Name: <strong>{{strtoupper($student_by_group[0]['name_latin'])}}</strong></p>
+                        <p>Name: <strong>{{strtoupper($student_by_group->first()['name_latin'])}}</strong></p>
                     </div>
-                    <div class="col-xs-4" align="center"><span>Sex: {{to_latin_gender($student_by_group[0]['gender'])}}</span></div>
-                    <div class="col-xs-4" align="center"><span>ID: {{$student_by_group[0]['id_card']}}</span></div>
+                    <div class="col-xs-4" align="center"><span>Sex: {{to_latin_gender($student_by_group->first()['gender'])}}</span></div>
+                    <div class="col-xs-4" align="center"><span>ID: {{$student_by_group->first()['id_card']}}</span></div>
                 </div>
 
                 <div class="row">
                     <div class="col-xs-12 no-padding department">
-                        <p>Department: {{$student_by_group[0]['department_en']}}</p>
+                        <p>Department: {{$student_by_group->first()['department_en']}}</p>
                     </div>
                 </div>
-                @if($student_by_group[0]['option_en'] != null)
+                @if($student_by_group->first()['option_en'] != null)
                 <div class="row">
                     <div class="col-xs-12 no-padding">
-                        <p>Option: {{$student_by_group[0]['option_en']}}</p>
+                        <p>Option: {{$student_by_group->first()['option_en']}}</p>
                     </div>
                 </div>
                 @endif
                 <div class="row">
                     <div class="col-xs-12 no-padding">
-                        <p>Degree: {{$student_by_group[0]['degree_en']}}</p>
+                        <p>Degree: {{$student_by_group->first()['degree_en']}}</p>
                     </div>
                 </div>
 
@@ -156,16 +156,34 @@
                     </div>
                 </div>
                 <?php
-                    $result = [];
-                    foreach ($student_by_group as $student_by_class) {
-                        $result[$student_by_class["grade_id"]]["total_score"] = $scores[$student_by_class["id"]]["final_score"];
-                        $result[$student_by_class["grade_id"]]["total_gpa"] = get_gpa($scores[$student_by_class["id"]]["final_score"]);
-                        $result[$student_by_class["grade_id"]]["credit"] = 0;
-                        foreach ($scores[$student_by_class["id"]] as $key=>$score) {
-                            if(is_numeric($key)){
-                                $result[$student_by_class["grade_id"]]["credit"] += $score["credit"];
+                    try {
+                        $fail = false;
+                        $result = [];
+                        foreach ($student_by_group as $key => $student_by_class) {
+                            $lowest_score = 100;
+                            if(is_numeric($key)) {
+                                $result[$student_by_class["grade_id"]]["total_score"] = $scores[$student_by_class["id"]]["final_score"];
+                                $result[$student_by_class["grade_id"]]["total_gpa"] = get_gpa($scores[$student_by_class["id"]]["final_score"]);
+                                $result[$student_by_class["grade_id"]]["credit"] = 0;
+                                $result[$student_by_class["grade_id"]]["courses_fail"] = "";
+                                foreach ($scores[$student_by_class["id"]] as $key=>$score) {
+                                    if(is_numeric($key)){
+                                        $result[$student_by_class["grade_id"]]["credit"] += $score["credit"];
+                                        if($score["score"] <30) {
+                                            if($score["resit"] == null) {
+                                                $result[$student_by_class["grade_id"]]["courses_fail"] = $result[$student_by_class["grade_id"]]["courses_fail"] . $score["name_fr"] . " (". $score["score"] .")". "<br/>";
+                                                $fail = true;
+                                            } else if($score["resit"] < 30) {
+                                                $result[$student_by_class["grade_id"]]["courses_fail"] = $result[$student_by_class["grade_id"]]["courses_fail"] . $score["name_fr"] . " (". $score["score"] .")". "<br/>";
+                                                $fail = true;
+                                            }
+                                        }
+                                    }
+                                }
                             }
                         }
+                    } catch (Exception $e) {
+                        dd($e->getMessage());
                     }
                 ?>
                 <div class="row">
@@ -192,13 +210,30 @@
                 <div class="row">
                     <table class="table no-border">
                         <?php
-                            $final_average_score = 0;
-                            foreach($result as $result_score) {
-                                $final_average_score += $result_score["total_score"];
+                        $final_average_score = 0;
+                        foreach($result as $result_score) {
+                            if(is_numeric($result_score["total_score"]) && is_numeric($final_average_score)) {
+                                $final_average_score = $final_average_score + $result_score["total_score"];
+                            } else {
+                                $final_average_score = "N/A";
                             }
+                        }
+                        if(is_numeric($final_average_score)) {
                             $final_average_score = $final_average_score / 2;
                             $final_average_gpa = get_gpa($final_average_score);
-                            $final_average_mention = get_english_mention($final_average_score);
+                            $final_average_mention = get_french_mention($final_average_score);
+                            if ($fail) {
+                                $final_average_gpa = "";
+                                $final_average_mention = "Echoué";
+                            } else if($lowest_score<50) {
+                                $final_average_gpa = get_gpa($lowest_score);
+                                $final_average_mention = get_french_mention($lowest_score);
+                            }
+                        } else {
+                            $final_average_score = "N/A";
+                            $final_average_gpa = "N/A";
+                            $final_average_mention = "N/A";
+                        }
                         ?>
                         <tr>
                             <td align="right" style="width: 60%">
@@ -206,7 +241,20 @@
                             </td>
                             <td></td>
                             <td align="center" style="width: 22%; font-size: 18px; border: 0.5px solid black; background-color: yellow">
-                                <strong>{{substr($final_average_gpa,0,3)}}</strong>
+                                <?php
+                                if($fail) {
+                                    echo "";
+                                } else if(is_numeric($final_average_score)) {
+                                    if($final_average_gpa<2) {
+                                        echo "<strong style='color: red'>".substr($final_average_gpa,0,3)."</strong>>";
+                                    } else {
+                                        echo "<strong>".substr($final_average_gpa,0,3)."</strong>";
+                                    }
+
+                                } else {
+                                    echo "<strong style='color: red'>N/A</strong>";
+                                }
+                                ?>
                             </td>
                         </tr>
                         <tr>
@@ -217,7 +265,15 @@
                         <tr class="attestation-cell">
                             <td align="right" style="width: 60%"><strong>FINAL MENTION:</strong></td>
                             <td></td>
-                            <td align="center" style="width: 22%; border: 0.5px solid black; background-color: yellow"><strong>{{$final_average_mention}}</strong></td>
+                            <td align="center" style="width: 22%; border: 0.5px solid black; background-color: yellow">
+                                <?php
+                                if($final_average_gpa<2) {
+                                    echo "<strong style='color:red'>$final_average_mention</strong>";
+                                } else {
+                                    echo "<strong>$final_average_mention</strong>";
+                                }
+                                ?>
+                            </td>
                         </tr>
                     </table>
                 </div>
