@@ -93,17 +93,16 @@
         }
 
         .page {
-            /*width: 297mm;*/
-            /*height: 210mm;*/
             margin: 0 auto;
             margin-top: 10mm;
-            /*border: 1px #D3D3D3 solid;*/
             padding: 37mm 7mm 8mm 7mm;
-            /*border-radius: 5px;*/
-            /*background: white;*/
-            /*box-shadow: 0 0 5px rgba(0, 0, 0, 0.1);*/
             position: relative;
             font-family: "Times New Roman" !important;
+        }
+        div.page
+        {
+            page-break-after: always;
+            page-break-inside: avoid;
         }
     </style>
 
