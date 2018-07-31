@@ -97,7 +97,6 @@
                             <?php
                             // dd($student_by_groups->first());
                             $first = true;
-                            $fail = false;
                             ?>
                             @foreach($student_by_groups->first() as $student_by_group_key => $student_by_group)
                                 @if(is_numeric($student_by_group_key))
@@ -146,6 +145,7 @@
                         @endphp
                         @foreach($student_by_groups as $student_by_group)
                             <?php
+                            $fail = false;
                             $result = [];
                             foreach ($student_by_group as $key => $student_by_class) {
                                 $lowest_score = 100;

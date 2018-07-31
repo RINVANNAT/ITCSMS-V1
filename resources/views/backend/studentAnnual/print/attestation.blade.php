@@ -155,34 +155,30 @@
                     </div>
                 </div>
                 <?php
-                    try {
-                        $fail = false;
-                        $result = [];
-                        foreach ($student_by_group as $key => $student_by_class) {
-                            $lowest_score = 100;
-                            if(is_numeric($key)) {
-                                $result[$student_by_class["grade_id"]]["total_score"] = $scores[$student_by_class["id"]]["final_score"];
-                                $result[$student_by_class["grade_id"]]["total_gpa"] = get_gpa($scores[$student_by_class["id"]]["final_score"]);
-                                $result[$student_by_class["grade_id"]]["credit"] = 0;
-                                $result[$student_by_class["grade_id"]]["courses_fail"] = "";
-                                foreach ($scores[$student_by_class["id"]] as $key=>$score) {
-                                    if(is_numeric($key)){
-                                        $result[$student_by_class["grade_id"]]["credit"] += $score["credit"];
-                                        if($score["score"] <30) {
-                                            if($score["resit"] == null) {
-                                                $result[$student_by_class["grade_id"]]["courses_fail"] = $result[$student_by_class["grade_id"]]["courses_fail"] . $score["name_fr"] . " (". $score["score"] .")". "<br/>";
-                                                $fail = true;
-                                            } else if($score["resit"] < 30) {
-                                                $result[$student_by_class["grade_id"]]["courses_fail"] = $result[$student_by_class["grade_id"]]["courses_fail"] . $score["name_fr"] . " (". $score["score"] .")". "<br/>";
-                                                $fail = true;
-                                            }
+                    $fail = false;
+                    $result = [];
+                    foreach ($student_by_group as $key => $student_by_class) {
+                        $lowest_score = 100;
+                        if(is_numeric($key)) {
+                            $result[$student_by_class["grade_id"]]["total_score"] = $scores[$student_by_class["id"]]["final_score"];
+                            $result[$student_by_class["grade_id"]]["total_gpa"] = get_gpa($scores[$student_by_class["id"]]["final_score"]);
+                            $result[$student_by_class["grade_id"]]["credit"] = 0;
+                            $result[$student_by_class["grade_id"]]["courses_fail"] = "";
+                            foreach ($scores[$student_by_class["id"]] as $key=>$score) {
+                                if(is_numeric($key)){
+                                    $result[$student_by_class["grade_id"]]["credit"] += $score["credit"];
+                                    if($score["score"] <30) {
+                                        if($score["resit"] == null) {
+                                            $result[$student_by_class["grade_id"]]["courses_fail"] = $result[$student_by_class["grade_id"]]["courses_fail"] . $score["name_fr"] . " (". $score["score"] .")". "<br/>";
+                                            $fail = true;
+                                        } else if($score["resit"] < 30) {
+                                            $result[$student_by_class["grade_id"]]["courses_fail"] = $result[$student_by_class["grade_id"]]["courses_fail"] . $score["name_fr"] . " (". $score["score"] .")". "<br/>";
+                                            $fail = true;
                                         }
                                     }
                                 }
                             }
                         }
-                    } catch (Exception $e) {
-                        dd($e->getMessage());
                     }
                 ?>
                 <div class="row">
@@ -220,13 +216,13 @@
                         if(is_numeric($final_average_score)) {
                             $final_average_score = $final_average_score / 2;
                             $final_average_gpa = get_gpa($final_average_score);
-                            $final_average_mention = get_french_mention($final_average_score);
+                            $final_average_mention = get_english_mention($final_average_score);
                             if ($fail) {
                                 $final_average_gpa = "";
                                 $final_average_mention = "Echoué";
                             } else if($lowest_score<50) {
                                 $final_average_gpa = get_gpa($lowest_score);
-                                $final_average_mention = get_french_mention($lowest_score);
+                                $final_average_mention = get_english_mention($lowest_score);
                             }
                         } else {
                             $final_average_score = "N/A";

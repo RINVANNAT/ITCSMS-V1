@@ -147,7 +147,7 @@ trait PrintAttestationTrait
         }
         // Sort by multiple columns
         $studentAnnuals = collect($studentAnnuals)->sortBy(function($student){
-            return sprintf('%-12s%s', $student['class'],$student['group'], $student['name_latin']);
+            return sprintf('%-12s%s', $student['class'],$student['name_latin']);
         });
         $datatables =  app('datatables')->of($studentAnnuals)
             ->filter(function ($instance) use ($request) {
@@ -341,9 +341,6 @@ trait PrintAttestationTrait
             }
         }
 
-        $student_by_groups = $student_by_groups->sortByDesc(function($collection){
-            return $collection->get("moy_score");
-        });
         $ranking_data = [];
         $view = 'backend.studentAnnual.print.attestation';
         /*if(isset($students[0]) && (($students[0]['degree_id'] == 1 && $students[0]['grade_id'] == 5) || ($students[0]['degree_id'] == 2 && $students[0]['grade_id'] == 2))) {

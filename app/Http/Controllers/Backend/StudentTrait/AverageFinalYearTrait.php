@@ -302,7 +302,6 @@ trait AverageFinalYearTrait
                     $cell->setAlignment('center');
                 });
                 $first = true;
-                $fail = false;
                 foreach($student_by_groups->first() as $student_by_group_key => $student_by_group) {
                     if(is_numeric($student_by_group_key)) {
                         if($first) {
@@ -418,6 +417,7 @@ trait AverageFinalYearTrait
                 $max_score_graduated = 0;
                 $max_moy_score = 0;
                 foreach ($student_by_groups as $key => $student_by_group) {
+                    $fail = false;
                     $result = [];
                     foreach ($student_by_group as $key => $student_by_class) {
                         $lowest_score = 100;
