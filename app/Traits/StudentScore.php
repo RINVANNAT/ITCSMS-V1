@@ -269,14 +269,27 @@ trait StudentScore {
                 foreach ($subjects as $course_annual_id => $subject) {
 
                     $totalCredit = $totalCredit + $subject['credit'];
-                    $score = $score + ($subject['credit'] * $subject['score']);
+                    if($subject['resit'] != null && $subject['score']<$subject['resit']) {
+                        $score = $score + ($subject['credit'] * $subject['resit']);
+                    } else {
+                        $score = $score + ($subject['credit'] * $subject['score']);
+                    }
 
                     if($subject["semester"] == 1){
                         $totalCredit_s1 = $totalCredit_s1 + $subject['credit'];
-                        $score_s1 = $score_s1 + ($subject['credit'] * $subject['score']);
+                        if($subject['resit'] != null && $subject['score']<$subject['resit']) {
+                            $score_s1 = $score_s1 + ($subject['credit'] * $subject['resit']);
+                        } else {
+                            $score_s1 = $score_s1 + ($subject['credit'] * $subject['score']);
+                        }
+
                     } else {
                         $totalCredit_s2 = $totalCredit_s2 + $subject['credit'];
-                        $score_s2 = $score_s2 + ($subject['credit'] * $subject['score']);
+                        if($subject['resit'] != null && $subject['score']<$subject['resit']) {
+                            $score_s2 = $score_s2 + ($subject['credit'] * $subject['resit']);
+                        } else {
+                            $score_s2 = $score_s2 + ($subject['credit'] * $subject['score']);
+                        }
                     }
                 }
 

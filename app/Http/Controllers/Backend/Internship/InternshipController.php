@@ -7,6 +7,7 @@ use App\Http\Requests\Backend\Internship\DeleteInternshipRequest;
 use App\Http\Requests\Backend\Internship\StoreInternshipRequest;
 use App\Models\AcademicYear;
 use App\Models\Internship\Internship;
+use App\Models\Internship\InternshipCompany;
 use App\Models\Internship\InternshipStudentAnnual;
 use App\Models\Student;
 use App\Models\StudentAnnual;
@@ -48,9 +49,11 @@ class InternshipController extends Controller
             $number += count($internships);
         }
         $academic_years = AcademicYear::latest()->get();
+        $companies = InternshipCompany::select('name as text', '*')->orderBy('name', 'asc')->get();
         return view('backend.internship.create')->with([
             'academic_years' => $academic_years,
-            'number' => $number
+            'number' => $number,
+            'companies' => $companies
         ]);
     }
 
@@ -72,7 +75,30 @@ class InternshipController extends Controller
         isset($is_name) ? $is_name = true : $is_name = false;
 
         try {
-            $internship = '';
+
+            $company = json_decode($request->company);
+
+            if (is_null($company)) {
+                $company = InternshipCompany::create([
+                    'name' => $request->company,
+                    'title' => $request->title,
+                    'training_field' => $request->training_field,
+                    'address' => $request->address,
+                    'phone' => $request->phone,
+                    'hp' => $request->hot_line,
+                    'mail' => $request->e_mail_address,
+                    'web' => $request->web
+                ]);
+                $request['company'] = $company->name;
+                $request['company_id'] = $company->id;
+            } else {
+                $findInternshipCompany = InternshipCompany::where('name', 'ilike', '%'.$company->name)
+                    ->orWhere('title', 'ilike', '%'.$company->title)
+                    ->orWhere('training_field', 'ilike', '%'.$company->training_field)
+                    ->first();
+                $request['company'] = $findInternshipCompany->name;
+                $request['company_id'] = $findInternshipCompany->id;
+            }
 
             if (array_key_exists('id', $request->all())) {
                 $internship = Internship::find($request->id);
@@ -128,14 +154,15 @@ class InternshipController extends Controller
             $number += count($internships);
         }
         $academic_years = AcademicYear::latest()->get();
-        $internship = Internship::with('internship_student_annuals')->find($internship->id);
+        $internship = Internship::with('internship_student_annuals', 'internship_company')->find($internship->id);
         $pre_academic_year = null;
         foreach ($internship->internship_student_annuals as $internship_student_annual) {
             $student_annual = StudentAnnual::find($internship_student_annual->student_annual_id);
             $pre_academic_year = AcademicYear::find($student_annual->academic_year_id);
         }
+        $companies = InternshipCompany::select('name as text', '*')->orderBy('name', 'asc')->get();
 
-        return view('backend.internship.edit', compact('internship', 'number', 'academic_years', 'pre_academic_year'));
+        return view('backend.internship.edit', compact('internship', 'number', 'academic_years', 'pre_academic_year', 'companies'));
     }
 
     /**
@@ -170,8 +197,11 @@ class InternshipController extends Controller
                 ->join('studentAnnuals', 'studentAnnuals.student_id', '=', 'students.id')
                 ->join('departments', 'departments.id', '=', 'studentAnnuals.department_id')
                 ->where('studentAnnuals.academic_year_id', $academic_year_id)
-                ->where('students.name_latin', 'ilike', "%" . Input::get("term") . "%")
-                ->orWhere('students.name_kh', 'ilike', "%" . Input::get("term") . "%")
+                ->where(function ($students) {
+                    $students->where('students.name_latin', 'ilike', "%" . Input::get("term") . "%")
+                        ->orWhere('students.name_kh', 'ilike', "%" . Input::get("term") . "%")
+                        ->orWhere('students.id_card', 'ilike', "%" . Input::get("term") . "%");
+                })
                 ->select([
                     'studentAnnuals.id as id',
                     'students.id_card',
@@ -237,7 +267,11 @@ class InternshipController extends Controller
                     ' <a href="' . route('internship.delete', $internship) . '" class="btn btn-xs btn-danger"><i class="fa fa-trash" data-toggle="tooltip" data-placement="top" title="" data-original-title="Delete"></i></a>';
             })
             ->addColumn('checkbox', function ($internship) {
-                return '<input type="checkbox" name="internships[]" class="checkbox" data-id=' . $internship->id . '>';
+                if(is_null($internship->printed_at)) {
+                    return '<input type="checkbox" checked name="internships[]" class="checkbox" data-id=' . $internship->id . '>';
+                } else {
+                    return '<input type="checkbox" name="internships[]" class="checkbox" data-id=' . $internship->id . '>';
+                }
             })
             ->editColumn('printed_at', function ($internship){
                 return '<span class="label label-success">'.
@@ -280,6 +314,17 @@ class InternshipController extends Controller
             return [
                 'status'=> true
             ];
+        }
+    }
+
+    public function remoteInternshipCompanies (Request $request)
+    {
+        $this->validate($request, ['q' => 'required']);
+        try {
+            $result = InternshipCompany::where('name', 'ilike', '%'.$request->q.'%')->select('name as text', 'id')->get();
+            return json_encode(['code' => 1, 'status' => 'success', 'results' => $result]);
+        } catch (\Exception $exception) {
+            return json_encode(['code' => 0, 'message' => $exception->getMessage()]);
         }
     }
 }

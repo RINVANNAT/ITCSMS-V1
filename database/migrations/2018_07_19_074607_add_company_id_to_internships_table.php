@@ -3,7 +3,7 @@
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
 
-class ModifyInternshipsTable extends Migration
+class AddCompanyIdToInternshipsTable extends Migration
 {
     /**
      * Run the migrations.
@@ -13,8 +13,7 @@ class ModifyInternshipsTable extends Migration
     public function up()
     {
         Schema::table('internships', function (Blueprint $table) {
-            $table->string('title')->nullable()->change();
-            $table->boolean('is_name')->default(true);
+            $table->integer('company_id')->nullable();
         });
     }
 
@@ -26,8 +25,7 @@ class ModifyInternshipsTable extends Migration
     public function down()
     {
         Schema::table('internships', function (Blueprint $table) {
-            $table->dropColumn('is_name');
-
+            $table->dropColumn('company_id')->nullable();
         });
     }
 }

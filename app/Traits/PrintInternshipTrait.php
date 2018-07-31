@@ -31,15 +31,17 @@ trait PrintInternshipTrait
                 $department_id = null;
                 $grade_id = null;
                 $degree_id = null;
+                $students = [];
                 foreach ($internship->internship_student_annuals as $internship_student_annual) {
                     $student_annual = StudentAnnual::find($internship_student_annual->student_annual_id);
                     $department_id = $student_annual->department_id;
                     $grade_id = $student_annual->grade_id;
                     $degree_id = $student_annual->degree_id;
                     $student = Student::find($student_annual->student_id);
-                    $internship_student_annual['student'] = $student;
-                    $internship_student_annual['gender'] = Gender::find($student->gender_id);
+                    $student['gender'] = Gender::find($student->gender_id);
+                    array_push($students, $student);
                 }
+                $internship['students'] = $students;
                 $internship['department'] = Department::find($department_id);
                 $internship['grade'] = Grade::find($grade_id);
                 $internship['degree'] = Degree::find($degree_id);

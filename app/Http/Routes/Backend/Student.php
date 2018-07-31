@@ -61,6 +61,5 @@
 
         Route::get('student/annual/export-lists-format', 'StudentAnnualController@exportFormatLists')->name('admin.student_annual.export_format_lists');
         Route::post('student/annual/import', 'StudentAnnualController@importStudentGroup')->name('student_annual.import');
-
     });
 

@@ -19,7 +19,8 @@ class Internship extends Model
         'start',
         'end',
         'issue_date',
-        'is_name'
+        'is_name',
+        'company_id'
     ];
 
     protected static function boot()
@@ -32,5 +33,10 @@ class Internship extends Model
      */
     public function internship_student_annuals(){
         return $this->hasMany(InternshipStudentAnnual::class);
+    }
+    
+    public function internship_company ()
+    {
+        return $this->belongsTo(InternshipCompany::class, 'company_id');
     }
 }

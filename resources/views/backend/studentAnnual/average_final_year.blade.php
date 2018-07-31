@@ -89,7 +89,7 @@
                         <div class="col-xs-12">
                             <p align="center" style="line-height: normal"><strong>Moyenne fin d'etude</strong></p>
                             <p align="center" style="line-height: normal">Département {{$department->name_fr}} {{$department_option != null? $department_option->name_fr:""}}</p>
-                            <p align="center" style="line-height: normal"><strong>Classe: {{$degree->code}} {{$degree->id == 1 ? '5' : '2'}} - {{$department->code}}_{{ $department_option !=null ? $department_option->code : null }}</strong></p>
+                            <p align="center" style="line-height: normal"><strong>Classe: {{$degree->code}} {{$degree->id == 1 ? '5' : '2'}} - {{$department->code}} {{ $department_option !=null ? $department_option->code : null }}</strong></p>
                             <p align="center" style="line-height: normal">Année Scolaire({{$academic_year->name_latin}})</p>
                         </div>
                     </div>
@@ -102,20 +102,36 @@
                                     <td class="no-border"></td>
                                     <td class="no-border"></td>
                                     <td class="no-border"></td>
-                                    <td class="border-thin" align="center" colspan="2">
-                                        @if($student_by_groups->first()[0]['grade_id'] == 4)
-                                            4 <sup>ème</sup> année
+                                    <?php
+                                    // dd($student_by_groups->first());
+                                    $first = true
+                                    ?>
+                                    @foreach($student_by_groups->first() as $student_by_group_key => $student_by_group)
+                                    @if(is_numeric($student_by_group_key))
+                                        @if ($first)
+                                            @if($student_by_group['grade_id'] == 4)
+                                                <td class="border-thin" align="center" colspan="2">
+                                                    4 <sup>ème</sup> année
+                                                </td>
+                                            @else
+                                                <td class="border-thin" align="center" colspan="2">
+                                                    1 <sup>ère</sup> année
+                                                </td>
+                                            @endif
+                                            <?php $first = false; ?>
                                         @else
-                                            1 <sup>ère</sup> année
+                                            @if($student_by_group['grade_id'] == 5)
+                                                <td class="border-thin" align="center" colspan="2">
+                                                    5 <sup>ème</sup> année
+                                                </td>
+                                            @else
+                                                <td class="border-thin" align="center" colspan="2">
+                                                    2 <sup>ème</sup> année
+                                                </td>
+                                            @endif
                                         @endif
-                                    </td>
-                                    <td class="border-thin" align="center" colspan="2">
-                                        @if($student_by_groups->first()[1]['grade_id'] == 5)
-                                            5 <sup>ème</sup> année
-                                        @else
-                                            2 <sup>ème</sup> année
-                                        @endif
-                                    </td>
+                                    @endif
+                                    @endforeach
                                     <td class="border-thin" align="center" colspan="2">Moy. de Sortie</td>
                                     <td class="border-thin border-bottom" align="center" rowspan="2">Mention <br/> de Sortie</td>
                                     <td class="border-thin border-bottom" align="center" rowspan="2">Observation</td>
@@ -144,20 +160,29 @@
                                             $result[$student_by_class["grade_id"]]["total_score"] = $scores[$student_by_class["id"]]["final_score"];
                                             $result[$student_by_class["grade_id"]]["total_gpa"] = get_gpa($scores[$student_by_class["id"]]["final_score"]);
                                             $result[$student_by_class["grade_id"]]["credit"] = 0;
+                                            $result[$student_by_class["grade_id"]]["courses_fail"] = "";
                                             foreach ($scores[$student_by_class["id"]] as $key=>$score) {
                                                 if(is_numeric($key)){
                                                     $result[$student_by_class["grade_id"]]["credit"] += $score["credit"];
+                                                    if($score["score"] <30) {
+                                                        if($score["resit"] == null) {
+                                                            $result[$student_by_class["grade_id"]]["courses_fail"] = $result[$student_by_class["grade_id"]]["courses_fail"] . $score["name_fr"] . " (". $score["score"] .")". "<br/>";
+                                                        } else if($score["resit"] < 30) {
+                                                            $result[$student_by_class["grade_id"]]["courses_fail"] = $result[$student_by_class["grade_id"]]["courses_fail"] . $score["name_fr"] . " (". $score["score"] .")". "<br/>";
+                                                        }
+                                                    }
                                                 }
                                             }
                                         }
                                     }
                                     ?>
-                                    @if(isset($student_by_group[0]))
+                                    @if($student_by_group->first())
                                     <tr>
                                         <td class="border-thin border-left border-right" align="center">{{$i}}</td>
-                                        <td class="border-thin">{{$student_by_group[0]['id_card']}}</td>
-                                        <td class="border-thin">{{strtoupper($student_by_group[0]['name_latin'])}}</td>
-                                        <td class="border-thin" align="center">{{$student_by_group[0]['gender']}}</td>
+                                        <td class="border-thin">{{$student_by_group->first()['id_card']}}</td>
+                                        <td class="border-thin">{{strtoupper($student_by_group->first()['name_latin'])}}</td>
+                                        <td class="border-thin" align="center">{{$student_by_group->first()['gender']}}</td>
+                                        <?php $courses_fail = "" ?>
                                         @foreach($result as $year => $score_each_year)
                                         <?php
                                             if($lowest_score > $score_each_year["total_score"]) {
@@ -177,6 +202,9 @@
                                                 if(is_numeric($score_each_year["total_score"]) && $max_score_graduated<$score_each_year["total_score"]){
                                                     $max_score_graduated = $score_each_year["total_score"];
                                                 }
+                                            }
+                                            if($score_each_year["courses_fail"] != "" and $score_each_year["courses_fail"] != " "){
+                                                $courses_fail = $courses_fail . $score_each_year["courses_fail"]. "<br/>";
                                             }
                                         ?>
                                         <td class="border-thin" align="center">
@@ -257,7 +285,19 @@
                                                 {{$final_average_mention}}
                                             </strong>
                                         </td>
-                                        <td class="border-thin">{!! $student_by_group[0]['observation'] !!}</td>
+                                        <td class="border-thin">
+                                            <?php
+                                                if($student_by_group->first()['observation'] != '' and $student_by_group->first()['observation'] != ' ') {
+                                                    echo $student_by_group->first()['observation'] . "<br/>";
+                                                }
+                                                echo '<span style="color: red;">';
+                                                if($courses_fail != "" and $courses_fail != " "){
+                                                    $courses_fail = substr($courses_fail,0,-5);
+                                                    echo $courses_fail;
+                                                }
+                                                echo '</span>';
+                                            ?>
+                                        </td>
                                     </tr>
                                     @endif
                                     <?php $i++; ?>

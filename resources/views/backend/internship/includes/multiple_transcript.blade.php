@@ -60,15 +60,15 @@
             <p>The names of students are:</p>
         </div>
         <div class="student-list">
-            @foreach($internship->internship_student_annuals as $internship_student_annual)
+            @foreach($internship->students as $student)
                 <p>
                     <strong>
-                        @if($internship_student_annual->gender->code == 'M')
+                        @if($student->gender->code == 'M')
                             Mr.
                         @else
                             Miss.
                         @endif
-                        {{ strtoupper($internship_student_annual->student->name_latin) }}
+                        {{ strtoupper($student->name_latin) }}
                     </strong>
                 </p>
             @endforeach
