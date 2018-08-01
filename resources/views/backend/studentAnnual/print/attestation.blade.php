@@ -77,11 +77,11 @@
             font-size: 10pt;
         }
         .background {
-            background: #a6a9af;
+            background: rgba(166, 169, 175, 0.51);
         }
         .background-half{
             width: 50%;
-            background: #a6a9af;
+            background: #a6a9af2b;
         }
 
         .underline {
@@ -195,7 +195,7 @@
                                 <td align="center" class="border-left border-bottom border-thin background">
                                     <span class="background-half"><strong>{{substr($score_each_year["total_gpa"],0,3)}}</strong></span>
                                 </td>
-                                <td align="center" class="border-right border-bottom">{{$score_each_year["credit"]}}</td>
+                                <td align="center" class="border-right border-bottom">{{round($score_each_year["credit"], 2)}}</td>
                             </tr>
                             @endforeach
                         </table>
@@ -257,7 +257,7 @@
                             <td></td>
                             <td></td>
                         </tr>
-                        <tr class="attestation-cell">
+                        <tr>
                             <td align="right" style="width: 60%"><strong>FINAL MENTION:</strong></td>
                             <td></td>
                             <td align="center" style="width: 22%; border: 0.5px solid black; background-color: yellow">
