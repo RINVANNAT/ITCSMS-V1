@@ -82,7 +82,7 @@
         }
 
         .footer {
-            margin-top: 220px;
+            margin-top: 205px;
             bottom: 10mm;
             left: 22mm;
             font-size: 10pt;
@@ -116,8 +116,9 @@
             page-break-inside: avoid;
         }
 
-        table {
-
+        .remark h5 {
+            margin-bottom: 0px;
+            font-family: times_new_roman_normal !important;
         }
     </style>
 
@@ -410,7 +411,9 @@
                             </table>
                         </div>
                         <div class="remark">
-                            <span class="smallest_text"> <u><b>Remark</b></u>: This attestation cannot be given a second time.</span>
+                            <h5><b>Remark:</b></h5>
+                            <span style="margin-left: 10mm"><b style="font-size: 14pt">*</b> The annual Grade Point Average minimum requirement to pass to the higher class is 2.0.</span><br/>
+                            <span style="margin-left: 10mm"><b style="font-size: 14pt">*</b> This transcript cannot be given for the second time.</span>
                         </div>
                     </div>
                 </div>
