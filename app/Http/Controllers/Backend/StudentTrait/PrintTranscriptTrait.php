@@ -126,7 +126,7 @@ trait PrintTranscriptTrait
         }
         // Sort by multiple columns
         $studentAnnuals = collect($studentAnnuals)->sortBy(function($student){
-            return sprintf('%-12s%s', $student['class'],$student['group'], $student['name_latin']);
+            return sprintf('%-12s%s', $student['class'], $student['name_latin']);
         });
         $datatables =  app('datatables')->of($studentAnnuals)
             ->filter(function ($instance) use ($request) {
