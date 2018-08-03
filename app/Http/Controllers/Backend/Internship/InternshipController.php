@@ -78,26 +78,31 @@ class InternshipController extends Controller
 
             $company = json_decode($request->company);
 
-            if (is_null($company)) {
-                $company = InternshipCompany::create([
-                    'name' => $request->company,
-                    'title' => $request->title,
-                    'training_field' => $request->training_field,
-                    'address' => $request->address,
-                    'phone' => $request->phone,
-                    'hp' => $request->hot_line,
-                    'mail' => $request->e_mail_address,
-                    'web' => $request->web
-                ]);
-                $request['company'] = $company->name;
+            if (array_key_exists('id', $request->all())) {
+                $request['company'] = $company->text;
                 $request['company_id'] = $company->id;
             } else {
-                $findInternshipCompany = InternshipCompany::where('name', 'ilike', '%'.$company->name)
-                    ->orWhere('title', 'ilike', '%'.$company->title)
-                    ->orWhere('training_field', 'ilike', '%'.$company->training_field)
-                    ->first();
-                $request['company'] = $findInternshipCompany->name;
-                $request['company_id'] = $findInternshipCompany->id;
+                if (is_null($company)) {
+                    $company = InternshipCompany::create([
+                        'name' => $request->company,
+                        'title' => $request->title,
+                        'training_field' => $request->training_field,
+                        'address' => $request->address,
+                        'phone' => $request->phone,
+                        'hp' => $request->hot_line,
+                        'mail' => $request->e_mail_address,
+                        'web' => $request->web
+                    ]);
+                    $request['company'] = $company->name;
+                    $request['company_id'] = $company->id;
+                } else {
+                    $findInternshipCompany = InternshipCompany::where('name', 'ilike', '%'.$company->name)
+                        ->orWhere('title', 'ilike', '%'.$company->title)
+                        ->orWhere('training_field', 'ilike', '%'.$company->training_field)
+                        ->first();
+                    $request['company'] = $findInternshipCompany->name;
+                    $request['company_id'] = $findInternshipCompany->id;
+                }
             }
 
             if (array_key_exists('id', $request->all())) {
@@ -148,21 +153,25 @@ class InternshipController extends Controller
      */
     public function edit(Internship $internship)
     {
-        $number = 1;
-        $internships = Internship::all();
-        if (count($internships)) {
-            $number += count($internships);
-        }
-        $academic_years = AcademicYear::latest()->get();
-        $internship = Internship::with('internship_student_annuals', 'internship_company')->find($internship->id);
-        $pre_academic_year = null;
-        foreach ($internship->internship_student_annuals as $internship_student_annual) {
-            $student_annual = StudentAnnual::find($internship_student_annual->student_annual_id);
-            $pre_academic_year = AcademicYear::find($student_annual->academic_year_id);
-        }
-        $companies = InternshipCompany::select('name as text', '*')->orderBy('name', 'asc')->get();
+        try {
+            $number = 1;
+            $internships = Internship::all();
+            if (count($internships)) {
+                $number += count($internships);
+            }
+            $academic_years = AcademicYear::latest()->get();
+            $internship = Internship::with('internship_student_annuals', 'internship_company')->find($internship->id);
+            $pre_academic_year = null;
+            foreach ($internship->internship_student_annuals as $internship_student_annual) {
+                $student_annual = StudentAnnual::find($internship_student_annual->student_annual_id);
+                $pre_academic_year = AcademicYear::find($student_annual->academic_year_id);
+            }
+            $companies = InternshipCompany::select('name as text', '*')->orderBy('name', 'asc')->get();
 
-        return view('backend.internship.edit', compact('internship', 'number', 'academic_years', 'pre_academic_year', 'companies'));
+            return view('backend.internship.edit', compact('internship', 'number', 'academic_years', 'pre_academic_year', 'companies'));
+        } catch (\Exception $exception) {
+            return $exception->getMessage();
+        }
     }
 
     /**
