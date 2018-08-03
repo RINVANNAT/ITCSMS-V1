@@ -232,14 +232,18 @@
                     <div class="pull-right" style="margin-top: 8mm">
                         <p class="text-center title" style="font-size: 12pt">
                             <?php
+                            if(($issued_date == null) or ($issued_date == "")){
                                 $now = \Carbon\Carbon::now();
-                                $c_day = $now->formatLocalized('%d');
-                                $c_month = $now->formatLocalized('%B');
-                                $c_year = $now->formatLocalized('%Y');
+                            } else {
+                                $now = \Carbon\Carbon::createFromFormat("d/m/Y",$issued_date);
+                            }
+                            $c_day = $now->formatLocalized('%d');
+                            $c_month = $now->formatLocalized('%B');
+                            $c_year = $now->formatLocalized('%Y');
                             ?>
                             <b>Phnom Penh, ITC, {{$c_day." ".$c_month." ".$c_year}}</b>
                         <p style="margin-top: -10px !important;">
-                            P. The Director of the Institute of Technology of Cambodia
+                            The Director of the Institute of Technology of Cambodia
                         </p>
                         </p>
                     </div>
