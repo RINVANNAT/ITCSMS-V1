@@ -60,6 +60,7 @@
 
             $first_chunk = array_slice($data->data, 0, 27);
             $next_chunk = array_slice($data->data,27);
+            $all_chunk = $data->data;
         ?>
         <div class="page">
             <div class="row">
@@ -165,7 +166,7 @@
                 </tr>
                 </thead>
                 <tbody>
-                    @foreach($first_chunk as $element)
+                    @foreach($all_chunk as $element)
                         <tr>
                             @foreach($element as $key => $value)
                                 @if($key == "student_name")
@@ -179,69 +180,6 @@
                 </tbody>
             </table>
         </div>
-        @if(count($next_chunk)> 0)
-            <?php
-            $chunks = array_chunk($next_chunk, 35);
-            ?>
-            @foreach($chunks as $chunk)
-                <div class="page">
-                    <table style="width:400mm; margin-left: auto; margin-right: auto;">
-                        <tbody>
-                        @foreach($chunk as $element)
-                            <tr>
-                                <?php
-                                    $index = 0;
-                                ?>
-                                @foreach($element as $key => $value)
-                                    <?php
-                                    if($index >3){
-                                        $width = "";
-                                        if(isset($data->nestedHeaders[1][$index]->label)){
-                                            if($data->nestedHeaders[1][$index]->label == "Abs"){
-                                                $custom_class = "Abs";
-                                            } else if(is_numeric($data->nestedHeaders[1][$index]->label)){
-                                                $custom_class = "score";
-                                            } else {
-                                                $custom_class = $data->nestedHeaders[1][$index]->label;
-                                            }
-                                        } else {
-                                            if(isset($data->nestedHeaders[1][$index])){
-                                                if(is_numeric($data->nestedHeaders[1][$index])){
-                                                    $custom_class = "score";
-                                                } else {
-                                                    $custom_class = $data->nestedHeaders[1][$index];
-                                                }
-                                            }
-                                        }
-                                    } else {
-                                        $custom_class = "";
-                                        if($index == 0 || $index == 3){
-                                            $width = "style='width:10mm'";
-                                        } else if($index == 1){
-                                            $width = "style='width:20mm'";
-                                        } else {
-                                            $width = "style='width:40mm !important'";
-                                        }
-                                    }
-
-                                    ?>
-                                    @if($key == "student_name")
-                                        <td {!! $width !!} class="left {{$custom_class}}">{{$value}}</td>
-                                    @elseif($key != "_empty_")
-                                        <?php
-                                                $td_style = "";
-                                        ?>
-                                        <td {!! $width !!} {!! $td_style !!} class="center {{$custom_class}}">{{$value}}</td>
-                                    @endif
-                                    <?php $index++; ?>
-                                @endforeach
-                            </tr>
-                        @endforeach
-                        </tbody>
-                    </table>
-                </div>
-            @endforeach
-        @endif
 @endsection
 
 @section('scripts')
