@@ -323,7 +323,7 @@
                                             </tr>
 
                                             <tr>
-                                                <td style="width: 6% !important">B<sub>+</sub></td>
+                                                <td style="width: 6% !important">B<sup>+</sup></td>
                                                 <td style="width: 6% !important"> =&nbsp; </td>
                                                 <td style="width: 6% !important">80%</td>
                                                 <td style="width: 6% !important"> &nbsp;&minus; </td>
@@ -347,7 +347,7 @@
                                             </tr>
 
                                             <tr>
-                                                <td style="width: 6% !important">C<sub>+</sub></td>
+                                                <td style="width: 6% !important">C<sup>+</sup></td>
                                                 <td style="width: 6% !important"> =&nbsp; </td>
                                                 <td style="width: 6% !important">65%</td>
                                                 <td style="width: 6% !important"> &nbsp;&minus; </td>
@@ -413,7 +413,7 @@
                         <div class="remark">
                             <h5><b>Remark:</b></h5>
                             <span style="margin-left: 10mm"><b style="font-size: 14pt">*</b> The annual Grade Point Average minimum requirement to pass to the higher class is 2.0.</span><br/>
-                            <span style="margin-left: 10mm"><b style="font-size: 14pt">*</b> This transcript cannot be given for the second time.</span>
+                            <span style="margin-left: 10mm;"><b style="font-size: 14pt">*</b> This attestation cannot be given for the second time.</span>
                         </div>
                     </div>
                 </div>

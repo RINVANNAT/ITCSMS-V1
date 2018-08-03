@@ -149,22 +149,107 @@
                     <div class="transcript-footer">
                         <div class="grading-system">
                             <h5><b>GRADING SYSTEM:</b></h5>
-                            <table class="">
+                            <table style="margin-left: 0px">
                                 <tr>
-                                    <td>A = 85% -100% = 4.00 = Excellent</td>
-                                    <td>C = 50% - 64% = 2.00 = Fair</td>
-                                </tr>
-                                <tr>
-                                    <td>B<sup>+</sup> = 80% - 84% = 3.50 = Very Good</td>
-                                    <td>D = 45% - 49% = 1.50 = Poor</td>
-                                </tr>
-                                <tr>
-                                    <td>B = 70% - 79% = 3.00 = Good</td>
-                                    <td>E = 40% - 44% = 1.00 = Very Poor</td>
-                                </tr>
-                                <tr>
-                                    <td>C<sup>+</sup> = 65% - 69% = 2.5 = Fairly Good</td>
-                                    <td>F = < 40% = 0.00 = Failure</td>
+                                    <td>
+                                        <table style="width: 150%;">
+                                            <tr>
+                                                <td style="width: 6% !important">A</td>
+                                                <td style="width: 6% !important"> =&nbsp; </td>
+                                                <td style="width: 6% !important">85%</td>
+                                                <td style="width: 6% !important"> &nbsp;&minus; </td>
+                                                <td style="width: 6% !important">100%</td>
+                                                <td style="width: 6% !important"> =&nbsp; </td>
+                                                <td style="width: 6% !important">4.0</td>
+                                                <td style="width: 6% !important"> &nbsp;=&nbsp; </td>
+                                                <td style="width: 52% !important">Excellent</td>
+                                            </tr>
+
+                                            <tr>
+                                                <td style="width: 6% !important">B<sup>+</sup></td>
+                                                <td style="width: 6% !important"> =&nbsp; </td>
+                                                <td style="width: 6% !important">80%</td>
+                                                <td style="width: 6% !important"> &nbsp;&minus; </td>
+                                                <td style="width: 6% !important">84%</td>
+                                                <td style="width: 6% !important"> =&nbsp; </td>
+                                                <td style="width: 6% !important">3.5</td>
+                                                <td style="width: 6% !important"> &nbsp;=&nbsp; </td>
+                                                <td style="width: 52% !important">Very Good</td>
+                                            </tr>
+
+                                            <tr>
+                                                <td style="width: 6% !important">B</td>
+                                                <td style="width: 6% !important"> =&nbsp; </td>
+                                                <td style="width: 6% !important">70%</td>
+                                                <td style="width: 6% !important"> &nbsp;&minus; </td>
+                                                <td style="width: 6% !important">79%</td>
+                                                <td style="width: 6% !important"> =&nbsp; </td>
+                                                <td style="width: 6% !important">3.0</td>
+                                                <td style="width: 6% !important"> &nbsp;=&nbsp; </td>
+                                                <td style="width: 52% !important">Good</td>
+                                            </tr>
+
+                                            <tr>
+                                                <td style="width: 6% !important">C<sup>+</sup></td>
+                                                <td style="width: 6% !important"> =&nbsp; </td>
+                                                <td style="width: 6% !important">65%</td>
+                                                <td style="width: 6% !important"> &nbsp;&minus; </td>
+                                                <td style="width: 6% !important">69%</td>
+                                                <td style="width: 6% !important"> =&nbsp; </td>
+                                                <td style="width: 6% !important">2.5</td>
+                                                <td style="width: 6% !important"> &nbsp;=&nbsp; </td>
+                                                <td style="width: 52% !important">Fairly Good</td>
+                                            </tr>
+                                        </table>
+                                    </td>
+                                    <td>
+                                        <table style="width: 140%; margin-left: 100px">
+                                            <tr>
+                                                <td style="width: 6% !important">C</td>
+                                                <td style="width: 6% !important"> &nbsp;= </td>
+                                                <td style="width: 6% !important">50%</td>
+                                                <td style="width: 6% !important"> &nbsp;&minus; </td>
+                                                <td style="width: 6% !important">64%</td>
+                                                <td style="width: 6% !important"> &nbsp;= </td>
+                                                <td style="width: 6% !important">2.0</td>
+                                                <td style="width: 6% !important"> &nbsp;= </td>
+                                                <td style="width: 52% !important">Fair</td>
+                                            </tr>
+
+                                            <tr>
+                                                <td style="width: 6% !important">D</td>
+                                                <td style="width: 6% !important"> &nbsp;= </td>
+                                                <td style="width: 6% !important">45%</td>
+                                                <td style="width: 6% !important"> &nbsp;&minus; </td>
+                                                <td style="width: 6% !important">49%</td>
+                                                <td style="width: 6% !important"> &nbsp;= </td>
+                                                <td style="width: 6% !important">1.5</td>
+                                                <td style="width: 6% !important"> &nbsp;= </td>
+                                                <td style="width: 52% !important">Poor</td>
+                                            </tr>
+
+                                            <tr>
+                                                <td style="width: 6% !important">E</td>
+                                                <td style="width: 6% !important"> &nbsp;= </td>
+                                                <td style="width: 6% !important">40%</td>
+                                                <td style="width: 6% !important"> &nbsp;&minus; </td>
+                                                <td style="width: 6% !important">44%</td>
+                                                <td style="width: 6% !important"> &nbsp;= </td>
+                                                <td style="width: 6% !important">1.0</td>
+                                                <td style="width: 6% !important"> &nbsp;= </td>
+                                                <td style="width: 52% !important">Very Poor</td>
+                                            </tr>
+                                            <tr>
+                                                <td style="width: 6% !important">F</td>
+                                                <td style="width: 6% !important"> &nbsp;= <</td>
+                                                <td style="width: 6% !important">40%</td>
+                                                <td style="width: 6% !important"> &nbsp;= </td>
+                                                <td style="width: 6% !important">0.0</td>
+                                                <td style="width: 6% !important"> &nbsp;= </td>
+                                                <td colspan="3">Failure</td>
+                                            </tr>
+                                        </table>
+                                    </td>
                                 </tr>
                             </table>
                         </div>
