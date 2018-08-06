@@ -7,6 +7,7 @@ use App\Models\Configuration;
 use App\Models\Gender;
 use App\Models\PrintedTranscript;
 use App\Models\StudentAnnual;
+use Barryvdh\Snappy\Facades\SnappyPdf;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
@@ -277,6 +278,24 @@ trait PrintTranscriptTrait
                 'is_certificate'
             )
         );
+
+//        return SnappyPdf::loadView($view,
+//            compact(
+//                'ranking_data',
+//                'scores',
+//                'students',
+//                'semester',
+//                'transcript_type',
+//                'issued_by',
+//                'issued_date',
+//                'issued_number',
+//                'smis_server',
+//                'photo',
+//                'is_front',
+//                'is_back',
+//                'is_certificate'
+//            )
+//        )->stream();
     }
 
     public function mark_printed_transcript(PrintTranscriptRequest $request){

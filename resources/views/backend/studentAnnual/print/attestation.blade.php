@@ -82,7 +82,7 @@
         }
 
         .footer {
-            margin-top: 205px;
+            margin-top: 170px;
             bottom: 10mm;
             left: 22mm;
             font-size: 10pt;
@@ -120,6 +120,16 @@
             margin-bottom: 0px;
             font-family: times_new_roman_normal !important;
         }
+
+        .smis-row {
+            width: 100%;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .smis-column:nth-child(1) { text-align: left; flex: 1;}
+        .smis-column:nth-child(2) { text-align: center; flex: 1;}
+        .smis-column:nth-child(3) { text-align: right; flex: 1;}
     </style>
 
 </head>
@@ -136,11 +146,19 @@
                 </div>
 
                 <div class="row margin-top-degree">
-                    <div class="col-xs-4 no-padding">
-                        <p><strong>Name: {{strtoupper($student_by_group->first()['name_latin'])}}</strong></p>
-                    </div>
-                    <div class="col-xs-4" align="center"><span><strong>Sex:</strong> {{to_latin_gender($student_by_group->first()['gender'])}}</span></div>
-                    <div class="col-xs-4" align="center"><span><strong>ID:</strong> {{$student_by_group->first()['id_card']}}</span></div>
+                    @if(strlen($student_by_group->first()['name_latin']) > 15)
+                        <div class="col-xs-7 no-padding">
+                            <p class="name"><strong>Name: {{strtoupper($student_by_group->first()['name_latin'])}}</strong></p>
+                        </div>
+                        <div class="col-xs-2" align="center"><span><strong>Sex:</strong> {{to_latin_gender($student_by_group->first()['gender'])}}</span></div>
+                        <div class="col-xs-3" align="center"><span><strong>ID:</strong> {{$student_by_group->first()['id_card']}}</span></div>
+                    @else
+                        <div class="col-xs-4 no-padding">
+                            <p class="name"><strong>Name: {{strtoupper($student_by_group->first()['name_latin'])}}</strong></p>
+                        </div>
+                        <div class="col-xs-4" align="center"><span><strong>Sex:</strong> {{to_latin_gender($student_by_group->first()['gender'])}}</span></div>
+                        <div class="col-xs-4" align="center"><span><strong>ID:</strong> {{$student_by_group->first()['id_card']}}</span></div>
+                    @endif
                 </div>
 
                 <div class="row">
@@ -424,4 +442,17 @@
 </div>
 @endforeach
 </body>
+{!! Html::script('plugins/jquery.min.js') !!}
+<script>
+    $(function () {
+        var name = $('.name');
+
+        var numWords = name.text().split("").length;
+        console.log(numWords)
+
+        if (numWords >= 14) {
+            // name.css("font-size", "8px");
+        }
+    })
+</script>
 </html>
