@@ -261,25 +261,7 @@ trait PrintTranscriptTrait
             $view = 'backend.studentAnnual.print.transcript';
         }
 
-        return view($view,
-            compact(
-                'ranking_data',
-                'scores',
-                'students',
-                'semester',
-                'transcript_type',
-                'issued_by',
-                'issued_date',
-                'issued_number',
-                'smis_server',
-                'photo',
-                'is_front',
-                'is_back',
-                'is_certificate'
-            )
-        );
-
-//        return SnappyPdf::loadView($view,
+//        return view($view,
 //            compact(
 //                'ranking_data',
 //                'scores',
@@ -295,7 +277,25 @@ trait PrintTranscriptTrait
 //                'is_back',
 //                'is_certificate'
 //            )
-//        )->stream();
+//        );
+
+        return SnappyPdf::loadView($view,
+            compact(
+                'ranking_data',
+                'scores',
+                'students',
+                'semester',
+                'transcript_type',
+                'issued_by',
+                'issued_date',
+                'issued_number',
+                'smis_server',
+                'photo',
+                'is_front',
+                'is_back',
+                'is_certificate'
+            )
+        )->stream();
     }
 
     public function mark_printed_transcript(PrintTranscriptRequest $request){
