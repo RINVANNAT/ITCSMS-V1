@@ -48,7 +48,7 @@
 
         .transcript-footer {
             position: absolute;
-            bottom: 0 !important;
+            bottom: 5mm !important;
             height: auto;
             width: 100%;
             left: 13mm;
