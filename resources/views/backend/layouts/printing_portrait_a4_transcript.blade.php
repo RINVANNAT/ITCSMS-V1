@@ -74,7 +74,7 @@
         }
 
         h4, h3, h2, h1 {
-            font-family: "Times New Roman"
+            font-family: times_new_roman_normal !important;
         }
 
         * {
@@ -87,7 +87,8 @@
             height: 297mm;
             margin-top: 5mm;
             padding: 20mm;
-            padding-right: 0mm;
+            padding-top: 5mm;
+            padding-left: 15mm;
             background: white;
             position: relative;
         }
@@ -100,16 +101,21 @@
             font-size: 10pt;
         }
 
+        .transcript-header {
+            padding-left: 0px !important;
+            padding-right: 0px !important;
+        }
+
         td {
-            font-family: "Times New Roman" !important;
+            font-family: times_new_roman_normal !important;
         }
         @media print {
             .page {
                 width: 210mm;
                 height: 297mm;
                 margin-top: 10mm;
-                padding: 20mm;
-                padding-right: 0mm;
+                padding: 20mm 0mm 20mm 20mm;
+                padding-right: 80mm;
                 background: white;
                 position: relative;
             }
