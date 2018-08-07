@@ -109,6 +109,7 @@
         td {
             font-family: times_new_roman_normal !important;
         }
+        
         @media print {
             .page {
                 width: 210mm;
