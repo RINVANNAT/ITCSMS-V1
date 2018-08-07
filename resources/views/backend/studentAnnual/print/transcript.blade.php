@@ -203,7 +203,7 @@
                                         </table>
                                     </td>
                                     <td>
-                                        <table style="width: 145%; margin-left: 100px">
+                                        <table style="width: 150%; margin-left: 100px">
                                             <tr>
                                                 <td style="width: 6% !important">C</td>
                                                 <td style="width: 6% !important"> &nbsp;= </td>
