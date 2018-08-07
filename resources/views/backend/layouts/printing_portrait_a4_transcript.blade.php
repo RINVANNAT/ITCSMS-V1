@@ -87,8 +87,9 @@
             height: 297mm;
             margin-top: 5mm;
             padding: 20mm;
-            padding-top: 5mm;
-            padding-left: 15mm;
+            padding-top: 15mm;
+            padding-left: 12mm;
+            padding-right: 15mm;
             background: white;
             position: relative;
         }
@@ -109,7 +110,7 @@
         td {
             font-family: times_new_roman_normal !important;
         }
-        
+
         @media print {
             .page {
                 width: 210mm;
