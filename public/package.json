@@ -9,6 +9,8 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "inputmask": "^4.0.0"
+    "axios": "^0.18.0",
+    "inputmask": "^4.0.0",
+    "vue": "^2.5.17"
   }
 }

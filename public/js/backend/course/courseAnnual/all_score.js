@@ -12,10 +12,13 @@ function setSelectedRow() {
 }
 
 var colorRenderer = function (instance, td, row, col, prop, value, cellProperties) {
-
+    
+    var passMoyenne = $('#average').val()
+    
     Handsontable.renderers.TextRenderer.apply(this, arguments);
+    
     if (jQuery.isNumeric(value)) {
-        if (value < parseInt(50)) {/*'{{\App\Models\Enum\ScoreEnum::Pass_Moyenne}}'*/
+        if (value < parseInt(passMoyenne)) {/*'{{\App\Models\Enum\ScoreEnum::Pass_Moyenne}}'*/
             if (prop != 'number') {
                 if (prop != 'Rank' && prop != 'Rattrapage') {
                     var check = prop.split('_');

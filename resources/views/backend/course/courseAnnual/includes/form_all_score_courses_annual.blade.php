@@ -107,7 +107,8 @@
                     <button type="button"
                             class="btn btn-default"
                             data-toggle="modal"
-                            data-target="#myModal">Set New Average (50.00)</button>
+                            data-target="#myModal"><strong>Set New Average</strong>
+                        <span class="badge" style="background-color: #ef7a35; color: #fff;">@{{ parseFloat(average).toFixed(2) }}</span></button>
 
                     {{--<button class="btn btn-warning" data-toggle="tooltip" data-placement="right"  title="Generate student for next year" id="generate_student" >
                         <i class="fa fa-circle-o-notch" aria-hidden="true"></i>
@@ -138,11 +139,21 @@
 
                 <div class="pull-right btn-right">
 
-                    <button class="btn btn-primary" data-toggle="tooltip" data-placement="left"  title="Refresh-Table" id="refresh_score_sheet" >
+                    <button class="btn btn-primary"
+                            data-toggle="tooltip"
+                            data-placement="left"
+                            @click="getAverage"
+                            title="Refresh-Table"
+                            id="refresh_score_sheet" >
                         <i class="fa fa-refresh" ></i>
                     </button>
 
-                    <button class="btn btn-success" data-toggle="tooltip" data-placement="left"  title="Change Option" id="change_option" >
+                    <button class="btn btn-success"
+                            data-toggle="tooltip"
+                            data-placement="left"
+                            title="Change Option"
+                            @click="getAverage"
+                            id="change_option" >
                         <i class="fa fa-stack-exchange" ></i>
                     </button>
 
@@ -163,13 +174,19 @@
 
         <div class="selection_blog col-sm-12 box" style="padding-right: 0px; margin-bottom: 10px; margin-top: 5px; border-top: 0px!important;">
 
-            <select name="academic_year" id="filter_academic_year"  class=" form-control col-sm-3">
+            <select name="academic_year"
+                    @change="getAverage"
+                    id="filter_academic_year"
+                    class=" form-control col-sm-3">
                 @foreach($academicYears as $key=>$year)
                     <option value="{{$key}}"> {{$year}}</option>
                 @endforeach
             </select>
 
-            <select name="department" id="filter_dept" class="left-margin form-control col-sm-3">
+            <select name="department"
+                    id="filter_dept"
+                    @change="getAverage"
+                    class="left-margin form-control col-sm-3">
                 @foreach($departments as $key=>$departmentName)
                     <option value="{{$key}}"> {{$departmentName}}</option>
                 @endforeach
@@ -250,19 +267,29 @@
                 <div class="modal-content">
                     <div class="modal-header">
                         <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-                        <h4 class="modal-title" id="myModalLabel">Set New Average for Department</h4>
+                        <h4 class="modal-title text-uppercase" id="myModalLabel">
+                            <strong>Set New Average for Department</strong>
+                        </h4>
                     </div>
                     <div class="modal-body">
-                        <div class="form-group">
-                            <label class="col-sm-3 control-label">Average</label>
-                            <div class="col-md-9">
-                                <input type="text" class="form-control"/>
+                        <div class="form-horizontal">
+                            <div class="form-group">
+                                <label class="col-sm-2 control-label">Average</label>
+                                <div class="col-sm-10">
+                                    <input type="number"
+                                           id="average"
+                                           v-model="average"
+                                           class="form-control"
+                                           placeholder="Enter average value">
+                                </div>
                             </div>
                         </div>
                     </div>
                     <div class="modal-footer">
                         <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-                        <button type="button" class="btn btn-primary">Save changes</button>
+                        <button type="button"
+                                @click="storeAverage"
+                                class="btn btn-primary">Save changes</button>
                     </div>
                 </div>
             </div>
@@ -274,6 +301,9 @@
     {!! HTML::script(elixir('js/handsontable.full.min.js')) !!}
     {!! Html::script('plugins/jpopup/jpopup.js') !!}
     {!! Html::script('js/backend/course/courseAnnual/all_score.js') !!}
+    <script src="{{ asset('node_modules/vue/dist/vue.js') }}"></script>
+    <script src="{{ asset('node_modules/axios/dist/axios.js') }}"></script>
+    <script src="{{ asset('js/set_average.js') }}"></script>
     {{--myscript--}}
 
     <script>
@@ -295,9 +325,10 @@
             dropdownMenu: ['filter_by_condition', 'filter_action_bar'],
             className: "htRight 4",
             currentRowClassName: 'currentRow',
+	        passMoyenne: 10,
             currentColClassName: 'currentCol',
             cells: function (row, col, prop) {
-
+                console.log(colorRenderer.arguments)
                 this.renderer = colorRenderer;
 
                 var cellProperties = {};
@@ -636,7 +667,6 @@
                         setting.nestedHeaders = resultData.nestedHeaders;
                         setting.colWidths = resultData.colWidths;
                         setting.subject = resultData.subject;
-
                         setting.array_fail_subject = resultData.array_fail_subject;
 
                         var table_size = $('.box-body').width() + 30;
@@ -803,7 +833,6 @@
         }
 
         function filter_table() {
-
             toggleLoading(true);
             var BaseData = getBaseData();
 

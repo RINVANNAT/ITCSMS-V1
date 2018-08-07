@@ -55,6 +55,7 @@ Route::group(['namespace' => 'Backend', 'prefix' => 'admin', 'middleware' => 'ad
     require(__DIR__ . '/Routes/Backend/Filter.php');
 
     require(__DIR__ . '/Routes/Backend/Internship.php');
+    require(__DIR__ . '/Routes/Backend/DefineAverage.php');
 
 });
 
