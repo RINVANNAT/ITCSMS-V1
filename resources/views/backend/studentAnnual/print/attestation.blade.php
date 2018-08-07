@@ -82,7 +82,7 @@
         }
 
         .footer {
-            margin-top: 190px;
+            margin-top: 210px;
             bottom: 10mm;
             left: 22mm;
             font-size: 10pt;
