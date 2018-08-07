@@ -103,11 +103,20 @@
                         <span class="caret"></span>
                     </button>
 
+                    <!-- Button trigger modal -->
+                    <button type="button"
+                            class="btn btn-default"
+                            data-toggle="modal"
+                            data-target="#myModal">Set New Average (50.00)</button>
+
                     {{--<button class="btn btn-warning" data-toggle="tooltip" data-placement="right"  title="Generate student for next year" id="generate_student" >
                         <i class="fa fa-circle-o-notch" aria-hidden="true"></i>
                     </button>--}}
 
                     <ul class="dropdown-menu">
+                        <li class="top">
+                            <a href="#" class="btn btn-xs" data-toggle="modal" data-target="#myModal"><i class="fa fa-print"></i> New Average</a>
+                        </li>
                         <li class="top"><a href="#" class="btn btn-xs" id="btn-print"><i class="fa fa-print"></i> Print</a>
                         </li>
                         <li class="top"><a href="#" class="btn btn-xs " id="get_radie"><i class="fa fa-download"></i>
@@ -235,6 +244,29 @@
 
         </div>
 
+        <!-- Modal -->
+        <div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                        <h4 class="modal-title" id="myModalLabel">Set New Average for Department</h4>
+                    </div>
+                    <div class="modal-body">
+                        <div class="form-group">
+                            <label class="col-sm-3 control-label">Average</label>
+                            <div class="col-md-9">
+                                <input type="text" class="form-control"/>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                        <button type="button" class="btn btn-primary">Save changes</button>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
 @stop
 
