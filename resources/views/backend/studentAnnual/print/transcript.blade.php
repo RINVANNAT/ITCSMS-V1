@@ -203,7 +203,7 @@
                                         </table>
                                     </td>
                                     <td>
-                                        <table style="width: 141%; margin-left: 100px">
+                                        <table style="width: 145%; margin-left: 100px">
                                             <tr>
                                                 <td style="width: 6% !important">C</td>
                                                 <td style="width: 6% !important"> &nbsp;= </td>
@@ -241,7 +241,7 @@
                                             </tr>
                                             <tr>
                                                 <td style="width: 6% !important">F</td>
-                                                <td style="width: 6% !important"> &nbsp;= <</td>
+                                                <td style="width: 6% !important"> &nbsp;= &lt;</td>
                                                 <td style="width: 6% !important">40%</td>
                                                 <td style="width: 6% !important"> &nbsp;= </td>
                                                 <td style="width: 6% !important">0.0</td>

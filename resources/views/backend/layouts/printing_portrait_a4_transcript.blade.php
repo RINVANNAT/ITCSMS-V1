@@ -59,8 +59,13 @@
         }
 
         @font-face {
+            font-family: times_new_roman_normal;
+            src: url("{{url('fonts/Times_New_Roman_Normal.ttf')}}");
+        }
+
+        @font-face {
             font-family: khmeros;
-            src: url("{{url('assets/fonts/KhmerOSContent-Regular.ttf')}}");
+            src: url("{{url('assets/fonts/tim')}}");
         }
 
         body {
@@ -80,6 +85,7 @@
         * {
             box-sizing: border-box;
             -moz-box-sizing: border-box;
+            font-family: times_new_roman_normal !important;
         }
 
         .page {
@@ -88,7 +94,7 @@
             margin-top: 5mm;
             padding: 20mm;
             padding-top: 15mm;
-            padding-left: 12mm;
+            padding-left: 13mm;
             padding-right: 15mm;
             background: white;
             position: relative;
@@ -98,7 +104,7 @@
             position: absolute;
             bottom: 5mm;
             width: 100%;
-            left: 15mm;
+            left: 13mm;
             font-size: 10pt;
         }
 
