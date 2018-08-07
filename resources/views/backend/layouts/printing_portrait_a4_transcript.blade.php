@@ -19,63 +19,9 @@
     {!! Html::style(elixir('css/backend.css')) !!}
     {!! Html::style(elixir('css/student_transcript.css'), array('media' => 'print, screen')) !!}
     <style>
-        h1, h2, h3, h4, h5, h6, .h1, .h2, .h3, .h4, .h5, .h6 {
-            font-family: 'bayon';
-        }
-
-        @font-face {
-            font-family: franklin_gothic;
-            src: url("{{url('assets/fonts/Franklin Gothic Demi Cond Regular.ttf')}}");
-        }
-
-        @font-face {
-            font-family: arial-rounded;
-            src: url("{{url('assets/fonts/arial-rounded-mt-bold.ttf')}}");
-        }
-
-        @font-face {
-            font-family: bayon;
-            src: url("{{url('assets/fonts/Bayon.ttf')}}");
-        }
-
-        @font-face {
-            font-family: kh-bokor;
-            src: url("{{url('assets/fonts/Kh-Bokor.ttf')}}");
-        }
-
-        @font-face {
-            font-family: khmerosmoulpali;
-            src: url("{{url('assets/fonts/KhmerOSMoulpali.ttf')}}");
-        }
-
-        @font-face {
-            font-family: metal;
-            src: url("{{url('assets/fonts/Metal.ttf')}}");
-        }
-
-        @font-face {
-            font-family: tactieng;
-            src: url("{{url('assets/fonts/TACTIENG.TTF')}}");
-        }
-
         @font-face {
             font-family: times_new_roman_normal;
             src: url("{{url('fonts/Times_New_Roman_Normal.ttf')}}");
-        }
-
-        @font-face {
-            font-family: khmeros;
-            src: url("{{url('assets/fonts/tim')}}");
-        }
-
-        body {
-            width: 100%;
-            height: 100%;
-            margin: 0;
-            padding: 0;
-            background-color: #FAFAFA;
-            font: 11pt "Times New Roman";
-            line-height: 110%;
         }
 
         h4, h3, h2, h1 {
@@ -91,18 +37,19 @@
         .page {
             width: 210mm;
             height: 297mm;
-            margin-top: 5mm;
-            padding: 20mm;
             padding-top: 15mm;
             padding-left: 13mm;
             padding-right: 15mm;
             background: white;
             position: relative;
+            page-break-after: always;
+            page-break-before: always;
         }
 
         .transcript-footer {
             position: absolute;
-            bottom: 5mm;
+            bottom: 0 !important;
+            height: auto;
             width: 100%;
             left: 13mm;
             font-size: 10pt;
@@ -121,11 +68,14 @@
             .page {
                 width: 210mm;
                 height: 297mm;
-                margin-top: 10mm;
-                padding: 20mm 0mm 20mm 20mm;
-                padding-right: 80mm;
+                padding-top: 15mm;
+                padding-left: 13mm;
+                padding-right: 15mm;
+                padding-bottom: 0mm;
                 background: white;
                 position: relative;
+                page-break-after: always;
+                page-break-before: always;
             }
         }
     </style>
