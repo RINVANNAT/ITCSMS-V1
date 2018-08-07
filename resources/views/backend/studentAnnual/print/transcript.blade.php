@@ -148,8 +148,8 @@
                     {{--transcript footer--}}
                     <div class="transcript-footer">
                         <div class="grading-system">
-                            <h5><b>GRADING SYSTEM:</b></h5>
-                            <table style="margin-left: 0px">
+                            <h5 style="font-weight: bold !important; font-family: times_new_roman_normal;">GRADING SYSTEM:</h5>
+                            <table style="margin-left: 0px; width: 60%;">
                                 <tr>
                                     <td>
                                         <table style="width: 150%;">
@@ -203,7 +203,7 @@
                                         </table>
                                     </td>
                                     <td>
-                                        <table style="width: 141%; margin-left: 100px">
+                                        <table style="width: 150%; margin-left: 100px">
                                             <tr>
                                                 <td style="width: 6% !important">C</td>
                                                 <td style="width: 6% !important"> &nbsp;= </td>
@@ -241,7 +241,7 @@
                                             </tr>
                                             <tr>
                                                 <td style="width: 6% !important">F</td>
-                                                <td style="width: 6% !important"> &nbsp;= <</td>
+                                                <td style="width: 6% !important"> &nbsp;= &lt;</td>
                                                 <td style="width: 6% !important">40%</td>
                                                 <td style="width: 6% !important"> &nbsp;= </td>
                                                 <td style="width: 6% !important">0.0</td>
@@ -253,8 +253,8 @@
                                 </tr>
                             </table>
                         </div>
-                        <div class="remark">
-                            <h5><b>Remark:</b></h5>
+                        <div class="remark" style="font-family: times_new_roman_normal;">
+                            <h5 style="font-weight: bold !important; font-family: times_new_roman_normal;">Remark:</h5>
                             <span style="margin-left: 10mm"><b style="font-size: 14pt">*</b> The annual Grade Point Average minimum requirement to pass to the higher class is 2.0.</span><br/>
                             <span style="margin-left: 10mm"><b style="font-size: 14pt">*</b> This transcript cannot be given for the second time.</span>
                         </div>
