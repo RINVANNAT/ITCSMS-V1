@@ -121,15 +121,9 @@
             font-family: times_new_roman_normal !important;
         }
 
-        .smis-row {
-            width: 100%;
-            display: flex;
-            justify-content: space-between;
+        *:last-of-type {
+            margin-bottom: 0; padding-bottom: 0;
         }
-
-        .smis-column:nth-child(1) { text-align: left; flex: 1;}
-        .smis-column:nth-child(2) { text-align: center; flex: 1;}
-        .smis-column:nth-child(3) { text-align: right; flex: 1;}
     </style>
 
 </head>
