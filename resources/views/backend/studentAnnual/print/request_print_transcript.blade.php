@@ -172,8 +172,8 @@
     {!! Html::script('plugins/daterangepicker/daterangepicker.js') !!}
     {!! Html::script('plugins/datetimepicker/bootstrap-datetimepicker.min.js') !!}
     {!! Html::script('plugins/select2/select2.full.min.js') !!}
-    <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/0.18.0/axios.min.js"></script>
+    <script src="{{ asset('node_modules/vue/dist/vue.js') }}"></script>
+    <script src="{{ asset('node_modules/axios/dist/axios.js') }}"></script>
 
     <script>
         new Vue({

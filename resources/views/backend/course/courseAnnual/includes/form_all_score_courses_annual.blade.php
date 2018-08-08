@@ -3,6 +3,7 @@
 @section ('title', 'Course Annual' . ' | ' . 'Total Score Annually')
 @section('after-styles-end')
     {!! Html::style(elixir('css/handsontable.full.min.css')) !!}
+    <link rel="stylesheet" href="{{ asset('node_modules/inputmask/css/inputmask.css') }}"/>
     <style>
         .popupdiv {
             height: 200px;
@@ -107,7 +108,7 @@
                     <button type="button"
                             class="btn btn-default"
                             data-toggle="modal"
-                            data-target="#myModal"><strong>Set New Average</strong>
+                            data-target="#myModal"><strong>Passed Score</strong>
                         <span class="badge" style="background-color: #ef7a35; color: #fff;">@{{ parseFloat(average).toFixed(2) }}</span></button>
 
                     {{--<button class="btn btn-warning" data-toggle="tooltip" data-placement="right"  title="Generate student for next year" id="generate_student" >
@@ -115,9 +116,6 @@
                     </button>--}}
 
                     <ul class="dropdown-menu">
-                        <li class="top">
-                            <a href="#" class="btn btn-xs" data-toggle="modal" data-target="#myModal"><i class="fa fa-print"></i> New Average</a>
-                        </li>
                         <li class="top"><a href="#" class="btn btn-xs" id="btn-print"><i class="fa fa-print"></i> Print</a>
                         </li>
                         <li class="top"><a href="#" class="btn btn-xs " id="get_radie"><i class="fa fa-download"></i>
@@ -268,16 +266,17 @@
                     <div class="modal-header">
                         <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
                         <h4 class="modal-title text-uppercase" id="myModalLabel">
-                            <strong>Set New Average for Department</strong>
+                            <strong>Passed Score</strong>
                         </h4>
                     </div>
                     <div class="modal-body">
                         <div class="form-horizontal">
                             <div class="form-group">
-                                <label class="col-sm-2 control-label">Average</label>
-                                <div class="col-sm-10">
-                                    <input type="number"
+                                <label class="col-sm-4 control-label">Passed Score</label>
+                                <div class="col-sm-8">
+                                    <input type="text"
                                            id="average"
+                                           {{--data-inputmask-regex="[4-9][0-9].[0-9][0-9]"--}}
                                            v-model="average"
                                            class="form-control"
                                            placeholder="Enter average value">
@@ -286,10 +285,13 @@
                         </div>
                     </div>
                     <div class="modal-footer">
-                        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                        <button type="button"
+                                class="btn btn-default"
+                                ref="btnCloseModal"
+                                data-dismiss="modal">Close</button>
                         <button type="button"
                                 @click="storeAverage"
-                                class="btn btn-primary">Save changes</button>
+                                class="btn btn-primary">Save Passed Score</button>
                     </div>
                 </div>
             </div>
@@ -301,12 +303,17 @@
     {!! HTML::script(elixir('js/handsontable.full.min.js')) !!}
     {!! Html::script('plugins/jpopup/jpopup.js') !!}
     {!! Html::script('js/backend/course/courseAnnual/all_score.js') !!}
+    <script src="{{ asset('node_modules/inputmask/dist/min/jquery.inputmask.bundle.min.js') }}"></script>
     <script src="{{ asset('node_modules/vue/dist/vue.js') }}"></script>
     <script src="{{ asset('node_modules/axios/dist/axios.js') }}"></script>
     <script src="{{ asset('js/set_average.js') }}"></script>
     {{--myscript--}}
 
     <script>
+
+        $(function () {
+            // $('#average').inputmask({autoUnmask: true, removeMaskOnSubmit: true})
+        })
 
         var table_width;
         var hotInstance;

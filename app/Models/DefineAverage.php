@@ -13,6 +13,7 @@ class DefineAverage extends Model
         'write_uid',
         'academic_year_id',
         'department_id',
+        'semester_id',
         'value'
     ];
 

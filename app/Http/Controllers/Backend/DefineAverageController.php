@@ -13,13 +13,19 @@ class DefineAverageController extends Controller
         $this->validate($request, [
             'academic_year_id' => 'required|numeric',
             'department_id' => 'required|numeric',
+            'semester_id' => 'required'
         ]);
 
         try {
+            $semester_id = $request->semester_id;
+            if ($request->semester_id == '') {
+                $semester_id = 0;
+            }
 
             $average = DefineAverage::where([
                 'academic_year_id' => $request->academic_year_id,
                 'department_id' => $request->department_id,
+                'semester_id' => $semester_id
             ])->first();
 
             return message_success($average);
@@ -34,13 +40,20 @@ class DefineAverageController extends Controller
         $this->validate($request, [
             'academic_year_id' => 'required|numeric',
             'department_id' => 'required|numeric',
+            'semester_id' => 'required',
             'value' => 'required|numeric'
         ]);
 
         try {
+            $semester_id = $request->semester_id;
+            if ($request->semester_id == '') {
+                $semester_id = 0;
+            }
+
             $average = DefineAverage::where([
                 'academic_year_id' => $request->academic_year_id,
-                'department_id' => $request->department_id
+                'department_id' => $request->department_id,
+                'semester_id' => $semester_id
             ])->first();
 
             if ($average instanceof DefineAverage) {
@@ -49,6 +62,7 @@ class DefineAverageController extends Controller
                 $average = DefineAverage::create([
                     'academic_year_id' => $request->academic_year_id,
                     'department_id' => $request->department_id,
+                    'semester_id' => $semester_id,
                     'value' => $request->value
                 ]);
             }

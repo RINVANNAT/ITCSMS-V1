@@ -73,6 +73,7 @@
 
 @section('after-scripts-end')
     <script type="text/javascript" src="{{ asset('node_modules/inputmask/dist/min/jquery.inputmask.bundle.min.js') }}"></script>
+    <script type="text/javascript" src="{{ asset('node_modules/inputmask/dist/inputmask/inputmask.numeric.extensions.js') }}"></script>
     <script type="text/javascript" src="{{ asset('plugins/select2/select2.full.min.js') }}"></script>
     <script type="text/javascript" src="{{ asset('plugins/daterangepicker/moment.js') }}"></script>
     <script type="text/javascript" src="{{ asset('plugins/daterangepicker/daterangepicker.js') }}"></script>
