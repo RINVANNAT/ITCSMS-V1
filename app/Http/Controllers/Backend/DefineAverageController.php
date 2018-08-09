@@ -12,8 +12,7 @@ class DefineAverageController extends Controller
     {
         $this->validate($request, [
             'academic_year_id' => 'required|numeric',
-            'department_id' => 'required|numeric',
-            'semester_id' => 'required'
+            'department_id' => 'required|numeric'
         ]);
 
         try {

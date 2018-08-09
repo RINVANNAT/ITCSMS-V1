@@ -20,7 +20,7 @@ new Vue({
 			axios.post('/admin/define-average/get-average', {
 				academic_year_id: $('#filter_academic_year').val(),
 				department_id: $('#filter_dept').val(),
-				semester_id: $('#filter_semester').val()
+				semester_id: $('#filter_semester').val() === '' ? '' : $('#filter_semester').val()
 			}).then(response => {
 				if (response.data.code === 1) {
 					if (response.data.data !== null) {

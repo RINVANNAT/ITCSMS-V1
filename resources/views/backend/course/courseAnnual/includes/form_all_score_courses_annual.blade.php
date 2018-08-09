@@ -198,7 +198,7 @@
                 @endforeach
             </select>
 
-            <select name="semester" id="filter_semester"  class="left-margin form-control col-sm-3">
+            <select name="semester"  @change="getAverage" id="filter_semester"  class="left-margin form-control col-sm-3">
                 @foreach($semesters as $key=>$semester)
                     <option value="{{$key}}"> {{$semester}}</option>
                 @endforeach
