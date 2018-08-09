@@ -39,7 +39,6 @@ class DefineAverageController extends Controller
         $this->validate($request, [
             'academic_year_id' => 'required|numeric',
             'department_id' => 'required|numeric',
-            'semester_id' => 'required',
             'value' => 'required|numeric'
         ]);
 
@@ -47,6 +46,7 @@ class DefineAverageController extends Controller
             $semester_id = $request->semester_id;
             if ($request->semester_id == '') {
                 $semester_id = 0;
+                $request['semester_id'] = 0;
             }
 
             $average = DefineAverage::where([

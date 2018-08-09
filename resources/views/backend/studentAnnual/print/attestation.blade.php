@@ -269,7 +269,7 @@
                                     echo "";
                                 } else if(is_numeric($final_average_score)) {
                                     if($final_average_gpa<2) {
-                                        echo "<strong style='color: red'>".substr($final_average_gpa,0,3)."</strong>>";
+                                        echo "<strong style='color: red'>".substr($final_average_gpa,0,3)."</strong>";
                                     } else {
                                         echo "<strong>".substr($final_average_gpa,0,3)."</strong>";
                                     }

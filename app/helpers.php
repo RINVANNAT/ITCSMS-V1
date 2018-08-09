@@ -203,28 +203,42 @@ if (! function_exists('get_gpa')) {
      * @param $score
      * @return String
      */
-    function get_gpa($score)
+    function get_gpa($score, $passedScore=50)
     {
+        $basePassedScore = 50;
+        $interval = $basePassedScore - $passedScore;
+        $reduceScoreInterval = ($interval)/9;
+
+        $scoreA = 85 - ($reduceScoreInterval * 3);
+        $scoreBPlus = 80 - ($reduceScoreInterval * 1);
+        $scoreB = 70 - ($reduceScoreInterval * 1);
+        $scoreCPlus = 65 - ($reduceScoreInterval * 1);
+        $scoreC = $passedScore;
+        $scoreD = $scoreC - 5;
+        $scoreE = $scoreD - 5;
+
         $gpa = "";
-        if($score >= 85){
+
+        if($score >= $scoreA){
             $gpa = "4.00";
-        } else if ($score >= 80) {
+        } else if ($score >= $scoreBPlus) {
             $gpa = "3.50";
-        } else if ($score >= 70) {
+        } else if ($score >= $scoreB) {
             $gpa = "3.00";
-        } else if ($score >= 65) {
+        } else if ($score >= $scoreCPlus) {
             $gpa = "2.50";
-        } else if ($score >= 50) {
+        } else if ($score >= $scoreC) {
             $gpa = "2.00";
-        } else if ($score >= 45) {
+        } else if ($score >= $scoreD) {
             $gpa = "1.50";
-        } else if ($score >= 40) {
+        } else if ($score >= $scoreE) {
             $gpa = "1.00";
         }  else if ($score == "N/A") {
             $gpa = "N/A";
         } else {
             $gpa = "0.00";
         }
+
         return $gpa;
     }
 }

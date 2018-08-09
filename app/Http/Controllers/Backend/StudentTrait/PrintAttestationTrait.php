@@ -11,6 +11,7 @@ namespace App\Http\Controllers\Backend\StudentTrait;
 
 use App\Http\Requests\Backend\Student\PrintTranscriptRequest;
 use App\Models\AcademicYear;
+use App\Models\DefineAverage;
 use App\Models\Gender;
 use App\Models\Student;
 use App\Models\StudentAnnual;
@@ -318,7 +319,46 @@ trait PrintAttestationTrait
         $errors = [];
         foreach($student_by_groups as &$student_by_class){
             $moy_score = 0;
+
             if(count($student_by_class) == 2) {
+
+                $student1Or4['academic_year_id'] = '';
+                $student2Or5['academic_year_id'] = '';
+                $department_id = '';
+
+                foreach ($student_by_class as $item) {
+                    $department_id = $item['department_id'];
+                    if ($item['grade_id'] == 1 || $item['grade_id'] == 4) {
+                        $student1Or4['academic_year_id'] = $item['academic_id'];
+                    }else {
+                        $student2Or5['academic_year_id'] = $item['academic_id'];
+                    }
+                }
+                $passedScore14 = 50;
+                $passedScore25 = 50;
+
+                $passedScore14Obj = DefineAverage::where([
+                    'academic_year_id' => $student1Or4['academic_year_id'],
+                    'department_id' => $department_id,
+                    'semester_id' => 0
+                ])->first();
+
+                if ($passedScore14Obj instanceof DefineAverage) {
+                    $passedScore14 = $passedScore14Obj->value;
+                }
+
+                $passedScore25Obj = DefineAverage::where([
+                    'academic_year_id' => $student2Or5['academic_year_id'],
+                    'department_id' => $department_id,
+                    'semester_id' => 0
+                ])->first();
+
+                if ($passedScore25Obj instanceof DefineAverage) {
+                    $passedScore25 = $passedScore25Obj->value;
+                }
+                $student_by_class['passedScore14'] = $passedScore14;
+                $student_by_class['passedScore25'] = $passedScore25;
+
                 foreach($student_by_class as $student_by_grade) {
                     $scores[$student_by_grade["id"]] = $this->getStudentScoreBySemester($student_by_grade['id'],null); // Full year
                     if(empty($scores[$student_by_grade["id"]])) {
@@ -361,6 +401,7 @@ trait PrintAttestationTrait
         //        'smis_server'
         //    )
         //);
+
 
         return SnappyPdf::loadView($view,
             compact(
