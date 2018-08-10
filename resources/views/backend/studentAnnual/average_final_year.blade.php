@@ -103,7 +103,6 @@
                                     <td class="no-border"></td>
                                     <td class="no-border"></td>
                                     <?php
-                                    // dd($student_by_groups->first());
                                     $first = true;
                                     ?>
                                     @foreach($student_by_groups->first() as $student_by_group_key => $student_by_group)
@@ -139,7 +138,7 @@
                                 <tr>
                                     <td class="border-thin border-bottom" align="center">N<sup>o</sup></td>
                                     <td class="border-thin border-bottom" align="center">ID</td>
-                                    <td class="border-thin border-bottom" align="center"><strong>Noms et Prenoms</strong></td>
+                                    <td class="border-thin border-bottom" align="center" style="width: 150px;"><strong>Noms et Prenoms</strong></td>
                                     <td class="border-thin border-bottom" align="center"><strong>Sexe</strong></td>
                                     <td class="border-thin border-bottom" align="center">Moy.(M1)</td>
                                     <td class="border-thin border-bottom" align="center">GPA</td>
@@ -150,16 +149,24 @@
                                 </tr>
                                 @php
                                     $i = 1;
+                                    $localKey = 0;
                                 @endphp
-                                @foreach($student_by_groups as $student_by_group)
+                                @foreach($student_by_groups as $pKey => $student_by_group)
                                     <?php
+                                    $localKey = $pKey;
                                     $result = [];
                                     $fail = false;
                                     foreach ($student_by_group as $key => $student_by_class) {
                                         $lowest_score = 100;
                                         if(is_numeric($key)) {
+                                            $passedScore = 50;
+                                            if($student_by_class['grade_id'] == 4 || $student_by_class['grade_id'] == 1) {
+                                                $passedScore = $student_by_group['passedScore14'];
+                                            } else {
+                                                $passedScore = $student_by_group['passedScore25'];
+                                            }
                                             $result[$student_by_class["grade_id"]]["total_score"] = $scores[$student_by_class["id"]]["final_score"];
-                                            $result[$student_by_class["grade_id"]]["total_gpa"] = get_gpa($scores[$student_by_class["id"]]["final_score"]);
+                                            $result[$student_by_class["grade_id"]]["total_gpa"] = get_gpa($scores[$student_by_class["id"]]["final_score"], $passedScore);
                                             $result[$student_by_class["grade_id"]]["credit"] = 0;
                                             $result[$student_by_class["grade_id"]]["courses_fail"] = "";
                                             foreach ($scores[$student_by_class["id"]] as $key=>$score) {
@@ -187,51 +194,54 @@
                                         <td class="border-thin" align="center">{{$student_by_group->first()['gender']}}</td>
                                         <?php $courses_fail = "" ?>
                                         @foreach($result as $year => $score_each_year)
-                                        <?php
-                                            if($lowest_score > $score_each_year["total_score"]) {
-                                                $lowest_score = $score_each_year["total_score"];
-                                            }
-                                            if($year == 4 || $year ==1) {
-                                                if(is_numeric($score_each_year["total_score"]) && $min_score_before_graduated>$score_each_year["total_score"]){
-                                                    $min_score_before_graduated = $score_each_year["total_score"];
+                                            <?php
+                                                if($lowest_score > $score_each_year["total_score"]) {
+                                                    $lowest_score = $score_each_year["total_score"];
                                                 }
-                                                if(is_numeric($score_each_year["total_score"]) && $max_score_before_graduated<$score_each_year["total_score"]){
-                                                    $max_score_before_graduated = $score_each_year["total_score"];
+                                                if($year == 4 || $year == 1) {
+                                                    if(is_numeric($score_each_year["total_score"]) && $min_score_before_graduated>$score_each_year["total_score"]){
+                                                        $min_score_before_graduated = $score_each_year["total_score"];
+                                                    }
+                                                    if(is_numeric($score_each_year["total_score"]) && $max_score_before_graduated<$score_each_year["total_score"]){
+                                                        $max_score_before_graduated = $score_each_year["total_score"];
+                                                    }
+                                                } else if($year == 5 || $year == 2) {
+                                                    if(is_numeric($score_each_year["total_score"]) && $min_score_graduated>$score_each_year["total_score"]){
+                                                        $min_score_graduated = $score_each_year["total_score"];
+                                                    }
+                                                    if(is_numeric($score_each_year["total_score"]) && $max_score_graduated<$score_each_year["total_score"]){
+                                                        $max_score_graduated = $score_each_year["total_score"];
+                                                    }
                                                 }
-                                            } else if($year == 5 || $year ==2) {
-                                                if(is_numeric($score_each_year["total_score"]) && $min_score_graduated>$score_each_year["total_score"]){
-                                                    $min_score_graduated = $score_each_year["total_score"];
+                                                if($score_each_year["courses_fail"] != "" and $score_each_year["courses_fail"] != " "){
+                                                    $courses_fail = $courses_fail . $score_each_year["courses_fail"]. "<br/>";
                                                 }
-                                                if(is_numeric($score_each_year["total_score"]) && $max_score_graduated<$score_each_year["total_score"]){
-                                                    $max_score_graduated = $score_each_year["total_score"];
-                                                }
-                                            }
-                                            if($score_each_year["courses_fail"] != "" and $score_each_year["courses_fail"] != " "){
-                                                $courses_fail = $courses_fail . $score_each_year["courses_fail"]. "<br/>";
-                                            }
-                                        ?>
-                                        <td class="border-thin" align="center">
-                                            @if($score_each_year["total_score"]<50)
-                                            <strong style="color: red">
-                                            @else
-                                            <strong>
-                                            @endif
-                                                {{$score_each_year["total_score"]}}
-                                            </strong>
-                                        </td>
-                                        <td class="border-thin" align="center">
-                                            @if($score_each_year["total_score"]<50)
-                                            <strong style="color: red">
-                                            @else
-                                            <strong>
-                                            @endif
-                                                {{substr($score_each_year["total_gpa"],0,3)}}
-                                            </strong>
-                                        </td>
+                                            ?>
+
+                                            <td class="border-thin" align="center">
+                                                @if($score_each_year["total_score"]<$student_by_group["passedScore14"])
+                                                <strong style="color: red">
+                                                @else
+                                                <strong>
+                                                @endif
+                                                    {{$score_each_year["total_score"]}}
+                                                </strong>
+                                            </td>
+                                            <td class="border-thin" align="center">
+                                                @if($score_each_year["total_score"]<$student_by_group["passedScore25"])
+                                                <strong style="color: red">
+                                                @else
+                                                <strong>
+                                                @endif
+                                                    {{substr($score_each_year["total_gpa"],0,3)}}
+                                                </strong>
+                                            </td>
                                         @endforeach
 
                                         <?php
                                         $final_average_score = 0;
+                                        $passedScoreFinal = ($student_by_group['passedScore14'] + $student_by_group['passedScore25'])/2;
+
                                         foreach($result as $result_score) {
                                             if(is_numeric($result_score["total_score"]) && is_numeric($final_average_score)) {
                                                 $final_average_score = $final_average_score + $result_score["total_score"];
@@ -241,14 +251,14 @@
                                         }
                                         if(is_numeric($final_average_score)) {
                                             $final_average_score = $final_average_score / 2;
-                                            $final_average_gpa = get_gpa($final_average_score);
-                                            $final_average_mention = get_french_mention($final_average_score);
+                                            $final_average_gpa = get_gpa($final_average_score, $passedScoreFinal);
+                                            $final_average_mention = get_french_mention($final_average_score, $passedScoreFinal);
                                             if ($fail) {
                                                 $final_average_gpa = "";
                                                 $final_average_mention = "Echoué";
-                                            } else if($lowest_score<50) {
-                                                $final_average_gpa = get_gpa($lowest_score);
-                                                $final_average_mention = get_french_mention($lowest_score);
+                                            } else if($lowest_score<$passedScoreFinal) { // @TODO else if($lowest_score<$passedScoreFinal < 50) ??? we replace 50 by $passedScoreFinal
+                                                $final_average_gpa = get_gpa($lowest_score, $passedScoreFinal);
+                                                $final_average_mention = get_french_mention($lowest_score, $passedScoreFinal);
                                             }
                                             if($min_moy_score>$final_average_score) {
                                                 $min_moy_score = $final_average_score;
@@ -265,7 +275,7 @@
                                         ?>
 
                                         <td class="border-thin" align="center">
-                                            @if($final_average_score<50)
+                                            @if($final_average_score<$passedScoreFinal)
                                             <strong style="color: red">
                                             @else
                                             <strong>
@@ -322,11 +332,11 @@
                                     <td class="border-top"></td>
                                     <td class="border-top" align="center">Max</td>
                                     <td class="border-top" align="center">{{$max_score_before_graduated}}</td>
-                                    <td class="border-top" align="center">{{substr(get_gpa($max_score_before_graduated),0,3)}}</td>
+                                    <td class="border-top" align="center">{{substr(get_gpa($max_score_before_graduated, $student_by_groups[$localKey]['passedScore14']),0,3)}}</td>
                                     <td class="border-top" align="center">{{$max_score_graduated}}</td>
-                                    <td class="border-top" align="center">{{substr(get_gpa($max_score_graduated),0,3)}}</td>
+                                    <td class="border-top" align="center">{{substr(get_gpa($max_score_graduated, $student_by_groups[$localKey]['passedScore25']),0,3)}}</td>
                                     <td class="border-top" align="center">{{$max_moy_score}}</td>
-                                    <td class="border-top" align="center">{{substr(get_gpa($max_moy_score),0,3)}}</td>
+                                    <td class="border-top" align="center">{{substr(get_gpa($max_moy_score, (($student_by_groups[$localKey]['passedScore14']) + $student_by_groups[$localKey]['passedScore25'])/2),0,3)}}</td>
                                     <td class="border-top"></td>
                                     <td class="border-top"></td>
                                 </tr>
@@ -336,25 +346,20 @@
                                     <td class="no-border"></td>
                                     <td class="no-border" align="center">Min</td>
                                     <td class="border-top" align="center">{{$min_score_before_graduated}}</td>
-                                    <td class="border-top" align="center">{{substr(get_gpa($min_score_before_graduated),0,3)}}</td>
+                                    <td class="border-top" align="center">{{substr(get_gpa($min_score_before_graduated, $student_by_groups[$localKey]['passedScore14']),0,3)}}</td>
                                     <td class="border-top" align="center">{{$min_score_graduated}}</td>
-                                    <td class="border-top" align="center">{{substr(get_gpa($min_score_graduated),0,3)}}</td>
+                                    <td class="border-top" align="center">{{substr(get_gpa($min_score_graduated, $student_by_groups[$localKey]['passedScore25']),0,3)}}</td>
                                     <td class="border-top" align="center">{{$min_moy_score}}</td>
-                                    <td class="border-top" align="center">{{substr(get_gpa($min_moy_score),0,3)}}</td>
+                                    <td class="border-top" align="center">{{substr(get_gpa($min_moy_score, (($student_by_groups[$localKey]['passedScore14']) + $student_by_groups[$localKey]['passedScore25'])/2),0,3)}}</td>
                                     <td class="no-border"></td>
                                     <td class="no-border"></td>
                                 </tr>
-
                             </table>
                         </div>
                     </div>
-
-
                 </div>
             </div>
-
         </div>
-
     </div>
 @stop
 

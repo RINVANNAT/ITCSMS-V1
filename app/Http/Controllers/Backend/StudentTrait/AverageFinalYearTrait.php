@@ -9,6 +9,7 @@
 namespace App\Http\Controllers\Backend\StudentTrait;
 
 use App\Models\AcademicYear;
+use App\Models\DefineAverage;
 use App\Models\Degree;
 use App\Models\Department;
 use App\Models\DepartmentOption;
@@ -228,6 +229,42 @@ trait AverageFinalYearTrait
             foreach($student_by_groups as &$student_by_class){
                 $moy_score = 0;
                 if(count($student_by_class) == 2) {
+
+                    $student1Or4['academic_year_id'] = '';
+                    $student2Or5['academic_year_id'] = '';
+                    $department_id = '';
+
+                    foreach ($student_by_class as $item) {
+                        $department_id = $item['department_id'];
+                        if ($item['grade_id'] == 1 || $item['grade_id'] == 4) {
+                            $student1Or4['academic_year_id'] = $item['academic_id'];
+                        }else {
+                            $student2Or5['academic_year_id'] = $item['academic_id'];
+                        }
+                    }
+                    $passedScore14 = 50;
+                    $passedScore25 = 50;
+
+                    $passedScore14Obj = DefineAverage::where([
+                        'academic_year_id' => $student1Or4['academic_year_id'],
+                        'department_id' => $department_id,
+                        'semester_id' => 0
+                    ])->first();
+
+                    if ($passedScore14Obj instanceof DefineAverage) {
+                        $passedScore14 = $passedScore14Obj->value;
+                    }
+
+                    $passedScore25Obj = DefineAverage::where([
+                        'academic_year_id' => $student2Or5['academic_year_id'],
+                        'department_id' => $department_id,
+                        'semester_id' => 0
+                    ])->first();
+
+                    if ($passedScore25Obj instanceof DefineAverage) {
+                        $passedScore25 = $passedScore25Obj->value;
+                    }
+
                     foreach($student_by_class as $student_by_grade) {
                         $scores[$student_by_grade["id"]] = $this->getStudentScoreBySemester($student_by_grade['id'],null); // Full year
                         if(empty($scores[$student_by_grade["id"]])) {
@@ -238,6 +275,9 @@ trait AverageFinalYearTrait
                             $moy_score = $moy_score + $scores[$student_by_grade["id"]]["final_score"];
                         }
                     }
+
+                    $student_by_class['passedScore14'] = $passedScore14;
+                    $student_by_class['passedScore25'] = $passedScore25;
                 } else {
                     // Something wrong here. It suppose to have only 2
                     array_push($errors,array("count"=>count($student_by_class), "id" => $student_by_class));
@@ -254,9 +294,6 @@ trait AverageFinalYearTrait
                 return $collection->get("moy_score");
             });
 
-            //dd($errors);
-            //dd($student_by_groups);
-            //dd($scores);
             if (count($student_by_groups) > 0) {
                 if ($type == "show"){
                     return view('backend.studentAnnual.average_final_year', compact('student_by_groups','scores','department','department_option','degree','academic_year','department_id','option_id','degree_id','academic_year_id'));
@@ -416,14 +453,23 @@ trait AverageFinalYearTrait
                 $max_score_before_graduated = 0;
                 $max_score_graduated = 0;
                 $max_moy_score = 0;
+                $localKey = 0;
                 foreach ($student_by_groups as $key => $student_by_group) {
+                    $localKey = $key;
                     $fail = false;
                     $result = [];
                     foreach ($student_by_group as $key => $student_by_class) {
                         $lowest_score = 100;
                         if(is_numeric($key)) {
+
+                            $passedScore = 50;
+                            if($student_by_class['grade_id'] == 4 || $student_by_class['grade_id'] == 1) {
+                                $passedScore = $student_by_group['passedScore14'];
+                            } else {
+                                $passedScore = $student_by_group['passedScore25'];
+                            }
                             $result[$student_by_class["grade_id"]]["total_score"] = $scores[$student_by_class["id"]]["final_score"];
-                            $result[$student_by_class["grade_id"]]["total_gpa"] = get_gpa($scores[$student_by_class["id"]]["final_score"]);
+                            $result[$student_by_class["grade_id"]]["total_gpa"] = get_gpa($scores[$student_by_class["id"]]["final_score"], $passedScore);
                             $result[$student_by_class["grade_id"]]["credit"] = 0;
                             $result[$student_by_class["grade_id"]]["courses_fail"] = "";
                             foreach ($scores[$student_by_class["id"]] as $key=>$score) {
@@ -481,6 +527,7 @@ trait AverageFinalYearTrait
                     }
 
                     $final_average_score = 0;
+                    $passedScoreFinal = ($student_by_group['passedScore14'] + $student_by_group['passedScore25'])/2;
                     foreach($result as $result_score) {
                         if(is_numeric($result_score["total_score"]) && is_numeric($final_average_score)) {
                             $final_average_score = $final_average_score + $result_score["total_score"];
@@ -490,14 +537,14 @@ trait AverageFinalYearTrait
                     }
                     if(is_numeric($final_average_score)) {
                         $final_average_score = $final_average_score / 2;
-                        $final_average_gpa = get_gpa($final_average_score);
-                        $final_average_mention = get_french_mention($final_average_score);
+                        $final_average_gpa = get_gpa($final_average_score, $passedScoreFinal);
+                        $final_average_mention = get_french_mention($final_average_score, $passedScoreFinal);
                         if ($fail) {
                             $final_average_gpa = "";
                             $final_average_mention = "Echoué";
-                        } else if($lowest_score<50) {
-                            $final_average_gpa = get_gpa($lowest_score);
-                            $final_average_mention = get_french_mention($lowest_score);
+                        } else if($lowest_score<$passedScoreFinal) {
+                            $final_average_gpa = get_gpa($lowest_score, $passedScoreFinal);
+                            $final_average_mention = get_french_mention($lowest_score, $passedScoreFinal);
                         }
                         if($min_moy_score>$final_average_score) {
                             $min_moy_score = $final_average_score;
@@ -536,21 +583,21 @@ trait AverageFinalYearTrait
 
                 $sheet->cell('D'.$row, 'Max');
                 $sheet->cell('E'.$row, $max_score_before_graduated);
-                $sheet->cell('F'.$row, get_gpa($max_score_before_graduated));
+                $sheet->cell('F'.$row, get_gpa($max_score_before_graduated, $student_by_groups[$localKey]['passedScore14']));
                 $sheet->cell('G'.$row, $max_score_graduated);
-                $sheet->cell('H'.$row, get_gpa($max_score_graduated));
+                $sheet->cell('H'.$row, get_gpa($max_score_graduated, $student_by_groups[$localKey]['passedScore25']));
                 $sheet->cell('I'.$row, $max_moy_score);
-                $sheet->cell('J'.$row, get_gpa($max_moy_score));
+                $sheet->cell('J'.$row, get_gpa($max_moy_score, (($student_by_groups[$localKey]['passedScore14']) + $student_by_groups[$localKey]['passedScore25'])/2));
 
                 $row++;
 
                 $sheet->cell('D'.$row, 'Min');
                 $sheet->cell('E'.$row, $min_score_before_graduated);
-                $sheet->cell('F'.$row, get_gpa($min_score_before_graduated));
+                $sheet->cell('F'.$row, get_gpa($min_score_before_graduated, $student_by_groups[$localKey]['passedScore14']));
                 $sheet->cell('G'.$row, $min_score_graduated);
-                $sheet->cell('H'.$row, get_gpa($min_score_graduated));
+                $sheet->cell('H'.$row, get_gpa($min_score_graduated, $student_by_groups[$localKey]['passedScore25']));
                 $sheet->cell('I'.$row, $min_moy_score);
-                $sheet->cell('J'.$row, get_gpa($min_moy_score));
+                $sheet->cell('J'.$row, get_gpa($min_moy_score, (($student_by_groups[$localKey]['passedScore14']) + $student_by_groups[$localKey]['passedScore25'])/2));
 
                 $sheet->setBorder('E8:L8', 'thin');
                 $sheet->setBorder('A9:L' . ($row-2), 'thin');

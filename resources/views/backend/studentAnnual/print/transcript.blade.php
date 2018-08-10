@@ -8,28 +8,10 @@
     <?php
         if($transcript_type == "semester1") {
             $last_score = $scores[$student['id']]["final_score_s1"];
+            $gpa = get_gpa($last_score, $passedScoreI);
         } else {
             $last_score = $scores[$student['id']]["final_score"];
-        }
-
-        $gpa = "";
-        if($last_score >= 85){
-            $gpa = "4.0";
-        } else if ($last_score >= 80) {
-            $gpa = "3.5";
-        } else if ($last_score >= 70) {
-            $gpa = "3.0";
-        } else if ($last_score >= 65) {
-            $gpa = "2.5";
-        } else if ($last_score >= 50) {
-            $gpa = "2.0";
-        } else if ($last_score >= 45) {
-            $gpa = "1.5";
-        } else if ($last_score >= 40) {
-            $gpa = "1.0";
-        }  else {
-
-            $gpa = "0.0";
+            $gpa = get_gpa($last_score, $passedScoreFinal);
         }
     ?>
     @if(floatval($gpa) > 1.5)
@@ -102,27 +84,11 @@
                                         <td width="5%">{{ $i }} -</td>
                                         <td style="text-align: left;width: 35%">{{isset($score['name_en'])?$score['name_en']:""}}</td>
                                         <td style="width: 20%">{{ $score["credit"] }}</td>
-                                        <?php
-                                        $grade = "";
-                                        if($score["score"] >= 85){
-                                            $grade = "A";
-                                        } else if ($score["score"] >= 80) {
-                                            $grade = "B<sup>+</sup>";
-                                        } else if ($score["score"] >= 70) {
-                                            $grade = "B";
-                                        } else if ($score["score"] >= 65) {
-                                            $grade = "C<sup>+</sup>";
-                                        } else if ($score["score"] >= 50) {
-                                            $grade = "C";
-                                        } else if ($score["score"] >= 45) {
-                                            $grade = "D";
-                                        } else if ($score["score"] >= 40) {
-                                            $grade = "E";
-                                        }  else {
-                                            $grade = "F";
-                                        }
-
-                                        ?>
+                                        @if($score['semester'] == 1)
+                                            @php $grade = get_grading($score["score"], $passedScoreI); @endphp
+                                        @else
+                                            @php $grade = get_grading($score["score"], $passedScoreII); @endphp
+                                        @endif
                                         <td class="col-right" style="width: 40%;">{!! $grade !!}</td>
                                     </tr>
                                     <?php $i++ ?>

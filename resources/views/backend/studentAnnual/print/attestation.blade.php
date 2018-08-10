@@ -185,17 +185,26 @@
                 <?php
                     $fail = false;
                     $result = [];
+                    $passedScore = 50;
+
                     foreach ($student_by_group as $key => $student_by_class) {
+                        if (is_numeric($key)) {
+                            if ($student_by_class['grade_id'] == 1 || $student_by_class['grade_id'] == 4) {
+                                $passedScore = $student_by_group['passedScore14'];
+                            } else {
+                                $passedScore = $student_by_group['passedScore25'];
+                            }
+                        }
                         $lowest_score = 100;
                         if(is_numeric($key)) {
                             $result[$student_by_class["grade_id"]]["total_score"] = $scores[$student_by_class["id"]]["final_score"];
-                            $result[$student_by_class["grade_id"]]["total_gpa"] = get_gpa($scores[$student_by_class["id"]]["final_score"]);
+                            $result[$student_by_class["grade_id"]]["total_gpa"] = get_gpa($scores[$student_by_class["id"]]["final_score"], $passedScore);
                             $result[$student_by_class["grade_id"]]["credit"] = 0;
                             $result[$student_by_class["grade_id"]]["courses_fail"] = "";
                             foreach ($scores[$student_by_class["id"]] as $key=>$score) {
                                 if(is_numeric($key)){
                                     $result[$student_by_class["grade_id"]]["credit"] += $score["credit"];
-                                    if($score["score"] <30) {
+                                    if($score["score"] < 30) {
                                         if($score["resit"] == null) {
                                             $result[$student_by_class["grade_id"]]["courses_fail"] = $result[$student_by_class["grade_id"]]["courses_fail"] . $score["name_fr"] . " (". $score["score"] .")". "<br/>";
                                             $fail = true;
@@ -234,6 +243,7 @@
                     <table class="table no-border">
                         <?php
                         $final_average_score = 0;
+                        $passedScoreFinal = ($student_by_group['passedScore14'] + $student_by_group['passedScore25'])/2;
                         foreach($result as $result_score) {
                             if(is_numeric($result_score["total_score"]) && is_numeric($final_average_score)) {
                                 $final_average_score = $final_average_score + $result_score["total_score"];
@@ -243,13 +253,13 @@
                         }
                         if(is_numeric($final_average_score)) {
                             $final_average_score = $final_average_score / 2;
-                            $final_average_gpa = get_gpa($final_average_score);
+                            $final_average_gpa = get_gpa($final_average_score, $passedScoreFinal);
                             $final_average_mention = get_english_mention($final_average_score);
                             if ($fail) {
                                 $final_average_gpa = "";
                                 $final_average_mention = "Echoué";
                             } else if($lowest_score<50) {
-                                $final_average_gpa = get_gpa($lowest_score);
+                                $final_average_gpa = get_gpa($lowest_score, $passedScoreFinal);
                                 $final_average_mention = get_english_mention($lowest_score);
                             }
                         } else {

@@ -173,22 +173,35 @@ if (! function_exists('get_grading')) {
      * @param $score
      * @return String
      */
-    function get_grading($score)
+    function get_grading($score, $passedScore=50)
     {
+        $basePassedScore = 50;
+        $interval = $basePassedScore - $passedScore;
+        $reduceScoreInterval = ($interval)/9;
+
+        $scoreA = 85 - ($reduceScoreInterval * 3);
+        $scoreBPlus = 80 - ($reduceScoreInterval * 1);
+        $scoreB = 70 - ($reduceScoreInterval * 1);
+        $scoreCPlus = 65 - ($reduceScoreInterval * 1);
+        $scoreC = $passedScore;
+        $scoreD = $scoreC - 5;
+        $scoreE = $scoreD - 5;
+
         $grade = "";
-        if($score >= 85){
+
+        if($score >= $scoreA){
             $grade = "A";
-        } else if ($score >= 80) {
+        } else if ($score >= $scoreBPlus) {
             $grade = "B<sup>+</sup>";
-        } else if ($score >= 70) {
+        } else if ($score >= $scoreB) {
             $grade = "B";
-        } else if ($score >= 65) {
+        } else if ($score >= $scoreCPlus) {
             $grade = "C<sup>+</sup>";
-        } else if ($score >= 50) {
+        } else if ($score >= $scoreC) {
             $grade = "C";
-        } else if ($score >= 45) {
+        } else if ($score >= $scoreD) {
             $grade = "D";
-        } else if ($score >= 40) {
+        } else if ($score >= $scoreE) {
             $grade = "E";
         }  else {
             $grade = "F";
@@ -242,6 +255,7 @@ if (! function_exists('get_gpa')) {
         return $gpa;
     }
 }
+
 if (! function_exists('get_english_mention')) {
     /**
      * Convert score to mention in english
@@ -249,22 +263,34 @@ if (! function_exists('get_english_mention')) {
      * @param $score
      * @return String
      */
-    function get_english_mention($score)
+    function get_english_mention($score, $passedScore=50)
     {
+        $basePassedScore = 50;
+        $interval = $basePassedScore - $passedScore;
+        $reduceScoreInterval = ($interval)/9;
+
+        $scoreA = 85 - ($reduceScoreInterval * 3);
+        $scoreBPlus = 80 - ($reduceScoreInterval * 1);
+        $scoreB = 70 - ($reduceScoreInterval * 1);
+        $scoreCPlus = 65 - ($reduceScoreInterval * 1);
+        $scoreC = $passedScore;
+        $scoreD = $scoreC - 5;
+        $scoreE = $scoreD - 5;
+
         $mention = "";
-        if($score >= 85){
+        if($score >= $scoreA){
             $mention = "Excellent";
-        } else if ($score >= 80) {
+        } else if ($score >= $scoreBPlus) {
             $mention = "Very Good";
-        } else if ($score >= 70) {
+        } else if ($score >= $scoreB) {
             $mention = "Good";
-        } else if ($score >= 65) {
+        } else if ($score >= $scoreCPlus) {
             $mention = "Fairly Good";
-        } else if ($score >= 50) {
+        } else if ($score >= $scoreC) {
             $mention = "Fair";
-        } else if ($score >= 45) {
+        } else if ($score >= $scoreD) {
             $mention = "Poor";
-        } else if ($score >= 40) {
+        } else if ($score >= $scoreE) {
             $mention = "Very Poor";
         }  else {
             $mention = "Failure";
@@ -279,22 +305,34 @@ if (! function_exists('get_french_mention')) {
      * @param $score
      * @return String
      */
-    function get_french_mention($score)
+    function get_french_mention($score, $passedScore=50)
     {
+        $basePassedScore = 50;
+        $interval = $basePassedScore - $passedScore;
+        $reduceScoreInterval = ($interval)/9;
+
+        $scoreA = 85 - ($reduceScoreInterval * 3);
+        $scoreBPlus = 80 - ($reduceScoreInterval * 1);
+        $scoreB = 70 - ($reduceScoreInterval * 1);
+        $scoreCPlus = 65 - ($reduceScoreInterval * 1);
+        $scoreC = $passedScore;
+        $scoreD = $scoreC - 5;
+        $scoreE = $scoreD - 5;
+
         $mention = "";
-        if($score >= 85){
+        if($score >= $scoreA){
             $mention = "Excellent";
-        } else if ($score >= 80) {
+        } else if ($score >= $scoreBPlus) {
             $mention = "Très Bien";
-        } else if ($score >= 70) {
+        } else if ($score >= $scoreB) {
             $mention = "Bien";
-        } else if ($score >= 65) {
+        } else if ($score >= $scoreCPlus) {
             $mention = "Assez Bien";
-        } else if ($score >= 50) {
+        } else if ($score >= $scoreC) {
             $mention = "Passable";
-        } else if ($score >= 45) {
+        } else if ($score >= $scoreD) {
             $mention = "Faible";
-        } else if ($score >= 40) {
+        } else if ($score >= $scoreE) {
             $mention = "Très Faible";
         }  else {
             $mention = "Insuffisant";

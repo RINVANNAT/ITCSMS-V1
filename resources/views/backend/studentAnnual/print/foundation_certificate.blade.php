@@ -10,33 +10,14 @@
 @section('content')
     @foreach($students as $student)
         <?php
+            $gpa = "";
             $student_pass = true;
             if($transcript_type == "semester1") {
                 $last_score = $scores[$student['id']]["final_score_s1"];
+                $gpa = get_gpa($last_score, $passedScoreI);
             } else {
                 $last_score = $scores[$student['id']]["final_score"];
-            }
-
-            $gpa = "";
-            if($last_score >= 85){
-                $gpa = "4.0";
-            } else if ($last_score >= 80) {
-                $gpa = "3.5";
-            } else if ($last_score >= 70) {
-                $gpa = "3.0";
-            } else if ($last_score >= 65) {
-                $gpa = "2.5";
-            } else if ($last_score >= 50) {
-                $gpa = "2.0";
-            } else if ($last_score >= 45) {
-                $student_pass = false;
-                $gpa = "1.5";
-            } else if ($last_score >= 40) {
-                $student_pass = false;
-                $gpa = "1.0";
-            }  else {
-                $student_pass = false;
-                $gpa = "0.0";
+                $gpa = get_gpa($last_score, $passedScoreII);
             }
 
             foreach ($scores[$student['id']] as $key => $score) {
@@ -80,7 +61,11 @@
                                             <td class="english_section" style="text-align: left;width: 35%">{{isset($score['name_en'])?$score['name_en']:""}}</td>
                                             <td class="english_section" style="text-align: center;width: 15%">{{ $score["credit"] }}</td>
                                             <?php
-                                            $grade = get_grading($score["score"]);
+                                                if ($transcript_type == "semester1") {
+                                                    $grade = get_grading($score["score"], $passedScoreI);
+                                                } else {
+                                                    $grade = get_grading($score["score"], $passedScoreII);
+                                                }
                                             ?>
                                             <td class="col-right english_section" style="text-align:center; width: 15%;">{!! $grade !!}</td>
                                         </tr>
@@ -99,7 +84,11 @@
                                             <td class="english_section" style="text-align: left;width: 35%">{{isset($score['name_en'])?$score['name_en']:""}}</td>
                                             <td class="english_section" style="text-align: center;width: 15%">{{ $score["credit"] }}</td>
                                             <?php
-                                            $grade = get_grading($score["score"]);
+                                                if ($transcript_type == "semester1") {
+                                                    $grade = get_grading($score["score"], $passedScoreI);
+                                                } else {
+                                                    $grade = get_grading($score["score"], $passedScoreII);
+                                                }
                                             ?>
                                             <td class="col-right english_section" style="text-align:center; width: 15%;">{!! $grade !!}</td>
                                         </tr>
@@ -160,43 +149,6 @@
         @endif
     @endforeach
     @foreach($students->reverse() as $student)
-        <?php
-        $student_pass = true;
-        if($transcript_type == "semester1") {
-            $last_score = $scores[$student['id']]["final_score_s1"];
-        } else {
-            $last_score = $scores[$student['id']]["final_score"];
-        }
-
-        $gpa = "";
-        if($last_score >= 85){
-            $gpa = "4.0";
-        } else if ($last_score >= 80) {
-            $gpa = "3.5";
-        } else if ($last_score >= 70) {
-            $gpa = "3.0";
-        } else if ($last_score >= 65) {
-            $gpa = "2.5";
-        } else if ($last_score >= 50) {
-            $gpa = "2.0";
-        } else if ($last_score >= 45) {
-            $student_pass = false;
-            $gpa = "1.5";
-        } else if ($last_score >= 40) {
-            $student_pass = false;
-            $gpa = "1.0";
-        }  else {
-            $student_pass = false;
-            $gpa = "0.0";
-        }
-        foreach ($scores[$student['id']] as $key => $score) {
-            if(is_numeric($key)) {
-                if(intval($score["score"]) < 30 && intval($score["resit"]) < 30) {
-                    $student_pass = false;
-                }
-            }
-        }
-        ?>
         @if($student_pass && ($is_back == 'true'))
             <div class="page">
                 <div class="row">

@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Backend\StudentTrait;
 use App\Http\Requests\Backend\Student\PrintTranscriptRequest;
 use App\Models\AcademicYear;
 use App\Models\Configuration;
+use App\Models\DefineAverage;
 use App\Models\Gender;
 use App\Models\PrintedTranscript;
 use App\Models\StudentAnnual;
@@ -164,6 +165,14 @@ trait PrintTranscriptTrait
         return $datatables->make(true);
     }
     public function print_transcript(PrintTranscriptRequest $request){
+        $academic_year_id = null;
+        $department_id = null;
+        $paramSemester = $request->transcript_type;
+        $semester_id = 1;
+        if($paramSemester == 'year') {
+            $semester_id = 0;
+        }
+
         $smis_server = Configuration::where("key","smis_server")->first();
         $semester = 1;
         $studentAnnualIds = json_decode($request->ids);
@@ -223,6 +232,53 @@ trait PrintTranscriptTrait
             ->get()
             ->toArray();
 
+        if (count($studentAnnualIds) >0){
+            $studentAnnual = StudentAnnual::find($studentAnnualIds[0]);
+            $academic_year_id = $studentAnnual->academic_year_id;
+            $department_id = $studentAnnual->department_id;
+
+            $passedScoreI = 50;
+            $passedScoreII = 50;
+            $passedScoreFinal = 50;
+
+            $passedScoreI = DefineAverage::where([
+                'academic_year_id' => $academic_year_id,
+                'department_id' => $department_id,
+                'semester_id' => 1
+            ])->first();
+
+            $passedScoreFinal = DefineAverage::where([
+                'academic_year_id' => $academic_year_id,
+                'department_id' => $department_id,
+                'semester_id' => 0
+            ])->first();
+
+            if ($passedScoreFinal instanceof DefineAverage) {
+                $passedScoreFinal = $passedScoreFinal->value;
+            } else {
+                $passedScoreFinal == 50;
+            }
+
+            if ($passedScoreI instanceof DefineAverage) {
+                $passedScoreI = $passedScoreI->value;
+            } else {
+                $passedScoreI = 50;
+            }
+
+            if ($semester_id == 0) {
+                $passedScoreII = DefineAverage::where([
+                    'academic_year_id' => $academic_year_id,
+                    'department_id' => $department_id,
+                    'semester_id' => 2
+                ])->first();
+                if ($passedScoreII instanceof DefineAverage) {
+                    $passedScoreII = $passedScoreII->value;
+                } else {
+                    $passedScoreII = 50;
+                }
+            }
+        }
+
         $students = collect($students);
         $students = collect($students)->sortBy(function($student){
             return sprintf('%-12s%s',
@@ -257,27 +313,29 @@ trait PrintTranscriptTrait
             );
             $ranking_data = collect(json_decode($this->get_total_score_summary($params))->data)->keyBy("student_id_card");
             $view = 'backend.studentAnnual.print.foundation_certificate';
+            return view($view,
+                compact(
+                    'ranking_data',
+                    'scores',
+                    'students',
+                    'semester',
+                    'transcript_type',
+                    'issued_by',
+                    'issued_date',
+                    'issued_number',
+                    'smis_server',
+                    'photo',
+                    'is_front',
+                    'is_back',
+                    'is_certificate',
+                    'passedScoreI',
+                    'passedScoreII',
+                    'passedScoreFinal'
+                )
+            );
         } else {
             $view = 'backend.studentAnnual.print.transcript';
         }
-
-//        return view($view,
-//            compact(
-//                'ranking_data',
-//                'scores',
-//                'students',
-//                'semester',
-//                'transcript_type',
-//                'issued_by',
-//                'issued_date',
-//                'issued_number',
-//                'smis_server',
-//                'photo',
-//                'is_front',
-//                'is_back',
-//                'is_certificate'
-//            )
-//        );
 
         return SnappyPdf::loadView($view,
             compact(
@@ -293,7 +351,10 @@ trait PrintTranscriptTrait
                 'photo',
                 'is_front',
                 'is_back',
-                'is_certificate'
+                'is_certificate',
+                'passedScoreI',
+                'passedScoreII',
+                'passedScoreFinal'
             )
         )->stream();
     }

@@ -356,6 +356,7 @@ trait PrintAttestationTrait
                 if ($passedScore25Obj instanceof DefineAverage) {
                     $passedScore25 = $passedScore25Obj->value;
                 }
+
                 $student_by_class['passedScore14'] = $passedScore14;
                 $student_by_class['passedScore25'] = $passedScore25;
 
