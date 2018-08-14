@@ -141,6 +141,7 @@
                             data-toggle="tooltip"
                             data-placement="left"
                             @click="getAverage"
+                            ref="refreshButton"
                             title="Refresh-Table"
                             id="refresh_score_sheet" >
                         <i class="fa fa-refresh" ></i>
@@ -190,7 +191,10 @@
                 @endforeach
             </select>
 
-            <select name="dept_option" id="filter_dept_option" class="left-margin form-control col-sm-3">
+            <select name="dept_option"
+                    @change="getAverage"
+                    id="filter_dept_option"
+                    class="left-margin form-control col-sm-3">
                 <option value="">Option</option>
                 @foreach($departmentOptions as $option)
                     <option value="{{$option->id}}"
@@ -198,21 +202,31 @@
                 @endforeach
             </select>
 
-            <select name="semester"  @change="getAverage" id="filter_semester"  class="left-margin form-control col-sm-3">
+            <select name="semester"
+                    @change="getAverage"
+                    id="filter_semester"
+                    class="left-margin form-control col-sm-3">
                 @foreach($semesters as $key=>$semester)
                     <option value="{{$key}}"> {{$semester}}</option>
                 @endforeach
                 <option value=""> Semesters</option>
             </select>
 
-            <select name="degree" id="filter_degree" class="left-margin form-control  col-sm-3">
+            <select name="degree"
+                    @change="getAverage"
+                    id="filter_degree"
+                    class="left-margin form-control  col-sm-3">
                 @foreach($degrees as $key=>$degreeName)
                     <option value="{{$key}}"> {{$degreeName}}</option>
                 @endforeach
             </select>
 
 
-            <select name="grade" id="filter_grade" class="left-margin form-control col-sm-3" style="margin-bottom: 5px">
+            <select name="grade"
+                    @change="getAverage"
+                    id="filter_grade"
+                    class="left-margin form-control col-sm-3"
+                    style="margin-bottom: 5px">
                 @foreach($grades as $key=>$gradeName)
 
                     @if($department_id = \App\Models\Enum\ScoreEnum::Dept_TC)
@@ -335,7 +349,7 @@
 	        passMoyenne: 10,
             currentColClassName: 'currentCol',
             cells: function (row, col, prop) {
-                console.log(colorRenderer.arguments)
+                // console.log(colorRenderer.arguments)
                 this.renderer = colorRenderer;
 
                 var cellProperties = {};
@@ -579,7 +593,7 @@
             });
 
             $("#filter_grade").on("change", function () {
-                console.log($('.btn-right').children().hasClass('btn-average-final-year'))
+                // console.log($('.btn-right').children().hasClass('btn-average-final-year'))
 
                 if($('.btn-right').children().hasClass('btn-average-final-year')){
                     $('.btn-right').children('.btn-average-final-year').remove();
