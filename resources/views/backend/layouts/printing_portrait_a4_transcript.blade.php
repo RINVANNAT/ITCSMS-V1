@@ -37,9 +37,10 @@
         .page {
             width: 210mm;
             height: 296mm;
-            padding-top: 15mm;
-            padding-left: 25mm;
-            padding-right: 15mm;
+            padding-top: 24mm;
+            padding-left: 21mm;
+            padding-right: 25mm;
+            padding-bottom: 0mm;
             background: white;
             position: relative;
             page-break-after: always;
@@ -51,7 +52,7 @@
             bottom: 5mm !important;
             height: auto;
             width: 100%;
-            left: 25mm;
+            left: 21mm;
             font-size: 10pt;
         }
 
@@ -68,9 +69,9 @@
             .page {
                 width: 210mm;
                 height: 297mm;
-                padding-top: 15mm;
-                padding-left: 13mm;
-                padding-right: 15mm;
+                padding-top: 13mm;
+                padding-left: 12mm;
+                padding-right: 18mm;
                 padding-bottom: 0mm;
                 background: white;
                 position: relative;
