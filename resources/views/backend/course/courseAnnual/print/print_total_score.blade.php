@@ -88,85 +88,85 @@
             </div>
 
             <table style="width:400mm;margin-left: auto; margin-right: auto;">
-                <thead>
-                <tr>
-                    <?php
-                        $index = 0;
-                    ?>
-                    @foreach($data->nestedHeaders[0] as $header)
+                <tbody style="width: 400mm !important;">
+                    <tr>
                         <?php
+                        $index = 0;
+                        ?>
+                        @foreach($data->nestedHeaders[0] as $header)
+                            <?php
                             if($index >2){
                                 $vertical = "vertical";
                             } else {
                                 $vertical = "";
                             }
-                        ?>
-                        @if(isset($header->label))
-                            <th class="{{$vertical}}" colspan="{{$header->colspan}}">
-                                <div class="{{$vertical}}">{{$header->label}}</div>
-                            </th>
-                        @else
-                            <th class="{{$vertical}}">
-                                <div class="{{$vertical}}">
-                                    {{$header}}
-                                </div>
-                            </th>
-                        @endif
-                        <?php $index++; ?>
-                    @endforeach
-                </tr>
-                <tr>
-                    <?php
-                    $index = 0;
-                    ?>
-                    @foreach($data->nestedHeaders[1] as $header)
+                            ?>
+                            @if(isset($header->label))
+                                <th class="{{$vertical}}" colspan="{{$header->colspan}}">
+                                    <div class="{{$vertical}}">{{$header->label}}</div>
+                                </th>
+                            @else
+                                <th class="{{$vertical}}">
+                                    <div class="{{$vertical}}">
+                                        {{$header}}
+                                    </div>
+                                </th>
+                            @endif
+                            <?php $index++; ?>
+                        @endforeach
+                    </tr>
+                    <tr>
                         <?php
-                        if($index >3){
-                            $width = "";
-                            if(isset($header->label)){
-                                if($header->label == "Abs"){
-                                    $custom_class = "Abs";
-                                } else if(is_numeric($header->label)){
-                                    $custom_class = "score";
-                                } else {
-                                    $custom_class = $header->label;
-                                }
-                            } else {
-                                if(is_numeric($header)){
-                                    $custom_class = "score";
-                                } else {
-                                    $custom_class = $header;
-                                }
-                            }
-                        } else {
-                            $custom_class = "";
-                            if($index == 0 || $index == 3){
-                                $width = "style='width:10mm'";
-                            } else if($index == 1){
-                                $width = "style='width:20mm'";
-                            } else {
-                                $width = "style='width:40mm !important'";
-                            }
-                        }
-
+                        $index = 0;
                         ?>
-                        @if(isset($header->label))
-                            <th {!! $width !!} class="{{$custom_class}}" colspan="{{$header->colspan}}">
-                                {{$header->label}}
-                            </th>
-                        @else
-                            <th {!! $width !!} class="{{$custom_class}}">
-                                @if(is_numeric($header))
-                                    {{$header}}
-                                @endif
-                            </th>
-                        @endif
-                        <?php $index++; ?>
-                    @endforeach
-                </tr>
-                </thead>
-                <tbody>
-                    @foreach($all_chunk as $element)
+                        @foreach($data->nestedHeaders[1] as $header)
+                            <?php
+                            if($index >3){
+                                $width = "";
+                                if(isset($header->label)){
+                                    if($header->label == "Abs"){
+                                        $custom_class = "Abs";
+                                    } else if(is_numeric($header->label)){
+                                        $custom_class = "score";
+                                    } else {
+                                        $custom_class = $header->label;
+                                    }
+                                } else {
+                                    if(is_numeric($header)){
+                                        $custom_class = "score";
+                                    } else {
+                                        $custom_class = $header;
+                                    }
+                                }
+                            } else {
+                                $custom_class = "";
+                                if($index == 0 || $index == 3){
+                                    $width = "style='width:10mm'";
+                                } else if($index == 1){
+                                    $width = "style='width:20mm'";
+                                } else {
+                                    $width = "style='width:40mm !important'";
+                                }
+                            }
+
+                            ?>
+                            @if(isset($header->label))
+                                <th {!! $width !!} class="{{$custom_class}}" colspan="{{$header->colspan}}">
+                                    {{$header->label}}
+                                </th>
+                            @else
+                                <th {!! $width !!} class="{{$custom_class}}">
+                                    @if(is_numeric($header))
+                                        {{$header}}
+                                    @endif
+                                </th>
+                            @endif
+                            <?php $index++; ?>
+                        @endforeach
+                    </tr>
+
+                    @foreach(collect($all_chunk)->reverse()->splice(5)->reverse() as &$element)
+                        <?php $element = collect($element)->reverse()->splice(1)->reverse() ?>
                         <tr>
                             @foreach($element as $key => $value)
                                 @if($key == "student_name")
@@ -177,6 +177,18 @@
                             @endforeach
                         </tr>
                     @endforeach
+                    {{--{{ dd($all_chunk[113]) }}--}}
+                    @for($i = count(collect($all_chunk)->reverse()->splice(5)->reverse()); $i < count($all_chunk); $i++)
+                        <tr>
+                            @foreach($all_chunk[$i] as $key => $value)
+                                @if($key == "student_name")
+                                    <td class="left">{{$value}}</td>
+                                @elseif($key != "_empty_")
+                                    <td class="center">{{$value}}</td>
+                                @endif
+                            @endforeach
+                        </tr>
+                    @endfor
                 </tbody>
             </table>
         </div>

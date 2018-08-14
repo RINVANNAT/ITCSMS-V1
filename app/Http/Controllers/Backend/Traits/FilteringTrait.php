@@ -74,12 +74,14 @@ trait FilteringTrait
             ->groupBy("class");
 
         $students->each(function ($item, $key) use (&$filter) {
-            $filter[$item[0]->department][$key] = [
-                "degree_id" => $item[0]->degree_id,
-                "grade_id" => $item[0]->grade_id,
-                "department_id" => $item[0]->department_id,
-                "department_option_id" => $item[0]->department_option_id,
-            ];
+            if(($item[0]->degree_id !== 2 || $item[0]->department_id !== 4) && ($item[0]->degree_id !== 2 || $item[0]->department_id !== 2 || $item[0]->degree_id !== 2 || $item[0]->department_option_id !== 2)){
+                $filter[$item[0]->department][$key] = [
+                    "degree_id" => $item[0]->degree_id,
+                    "grade_id" => $item[0]->grade_id,
+                    "department_id" => $item[0]->department_id,
+                    "department_option_id" => $item[0]->department_option_id,
+                ];
+            }
         });
         return $filter;
     }

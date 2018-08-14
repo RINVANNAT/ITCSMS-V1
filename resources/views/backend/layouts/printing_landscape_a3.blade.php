@@ -66,7 +66,7 @@
             }
             .page {
                 width: 420mm;
-                height: 297mm;
+                /*height: 297mm;*/
                 padding: 15mm;
                 margin: 5mm auto;
                 border: 1px #D3D3D3 solid;
