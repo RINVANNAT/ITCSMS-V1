@@ -318,7 +318,7 @@
         var table_width;
         var hotInstance;
         var print_url = "{{route('admin.course.print_total_score')}}";
-        var average_final_year = '<button class="btn btn-warning btn-average-final-year" data-toggle="tooltip" style="margin-left: 5px" data-placement="left"  title="Print Average Final Year" id="print_average_final_year"> Average Final Year</button>';
+        var average_final_year = '<button class="btn btn-warning btn-average-final-year" data-toggle="tooltip" style="margin-right: 5px" data-placement="left"  title="Print Average Final Year" id="print_average_final_year"> Average Final Year</button>';
         var final_score_url = "{{route('admin.student.print_average_final_year', ['type'=>'show'])}}";
         var setting = {
             readOnly: true,
