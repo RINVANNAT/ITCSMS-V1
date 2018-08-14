@@ -36,9 +36,9 @@
 
         .page {
             width: 210mm;
-            height: 297mm;
+            height: 296mm;
             padding-top: 15mm;
-            padding-left: 13mm;
+            padding-left: 25mm;
             padding-right: 15mm;
             background: white;
             position: relative;
@@ -51,7 +51,7 @@
             bottom: 5mm !important;
             height: auto;
             width: 100%;
-            left: 13mm;
+            left: 25mm;
             font-size: 10pt;
         }
 
@@ -84,9 +84,7 @@
 
 </head>
 <body class="skin-{!! config('backend.theme') !!}">
-
-@yield('content')
-{{--<script>window.jQuery || document.write('<script src="{{asset('js/vendor/jquery/jquery-2.1.4.min.js')}}"><\/script>')</script>--}}
+    @yield('content')
 </body>
 @yield('scripts')
 </html>
