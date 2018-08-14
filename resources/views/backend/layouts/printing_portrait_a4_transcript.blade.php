@@ -79,6 +79,18 @@
                 page-break-before: always;
             }
         }
+         .custom-break-line {
+            padding-top: 8px;
+        }
+        .custom-transcript-title img {
+            margin-top: 0px;
+        }
+        table.custom-subject {
+            margin-top: 2mm;
+        }
+        .director-signature {
+            margin-right: 0mm;
+        }
     </style>
 
     @yield('after-styles-end')
