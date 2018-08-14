@@ -22,7 +22,7 @@
                     <div class="transcript-header">
                         <table class="head">
                             <tr>
-                                <td colspan="2"><h4><b>Department1:</b> <span class="no-bold">{{$student['department_en']}}</span></h4></td>
+                                <td colspan="2"><h4><b>Department:</b> <span class="no-bold">{{$student['department_en']}}</span></h4></td>
                             </tr>
                             @if($student['option_en'] != "" && ($student['department_id'] != 2 && $student['degree_id'] != 2 && $student['grade_id'] != 2 ))
                                 <tr>
