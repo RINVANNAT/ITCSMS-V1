@@ -37,7 +37,7 @@
         .page {
             width: 210mm;
             height: 296mm;
-            padding-top: 24mm;
+            padding-top: 19mm;
             padding-left: 21mm;
             padding-right: 25mm;
             padding-bottom: 0mm;
@@ -49,7 +49,7 @@
 
         .transcript-footer {
             position: absolute;
-            bottom: 5mm !important;
+            bottom: 6mm !important;
             height: auto;
             width: 100%;
             left: 21mm;
