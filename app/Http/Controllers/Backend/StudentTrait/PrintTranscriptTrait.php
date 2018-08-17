@@ -256,7 +256,7 @@ trait PrintTranscriptTrait
             if ($passedScoreFinal instanceof DefineAverage) {
                 $passedScoreFinal = $passedScoreFinal->value;
             } else {
-                $passedScoreFinal == 50;
+                $passedScoreFinal = 50;
             }
 
             if ($passedScoreI instanceof DefineAverage) {
