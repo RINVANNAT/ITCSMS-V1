@@ -361,6 +361,7 @@ trait PrintTranscriptTrait
         ->setOption('margin-left', 0)
         ->setOption('margin-right', 0)
         ->setOption('margin-top', 0)
+        ->setOption('encoding', 'utf-8')
         ->stream();
     }
 
