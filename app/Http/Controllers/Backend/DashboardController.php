@@ -9,6 +9,7 @@ use App\Models\CourseAnnual;
 use App\Models\Employee;
 use App\Models\Schedule\Timetable\TimetableSlot;
 use App\Models\Schedule\Timetable\Week;
+use App\Models\Semester;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -32,16 +33,18 @@ class DashboardController extends Controller
         $courses = null;
         $academic_years = AcademicYear::latest()->get();
         $weeks = Week::all();
+        $semesterIds = Semester::select('id')->pluck('id');
 
-        $last_year = AcademicYear::orderBy('id', 'DESC')->first();
+        $last_year = AcademicYear::orderBy('id', 'DESC')->pluck('id');
+
         if ($employee != null) {
             $courses = CourseAnnual::leftJoin('departments', 'course_annuals.department_id', '=', 'departments.id')
                 ->leftJoin('degrees', 'course_annuals.degree_id', '=', 'degrees.id')
                 ->leftJoin('grades', 'course_annuals.grade_id', '=', 'grades.id')
                 ->leftJoin('semesters', 'course_annuals.semester_id', '=', 'semesters.id')
                 ->leftJoin('departmentOptions', 'course_annuals.department_option_id', '=', 'departmentOptions.id')
-                ->where('course_annuals.academic_year_id', $last_year->id)
-                ->where('course_annuals.semester_id', 2)
+                ->whereIn('course_annuals.academic_year_id', $last_year)
+                ->whereIn('course_annuals.semester_id', $semesterIds)
                 ->where('employee_id', $employee->id)
                 ->with("courseAnnualClass")
                 ->select([
@@ -56,10 +59,11 @@ class DashboardController extends Controller
                     'departmentOptions.code as option',
                     DB::raw("CONCAT(degrees.code,grades.code,departments.code) as class")
                 ])
+                ->orderBy('course_annuals.academic_year_id', "DESC")
                 ->orderBy('course_annuals.department_id', "ASC")
                 ->orderBy('course_annuals.degree_id', "ASC")
                 ->orderBy('course_annuals.grade_id', "ASC")
-                ->orderBy('course_annuals.semester_id', "ASC")
+                ->orderBy('course_annuals.semester_id', "DESC")
                 ->get()
                 ->toArray();
         }

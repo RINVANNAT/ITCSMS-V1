@@ -14,6 +14,7 @@
                     <th>Courses</th>
                     <th>Class</th>
                     <th>Group</th>
+                    <th>Academic Year</th>
                     <th>Semester</th>
                     <th style="width: 40px"></th>
                 </tr>
@@ -37,6 +38,9 @@
                                     <span>{{$group["group"]}}</span>
                                 @endforeach
                             @endif
+                        </td>
+                        <td>
+                            {{$course['academic_year_id']}}
                         </td>
                         <td>
                             {{$course['semester']}}
