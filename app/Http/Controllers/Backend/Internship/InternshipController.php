@@ -15,7 +15,6 @@ use App\Traits\PrintInternshipTrait;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Input;
-use PetstoreIO\Category;
 use Yajra\Datatables\Facades\Datatables;
 
 /**
@@ -65,6 +64,7 @@ class InternshipController extends Controller
      */
     public function store(StoreInternshipRequest $request)
     {
+        // dd($request->all());
         $result = array(
             'code' => 1,
             'message' => 'success',
@@ -75,39 +75,32 @@ class InternshipController extends Controller
         isset($is_name) ? $is_name = true : $is_name = false;
 
         try {
-
             $company = json_decode($request->company);
-
-            if (array_key_exists('id', $request->all())) {
-                $request['company'] = $company->text;
+            if (is_null($company)) {
+                $company = InternshipCompany::create([
+                    'name' => $request->company,
+                    'title' => $request->title,
+                    'training_field' => $request->training_field,
+                    'address' => $request->address,
+                    'phone' => $request->phone,
+                    'hp' => $request->hot_line,
+                    'mail' => $request->e_mail_address,
+                    'web' => $request->web
+                ]);
+                $request['company'] = $company->name;
                 $request['company_id'] = $company->id;
             } else {
-                if (is_null($company)) {
-                    $company = InternshipCompany::create([
-                        'name' => $request->company,
-                        'title' => $request->title,
-                        'training_field' => $request->training_field,
-                        'address' => $request->address,
-                        'phone' => $request->phone,
-                        'hp' => $request->hot_line,
-                        'mail' => $request->e_mail_address,
-                        'web' => $request->web
-                    ]);
-                    $request['company'] = $company->name;
-                    $request['company_id'] = $company->id;
-                } else {
-                    $findInternshipCompany = InternshipCompany::where('name', 'ilike', '%'.$company->name)
-                        ->orWhere('title', 'ilike', '%'.$company->title)
-                        ->orWhere('training_field', 'ilike', '%'.$company->training_field)
-                        ->first();
-                    $request['company'] = $findInternshipCompany->name;
-                    $request['company_id'] = $findInternshipCompany->id;
-                }
+                $findInternshipCompany = InternshipCompany::where('name', 'ilike', '%' . $company->name)
+                    ->orWhere('title', 'ilike', '%' . $company->title)
+                    ->orWhere('training_field', 'ilike', '%' . $company->training_field)
+                    ->first();
+                $request['company'] = $findInternshipCompany->name;
+                $request['company_id'] = $findInternshipCompany->id;
             }
-
+            
             if (array_key_exists('id', $request->all())) {
                 $internship = Internship::find($request->id);
-                if($internship instanceof Internship) {
+                if ($internship instanceof Internship) {
                     $internship->update($request->all());
                     if (count($request->students) > 0) {
                         $internshipStudentAnnuals = InternshipStudentAnnual::where('internship_id', $internship->id)->get();
@@ -263,27 +256,27 @@ class InternshipController extends Controller
                 return $template;
             })
             ->addColumn('company_info', function ($internship) {
-                return 'To: <strong>' . $internship->person . '</strong><br/>'.
-                    '<strong>'. $internship->company. '</strong><br/>'.
-                    '<strong>'.$internship->address . '</strong><br/>'.
-                    'Phone: <strong>' .$internship->phone . '</strong><br/>'.
-                    'H/P: <strong>' .$internship->hot_line . '</strong><br/>'.
-                    'E-Mail: <strong>' .$internship->e_mail_address . '</strong><br/>'.
-                    'Web: <strong>' .$internship->web. '</strong>';
+                return 'To: <strong>' . $internship->person . '</strong><br/>' .
+                    '<strong>' . $internship->company . '</strong><br/>' .
+                    '<strong>' . $internship->address . '</strong><br/>' .
+                    'Phone: <strong>' . $internship->phone . '</strong><br/>' .
+                    'H/P: <strong>' . $internship->hot_line . '</strong><br/>' .
+                    'E-Mail: <strong>' . $internship->e_mail_address . '</strong><br/>' .
+                    'Web: <strong>' . $internship->web . '</strong>';
             })
             ->addColumn('actions', function ($internship) {
                 return '<a href="' . route('internship.edit', $internship) . '" class="btn btn-xs btn-primary"><i class="fa fa-pencil" data-toggle="tooltip" data-placement="top" title="" data-original-title="Edit"></i></a>' .
                     ' <a href="' . route('internship.delete', $internship) . '" class="btn btn-xs btn-danger"><i class="fa fa-trash" data-toggle="tooltip" data-placement="top" title="" data-original-title="Delete"></i></a>';
             })
             ->addColumn('checkbox', function ($internship) {
-                if(is_null($internship->printed_at)) {
+                if (is_null($internship->printed_at)) {
                     return '<input type="checkbox" checked name="internships[]" class="checkbox" data-id=' . $internship->id . '>';
                 } else {
                     return '<input type="checkbox" name="internships[]" class="checkbox" data-id=' . $internship->id . '>';
                 }
             })
-            ->editColumn('printed_at', function ($internship){
-                return '<span class="label label-success">'.
+            ->editColumn('printed_at', function ($internship) {
+                return '<span class="label label-success">' .
                     $internship->printed_at . '</span>';
             })
             ->make(true);
@@ -312,25 +305,26 @@ class InternshipController extends Controller
     /**
      * @return array
      */
-    public function markPrinted(){
-        if ( count(\request('internship_ids'))>0  ){
+    public function markPrinted()
+    {
+        if (count(\request('internship_ids')) > 0) {
             $now = Carbon::now();
-            foreach (\request('internship_ids') as $item){
-                $internship = Internship::find((int) $item);
+            foreach (\request('internship_ids') as $item) {
+                $internship = Internship::find((int)$item);
                 $internship->printed_at = $now;
                 $internship->update();
             }
             return [
-                'status'=> true
+                'status' => true
             ];
         }
     }
 
-    public function remoteInternshipCompanies (Request $request)
+    public function remoteInternshipCompanies(Request $request)
     {
         $this->validate($request, ['q' => 'required']);
         try {
-            $result = InternshipCompany::where('name', 'ilike', '%'.$request->q.'%')->select('name as text', 'id')->get();
+            $result = InternshipCompany::where('name', 'ilike', '%' . $request->q . '%')->select('name as text', 'id')->get();
             return json_encode(['code' => 1, 'status' => 'success', 'results' => $result]);
         } catch (\Exception $exception) {
             return json_encode(['code' => 0, 'message' => $exception->getMessage()]);
