@@ -14,6 +14,9 @@ class DefineAverage extends Model
         'academic_year_id',
         'department_id',
         'semester_id',
+        'option_id',
+        'grade_id',
+        'degree_id',
         'value'
     ];
 

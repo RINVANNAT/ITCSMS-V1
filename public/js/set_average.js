@@ -19,12 +19,16 @@ new Vue({
 		getAverage() {
 			axios.post('/admin/define-average/get-average', {
 				academic_year_id: $('#filter_academic_year').val(),
-				department_id: $('#filter_dept').val(),
-				semester_id: $('#filter_semester').val() === '' ? '' : $('#filter_semester').val()
+				department_id: $('#filter_dept').val(),department_id: $('#filter_dept').val(),
+                option_id: $('#filter_dept_option').val(),
+                semester_id: $('#filter_semester').val(),
+                degree_id: $('#filter_degree').val(),
+                grade_id: $('#filter_grade').val()
 			}).then(response => {
 				if (response.data.code === 1) {
 					if (response.data.data !== null) {
 						this.average = response.data.data.value
+						// this.$refs.refreshButton.click()
 					} else {
 						this.average = 50.00
 					}
@@ -35,10 +39,14 @@ new Vue({
 			axios.post('/admin/define-average/store-average', {
 				academic_year_id: $('#filter_academic_year').val(),
 				department_id: $('#filter_dept').val(),
-				semester_id: $('#filter_semester').val(),
+                option_id: $('#filter_dept_option').val(),
+                semester_id: $('#filter_semester').val(),
+                degree_id: $('#filter_degree').val(),
+                grade_id: $('#filter_grade').val(),
 				value: this.average
 			}).then(response => {
 				if (response.data.code === 1) {
+                    this.$refs.refreshButton.click()
 					if (response.data.data !== null) {
 						this.average = response.data.data.value
 					}

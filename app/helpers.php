@@ -233,19 +233,19 @@ if (! function_exists('get_gpa')) {
         $gpa = "";
 
         if($score >= $scoreA){
-            $gpa = "4.00";
+            $gpa = "4.0";
         } else if ($score >= $scoreBPlus) {
-            $gpa = "3.50";
+            $gpa = "3.5";
         } else if ($score >= $scoreB) {
-            $gpa = "3.00";
+            $gpa = "3.0";
         } else if ($score >= $scoreCPlus) {
-            $gpa = "2.50";
+            $gpa = "2.5";
         } else if ($score >= $scoreC) {
-            $gpa = "2.00";
+            $gpa = "2.0";
         } else if ($score >= $scoreD) {
-            $gpa = "1.50";
+            $gpa = "1.5";
         } else if ($score >= $scoreE) {
-            $gpa = "1.00";
+            $gpa = "1.0";
         }  else if ($score == "N/A") {
             $gpa = "N/A";
         } else {

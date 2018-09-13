@@ -471,21 +471,21 @@
         }
         /** load script */
         $(function () {
-            show_timetable();
+            // show_timetable();
 
-            get_teacher_timetable();
+            // get_teacher_timetable();
 
-            $('#form_teacher_timetable').on('change', function () {
-                get_teacher_timetable();
-            });
-
-            $('#academic_years').select2({
-                placeholder: "Academic Year"
-            });
-
-            $('#weeks').select2({
-                placeholder: "Week"
-            });
+            // $('#form_teacher_timetable').on('change', function () {
+            //     get_teacher_timetable();
+            // });
+            //
+            // $('#academic_years').select2({
+            //     placeholder: "Academic Year"
+            // });
+            //
+            // $('#weeks').select2({
+            //     placeholder: "Week"
+            // });
         });
     </script>
 

@@ -17,6 +17,9 @@ class CreateDefineAveragesTable extends Migration
             $table->integer('academic_year_id');
             $table->integer('department_id');
             $table->integer('semester_id');
+            $table->integer('option_id')->nullable();
+            $table->integer('degree_id');
+            $table->integer('grade_id');
             $table->float('value')->default(50.00);
             $table->integer('create_uid');
             $table->integer('write_uid');

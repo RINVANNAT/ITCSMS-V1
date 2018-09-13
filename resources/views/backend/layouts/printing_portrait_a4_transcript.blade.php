@@ -2,6 +2,7 @@
 <html class="no-js" lang="">
 <head>
     <meta charset="utf-8">
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="_token" content="{{ csrf_token() }}"/>
@@ -36,10 +37,11 @@
 
         .page {
             width: 210mm;
-            height: 297mm;
-            padding-top: 15mm;
-            padding-left: 13mm;
-            padding-right: 15mm;
+            height: 296mm;
+            padding-top: 19mm;
+            padding-left: 21mm;
+            padding-right: 25mm;
+            padding-bottom: 0mm;
             background: white;
             position: relative;
             page-break-after: always;
@@ -48,10 +50,10 @@
 
         .transcript-footer {
             position: absolute;
-            bottom: 5mm !important;
+            bottom: 6mm !important;
             height: auto;
             width: 100%;
-            left: 13mm;
+            left: 21mm;
             font-size: 10pt;
         }
 
@@ -68,9 +70,9 @@
             .page {
                 width: 210mm;
                 height: 297mm;
-                padding-top: 15mm;
-                padding-left: 13mm;
-                padding-right: 15mm;
+                padding-top: 13mm;
+                padding-left: 12mm;
+                padding-right: 18mm;
                 padding-bottom: 0mm;
                 background: white;
                 position: relative;
@@ -78,15 +80,25 @@
                 page-break-before: always;
             }
         }
+         .custom-break-line {
+            padding-top: 8px;
+        }
+        .custom-transcript-title img {
+            margin-top: 0px;
+        }
+        table.custom-subject {
+            margin-top: 2mm;
+        }
+        .director-signature {
+            margin-right: 0mm;
+        }
     </style>
 
     @yield('after-styles-end')
 
 </head>
 <body class="skin-{!! config('backend.theme') !!}">
-
-@yield('content')
-{{--<script>window.jQuery || document.write('<script src="{{asset('js/vendor/jquery/jquery-2.1.4.min.js')}}"><\/script>')</script>--}}
+    @yield('content')
 </body>
 @yield('scripts')
 </html>
