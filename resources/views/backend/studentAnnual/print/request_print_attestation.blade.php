@@ -410,7 +410,7 @@
                 '{!! Form::select('gender',$genders,null, array('class'=>'form-control filter','id'=>'filter_gender','placeholder'=>'Gender')) !!} ' +
                 '{!! Form::text('group',null, array('class'=>'form-control filter','id'=>'filter_group','placeholder'=>'Group')) !!} ' +
                 '<select name="student_class" class="form-control filter" multiple="multiple" id="filter_class"></select>' +
-                '{!! Form::select('academic_year',$academicYears,null, array('class'=>'form-control filter','id'=>'filter_academic_year')) !!} '
+                '{!! Form::select('academic_year',$academicYears,$academicYear, array('class'=>'form-control filter','id'=>'filter_academic_year')) !!} '
             );
 
             update_filter_class(redraw_student_list);

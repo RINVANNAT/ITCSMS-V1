@@ -19,6 +19,7 @@ use Barryvdh\Snappy\Facades\SnappyPdf;
 use Carbon\Carbon;
 use App\Models\Configuration;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Str;
 
 trait PrintAttestationTrait
 {
