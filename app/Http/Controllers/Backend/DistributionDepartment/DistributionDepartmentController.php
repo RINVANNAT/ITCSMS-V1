@@ -73,9 +73,9 @@ class DistributionDepartmentController extends Controller
             $studentAnnualIds = DistributionDepartment::where([
                 'academic_year_id' => $request->academic_year_id
             ])
-            ->select('student_annual_id')
-            ->distinct('student_annual_id')
-            ->pluck('student_annual_id');
+                ->select('student_annual_id')
+                ->distinct('student_annual_id')
+                ->pluck('student_annual_id');
 
             if (count($studentAnnualIds) > 0) {
                 // find all student annual from DistributionDepartment
@@ -221,16 +221,17 @@ class DistributionDepartmentController extends Controller
                                     $this->getSheet($excel, $department, $option, $result);
                                 }
                             }
-                        } else {
-                            $result = DistributionDepartmentResult::with('studentAnnual', 'department', 'departmentOption')
-                                ->where([
-                                    'department_id' => $department->id,
-                                    'academic_year_id' => $academic_year_id
-                                ])
-                                ->get();
-                            if (count($result) > 0) {
-                                $this->getSheet($excel, $department, null, $result);
-                            }
+                        }
+
+                        $result = DistributionDepartmentResult::with('studentAnnual', 'department', 'departmentOption')
+                            ->where([
+                                'department_id' => $department->id,
+                                'academic_year_id' => $academic_year_id,
+                                'department_option_id' => null
+                            ])
+                            ->get();
+                        if (count($result) > 0) {
+                            $this->getSheet($excel, $department, null, $result);
                         }
                     }
                 })->export('xlsx');
