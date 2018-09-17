@@ -174,9 +174,8 @@ class DistributionDepartmentController extends Controller
     public function data(Request $request)
     {
         try {
-            $academicYearId = AcademicYear::latest()->first();
             $result = DistributionDepartmentResult::with('department', 'departmentOption', 'studentAnnual')
-                ->where('academic_year_id', $academicYearId->id)
+                ->where('academic_year_id', $request->academic_year_id)
                 ->select('distribution_department_results.*')
                 ->latest();
             return Datatables::of($result)

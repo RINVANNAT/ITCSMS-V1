@@ -61,7 +61,11 @@
             let oTable = $('#distribution-department').DataTable({
                 processing: true,
                 serverSide: true,
-                ajax: '{{ route('distribution-department.data') }}',
+                ajax: {
+                	url: '{{ route('distribution-department.data') }}',
+                    type: 'GET',
+                    data: {academic_year_id: 2018}
+                },
                 columns: [
                     {data: 'student_annual.student.id_card', name: 'student_annual.student.id_card'},
                     {data: 'student.name_kh', name: 'student.name_kh'},
