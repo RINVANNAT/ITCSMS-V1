@@ -62,7 +62,7 @@ class DistributionDepartmentController extends Controller
             // find all distribution department results by academic year id.
             $distributionDepartmentResults = DistributionDepartmentResult::where([
                 'academic_year_id' => $request->academic_year_id
-            ]);
+            ])->get();
 
             // delete all distribution department
             foreach ($distributionDepartmentResults as $departmentResult) {
@@ -73,9 +73,9 @@ class DistributionDepartmentController extends Controller
             $studentAnnualIds = DistributionDepartment::where([
                 'academic_year_id' => $request->academic_year_id
             ])
-                ->select('student_annual_id')
-                ->distinct('student_annual_id')
-                ->pluck('student_annual_id');
+            ->select('student_annual_id')
+            ->distinct('student_annual_id')
+            ->pluck('student_annual_id');
 
             if (count($studentAnnualIds) > 0) {
                 // find all student annual from DistributionDepartment
