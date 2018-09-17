@@ -86,9 +86,21 @@
                                             <td style="text-align: left;width: 50%">{{isset($score['name_en'])?$score['name_en']:""}}</td>
                                             <td style="width: 22.5%;">{{ $score["credit"] }}</td>
                                             @if($score['semester'] == 1)
-                                                @php $grade = get_grading($score["score"], $passedScoreI); @endphp
+                                                @php
+                                                    if ((float)$score["score"] >= (float)$score["resit"]) {
+                                                        $grade = get_grading($score["score"], $passedScoreI);
+                                                    } else {
+                                                        $grade = get_grading($score["resit"], $passedScoreI);
+                                                    }
+                                                @endphp
                                             @else
-                                                @php $grade = get_grading($score["score"], $passedScoreII); @endphp
+                                                @php
+                                                    if ((float)$score["score"] >= (float)$score["resit"]) {
+                                                        $grade = get_grading($score["score"], $passedScoreII);
+                                                    } else {
+                                                        $grade = get_grading($score["resit"], $passedScoreII);
+                                                    }
+                                                @endphp
                                             @endif
                                             <td class="col-right" style="width: 22.5%; padding-right: 40px;">{!! $grade !!}</td>
                                         </tr>
@@ -294,14 +306,29 @@
                                 <?php $i = 1 ?>
                                 @foreach($scores[$student['id']] as $key => $score)
                                     @if(is_numeric($key))
+                                        @if($score['name_en'] == 'Final Year Internship')
+{{--                                            {{dd((float)$score["score"] <= (float)$score["resit"])}}--}}
+                                        @endif
                                         <tr>
                                             <td style="width: 5%;">{{ $i }} -</td>
                                             <td style="text-align: left;width: 50%">{{isset($score['name_en'])?$score['name_en']:""}}</td>
                                             <td style="width: 22.5%;">{{ $score["credit"] }}</td>
                                             @if($score['semester'] == 1)
-                                                @php $grade = get_grading($score["score"], $passedScoreI); @endphp
+                                                @php
+                                                    if ((float)$score["score"] >= (float)$score["resit"]) {
+                                                        $grade = get_grading($score["score"], $passedScoreI);
+                                                    } else {
+                                                        $grade = get_grading($score["resit"], $passedScoreI);
+                                                    }
+                                                @endphp
                                             @else
-                                                @php $grade = get_grading($score["score"], $passedScoreII); @endphp
+                                                @php
+                                                    if ((float)$score["score"] >= (float)$score["resit"]) {
+                                                        $grade = get_grading($score["score"], $passedScoreII);
+                                                    } else {
+                                                        $grade = get_grading($score["resit"], $passedScoreII);
+                                                    }
+                                                @endphp
                                             @endif
                                             <td class="col-right" style="width: 22.5%; padding-right: 40px;">{!! $grade !!}</td>
                                         </tr>
