@@ -93,10 +93,10 @@
                 <div class="pull-right">
                     <input type="submit"
                            id="submit_form"
-                           class="btn btn-success btn-xs"
+                           class="btn btn-primary btn-xs"
                            value="Generate"/>
                     <a :href="'/admin/distribution-department/' + academicYearSelected + '/export'"
-                       class="btn btn-warning btn-xs">
+                       class="btn btn-success btn-xs">
                         <i class="fa fa-file-excel-o"></i> Export
                     </a>
                 </div>
