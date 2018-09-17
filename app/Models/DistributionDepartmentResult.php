@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 class DistributionDepartmentResult extends Model
 {
     protected $fillable = [
+        'academic_year_id',
         'distribution_department_id',
         'department_id',
         'department_option_id',

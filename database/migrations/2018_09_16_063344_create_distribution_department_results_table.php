@@ -14,6 +14,7 @@ class CreateDistributionDepartmentResultsTable extends Migration
     {
         Schema::create('distribution_department_results', function (Blueprint $table) {
             $table->increments('id');
+            $table->integer('academic_year_id');
             $table->bigInteger('student_annual_id');
             $table->integer('department_id');
             $table->integer('department_option_id')->nullable();

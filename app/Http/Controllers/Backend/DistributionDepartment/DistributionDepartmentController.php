@@ -7,7 +7,6 @@ use App\Models\AcademicYear;
 use App\Models\Department;
 use App\Models\DistributionDepartment;
 use App\Models\DistributionDepartmentResult;
-use App\Models\StudentAnnual;
 use Illuminate\Http\Request;
 use Maatwebsite\Excel\Facades\Excel;
 use Yajra\Datatables\Datatables;
@@ -45,12 +44,13 @@ class DistributionDepartmentController extends Controller
             'academic_year_id' => 'required'
         ]);
         try {
-            $studentAnnuals = StudentAnnual::where([
-                'academic_year_id' => $request->academic_year_id,
-                'degree_id' => 1,
-                'grade_id' => 2
-            ])->count();
-            return message_success($studentAnnuals);
+            $studentAnnuals = DistributionDepartment::where([
+                'academic_year_id' => $request->academic_year_id
+            ])
+                ->select('student_annual_id')
+                ->distinct('student_annual_id')
+                ->pluck('student_annual_id');
+            return message_success(count($studentAnnuals));
         } catch (\Exception $exception) {
             return message_error($exception->getMessage());
         }
@@ -59,12 +59,23 @@ class DistributionDepartmentController extends Controller
     public function generate(Request $request)
     {
         try {
+            // find all distribution department results by academic year id.
+            $distributionDepartmentResults = DistributionDepartmentResult::where([
+                'academic_year_id' => $request->academic_year_id
+            ]);
+
+            // delete all distribution department
+            foreach ($distributionDepartmentResults as $departmentResult) {
+                $departmentResult->delete();
+            }
+
             // find student_annual_id in StudentAnnual model with
-            $studentAnnualIds = StudentAnnual::where([
-                'academic_year_id' => $request->academic_year_id,
-                'degree_id' => 1,
-                'grade_id' => 2
-            ])->pluck('id');
+            $studentAnnualIds = DistributionDepartment::where([
+                'academic_year_id' => $request->academic_year_id
+            ])
+                ->select('student_annual_id')
+                ->distinct('student_annual_id')
+                ->pluck('student_annual_id');
 
             if (count($studentAnnualIds) > 0) {
                 // find all student annual from DistributionDepartment
@@ -93,6 +104,7 @@ class DistributionDepartmentController extends Controller
 
                 if ($totalStudentAnnualFormRequest == count($studentAnnualDistributionDepartments)) {
                     foreach ($studentAnnualDistributionDepartments as $annualDistributionDepartment) {
+                        // take an student annual
                         $data = DistributionDepartment::where('student_annual_id', $annualDistributionDepartment->student_annual_id)
                             ->select('id', 'student_annual_id', 'score', 'department_id', 'priority', 'department_option_id')
                             ->orderBy('priority', 'asc')
@@ -135,24 +147,14 @@ class DistributionDepartmentController extends Controller
                                 }
                             }
                             if ($isBreak) {
-                                $result = DistributionDepartmentResult::where('student_annual_id', $student_annual_id)->first();
-                                if ($result instanceof DistributionDepartmentResult) {
-                                    $result->update([
-                                        'student_annual_id' => $student_annual_id,
-                                        'department_id' => $departmentIdSelected,
-                                        'department_option_id' => $departmentOptionIdSelected,
-                                        'total_score' => $score,
-                                        'priority' => $prioritySelected
-                                    ]);
-                                } else {
-                                    DistributionDepartmentResult::create([
-                                        'student_annual_id' => $student_annual_id,
-                                        'department_id' => $departmentIdSelected,
-                                        'department_option_id' => $departmentOptionIdSelected,
-                                        'total_score' => $score,
-                                        'priority' => $prioritySelected
-                                    ]);
-                                }
+                                DistributionDepartmentResult::create([
+                                    'academic_year_id' => $request->academic_year_id,
+                                    'student_annual_id' => $student_annual_id,
+                                    'department_id' => $departmentIdSelected,
+                                    'department_option_id' => $departmentOptionIdSelected,
+                                    'total_score' => $score,
+                                    'priority' => $prioritySelected
+                                ]);
                                 break;
                             }
                         }
@@ -173,14 +175,8 @@ class DistributionDepartmentController extends Controller
     {
         try {
             $academicYearId = AcademicYear::latest()->first();
-            $studentAnnualsIds = StudentAnnual::where([
-                'academic_year_id' => $academicYearId->id,
-                'degree_id' => 1,
-                'grade_id' => 2
-            ])->pluck('id');
-
             $result = DistributionDepartmentResult::with('department', 'departmentOption', 'studentAnnual')
-                ->whereIn('student_annual_id', $studentAnnualsIds)
+                ->where('academic_year_id', $academicYearId->id)
                 ->select('distribution_department_results.*')
                 ->latest();
             return Datatables::of($result)
@@ -199,11 +195,9 @@ class DistributionDepartmentController extends Controller
     public function export($academic_year_id)
     {
         try {
-            $studentAnnualIds = StudentAnnual::where([
-                'academic_year_id' => $academic_year_id,
-                'degree_id' => 1,
-                'grade_id' => 2
-            ])->pluck('id');
+            $studentAnnualIds = DistributionDepartmentResult::where([
+                'academic_year_id' => $academic_year_id
+            ])->pluck('student_annual_id');
 
             if (count($studentAnnualIds) > 0) {
                 return Excel::create('Distribution Department ' . $academic_year_id, function ($excel) use ($academic_year_id, $studentAnnualIds) {
@@ -215,15 +209,14 @@ class DistributionDepartmentController extends Controller
                         ->get();
 
                     foreach ($departments as $department) {
-                        $result = null;
                         if (count($department->department_options) > 0) {
                             foreach ($department->department_options as $option) {
                                 $result = DistributionDepartmentResult::with('studentAnnual', 'department', 'departmentOption')
                                     ->where([
                                         'department_id' => $department->id,
-                                        'department_option_id' => $option->id
+                                        'department_option_id' => $option->id,
+                                        'academic_year_id' => $academic_year_id
                                     ])
-                                    ->whereIn('student_annual_id', $studentAnnualIds)
                                     ->get();
                                 if (count($result) > 0) {
                                     $this->getSheet($excel, $department, $option, $result);
@@ -232,9 +225,9 @@ class DistributionDepartmentController extends Controller
                         } else {
                             $result = DistributionDepartmentResult::with('studentAnnual', 'department', 'departmentOption')
                                 ->where([
-                                    'department_id' => $department->id
+                                    'department_id' => $department->id,
+                                    'academic_year_id' => $academic_year_id
                                 ])
-                                ->whereIn('student_annual_id', $studentAnnualIds)
                                 ->get();
                             if (count($result) > 0) {
                                 $this->getSheet($excel, $department, null, $result);
