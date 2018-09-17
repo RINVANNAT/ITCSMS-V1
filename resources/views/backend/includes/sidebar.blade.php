@@ -98,6 +98,10 @@
                     <li class="{{ Active::pattern('admin/exams/'.config('access.exam.final_semester').'/*') }}">
                         <a href="{!! route('admin.exam.index',config('access.exam.final_semester')) !!}">{{ trans('menus.backend.exam.finals') }}</a>
                     </li>
+
+                    <li class="{{ Active::pattern('admin/distribution-department*') }}">
+                        <a href="{{ route('distribution-department.index') }}">Student Distribution Dept.</a>
+                    </li>
                 </ul>
             </li>
             @endauth

@@ -111,4 +111,12 @@ class Student extends Model
 		//"photo" => 'required|mimes:png,jpg,jpeg'
 	];
 
+	protected $appends = [
+	    'full_name_latin'
+    ];
+
+    public function getFullNameLatinAttribute ()
+    {
+        return strtoupper($this->name_latin);
+    }
 }
