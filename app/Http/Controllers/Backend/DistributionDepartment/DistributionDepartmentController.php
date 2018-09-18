@@ -116,15 +116,22 @@ class DistributionDepartmentController extends Controller
                         $isBreak = false;
                         $student_annual_id = null;
 
-                        foreach ($data as $item) {
+                        foreach ($data as $key => $item) {
+                            $prevStudentScore = null;
+                            if ($key != 0) {
+                                $prevStudentScore = $item[$key-1];
+                            }
                             $score = $item['score'];
                             $student_annual_id = $item['student_annual_id'];
                             foreach ($departments as &$department) {
                                 if ($department['total'] > 0) {
+                                    // check each student
+                                    // there are two ways to set student into department
+                                    // in case department is not enough or current and previous student has the same score
                                     if (!is_null($department['option_id'])) {
                                         $departmentOptionIdSelected = $department['option_id'];
                                         if (($item['department_id'] == $department['department_id']) && ($item['department_option_id'] == $department['option_id'])) {
-                                            if ($department['total'] > 0) {
+                                            if (($department['total'] > 0) || ($item['score'] == $prevStudentScore['score'])) {
                                                 $department['total']--;
                                                 $departmentIdSelected = $department['department_id'];
                                                 $prioritySelected = $item['priority'];
@@ -135,7 +142,7 @@ class DistributionDepartmentController extends Controller
                                         }
                                     }
                                     if (($item['department_id'] == $department['department_id']) && is_null($department['option_id'])) {
-                                        if ($department['total'] > 0) {
+                                        if ($department['total'] > 0 || ($item['department_option_id'] == $department['option_id'])) {
                                             $department['total']--;
                                             $departmentIdSelected = $department['department_id'];
                                             $prioritySelected = $item['priority'];
@@ -146,6 +153,7 @@ class DistributionDepartmentController extends Controller
                                     }
                                 }
                             }
+                            // put student into department
                             if ($isBreak) {
                                 DistributionDepartmentResult::create([
                                     'academic_year_id' => $request->academic_year_id,

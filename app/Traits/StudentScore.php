@@ -1440,4 +1440,176 @@ trait StudentScore {
         }
 
     }
+
+    public function getStudentOriginScoreBySemester($studentAnnualId, $semester_id) {
+
+
+        $student = [];
+        $courseAnnualByProgram = [];
+        $arrayCourseAnnualIds = [];
+        $classByCourseAnnualIds = [];
+
+
+        if($studentAnnualId){
+
+            $studentAnnual = DB::table('studentAnnuals')->where('id', $studentAnnualId)->first();
+            $groupStudentAnnuals = DB::table('group_student_annuals')
+                ->where('student_annual_id', '=', $studentAnnualId);
+
+            if($semester_id == SemesterEnum::SEMESTER_ONE) {
+
+                $groupStudentAnnuals = $groupStudentAnnuals->where('semester_id', '=', $semester_id)
+                    ->whereNull('department_id')->lists('group_id', 'semester_id');
+            } else {
+                $groupStudentAnnuals = $groupStudentAnnuals->whereNull('department_id')->lists('group_id', 'semester_id');
+            }
+
+            $courseAnnuals = $this->getCourseAnnually();
+
+            $courseAnnuals = $courseAnnuals->where('course_annuals.department_id', $studentAnnual->department_id);
+            $courseAnnuals = $courseAnnuals->where('course_annuals.academic_year_id', $studentAnnual->academic_year_id);
+            $courseAnnuals = $courseAnnuals->where('course_annuals.degree_id', $studentAnnual->degree_id);
+            $courseAnnuals = $courseAnnuals->where('course_annuals.grade_id', $studentAnnual->grade_id);
+            $courseAnnuals = $courseAnnuals->where('course_annuals.department_option_id', $studentAnnual->department_option_id);
+            $courseAnnuals = $courseAnnuals->where('course_annuals.is_counted_creditability', true);
+
+            if($semester_id == SemesterEnum::SEMESTER_ONE) { // apply semester filter only it is a 1st semester
+                $courseAnnuals = $courseAnnuals->where('course_annuals.semester_id', $semester_id);
+            }
+
+            $courseAnnuals = $courseAnnuals->orderBy('course_annuals.name_en')->get();
+
+            if($courseAnnuals) {
+
+                collect($courseAnnuals)->filter(function( $item ) use(&$arrayCourseAnnualIds, &$courseAnnualByProgram) {
+                    $arrayCourseAnnualIds[] = $item->course_annual_id;
+                    $courseAnnualByProgram[$item->course_id][] = $item ;
+                });
+
+                $eachScoreCourseAnnual = $this->getCourseAnnualWithScore($arrayCourseAnnualIds);
+                $averages = $eachScoreCourseAnnual['averages'];
+                $absences = $eachScoreCourseAnnual['absences'];
+
+                $courseAnnualClass = DB::table('course_annual_classes')->whereIn('course_annual_id', $arrayCourseAnnualIds)->get();
+                collect($courseAnnualClass)->filter(function($classItem) use(&$classByCourseAnnualIds) {
+
+                    if($classItem->group_id) {
+                        $classByCourseAnnualIds[$classItem->course_annual_id][] = $classItem->group_id;
+                    }
+
+                });
+
+
+                foreach($courseAnnuals as $courseAnnual) {
+
+                    $groups = isset($classByCourseAnnualIds[$courseAnnual->course_annual_id])?$classByCourseAnnualIds[$courseAnnual->course_annual_id]:[];
+
+                    $resit = Average::where([
+                        ['student_annual_id', $studentAnnual->id],
+                        ['course_annual_id', $courseAnnual->course_annual_id],
+                    ])->whereNotNull('resit_score')->pluck('resit_score')->first();
+
+                    if(count($groups) > 0) {
+
+
+
+
+                        if(in_array($groupStudentAnnuals[$courseAnnual->semester_id], $groups)) {
+
+                            if(isset($absences[$courseAnnual->course_annual_id][$studentAnnual->id])){
+                                $absence = $absences[$courseAnnual->course_annual_id][$studentAnnual->id]->num_absence;
+                            } else {
+                                $absence = 0;
+                            }
+
+                            //---this is the course annual which this student learn
+
+
+                            $student[$studentAnnual->id][$courseAnnual->course_annual_id] = [
+
+                                'name_kh' => $courseAnnual->name_kh,
+                                'name_en' => $courseAnnual->name_en,
+                                'name_fr' => $courseAnnual->name_fr,
+                                'credit'  => $courseAnnual->course_annual_credit,
+                                'semester' => $courseAnnual->semester_id,
+                                'absence' => $absence,
+                                'resit' => $resit,
+                                'score'    => isset($averages[$courseAnnual->course_annual_id])? (isset($averages[$courseAnnual->course_annual_id][$studentAnnual->id]) ? $averages[$courseAnnual->course_annual_id][$studentAnnual->id]->average :null) :null
+                            ];
+                        }
+                    } else {
+
+                        if(isset($absences[$courseAnnual->course_annual_id][$studentAnnual->id])){
+                            $absence = $absences[$courseAnnual->course_annual_id][$studentAnnual->id]->num_absence;
+                        } else {
+                            $absence = 0;
+                        }
+
+                        $student[$studentAnnual->id][$courseAnnual->course_annual_id] = [
+
+                            'name_kh' => $courseAnnual->name_kh,
+                            'name_en' => $courseAnnual->name_en,
+                            'name_fr' => $courseAnnual->name_fr,
+                            'credit'  => $courseAnnual->course_annual_credit,
+                            'semester' => $courseAnnual->semester_id,
+                            'absence' => $absence,
+                            'resit' => $resit,
+                            'score'    => isset($averages[$courseAnnual->course_annual_id])? (isset($averages[$courseAnnual->course_annual_id][$studentAnnual->id]) ? $averages[$courseAnnual->course_annual_id][$studentAnnual->id]->average :null) :null
+                        ];
+                    }
+                }
+
+                $subjects = $student[$studentAnnualId];
+                $totalCredit = 0;
+                $score = 0;
+
+                $totalCredit_s1 = 0;
+                $score_s1 = 0;
+                $totalCredit_s2 = 0;
+                $score_s2 = 0;
+
+                foreach ($subjects as $course_annual_id => $subject) {
+
+                    $totalCredit = $totalCredit + $subject['credit'];
+
+                    $score = $score + ($subject['credit'] * $subject['score']);
+
+                    if($subject["semester"] == 1){
+                        $totalCredit_s1 = $totalCredit_s1 + $subject['credit'];
+                        $score_s1 = $score_s1 + ($subject['credit'] * $subject['score']);
+                    } else {
+                        $totalCredit_s2 = $totalCredit_s2 + $subject['credit'];
+                        $score_s2 = $score_s2 + ($subject['credit'] * $subject['score']);
+                    }
+                }
+
+                if($totalCredit != 0){
+                    $moyenne = $this->floatFormat(($score/$totalCredit));
+                } else {
+                    $moyenne = 0;
+                }
+
+                if($totalCredit_s1 != 0){
+                    $moyenne_s1 = $this->floatFormat(($score_s1/$totalCredit_s1));
+                } else {
+                    $moyenne_s1 = 0;
+                }
+
+                if($totalCredit_s2 != 0){
+                    $moyenne_s2 = $this->floatFormat(($score_s2/$totalCredit_s2));
+                } else {
+                    $moyenne_s2 = 0;
+                }
+                $student = array_merge($subjects, ['final_score' => $moyenne]);
+                $student = array_merge($student, ['final_score_s1' => $moyenne_s1]);
+                $student = array_merge($student, ['final_score_s2' => $moyenne_s2]);
+            } else {
+                $student = [];
+            }
+
+            return $student;
+        } else {
+            return null;
+        }
+    }
 }

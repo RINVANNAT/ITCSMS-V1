@@ -24,7 +24,7 @@ class DistributionDepartment extends Seeder
             array_push($departments, $dept->id);
         }
         foreach ($studentAnnuals as $studentAnnual) {
-            $score = $this->getStudentScoreBySemester($studentAnnual->id, 1);
+            $score = $this->getStudentOriginScoreBySemester($studentAnnual->id, 1);
             $score = ($score['final_score_s1'] * 2) + ($score['final_score_s2'] * 3);
             foreach ($departments as $key => $deptId) {
                 \App\Models\DistributionDepartment::create([
