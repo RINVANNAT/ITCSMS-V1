@@ -19,6 +19,7 @@ class Kernel extends ConsoleKernel
     protected $commands = [
         Commands\Inspire::class,
         Commands\LogDemo::class,
+        Commands\SetOriginalScoreToDistributionDepartmentConsole::class,
         Commands\Backend\Schedule\Timetable\CreateTimetablePermissionConsole::class,
     ];
 

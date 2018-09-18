@@ -15,4 +15,8 @@ class DistributionDepartment extends Model
         'score_1',
         'score_2'
     ];
+
+    protected $casts = [
+        'score' => 'float'
+    ];
 }

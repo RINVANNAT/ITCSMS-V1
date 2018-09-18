@@ -59,6 +59,36 @@ class DistributionDepartmentController extends Controller
     public function generate(Request $request)
     {
         try {
+            $distributionDepartments = DistributionDepartment::where('academic_year_id', $request->academic_year_id)
+                ->where(function ($q) {
+                    $q->whereNull('distribution_departments.score_1')
+                        ->orWhereNull('distribution_departments.score_2');
+                })->get();
+
+            if (count($distributionDepartments) > 0) {
+                return redirect()->route('distribution-department.get-fill-score-page')->withFlashDanger('Please fill out missing student score first');
+            }
+
+            // calculate final score = (score_1 * 2) + (score_2 * 3)
+            $distributionDepartments = DistributionDepartment::where('academic_year_id', $request->academic_year_id)
+                ->whereNotNull('score')
+                ->select('student_annual_id', 'score_1', 'score_2')
+                ->distinct('student_annual_id')
+                ->get();
+
+            if (count($distributionDepartments)) {
+                foreach ($distributionDepartments as $distributionDepartment) {
+                    $items = DistributionDepartment::where('student_annual_id', $distributionDepartment->student_annual_id)->get();
+                    if (count($items) > 0) {
+                        $score= number_format((float) (((float) $items[0]->socre_1) * 2) + (((float) $items[0]->score_2) * 3), 2);
+                        foreach ($items as $item) {
+                            $item->score = number_format((float) $score, 2);
+                            $item->update();
+                        }
+                    }
+                }
+            }
+
             // find all distribution department results by academic year id.
             $distributionDepartmentResults = DistributionDepartmentResult::where([
                 'academic_year_id' => $request->academic_year_id
@@ -73,9 +103,9 @@ class DistributionDepartmentController extends Controller
             $studentAnnualIds = DistributionDepartment::where([
                 'academic_year_id' => $request->academic_year_id
             ])
-                ->select('student_annual_id')
-                ->distinct('student_annual_id')
-                ->pluck('student_annual_id');
+            ->select('student_annual_id')
+            ->distinct('student_annual_id')
+            ->pluck('student_annual_id');
 
             if (count($studentAnnualIds) > 0) {
                 // find all student annual from DistributionDepartment
@@ -116,54 +146,56 @@ class DistributionDepartmentController extends Controller
                         $isBreak = false;
                         $student_annual_id = null;
 
-                        foreach ($data as $key => $item) {
-                            $prevStudentScore = null;
-                            if ($key != 0) {
-                                $prevStudentScore = $item[$key-1];
-                            }
-                            $score = $item['score'];
-                            $student_annual_id = $item['student_annual_id'];
-                            foreach ($departments as &$department) {
-                                if ($department['total'] > 0) {
-                                    // check each student
-                                    // there are two ways to set student into department
-                                    // in case department is not enough or current and previous student has the same score
-                                    if (!is_null($department['option_id'])) {
-                                        $departmentOptionIdSelected = $department['option_id'];
-                                        if (($item['department_id'] == $department['department_id']) && ($item['department_option_id'] == $department['option_id'])) {
-                                            if (($department['total'] > 0) || ($item['score'] == $prevStudentScore['score'])) {
+                        if (count($data) > 0) {
+                            for ($i=0; $i<count($data); $i++) {
+                                $prevStudentScore = 0;
+                                if ($i > 0) {
+                                    $prevStudentScore = (float) $item[$i-1]['score'];
+                                }
+                                $score = $data[$i]['score'];
+                                $student_annual_id = $data[$i]['student_annual_id'];
+                                foreach ($departments as &$department) {
+                                    if ($department['total'] > 0) {
+                                        // check each student
+                                        // there are two ways to set student into department
+                                        // in case department is not enough or current and previous student has the same score
+                                        if (!is_null($department['option_id'])) {
+                                            $departmentOptionIdSelected = $department['option_id'];
+                                            if (($data[$i]['department_id'] == $department['department_id']) && ($data[$i]['department_option_id'] == $department['option_id'])) {
+                                                if (($department['total'] > 0) || ($data[$i]['score'] == $prevStudentScore)) {
+                                                    $department['total']--;
+                                                    $departmentIdSelected = $department['department_id'];
+                                                    $prioritySelected = $data[$i]['priority'];
+                                                    $departmentOptionIdSelected = $department['option_id'];
+                                                    $isBreak = true;
+                                                    break;
+                                                }
+                                            }
+                                        }
+                                        if (($data[$i]['department_id'] == $department['department_id']) && is_null($department['option_id'])) {
+                                            if ($department['total'] > 0 || ($data[$i]['score'] == $prevStudentScore)) {
                                                 $department['total']--;
                                                 $departmentIdSelected = $department['department_id'];
-                                                $prioritySelected = $item['priority'];
+                                                $prioritySelected = $data[$i]['priority'];
                                                 $departmentOptionIdSelected = $department['option_id'];
                                                 $isBreak = true;
                                                 break;
                                             }
                                         }
                                     }
-                                    if (($item['department_id'] == $department['department_id']) && is_null($department['option_id'])) {
-                                        if ($department['total'] > 0 || ($item['department_option_id'] == $department['option_id'])) {
-                                            $department['total']--;
-                                            $departmentIdSelected = $department['department_id'];
-                                            $prioritySelected = $item['priority'];
-                                            $departmentOptionIdSelected = $department['option_id'];
-                                            $isBreak = true;
-                                            break;
-                                        }
-                                    }
                                 }
-                            }
-                            // put student into department
-                            if ($isBreak) {
-                                DistributionDepartmentResult::create([
-                                    'academic_year_id' => $request->academic_year_id,
-                                    'student_annual_id' => $student_annual_id,
-                                    'department_id' => $departmentIdSelected,
-                                    'department_option_id' => $departmentOptionIdSelected,
-                                    'total_score' => $score,
-                                    'priority' => $prioritySelected
-                                ]);
-                                break;
+                                // put student into department
+                                if ($isBreak) {
+                                    DistributionDepartmentResult::create([
+                                        'academic_year_id' => $request->academic_year_id,
+                                        'student_annual_id' => $student_annual_id,
+                                        'department_id' => $departmentIdSelected,
+                                        'department_option_id' => $departmentOptionIdSelected,
+                                        'total_score' => $score,
+                                        'priority' => $prioritySelected
+                                    ]);
+                                    break;
+                                }
                             }
                         }
                     }
@@ -306,5 +338,61 @@ class DistributionDepartmentController extends Controller
             $end = $row - 1;
             $sheet->setBorder('A' . $start . ':E' . $end, 'thin');
         });
+    }
+
+    public function getFillScorePage()
+    {
+        return view('backend.distributionDepartment.fill-score');
+    }
+
+    public function getStudentWhoHaveNoScore(Request $request)
+    {
+        $this->validate($request, [
+            'academic_year_id' => 'required'
+        ]);
+        try {
+            $students = DistributionDepartment::where('distribution_departments.academic_year_id', $request->academic_year_id)
+                ->join('studentAnnuals', 'studentAnnuals.id', '=', 'distribution_departments.student_annual_id')
+                ->join('students', 'students.id', '=', 'studentAnnuals.student_id')
+                ->where(function ($q) {
+                    $q->whereNull('distribution_departments.score_1')
+                        ->orWhereNull('distribution_departments.score_2');
+                })
+                ->select([
+                    'students.id as student_id',
+                    'students.id_card as student_id_card',
+                    'students.name_kh as student_name_kh',
+                    'students.name_latin as student_name_latin',
+                    'distribution_departments.student_annual_id as student_annual_id',
+                    'distribution_departments.score_1 as score_1',
+                    'distribution_departments.score_2 as score_2',
+                ])
+                ->distinct('distribution_departments.student_annual_id')
+                ->get();
+            return message_success($students);
+        } catch (\Exception $exception) {
+            return message_error($exception->getMessage());
+        }
+    }
+
+    public function saveStudentWhoHaveNoScore (Request $request)
+    {
+        $this->validate($request, [
+            'students' => 'required'
+        ]);
+        try {
+            $students = $request->students;
+            foreach ($students as $student) {
+                $distributionDepartments = DistributionDepartment::where('student_annual_id', $student['student_annual_id'])->get();
+                foreach ($distributionDepartments as $distributionDepartment) {
+                    if ($distributionDepartment instanceof DistributionDepartment) {
+                        $distributionDepartment->update($student);
+                    }
+                }
+            }
+            return message_success($request->students);
+        } catch (\Exception $e) {
+            return message_error($e->getMessage());
+        }
     }
 }

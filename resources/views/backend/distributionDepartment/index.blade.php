@@ -24,12 +24,16 @@
         <div class="box-header with-border">
             <h3 class="box-title">Distribution Department</h3>
             <div class="box-tools pull-right">
+                <a href="{{ route('distribution-department.get-fill-score-page') }}"
+                   class="btn btn-warning btn-sm">
+                    <i class="fa fa-edit"></i> Fill Score Missing
+                </a>
                 <a :href="'/admin/distribution-department/' + academicYearSelected + '/export'"
                    class="btn btn-success btn-sm">
                     <i class="fa fa-download"></i> Export
                 </a>
 
-                <a :href="'/admin/distribution-department/' + academicYearSelected + '/export'"
+                <a href="javascript::void(0)"
                    class="btn btn-info btn-sm">
                     <i class="fa fa-database"></i> Import
                 </a>
