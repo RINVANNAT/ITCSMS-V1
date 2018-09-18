@@ -1510,32 +1510,32 @@ trait StudentScore {
                     ])->whereNotNull('resit_score')->pluck('resit_score')->first();
 
                     if(count($groups) > 0) {
+                        try {
+                            if(in_array($groupStudentAnnuals[$courseAnnual->semester_id], $groups)) {
+
+                                if(isset($absences[$courseAnnual->course_annual_id][$studentAnnual->id])){
+                                    $absence = $absences[$courseAnnual->course_annual_id][$studentAnnual->id]->num_absence;
+                                } else {
+                                    $absence = 0;
+                                }
+
+                                //---this is the course annual which this student learn
 
 
+                                $student[$studentAnnual->id][$courseAnnual->course_annual_id] = [
 
-
-                        if(in_array($groupStudentAnnuals[$courseAnnual->semester_id], $groups)) {
-
-                            if(isset($absences[$courseAnnual->course_annual_id][$studentAnnual->id])){
-                                $absence = $absences[$courseAnnual->course_annual_id][$studentAnnual->id]->num_absence;
-                            } else {
-                                $absence = 0;
+                                    'name_kh' => $courseAnnual->name_kh,
+                                    'name_en' => $courseAnnual->name_en,
+                                    'name_fr' => $courseAnnual->name_fr,
+                                    'credit'  => $courseAnnual->course_annual_credit,
+                                    'semester' => $courseAnnual->semester_id,
+                                    'absence' => $absence,
+                                    'resit' => $resit,
+                                    'score'    => isset($averages[$courseAnnual->course_annual_id])? (isset($averages[$courseAnnual->course_annual_id][$studentAnnual->id]) ? $averages[$courseAnnual->course_annual_id][$studentAnnual->id]->average :null) :null
+                                ];
                             }
-
-                            //---this is the course annual which this student learn
-
-
-                            $student[$studentAnnual->id][$courseAnnual->course_annual_id] = [
-
-                                'name_kh' => $courseAnnual->name_kh,
-                                'name_en' => $courseAnnual->name_en,
-                                'name_fr' => $courseAnnual->name_fr,
-                                'credit'  => $courseAnnual->course_annual_credit,
-                                'semester' => $courseAnnual->semester_id,
-                                'absence' => $absence,
-                                'resit' => $resit,
-                                'score'    => isset($averages[$courseAnnual->course_annual_id])? (isset($averages[$courseAnnual->course_annual_id][$studentAnnual->id]) ? $averages[$courseAnnual->course_annual_id][$studentAnnual->id]->average :null) :null
-                            ];
+                        } catch (\Exception $e) {
+                            dd($studentAnnual->id);
                         }
                     } else {
 

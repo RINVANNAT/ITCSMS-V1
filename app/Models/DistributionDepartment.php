@@ -11,6 +11,8 @@ class DistributionDepartment extends Model
         'department_id',
         'department_option_id',
         'priority',
-        'score'
+        'score',
+        'score_1',
+        'score_2'
     ];
 }

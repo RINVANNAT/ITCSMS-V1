@@ -19,7 +19,9 @@ class CreateDistributionDepartmentsTable extends Migration
             $table->integer('department_id');
             $table->integer('department_option_id')->nullable();
             $table->integer('priority');
-            $table->float('score');
+            $table->float('score')->nullable();
+            $table->float('score_1')->nullable();
+            $table->float('score_2')->nullable();
             $table->timestamps();
         });
     }
