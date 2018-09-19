@@ -71,16 +71,16 @@ class DistributionDepartmentController extends Controller
 
             // calculate final score = (score_1 * 2) + (score_2 * 3)
             $distributionDepartments = DistributionDepartment::where('academic_year_id', $request->academic_year_id)
-                ->whereNotNull('score')
+                // ->whereNull('score')
                 ->select('student_annual_id', 'score_1', 'score_2')
                 ->distinct('student_annual_id')
                 ->get();
 
-            if (count($distributionDepartments)) {
+            if (count($distributionDepartments) > 0) {
                 foreach ($distributionDepartments as $distributionDepartment) {
                     $items = DistributionDepartment::where('student_annual_id', $distributionDepartment->student_annual_id)->get();
                     if (count($items) > 0) {
-                        $score= number_format((float) (((float) $items[0]->socre_1) * 2) + (((float) $items[0]->score_2) * 3), 2);
+                        $score= number_format((float) ((((float) $items[0]->socre_1)) + (((float) $items[0]->score_2) * 2))/3, 2);
                         foreach ($items as $item) {
                             $item->score = number_format((float) $score, 2);
                             $item->update();
@@ -150,7 +150,7 @@ class DistributionDepartmentController extends Controller
                             for ($i=0; $i<count($data); $i++) {
                                 $prevStudentScore = 0;
                                 if ($i > 0) {
-                                    $prevStudentScore = (float) $item[$i-1]['score'];
+                                    $prevStudentScore = (float) $data[$i-1]['score'];
                                 }
                                 $score = $data[$i]['score'];
                                 $student_annual_id = $data[$i]['student_annual_id'];
