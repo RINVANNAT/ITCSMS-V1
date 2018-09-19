@@ -10,6 +10,7 @@ Route::group(['namespace' => 'DistributionDepartment',
     Route::get('data', 'DistributionDepartmentController@data')->name('distribution-department.data');
 
     Route::get('get-fill-score-page', 'DistributionDepartmentController@getFillScorePage')->name('distribution-department.get-fill-score-page');
+    Route::get('{academic_year_id}/get-student-priority-department', 'DistributionDepartmentController@getStudentPriorityDepartment')->name('distribution-department.get-student-priority-department');
     Route::post('get-student-who-have-no-score', 'DistributionDepartmentController@getStudentWhoHaveNoScore')->name('distribution-department.get-student-who-have-no-score');
     Route::post('save-student-who-have-no-score', 'DistributionDepartmentController@saveStudentWhoHaveNoScore')->name('distribution-department.save-student-who-have-no-score');
 

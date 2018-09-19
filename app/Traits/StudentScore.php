@@ -713,7 +713,7 @@ trait StudentScore {
 
         $fullUrl = $request->fullUrl();
 
-        $studentDataProperties = $this->findPassOrFailStudentScore($request);/*--this method is implemented in StudentScore Trait Class--*/
+        $studentDataProperties = $this->findPassOrFailStudentScore($request);/*--this method is implemented in StudentScore DistributionDepartmentTrait Class--*/
         if(!$studentDataProperties['status']) {
 
             return $studentDataProperties;

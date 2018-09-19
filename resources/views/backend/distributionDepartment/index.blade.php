@@ -24,9 +24,9 @@
         <div class="box-header with-border">
             <h3 class="box-title">Distribution Department</h3>
             <div class="box-tools pull-right">
-                <a href="{{ route('distribution-department.get-fill-score-page') }}"
+                <a :href="'/admin/distribution-department/' + academicYearSelected + '/get-student-priority-department'"
                    class="btn btn-warning btn-sm">
-                    <i class="fa fa-edit"></i> Fill Score Missing
+                    <i class="fa fa-download"></i> Export Student Priority Department
                 </a>
                 <a :href="'/admin/distribution-department/' + academicYearSelected + '/export'"
                    class="btn btn-success btn-sm">

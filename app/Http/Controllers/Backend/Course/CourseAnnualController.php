@@ -1517,7 +1517,7 @@ class CourseAnnualController extends Controller
         $allNumberAbsences = $this->getAbsenceFromDB($courseAnnualId);
 
         if($courseAnnual->is_having_resitted) {
-            $resitScores = $this->resitScoreFromDB($courseAnnualId);//Trait/ScoreProp
+            $resitScores = $this->resitScoreFromDB($courseAnnualId);//DistributionDepartmentTrait/ScoreProp
         }
         if (count($department_option_ids) > 0) {
             $studentByCourse = $studentByCourse->whereIn('studentAnnuals.department_option_id', $department_option_ids);

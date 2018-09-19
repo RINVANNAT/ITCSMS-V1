@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Backend\DistributionDepartment;
 
+use App\Http\Controllers\Backend\DistributionDepartment\DistributionDepartmentTrait\StudentPriorityDepartmentTrait;
 use App\Http\Controllers\Controller;
 use App\Models\AcademicYear;
 use App\Models\Department;
@@ -13,6 +14,8 @@ use Yajra\Datatables\Datatables;
 
 class DistributionDepartmentController extends Controller
 {
+    use StudentPriorityDepartmentTrait;
+
     public function index()
     {
         return view('backend.distributionDepartment.index');

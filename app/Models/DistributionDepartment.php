@@ -19,4 +19,24 @@ class DistributionDepartment extends Model
     protected $casts = [
         'score' => 'float'
     ];
+
+    public function studentAnnual ()
+    {
+        return $this->belongsTo(StudentAnnual::class);
+    }
+
+    public function getStudentAttribute ()
+    {
+        return $this->studentAnnual->student;
+    }
+
+    public function department ()
+    {
+        return $this->belongsTo(Department::class);
+    }
+
+    public function departmentOption ()
+    {
+        return $this->belongsTo(DepartmentOption::class);
+    }
 }
