@@ -24,23 +24,36 @@
         <div class="box-header with-border">
             <h3 class="box-title">Distribution Department</h3>
             <div class="box-tools pull-right">
-                <a :href="'/admin/distribution-department/' + academicYearSelected + '/get-student-priority-department'"
-                   class="btn btn-warning btn-sm">
-                    <i class="fa fa-download"></i> Export Student Priority Department
-                </a>
-                <a :href="'/admin/distribution-department/' + academicYearSelected + '/export'"
-                   class="btn btn-success btn-sm">
-                    <i class="fa fa-download"></i> Export
-                </a>
-
-                <a href="javascript::void(0)"
-                   class="btn btn-info btn-sm">
-                    <i class="fa fa-database"></i> Import
-                </a>
-
                 <a class="btn btn-primary btn-sm"
                    href="{{ route('distribution-department.get-generate-page') }}">
                     <i class="fa fa-refresh"></i> Generate</a>
+                <div class="btn-group">
+                    <button type="button" class="btn btn-warning btn-sm dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
+                        Actions <span class="caret"></span>
+                    </button>
+                    <ul class="dropdown-menu" role="menu">
+                        <li>
+                            <a :href="'/admin/distribution-department/' + academicYearSelected + '/get-student-priority-department'">
+                                <i class="fa fa-download"></i> Export Student Priority Department
+                            </a>
+                        </li>
+                        <li>
+                            <a :href="'/admin/distribution-department/' + academicYearSelected + '/export'">
+                                <i class="fa fa-download"></i> Export Result General
+                            </a>
+                        </li>
+                        <li>
+                            <a :href="'/admin/distribution-department/' + academicYearSelected + '/export'">
+                                <i class="fa fa-download"></i> Export Result Each Department
+                            </a>
+                        </li>
+                        <li>
+                            <a href="javascript::void(0)">
+                                <i class="fa fa-database"></i> Import data
+                            </a>
+                        </li>
+                    </ul>
+                </div>
             </div>
         </div>
         <div class="box-body">
