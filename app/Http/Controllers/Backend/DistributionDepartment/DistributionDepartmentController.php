@@ -560,9 +560,46 @@ class DistributionDepartmentController extends Controller
         });
     }
 
-    public function printEachDepartment ()
+    public function printEachDepartment (Request $request)
     {
-        return view('');
+        $academicYear = AcademicYear::find($request->academic_year_id);
+
+        $studentAnnualId = DistributionDepartment::where('academic_year_id', $request->academic_year_id)
+            ->first();
+        $data = [];
+        if ($studentAnnualId instanceof DistributionDepartment) {
+            $studentAnnualId = $studentAnnualId->student_annual_id;
+            $distributionDepartment = DistributionDepartment::where('student_annual_id', $studentAnnualId)
+                ->get();
+            foreach ($distributionDepartment as $item) {
+
+                $result = DistributionDepartmentResult::where([
+                    'distribution_department_results.academic_year_id' => $academicYear->id,
+                    'distribution_department_results.department_id' => $item->department_id
+                ]);
+
+                if (!is_null($item->department_option_id)) {
+                    $result->where('distribution_department_results.department_option_id', $item->department_option_id);
+                }
+
+                $result->join('studentAnnuals', 'studentAnnuals.id', '=', 'distribution_department_results.student_annual_id')
+                    ->join('departments', 'departments.id', '=', 'distribution_department_results.department_id')
+                    ->join('students', 'students.id', '=', 'studentAnnuals.student_id')
+                    ->join('genders', 'genders.id', '=', 'students.gender_id')
+                    ->select('distribution_department_results.*', 'students.*', 'departments.code as dept_code', 'genders.code as sex')
+                    ->orderBy('students.name_latin', 'asc');
+
+                array_push($data, $result->get());
+            }
+        }
+
+        if (count($data) > 0) {
+            return SnappyPdf::loadView('backend.distributionDepartment.print-each-department', compact('academicYear', 'data'))
+                ->setOption('encoding', 'utf-8')
+                ->stream();
+        } else {
+            return redirect()->back()->withFlashInfo('No data are found! Verify your academic already has student!');
+        }
     }
 
     public function printAll (Request $request)
@@ -584,7 +621,5 @@ class DistributionDepartmentController extends Controller
         return SnappyPdf::loadView('backend.distributionDepartment.print-all', compact('academicYear', 'result'))
             ->setOption('encoding', 'utf-8')
             ->stream();
-
-        // return view('backend.distributionDepartment.print-all', compact('academicYear', 'result'));
     }
 }

@@ -59,7 +59,7 @@
                             </a>
                         </li>
                         <li>
-                            <a :href="'/admin/distribution-department/' + academicYearSelected + '/print-all'"
+                            <a :href="'/admin/distribution-department/' + academicYearSelected + '/print-each-department'"
                                target="_blank">
                                 <i class="fa fa-print"></i> Print Result Each Department
                             </a>
