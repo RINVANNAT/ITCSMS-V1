@@ -52,10 +52,9 @@
                                 <div class="col-md-3"
                                      :key="keyDept"
                                      style="margin-bottom: 5px;">
-                                    <label class="col-md-6 control-label">@{{ eachDepartment.code }}</label>
+                                    <label class="col-md-6 control-label">@{{ eachDepartment.label }}</label>
                                     <div class="col-md-6">
                                         <input type="number"
-                                               @change="makeChangeTotalStudentAnnuals($event)"
                                                value="0"
                                                :name="eachDepartment.id"
                                                class="form-control"/>
@@ -68,7 +67,6 @@
                                             @{{ eachDepartment.code }}_@{{ eachOption.code }}</label>
                                         <div class="col-md-6">
                                             <input type="number"
-                                                   @change="makeChangeTotalStudentAnnuals($event)"
                                                    value="0"
                                                    :name="eachDepartment.id + '_' + eachOption.id"
                                                    class="form-control"/>
@@ -144,19 +142,21 @@
                             this.getTotalStudentAnnuals()
                         })
                 },
-                getDepartment () {
+                getDepartmentChosen () {
                     toggleLoading(true)
-                    axios.post('/admin/distribution-department/get-department')
-                        .then((response) => {
-                            this.departments = response.data.data
-                            toggleLoading(false)
-                        })
+                    axios.post('/admin/distribution-department/get-department-chosen', {
+                    	academic_year_id: this.academicYearSelected
+                    }).then((response) => {
+                        this.departments = response.data.data
+                        toggleLoading(false)
+                    })
                 },
                 getTotalStudentAnnuals () {
                     toggleLoading(true)
                     axios.post('/admin/distribution-department/get-total-student-annuals', {academic_year_id: this.academicYearSelected})
                         .then((response) => {
                             this.totalStudentAnnuals = response.data.data
+                            this.getDepartmentChosen()
                             toggleLoading(false)
                         })
                 },
@@ -172,7 +172,6 @@
             },
             mounted () {
                 this.getAcademicYear()
-                this.getDepartment()
             }
         })
     </script>

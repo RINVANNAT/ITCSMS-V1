@@ -17,6 +17,7 @@ Route::group(['namespace' => 'DistributionDepartment',
     Route::get('import-data', 'DistributionDepartmentController@importData')->name('distribution-department.import-data');
     Route::post('get-academic-year', 'DistributionDepartmentController@getAcademicYear')->name('distribution-department.get-academic-year');
     Route::post('get-department', 'DistributionDepartmentController@getDepartment')->name('distribution-department.get-department');
+    Route::post('get-department-chosen', 'DistributionDepartmentController@getDepartmentChosen')->name('distribution-department.get-department-chosen');
     Route::post('get-total-student-annuals', 'DistributionDepartmentController@getTotalStudentAnnuals')->name('distribution-department.get-total-student-annuals');
 
     Route::get('{academic_year_id}/export', 'DistributionDepartmentController@export')->name('distribution-department.export');
