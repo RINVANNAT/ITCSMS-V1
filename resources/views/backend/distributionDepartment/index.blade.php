@@ -28,25 +28,43 @@
                    href="{{ route('distribution-department.get-generate-page') }}">
                     <i class="fa fa-refresh"></i> Generate</a>
                 <div class="btn-group">
-                    <button type="button" class="btn btn-warning btn-sm dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
+                    <button type="button" class="btn btn-warning btn-sm dropdown-toggle" data-toggle="dropdown"
+                            aria-expanded="false">
                         Actions <span class="caret"></span>
                     </button>
                     <ul class="dropdown-menu" role="menu">
                         <li>
-                            <a :href="'/admin/distribution-department/' + academicYearSelected + '/get-student-priority-department'">
+                            <a :href="'/admin/distribution-department/' + academicYearSelected + '/get-student-priority-department'"
+                               target="_blank">
                                 <i class="fa fa-download"></i> Export Student Priority Department
                             </a>
                         </li>
                         <li>
-                            <a :href="'/admin/distribution-department/' + academicYearSelected + '/export'">
-                                <i class="fa fa-download"></i> Export Result General
+                            <a :href="'/admin/distribution-department/' + academicYearSelected + '/export-all'"
+                               target="_blank">
+                                <i class="fa fa-download"></i> Export Result All Departments
                             </a>
                         </li>
                         <li>
-                            <a :href="'/admin/distribution-department/' + academicYearSelected + '/export'">
+                            <a :href="'/admin/distribution-department/' + academicYearSelected + '/export'"
+                               target="_blank">
                                 <i class="fa fa-download"></i> Export Result Each Department
                             </a>
                         </li>
+                        <li class="divider"></li>
+                        <li>
+                            <a :href="'/admin/distribution-department/' + academicYearSelected + '/print-all'"
+                               target="_blank">
+                                <i class="fa fa-print"></i> Print Result All Department
+                            </a>
+                        </li>
+                        <li>
+                            <a :href="'/admin/distribution-department/' + academicYearSelected + '/print-all'"
+                               target="_blank">
+                                <i class="fa fa-print"></i> Print Result Each Department
+                            </a>
+                        </li>
+                        <li class="divider"></li>
                         <li>
                             <a href="javascript::void(0)">
                                 <i class="fa fa-database"></i> Import data
@@ -107,57 +125,57 @@
 
     <script>
 
-	    $(function () {
-		    let oTable = $('#distribution-department').DataTable({
-			    processing: true,
-			    serverSide: true,
-			    ajax: {
-				    url: '{{ route('distribution-department.data') }}',
-				    type: 'GET',
-				    data: function (d) {
-                        d.academic_year_id = $('#academicYear').val()
-				    }
-			    },
-			    columns: [
-				    {data: 'student_annual.student.id_card', name: 'student_annual.student.id_card'},
-				    {data: 'student.name_kh', name: 'student.name_kh'},
-				    {data: 'student.full_name_latin', name: 'student.full_name_latin'},
-				    {data: 'department.name_en', name: 'department.name_en'},
-				    {data: 'department_option', name: 'department_option'},
-				    {data: 'total_score', name: 'total_score'},
-				    {data: 'priority', name: 'priority', orderable: false, searchable: false}
-			    ],
-			    order: [[5, 'desc']]
-		    })
+		$(function () {
+			let oTable = $('#distribution-department').DataTable({
+				processing: true,
+				serverSide: true,
+				ajax: {
+					url: '{{ route('distribution-department.data') }}',
+					type: 'GET',
+					data: function (d) {
+						d.academic_year_id = $('#academicYear').val()
+					}
+				},
+				columns: [
+					{data: 'student_annual.student.id_card', name: 'student_annual.student.id_card'},
+					{data: 'student.name_kh', name: 'student.name_kh'},
+					{data: 'student.full_name_latin', name: 'student.full_name_latin'},
+					{data: 'department.name_en', name: 'department.name_en'},
+					{data: 'department_option', name: 'department_option'},
+					{data: 'total_score', name: 'total_score'},
+					{data: 'priority', name: 'priority', orderable: false, searchable: false}
+				],
+				order: [[5, 'desc']]
+			})
 
-		    $(document).on('change', '#academicYear', function (e) {
-	            oTable.draw()
-	            e.preventDefault()
-            })
-	    })
+			$(document).on('change', '#academicYear', function (e) {
+				oTable.draw()
+				e.preventDefault()
+			})
+		})
     </script>
 
     <script>
-	    const vm = new Vue({
-		    el: '.wrapper',
-		    data () {
-			    return {
-				    academicYears: null,
-				    academicYearSelected: 2018
-			    }
-		    },
-		    methods: {
-			    getAcademicYear () {
-				    axios.post('/admin/distribution-department/get-academic-year')
-					    .then((response) => {
-						    this.academicYears = response.data.data
-						    this.academicYearSelected = response.data.data[0].id
-					    })
-			    }
-		    },
-		    mounted () {
-			    this.getAcademicYear()
-		    }
-	    })
+		const vm = new Vue({
+			el: '.wrapper',
+			data() {
+				return {
+					academicYears: null,
+					academicYearSelected: 2018
+				}
+			},
+			methods: {
+				getAcademicYear() {
+					axios.post('/admin/distribution-department/get-academic-year')
+						.then((response) => {
+							this.academicYears = response.data.data
+							this.academicYearSelected = response.data.data[0].id
+						})
+				}
+			},
+			mounted() {
+				this.getAcademicYear()
+			}
+		})
     </script>
 @stop

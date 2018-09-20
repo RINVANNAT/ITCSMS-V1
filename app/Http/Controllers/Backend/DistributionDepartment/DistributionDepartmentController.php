@@ -9,6 +9,7 @@ use App\Models\Department;
 use App\Models\DepartmentOption;
 use App\Models\DistributionDepartment;
 use App\Models\DistributionDepartmentResult;
+use Barryvdh\Snappy\Facades\SnappyPdf;
 use Illuminate\Http\Request;
 use Maatwebsite\Excel\Facades\Excel;
 use Yajra\Datatables\Datatables;
@@ -84,9 +85,9 @@ class DistributionDepartmentController extends Controller
                 foreach ($distributionDepartments as $distributionDepartment) {
                     $items = DistributionDepartment::where('student_annual_id', $distributionDepartment->student_annual_id)->get();
                     if (count($items) > 0) {
-                        $score= number_format((float) ((((float) $items[0]->socre_1)) + (((float) $items[0]->score_2) * 2))/3, 2);
+                        $score = number_format((float)((((float)$items[0]->socre_1)) + (((float)$items[0]->score_2) * 2)) / 3, 2);
                         foreach ($items as $item) {
-                            $item->score = number_format((float) $score, 2);
+                            $item->score = number_format((float)$score, 2);
                             $item->update();
                         }
                     }
@@ -107,9 +108,9 @@ class DistributionDepartmentController extends Controller
             $studentAnnualIds = DistributionDepartment::where([
                 'academic_year_id' => $request->academic_year_id
             ])
-            ->select('student_annual_id')
-            ->distinct('student_annual_id')
-            ->pluck('student_annual_id');
+                ->select('student_annual_id')
+                ->distinct('student_annual_id')
+                ->pluck('student_annual_id');
 
             if (count($studentAnnualIds) > 0) {
                 // find all student annual from DistributionDepartment
@@ -151,10 +152,10 @@ class DistributionDepartmentController extends Controller
                         $student_annual_id = null;
 
                         if (count($data) > 0) {
-                            for ($i=0; $i<count($data); $i++) {
+                            for ($i = 0; $i < count($data); $i++) {
                                 $prevStudentScore = 0;
                                 if ($i > 0) {
-                                    $prevStudentScore = (float) $data[$i-1]['score'];
+                                    $prevStudentScore = (float)$data[$i - 1]['score'];
                                 }
                                 $score = $data[$i]['score'];
                                 $student_annual_id = $data[$i]['student_annual_id'];
@@ -262,14 +263,16 @@ class DistributionDepartmentController extends Controller
                         if (count($department->department_options) > 0) {
                             foreach ($department->department_options as $option) {
                                 $result = DistributionDepartmentResult::where([
-                                        'distribution_department_results.department_id' => $department->id,
-                                        'distribution_department_results.department_option_id' => $option->id,
-                                        'distribution_department_results.academic_year_id' => $academic_year_id
-                                    ])
+                                    'distribution_department_results.department_id' => $department->id,
+                                    'distribution_department_results.department_option_id' => $option->id,
+                                    'distribution_department_results.academic_year_id' => $academic_year_id
+                                ])
                                     ->join('studentAnnuals', 'studentAnnuals.id', '=', 'distribution_department_results.student_annual_id')
                                     ->join('departments', 'departments.id', '=', 'distribution_department_results.department_id')
                                     ->join('departmentOptions', 'departmentOptions.id', '=', 'distribution_department_results.department_option_id')
                                     ->join('students', 'students.id', '=', 'studentAnnuals.student_id')
+                                    ->join('genders', 'genders.id', '=', 'students.gender_id')
+                                    ->select('distribution_department_results.*', 'departments.*', 'studentAnnuals.*', 'students.*', 'genders.code as sex')
                                     ->orderBy('students.name_latin', 'asc')
                                     ->get();
                                 if (count($result) > 0) {
@@ -279,13 +282,15 @@ class DistributionDepartmentController extends Controller
                         }
 
                         $result = DistributionDepartmentResult::where([
-                                'distribution_department_results.department_id' => $department->id,
-                                'distribution_department_results.academic_year_id' => $academic_year_id,
-                                'distribution_department_results.department_option_id' => null
-                            ])
+                            'distribution_department_results.department_id' => $department->id,
+                            'distribution_department_results.academic_year_id' => $academic_year_id,
+                            'distribution_department_results.department_option_id' => null
+                        ])
                             ->join('studentAnnuals', 'studentAnnuals.id', '=', 'distribution_department_results.student_annual_id')
                             ->join('departments', 'departments.id', '=', 'distribution_department_results.department_id')
                             ->join('students', 'students.id', '=', 'studentAnnuals.student_id')
+                            ->join('genders', 'genders.id', '=', 'students.gender_id')
+                            ->select('distribution_department_results.*', 'departments.*', 'studentAnnuals.*', 'students.*', 'genders.code as sex')
                             ->orderBy('students.name_latin', 'asc')
                             ->get();
                         if (count($result) > 0) {
@@ -294,7 +299,7 @@ class DistributionDepartmentController extends Controller
                     }
                 })->export('xlsx');
             }
-            return redirect()->back()->withFlashInfo('No data are found!');
+            return redirect()->back()->withFlashInfo('No data are found! Verify your academic already has student!');
         } catch (\Exception $exception) {
             return redirect()->back()->withFlashDanger($exception->getMessage());
         }
@@ -353,21 +358,22 @@ class DistributionDepartmentController extends Controller
                 $sheet->cell('A' . $row, $nb);
                 $sheet->cell('B' . $row, $item->studentAnnual->student->id_card);
                 $sheet->cell('C' . $row, $item->studentAnnual->student->name_latin);
-                $sheet->cell('D' . $row, $item->studentAnnual->student->sex);
+                $sheet->cell('D' . $row, $item->sex);
                 $sheet->cell('E' . $row, $department->code . ($departmentOption != null ? $departmentOption->code : ''));
                 $row++;
                 $nb++;
             }
             $end = $row - 1;
             $sheet->setBorder('A' . $start . ':E' . $end, 'thin');
-            $sheet->cells('A6:A'.$end, function($cells) {
+            $sheet->cells('A6:A' . $end, function ($cells) {
                 $cells->setAlignment('center');
             });
-            $sheet->cells('E6:E'.$end, function($cells) {
+            $sheet->cells('D6:E' . $end, function ($cells) {
                 $cells->setAlignment('center');
             });
             $sheet->cells('A5:E5', function ($cells) {
                 $cells->setBackground('#dddddd');
+                $cells->setAlignment('center');
             });
         });
     }
@@ -407,7 +413,7 @@ class DistributionDepartmentController extends Controller
         }
     }
 
-    public function saveStudentWhoHaveNoScore (Request $request)
+    public function saveStudentWhoHaveNoScore(Request $request)
     {
         $this->validate($request, [
             'students' => 'required'
@@ -428,7 +434,7 @@ class DistributionDepartmentController extends Controller
         }
     }
 
-    public function getDepartmentChosen (Request $request)
+    public function getDepartmentChosen(Request $request)
     {
         $this->validate($request, [
             'academic_year_id' => 'required'
@@ -443,12 +449,12 @@ class DistributionDepartmentController extends Controller
                 $depts = [];
                 foreach ($distributionDepartment as $item) {
                     $deptCode = Department::find($item->department_id);
-                    $label = (string) $deptCode->code;
-                    $id = (string) $deptCode->id;
-                    if(!is_null($item->department_option_id)) {
+                    $label = (string)$deptCode->code;
+                    $id = (string)$deptCode->id;
+                    if (!is_null($item->department_option_id)) {
                         $deptOption = DepartmentOption::find($item->department_option_id);
-                        $label .= (string) $deptOption->code;
-                        $id .= '_' . (string) $deptOption->id;
+                        $label .= (string)$deptOption->code;
+                        $id .= '_' . (string)$deptOption->id;
                     }
                     $option['label'] = $label;
                     $option['id'] = $id;
@@ -460,5 +466,125 @@ class DistributionDepartmentController extends Controller
         } catch (\Exception $e) {
             return message_error($e->getMessage());
         }
+    }
+
+    public function exportAll(Request $request)
+    {
+        try {
+            $academicYear = AcademicYear::find($request->academic_year_id);
+            $academic_year_id = $request->academic_year_id;
+
+            $result = DistributionDepartmentResult::where([
+                'distribution_department_results.academic_year_id' => $academic_year_id,
+            ])
+                ->join('studentAnnuals', 'studentAnnuals.id', '=', 'distribution_department_results.student_annual_id')
+                ->join('departments', 'departments.id', '=', 'distribution_department_results.department_id')
+                ->join('students', 'students.id', '=', 'studentAnnuals.student_id')
+                ->join('genders', 'genders.id', '=', 'students.gender_id')
+                ->select('distribution_department_results.*', 'students.*', 'departments.code as dept_code', 'genders.code as sex')
+                ->orderBy('students.name_latin', 'asc')
+                ->get();
+            if (count($result) > 0) {
+                return Excel::create('Distribution Department Result ' . $academicYear->name_latin, function ($excel) use ($academic_year_id, $academicYear, $result) {
+                    $excel->setTitle('Distribution Department Result ' . $academic_year_id);
+                    $this->getSheetAll($excel, $result, $academicYear);
+                })->export('xlsx');
+
+            }else {
+                return redirect()->back()->withFlashInfo('No data are found! Verify your academic already has student!');
+            }
+        } catch (\Exception $exception) {
+            return message_error($exception->getMessage());
+        }
+    }
+
+    private function getSheetAll($excel, $data, AcademicYear $academicYear)
+    {
+        $excel->sheet('Result', function ($sheet) use ($data, $academicYear) {
+            // header
+            $sheet->mergeCells('A1:E1');
+            $sheet->cell('A1', function ($cell) {
+                $cell->setAlignment('center');
+                $cell->setValue('បំនែងចែកដេប៉ាតឺម៉ង់ថ្នាក់ឆ្នាំទី៣');
+                $cell->setFont(array(
+                    'bold' => true,
+                    'size' => 14
+                ));
+            });
+
+            $sheet->mergeCells('A3:E3');
+            $sheet->cell('A3', function ($cell) use ($academicYear) {
+                $cell->setValue('ឆ្នាំសិក្សា ' . $academicYear->name_kh);
+                $cell->setAlignment('center');
+                $cell->setFont(array(
+                    'bold' => true,
+                    'size' => 13
+                ));
+            });
+
+            $sheet->cell('A5', 'ល.រ');
+            $sheet->cell('B5', 'អត្តលេខ');
+            $sheet->cell('C5', 'គ្តោនាម');
+            $sheet->cell('D5', 'ភេទ');
+            $sheet->cell('E5', 'ដេប៉ាតឺម៉ង');
+
+            $row = 6;
+            $start = $row - 1;
+            $nb = 1;
+            foreach ($data as $item) {
+                $deptOption = '';
+                if(isset($item->department_option_id)) {
+                    $deptOption = DepartmentOption::find($item->department_option_id);
+                    $deptOption = $deptOption->code;
+                }
+                $sheet->cell('A' . $row, $nb);
+                $sheet->cell('B' . $row, $item->studentAnnual->student->id_card);
+                $sheet->cell('C' . $row, $item->studentAnnual->student->name_latin);
+                $sheet->cell('D' . $row, $item->sex);
+                $sheet->cell('E' . $row, $item->dept_code . $deptOption);
+                $row++;
+                $nb++;
+            }
+            $end = $row - 1;
+            $sheet->setBorder('A' . $start . ':E' . $end, 'thin');
+            $sheet->cells('A6:A' . $end, function ($cells) {
+                $cells->setAlignment('center');
+            });
+            $sheet->cells('D6:E' . $end, function ($cells) {
+                $cells->setAlignment('center');
+            });
+            $sheet->cells('A5:E5', function ($cells) {
+                $cells->setBackground('#dddddd');
+                $cells->setAlignment('center');
+            });
+        });
+    }
+
+    public function printEachDepartment ()
+    {
+        return view('');
+    }
+
+    public function printAll (Request $request)
+    {
+        $academicYear = AcademicYear::find($request->academic_year_id);
+        $academic_year_id = $request->academic_year_id;
+
+        $result = DistributionDepartmentResult::where([
+            'distribution_department_results.academic_year_id' => $academic_year_id,
+        ])
+            ->join('studentAnnuals', 'studentAnnuals.id', '=', 'distribution_department_results.student_annual_id')
+            ->join('departments', 'departments.id', '=', 'distribution_department_results.department_id')
+            ->join('students', 'students.id', '=', 'studentAnnuals.student_id')
+            ->join('genders', 'genders.id', '=', 'students.gender_id')
+            ->select('distribution_department_results.*', 'students.*', 'departments.code as dept_code', 'genders.code as sex')
+            ->orderBy('students.name_latin', 'asc')
+            ->get();
+
+        return SnappyPdf::loadView('backend.distributionDepartment.print-all', compact('academicYear', 'result'))
+            ->setOption('encoding', 'utf-8')
+            ->stream();
+
+        // return view('backend.distributionDepartment.print-all', compact('academicYear', 'result'));
     }
 }

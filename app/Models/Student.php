@@ -112,17 +112,11 @@ class Student extends Model
 	];
 
 	protected $appends = [
-	    'full_name_latin',
-        'sex'
+	    'full_name_latin'
     ];
 
     public function getFullNameLatinAttribute ()
     {
         return strtoupper($this->name_latin);
-    }
-
-    public function getSexAttribute ()
-    {
-        return $this->gender->code;
     }
 }

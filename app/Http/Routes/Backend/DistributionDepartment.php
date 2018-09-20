@@ -21,4 +21,7 @@ Route::group(['namespace' => 'DistributionDepartment',
     Route::post('get-total-student-annuals', 'DistributionDepartmentController@getTotalStudentAnnuals')->name('distribution-department.get-total-student-annuals');
 
     Route::get('{academic_year_id}/export', 'DistributionDepartmentController@export')->name('distribution-department.export');
+    Route::get('{academic_year_id}/export-all', 'DistributionDepartmentController@exportAll')->name('distribution-department.export-all');
+    Route::get('{academic_year_id}/print-each-department', 'DistributionDepartmentController@printEachDepartment')->name('distribution-department.print-each-department');
+    Route::get('{academic_year_id}/print-all', 'DistributionDepartmentController@printAll')->name('distribution-department.print-all');
 });
