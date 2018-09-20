@@ -18,8 +18,11 @@ trait StudentPriorityDepartmentTrait
                 ->first()->priority;
 
             $studentDistributeDepartments = DistributionDepartment::where([
-                'academic_year_id' => $academic_year_id
-            ])->get();
+                'distribution_departments.academic_year_id' => $academic_year_id
+            ])->join('studentAnnuals', 'studentAnnuals.id','=', 'distribution_departments.student_annual_id')
+                ->join('students', 'students.id','=', 'studentAnnuals.student_id')
+                ->orderBy('students.name_latin')
+                ->get();
 
 
             if (count($studentDistributeDepartments) > 0) {
@@ -58,6 +61,50 @@ trait StudentPriorityDepartmentTrait
             $sheet->cell('E6', 'Score Year 1');
             $sheet->cell('F6', 'Score Year 2');
             $sheet->cell('G6', 'Chosen Priority');
+
+            $mergChoosPriorityCell = 1;
+            for($x='G'; $x != 'IW'; $x++)
+            {
+                if ($mergChoosPriorityCell == $amountDepartmentChosen) {
+                    $sheet->mergeCells('G6:'.$x.'6');
+                    break;
+                }
+                $mergChoosPriorityCell += 1;
+            }
+
+            $priority = 1;
+            for($x='G'; $x != 'IW'; $x++)
+            {
+                if ($priority <= $amountDepartmentChosen) {
+                    $sheet->cell($x.'7', $priority);
+                    $priority +=1;
+                } else {
+                    break;
+                }
+            }
+
+            $number = 1;
+            $row = 8;
+            $studentAnnuals = [];
+            foreach ($students as $index => $value) {
+                if ($index == 0 || $value->student_annual_id != $students[$index-1]->student_annual_id) {
+                    $studentAnnuals[$value->student_annual_id] = [];
+                    $studentAnnuals[$value->student_annual_id][$value->priority] = [];
+                    $studentAnnuals[$value->student_annual_id][$value->priority]['department_id'] = $value->department_id;
+                    $studentAnnuals[$value->student_annual_id][$value->priority]['department_option_id'] = $value->department_option_id;
+                    $sheet->cell('A'.$row, $number);
+                    $sheet->cell('B'.$row, $value->studentAnnual->student->id_card);
+                    $sheet->cell('C'.$row, strtoupper($value->studentAnnual->student->name_latin));
+                    $sheet->cell('D'.$row, $value->student->gender->code);
+                    $sheet->cell('E'.$row, $value->score_1);
+                    $sheet->cell('F'.$row, $value->score_2);
+                    $number+=1;
+                    $row+=1;
+                } else if ($value->student_annual_id == $students[$index-1]->student_annual_id) {
+                    $studentAnnuals[$value->student_annual_id][$value->priority]['department_id'] = $value->department_id;
+                    $studentAnnuals[$value->student_annual_id][$value->priority]['department_option_id'] = $value->department_option_id;
+                }
+            }
 
 
         });
