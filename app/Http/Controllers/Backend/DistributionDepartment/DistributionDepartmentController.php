@@ -631,26 +631,17 @@ class DistributionDepartmentController extends Controller
 
     public function importData(Request $request)
     {
+        $this->validate($request, [
+            'file' => 'required'
+        ]);
         try {
-            $distributionDepartments = DistributionDepartment::where('academic_year_id', $request->academic_year_id)->get();
-            if (count($distributionDepartments) > 0) {
-                foreach ($distributionDepartments as $distributionDepartment) {
-                    $distributionDepartment->delete();
-                }
-            }
-
-            $distributionDepartmentResults = DistributionDepartment::where('academic_year_id', $request->academic_year_id)->get();
-            if (count($distributionDepartmentResults) > 0) {
-                foreach ($distributionDepartmentResults as $distributionDepartmentResult) {
-                    $distributionDepartmentResult->delete();
-                }
-            }
+            DistributionDepartment::where('academic_year_id', (int) $request->academic_year_id)->delete();
+            DistributionDepartmentResult::where('academic_year_id', (int) $request->academic_year_id)->delete();
 
             $file = $request->file('file');
             Excel::load($file, function ($reader) use ($request) {
                 $reader->setHeaderRow(6);
                 $rows = $reader->get();
-                dd($rows);
                 foreach ($rows as $row) {
                     $studentAnnual = StudentAnnual::join('students', 'students.id', '=', 'studentAnnuals.student_id')
                         ->where('students.id_card', $row['id_card'])
@@ -662,7 +653,7 @@ class DistributionDepartmentController extends Controller
                     $priorities = array_except($row->toArray(), ['no', 'id_card', 'name', 'sex', 'score_year_i', 'score_year_ii']);
                     foreach ($priorities as $key => $value) {
                         $item['student_annual_id'] = $studentAnnual->id;
-                        $item['academic_year_id'] = $request->academic_year_id;
+                        $item['academic_year_id'] = (int) $request->academic_year_id;
                         $item['score_1'] = $row['score_year_i'];
                         $item['score_2'] = $row['score_year_ii'];
                         $item['priority'] = $key;
@@ -676,7 +667,6 @@ class DistributionDepartmentController extends Controller
                             $item['department_option_id'] = null;
                         }
                         array_push($chosen, $item);
-                        dd($item);
                     }
 
                     foreach ($chosen as $item) {
@@ -686,7 +676,7 @@ class DistributionDepartmentController extends Controller
             });
             return redirect()->route('distribution-department.index')->withFlashInfo('Imported !');
         } catch (\Exception $exception) {
-            return redirect()->back()->withFlashInfo('No data are found! Verify your file information again!');
+            return redirect()->back()->withFlashInfo($exception->getMessage());
         }
     }
 }
