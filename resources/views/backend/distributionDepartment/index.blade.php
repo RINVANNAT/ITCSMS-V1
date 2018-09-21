@@ -66,8 +66,13 @@
                         </li>
                         <li class="divider"></li>
                         <li>
-                            <a href="javascript::void(0)">
-                                <i class="fa fa-database"></i> Import data
+                            <a href="{{ route('distribution-department.get-import', 2) }}">
+                                <i class="fa fa-database"></i> Import Student List Grade 2
+                            </a>
+                        </li>
+                        <li>
+                            <a href="{{ route('distribution-department.get-import', 1) }}">
+                                <i class="fa fa-database"></i> Import Student List Grade 1
                             </a>
                         </li>
                     </ul>

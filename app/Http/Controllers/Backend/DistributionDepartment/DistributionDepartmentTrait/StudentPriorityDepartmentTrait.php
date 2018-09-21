@@ -58,39 +58,45 @@ trait StudentPriorityDepartmentTrait
             // header
             $sheet->mergeCells('A1:E1');
             $sheet->cell('A1', function ($cell) {
-                $cell->setValue('Institute of Technology of Cambodia');
+                $cell->setValue('វិទ្យាស្ថានបច្ចេកវិទ្យាកម្ពុជា');
+                $cell->setFont(array(
+                    'bold' => true,
+                    'size' => 14
+                ));
+            });
+
+            $sheet->mergeCells('A3:O3');
+            $sheet->cell('A3', function ($cell) {
+                $cell->setValue('បញ្ចើសម្រង់ជម្រើសនិសិ្សត');
+                $cell->setAlignment('center');
+                $cell->setFont(array(
+                    'bold' => true,
+                    'size' => 16
+                ));
             });
 
             $sheet->setAutoSize(true);
 
-            $sheet->mergeCells('A6:A7');
-            $sheet->mergeCells('B6:B7');
-            $sheet->mergeCells('C6:C7');
-            $sheet->mergeCells('D6:D7');
-            $sheet->mergeCells('E6:E7');
-            $sheet->mergeCells('F6:F7');
+            $sheet->cell('A6', 'ល.រ');
+            $sheet->cell('B6', 'អត្តលេខ');
+            $sheet->cell('C6', 'គោត្តនាម និង នាមខ្លួន');
+            $sheet->cell('D6', 'ភេទ');
+            $sheet->cell('E6', 'ពិន្ទុ ឆ្នាំទី ១');
+            $sheet->cell('F6', 'ពិន្ទុឆ្នាំទី២');
 
-            $sheet->cell('A6', 'No');
-            $sheet->cell('B6', 'ID Card');
-            $sheet->cell('C6', 'Name Latin');
-            $sheet->cell('D6', 'Sex');
-            $sheet->cell('E6', 'Score Year 1');
-            $sheet->cell('F6', 'Score Year 2');
-            $sheet->cell('G6', 'Chosen Priority');
-
-            $mergChoosPriorityCell = 1;
-            for ($x = 'G'; $x != 'IW'; $x++) {
-                if ($mergChoosPriorityCell == $amountDepartmentChosen) {
-                    $sheet->mergeCells('G6:' . $x . '6');
-                    break;
-                }
-                $mergChoosPriorityCell += 1;
-            }
+            $sheet->cells('A6:F6', function ($cells) {
+                $cells->setBackground('#dddddd');
+                $cells->setAlignment('center');
+            });
 
             $priority = 1;
             for ($x = 'G'; $x != 'IW'; $x++) {
                 if ($priority <= $amountDepartmentChosen) {
-                    $sheet->cell($x . '7', $priority);
+                    $sheet->cell($x . '6', $priority);
+                    $sheet->cell($x . '6', function ($cell) {
+                        $cell->setBackground('#dddddd');
+                        $cell->setAlignment('center');
+                    });
                     $priority += 1;
                 } else {
                     break;
@@ -98,7 +104,7 @@ trait StudentPriorityDepartmentTrait
             }
 
             $number = 1;
-            $row = 8;
+            $row = 7;
 
             foreach ($students as $index => $value) {
                 $sheet->cell('A' . $row, $number);
@@ -127,7 +133,7 @@ trait StudentPriorityDepartmentTrait
             }
 
             $sheet->setBorder('A6:' . $alphabet[$selectAlphabet - 1] . ($row - 1), 'thin');
-            $sheet->cells('A6:' . $alphabet[$selectAlphabet - 1] . '7', function ($cells) {
+            $sheet->cells('A6:' . $alphabet[$selectAlphabet - 1] . '6', function ($cells) {
                 $cells->setValignment('center');
                 $cells->setAlignment('center');
                 $cells->setFont(array(

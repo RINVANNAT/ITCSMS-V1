@@ -24,4 +24,7 @@ Route::group(['namespace' => 'DistributionDepartment',
     Route::get('{academic_year_id}/export-all', 'DistributionDepartmentController@exportAll')->name('distribution-department.export-all');
     Route::get('{academic_year_id}/print-each-department', 'DistributionDepartmentController@printEachDepartment')->name('distribution-department.print-each-department');
     Route::get('{academic_year_id}/print-all', 'DistributionDepartmentController@printAll')->name('distribution-department.print-all');
+
+    Route::get('{degree}/get-import', 'DistributionDepartmentController@getImportPage')->name('distribution-department.get-import');
+    Route::post('import', 'DistributionDepartmentController@importData')->name('distribution-department.import');
 });

@@ -490,7 +490,7 @@ class DistributionDepartmentController extends Controller
                     $this->getSheetAll($excel, $result, $academicYear);
                 })->export('xlsx');
 
-            }else {
+            } else {
                 return redirect()->back()->withFlashInfo('No data are found! Verify your academic already has student!');
             }
         } catch (\Exception $exception) {
@@ -533,7 +533,7 @@ class DistributionDepartmentController extends Controller
             $nb = 1;
             foreach ($data as $item) {
                 $deptOption = '';
-                if(isset($item->department_option_id)) {
+                if (isset($item->department_option_id)) {
                     $deptOption = DepartmentOption::find($item->department_option_id);
                     $deptOption = $deptOption->code;
                 }
@@ -560,7 +560,7 @@ class DistributionDepartmentController extends Controller
         });
     }
 
-    public function printEachDepartment (Request $request)
+    public function printEachDepartment(Request $request)
     {
         $academicYear = AcademicYear::find($request->academic_year_id);
 
@@ -602,7 +602,7 @@ class DistributionDepartmentController extends Controller
         }
     }
 
-    public function printAll (Request $request)
+    public function printAll(Request $request)
     {
         $academicYear = AcademicYear::find($request->academic_year_id);
         $academic_year_id = $request->academic_year_id;
@@ -621,5 +621,23 @@ class DistributionDepartmentController extends Controller
         return SnappyPdf::loadView('backend.distributionDepartment.print-all', compact('academicYear', 'result'))
             ->setOption('encoding', 'utf-8')
             ->stream();
+    }
+
+    public function getImportPage($degree)
+    {
+        return view('backend.distributionDepartment.import', compact('degree'));
+    }
+
+    public function importData(Request $request)
+    {
+        try {
+            $file = $request->file('file');
+            Excel::load($file, function ($reader) {
+                $reader->setHeaderRow(6);
+                dd($reader->skip(7)->get());
+            });
+        } catch (\Exception $exception) {
+            return redirect()->back()->withFlashInfo('No data are found! Verify your file information again!');
+        }
     }
 }
