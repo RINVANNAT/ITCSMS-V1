@@ -30,6 +30,7 @@
                     <form file="true" method="POST" action="{{ route('distribution-department.import') }}" enctype="multipart/form-data">
                         {{ csrf_field() }}
                         <input type="hidden" value="{{ $degree }}" name="degree_id"/>
+                        <input type="hidden" value="{{ $academic_year_id }}" name="academic_year_id"/>
                         <div class="form-group">
                             <label></label>
                             <input type="file" name="file" accept="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"/>

@@ -66,12 +66,12 @@
                         </li>
                         <li class="divider"></li>
                         <li>
-                            <a href="{{ route('distribution-department.get-import', 2) }}">
+                            <a :href="'/admin/distribution-department/2/' + academicYearSelected + '/get-import'">
                                 <i class="fa fa-database"></i> Import Student List Grade 2
                             </a>
                         </li>
                         <li>
-                            <a href="{{ route('distribution-department.get-import', 1) }}">
+                            <a :href="'/admin/distribution-department/1/' + academicYearSelected + '/get-import'">
                                 <i class="fa fa-database"></i> Import Student List Grade 1
                             </a>
                         </li>

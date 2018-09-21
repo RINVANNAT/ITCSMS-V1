@@ -77,26 +77,17 @@ trait StudentPriorityDepartmentTrait
 
             $sheet->setAutoSize(true);
 
-            $sheet->cell('A6', 'ល.រ');
-            $sheet->cell('B6', 'អត្តលេខ');
-            $sheet->cell('C6', 'គោត្តនាម និង នាមខ្លួន');
-            $sheet->cell('D6', 'ភេទ');
-            $sheet->cell('E6', 'ពិន្ទុ ឆ្នាំទី ១');
-            $sheet->cell('F6', 'ពិន្ទុឆ្នាំទី២');
-
-            $sheet->cells('A6:F6', function ($cells) {
-                $cells->setBackground('#dddddd');
-                $cells->setAlignment('center');
-            });
+            $sheet->cell('A6', 'No.');
+            $sheet->cell('B6', 'ID Card');
+            $sheet->cell('C6', 'Name');
+            $sheet->cell('D6', 'Sex');
+            $sheet->cell('E6', 'Score Year I');
+            $sheet->cell('F6', 'Score Year II');
 
             $priority = 1;
             for ($x = 'G'; $x != 'IW'; $x++) {
                 if ($priority <= $amountDepartmentChosen) {
                     $sheet->cell($x . '6', $priority);
-                    $sheet->cell($x . '6', function ($cell) {
-                        $cell->setBackground('#dddddd');
-                        $cell->setAlignment('center');
-                    });
                     $priority += 1;
                 } else {
                     break;
