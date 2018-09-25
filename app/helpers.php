@@ -534,3 +534,18 @@ if (! function_exists('get_order_alpha_numeric')) {
         }
     }
 }
+
+if (! function_exists('get_department_option_code')) {
+    /**
+     * @param null $department_option
+     * @return null
+     */
+    function get_department_option_code($department_option=null)
+    {
+        if (is_null($department_option)) {
+            return null;
+        } else {
+            return \App\Models\DepartmentOption::find($department_option)->code;
+        }
+    }
+}

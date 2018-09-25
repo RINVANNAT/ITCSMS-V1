@@ -55,39 +55,50 @@
             padding-bottom: 15px;
             padding-top: 15px;
         }
+
+        @media print {
+            html, body {
+                border: 1px solid white;
+                height: 99%;
+                page-break-after: avoid;
+                page-break-before: avoid;
+            }
+        }
     </style>
 
 </head>
 <body>
 @foreach($data as $result)
+    @if (count($result) > 0)
     <div class="page">
         <div class="container">
             <div class="row">
                 <div class="col-xs-12" style="margin-bottom: 15px;">
                     <h3 class="title text-center text-bold">បំនែងចែកដេប៉ាតឺម៉ងថ្នាក់ឆ្នាំទី៣</h3>
                     <h4 class="sub-title text-center text-bold pull-left">ឆ្នាំសិក្សា {{ $academicYear->name_kh }}</h4>
-                    <h4 class="sub-title text-center text-bold pull-right" style="padding-right: 150px;">ដេប៉ាតឺម៉ង់  <span style="font-size: 20px;">{{ $result[0]->dept_code }}</span></h4>
+                    @php
+                        $deptOption = get_department_option_code($result[0]->department_option_id)
+                    @endphp
+                    <h4 class="sub-title text-center text-bold pull-right" style="padding-right: 150px;">ដេប៉ាតឺម៉ង់  <span style="font-size: 20px;">{{ $result[0]->dept_code }}{{ $deptOption }}</span></h4>
                 </div>
                 <div class="col-xs-12">
                     <table>
-                        <thead>
-                        <tr style="background: #dddddd !important;">
-                            <th width="20px;">ល.រ</th>
-                            <th width="35px;">អត្តលេខ</th>
-                            <th>គោត្តនាម និង នាមខ្លួន</th>
-                            <th>ភេទ</th>
-                            <th>ដេប៉ាតឺម៉ង់</th>
-                            <th>សេចក្តីផ្សេងៗ</th>
-                        </tr>
-                        </thead>
                         <tbody>
+                            <tr style="background: #dddddd !important;">
+                                <th width="20px;">ល.រ</th>
+                                <th width="35px;">អត្តលេខ</th>
+                                <th>គោត្តនាម និង នាមខ្លួន</th>
+                                <th>ភេទ</th>
+                                <th>ដេប៉ាតឺម៉ង់</th>
+                                <th>សេចក្តីផ្សេងៗ</th>
+                            </tr>
                         @foreach($result as $key => $item)
                             <tr>
                                 <td class="text-center">{{ $key+1 }}</td>
                                 <td>{{ $item->id_card }}</td>
                                 <td>{{ $item->name_latin }}</td>
                                 <td class="text-center">{{ $item->sex }}</td>
-                                <td class="text-center">{{ $item->dept_code }}</td>
+                                <td class="text-center">{{ $item->dept_code }}{{ $deptOption }}</td>
                                 <td></td>
                             </tr>
                         @endforeach
@@ -97,6 +108,9 @@
             </div>
         </div>
     </div>
+    <p style="page-break-after: always;">&nbsp;</p>
+    <p style="page-break-before: always;">&nbsp;</p>
+    @endif
 @endforeach
 </body>
 </html>
