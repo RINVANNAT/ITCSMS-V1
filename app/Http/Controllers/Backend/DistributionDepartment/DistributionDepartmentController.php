@@ -448,6 +448,7 @@ class DistributionDepartmentController extends Controller
                 $distributionDepartment = DistributionDepartment::where('student_annual_id', $studentAnnualId)
                     ->get();
                 $depts = [];
+
                 foreach ($distributionDepartment as $item) {
                     $deptCode = Department::find($item->department_id);
                     $label = (string)$deptCode->code;
@@ -459,8 +460,23 @@ class DistributionDepartmentController extends Controller
                     }
                     $option['label'] = $label;
                     $option['id'] = $id;
-                    array_push($depts, $option);
+
+                    if (count($depts) == 0) {
+                        array_push($depts, $option);
+                    } else {
+                        $found = true;
+                        foreach ($depts as $dept) {
+                            if ($option['label'] == $dept['label']) {
+                                $found = false;
+                                break;
+                            }
+                        }
+                        if ($found) {
+                            array_push($depts, $option);
+                        }
+                    }
                 }
+
                 return message_success($depts);
             }
             return message_success([]);
