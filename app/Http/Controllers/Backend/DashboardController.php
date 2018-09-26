@@ -2,15 +2,11 @@
 
 namespace App\Http\Controllers\Backend;
 
-use App\Http\Controllers\Backend\Schedule\Traits\ViewTimetableByTeacherController;
 use App\Http\Controllers\Controller;
 use App\Models\AcademicYear;
 use App\Models\CourseAnnual;
 use App\Models\Employee;
-use App\Models\Schedule\Timetable\TimetableSlot;
-use App\Models\Schedule\Timetable\Week;
 use App\Models\Semester;
-use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 
@@ -20,8 +16,6 @@ use Illuminate\Support\Facades\DB;
  */
 class DashboardController extends Controller
 {
-    use ViewTimetableByTeacherController;
-
     /**
      * Dashboard page.
      *
@@ -31,10 +25,7 @@ class DashboardController extends Controller
     {
         $employee = Employee::where('user_id', Auth::user()->id)->first();
         $courses = null;
-        $academic_years = AcademicYear::latest()->get();
-        $weeks = Week::all();
         $semesterIds = Semester::select('id')->pluck('id');
-
         $last_year = AcademicYear::orderBy('id', 'DESC')->pluck('id');
 
         if ($employee != null) {
@@ -68,16 +59,6 @@ class DashboardController extends Controller
                 ->toArray();
         }
 
-        /** @var Collection $timetables */
-        $timetables = new Collection();
-        $timetable_slots = TimetableSlot::where(['lecturer_id' => Employee::where('user_id')->first()->id])->get();
-
-        foreach ($timetable_slots as $timetable_slot) {
-            $timetables->push($timetable_slot->timetable);
-        }
-        $timetables = $timetables->keyBy('id');
-
-
-        return view('backend.dashboard', compact('courses', 'timetables', 'academic_years', 'weeks'))->withUser(access()->user());
+        return view('backend.dashboard', compact('courses'))->withUser(access()->user());
     }
 }

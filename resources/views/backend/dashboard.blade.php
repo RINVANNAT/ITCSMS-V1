@@ -61,17 +61,6 @@
         <div class="box-header with-border">
             <h3 class="box-title">{{ trans('strings.backend.dashboard.welcome') }} {!! access()->user()->name !!}!</h3>
             <div class="box-tools pull-right">
-                {{--<button class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i></button>--}}
-                {{--<div class="btn-group">--}}
-                {{--<button type="button" class="btn btn-primary btn-xs dropdown-toggle" data-toggle="dropdown" aria-expanded="false">--}}
-                {{--Export data <span class="caret"></span>--}}
-                {{--</button>--}}
-                {{--<ul class="dropdown-menu" role="menu">--}}
-                {{--<li><a href="#" id="export_student_list">Export current student list</a></li>--}}
-                {{--<li><a href="#" id="export_student_list_custom">Export custom student list</a></li>--}}
-
-                {{--</ul>--}}
-                {{--</div>--}}
             </div>
         </div>
         <div class="box-body">
@@ -98,16 +87,13 @@
                     break;
                 }
             }
-           ?>
+            ?>
 
             <div class="row">
                 <div class="col-md-12">
                     <ul class="timeline timeline-inverse">
 
                         @if($teacher)
-                            @if(isset($timetables) && access()->allow('teacher-view-timetable'))
-                                @include('backend.dashboard.includes.timetable')
-                            @endif
                             @include('backend.dashboard.teacher')
                         @endif
 
@@ -187,23 +173,6 @@
                                 </div>
                             </div>
                         </li>
-
-                        {{--<li>--}}
-                        {{--<i class="fa fa-camera bg-purple"></i>--}}
-
-                        {{--<div class="timeline-item">--}}
-                        {{--<span class="time"><i class="fa fa-clock-o"></i> 2 days ago</span>--}}
-
-                        {{--<h3 class="timeline-header"><a href="#">Mina Lee</a> uploaded new photos</h3>--}}
-
-                        {{--<div class="timeline-body">--}}
-                        {{--<img src="http://placehold.it/150x100" alt="..." class="margin">--}}
-                        {{--<img src="http://placehold.it/150x100" alt="..." class="margin">--}}
-                        {{--<img src="http://placehold.it/150x100" alt="..." class="margin">--}}
-                        {{--<img src="http://placehold.it/150x100" alt="..." class="margin">--}}
-                        {{--</div>--}}
-                        {{--</div>--}}
-                        {{--</li>--}}
                         <li>
                             <i class="fa fa-clock-o bg-gray"></i>
                         </li>
@@ -223,270 +192,5 @@
     {!! Html::script('plugins/toastr/toastr.min.js') !!}
     {!! Html::script('plugins/select2/select2.full.min.js') !!}
     {!! Html::script('bower_components/bootstrap-toggle/js/bootstrap2-toggle.min.js') !!}
-    {!! Html::script('js/backend/schedule/timetable.js') !!}
-
-    <script type="text/javascript">
-        /** move timetable slot */
-        function move_timetable_slot(event, start_date) {
-            toggleLoading(true);
-            $('#timetable').fullCalendar({
-                eventDurationEditable: false
-            });
-            $.ajax({
-                type: 'POST',
-                url: '{!! route('teacher.move_timetable_slot') !!}',
-                data: {
-                    timetable_slot_id: event.id,
-                    start_date: start_date
-                },
-                success: function (response) {
-                    if (response.status === true) {
-                        notify('info', 'Timetable Slot was moved.', 'Move Timetable Slot');
-                        $('#timetable').fullCalendar('refresh');
-                    } else {
-                        notify('error', 'Something went wrong.', 'Move Timetable Slot');
-                    }
-                },
-                error: function (response) {
-                    if (response.status === 403) {
-                        notify('error', 'You are not allowed to move  timetable slot.', 'Unauthorized');
-                    }
-                    else {
-                        notify('error', 'Something went wrong.', 'Move Timetable Slot');
-                    }
-                },
-                complete: function () {
-                    get_teacher_timetable();
-                    toggleLoading(false);
-                }
-            })
-        }
-        /** resize timetable slot */
-        function resize_timetable_slot(timetable_slot_id, end_date, revertFunc) {
-            $.ajax({
-                type: 'POST',
-                url: '{!! route('teacher.resize_timetable_slot') !!}',
-                data: {
-                    timetable_slot_id: timetable_slot_id,
-                    end: end_date
-                },
-                success: function (response) {
-                    if (response.status === true) {
-                        notify('info', 'Timetable slot have been changed.', 'Resize Timetable Slot');
-                    } else {
-                        notify('error', 'Something went wrong.', 'Resize Timetable Slot');
-                        revertFunc();
-                    }
-                },
-                error: function (response) {
-                    if (response.status === 403) {
-                        notify('error', 'You are not allowed to resize timetable slot.', 'Unauthorized');
-                    } else {
-                        notify('error', response.message, "Resize timetable Slot");
-                    }
-                    get_teacher_timetable();
-                },
-                complete: function () {
-                    get_teacher_timetable();
-                    $('#timetable').fullCalendar({
-                        eventDurationEditable: true
-                    });
-                }
-            })
-        }
-        /** timetable */
-        function show_timetable() {
-            var date = new Date();
-            var d = date.getDate(),
-                m = date.getMonth(),
-                y = date.getFullYear();
-            $('#timetable_for_teacher').fullCalendar({
-                defaultView: 'timetable',
-                defaultDate: '2017-01-01',
-                header: false,
-                footer: false,
-                views: {
-                    timetable: {
-                        type: 'agendaWeek',
-                        setHeight: '100px'
-                    }
-                },
-                allDaySlot: false,
-                hiddenDays: [0],
-                height: 650,
-                fixedWeekCount: false,
-                minTime: '07:00:00',
-                maxTime: '20:00:00',
-                slotLabelFormat: 'h:mm a',
-                columnFormat: 'dddd',
-                timezone: 'Asia/Phnom_Penh',
-                droppable: true,
-                dragRevertDuration: 0,
-                editable: '{{ access()->allow('teacher-edit-timetable') ? true : false }}',
-                eventConstraint: {
-                    start: '07:00:00',
-                    end: '20:00:00'
-                },
-                eventDrop: function (event, delta, revertFunc) {
-                    var start_date = event.start.format();
-                    move_timetable_slot(event, start_date);
-                    get_teacher_timetable();
-                },
-                eventRender: function (event, element, view) {
-                    set_background_color_slot_not_allow();
-                    var isFilter = $('input[name="filter_by"]:checked').val();
-                    if (isFilter === 'on') {
-                        event.editable = false;
-                    } else {
-                        if ('{{ auth()->user()->name }}' !== event.teacher_name) {
-                            event.editable = false;
-                        }
-                    }
-                    var object = '<a class="fc-time-grid-event fc-v-event fc-event fc-start fc-end course-item  fc-draggable fc-resizable" style="top: 65px; bottom: -153px; z-index: 1; left: 0%; right: 0%;">' +
-                        '<div class="fc-content">' +
-                        '<div class="container-room">';
-                    if (typeof event.slotsForLanguage !== 'undefined') {
-                        object += '<div class="side-courses" id="' + event.id + '" style="width: 100% !important;padding: 2px;" ​​​>';
-                        // check conflict room and render
-                        object += '<div class="row"> <div class="col-md-12"><div class="fc-title">' + event.course_name + '</div></div>';
-                        event.editable = false;
-                        object += '<div class="lang-info">';
-                        for (var i = 0; i < event.slotsForLanguage.length; i++) {
-                            if (i % 2 === 0) {
-                                object += '<div class="lang-info-left"> Gr: ' + event.slotsForLanguage[i].group + ' (' + event.slotsForLanguage[i].building + '-' + event.slotsForLanguage[i].room + ')</div>';
-                            } else {
-                                object += '<div class="lang-info-right"> Gr: ' + event.slotsForLanguage[i].group + ' (' + event.slotsForLanguage[i].building + '-' + event.slotsForLanguage[i].room + ')</div>';
-                            }
-                        }
-                        object += '</div></div></div>';
-                    } else {
-                        object += '<div class="side-course" id="' + event.id + '"​​​>';
-
-                        // check conflict room and render
-                        object += '<div class="fc-title">' + (event.course_name).substr(0, 20) + '...';
-                        if (typeof event.type !== 'undefined') {
-                            object += '<span class="text-primary"> (' + event.type + ')</span> ';
-                        }
-                        object += '<span class="text-primary"> (' + event.degree_name + event.grade_name + '-' + event.department_name + ')</span> ';
-                        object += '</div>';
-
-                        // check conflict lecturer and render
-                        if (typeof event.conflict_lecturer !== 'undefined') {
-                            if (event.conflict_lecturer.canMerge.length > 0 || event.conflict_lecturer.canNotMerge.length > 0) {
-                                object += '<p class="text-primary conflict">' + event.teacher_name + '</p> ';
-                            }
-                            else {
-                                object += '<p class="text-primary">' + event.teacher_name + '</p> ';
-                            }
-                        }
-                        else {
-                            object += '<p class="text-primary">' + event.teacher_name + '</p> ';
-                        }
-
-                        object += '</div>';
-                    }
-
-                    if (typeof event.slotsForLanguage === 'undefined') {
-                        object += '<div class="side-room">' +
-                            '<div class="room-name">';
-
-                        // check conflict and render room
-                        if (event.room !== null && event.building !== null) {
-                            if (event.conflict_room === true) {
-                                object += '<p class="fc-room bg-danger badge">' + event.building + '-' + event.room + '</p>';
-                            } else {
-                                object += '<p class="fc-room">' + event.building + '-' + event.room + '</p>';
-                            }
-                        }
-                        object += '</div>';
-
-                        // render groups
-                        if (typeof event.groups !== 'undefined') {
-                            if (event.groups.length > 0) {
-                                var groups = '<p>Gr: ';
-                                event.groups.forEach(function (ele) {
-                                    groups += ele;
-                                });
-                                groups += '</p>';
-                            }
-                            object += groups;
-                        }
-                        object += '</div> ';
-                    }
-                    object += '<div class="clearfix"></div> ' +
-                        '</div>' +
-                        '</div>' +
-                        '<div class="fc-bgd"></div>' +
-                        '<div class="fc-resizer fc-end-resizer"></div>' +
-                        '</a>';
-                    return $(object);
-                },
-                eventOverlap: function (stillEvent, movingEvent) {
-                    return stillEvent.allDay && movingEvent.allDay
-                },
-                eventResize: function (event, delta, revertFunc) {
-                    var end = event.end.format();
-                    resize_timetable_slot(event.id, end, revertFunc);
-                    $('#timetable').fullCalendar('rerenderEvents');
-                    hide_conflict_information();
-                },
-                loading: function (isLoading, view) {
-                    if (isLoading) {
-                        toggleLoading(isLoading);
-                    }
-                    else {
-                        toggleLoading(false);
-                    }
-                },
-                eventAfterRender: function (event, element, view) {
-                    var isFilter = $('input[name="filter_by"]:checked').val();
-                    if (isFilter === 'on') {
-                        event.editable = false;
-                    } else {
-                        if ('{{ auth()->user()->name }}' !== event.teacher_name) {
-                            event.editable = false;
-                            element.find('.fc-content').parent().addClass('not-mine');
-                        }
-                    }
-                }
-            });
-        }
-        /** get timetable for teacher */
-        function get_teacher_timetable() {
-            toggleLoading(true);
-            $.ajax({
-                type: 'POST',
-                url: '/admin/dashboard/get_teacher_timetable',
-                data: $('#form_teacher_timetable').serialize(),
-                success: function (response) {
-                    $('#timetable_for_teacher').fullCalendar('removeEvents');
-                    $('#timetable_for_teacher').fullCalendar('renderEvents', response.timetableSlots, true);
-                    $('#timetable_for_teacher').fullCalendar('rerenderEvents');
-                    toggleLoading(false);
-                },
-                complete: function () {
-                    toggleLoading(false);
-                }
-            });
-        }
-        /** load script */
-        $(function () {
-            // show_timetable();
-
-            // get_teacher_timetable();
-
-            // $('#form_teacher_timetable').on('change', function () {
-            //     get_teacher_timetable();
-            // });
-            //
-            // $('#academic_years').select2({
-            //     placeholder: "Academic Year"
-            // });
-            //
-            // $('#weeks').select2({
-            //     placeholder: "Week"
-            // });
-        });
-    </script>
 
 @stop
