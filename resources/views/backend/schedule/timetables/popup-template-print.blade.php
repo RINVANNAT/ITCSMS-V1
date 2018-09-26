@@ -14,7 +14,7 @@
 @section('content')
     @if(isset($timetables))
         @foreach($timetables as $timetable)
-            <page size="A4" layout="portrait" class="each-page">
+            <page size="A4" class="each-page">
                 <table class="timetable">
                     <thead>
                     <tr style="border: none !important; margin-bottom: 200px !important;">
@@ -64,11 +64,19 @@
                                                         @foreach($timetableSlot['slotsForLanguage'] as $key => $item)
                                                             @if($key % 2 !== 0)
                                                                 <div class="lang-info-right">Gr: {{ $item['group'] }}
-                                                                    ({{ $item['building'] }}-{{$item['room']}})
+                                                                    @if(!is_null($item['room']))
+                                                                        ({{ $item['building'] }}-{{$item['room']}})
+                                                                    @else
+                                                                        None
+                                                                    @endif
                                                                 </div>
                                                             @else
                                                                 <div class="lang-info-left">Gr: {{ $item['group'] }}
-                                                                    ({{ $item['building'] }}-{{$item['room']}})
+                                                                    @if(!is_null($item['room']))
+                                                                        ({{ $item['building'] }}-{{$item['room']}})
+                                                                    @else
+                                                                        None
+                                                                    @endif
                                                                 </div>
                                                             @endif
                                                             <div class="clearfix"></div>
@@ -87,7 +95,7 @@
                                                 <td rowspan="{{ ( (new \Carbon\Carbon($timetableSlot->end))->hour - (new \Carbon\Carbon($timetableSlot->start))->hour) }}">
                                                     <div class="course_type">{{ $timetableSlot->type }}</div>
                                                     <div class="course_name">{{ smis_str_limit($timetableSlot->course_name, 20) }}</div>
-                                                    <div class="teacher_name">{{ $timetableSlot->teacher_name }}</div>
+                                                    <div class="teacher_name">{{ ($timetableSlot->lecturer_id == null ? 'No Lecturer' : $timetableSlot->employee->name_latin) }}</div>
                                                     <div class="room_name">
                                                         {{ $timetableSlot->room != null ?  smis_concat_str($timetableSlot->room->name, $timetableSlot->room->building->code) : 'N/A'}}
                                                     </div>
@@ -124,11 +132,19 @@
                                                     @foreach($timetableSlot['slotsForLanguage'] as $key => $item)
                                                         @if($key % 2 !== 0)
                                                             <div class="lang-info-right">Gr: {{ $item['group'] }}
-                                                                ({{ $item['building'] }}-{{$item['room']}})
+                                                                @if(!is_null($item['room']))
+                                                                    ({{ $item['building'] }}-{{$item['room']}})
+                                                                @else
+                                                                    None
+                                                                @endif
                                                             </div>
                                                         @else
                                                             <div class="lang-info-left">Gr: {{ $item['group'] }}
-                                                                ({{ $item['building'] }}-{{$item['room']}})
+                                                                @if(!is_null($item['room']))
+                                                                    ({{ $item['building'] }}-{{$item['room']}})
+                                                                @else
+                                                                    None
+                                                                @endif
                                                             </div>
                                                         @endif
                                                     @endforeach
@@ -154,7 +170,7 @@
                                                 <td rowspan="{{ ( (new \Carbon\Carbon($timetableSlot->end))->hour - (new \Carbon\Carbon($timetableSlot->start))->hour) }}">
                                                     <div class="course_type">{{ $timetableSlot->type }}</div>
                                                     <div class="course_name">{{ smis_str_limit($timetableSlot->course_name, 20) }}</div>
-                                                    <div class="teacher_name">{{ $timetableSlot->teacher_name }}</div>
+                                                    <div class="teacher_name">{{ $timetableSlot->employee->name_latin }}</div>
                                                     <div class="room_name">
                                                         {{ $timetableSlot->room != null ?  smis_concat_str($timetableSlot->room->name, $timetableSlot->room->building->code) : 'N/A'}}
                                                     </div>
@@ -193,11 +209,19 @@
                                                     @foreach($timetableSlot['slotsForLanguage'] as $key => $item)
                                                         @if($key % 2 !== 0)
                                                             <div class="lang-info-right">Gr: {{ $item['group'] }}
-                                                                ({{ $item['building'] }}-{{$item['room']}})
+                                                                @if(!is_null($item['room']))
+                                                                    ({{ $item['building'] }}-{{$item['room']}})
+                                                                @else
+                                                                    None
+                                                                @endif
                                                             </div>
                                                         @else
                                                             <div class="lang-info-left">Gr: {{ $item['group'] }}
-                                                                ({{ $item['building'] }}-{{$item['room']}})
+                                                                @if(!is_null($item['room']))
+                                                                    ({{ $item['building'] }}-{{$item['room']}})
+                                                                @else
+                                                                    None
+                                                                @endif
                                                             </div>
                                                         @endif
                                                     @endforeach
@@ -220,7 +244,7 @@
                                                 <td rowspan="{{ ($end-$start) }}">
                                                     <div class="course_type">{{ $timetableSlot->type }}</div>
                                                     <div class="course_name">{{ smis_str_limit($timetableSlot->course_name, 20) }}</div>
-                                                    <div class="teacher_name">{{ $timetableSlot->teacher_name }}</div>
+                                                    <div class="teacher_name">{{ ($timetableSlot->lecturer_id != null ? $timetableSlot->employee->name_latin: 'No Lecturer') }}</div>
                                                     <div class="room_name">
                                                         {{ $timetableSlot->room != null ? smis_concat_str($timetableSlot->room->name, $timetableSlot->room->building->code) : 'N/A' }}
                                                     </div>
@@ -257,11 +281,19 @@
                                                     @foreach($timetableSlot['slotsForLanguage'] as $key => $item)
                                                         @if($key % 2 !== 0)
                                                             <div class="lang-info-right">Gr: {{ $item['group'] }}
-                                                                ({{ $item['building'] }}-{{$item['room']}})
+                                                                @if(!is_null($item['room']))
+                                                                    ({{ $item['building'] }}-{{$item['room']}})
+                                                                @else
+                                                                    None
+                                                                @endif
                                                             </div>
                                                         @else
                                                             <div class="lang-info-left">Gr: {{ $item['group'] }}
-                                                                ({{ $item['building'] }}-{{$item['room']}})
+                                                                @if(!is_null($item['room']))
+                                                                    ({{ $item['building'] }}-{{$item['room']}})
+                                                                @else
+                                                                    None
+                                                                @endif
                                                             </div>
                                                         @endif
                                                     @endforeach
@@ -283,7 +315,7 @@
                                                 <td rowspan="{{ ($end-$start) }}">
                                                     <div class="course_type">{{ $timetableSlot->type }}</div>
                                                     <div class="course_name">{{ smis_str_limit($timetableSlot->course_name, 20) }}</div>
-                                                    <div class="teacher_name">{{ $timetableSlot->teacher_name }}</div>
+                                                    <div class="teacher_name">{{ $timetableSlot->employee->name_latin }}</div>
                                                     <div class="room_name">
                                                         {{ $timetableSlot->room != null ? smis_concat_str($timetableSlot->room->name, $timetableSlot->room->building->code) : 'N/A'}}
                                                     </div>
@@ -345,7 +377,7 @@
                                                 <td rowspan="{{ ($end-$start) }}">
                                                     <div class="course_type">{{ $timetableSlot->type }}</div>
                                                     <div class="course_name">{{ smis_str_limit($timetableSlot->course_name, 20) }}</div>
-                                                    <div class="teacher_name">{{ $timetableSlot->teacher_name }}</div>
+                                                    <div class="teacher_name">{{ $timetableSlot->employee->name_latin }}</div>
                                                     <div class="room_name">
                                                         {{ $timetableSlot->room != null ? smis_concat_str($timetableSlot->room->name, $timetableSlot->room->building->code) : 'N/A'}}
                                                     </div>
@@ -384,11 +416,19 @@
                                                     @foreach($timetableSlot['slotsForLanguage'] as $key => $item)
                                                         @if($key % 2 !== 0)
                                                             <div class="lang-info-right">Gr: {{ $item['group'] }}
-                                                                ({{ $item['building'] }}-{{$item['room']}})
+                                                                @if(!is_null($item['room']))
+                                                                    ({{ $item['building'] }}-{{$item['room']}})
+                                                                @else
+                                                                    None
+                                                                @endif
                                                             </div>
                                                         @else
                                                             <div class="lang-info-left">Gr: {{ $item['group'] }}
-                                                                ({{ $item['building'] }}-{{$item['room']}})
+                                                                @if(!is_null($item['room']))
+                                                                    ({{ $item['building'] }}-{{$item['room']}})
+                                                                @else
+                                                                    None
+                                                                @endif
                                                             </div>
                                                         @endif
                                                     @endforeach
@@ -412,7 +452,7 @@
                                                 <td rowspan="{{ ($end-$start) }}">
                                                     <div class="course_type">{{ $timetableSlot->type }}</div>
                                                     <div class="course_name">{{ smis_str_limit($timetableSlot->course_name, 20) }}</div>
-                                                    <div class="teacher_name">{{ $timetableSlot->teacher_name }}</div>
+                                                    <div class="teacher_name">{{ $timetableSlot->employee->name_latin }}</div>
                                                     <div class="room_name">
                                                         {{ $timetableSlot->room != null ? smis_concat_str($timetableSlot->room->name, $timetableSlot->room->building->code) : 'N/A'}}
                                                     </div>
@@ -451,11 +491,19 @@
                                                     @foreach($timetableSlot['slotsForLanguage'] as $key => $item)
                                                         @if($key % 2 !== 0)
                                                             <div class="lang-info-right">Gr: {{ $item['group'] }}
-                                                                ({{ $item['building'] }}-{{$item['room']}})
+                                                                @if(!is_null($item['room']))
+                                                                    ({{ $item['building'] }}-{{$item['room']}})
+                                                                @else
+                                                                    None
+                                                                @endif
                                                             </div>
                                                         @else
                                                             <div class="lang-info-left">Gr: {{ $item['group'] }}
-                                                                ({{ $item['building'] }}-{{$item['room']}})
+                                                                @if(!is_null($item['room']))
+                                                                    ({{ $item['building'] }}-{{$item['room']}})
+                                                                @else
+                                                                    None
+                                                                @endif
                                                             </div>
                                                         @endif
                                                     @endforeach
@@ -480,7 +528,7 @@
                                                 <td rowspan="{{ ($end-$start) }}">
                                                     <div class="course_type">{{ $timetableSlot->type }}</div>
                                                     <div class="course_name">{{ smis_str_limit($timetableSlot->course_name, 20) }}</div>
-                                                    <div class="teacher_name">{{ $timetableSlot->teacher_name }}</div>
+                                                    <div class="teacher_name">{{ $timetableSlot->employee->name_latin }}</div>
                                                     <div class="room_name">
                                                         {{ $timetableSlot->room != null ? smis_concat_str($timetableSlot->room->name, $timetableSlot->room->building->code) : 'N/A'}}
                                                     </div>
@@ -517,11 +565,19 @@
                                                     @foreach($timetableSlot['slotsForLanguage'] as $key => $item)
                                                         @if($key % 2 !== 0)
                                                             <div class="lang-info-right">Gr: {{ $item['group'] }}
-                                                                ({{ $item['building'] }}-{{$item['room']}})
+                                                                @if(!is_null($item['room']))
+                                                                    ({{ $item['building'] }}-{{$item['room']}})
+                                                                @else
+                                                                    None
+                                                                @endif
                                                             </div>
                                                         @else
                                                             <div class="lang-info-left">Gr: {{ $item['group'] }}
-                                                                ({{ $item['building'] }}-{{$item['room']}})
+                                                                @if(!is_null($item['room']))
+                                                                    ({{ $item['building'] }}-{{$item['room']}})
+                                                                @else
+                                                                    None
+                                                                @endif
                                                             </div>
                                                         @endif
                                                     @endforeach
@@ -544,7 +600,7 @@
                                                 <td rowspan="{{ ($end-$start) }}">
                                                     <div class="course_type">{{ $timetableSlot->type }}</div>
                                                     <div class="course_name">{{ smis_str_limit($timetableSlot->course_name, 20) }}</div>
-                                                    <div class="teacher_name">{{ $timetableSlot->teacher_name }}</div>
+                                                    <div class="teacher_name">{{ $timetableSlot->employee->name_latin }}</div>
                                                     <div class="room_name">
                                                         {{ $timetableSlot->room != null ? smis_concat_str($timetableSlot->room->name, $timetableSlot->room->building->code) : 'N/A'}}
                                                     </div>
@@ -577,11 +633,19 @@
                                                         @foreach($timetableSlot['slotsForLanguage'] as $key => $item)
                                                             @if($key % 2 !== 0)
                                                                 <div class="lang-info-right">Gr: {{ $item['group'] }}
-                                                                    ({{ $item['building'] }}-{{$item['room']}})
+                                                                    @if(!is_null($item['room']))
+                                                                        ({{ $item['building'] }}-{{$item['room']}})
+                                                                    @else
+                                                                        None
+                                                                    @endif
                                                                 </div>
                                                             @else
                                                                 <div class="lang-info-left">Gr: {{ $item['group'] }}
-                                                                    ({{ $item['building'] }}-{{$item['room']}})
+                                                                    @if(!is_null($item['room']))
+                                                                        ({{ $item['building'] }}-{{$item['room']}})
+                                                                    @else
+                                                                        None
+                                                                    @endif
                                                                 </div>
                                                             @endif
                                                             <div class="clearfix"></div>
@@ -600,7 +664,7 @@
                                                 <td rowspan="{{ ( (new \Carbon\Carbon($timetableSlot->end))->hour - (new \Carbon\Carbon($timetableSlot->start))->hour) }}">
                                                     <div class="course_type">{{ $timetableSlot->type }}</div>
                                                     <div class="course_name">{{ smis_str_limit($timetableSlot->course_name, 20) }}</div>
-                                                    <div class="teacher_name">{{ $timetableSlot->teacher_name }}</div>
+                                                    <div class="teacher_name">{{ $timetableSlot->employee->name_latin }}</div>
                                                     <div class="room_name">
                                                         {{ $timetableSlot->room != null ? smis_concat_str($timetableSlot->room->name, $timetableSlot->room->building->code) : 'N/A'}}
                                                     </div>
@@ -637,11 +701,19 @@
                                                     @foreach($timetableSlot['slotsForLanguage'] as $key => $item)
                                                         @if($key % 2 !== 0)
                                                             <div class="lang-info-right">Gr: {{ $item['group'] }}
-                                                                ({{ $item['building'] }}-{{$item['room']}})
+                                                                @if(!is_null($item['room']))
+                                                                    ({{ $item['building'] }}-{{$item['room']}})
+                                                                @else
+                                                                    None
+                                                                @endif
                                                             </div>
                                                         @else
                                                             <div class="lang-info-left">Gr: {{ $item['group'] }}
-                                                                ({{ $item['building'] }}-{{$item['room']}})
+                                                                @if(!is_null($item['room']))
+                                                                    ({{ $item['building'] }}-{{$item['room']}})
+                                                                @else
+                                                                    None
+                                                                @endif
                                                             </div>
                                                         @endif
                                                     @endforeach
@@ -666,7 +738,7 @@
                                                 <td rowspan="{{ ($end-$start) }}">
                                                     <div class="course_type">{{ $timetableSlot->type }}</div>
                                                     <div class="course_name">{{ smis_str_limit($timetableSlot->course_name, 20) }}</div>
-                                                    <div class="teacher_name">{{ $timetableSlot->teacher_name }}</div>
+                                                    <div class="teacher_name">{{ $timetableSlot->employee->name_latin }}</div>
                                                     <div class="room_name">
                                                         {{ $timetableSlot->room != null ? smis_concat_str($timetableSlot->room->name, $timetableSlot->room->building->code) : 'N/A'}}
                                                     </div>
@@ -716,11 +788,19 @@
                                                     @foreach($timetableSlot['slotsForLanguage'] as $key => $item)
                                                         @if($key % 2 !== 0)
                                                             <div class="lang-info-right">Gr: {{ $item['group'] }}
-                                                                ({{ $item['building'] }}-{{$item['room']}})
+                                                                @if(!is_null($item['room']))
+                                                                    ({{ $item['building'] }}-{{$item['room']}})
+                                                                @else
+                                                                    None
+                                                                @endif
                                                             </div>
                                                         @else
                                                             <div class="lang-info-left">Gr: {{ $item['group'] }}
-                                                                ({{ $item['building'] }}-{{$item['room']}})
+                                                                @if(!is_null($item['room']))
+                                                                    ({{ $item['building'] }}-{{$item['room']}})
+                                                                @else
+                                                                    None
+                                                                @endif
                                                             </div>
                                                         @endif
                                                         <div class="clearfix"></div>
@@ -744,7 +824,7 @@
 
                                                 <div class="course_type">{{ $timetableSlot->type }}</div>
                                                 <div class="course_name">{{ smis_str_limit($timetableSlot->course_name, 20) }}</div>
-                                                <div class="teacher_name">{{ $timetableSlot->teacher_name }}</div>
+                                                <div class="teacher_name">{{ $timetableSlot->employee->name_latin }}</div>
                                                 <div class="room_name">
                                                     {{ $timetableSlot->room != null ? smis_concat_str($timetableSlot->room->name, $timetableSlot->room->building->code) : 'N/A' }}
                                                 </div>
@@ -785,11 +865,19 @@
                                                 @foreach($timetableSlot['slotsForLanguage'] as $key => $item)
                                                     @if($key % 2 !== 0)
                                                         <div class="lang-info-right">Gr: {{ $item['group'] }}
-                                                            ({{ $item['building'] }}-{{$item['room']}})
+                                                            @if(!is_null($item['room']))
+                                                                ({{ $item['building'] }}-{{$item['room']}})
+                                                            @else
+                                                                None
+                                                            @endif
                                                         </div>
                                                     @else
                                                         <div class="lang-info-left">Gr: {{ $item['group'] }}
-                                                            ({{ $item['building'] }}-{{$item['room']}})
+                                                            @if(!is_null($item['room']))
+                                                                ({{ $item['building'] }}-{{$item['room']}})
+                                                            @else
+                                                                None
+                                                            @endif
                                                         </div>
                                                     @endif
                                                 @endforeach
@@ -814,7 +902,7 @@
                                             <td rowspan="{{ get_rowspan($start, $end) }}">
                                                 <div class="course_type">{{ $timetableSlot->type }}</div>
                                                 <div class="course_name">{{ smis_str_limit($timetableSlot->course_name, 20) }}</div>
-                                                <div class="teacher_name">{{ $timetableSlot->teacher_name }}</div>
+                                                <div class="teacher_name">{{ $timetableSlot->employee->name_latin }}</div>
                                                 <div class="room_name">
                                                     {{ $timetableSlot->room != null ? smis_concat_str($timetableSlot->room->name, $timetableSlot->room->building->code) : 'N/A' }}
                                                 </div>
@@ -858,11 +946,19 @@
                                                 @foreach($timetableSlot['slotsForLanguage'] as $key => $item)
                                                     @if($key % 2 !== 0)
                                                         <div class="lang-info-right">Gr: {{ $item['group'] }}
-                                                            ({{ $item['building'] }}-{{$item['room']}})
+                                                            @if(!is_null($item['room']))
+                                                                ({{ $item['building'] }}-{{$item['room']}})
+                                                            @else
+                                                                None
+                                                            @endif
                                                         </div>
                                                     @else
                                                         <div class="lang-info-left">Gr: {{ $item['group'] }}
-                                                            ({{ $item['building'] }}-{{$item['room']}})
+                                                            @if(!is_null($item['room']))
+                                                                ({{ $item['building'] }}-{{$item['room']}})
+                                                            @else
+                                                                None
+                                                            @endif
                                                         </div>
                                                     @endif
                                                 @endforeach
@@ -896,11 +992,19 @@
                                                 @foreach($timetableSlot['slotsForLanguage'] as $key => $item)
                                                     @if($key % 2 !== 0)
                                                         <div class="lang-info-right">Gr: {{ $item['group'] }}
-                                                            ({{ $item['building'] }}-{{$item['room']}})
+                                                            @if(!is_null($item['room']))
+                                                                ({{ $item['building'] }}-{{$item['room']}})
+                                                            @else
+                                                                None
+                                                            @endif
                                                         </div>
                                                     @else
                                                         <div class="lang-info-left">Gr: {{ $item['group'] }}
-                                                            ({{ $item['building'] }}-{{$item['room']}})
+                                                            @if(!is_null($item['room']))
+                                                                ({{ $item['building'] }}-{{$item['room']}})
+                                                            @else
+                                                                None
+                                                            @endif
                                                         </div>
                                                     @endif
                                                 @endforeach
@@ -929,7 +1033,7 @@
                                             <td rowspan="{{ get_rowspan($start, $end) }}">
                                                 <div class="course_type">{{ $timetableSlot->type }}</div>
                                                 <div class="course_name">{{ smis_str_limit($timetableSlot->course_name, 20) }}</div>
-                                                <div class="teacher_name">{{ $timetableSlot->teacher_name }}</div>
+                                                <div class="teacher_name">{{ $timetableSlot->employee->name_latin }}</div>
                                                 <div class="room_name">
                                                     {{ $timetableSlot->room != null ? smis_concat_str($timetableSlot->room->name, $timetableSlot->room->building->code) : 'N/A' }}
                                                 </div>
@@ -975,11 +1079,19 @@
                                                 @foreach($timetableSlot['slotsForLanguage'] as $key => $item)
                                                     @if($key % 2 !== 0)
                                                         <div class="lang-info-right">Gr: {{ $item['group'] }}
-                                                            ({{ $item['building'] }}-{{$item['room']}})
+                                                            @if(!is_null($item['room']))
+                                                                ({{ $item['building'] }}-{{$item['room']}})
+                                                            @else
+                                                                None
+                                                            @endif
                                                         </div>
                                                     @else
                                                         <div class="lang-info-left">Gr: {{ $item['group'] }}
-                                                            ({{ $item['building'] }}-{{$item['room']}})
+                                                            @if(!is_null($item['room']))
+                                                                ({{ $item['building'] }}-{{$item['room']}})
+                                                            @else
+                                                                None
+                                                            @endif
                                                         </div>
                                                     @endif
                                                 @endforeach
@@ -1010,7 +1122,7 @@
                                             <td rowspan="{{ get_rowspan($start, $end) }}">
                                                 <div class="course_type">{{ $timetableSlot->type }}</div>
                                                 <div class="course_name">{{ smis_str_limit($timetableSlot->course_name, 20) }}</div>
-                                                <div class="teacher_name">{{ $timetableSlot->teacher_name }}</div>
+                                                <div class="teacher_name">{{ $timetableSlot->employee->name_latin }}</div>
                                                 <div class="room_name">
                                                     {{ $timetableSlot->room != null ? smis_concat_str($timetableSlot->room->name, $timetableSlot->room->building->code) : 'N/A' }}
                                                 </div>
@@ -1058,11 +1170,19 @@
                                                 @foreach($timetableSlot['slotsForLanguage'] as $key => $item)
                                                     @if($key % 2 !== 0)
                                                         <div class="lang-info-right">Gr: {{ $item['group'] }}
-                                                            ({{ $item['building'] }}-{{$item['room']}})
+                                                            @if(!is_null($item['room']))
+                                                                ({{ $item['building'] }}-{{$item['room']}})
+                                                            @else
+                                                                None
+                                                            @endif
                                                         </div>
                                                     @else
                                                         <div class="lang-info-left">Gr: {{ $item['group'] }}
-                                                            ({{ $item['building'] }}-{{$item['room']}})
+                                                            @if(!is_null($item['room']))
+                                                                ({{ $item['building'] }}-{{$item['room']}})
+                                                            @else
+                                                                None
+                                                            @endif
                                                         </div>
                                                     @endif
                                                 @endforeach
@@ -1095,7 +1215,7 @@
                                             <td rowspan="{{ get_rowspan($start, $end) }}">
                                                 <div class="course_type">{{ $timetableSlot->type }}</div>
                                                 <div class="course_name">{{ smis_str_limit($timetableSlot->course_name, 20) }}</div>
-                                                <div class="teacher_name">{{ $timetableSlot->teacher_name }}</div>
+                                                <div class="teacher_name">{{ $timetableSlot->employee->name_latin }}</div>
                                                 <div class="room_name">
                                                     {{ $timetableSlot->room != null ? smis_concat_str($timetableSlot->room->name, $timetableSlot->room->building->code) : 'N/A' }}
                                                 </div>
@@ -1145,11 +1265,19 @@
                                                 @foreach($timetableSlot['slotsForLanguage'] as $key => $item)
                                                     @if($key % 2 !== 0)
                                                         <div class="lang-info-right">Gr: {{ $item['group'] }}
-                                                            ({{ $item['building'] }}-{{$item['room']}})
+                                                            @if(!is_null($item['room']))
+                                                                ({{ $item['building'] }}-{{$item['room']}})
+                                                            @else
+                                                                None
+                                                            @endif
                                                         </div>
                                                     @else
                                                         <div class="lang-info-left">Gr: {{ $item['group'] }}
-                                                            ({{ $item['building'] }}-{{$item['room']}})
+                                                            @if(!is_null($item['room']))
+                                                                ({{ $item['building'] }}-{{$item['room']}})
+                                                            @else
+                                                                None
+                                                            @endif
                                                         </div>
                                                     @endif
                                                 @endforeach
@@ -1184,7 +1312,7 @@
                                             <td rowspan="{{ get_rowspan($start, $end) }}">
                                                 <div class="course_type">{{ $timetableSlot->type }}</div>
                                                 <div class="course_name">{{ smis_str_limit($timetableSlot->course_name, 20) }}</div>
-                                                <div class="teacher_name">{{ $timetableSlot->teacher_name }}</div>
+                                                <div class="teacher_name">{{ $timetableSlot->employee->name_latin }}</div>
                                                 <div class="room_name">
                                                     {{ $timetableSlot->room != null ? smis_concat_str($timetableSlot->room->name, $timetableSlot->room->building->code) : 'N/A' }}
                                                 </div>
@@ -1236,11 +1364,19 @@
                                                 @foreach($timetableSlot['slotsForLanguage'] as $key => $item)
                                                     @if($key % 2 !== 0)
                                                         <div class="lang-info-right">Gr: {{ $item['group'] }}
-                                                            ({{ $item['building'] }}-{{$item['room']}})
+                                                            @if(!is_null($item['room']))
+                                                                ({{ $item['building'] }}-{{$item['room']}})
+                                                            @else
+                                                                None
+                                                            @endif
                                                         </div>
                                                     @else
                                                         <div class="lang-info-left">Gr: {{ $item['group'] }}
-                                                            ({{ $item['building'] }}-{{$item['room']}})
+                                                            @if(!is_null($item['room']))
+                                                                ({{ $item['building'] }}-{{$item['room']}})
+                                                            @else
+                                                                None
+                                                            @endif
                                                         </div>
                                                     @endif
                                                 @endforeach
@@ -1277,7 +1413,7 @@
                                             <td rowspan="{{ get_rowspan($start, $end) }}">
                                                 <div class="course_type">{{ $timetableSlot->type }}</div>
                                                 <div class="course_name">{{ smis_str_limit($timetableSlot->course_name, 20) }}</div>
-                                                <div class="teacher_name">{{ $timetableSlot->teacher_name }}</div>
+                                                <div class="teacher_name">{{ $timetableSlot->employee->name_latin }}</div>
                                                 <div class="room_name">
                                                     {{ $timetableSlot->room != null ? smis_concat_str($timetableSlot->room->name, $timetableSlot->room->building->code) : 'N/A' }}
                                                 </div>
@@ -1331,11 +1467,19 @@
                                                 @foreach($timetableSlot['slotsForLanguage'] as $key => $item)
                                                     @if($key % 2 !== 0)
                                                         <div class="lang-info-right">Gr: {{ $item['group'] }}
-                                                            ({{ $item['building'] }}-{{$item['room']}})
+                                                            @if(!is_null($item['room']))
+                                                                ({{ $item['building'] }}-{{$item['room']}})
+                                                            @else
+                                                                None
+                                                            @endif
                                                         </div>
                                                     @else
                                                         <div class="lang-info-left">Gr: {{ $item['group'] }}
-                                                            ({{ $item['building'] }}-{{$item['room']}})
+                                                            @if(!is_null($item['room']))
+                                                                ({{ $item['building'] }}-{{$item['room']}})
+                                                            @else
+                                                                None
+                                                            @endif
                                                         </div>
                                                     @endif
                                                 @endforeach
@@ -1374,7 +1518,7 @@
                                             <td rowspan="{{ get_rowspan($start, $end) }}">
                                                 <div class="course_type">{{ $timetableSlot->type }}</div>
                                                 <div class="course_name">{{ smis_str_limit($timetableSlot->course_name, 20) }}</div>
-                                                <div class="teacher_name">{{ $timetableSlot->teacher_name }}</div>
+                                                <div class="teacher_name">{{ $timetableSlot->employee->name_latin }}</div>
                                                 <div class="room_name">
                                                     {{ $timetableSlot->room != null ? smis_concat_str($timetableSlot->room->name, $timetableSlot->room->building->code) : 'N/A' }}
                                                 </div>
@@ -1414,11 +1558,19 @@
                                                     @foreach($timetableSlot['slotsForLanguage'] as $key => $item)
                                                         @if($key % 2 !== 0)
                                                             <div class="lang-info-right">Gr: {{ $item['group'] }}
-                                                                ({{ $item['building'] }}-{{$item['room']}})
+                                                                @if(!is_null($item['room']))
+                                                                    ({{ $item['building'] }}-{{$item['room']}})
+                                                                @else
+                                                                    None
+                                                                @endif
                                                             </div>
                                                         @else
                                                             <div class="lang-info-left">Gr: {{ $item['group'] }}
-                                                                ({{ $item['building'] }}-{{$item['room']}})
+                                                                @if(!is_null($item['room']))
+                                                                    ({{ $item['building'] }}-{{$item['room']}})
+                                                                @else
+                                                                    None
+                                                                @endif
                                                             </div>
                                                         @endif
                                                         <div class="clearfix"></div>
@@ -1462,11 +1614,19 @@
                                                 @foreach($timetableSlot['slotsForLanguage'] as $key => $item)
                                                     @if($key % 2 !== 0)
                                                         <div class="lang-info-right">Gr: {{ $item['group'] }}
-                                                            ({{ $item['building'] }}-{{$item['room']}})
+                                                            @if(!is_null($item['room']))
+                                                                ({{ $item['building'] }}-{{$item['room']}})
+                                                            @else
+                                                                None
+                                                            @endif
                                                         </div>
                                                     @else
                                                         <div class="lang-info-left">Gr: {{ $item['group'] }}
-                                                            ({{ $item['building'] }}-{{$item['room']}})
+                                                            @if(!is_null($item['room']))
+                                                                ({{ $item['building'] }}-{{$item['room']}})
+                                                            @else
+                                                                None
+                                                            @endif
                                                         </div>
                                                     @endif
                                                 @endforeach
@@ -1487,7 +1647,7 @@
                                             <td rowspan="{{ get_rowspan($start, $end) }}">
                                                 <div class="course_type">{{ $timetableSlot->type }}</div>
                                                 <div class="course_name">{{ smis_str_limit($timetableSlot->course_name, 20) }}</div>
-                                                <div class="teacher_name">{{ $timetableSlot->teacher_name }}</div>
+                                                <div class="teacher_name">{{ $timetableSlot->employee->name_latin }}</div>
                                                 <div class="room_name">
                                                     {{ $timetableSlot->room != null ? smis_concat_str($timetableSlot->room->name, $timetableSlot->room->building->code) : 'N/A' }}
                                                 </div>
@@ -1527,11 +1687,19 @@
                                                 @foreach($timetableSlot['slotsForLanguage'] as $key => $item)
                                                     @if($key % 2 !== 0)
                                                         <div class="lang-info-right">Gr: {{ $item['group'] }}
-                                                            ({{ $item['building'] }}-{{$item['room']}})
+                                                            @if(!is_null($item['room']))
+                                                                ({{ $item['building'] }}-{{$item['room']}})
+                                                            @else
+                                                                None
+                                                            @endif
                                                         </div>
                                                     @else
                                                         <div class="lang-info-left">Gr: {{ $item['group'] }}
-                                                            ({{ $item['building'] }}-{{$item['room']}})
+                                                            @if(!is_null($item['room']))
+                                                                ({{ $item['building'] }}-{{$item['room']}})
+                                                            @else
+                                                                None
+                                                            @endif
                                                         </div>
                                                     @endif
                                                 @endforeach
@@ -1556,7 +1724,7 @@
                                             <td rowspan="{{ get_rowspan($start, $end) }}">
                                                 <div class="course_type">{{ $timetableSlot->type }}</div>
                                                 <div class="course_name">{{ smis_str_limit($timetableSlot->course_name, 20) }}</div>
-                                                <div class="teacher_name">{{ $timetableSlot->teacher_name }}</div>
+                                                <div class="teacher_name">{{ $timetableSlot->employee->name_latin }}</div>
                                                 <div class="room_name">
                                                     {{ $timetableSlot->room != null ? smis_concat_str($timetableSlot->room->name, $timetableSlot->room->building->code) : 'N/A' }}
                                                 </div>
@@ -1601,11 +1769,19 @@
                                                 @foreach($timetableSlot['slotsForLanguage'] as $key => $item)
                                                     @if($key % 2 !== 0)
                                                         <div class="lang-info-right">Gr: {{ $item['group'] }}
-                                                            ({{ $item['building'] }}-{{$item['room']}})
+                                                            @if(!is_null($item['room']))
+                                                                ({{ $item['building'] }}-{{$item['room']}})
+                                                            @else
+                                                                None
+                                                            @endif
                                                         </div>
                                                     @else
                                                         <div class="lang-info-left">Gr: {{ $item['group'] }}
-                                                            ({{ $item['building'] }}-{{$item['room']}})
+                                                            @if(!is_null($item['room']))
+                                                                ({{ $item['building'] }}-{{$item['room']}})
+                                                            @else
+                                                                None
+                                                            @endif
                                                         </div>
                                                     @endif
                                                 @endforeach
@@ -1634,7 +1810,7 @@
                                             <td rowspan="{{ get_rowspan($start, $end) }}">
                                                 <div class="course_type">{{ $timetableSlot->type }}</div>
                                                 <div class="course_name">{{ smis_str_limit($timetableSlot->course_name, 20) }}</div>
-                                                <div class="teacher_name">{{ $timetableSlot->teacher_name }}</div>
+                                                <div class="teacher_name">{{ $timetableSlot->employee->name_latin }}</div>
                                                 <div class="room_name">
                                                     {{ $timetableSlot->room != null ? smis_concat_str($timetableSlot->room->name, $timetableSlot->room->building->code) : 'N/A' }}
                                                 </div>
@@ -1681,11 +1857,19 @@
                                                 @foreach($timetableSlot['slotsForLanguage'] as $key => $item)
                                                     @if($key % 2 !== 0)
                                                         <div class="lang-info-right">Gr: {{ $item['group'] }}
-                                                            ({{ $item['building'] }}-{{$item['room']}})
+                                                            @if(!is_null($item['room']))
+                                                                ({{ $item['building'] }}-{{$item['room']}})
+                                                            @else
+                                                                None
+                                                            @endif
                                                         </div>
                                                     @else
                                                         <div class="lang-info-left">Gr: {{ $item['group'] }}
-                                                            ({{ $item['building'] }}-{{$item['room']}})
+                                                            @if(!is_null($item['room']))
+                                                                ({{ $item['building'] }}-{{$item['room']}})
+                                                            @else
+                                                                None
+                                                            @endif
                                                         </div>
                                                     @endif
                                                 @endforeach
@@ -1716,7 +1900,7 @@
                                             <td rowspan="{{ get_rowspan($start, $end) }}">
                                                 <div class="course_type">{{ $timetableSlot->type }}</div>
                                                 <div class="course_name">{{ smis_str_limit($timetableSlot->course_name, 20) }}</div>
-                                                <div class="teacher_name">{{ $timetableSlot->teacher_name }}</div>
+                                                <div class="teacher_name">{{ $timetableSlot->employee->name_latin }}</div>
                                                 <div class="room_name">
                                                     {{ $timetableSlot->room != null ? smis_concat_str($timetableSlot->room->name, $timetableSlot->room->building->code) : 'N/A' }}
                                                 </div>
@@ -1765,11 +1949,19 @@
                                                 @foreach($timetableSlot['slotsForLanguage'] as $key => $item)
                                                     @if($key % 2 !== 0)
                                                         <div class="lang-info-right">Gr: {{ $item['group'] }}
-                                                            ({{ $item['building'] }}-{{$item['room']}})
+                                                            @if(!is_null($item['room']))
+                                                                ({{ $item['building'] }}-{{$item['room']}})
+                                                            @else
+                                                                None
+                                                            @endif
                                                         </div>
                                                     @else
                                                         <div class="lang-info-left">Gr: {{ $item['group'] }}
-                                                            ({{ $item['building'] }}-{{$item['room']}})
+                                                            @if(!is_null($item['room']))
+                                                                ({{ $item['building'] }}-{{$item['room']}})
+                                                            @else
+                                                                None
+                                                            @endif
                                                         </div>
                                                     @endif
                                                 @endforeach
@@ -1802,7 +1994,7 @@
                                             <td rowspan="{{ get_rowspan($start, $end) }}">
                                                 <div class="course_type">{{ $timetableSlot->type }}</div>
                                                 <div class="course_name">{{ smis_str_limit($timetableSlot->course_name, 20) }}</div>
-                                                <div class="teacher_name">{{ $timetableSlot->teacher_name }}</div>
+                                                <div class="teacher_name">{{ $timetableSlot->employee->name_latin }}</div>
                                                 <div class="room_name">
                                                     {{ $timetableSlot->room != null ? smis_concat_str($timetableSlot->room->name, $timetableSlot->room->building->code) : 'N/A' }}
                                                 </div>
@@ -1853,11 +2045,19 @@
                                                 @foreach($timetableSlot['slotsForLanguage'] as $key => $item)
                                                     @if($key % 2 !== 0)
                                                         <div class="lang-info-right">Gr: {{ $item['group'] }}
-                                                            ({{ $item['building'] }}-{{$item['room']}})
+                                                            @if(!is_null($item['room']))
+                                                                ({{ $item['building'] }}-{{$item['room']}})
+                                                            @else
+                                                                None
+                                                            @endif
                                                         </div>
                                                     @else
                                                         <div class="lang-info-left">Gr: {{ $item['group'] }}
-                                                            ({{ $item['building'] }}-{{$item['room']}})
+                                                            @if(!is_null($item['room']))
+                                                                ({{ $item['building'] }}-{{$item['room']}})
+                                                            @else
+                                                                None
+                                                            @endif
                                                         </div>
                                                     @endif
                                                 @endforeach
@@ -1892,7 +2092,7 @@
                                             <td rowspan="{{ get_rowspan($start, $end) }}">
                                                 <div class="course_type">{{ $timetableSlot->type }}</div>
                                                 <div class="course_name">{{ smis_str_limit($timetableSlot->course_name, 20) }}</div>
-                                                <div class="teacher_name">{{ $timetableSlot->teacher_name }}</div>
+                                                <div class="teacher_name">{{ $timetableSlot->employee->name_latin }}</div>
                                                 <div class="room_name">
                                                     {{ $timetableSlot->room != null ? smis_concat_str($timetableSlot->room->name, $timetableSlot->room->building->code) : 'N/A' }}
                                                 </div>
@@ -1946,11 +2146,19 @@
                                                 @foreach($timetableSlot['slotsForLanguage'] as $key => $item)
                                                     @if($key % 2 !== 0)
                                                         <div class="lang-info-right">Gr: {{ $item['group'] }}
-                                                            ({{ $item['building'] }}-{{$item['room']}})
+                                                            @if(!is_null($item['room']))
+                                                                ({{ $item['building'] }}-{{$item['room']}})
+                                                            @else
+                                                                None
+                                                            @endif
                                                         </div>
                                                     @else
                                                         <div class="lang-info-left">Gr: {{ $item['group'] }}
-                                                            ({{ $item['building'] }}-{{$item['room']}})
+                                                            @if(!is_null($item['room']))
+                                                                ({{ $item['building'] }}-{{$item['room']}})
+                                                            @else
+                                                                None
+                                                            @endif
                                                         </div>
                                                     @endif
                                                 @endforeach
@@ -1987,7 +2195,7 @@
                                             <td rowspan="{{ get_rowspan($start, $end) }}">
                                                 <div class="course_type">{{ $timetableSlot->type }}</div>
                                                 <div class="course_name">{{ smis_str_limit($timetableSlot->course_name, 20) }}</div>
-                                                <div class="teacher_name">{{ $timetableSlot->teacher_name }}</div>
+                                                <div class="teacher_name">{{ $timetableSlot->employee->name_latin }}</div>
                                                 <div class="room_name">
                                                     {{ $timetableSlot->room != null ? smis_concat_str($timetableSlot->room->name, $timetableSlot->room->building->code) : 'N/A' }}
                                                 </div>
@@ -2042,11 +2250,19 @@
                                                 @foreach($timetableSlot['slotsForLanguage'] as $key => $item)
                                                     @if($key % 2 !== 0)
                                                         <div class="lang-info-right">Gr: {{ $item['group'] }}
-                                                            ({{ $item['building'] }}-{{$item['room']}})
+                                                            @if(!is_null($item['room']))
+                                                                ({{ $item['building'] }}-{{$item['room']}})
+                                                            @else
+                                                                None
+                                                            @endif
                                                         </div>
                                                     @else
                                                         <div class="lang-info-left">Gr: {{ $item['group'] }}
-                                                            ({{ $item['building'] }}-{{$item['room']}})
+                                                            @if(!is_null($item['room']))
+                                                                ({{ $item['building'] }}-{{$item['room']}})
+                                                            @else
+                                                                None
+                                                            @endif
                                                         </div>
                                                     @endif
                                                 @endforeach
@@ -2085,7 +2301,7 @@
                                             <td rowspan="{{ get_rowspan($start, $end) }}">
                                                 <div class="course_type">{{ $timetableSlot->type }}</div>
                                                 <div class="course_name">{{ smis_str_limit($timetableSlot->course_name, 20) }}</div>
-                                                <div class="teacher_name">{{ $timetableSlot->teacher_name }}</div>
+                                                <div class="teacher_name">{{ $timetableSlot->employee->name_latin }}</div>
                                                 <div class="room_name">
                                                     {{ $timetableSlot->room != null ? smis_concat_str($timetableSlot->room->name, $timetableSlot->room->building->code) : 'N/A' }}
                                                 </div>

@@ -23,10 +23,12 @@ Route::group(['namespace' => 'Schedule', 'prefix' => 'schedule', 'middleware' =>
     Route::post('timetables/get_conflict_info', 'TimetableController@get_conflict_info')->name('get_conflict_info');
     Route::post('timetables/merge_timetable_slot', 'TimetableController@merge_timetable_slot')->name('merge_timetable_slot');
     Route::post('timetables/remove_timetable_slot', 'TimetableController@remove_timetable_slot')->name('remove_timetable_slot');
-    Route::post('timetables/search_course_session', 'TimetableController@search_course_session')->name('search_course_session');
+    Route::post('timetables/search_course_program', 'TimetableController@search_course_program')->name('search_course_program');
+    Route::post('timetables/assign_lecturer_to_course_program', 'TimetableController@assign_lecturer_to_course_program')->name('assign_lecturer_to_course_program');
+    Route::post('timetables/assign_lecturer_to_timetable_slot', 'TimetableController@assign_lecturer_to_timetable_slot')->name('assign_lecturer_to_timetable_slot');
 
     /** timetable assignment */
-    Route::post('timetables/export_course_session', 'TimetableController@export_course_session')->name('export_course_session');
+    Route::post('timetables/export_course_program', 'TimetableController@export_course_program')->name('export_course_program');
     Route::post('timetables/assign_turn_create_timetable', 'TimetableController@assign_turn_create_timetable')->name('assign_turn_create_timetable');
     Route::post('timetables/get_timetable_assignment', 'TimetableController@get_timetable_assignment')->name('get_timetable_assignment');
     Route::post('timetables/assign/delete', 'TimetableController@assign_delete')->name('assign.delete');
@@ -38,8 +40,9 @@ Route::group(['namespace' => 'Schedule', 'prefix' => 'schedule', 'middleware' =>
     Route::post('timetables/get_options', 'TimetableController@get_options')->name('admin.schedule.timetables.get_options');
     Route::post('timetables/get_groups', 'TimetableController@get_groups')->name('admin.schedule.timetables.get_groups');
     Route::post('timetables/get_grades', 'TimetableController@get_grades')->name('admin.schedule.timetables.get_grades');
-    Route::post('timetables/get_course_sessions', 'TimetableController@get_course_sessions')->name('admin.schedule.timetables.get_course_sessions');
+    Route::post('timetables/get_course_programs', 'TimetableController@get_course_programs')->name('admin.schedule.timetables.get_course_programs');
     Route::post('timetables/get_rooms', 'TimetableController@get_rooms')->name('admin.schedule.timetables.get_rooms');
+    Route::post('timetables/get_employees', 'TimetableController@get_employees')->name('admin.schedule.timetables.get_employees');
     Route::post('timetables/search_rooms', 'TimetableController@search_rooms')->name('admin.schedule.timetables.search_rooms');
     Route::post('timetables/filter-courses-sessions', 'TimetableController@filterCoursesSessions')->name('admin.schedule.timetables.filterCoursesSessions');
 

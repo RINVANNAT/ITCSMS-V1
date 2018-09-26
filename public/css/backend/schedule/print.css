@@ -14,7 +14,9 @@ body {
 }
 
 .each-page {
-    page-break-after: always;
+    page-break-after  : avoid;
+    page-break-before : avoid;
+    page-break-inside : avoid;
 }
 
 table.timetable {
@@ -23,7 +25,7 @@ table.timetable {
 
 table.timetable tr td {
     margin: 0 !important;
-    border: 1px solid #c7c7c7;
+    border: 0.5px solid #c7c7c7;
     border-collapse: collapse;
 }
 
@@ -69,7 +71,7 @@ img.image-logo {
 /** end print timetable **/
 
 .content {
-    background: rgb(204, 204, 204) !important;
+    /*background: rgb(204, 204, 204) !important;*/
 }
 
 page {
@@ -77,13 +79,13 @@ page {
     display: block;
     margin: 0 auto;
     margin-bottom: 0.5cm;
-    box-shadow: 0 0 0.5cm rgba(0, 0, 0, 0.5);
+    /*box-shadow: 0 0 0.5cm rgba(0, 0, 0, 0.5);*/
     padding: 10px;
 }
 
 page[size="A4"] {
-    width: 21cm;
-    height: 29.7cm;
+    width: 100%;
+    height: auto;
 }
 
 page[size="A4"][layout="portrait"] {

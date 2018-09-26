@@ -1,5 +1,6 @@
 <div class="box-body box-smis">
-    <table class="table table-striped table-bordered table-hover dt-responsive nowrap" id="display-assign">
+    <table class="table table-striped table-bordered table-hover dt-responsive nowrap"
+           id="display-assign">
         <thead>
         <tr>
             <th>{{ trans('tables.backend.timetable.assignment_permission.thead.department') }}</th>

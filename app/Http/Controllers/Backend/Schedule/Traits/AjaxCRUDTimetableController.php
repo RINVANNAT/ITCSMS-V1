@@ -9,9 +9,12 @@ use App\Http\Requests\Backend\Schedule\Timetable\RemoveRoomFromTimetableSlot;
 use App\Http\Requests\Backend\Schedule\Timetable\RemoveTimetableSlotRequest;
 use App\Http\Requests\Backend\Schedule\Timetable\ResizeTimetableSlotRequest;
 use App\Models\Configuration;
+use App\Models\Course;
 use App\Models\Department;
 use App\Models\DepartmentOption;
+use App\Models\Employee;
 use App\Models\Grade;
+use App\Models\Group;
 use App\Models\Schedule\Timetable\Slot;
 use App\Models\Schedule\Timetable\Timetable;
 use App\Models\Schedule\Timetable\TimetableSlot;
@@ -169,7 +172,7 @@ trait AjaxCRUDTimetableController
      *
      * @return mixed
      */
-    public function get_course_sessions()
+    public function get_course_programs()
     {
         $academic_year_id = request('academicYear');
         $department_id = request('department');
@@ -179,43 +182,32 @@ trait AjaxCRUDTimetableController
         $option_id = (request('option') == null ? null : (request('option') == '' ? null : request('option')));
         $group_id = request('group') == null ? null : request('group');
 
-        //dd(request()->all());
+        $course_program_ids = Course::where([
+            ['department_id', $department_id],
+            ['degree_id', $degree_id],
+            ['grade_id', $grade_id],
+            ['department_option_id', $option_id],
+            ['semester_id', $semester_id],
+        ])->pluck('id');
 
-        $course_sessions = DB::table('course_annuals')
-            ->where([
-                ['course_annuals.academic_year_id', $academic_year_id],
-                ['course_annuals.department_id', $department_id],
-                ['course_annuals.degree_id', $degree_id],
-                ['course_annuals.grade_id', $grade_id],
-                ['course_annuals.semester_id', $semester_id],
-                ['course_annuals.department_option_id', $option_id],
-            ])
-            ->join('slots', 'slots.course_annual_id', '=', 'course_annuals.id')
+        $slots = Slot::join('courses', 'courses.id', '=', 'slots.course_program_id')
             ->leftJoin('employees', 'employees.id', '=', 'slots.lecturer_id')
-            ->where('slots.group_id', '=', $group_id)
+            ->whereIn('course_program_id', $course_program_ids)
+            ->where('group_id', $group_id)
+            ->where('slots.academic_year_id', $academic_year_id)
             ->where('slots.time_remaining', '>', 0)
             ->select(
                 'slots.id as id',
-                'slots.course_session_id as course_session_id',
+                'slots.course_program_id as course_program_id',
                 'slots.time_tp as tp',
                 'slots.time_td as td',
                 'slots.time_course as tc',
                 'slots.time_remaining as remaining',
-                'course_annuals.name_en as course_name',
+                'courses.name_en as course_name',
+                'slots.lecturer_id as lecturer_id',
                 'employees.name_latin as teacher_name'
             )->get();
-
-        // dd($course_sessions);
-        if (count($course_sessions) > 0) {
-            return Response::json([
-                'status' => true,
-                'course_sessions' => $course_sessions
-            ]);
-        } else {
-            return Response::json([
-                'status' => false
-            ]);
-        }
+        return array('status' => true, 'data' => $slots, 'code' => 200);
     }
 
     /**
@@ -225,39 +217,12 @@ trait AjaxCRUDTimetableController
      */
     public function get_groups()
     {
-        $academic_year_id = request('academicYear');
-        $department_id = request('department');
-        $degree_id = request('degree');
-        $grade_id = request('grade');
-        $option_id = request('option') == null ? null : request('option');
-
-        // get group by search on slot tables.
-        $groups = DB::table('course_annuals')
-            ->where([
-                ['academic_year_id', $academic_year_id],
-                ['department_id', $department_id],
-                ['degree_id', $degree_id],
-                ['grade_id', $grade_id],
-                ['department_option_id', $option_id]
-            ])
-            ->join('slots', 'slots.course_annual_id', '=', 'course_annuals.id')
-            ->join('groups', 'groups.id', '=', 'slots.group_id')
-            ->distinct('groups.code')
-            ->select('groups.code as name', 'groups.id as id')
-            ->get();
-
-        usort($groups, function ($a, $b) {
-            if (is_numeric($a->name)) {
-                return $a->name - $b->name;
-            } else {
-                return strcmp($a->name, $b->name);
-            }
-        });
-
+        $code = 200;
+        $groups = Group::get()->toArray();
+        $groups = $this->timetableSlotRepo->sort_groups($groups);
         if (count($groups) > 0) {
-            return Response::json(['status' => true, 'groups' => $groups]);
+            return array('code' => $code, 'status' => true, 'groups' => $groups);
         }
-        return Response::json(['status' => false]);
     }
 
     /**
@@ -281,8 +246,15 @@ trait AjaxCRUDTimetableController
                             }
                         }
                     })
-                    ->where(DB::raw("CONCAT(buildings.code, '-', rooms.name)"), 'LIKE', "%" . request('query') . "%")
-                    ->select('rooms.id as id', 'rooms.name as name', 'buildings.code as code', 'rooms.nb_desk as desk', 'rooms.nb_chair as chair', 'roomTypes.name as room_type')
+                    ->where(DB::raw("CONCAT(buildings.code, '-', rooms.name)"), 'ilike', "%" . request('query') . "%")
+                    ->select(
+                        'rooms.id as id',
+                        'rooms.name as name',
+                        'buildings.code as code',
+                        'rooms.nb_desk as desk',
+                        'rooms.nb_chair as chair',
+                        'roomTypes.name as room_type'
+                    )
                     ->get();
 
                 if (count($rooms) > 0) {
@@ -305,25 +277,42 @@ trait AjaxCRUDTimetableController
      */
     public function get_rooms()
     {
-        $rooms = DB::table('rooms')
-            ->join('buildings', 'buildings.id', '=', 'rooms.building_id')
-            ->join('roomTypes', 'roomTypes.id', '=', 'rooms.room_type_id')
-            ->where(function ($query) {
-                if (!access()->hasRole('Administrator')) {
-                    if (!access()->hasRole('Administrator')) {
-                        $department_id = ((auth()->user())->employees)[0]->department_id;
-                        $query->where('rooms.department_id', $department_id)
-                            ->orWhere('rooms.is_public_room', true);
-                    }
-                }
-            })
-            ->select('rooms.id as id', 'rooms.name as name', 'buildings.code as code', 'rooms.nb_desk as desk', 'rooms.nb_chair as chair', 'roomTypes.name as room_type')
-            ->get();
-
-        return Response::json([
+        $result = array(
+            'code' => 200,
             'status' => true,
-            'rooms' => $rooms
-        ]);
+            'rooms' => []
+        );
+
+        try {
+            $rooms = DB::table('rooms')
+                ->join('buildings', 'buildings.id', '=', 'rooms.building_id')
+                ->join('roomTypes', 'roomTypes.id', '=', 'rooms.room_type_id')
+                ->where(function ($query) {
+                    if (!access()->hasRole('Administrator')) {
+                        if (!access()->hasRole('Administrator')) {
+                            $department_id = ((auth()->user())->employees)[0]->department_id;
+                            $query->where('rooms.department_id', $department_id)
+                                ->orWhere('rooms.is_public_room', true);
+                        }
+                    }
+                })
+                ->select(
+                    'rooms.id as id',
+                    'rooms.name as name',
+                    'buildings.code as code',
+                    'rooms.nb_desk as desk',
+                    'rooms.nb_chair as chair',
+                    'roomTypes.name as room_type'
+                )
+                ->get();
+            $result['rooms'] = $rooms;
+
+        } catch (\Exception $e) {
+            $result['code'] = $e->getCode();
+            $result['status'] = false;
+        }
+
+        return $result;
     }
 
     /**
@@ -334,39 +323,37 @@ trait AjaxCRUDTimetableController
      */
     public function get_timetable_slots(CreateTimetableRequest $request)
     {
-        //dd($request->all());
-        $timetableSlots = new Collection();
+        $result = array(
+            'code' => 200,
+            'message' => 'Successfully',
+            'timetable' => null,
+            'timetableSlots' => [],
+        );
 
-        // find timetable
-        $timetable = $this->timetableRepo->find_timetable_is_existed($request);
-
-
-        if ($timetable instanceof Timetable) {
-            $this->timetableSlotRepo->get_timetable_slot_with_conflict_info($timetable, $timetableSlots, null);
-            // dd($timetableSlots);
-        }
-
-        // get student annuals.
-        if ($request->department < 12 && ($timetable instanceof Timetable)) {
-            // get student annuals id
-            $student_annual_ids = $this->timetableSlotRepo->find_student_annual_ids($timetable);
-
-            $department_languages = array(12, 13); // (english, french)
-            foreach ($department_languages as $department_language) {
-                // get group language, [@return array(Collection $groups, Array $groups)]
-                $groups = $this->timetableSlotRepo->get_group_student_annual_form_language($department_language, $student_annual_ids, $timetable);
-                // get timetable language,
-                $timetables = $this->timetableSlotRepo->get_timetables_form_language_by_student_annual($groups[0], $timetable, $department_language);
-
-                // get timetable slots [@return array(timetableSlots, groupsRoom)]
-                $timetableSlotsLang = $this->timetableSlotRepo->get_timetable_slot_language_dept($timetables, $groups[0]);
-
-                // set timetable slots language to view.
-                $this->timetableSlotRepo->set_timetable_slot_language($timetableSlots, $timetableSlotsLang[1], $timetableSlotsLang[0]);
+        try {
+            $timetableSlots = new Collection();
+            $timetable = $this->timetableRepo->find_timetable_is_existed($request);
+            if (($request->filter_language == "true") && !($request->department == 12 || $request->department == 13)) {
+                if ($request->department < 12 && ($timetable instanceof Timetable)) {
+                    $this->timetableSlotRepo->get_timetable_slot_language_dept($timetableSlots, $timetable);
+                }
             }
-        }
 
-        return Response::json(['status' => true, 'timetable' => $timetable == null ? null : $timetable, 'timetableSlots' => $timetableSlots]);
+            if ($timetable instanceof Timetable) {
+                $this->timetableSlotRepo->get_timetable_slot_with_conflict_info($timetable, $timetableSlots, null);
+            }
+
+            if (!is_null($timetable)) {
+                $result['timetable'] = $timetable;
+                $result['timetableSlots'] = $timetableSlots;
+            }
+
+        } catch (\Exception $e) {
+            $result['code'] = $e->getCode();
+            $result['message'] = $e->getMessage();
+            $request['status'] = false;
+        }
+        return $result;
     }
 
     /**
@@ -378,18 +365,13 @@ trait AjaxCRUDTimetableController
     public function move_timetable_slot(MoveTimetableSlotRequest $request)
     {
         if (isset($request->timetable_slot_id)) {
-
-            // find timetable slot
             $timetable_slot = TimetableSlot::find($request->timetable_slot_id);
-            // update timetable slot
             if ($timetable_slot instanceof TimetableSlot) {
                 $start = new Carbon($request->start_date);
                 $end = $start->addHours($timetable_slot->durations);
                 $timetable_slot->start = new Carbon($request->start_date);
                 $timetable_slot->end = $end;
                 $timetable_slot->updated_at = Carbon::now();
-
-                // update merge timetable slot
                 if ($timetable_slot->update()) {
                     $this->timetableSlotRepo->update_merge_timetable_slot($timetable_slot);
                 }
@@ -407,44 +389,47 @@ trait AjaxCRUDTimetableController
      */
     public function resize_timetable_slot(ResizeTimetableSlotRequest $request)
     {
-        if (isset($request->timetable_slot_id)) {
-            // find timetable slot
+        $result = array(
+            'code' => 200,
+            'message' => 'The operation was executed successfully',
+            'data' => [],
+            'status' => true,
+            'timetable_slot' => []
+        );
+
+        try {
             $timetable_slot = TimetableSlot::find($request->timetable_slot_id);
             if ($timetable_slot instanceof TimetableSlot) {
-                // get old durations.
                 $old_durations = $timetable_slot->durations;
-                // find new durations.
                 $new_durations = $this->timetableSlotRepo->durations(new Carbon($timetable_slot->start), new Carbon($request->end));
-                // set update new value.
                 $timetable_slot->durations = $new_durations;
                 $timetable_slot->end = new Carbon($request->end);
                 $timetable_slot->updated_at = Carbon::now();
-                // find course session.
+
                 $slot = Slot::find($timetable_slot->slot_id);
 
-                // calculate duration time.
-                if ($new_durations > $old_durations) {
-                    $interval = $new_durations - $old_durations;
-                    $slot->time_remaining = $slot->time_remaining - $interval;
-                } else {
-                    $interval = $old_durations - $new_durations;
-                    $slot->time_remaining = $slot->time_remaining + $interval;
-                }
-
-                // validate duration time.
-                if (($slot->time_remaining <= $slot->time_used) && $slot->time_remaining >= 0) {
-                    $slot->update();
-                    // update timetable slot.
-                    $timetable_slot->update();
-                    // update merge timetable slot.
-                    $this->timetableSlotRepo->update_merge_timetable_slot($timetable_slot);
-                    return Response::json(['status' => true, 'timetable_slot' => $timetable_slot]);
-                } else {
-                    return Response::json(['status' => false, 'message' => 'Time is limited.']);
+                if (($slot->time_remaining >= ($new_durations - $old_durations)) && $slot->time_remaining >= 0) {
+                    if ($new_durations > $old_durations) {
+                        $interval = $new_durations - $old_durations;
+                        $slot->time_remaining = $slot->time_remaining - $interval;
+                    } else {
+                        $interval = $old_durations - $new_durations;
+                        $slot->time_remaining = $slot->time_remaining + $interval;
+                    }
+                    if ($slot->update()) {
+                        $timetable_slot->update();
+                        $this->timetableSlotRepo->update_merge_timetable_slot($timetable_slot);
+                    }
+                    $result['timetable_slot'] = $timetable_slot;
                 }
             }
+        } catch (\Exception $e) {
+            $result['message'] = $e->getMessage();
+            $result['code'] = $e->getCode();
+            $result['status'] = false;
         }
-        return Response::json(['status' => false, 'message' => 'The timetable slot did not create yet.']);
+
+        return $result;
     }
 
     /**
@@ -455,27 +440,32 @@ trait AjaxCRUDTimetableController
      */
     public function insert_room_into_timetable_slot(AddRoomIntoTimetableSlotRequest $request)
     {
-        // find timetable slot by request
-        $timetableSlot = TimetableSlot::find($request->timetable_slot_id);
-        // check validate
-        if ($timetableSlot instanceof TimetableSlot) {
-            // find another timetables with the same group.
-            $timetableSlots = TimetableSlot::where('group_merge_id', $timetableSlot->group_merge_id)->get();
-            if (count($timetableSlots) > 1) {
-                foreach ($timetableSlots as $item) {
-                    // a new room
-                    $item->room_id = request('room_id');
-                    $item->update();
-                }
-            } else {
-                // set room only itself
-                $timetableSlot->room_id = request('room_id');
-                $timetableSlot->update();
+        $result = array(
+            'code' => 200,
+            'status' => true,
+            'data' => []
+        );
 
+        try {
+            $timetableSlot = TimetableSlot::find($request->timetable_slot_id);
+            if ($timetableSlot instanceof TimetableSlot) {
+                $timetableSlots = TimetableSlot::where('group_merge_id', $timetableSlot->group_merge_id)->get();
+                if (count($timetableSlots) > 1) {
+                    foreach ($timetableSlots as $item) {
+                        $item->room_id = request('room_id');
+                        $item->update();
+                    }
+                } else {
+                    $timetableSlot->room_id = request('room_id');
+                    $timetableSlot->update();
+
+                }
             }
-            return Response::json(['status' => true]);
+        } catch (\Exception $e) {
+            $result['code'] = $e->getCode();
+            $result['status'] = false;
         }
-        return Response::json(['status' => false]);
+        return $result;
     }
 
     /**
@@ -486,24 +476,33 @@ trait AjaxCRUDTimetableController
      */
     public function remove_room(RemoveRoomFromTimetableSlot $removeRoomFromTimetableSlot)
     {
-        $timetable_slot_id = $removeRoomFromTimetableSlot->timetable_slot_id;
-        if (isset($timetable_slot_id)) {
-            $timetableSlot = TimetableSlot::find($timetable_slot_id);
-            // find all timetable slots in the same group_merge_id
-            $timetableSlots = TimetableSlot::where('group_merge_id', $timetableSlot->group_merge_id)->get();
-            if (count($timetableSlots) > 1) {
-                // remove room which timetable has the same group_merge_id
-                foreach ($timetableSlots as $timetableSlot) {
+        $result = array(
+            'code' => 200,
+            'status' => true,
+            'data' => []
+        );
+
+        try {
+            $timetable_slot_id = $removeRoomFromTimetableSlot->timetable_slot_id;
+            if (isset($timetable_slot_id)) {
+                $timetableSlot = TimetableSlot::find($timetable_slot_id);
+                $timetableSlots = TimetableSlot::where('group_merge_id', $timetableSlot->group_merge_id)->get();
+                if (count($timetableSlots) > 1) {
+                    foreach ($timetableSlots as $timetableSlot) {
+                        $timetableSlot->room_id = null;
+                        $timetableSlot->update();
+                    }
+                } else {
                     $timetableSlot->room_id = null;
                     $timetableSlot->update();
                 }
-            } else {
-                $timetableSlot->room_id = null;
-                $timetableSlot->update();
             }
-            return Response::json(['status' => true, 'timetable_slot' => $timetableSlot]);
+        } catch (\Exception $e) {
+            $result['code'] = $e->getCode();
+            $result['status'] = false;
         }
-        return Response::json(['status' => false]);
+
+        return $result;
     }
 
     /**
@@ -541,9 +540,16 @@ trait AjaxCRUDTimetableController
                             }
                         }
                     })
-                    ->where(DB::raw("CONCAT(buildings.code, '-', rooms.name)"), 'LIKE', "%" . $query . "%")
+                    ->where(DB::raw("CONCAT(buildings.code, '-', rooms.name)"), 'ilike', "%" . $query . "%")
                     ->whereNotNull('timetable_slots.room_id')
-                    ->select('rooms.id as id', 'rooms.name as name', 'buildings.code as code', 'rooms.nb_desk as desk', 'rooms.nb_chair as chair', 'roomTypes.name as room_type')
+                    ->select(
+                        'rooms.id as id',
+                        'rooms.name as name',
+                        'buildings.code as code',
+                        'rooms.nb_desk as desk',
+                        'rooms.nb_chair as chair',
+                        'roomTypes.name as room_type'
+                    )
                     ->distinct('name', 'code')
                     ->get();
 
@@ -566,7 +572,7 @@ trait AjaxCRUDTimetableController
                             }
                         }
                     })
-                    ->where(DB::raw("CONCAT(buildings.code, '-', rooms.name)"), 'LIKE', "%" . $query . "%")
+                    ->where(DB::raw("CONCAT(buildings.code, '-', rooms.name)"), 'ilike', "%" . $query . "%")
                     ->whereNotNull('timetable_slots.room_id')
                     ->lists('timetable_slots.room_id');
 
@@ -583,21 +589,22 @@ trait AjaxCRUDTimetableController
                         }
                     })
                     ->whereNotIn('rooms.id', $rooms_tmp == [] ? [] : $rooms_tmp)
-                    ->where(DB::raw("CONCAT(buildings.code, '-', rooms.name)"), 'LIKE', "%" . $query . "%")
-                    ->select('rooms.id as id', 'rooms.name as name', 'buildings.code as code', 'rooms.nb_desk as desk', 'rooms.nb_chair as chair', 'roomTypes.name as room_type')
+                    ->where(DB::raw("CONCAT(buildings.code, '-', rooms.name)"), 'ilike', "%" . $query . "%")
+                    ->select(
+                        'rooms.id as id',
+                        'rooms.name as name',
+                        'buildings.code as code',
+                        'rooms.nb_desk as desk',
+                        'rooms.nb_chair as chair',
+                        'roomTypes.name as room_type'
+                    )
                     ->get();
 
-                if (count($rooms_remaining) > 0) {
-                    return Response::json([
-                        'status' => true,
-                        'roomUsed' => $rooms_used,
-                        'roomRemain' => $rooms_remaining
-                    ]);
-                } else {
-                    return Response::json([
-                        'status' => false
-                    ]);
-                }
+                return Response::json([
+                    'status' => true,
+                    'roomUsed' => $rooms_used,
+                    'roomRemain' => $rooms_remaining
+                ]);
             }
         }
     }
@@ -662,24 +669,24 @@ trait AjaxCRUDTimetableController
 
         // sort result can not merge item
         if (count($resultArrayCanNotMergeItem) > 1) {
-            usort($resultArrayCanNotMergeItem, function ($a, $b) {
+            /*usort($resultArrayCanNotMergeItem, function ($a, $b) {
                 if (is_numeric($a->group)) {
                     return $a->group - $b->group;
                 } else {
                     return strcmp($a->group, $b->group);
                 }
-            });
+            });*/
         }
 
         // sort result can merge item
         if (count($resultArrayCanMergeItem) > 1) {
-            usort($resultArrayCanMergeItem, function ($a, $b) {
+            /*usort($resultArrayCanMergeItem, function ($a, $b) {
                 if (is_numeric($a->group)) {
                     return $a->group - $b->group;
                 } else {
                     return strcmp($a->group, $b->group);
                 }
-            });
+            });*/
         }
 
         // put can or can't merge to lecturer collection.
@@ -732,13 +739,91 @@ trait AjaxCRUDTimetableController
      *
      * @return mixed
      */
-    public function export_course_session()
+    public function export_course_program()
     {
         $data = request()->all();
-        if ($this->timetableSlotRepo->export_course_sessions($data) == true) {
-            return Response::json(['status' => true]);
+        $group_id = is_null($data['group_id']) ? null : $data['group_id'];
+        $course_programs = Course::where([
+            ['department_id', $data['department_id']],
+            ['degree_id', $data['degree_id']],
+            ['department_option_id', isset($data['option_id']) ? $data['option_id'] : null],
+            ['grade_id', $data['grade_id']],
+            ['semester_id', $data['semester_id']]
+        ])->get();
+
+        if (count($course_programs) > 0) {
+            foreach ($course_programs as $course_program) {
+                $slots = Slot::where([
+                    ['course_program_id', $course_program->id],
+                    ['academic_year_id', $data['academic_year_id']],
+                    ['semester_id', $data['semester_id']],
+                    ['group_id', $group_id],
+                ])->get();
+                if (count($slots) == 0) {
+                    for ($i = 0; $i < 3; $i++) {
+                        if ($i == 0) {
+                            if ($course_program->time_tp > 0) {
+                                DB::transaction(function () use ($data, $course_program, $group_id) {
+                                    $newSlot = new Slot();
+                                    $newSlot->time_tp = $course_program->time_tp;
+                                    $newSlot->time_td = 0;
+                                    $newSlot->time_course = 0;
+                                    $newSlot->academic_year_id = $data['academic_year_id'];
+                                    $newSlot->course_program_id = $course_program->id;
+                                    $newSlot->lecturer_id = null;
+                                    $newSlot->semester_id = $data['semester_id'];
+                                    $newSlot->time_used = 0;
+                                    $newSlot->group_id = $group_id;
+                                    $newSlot->time_remaining = $course_program->time_tp;
+                                    $newSlot->created_uid = auth()->user()->id;
+                                    $newSlot->write_uid = auth()->user()->id;
+                                    $newSlot->save();
+                                });
+                            }
+                        } else if ($i == 1) {
+                            if ($course_program->time_td > 0) {
+                                DB::transaction(function () use ($data, $course_program, $group_id) {
+                                    $newSlot = new Slot();
+                                    $newSlot->time_tp = 0;
+                                    $newSlot->time_td = $course_program->time_td;
+                                    $newSlot->time_course = 0;
+                                    $newSlot->lecturer_id = null;
+                                    $newSlot->academic_year_id = $data['academic_year_id'];
+                                    $newSlot->course_program_id = $course_program->id;
+                                    $newSlot->semester_id = $data['semester_id'];
+                                    $newSlot->group_id = $group_id;
+                                    $newSlot->time_used = 0;
+                                    $newSlot->time_remaining = $course_program->time_td;
+                                    $newSlot->created_uid = auth()->user()->id;
+                                    $newSlot->write_uid = auth()->user()->id;
+                                    $newSlot->save();
+                                });
+                            }
+                        } else if ($i == 2) {
+                            if ($course_program->time_course > 0) {
+                                DB::transaction(function () use ($data, $course_program, $group_id) {
+                                    $newSlot = new Slot();
+                                    $newSlot->time_tp = 0;
+                                    $newSlot->time_td = 0;
+                                    $newSlot->time_course = $course_program->time_course;
+                                    $newSlot->lecturer_id = null;
+                                    $newSlot->academic_year_id = $data['academic_year_id'];
+                                    $newSlot->course_program_id = $course_program->id;
+                                    $newSlot->semester_id = $data['semester_id'];
+                                    $newSlot->group_id = $group_id;
+                                    $newSlot->time_used = 0;
+                                    $newSlot->time_remaining = $course_program->time_course;
+                                    $newSlot->created_uid = auth()->user()->id;
+                                    $newSlot->write_uid = auth()->user()->id;
+                                    $newSlot->save();
+                                });
+                            }
+                        }
+                    }
+                }
+            }
         }
-        return Response::json(['status' => false]);
+        return array('status' => true, 'message' => 'Operation is successfully.');
     }
 
     /**
@@ -838,6 +923,7 @@ trait AjaxCRUDTimetableController
      * Delete timetable assignment.
      *
      * @return mixed
+     * @throws \Exception
      */
     public function assign_delete()
     {
@@ -919,7 +1005,12 @@ trait AjaxCRUDTimetableController
         return Response::json(['status' => true, 'start' => (new Carbon($configuration->created_at))->toDateString(), 'end' => (new Carbon($configuration->updated_at))->toDateString()]);
     }
 
-    public function search_course_session()
+    /**
+     * Search groups.
+     *
+     * @return array
+     */
+    public function search_course_program()
     {
         $academic_year_id = request('academic');
         $department_id = request('department');
@@ -929,46 +1020,123 @@ trait AjaxCRUDTimetableController
         $option_id = (request('option') == null ? null : (request('option') == '' ? null : request('option')));
         $group_id = request('group') == null ? null : request('group');
 
-        // dd(request()->all());
+        $course_program_ids = Course::where([
+            ['department_id', $department_id],
+            ['degree_id', $degree_id],
+            ['grade_id', $grade_id],
+            ['department_option_id', $option_id],
+            ['semester_id', $semester_id],
+        ])->pluck('id');
 
-        $course_sessions = DB::table('course_annuals')
-            ->where([
-                ['course_annuals.academic_year_id', $academic_year_id],
-                ['course_annuals.department_id', $department_id],
-                ['course_annuals.degree_id', $degree_id],
-                ['course_annuals.grade_id', $grade_id],
-                ['course_annuals.semester_id', $semester_id],
-                ['course_annuals.department_option_id', $option_id],
-            ])
-            ->join('slots', 'slots.course_annual_id', '=', 'course_annuals.id')
+
+        $slots = Slot::join('courses', 'courses.id', '=', 'slots.course_program_id')
             ->leftJoin('employees', 'employees.id', '=', 'slots.lecturer_id')
-            ->where('slots.group_id', '=', $group_id)
+            ->whereIn('course_program_id', $course_program_ids)
+            ->where('group_id', $group_id)
+            ->where('slots.academic_year_id', $academic_year_id)
             ->where('slots.time_remaining', '>', 0)
             ->where(function ($query) {
-                $query->whereRaw('LOWER(course_annuals.name_en) LIKE ?', array('%' . strtolower(request('query')) . '%'))
-                    ->orWhereRaw('LOWER(employees.name_latin) LIKE ?', array('%' . strtolower(request('query')) . '%'));
+                $query->whereRaw('LOWER(courses.name_en) LIKE ?', array('%' . strtolower(request('query')) . '%'))
+                    ->orWhereRaw('LOWER(courses.name_kh) LIKE ?', array('%' . strtolower(request('query')) . '%'))
+                    ->orWhereRaw('LOWER(employees.name_latin) LIKE ?', array('%' . strtolower(request('query')) . '%'))
+                    ->orWhereRaw('LOWER(employees.name_kh) LIKE ?', array('%' . strtolower(request('query')) . '%'));
             })
             ->select(
                 'slots.id as id',
-                'slots.course_session_id as course_session_id',
+                'slots.course_program_id as course_session_id',
                 'slots.time_tp as tp',
                 'slots.time_td as td',
                 'slots.time_course as tc',
                 'slots.time_remaining as remaining',
-                'course_annuals.name_en as course_name',
+                'courses.name_en as course_name',
+                'slots.lecturer_id as lecturer_id',
                 'employees.name_latin as teacher_name'
             )->get();
+        return array('status' => true, 'course_sessions' => $slots, 'code' => 200);
+    }
 
-        // dd($course_sessions);
-        if (count($course_sessions) > 0) {
-            return Response::json([
-                'status' => true,
-                'course_sessions' => $course_sessions
-            ]);
-        } else {
-            return Response::json([
-                'status' => false
-            ]);
+    /**
+     * Get Employees.
+     *
+     * @return array
+     */
+    public function get_employees()
+    {
+        $query = request('query');
+        $employees = Employee::join('genders', 'employees.gender_id', '=', 'genders.id')
+            ->join('departments', 'departments.id', '=', 'employees.department_id')
+            ->where(function ($sql) use ($query) {
+                if (isset($query) && !is_null($query) && $query != '') {
+                    $sql->orWhere('employees.name_kh', 'ilike', '%' . $query . '%')
+                        ->orWhere('employees.name_latin', 'ilike', '%' . $query . '%')
+                        ->orWhere('departments.code', 'ilike', '%' . $query . '%');
+                }
+            })
+            ->select([
+                'employees.id as employee_id',
+                'employees.name_kh as employee_name_kh',
+                'employees.name_latin as employee_name_latin',
+                'employees.id_card as id_card',
+                'genders.code as gender_code',
+                'departments.code as department_code'
+            ])
+            ->orderBy('employee_name_kh', 'asc')
+            ->get();
+        return array('status' => true, 'code' => 200, 'data' => $employees);
+    }
+
+    public function assign_lecturer_to_course_program()
+    {
+        $result = [
+            'code' => 200,
+            'data' => [],
+            'message' => "The operation was executed successfully"
+        ];
+
+        $slot_id = request('slot_id');
+        $lecturer_id = request('lecturer_id');
+        if (isset($slot_id) && !is_null($slot_id)) {
+            try {
+                DB::transaction(function () use ($slot_id, $lecturer_id) {
+                    $slot = Slot::find($slot_id);
+                    $slot->lecturer_id = $lecturer_id;
+                    $slot->write_uid = auth()->user()->id;
+                    $slot->updated_at = Carbon::now();
+                    $slot->update();
+                });
+            } catch (\Exception $e) {
+                $result['code'] = $e->getCode();
+                $result['message'] = $e->getMessage();
+            }
         }
+
+        return $result;
+    }
+
+    public function assign_lecturer_to_timetable_slot()
+    {
+        $result = [
+            'code' => 200,
+            'data' => [],
+            'message' => "The operation was executed successfully"
+        ];
+
+        $timetable_slot_id = request('timetable_slot_id');
+        $lecturer_id = request('lecturer_id');
+        if (isset($timetable_slot_id) && !is_null($timetable_slot_id)) {
+            try {
+                DB::transaction(function () use ($timetable_slot_id, $lecturer_id) {
+                    $timetable_slot = TimetableSlot::find($timetable_slot_id);
+                    $timetable_slot->lecturer_id = $lecturer_id;
+                    $timetable_slot->updated_at = Carbon::now();
+                    $timetable_slot->update();
+                });
+            } catch (\Exception $e) {
+                $result['code'] = $e->getCode();
+                $result['message'] = $e->getMessage();
+            }
+        }
+
+        return $result;
     }
 }

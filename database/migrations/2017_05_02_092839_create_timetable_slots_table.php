@@ -16,13 +16,13 @@ class CreateTimetableSlotsTable extends Migration
             $table->increments('id');
 
             $table->integer('timetable_id')->unsigned();
-            $table->integer('course_session_id')->unsigned();
+            $table->integer('course_program_id')->unsigned();
             $table->integer('slot_id')->unsigned();
+            $table->integer('lecturer_id')->unsigned()->nullable();
             $table->integer('room_id')->nullable();
             $table->integer('group_merge_id')->unsiged();
 
             $table->string('course_name');
-            $table->string('teacher_name');
             $table->string('type');
             $table->double('durations')->unsigned();
 
@@ -36,9 +36,9 @@ class CreateTimetableSlotsTable extends Migration
                 ->on('timetables')
                 ->onDelete('cascade');
 
-            $table->foreign('course_session_id')
+            $table->foreign('course_program_id')
                 ->references('id')
-                ->on('course_sessions')
+                ->on('courses')
                 ->onDelete('cascade');
 
             $table->foreign('room_id')
@@ -46,14 +46,14 @@ class CreateTimetableSlotsTable extends Migration
                 ->on('rooms')
                 ->onDelete('cascade');
 
-            /*$table->foreign('group_merge_id')
-                ->references('id')
-                ->on('merge_timetable_slots')
-                ->onDelete('cascade');*/
-
             $table->foreign('slot_id')
                 ->references('id')
                 ->on('slots')
+                ->onDelete('cascade');
+
+            $table->foreign('lecturer_id')
+                ->references('id')
+                ->on('employees')
                 ->onDelete('cascade');
 
 

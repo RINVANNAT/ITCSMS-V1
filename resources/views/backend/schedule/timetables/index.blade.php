@@ -66,7 +66,7 @@
                 @endauth
 
                 <a href="/admin/schedule/timetables/check-available-room" class="btn btn-warning btn-sm">
-                    <i class="fa fa-plus-circle"></i> Check Available Room
+                    <i class="fa fa-building-o"></i> Check Available Room
                 </a>
 
             </div>
@@ -119,7 +119,7 @@
                     if (response.status === true) {
                         var group_item = '';
                         $.each(response.groups, function (key, val) {
-                            group_item += '<option value="' + val.id + '">' + val.name + '</option>';
+                            group_item += '<option value="' + val.id + '">' + val.code + '</option>';
                         });
 
                         $('select[name="group"]').html(group_item);
@@ -147,7 +147,7 @@
             toggleLoading(true);
             $.ajax({
                 type: 'POST',
-                url: '/admin/schedule/timetables/get_course_sessions',
+                url: '/admin/schedule/timetables/get_course_programs',
                 data: $('#options-filter').serialize(),
                 success: function (response) {
                     if (response.status === true) {
@@ -268,6 +268,7 @@
             $('.smis-close-icon').click(function () {
                 $('.smis-notification').addClass('animated slideOutRight');
             });
+
             get_options($('select[name="department"] :selected').val());
 
             $(document).on('change', 'select[name="semester"]', function () {
@@ -371,7 +372,6 @@
                         row += val.code;
                         row += '</td>';
                         row += '<td>';
-                        //row += //*<span class="start_date"> ' + moment(val.start, 'YYYY-MM-DD').fromNow() + '</span> -*// '<span class="start_date">' + moment(val.end, 'YYYY-MM-DD').fromNow() + '</span>';
                         if (val.description === 'true') {
                             row += '<span class="start_date"> end ' + moment(val.end, 'YYYY-MM-DD').fromNow() + '</span>';
                         } else if (val.description === 'false') {
@@ -391,7 +391,7 @@
                         
                         row += '</td>';
                         row += '<td>';
-                        row += '<button class="btn btn-primary btn-xs" id="btn_assign_update"><i class="fa fa-clock-o"></i> Set Time</button> ';
+                        row += '<button class="btn btn-primary btn-xs" id="btn_assign_update"><i class="fa fa-clock-o"></i> Re-set</button> ';
                         // row += '<button class="btn btn-danger btn-xs" id="btn_assign_delete"><i class="fa fa-trash"></i></button> ';
                         row += '</td>';
                         row += '</tr>';

@@ -165,14 +165,14 @@
                         // check conflict lecturer and render
                         if (typeof event.conflict_lecturer !== 'undefined') {
                             if (event.conflict_lecturer.canMerge.length > 0 || event.conflict_lecturer.canNotMerge.length > 0) {
-                                object += '<p class="text-primary conflict">' + event.teacher_name + '</p> ';
+                                object += '<p class="text-primary conflict">' + (event.employee !== [] ? event.employee.name_latin : "NO LECTURER") + '</p> ';
                             }
                             else {
-                                object += '<p class="text-primary">' + event.teacher_name + '</p> ';
+                                object += '<p class="text-primary">' + (event.employee !== [] ? event.employee.name_latin : "NO LECTURER") + '</p> ';
                             }
                         }
                         else {
-                            object += '<p class="text-primary">' + event.teacher_name + '</p> ';
+                            object += '<p class="text-primary">' + (event.employee !== [] ? event.employee.name_latin : "NO LECTURER") + '</p> ';
                         }
 
 
