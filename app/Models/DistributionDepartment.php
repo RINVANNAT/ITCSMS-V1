@@ -14,7 +14,8 @@ class DistributionDepartment extends Model
         'priority',
         'score',
         'score_1',
-        'score_2'
+        'score_2',
+        'grade_id'
     ];
 
     protected $casts = [

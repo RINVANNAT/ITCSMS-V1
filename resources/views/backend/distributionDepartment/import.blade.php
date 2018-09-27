@@ -15,7 +15,7 @@
 @section('page-header')
     <h1>
         {!! app_name() !!}
-        <small>Import data for Grade {{ $degree == 2 ? 'II' : 'I' }}</small>
+        <small>Import data for Grade {{ $grade_id == 2 ? 'II' : 'I' }}</small>
     </h1>
 @endsection
 
@@ -29,7 +29,7 @@
                 <div class="col-md-12">
                     <form file="true" method="POST" action="{{ route('distribution-department.import') }}" enctype="multipart/form-data">
                         {{ csrf_field() }}
-                        <input type="hidden" value="{{ $degree }}" name="degree_id"/>
+                        <input type="hidden" value="{{ $grade_id }}" name="grade_id"/>
                         <input type="hidden" value="{{ $academic_year_id }}" name="academic_year_id"/>
                         <div class="form-group">
                             <label></label>

@@ -24,9 +24,9 @@ class DistributionDepartmentController extends Controller
         return view('backend.distributionDepartment.index');
     }
 
-    public function getGeneratePage()
+    public function getGeneratePage($grade_id, $academic_year_id)
     {
-        return view('backend.distributionDepartment.generate');
+        return view('backend.distributionDepartment.generate', compact('grade_id', 'academic_year_id'));
     }
 
     public function getDepartment()
@@ -47,11 +47,13 @@ class DistributionDepartmentController extends Controller
     public function getTotalStudentAnnuals(Request $request)
     {
         $this->validate($request, [
-            'academic_year_id' => 'required'
+            'academic_year_id' => 'required',
+            'grade_id' => 'required'
         ]);
         try {
             $studentAnnuals = DistributionDepartment::where([
-                'academic_year_id' => $request->academic_year_id
+                'academic_year_id' => $request->academic_year_id,
+                'grade_id' => $request->grade_id
             ])
                 ->select('student_annual_id')
                 ->distinct('student_annual_id')
@@ -64,50 +66,54 @@ class DistributionDepartmentController extends Controller
 
     public function generate(Request $request)
     {
+        $this->validate($request, [
+            'academic_year_id' => 'required',
+            'grade_id' => 'required'
+        ]);
         try {
-            $distributionDepartments = DistributionDepartment::where('academic_year_id', $request->academic_year_id)
-                ->where(function ($q) {
-                    $q->whereNull('distribution_departments.score_1')
-                        ->orWhereNull('distribution_departments.score_2');
-                })->get();
-
-            if (count($distributionDepartments) > 0) {
-                return redirect()->route('distribution-department.get-fill-score-page')->withFlashDanger('Please fill out missing student score first');
-            }
-
             // calculate final score = (score_1 * 2) + (score_2 * 3)
-            $distributionDepartments = DistributionDepartment::where('academic_year_id', $request->academic_year_id)
-                // ->whereNull('score')
+            $distributionDepartments = DistributionDepartment::where([
+                'academic_year_id' => $request->academic_year_id,
+                'grade_id' => $request->grade_id,
+            ])
                 ->select('student_annual_id', 'score_1', 'score_2')
                 ->distinct('student_annual_id')
                 ->get();
 
             if (count($distributionDepartments) > 0) {
                 foreach ($distributionDepartments as $distributionDepartment) {
-                    $items = DistributionDepartment::where('student_annual_id', $distributionDepartment->student_annual_id)->get();
+                    $items = DistributionDepartment::where([
+                        'student_annual_id' => $distributionDepartment->student_annual_id,
+                        'grade_id' => $request->grade_id
+                    ])->get();
+
                     if (count($items) > 0) {
-                        $score = number_format((float)((((float)$items[0]->socre_1)) + (((float)$items[0]->score_2) * 2)) / 3, 2);
+                        if ($request->grade_id == 1) {
+                            $score = number_format((float)$items[0]->score_1);
+                        } else {
+                            $score = number_format((float)((((float)$items[0]->socre_1)) + (((float)$items[0]->score_2) * 2)) / 3, 2);
+                        }
                         foreach ($items as $item) {
-                            $item->score = number_format((float)$score, 2);
+                            $item->score = $score;
+                            if ($request->grade_id == 1) {
+                                $item->score_2 = 0;
+                            }
                             $item->update();
                         }
                     }
                 }
             }
 
-            // find all distribution department results by academic year id.
-            $distributionDepartmentResults = DistributionDepartmentResult::where([
-                'academic_year_id' => $request->academic_year_id
-            ])->get();
-
-            // delete all distribution department
-            foreach ($distributionDepartmentResults as $departmentResult) {
-                $departmentResult->delete();
-            }
+            // find all distribution department results by academic year id and grade id.
+            DistributionDepartmentResult::where([
+                'academic_year_id' => $request->academic_year_id,
+                'grade_id' => $request->grade_id,
+            ])->delete();
 
             // find student_annual_id in StudentAnnual model with
             $studentAnnualIds = DistributionDepartment::where([
-                'academic_year_id' => $request->academic_year_id
+                'academic_year_id' => $request->academic_year_id,
+                'grade_id' => $request->grade_id
             ])
                 ->select('student_annual_id')
                 ->distinct('student_annual_id')
@@ -116,13 +122,17 @@ class DistributionDepartmentController extends Controller
             if (count($studentAnnualIds) > 0) {
                 // find all student annual from DistributionDepartment
                 $studentAnnualDistributionDepartments = DistributionDepartment::whereIn('student_annual_id', $studentAnnualIds)
+                    ->where([
+                        'academic_year_id' => $request->academic_year_id,
+                        'grade_id' => $request->grade_id
+                    ])
                     ->select('student_annual_id', 'score')
                     ->distinct('student_annual_id')
                     ->orderBy('score', 'desc')
                     ->get();
 
                 // prepare data with department and department option
-                $tmpDepts = $request->except(['_token', 'academic_year_id']);
+                $tmpDepts = $request->except(['_token', 'academic_year_id', 'grade_id']);
                 $departments = [];
                 $totalStudentAnnualFormRequest = 0;
                 foreach ($tmpDepts as $key => $dept) {
@@ -141,7 +151,11 @@ class DistributionDepartmentController extends Controller
                 if ($totalStudentAnnualFormRequest == count($studentAnnualDistributionDepartments)) {
                     foreach ($studentAnnualDistributionDepartments as $annualDistributionDepartment) {
                         // take an student annual
-                        $data = DistributionDepartment::where('student_annual_id', $annualDistributionDepartment->student_annual_id)
+                        $data = DistributionDepartment::where([
+                            'student_annual_id' => $annualDistributionDepartment->student_annual_id,
+                            'academic_year_id' => $request->academic_year_id,
+                            'grade_id' => $request->grade_id
+                        ])
                             ->select('id', 'student_annual_id', 'score', 'department_id', 'priority', 'department_option_id')
                             ->orderBy('priority', 'asc')
                             ->get()->toArray();
@@ -198,7 +212,8 @@ class DistributionDepartmentController extends Controller
                                         'department_id' => $departmentIdSelected,
                                         'department_option_id' => $departmentOptionIdSelected,
                                         'total_score' => $score,
-                                        'priority' => $prioritySelected
+                                        'priority' => $prioritySelected,
+                                        'grade_id' => $request->grade_id
                                     ]);
                                     break;
                                 }
@@ -221,14 +236,16 @@ class DistributionDepartmentController extends Controller
     {
         try {
             $academic_year_id = null;
+            $grade_id = 1;
             if (isset($request->academic_year_id)) {
                 $academic_year_id = $request->academic_year_id;
+                $grade_id = $request->grade_id;
             } else {
                 $tmp = AcademicYear::latest()->first();
                 $academic_year_id = $tmp->id;
             }
             $result = DistributionDepartmentResult::with('department', 'departmentOption', 'studentAnnual')
-                ->where('academic_year_id', $academic_year_id)
+                ->where(['academic_year_id' => $academic_year_id, 'grade_id' => $grade_id])
                 ->select('distribution_department_results.*')
                 ->latest();
             return Datatables::of($result)
@@ -438,45 +455,52 @@ class DistributionDepartmentController extends Controller
     public function getDepartmentChosen(Request $request)
     {
         $this->validate($request, [
-            'academic_year_id' => 'required'
+            'academic_year_id' => 'required',
+            'grade_id' => 'required'
         ]);
         try {
-            $studentAnnualId = DistributionDepartment::where('academic_year_id', $request->academic_year_id)
-                ->first();
+            $studentAnnualId = DistributionDepartment::where([
+                'academic_year_id' => $request->academic_year_id,
+                'grade_id' => $request->grade_id
+            ])->first();
+
             if ($studentAnnualId instanceof DistributionDepartment) {
                 $studentAnnualId = $studentAnnualId->student_annual_id;
-                $distributionDepartment = DistributionDepartment::where('student_annual_id', $studentAnnualId)
-                    ->get();
+                $distributionDepartment = DistributionDepartment::where([
+                    'student_annual_id' => $studentAnnualId,
+                    'grade_id' => $request->grade_id
+                ])->get();
                 $depts = [];
 
                 foreach ($distributionDepartment as $item) {
                     $deptCode = Department::find($item->department_id);
-                    $label = (string)$deptCode->code;
-                    $id = (string)$deptCode->id;
-                    if (!is_null($item->department_option_id)) {
-                        $deptOption = DepartmentOption::find($item->department_option_id);
-                        $label .= (string)$deptOption->code;
-                        $id .= '_' . (string)$deptOption->id;
-                    }
-                    $option['label'] = $label;
-                    $option['id'] = $id;
-
-                    if (count($depts) == 0) {
-                        array_push($depts, $option);
-                    } else {
-                        $found = true;
-                        foreach ($depts as $dept) {
-                            if ($option['label'] == $dept['label']) {
-                                $found = false;
-                                break;
-                            }
+                    if ($deptCode instanceof Department) {
+                        $label = (string)$deptCode->code;
+                        $id = (string)$deptCode->id;
+                        if (!is_null($item->department_option_id)) {
+                            $deptOption = DepartmentOption::find($item->department_option_id);
+                            $label .= (string)$deptOption->code;
+                            $id .= '_' . (string)$deptOption->id;
                         }
-                        if ($found) {
+                        $option['label'] = $label;
+                        $option['id'] = $id;
+
+                        if (count($depts) == 0) {
                             array_push($depts, $option);
+                        } else {
+                            $found = true;
+                            foreach ($depts as $dept) {
+                                if ($option['label'] == $dept['label']) {
+                                    $found = false;
+                                    break;
+                                }
+                            }
+                            if ($found) {
+                                array_push($depts, $option);
+                            }
                         }
                     }
                 }
-
                 return message_success($depts);
             }
             return message_success([]);
@@ -640,19 +664,28 @@ class DistributionDepartmentController extends Controller
             ->stream();
     }
 
-    public function getImportPage($degree, $academic_year_id)
+    public function getImportPage($grade_id, $academic_year_id)
     {
-        return view('backend.distributionDepartment.import', compact('degree', 'academic_year_id'));
+        return view('backend.distributionDepartment.import', compact('grade_id', 'academic_year_id'));
     }
 
     public function importData(Request $request)
     {
         $this->validate($request, [
-            'file' => 'required'
+            'file' => 'required',
+            'academic_year_id' => 'required',
+            'grade_id' => 'required'
         ]);
         try {
-            DistributionDepartment::where('academic_year_id', (int) $request->academic_year_id)->delete();
-            DistributionDepartmentResult::where('academic_year_id', (int) $request->academic_year_id)->delete();
+            DistributionDepartment::where([
+                'academic_year_id' => (int)$request->academic_year_id,
+                'grade_id' => $request->grade_id
+            ])->delete();
+
+            DistributionDepartmentResult::where([
+                'academic_year_id' => (int)$request->academic_year_id,
+                'grade_id' => $request->grade_id
+            ])->delete();
 
             $file = $request->file('file');
             Excel::load($file, function ($reader) use ($request) {
@@ -669,10 +702,13 @@ class DistributionDepartmentController extends Controller
                     $priorities = array_except($row->toArray(), ['no', 'id_card', 'name', 'sex', 'score_year_i', 'score_year_ii']);
                     foreach ($priorities as $key => $value) {
                         $item['student_annual_id'] = $studentAnnual->id;
-                        $item['academic_year_id'] = (int) $request->academic_year_id;
+                        $item['academic_year_id'] = (int)$request->academic_year_id;
                         $item['score_1'] = $row['score_year_i'];
-                        $item['score_2'] = $row['score_year_ii'];
+                        if ($request->grade_id == 2) {
+                            $item['score_2'] = $row['score_year_ii'];
+                        }
                         $item['priority'] = $key;
+                        $item['grade_id'] = $request->grade_id;
 
                         $tmp = explode('_', $value);
                         if (count($tmp) > 1) {

@@ -19,31 +19,16 @@
           action="{{ route('distribution-department.generate') }}">
         {{ csrf_field() }}
         <input type="hidden" :value="academicYearSelected" name="academic_year_id"/>
+        <input type="hidden" value="{{ $grade_id }}" name="grade_id"/>
         <div class="box box-success">
             <div class="box-header with-border">
-                <div class="box-tools pull-right"
-                     v-if="academicYears !== null">
-                    <div class="row">
-                        <div class="col-md-12">
-                            <select class="form-control input-sm"
-                                    @change="getTotalStudentAnnuals"
-                                    v-model="academicYearSelected">
-                                <option :value="academicYear.id"
-                                        :key="key"
-                                        v-for="(academicYear, key) in academicYears">
-                                    @{{ academicYear.name_latin }}
-                                </option>
-                            </select>
-                        </div>
-                    </div>
-                </div>
-                <h3 class="box-title">New Distribution Department</h3>
+                <h3 class="box-title"><strong>New Distribution Department</strong></h3>
             </div>
 
             <div class="box-body">
                 <div class="row">
                     <div class="col-md-12">
-                        <h3 class="text-center"><strong>TOTAL STUDENT ANNUALS: @{{ totalStudentAnnuals }}</strong></h3>
+                        <h3 class="text-center"><strong>({{ $academic_year_id }} - {{ $grade_id == 2 ? 'II' : 'I' }}) TOTAL STUDENT ANNUALS: @{{ totalStudentAnnuals }}</strong></h3>
                     </div>
                     <div class="col-md-12"><hr/></div>
                     <div class="col-md-12">
@@ -74,7 +59,11 @@
                                     </div>
                                 </template>
                             </template>
-
+                        </div>
+                        <div class="row" v-else>
+                            <div class="col-md-12">
+                                <h3 class="text-center">There are no department</h3>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -85,16 +74,16 @@
             <div class="box-body">
                 <div class="pull-left">
                     <a href="{!! route('distribution-department.index') !!}"
-                       class="btn btn-danger btn-xs">{{ trans('buttons.general.cancel') }}</a>
+                       class="btn btn-danger btn-sm">{{ trans('buttons.general.cancel') }}</a>
                 </div>
 
                 <div class="pull-right">
                     <input type="submit"
                            id="submit_form"
-                           class="btn btn-primary btn-xs"
+                           class="btn btn-primary btn-sm"
                            value="Generate"/>
                     <a :href="'/admin/distribution-department/' + academicYearSelected + '/export'"
-                       class="btn btn-success btn-xs">
+                       class="btn btn-success btn-sm">
                         <i class="fa fa-file-excel-o"></i> Export
                     </a>
                 </div>
@@ -122,6 +111,7 @@
                     academicYears: null,
                     departments: null,
                     academicYearSelected: null,
+                    gradeId: null,
                     totalStudentAnnuals: 0
                 }
             },
@@ -139,13 +129,14 @@
                         .then((response) => {
                             this.academicYears = response.data.data
                             this.academicYearSelected = response.data.data[0].id
-                            this.getTotalStudentAnnuals()
+
                         })
                 },
                 getDepartmentChosen () {
                     toggleLoading(true)
                     axios.post('/admin/distribution-department/get-department-chosen', {
-                    	academic_year_id: this.academicYearSelected
+                    	academic_year_id: this.academicYearSelected,
+                        grade_id: this.grade_id
                     }).then((response) => {
                         this.departments = response.data.data
                         toggleLoading(false)
@@ -153,12 +144,14 @@
                 },
                 getTotalStudentAnnuals () {
                     toggleLoading(true)
-                    axios.post('/admin/distribution-department/get-total-student-annuals', {academic_year_id: this.academicYearSelected})
-                        .then((response) => {
-                            this.totalStudentAnnuals = response.data.data
-                            this.getDepartmentChosen()
-                            toggleLoading(false)
-                        })
+                    axios.post('/admin/distribution-department/get-total-student-annuals', {
+                        academic_year_id: this.academicYearSelected,
+                        grade_id: this.grade_id
+                    }).then((response) => {
+                        this.totalStudentAnnuals = response.data.data
+                        this.getDepartmentChosen()
+                        toggleLoading(false)
+                    })
                 },
                 makeChangeTotalStudentAnnuals (e) {
                     var value = parseFloat(e.target.value)
@@ -171,7 +164,9 @@
                 }
             },
             mounted () {
-                this.getAcademicYear()
+                this.academicYearSelected = '{{ $academic_year_id }}'
+                this.grade_id = '{{ $grade_id }}'
+                this.getTotalStudentAnnuals()
             }
         })
     </script>

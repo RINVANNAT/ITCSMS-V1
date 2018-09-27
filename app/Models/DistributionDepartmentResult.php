@@ -13,7 +13,8 @@ class DistributionDepartmentResult extends Model
         'department_option_id',
         'total_score',
         'priority',
-        'student_annual_id'
+        'student_annual_id',
+        'grade_id'
     ];
 
     protected $appends = [

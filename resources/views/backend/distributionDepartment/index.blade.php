@@ -25,7 +25,7 @@
             <h3 class="box-title">Distribution Department</h3>
             <div class="box-tools pull-right">
                 <a class="btn btn-primary btn-sm"
-                   href="{{ route('distribution-department.get-generate-page') }}">
+                   :href="'/admin/distribution-department/' + gradeId + '/' + academicYearSelected + '/get-generate-page'">
                     <i class="fa fa-refresh"></i> Generate</a>
                 <div class="btn-group">
                     <button type="button" class="btn btn-warning btn-sm dropdown-toggle" data-toggle="dropdown"
@@ -34,32 +34,32 @@
                     </button>
                     <ul class="dropdown-menu" role="menu">
                         <li>
-                            <a :href="'/admin/distribution-department/' + academicYearSelected + '/get-student-priority-department'"
+                            <a :href="'/admin/distribution-department/' + gradeId + '/' + academicYearSelected + '/get-student-priority-department'"
                                target="_blank">
                                 <i class="fa fa-download"></i> Export Student Priority Department
                             </a>
                         </li>
                         <li>
-                            <a :href="'/admin/distribution-department/' + academicYearSelected + '/export-all'"
+                            <a :href="'/admin/distribution-department/' + gradeId + '/' + academicYearSelected + '/export-all'"
                                target="_blank">
                                 <i class="fa fa-download"></i> Export Result All Departments
                             </a>
                         </li>
                         <li>
-                            <a :href="'/admin/distribution-department/' + academicYearSelected + '/export'"
+                            <a :href="'/admin/distribution-department/' + gradeId + '/' + academicYearSelected + '/export'"
                                target="_blank">
                                 <i class="fa fa-download"></i> Export Result Each Department
                             </a>
                         </li>
                         <li class="divider"></li>
                         <li>
-                            <a :href="'/admin/distribution-department/' + academicYearSelected + '/print-all'"
+                            <a :href="'/admin/distribution-department/' + gradeId + '/' + academicYearSelected + '/print-all'"
                                target="_blank">
                                 <i class="fa fa-print"></i> Print Result All Department
                             </a>
                         </li>
                         <li>
-                            <a :href="'/admin/distribution-department/' + academicYearSelected + '/print-each-department'"
+                            <a :href="'/admin/distribution-department/' + gradeId + '/' + academicYearSelected + '/print-each-department'"
                                target="_blank">
                                 <i class="fa fa-print"></i> Print Result Each Department
                             </a>
@@ -67,12 +67,12 @@
                         <li class="divider"></li>
                         <li>
                             <a :href="'/admin/distribution-department/2/' + academicYearSelected + '/get-import'">
-                                <i class="fa fa-database"></i> Import Student List Grade 2
+                                <i class="fa fa-database"></i> Import Student List Grade II
                             </a>
                         </li>
                         <li>
                             <a :href="'/admin/distribution-department/1/' + academicYearSelected + '/get-import'">
-                                <i class="fa fa-database"></i> Import Student List Grade 1
+                                <i class="fa fa-database"></i> Import Student List Grade I
                             </a>
                         </li>
                     </ul>
@@ -94,6 +94,13 @@
                                 </option>
                             </select>
                         </template>
+                        <select class="form-control input-sm"
+                                name="grade"
+                                v-model="gradeId"
+                                id="grade">
+                            <option value="1" selected>Grade I</option>
+                            <option value="2">Grade II</option>
+                        </select>
                     </form>
                 </div>
                 <div class="col-md-12">
@@ -139,6 +146,7 @@
 					type: 'GET',
 					data: function (d) {
 						d.academic_year_id = $('#academicYear').val()
+						d.grade_id = $('#grade').val()
 					}
 				},
 				columns: [
@@ -153,7 +161,7 @@
 				order: [[5, 'desc']]
 			})
 
-			$(document).on('change', '#academicYear', function (e) {
+			$(document).on('change', '#academicYear, #grade', function (e) {
 				oTable.draw()
 				e.preventDefault()
 			})
@@ -166,7 +174,8 @@
 			data() {
 				return {
 					academicYears: null,
-					academicYearSelected: 2018
+					academicYearSelected: 2018,
+                    gradeId: 1
 				}
 			},
 			methods: {

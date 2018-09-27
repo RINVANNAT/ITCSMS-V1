@@ -10,11 +10,15 @@ use Maatwebsite\Excel\Facades\Excel;
 
 trait StudentPriorityDepartmentTrait
 {
-    public function getStudentPriorityDepartment($academic_year_id)
+    public function getStudentPriorityDepartment($academic_year_id, $grade_id)
     {
+        $academic_year_id = (int)$academic_year_id;
+        $grade_id = (int)$grade_id;
+
         try {
             $amountDepartmentChosen = DistributionDepartment::where([
-                'academic_year_id' => $academic_year_id
+                'academic_year_id' => $academic_year_id,
+                'grade_id' => $grade_id
             ])
                 ->select('student_annual_id', DB::raw('COUNT(priority) as priority'))
                 ->groupBy('student_annual_id')
@@ -25,7 +29,8 @@ trait StudentPriorityDepartmentTrait
             }
 
             $studentDistributeDepartments = DistributionDepartment::where([
-                'distribution_departments.academic_year_id' => $academic_year_id
+                'distribution_departments.academic_year_id' => $academic_year_id,
+                'distribution_departments.grade_id' => $grade_id
             ])
                 ->join('studentAnnuals', 'studentAnnuals.id', '=', 'distribution_departments.student_annual_id')
                 ->join('students', 'students.id', '=', 'studentAnnuals.student_id')

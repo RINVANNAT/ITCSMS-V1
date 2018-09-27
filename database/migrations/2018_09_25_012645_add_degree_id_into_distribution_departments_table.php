@@ -15,6 +15,10 @@ class AddDegreeIdIntoDistributionDepartmentsTable extends Migration
         Schema::table('distribution_departments', function (Blueprint $table) {
             $table->integer('grade_id')->after('academic_year_id')->default(2);
         });
+
+        Schema::table('distribution_department_results', function (Blueprint $table) {
+            $table->integer('grade_id')->after('academic_year_id')->default(2);
+        });
     }
 
     /**
@@ -25,6 +29,10 @@ class AddDegreeIdIntoDistributionDepartmentsTable extends Migration
     public function down()
     {
         Schema::table('distribution_departments', function (Blueprint $table) {
+            $table->dropColumn('grade_id');
+        });
+
+        Schema::table('distribution_department_results', function (Blueprint $table) {
             $table->dropColumn('grade_id');
         });
     }
