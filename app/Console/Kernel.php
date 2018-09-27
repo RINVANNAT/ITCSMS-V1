@@ -2,6 +2,7 @@
 
 namespace App\Console;
 
+use App\Console\Commands\DistributionDepartmentGradeIConsole;
 use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Foundation\Console\Kernel as ConsoleKernel;
 
@@ -21,6 +22,7 @@ class Kernel extends ConsoleKernel
         Commands\LogDemo::class,
         Commands\SetOriginalScoreToDistributionDepartmentConsole::class,
         Commands\Backend\Schedule\Timetable\CreateTimetablePermissionConsole::class,
+        DistributionDepartmentGradeIConsole::class,
     ];
 
     /**
