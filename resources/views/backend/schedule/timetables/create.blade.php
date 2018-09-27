@@ -5,8 +5,8 @@
 @section('page-header')
 
     <h1>
-        {{ trans('labels.backend.schedule.timetable.title') }}
-        <small>{{ trans('labels.backend.schedule.timetable.sub_index_title') }}</small>
+        Schedule
+        <small>Timetable</small>
     </h1>
 
 @endsection
@@ -45,7 +45,6 @@
                 <div class="box-header with-border">
                     <div class="mailbox-controls">
                         <div class="pull-right">
-
                             <div class="btn-group">
                                 <button class="btn btn-warning dropdown-toggle btn-sm"
                                         data-toggle="dropdown"
@@ -54,11 +53,11 @@
                                     <span class="fa fa-cog"></span>
                                 </button>
                                 <ul class="dropdown-menu">
-                                    <li><a href="javascript:void(0)"><label><input type="checkbox" id="filter_language" checked name="filter_language"/> Show language session</label></a></li>
+                                    <li><a href="javascript:void(0)"><label><input type="checkbox" id="filter_language" checked name="filter_language"/> Show Language Session</label></a></li>
                                     <li><a href="javascript:void(0)"><label><input type="checkbox" id="filter_alphabet_group" name="filter_alphabet_group"/> Get Alphabet Group</label></a></li>
                                     <li><a href="javascript:void(0)"><label><input type="checkbox" id="filter_number_group" name="filter_number_group"/> Get Number Group</label></a></li>
                                     <li role="separator" class="divider"></li>
-                                    <li><a href="javascript:void(0)"><label><input type="checkbox"/> Other Option</label></a></li>
+                                    <li><a href="javascript:void(0)"><label><input type="checkbox"/> Others</label></a></li>
                                 </ul>
                             </div>
 
@@ -97,16 +96,6 @@
                             </a>
                             @endauth
 
-                            @permission('save-change-timetable')
-                            <a href="#">
-                                <button class="btn btn-danger btn-sm"
-                                        data-toggle="tooltip"
-                                        data-placement="top"
-                                        title="{{ trans('buttons.backend.schedule.timetable.save_change') }}">
-                                    {{ trans('buttons.backend.schedule.timetable.save_change') }}
-                                </button>
-                            </a>
-                            @endauth
                         </div>
 
                         <form name="options-filter"
@@ -124,11 +113,8 @@
                             <div id="timetable" class="view-timetable"></div>
                         </div>
                         <div class="col-md-3 col-sm-12 col-xs-12">
-
                             @include('backend.schedule.timetables.includes.partials.courses-sessions')
-
                             @include('backend.schedule.timetables.includes.partials.rooms')
-
                         </div>
                     </div>
                     <div class="clearfix"></div>
@@ -137,7 +123,6 @@
             </div>
         </div>
     </div>
-
     @include('backend.schedule.timetables.includes.modals.clone')
 @stop
 

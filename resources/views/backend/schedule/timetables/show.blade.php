@@ -172,7 +172,7 @@
                             }
                         }
                         else {
-                            object += '<p class="text-primary">' + (event.employee !== [] ? event.employee.name_latin : "NO LECTURER") + '</p> ';
+                            object += '<p class="text-primary">' + (event.employee !== null ? event.employee.name_latin : "NO LECTURER") + '</p> ';
                         }
 
 
