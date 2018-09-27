@@ -9,6 +9,7 @@ use App\Models\Department;
 use App\Models\DepartmentOption;
 use App\Models\DistributionDepartment;
 use App\Models\DistributionDepartmentResult;
+use App\Models\Grade;
 use App\Models\StudentAnnual;
 use Barryvdh\Snappy\Facades\SnappyPdf;
 use Illuminate\Http\Request;
@@ -601,21 +602,29 @@ class DistributionDepartmentController extends Controller
         });
     }
 
-    public function printEachDepartment(Request $request)
+    public function printEachDepartment($grade_id, $academic_year_id)
     {
-        $academicYear = AcademicYear::find($request->academic_year_id);
+        $academicYear = AcademicYear::find($academic_year_id);
+        $grade = Grade::find($grade_id);
 
-        $studentAnnualId = DistributionDepartment::where('academic_year_id', $request->academic_year_id)
-            ->first();
+        $studentAnnualId = DistributionDepartment::where([
+            'academic_year_id' => $academic_year_id,
+            'grade_id' => $grade_id
+        ])->first();
+
         $data = [];
         if ($studentAnnualId instanceof DistributionDepartment) {
             $studentAnnualId = $studentAnnualId->student_annual_id;
-            $distributionDepartment = DistributionDepartment::where('student_annual_id', $studentAnnualId)
-                ->get();
+            $distributionDepartment = DistributionDepartment::where([
+                'student_annual_id' => $studentAnnualId,
+                'academic_year_id' => $academicYear->id,
+                'grade_id' => $grade->id
+            ])->get();
             foreach ($distributionDepartment as $item) {
 
                 $result = DistributionDepartmentResult::where([
                     'distribution_department_results.academic_year_id' => $academicYear->id,
+                    'distribution_department_results.grade_id' => $grade->id,
                     'distribution_department_results.department_id' => $item->department_id
                 ]);
 
@@ -635,7 +644,7 @@ class DistributionDepartmentController extends Controller
         }
 
         if (count($data) > 0) {
-            return SnappyPdf::loadView('backend.distributionDepartment.print-each-department', compact('academicYear', 'data'))
+            return SnappyPdf::loadView('backend.distributionDepartment.print-each-department', compact('academicYear', 'grade', 'data'))
                 ->setOption('encoding', 'utf-8')
                 ->stream();
         } else {
@@ -643,13 +652,14 @@ class DistributionDepartmentController extends Controller
         }
     }
 
-    public function printAll(Request $request)
+    public function printAll($grade_id, $academic_year_id)
     {
-        $academicYear = AcademicYear::find($request->academic_year_id);
-        $academic_year_id = $request->academic_year_id;
+        $academicYear = AcademicYear::find($academic_year_id);
+        $grade = Grade::find($grade_id);
 
         $result = DistributionDepartmentResult::where([
-            'distribution_department_results.academic_year_id' => $academic_year_id,
+            'distribution_department_results.academic_year_id' => $academicYear->id,
+            'distribution_department_results.grade_id' => $grade->id
         ])
             ->join('studentAnnuals', 'studentAnnuals.id', '=', 'distribution_department_results.student_annual_id')
             ->join('departments', 'departments.id', '=', 'distribution_department_results.department_id')
@@ -659,9 +669,13 @@ class DistributionDepartmentController extends Controller
             ->orderBy('students.name_latin', 'asc')
             ->get();
 
-        return SnappyPdf::loadView('backend.distributionDepartment.print-all', compact('academicYear', 'result'))
-            ->setOption('encoding', 'utf-8')
-            ->stream();
+        if (count($result) > 0) {
+            return SnappyPdf::loadView('backend.distributionDepartment.print-all', compact('academicYear', 'grade', 'result'))
+                ->setOption('encoding', 'utf-8')
+                ->stream();
+        } else {
+            return redirect()->back()->withFlashInfo('No data are found! Verify your academic already has student!');
+        }
     }
 
     public function getImportPage($grade_id, $academic_year_id)
@@ -700,7 +714,9 @@ class DistributionDepartmentController extends Controller
 
                     $chosen = [];
                     $priorities = array_except($row->toArray(), ['no', 'id_card', 'name', 'sex', 'score_year_i', 'score_year_ii']);
+
                     foreach ($priorities as $key => $value) {
+                        // set value
                         $item['student_annual_id'] = $studentAnnual->id;
                         $item['academic_year_id'] = (int)$request->academic_year_id;
                         $item['score_1'] = $row['score_year_i'];
@@ -710,17 +726,19 @@ class DistributionDepartmentController extends Controller
                         $item['priority'] = $key;
                         $item['grade_id'] = $request->grade_id;
 
-                        $tmp = explode('_', $value);
-                        if (count($tmp) > 1) {
-                            $item['department_id'] = $tmp[0];
-                            $item['department_option_id'] = $tmp[1];
-                        } else {
-                            $item['department_id'] = $value;
-                            $item['department_option_id'] = null;
+                        if (!is_null($value)) {
+                            // explode priorities
+                            $tmp = explode('_', $value);
+                            if (count($tmp) > 1) {
+                                $item['department_id'] = $tmp[0];
+                                $item['department_option_id'] = $tmp[1];
+                            } else {
+                                $item['department_id'] = $value;
+                                $item['department_option_id'] = null;
+                            }
+                            array_push($chosen, $item);
                         }
-                        array_push($chosen, $item);
                     }
-
                     foreach ($chosen as $item) {
                         DistributionDepartment::create($item);
                     }

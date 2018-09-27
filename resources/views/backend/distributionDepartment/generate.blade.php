@@ -32,7 +32,7 @@
                     </div>
                     <div class="col-md-12"><hr/></div>
                     <div class="col-md-12">
-                        <div class="form-group row" v-if="departments !== null">
+                        <div class="form-group row" v-if="departments !== null && departments.length > 0">
                             <template v-for="(eachDepartment, keyDept) in departments">
                                 <div class="col-md-3"
                                      :key="keyDept"
@@ -62,7 +62,11 @@
                         </div>
                         <div class="row" v-else>
                             <div class="col-md-12">
-                                <h3 class="text-center">There are no department</h3>
+                                <div class="alert alert-info" role="alert">
+                                    <span class="glyphicon glyphicon-exclamation-sign" aria-hidden="true"></span>
+                                    <span class="sr-only">Error:</span>
+                                    There are no department
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -82,10 +86,10 @@
                            id="submit_form"
                            class="btn btn-primary btn-sm"
                            value="Generate"/>
-                    <a :href="'/admin/distribution-department/' + academicYearSelected + '/export'"
+                    {{--<a :href="'/admin/distribution-department/' + academicYearSelected + '/export'"
                        class="btn btn-success btn-sm">
                         <i class="fa fa-file-excel-o"></i> Export
-                    </a>
+                    </a>--}}
                 </div>
                 <div class="clearfix"></div>
             </div>

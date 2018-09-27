@@ -39,10 +39,10 @@
                             <hr/>
                         </div>
                         <div class="form-group">
-                            <button class="btn btn-primary btn-xs">
-                                <i class="fa fa-database"></i> Store
+                            <button class="btn btn-primary btn-sm">
+                                <i class="fa fa-database"></i> Restore
                             </button>
-                            <a href="{{ route('distribution-department.index') }}" class="btn btn-danger btn-xs">
+                            <a href="{{ route('distribution-department.index') }}" class="btn btn-danger btn-sm">
                                 <i class="fa fa-times-circle"></i> Cancel
                             </a>
                         </div>

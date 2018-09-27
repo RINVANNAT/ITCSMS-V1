@@ -22,7 +22,7 @@
 @section('content')
     <div class="box box-success">
         <div class="box-header with-border">
-            <h3 class="box-title">Distribution Department Results</h3>
+            <h3 class="box-title">Distribution Department Result</h3>
             <div class="box-tools pull-right">
                 <a class="btn btn-primary btn-sm"
                    :href="'/admin/distribution-department/' + gradeId + '/' + academicYearSelected + '/get-generate-page'">
@@ -66,13 +66,8 @@
                         </li>
                         <li class="divider"></li>
                         <li>
-                            <a :href="'/admin/distribution-department/2/' + academicYearSelected + '/get-import'">
-                                <i class="fa fa-database"></i> Import Student List Grade II
-                            </a>
-                        </li>
-                        <li>
-                            <a :href="'/admin/distribution-department/1/' + academicYearSelected + '/get-import'">
-                                <i class="fa fa-database"></i> Import Student List Grade I
+                            <a :href="'/admin/distribution-department/' + gradeId + '/' + academicYearSelected + '/get-import'">
+                                <i class="fa fa-database"></i> Import Student List
                             </a>
                         </li>
                     </ul>
@@ -175,7 +170,7 @@
 				return {
 					academicYears: null,
 					academicYearSelected: 2018,
-                    gradeId: 1
+					gradeId: 1
 				}
 			},
 			methods: {

@@ -63,22 +63,20 @@
     <div class="container">
         <div class="row">
             <div class="col-xs-12">
-                <h3 class="title text-center text-bold">បំនែងចែកដេប៉ាតឺម៉ងថ្នាក់ឆ្នាំទី៣</h3>
+                <h3 class="title text-center text-bold">បំនែងចែកដេប៉ាតឺម៉ងថ្នាក់ឆ្នាំទី  {{ $grade->id == 1 ? '២' : '៣' }}</h3>
                 <h4 class="sub-title text-center text-bold">ឆ្នាំសិក្សា {{ $academicYear->name_kh }}</h4>
             </div>
             <div class="col-xs-12">
                 <table>
-                    <thead>
-                    <tr style="background: #dddddd !important;">
-                        <th width="20px;">ល.រ</th>
-                        <th width="35px;">អត្តលេខ</th>
-                        <th>គោត្តនាម និង នាមខ្លួន</th>
-                        <th>ភេទ</th>
-                        <th>ដេប៉ាតឺម៉ង់</th>
-                        <th>សេចក្តីផ្សេងៗ</th>
-                    </tr>
-                    </thead>
                     <tbody>
+                        <tr style="background: #dddddd !important;">
+                            <th width="20px;">ល.រ</th>
+                            <th width="35px;">អត្តលេខ</th>
+                            <th>គោត្តនាម និង នាមខ្លួន</th>
+                            <th>ភេទ</th>
+                            <th>ដេប៉ាតឺម៉ង់</th>
+                            <th>សេចក្តីផ្សេងៗ</th>
+                        </tr>
                         @foreach($result as $key => $item)
                             <tr>
                                 <td class="text-center">{{ $key+1 }}</td>
