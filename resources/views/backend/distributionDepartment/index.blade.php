@@ -22,7 +22,7 @@
 @section('content')
     <div class="box box-success">
         <div class="box-header with-border">
-            <h3 class="box-title">Distribution Department</h3>
+            <h3 class="box-title">Distribution Department Results</h3>
             <div class="box-tools pull-right">
                 <a class="btn btn-primary btn-sm"
                    :href="'/admin/distribution-department/' + gradeId + '/' + academicYearSelected + '/get-generate-page'">
